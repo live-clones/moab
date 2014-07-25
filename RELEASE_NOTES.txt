@@ -1,0 +1,21 @@
+Version 3.1  (SIGMA v1.0)
+=========================
+See details on compatibility with dependent libraries in NEWS section of http://sigma.mcs.anl.gov
+
+A. BUG FIXES
+------------
+
+ 1. Miscellaneous warning fixes exposed through Buildbot
+ 2. Fix some stack smashing bugs
+ 3. Added [Doxygen support][http://ftp.mcs.anl.gov/pub/fathom/lasso-docs] with nightly API built from repository
+ 4. Better flag determination during configuration
+
+B. NEW FEATURES
+--------------
+  None
+
+C. API CHANGES
+--------------
+  None
+
+
