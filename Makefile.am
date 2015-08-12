@@ -73,7 +73,9 @@ examples_advanced_DATA = \
                examples/advanced/ExtrudePoly.cpp \
                examples/advanced/GenLargeMesh.cpp \
                examples/advanced/LloydRelaxation.cpp \
-               examples/advanced/VisTags.cpp
+               examples/advanced/VisTags.cpp \
+               examples/advanced/NearestNeighborSearch.cpp \
+               examples/advanced/nanoflann.hpp
 examples_fortrandir = $(datadir)/examples/fortran
 examples_fortran_DATA = \
                examples/fortran/makefile \
