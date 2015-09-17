@@ -121,6 +121,12 @@ else
   dagmc_DIR = 
 endif 
 
+if ENABLE_mesquite
+  mesquite_DIR = mesquite
+else
+  mesquite_DIR = 
+endif
+
 if PARALLEL
   parread = parread
 else
@@ -156,7 +162,8 @@ SUBDIRS = . \
           $(mbzoltan_DIR) \
           $(mcnpmit_DIR) \
           $(vtkMOABReader_DIR) \
-          $(dagmc_DIR) 
+          $(dagmc_DIR) \
+          $(mesquite_DIR)
 
 mbconvert_SOURCES = convert.cpp
 mbmerge_SOURCES = merge.cpp
