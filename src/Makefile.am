@@ -20,7 +20,6 @@ libMOAB_la_LIBADD += io/libmoabio.la LocalDiscretization/libLocalDiscretization.
 if ENABLE_mesquite
 SUBDIRS += mesquite
 endif
-DIST_SUBDIRS = $(SUBDIRS)
 
 # Some variables
 AM_CPPFLAGS += -DIS_BUILDING_MB \

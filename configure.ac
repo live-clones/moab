@@ -1237,6 +1237,8 @@ AC_SUBST([EXPORT_LDFLAGS])
 AC_CONFIG_HEADERS([src/moab/Version.h
                    src/moab/EntityHandle.hpp
                    src/parallel/moab_mpi_config.h
+                   src/mesquite/include/mesquite_config.h
+                   src/mesquite/include/mesquite_version.h
                    src/moab/MOABConfig.h:config/MOABConfig.h.in])
 AX_PREFIX_CONFIG_H([src/moab/MOABConfig.h],[MOAB],[src/moab/MOABConfig.h])
 
@@ -1287,6 +1289,48 @@ AC_CONFIG_FILES([Makefile
                  MeshFiles/unittest/mbcslam/Makefile
                  MeshFiles/unittest/h5file/Makefile
                  MeshFiles/examples/Makefile
+                 ])
+
+# Specify the headers to create for mesquite
+AC_CONFIG_FILES([src/mesquite/Makefile
+                 itaps/mesquite/Makefile
+                 test/mesquite/Makefile
+                 test/mesquite/meshfiles.h
+                 test/mesquite/ActiveSetTest/Makefile
+                 test/mesquite/algorithm_test/Makefile
+                 test/mesquite/analytical_grad_3D/Makefile
+                 test/mesquite/convert/Makefile
+                 test/mesquite/benchmark_tests/Makefile
+                 test/mesquite/paraboloid_domain_test/Makefile
+                 test/mesquite/headers/Makefile
+                 test/mesquite/idft_time/Makefile
+                 test/mesquite/igeom/Makefile
+                 test/mesquite/imesh/Makefile
+                 test/mesquite/jacobi/Makefile
+                 test/mesquite/laplacian_test/Makefile
+                 test/mesquite/laplacian_polygon_test/Makefile
+                 test/mesquite/nongradient_test/Makefile
+                 test/mesquite/pyramid/Makefile
+                 test/mesquite/simple_hybrid_test/Makefile
+                 test/mesquite/test_1/Makefile
+                 test/mesquite/transform/Makefile
+                 test/mesquite/tutorial/Makefile
+                 test/mesquite/tutorial/tutorial.make
+                 test/mesquite/unit/Makefile
+                 test/mesquite/untangle_test/Makefile
+                 test/mesquite/parallel_untangle_shape/Makefile 
+                 test/mesquite/parallel_smooth_laplace/Makefile
+                 test/mesquite/wedge/Makefile
+                 test/mesquite/wrapper_tests/Makefile
+                 test/mesquite/2d_target/Makefile
+                 test/mesquite/2d_metrics/Makefile
+                 test/mesquite/2d_formulation/Makefile
+                 test/mesquite/synchronous/Makefile
+                 test/mesquite/high_aspect_ratio/Makefile
+                 test/mesquite/higher_order/Makefile
+                 test/mesquite/slaved/Makefile
+                 tools/mesquite/Makefile
+                 MeshFiles/mesquite/Makefile
                  ])
 
 # DISTCHECK_CONFIGURE_FLAGS="$USER_CONFIGURE_CMD"
