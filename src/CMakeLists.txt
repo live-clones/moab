@@ -27,6 +27,10 @@ add_subdirectory(io)
 add_subdirectory(LocalDiscretization)
 # add_subdirectory(oldinc)
 
+if (ENABLE_MESQUITE AND MOAB_HAVE_CGM)
+  add_subdirectory(mesquite)
+endif(ENABLE_MESQUITE AND MOAB_HAVE_CGM)
+
 if( MOAB_HAVE_HDF5 )
   include_directories(${HDF5_INCLUDES})
   set( MOAB_HDF_LIBS ${HDF5_LIBRARIES} )
