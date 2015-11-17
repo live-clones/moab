@@ -21,6 +21,16 @@ namespace moab{
   /**********************
     *  AHF related routines   *
     *********************/
+  ErrorCode RefineSlabs::get_adjacencies(const EntityHandle source_entity,
+                                          const unsigned int target_dimension,
+                                          std::vector<EntityHandle> &target_entities)
+  {
+    ErrorCode error;
+    error = ahf->get_adjacencies(source_entity, target_dimension, target_entities); MB_CHK_ERR(error);
+
+    return MB_SUCCESS;
+  }
+
   ErrorCode RefineSlabs::estimate_allocate_ahf_maps( size_t num_hexes_memory_estimate )
   {
     ErrorCode error;

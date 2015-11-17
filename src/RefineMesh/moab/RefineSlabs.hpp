@@ -144,6 +144,11 @@ namespace moab
     /******************************************
       *  Updating the Mesh Data Structure: AHF maps   *
       *****************************************/
+    //Adjacency routines
+    ErrorCode get_adjacencies(const EntityHandle source_entity,
+                              const unsigned int target_dimension,
+                              std::vector<EntityHandle> &target_entities);
+
     //Estimate #refined hexes and allocate memory for new entities
      ErrorCode estimate_allocate_ahf_maps( size_t num_hexes_memory_estimate );
 
