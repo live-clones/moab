@@ -79,7 +79,7 @@ ErrorCode test_adjacencies(Interface *mbImpl, RefineSlabs &rs, Range all_ents)
       //IQ1: For every vertex, obtain incident edges
       for (Range::iterator i = verts.begin(); i != verts.end(); ++i) {
           adjents.clear(); mbents.clear(); ahfents.clear();
-          error = rs->get_adjacencies( *i, 1, adjents);  CHECK_ERR(error);
+          error = rs.get_adjacencies( *i, 1, adjents);  CHECK_ERR(error);
           error = mbImpl->get_adjacencies( &*i, 1, 1, false, mbents ); CHECK_ERR(error);
           CHECK_EQUAL(adjents.size(),mbents.size());
           std::sort(adjents.begin(), adjents.end());
@@ -91,7 +91,7 @@ ErrorCode test_adjacencies(Interface *mbImpl, RefineSlabs &rs, Range all_ents)
       //NQ1:  For every edge, obtain neighbor edges
       for (Range::iterator i = edges.begin(); i != edges.end(); ++i) {
           adjents.clear(); mbents.clear(); ahfents.clear();
-          error = rs->get_adjacencies( *i, 1, adjents); CHECK_ERR(error);
+          error = rs.get_adjacencies( *i, 1, adjents); CHECK_ERR(error);
           error = mtu.get_bridge_adjacencies( *i, 0, 1, mbents); CHECK_ERR(error);
           CHECK_EQUAL(adjents.size(), mbents.size());
           std::sort(adjents.begin(), adjents.end());
@@ -106,7 +106,7 @@ ErrorCode test_adjacencies(Interface *mbImpl, RefineSlabs &rs, Range all_ents)
       // IQ21: For every vertex, obtain incident faces
       for (Range::iterator i = verts.begin(); i != verts.end(); ++i) {
           adjents.clear(); mbents.clear(); ahfents.clear();
-          error = rs->get_adjacencies( *i, 2, adjents); CHECK_ERR(error);
+          error = rs.get_adjacencies( *i, 2, adjents); CHECK_ERR(error);
           error = mbImpl->get_adjacencies( &*i, 1, 2, false, mbents); CHECK_ERR(error);
           CHECK_EQUAL(adjents.size(), mbents.size());
           std::sort(adjents.begin(), adjents.end());
@@ -119,7 +119,7 @@ ErrorCode test_adjacencies(Interface *mbImpl, RefineSlabs &rs, Range all_ents)
       if (!edges.empty()){
           for (Range::iterator i = edges.begin(); i != edges.end(); ++i) {
               adjents.clear(); mbents.clear(); ahfents.clear();
-              error = rs->get_adjacencies( *i, 2, adjents);
+              error = rs.get_adjacencies( *i, 2, adjents);
               CHECK_ERR(error);
               error = mbImpl->get_adjacencies( &*i, 1, 2, false, mbents);
               CHECK_ERR(error);
@@ -134,7 +134,7 @@ ErrorCode test_adjacencies(Interface *mbImpl, RefineSlabs &rs, Range all_ents)
       //NQ2: For every face, obtain neighbor faces
       for (Range::iterator i = faces.begin(); i != faces.end(); ++i) {
           adjents.clear(); mbents.clear(); ahfents.clear();
-          error = rs->get_adjacencies( *i, 2, adjents); CHECK_ERR(error);
+          error = rs.get_adjacencies( *i, 2, adjents); CHECK_ERR(error);
           error = mtu.get_bridge_adjacencies( *i, 1, 2, mbents); CHECK_ERR(error);
           CHECK_EQUAL(adjents.size(), mbents.size());
           std::sort(adjents.begin(), adjents.end());
@@ -146,7 +146,7 @@ ErrorCode test_adjacencies(Interface *mbImpl, RefineSlabs &rs, Range all_ents)
       if (!edges.empty()){
           for (Range::iterator i = faces.begin(); i != faces.end(); ++i) {
               adjents.clear(); mbents.clear(); ahfents.clear();
-              error = rs->get_adjacencies( *i, 1, adjents);
+              error = rs.get_adjacencies( *i, 1, adjents);
               CHECK_ERR(error);
               error = mbImpl->get_adjacencies( &*i, 1, 1, false, mbents);
               CHECK_ERR(error);
@@ -164,7 +164,7 @@ ErrorCode test_adjacencies(Interface *mbImpl, RefineSlabs &rs, Range all_ents)
       //IQ 31: For every vertex, obtain incident cells
       for (Range::iterator i = verts.begin(); i != verts.end(); ++i) {
           adjents.clear(); mbents.clear(); ahfents.clear();
-          error = rs->get_adjacencies( *i, 3, adjents); CHECK_ERR(error);
+          error = rs.get_adjacencies( *i, 3, adjents); CHECK_ERR(error);
           error = mbImpl->get_adjacencies(&*i, 1, 3, false, mbents); CHECK_ERR(error);
           CHECK_EQUAL(adjents.size(), mbents.size());
           std::sort(adjents.begin(), adjents.end());
@@ -177,7 +177,7 @@ ErrorCode test_adjacencies(Interface *mbImpl, RefineSlabs &rs, Range all_ents)
         {
           for (Range::iterator i = edges.begin(); i != edges.end(); ++i) {
               adjents.clear(); mbents.clear(); ahfents.clear();
-              error = rs->get_adjacencies( *i, 3, adjents);
+              error = rs.get_adjacencies( *i, 3, adjents);
               CHECK_ERR(error);
               error = mbImpl->get_adjacencies(&*i, 1, 3, false, mbents);
               CHECK_ERR(error);
@@ -193,7 +193,7 @@ ErrorCode test_adjacencies(Interface *mbImpl, RefineSlabs &rs, Range all_ents)
         {
           for (Range::iterator i = faces.begin(); i != faces.end(); ++i) {
               adjents.clear(); mbents.clear(); ahfents.clear();
-              error = rs->get_adjacencies( *i, 3, adjents);
+              error = rs.get_adjacencies( *i, 3, adjents);
               CHECK_ERR(error);
               error = mbImpl->get_adjacencies(&*i, 1, 3, false, mbents);
               CHECK_ERR(error);
@@ -208,7 +208,7 @@ ErrorCode test_adjacencies(Interface *mbImpl, RefineSlabs &rs, Range all_ents)
       //NQ3: For every cell, obtain neighbor cells
       for (Range::iterator i = cells.begin(); i != cells.end(); ++i) {
           adjents.clear(); mbents.clear(); ahfents.clear();
-          error = rs->get_adjacencies( *i, 3, adjents); CHECK_ERR(error);
+          error = rs.get_adjacencies( *i, 3, adjents); CHECK_ERR(error);
           error = mtu.get_bridge_adjacencies( *i, 2, 3, mbents); CHECK_ERR(error);
           CHECK_EQUAL(adjents.size(), mbents.size());
           std::sort(adjents.begin(), adjents.end());
@@ -221,7 +221,7 @@ ErrorCode test_adjacencies(Interface *mbImpl, RefineSlabs &rs, Range all_ents)
         {
           for (Range::iterator i = cells.begin(); i != cells.end(); ++i) {
               adjents.clear(); mbents.clear(); ahfents.clear();
-              error = rs->get_adjacencies( *i, 1, adjents);
+              error = rs.get_adjacencies( *i, 1, adjents);
               CHECK_ERR(error);
               error = mbImpl->get_adjacencies( &*i, 1, 1, false, mbents);
               CHECK_ERR(error);
@@ -237,7 +237,7 @@ ErrorCode test_adjacencies(Interface *mbImpl, RefineSlabs &rs, Range all_ents)
         {
           for (Range::iterator i = cells.begin(); i != cells.end(); ++i) {
               adjents.clear(); mbents.clear(); ahfents.clear();
-              error = rs->get_adjacencies( *i, 2, adjents);
+              error = rs.get_adjacencies( *i, 2, adjents);
               CHECK_ERR(error);
               error = mbImpl->get_adjacencies( &*i, 1, 2, false, mbents);
               CHECK_ERR(error);
