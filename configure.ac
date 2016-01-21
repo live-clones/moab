@@ -986,6 +986,8 @@ fi
 
 MB_OPTIONAL_TOOL([refiner],      [no], [no])
 MB_OPTIONAL_TOOL([h5mtools],     [${enablehdf5}], [${enablehdf5}])
+MB_OPTIONAL_TOOL([mbcslam],      [no], [yes])
+MB_OPTIONAL_TOOL([mbmeshtogeom],    [yes], [yes])
 MB_OPTIONAL_TOOL([mbquality],    [yes], [yes])
 
 MB_OPTIONAL_TOOL([ahf],          [yes], [yes])
