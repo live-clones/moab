@@ -11,6 +11,10 @@ if ENABLE_imesh
  LDADD+= $(top_builddir)/itaps/imesh/libiMesh.la
 endif
 
+if ENABLE_irel
+ LDADD+= $(top_builddir)/itaps/irel/libiRel.la
+endif
+
 if HAVE_CGM
   AM_CPPFLAGS += $(CGM_CPPFLAGS)
 if USING_DEV_CGM
@@ -171,6 +175,12 @@ if HAVE_CGM
     LIBS += ${CGM_LIBS}
     TEST_DEPS += ${CGM_DIR}/lib/libiGeom.la
 endif
+
+if ENABLE_irel
+    AM_CPPFLAGS += -DENABLE_IREL -I$(top_srcdir)/itaps/irel
+    TEST_DEPS += $(top_builddir)/itaps/irel/libiRel.la
+endif
+
 TEST_DEPS += ${MOAB_CXX_LINKFLAGS} ${MOAB_CXX_LIBS}
 
 if ENABLE_mbumr
