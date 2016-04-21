@@ -1,6 +1,6 @@
 cmake_minimum_required( VERSION 2.8.12 )
 SET(PACKAGE_NAME "MOAB")
-SET(PACKAGE_VERSION "4.9.1pre")
+SET(PACKAGE_VERSION "4.9.2pre")
 
 if (NOT WIN32)
   #This all breaks on windows.
@@ -102,8 +102,8 @@ option ( ENABLE_CGM        "Should build with CGM support?"                  OFF
 option ( ENABLE_CGNS       "Should build with CGNS support?"                 OFF )
 option ( ENABLE_MPI        "Should MOAB be compiled with MPI support?"       OFF )
 option ( ENABLE_HDF5       "Include HDF I/O interfaces in the build?"                   OFF )
-option ( ENABLE_NETCDF     "Include NetCDF support (ExodusII) interfaces in the build?" OFF )
-option ( ENABLE_PNETCDF    "Include parallel NetCDF support (ExodusII) interfaces in the build?" OFF )
+option ( ENABLE_NETCDF     "Include NetCDF (ExodusII) interfaces in the build?" OFF )
+option ( ENABLE_PNETCDF    "Include PNetCDF interfaces in the build (Requires NetCDF) ?" OFF )
 option ( ENABLE_METIS      "Include Metis support for partitioning algorithms?" OFF )
 option ( ENABLE_PARMETIS   "Include ParMetis support for partitioning algorithms?" OFF )
 option ( ENABLE_ZOLTAN     "Include Zoltan support for partitioning algorithms?" OFF )
@@ -230,6 +230,7 @@ if ( ENABLE_NETCDF )
   find_package( NetCDF REQUIRED )
   # set( MOAB_DEFINES "-DNETCDF_FILE ${MOAB_DEFINES}" )
   set (MOAB_HAVE_NETCDF 1)
+  set (MOAB_HAVE_NETCDF_H 1)
   include_directories( ${NETCDF_INCLUDES} )
   set( MOAB_LIBS ${MOAB_LIBS} ${NETCDF_LIBRARIES} )
   # 
@@ -334,10 +335,35 @@ CONFIGURE_FILE(
     IMMEDIATE @ONLY
     )
 
+if ( ENABLE_IMESH OR ENABLE_FBIGEOM )
+  enable_language(Fortran)
+
+  # Include CMake's Fortran mangling evaluation macros
+  include(FortranCInterface)
+
+  if ("${FortranCInterface_GLOBAL_CASE}" MATCHES "UPPER")
+    set(FC_CASE "NAME")
+  else ("${FortranCInterface_GLOBAL_CASE}" MATCHES "UPPER")
+    set(FC_CASE "name")
+  endif ("${FortranCInterface_GLOBAL_CASE}" MATCHES "UPPER")
+  if (NOT "${FortranCInterface_GLOBAL_SUFFIX}" STREQUAL "")
+    set(FortranCInterface_GLOBAL_SUFFIX "## ${FortranCInterface_GLOBAL_SUFFIX}")
+  endif (NOT "${FortranCInterface_GLOBAL_SUFFIX}" STREQUAL "")
+  if (NOT "${FortranCInterface_GLOBAL__SUFFIX}" STREQUAL "")
+    set(FortranCInterface_GLOBAL__SUFFIX "## ${FortranCInterface_GLOBAL__SUFFIX}")
+  endif (NOT "${FortranCInterface_GLOBAL__SUFFIX}" STREQUAL "")
+ 
+  set(MOAB_F77_FUNC  "${FortranCInterface_GLOBAL_PREFIX} ${FC_CASE} ${FortranCInterface_GLOBAL_SUFFIX}")
+  set(MOAB_F77_FUNC_ "${FortranCInterface_GLOBAL__PREFIX} ${FC_CASE} ${FortranCInterface_GLOBAL__SUFFIX}")
+  set(MOAB_FC_FUNC   "${FortranCInterface_GLOBAL_PREFIX} ${FC_CASE} ${FortranCInterface_GLOBAL_SUFFIX}")
+  set(MOAB_FC_FUNC_  "${FortranCInterface_GLOBAL__PREFIX} ${FC_CASE} ${FortranCInterface_GLOBAL__SUFFIX}")
+
+endif ( ENABLE_IMESH OR ENABLE_FBIGEOM )
 # Generate the CMake input header file and then pass it through configuration
-#execute_process( COMMAND cat MOABConfig.h.in COMMAND sed -e "s/#undef /#cmakedefine MOAB_/g"
+## execute_process( COMMAND cat MOABConfig.h.in COMMAND sed -e "s/#undef /#cmakedefine MOAB_/g"
+#execute_process( COMMAND cat MOABConfig.h.in COMMAND sed -r "s/#undef ([A-Z].*)/#cmakedefine MOAB_\\1 @MOAB_\\1@/"
 #  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/config
-#  OUTPUT_FILE MOABConfig.cmake.h.in
+#  OUTPUT_FILE MOABConfig.cmake2.h.in
 #  OUTPUT_STRIP_TRAILING_WHITESPACE
 #  )
 CONFIGURE_FILE(config/MOABConfig.cmake.h.in "${PROJECT_BINARY_DIR}/src/moab/MOABConfig.h" @ONLY)

@@ -1,7 +1,7 @@
 ################################################################################
 #                           Standard Stuff
 ################################################################################
-AC_INIT([MOAB],[4.9.1pre],[moab-dev@mcs.anl.gov],[moab],[http://sigma.mcs.anl.gov])
+AC_INIT([MOAB],[4.9.2pre],[moab-dev@mcs.anl.gov],[moab],[http://sigma.mcs.anl.gov])
 AC_CONFIG_SRCDIR([moab.make.in])
 AC_CONFIG_SRCDIR([MOABConfig.cmake.in])
 AC_CONFIG_SRCDIR([examples/makefile.in])
@@ -9,8 +9,10 @@ AC_CONFIG_MACRO_DIR([config])
 AC_CONFIG_AUX_DIR([config])
 AC_CANONICAL_TARGET
 m4_ifdef([AM_SILENT_RULES],
- [AM_INIT_AUTOMAKE([color-tests subdir-objects parallel-tests])],
- [AM_INIT_AUTOMAKE])
+          [m4_define([mb_am_oldtests], [[color-tests] [parallel-tests]])],
+          [m4_define([mb_am_oldtests], [])])
+AM_INIT_AUTOMAKE([subdir-objects] mb_am_oldtests)
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 AC_CHECK_PROG( [SED], [sed], [sed], [true] )
 
@@ -22,6 +24,10 @@ USER_CONFIGURE_CMD="$0 $ac_configure_args"
 ################################################################################
 #                           Compilers
 ################################################################################
+INITIALIZE_EXTERNAL_PACKAGES
+
+MB_CPPFLAGS=""
+MB_DEFS=""
 
 ENABLE_FORTRAN=no
 AC_ARG_ENABLE([fortran],
@@ -32,11 +38,6 @@ if (test "x$enable_fortran" != "xno"); then
 fi
 AC_SUBST(ENABLE_FORTRAN)
 DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS --enable-fortran=$ENABLE_FORTRAN"
-EXTRA_GNU_CXX_FLAGS='-Wno-long-long -Wpointer-arith -Wformat -Wformat-security -pedantic -Wextra -Wno-variadic-macros'
-EXTRA_GNU_FLAGS='-Wall -pipe -Wcast-align -Wshadow -Wunused-parameter'
-EXTRA_INTEL_FLAGS='-Wall'
-EXTRA_INTEL_FFLAGS='-check all'
-EXTRA_BG_FLAGS='-qarch=auto -qtune=auto -qpic=large'
 
 # Find out the appropriate compiler based on user options
 FATHOM_CHECK_COMPILERS([yes],[yes],[$ENABLE_FORTRAN])
@@ -47,13 +48,6 @@ AC_SUBST(enablempi)
 # Invoke and find all necessary flags for C, C++, FC
 FATHOM_COMPILER_FLAGS([yes],[yes],[$ENABLE_FORTRAN])
 
-m4_ifdef([AM_SILENT_RULES],[
-if test "x$DEBUG" = "xyes"; then
-  AM_SILENT_RULES(yes)
-else
-  AM_SILENT_RULES(no)
-fi
-])
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_DISABLE_SHARED
@@ -64,17 +58,6 @@ AC_DISABLE_SHARED
 LT_INIT([dlopen])
 
 AC_C_BIGENDIAN
-
-MB_CPPFLAGS=""
-MB_DEFS=""
-
-# Check if platform is BlueGene
-AC_MSG_CHECKING([if platform is IBM BlueGene])
-FATHOM_TRY_COMPILER_DEFINE([__bg__],
-  [MB_DEFS="$MB_DEFS -DBLUEGENE"
-   MB_BLUEGENE_CONF=yes],
-  [MB_BLUEGENE_CONF=no])
-AC_MSG_RESULT([$MB_BLUEGENE_CONF])
 
 AC_CHECK_PROG([ZCAT],[gunzip],[gunzip -c],[])
 AC_CHECK_PROG([ZCAT],[gzip],[gzip -cd],[])
@@ -390,45 +373,6 @@ fi
 ################################################################################
 
 FATHOM_CHECK_HDF5
-if test "xno" = "x$HAVE_HDF5"; then
-  AC_MSG_WARN([Support for native HDF5 file format disabled])
-else
-  AC_DEFINE([HAVE_HDF5],[1],[Define if configured with HDF5 support.])
-fi
-AM_CONDITIONAL(HAVE_HDF5, [test "xno" != "x$HAVE_HDF5"])
-AC_SUBST(HAVE_HDF5)
-MB_CPPFLAGS="$HDF5_CPPFLAGS $MB_CPPFLAGS"
-EXPORT_LDFLAGS="$EXPORT_LDFLAGS $HDF5_LDFLAGS"
-AC_SUBST(HDF5_LIBS)
-
-WARN_PARALLEL_HDF5=no
-WARN_PARALLEL_HDF5_NO_COMPLEX=no
-HAVE_HDF5_PARALLEL=no
-if test "xno" != "x$HAVE_HDF5"; then
-  if test "xno" != "x$enablempi"; then
-    old_LDFLAGS="$LDFLAGS"
-    LDFLAGS="$LDFLAGS $HDF5_LDFLAGS"
-    AC_CHECK_LIB( [hdf5], [H5Pset_fapl_mpio], [HAVE_HDF5_PARALLEL=yes],
-      [WARN_PARALLEL_HDF5=yes; AC_MSG_WARN("libhdf5 library does not include parallel support.  Parallel HDF5 I/O disabled")],
-      [$HDF5_LIBS $LIBS]
-      )
-    LDFLAGS="$old_LDFLAGS"
-  fi
-fi
-AM_CONDITIONAL(HAVE_HDF5_PARALLEL, [test "xno" != "x$HAVE_HDF5_PARALLEL"])
-if test "xno" != "x$HAVE_HDF5_PARALLEL"; then
-  AC_DEFINE([HAVE_HDF5_PARALLEL],[1],[Define if configured with Parallel HDF5 support.])
-  
-  AC_MSG_CHECKING([for H5_MPI_COMPLEX_DERIVED_DATATYPE_WORKS])
-  old_CPPFLAGS="$CPPFLAGS"
-  CPPFLAGS="$CPPFLAGS $HDF5_CPPFLAGS"
-  AC_PREPROC_IFELSE([AC_LANG_PROGRAM([#include <H5pubconf.h>],[
-#ifndef H5_MPI_COMPLEX_DERIVED_DATATYPE_WORKS
-  choke me
-#endif])],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no); WARN_PARALLEL_HDF5_NO_COMPLEX=yes])
-  CPPFLAGS="$old_CPPFLAGS"
-fi
-AC_SUBST(HAVE_HDF5_PARALLEL)
 
 ################################################################################
 #                             CCMIO OPTIONS
@@ -455,10 +399,10 @@ old_LDFLAGS="$LDFLAGS"
 LDFLAGS="$LDFLAGS $HDF5_LDFLAGS"
 FATHOM_CHECK_DAMSEL
 LDFLAGS="$old_LDFLAGS"
-if test "xno" != "x$HAVE_DAMSEL"; then
+if (test "xno" != "x$HAVE_DAMSEL" && test "x" != "x$HAVE_DAMSEL"); then
   AC_DEFINE([HAVE_DAMSEL],[1],["Define if configured with Damsel I/O format support."])
 fi
-AM_CONDITIONAL(HAVE_DAMSEL, [test "xno" != "x$HAVE_DAMSEL"])
+AM_CONDITIONAL(HAVE_DAMSEL, [test "xno" != "x$HAVE_DAMSEL" && test "x" != "x$HAVE_DAMSEL"])
 MB_CPPFLAGS="$DAMSEL_CPPFLAGS $MB_CPPFLAGS"
 EXPORT_LDFLAGS="$DAMSEL_LDFLAGS $EXPORT_LDFLAGS"
 AC_SUBST(DAMSEL_LIBS)
@@ -470,26 +414,27 @@ AC_SUBST(DAMSEL_LIBS)
 
   # now pnetcdf
 FATHOM_CHECK_PNETCDF([65536],[524288])
-if test "xyes" = "x$HAVE_PNETCDF"; then
-  AC_DEFINE([HAVE_PNETCDF],[1],["Define if configured with Parallel NetCDF support."])
+if test "xyes" = "x$enablepnetcdf"; then
+  AC_DEFINE([HAVE_PNETCDF],[1],["Define if configured with PNetCDF support."])
 fi
-AM_CONDITIONAL(HAVE_PNETCDF, [test "xyes" = "x$HAVE_PNETCDF"])
+AM_CONDITIONAL(HAVE_PNETCDF, [test "xyes" = "x$enablepnetcdf"])
 MB_CPPFLAGS="$PNETCDF_CPPFLAGS $MB_CPPFLAGS"
 EXPORT_LDFLAGS="$PNETCDF_LDFLAGS $EXPORT_LDFLAGS"
 AC_SUBST(PNETCDF_LIBS)
+AC_SUBST(enablepnetcdf)
 
 old_LDFLAGS="$LDFLAGS"
 LDFLAGS="$LDFLAGS $PNETCDF_LDFLAGS $HDF5_LDFLAGS"
 FATHOM_CHECK_NETCDF([65536],[524288])
 LDFLAGS="$old_LDFLAGS"
-if test "xyes" = "x$HAVE_NETCDF"; then
+if test "xyes" = "x$enablenetcdf"; then
   AC_DEFINE([HAVE_NETCDF],[1],["Define if configured with NetCDF support."])
 fi
-AM_CONDITIONAL(HAVE_NETCDF, [test "xno" != "x$HAVE_NETCDF"])
+AM_CONDITIONAL(HAVE_NETCDF, [test "xno" != "x$enablenetcdf"])
 MB_CPPFLAGS="$NETCDF_CPPFLAGS $MB_CPPFLAGS"
 EXPORT_LDFLAGS="$NETCDF_LDFLAGS $EXPORT_LDFLAGS"
 AC_SUBST(NETCDF_LIBS)
-AC_SUBST(HAVE_NETCDF)
+AC_SUBST(enablenetcdf)
 
 
 ################################################################################
@@ -599,81 +544,8 @@ AC_ARG_WITH( [zoltan],
                  ;;
                esac],[WITH_ZOLTAN=$ZOLTAN_DEFAULT] )
 
-# If user specified with-parmetis, then assume they are trying
-# to add an additional library search directory in which to check
-# for the parmetis library.  We always check if zoltan requires
-# parmetis, so the only thing the user would really need to tell
-# us is if we need to look in some special place for it. 
-AC_ARG_WITH([parmetis], 
-            [AS_HELP_STRING([--with-parmetis=DIR],[Directory containing ParMetis library for Zoltan])],
-             [case "x$withval" in
-               xyes|xno)
-                 # do nothing
-                 ;;
-               x*)
-                 PARMETIS_DIR="$withval"
-                 test -d "$withval" || AC_MSG_ERROR([Not a directory: with-parmetis=$withval])
-                 if test -d "$withval/lib"; then
-                   PARMETIS_LIB_FLAGS="-L$withval/lib"
-                 else
-                   PARMETIS_LIB_FLAGS="-L$withval"
-                 fi
-                 PARMETIS_LIBS="$PARMETIS_LIB_FLAGS -lparmetis"
-                 if test -d "$withval/include"; then
-                   PARMETIS_INC_FLAGS="-I$withval/include"
-                 else
-                   PARMETIS_INC_FLAGS="-I$withval"
-                 fi
-                 ZOLTAN_INC_FLAGS="$ZOLTAN_INC_FLAGS $PARMETIS_INC_FLAGS"
-                 if (test -f "$withval/include/parmetis.h" || test -f "$withval/parmetis.h"); then
-                   AC_DEFINE(HAVE_PARMETIS, [1], [Define if configured with ParMetis partitioner support])
-                 fi
-                 DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS --with-parmetis=\"${withval}\""
-		 ;;
-               esac] )
-AM_CONDITIONAL(ENABLE_parmetis, [test "x" != "x$PARMETIS_DIR"])
-AC_SUBST(PARMETIS_LIBS)
-AC_SUBST(PARMETIS_INC_FLAGS)
-
-# If user specified with-metis, then assume they are trying
-# to add an additional library search directory in which to check
-# for the metis library.  We always check if zoltan requires
-# metis, so the only thing the user would really need to tell
-# us is if we need to look in some special place for it. 
-AC_ARG_WITH([metis], 
-            [AS_HELP_STRING([--with-metis=DIR],[Directory containing Metis library for ParMetis/Zoltan])],
-             [case "x$withval" in
-               xyes|xno)
-                 # do nothing
-                 ;;
-               x*)
-                 METIS_DIR="$withval"
-                 test -d "$withval" || AC_MSG_ERROR([Not a directory: with-metis=$withval])
-                 if test -d "$withval/lib"; then
-                   METIS_LIB_FLAGS="-L$withval/lib"
-                 else
-                   METIS_LIB_FLAGS="-L$withval"
-                 fi
-                 METIS_LIBS="$METIS_LIB_FLAGS -lmetis"
-                 ZOLTAN_LIB_FLAGS="$ZOLTAN_LIB_FLAGS $METIS_LIB_FLAGS"
-                 if test -d "$withval/include"; then
-                   METIS_INC_FLAGS="-I$withval/include"
-                  if (test -f "$withval/include/metis.h"); then
-                    AC_DEFINE(HAVE_METIS, [1], [Define if configured with Metis partitioner support])
-                  fi
-                 else
-                   METIS_INC_FLAGS="-I$withval"
-                   # if (test -f "$withval/metis.h"); then # METIS-3.x might not install a header though
-                   #  AC_DEFINE(HAVE_METIS, [1], [Define if configured with Metis partitioner support])
-                   # fi
-                 fi
-                 ZOLTAN_INC_FLAGS="$ZOLTAN_INC_FLAGS $METIS_INC_FLAGS"
-                 DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS --with-metis=\"${withval}\""
-     ;;
-               esac] )
-AM_CONDITIONAL(ENABLE_metis, [test "x" != "x$METIS_DIR"])
-AC_SUBST(METIS_LIBS)
-AC_SUBST(METIS_INC_FLAGS)
+FATHOM_CONFIGURE_METIS
+FATHOM_CONFIGURE_PARMETIS
 
 # If user specified with-scotch, then assume they are trying
 # to add an additional library search directory in which to check
@@ -763,7 +635,7 @@ fi
 ################################################################################
 
 AC_ARG_WITH([vtk],
-  [AS_HELP_STRING([--with-vtk@<:@=DIR@:>@],[Enable VTK support, and specify VTK location])],
+  [AS_HELP_STRING([--with-vtk=DIR],[Enable VTK support, and specify VTK location])],
   [WITH_VTK=$withval
    DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS --with-vtk=\"${withval}\""
   ],[WITH_VTK=])
@@ -1079,7 +951,7 @@ else
   MB_OPTIONAL_TOOL([mcnpmit],      [no], [no])
   MB_OPTIONAL_TOOL([refiner],      [no], [no])
 fi
-MB_OPTIONAL_TOOL([h5mtools],     [${HAVE_HDF5}], [${HAVE_HDF5}])
+MB_OPTIONAL_TOOL([h5mtools],     [${enablehdf5}], [${enablehdf5}])
 MB_OPTIONAL_TOOL([mbcslam],      [no], [yes])
 MB_OPTIONAL_TOOL([mbquality],    [yes], [yes])
 
@@ -1329,7 +1201,6 @@ AC_ARG_VAR([FC], [FORTRAN compiler command])
 AC_CONFIG_HEADERS([src/moab/Version.h
                    src/moab/EntityHandle.hpp
                    src/parallel/moab_mpi_config.h
-                   src/FCDefs.h
                    src/moab/MOABConfig.h:config/MOABConfig.h.in])
 AX_PREFIX_CONFIG_H([src/moab/MOABConfig.h],[MOAB],[src/moab/MOABConfig.h])
 
@@ -1381,8 +1252,6 @@ AC_CONFIG_FILES([Makefile
                  MeshFiles/unittest/h5file/Makefile
                  MeshFiles/examples/Makefile
                  ])
-AC_CONFIG_COMMANDS([src/MOAB_FCDefs.h],
-  [sed -e "s/FC_FUNC/MOAB_FC_FUNC/" src/FCDefs.h >src/MOAB_FCDefs.h])
 
 # DISTCHECK_CONFIGURE_FLAGS="$USER_CONFIGURE_CMD"
 # make distcheck will use this DISTCHECK_CONFIGURE_FLAGS 
@@ -1413,7 +1282,7 @@ if (test "xno" != "x$ENABLE_FORTRAN"); then
 fi
 AC_MSG_RESULT([Linker: $LD $EXPORT_LDFLAGS $CXX_LDFLAGS $LDFLAGS -L${PWD}/src/.libs -lMOAB $PNETCDF_LIBS $NETCDF_LIBS $CGNS_LIBS $HDF5_LIBS $CCMIO_LIBS $CGM_LIBS $ZOLTAN_LIBS $PARMETIS_LIBS $METIS_LIBS $LIBS])
 
-if test "x$HAVE_HDF5" = "xno"; then
+if test "x$enablehdf5" = "xno"; then
   AC_MSG_WARN([
 *************************************************************************
 *            MOAB has been configured w/out the HDF5 library.
@@ -1421,7 +1290,7 @@ if test "x$HAVE_HDF5" = "xno"; then
 *************************************************************************])
 fi
 
-if test "x$HAVE_NETCDF" = "xno"; then
+if test "x$enablenetcdf" = "xno"; then
   AC_MSG_WARN([
 *************************************************************************
 *           MOAB has been configured w/out the NetCDF library.
@@ -1459,4 +1328,6 @@ if test "x$WARN_PARALLEL_HDF5_NO_COMPLEX" = "xyes"; then
 *************************************************************************])
 fi
 
+# define([ConfigurationSuggestion], [`esyscmd(config/suggest_configure_command)'])
+# m4_echo(echo "m4_expand([ConfigurationSuggestion])")
 
