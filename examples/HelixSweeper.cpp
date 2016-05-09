@@ -40,6 +40,11 @@ int main(int argc, char **argv)
 
   double angleRadInc = angle/180.*M_PI/orglayers; // 
   double deltazInc =  pitch/orglayers* (angle/360.) ;
+
+  int numLayersSupport = 5;
+  double supportAngle = 1.; // in degrees
+  double angleIncSupport = supportAngle * M_PI/180./numLayersSupport; // so total support angle will be 1 degree 
+  double deltazIncSupport = pitch/2/M_PI*angleIncSupport; // 
   Core mb;
 
   ErrorCode rval = mb.load_file(inputf.c_str()); MB_CHK_ERR(rval);
@@ -86,7 +91,7 @@ int main(int argc, char **argv)
   rval = mb.get_adjacencies(xzverts, 1, false, xzedges, Interface::UNION);
    cout <<" number of edges on xz plane: " << xzedges.size() << " psize: " << xzedges.psize() << endl;
 
-  int layers = 3 + orglayers + 3 + 20; // 3 layers for support 1, 3 for support 2, 20 free 
+  int layers = 5 + orglayers + 5 + 20; // 5 layers for support 1, 5 for support 2, 20 free 
 
   int num_newNodes = (layers) * (int)xzverts.size();
 
@@ -101,8 +106,29 @@ int main(int argc, char **argv)
   int nv = (int)xzverts.size();
   for (int i=0; i<layers; i++)
   {
-    double arad=angleRadInc*(i+1); // for last layer (128?), it will be angle * 180/M_PI
-    double deltaz = deltazInc* (i+1); // for last layer it will be total pitch 
+    double arad, deltaz; // this is for layer i
+    if (i<numLayersSupport) // between [0 and 5)
+    {
+      arad = angleIncSupport*(i+1);
+      deltaz = deltazIncSupport*(i+1); 
+    }
+    else if (i < numLayersSupport + 128)  // between [5 and 128+5)
+    {
+      arad = angleIncSupport*numLayersSupport + (i-numLayersSupport+1)*angleRadInc;
+      deltaz = deltazIncSupport*numLayersSupport + (i-numLayersSupport+1)*deltazInc; 
+    }
+    else if (i < 2*numLayersSupport + 128) // between [5 + 128 and 5 + 128 + 5)
+    {
+      arad = angleIncSupport*numLayersSupport + 128 * angleRadInc + (i-numLayersSupport-128+1)* angleIncSupport;
+      deltaz = deltazIncSupport*numLayersSupport + 128 * deltazInc + (i-numLayersSupport-128+1)* deltazIncSupport;
+    }
+    else // i between [5 + 128 + 5 and 5 + 128 + 5 + 20)
+    {
+      arad = 2*angleIncSupport*numLayersSupport + 128 * angleRadInc + (i-2*numLayersSupport-128+1)* angleRadInc;
+      deltaz =2*deltazIncSupport*numLayersSupport + 128 * deltazInc + (i-2*numLayersSupport-128+1)* deltazInc;
+    }
+     //double arad=angleRadInc*(i+1); // for last layer (128?), it will be angle * 180/M_PI
+     //double deltaz = deltazInc* (i+1); // for last layer it will be total pitch 
     for (int j=0; j<nv; j++)
     {
       double x=inico[3*j];
@@ -178,7 +204,7 @@ int main(int argc, char **argv)
   rval = mb.create_meshset(MESHSET_SET, set1);MB_CHK_ERR(rval);
   rval = mb.add_entities(set1, orgQuads);
   sets.insert(set1);
-  Range newQuadsSupport1(starte, starte+(int)xzedges.size()*3-1);
+  Range newQuadsSupport1(starte, starte+(int)xzedges.size()*5-1);
 
   rval = mb.create_meshset(MESHSET_SET, setSupp1);MB_CHK_ERR(rval);
   rval = mb.add_entities(setSupp1, newQuadsSupport1);
@@ -193,7 +219,7 @@ int main(int argc, char **argv)
   dum_id = 1;
   rval = mb.tag_set_data(ptag, &setSupp1, 1, &dum_id);MB_CHK_ERR(rval);
 
-  Range newQuads2(starte+(int)xzedges.size()*3, starte+(int)xzedges.size()*(3+128)-1);
+  Range newQuads2(starte+(int)xzedges.size()*5, starte+(int)xzedges.size()*(5+128)-1);
   rval = mb.create_meshset(MESHSET_SET, set2);MB_CHK_ERR(rval);
   rval = mb.add_entities(set2, newQuads2);
   sets.insert(set2);
@@ -203,7 +229,7 @@ int main(int argc, char **argv)
   rval = mb.tag_set_data(ptag, &set2, 1, &dum_id);MB_CHK_ERR(rval);
 
   
-  Range newQuadsSupport2(starte+(int)xzedges.size()*(3+128), starte+(int)xzedges.size()*(3+128+3)-1);
+  Range newQuadsSupport2(starte+(int)xzedges.size()*(5+128), starte+(int)xzedges.size()*(5+128+5)-1);
   rval = mb.create_meshset(MESHSET_SET, setSupp2);MB_CHK_ERR(rval);
   rval = mb.add_entities(setSupp2, newQuadsSupport2);
   sets.insert(setSupp2);
@@ -212,7 +238,7 @@ int main(int argc, char **argv)
   dum_id = 3;
   rval = mb.tag_set_data(ptag, &setSupp2, 1, &dum_id);MB_CHK_ERR(rval);
 
-  Range newQuads3(starte+(int)xzedges.size()*(3+128+3), starte+(int)xzedges.size()*(3+128+3+20)-1);
+  Range newQuads3(starte+(int)xzedges.size()*(5+128+5), starte+(int)xzedges.size()*(5+128+5+20)-1);
   rval = mb.create_meshset(MESHSET_SET, set3);MB_CHK_ERR(rval);
   rval = mb.add_entities(set3, newQuads3);
   sets.insert(set3);
@@ -228,7 +254,7 @@ int main(int argc, char **argv)
   rval = mb.get_adjacencies(otherverts, 1, false, otheredges, Interface::UNION);
    cout <<" number of edges at 45 degree plane: " << otheredges.size() << " psize: " << otheredges.psize() << endl;
 
-  // int layers = 3 + orglayers + 3 + 20; // 3 layers for support 1, 3 for support 2, 20 free 
+  // int layers = 5 + orglayers + 5 + 20; // 5 layers for support 1, 5 for support 2, 20 free 
 
   num_newNodes = (layers) * (int)xzverts.size();
 
@@ -243,8 +269,31 @@ int main(int argc, char **argv)
   // int nv = (int)xzverts.size();
   for (int i=0; i<layers; i++)
   {
-    double arad=  - angleRadInc*(i+1); // this angle is now negative (clockwise)
-    double deltaz = deltazInc*(i+1); // for last layer it will be total pitch 
+    double arad, deltaz; // this is for layer i
+    if (i<numLayersSupport) // between [0 and 5)
+    {
+      arad = angleIncSupport*(i+1);
+      deltaz = deltazIncSupport*(i+1);
+    }
+    else if (i < numLayersSupport + 128)  // between [5 and 128+5)
+    {
+      arad = angleIncSupport*numLayersSupport + (i-numLayersSupport+1)*angleRadInc;
+      deltaz = deltazIncSupport*numLayersSupport + (i-numLayersSupport+1)*deltazInc;
+    }
+    else if (i < 2*numLayersSupport + 128) // between [5 + 128 and 5 + 128 + 5)
+    {
+      arad = angleIncSupport*numLayersSupport + 128 * angleRadInc + (i-numLayersSupport-128+1)* angleIncSupport;
+      deltaz = deltazIncSupport*numLayersSupport + 128 * deltazInc + (i-numLayersSupport-128+1)* deltazIncSupport;
+    }
+    else // i between [5 + 128 + 5 and 5 + 128 + 5 + 20)
+    {
+      arad = 2*angleIncSupport*numLayersSupport + 128 * angleRadInc + (i-2*numLayersSupport-128+1)* angleRadInc;
+      deltaz =2*deltazIncSupport*numLayersSupport + 128 * deltazInc + (i-2*numLayersSupport-128+1)* deltazInc;
+    }
+     //double arad=angleRadInc*(i+1); // for last layer (128?), it will be angle * 180/M_PI
+     //double deltaz = deltazInc* (i+1); // for last layer it will be total pitch 
+    arad=  - arad; // this angle is now negative (clockwise)
+    // double deltaz = deltazInc*(i+1); // for last layer it will be total pitch 
     for (int j=0; j<nv; j++)
     {
       double x = inico[3*j];
@@ -309,7 +358,7 @@ int main(int argc, char **argv)
 
   EntityHandle setSupp3, set4, setSupp4, set5;
   
-  Range newQuadsSupport3(starte, starte+(int)otheredges.size()*3 -1);
+  Range newQuadsSupport3(starte, starte+(int)otheredges.size()*5 -1);
   rval = mb.create_meshset(MESHSET_SET, setSupp3);MB_CHK_ERR(rval);
   rval = mb.add_entities(setSupp3, newQuadsSupport3);
   sets.insert(setSupp3);
@@ -318,7 +367,7 @@ int main(int argc, char **argv)
   dum_id = 5;
   rval = mb.tag_set_data(ptag, &setSupp3, 1, &dum_id);MB_CHK_ERR(rval);
 
-  Range newQuads4(starte+(int)otheredges.size()*3, starte+(int)otheredges.size()*(3+128)-1);
+  Range newQuads4(starte+(int)otheredges.size()*5, starte+(int)otheredges.size()*(5+128)-1);
   rval = mb.create_meshset(MESHSET_SET, set4);MB_CHK_ERR(rval);
   rval = mb.add_entities(set4, newQuads4);
   sets.insert(set4);
@@ -328,7 +377,7 @@ int main(int argc, char **argv)
   rval = mb.tag_set_data(ptag, &set4, 1, &dum_id);MB_CHK_ERR(rval);
 
   
-  Range newQuadsSupport4(starte+(int)otheredges.size()*(3+128), starte+(int)otheredges.size()*(3+128+3)-1);
+  Range newQuadsSupport4(starte+(int)otheredges.size()*(5+128), starte+(int)otheredges.size()*(5+128+5)-1);
   rval = mb.create_meshset(MESHSET_SET, setSupp4);MB_CHK_ERR(rval);
   rval = mb.add_entities(setSupp4, newQuadsSupport4);
   sets.insert(setSupp4);
@@ -337,7 +386,7 @@ int main(int argc, char **argv)
   dum_id = 7;
   rval = mb.tag_set_data(ptag, &setSupp4, 1, &dum_id);MB_CHK_ERR(rval);
 
-  Range newQuads5(starte+(int)otheredges.size()*(3+128+3), starte+(int)otheredges.size()*(3+128+3+20)-1);
+  Range newQuads5(starte+(int)otheredges.size()*(5+128+5), starte+(int)otheredges.size()*(5+128+5+20)-1);
   rval = mb.create_meshset(MESHSET_SET, set5);MB_CHK_ERR(rval);
   rval = mb.add_entities(set5, newQuads5);
   sets.insert(set5);
