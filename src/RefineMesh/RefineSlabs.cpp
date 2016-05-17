@@ -652,17 +652,79 @@ namespace moab{
   {
     // get coordinates from node
     const double *xp, *yp, *zp;
-    ErrorCode error = mbImpl->get_coords( node, xp, yp, zp );
-    assert(  MB_SUCCESS == error );
+    ErrorCode error = mbImpl->get_coords( node, xp, yp, zp );MB_CHK_ERR(error);
+   // assert(  MB_SUCCESS == error );
 
 
-    double coord[3];
-    coord[0] = *xp;
-    coord[1] = *yp;
-    coord[2] = *zp;
-    error = mbImpl->create_vertex(coord, new_node);
-    assert( MB_SUCCESS == error );
+  //  double coord[3];
+ //   coord[0] = *xp;
+//    coord[1] = *yp;
+ //   coord[2] = *zp;
+ //   error = mbImpl->create_vertex(coord, new_node);MB_CHK_ERR(error);
+   // assert( MB_SUCCESS == error );
 
+    //new strategy for point positioning
+    const double eps = 1.0/3.0;
+    Entities adjents;
+    error = ahf->get_up_adjacencies_vert_3d(node, adjents);
+    if (adjents.size() == 1)
+      {
+        EntityHandle hnodes[8];
+        get_hex_nodes(adjents[0], hnodes);
+        double centroid[3] = {0,0,0};
+        const double *xh, *yh, *zh;
+        for (size_t n=0; n<8; ++n)
+          {
+            error = mbImpl->get_coords(hnodes[n], xh, yh, zh);MB_CHK_ERR(error);
+            centroid[0] += *xh; centroid[1] += *yh; centroid[2] += *zh;
+          }
+        centroid[0] = centroid[0]/8; centroid[1] = centroid[1]/8; centroid[2] = centroid[2]/8;
+        double dist = sqrt(((*xp-centroid[0])^2)+((*yp-centroid[1])^2)+((*zp-centroid[2])^2));
+        double coords[3] = {0,0,0};
+        coords[0] = *xp + (eps/dist) * (centroid[0]-*xp);
+        coords[1] = *yp + (eps/dist) * (centroid[1]-*yp);
+        coords[2] = *zp + (eps/dist) * (centroid[2]-*zp);
+        error = mbImpl->create_vertex(coords, new_node);MB_CHK_ERR(error);
+      }
+    else
+      {
+        Entities tnodes[8], hnodes[8], cnodes;
+        std::vector<EntityHandle>::iterator it ;
+        for (int j=0; j<(int)adjents.size(); j++)
+          {
+            get_hex_nodes(adjents[j], &hnodes[0]);
+            std::sort(hnodes.begin(), hnodes.end());
+            if (j==0)
+              tnodes.insert(tnodes.end(), hnodes.begin(), hnodes.end());
+            else
+              {
+                it = std::set_intersection(hnodes.begin(), hnodes.end(), tnodes.begin(), tnodes.end(), cnodes.begin());
+                cnodes.resize(it-cnodes.begin());
+              }
+          }
+        double centroid[3] = {0,0,0};
+        const double *xh, *yh, *zh;
+        int numc = cnodes.size();
+        if (numc == 1)
+          {
+            MB_SET_ERR(MB_FAILURE,"Check configuration of the shrink set ");
+          }
+        else
+          {
+            for (size_t n=0; n<numc; ++n)
+              {
+                error = mbImpl->get_coords(cnodes[n], xh, yh, zh);MB_CHK_ERR(error);
+                centroid[0] += *xh; centroid[1] += *yh; centroid[2] += *zh;
+              }
+            centroid[0] = centroid[0]/numc; centroid[1] = centroid[1]/num; centroid[2] = centroid[2]/num;
+            double dist = sqrt(((*xp-centroid[0])^2)+((*yp-centroid[1])^2)+((*zp-centroid[2])^2));
+            double coords[3] = {0,0,0};
+            coords[0] = *xp + (eps/dist) * (centroid[0]-*xp);
+            coords[1] = *yp + (eps/dist) * (centroid[1]-*yp);
+            coords[2] = *zp + (eps/dist) * (centroid[2]-*zp);
+            error = mbImpl->create_vertex(coords, new_node);MB_CHK_ERR(error);
+          }
+      }
 
     // refinement_AHF
     // tell AHF about the new node // AHF todo
@@ -1149,8 +1211,7 @@ namespace moab{
     // debug 
     std::cout << "find_slabs_loc round 2, all edges, no tiny" << std::endl;
 
-    ErrorCode 
-      err = find_slabs_loc( coarse_hexes, coarse_quads,  slabs, false );
+    ErrorCode  err = find_slabs_loc( coarse_hexes, coarse_quads,  slabs, false );
 
     if (err == MB_SUCCESS)
     {

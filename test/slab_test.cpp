@@ -58,15 +58,16 @@ double wtime() {
   return (y);
 }
 
-ErrorCode test_adjacencies(Interface *mbImpl, RefineSlabs &rs, Range all_ents)
+ErrorCode test_adjacencies(Interface *mbImpl)
 {
   MeshTopoUtil mtu(mbImpl);
   ErrorCode error;
+
   Range verts, edges, faces, cells;
-  verts = all_ents.subset_by_dimension(0);
-  edges = all_ents.subset_by_dimension(1);
-  faces = all_ents.subset_by_dimension(2);
-  cells = all_ents.subset_by_dimension(3);
+  error = mbImpl->get_entities_by_dimension(0, 0, verts);CHECK_ERR(error);
+  error = mbImpl->get_entities_by_dimension(0, 1, edges);CHECK_ERR(error);
+  error = mbImpl->get_entities_by_dimension(0, 2, faces);CHECK_ERR(error);
+  error = mbImpl->get_entities_by_dimension(0, 3, cells);CHECK_ERR(error);
 
   std::vector<EntityHandle> adjents;
   Range mbents, ahfents;
@@ -690,7 +691,7 @@ ErrorCode test_C()
   error = refine_slabs.refine_mesh(coarse_hexes, coarse_quads, fine_hexes, fine_quads, is_sweep_edge, sweep_edge); CHECK_ERR(error);
 
   // test adjacencies of the refined mesh
-  error = test_adjacencies(mbImpl, refine_slabs);CHECK_ERR(error);
+  error = test_adjacencies(mbImpl);CHECK_ERR(error);
 
   return MB_SUCCESS;
 }
