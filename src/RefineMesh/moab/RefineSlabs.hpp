@@ -400,6 +400,7 @@ namespace moab
     EntityHandle copy_node( EntityHandle coarse_node );
 
     ErrorCode create_node( EntityHandle node, EntityHandle &new_node );
+    ErrorCode create_node_new( EntityHandle node, EntityHandle &new_node );
 
     // copy the coarse hexes into the fine ahf
     ErrorCode copy_hexes(Entities &coarse_hexes , Entities &fine_hexes);

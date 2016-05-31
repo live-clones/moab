@@ -103,7 +103,7 @@ namespace moab{
   ErrorCode RefineSlabs::update_ahf_maps(Entities &coarse_hexes)
   {
     ErrorCode error = ahf->update_hf_maps_patch(3, coarse_hexes);MB_CHK_ERR(error);
-    error = ahf->print_tags(3);MB_CHK_ERR(error);
+    //error = ahf->print_tags(3);MB_CHK_ERR(error);
     return MB_SUCCESS;
   }
   
@@ -653,15 +653,25 @@ namespace moab{
     // get coordinates from node
     const double *xp, *yp, *zp;
     ErrorCode error = mbImpl->get_coords( node, xp, yp, zp );MB_CHK_ERR(error);
-   // assert(  MB_SUCCESS == error );
+
+    double coord[3];
+    coord[0] = *xp;
+    coord[1] = *yp;
+    coord[2] = *zp;
+    error = mbImpl->create_vertex(coord, new_node);MB_CHK_ERR(error);
+
+    //debug
+    created_fine_nodes.insert(new_node);
+
+    return error;
+  }
 
 
-  //  double coord[3];
- //   coord[0] = *xp;
-//    coord[1] = *yp;
- //   coord[2] = *zp;
- //   error = mbImpl->create_vertex(coord, new_node);MB_CHK_ERR(error);
-   // assert( MB_SUCCESS == error );
+  ErrorCode RefineSlabs::create_node_new( EntityHandle node, EntityHandle &new_node )
+  {
+    // get coordinates from node
+    const double *xp, *yp, *zp;
+    ErrorCode error = mbImpl->get_coords( node, xp, yp, zp );MB_CHK_ERR(error);
 
     //new strategy for point positioning
     const double eps = 1.0/3.0;
@@ -679,7 +689,7 @@ namespace moab{
             centroid[0] += *xh; centroid[1] += *yh; centroid[2] += *zh;
           }
         centroid[0] = centroid[0]/8; centroid[1] = centroid[1]/8; centroid[2] = centroid[2]/8;
-        double dist = sqrt(((*xp-centroid[0])^2)+((*yp-centroid[1])^2)+((*zp-centroid[2])^2));
+        double dist = sqrt(((*xp-centroid[0])*(*xp-centroid[0]))+((*yp-centroid[1])*(*yp-centroid[1]))+((*zp-centroid[2])*(*zp-centroid[2])));
         double coords[3] = {0,0,0};
         coords[0] = *xp + (eps/dist) * (centroid[0]-*xp);
         coords[1] = *yp + (eps/dist) * (centroid[1]-*yp);
@@ -688,18 +698,28 @@ namespace moab{
       }
     else
       {
-        Entities tnodes[8], hnodes[8], cnodes;
+        Entities tnodes, hnodes(8), cnodes;
         std::vector<EntityHandle>::iterator it ;
         for (int j=0; j<(int)adjents.size(); j++)
           {
             get_hex_nodes(adjents[j], &hnodes[0]);
             std::sort(hnodes.begin(), hnodes.end());
+
+            //for (int i=0; i<(int)hnodes.size(); i++)
+           //   std::cout<<"hnodes["<<i<<"] = "<<hnodes[i]<<std::endl;
+
             if (j==0)
-              tnodes.insert(tnodes.end(), hnodes.begin(), hnodes.end());
+              {
+                tnodes.insert(tnodes.end(), hnodes.begin(), hnodes.end());
+
+               // for (int i=0; i<(int)tnodes.size(); i++)
+               //   std::cout<<"tnodes["<<i<<"] = "<<tnodes[i]<<std::endl;
+              }
             else
               {
-                it = std::set_intersection(hnodes.begin(), hnodes.end(), tnodes.begin(), tnodes.end(), cnodes.begin());
-                cnodes.resize(it-cnodes.begin());
+               // it = std::set_intersection(hnodes.begin(), hnodes.end(), tnodes.begin(), tnodes.end(), cnodes.begin());
+               // cnodes.resize(it-cnodes.begin());
+                std::set_intersection(hnodes.begin(), hnodes.end(), tnodes.begin(), tnodes.end(), std::back_inserter(cnodes));
               }
           }
         double centroid[3] = {0,0,0};
@@ -711,13 +731,13 @@ namespace moab{
           }
         else
           {
-            for (size_t n=0; n<numc; ++n)
+            for (int n=0; n<numc; ++n)
               {
                 error = mbImpl->get_coords(cnodes[n], xh, yh, zh);MB_CHK_ERR(error);
                 centroid[0] += *xh; centroid[1] += *yh; centroid[2] += *zh;
               }
-            centroid[0] = centroid[0]/numc; centroid[1] = centroid[1]/num; centroid[2] = centroid[2]/num;
-            double dist = sqrt(((*xp-centroid[0])^2)+((*yp-centroid[1])^2)+((*zp-centroid[2])^2));
+            centroid[0] = centroid[0]/numc; centroid[1] = centroid[1]/numc; centroid[2] = centroid[2]/numc;
+            double dist = sqrt(((*xp-centroid[0])*(*xp-centroid[0]))+((*yp-centroid[1])*(*yp-centroid[1]))+((*zp-centroid[2])*(*zp-centroid[2])));
             double coords[3] = {0,0,0};
             coords[0] = *xp + (eps/dist) * (centroid[0]-*xp);
             coords[1] = *yp + (eps/dist) * (centroid[1]-*yp);
@@ -725,10 +745,6 @@ namespace moab{
             error = mbImpl->create_vertex(coords, new_node);MB_CHK_ERR(error);
           }
       }
-
-    // refinement_AHF
-    // tell AHF about the new node // AHF todo
-    // alternatively, as in the pseudocode, AHF can do this once after all the hexes have been created
 
     //debug
     created_fine_nodes.insert(new_node);
@@ -1085,10 +1101,10 @@ namespace moab{
 
   ErrorCode RefineSlabs::initialize()
   {
-#ifdef USE_AHF
-  std::cout << "macro USE_AHF is defined" << std::endl;
+#ifdef MOAB_HAVE_AHF
+  std::cout << "macro MOAB_HAVE_AHF is defined" << std::endl;
 #else
-  std::cout << "macro USE_AHF is undefined" << std::endl;
+  std::cout << "macro MOAB_HAVE_AHF is undefined" << std::endl;
 #endif
 
     ErrorCode error;
@@ -1104,7 +1120,7 @@ namespace moab{
     error = ahf->initialize(); MB_CHK_ERR(error);
 
     //DBG
-    error = ahf->print_tags(3);MB_CHK_ERR(error);
+ //   error = ahf->print_tags(3);MB_CHK_ERR(error);
 
     Range _inverts, _inedges, _infaces, _incells;
     error = ahf->get_entity_ranges(_inverts, _inedges, _infaces, _incells);  MB_CHK_ERR(error);
@@ -1140,30 +1156,36 @@ namespace moab{
     // define which vertices are on the boundary of the coarse_hexes refinement set?
     ErrorCode err = MB_SUCCESS;
     Entities coarse_bndverts, coarse_opphexes;
-    err = mark_hex_nodes(coarse_hexes, coarse_bndverts, coarse_opphexes);
-    if (err == MB_SUCCESS)
-      err = mark_surface_nodes(coarse_quads);
+    err = mark_hex_nodes(coarse_hexes, coarse_bndverts, coarse_opphexes);MB_CHK_ERR(err);
+
+    err = mark_surface_nodes(coarse_quads);MB_CHK_ERR(err);
+    std::cout<<"Stage 1 Complete: mark nodes"<<std::endl;
 
     // find slabs    
     // ideally two parallel sheets of hexes
     // avoid very small slabs, say with one star node, in the first pass
     // do a second pass, allowing one-star nodes
     Slabs slabs;
-    if (err == MB_SUCCESS)
-      err = find_slabs( coarse_hexes, coarse_quads, is_sweep_edge, sweep_edge, slabs );
+    err = find_slabs( coarse_hexes, coarse_quads, is_sweep_edge, sweep_edge, slabs );MB_CHK_ERR(err);
+    std::cout<<"Stage 2 Complete: find slabs"<<std::endl;
 
     // initialize refinement
-    if (err == MB_SUCCESS)
-      err = initialize_refinement( coarse_hexes, coarse_quads );
+    err = initialize_refinement( coarse_hexes, coarse_quads );MB_CHK_ERR(err);
+    std::cout<<"Stage 3 Complete: initialize ds"<<std::endl;
 
     // pillow slabs
     // refine the hexes of each slab, referencing each hex's current refinement
-    if (err == MB_SUCCESS)
-      err = pillow_slabs( slabs, fine_hexes );
+    err = pillow_slabs( slabs, fine_hexes );MB_CHK_ERR(err);
+    std::cout<<"Stage 4 Complete: pillow slabs"<<std::endl;
 
     // replace mesh
-    if (err == MB_SUCCESS)
-      err = replace_mesh( coarse_hexes,  coarse_bndverts, coarse_opphexes, fine_hexes);
+    err = replace_mesh( coarse_hexes,  coarse_bndverts, coarse_opphexes, fine_hexes);MB_CHK_ERR(err);
+    std::cout<<"Stage 5 Complete: replace mesh"<<std::endl;
+
+    //dbg
+    Entities allhexes;
+    err = mbImpl->get_entities_by_dimension(0, 3, allhexes);MB_CHK_ERR(err);
+    write_file_slab(allhexes, "refined_mesh");
 
     delete_slabs( slabs );
 
@@ -1308,6 +1330,10 @@ namespace moab{
     // this could be made tighter by considering the quads, and the actual slabs found.
     size_t memory_estimate = 8 * coarse_hexes.size() + 8 * coarse_hexes.size();
     //                        refine each hex into 8      transition == outer pillow
+
+
+    std::cout<<"coarse_hexes.size ="<<coarse_hexes.size()<<std::endl;
+    std::cout<<"memory estimate ="<<memory_estimate<<std::endl;
 
     // make a new AHF to store the refinement
     ErrorCode error = estimate_allocate_ahf_maps( memory_estimate );
@@ -1891,6 +1917,13 @@ namespace moab{
       ErrorCode err_i = pillow_slab( *slabs[i], new_hexes );
       if (err_i != MB_SUCCESS)
         return err_i;
+
+      if (i==0){
+          Entities allhexes;
+          err_i = mbImpl->get_entities_by_dimension(0, 3, allhexes);MB_CHK_ERR(err_i);
+          write_file_slab(allhexes, "refined_mesh_slab_1");
+          write_file_slab(new_hexes, "fine_hexes");
+        }
     }
     return MB_SUCCESS;
   }
@@ -2073,7 +2106,9 @@ namespace moab{
           create_hex( quad_nodes, fhex );
           add_refined_hex(chex, fhex);
           finehexes.push_back(fhex);
+          finehexes.push_back(chex);
           new_hexes.push_back(fhex);
+         // new_hexes.push_back(chex);
         }
       }
     }
@@ -2081,19 +2116,20 @@ namespace moab{
     // update the ahf maps for the new hexes
     //DBG
     std::cout<<"Shrink set and new hexes"<<std::endl;
-    for (int i=0; i<shrink_set.size(); i++)
+    for (int i=0; i<(int)shrink_set.size(); i++)
       {
         EntityHandle hex_nodes[8];
         get_hex_nodes( shrink_set[i], hex_nodes );
         std::cout<<"shrinkset["<<i<<"] = "<<shrink_set[i]<<", conn = ["<<hex_nodes[0]<<", "<<hex_nodes[1]<<", "<<hex_nodes[2]<<", "<<hex_nodes[3]<<", "<<hex_nodes[4]<<", "<<hex_nodes[5]<<", "<<hex_nodes[6]<<", "<<hex_nodes[7]<<" ]"<<std::endl;
       }
 
-    for (int i=0; i<finehexes.size(); i++)
+    for (int i=0; i<(int)finehexes.size(); i++)
       {
         EntityHandle hex_nodes[8];
         get_hex_nodes(finehexes[i], hex_nodes );
         std::cout<<"finehexes["<<i<<"] = "<<finehexes[i]<<", conn = ["<<hex_nodes[0]<<", "<<hex_nodes[1]<<", "<<hex_nodes[2]<<", "<<hex_nodes[3]<<", "<<hex_nodes[4]<<", "<<hex_nodes[5]<<", "<<hex_nodes[6]<<", "<<hex_nodes[7]<<" ]"<<std::endl;
       }
+
 
     ErrorCode err = update_ahf_maps(shrink_set, finehexes);
     assert(err == MB_SUCCESS);
@@ -2356,7 +2392,7 @@ namespace moab{
     SlabData *slab_data = force_slab_data(fine_node);
     assert( slab_data->is_coarse == false );
     EntityHandle fine_copy;
-    create_node( fine_node, fine_copy );
+    create_node_new( fine_node, fine_copy );
     set_shrunk_node( fine_node, fine_copy );
     SlabData *copy_slab = force_slab_data(fine_copy);
     copy_slab->copy_data( slab_data );
