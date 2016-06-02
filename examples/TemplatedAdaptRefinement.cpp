@@ -8,13 +8,14 @@
 #include "moab/LinearHex.hpp"
 #include "moab/LinearQuad.hpp"
 #include "moab/QuadraticQuad.hpp"
+#include "moab/QuadraticHex.hpp"
 
 using namespace moab;
 
 #define STRINGIFY_(X) #X
 #define STRINGIFY(X) STRINGIFY_(X)
 
-#define MAX_VERTS 16
+#define MAX_VERTS 100
 #define MAX_CHILDS 10
 #define MAX_CONN   27
 struct refTemplates {
@@ -47,12 +48,12 @@ struct refTemplates hexTemp = {
      { -alfa,  alfa,  alfa }
    },
    {
-     {0,1,5,4, 8,9,13,12}, 
-     {1,2,6,5, 9,10,14,13}, 
-     {2,3,7,6, 10,11,15,14}, 
-     {3,0,4,7, 11,8,12,15}, 
-     {0,3,2,1, 8,11,10,9}, 
-     {4,5,6,7, 12,13,14,15}, 
+     {8,9,13, 12, 0,1,5,4  },
+     {9,10,14,13, 1,2,6,5 },
+     {10,11,15,14, 2,3,7,6 },
+     {11,8,12,15, 3,0,4,7 },
+     {8,11,10,9, 0,3,2,1 },
+     {12,13,14,15, 4,5,6,7 },
      {8,9,10,11, 12,13,14,15} 
    }
  };
@@ -101,6 +102,108 @@ struct refTemplates quadTempQuadratic = {
     }
 };
 
+#if 0
+const int QuadraticHex::corner[27][3] = {
+          { -1, -1, -1 },
+          {  1, -1, -1 },
+          {  1,  1, -1 },  // corner nodes: 0-7
+          { -1,  1, -1 },  // mid-edge nodes: 8-19
+          { -1, -1,  1 },  // center-face nodes 20-25  center node  26
+          {  1, -1,  1 },  //
+          {  1,  1,  1 },
+          { -1,  1,  1 }, //                    4   ----- 19   -----  7
+          {  0, -1, -1 }, //                .   |                 .   |
+          {  1,  0, -1 }, //            16         25         18      |
+          {  0,  1, -1 }, //         .          |          .          |
+          { -1,  0, -1 }, //      5   ----- 17   -----  6             |
+          { -1, -1,  0 }, //      |            12       | 23         15
+          {  1, -1,  0 }, //      |                     |             |
+          {  1,  1,  0 }, //      |     20      |  26   |     22      |
+          { -1,  1,  0 }, //      |                     |             |
+          {  0, -1,  1 }, //     13         21  |      14             |
+          {  1,  0,  1 }, //      |             0   ----- 11   -----  3
+          {  0,  1,  1 }, //      |         .           |         .
+          { -1,  0,  1 }, //      |      8         24   |     10
+          {  0, -1,  0 }, //      |  .                  |  .
+          {  1,  0,  0 }, //      1   -----  9   -----  2
+          {  0,  1,  0 }, //
+          { -1,  0,  0 },
+          {  0,  0, -1 },
+          {  0,  0,  1 },
+          {  0,  0,  0 }
+    };
+#endif
+
+struct refTemplates hexQuadraticTemp = {
+  52, // new nodes: 26 with alfa; 26 middle layer, from center
+  7,
+   {
+      { -alfa, -alfa, -alfa },  // 27 to
+      {  alfa, -alfa, -alfa },
+      {  alfa,  alfa, -alfa },
+      { -alfa,  alfa, -alfa },
+      { -alfa, -alfa,  alfa },
+      {  alfa, -alfa,  alfa },
+      {  alfa,  alfa,  alfa },
+      { -alfa,  alfa,  alfa },
+      {     0, -alfa, -alfa },
+      {  alfa,     0, -alfa },
+      {     0,  alfa, -alfa },
+      { -alfa,     0, -alfa },
+      { -alfa, -alfa,   0   },
+      {  alfa, -alfa,   0   },
+      {  alfa,  alfa,   0   },
+      { -alfa,  alfa,   0   },
+      {     0, -alfa,  alfa },
+      {  alfa,     0,  alfa },
+      {     0,  alfa,  alfa },
+      { -alfa,     0,  alfa },
+      {     0, -alfa,   0   },
+      {  alfa,     0,   0   },
+      {     0,  alfa,   0   },
+      { -alfa,     0,   0   },
+      {     0,     0, -alfa },
+      {     0,     0,  alfa },  // 52
+
+      { -(1+alfa)/2, -(1+alfa)/2, -(1+alfa)/2 },  // 53
+      {  (1+alfa)/2, -(1+alfa)/2, -(1+alfa)/2 },  // 54
+      {  (1+alfa)/2,  (1+alfa)/2, -(1+alfa)/2 },  // 55
+      { -(1+alfa)/2,  (1+alfa)/2, -(1+alfa)/2 },  // 56
+      { -(1+alfa)/2, -(1+alfa)/2,  (1+alfa)/2 },  // 57
+      {  (1+alfa)/2, -(1+alfa)/2,  (1+alfa)/2 },  // 58
+      {  (1+alfa)/2,  (1+alfa)/2,  (1+alfa)/2 },  // 59
+      { -(1+alfa)/2,  (1+alfa)/2,  (1+alfa)/2 },
+      {     0, -(1+alfa)/2, -(1+alfa)/2 },
+      {  (1+alfa)/2,     0, -(1+alfa)/2 },
+      {     0,  (1+alfa)/2, -(1+alfa)/2 },
+      { -(1+alfa)/2,     0, -(1+alfa)/2 },
+      { -(1+alfa)/2, -(1+alfa)/2,   0   },
+      {  (1+alfa)/2, -(1+alfa)/2,   0   },
+      {  (1+alfa)/2,  (1+alfa)/2,   0   },
+      { -(1+alfa)/2,  (1+alfa)/2,   0   },
+      {     0, -(1+alfa)/2,  (1+alfa)/2 },
+      {  (1+alfa)/2,     0,  (1+alfa)/2 },
+      {     0,  (1+alfa)/2,  (1+alfa)/2 },
+      { -(1+alfa)/2,     0,  (1+alfa)/2 },
+      {     0, -(1+alfa)/2,   0   },
+      {  (1+alfa)/2,     0,   0   },
+      {     0,  (1+alfa)/2,   0   },
+      { -(1+alfa)/2,     0,   0   },
+      {     0,     0, -(1+alfa)/2 },
+      {     0,     0,  (1+alfa)/2 }  // 78
+   },
+
+     {   // from 4 to 7 are the face vertices; first 4 just add 27 to it
+        {27, 28, 32, 31, 0, 1, 5, 4, 35, 40, 43, 39, 53, 54, 58, 57,  8, 13, 16, 12,  8+53, 13+53, 16+53, 12+53, 47, 20, 20+53  },
+        {28, 29, 33, 32, 1, 2, 6, 5, 36, 41, 44, 40, 54, 55, 59, 58,  9, 14, 17, 13,  9+53, 14+53, 17+53, 13+53, 48, 21, 21+53 },
+        {29, 30, 34, 33, 2, 3, 7, 6, 37, 42, 45, 41, 55, 56, 60, 59, 10, 15, 18, 14, 10+53, 15+53, 18+53, 14+53, 49, 22, 22+53 },
+        {30, 27, 31, 34, 3, 0, 4, 7, 38, 39, 46, 42, 56, 53, 57, 60, 11, 12, 19, 15, 11+53, 12+53, 19+53, 15+53, 50, 23, 23+53 },
+        {27, 30, 29, 28, 0, 3, 2, 1, 38, 37, 36, 35, 53, 56, 55, 54, 11, 10,  9,  8, 11+53, 10+53,  9+53,  8+53, 51, 24, 24+53 },
+        {31, 32, 33, 34, 4, 5, 6, 7, 43, 44, 45, 46, 57, 58, 59, 60, 16, 17, 18, 19, 16+53, 17+53, 18+53, 19+53, 52, 25, 25+53 },
+        {27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 26}
+     }
+};
+
 bool Errfunc(double point[3], double tol)
 {
   double center[3] = {0,0,0};
@@ -127,6 +230,9 @@ int main(int argc, char *argv[])
 
   //Load Mesh
   const char *filename = argv[1];
+  std::string filen(filename);
+  filen = filen.substr(0, filen.rfind("."));
+  filen = "Ref_" + filen + ".h5m";
   // 
   int dim = atoi(argv[2]);
   if (dim!=2 && dim!=3) 
@@ -157,8 +263,16 @@ int main(int argc, char *argv[])
   }
   else
   {
-    entTemplate = &hexTemp;
-    entType = MBHEX;
+    if (numNodes == 8)
+    {
+      entTemplate = &hexTemp;
+      entType = MBHEX;
+    }
+    else if (numNodes == 27)
+    {
+      entTemplate = &hexQuadraticTemp;
+      entType = MBHEX;
+    }
   }
   //Create refinement set from error indicators
   EntityHandle refset;
@@ -191,7 +305,7 @@ int main(int argc, char *argv[])
   Range remEnts = subtract(ents, coarseEnts);
   error = mbImpl->add_entities(finemesh, remEnts);MB_CHK_ERR(error);
 
-  EntityHandle vbuffer[25]; // max number of nodes in template // quad 9 has 9 + 16 = 25 nodes
+  EntityHandle vbuffer[100]; // max number of nodes in template // quad 9 has 9 + 16 = 25 nodes
   for (Range::iterator it = coarseEnts.begin(); it != coarseEnts.end(); it++)
     {
       int nconn = 0;
@@ -211,17 +325,25 @@ int main(int argc, char *argv[])
            std::cerr << " not supported yet\n";
       }
       else
-        ee.set_eval_set(MBHEX, LinearHex::eval_set());
+      {
+        if (nconn == 8)
+          ee.set_eval_set(MBHEX, LinearHex::eval_set());
+        else if (nconn == 27)
+          ee.set_eval_set(MBHEX, QuadraticHex::eval_set());
+        else
+          std::cerr << " not supported yet\n";
+      }
+
       
-      
-      for (int k=0; k<entTemplate->num_verts; k++) // 4 or 8
+
+      for (int k=0; k<entTemplate->num_verts; k++) // 4 or 8, or 52 new nodes (26+26)
       {
         double coords[3];
         error = ee.eval(entTemplate->vertex_natcoords[k], coords);MB_CHK_ERR(error);
-        error = mbImpl->create_vertex(coords, vbuffer[nconn+k]);MB_CHK_ERR(error);
+        error = mbImpl->create_vertex(coords, vbuffer[nconn+k]);MB_CHK_ERR(error); // could get to 27+51=78 (index)
       } 
 
-      for (int i=0; i<nconn; i++)
+      for (int i=0; i<nconn; i++) //the original vertices in entity
         vbuffer[i] = conn[i];
 
       //Create new ents
@@ -241,9 +363,7 @@ int main(int argc, char *argv[])
 
 
   //Write out
-  std::stringstream file;
-  file <<"refined_mesh.h5m";
-  error = mbImpl->write_file(file.str().c_str(), 0, NULL, &finemesh, 1);MB_CHK_ERR(error);
+  error = mbImpl->write_file(filen.c_str(), 0, NULL, &finemesh, 1);MB_CHK_ERR(error);
 
   return 0;
 }
