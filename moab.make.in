@@ -10,6 +10,7 @@ MOAB_INCLUDES = -I@abs_srcdir@/src \
                 -I@abs_srcdir@/src/LocalDiscretization \
                 -I@abs_srcdir@/src/RefineMesh
 
+CGM_DIR = @CGM_DIR@
 MSQ_LIBS = -L@abs_builddir@/src/mesquite/.libs -lmbmesquite
 MSQ_INCLUDES = -I@abs_srcdir@/src/mesquite/include \
 	-I@abs_builddir@/src/mesquite/include \

@@ -12,6 +12,10 @@ include ${MOAB_BUILD_DIR}/itaps/imesh/iMesh-Defs.inc
 MOAB_DEV = yes
 endif
 
+ifeq ($(MOAB_IGEOM_ENABLED),yes)
+include ${CGM_DIR}/lib/iGeom-Defs.inc
+endif
+
 .SUFFIXES: .o .cpp .F90
 
 default: all
@@ -19,7 +23,7 @@ default: all
 # MESH_DIR is the directory containing mesh files that come with MOAB source
 MESH_DIR="@abs_top_srcdir@/MeshFiles/unittest"
 
-EXAMPLES = HelloMOAB GetEntities SetsNTags LoadPartial StructuredMesh StructuredMeshSimple DirectAccessWithHoles DirectAccessNoHoles PointInElementSearch GenLargeMesh UniformRefinement ExtrudePoly
+EXAMPLES = HelloMOAB GetEntities SetsNTags LoadPartial StructuredMesh StructuredMeshSimple DirectAccessWithHoles DirectAccessNoHoles PointInElementSearch GenLargeMesh UniformRefinement ExtrudePoly OptimizeMeshMesquite
 PAREXAMPLES = HelloParMOAB ReduceExchangeTags LloydRelaxation CrystalRouterExample ReadWriteTest
 EXOIIEXAMPLES = TestExodusII VisTags
 F90EXAMPLES = DirectAccessNoHolesF90
@@ -83,6 +87,18 @@ run-LloydRelaxation: LloydRelaxation
 ifeq ("$(MOAB_MPI_ENABLED)-$(MOAB_HDF5_ENABLED)","yes-yes")
 	${RUNSERIAL} ./LloydRelaxation
 	${RUNPARALLEL} ./LloydRelaxation
+endif
+
+ifeq ("$(MOAB_MESQUITE_ENABLED)","yes")
+OptimizeMeshMesquite: OptimizeMeshMesquite.o ${MOAB_LIBDIR}/libMOAB.la
+	${MOAB_CXX} -o $@ $< ${IMESH_LIBS} ${IGEOM_LIBS}
+
+OptimizeMeshMesquite.o: OptimizeMeshMesquite.cpp
+	@echo "     CXX  $<"
+	@${MOAB_CXX} ${CXXFLAGS} ${MOAB_CXXFLAGS} ${MOAB_CPPFLAGS} ${MOAB_INCLUDES} ${IMESH_INCLUDES} ${IGEOM_INCLUDES} -DMESH_DIR=\"${MESH_DIR}\" -c $<
+
+run-OptimizeMeshMesquite: OptimizeMeshMesquite
+	${RUNSERIAL} ./OptimizeMeshMesquite
 endif
 
 LoadPartial: LoadPartial.o ${MOAB_LIBDIR}/libMOAB.la
@@ -231,8 +247,10 @@ clean:
 	rm -rf *.o *.mod *.h5m ${ALLEXAMPLES}
 
 .cpp.o:
-	${MOAB_CXX} ${CXXFLAGS} ${MOAB_CXXFLAGS} ${MOAB_CPPFLAGS} ${MOAB_INCLUDES} -DMESH_DIR=\"${MESH_DIR}\" -c $<
+	@echo "   CXX  $<"
+	@${MOAB_CXX} ${CXXFLAGS} ${MOAB_CXXFLAGS} ${MOAB_CPPFLAGS} ${MOAB_INCLUDES} -DMESH_DIR=\"${MESH_DIR}\" -c $<
 
 .F90.o:
-	${IMESH_FC} ${FCFLAGS} ${IMESH_FCFLAGS} ${MOAB_CPPFLAGS} ${IMESH_INCLUDES} ${IMESH_FCDEFS} $(FC_DEFINE)MESH_DIR=\"${MESH_DIR}\" -c $<
+	@echo "    FC  $<"
+	@${IMESH_FC} ${FCFLAGS} ${IMESH_FCFLAGS} ${MOAB_CPPFLAGS} ${IMESH_INCLUDES} ${IMESH_FCDEFS} $(FC_DEFINE)MESH_DIR=\"${MESH_DIR}\" -c $<
 
