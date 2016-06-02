@@ -7,6 +7,7 @@
 #include "moab/ElemEvaluator.hpp"
 #include "moab/LinearHex.hpp"
 #include "moab/LinearQuad.hpp"
+#include "moab/QuadraticQuad.hpp"
 
 using namespace moab;
 
@@ -56,6 +57,50 @@ struct refTemplates hexTemp = {
    }
  };
 
+
+struct refTemplates quadTempQuadratic = {
+  16, // 16 new nodes; 4 new corners, 4 on internal edges, 4 on radial edges, 4 interior
+  5,  // 5 quads, as in the linear case 
+        /* original connectivity for quad 9 in MOAB
+         { -1, -1, 0},  // 0                                  
+         {  1, -1, 0},  // 1                                 3           6          2
+         {  1,  1, 0},  // 2                                   20       23      19
+         { -1,  1, 0},  // 3                                      12    15   11  
+         {  0, -1, 0},  // 4                                   
+
+         {  1,  0, 0},  // 5                                    
+         {  0,  1, 0},  // 6                                 7 24 16     8   14 22  5 
+         { -1,  0, 0},  // 7                                                      
+         {  0,  0, 0}   // 8  */                                
+   {                                                                
+     { -alfa, -alfa, 0 },  // 9                                    9    13   10
+     {  alfa, -alfa, 0 },  // 10                               17       21       18
+     {  alfa,  alfa, 0 },  // 11                             0           4          1    
+     { -alfa,  alfa, 0 },  // 12                               
+     {     0, -alfa, 0 },  // 13
+     {  alfa,     0, 0 },  // 14
+     {     0,  alfa, 0 },  // 15
+     { -alfa,     0, 0 },  // 16
+     { (-1-alfa)/2, (-1-alfa)/2, 0 }, // 17  = (0+9)/2
+     { ( 1+alfa)/2, (-1-alfa)/2, 0 }, // 18  = (1+10)/2
+     { ( 1+alfa)/2, ( 1+alfa)/2, 0 }, // 19  = (2+11)/2
+     { (-1-alfa)/2, ( 1+alfa)/2, 0 }, // 20  = (3+12)/2
+     {           0, (-1-alfa)/2, 0 }, // 21  = (4+13)/2
+     { ( 1+alfa)/2,           0, 0 }, // 22  = (5+14)/2
+     {           0, ( 1+alfa)/2, 0 }, // 23  = (6+15)/2
+     { (-1-alfa)/2,           0, 0 }, // 24  = (7+16)/2
+
+   },
+
+    {
+     {0,1,10, 9, 4, 18, 13, 17, 21 },
+     {1,2,11,10, 5, 19, 14, 18, 22 },
+     {2,3, 12, 11, 6, 20, 15, 19, 23},
+     {3,0, 9,12, 7, 17, 16, 20, 24 },
+     {9, 10, 11, 12, 13, 14, 15, 16, 8} 
+    }
+};
+
 bool Errfunc(double point[3], double tol)
 {
   double center[3] = {0,0,0};
@@ -96,8 +141,20 @@ int main(int argc, char *argv[])
   error = mbImpl->get_entities_by_dimension(inmesh, dim, ents);MB_CHK_ERR(error);
   const struct refTemplates * entTemplate;
   EntityType entType = MBQUAD;
+  // number of nodes of first entity quad 4 or 9?
+  EntityHandle firstEnt = ents[0];
+  const EntityHandle * co;
+  int numNodes = 4;
+  error = mbImpl->get_connectivity(firstEnt, co, numNodes); MB_CHK_ERR(error);
   if (2==dim)
-    entTemplate = &quadTemp;
+  { 
+    if (numNodes == 4)
+      entTemplate = &quadTemp;
+    else if (numNodes ==9)
+      entTemplate = &quadTempQuadratic;
+    else
+      std::cerr << " not supported yet\n";
+  }
   else
   {
     entTemplate = &hexTemp;
@@ -134,7 +191,7 @@ int main(int argc, char *argv[])
   Range remEnts = subtract(ents, coarseEnts);
   error = mbImpl->add_entities(finemesh, remEnts);MB_CHK_ERR(error);
 
-  EntityHandle vbuffer[16]; // max number of nodes in template
+  EntityHandle vbuffer[25]; // max number of nodes in template // quad 9 has 9 + 16 = 25 nodes
   for (Range::iterator it = coarseEnts.begin(); it != coarseEnts.end(); it++)
     {
       int nconn = 0;
@@ -146,13 +203,18 @@ int main(int argc, char *argv[])
       ee.set_tag_handle(0, 0);
       if (dim == 2)
       {
-        ee.set_eval_set(MBQUAD, LinearQuad::eval_set());
+        if (nconn==4)
+           ee.set_eval_set(MBQUAD, LinearQuad::eval_set());
+        else if (nconn == 9)
+           ee.set_eval_set(MBQUAD, QuadraticQuad::eval_set());
+        else
+           std::cerr << " not supported yet\n";
       }
       else
         ee.set_eval_set(MBHEX, LinearHex::eval_set());
       
       
-      for (int k=0; k<nconn; k++) // 4 or 8
+      for (int k=0; k<entTemplate->num_verts; k++) // 4 or 8
       {
         double coords[3];
         error = ee.eval(entTemplate->vertex_natcoords[k], coords);MB_CHK_ERR(error);
@@ -164,7 +226,7 @@ int main(int argc, char *argv[])
 
       //Create new ents
       EntityHandle newEnt;
-      EntityHandle nwconn[8]; // max
+      EntityHandle nwconn[27]; // max could be 27 
       for (int i=0; i<entTemplate->num_ents; i++)
         {
           for (int k=0; k<nconn; k++)
