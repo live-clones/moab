@@ -4,6 +4,9 @@
 #include "moab/Core.hpp"
 #include "moab/ReadUtilIface.hpp"
 
+#include "moab/ElemEvaluator.hpp"
+#include "moab/LinearHex.hpp"
+#include "moab/LinearQuad.hpp"
 
 using namespace moab;
 
@@ -12,16 +15,46 @@ using namespace moab;
 
 #define MAX_VERTS 16
 #define MAX_CHILDS 10
+#define MAX_CONN   27
 struct refTemplates {
   int num_verts;
   int num_ents;
   double vertex_natcoords[MAX_VERTS][3];
-  int ents_conn[MAX_CHILDS][4];
+  int ents_conn[MAX_CHILDS][MAX_CONN];
 };
 
-static const refTemplates quadTemp = {
-  4, 5, {{-1/3.0, -1/3.0,0},{1/3.0, -1/3.0,0},{1/3.0,1/3.0,0},{-1/3.0, 1/3.0,0}}, {{0,1,5,4},{1,2,6,5},{3,7,6,2},{0,4,7,3},{4,5,6,7}}
+struct refTemplates quadTemp = {
+  4, 
+  5,
+   {{-1/3.0, -1/3.0,0},{1/3.0, -1/3.0,0},{1/3.0,1/3.0,0},{-1/3.0, 1/3.0,0}},
+    {{0,1,5,4},{1,2,6,5},{3,7,6,2},{0,4,7,3},{4,5,6,7}}
 };
+
+#define alfa 1./3
+
+struct refTemplates hexTemp = {
+  8,
+  7,
+   {
+     { -alfa, -alfa, -alfa },
+     {  alfa, -alfa, -alfa },
+     {  alfa,  alfa, -alfa },
+     { -alfa,  alfa, -alfa },
+     { -alfa, -alfa,  alfa },
+     {  alfa, -alfa,  alfa },
+     {  alfa,  alfa,  alfa },
+     { -alfa,  alfa,  alfa }
+   },
+   {
+     {0,1,5,4, 8,9,13,12}, 
+     {1,2,6,5, 9,10,14,13}, 
+     {2,3,7,6, 10,11,15,14}, 
+     {3,0,4,7, 11,8,12,15}, 
+     {0,3,2,1, 8,11,10,9}, 
+     {4,5,6,7, 12,13,14,15}, 
+     {8,9,10,11, 12,13,14,15} 
+   }
+ };
 
 bool Errfunc(double point[3], double tol)
 {
@@ -33,22 +66,6 @@ bool Errfunc(double point[3], double tol)
     return false;
 }
 
-void compute_coords(double *corner_coords, int num_coords, double xi, double eta, double verts[3])
-{
-  double N[4];
-   N[0] = (1-xi)*(1-eta)/4; N[1] = (1+xi)*(1-eta)/4; N[2] = (1+xi)*(1+eta)/4, N[3] = (1-xi)*(1+eta)/4;
-
-   double x=0, y=0, z=0;
-   for (int j=0; j<num_coords; j++)
-     {
-       x += N[j]*corner_coords[3*j];
-       y += N[j]*corner_coords[3*j+1];
-       z += N[j]*corner_coords[3*j+2];
-     }
-   verts[0] = x; verts[1] = y; verts[2] = z;
-
-}
-
 int main(int argc, char *argv[])
 {
 
@@ -57,27 +74,41 @@ int main(int argc, char *argv[])
   ErrorCode error;
 
 
-  if (argc==1)
+  if (argc<=2)
     {
-      std::cerr << "Usage: " << argv[0] << " [filename]" << std::endl;
+      std::cerr << "Usage: " << argv[0] << " [filename] [dim]" << std::endl;
       return 1;
     }
 
   //Load Mesh
   const char *filename = argv[1];
+  // 
+  int dim = atoi(argv[2]);
+  if (dim!=2 && dim!=3) 
+  {
+     std::cerr<< " dimension is not 2 or 3 :" << dim << "\n";
+  }
   EntityHandle inmesh;
   error = mbImpl->create_meshset(MESHSET_SET, inmesh);MB_CHK_ERR(error);
   error = mbImpl->load_file(filename, &inmesh);MB_CHK_ERR(error);
-  Range allverts, allquads;
-  error = mbImpl->get_entities_by_dimension(inmesh, 0, allverts);MB_CHK_ERR(error);
-  error = mbImpl->get_entities_by_dimension(inmesh, 2, allquads);MB_CHK_ERR(error);
+  Range ents;
 
+  error = mbImpl->get_entities_by_dimension(inmesh, dim, ents);MB_CHK_ERR(error);
+  const struct refTemplates * entTemplate;
+  EntityType entType = MBQUAD;
+  if (2==dim)
+    entTemplate = &quadTemp;
+  else
+  {
+    entTemplate = &hexTemp;
+    entType = MBHEX;
+  }
   //Create refinement set from error indicators
   EntityHandle refset;
   error = mbImpl->create_meshset(MESHSET_SET, refset);MB_CHK_ERR(error);
   double centroid[3];
   double tol = 0.5;
-  for (Range::iterator it = allquads.begin(); it != allquads.end(); it++)
+  for (Range::iterator it = ents.begin(); it != ents.end(); it++)
     {
       error = mbImpl->get_coords(&(*it), 1, &centroid[0]);MB_CHK_ERR(error);
       bool select = Errfunc(centroid, tol);
@@ -97,61 +128,59 @@ int main(int argc, char *argv[])
   EntityHandle finemesh;
   error = mbImpl->create_meshset(MESHSET_SET, finemesh);MB_CHK_ERR(error);
 
-  Range coarse_quads;
-  error = mbImpl->get_entities_by_dimension(refset, 2, coarse_quads);MB_CHK_ERR(error);
+  Range coarseEnts;
+  error = mbImpl->get_entities_by_dimension(refset, dim, coarseEnts);MB_CHK_ERR(error);
 
-  Range remquads = subtract(allquads, coarse_quads);
-  error = mbImpl->add_entities(finemesh, remquads);MB_CHK_ERR(error);
+  Range remEnts = subtract(ents, coarseEnts);
+  error = mbImpl->add_entities(finemesh, remEnts);MB_CHK_ERR(error);
 
-  for (Range::iterator it = coarse_quads.begin(); it != coarse_quads.end(); it++)
+  EntityHandle vbuffer[16]; // max number of nodes in template
+  for (Range::iterator it = coarseEnts.begin(); it != coarseEnts.end(); it++)
     {
       int nconn = 0;
       const EntityHandle *conn;
-      error = mbImpl->get_connectivity(*it, conn, nconn);MB_CHK_ERR(error);
+      EntityHandle ent=*it;
+      error = mbImpl->get_connectivity(ent, conn, nconn);MB_CHK_ERR(error);
 
-      double *coords = new double[3*nconn];
-      error = mbImpl->get_coords(conn, nconn, coords);MB_CHK_ERR(error);
-
-      //Create new vertices
-      EntityHandle nwvert;  double x[3];
-      EntityHandle *vbuffer = new EntityHandle[nconn+quadTemp.num_verts];
+      ElemEvaluator ee(mbImpl, ent, 0);
+      ee.set_tag_handle(0, 0);
+      if (dim == 2)
+      {
+        ee.set_eval_set(MBQUAD, LinearQuad::eval_set());
+      }
+      else
+        ee.set_eval_set(MBHEX, LinearHex::eval_set());
+      
+      
+      for (int k=0; k<nconn; k++) // 4 or 8
+      {
+        double coords[3];
+        error = ee.eval(entTemplate->vertex_natcoords[k], coords);MB_CHK_ERR(error);
+        error = mbImpl->create_vertex(coords, vbuffer[nconn+k]);MB_CHK_ERR(error);
+      } 
 
       for (int i=0; i<nconn; i++)
         vbuffer[i] = conn[i];
 
-      for (int i = 0; i < quadTemp.num_verts; i++)
-        {
-          double xi = quadTemp.vertex_natcoords[i][0];
-          double eta = quadTemp.vertex_natcoords[i][1];
-          compute_coords(coords, nconn, xi, eta, x);
-
-          error = mbImpl->create_vertex(x, nwvert);MB_CHK_ERR(error);
-          vbuffer[i+nconn] = nwvert;
-        }
-
-      //Create new quads
-      EntityHandle nwquad;
-      EntityHandle *nwconn = new EntityHandle[nconn];
-      for (int i=0; i<quadTemp.num_ents; i++)
+      //Create new ents
+      EntityHandle newEnt;
+      EntityHandle nwconn[8]; // max
+      for (int i=0; i<entTemplate->num_ents; i++)
         {
           for (int k=0; k<nconn; k++)
             {
-              int idx = quadTemp.ents_conn[i][k];
+              int idx = entTemplate->ents_conn[i][k];
               nwconn[k] = vbuffer[idx];
             }
-          error = mbImpl->create_element(MBQUAD, nwconn, nconn, nwquad);MB_CHK_ERR(error);
-          error = mbImpl->add_entities(finemesh, &nwquad, 1);MB_CHK_ERR(error);
+          error = mbImpl->create_element(entType, nwconn, nconn, newEnt);MB_CHK_ERR(error);
+          error = mbImpl->add_entities(finemesh, &newEnt, 1);MB_CHK_ERR(error);
         }
-
-      delete [] vbuffer;
-      delete [] coords;
-      delete [] nwconn;
     }
 
 
   //Write out
   std::stringstream file;
-  file <<"refined_mesh.vtk";
+  file <<"refined_mesh.h5m";
   error = mbImpl->write_file(file.str().c_str(), 0, NULL, &finemesh, 1);MB_CHK_ERR(error);
 
   return 0;
