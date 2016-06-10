@@ -23,7 +23,7 @@ default: all
 # MESH_DIR is the directory containing mesh files that come with MOAB source
 MESH_DIR="@abs_top_srcdir@/MeshFiles/unittest"
 
-EXAMPLES = HelloMOAB GetEntities SetsNTags LoadPartial StructuredMesh StructuredMeshSimple DirectAccessWithHoles DirectAccessNoHoles PointInElementSearch GenLargeMesh UniformRefinement ExtrudePoly OptimizeMeshMesquite
+EXAMPLES = HelloMOAB GetEntities SetsNTags LoadPartial StructuredMesh StructuredMeshSimple DirectAccessWithHoles DirectAccessNoHoles PointInElementSearch GenLargeMesh UniformRefinement ExtrudePoly OptimizeMeshMesquite TemplatedAdaptRefinement LocalRefHex
 PAREXAMPLES = HelloParMOAB ReduceExchangeTags LloydRelaxation CrystalRouterExample ReadWriteTest
 EXOIIEXAMPLES = TestExodusII VisTags
 F90EXAMPLES = DirectAccessNoHolesF90
@@ -244,6 +244,12 @@ ifeq ("$(wildcard GenLargeMesh.vtk)","")
 endif
 	${RUNSERIAL} ./UniformRefinement GenLargeMesh.vtk
 endif
+
+TemplatedAdaptRefinement: TemplatedAdaptRefinement.o ${MOAB_LIBDIR}/libMOAB.la
+	${MOAB_CXX} -o $@ $< ${MOAB_LIBS_LINK}
+
+LocalRefHex: LocalRefHex.o ${MOAB_LIBDIR}/libMOAB.la
+	${MOAB_CXX} -o $@ $< ${MOAB_LIBS_LINK}
 
 run: all $(addprefix run-,$(ALLEXAMPLES))
 

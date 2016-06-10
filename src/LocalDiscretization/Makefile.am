@@ -16,6 +16,7 @@ MOAB_LOCALDISCR_SRCS = \
 	ElemEvaluator.cpp \
 	LinearHex.cpp \
 	LinearQuad.cpp \
+	QuadraticQuad.cpp \
 	LinearTet.cpp \
 	LinearTri.cpp \
 	QuadraticHex.cpp
@@ -24,6 +25,7 @@ MOAB_LOCALDISCR_HDRS = \
 	moab/ElemEvaluator.hpp \
 	moab/LinearHex.hpp \
 	moab/LinearQuad.hpp \
+	moab/QuadraticQuad.hpp \
 	moab/LinearTet.hpp \
 	moab/LinearTri.hpp \
 	moab/QuadraticHex.hpp

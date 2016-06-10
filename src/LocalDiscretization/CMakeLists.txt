@@ -1,6 +1,7 @@
 set( MOAB_LOC_DSCR_SRCS ElemEvaluator.cpp
                         LinearHex.cpp
                         LinearQuad.cpp
+                        QuadraticQuad.cpp
                         LinearTet.cpp
                         LinearTri.cpp
                         QuadraticHex.cpp )
@@ -8,7 +9,8 @@ set( MOAB_LOC_DSCR_SRCS ElemEvaluator.cpp
 set( MOAB_LOCALDSRC_Install_Headers moab/ElemEvaluator.hpp
                                     moab/LinearHex.hpp
                                     moab/LinearQuad.hpp
-	                                  moab/LinearTet.hpp
+                                    moab/QuadraticQuad.hpp
+	                                moab/LinearTet.hpp
                                     moab/LinearTri.hpp
                                     moab/QuadraticHex.hpp )
 
