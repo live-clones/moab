@@ -7,6 +7,7 @@
 #include "MeshImpl.hpp"
 #include "moab/Core.hpp"
 #include "moab/Skinner.hpp"
+#include "moab/LloydSmoother.hpp"
 #include "FacetModifyEngine.hpp"
 #include "MsqError.hpp"
 #include "InstructionQueue.hpp"
@@ -19,16 +20,22 @@
 
 // algorithms
 #include "IdealWeightInverseMeanRatio.hpp"
+#include "TMPQualityMetric.hpp"
+#include "AspectRatioGammaQualityMetric.hpp"
 #include "ConditionNumberQualityMetric.hpp"
 #include "VertexConditionNumberQualityMetric.hpp"
-#include "EdgeLengthQualityMetric.hpp"
+#include "MultiplyQualityMetric.hpp"
 #include "LPtoPTemplate.hpp"
+#include "LInfTemplate.hpp"
 #include "PMeanPTemplate.hpp"
 #include "SteepestDescent.hpp"
 #include "FeasibleNewton.hpp"
+#include "QuasiNewton.hpp"
 #include "ConjugateGradient.hpp"
 #include "SmartLaplacianSmoother.hpp"
+#include "Randomize.hpp"
 
+#include "ElementSolIndQM.hpp"
 
 #include "ReferenceMesh.hpp"
 #include "RefMeshTargetCalculator.hpp"
@@ -36,6 +43,7 @@
 #include "TQualityMetric.hpp"
 #include "IdealShapeTarget.hpp"
 
+#include <sys/stat.h>
 #include <iostream>
 using std::cerr;
 using std::cout;
@@ -89,6 +97,8 @@ static int print_iMesh_error( const char* desc,
 
 std::string default_file_name = "../../../MeshFiles/mesquite/3D/vtk/large_box_hex_1000.vtk";
 
+std::vector<double> solution_indicator;
+
 void usage()
 {
   cout << "main [-N] [filename]" << endl;
@@ -98,7 +108,9 @@ void usage()
   exit (1);
 }
 
-  // Construct a MeshTSTT from the file
+int write_vtk_mesh( Mesh* mesh, const char* filename);
+
+// Construct a MeshTSTT from the file
 int get_imesh_mesh( MBMesquite::Mesh** , const char* file_name, int dimension );
 
   // Construct a MeshImpl from the file
@@ -108,12 +120,19 @@ int get_itaps_domain(MeshDomain**, const char*);
 int get_mesquite_domain(MeshDomain**, const char*);
 
   // Run FeasibleNewton solver
-int run_global_smoother( MeshDomainAssoc& mesh, MsqError& err );
+int run_global_smoother( MeshDomainAssoc& mesh, MsqError& err, double OF_value=1e-4 );
 
   // Run SmoothLaplacian solver
-int run_local_smoother( MeshDomainAssoc& mesh, MsqError& err );
+int run_local_smoother( MeshDomainAssoc& mesh, MsqError& err, double OF_value=1e-3 );
 
 int run_quality_optimizer( MeshDomainAssoc& mesh_and_domain, MsqError& err );
+
+int run_solution_mesh_optimizer( MeshDomainAssoc& mesh_and_domain, MsqError& err );
+
+bool file_exists (const std::string& name) {
+  struct stat buffer;   
+  return (stat (name.c_str(), &buffer) == 0); 
+}
 
 int main(int argc, char* argv[])
 {
@@ -157,6 +176,7 @@ int main(int argc, char* argv[])
 //  PlanarDomain plane( PlanarDomain::XY );
   MeshDomain* plane;
   int ierr;
+  if (!file_exists(geometry_file_name)) geometry_file_name = "";
   ierr = get_itaps_domain(&plane, geometry_file_name.c_str());
   if (ierr) return 1;
 
@@ -174,12 +194,12 @@ int main(int argc, char* argv[])
 
   MeshDomainAssoc mesh_and_domain(mesh, plane);
 
-  MeshWriter::write_vtk(mesh, "original.vtk", err);
-  if (err) return 1;
+  ierr = write_vtk_mesh( mesh, "original.vtk");
+  if (ierr) return 1;
   cout << "Wrote \"original.vtk\"" << endl;
 
-  run_global_smoother( mesh_and_domain, err );
-  if (err) return 1;
+  // run_global_smoother( mesh_and_domain, err );
+  // if (err) return 1;
 
     // Try running a local smoother on the mesh
 //  Mesh* meshl=0;
@@ -193,41 +213,68 @@ int main(int argc, char* argv[])
 //  }
 
 //  MeshDomainAssoc mesh_and_domain_local(meshl, plane);
-  run_local_smoother( mesh_and_domain, err );
+  
+  // run_solution_mesh_optimizer( mesh_and_domain, err );
+  // if (err) return 1;
+
+  run_local_smoother( mesh_and_domain, err, 1e-4 );
   if (err) return 1;
 
-  run_quality_optimizer( mesh_and_domain, err );
-  if (err) return 1;
+  double reps = 5e-2;
+  for (int iter=0; iter < 10; iter++) {    
+    
+    if (!(iter % 4)) {
+      run_local_smoother( mesh_and_domain, err, reps*10 );
+      if (err) return 1;
+    }
+
+    run_global_smoother( mesh_and_domain, err, reps );
+    if (err) return 1;
+
+    reps *= 0.1;
+  }
+
+  // run_quality_optimizer( mesh_and_domain, err );
+  // if (err) return 1;
+
+  // run_local_smoother( mesh_and_domain, err );
+  // if (err) return 1;
 
   return 0;
 }
 
 
-int run_global_smoother( MeshDomainAssoc& mesh_and_domain, MsqError& err )
+int run_global_smoother( MeshDomainAssoc& mesh_and_domain, MsqError& err, double OF_value )
 {
-  double OF_value = 0.00001;
+  // double OF_value = 1e-6;
 
   Mesh* mesh = mesh_and_domain.get_mesh();
+  MeshDomain* domain = mesh_and_domain.get_domain();
 
   // creates an intruction queue
   InstructionQueue queue1;
 
   // creates a mean ratio quality metric ...
-  // IdealWeightInverseMeanRatio* mean_ratio = new IdealWeightInverseMeanRatio(err);
+  IdealWeightInverseMeanRatio* mean_ratio = new IdealWeightInverseMeanRatio(err);
   // ConditionNumberQualityMetric* mean_ratio = new ConditionNumberQualityMetric();
+  // TMPQualityMetric* mean_ratio = new TMPQualityMetric();
 
-  VertexConditionNumberQualityMetric* mean_ratio = new VertexConditionNumberQualityMetric();
+  // VertexConditionNumberQualityMetric* mean_ratio = new VertexConditionNumberQualityMetric();
   if (err) return 1;
   mean_ratio->set_averaging_method(QualityMetric::RMS, err);
   if (err) return 1;
 
   // ... and builds an objective function with it
   LPtoPTemplate* obj_func = new LPtoPTemplate(mean_ratio, 1, err);
+  // LInfTemplate* obj_func = new LInfTemplate(mean_ratio);
   if (err) return 1;
 
   // creates the feas newt optimization procedures
-  ConjugateGradient* pass1 = new ConjugateGradient( obj_func, err );
+  // ConjugateGradient* pass1 = new ConjugateGradient( obj_func, err );
   // FeasibleNewton* pass1 = new FeasibleNewton( obj_func );
+  SteepestDescent* pass1 = new SteepestDescent( obj_func );
+  pass1->use_element_on_vertex_patch();
+  pass1->do_block_coordinate_descent_optimization();
   pass1->use_global_patch();
   if (err) return 1;
 
@@ -238,8 +285,10 @@ int run_global_smoother( MeshDomainAssoc& mesh_and_domain, MsqError& err )
   tc_inner.add_absolute_vertex_movement( OF_value );
   if (err) return 1;
   TerminationCriterion tc_outer;
-  tc_inner.add_iteration_limit( 15 );
-  tc_outer.add_iteration_limit( 2 );
+  tc_inner.add_iteration_limit( 10 );
+  tc_outer.add_iteration_limit( 5 );
+  tc_outer.set_debug_output_level(3);
+  tc_inner.set_debug_output_level(3);
   pass1->set_inner_termination_criterion(&tc_inner);
   pass1->set_outer_termination_criterion(&tc_outer);
 
@@ -254,28 +303,70 @@ int run_global_smoother( MeshDomainAssoc& mesh_and_domain, MsqError& err )
   if (err) return 1;
 
   // launches optimization on mesh_set
-  queue1.run_instructions(&mesh_and_domain, err);
+  if (domain) {
+    queue1.run_instructions(&mesh_and_domain, err);
+  }
+  else {
+    queue1.run_instructions(mesh, err);
+  }
   if (err) return 1;
 
-  MeshWriter::write_vtk(mesh, "feasible-newton-result.vtk", err);
-  if (err) return 1;
+
+  // Construct a MeshTSTT from the file
+  int ierr = write_vtk_mesh( mesh, "feasible-newton-result.vtk");
+  if (ierr) return 1;
+  // MeshWriter::write_vtk(mesh, "feasible-newton-result.vtk", err);
+  // if (err) return 1;
   cout << "Wrote \"feasible-newton-result.vtk\"" << endl;
 
   //print_timing_diagnostics( cout );
   return 0;
 }
 
-int run_local_smoother( MeshDomainAssoc& mesh_and_domain, MsqError& err )
+int write_vtk_mesh( Mesh* mesh, const char* filename )
 {
-  double OF_value = 0.000001;
+  moab::Interface* mbi = reinterpret_cast<MBiMesh*>(dynamic_cast<MsqIMesh*>(mesh)->get_imesh_instance())->mbImpl;
+
+  mbi->write_file(filename);
+
+  return 0;
+}
+
+int run_local_smoother2( MeshDomainAssoc& mesh_and_domain, MsqError& err, double OF_value );
+int run_local_smoother( MeshDomainAssoc& mesh_and_domain, MsqError& err, double OF_value )
+{
+  Mesh* mesh = mesh_and_domain.get_mesh();
+  moab::Interface* mbi = reinterpret_cast<MBiMesh*>(dynamic_cast<MsqIMesh*>(mesh)->get_imesh_instance())->mbImpl;
+
+
+  moab::Tag fixed;
+  moab::ErrorCode rval = mbi->tag_get_handle("fixed", 1, moab::MB_TYPE_INTEGER, fixed); MB_CHK_SET_ERR(rval, "Getting tag handle failed");
+  moab::Range cells;
+  rval = mbi->get_entities_by_dimension(0, 2, cells); MB_CHK_SET_ERR(rval, "Querying elements failed");
+
+  moab::LloydSmoother lloyd(mbi, 0, cells, 0, 0/*fixed*/);
+
+  lloyd.perform_smooth();
+
+  // run_local_smoother2(mesh_and_domain, err, OF_value);
+
+  return 0;
+}
+
+int run_local_smoother2( MeshDomainAssoc& mesh_and_domain, MsqError& err, double OF_value )
+{
+  // double OF_value = 1e-5;
 
   Mesh* mesh = mesh_and_domain.get_mesh();
+  MeshDomain* domain = mesh_and_domain.get_domain();
 
   // creates an intruction queue
   InstructionQueue queue1;
 
   // creates a mean ratio quality metric ...
-  IdealWeightInverseMeanRatio* mean_ratio = new IdealWeightInverseMeanRatio(err);
+  // IdealWeightInverseMeanRatio* mean_ratio = new IdealWeightInverseMeanRatio(err);
+  ConditionNumberQualityMetric* mean_ratio = new ConditionNumberQualityMetric();
+  // VertexConditionNumberQualityMetric* mean_ratio = new VertexConditionNumberQualityMetric();
   if (err) return 1;
   //  mean_ratio->set_gradient_type(QualityMetric::NUMERICAL_GRADIENT);
   //   mean_ratio->set_hessian_type(QualityMetric::NUMERICAL_HESSIAN);
@@ -286,8 +377,27 @@ int run_local_smoother( MeshDomainAssoc& mesh_and_domain, MsqError& err )
   LPtoPTemplate* obj_func = new LPtoPTemplate(mean_ratio, 1, err);
   if (err) return 1;
 
+  if (false)
+  {
+    InstructionQueue qtmp;
+    Randomize rand (-0.005) ;
+    TerminationCriterion sc_rand;
+    sc_rand.add_iteration_limit( 2 ) ;
+    rand.set_outer_termination_criterion(&sc_rand);
+    qtmp.set_master_quality_improver(&rand, err);
+    if (err) return 1;
+    if (domain) {
+      qtmp.run_instructions(&mesh_and_domain, err);
+    }
+    else {
+      qtmp.run_instructions(mesh, err);
+    }
+    if (err) return 1;
+  }
+
   // creates the smart laplacian optimization procedures
   SmartLaplacianSmoother* pass1 = new SmartLaplacianSmoother( obj_func );
+  // SteepestDescent* pass1 = new SteepestDescent( obj_func );
 
   QualityAssessor stop_qa( mean_ratio );
 
@@ -295,7 +405,7 @@ int run_local_smoother( MeshDomainAssoc& mesh_and_domain, MsqError& err )
   TerminationCriterion tc_inner;
   tc_inner.add_absolute_vertex_movement( OF_value );
   TerminationCriterion tc_outer;
-  tc_outer.add_iteration_limit( 1 );
+  tc_outer.add_iteration_limit( 10 );
   pass1->set_inner_termination_criterion(&tc_inner);
   pass1->set_outer_termination_criterion(&tc_outer);
 
@@ -310,11 +420,19 @@ int run_local_smoother( MeshDomainAssoc& mesh_and_domain, MsqError& err )
   if (err) return 1;
 
   // launches optimization on mesh_set
-  queue1.run_instructions(&mesh_and_domain, err);
+  if (domain) {
+    queue1.run_instructions(&mesh_and_domain, err);
+  }
+  else {
+    queue1.run_instructions(mesh, err);
+  }
   if (err) return 1;
 
-  MeshWriter::write_vtk(mesh, "smart-laplacian-result.vtk", err);
-  if (err) return 1;
+  // Construct a MeshTSTT from the file
+  int ierr = write_vtk_mesh( mesh, "smart-laplacian-result.vtk");
+  if (ierr) return 1;
+  // MeshWriter::write_vtk(mesh, "smart-laplacian-result.vtk", err);
+  // if (err) return 1;
   cout << "Wrote \"smart-laplacian-result.vtk\"" << endl;
 
   //print_timing_diagnostics( cout );
@@ -325,6 +443,7 @@ int run_local_smoother( MeshDomainAssoc& mesh_and_domain, MsqError& err )
 int run_quality_optimizer( MeshDomainAssoc& mesh_and_domain, MsqError& err )
 {
   Mesh* mesh = mesh_and_domain.get_mesh();
+  MeshDomain* domain = mesh_and_domain.get_domain();
 
   // creates an intruction queue
   InstructionQueue q;
@@ -353,17 +472,102 @@ int run_quality_optimizer( MeshDomainAssoc& mesh_and_domain, MsqError& err )
   q.add_quality_assessor( &qa, err );
   if (err) return 1;
 
-  // launches optimization on mesh_set
-  q.run_instructions( &mesh_and_domain, err );
+// launches optimization on mesh_set
+  if (domain) {
+    q.run_instructions(&mesh_and_domain, err);
+  }
+  else {
+    q.run_instructions(mesh, err);
+  }
   if (err) return 1;
 
-  MeshWriter::write_vtk(mesh, "ideal-shape-result.vtk", err);
-  if (err) return 1;
+  // Construct a MeshTSTT from the file
+  int ierr = write_vtk_mesh( mesh, "ideal-shape-result.vtk");
+  if (ierr) return 1;
+  // MeshWriter::write_vtk(mesh, "ideal-shape-result.vtk", err);
+  // if (err) return 1;
   cout << "Wrote \"ideal-shape-result.vtk\"" << endl;
 
-  //print_timing_diagnostics( cout );
+  print_timing_diagnostics( cout );
   return 0;
 }
+
+
+int run_solution_mesh_optimizer( MeshDomainAssoc& mesh_and_domain, MsqError& err )
+{
+  double OF_value = 0.01;
+
+  Mesh* mesh = mesh_and_domain.get_mesh();
+  MeshDomain* domain = mesh_and_domain.get_domain();
+
+  // creates an intruction queue
+  InstructionQueue queue1;
+
+  // creates a mean ratio quality metric ...
+  // IdealWeightInverseMeanRatio* mean_ratio = new IdealWeightInverseMeanRatio(err);
+  // ConditionNumberQualityMetric* mean_ratio = new ConditionNumberQualityMetric();
+  // VertexConditionNumberQualityMetric* mean_ratio = new VertexConditionNumberQualityMetric();
+  // AspectRatioGammaQualityMetric* mean_ratio = new AspectRatioGammaQualityMetric();
+  
+  ElementSolIndQM* solindqm = new ElementSolIndQM(solution_indicator);
+  MultiplyQualityMetric* mean_ratio = new MultiplyQualityMetric(new ConditionNumberQualityMetric(), solindqm, err);
+
+  // mean_ratio->set_averaging_method(QualityMetric::SUM_OF_RATIOS_SQUARED, err);
+  if (err) return 1;
+
+  // ... and builds an objective function with it
+  LPtoPTemplate* obj_func = new LPtoPTemplate(mean_ratio, 1, err);
+  if (err) return 1;
+
+  // // creates the feas newt optimization procedures
+  ConjugateGradient* pass1 = new ConjugateGradient( obj_func, err );
+  // QuasiNewton* pass1 = new QuasiNewton( obj_func );
+  // FeasibleNewton* pass1 = new FeasibleNewton( obj_func );
+  pass1->use_global_patch();
+
+  QualityAssessor stop_qa( mean_ratio );
+
+  // **************Set stopping criterion****************
+  TerminationCriterion tc_inner;
+  tc_inner.add_absolute_vertex_movement( OF_value );
+  if (err) return 1;
+  TerminationCriterion tc_outer;
+  tc_inner.add_iteration_limit( 20 );
+  tc_outer.add_iteration_limit( 5 );
+  pass1->set_inner_termination_criterion(&tc_inner);
+  pass1->set_outer_termination_criterion(&tc_outer);
+  pass1->set_debugging_level(3);
+
+  queue1.add_quality_assessor(&stop_qa, err);
+  if (err) return 1;
+
+  // adds 1 pass of pass1 to mesh_set1
+  queue1.set_master_quality_improver(pass1, err);
+  if (err) return 1;
+
+  queue1.add_quality_assessor(&stop_qa, err);
+  if (err) return 1;
+
+  // launches optimization on mesh_set
+  if (domain) {
+    queue1.run_instructions(&mesh_and_domain, err);
+  }
+  else {
+    queue1.run_instructions(mesh, err);
+  }
+  if (err) return 1;
+
+  // Construct a MeshTSTT from the file
+  int ierr = write_vtk_mesh( mesh, "solution-mesh-result.vtk");
+  if (ierr) return 1;
+  // MeshWriter::write_vtk(mesh, "solution-mesh-result.vtk", err);
+  // if (err) return 1;
+  cout << "Wrote \"solution-mesh-result.vtk\"" << endl;
+
+  print_timing_diagnostics( cout );
+  return 0;
+}
+
 
 
 int get_imesh_mesh( MBMesquite::Mesh** mesh, const char* file_name, int dimension )
@@ -393,19 +597,31 @@ int get_imesh_mesh( MBMesquite::Mesh** mesh, const char* file_name, int dimensio
     moab::Tag fixed;
     int def_val = 0;
     err=0;
-    moab::ErrorCode rval = mbi->tag_get_handle("fixed", 1, moab::MB_TYPE_INTEGER, fixed, moab::MB_TAG_CREAT | moab::MB_TAG_DENSE, &def_val); CHECK_IMESH("Getting tag handle failed");
+    moab::ErrorCode rval = mbi->tag_get_handle("fixed", 1, moab::MB_TYPE_INTEGER, fixed, moab::MB_TAG_CREAT | moab::MB_TAG_DENSE, &def_val); MB_CHK_SET_ERR(rval, "Getting tag handle failed");
     moab::Range verts, cells, skin_verts;
-    rval = mbi->get_entities_by_type(currset, moab::MBVERTEX, verts); CHECK_IMESH("Querying vertices failed");
-    rval = mbi->get_entities_by_dimension(currset, dimension, cells); CHECK_IMESH("Querying elements failed");
+    rval = mbi->get_entities_by_type(currset, moab::MBVERTEX, verts); MB_CHK_SET_ERR(rval, "Querying vertices failed");
+    rval = mbi->get_entities_by_dimension(currset, dimension, cells); MB_CHK_SET_ERR(rval, "Querying elements failed");
     std::cout << "Found " << verts.size() << " vertices and " << cells.size() << " elements" << std::endl;
 
     moab::Skinner skinner(mbi);
-    rval = skinner.find_skin(currset, cells, true, skin_verts); CHECK_IMESH("Finding the skin of the mesh failed"); // 'true' param indicates we want vertices back, not cells
+    rval = skinner.find_skin(currset, cells, true, skin_verts); MB_CHK_SET_ERR(rval, "Finding the skin of the mesh failed"); // 'true' param indicates we want vertices back, not cells
 
     std::vector<int> fix_tag(skin_verts.size(), 1); // initialized to 1 to indicate fixed
-    rval = mbi->tag_set_data(fixed, skin_verts, &fix_tag[0]); CHECK_IMESH("Setting tag data failed");;
+    rval = mbi->tag_set_data(fixed, skin_verts, &fix_tag[0]); MB_CHK_SET_ERR(rval, "Setting tag data failed");
+    std::cout << "Found " << skin_verts.size() << " vertices on the skin of the domain." << std::endl;
 
-    iMesh_getTagHandle( instance, "fixed", &fixed_tag, &err, strlen("fixed") );
+    // fix_tag.resize(verts.size(),0);
+    // rval = mbi->tag_get_data(fixed, verts, &fix_tag[0]); MB_CHK_SET_ERR(rval, "Getting tag data failed");
+
+    iMesh_getTagHandle( instance, "fixed", &fixed_tag, &err, strlen("fixed") );CHECK_IMESH("Getting tag handle (fixed) failed");
+
+    // Set some arbitrary solution indicator
+    moab::Tag solindTag;
+    double def_val_dbl=0.0;
+    rval = mbi->tag_get_handle("solution_indicator", 1, moab::MB_TYPE_DOUBLE, solindTag, moab::MB_TAG_CREAT | moab::MB_TAG_DENSE, &def_val_dbl); MB_CHK_SET_ERR(rval, "Getting tag handle failed");
+    solution_indicator.resize(cells.size(),0.0);
+    rval = mbi->tag_set_data(solindTag, cells, &solution_indicator[0]); MB_CHK_SET_ERR(rval, "Setting tag data failed");
+    
   }
 
 
@@ -443,7 +659,12 @@ int get_native_mesh( MBMesquite::Mesh** mesh, const char* file_name, int  )
 
 int get_itaps_domain(MeshDomain** odomain, const char* filename)
 {
-//  const double EPS = 1e-2;
+
+  if (filename == 0 || strlen(filename) == 0) {
+    *odomain=new PlanarDomain( PlanarDomain::XY );
+    return 0;
+  }
+
   int err;
   iGeom_Instance geom;
   iGeom_newGeom( "", &geom, &err, 0 ); CHECK_IGEOM("ERROR: iGeom creation failed");
