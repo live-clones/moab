@@ -90,10 +90,14 @@ ifeq ("$(MOAB_MPI_ENABLED)-$(MOAB_HDF5_ENABLED)","yes-yes")
 endif
 
 ifeq ("$(MOAB_MESQUITE_ENABLED)","yes")
-OptimizeMeshMesquite: OptimizeMeshMesquite.o ${MOAB_LIBDIR}/libMOAB.la
-	${MOAB_CXX} -o $@ $< ${IMESH_LIBS} ${IGEOM_LIBS}
+OptimizeMeshMesquite: OptimizeMeshMesquite.o ElementSolIndQM.o ${MOAB_LIBDIR}/libMOAB.la
+	${MOAB_CXX} -o $@ $< ElementSolIndQM.o ${IMESH_LIBS} ${IGEOM_LIBS}
 
-OptimizeMeshMesquite.o: OptimizeMeshMesquite.cpp
+OptimizeMeshMesquite.o: OptimizeMeshMesquite.cpp ElementSolIndQM.o
+	@echo "     CXX  $<"
+	@${MOAB_CXX} ${CXXFLAGS} ${MOAB_CXXFLAGS} ${MOAB_CPPFLAGS} ${MOAB_INCLUDES} ${IMESH_INCLUDES} ${IGEOM_INCLUDES} -DMESH_DIR=\"${MESH_DIR}\" -c $< 
+
+ElementSolIndQM.o: ElementSolIndQM.cpp
 	@echo "     CXX  $<"
 	@${MOAB_CXX} ${CXXFLAGS} ${MOAB_CXXFLAGS} ${MOAB_CPPFLAGS} ${MOAB_INCLUDES} ${IMESH_INCLUDES} ${IGEOM_INCLUDES} -DMESH_DIR=\"${MESH_DIR}\" -c $<
 
