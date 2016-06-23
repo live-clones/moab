@@ -124,6 +124,7 @@ int run_global_smoother( MeshDomainAssoc& mesh, MsqError& err, double OF_value=1
 
   // Run SmoothLaplacian solver
 int run_local_smoother( MeshDomainAssoc& mesh, MsqError& err, double OF_value=1e-3 );
+int run_local_smoother2( MeshDomainAssoc& mesh_and_domain, MsqError& err, double OF_value=1e-3 );
 
 int run_quality_optimizer( MeshDomainAssoc& mesh_and_domain, MsqError& err );
 
@@ -221,18 +222,24 @@ int main(int argc, char* argv[])
   if (err) return 1;
 
   double reps = 5e-2;
-  for (int iter=0; iter < 10; iter++) {    
+  for (int iter=0; iter < 5; iter++) {    
     
-    if (!(iter % 4)) {
-      run_local_smoother( mesh_and_domain, err, reps*10 );
+    if (!(iter % 2)) {
+      run_local_smoother2( mesh_and_domain, err, reps*10 );
       if (err) return 1;
     }
 
-    run_global_smoother( mesh_and_domain, err, reps );
+    // run_global_smoother( mesh_and_domain, err, reps );
+    // if (err) return 1;
+
+    run_solution_mesh_optimizer( mesh_and_domain, err );
     if (err) return 1;
 
-    reps *= 0.1;
+    reps *= 0.01;
   }
+
+  run_local_smoother2( mesh_and_domain, err, 1e-4 );
+  if (err) return 1;
 
   // run_quality_optimizer( mesh_and_domain, err );
   // if (err) return 1;
@@ -350,6 +357,12 @@ int run_local_smoother( MeshDomainAssoc& mesh_and_domain, MsqError& err, double 
 
   // run_local_smoother2(mesh_and_domain, err, OF_value);
 
+  // Construct a MeshTSTT from the file
+  int ierr = write_vtk_mesh( mesh, "smart-laplacian-result.vtk");
+  if (ierr) return 1;
+  // MeshWriter::write_vtk(mesh, "smart-laplacian-result.vtk", err);
+  // if (err) return 1;
+  cout << "Wrote \"smart-laplacian-result.vtk\"" << endl;
   return 0;
 }
 
@@ -510,7 +523,10 @@ int run_solution_mesh_optimizer( MeshDomainAssoc& mesh_and_domain, MsqError& err
   // AspectRatioGammaQualityMetric* mean_ratio = new AspectRatioGammaQualityMetric();
   
   ElementSolIndQM* solindqm = new ElementSolIndQM(solution_indicator);
-  MultiplyQualityMetric* mean_ratio = new MultiplyQualityMetric(new ConditionNumberQualityMetric(), solindqm, err);
+  MultiplyQualityMetric* mean_ratio = new MultiplyQualityMetric(new VertexConditionNumberQualityMetric(), solindqm, err);
+  // ElementSolIndQM* mean_ratio = solindqm;
+
+  // LocalSizeQualityMetric* mean_ratio = new LocalSizeQualityMetric();
 
   // mean_ratio->set_averaging_method(QualityMetric::SUM_OF_RATIOS_SQUARED, err);
   if (err) return 1;
@@ -583,7 +599,8 @@ int get_imesh_mesh( MBMesquite::Mesh** mesh, const char* file_name, int dimensio
 
   iBase_TagHandle fixed_tag;
   iMesh_getTagHandle( instance, "fixed", &fixed_tag, &err, strlen("fixed") );
-  if (iBase_SUCCESS != err) {
+  // if (iBase_SUCCESS != err)
+  {
     // get the skin vertices of those cells and mark them as fixed; we don't want to fix the vertices on a
     // part boundary, but since we exchanged a layer of ghost cells, those vertices aren't on the skin locally
     // ok to mark non-owned skin vertices too, I won't move those anyway
@@ -619,7 +636,16 @@ int get_imesh_mesh( MBMesquite::Mesh** mesh, const char* file_name, int dimensio
     moab::Tag solindTag;
     double def_val_dbl=0.0;
     rval = mbi->tag_get_handle("solution_indicator", 1, moab::MB_TYPE_DOUBLE, solindTag, moab::MB_TAG_CREAT | moab::MB_TAG_DENSE, &def_val_dbl); MB_CHK_SET_ERR(rval, "Getting tag handle failed");
-    solution_indicator.resize(cells.size(),0.0);
+    solution_indicator.resize(cells.size(),0.01);
+    for (unsigned i=0; i < cells.size()/4; i++)
+      solution_indicator[i]=0.1;
+    for (unsigned i=cells.size()/4; i < 2*cells.size()/4; i++)
+      solution_indicator[i]=0.5;
+    for (unsigned i=2*cells.size()/4; i < 3*cells.size()/4; i++)
+      solution_indicator[i]=0.5;
+    for (unsigned i=3*cells.size()/4; i < cells.size(); i++)
+      solution_indicator[i]=0.5;
+    
     rval = mbi->tag_set_data(solindTag, cells, &solution_indicator[0]); MB_CHK_SET_ERR(rval, "Setting tag data failed");
     
   }
