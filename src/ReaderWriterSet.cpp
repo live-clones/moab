@@ -24,7 +24,9 @@
 #include "ReadGmsh.hpp"
 #include "ReadIDEAS.hpp"
 #include "ReadMCNP5.hpp"
+#include "ReadOBJ.hpp"
 #include "ReadNASTRAN.hpp"
+#include "ReadRTT.hpp"
 #include "ReadABAQUS.hpp"
 #include "ReadSms.hpp"
 #include "Tqdcfr.hpp"
@@ -118,20 +120,25 @@ ReaderWriterSet::ReaderWriterSet(Core* mdb)
 
   register_factory( ReadABAQUS::factory, NULL, "ABAQUS INP mesh format", "abq", "Abaqus mesh" );
 
+  register_factory( ReadRTT::factory, NULL, "RTT Mesh Format", "rtt", "Atilla RTT Mesh" );
+
   register_factory( ReadVtk::factory, WriteVtk::factory, "Kitware VTK", "vtk", "VTK" );
+
+  register_factory( ReadOBJ::factory, NULL, "OBJ mesh format", "obj", "OBJ mesh" );
 
   register_factory( ReadSms::factory, NULL, "RPI SMS", "sms", "SMS" );
 
   register_factory( Tqdcfr::factory, NULL, "Cubit", "cub", "CUBIT" );
 
   register_factory( ReadSmf::factory, WriteSmf::factory , "QSlim format", "smf", "SMF");
-
-#ifdef MOAB_HAVE_CGM
-  const char* acis_sufxs[] = { "sat", "sab", NULL };
+#ifdef MOAB_HAVE_CGM_FACET
+  const char* facet_sufxs[] = { "facet", NULL };
+  register_factory( ReadCGM::factory, NULL, "Facet Engine Solid Model", facet_sufxs, "facet");
+#endif
+#ifdef MOAB_HAVE_CGM_OCC
   const char* occ_sufxs[] = { "brep", "occ", NULL };
   const char* step_sufxs[] = { "step", "stp", NULL };
   const char* iges_sufxs[] = { "iges", "igs", NULL };
-  register_factory( ReadCGM::factory, NULL, "ACIS solid model", acis_sufxs, "ACIS");
   register_factory( ReadCGM::factory, NULL, "OpenCascade solid model", occ_sufxs, "OCC");
   register_factory( ReadCGM::factory, NULL, "STEP B-Rep exchange", step_sufxs, "STEP");
   register_factory( ReadCGM::factory, NULL, "IGES B-Rep exchange", iges_sufxs, "IGES");

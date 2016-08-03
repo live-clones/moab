@@ -53,12 +53,6 @@
 #include <functional>
 #include <iostream>
 
-#ifdef BLUEGENE
-#include <sys/vfs.h>
-  // Magic number for GPFS file system (ASCII for 'G' 'P' 'F' 'S')
-# define BG_LOCKLESS_GPFS 0x47504653
-#endif
-
 #include "IODebugTrack.hpp"
 #include "ReadHDF5Dataset.hpp"
 #include "ReadHDF5VarLen.hpp"
@@ -305,7 +299,6 @@ ErrorCode ReadHDF5::set_up_read(const char* filename,
   opts.get_toggle_option("BLOCKED_COORDINATE_IO", DEFAULT_BLOCKED_COORDINATE_IO, blockedCoordinateIO);
   opts.get_toggle_option("BCAST_SUMMARY",         DEFAULT_BCAST_SUMMARY,         bcastSummary);
   opts.get_toggle_option("BCAST_DUPLICATE_READS", DEFAULT_BCAST_DUPLICATE_READS, bcastDuplicateReads);
-  bool bglockless = (MB_SUCCESS == opts.get_null_option("BGLOCKLESS"));
 
   // Handle parallel options
   bool use_mpio = (MB_SUCCESS == opts.get_null_option("USE_MPIO"));
@@ -333,21 +326,6 @@ ErrorCode ReadHDF5::set_up_read(const char* filename,
     MB_CHK_ERR(MB_MEMORY_ALLOCATION_FAILED);
 
   if (use_mpio || nativeParallel) {
-    // Lockless file IO on IBM BlueGene
-    std::string pfilename(filename);
-#ifdef BLUEGENE
-    if (!bglockless && 0 != pfilename.find("bglockless:")) {
-      // Check for GPFS file system
-      struct statfs fsdata;
-      statfs(filename, &fsdata);
-      if (fsdata.f_type == BG_LOCKLESS_GPFS) {
-        bglockless = true;
-      }
-    }
-#endif
-    if (bglockless) {
-      pfilename = std::string("bglockless:") + pfilename;
-    }
 
 #ifndef MOAB_HAVE_HDF5_PARALLEL
     free(dataBuffer);
@@ -375,9 +353,6 @@ ErrorCode ReadHDF5::set_up_read(const char* filename,
     dbgOut.set_rank(rank);
     dbgOut.limit_output_to_first_N_procs(32);
     mpiComm = new MPI_Comm(myPcomm->proc_config().proc_comm());
-    if (bglockless) {
-      dbgOut.printf(1, "Enabling lockless IO for BlueGene (filename: \"%s\")\n", pfilename.c_str());
-    }
 
 #ifndef H5_MPI_COMPLEX_DERIVED_DATATYPE_WORKS 
     dbgOut.print(1, "H5_MPI_COMPLEX_DERIVED_DATATYPE_WORKS is not defined\n");
@@ -395,11 +370,11 @@ ErrorCode ReadHDF5::set_up_read(const char* filename,
         err = H5Pset_fapl_mpio(file_prop, MPI_COMM_SELF, MPI_INFO_NULL);
         assert(file_prop >= 0);
         assert(err >= 0);
-        filePtr = mhdf_openFileWithOpt(pfilename.c_str(), 0, NULL, handleType, file_prop, &status);
+        filePtr = mhdf_openFileWithOpt(filename, 0, NULL, handleType, file_prop, &status);
         H5Pclose(file_prop);
 
         if (filePtr) {
-          fileInfo = mhdf_getFileSummary(filePtr, handleType, &status);
+          fileInfo = mhdf_getFileSummary(filePtr, handleType, &status, 0); // no extra set info
           if (!is_error(status)) {
             size = fileInfo->total_size;
             fileInfo->offset = (unsigned char*)fileInfo;
@@ -438,8 +413,8 @@ ErrorCode ReadHDF5::set_up_read(const char* filename,
     indepIO = nativeParallel ? H5P_DEFAULT : collIO;
 
     // Re-open file in parallel
-    dbgOut.tprintf(1, "Opening \"%s\" for parallel IO\n", pfilename.c_str());
-    filePtr = mhdf_openFileWithOpt(pfilename.c_str(), 0, NULL, handleType, file_prop, &status);
+    dbgOut.tprintf(1, "Opening \"%s\" for parallel IO\n", filename);
+    filePtr = mhdf_openFileWithOpt(filename, 0, NULL, handleType, file_prop, &status);
 
     H5Pclose(file_prop);
     if (!filePtr) {
@@ -453,7 +428,7 @@ ErrorCode ReadHDF5::set_up_read(const char* filename,
     }
 
     if (!bcastSummary) {
-      fileInfo = mhdf_getFileSummary(filePtr, handleType, &status);
+      fileInfo = mhdf_getFileSummary(filePtr, handleType, &status, 0);
       if (is_error(status)) {
         free(dataBuffer);
         dataBuffer = NULL;
@@ -473,7 +448,7 @@ ErrorCode ReadHDF5::set_up_read(const char* filename,
     }
 
     // Get file info
-    fileInfo = mhdf_getFileSummary(filePtr, handleType, &status);
+    fileInfo = mhdf_getFileSummary(filePtr, handleType, &status, 0);
     if (is_error(status)) {
       free(dataBuffer);
       dataBuffer = NULL;
@@ -583,6 +558,13 @@ ErrorCode ReadHDF5::load_file(const char* filename,
     dbgOut.tprint(1, "Storing file IDs in tag\n");
     rval = store_file_ids(*file_id_tag);
   }
+  ErrorCode rval3 = opts.get_null_option("STORE_SETS_FILEIDS");
+  if (MB_SUCCESS == rval3)
+  {
+    rval = store_sets_file_ids();
+    if (MB_SUCCESS != rval) return rval;
+  }
+
   if (cputime)
     _times[STORE_FILE_IDS_TIME]=timer->time_elapsed();
 
@@ -2375,8 +2357,21 @@ ErrorCode ReadHDF5::find_sets_containing(hid_t contents_handle,
         // Check whether contents include set already being loaded
         if (read_set_containing_parents) {
           tmp_range.clear();
-          if (setMeta[sets_offset + i][3] & mhdf_SET_RANGE_BIT) tmp_range.insert(*buff_iter, *(buff_iter + 1));
-          else std::copy(buff_iter, buff_iter + set_size, range_inserter(tmp_range));
+          if (setMeta[sets_offset + i][3] & mhdf_SET_RANGE_BIT)
+          {
+            // put in tmp_range the contents on the set
+            // file_ids contain at this points only other sets
+            const long* j = buff_iter;
+            const long* const end = buff_iter + set_size;
+            assert(set_size % 2 == 0);
+            while (j != end) {
+              long start = *(j++);
+              long count = *(j++);
+              tmp_range.insert(start, start+count-1);
+            }
+          }
+          else
+            std::copy(buff_iter, buff_iter + set_size, range_inserter(tmp_range));
           tmp_range = intersect(tmp_range, file_ids);
         }
 
@@ -3548,6 +3543,58 @@ ErrorCode ReadHDF5::store_file_ids(Tag tag)
     }
   }
 
+  return MB_SUCCESS;
+}
+
+ErrorCode ReadHDF5::store_sets_file_ids()
+{
+  CHECK_OPEN_HANDLES;
+
+  // create a tag that will not be saved, but it will be
+  // used by visit plugin to match the sets and their file ids
+  // it is the same type as the tag defined in ReadParallelcpp, for file id
+  Tag setFileIdTag;
+  long default_val=0;
+  ErrorCode rval = iFace->tag_get_handle("__FILE_ID_FOR_SETS", sizeof(long), MB_TYPE_OPAQUE, setFileIdTag,
+      (MB_TAG_DENSE | MB_TAG_CREAT),  &default_val);
+
+  if (MB_SUCCESS != rval || 0==setFileIdTag)
+    return rval;
+  //typedef int tag_type;
+  typedef long tag_type;
+  // change it to be able to read much bigger files (long is 64 bits ...)
+
+  tag_type* buffer = reinterpret_cast<tag_type*>(dataBuffer);
+  const long buffer_size = bufferSize / sizeof(tag_type);
+  for (IDMap::iterator i = idMap.begin(); i != idMap.end(); ++i) {
+    IDMap::Range range = *i;
+    EntityType htype = iFace->type_from_handle(range.value);
+    if (MBENTITYSET!=htype)
+      continue;
+    // work only with entity sets
+    // Make sure the values will fit in the tag type
+    IDMap::key_type rv = range.begin + (range.count - 1);
+    tag_type tv = (tag_type)rv;
+    if ((IDMap::key_type)tv != rv) {
+      assert(false);
+      return MB_INDEX_OUT_OF_RANGE;
+    }
+
+    while (range.count) {
+      long count = buffer_size < range.count ? buffer_size : range.count;
+
+      Range handles;
+      handles.insert(range.value, range.value + count - 1);
+      range.value += count;
+      range.count -= count;
+      for (long j = 0; j < count; ++j)
+        buffer[j] = (tag_type)range.begin++;
+
+      rval = iFace->tag_set_data(setFileIdTag, handles, buffer);
+      if (MB_SUCCESS != rval)
+        return rval;
+    }
+  }
   return MB_SUCCESS;
 }
 

@@ -1708,6 +1708,7 @@ ErrorCode Core::connect_iterate(Range::const_iterator iter,
     return MB_ENTITY_NOT_FOUND;
 
   ElementSequence *eseq = dynamic_cast<ElementSequence*>(seq);
+  assert(eseq != NULL);
 
   connect = eseq->get_connectivity_array();
   if (!connect) {
@@ -3049,6 +3050,19 @@ ErrorCode Core::side_number(const EntityHandle parent,
     }
   }
 
+  if (TYPE_FROM_HANDLE(parent) == MBPOLYHEDRON ) {
+    // find the child in the parent_conn connectivity list, and call it a day ..
+    // it should work only for faces within a conn list
+    for (int i=0; i< num_parent_vertices; i++)
+      if (child == parent_conn[i])
+      {
+        sd_number = i;
+        sense =1 ; // always
+        offset =0;
+        return MB_SUCCESS;
+      }
+    return MB_FAILURE;
+  }
   result = get_connectivity(child, child_conn, num_child_vertices, true);MB_CHK_ERR(result);
 
     // call handle vector-based function
@@ -3899,10 +3913,10 @@ ErrorCode Core::create_set_iterator(EntityHandle meshset,
     rval = get_meshset_options(meshset, options);MB_CHK_ERR(rval);
   }
 
-  if (!meshset || options & MESHSET_SET)
-    set_iter = new RangeSetIterator(this, meshset, chunk_size, ent_type, ent_dim, check_valid);
+  if (!meshset || (options & MESHSET_SET))
+    set_iter = new (std::nothrow) RangeSetIterator(this, meshset, chunk_size, ent_type, ent_dim, check_valid);
   else
-    set_iter = new VectorSetIterator(this, meshset, chunk_size, ent_type, ent_dim, check_valid);
+    set_iter = new (std::nothrow) VectorSetIterator(this, meshset, chunk_size, ent_type, ent_dim, check_valid);
 
   setIterators.push_back(set_iter);
   return MB_SUCCESS;

@@ -30,7 +30,7 @@
 #include "moab/ReadUtilIface.hpp"
 #include "moab/FileOptions.hpp"
 #include "FileTokenizer.hpp"
-#include "VtkUtil.hpp"
+#include "moab/VtkUtil.hpp"
 
 #define MB_VTK_MATERIAL_SETS
 #ifdef MB_VTK_MATERIAL_SETS
@@ -95,9 +95,13 @@ public:
     this->mesh = iface;
     std::vector<unsigned char> default_val;
     default_val.resize(sz * per_elem);
-    this->mesh->tag_get_handle(tag_name.c_str(), per_elem, mb_type, this->tag,
-                               MB_TAG_SPARSE | MB_TAG_BYTES | MB_TAG_CREAT,
-                               &default_val[0]);
+    ErrorCode rval;
+    rval = this->mesh->tag_get_handle(
+        tag_name.c_str(), per_elem, mb_type, this->tag,
+        MB_TAG_SPARSE | MB_TAG_BYTES | MB_TAG_CREAT,
+        &default_val[0]
+        );
+    MB_CHK_SET_ERR_RET(rval, "can't tag_get_handle");
   }
 
   void add_entity(EntityHandle ent, const unsigned char* bytes, size_t len)
@@ -1120,8 +1124,6 @@ ErrorCode ReadVtk::vtk_read_tag_data(FileTokenizer& tokens,
         return result;
     }
   }
-  else
-    return MB_FAILURE;
 
   return MB_SUCCESS;
 }
