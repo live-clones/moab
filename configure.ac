@@ -161,6 +161,10 @@ AC_CHECK_LIB(z, compress, LIBS="$LIBS -lz")
 AC_CHECK_LIB(dl, dlopen, LIBS="$LIBS -ldl")
 AC_CHECK_LIB(m, pow, LIBS="$LIBS -lm")
 
+### Check for BLAS and Lapack dense solvers
+AX_BLAS([], [AC_MSG_ERROR([BLAS library not found])])
+AX_LAPACK([], [AC_MSG_ERROR([LAPACK library not found])])
+
 ################################################################################
 #                           iMesh Part 1 of 2
 ################################################################################
@@ -685,14 +689,18 @@ if (test "x$WITH_TEMPEST" != "xno" && test "x$WITH_TEMPEST" != "x"); then
 
   # Test for TempestRemap library, possibly requiring NetCDF
   old_LDFLAGS="$LDFLAGS"
-  LDFLAGS="$LDFLAGS -L$WITH_TEMPEST/lib"
-  AC_CHECK_LIB([TempestRemap],[GenerateOfflineMap],[TEMPESTREMAP_LIBS="-L$WITH_TEMPEST/lib -lTempestRemap"],
+  old_LIBS="$LIBS"
+  LDFLAGS="$LDFLAGS -L$WITH_TEMPEST/lib $PNETCDF_LDFLAGS $NETCDF_LDFLAGS $HDF5_LDFLAGS"
+  LIBS="$NETCDF_LIBS $LAPACK_LIBS $BLAS_LIBS $LIBS"
+  AC_CHECK_LIB([TempestRemap],[GenerateOfflineMap],[TEMPESTREMAP_LIBS="-L$WITH_TEMPEST/lib -lTempestRemap $NETCDF_LIBS $LAPACK_LIBS $BLAS_LIBS"],
     [unset ac_cv_lib_TempestRemap_GenerateOfflineMap
+    LIBS="$NETCDF_LIBS $PNETCDF_LIBS $HDF5_LIBS $LAPACK_LIBS $BLAS_LIBS $LIBS"
     AC_CHECK_LIB([TempestRemap],[GenerateOfflineMap],
-                  [TEMPESTREMAP_LIBS="-L$WITH_TEMPEST/lib -lTempestRemap $NETCDF_LIBS"],
+                  [TEMPESTREMAP_LIBS="-L$WITH_TEMPEST/lib -lTempestRemap $NETCDF_LIBS $PNETCDF_LIBS $LAPACK_LIBS $BLAS_LIBS"],
                   [AC_MSG_ERROR([TempestRemap library not found or not usable.])]
-                  [$NETCDF_LIBS])])
+                  [$NETCDF_LIBS $PNETCDF_LIBS])],[$NETCDF_LIBS])
   LDFLAGS="$old_LDFLAGS"
+  LIBS="$old_LIBS"
   AC_LANG_POP([C++])
   AC_SUBST(TEMPESTREMAP_LIBS)
 
