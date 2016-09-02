@@ -22,6 +22,7 @@ configure_file(${CMAKE_CURRENT_BINARY_DIR}/moab/EntityHandle.hpp.in ${CMAKE_CURR
 set(moab_link_lib)
 add_subdirectory(io)
 add_subdirectory(RefineMesh)
+add_subdirectory(IntxMesh)
 add_subdirectory(LocalDiscretization)
 # add_subdirectory(oldinc)
 
@@ -223,6 +224,7 @@ add_library(
   $<TARGET_OBJECTS:moabio>
   $<TARGET_OBJECTS:moab_loc_discr>
   $<TARGET_OBJECTS:moab_refine_mesh>
+  $<TARGET_OBJECTS:moab_intx_mesh>
   $<TARGET_OBJECTS:moabverdict>
   ${MOABPAR_OBJECTS}
   ${MDHF_OBJ}

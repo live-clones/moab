@@ -5,6 +5,7 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/src/io
     ${CMAKE_SOURCE_DIR}/src/LocalDiscretization
     ${CMAKE_SOURCE_DIR}/src/RefineMesh
+    ${CMAKE_SOURCE_DIR}/src/IntxMesh
     ${CMAKE_SOURCE_DIR}/src/verdict
     ${CMAKE_SOURCE_DIR}/itaps
     ${CMAKE_BINARY_DIR}/itaps
@@ -43,7 +44,11 @@ set( TESTS range_test.cpp
            coords_connect_iterate.cpp
            urefine_mesh_test.cpp
            adj_moab_test.cpp
-           test_boundbox.cpp )
+           test_boundbox.cpp 
+           spherical_area_test.cpp
+           arc_intx_tests.cpp
+           intx_in_plane_test.cpp
+           intx_on_sphere_test.cpp )
            
 if(MOAB_HAVE_HDF5)
   set( TESTS ${TESTS}
@@ -55,6 +60,11 @@ if(MOAB_HAVE_HDF5)
              gttool_test.cpp
              crop_vol_test.cpp 
              imoab_test.cpp )
+endif()
+
+if(MOAB_HAVE_NETCDF)
+  set ( TESTS ${TESTS} 
+              IntxRllCssphere_test.cpp )
 endif()
 
 foreach( fname ${TESTS} )
