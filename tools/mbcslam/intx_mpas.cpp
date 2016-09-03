@@ -22,7 +22,7 @@
 #include "TestUtil.hpp"
 #include "moab/ParallelComm.hpp"
 
-#include "CslamUtils.hpp"
+#include "IntxUtils.hpp"
 #include <time.h>
 
 #ifdef MESHDIR
