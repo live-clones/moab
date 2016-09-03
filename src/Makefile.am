@@ -51,7 +51,6 @@ libMOAB_la_SOURCES = \
   CN.cpp \
   CartVect.cpp \
   Core.cpp \
-  CoreOptions.hpp \
   DebugOutput.cpp \
   DebugOutput.hpp \
   DenseTag.hpp \
@@ -71,6 +70,7 @@ libMOAB_la_SOURCES = \
   HalfFacetRep.cpp \
   HigherOrderFactory.cpp \
   HomXform.cpp \
+  iMOAB.cpp \
   Internals.hpp \
   LloydSmoother.cpp \
   MBCNArrays.hpp \
@@ -83,7 +83,6 @@ libMOAB_la_SOURCES = \
   MeshTag.cpp \
   MeshTopoUtil.cpp \
   OrientedBox.cpp \
-  OrientedBox.hpp \
   OrientedBoxTreeTool.cpp \
   lotte/poly.c \
   lotte/findpt.c \
@@ -150,6 +149,9 @@ libMOAB_la_SOURCES = \
   WriteUtil.hpp \
   moab_mpe.h
 
+nobase_includedir = $(includedir)/moab
+nodist_nobase_include_HEADERS = moab/MOABConfig.h
+
 # The list of header files which are to be installed
 nobase_libMOAB_la_include_HEADERS = \
   moab/AdaptiveKDTree.hpp \
@@ -177,6 +179,8 @@ nobase_libMOAB_la_include_HEADERS = \
   moab/Forward.hpp \
   moab/GeomUtil.hpp \
   moab/Interface.hpp \
+  moab/iMOAB.h \
+  moab/imoab_protos.h \
   moab/LloydSmoother.hpp \
   moab/point_locater/tree/common_tree.hpp \
   moab/point_locater/tree/element_tree.hpp \
@@ -191,7 +195,7 @@ nobase_libMOAB_la_include_HEADERS = \
   moab/Matrix3.hpp \
   moab/MergeMesh.hpp \
   moab/MeshTopoUtil.hpp \
-  moab/MOABConfig.h \
+  moab/OrientedBox.hpp \
   moab/OrientedBoxTreeTool.hpp \
   moab/PartitionerBase.hpp \
   moab/ProgOptions.hpp \
@@ -213,13 +217,11 @@ nobase_libMOAB_la_include_HEADERS = \
   moab/Types.hpp \
   moab/UnknownInterface.hpp \
   moab/Util.hpp \
-  moab/Version.h \
   moab/WriteUtilIface.hpp \
   moab/WriterIface.hpp \
   MBEntityType.h \
   MBCN.h \
   MBCN_protos.h \
-  moab/MOABConfig.h \
   MBTagConventions.hpp 
 
 if HAVE_HDF5

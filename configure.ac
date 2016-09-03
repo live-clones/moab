@@ -1,7 +1,7 @@
 ################################################################################
 #                           Standard Stuff
 ################################################################################
-AC_INIT([MOAB],[4.9.2pre],[moab-dev@mcs.anl.gov],[moab],[http://sigma.mcs.anl.gov])
+AC_INIT([MOAB],[4.9.2],[moab-dev@mcs.anl.gov],[moab],[http://sigma.mcs.anl.gov])
 AC_CONFIG_SRCDIR([moab.make.in])
 AC_CONFIG_SRCDIR([MOABConfig.cmake.in])
 AC_CONFIG_SRCDIR([examples/makefile.in])
@@ -357,7 +357,7 @@ if test "xyes" = "x$MPI_CXX_HELP_NEEDED"; then
 fi
 FATHOM_CHECK_MPITYPE
 
-if (test "$MPIFAMILY" == "OPENMPI" && test "x$ENABLE_FORTRAN" != "xno"); then
+if (test "$MPIFAMILY" = "OPENMPI" && test "x$ENABLE_FORTRAN" != "xno"); then
   FCLIBS="$FCLIBS -lmpi_cxx"
 fi
 
@@ -836,7 +836,7 @@ AC_SUBST(CGM_DIR)
 AM_CONDITIONAL( HAVE_CGM, [test "x$CGM_MISSING" = "xno"] )
 AM_CONDITIONAL( HAVE_OCC, [test "x$HAVE_OCC" = "xyes"] )
 
-if (test "x$CGM_MISSING" == "xno"); then
+if (test "x$CGM_MISSING" = "xno"); then
   AC_DEFINE([HAVE_CGM],[1],["Define if configured with CGM support."])
   if (test "x$HAVE_CGM_FIRE_RAY" != "xno"); then
     AC_DEFINE([HAVE_CGM_FIRE_RAY],[1],["Define if configured with CGM and Ray fire support."])
@@ -962,12 +962,12 @@ if test "xyes" = "x$ENABLE_ahf"; then
   AC_DEFINE([HAVE_AHF],[1],[Enable use of AHF data-structures for querying adjacency information])
 fi
 
-AM_CONDITIONAL(ENABLE_AHF, [test "xyes" == "x$ENABLE_ahf"])
+AM_CONDITIONAL(ENABLE_AHF, [test "xyes" = "x$ENABLE_ahf"])
 
 if test "xyes" = "x$ENABLE_vtkMOABReader"; then
-  if test "xno" == "x$WITH_VTK"; then
+  if test "xno" = "x$WITH_VTK"; then
     AC_MSG_ERROR([vtkMOABReader requires VTK])
-  elif test "x" == "x$WITH_VTK"; then 
+  elif test "x" = "x$WITH_VTK"; then 
     WITH_VTK=yes
   fi
 fi
@@ -1199,8 +1199,7 @@ AC_ARG_VAR([FC], [FORTRAN compiler command])
 # Prefixes everything in the temporary file with MOAB_, e.g. MOAB_HAVE_MPI
 #AX_PREFIX_CONFIG_H([src/moab/MOABConfig.h],[MOAB],[.MOABConfig.h])
 
-AC_CONFIG_HEADERS([src/moab/Version.h
-                   src/moab/EntityHandle.hpp
+AC_CONFIG_HEADERS([src/moab/EntityHandle.hpp
                    src/parallel/moab_mpi_config.h
                    src/moab/MOABConfig.h:config/MOABConfig.h.in])
 AX_PREFIX_CONFIG_H([src/moab/MOABConfig.h],[MOAB],[src/moab/MOABConfig.h])
@@ -1270,6 +1269,20 @@ for var in CC CXX F90 FC F77 LDFLAGS LIBS; do
 done
 
 AC_SUBST([DISTCHECK_CONFIGURE_FLAGS])
+
+dnl Before configuring libtool check for --enable-all-static option
+AC_ARG_ENABLE(all-static,
+  AS_HELP_STRING([--enable-all-static],
+                 [Build completely static (standalone) binaries.]),
+  [
+    if ( test "x$enable_static" != "xno" ); then
+      if ( test "$enableval" = "yes" ); then
+        LDFLAGS="-all-static $LDFLAGS"
+      fi
+    else
+      AC_MSG_WARN([ Static linking disabled. Ignoring --enable-all-static option. Please add --enable-static also. ])
+    fi
+])
 
 AC_OUTPUT
 
