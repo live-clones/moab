@@ -37,7 +37,7 @@ on the sphere; see CSLAM Utils case1
 #include "TestUtil.hpp"
 #include "moab/ParallelComm.hpp"
 
-#include "CslamUtils.hpp"
+#include "IntxUtils.hpp"
 
 const char BRIEF_DESC[] =
     "Simulate a transport problem in a semi-Lagrangian formulation\n";
@@ -290,7 +290,7 @@ ErrorCode compute_tracer_case1(Interface * mb, Intx2MeshOnSphere & worker, Entit
     CartVect posi;
     rval = mb->get_coords(&oldV, 1, &(posi[0]));
     CHECK_ERR(rval);
-    // cslam utils, case 1
+    // Intx utils, case 1
     CartVect newPos;
     departure_point_case1(posi, t, delta_t, newPos);
     newPos = radius * newPos; // do we need this? the radius should be 1

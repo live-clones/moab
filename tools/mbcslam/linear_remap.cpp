@@ -15,7 +15,7 @@
 #include "moab/ReadUtilIface.hpp"
 #include "MBTagConventions.hpp"
 #include "TestUtil.hpp"
-#include "CslamUtils.hpp"
+#include "IntxUtils.hpp"
 
 #ifdef MESHDIR
 std::string TestDir( STRINGIFY(MESHDIR) );
