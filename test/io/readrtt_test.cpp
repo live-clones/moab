@@ -15,12 +15,6 @@ static const char example[] = STRINGIFY(MESHDIR) "/io/rtttest.rtt";
 #else
 static const char example[] = "rtttest.rtt";
 #endif
-// rtttest2.rtt
-#ifdef MESHDIR
-static const char example_2[] = STRINGIFY(MESHDIR) "/io/rtttest2.rtt";
-#else
-static const char example_2[] = "rtttest2.rtt";
-#endif
 
 void test_loadfile();
 void test_meshset_tags();
