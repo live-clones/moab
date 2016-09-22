@@ -184,3 +184,6 @@ mbtagprop_SOURCES = parse.cpp parse.hpp propagate_tags.cpp
 mbmem_SOURCES = mbmem.cpp
 parread_SOURCES = parread.cpp
 
+bin_PROGRAMS += mbslavepart
+mbslavepart_SOURCES = mbslavepart.cpp
+
