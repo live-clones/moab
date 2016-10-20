@@ -30,6 +30,7 @@
 #include <cmath>
 #include <cassert>
 
+#include "moab/MOABConfig.h"
 #include "moab/Util.hpp"
 #include "moab/Types.hpp"
 #include "moab/CartVect.hpp"

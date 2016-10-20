@@ -1,6 +1,13 @@
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <stdlib.h>
+#include <time.h>
+
+#include "moab/MOABConfig.h"
 #include "moab/Core.hpp"
-#include "moab/ProgOptions.hpp"
 #include "moab/ReorderTool.hpp"
+#include "moab/ProgOptions.hpp"
 
 #ifdef MOAB_HAVE_MPI
 #include "moab/ParallelComm.hpp"
@@ -22,12 +29,6 @@ typedef idx_t PartType;
 #else
 typedef int PartType;
 #endif
-
-#include <iostream>
-#include <sstream>
-#include <stdlib.h>
-#include <list>
-#include <time.h>
 
 using namespace moab;
 
@@ -491,7 +492,7 @@ int main(int argc, char* argv[])
       rval = mb.write_file(tmp_output_file.str().c_str());
       if (MB_SUCCESS != rval)
       {
-        std::cerr << tmp_output_file << " : failed to write file." << std::endl;
+        std::cerr << tmp_output_file.str() << " : failed to write file." << std::endl;
         std::cerr << "  Error code: " << mb.get_error_string(rval) << " ("
                   << rval << ")" << std::endl;
         std::string errstr;

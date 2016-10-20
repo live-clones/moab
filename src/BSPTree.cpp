@@ -18,12 +18,12 @@
  *\date 2008-05-13
  */
 
+#include "moab/Util.hpp"
 #include "moab/BSPTree.hpp"
 #include "moab/GeomUtil.hpp"
 #include "moab/Range.hpp"
 #include "Internals.hpp"
 #include "moab/BSPTreePoly.hpp"
-#include "moab/Util.hpp"
 
 #include <assert.h>
 #include <string.h>

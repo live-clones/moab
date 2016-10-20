@@ -1,13 +1,12 @@
 #include <iostream>
 #include <fstream>
-#include <math.h>
 #include <time.h>
 #include <cstdlib>
 #include "assert.h"
 
+#include "moab/Util.hpp"
 #include "mcnpmit.hpp"
 
-#include "moab/CartVect.hpp"
 #include "moab/Core.hpp"
 #include "MBTagConventions.hpp"
 #include "moab/AdaptiveKDTree.hpp"

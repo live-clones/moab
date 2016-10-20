@@ -1,3 +1,4 @@
+#include "moab/Util.hpp"
 #include "Coupler.hpp"
 #include "moab/ParallelComm.hpp"
 #include "moab/AdaptiveKDTree.hpp"

@@ -1,6 +1,7 @@
 /**\file AdaptiveKDTree.cpp
  */
 
+#include "moab/Util.hpp"
 #include "moab/AdaptiveKDTree.hpp"
 #include "moab/Interface.hpp"
 #include "moab/GeomUtil.hpp"
@@ -8,7 +9,6 @@
 #include "moab/ElemEvaluator.hpp"
 #include "moab/CpuTimer.hpp"
 #include "Internals.hpp"
-#include "moab/Util.hpp"
 #include <math.h>
 
 #include <assert.h>

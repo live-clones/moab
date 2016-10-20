@@ -1,5 +1,5 @@
+#include "moab/Util.hpp"
 #include "moab/SpatialLocator.hpp"
-#include "moab/Interface.hpp"
 #include "moab/ElemEvaluator.hpp"
 #include "moab/AdaptiveKDTree.hpp"
 #include "moab/BVHTree.hpp"

@@ -2,7 +2,6 @@
 #define ELEM_EVALUATOR_HPP
 
 #include "moab/Interface.hpp"
-#include "moab/CartVect.hpp"
 #include "moab/Matrix3.hpp"
 #include "moab/CN.hpp"
 

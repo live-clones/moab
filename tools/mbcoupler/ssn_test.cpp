@@ -1,4 +1,5 @@
 // A test file for Subset Normalization
+#include "moab/Util.hpp"
 #include "moab/ParallelComm.hpp"
 #include "MBParallelConventions.h"
 #include "moab/Core.hpp"

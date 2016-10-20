@@ -20,16 +20,18 @@
 #include "moab/Forward.hpp"
 #include "moab/CartVect.hpp"
 
-#include <math.h>
-#if defined MOAB_HAVE_ISFINITE
-#define moab_isfinite(f) isfinite(f)
-#elif defined MOAB_HAVE_STDISFINITE
+#ifdef MOAB_HAVE_STDISFINITE
 #include <cmath>
 #define moab_isfinite(f) std::isfinite(f)
+#else
+#include <math.h>
+#ifdef MOAB_HAVE_ISFINITE
+#define moab_isfinite(f) isfinite(f)
 #elif defined MOAB_HAVE_FINITE
 #define moab_isfinite(f) finite(f)
 #else
 #define moab_isfinite(f) (!isinf(f) && !isnan(f))
+#endif
 #endif
 
 namespace moab {
