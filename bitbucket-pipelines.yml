@@ -18,7 +18,7 @@ pipelines:
                 - make all
                 - cd test/obb
                 - make obb_test
-                - ./obb_test -v -v -v 
+                - ./obb_test -v -v  
                 # Now configure with CMake build system
                 - echo "Running the CMake Build System"
                 - cd ../build_cmake
