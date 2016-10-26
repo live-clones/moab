@@ -319,7 +319,7 @@ ErrorCode OrientedBox::covariance_data_from_tris( CovarienceData& result,
       const CartVect edge0 = coords[1] - coords[0];
       const CartVect edge1 = coords[2] - coords[0];
       const CartVect centroid = (coords[0] + coords[1] + coords[2]) / 3;
-      const double tri_area2 = (edge0 * edge1).length();
+      const double tri_area2 = (edge0 * edge1).length()/2;
       result.area += tri_area2;
       result.center += tri_area2 * centroid;
       
