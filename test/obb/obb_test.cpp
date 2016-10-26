@@ -26,7 +26,8 @@ static const char* NAME = "obb_test";
 static const char* DEFAULT_FILES[] = { STRINGIFY(MESHDIR) "/3k-tri-sphere.vtk",
                               //  STRINGIFY(MESHDIR) "../4k-tri-plane.vtk",
 #ifdef MOAB_HAVE_HDF5
-                                STRINGIFY(MESHDIR) "/3k-tri-cube.h5m",
+//                                STRINGIFY(MESHDIR) "/3k-tri-cube.h5m",
+                                STRINGIFY(MESHDIR) "/trimesh.h5m",
 #endif
                                 0 };
 
