@@ -295,6 +295,73 @@ bool plucker_ray_tri_intersect( const CartVect vertices[3],
   return true;
 }
 
+/*
+ * https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
+ * moller trumbore 1997 algorithm
+ *
+ * it solves for u and v (baricentric coordinates) and for t, such as
+ *  point on ray:  B + t * V = (1-u-v) * V0 + u * V1 + v * V2  point in triangle plane
+ *   conditions:  u, v >=0, u+v <=1, t > 0
+ */
+bool ray_tri_intersect( const CartVect vertices[3],
+    const CartVect& B,
+    const CartVect& V,
+    double tolerance,
+    double& t_out,
+    const double* ray_length)
+{
+  double det, inv_det, u, v;
+  double t;
+
+  //
+  const double small_epsilon = tolerance*1.e-5; // this is related to double precision round off errors
+  //Find vectors for two edges sharing first vertex
+  CartVect e1 = vertices[1] - vertices[0];
+  CartVect e2 = vertices[2] - vertices[0];
+  //Begin calculating determinant - also used to calculate u parameter
+
+  CartVect P = V * e2;
+  //if determinant is near zero, ray lies in plane of triangle
+  // or ray is parallel to plane of triangle
+  det = e1%P;
+
+  if (det > -tolerance && det < tolerance)
+    return false;
+  inv_det = 1. / det;
+
+  //calculate distance from first vertex to ray origin
+  CartVect T = B - vertices[0];
+
+  //Calculate u parameter and test bound
+
+  u = T%P * inv_det;
+  //The intersection lies outside of the triangle
+  if (u<-small_epsilon  || u> 1. +small_epsilon )
+    return false;
+  //Prepare to test v parameter
+  CartVect Q = T * e1;
+
+  //Calculate v parameter and test bound
+  v = V%Q * inv_det;
+  //The intersection lies outside of the triangle
+  if (v < -small_epsilon || u+v > 1.+small_epsilon )
+    return false;
+
+  t = e2%Q * inv_det;
+
+  if (t > tolerance)
+  {
+    t_out = t;
+    if (ray_length && t > *ray_length)
+      return false;
+    return true;
+  }
+
+  // No hit, no win
+  return false;
+}
+
+#if 0
 /* Implementation copied from cgmMC ray_tri_contact (overlap.C) */
 bool ray_tri_intersect( const CartVect vertices[3],
                         const CartVect& b,
@@ -347,7 +414,7 @@ bool ray_tri_intersect( const CartVect vertices[3],
   t_out = t;
   return true;
 }
-
+#endif
 bool ray_box_intersect( const CartVect& box_min,
                         const CartVect& box_max,
                         const CartVect& ray_pt,

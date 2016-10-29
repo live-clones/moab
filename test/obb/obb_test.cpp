@@ -775,7 +775,7 @@ static bool do_file( const char* filename )
     
     if (verbosity)
       std::cout << "Built tree from " << surfaces.size() << " surfaces" 
-                << " (" << entities.size() - surfaces.size() << " elements)" << std::endl;
+                << " (" << entities.size()  << " elements)" << std::endl;
 
     entities.merge( surfaces );
   }    
@@ -930,7 +930,10 @@ static bool do_ray_fire_test( OrientedBoxTreeTool& tool,
   
   /* Do standard ray fire tests */
   
+  CartVect origin(0.,0.,0.);
+  CartVect unitDiag(1., 1., 1.);
   RayTest tests[] = { 
+   { "diag through origin "     , 1, origin,                                15*unitDiag },
    { "half-diagonal from center", 1, box.center,                            1.5 * box.dimensions() },
    { "large axis through box",    2, box.center - 1.2 * box.scaled_axis(2), box.axis(2) },
    { "small axis through box",    2, box.center - 1.2 * box.scaled_axis(0), box.axis(0) },
@@ -962,7 +965,7 @@ static bool do_ray_fire_test( OrientedBoxTreeTool& tool,
         std::cout << "  Expected " << tests[i].expected_hits << " and got "
                   << intersections.size() << " hits for ray fire of " 
                   << tests[i].description << std::endl;
-      if (verbosity > 3) {
+      if (verbosity > 2) {
         for (unsigned j = 0; j < intersections.size(); ++j)
           std::cout << "  " << intersections[j];
         std::cout << std::endl;

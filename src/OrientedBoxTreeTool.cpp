@@ -911,6 +911,42 @@ ErrorCode OrientedBoxTreeTool::ray_intersect_triangles(
         intersection_distances_out.push_back(td);
         intersection_facets_out.push_back( *t );
       }
+      // if the intersection distances are too close to each other, merge them
+      // it could also mean that the triangles are adjacent
+      if (intersection_distances_out.size() > 1)
+      {
+        // see if we have repeated distances or adjacent triangles
+        std::vector<double> dists=intersection_distances_out;
+        std::sort(dists.begin(), dists.end());
+        std::vector<double> uniques;
+        uniques.push_back(dists[0]);
+        int i=0;
+        for (std::vector<double>::iterator it = dists.begin(); it!=dists.end(); it++)
+        {
+          double d = *it;
+          if ( fabs(uniques[i] - d)<tolerance )
+            continue;
+          else
+          {
+            uniques.push_back(d); i++;
+          }
+        }
+        // now find triangles for uniques distances
+        std::vector<EntityHandle> ents;
+        for (std::vector<double>::iterator it = uniques.begin(); it!=uniques.end(); it++)
+        {
+          for (size_t j=0; j<intersection_distances_out.size(); j++)
+          {
+            if (*it == intersection_distances_out[j])
+            {
+              ents.push_back(intersection_facets_out[j]);
+              break; // break this j loop
+            }
+          }
+        }
+        intersection_distances_out = uniques;
+        intersection_facets_out = ents;
+      }
     }
   }
   
