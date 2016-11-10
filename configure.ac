@@ -1281,6 +1281,7 @@ AC_CONFIG_FILES([Makefile
                  src/LocalDiscretization/Makefile
                  src/RefineMesh/Makefile
                  src/IntxMesh/Makefile
+                 src/Remapping/Makefile
                  src/parallel/Makefile
                  src/verdict/Makefile
                  test/Makefile
