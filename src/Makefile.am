@@ -16,7 +16,10 @@ endif
 
 include moab/EigenHeaders
 
-SUBDIRS += io LocalDiscretization verdict RefineMesh IntxMesh Remapping .
+SUBDIRS += io LocalDiscretization verdict RefineMesh IntxMesh .
+if HAVE_TEMPESTREMAP
+ SUBDIRS += Remapping
+endif 
 libMOAB_la_LIBADD += io/libmoabio.la LocalDiscretization/libLocalDiscretization.la verdict/libmoabverdict.la RefineMesh/libRefineMesh.la IntxMesh/libIntxMesh.la
 
 # Some variables
