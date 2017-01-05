@@ -16,12 +16,13 @@ endif
 
 include moab/EigenHeaders
 
-SUBDIRS += io LocalDiscretization verdict RefineMesh IntxMesh .
-if HAVE_TEMPESTREMAP
- SUBDIRS += Remapping
-endif 
-libMOAB_la_LIBADD += io/libmoabio.la LocalDiscretization/libLocalDiscretization.la verdict/libmoabverdict.la RefineMesh/libRefineMesh.la IntxMesh/libIntxMesh.la
+SUBDIRS += io LocalDiscretization verdict RefineMesh IntxMesh 
 
+libMOAB_la_LIBADD += io/libmoabio.la LocalDiscretization/libLocalDiscretization.la verdict/libmoabverdict.la RefineMesh/libRefineMesh.la IntxMesh/libIntxMesh.la
+if ENABLE_mbtempest
+ SUBDIRS += Remapping
+ libMOAB_la_LIBADD += Remapping/libRemapping.la
+endif
 # Some variables
 AM_CPPFLAGS += -DIS_BUILDING_MB \
                -DLOCDIR=src/ \
