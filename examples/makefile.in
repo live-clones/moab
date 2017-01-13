@@ -91,6 +91,9 @@ LoadPartial: LoadPartial.o ${MOAB_LIBDIR}/libMOAB.la
 run-LoadPartial: LoadPartial
 	${RUNSERIAL} ./LoadPartial
 
+sphtri: sphtri.o ${MOAB_LIBDIR}/libMOAB.la
+	${MOAB_CXX} -o $@ $< ${MOAB_LIBS_LINK} ${MOAB_LIBS_LINK}
+
 StructuredMesh: StructuredMesh.o ${MOAB_LIBDIR}/libMOAB.la
 	${MOAB_CXX} -o $@ $< ${MOAB_LIBS_LINK}
 
