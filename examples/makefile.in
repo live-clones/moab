@@ -94,6 +94,12 @@ run-LoadPartial: LoadPartial
 sphtri: sphtri.o ${MOAB_LIBDIR}/libMOAB.la
 	${MOAB_CXX} -o $@ $< ${MOAB_LIBS_LINK} ${MOAB_LIBS_LINK}
 
+bound: bound.o ${MOAB_LIBDIR}/libMOAB.la
+	${MOAB_CXX} -o $@ $< ${MOAB_LIBS_LINK} ${MOAB_LIBS_LINK}
+
+dualForMPAS: dualForMPAS.o ${MOAB_LIBDIR}/libMOAB.la
+	${MOAB_CXX} -o $@ $< ${MOAB_LIBS_LINK} ${MOAB_LIBS_LINK}
+
 StructuredMesh: StructuredMesh.o ${MOAB_LIBDIR}/libMOAB.la
 	${MOAB_CXX} -o $@ $< ${MOAB_LIBS_LINK}
 
