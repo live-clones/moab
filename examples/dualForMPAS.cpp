@@ -152,6 +152,8 @@ int main(int argc, char **argv)
     dualVertices.insert(dual_vertex);
 
     rval = mb->tag_set_data(dualTag, &triangle, 1, &dual_vertex); MB_CHK_SET_ERR(rval, "Can't set dual tag vertex ");
+    rval = mb->tag_set_data(dualTag, &dual_vertex, 1, &triangle); MB_CHK_SET_ERR(rval, "Can't set dual tag triangle ");
+
   }
 
   Range dualEdges;
@@ -171,12 +173,72 @@ int main(int argc, char **argv)
     EntityHandle dualEdge ;
     rval = mb->create_element(MBEDGE, &dualVerts[0], 2, dualEdge);MB_CHK_SET_ERR(rval, "Can't create dual edge");
 
+    rval = mb->tag_set_data(dualTag, &edge, 1, &dualEdge); MB_CHK_SET_ERR(rval, "Can't set dual tag edge ");
+    rval = mb->tag_set_data(dualTag, &dualEdge, 1, &edge); MB_CHK_SET_ERR(rval, "Can't set dual tag edge ");
     dualEdges.insert(dualEdge);
   }
+
+  // for each point in original triangulation, create the dual polygon
+
+  Range dualPolygons;
+  for (Range::iterator vit=verts.begin(); vit!=verts.end(); vit++)
+  {
+    EntityHandle vertex=*vit;
+    // the issue is how to arrange the dual vertices in order
+    // start with first edge?
+    vector<EntityHandle> edges2;
+    rval = mb->get_adjacencies(&vertex, 1, 1, false, edges2); MB_CHK_SET_ERR(rval, "Can't get adjacent edges");
+    vector<EntityHandle> dualEdges2;
+    if (edges2.size()<3)
+      MB_CHK_SET_ERR(MB_FAILURE, "less than 3 edges adjacent to a vertex");
+    dualEdges2.resize(edges2.size());
+    rval = mb->tag_get_data(dualTag, &edges2[0], (int)edges2.size(), &dualEdges2[0]); MB_CHK_SET_ERR(rval, "Can't get dual edges");
+
+    Range dualVerts;
+    rval = mb->get_connectivity(&dualEdges2[0], dualEdges2.size(), dualVerts); MB_CHK_SET_ERR(rval, "Can't get connectivity");
+
+    // now form a loop with vertices in dualVerts
+    vector<EntityHandle> polyv;
+    polyv.resize(dualVerts.size());
+    // first 2 vertices are from dualEdges[0]; orientation will follow later
+    Range dualEdgesRange;
+    std::copy( dualEdges2.begin(), dualEdges2.end(), range_inserter(dualEdgesRange) );
+    const EntityHandle * conn2;
+    int nnodes;
+    rval = mb->get_connectivity(dualEdgesRange[0], conn2, nnodes); MB_CHK_SET_ERR(rval, "Can't get conn of first edge ");
+    polyv[0] = conn2[0];
+    polyv[1] = conn2[1];
+    // next, find the next nodes in the loop
+    int currentIndex=1;
+    dualEdgesRange.erase(dualEdgesRange[0]);
+    while (currentIndex<(int)edges2.size()-1 )
+    {
+      EntityHandle dualv=polyv[currentIndex];
+      // current edges adjacent
+      Range dualEdgesFront;
+      rval = mb->get_adjacencies(&dualv, 1, 1, false, dualEdgesFront);MB_CHK_SET_ERR(rval, "Can't get adj dual edges");
+
+      Range front =intersect(dualEdgesRange, dualEdgesFront);
+      if (front.size() != 1)
+        MB_CHK_SET_ERR(MB_FAILURE, "cannot find next dual edge");
+      rval = mb->get_connectivity(front[0], conn2, nnodes); MB_CHK_SET_ERR(rval, "Can't get conn of front edge ");
+      EntityHandle nextV = conn2[0];
+      dualEdgesRange.erase(front[0]);
+      if (dualv==nextV)
+        nextV = conn2[1];
+      polyv[++currentIndex] = nextV;
+    }
+    // finally create a polygon
+    EntityHandle polyg;
+    rval = mb->create_element(MBPOLYGON, &polyv[0], polyv.size(), polyg ); MB_CHK_SET_ERR(rval, "Can't create polygon ");
+    dualPolygons.insert(polyg);
+  }
+
 
   EntityHandle dual_set;
   rval = mb->create_meshset(MESHSET_SET, dual_set);MB_CHK_SET_ERR(rval, "Can't create dual set");
 
+  rval = mb->add_entities(dual_set, dualPolygons); MB_CHK_SET_ERR(rval, "Can't add polygons to dual set");
   rval = mb->add_entities(dual_set, dualEdges); MB_CHK_SET_ERR(rval, "Can't add edges to dual set");
 
   // add to the dual set the original verts
