@@ -20,6 +20,7 @@ using namespace std;
 
 string points_name = string("end_points.dat");
 string triangles_name = string("triangles.dat");
+string density_file = string("point_density.dat"); // associated with points or voronoi centers
 
 void circumcenter(const CartVect &A,const CartVect &B,const CartVect &C, CartVect &cent){/*{{{*/
   double a, b, c;
@@ -61,6 +62,7 @@ int main(int argc, char **argv)
     offset = atoi(argv[3]); // usually run with 0, for no offset, so triangulation is directly from 1
   }
 
+
   cout<< " execute:  " << argv[0] << " " << points_name << " " << triangles_name << "\n";
   ifstream pointsFile(points_name.c_str());
   if(!pointsFile) {
@@ -89,6 +91,19 @@ int main(int argc, char **argv)
   }
   cout<<" number of triangles:" << conns.size()/3 << "\n";
   
+  ifstream densityFile(density_file.c_str());
+  if(!densityFile) {
+    cout << endl << "Failed to open file " << points_name << endl;;
+    return 1;
+  }
+  vector<double>  densities;
+  while(!densityFile.eof())
+  {
+    double co;
+    densityFile >> co;
+    densities.push_back(co);
+  }
+
   ReadUtilIface* readMeshIface;
   mb->query_interface(readMeshIface);
   Range verts;
@@ -98,11 +113,20 @@ int main(int argc, char **argv)
 
   Tag gid;
   rval = mb->tag_get_handle("GLOBAL_ID", 1, MB_TYPE_INTEGER, gid); MB_CHK_SET_ERR(rval, "can't get global id tag");
+  Tag densityTag;
+  double densval = 0;
+  rval = mb->tag_get_handle("Density", 1, MB_TYPE_DOUBLE, densityTag,
+      MB_TAG_CREAT | MB_TAG_DENSE, &densval); MB_CHK_SET_ERR(rval, "can't get density tag");
+
   vector<int> gids;
   gids.resize(verts.size());
   for (int j=0; j<(int)verts.size(); j++)
     gids[j] = j+1;
   rval =mb->tag_set_data(gid, verts, &gids[0]);  MB_CHK_SET_ERR(rval, "can't set global id tag on original verts");
+  if (densities.size()>=verts.size())
+  {
+    rval = mb->tag_set_data(densityTag, verts, &densities[0]);MB_CHK_SET_ERR(rval, "can't set density tag on original verts");
+  }
   EntityHandle* conn_array;
   EntityHandle handle = 0;
   rval = readMeshIface->get_element_connect( conns.size()/3 , 3, MBTRI,
@@ -122,8 +146,6 @@ int main(int argc, char **argv)
     gids[j] = j+1;
   rval =mb->tag_set_data(gid, tris, &gids[0]);  MB_CHK_SET_ERR(rval, "can't set global id tag on original triangles");
 
-  cout << " writing tris.h5m ... \n";
-  rval = mb-> write_file("tris.h5m", 0, 0, &tri_set, 1); MB_CHK_SET_ERR(rval, "Can't write tris mesh");
   // dual of the triangular mesh is the MPAS mesh
   // first find out all edges in the triangulation
   Range edges;
@@ -260,6 +282,8 @@ int main(int argc, char **argv)
     dualPolygons.insert(polyg);
     // also set the gid on the dual polyg, which should be the same as original vertex
     rval = mb->tag_set_data(gid, &polyg, 1, &global_id); MB_CHK_SET_ERR(rval, "Can't set gid on dual polygon ");
+    // set density on the polygon, from the densities
+    rval = mb->tag_set_data(densityTag, &polyg, 1, &densities[global_id-1]); MB_CHK_SET_ERR(rval, "Can't set gid on dual polygon ");
     global_id++;
   }
 
