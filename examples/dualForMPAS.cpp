@@ -12,7 +12,7 @@
 #include "moab/CartVect.hpp"
 
 #include <iostream>
-#include<fstream>
+#include <fstream>
 
 using namespace moab;
 using namespace std;
@@ -54,6 +54,14 @@ int main(int argc, char **argv)
     triangles_name = argv[2];
   }
 
+  int offset = 1; //for triangulation
+  if (argc>3)
+  {
+
+    offset = atoi(argv[3]); // usually run with 0, for no offset, so triangulation is directly from 1
+  }
+
+  cout<< " execute:  " << argv[0] << " " << points_name << " " << triangles_name << "\n";
   ifstream pointsFile(points_name.c_str());
   if(!pointsFile) {
     cout << endl << "Failed to open file " << points_name << endl;;
@@ -88,6 +96,13 @@ int main(int argc, char **argv)
                                       coords.size()/3,
                                       verts ); MB_CHK_SET_ERR(rval, "do not create v");
 
+  Tag gid;
+  rval = mb->tag_get_handle("GLOBAL_ID", 1, MB_TYPE_INTEGER, gid); MB_CHK_SET_ERR(rval, "can't get global id tag");
+  vector<int> gids;
+  gids.resize(verts.size());
+  for (int j=0; j<(int)verts.size(); j++)
+    gids[j] = j+1;
+  rval =mb->tag_set_data(gid, verts, &gids[0]);  MB_CHK_SET_ERR(rval, "can't set global id tag on original verts");
   EntityHandle* conn_array;
   EntityHandle handle = 0;
   rval = readMeshIface->get_element_connect( conns.size()/3 , 3, MBTRI,
@@ -95,15 +110,20 @@ int main(int argc, char **argv)
                                               handle, conn_array); MB_CHK_SET_ERR(rval, "do not elems");
   
   for (size_t i=0; i<conns.size(); i++)
-     conn_array[i] = conns[i]+1; // vertices for sure start at 1
+     conn_array[i] = conns[i]+offset; // sometimes the connectivities for triangles start at 0, sometimes at 1
    
   EntityHandle tri_set;
   rval = mb->create_meshset(MESHSET_SET, tri_set);MB_CHK_SET_ERR(rval, "Can't create mesh set");
   Range tris(handle, handle+ conns.size()/3-1);
   rval = mb->add_entities(tri_set, tris);MB_CHK_SET_ERR(rval, "Can't add triangles to set");
-  
-  mb-> write_file("tris.vtk", 0, 0, &tri_set, 1);
 
+  gids.resize(tris.size());
+  for (int j=0; j<(int)tris.size(); j++)
+    gids[j] = j+1;
+  rval =mb->tag_set_data(gid, tris, &gids[0]);  MB_CHK_SET_ERR(rval, "can't set global id tag on original triangles");
+
+  cout << " writing tris.h5m ... \n";
+  rval = mb-> write_file("tris.h5m", 0, 0, &tri_set, 1); MB_CHK_SET_ERR(rval, "Can't write tris mesh");
   // dual of the triangular mesh is the MPAS mesh
   // first find out all edges in the triangulation
   Range edges;
@@ -114,7 +134,8 @@ int main(int argc, char **argv)
       /*const int operation_type = Interface::INTERSECT*/ Interface::UNION); MB_CHK_SET_ERR(rval, "Can't create edges");
   rval = mb->add_entities(tri_set, edges);MB_CHK_SET_ERR(rval, "Can't add edges to set");
 
-  mb-> write_file("tris.vtk", 0, 0, &tri_set, 1);
+  cout << " writing tris.h5m ... \n";
+  rval = mb-> write_file("tris.h5m", 0, 0, &tri_set, 1); MB_CHK_SET_ERR(rval, "Can't write tris mesh");
   // create a dual polygon for each vertex, and a dual edge for each edge
   // create first a dual vertex for each triangle, at circumcenter
   /*tag_get_handle( const char* name,
@@ -130,6 +151,7 @@ int main(int argc, char **argv)
 
   Range dualVertices;
   // first determine circumcenters, and normalize them
+  int global_id=1; // start with 1
   for (Range::iterator tit=tris.begin(); tit!=tris.end(); tit++)
   {
     EntityHandle triangle=*tit;
@@ -154,6 +176,9 @@ int main(int argc, char **argv)
     rval = mb->tag_set_data(dualTag, &triangle, 1, &dual_vertex); MB_CHK_SET_ERR(rval, "Can't set dual tag vertex ");
     rval = mb->tag_set_data(dualTag, &dual_vertex, 1, &triangle); MB_CHK_SET_ERR(rval, "Can't set dual tag triangle ");
 
+    // also set the gid on the dual vertex, which will be the same as the triangle it came on (dual)
+    rval = mb->tag_set_data(gid, &dual_vertex, 1, &global_id); MB_CHK_SET_ERR(rval, "Can't set gid on dual vertex ");
+    global_id++;
   }
 
   Range dualEdges;
@@ -181,6 +206,7 @@ int main(int argc, char **argv)
   // for each point in original triangulation, create the dual polygon
 
   Range dualPolygons;
+  global_id =1; // reset for polygons
   for (Range::iterator vit=verts.begin(); vit!=verts.end(); vit++)
   {
     EntityHandle vertex=*vit;
@@ -232,6 +258,9 @@ int main(int argc, char **argv)
     EntityHandle polyg;
     rval = mb->create_element(MBPOLYGON, &polyv[0], polyv.size(), polyg ); MB_CHK_SET_ERR(rval, "Can't create polygon ");
     dualPolygons.insert(polyg);
+    // also set the gid on the dual polyg, which should be the same as original vertex
+    rval = mb->tag_set_data(gid, &polyg, 1, &global_id); MB_CHK_SET_ERR(rval, "Can't set gid on dual polygon ");
+    global_id++;
   }
 
 
@@ -245,9 +274,9 @@ int main(int argc, char **argv)
   rval = mb->add_entities(dual_set, verts); MB_CHK_SET_ERR(rval, "Can't add original verts to dual set");
 
   // create polygons too, from dual verts
-  mb-> write_file("dual.vtk", 0, "CREATE_ONE_NODE_CELLS;", &dual_set, 1);
+  cout << " writing dual.h5m ... \n";
+  rval = mb-> write_file("dual.h5m", 0, 0, &dual_set, 1); MB_CHK_SET_ERR(rval, "Can't write dual mesh\n");
 
   delete mb;
-
   return 0;
 }
