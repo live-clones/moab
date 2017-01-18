@@ -1,7 +1,7 @@
-/** @example sphtri       
- * Description: read a mesh on a sphere\n
- *
- *    sphtri  <end_points.dat> <triangle.dat> <bisected_points.dat>  <boundary_points.dat> <SaveLoopCounts>
+/** @example dualForMPAS
+ * Description: read a delaunay triangular mesh on a sphere and convert to MPAS\n
+ *  assume density_points.dat exists too, for density
+ *    dualForMPAS  <end_points.dat> <triangle.dat> <offset>
  * (default values can run if users don't specify a mesh file)
  */
 
