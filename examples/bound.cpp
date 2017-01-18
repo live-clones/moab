@@ -67,7 +67,9 @@ int main(int argc, char **argv)
                                       coords.size()/3,
                                       verts ); MB_CHK_SET_ERR(rval, "do not create boundary vertices");
 
-  
+  Tag gid;
+  rval = mb->tag_get_handle("GLOBAL_ID", 1, MB_TYPE_INTEGER, gid); MB_CHK_SET_ERR(rval, "can't get global id tag");
+
   int num_edges=0;
   for (size_t i=0; i<loopsindx.size()/2; i++)
   {
@@ -99,6 +101,17 @@ int main(int argc, char **argv)
   rval = mb->create_meshset(MESHSET_SET, bound_set);MB_CHK_SET_ERR(rval, "Can't create boundary edges set");
 
   rval = mb->add_entities(bound_set, bedges);MB_CHK_SET_ERR(rval, "Can't add edges to boundary set");
+
+  // set global ids for vertices and edges
+  vector<int> gids;
+  gids.resize(verts.size());
+  for (int j=0; j<(int)verts.size(); j++)
+  {
+    gids[j] = j+1;
+  }
+  rval = mb->tag_set_data(gid, verts, &gids[0]); MB_CHK_SET_ERR(rval, "Can't set global ids on verts");
+  // we have less edges than vertices, we can reuse the array for edges too
+  rval = mb->tag_set_data(gid, bedges, &gids[0]); MB_CHK_SET_ERR(rval, "Can't set global ids on edges");
 
   mb-> write_file("bound.vtk", 0, 0, &bound_set, 1);
   delete mb;
