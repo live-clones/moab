@@ -392,7 +392,11 @@ int main(int argc, char* argv[])
     // Write out our computed intersection file
     // we should not add ini sets to the intersection set
     // rval = mbCore->add_entities(ctx.meshsets[2], &ctx.meshsets[0], 2);MB_CHK_ERR(rval);
-    rval = mbCore->write_file("moab_intersection.h5m", NULL, "PARALLEL=WRITE_PART", &ctx.meshsets[2], 1); MB_CHK_ERR(rval);
+    std::stringstream ste;
+    ste<<"moab_intersection_" << proc_id<<".h5m";
+
+    // write in serial, 2 meshes
+    rval = mbCore->write_file(ste.str().c_str(), 0, 0, &ctx.meshsets[2], 1); MB_CHK_ERR(rval);
 
     {
       double local_areas[3], global_areas[3]; // Array for Initial area, and through Method 1 and Method 2
