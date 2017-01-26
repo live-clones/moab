@@ -273,18 +273,7 @@ ErrorCode TempestRemapper::ConvertMOABMeshToTempest_Private(Mesh* mesh, EntityHa
 	// rval = m_interface->get_entities_by_dimension(mesh_set, 0, verts); MB_CHK_ERR(rval);
 	// verts.intersect(vertsall);
 
-	for (unsigned iface = 0; iface < elems.size(); ++iface) {
-
-		// get the connectivity for each edge
-		const EntityHandle* connectface;
-		int nnodesf;
-		rval = m_interface->get_connectivity(elems[iface], connectface, nnodesf); MB_CHK_ERR(rval);
-
-		for (int iverts = 0; iverts < nnodesf; ++iverts) {
-			if (verts.index(connectface[iverts]) < 0)
-				verts.insert(connectface[iverts]);
-		}
-	}
+	rval = m_interface->get_connectivity(elems, verts);  MB_CHK_ERR(rval);
 
 	for (unsigned iface = 0; iface < elems.size(); ++iface) {
 		Face& face = faces[iface];
@@ -394,12 +383,12 @@ ErrorCode TempestRemapper::AssociateSrcTargetInOverlap()
 	m_overlap->vecTargetFaceIx.resize(m_overlap_entities.size());
 
 	std::vector<int> rbids(m_overlap_entities.size());
-	rval = m_interface->tag_get_data(bluePtag,  m_overlap_entities, &rbids[0]); MB_CHK_ERR(rval);
+	rval = m_interface->tag_get_data(redPtag,  m_overlap_entities, &rbids[0]); MB_CHK_ERR(rval);
 	for (unsigned ie=0; ie < m_overlap_entities.size(); ++ie) {
 		m_overlap->vecSourceFaceIx[ie] = gid_to_lid_src[rbids[ie]];
 		// if(!m_pcomm->rank()) std::cout << "Overlap vecSourceFaceIx[" << ie << "]: GID = " << rbids[ie] << " and value = " << m_overlap->vecSourceFaceIx[ie] << "\n";
 	}
-	rval = m_interface->tag_get_data(redPtag,  m_overlap_entities, &rbids[0]); MB_CHK_ERR(rval);
+	rval = m_interface->tag_get_data(bluePtag,  m_overlap_entities, &rbids[0]); MB_CHK_ERR(rval);
 	for (unsigned ie=0; ie < m_overlap_entities.size(); ++ie) {
 		m_overlap->vecTargetFaceIx[ie] = gid_to_lid_tgt[rbids[ie]];
 		// if(!m_pcomm->rank()) std::cout << "Overlap vecTargetFaceIx[" << ie << "]: GID = " << rbids[ie] << " and value = " << m_overlap->vecTargetFaceIx[ie] << "\n";
@@ -447,7 +436,7 @@ ErrorCode TempestRemapper::ComputeOverlapMesh(double tolerance, double radius, b
       mbintx->SetRadius(radius);
       mbintx->set_parallel_comm(m_pcomm);
 
-      rval = mbintx->FindMaxEdges(m_source_set, m_target_set);MB_CHK_ERR(rval);
+      rval = mbintx->FindMaxEdges( m_target_set, m_source_set);MB_CHK_ERR(rval);
 
       // Note: lots of communication possible, if mesh is distributed very differently
       if (m_pcomm->size() != 1) {
@@ -459,25 +448,26 @@ ErrorCode TempestRemapper::ComputeOverlapMesh(double tolerance, double radius, b
       	m_covering_target = new Mesh();
       	rval = ConvertMOABMeshToTempest_Private(m_covering_target, m_covering_target_set, m_covering_target_entities);MB_CHK_SET_ERR(rval, "Can't convert source Tempest mesh");
 
-      	m_intersecting_source_entities = moab::intersect(m_target_entities, m_covering_target_entities);
-      	std::cout << "Number of intersected entities = " << m_intersecting_source_entities.size() << "/" << m_target_entities.size() << "\n";
+      	Range localTargetEnts = moab::intersect(m_target_entities, m_covering_target_entities);
+      	std::cout << "Number of target entities already on the right task = " << localTargetEnts.size() << " of initial " << m_target_entities.size() << "\n";
 
       }
       else {
       	m_covering_target_set = m_target_set;
       	m_covering_target = m_target;
       	m_covering_target_entities = m_target_entities;
-      	m_intersecting_source_entities = m_target_entities;
       }
 
       // Now perform the actual parallel intersection between the source and the target meshes
-      rval = mbintx->intersect_meshes(m_source_set, m_covering_target_set, m_overlap_set);MB_CHK_SET_ERR(rval, "Can't compute the intersection of meshes on the sphere");
+      rval = mbintx->intersect_meshes(m_covering_target_set, m_source_set, m_overlap_set);MB_CHK_SET_ERR(rval, "Can't compute the intersection of meshes on the sphere");
 
       // rval = m_interface->add_entities(m_overlap_set, &m_source_set, 1);MB_CHK_ERR(rval);
       // rval = m_interface->add_entities(m_overlap_set, &m_target_set, 1);MB_CHK_ERR(rval);
 
-      rval = fix_degenerate_quads(m_interface, m_overlap_set);MB_CHK_ERR(rval);
-      rval = positive_orientation(m_interface, m_overlap_set, radius);MB_CHK_ERR(rval);
+      // this should be used on input meshes, it has no effect on intx set
+      //rval = fix_degenerate_quads(m_interface, m_overlap_set);MB_CHK_ERR(rval);
+      // also, this should be used on input meshes; output (intx) is oriented fine, always, because we created it
+      // rval = positive_orientation(m_interface, m_overlap_set, radius);MB_CHK_ERR(rval);
 
       // free the memory
       delete mbintx;

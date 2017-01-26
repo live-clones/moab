@@ -120,8 +120,6 @@ private:
     moab::EntityHandle m_covering_target_set;
     moab::Range m_covering_target_entities;
 
-    moab::Range m_intersecting_source_entities;
-
 };
 
 // Inline functions

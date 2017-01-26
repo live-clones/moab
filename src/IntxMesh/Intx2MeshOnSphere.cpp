@@ -405,9 +405,12 @@ ErrorCode Intx2MeshOnSphere::findNodes(EntityHandle red, int nsRed, EntityHandle
 #endif
 
   }
-  else {
+  /*
+    // this is not a FAILURE, because it is possible the intersection is along an edge,
+    // so no polygon gets generated (also area returned would be 0)
+    else {
     std::cout << "[[FAILURE]] Number of vertices in polygon is less than 3\n";
-  }
+  }*/
   //disable_debug();
   delete[] foundIds;
   foundIds = NULL;
