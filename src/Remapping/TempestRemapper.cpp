@@ -472,6 +472,19 @@ ErrorCode TempestRemapper::ComputeOverlapMesh(double tolerance, double radius, b
       // rval = mbintx->intersect_meshes(m_source_set, m_covering_target_set, m_overlap_set);MB_CHK_SET_ERR(rval, "Can't compute the intersection of meshes on the sphere");
       rval = mbintx->intersect_meshes(m_covering_set, m_target_set, m_overlap_set);MB_CHK_SET_ERR(rval, "Can't compute the intersection of meshes on the sphere");
 
+      if (true) // debugging
+      {
+        // dump the meshes of interest
+        std::stringstream filename, targetf, intxfile;
+        int pid = m_pcomm->rank();
+        int size = m_pcomm->size();
+        filename << "covering_" <<pid<<"_"<< size <<".h5m";
+        m_interface->write_file(filename.str().c_str(), 0, 0, &m_covering_set, 1);
+        targetf << "localtarget_" <<pid<<"_"<< size <<".h5m";
+        m_interface->write_file(targetf.str().c_str(), 0, 0, &m_target_set, 1);
+        intxfile << "intx_" <<pid<<"_"<< size <<".h5m";
+        m_interface->write_file(intxfile.str().c_str(), 0, 0, &m_overlap_set, 1);
+      }
       // rval = m_interface->add_entities(m_overlap_set, &m_source_set, 1);MB_CHK_ERR(rval);
       // rval = m_interface->add_entities(m_overlap_set, &m_target_set, 1);MB_CHK_ERR(rval);
 
