@@ -58,8 +58,8 @@ TempestOfflineMap::TempestOfflineMap(moab::TempestRemapper* remapper) : OfflineM
     
     // Initialize dimension information from file
     dbgprint.printf(0, "Initializing dimensions of map\n");
-    dbgprint.printf(0, "Input mesh\n");
-    this->InitializeSourceDimensionsFromMesh(*m_meshInput);
+    dbgprint.printf(0, "Input mesh coverage\n");
+    this->InitializeSourceDimensionsFromMesh(*m_meshInputCov);
     dbgprint.printf(0, "Output mesh\n");
     this->InitializeTargetDimensionsFromMesh(*m_meshOutput);
     // dbgprint.printf(0, "----------------------------------\n");
@@ -79,6 +79,7 @@ TempestOfflineMap::~TempestOfflineMap()
     mbCore = NULL;
     pcomm = NULL;
     m_meshInput = NULL;
+    m_meshInputCov = NULL;
     m_meshOutput = NULL;
     m_meshOverlap = NULL;
 }
@@ -181,8 +182,8 @@ void TempestOfflineMap::LinearRemapFVtoFV_Tempest_MOAB(
     const int TriQuadRuleOrder = 4;
 
     // Verify ReverseNodeArray has been calculated
-    if (m_meshInput->revnodearray.size() == 0) {
-        _EXCEPTIONT("ReverseNodeArray has not been calculated for m_meshInput");
+    if (m_meshInputCov->revnodearray.size() == 0) {
+        _EXCEPTIONT("ReverseNodeArray has not been calculated for m_meshInputCov");
     }
 
     // Triangular quadrature rule
@@ -214,11 +215,11 @@ void TempestOfflineMap::LinearRemapFVtoFV_Tempest_MOAB(
     // return ;
 
     // Loop through all faces on m_meshInput
-    for (int ixFirst = 0; ixFirst < m_meshInput->faces.size(); ixFirst++) {
+    for (int ixFirst = 0; ixFirst < m_meshInputCov->faces.size(); ixFirst++) {
 
         // Output every 100 elements
         if (ixFirst % 100 == 0) {
-            Announce("Element %i/%i", ixFirst, m_meshInput->faces.size());
+            Announce("Element %i/%i", ixFirst, m_meshInputCov->faces.size());
         }
 
         // This Face
@@ -256,7 +257,7 @@ void TempestOfflineMap::LinearRemapFVtoFV_Tempest_MOAB(
             DataMatrix<double> dIntArray;
 
             BuildIntegrationArray(
-                *m_meshInput,
+                *m_meshInputCov,
                 *m_meshOverlap,
                 triquadrule,
                 ixFirst,
@@ -270,7 +271,7 @@ void TempestOfflineMap::LinearRemapFVtoFV_Tempest_MOAB(
             AdjacentFaceVector vecAdjFaces;
 
             GetAdjacentFaceVectorByEdge(
-                *m_meshInput,
+                *m_meshInputCov,
                 ixFirst,
                 nRequiredFaceSetSize,
                 vecAdjFaces);
@@ -283,7 +284,7 @@ void TempestOfflineMap::LinearRemapFVtoFV_Tempest_MOAB(
 
             dConstraint.Initialize(nCoefficients);
 
-            double dFirstArea = m_meshInput->vecFaceArea[ixFirst];
+            double dFirstArea = m_meshInputCov->vecFaceArea[ixFirst];
 
             for (int p = 0; p < nCoefficients; p++) {
                 for (int j = 0; j < nOverlapFaces; j++) {
@@ -298,7 +299,7 @@ void TempestOfflineMap::LinearRemapFVtoFV_Tempest_MOAB(
             DataMatrix<double> dFitArrayPlus;
 
             BuildFitArray(
-                *m_meshInput,
+                *m_meshInputCov,
                 triquadrule,
                 ixFirst,
                 vecAdjFaces,
@@ -470,14 +471,14 @@ try {
 
     // Calculate Face areas
     if (!pcomm->rank()) dbgprint.printf(0, "Calculating input mesh Face areas\n");
-    double dTotalAreaInput_loc = m_meshInput->CalculateFaceAreas();
+    double dTotalAreaInput_loc = m_meshInputCov->CalculateFaceAreas();
     Real dTotalAreaInput;
     MPI_Allreduce(&dTotalAreaInput_loc, &dTotalAreaInput, 1, MPI_DOUBLE, MPI_SUM, pcomm->comm());
     if (!pcomm->rank()) dbgprint.printf(0, "Input Mesh Geometric Area: %1.15e\n", dTotalAreaInput);
 
     // Input mesh areas
     if (eInputType == DiscretizationType_FV) {
-        this->SetSourceAreas(m_meshInput->vecFaceArea);
+        this->SetSourceAreas(m_meshInputCov->vecFaceArea);
     }
 
     // Calculate Face areas
@@ -515,7 +516,7 @@ try {
     dbgprint.printf(0, "m_meshInputCov->faces = %lu, m_meshOutput->faces = %lu, ixSourceFaceMax = %d\n", m_meshInput->faces.size(), m_meshOutput->faces.size(), ixSourceFaceMax);
 
     // Check for forward correspondence in overlap mesh
-    if (m_meshInput->faces.size() - ixSourceFaceMax == 0 //&&
+    if (m_meshInputCov->faces.size() - ixSourceFaceMax == 0 //&&
         //(ixTargetFaceMax == m_meshOutput.faces.size())
     ) {
         if (!pcomm->rank()) dbgprint.printf(0, "Overlap mesh forward correspondence found\n");
@@ -568,11 +569,11 @@ try {
     ) {
 
         // Generate reverse node array and edge map
-        m_meshInput->ConstructReverseNodeArray();
-        m_meshInput->ConstructEdgeMap();
+        m_meshInputCov->ConstructReverseNodeArray();
+        m_meshInputCov->ConstructEdgeMap();
 
         // Initialize coordinates for map
-        this->InitializeSourceCoordinatesFromMeshFV(*m_meshInput);
+        this->InitializeSourceCoordinatesFromMeshFV(*m_meshInputCov);
         this->InitializeTargetCoordinatesFromMeshFV(*m_meshOutput);
 
         // Construct OfflineMap
@@ -620,15 +621,15 @@ try {
         }
 
         // Generate reverse node array and edge map
-        m_meshInput->ConstructReverseNodeArray();
-        m_meshInput->ConstructEdgeMap();
+        m_meshInputCov->ConstructReverseNodeArray();
+        m_meshInputCov->ConstructEdgeMap();
 
         // Generate remap weights
         if (!pcomm->rank()) dbgprint.printf(0, "Calculating offline map\n");
 
         if (fVolumetric) {
             LinearRemapFVtoGLL_Volumetric(
-                *m_meshInput,
+                *m_meshInputCov,
                 *m_meshOutput,
                 *m_meshOverlap,
                 dataGLLNodes,
@@ -642,7 +643,7 @@ try {
 
         } else {
             LinearRemapFVtoGLL(
-                *m_meshInput,
+                *m_meshInputCov,
                 *m_meshOutput,
                 *m_meshOverlap,
                 dataGLLNodes,
@@ -715,7 +716,7 @@ try {
         }
 
         LinearRemapSE4(
-            *m_meshInput,
+            *m_meshInputCov,
             *m_meshOutput,
             *m_meshOverlap,
             dataGLLNodes,
@@ -778,7 +779,7 @@ try {
 
         // Initialize coordinates for map
         this->InitializeSourceCoordinatesFromMeshFE(
-            *m_meshInput, nPin, dataGLLNodesIn);
+            *m_meshInputCov, nPin, dataGLLNodesIn);
         this->InitializeTargetCoordinatesFromMeshFE(
             *m_meshOutput, nPout, dataGLLNodesOut);
 
@@ -816,7 +817,7 @@ try {
         if (!pcomm->rank()) dbgprint.printf(0, "Calculating offline map");
 
         LinearRemapGLLtoGLL2(
-            *m_meshInput,
+            *m_meshInputCov,
             *m_meshOutput,
             *m_meshOverlap,
             dataGLLNodesIn,
@@ -1269,13 +1270,13 @@ void TempestOfflineMap::GatherAllToRoot() {
 		
 		ierr = MPI_Gather( sendarray, 2, MPI_INTEGER, &rowcolss[0], 2, MPI_INTEGER, rootProc, pcomm->comm());
 
-		dbgprint.printf(0, "[%D] Dimensions: %D, %D\n", pcomm->rank(), vecRow.GetRows(), vecCol.GetRows());
+		dbgprint.printf(0, "[%d] Dimensions: %d, %d\n", pcomm->rank(), vecRow.GetRows(), vecCol.GetRows());
 
 		if (!pcomm->rank()) {
 			int gsize=0;
 			for (unsigned i=0; i < rowcolss.size(); ++i) gsize += rowcolss[i];
 			rowcolsv.resize(gsize);
-			dbgprint.printf(0, "Resizing rowscolv to %D\n", gsize);
+			dbgprint.printf(0, "Resizing rowscolv to %d\n", gsize);
 		}
 	}
 
@@ -1295,7 +1296,7 @@ void TempestOfflineMap::GatherAllToRoot() {
 				rcount[i] = rowcolss[2*i]+rowcolss[2*i+1];
 				gsum += rcount[i];
 			}
-			dbgprint.printf(0, "Received global dimensions: %D, %D\n", nR, gsum);
+			dbgprint.printf(0, "Received global dimensions: %d, %d\n", nR, gsum);
 		}
 
 		// Both rows and columns have a size of "rowsize"

@@ -389,10 +389,12 @@ int main(int argc, char* argv[])
       ctx.meshes[2] = remapper.GetMesh(moab::Remapper::IntersectedMesh);
     }
 
-    // Write out our computed intersection file
-    if (false) {
-      rval = mbCore->add_entities(ctx.meshsets[2], &ctx.meshsets[0], 2);MB_CHK_ERR(rval);
-      rval = mbCore->write_file("moab_intersection.h5m", NULL, "PARALLEL=WRITE_PART", &ctx.meshsets[2], 1); MB_CHK_ERR(rval);
+    // Write out our computed intersection files
+    if (true) {
+      //rval = mbCore->add_entities(ctx.meshsets[2], &ctx.meshsets[0], 2);MB_CHK_ERR(rval);
+      std::stringstream ste;
+      ste<< "moab_intx_" << proc_id << ".h5m" ;
+      rval = mbCore->write_file(ste.str().c_str(), NULL, 0, &ctx.meshsets[2], 1); MB_CHK_ERR(rval);
     }
 
     {

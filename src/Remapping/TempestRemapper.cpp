@@ -367,8 +367,8 @@ ErrorCode TempestRemapper::AssociateSrcTargetInOverlap()
 
 		std::vector<int> gids;
 
-		gids.resize(m_covering_target_entities.size(),-1);
-		rval = m_interface->tag_get_data(gidtag,  m_covering_target_entities, &gids[0]);MB_CHK_ERR(rval);
+		gids.resize(m_covering_entities.size(),-1);
+		rval = m_interface->tag_get_data(gidtag,  m_covering_entities, &gids[0]);MB_CHK_ERR(rval);
 		for (unsigned ie=0; ie < gids.size(); ++ie) {
 			gid_to_lid_src[gids[ie]] = ie;
 			lid_to_gid_src[ie] = gids[ie];
@@ -438,7 +438,6 @@ ErrorCode TempestRemapper::ComputeOverlapMesh(double tolerance, double radius, b
       // const double radius = 1.0 /*2.0*acos(-1.0)*/;
       const double boxeps = 0.1;
 	  // Create the intersection on the sphere object and set up necessary parameters
-      moab::Range local_verts;
       moab::Intx2MeshOnSphere *mbintx = new moab::Intx2MeshOnSphere(m_interface);
 
       mbintx->SetErrorTolerance(tolerance);
@@ -450,34 +449,35 @@ ErrorCode TempestRemapper::ComputeOverlapMesh(double tolerance, double radius, b
 
       // Note: lots of communication possible, if mesh is distributed very differently
       if (m_pcomm->size() != 1) {
+        moab::Range local_verts;
       	rval = mbintx->build_processor_euler_boxes(m_target_set, local_verts); MB_CHK_ERR(rval);
 
-      	rval = m_interface->create_meshset(moab::MESHSET_SET, m_covering_target_set);MB_CHK_SET_ERR(rval, "Can't create new set");
-      	rval = mbintx->construct_covering_set(m_source_set, m_covering_target_set); MB_CHK_ERR(rval);
+      	rval = m_interface->create_meshset(moab::MESHSET_SET, m_covering_set);MB_CHK_SET_ERR(rval, "Can't create new set");
+      	rval = mbintx->construct_covering_set(m_source_set, m_covering_set); MB_CHK_ERR(rval);
 
-      	m_covering_target = new Mesh();
-      	rval = ConvertMOABMeshToTempest_Private(m_covering_target, m_covering_target_set, m_covering_target_entities);MB_CHK_SET_ERR(rval, "Can't convert source Tempest mesh");
+      	m_covering = new Mesh();
+      	rval = ConvertMOABMeshToTempest_Private(m_covering, m_covering_set, m_covering_entities);MB_CHK_SET_ERR(rval, "Can't convert source Tempest mesh");
 
-      	m_intersecting_target_entities = moab::intersect(m_source_entities, m_covering_target_entities);
-      	std::cout << "Number of common entities = " << m_intersecting_target_entities.size() << "/ (" << m_source_entities.size() << ", " << m_covering_target_entities.size() << ")\n";
+      	Range localNonMigrated = moab::intersect(m_source_entities, m_covering_entities);
+      	std::cout << "Number of local entities on rank " << m_pcomm->rank()<<", not migrating = " << localNonMigrated.size() << " initial:" << m_source_entities.size() << " final:" << m_covering_entities.size() << "\n";
 
       }
       else {
-      	m_covering_target_set = m_source_set;
-      	m_covering_target = m_source;
-      	m_covering_target_entities = m_source_entities;
-      	m_intersecting_target_entities = m_source_entities;
+      	m_covering_set = m_source_set;
+      	m_covering = m_source; // this is a tempest mesh object; careful about incrementing the reference?
+      	m_covering_entities = m_source_entities; // no migration needed; source is completely covering target
       }
 
       // Now perform the actual parallel intersection between the source and the target meshes
       // rval = mbintx->intersect_meshes(m_source_set, m_covering_target_set, m_overlap_set);MB_CHK_SET_ERR(rval, "Can't compute the intersection of meshes on the sphere");
-      rval = mbintx->intersect_meshes(m_covering_target_set, m_target_set, m_overlap_set);MB_CHK_SET_ERR(rval, "Can't compute the intersection of meshes on the sphere");
+      rval = mbintx->intersect_meshes(m_covering_set, m_target_set, m_overlap_set);MB_CHK_SET_ERR(rval, "Can't compute the intersection of meshes on the sphere");
 
       // rval = m_interface->add_entities(m_overlap_set, &m_source_set, 1);MB_CHK_ERR(rval);
       // rval = m_interface->add_entities(m_overlap_set, &m_target_set, 1);MB_CHK_ERR(rval);
 
-      rval = fix_degenerate_quads(m_interface, m_overlap_set);MB_CHK_ERR(rval);
-      rval = positive_orientation(m_interface, m_overlap_set, radius);MB_CHK_ERR(rval);
+      // not needed
+      /*rval = fix_degenerate_quads(m_interface, m_overlap_set);MB_CHK_ERR(rval);
+        rval = positive_orientation(m_interface, m_overlap_set, radius);MB_CHK_ERR(rval);*/
 
       // free the memory
       delete mbintx;
