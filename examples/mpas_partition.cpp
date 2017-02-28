@@ -109,6 +109,10 @@ int main(int argc, char **argv)
     rval = mb->add_entities(tagged_sets[partition], &eh, 1); MB_CHK_ERR(rval);
   }
   
+  // remove the edges from file
+  Range edges;
+  rval = mb->get_entities_by_dimension(0, 1, edges); MB_CHK_ERR(rval);
+  rval = mb->delete_entities(edges); MB_CHK_ERR(rval);
   // write the new file:
   string out_file("mpas_part.h5m");
   if (argc>3)
