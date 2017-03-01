@@ -1,4 +1,5 @@
 #include "moab/Core.hpp"
+#include "moab/CartVect.hpp"
 #include <iostream>
 #include <fstream>
 #include <algorithm>
@@ -27,6 +28,7 @@ int main(int argc, char **argv)
 
   // Load the mesh from h5m  file
   ErrorCode rval = mb->load_mesh(test_file_name.c_str());MB_CHK_ERR(rval);
+  cout<< " read " << test_file_name << endl;
   if (argc > 2) {
     mpas_file= argv[2];
   }
@@ -38,6 +40,7 @@ int main(int argc, char **argv)
     cout<< "can't open file\n";
     return 1;
   }
+  cout << "open " << mpas_file << endl;
 
   Range polys;
   Range edges;
@@ -130,21 +133,13 @@ int main(int argc, char **argv)
   if (NC_NOERR != nc_def_var(ncFile, "lonCell", NC_DOUBLE, 1, dimlist, &wrVarIDlonCell)) {
     MB_SET_ERR(MB_FAILURE, "fail to define lonCell var");
   }
-  /*
-  dimlist( 1) = wrDimIDnCells
-  nferr = nf_def_var(wr_ncid, 'meshDensity', NF_DOUBLE,  1, dimlist, wrVarIDmeshDensity)*/
+
   int wrVarIDmeshDensity;
   dimlist[0] = wrDimIDnCells;
   if (NC_NOERR != nc_def_var(ncFile, "meshDensity", NC_DOUBLE, 1, dimlist, &wrVarIDmeshDensity)) {
     MB_SET_ERR(MB_FAILURE, "fail to define wrVarIDmeshDensity var");
   }
-  /*
-  dimlist( 1) = wrDimIDnCells
-  nferr = nf_def_var(wr_ncid, 'xCell', NF_DOUBLE,  1, dimlist, wrVarIDxCell)
-  dimlist( 1) = wrDimIDnCells
-  nferr = nf_def_var(wr_ncid, 'yCell', NF_DOUBLE,  1, dimlist, wrVarIDyCell)
-  dimlist( 1) = wrDimIDnCells
-  nferr = nf_def_var(wr_ncid, 'zCell', NF_DOUBLE,  1, dimlist, wrVarIDzCell)*/
+
   int wrVarIDxCell, wrVarIDyCell, wrVarIDzCell;
   if (NC_NOERR != nc_def_var(ncFile, "xCell", NC_DOUBLE, 1, dimlist, &wrVarIDxCell)) {
       MB_SET_ERR(MB_FAILURE, "fail to define wrVarIDmeshDensity var");
@@ -155,42 +150,73 @@ int main(int argc, char **argv)
   if (NC_NOERR != nc_def_var(ncFile, "zCell", NC_DOUBLE, 1, dimlist, &wrVarIDzCell)) {
       MB_SET_ERR(MB_FAILURE, "fail to define wrVarIDmeshDensity var");
     }
-  /*
-  dimlist( 1) = wrDimIDnCells
-  nferr = nf_def_var(wr_ncid, 'indexToCellID', NF_INT,  1, dimlist, wrVarIDindexToCellID)*/
+
 
   int wrVarIDindexToCellID;
   if (NC_NOERR != nc_def_var(ncFile, "indexToCellID", NC_INT, 1, dimlist, &wrVarIDindexToCellID)) {
-        MB_SET_ERR(MB_FAILURE, "fail to define indexToCellID var");
-      }
+    MB_SET_ERR(MB_FAILURE, "fail to define indexToCellID var");
+  }
+
+  // edges:
+  dimlist[0] = wrDimIDnEdges;
+  int wrVarIDlatEdge, wrVarIDlonEdge, wrVarIDxEdge, wrVarIDyEdge, wrVarIDzEdge, wrVarIDindexToEdgeID;
+  if (NC_NOERR != nc_def_var(ncFile, "latEdge", NC_DOUBLE, 1, dimlist, &wrVarIDlatEdge)) {
+    MB_SET_ERR(MB_FAILURE, "fail to define latEdge var");
+  }
+  if (NC_NOERR != nc_def_var(ncFile, "lonEdge", NC_DOUBLE, 1, dimlist, &wrVarIDlonEdge)) {
+    MB_SET_ERR(MB_FAILURE, "fail to define lonEdge var");
+  }
+  if (NC_NOERR != nc_def_var(ncFile, "xEdge", NC_DOUBLE, 1, dimlist, &wrVarIDxEdge)) {
+    MB_SET_ERR(MB_FAILURE, "fail to define xEdge var");
+  }
+  if (NC_NOERR != nc_def_var(ncFile, "yEdge", NC_DOUBLE, 1, dimlist, &wrVarIDyEdge)) {
+    MB_SET_ERR(MB_FAILURE, "fail to define yEdge var");
+  }
+  if (NC_NOERR != nc_def_var(ncFile, "zEdge", NC_DOUBLE, 1, dimlist, &wrVarIDzEdge)) {
+    MB_SET_ERR(MB_FAILURE, "fail to define zEdge var");
+  }
+  if (NC_NOERR != nc_def_var(ncFile, "indexToEdgeID", NC_INT, 1, dimlist, &wrVarIDindexToEdgeID)) {
+    MB_SET_ERR(MB_FAILURE, "fail to define indexToEdgeID var");
+  }
+  dimlist[0]= wrDimIDTWO;
+  dimlist[1] = wrDimIDnEdges;
+  int wrVarIDcellsOnEdge;
+  if (NC_NOERR != nc_def_var(ncFile, "cellsOnEdge", NC_INT, 2, dimlist, &wrVarIDcellsOnEdge)) {
+    MB_SET_ERR(MB_FAILURE, "fail to define cellsOnEdge var");
+  }
+
+  int wrVarIDlatVertex, wrVarIDlonVertex, wrVarIDxVertex, wrVarIDyVertex, wrVarIDzVertex;
+  int wrVarIDindexToVertexID;
+  dimlist[0] = wrDimIDnVertices;
+  if (NC_NOERR != nc_def_var(ncFile, "latVertex", NC_DOUBLE,  1, dimlist, &wrVarIDlatVertex) )
+  {
+    MB_SET_ERR(MB_FAILURE, "fail to define latVertex var");
+  }
+  if (NC_NOERR != nc_def_var(ncFile, "lonVertex", NC_DOUBLE,  1, dimlist, &wrVarIDlonVertex) )
+  {
+    MB_SET_ERR(MB_FAILURE, "fail to define lonVertex var");
+  }
+  if (NC_NOERR != nc_def_var(ncFile, "xVertex", NC_DOUBLE,  1, dimlist, &wrVarIDxVertex))
+  {
+    MB_SET_ERR(MB_FAILURE, "fail to define xVertex var");
+  }
+  if (NC_NOERR != nc_def_var(ncFile, "yVertex", NC_DOUBLE,  1, dimlist, &wrVarIDyVertex))
+  {
+    MB_SET_ERR(MB_FAILURE, "fail to define yVertex var");
+  }
+  if (NC_NOERR != nc_def_var(ncFile, "zVertex", NC_DOUBLE,  1, dimlist, &wrVarIDzVertex))
+  {
+    MB_SET_ERR(MB_FAILURE, "fail to define zVertex var");
+  }
+  if (NC_NOERR != nc_def_var(ncFile, "indexToVertexID", NC_INT,  1, dimlist, &wrVarIDindexToVertexID))
+  {
+    MB_SET_ERR(MB_FAILURE, "fail to define indexToVertexID var");
+  }
+
+  /* */
+
+
   /*
-  dimlist( 1) = wrDimIDnEdges
-  nferr = nf_def_var(wr_ncid, 'latEdge', NF_DOUBLE,  1, dimlist, wrVarIDlatEdge)
-  dimlist( 1) = wrDimIDnEdges
-  nferr = nf_def_var(wr_ncid, 'lonEdge', NF_DOUBLE,  1, dimlist, wrVarIDlonEdge)
-  dimlist( 1) = wrDimIDnEdges
-  nferr = nf_def_var(wr_ncid, 'xEdge', NF_DOUBLE,  1, dimlist, wrVarIDxEdge)
-  dimlist( 1) = wrDimIDnEdges
-  nferr = nf_def_var(wr_ncid, 'yEdge', NF_DOUBLE,  1, dimlist, wrVarIDyEdge)
-  dimlist( 1) = wrDimIDnEdges
-  nferr = nf_def_var(wr_ncid, 'zEdge', NF_DOUBLE,  1, dimlist, wrVarIDzEdge)
-  dimlist( 1) = wrDimIDnEdges
-  nferr = nf_def_var(wr_ncid, 'indexToEdgeID', NF_INT,  1, dimlist, wrVarIDindexToEdgeID)
-  dimlist( 1) = wrDimIDnVertices
-  nferr = nf_def_var(wr_ncid, 'latVertex', NF_DOUBLE,  1, dimlist, wrVarIDlatVertex)
-  dimlist( 1) = wrDimIDnVertices
-  nferr = nf_def_var(wr_ncid, 'lonVertex', NF_DOUBLE,  1, dimlist, wrVarIDlonVertex)
-  dimlist( 1) = wrDimIDnVertices
-  nferr = nf_def_var(wr_ncid, 'xVertex', NF_DOUBLE,  1, dimlist, wrVarIDxVertex)
-  dimlist( 1) = wrDimIDnVertices
-  nferr = nf_def_var(wr_ncid, 'yVertex', NF_DOUBLE,  1, dimlist, wrVarIDyVertex)
-  dimlist( 1) = wrDimIDnVertices
-  nferr = nf_def_var(wr_ncid, 'zVertex', NF_DOUBLE,  1, dimlist, wrVarIDzVertex)
-  dimlist( 1) = wrDimIDnVertices
-  nferr = nf_def_var(wr_ncid, 'indexToVertexID', NF_INT,  1, dimlist, wrVarIDindexToVertexID)
-  dimlist( 1) = wrDimIDTWO
-  dimlist( 2) = wrDimIDnEdges
-  nferr = nf_def_var(wr_ncid, 'cellsOnEdge', NF_INT,  2, dimlist, wrVarIDcellsOnEdge)
   dimlist( 1) = wrDimIDnCells
   nferr = nf_def_var(wr_ncid, 'nEdgesOnCell', NF_INT,  1, dimlist, wrVarIDnEdgesOnCell)
   dimlist( 1) = wrDimIDnEdges
@@ -333,9 +359,10 @@ int main(int argc, char **argv)
   for (int i=0; i<nCells; i++)
     wkint[i] = i+1;
   fail = nc_put_vara_int(ncFile, wrVarIDindexToCellID, &start, &count, &wkint[0]);
-    if (NC_NOERR != fail) {
-      MB_SET_ERR(MB_FAILURE, "Failed writing indexToCellID");
-    }
+  if (NC_NOERR != fail) {
+    MB_SET_ERR(MB_FAILURE, "Failed writing indexToCellID");
+  }
+
   /*
       start1(1) = 1
       count1( 1) = wrLocalnEdges
@@ -359,49 +386,18 @@ int main(int argc, char **argv)
 
       start1(1) = 1
       count1( 1) = wrLocalnEdges
-      nferr = nf_put_vara_int(wr_ncid, wrVarIDindexToEdgeID, start1, count1, indexToEdgeID)
-
-      start1(1) = 1
-      count1( 1) = wrLocalnVertices
-      nferr = nf_put_vara_double(wr_ncid, wrVarIDlatVertex, start1, count1, latVertex)
-
-      start1(1) = 1
-      count1( 1) = wrLocalnVertices
-      nferr = nf_put_vara_double(wr_ncid, wrVarIDlonVertex, start1, count1, lonVertex)
-
-      start1(1) = 1
-      count1( 1) = wrLocalnVertices
-      nferr = nf_put_vara_double(wr_ncid, wrVarIDxVertex, start1, count1, xVertex)
-
-      start1(1) = 1
-      count1( 1) = wrLocalnVertices
-      nferr = nf_put_vara_double(wr_ncid, wrVarIDyVertex, start1, count1, yVertex)
-
-      start1(1) = 1
-      count1( 1) = wrLocalnVertices
-      nferr = nf_put_vara_double(wr_ncid, wrVarIDzVertex, start1, count1, zVertex)
-
-      start1(1) = 1
-      count1( 1) = wrLocalnVertices
-      nferr = nf_put_vara_int(wr_ncid, wrVarIDindexToVertexID, start1, count1, indexToVertexID)
-
-      start2(2) = 1
-      count2( 1) = 2
-      count2( 2) = wrLocalnEdges
-      nferr = nf_put_vara_int(wr_ncid, wrVarIDcellsOnEdge, start2, count2, cellsOnEdge)
-
-      start1(1) = 1
-      count1( 1) = wrLocalnCells
-      nferr = nf_put_vara_int(wr_ncid, wrVarIDnEdgesOnCell, start1, count1, nEdgesOnCell)
-
-      start1(1) = 1
+      nferr = nf_put_vara_int(wr_ncid, wrVarIDindexToEdgeID, start1, count1, indexToEdgeID) */
+  /*start2(2) = 1
+        count2( 1) = 2
+        count2( 2) = wrLocalnEdges
+        nferr = nf_put_vara_int(wr_ncid, wrVarIDcellsOnEdge, start2, count2, cellsOnEdge)
+    start1(1) = 1
       count1( 1) = wrLocalnEdges
       nferr = nf_put_vara_int(wr_ncid, wrVarIDnEdgesOnEdge, start1, count1, nEdgesOnEdge)
-
-      start2(2) = 1
-      count2( 1) = wrLocalmaxEdges
-      count2( 2) = wrLocalnCells
-      nferr = nf_put_vara_int(wr_ncid, wrVarIDedgesOnCell, start2, count2, edgesOnCell)
+    start2(2) = 1
+        count2( 1) = 2
+        count2( 2) = wrLocalnEdges
+        nferr = nf_put_vara_int(wr_ncid, wrVarIDverticesOnEdge, start2, count2, verticesOnEdge)
 
       start2(2) = 1
       count2( 1) = 2*wrLocalmaxEdges
@@ -433,6 +429,146 @@ int main(int argc, char **argv)
       count1( 1) = wrLocalnEdges
       nferr = nf_put_vara_double(wr_ncid, wrVarIDangleEdge, start1, count1, angleEdge)
 
+
+ */
+  /* edges */
+  std::vector<double> latEdge(nEdges), lonEdge(nEdges);
+  std::vector<double> xEdge(nEdges), yEdge(nEdges), zEdge(nEdges);
+  std::vector<int>  indexToEdgeID(nEdges);
+  std::vector<int> cellsOnEdge(2*nEdges); // 2d array;
+  std::vector<int> verticesOnEdge(2*nEdges);
+  std::vector<int> nEdgesOnEdge(nEdges);
+  std::vector<int> edgesOnEdge(2*maxEdges*nEdges); // will have to fill up to maxEdges
+  for (int i=0; i<nEdges; i++)
+  {
+    EntityHandle edge=edges[i];
+    const EntityHandle * conn2=NULL;
+    int nnodes=2;
+    rval = mb->get_connectivity(edge, conn2, nnodes);  MB_CHK_ERR(rval);
+    if (nnodes!=2)
+      return 1;
+    verticesOnEdge[2*i]=(int)conn2[0];
+    verticesOnEdge[2*i+1]=(int)conn2[1];
+    CartVect v[2];
+    rval = mb->get_coords(conn2, 2, &(v[0][0])); MB_CHK_ERR(rval);
+    CartVect mid=0.5*(v[0]+v[1]);
+    mid.normalize();
+    xEdge[i]=mid[0]; yEdge[i]=mid[1]; zEdge[i] = mid[2];
+    latEdge[i] = M_PI/2- acos(mid[2]);
+    latEdge[i] = atan2(mid[1], mid[0]); //
+    indexToEdgeID[i] = i+1;
+    Range adjCells;
+    rval = mb->get_adjacencies(&edge, 1, 2, false, adjCells); MB_CHK_ERR(rval);
+    // it should be at least one
+    if (adjCells.size()<1)
+      return 1; // error
+    EntityHandle cell0=adjCells[0], cell1=0;
+    if (adjCells.size()==2)
+      cell1=adjCells[1];
+    cellsOnEdge[i*2] = polys.index(cell0)+1;
+    cellsOnEdge[i*2+1] = polys.index(cell1)+1; // could be 0
+  }
+  start = 0;
+  count = nEdges;
+  fail = nc_put_vara_double(ncFile, wrVarIDlatEdge, &start, &count, &latEdge[0]);
+  if (NC_NOERR != fail) {
+    MB_SET_ERR(MB_FAILURE, "Failed writing latEdge");
+  }
+
+  fail = nc_put_vara_double(ncFile, wrVarIDlonEdge, &start, &count, &lonEdge[0]);
+  if (NC_NOERR != fail) {
+    MB_SET_ERR(MB_FAILURE, "Failed writing lonEdge");
+  }
+
+  fail = nc_put_vara_double(ncFile, wrVarIDxEdge, &start, &count, &xEdge[0]);
+  if (NC_NOERR != fail) {
+    MB_SET_ERR(MB_FAILURE, "Failed writing xEdge");
+  }
+
+  fail = nc_put_vara_double(ncFile, wrVarIDyEdge, &start, &count, &yEdge[0]);
+  if (NC_NOERR != fail) {
+    MB_SET_ERR(MB_FAILURE, "Failed writing yEdge");
+  }
+
+  fail = nc_put_vara_double(ncFile, wrVarIDzEdge,  &start, &count, &zEdge[0]);
+  if (NC_NOERR != fail) {
+    MB_SET_ERR(MB_FAILURE, "Failed writing zEdge");
+  }
+
+  fail = nc_put_vara_int(ncFile, wrVarIDindexToEdgeID, &start, &count, &indexToEdgeID[0]);
+  if (NC_NOERR != fail) {
+    MB_SET_ERR(MB_FAILURE, "Failed writing indexToEdgeID");
+  }
+  size_t start2[2], count2[2];
+  start2[0]=start2[1]=0;
+  count2[0]=2; count2[1]=nEdges;
+
+  fail = nc_put_vara_int(ncFile, wrVarIDcellsOnEdge, start2, count2, &cellsOnEdge[0]);
+  if (NC_NOERR != fail) {
+    MB_SET_ERR(MB_FAILURE, "Failed writing indexToEdgeID");
+  }
+
+  std::vector<double> coordsv(3*verts.size());
+  rval = mb->get_coords(verts, &coordsv[0]);  MB_CHK_ERR(rval);
+  std::vector<double> wkx(nVertices);
+
+  count = nVertices;
+  std::vector<double> latVertex(nVertices), lonVertex(nVertices);
+
+  for (int i=0; i<nVertices; i++)
+  {
+    latVertex[i] = M_PI/2- acos(coordsv[i*3+2]);
+    lonVertex[i] = atan2(coordsv[i*3+1], coordsv[i*3]); //
+  }
+  fail = nc_put_vara_double(ncFile, wrVarIDlatVertex, &start, &count, &latVertex[0]);
+  if (NC_NOERR != fail) {
+    MB_SET_ERR(MB_FAILURE, "Failed writing latVertex");
+  }
+
+  fail = nc_put_vara_double(ncFile,  wrVarIDlonVertex, &start, &count, &lonVertex[0]);
+
+  for (int i=0; i<nVertices; i++)
+    wkx[i]=coordsv[3*i];
+
+  fail = nc_put_vara_double(ncFile, wrVarIDxVertex, &start, &count, &wkx[0]);
+  if (NC_NOERR != fail) {
+    MB_SET_ERR(MB_FAILURE, "Failed writing xVertex");
+  }
+
+  for (int i=0; i<nVertices; i++)
+    wkx[i]=coordsv[3*i+1];
+
+  fail = nc_put_vara_double(ncFile, wrVarIDyVertex, &start, &count, &wkx[0]);
+  if (NC_NOERR != fail) {
+    MB_SET_ERR(MB_FAILURE, "Failed writing yVertex");
+  }
+  for (int i=0; i<nVertices; i++)
+    wkx[i]=coordsv[3*i+2];
+
+  fail = nc_put_vara_double(ncFile, wrVarIDzVertex, &start, &count, &wkx[0]);
+  if (NC_NOERR != fail) {
+    MB_SET_ERR(MB_FAILURE, "Failed writing zVertex");
+  }
+
+  wkint.resize(nVertices);
+  for (int i=0;i<nVertices; i++)
+    wkint[i] = i+1;
+
+  fail = nc_put_vara_int(ncFile, wrVarIDindexToVertexID, &start, &count, &wkint[0]);
+  if (NC_NOERR != fail) {
+    MB_SET_ERR(MB_FAILURE, "Failed writing indexToVertexID");
+  }
+  /*
+
+      start1(1) = 1
+      count1( 1) = wrLocalnCells
+      nferr = nf_put_vara_int(wr_ncid, wrVarIDnEdgesOnCell, start1, count1, nEdgesOnCell)
+
+      start2(2) = 1
+      count2( 1) = wrLocalmaxEdges
+      count2( 2) = wrLocalnCells
+      nferr = nf_put_vara_int(wr_ncid, wrVarIDedgesOnCell, start2, count2, edgesOnCell)
+
       start1(1) = 1
       count1( 1) = wrLocalnCells
       nferr = nf_put_vara_double(wr_ncid, wrVarIDareaCell, start1, count1, areaCell)
@@ -449,12 +585,11 @@ int main(int argc, char **argv)
       start2(2) = 1
       count2( 1) = wrLocalmaxEdges
       count2( 2) = wrLocalnCells
-      nferr = nf_put_vara_int(wr_ncid, wrVarIDverticesOnCell, start2, count2, verticesOnCell)
+      nferr = nf_put_vara_int(wr_ncid, wrVarIDverticesOnCell, start2, count2, verticesOnCell)*/
 
-      start2(2) = 1
-      count2( 1) = 2
-      count2( 2) = wrLocalnEdges
-      nferr = nf_put_vara_int(wr_ncid, wrVarIDverticesOnEdge, start2, count2, verticesOnEdge)
+
+
+  /*
 
       start2(2) = 1
       count2( 1) = 3
@@ -484,6 +619,7 @@ int main(int argc, char **argv)
   if (NC_NOERR != fail) {
     MB_SET_ERR(MB_FAILURE, "Trouble closing file");
   }
+  cout << " close " << mpas_file << endl;
 
 
 
