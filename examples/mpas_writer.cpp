@@ -213,24 +213,39 @@ int main(int argc, char **argv)
     MB_SET_ERR(MB_FAILURE, "fail to define indexToVertexID var");
   }
 
-  /* */
+  dimlist[0] = wrDimIDnCells;
+  int wrVarIDnEdgesOnCell, wrVarIDnEdgesOnEdge, wrVarIDedgesOnCell;
+  if (NC_NOERR != nc_def_var(ncFile, "nEdgesOnCell", NC_INT,  1, dimlist, &wrVarIDnEdgesOnCell))
+  {
+    MB_SET_ERR(MB_FAILURE, "fail to define nEdgesOnCell var");
+  }
 
+  dimlist[0] = wrDimIDnEdges;
+  if (NC_NOERR != nc_def_var(ncFile, "nEdgesOnEdge", NC_INT,  1, dimlist, &wrVarIDnEdgesOnEdge))
+  {
+    MB_SET_ERR(MB_FAILURE, "fail to define nEdgesOnEdge var");
+  }
+  dimlist[0] = wrDimIDmaxEdges;
+  dimlist[1] = wrDimIDnCells;
+  if (NC_NOERR != nc_def_var(ncFile, "edgesOnCell", NC_INT,  2, dimlist, &wrVarIDedgesOnCell) )
+  {
+    MB_SET_ERR(MB_FAILURE, "fail to define nEdgesOnEdge var");
+  }
 
+  int wrVarIDedgesOnEdge, wrVarIDweightsOnEdge;
+  dimlist[0] = wrDimIDmaxEdges2;
+  dimlist[1] = wrDimIDnEdges;
+  if (NC_NOERR != nc_def_var(ncFile, "edgesOnEdge", NC_INT,  2, dimlist, &wrVarIDedgesOnEdge))
+  {
+    MB_SET_ERR(MB_FAILURE, "fail to define edgesOnEdge var");
+  }
+
+  if (NC_NOERR != nc_def_var(ncFile, "weightsOnEdge", NC_DOUBLE,  2, dimlist, &wrVarIDweightsOnEdge))
+  {
+    MB_SET_ERR(MB_FAILURE, "fail to define weightsOnEdge var");
+  }
+  dimlist[0] = wrDimIDnEdges;
   /*
-  dimlist( 1) = wrDimIDnCells
-  nferr = nf_def_var(wr_ncid, 'nEdgesOnCell', NF_INT,  1, dimlist, wrVarIDnEdgesOnCell)
-  dimlist( 1) = wrDimIDnEdges
-  nferr = nf_def_var(wr_ncid, 'nEdgesOnEdge', NF_INT,  1, dimlist, wrVarIDnEdgesOnEdge)
-  dimlist( 1) = wrDimIDmaxEdges
-  dimlist( 2) = wrDimIDnCells
-  nferr = nf_def_var(wr_ncid, 'edgesOnCell', NF_INT,  2, dimlist, wrVarIDedgesOnCell)
-  dimlist( 1) = wrDimIDmaxEdges2
-  dimlist( 2) = wrDimIDnEdges
-  nferr = nf_def_var(wr_ncid, 'edgesOnEdge', NF_INT,  2, dimlist, wrVarIDedgesOnEdge)
-  dimlist( 1) = wrDimIDmaxEdges2
-  dimlist( 2) = wrDimIDnEdges
-  nferr = nf_def_var(wr_ncid, 'weightsOnEdge', NF_DOUBLE,  2, dimlist, wrVarIDweightsOnEdge)
-  dimlist( 1) = wrDimIDnEdges
   nferr = nf_def_var(wr_ncid, 'dvEdge', NF_DOUBLE,  1, dimlist, wrVarIDdvEdge)
   dimlist( 1) = wrDimIDnEdges
   nferr = nf_def_var(wr_ncid, 'dv1Edge', NF_DOUBLE,  1, dimlist, wrVarIDdv1Edge)
@@ -243,26 +258,44 @@ int main(int argc, char **argv)
   dimlist( 1) = wrDimIDnCells
   nferr = nf_def_var(wr_ncid, 'areaCell', NF_DOUBLE,  1, dimlist, wrVarIDareaCell)
   dimlist( 1) = wrDimIDnVertices
-  nferr = nf_def_var(wr_ncid, 'areaTriangle', NF_DOUBLE,  1, dimlist, wrVarIDareaTriangle)
-  dimlist( 1) = wrDimIDmaxEdges
-  dimlist( 2) = wrDimIDnCells
-  nferr = nf_def_var(wr_ncid, 'cellsOnCell', NF_INT,  2, dimlist, wrVarIDcellsOnCell)
-  dimlist( 1) = wrDimIDmaxEdges
-  dimlist( 2) = wrDimIDnCells
-  nferr = nf_def_var(wr_ncid, 'verticesOnCell', NF_INT,  2, dimlist, wrVarIDverticesOnCell)
-  dimlist( 1) = wrDimIDTWO
-  dimlist( 2) = wrDimIDnEdges
-  nferr = nf_def_var(wr_ncid, 'verticesOnEdge', NF_INT,  2, dimlist, wrVarIDverticesOnEdge)
-  dimlist( 1) = wrDimIDvertexDegree
-  dimlist( 2) = wrDimIDnVertices
-  nferr = nf_def_var(wr_ncid, 'edgesOnVertex', NF_INT,  2, dimlist, wrVarIDedgesOnVertex)
-  dimlist( 1) = wrDimIDvertexDegree
-  dimlist( 2) = wrDimIDnVertices
-  nferr = nf_def_var(wr_ncid, 'cellsOnVertex', NF_INT,  2, dimlist, wrVarIDcellsOnVertex)
-  dimlist( 1) = wrDimIDvertexDegree
-  dimlist( 2) = wrDimIDnVertices
-  nferr = nf_def_var(wr_ncid, 'kiteAreasOnVertex', NF_DOUBLE,  2, dimlist, wrVarIDkiteAreasOnVertex)
-  dimlist( 1) = wrDimIDnEdges
+  nferr = nf_def_var(wr_ncid, 'areaTriangle', NF_DOUBLE,  1, dimlist, wrVarIDareaTriangle) */
+  int wrVarIDcellsOnCell, wrVarIDverticesOnCell, wrVarIDverticesOnEdge, wrVarIDedgesOnVertex;
+  dimlist[0] = wrDimIDmaxEdges;
+  dimlist[1] = wrDimIDnCells;
+  if (NC_NOERR != nc_def_var(ncFile, "cellsOnCell", NC_INT,  2, dimlist, &wrVarIDcellsOnCell))
+  {
+    MB_SET_ERR(MB_FAILURE, "fail to define weightsOnEdge var");
+  }
+
+  if (NC_NOERR != nc_def_var(ncFile, "verticesOnCell", NC_INT,  2, dimlist, &wrVarIDverticesOnCell))
+  {
+    MB_SET_ERR(MB_FAILURE, "fail to define verticesOnCell var");
+  }
+  dimlist[0]= wrDimIDTWO;
+  dimlist[1] = wrDimIDnEdges;
+  if (NC_NOERR != nc_def_var(ncFile, "verticesOnEdge", NC_INT,  2, dimlist, &wrVarIDverticesOnEdge))
+  {
+    MB_SET_ERR(MB_FAILURE, "fail to define verticesOnEdge var");
+  }
+
+  dimlist[0] = wrDimIDvertexDegree;
+  dimlist[1]= wrDimIDnVertices;
+  if (NC_NOERR != nc_def_var(ncFile, "edgesOnVertex", NC_INT,  2, dimlist, &wrVarIDedgesOnVertex))
+  {
+    MB_SET_ERR(MB_FAILURE, "fail to define edgesOnVertex var");
+  }
+  dimlist[0] = wrDimIDvertexDegree;
+  dimlist[1] = wrDimIDnVertices;
+  int wrVarIDcellsOnVertex, wrVarIDkiteAreasOnVertex;
+  if (NC_NOERR != nc_def_var(ncFile, "cellsOnVertex", NC_INT,  2, dimlist, &wrVarIDcellsOnVertex))
+  {
+    MB_SET_ERR(MB_FAILURE, "fail to define cellsOnVertex var");
+  }
+
+  /*dimlist[0] = wrDimIDvertexDegree;
+  dimlist[1] = wrDimIDnVertices;
+  if (NC_NOERR != nc_def_var(ncFile, "kiteAreasOnVertex", NC_DOUBLE,  2, dimlist, &wrVarIDkiteAreasOnVertex)*/
+ /* dimlist( 1) = wrDimIDnEdges
   nferr = nf_def_var(wr_ncid, 'fEdge', NF_DOUBLE,  1, dimlist, wrVarIDfEdge)
   dimlist( 1) = wrDimIDnVertices
   nferr = nf_def_var(wr_ncid, 'fVertex', NF_DOUBLE,  1, dimlist, wrVarIDfVertex)
@@ -391,18 +424,7 @@ int main(int argc, char **argv)
         count2( 1) = 2
         count2( 2) = wrLocalnEdges
         nferr = nf_put_vara_int(wr_ncid, wrVarIDcellsOnEdge, start2, count2, cellsOnEdge)
-    start1(1) = 1
-      count1( 1) = wrLocalnEdges
-      nferr = nf_put_vara_int(wr_ncid, wrVarIDnEdgesOnEdge, start1, count1, nEdgesOnEdge)
-    start2(2) = 1
-        count2( 1) = 2
-        count2( 2) = wrLocalnEdges
-        nferr = nf_put_vara_int(wr_ncid, wrVarIDverticesOnEdge, start2, count2, verticesOnEdge)
 
-      start2(2) = 1
-      count2( 1) = 2*wrLocalmaxEdges
-      count2( 2) = wrLocalnEdges
-      nferr = nf_put_vara_int(wr_ncid, wrVarIDedgesOnEdge, start2, count2, edgesOnEdge)
 
       start2(2) = 1
       count2( 1) = 2*wrLocalmaxEdges
@@ -437,8 +459,7 @@ int main(int argc, char **argv)
   std::vector<int>  indexToEdgeID(nEdges);
   std::vector<int> cellsOnEdge(2*nEdges); // 2d array;
   std::vector<int> verticesOnEdge(2*nEdges);
-  std::vector<int> nEdgesOnEdge(nEdges);
-  std::vector<int> edgesOnEdge(2*maxEdges*nEdges); // will have to fill up to maxEdges
+
   for (int i=0; i<nEdges; i++)
   {
     EntityHandle edge=edges[i];
@@ -467,7 +488,9 @@ int main(int argc, char **argv)
       cell1=adjCells[1];
     cellsOnEdge[i*2] = polys.index(cell0)+1;
     cellsOnEdge[i*2+1] = polys.index(cell1)+1; // could be 0
+
   }
+
   start = 0;
   count = nEdges;
   fail = nc_put_vara_double(ncFile, wrVarIDlatEdge, &start, &count, &latEdge[0]);
@@ -558,16 +581,119 @@ int main(int argc, char **argv)
   if (NC_NOERR != fail) {
     MB_SET_ERR(MB_FAILURE, "Failed writing indexToVertexID");
   }
+
+  std::vector<int> nEdgesOnCell(nEdges), edgesOnCell(maxEdges*nCells), cellsOnCell(maxEdges*nCells),
+      verticesOnCell(maxEdges*nCells);
+
+  int j=0;
+  for (Range::iterator pit=polys.begin(); pit!=polys.end(); pit++, j++)
+  {
+    EntityHandle cell=*pit;
+    const EntityHandle * connp=NULL;
+    int nnodes=5;
+    rval = mb->get_connectivity(cell, connp, nnodes);  MB_CHK_ERR(rval);
+    /*while (connp[nnodes-2]==connp[nnodes-1])
+      nnodes--; // it should not be, for not padded*/
+    nEdgesOnCell[j]=nnodes;
+    // also, form connectivity for each cell, in terms of edges
+    for (int k=0; k<nnodes; k++)
+    {
+      verticesOnCell[maxEdges*j+k]=verts.index(connp[k])+1; // it should be connp[k]
+      EntityHandle v1=connp[k], v2=connp[(k+1)%nnodes];
+      EntityHandle conn2[2]={v1, v2};
+      // find the edge connected to them
+      Range ledges;
+      rval = mb->get_adjacencies(conn2, 2, 1, false, ledges); MB_CHK_ERR(rval);
+      if (ledges.size()!=1)
+      {
+        cout << " can't find edge connected to " << v1 << " and " << v2 << endl;
+        return 1;
+      }
+      edgesOnCell[maxEdges*j+k] = edges.index(ledges[0])+1;
+      Range lcells;
+      rval = mb->get_adjacencies(conn2, 2, 2, false, lcells); MB_CHK_ERR(rval);
+      if (lcells.size()==1)
+      {
+        cellsOnCell[maxEdges*j+k]=0; // no cell connected
+      }
+      else
+      {
+        EntityHandle otherCell = lcells[0];
+        if (cell==otherCell)
+          otherCell = lcells[1];
+        cellsOnCell[maxEdges*j+k]=polys.index(otherCell)+1;
+      }
+    }
+    for (int k=nnodes; k<maxEdges; k++)
+    {
+      edgesOnCell[maxEdges*j+k] = 0; // pad it up
+      cellsOnCell[maxEdges*j+k] = 0;
+      verticesOnCell[maxEdges*j+k] = 0;
+    }
+  }
+  start=0; count = nCells;
+  fail = nc_put_vara_int(ncFile, wrVarIDnEdgesOnCell, &start, &count, &nEdgesOnCell[0]);
+  if (NC_NOERR != fail) {
+    MB_SET_ERR(MB_FAILURE, "Failed writing nEdgesOnCell");
+  }
+  start2[0]=start2[1]=0;
+  count2[0]=maxEdges;
+  count2[1]=nCells;
+  fail = nc_put_vara_int(ncFile,  wrVarIDedgesOnCell, start2, count2, &edgesOnCell[0]);
+  if (NC_NOERR != fail) {
+    MB_SET_ERR(MB_FAILURE, "Failed writing edgesOnCell");
+  }
+
+  fail = nc_put_vara_int(ncFile,  wrVarIDcellsOnCell, start2, count2, &cellsOnCell[0]);
+  if (NC_NOERR != fail) {
+    MB_SET_ERR(MB_FAILURE, "Failed writing cellsOnCell");
+  }
+
+  fail = nc_put_vara_int(ncFile, wrVarIDverticesOnCell, start2, count2, &verticesOnCell[0]);
+  if (NC_NOERR != fail) {
+    MB_SET_ERR(MB_FAILURE, "Failed writing verticesOnCell");
+  }
+  std::vector<int> nEdgesOnEdge(nEdges); // will use cellsOnEdges
+  std::vector<int> edgesOnEdge(2*maxEdges*nEdges); // will have to fill up to maxEdges
+
+  for (int i=0; i<nEdges; i++)
+  {
+
+    int e1=cellsOnEdge[2*i], e2=cellsOnEdge[2*i+1];
+    nEdgesOnEdge[i] = nEdgesOnCell[e1-1] + nEdgesOnCell[e2-1];
+    // collect the edges also
+    for (int k=0; k<nEdgesOnCell[e1-1]; k++)
+    {
+      edgesOnEdge[2*maxEdges*i+k]=edgesOnCell[ (e1-1)*maxEdges+k];
+    }
+    for (int k=0; k<nEdgesOnCell[e2-1]; k++)
+    {
+      edgesOnEdge[2*maxEdges*i+nEdgesOnCell[e1-1]+k]=edgesOnCell[ (e2-1)*maxEdges+k];
+    }
+    for (int k=nEdgesOnEdge[i]; k<2*maxEdges; k++)
+      edgesOnEdge[2*maxEdges*i+k] = 0; // pad up with 0
+  }
+
+  start=0;
+  count = nEdges;
+
+  fail = nc_put_vara_int(ncFile,  wrVarIDnEdgesOnEdge, &start, &count, &nEdgesOnEdge[0]);
+  if (NC_NOERR != fail) {
+    MB_SET_ERR(MB_FAILURE, "Failed writing nEdgesOnEdge");
+  }
+  count2[0]=2;
+  count2[1] = nEdges;
+  fail = nc_put_vara_int(ncFile,   wrVarIDverticesOnEdge, start2, count2, &verticesOnEdge[0]);
+  if (NC_NOERR != fail) {
+    MB_SET_ERR(MB_FAILURE, "Failed writing verticesOnEdge");
+  }
+  count2[0] = 2*maxEdges;
+  count2[1] = nEdges;
+  fail = nc_put_vara_int(ncFile,   wrVarIDedgesOnEdge, start2, count2, &edgesOnEdge[0]);
+  if (NC_NOERR != fail) {
+    MB_SET_ERR(MB_FAILURE, "Failed writing edgesOnEdge");
+  }
   /*
-
-      start1(1) = 1
-      count1( 1) = wrLocalnCells
-      nferr = nf_put_vara_int(wr_ncid, wrVarIDnEdgesOnCell, start1, count1, nEdgesOnCell)
-
-      start2(2) = 1
-      count2( 1) = wrLocalmaxEdges
-      count2( 2) = wrLocalnCells
-      nferr = nf_put_vara_int(wr_ncid, wrVarIDedgesOnCell, start2, count2, edgesOnCell)
 
       start1(1) = 1
       count1( 1) = wrLocalnCells
@@ -577,15 +703,7 @@ int main(int argc, char **argv)
       count1( 1) = wrLocalnVertices
       nferr = nf_put_vara_double(wr_ncid, wrVarIDareaTriangle, start1, count1, areaTriangle)
 
-      start2(2) = 1
-      count2( 1) = wrLocalmaxEdges
-      count2( 2) = wrLocalnCells
-      nferr = nf_put_vara_int(wr_ncid, wrVarIDcellsOnCell, start2, count2, cellsOnCell)
-
-      start2(2) = 1
-      count2( 1) = wrLocalmaxEdges
-      count2( 2) = wrLocalnCells
-      nferr = nf_put_vara_int(wr_ncid, wrVarIDverticesOnCell, start2, count2, verticesOnCell)*/
+      */
 
 
 
