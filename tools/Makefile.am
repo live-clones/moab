@@ -229,6 +229,5 @@ parread_SOURCES = parread.cpp
 mbquality_SOURCES = quality.cpp
 mbhonodes_SOURCES = honodes.cpp
 mbmeshtogeom_SOURCES = meshtogeom.cpp
-mbmeshtogeom_LDADD = $(TEST_DEPS)
 mbumr_SOURCES = umr.cpp
 
