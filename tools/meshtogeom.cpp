@@ -22,7 +22,7 @@
 #include "moab/Interface.hpp"
 
 
-#include "moab/VerdictWrapper.hpp"
+#include "moab/verdict/VerdictWrapper.hpp"
 #include "iGeom.h"
 #include "iMesh.h"
 #include "iRel.h"
