@@ -4,7 +4,6 @@
 #include <map>
 #include <string>
 #include <stdio.h>
-#include <iomanip>
 #include <fstream>
 #include "moab/MOABConfig.h"
 
@@ -123,6 +122,10 @@ int main( int argc, char* argv[] )
       iGeom_getTagHandle(geom, tag1, &igeom_gidtag, &result, namelen);
       if(result!=0){std::cerr << "iGeom failure " << result << std::endl; exit(1);}
 
+      if(geomsets_for_gid.size() == 0){
+          std::cout << "Warning: No entityset found in  material sets\n MATERIAL_SET tag must contain a MBENTITYSET, this MBENTITYSET is a GEOMDIMENSION tag" << std::endl;
+      }
+
       for(unsigned int volid = 0; volid < geomsets_for_gid.size(); volid++){
           // get the gid of this volume
           int my_geom_id = 0;
@@ -132,8 +135,8 @@ int main( int argc, char* argv[] )
           iRel_getSetEntRelation(assoc, pair, (iBase_EntitySetHandle) geomsets_for_gid[volid], 1, &ent2, &result);
           if(result!=0){std::cerr << "iRel failure " << result << std::endl; exit(1);}
 
-          double *myvol;
-          int myvol_alloc, myvol_size;
+          double *myvol = NULL;
+          int myvol_alloc = 0, myvol_size;
           if(ent2 != NULL){
               iGeom_measure(geom, &ent2, 1, &myvol, &myvol_alloc, &myvol_size, &result);
               if(result!=0){std::cerr << "iGeom failure " << result << std::endl; exit(1);}
@@ -159,7 +162,7 @@ int main( int argc, char* argv[] )
         }
 
       double meshtogeom = mtot/volume;
-      std::cout << material_id << " has mesh volume " << mtot << " geometric volume " << volume << " ratio is " << meshtogeom << std::endl;
+      std::cout << "Material Id: " << material_id << " has mesh volume " << mtot << " geometric volume " << volume << " MESHTOGEOM ratio is " << meshtogeom << std::endl;
       ofile << "Material Id: "<<  material_id << " has mesh volume " << mtot << " geometric volume " << volume << " MESHTOGEOM ratio is " << meshtogeom << std::endl;
 
       moab::Tag mtog_tag;
