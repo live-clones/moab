@@ -18,9 +18,9 @@ endif
 if HAVE_CGM
   AM_CPPFLAGS += $(CGM_CPPFLAGS)
 if USING_DEV_CGM
-  LDADD+=  ${CGM_DIR}/src/libcgm.la
+  LDADD+= ${CGM_DIR}/itaps/libiGeom.la  ${CGM_DIR}/src/libcgm.la
 else
-  LDADD+=  ${CGM_DIR}/lib/libcgm.la
+  LDADD+= ${CGM_DIR}/lib/libiGeom.la  ${CGM_DIR}/lib/libcgm.la
 endif
 endif
 
