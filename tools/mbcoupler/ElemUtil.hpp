@@ -72,9 +72,9 @@ namespace ElemUtil {
       /**\brief Construct a Map defined by n vertices. */
       Map(const unsigned int n) {this->vertex = std::vector<CartVect>(n);};
       virtual ~Map();
-      /**\brief Evaluate the map on \xi (calculate $\vec x = F($\vec \xi)$ )*/
+      /**\brief Evaluate the map on \f$x_i\f$ (calculate \f$\vec x = F($\vec \xi)\f$ )*/
       virtual CartVect evaluate( const CartVect& xi ) const = 0;
-      /**\brief Evaluate the inverse map (calculate $\vec \xi = F^-1($\vec x)$ to given tolerance)*/
+      /**\brief Evaluate the inverse map (calculate \f$\vec \xi = F^-1($\vec x)\f$ to given tolerance)*/
       virtual CartVect ievaluate( const CartVect& x, double tol, const CartVect& x0 = CartVect(0.0)) const ;
       /**\brief decide if within the natural param space, with a tolerance*/
       virtual bool inside_nat_space(const CartVect & xi, double & tol) const = 0;
@@ -214,7 +214,7 @@ namespace ElemUtil {
       void set_gl_points( double * x, double * y, double *z) ;
       virtual CartVect evaluate( const CartVect& xi ) const;
       using Map::ievaluate;
-      virtual CartVect ievaluate(const CartVect& x) const;
+      virtual CartVect ievaluate( double abs_eps, const CartVect& x) const;
       virtual Matrix3  jacobian(const CartVect& xi) const;
       double   evaluate_scalar_field(const CartVect& xi, const double *field_vertex_values) const;
       double   integrate_scalar_field(const double *field_vertex_values) const;
@@ -261,6 +261,21 @@ namespace ElemUtil {
       static const unsigned int gauss_count  = 1;
 
     };// class LinearQuad
+
+    /**\brief Shape function space for bilinear quadrilateral on sphere, obtained from the canonical linear (affine) functions. */
+    class SphericalQuad : public LinearQuad {
+    public:
+      SphericalQuad(const std::vector<CartVect>& vertices);
+      virtual ~SphericalQuad() {};
+      virtual bool inside_box(const CartVect & pos, double & tol) const;
+      using Map::ievaluate;
+      virtual CartVect ievaluate( double abs_eps, const CartVect& x) const;
+    protected:
+      CartVect v1;
+      Matrix3 transf; // so will have a lot of stuff, including the transf to a coordinate system
+      //double tangent_plane; // at first vertex; normal to the plane is first vertex
+
+    };// class SphericalQuad
 
     /**\brief Shape function space for bilinear quadrilateral, obtained from the canonical linear (affine) functions. */
     class LinearEdge : public Map {

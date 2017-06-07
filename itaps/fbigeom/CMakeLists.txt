@@ -28,7 +28,7 @@ if ( MOAB_HAVE_MPI )
                        ${CMAKE_BINARY_DIR}/src/parallel)
 endif ()
 
-target_link_libraries( FBiGeomMOAB MOAB )
+target_link_libraries( FBiGeomMOAB iMesh MOAB ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES} )
 
 set_target_properties(
   FBiGeomMOAB
@@ -36,3 +36,18 @@ set_target_properties(
   VERSION ${MOAB_VERSION}
   SOVERSION ${MOAB_VERSION_MAJOR}
   )
+
+install(
+  TARGETS FBiGeomMOAB
+  EXPORT MOABTargets
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  )
+set( MOAB_INSTALL_TARGETS ${MOAB_INSTALL_TARGETS} FBiGeomMOAB)
+
+install(
+  FILES ${FBiGEOM_INCLUDE_HEADERS}
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+  )
+

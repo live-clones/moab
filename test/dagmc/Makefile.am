@@ -1,4 +1,4 @@
-LDADD = $(top_builddir)/src/libMOAB.la $(top_builddir)/tools/dagmc/DagMC.lo
+LDADD = $(top_builddir)/src/libMOAB.la $(top_builddir)/tools/dagmc/DagMC.lo $(top_builddir)/tools/dagmc/libdagmc.la
 
 MESHDIR = $(abs_top_srcdir)/MeshFiles/unittest
 

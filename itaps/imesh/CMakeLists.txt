@@ -16,6 +16,8 @@ if ( MOAB_HAVE_MPI )
                       iMeshP_MOAB.cpp)
   set(MOAB_IMESH_LIB_INCLUDES
           ${MOAB_IMESH_LIB_INCLUDES}
+          iMeshP.h
+          iMeshP_f.h
           iMeshP_protos.h )
 endif()
 
@@ -43,7 +45,7 @@ add_library(
   ${MOAB_IMESH_LIB_INCLUDES}
   )
 
-target_link_libraries( iMesh MOAB )
+target_link_libraries( iMesh MOAB ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES} )
 
 set_target_properties(
   iMesh

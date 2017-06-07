@@ -1,10 +1,10 @@
 ################################################################################
 #                           Standard Stuff
 ################################################################################
-AC_INIT([MOAB],[4.9.2],[moab-dev@mcs.anl.gov],[moab],[http://sigma.mcs.anl.gov])
+AC_INIT([MOAB],[5.0.0],[moab-dev@mcs.anl.gov],[moab],[http://sigma.mcs.anl.gov])
 AC_CONFIG_SRCDIR([moab.make.in])
-AC_CONFIG_SRCDIR([MOABConfig.cmake.in])
-AC_CONFIG_SRCDIR([examples/makefile.in])
+AC_CONFIG_SRCDIR([config/MOABConfig.cmake.in])
+AC_CONFIG_SRCDIR([examples/makefile.config.in])
 AC_CONFIG_MACRO_DIR([config])
 AC_CONFIG_AUX_DIR([config])
 AC_CANONICAL_TARGET
@@ -17,8 +17,8 @@ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 AC_CHECK_PROG( [SED], [sed], [sed], [true] )
 
 # Infer the source directory as the path to the ./configure script
-#srcdir=`dirname $0`
-#top_srcdir=`dirname $0`
+project_topsrcdir=`dirname $0`
+project_topbuilddir="$PWD"
 USER_CONFIGURE_CMD="$0 $ac_configure_args"
 
 ################################################################################
@@ -28,6 +28,12 @@ INITIALIZE_EXTERNAL_PACKAGES
 
 MB_CPPFLAGS=""
 MB_DEFS=""
+
+AC_ARG_ENABLE( [devmode],
+[AS_HELP_STRING([--enable-devmode],[Enable (advanced) developer mode in the build (not recommended for users).])],
+[enable_devmode=$enableval],
+[enable_devmode=no] )
+AM_CONDITIONAL(DEVELOPER_MODE,[test "x$enable_devmode" != "xno"])
 
 ENABLE_FORTRAN=no
 AC_ARG_ENABLE([fortran],
@@ -43,6 +49,8 @@ DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS --enable-fortran=$ENABLE_F
 FATHOM_CHECK_COMPILERS([yes],[yes],[$ENABLE_FORTRAN])
 AM_CONDITIONAL(PARALLEL,[test "x$enablempi" != "xno"])
 AM_CONDITIONAL(ENABLE_FORTRAN,[test "x$ENABLE_FORTRAN" != "xno"])
+MPI_DIR=$WITH_MPI
+AC_SUBST(MPI_DIR)
 AC_SUBST(enablempi)
 
 # Invoke and find all necessary flags for C, C++, FC
@@ -50,12 +58,16 @@ FATHOM_COMPILER_FLAGS([yes],[yes],[$ENABLE_FORTRAN])
 
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
+AC_PROG_MKDIR_P
 AC_DISABLE_SHARED
+AC_SUBST(enable_static)
+AC_SUBST(enable_shared)
 
 # All language options initialized -- now call
 # libtool initialization
 # AC_PROG_LIBTOOL is deprecated
 LT_INIT([dlopen])
+LT_LANG([C++])
 
 AC_C_BIGENDIAN
 
@@ -92,21 +104,30 @@ fi
 ################################################################################
 #                           Basic Portability Stuff
 ################################################################################
-AC_CHECK_FUNC([vsnprintf],
-              AC_DEFINE([HAVE_VSNPRINTF],[1],[Define if vsnprintf is available.]))
+AC_CHECK_FUNC([vsnprintf], [AC_DEFINE([HAVE_VSNPRINTF],[1],[Define if vsnprintf is available.])] )
+AC_CHECK_FUNC([vsprintf],  [AC_DEFINE([HAVE_VSPRINTF], [1],[Define if vsprintf is available.])] )
+AC_CHECK_FUNC([clock],     [AC_DEFINE([HAVE_CLOCK],    [1],[Define if clock is available.])] )
+AC_CHECK_FUNC([times],     [AC_DEFINE([HAVE_TIMES],    [1],[Define if times is available.])] )
+AC_CHECK_FUNC([cbrt],      [AC_DEFINE([HAVE_CBRT],     [1],[Define if cbrt is available.])] )
 
 FATHOM_VECTOR_TEMPLATE_INSERT
 FATHOM_OLD_STD_COUNT
 MB_DEFS="$MB_DEFS $NO_VECTOR_TEMPLATE_INSERT $OLD_STD_COUNT"
 
 ################################################################################
-#                              HANDLE SIZE
+#                              Headers
 ################################################################################
+AC_HEADER_STDC
+AC_CHECK_HEADERS(fcntl.h strings.h sys/file.h sys/time.h unistd.h)
 AC_CHECK_HEADER([inttypes.h], [AC_DEFINE(HAVE_INTTYPES_H,  [1], [MOAB qualified HAVE_INTTYPES_H]) ])
 AC_CHECK_HEADER([stdint.h],   [AC_DEFINE(HAVE_STDINT_H,    [1], [MOAB qualified HAVE_STDINT_H])   ])
-AC_CHECK_HEADER([sys/types.h],[AC_DEFINE(HAVE_SYS_TYPES_H, [1], [MOAB qualified HAVE_SYS_TYPES_H])])
 AC_CHECK_HEADER([stddef.h],   [AC_DEFINE(HAVE_STDDEF_H,    [1], [MOAB qualified HAVE_STDDEF_H])   ])
 AC_CHECK_HEADER([stdlib.h],   [AC_DEFINE(HAVE_STDLIB_H,    [1], [MOAB qualified HAVE_STDLIB_H])   ])
+AC_CHECK_HEADER([ieeefp.h],   [AC_DEFINE(HAVE_IEEEFP_H,    [1], [MOAB qualified HAVE_IEEEFP_H])   ])
+AC_CHECK_HEADER([termios.h],  [AC_DEFINE(HAVE_TERMIOS_H,   [1], [MOAB qualified HAVE_TERMIOS_H])  ])
+AC_CHECK_HEADER([sys/types.h],[AC_DEFINE(HAVE_SYS_TYPES_H, [1], [MOAB qualified HAVE_SYS_TYPES_H])])
+AC_CHECK_HEADER([sys/ioctl.h],[AC_DEFINE(HAVE_SYS_IOCTL_H, [1], [MOAB qualified HAVE_SYS_IOCTL_H])])
+
 SIZEOF_MBENTITYHANDLE=0
 AC_CHECK_SIZEOF([void *])
 SIZEOF_VOID_P=$ac_cv_sizeof_void_p
@@ -157,10 +178,170 @@ if (test "x$enable_32bit_handles" != "x"); then
   # AC_DEFINE_UNQUOTED([FILE_OFFSET_BITS], [64], [Support for handling files larger than 2GB on 32-bit machines])
 fi
 
-AC_CHECK_LIB(z, compress, LIBS="$LIBS -lz")
 AC_CHECK_LIB(dl, dlopen, LIBS="$LIBS -ldl")
-AC_CHECK_LIB(m, pow, LIBS="$LIBS -lm")
+AC_CHECK_LIB(z, compress, LIBS="$LIBS -lz")
+if (test "$cxx_compiler" != "Intel"); then
+  AC_CHECK_LIB(m, pow, LIBS="$LIBS -lm")
+fi
 
+### Check for BLAS and Lapack dense solvers
+#AX_BLAS
+AX_LAPACK
+LIBS="$LAPACK_LIBS $BLAS_LIBS $LIBS"
+
+################################################################################
+#                                 pymoab
+################################################################################
+# function for detecting python modules
+AC_DEFUN([AC_PYTHON_MODULE],
+[AC_MSG_CHECKING(for module $1 in python)
+echo "import $1" | python -
+if test $? -ne 0 ; then
+AC_MSG_RESULT(not found)
+AC_MSG_ERROR(You need the module $1 available to python for this package)
+fi
+AC_MSG_RESULT(found)
+])
+
+filter_sources="NO"
+filter_program=""
+python_patterns=""
+
+AC_MSG_CHECKING([if pymoab interface was requested by user])
+AC_ARG_ENABLE( [pymoab],
+[AS_HELP_STRING([--enable-pymoab],[Build support for pymoab interface.])],
+[enable_pymoab=$enableval],
+[enable_pymoab=no] )
+
+AC_ARG_VAR([PYMOAB_PREFIX],
+Custom location for install of PyMOAB module)
+
+pymoab_custom_install=no
+AC_MSG_RESULT([$enable_pymoab])
+
+if (test "xyes" != "x$enable_pymoab" && test "xno" != "x$enable_pymoab"); then
+  AC_MSG_ERROR([Unknown argument --enable-pymoab=$enableval])
+else
+  if (test "x$enable_pymoab" != "xno"); then
+    ENABLE_pymoab=yes
+    AM_PATH_PYTHON()
+    AX_PYTHON_DEVEL()
+    AC_PYTHON_MODULE(numpy)
+    AC_PYTHON_MODULE(setuptools)
+    
+    # if enabling PyMOAB, turn cython file filter oni
+    filter_sources="YES"
+    filter_program=$PYTHON" cython_filter.py 2>/dev/null"
+    python_patterns="*.py *.pyx"
+    
+    if (test "x$enable_devmode" != "xno"); then
+      # Developers updating the PyMOAB modules need Cython (> 0.25)
+      AC_PYTHON_MODULE(cython)
+      AC_MSG_CHECKING(for proper cython capabilities)
+      cython --cplus $srcdir/pymoab/cmake/cython_test.pyx --output-file ./.cython_test_out && rm .cython_test_out
+      if test $? -ne 0 ; then
+        AC_MSG_ERROR(cython is not the correct version for pymoab)
+      fi
+      AC_CHECK_PROG(CYTHON_AVAILABLE, cython, yes, no)
+      if test x"$CYTHON_AVAILABLE" != x"yes" ; then
+          AC_MSG_ERROR([Cython is not installed. Use 'easy_install cython'.])
+      else
+          CYTHON=`which cython`
+          AC_SUBST(CYTHON)
+      fi
+    fi
+
+    AC_CONFIG_SRCDIR([pymoab/setup.py.in])
+    # link source files to build location
+    AC_CONFIG_LINKS([pymoab/pymoab/moab.pxd:pymoab/pymoab/moab.pxd
+                     pymoab/pymoab/tag.cpp:pymoab/pymoab/tag.cpp
+                     pymoab/pymoab/tag.pyx:pymoab/pymoab/tag.pyx
+                     pymoab/pymoab/tag.pxd:pymoab/pymoab/tag.pxd
+                     pymoab/pymoab/core.cpp:pymoab/pymoab/core.cpp
+                     pymoab/pymoab/core.pyx:pymoab/pymoab/core.pyx
+		     pymoab/pymoab/core.pxd:pymoab/pymoab/core.pxd
+		     pymoab/pymoab/rng.cpp:pymoab/pymoab/rng.cpp
+		     pymoab/pymoab/rng.pyx:pymoab/pymoab/rng.pyx
+		     pymoab/pymoab/rng.pxd:pymoab/pymoab/rng.pxd
+		     pymoab/pymoab/hcoord.cpp:pymoab/pymoab/hcoord.cpp
+		     pymoab/pymoab/hcoord.pyx:pymoab/pymoab/hcoord.pyx
+		     pymoab/pymoab/hcoord.pxd:pymoab/pymoab/hcoord.pxd
+		     pymoab/pymoab/types.cpp:pymoab/pymoab/types.cpp
+		     pymoab/pymoab/types.pyx:pymoab/pymoab/types.pyx
+		     pymoab/pymoab/topo_util.cpp:pymoab/pymoab/topo_util.cpp
+		     pymoab/pymoab/topo_util.pyx:pymoab/pymoab/topo_util.pyx
+		     pymoab/pymoab/topo_util.pxd:pymoab/pymoab/topo_util.pxd
+		     pymoab/pymoab/scd.cpp:pymoab/pymoab/scd.cpp
+		     pymoab/pymoab/scd.pyx:pymoab/pymoab/scd.pyx
+		     pymoab/pymoab/scd.pxd:pymoab/pymoab/scd.pxd
+		     pymoab/pymoab/skinner.cpp:pymoab/pymoab/skinner.cpp
+		     pymoab/pymoab/skinner.pyx:pymoab/pymoab/skinner.pyx
+		     pymoab/pymoab/skinner.pxd:pymoab/pymoab/skinner.pxd
+		     pymoab/pymoab/__init__.pxd:pymoab/pymoab/__init__.pxd
+		     pymoab/pymoab/__init__.py:pymoab/pymoab/__init__.py])
+    # link test files to build location
+    AC_CONFIG_LINKS([pymoab/tests/driver.py:pymoab/tests/driver.py
+                     pymoab/tests/test_core.py:pymoab/tests/test_core.py
+		     pymoab/tests/test_tag.py:pymoab/tests/test_tag.py
+		     pymoab/tests/test_scd.py:pymoab/tests/test_scd.py
+		     pymoab/tests/test_hom.py:pymoab/tests/test_hom.py
+		     pymoab/tests/test_topo_util.py:pymoab/tests/test_topo_util.py
+		     pymoab/tests/test_range.py:pymoab/tests/test_range.py
+		     pymoab/tests/test_skinner.py:pymoab/tests/test_skinner.py
+		     pymoab/tests/cyl_grps.h5m:pymoab/tests/cyl_grps.h5m
+		     pymoab/tests/cyl_grps.vtk:pymoab/tests/cyl_grps.vtk])
+    # if a python install location is specified, use that
+    if test "x$PYMOAB_PREFIX" != "x"; then
+      pymoab_custom_install=yes
+      pymoab_prefix=${PYMOAB_PREFIX}
+      pythondir=$pymoab_prefix
+    else
+      # if a prefix was supplied, then install under the lib directory
+      # of the specified prefix location
+      if test "x$prefix" != "xNONE"; then
+        pymoab_prefix=$prefix/lib/python${PYTHON_VERSION}/site-packages
+        pymoab_custom_install=yes
+        pythondir=$pymoab_prefix
+      else
+        # if no specific location is used and no prefix was supplied,
+        # then install to the system location
+        pymoab_prefix=/usr/lib/python${PYTHON_VERSION}/dist-packages
+        pythondir=$pymoab_prefix
+      fi
+    fi
+
+    AC_SUBST([pymoab_prefix])
+    # ensure shared libraries are enabled
+    if (test "xyes" != "x$enable_shared" || test "xno" = "x$enable_shared"); then
+      AC_MSG_ERROR([Cannot build static libraries and the python interface. Please build with shared libraries (--enable-shared) or build without MOAB's python interface.])
+    fi
+    # ensure 32 bit objects are NOT enabled
+    if (test "xyes" = "x$enable_32bit" || test "xno" != "x$enable_32bit"); then
+      AC_MSG_ERROR([Cannot build pymoab with 32bit objects enabled. Please remove the --enable-32bit configuration option or build without MOAB's python interface.])
+    fi
+    # ensure 32 bit handles are NOT enabled
+    if (test "x$enable_32bit_handles" != "x"); then
+      AC_MSG_ERROR([Cannot build pymoab with 32bit EntityHandles enabled. Please remove the --enable-32bit-handles configuration option or build without MOAB's python interface.])
+    fi
+    UNAME_S=`uname -s`
+    if (test "x$UNAME_S" = "xDarwin"); then
+      SLIBENVPATH="DYLD_LIBRARY_PATH"
+    else
+      SLIBENVPATH="LD_LIBRARY_PATH"
+    fi
+    AC_SUBST(SLIBENVPATH)
+    DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS --enable-pymoab=$ENABLE_pymoab"
+  else
+    ENABLE_pymoab=no
+  fi
+fi
+
+AM_CONDITIONAL([ENABLE_pymoab],[test "xyes" = "x$ENABLE_pymoab"])
+AC_MSG_CHECKING([if pymoab interface is enabled])
+AC_MSG_RESULT([$ENABLE_pymoab])
+AC_SUBST([filter_sources])
+AC_SUBST([filter_program])
+AC_SUBST([python_patterns])
 ################################################################################
 #                           iMesh Part 1 of 2
 ################################################################################
@@ -170,7 +351,7 @@ AC_ARG_ENABLE( [imesh],
 [disable_imesh=yes] )
 
 if (test "xyes" != "x$disable_imesh" && test "xno" != "x$disable_imesh"); then
-  AC_MSG_ERROR([Unknown argument --enable-imesh=$enableval])
+  AC_MSG_ERROR([Unknown argument --disable-imesh=$enableval])
 else
   if (test "$disable_imesh" != "no"); then
     ENABLE_imesh=yes
@@ -221,8 +402,9 @@ if test "x$ENABLE_fbigeom" = "xyes"; then
     AC_MSG_ERROR([Cannot build FBiGeom API with sizeof(EntityHandle) != sizeof(void*)])
   fi
   AC_DEFINE([HAVE_FBIGEOM],[1],[Define if configured with FBiGeom interfaces.])
-  
 fi
+HAVE_FBIGEOM=$ENABLE_fbigeom
+AC_SUBST(HAVE_FBIGEOM)
 
 AC_MSG_CHECKING([if iMesh support is to be built])
 AC_MSG_RESULT([$ENABLE_imesh])
@@ -248,6 +430,19 @@ else
   DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS --enable-irel=$enable_irel"
 fi
 
+################################################################################
+#                           Mesquite Part 1 of 2
+################################################################################
+AC_ARG_ENABLE( [mesquite],
+[AS_HELP_STRING([--enable-mesquite],[Build support for Mesquite interfaces.])],
+[enable_mesquite=$enableval],
+[enable_mesquite=no] )
+
+if (test "xyes" != "x$enable_mesquite" && test "xno" != "x$enable_mesquite"); then
+  AC_MSG_ERROR([Unknown argument --enable-mesquite=$enableval])
+else
+  DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS --enable-mesquite=$enable_mesquite"
+fi
 
 ################################################################################
 #                              Version Stuff
@@ -367,6 +562,12 @@ if test "xyes" = "x$enablempi"; then
   AC_SUBST([MPE_LIBS])
   test "xyes" != "x$WITH_MPE" || MB_DEFS="$MB_DEFS -DUSE_MPE"
 fi
+
+################################################################################
+#                              Eigen3 OPTIONS
+################################################################################
+
+FATHOM_CONFIGURE_EIGEN3
 
 ################################################################################
 #                              HDF5 OPTIONS
@@ -662,6 +863,54 @@ AC_ARG_WITH( [vtk-lib-suffix],
                  ;;
                esac],[VTK_LIB_SUFFIX=] )
 
+# Provide downloadable option for TempestRemap library
+# Supported TempestRemap versions: 1.0.beta
+# Arguments: 1) Default Version Number, 2) Download by default ?
+AUSCM_CONFIGURE_DOWNLOAD_TEMPESTREMAP([1.0.beta],[no])
+
+# Configuration for TempestRemap library
+AC_ARG_WITH([tempestremap],
+  [AS_HELP_STRING([--with-tempestremap=DIR],[Enable intersection/remapping support through interface to TempestRemap])],
+  [WITH_TEMPEST=$withval
+   DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS --with-tempestremap=\"${withval}\""
+  ],[WITH_TEMPEST=$TEMPESTREMAP_DIR])
+
+HAVE_TEMPEST=no
+if (test "x$WITH_TEMPEST" != "xno" && test "x$WITH_TEMPEST" != "x"); then
+  # Test for Tempest headers
+  AC_LANG_PUSH([C++])
+  old_CPPFLAGS="$CPPFLAGS"
+  CPPFLAGS="$CPPFLAGS -I$WITH_TEMPEST/include"
+  AC_CHECK_HEADER([TempestConfig.h],[TEMPESTREMAP_INCLUDE="-I$WITH_TEMPEST/include"],
+                  [WITH_TEMPEST=no
+                  AC_MSG_WARN([TempestConfig.h: header not found in $WITH_TEMPEST/include.])],
+                  [#include <stdlib.h>])
+  CPPFLAGS="$old_CPPFLAGS"
+  AC_SUBST(TEMPESTREMAP_INCLUDE)
+
+  # Test for TempestRemap library, possibly requiring NetCDF
+  old_LDFLAGS="$LDFLAGS"
+  old_LIBS="$LIBS"
+  LDFLAGS="$LDFLAGS -L$WITH_TEMPEST/lib $PNETCDF_LDFLAGS $NETCDF_LDFLAGS $HDF5_LDFLAGS"
+  LIBS="$NETCDF_LIBS $LAPACK_LIBS $BLAS_LIBS $LIBS"
+  AC_CHECK_LIB([TempestRemap],[GenerateOfflineMap],[TEMPESTREMAP_LIBS="-L$WITH_TEMPEST/lib -lTempestRemap $NETCDF_LIBS $LAPACK_LIBS $BLAS_LIBS"],
+    [unset ac_cv_lib_TempestRemap_GenerateOfflineMap
+    LIBS="$NETCDF_LIBS $PNETCDF_LIBS $HDF5_LIBS $LAPACK_LIBS $BLAS_LIBS $LIBS"
+    AC_CHECK_LIB([TempestRemap],[GenerateOfflineMap],
+                  [TEMPESTREMAP_LIBS="-L$WITH_TEMPEST/lib -lTempestRemap $NETCDF_LIBS $PNETCDF_LIBS $LAPACK_LIBS $BLAS_LIBS"],
+                  [AC_MSG_ERROR([TempestRemap library not found or not usable.])]
+                  [$NETCDF_LIBS $PNETCDF_LIBS])],[$NETCDF_LIBS])
+  LDFLAGS="$old_LDFLAGS"
+  LIBS="$old_LIBS"
+  AC_LANG_POP([C++])
+  AC_SUBST(TEMPESTREMAP_LIBS)
+
+    # Define macro HAVE_TEMPESTREMAP
+  AC_DEFINE([HAVE_TEMPESTREMAP],[1],[Enable use of TempestRemap library API for computing intersection and remapping for Climate problems])
+  HAVE_TEMPEST=yes
+fi
+AM_CONDITIONAL( HAVE_TEMPESTREMAP, [test "x$HAVE_TEMPEST" = "xyes"] )
+
 ################################################################################
 #                           Zoltan - Part 2 of 2
 ################################################################################
@@ -737,6 +986,9 @@ if test "xyes" = "x$WITH_ZOLTAN"; then
 fi
 
 AM_CONDITIONAL( HAVE_ZOLTAN, [test "x$WITH_ZOLTAN" = "xyes"] )
+enablezoltan=$WITH_ZOLTAN
+AC_SUBST(enablezoltan)
+AC_SUBST(ZOLTAN_DIR)
 AC_SUBST(ZOLTAN_LIBS)
 AC_SUBST(ZOLTAN_LIB_FLAGS)
 AC_SUBST(ZOLTAN_INC_FLAGS)
@@ -745,6 +997,7 @@ EXPORT_LDFLAGS="$ZOLTAN_LIB_FLAGS $EXPORT_LDFLAGS"
 ################################################################################
 #                           CGM
 ################################################################################
+USING_DEV_CGM=no
 AC_ARG_WITH(cgm, 
 [AS_HELP_STRING([--with-cgm=DIR],[Specify directory containing CGM])],
 [CGM_DIR=$withval
@@ -767,7 +1020,7 @@ case "x$CGM_DIR" in
     AC_CHECK_FILE([${CGM_DIR}/lib/cgm.make],
                   [CGM_MAKE="${CGM_DIR}/lib/cgm.make"],
                   [AC_CHECK_FILE([${CGM_DIR}/cgm.make],
-                                 [CGM_MAKE="${CGM_DIR}/cgm.make"],
+                                 [CGM_MAKE="${CGM_DIR}/cgm.make"; USING_DEV_CGM=yes],
                                  [AC_MSG_ERROR([$CGM_DIR : not a configured CGM]); 
                                   CGM_MISSING=yes])
                   ])
@@ -777,7 +1030,6 @@ esac
 if test "x$CGM_MISSING" = "xno"; then
   CGM_CONFIG_OPTIONS="include $CGM_MAKE"
 
-  AC_MSG_CHECKING([Checking for GeometryQueryTool::ray_fire(RefFace*,...)])
   FATHOM_MAKE_INC_VAR([$CGM_MAKE],[CGM_DEFINES], [CGM_CPPFLAGS="$make_val"])   
   FATHOM_MAKE_INC_VAR([$CGM_MAKE],[CGM_INCLUDES],[CGM_CPPFLAGS="$CGM_CPPFLAGS $make_val"])   
   FATHOM_MAKE_INC_VAR([$CGM_MAKE],[CGM_LTFLAGS], [CGM_LTFLAGS="$make_val"])   
@@ -789,42 +1041,68 @@ if test "x$CGM_MISSING" = "xno"; then
   CPPFLAGS="$CGM_CPPFLAGS $CPPFLAGS"
   HAVE_OCC=no
   HAVE_FACET=no
-  AC_CHECK_HEADER([OCCPoint.hpp], 
-                   [HAVE_OCC=yes; AC_DEFINE(HAVE_CGM_OCC, [1], [MOAB uses CGM configured with OpenCascade]) ],
-                   [HAVE_FACET=yes; AC_DEFINE(HAVE_CGM_FACET, [1], [MOAB uses CGM configured with Facet Engine only]) ]
-                   )
+  AC_MSG_CHECKING([for underlying geometry engine in CGM])
+  AC_COMPILE_IFELSE(
+  [AC_LANG_PROGRAM([@%:@include <CGMConfig.h>],
+  [ #ifndef CGM_HAVE_FACET_ENGINE_ONLY
+  // Perfect!
+  #else
+  # error Only Facet engine available
+  #endif
+  ])
+  ],
+  [HAVE_OCC=yes
+   AC_DEFINE(HAVE_CGM_OCC, [1], [MOAB uses CGM configured with OpenCascade])
+   AC_MSG_RESULT(OCC)],
+  [HAVE_FACET=yes
+   AC_DEFINE(HAVE_CGM_FACET, [1], [MOAB uses CGM configured with Facet Engine only])
+  AC_MSG_RESULT(Facets)] )
   CPPFLAGS="$old_CPPFLAGS"
   AC_LANG_POP([C++])
 
-  if (test "x$HAVE_CUBIT" != "xno"); then
-    AC_LANG_PUSH([C++])
-    old_CPPFLAGS="$CPPFLAGS"
-    old_LDFLAGS="$LDFLAGS"
-    old_LIBS="$LIBS"
-    CPPFLAGS="$CGM_CPPFLAGS $CPPFLAGS"
-    LDFLAGS="$CGM_LDFLAGS $CPPFLAGS"
-    LIBS="$CGM_LIBS $LIBS"
-    HAVE_CGM_FIRE_RAY=no
-    AC_LINK_IFELSE(
-      [AC_LANG_PROGRAM([#include "GeometryQueryTool.hpp"
-                        #include "CubitVector.hpp"],
-                      [CubitVector a,b;
-                      DLIList<double> c;
-                      GeometryQueryTool::instance()->fire_ray((RefFace*)0, a, b, c );
-                      ])],
-      [HAVE_CGM_FIRE_RAY=yes;
-      
-      AC_MSG_RESULT(yes)],
-      [AC_MSG_RESULT(no)])
-    CPPFLAGS="$old_CPPFLAGS"
-    LDFLAGS="$old_LDFLAGS"
-    LIBS="$old_LIBS"
-#  LDFLAGS="$old_LDFLAGS"
-#  LIBS="$old_LIBS"
-    AC_LANG_POP([C++])
-  fi
+  AC_MSG_CHECKING([for GeometryQueryTool::ray_fire(RefFace*,...)])
+  AC_LANG_PUSH([C++])
+  old_CPPFLAGS="$CPPFLAGS"
+  old_LDFLAGS="$LDFLAGS"
+  old_LIBS="$LIBS"
+  CPPFLAGS="$CGM_CPPFLAGS $CPPFLAGS"
+  LDFLAGS="$CGM_LDFLAGS $CPPFLAGS"
+  LIBS="$CGM_LIBS $LIBS"
+  HAVE_CGM_FIRE_RAY=no
+  AC_LINK_IFELSE(
+    [AC_LANG_PROGRAM([#include "GeometryQueryTool.hpp"
+                      #include "CubitVector.hpp"],
+                    [CubitVector a,b;
+                    DLIList<double> c;
+                    GeometryQueryTool::instance()->fire_ray((RefFace*)0, a, b, c );
+                    ])],
+    [HAVE_CGM_FIRE_RAY=yes;
+    AC_MSG_RESULT(yes)],
+    [AC_MSG_RESULT(no)])
+  CPPFLAGS="$old_CPPFLAGS"
+  LDFLAGS="$old_LDFLAGS"
+  LIBS="$old_LIBS"
+  AC_LANG_POP([C++])
+
   EXPORT_LDFLAGS="$EXPORT_LDFLAGS $CGM_LDFLAGS"
   EXPORT_LTFLAGS="$EXPORT_LTFLAGS $CGM_LTFLAGS"
+
+  AC_CHECK_FILE([${CGM_DIR}/lib/iGeom-Defs.inc],
+              [IGEOM_CONFIG_OPTIONS="include ${CGM_DIR}/lib/iGeom-Defs.inc";
+               FATHOM_MAKE_INC_VAR([${CGM_DIR}/lib/iGeom-Defs.inc],[IGEOM_DEFINES], [IGEOM_DEFINES="$make_val"],[IGEOM_DEFINES=])
+               FATHOM_MAKE_INC_VAR([${CGM_DIR}/lib/iGeom-Defs.inc],[IGEOM_INCLUDES], [IGEOM_INCLUDES="$make_val"],[IGEOM_INCLUDES=])
+               FATHOM_MAKE_INC_VAR([${CGM_DIR}/lib/iGeom-Defs.inc],[IGEOM_LDFLAGS], [IGEOM_LDFLAGS="$make_val"],[IGEOM_LDFLAGS=])
+               FATHOM_MAKE_INC_VAR([${CGM_DIR}/lib/iGeom-Defs.inc],[IGEOM_LIBS], [IGEOM_LIBS="$make_val"],[IGEOM_LIBS=]) ],
+              [AC_CHECK_FILE([${CGM_DIR}/iGeom-Defs.inc],
+                             [IGEOM_CONFIG_OPTIONS="include ${CGM_DIR}/iGeom-Defs.inc";
+                              FATHOM_MAKE_INC_VAR([${CGM_DIR}/iGeom-Defs.inc],[IGEOM_DEFINES], [IGEOM_DEFINES="$make_val"],[IGEOM_DEFINES=])
+                              FATHOM_MAKE_INC_VAR([${CGM_DIR}/iGeom-Defs.inc],[IGEOM_INCLUDES], [IGEOM_INCLUDES="$make_val"],[IGEOM_INCLUDES=])
+                              FATHOM_MAKE_INC_VAR([${CGM_DIR}/iGeom-Defs.inc],[IGEOM_LDFLAGS], [IGEOM_LDFLAGS="$make_val"],[IGEOM_LDFLAGS=])
+                              FATHOM_MAKE_INC_VAR([${CGM_DIR}/iGeom-Defs.inc],[IGEOM_LIBS], [IGEOM_LIBS="$make_val"],[IGEOM_LIBS=]) ],
+                             [AC_MSG_WARN([$CGM_DIR : not a configured iGeom])]
+                            )
+              ])
+
 fi
 
 AC_SUBST(CGM_CPPFLAGS)
@@ -832,6 +1110,11 @@ AC_SUBST(CGM_LDFLAGS)
 AC_SUBST(CGM_LTFLAGS)
 AC_SUBST(CGM_LIBS)
 AC_SUBST(CGM_DIR)
+AC_SUBST(IGEOM_DEFINES)
+AC_SUBST(IGEOM_INCLUDES)
+AC_SUBST(IGEOM_CONFIG_OPTIONS)
+AC_SUBST(IGEOM_LDFLAGS)
+AC_SUBST(IGEOM_LIBS)
 
 AM_CONDITIONAL( HAVE_CGM, [test "x$CGM_MISSING" = "xno"] )
 AM_CONDITIONAL( HAVE_OCC, [test "x$HAVE_OCC" = "xyes"] )
@@ -851,23 +1134,12 @@ fi
 AC_MSG_CHECKING([if iRel support is to be built])
 AC_MSG_RESULT([$ENABLE_irel])
 AM_CONDITIONAL([ENABLE_irel],[test "xyes" = "x$ENABLE_irel"])
+
 if test "x$ENABLE_irel" = "xyes"; then
   if (test "x$ENABLE_imesh" != "xyes" || test "x$CGM_MISSING" != "xno"); then
     AC_MSG_ERROR([Cannot build iRel API. Enable both iGeom (CGM) and iMesh implementations.])
   fi
   AC_DEFINE([HAVE_IREL],[1],[Define if configured with iRel interfaces.])
-  
-  AC_CHECK_FILE([${CGM_DIR}/lib/iGeom-Defs.inc],
-              [IGEOM_CONFIG_OPTIONS="include ${CGM_DIR}/lib/iGeom-Defs.inc";
-               FATHOM_MAKE_INC_VAR([${CGM_DIR}/lib/iGeom-Defs.inc],[IGEOM_DEFINES], [IGEOM_DEFINES="$make_val"],
-                  [IGEOM_DEFINES=]) ],
-              [AC_CHECK_FILE([${CGM_DIR}/iGeom-Defs.inc],
-                             [IGEOM_CONFIG_OPTIONS="include ${CGM_DIR}/iGeom-Defs.inc"],
-                             [AC_MSG_WARN([$CGM_DIR : not a configured iGeom])]
-                            )
-              ])
-  AC_SUBST(IGEOM_DEFINES)
-  AC_SUBST(IGEOM_CONFIG_OPTIONS)
 fi
 
 HAVE_IGEOM="no"
@@ -879,6 +1151,29 @@ test "x$ENABLE_irel" != "xyes" || HAVE_IREL="yes"
 AC_SUBST(HAVE_IGEOM)
 AC_SUBST(HAVE_IMESH)
 AC_SUBST(HAVE_IREL)
+AM_CONDITIONAL([USING_DEV_CGM],[test "xyes" = "x$USING_DEV_CGM"])
+
+################################################################################
+#                           Mesquite Part 2 of 2
+################################################################################
+
+AC_MSG_CHECKING([if Mesquite support is to be built])
+AC_MSG_RESULT([$enable_mesquite])
+HAVE_MESQUITE="no"
+if (test "xno" != "x$enable_mesquite"); then
+  if (test "x$ENABLE_imesh" != "xyes"); then
+    enable_mesquite=no
+    AC_MSG_WARN([** Disabling Mesquite since iGeom or iMesh is not configured correctly.])
+  fi
+  if (test "xno" != "x$enable_mesquite"); then
+    CONFIGURE_MESQUITE
+    AC_DEFINE(HAVE_MESQUITE,[1],"MOAB configured with Mesquite support")
+    HAVE_MESQUITE="yes"
+  fi
+fi
+AM_CONDITIONAL([ENABLE_mesquite],[test "yes" = "$enable_mesquite"])
+AM_CONDITIONAL([HAVE_CPPUNIT],[test "$HAVE_CPPUNIT" = "yes"])
+AC_SUBST(HAVE_MESQUITE)
 
 ###############################################################################
 #                           Optional Tools
@@ -906,7 +1201,7 @@ AS_HELP_STRING([--disable-$1],[Don't build $1])],
   fi
   AC_MSG_CHECKING([if $1 is to be built])
   AC_MSG_RESULT([${ENABLE_$1}])
-  DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS --enable-$1=\"${ENABLE_$1}\""
+  DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS --enable-$1=${ENABLE_$1}"
 ])
   # The default for all tools
 AC_ARG_ENABLE( [tools], [
@@ -919,55 +1214,53 @@ MB_OPTIONAL_TOOL([mbconvert],    [yes], [yes])
 MB_OPTIONAL_TOOL([hexmodops],    [yes], [yes])
 MB_OPTIONAL_TOOL([vtkMOABReader],[${VTKMOAB_DEFAULT}], [${VTKMOAB_DEFAULT}])
 MB_OPTIONAL_TOOL([mbsize],       [yes], [yes])
+MB_OPTIONAL_TOOL([mbhonodes],    [yes], [yes])
 MB_OPTIONAL_TOOL([mbskin],       [yes], [yes])
 MB_OPTIONAL_TOOL([mbtagprop],    [yes], [yes])
 MB_OPTIONAL_TOOL([mbmem],        [yes], [yes])
 MB_OPTIONAL_TOOL([spheredecomp], [yes], [yes])
 MB_OPTIONAL_TOOL([mbsurfplot],   [yes], [yes])
 if (test "x$WITH_ZOLTAN" != "xno" || test "x$METIS_DIR" != "x"); then
-  # mbpart_deftools=no
-  # test "x$METIS_DIR" != "x" || mbpart_deftools="yes"
-  # MB_OPTIONAL_TOOL([mbpart],     [${mbpart_deftools}], [yes] )
   MB_OPTIONAL_TOOL([mbpart],     [yes], [yes] )
 else
   MB_OPTIONAL_TOOL([mbpart],     [no], [no] )
 fi
 
-MB_OPTIONAL_TOOL([dagmc],        [no], [yes])
-if test "xyes" = "x$ENABLE_dagmc"; then
-   DAGMC_LIBS="-ldagmc"
-   AC_SUBST(DAGMC_LIBS)
-fi
 
 MB_OPTIONAL_TOOL([gsets],        [yes], [yes])
-MB_OPTIONAL_TOOL([mbmerge],        [yes], [yes])
+MB_OPTIONAL_TOOL([mbmerge],      [yes], [yes])
 MB_OPTIONAL_TOOL([mbdepth],      [yes], [yes])
 if test "x$enablempi" != "xno"; then
-  MB_OPTIONAL_TOOL([mbcoupler],    [no], [yes] )
-  MB_OPTIONAL_TOOL([mcnpmit],      [no], [yes])
-  MB_OPTIONAL_TOOL([refiner],      [no], [yes])
+  MB_OPTIONAL_TOOL([mbcoupler],  [no], [yes] )
+  MB_OPTIONAL_TOOL([mcnpmit],    [no], [yes])
+  MB_OPTIONAL_TOOL([mbcslam],    [no], [yes])
 else
-  AS_ECHO("Disabling mbcoupler and refiner since these tools require MPI/parallel configuration")
-  MB_OPTIONAL_TOOL([mbcoupler],    [no], [no] )
-  MB_OPTIONAL_TOOL([mcnpmit],      [no], [no])
-  MB_OPTIONAL_TOOL([refiner],      [no], [no])
+  AS_ECHO(["Disabling mbcoupler, mbcslam and mcnpmit since these tools require MPI/parallel configuration"])
+  MB_OPTIONAL_TOOL([mbcoupler],  [no], [no] )
+  MB_OPTIONAL_TOOL([mcnpmit],    [no], [no])
+  MB_OPTIONAL_TOOL([mbcslam],    [no], [no])
 fi
+
+MB_OPTIONAL_TOOL([refiner],      [no], [no])
 MB_OPTIONAL_TOOL([h5mtools],     [${enablehdf5}], [${enablehdf5}])
-MB_OPTIONAL_TOOL([mbcslam],      [no], [yes])
 MB_OPTIONAL_TOOL([mbquality],    [yes], [yes])
+MB_OPTIONAL_TOOL([mbtempest],    [${HAVE_TEMPEST}], [${HAVE_TEMPEST}])
+if (test "xyes" = "x$ENABLE_tempestremap"); then
+  if (test "xyes" != "x$HAVE_TEMPEST"); then
+    AC_MSG_ERROR([mbtempest requires TempestRemap library. Configure using --with-tempestremap])
+  fi
+fi
 
 MB_OPTIONAL_TOOL([ahf],          [no], [no])
 MB_OPTIONAL_TOOL([mbumr],        [yes], [yes])
-if test "xyes" = "x$ENABLE_ahf"; then
+if (test "xyes" = "x$ENABLE_ahf"); then
   AC_DEFINE([HAVE_AHF],[1],[Enable use of AHF data-structures for querying adjacency information])
 fi
-
-AM_CONDITIONAL(ENABLE_AHF, [test "xyes" = "x$ENABLE_ahf"])
 
 if test "xyes" = "x$ENABLE_vtkMOABReader"; then
   if test "xno" = "x$WITH_VTK"; then
     AC_MSG_ERROR([vtkMOABReader requires VTK])
-  elif test "x" = "x$WITH_VTK"; then 
+  elif (test "x" = "x$WITH_VTK"); then 
     WITH_VTK=yes
   fi
 fi
@@ -1180,7 +1473,7 @@ if test "x" = "x$examplesdir"; then
   AC_SUBST(examplesdir)
 fi
 
-CPPFLAGS="$MB_CPPFLAGS"
+CPPFLAGS="$MB_CPPFLAGS $CPPFLAGS"
 FCPPFLAGS=`echo $MB_CPPFLAGS | sed -e "s/-D/$FC_DEFINE/g"`
 FCDEFS=`echo $MB_DEFS | sed -e "s/-D/$FC_DEFINE/g"`
 AC_SUBST([CPPFLAGS])
@@ -1192,13 +1485,6 @@ AC_SUBST([AM_LDFLAGS])
 AC_SUBST([EXPORT_LTFLAGS])
 AC_SUBST([EXPORT_LDFLAGS])
 
-AC_ARG_VAR([FC], [FORTRAN compiler command])
-# AC_CONFIG_HEADERS([config.h])
-# Create a temporary file with e.g. HAVE_MPI
-#AC_CONFIG_HEADERS([.MOABConfig.h:config/MOABConfig.h.in])
-# Prefixes everything in the temporary file with MOAB_, e.g. MOAB_HAVE_MPI
-#AX_PREFIX_CONFIG_H([src/moab/MOABConfig.h],[MOAB],[.MOABConfig.h])
-
 AC_CONFIG_HEADERS([src/moab/EntityHandle.hpp
                    src/parallel/moab_mpi_config.h
                    src/moab/MOABConfig.h:config/MOABConfig.h.in])
@@ -1206,18 +1492,12 @@ AX_PREFIX_CONFIG_H([src/moab/MOABConfig.h],[MOAB],[src/moab/MOABConfig.h])
 
 AC_CONFIG_FILES([Makefile 
                  moab.make                  
-                 MOABConfig.cmake
-                 examples/makefile
-                 examples/old/deform_mesh/makefile
+                 MOABConfig.cmake:config/MOABConfig.cmake.in
+                 examples/makefile.config
                  src/Makefile
                  src/io/Makefile
                  src/io/mhdf/Makefile
-                 src/LocalDiscretization/Makefile
-                 src/RefineMesh/Makefile
-                 src/parallel/Makefile
-                 src/verdict/Makefile
                  test/Makefile
-                 test/dagmc/Makefile
                  test/h5file/Makefile
                  test/dual/Makefile
                  test/obb/Makefile
@@ -1225,6 +1505,8 @@ AC_CONFIG_FILES([Makefile
                  test/perf/point_location/Makefile
                  test/io/Makefile
                  test/parallel/Makefile
+                 pymoab/Makefile
+                 pymoab/setup.py
                  itaps/iBase_f.h
                  itaps/Makefile
                  itaps/imesh/Makefile
@@ -1238,21 +1520,39 @@ AC_CONFIG_FILES([Makefile
                  tools/mbcoupler/Makefile
                  tools/mbcslam/Makefile
                  tools/mcnpmit/Makefile
-                 tools/dagmc/Makefile
+                 tools/geometry/Makefile
                  tools/vtkMOABReader/CMakeLists.txt
                  doc/user.dox
+		 doc/cython_filter.py
                  doc/config.tex
                  MeshFiles/Makefile
                  MeshFiles/unittest/Makefile
                  MeshFiles/unittest/io/Makefile
                  MeshFiles/unittest/fbigeom/Makefile
                  MeshFiles/unittest/irel/Makefile
-                 MeshFiles/unittest/dagmc/Makefile
                  MeshFiles/unittest/mbcslam/Makefile
                  MeshFiles/unittest/h5file/Makefile
                  MeshFiles/examples/Makefile
                  ])
 
+# Specify the headers to create for mesquite
+AC_CONFIG_FILES([src/mesquite/Makefile
+                 itaps/mesquite/Makefile
+                 test/mesquite/Makefile
+                 test/mesquite/convert/Makefile
+                 test/mesquite/igeom/Makefile
+                 test/mesquite/imesh/Makefile
+                 test/mesquite/unit/Makefile
+                 test/mesquite/parallel_untangle_shape/Makefile 
+                 test/mesquite/parallel_smooth_laplace/Makefile
+                 test/mesquite/wrapper_tests/Makefile
+                 test/mesquite/higher_order/Makefile
+                 test/mesquite/slaved/Makefile
+                 tools/mesquite/Makefile
+                 MeshFiles/mesquite/Makefile
+                 ])
+
+DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS --enable-static=$enable_static --enable-shared=$enable_shared"
 # DISTCHECK_CONFIGURE_FLAGS="$USER_CONFIGURE_CMD"
 # make distcheck will use this DISTCHECK_CONFIGURE_FLAGS 
 # variable to be passed to configure line
@@ -1339,6 +1639,29 @@ if test "x$WARN_PARALLEL_HDF5_NO_COMPLEX" = "xyes"; then
 *     patterns MOAB typically does this will result in degrading
 *     collective IO calls to independent IO, which may have a very
 *     significant impact on IO performance.
+*************************************************************************])
+fi
+
+
+# echo "Other details"
+# echo "Static: $enable_static"
+# echo "Shared: $enable_shared"
+# echo "BLAS: $enableblas"
+# echo "LAPACK: $enablelapack"
+# echo "Zoltan: $enablezoltan"
+# echo "Zlib: $enablezlib"
+# echo "SZip: $enableszip"
+
+
+if test "x$enable_pymoab" != "xno" && test "x$pymoab_custom_install" = "xyes" ; then
+AC_MSG_NOTICE([
+*************************************************************************
+*     The PyMOAB interface will be installed to a custom location.
+*     In order to access this module from a python interpreter, please add
+*     its install location to the PYTHONPATH environment variable:
+*
+*     export PYTHONPATH=$pythondir:\$PYTHONPATH
+*
 *************************************************************************])
 fi
 

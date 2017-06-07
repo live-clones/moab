@@ -18,14 +18,11 @@ AM_CPPFLAGS  = -I. \
                -I$(top_builddir)/src \
                -I$(top_srcdir)/src \
                -I$(top_srcdir)/src/parallel \
+               -I$(top_srcdir)/src/IntxMesh \
                -I$(top_srcdir)/src/io/mhdf/include
 
 if ENABLE_mbcoupler
   AM_CPPFLAGS += -I$(top_srcdir)/tools/mbcoupler
-endif
-
-if ENABLE_mbcslam
-  AM_CPPFLAGS += -I$(top_srcdir)/tools/mbcslam
 endif
 
 # Run parallel tests in parallel
@@ -37,15 +34,17 @@ endif
 TESTS = pcomm_unit \
         scdtest \
         pcomm_serial \
-	par_spatial_locator_test \
-	parallel_unit_tests \
+        par_spatial_locator_test \
+        parallel_unit_tests imoab_ptest2 \
+        uber_parallel_test \
+        hireconst_test_parallel \
         $(NETCDF_TESTS) \
         $(HDF5_TESTS) \
-        $(MBCSLAM_TESTS) $(IMESH_TESTS)
+        $(MBCSLAM_TESTS) $(IMESH_TESTS) $(IMOAB_TESTS)
 
 if HAVE_HDF5_PARALLEL
   HDF5_TESTS = parallel_hdf5_test mhdf_parallel parallel_write_test \
-        uber_parallel_test parallel_adj parmerge_test augment_with_ghosts
+         parallel_adj parmerge_test augment_with_ghosts uref_hirec_test_parallel
 else
   HDF5_TESTS = 
 endif
@@ -65,14 +64,15 @@ endif
 endif
 
 
-if ENABLE_mbcslam
 if HAVE_HDF5_PARALLEL
   MBCSLAM_TESTS = par_intx_sph 
 else
   MBCSLAM_TESTS =
 endif
-else
-  MBCSLAM_TESTS = 
+
+IMOAB_TESTS = 
+if ENABLE_FORTRAN
+   IMOAB_TESTS += imoab_ptest
 endif
 
 IMESH_TESTS = 
@@ -95,11 +95,11 @@ endif
 
 
 pcomm_unit_SOURCES = pcomm_unit.cpp
-parallel_hdf5_test_SOURCES = parallel_hdf5_test.cc
+parallel_hdf5_test_SOURCES = parallel_hdf5_test.cpp
 mhdf_parallel_SOURCES = mhdf_parallel.c
 mhdf_parallel_LDADD = $(LDADD) $(HDF5_LIBS)
 parallel_unit_tests_SOURCES = parallel_unit_tests.cpp
-parallel_write_test_SOURCES = parallel_write_test.cc
+parallel_write_test_SOURCES = parallel_write_test.cpp
 uber_parallel_test_SOURCES = uber_parallel_test.cpp
 pcomm_serial_SOURCES = pcomm_serial.cpp
 mbparallelcomm_test_SOURCES = mbparallelcomm_test.cpp
@@ -117,6 +117,11 @@ par_spatial_locator_test_SOURCES = par_spatial_locator_test.cpp
 parallel_adj_SOURCES = ../adj_moab_test.cpp
 parmerge_test_SOURCES = parmerge_test.cpp
 augment_with_ghosts_SOURCES = augment_with_ghosts.cpp
+imoab_ptest_SOURCES = imoab_ptest.F
+imoab_ptest_LDADD = $(LDADD) $(FCLIBS)
+imoab_ptest2_SOURCES = imoab_ptest2.cpp
+hireconst_test_parallel_SOURCES = hireconst_test_parallel.cpp
+uref_hirec_test_parallel_SOURCES = uref_hirec_test_parallel.cpp ../geomObject.cpp
 
 if ENABLE_imesh
 if HAVE_HDF5_PARALLEL
@@ -128,10 +133,9 @@ endif
 endif
 
 
-if ENABLE_mbcslam
-  par_intx_sph_SOURCES = par_intx_sph.cpp
-  par_intx_sph_LDADD = $(LDADD) ../../tools/mbcslam/libmbcslam.la  
-endif
+par_intx_sph_SOURCES = par_intx_sph.cpp
+par_intx_sph_LDADD = $(LDADD)  
+
 # Other files to clean up (e.g. output from tests)
 MOSTLYCLEANFILES = mhdf_ll.h5m tmp0.h5m tmp1.h5m tmp2.h5m tmp3.h5m \
                    partial0.vtk \
@@ -165,7 +169,8 @@ MOSTLYCLEANFILES = mhdf_ll.h5m tmp0.h5m tmp1.h5m tmp2.h5m tmp3.h5m \
                    TaskMesh_n2.0.h5m \
                    TaskMesh_n2.1.h5m \
                    testReadGhost_n2.0.h5m \
-                   testReadGhost_n2.1.h5m
+                   testReadGhost_n2.1.h5m \
+                   whole.h5m
 
 FORTDEFS = $(FCDEFS) 
 PPFCCOMPILE = $(FC) $(FORTDEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \

@@ -6,7 +6,6 @@ AM_CPPFLAGS  = -I$(top_srcdir)/src \
                -I$(top_srcdir)/test \
                -DMESHDIR=$(MESHDIR)
 
-
 lib_LTLIBRARIES = libMOABrefiner.la
 libMOABrefiner_la_LIBADD = $(top_builddir)/src/libMOAB.la
 
@@ -36,7 +35,7 @@ libMOABrefiner_la_include_HEADERS =
 
 libMOABrefiner_la_includedir = $(includedir)
 
-EXTRA_DIST = fourVolsBare.cub
+EXTRA_DIST = fourVolsBare.cub CMakeLists.txt
 
 # Automake doesn't seem to have a directory defined for
 # platform-dependent data (or include) files. So put 

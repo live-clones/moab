@@ -1,4 +1,4 @@
-SUBDIRS = dagmc h5file io fbigeom irel mbcslam
+SUBDIRS = h5file io fbigeom irel mbcslam
 
 EXTRA_DIST = 125hex.g \
              16_unmerged_hex.h5m \
@@ -8,6 +8,7 @@ EXTRA_DIST = 125hex.g \
              1khex.g \
              1tet.g \
              3k-tri-cube.h5m \
+             3k-tri-cube.vtk \
              3k-tri-sphere.vtk \
              4k-tri-plane.vtk \
              4tet.g \
@@ -43,6 +44,7 @@ EXTRA_DIST = 125hex.g \
              surfrandomtris-4part.h5m \
              hexes_mixed.vtk \
              32hex_ef.h5m \
+             brick.stp \
              brick1.vtk \
              brick2.vtk \
              hex01.vtk \
@@ -51,5 +53,17 @@ EXTRA_DIST = 125hex.g \
              quad_1000.h5m \
              quad_1000.vtk \
              spectral.h5m \
-             tet_brick.vtk
+             tet_brick.vtk \
+             test_geom.h5m \
+             sphere_quads_5.vtk \
+             sphere_quads_20.vtk \
+             sphere_tris_5.vtk \
+             sphere_tris_20.vtk \
+             sphere_quads_5_ML_0.h5m \
+             sphere_quads_5_ML_1.h5m \
+             circle_3.vtk \
+             circle_4.vtk \
+             circle_10.vtk \
+             circle_20.vtk \
+             torus_tris_12.vtk
 

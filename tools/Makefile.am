@@ -3,7 +3,8 @@ AM_CPPFLAGS =  -I$(top_srcdir)/src \
                -I$(top_builddir)/src \
                -I$(top_srcdir)/src/parallel \
                -I$(top_srcdir)/itaps \
-               -I$(top_builddir)/itaps/imesh
+               -I$(top_builddir)/itaps/imesh \
+               $(EIGEN3_INCLUDES)
 
 LDADD = $(top_builddir)/src/libMOAB.la
 if ENABLE_imesh
@@ -12,8 +13,18 @@ endif
 
 if HAVE_CGM
   AM_CPPFLAGS += $(CGM_CPPFLAGS)
+if USING_DEV_CGM
+  LDADD+=  ${CGM_DIR}/src/libcgm.la
+else
   LDADD+=  ${CGM_DIR}/lib/libcgm.la
-endif 
+endif
+endif
+
+if HAVE_CGM
+  geometry_DIR = geometry
+else
+  geometry_DIR = 
+endif
 
 # For old (pre 1.10.x) versions of Automake
 docdir = @docdir@
@@ -28,7 +39,8 @@ EXTRA_DIST = README.hexmodops \
              README.mbskin \
              README.mbsurfplot \
              README.mbtagprop \
-             README.spheredecomp
+             README.spheredecomp \
+             CMakeLists.txt
 
 if ENABLE_mbconvert
   bin_PROGRAMS += mbconvert
@@ -115,11 +127,12 @@ else
   mcnpmit_DIR =
 endif
 
-if ENABLE_dagmc
-  dagmc_DIR = dagmc
+
+if ENABLE_mesquite
+  mesquite_DIR = mesquite
 else
-  dagmc_DIR = 
-endif 
+  mesquite_DIR = 
+endif
 
 if PARALLEL
   parread = parread
@@ -136,15 +149,29 @@ endif
 if ENABLE_mbquality
   AM_CPPFLAGS += -I$(top_srcdir)/src/verdict
   bin_PROGRAMS += mbquality
+mbquality_SOURCES = quality.cpp
 endif
 
 if ENABLE_mbumr
   AM_CPPFLAGS += -I$(top_srcdir)/src/RefineMesh
   bin_PROGRAMS += mbumr
+mbumr_SOURCES = umr.cpp
+endif
+
+if ENABLE_mbtempest
+  AM_CPPFLAGS += $(TEMPESTREMAP_INCLUDE) -I$(top_srcdir)/src/Remapping -I$(top_srcdir)/src/IntxMesh
+  bin_PROGRAMS += mbtempest
+mbtempest_SOURCES = mbtempest.cpp
+mbtempest_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
 endif
 
 if ENABLE_mbmerge
   bin_PROGRAMS += mbmerge
+mbmerge_SOURCES = merge.cpp
+endif
+
+if ENABLE_mbhonodes
+  bin_PROGRAMS += mbhonodes
 endif
 
 noinst_PROGRAMS = $(parread)
@@ -153,14 +180,13 @@ SUBDIRS = . \
           $(refiner_DIR) \
           $(mbcoupler_DIR) \
           $(mbcslam_DIR) \
-          $(mbzoltan_DIR) \
           $(mcnpmit_DIR) \
           $(vtkMOABReader_DIR) \
-          $(dagmc_DIR) 
+          $(mesquite_DIR) \
+          $(geometry_DIR) 
 
 mbconvert_SOURCES = convert.cpp
-mbmerge_SOURCES = merge.cpp
-mbgsets_SOURCES = gsets.cc
+mbgsets_SOURCES = gsets.cpp
 hexmodops_SOURCES = makeops.cpp
 mbsize_SOURCES = measure.cpp measure.hpp size.cpp
 mbskin_SOURCES = skin.cpp
@@ -170,6 +196,8 @@ mbsurfplot_SOURCES = surfplot.cpp
 mbtagprop_SOURCES = parse.cpp parse.hpp propagate_tags.cpp
 mbmem_SOURCES = mbmem.cpp
 parread_SOURCES = parread.cpp
-mbquality_SOURCES = quality.cpp
-mbumr_SOURCES = umr.cpp
+mbhonodes_SOURCES = honodes.cpp
+
+bin_PROGRAMS += mbslavepart
+mbslavepart_SOURCES = mbslavepart.cpp
 

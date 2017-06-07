@@ -2,7 +2,6 @@
 # Optional tools
 option ( MOAB_BUILD_MBCONVERT    "Build the MOAB mesh converter tool?"           ON )
 option ( MOAB_BUILD_HEXMODOPS    "Build the hexahedral modops tool?"             ON )
-option ( MOAB_BUILD_MBCHACO      "Build MOAB Chaco interface?"                  OFF )
 option ( MOAB_BUILD_MBSIZE       "Build the mbsize tool?"                        ON )
 option ( MOAB_BUILD_MBMEM        "Build the mbmem tool?"                         ON )
 option ( MOAB_BUILD_MBSKIN       "Build the mbskin tool?"                        ON )
@@ -12,12 +11,20 @@ option ( MOAB_BUILD_MBGSETS      "Build the mbgsets tool?"                      
 option ( MOAB_BUILD_SPHEREDECOMP "Build the sphere decomposition tool?"          ON )
 option ( MOAB_BUILD_MBSURFPLOT   "Build the mbsurfplot application?"             ON )
 option ( MOAB_BUILD_MBPART       "Build the mbpart (Zoltan-based) partitioner?" OFF )
-option ( MOAB_BUILD_DAGMC        "Build the dagmc tool?"                         ON )
+option ( MOAB_BUILD_MBSLAVEPART  "Build the slave partitioner tool?"             ON )
 option ( MOAB_BUILD_MBCOUPLER    "Build the mesh coupler tool?"                  ON )
+option ( MOAB_BUILD_MBHONODES    "Build the hex8 to hex27 converter tool?"       ON )
+option ( MOAB_BUILD_MBUMR        "Build the uniform mesh refinement tool?"       ON )
+option ( MOAB_BUILD_MBQUALITY    "Build the quality metrics tool?"               ON )
+option ( MOAB_BUILD_MBTEMPEST    "Build the TempestRemap coupler tool?"         OFF )
 
 if ( MOAB_HAVE_MPI AND MPI_FOUND )
   add_subdirectory( refiner )
 endif ( )
+
+if (ENABLE_MESQUITE AND MOAB_HAVE_CGM)
+  # add_subdirectory(mesquite)
+endif(ENABLE_MESQUITE AND MOAB_HAVE_CGM)
 
 include_directories(
   ${CMAKE_BINARY_DIR}
@@ -28,9 +35,10 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-set( TOOLS_LINK_LIBS MOAB )
+set( TOOLS_LINK_LIBS MOAB ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES} )
 if ( MOAB_HAVE_CGM )
   set( TOOLS_LINK_LIBS ${TOOLS_LINK_LIBS} ${CGM_LIBRARIES} )
+  add_subdirectory( geometry )
 endif ( MOAB_HAVE_CGM )
 
 # MBSIZE
@@ -69,6 +77,20 @@ if ( MOAB_BUILD_MBCONVERT )
   set( MOAB_HAVE_MBCONVERT 1 )
   install(
     TARGETS mbconvert
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    )
+endif ( )
+
+# MBHONODES
+if ( MOAB_BUILD_MBHONODES )
+  add_executable( mbhonodes honodes.cpp)
+  set_source_files_properties( honodes.cpp COMPILE_FLAGS "${MOAB_DEFINES}" )
+  target_link_libraries( mbhonodes ${TOOLS_LINK_LIBS} )
+  set( MOAB_HAVE_MBHONODES 1 )
+  install(
+    TARGETS mbhonodes
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -133,8 +155,8 @@ endif ( )
 
 # MBGSETS
 if ( MOAB_BUILD_MBGSETS )
-  add_executable( mbgsets gsets.cc )
-  set_source_files_properties( gsets.cc COMPILE_FLAGS "${MOAB_DEFINES}" )
+  add_executable( mbgsets gsets.cpp )
+  set_source_files_properties( gsets.cpp COMPILE_FLAGS "${MOAB_DEFINES}" )
   target_link_libraries( mbgsets ${TOOLS_LINK_LIBS} )
   set( MOAB_HAVE_MBGSETS 1 )
   install(
@@ -145,18 +167,70 @@ if ( MOAB_BUILD_MBGSETS )
     )
 endif( )
 
-# CGM + DagMC
-if ( MOAB_BUILD_DAGMC )
-  add_subdirectory( dagmc )
+# MBUMR
+if ( MOAB_BUILD_MBUMR )
+  add_executable( mbumr umr.cpp )
+  set_source_files_properties( umr.cpp COMPILE_FLAGS "${MOAB_DEFINES}" )
+  target_link_libraries( mbumr ${TOOLS_LINK_LIBS} )
+  set( MOAB_HAVE_MBUMR 1 )
+  install(
+    TARGETS mbumr
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    )
+endif( )
+
+# MBSLAVEPART
+if ( MOAB_BUILD_MBSLAVEPART )
+  add_executable( mbslavepart mbslavepart.cpp)
+  set_source_files_properties( mbslavepart.cpp COMPILE_FLAGS "${MOAB_DEFINES}" )
+  target_link_libraries( mbslavepart ${TOOLS_LINK_LIBS} )
+  set( MOAB_HAVE_MBSLAVEPART 1 )
+  install(
+    TARGETS mbslavepart
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    )
+endif( )
+
+# MBTEMPEST
+if ( MOAB_BUILD_MBTEMPEST AND MOAB_HAVE_TEMPEST )
+  add_executable( mbtempest mbtempest.cpp)
+  set_source_files_properties( mbtempest.cpp COMPILE_FLAGS "${MOAB_DEFINES}" )
+  target_link_libraries( mbtempest ${TOOLS_LINK_LIBS} )
+  set( MOAB_HAVE_MBTEMPEST 1 )
+  install(
+    TARGETS mbtempest
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    )
+endif( )
+
+# MBQUALITY
+if ( MOAB_BUILD_MBQUALITY )
+  add_executable( mbquality quality.cpp )
+  set_source_files_properties( quality.cpp COMPILE_FLAGS "${MOAB_DEFINES}" )
+  target_link_libraries( mbquality ${TOOLS_LINK_LIBS} )
+  set( MOAB_HAVE_MBQUALITY 1 )
+  install(
+    TARGETS mbquality
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    )
 endif( )
 
 # Zoltan
-if ( MOAB_BUILD_MBPART AND ( MOAB_HAVE_ZOLTAN OR MOAB_HAVE_METIS ) )
+if ( MOAB_BUILD_MBPART OR ( MOAB_HAVE_ZOLTAN OR MOAB_HAVE_METIS ) )
+  set(MOAB_BUILD_MBPART ON)
   # Build the mbpart executable
   add_executable( mbpart mbpart.cpp )
   include_directories( ${ZOLTAN_INCLUDES} ${PARMETIS_INCLUDES} ${METIS_INCLUDES} )
   if (MOAB_HAVE_CGM)
-    include_directories( ${CGM_INCLUDE_DIRS} )
+    include_directories( ${CGM_INCLUDES} )
   endif (MOAB_HAVE_CGM)
   set_source_files_properties( mbpart.cpp COMPILE_FLAGS "${MOAB_DEFINES}" )
   target_link_libraries( mbpart ${TOOLS_LINK_LIBS} ${ZOLTAN_LIBRARIES} ${PARMETIS_LIBRARIES} ${METIS_LIBRARIES} )
@@ -167,7 +241,7 @@ if ( MOAB_BUILD_MBPART AND ( MOAB_HAVE_ZOLTAN OR MOAB_HAVE_METIS ) )
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     )
-endif ( MOAB_BUILD_MBPART AND ( MOAB_HAVE_ZOLTAN OR MOAB_HAVE_METIS ) )
+endif ( MOAB_BUILD_MBPART OR ( MOAB_HAVE_ZOLTAN OR MOAB_HAVE_METIS ) )
 
 # MBCoupler
 if ( ENABLE_IMESH AND MOAB_HAVE_MPI AND MPI_FOUND AND MOAB_BUILD_MBCOUPLER )
@@ -186,3 +260,4 @@ if( MOAB_BUILD_HEXMODOPS )
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     )
 endif()
+

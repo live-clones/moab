@@ -5907,7 +5907,7 @@ ErrorCode ParallelComm::get_remote_handles(EntityHandle *local_vec, EntityHandle
       this_incoming++;
       PRINT_DEBUG_IRECV(procConfig.proc_rank(), to_proc, (unsigned char*)ack_buff,
                         sizeof(int), mesg_tag - 1, this_incoming);
-      success = MPI_Irecv(ack_buff, sizeof(int),
+      success = MPI_Irecv((void*)ack_buff, sizeof(int),
                           MPI_UNSIGNED_CHAR, to_proc,
                           mesg_tag - 1, procConfig.proc_comm(),
                           &ack_req);
@@ -8301,7 +8301,7 @@ ErrorCode ParallelComm::get_remote_handles(EntityHandle *local_vec, EntityHandle
     // Set up to receive data
     for (int i = 0; i < num_proc; i++) {
       result[i].resize(sizes_recv[i]);
-      ierr = MPI_Irecv(&result[i][0],
+      ierr = MPI_Irecv( (void *)( &(result[i][0]) ),
                        sizeof(SharedEntityData)*sizes_recv[i],
                        MPI_UNSIGNED_CHAR,
                        buffProcs[i], tag, cm, &recv_req[i]);
@@ -8311,7 +8311,7 @@ ErrorCode ParallelComm::get_remote_handles(EntityHandle *local_vec, EntityHandle
 
     // Send data
     for (int i = 0; i < num_proc; i++) {
-      ierr = MPI_Isend(&send_data[i][0],
+      ierr = MPI_Isend((void *)( &(send_data[i][0]) ),
                        sizeof(SharedEntityData)*sizes_send[i],
                        MPI_UNSIGNED_CHAR,
                        buffProcs[i], tag, cm, &send_req[i]);
@@ -8949,15 +8949,13 @@ ErrorCode ParallelComm::get_remote_handles(EntityHandle *local_vec, EntityHandle
           // Now get the number of nodes on this (now local) edge
           int nverts;
           UNPACK_INT(buff->buff_ptr, nverts);
-          assert(nverts==(int)intx_nodes.size());
-          // Get the positions communicated
           std::vector<double> pos_from_owner;
           pos_from_owner.resize(3*nverts);
           UNPACK_DBLS(buff->buff_ptr, &pos_from_owner[0], 3*nverts);
-          std::vector<double> current_positions(3*nverts);
-          result = mbImpl->get_coords(&intx_nodes[0], nverts, &current_positions[0]);MB_CHK_SET_ERR(result, "Failed to get current positions");
+          std::vector<double> current_positions(3*intx_nodes.size());
+          result = mbImpl->get_coords(&intx_nodes[0], intx_nodes.size(), &current_positions[0]);MB_CHK_SET_ERR(result, "Failed to get current positions");
           // Now, look at what we have in current pos, compare to pos from owner, and reset
-          for (int k = 0; k < nverts; k++) {
+          for (int k = 0;  k < (int)intx_nodes.size(); k++) {
             double * pk = &current_positions[3*k];
             // Take the current pos k, and settle among the ones from owner:
             bool found = false;
@@ -8972,12 +8970,14 @@ ErrorCode ParallelComm::get_remote_handles(EntityHandle *local_vec, EntityHandle
               }
             }
             if (!found) {
+#ifndef  NDEBUG
               std::cout << " pk:" << pk[0] << " " << pk[1] << " " << pk[2] << " not found \n";
+#endif
               result = MB_FAILURE;
             }
           }
           // After we are done resetting, we can set the new positions of nodes:
-          result = mbImpl->set_coords(&intx_nodes[0], nverts, &current_positions[0]);MB_CHK_SET_ERR(result, "Failed to set new current positions");
+          result = mbImpl->set_coords(&intx_nodes[0], (int)intx_nodes.size(), &current_positions[0]);MB_CHK_SET_ERR(result, "Failed to set new current positions");
         }
       }
     }

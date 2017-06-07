@@ -40,9 +40,7 @@ const char ZOLTAN_OCTPART_METHOD[] = "OCTPART";
 #endif
 
 const char METIS_DEFAULT_METHOD[] = "ML_KWAY";
-#ifdef MOAB_HAVE_METIS
-const char METIS_ALTERNATIVE_METHOD[] = "ML_RB";
-#endif
+/* const char METIS_ALTERNATIVE_METHOD[] = "ML_RB"; */
 
 const char BRIEF_DESC[] = "Use Zoltan or Metis to partition MOAB meshes for use on parallel computers";
 std::ostringstream LONG_DESC;
@@ -227,7 +225,7 @@ int main(int argc, char* argv[])
 #ifdef MOAB_HAVE_METIS
   MetisPartitioner *metis_tool = NULL;
   if (moab_use_metis && !metis_tool) {
-    metis_tool = new MetisPartitioner (&mb, false, argc, argv);
+    metis_tool = new MetisPartitioner (&mb, false);
   }
 
   if ((aggregating_tag.empty() && partition_tagged_sets) || (aggregating_tag.empty() && partition_tagged_ents))
@@ -491,7 +489,7 @@ int main(int argc, char* argv[])
       rval = mb.write_file(tmp_output_file.str().c_str());
       if (MB_SUCCESS != rval)
       {
-        std::cerr << tmp_output_file << " : failed to write file." << std::endl;
+        std::cerr << tmp_output_file.str() << " : failed to write file." << std::endl;
         std::cerr << "  Error code: " << mb.get_error_string(rval) << " ("
                   << rval << ")" << std::endl;
         std::string errstr;

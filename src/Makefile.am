@@ -3,19 +3,16 @@ AUTOMAKE_OPTIONS = foreign subdir-objects
 
 # Things to build
 lib_LTLIBRARIES = libMOAB.la 
-AM_CPPFLAGS =
+AM_CPPFLAGS = 
 
 # Subdirectories to build
-SUBDIRS =
-libMOAB_la_LIBADD =
-if PARALLEL
-  SUBDIRS += parallel
-  libMOAB_la_LIBADD += parallel/libMOABpar.la
-  AM_CPPFLAGS += -I$(srcdir)/parallel
-endif
+SUBDIRS = io .
+libMOAB_la_LIBADD = io/libmoabio.la
+EXTRA_DIST = 
 
-SUBDIRS += io LocalDiscretization verdict RefineMesh .
-libMOAB_la_LIBADD += io/libmoabio.la LocalDiscretization/libLocalDiscretization.la verdict/libmoabverdict.la RefineMesh/libRefineMesh.la
+if ENABLE_mesquite
+SUBDIRS += mesquite
+endif
 
 # Some variables
 AM_CPPFLAGS += -DIS_BUILDING_MB \
@@ -26,7 +23,9 @@ AM_CPPFLAGS += -DIS_BUILDING_MB \
                -I$(srcdir)/parallel \
                -I$(srcdir)/LocalDiscretization \
                -I$(srcdir)/verdict \
-               -I$(srcdir)/RefineMesh
+               -I$(srcdir)/RefineMesh \
+               -I$(srcdir)/DiscreteGeometry \
+               -I$(srcdir)/IntxMesh
 
 # The directory in which to install headers
 libMOAB_la_includedir = $(includedir)
@@ -56,6 +55,8 @@ libMOAB_la_SOURCES = \
   DenseTag.hpp \
   DenseTag.cpp \
   DualTool.cpp \
+  DiscreteGeometry/DGMSolver.cpp \
+  DiscreteGeometry/HiReconstruction.cpp \
   ElementSequence.hpp \
   EntitySequence.cpp \
   EntitySequence.hpp \
@@ -66,12 +67,18 @@ libMOAB_la_SOURCES = \
   FBEngine.cpp \
   FileOptions.cpp \
   GeomUtil.cpp \
+  GeomQueryTool.cpp \
   GeomTopoTool.cpp \
   HalfFacetRep.cpp \
   HigherOrderFactory.cpp \
   HomXform.cpp \
   iMOAB.cpp \
   Internals.hpp \
+  IntxMesh/Intx2Mesh.cpp  \
+  IntxMesh/Intx2MeshInPlane.cpp  \
+  IntxMesh/Intx2MeshOnSphere.cpp \
+  IntxMesh/IntxRllCssphere.cpp \
+  IntxMesh/IntxUtils.cpp \
   LloydSmoother.cpp \
   MBCNArrays.hpp \
   MergeMesh.cpp \
@@ -82,12 +89,20 @@ libMOAB_la_SOURCES = \
   MeshTag.hpp \
   MeshTag.cpp \
   MeshTopoUtil.cpp \
+  NestedRefine.cpp \
   OrientedBox.cpp \
   OrientedBoxTreeTool.cpp \
   lotte/poly.c \
   lotte/findpt.c \
   lotte/errmem.c \
   lotte/tensor.c \
+  LocalDiscretization/ElemEvaluator.cpp \
+  LocalDiscretization/LinearHex.cpp \
+  LocalDiscretization/LinearQuad.cpp \
+  LocalDiscretization/LinearTet.cpp \
+  LocalDiscretization/LinearTri.cpp \
+  LocalDiscretization/QuadraticHex.cpp \
+  MeshGeneration.cpp \
   PolyElementSeq.cpp \
   PolyElementSeq.hpp \
   ProgOptions.cpp \
@@ -145,6 +160,21 @@ libMOAB_la_SOURCES = \
   VarLenTag.hpp \
   VertexSequence.hpp \
   VertexSequence.cpp \
+  verdict/V_EdgeMetric.cpp \
+  verdict/V_GaussIntegration.cpp \
+  verdict/V_HexMetric.cpp \
+  verdict/V_KnifeMetric.cpp \
+  verdict/V_PyramidMetric.cpp \
+  verdict/V_QuadMetric.cpp \
+  verdict/V_TetMetric.cpp \
+  verdict/V_TriMetric.cpp \
+  verdict/V_WedgeMetric.cpp \
+  verdict/V_GaussIntegration.hpp \
+  verdict/verdict_defines.hpp \
+  verdict/v_vector.h \
+  verdict/VerdictVector.cpp \
+  verdict/VerdictVector.hpp \
+  verdict/VerdictWrapper.cpp \
   WriteUtil.cpp \
   WriteUtil.hpp \
   moab_mpe.h
@@ -166,6 +196,7 @@ nobase_libMOAB_la_include_HEADERS = \
   moab/CpuTimer.hpp \
   moab/DualTool.hpp \
   moab/Error.hpp \
+  moab/GeomQueryTool.hpp \
   moab/GeomTopoTool.hpp \
   moab/HalfFacetRep.hpp \
   moab/HigherOrderFactory.hpp \
@@ -182,19 +213,12 @@ nobase_libMOAB_la_include_HEADERS = \
   moab/iMOAB.h \
   moab/imoab_protos.h \
   moab/LloydSmoother.hpp \
-  moab/point_locater/tree/common_tree.hpp \
-  moab/point_locater/tree/element_tree.hpp \
-  moab/point_locater/tree/bvh_tree.hpp \
-  moab/point_locater/io.hpp  \
-  moab/point_locater/element_maps/linear_hex_map.hpp  \
-  moab/point_locater/element_maps/linear_tet_map.hpp  \
-  moab/point_locater/element_maps/spectral_hex_map.hpp  \
-  moab/point_locater/element_maps/quadratic_hex_map.hpp  \
-  moab/point_locater/point_locater.hpp \
-  moab/point_locater/parametrizer.hpp \
+  moab/NestedRefine.hpp \
+  moab/NestedRefineTemplates.hpp \
   moab/Matrix3.hpp \
   moab/MergeMesh.hpp \
   moab/MeshTopoUtil.hpp \
+  moab/MeshGeneration.hpp \
   moab/OrientedBox.hpp \
   moab/OrientedBoxTreeTool.hpp \
   moab/PartitionerBase.hpp \
@@ -217,15 +241,125 @@ nobase_libMOAB_la_include_HEADERS = \
   moab/Types.hpp \
   moab/UnknownInterface.hpp \
   moab/Util.hpp \
+  moab/verdict.h \
   moab/WriteUtilIface.hpp \
   moab/WriterIface.hpp \
+  moab/ElemEvaluator.hpp \
   MBEntityType.h \
   MBCN.h \
   MBCN_protos.h \
   MBTagConventions.hpp 
 
+verdictincludedir = $(includedir)/moab/verdict
+verdictinclude_HEADERS = \
+  moab/verdict/VerdictWrapper.hpp
+
+discretegeomincludedir = $(includedir)/moab/DiscreteGeometry
+discretegeominclude_HEADERS = \
+	moab/DiscreteGeometry/DGMSolver.hpp \
+	moab/DiscreteGeometry/HiReconstruction.hpp
+
+localdiscincludedir = $(includedir)/moab/LocalDiscretization
+localdiscinclude_HEADERS = \
+  moab/LocalDiscretization/LinearHex.hpp \
+  moab/LocalDiscretization/LinearQuad.hpp \
+  moab/LocalDiscretization/LinearTet.hpp \
+  moab/LocalDiscretization/LinearTri.hpp \
+  moab/LocalDiscretization/QuadraticHex.hpp
+
+pointlocincludedir = $(includedir)/moab/point_locater
+pointlocinclude_HEADERS = \
+  moab/point_locater/tree/common_tree.hpp \
+  moab/point_locater/tree/element_tree.hpp \
+  moab/point_locater/tree/bvh_tree.hpp \
+  moab/point_locater/io.hpp  \
+  moab/point_locater/element_maps/linear_hex_map.hpp  \
+  moab/point_locater/element_maps/linear_tet_map.hpp  \
+  moab/point_locater/element_maps/spectral_hex_map.hpp  \
+  moab/point_locater/element_maps/quadratic_hex_map.hpp  \
+  moab/point_locater/point_locater.hpp \
+  moab/point_locater/parametrizer.hpp
+
+intxmeshincludedir = $(includedir)/moab/IntxMesh
+intxmeshinclude_HEADERS = \
+	moab/IntxMesh/Intx2Mesh.hpp \
+	moab/IntxMesh/IntxUtils.hpp \
+  moab/IntxMesh/Intx2MeshInPlane.hpp \
+  moab/IntxMesh/Intx2MeshOnSphere.hpp \
+  moab/IntxMesh/IntxRllCssphere.hpp   
+
+# Conditional sources
+if ENABLE_mbtempest
+MOAB_REMAPPING_SRCS = 
+
+MOAB_REMAPPING_HDRS = \
+	moab/Remapping/Remapper.hpp
+
+AM_CPPFLAGS += -I$(srcdir)/Remapping
+
+if HAVE_TEMPESTREMAP
+  AM_CPPFLAGS += $(TEMPESTREMAP_INCLUDE)
+  AM_LDFLAGS += $(TEMPESTREMAP_LIBS)
+
+  MOAB_REMAPPING_SRCS += \
+     Remapping/TempestRemapper.cpp  \
+     Remapping/TempestLinearRemap.cpp \
+     Remapping/TempestOfflineMap.cpp
+
+  MOAB_REMAPPING_HDRS += \
+     moab/Remapping/TempestRemapper.hpp \
+     moab/Remapping/TempestOfflineMap.hpp
+
+endif # if HAVE_TEMPESTREMAP
+
+# Add the remapping sources to the library
+libMOAB_la_SOURCES += $(MOAB_REMAPPING_SRCS)
+# Add the include headers to installation paths
+remappingincludedir = $(includedir)/moab/Remapping
+remappinginclude_HEADERS = $(MOAB_REMAPPING_HDRS)
+
+endif # if ENABLE_mbtempest
+
 if HAVE_HDF5
   nobase_libMOAB_la_include_HEADERS += moab/mhdf_public.h
+endif
+
+if PARALLEL
+#  	 IntxMesh/wrap_intx.cpp
+  libMOAB_la_SOURCES += \
+     parallel/ParallelComm.cpp \
+     parallel/ProcConfig.cpp \
+     parallel/ParallelData.cpp \
+     parallel/ParallelMergeMesh.cpp \
+     parallel/ReadParallel.cpp \
+     parallel/ReadParallel.hpp \
+     parallel/SharedSetData.cpp \
+     parallel/SharedSetData.hpp \
+     parallel/gs.cpp
+
+if HAVE_HDF5_PARALLEL
+  libMOAB_la_SOURCES += parallel/WriteHDF5Parallel.cpp \
+                        parallel/WriteHDF5Parallel.hpp
+endif
+
+mpiparallelincludedir = $(includedir)
+mpiparallelinclude_HEADERS = \
+     parallel/moab_mpi.h \
+     parallel/moab_mpi_config.h \
+     parallel/MBParallelConventions.h
+
+moabparallelincludedir = $(includedir)/moab
+moabparallelinclude_HEADERS = \
+     parallel/moab/gs.hpp \
+     parallel/moab/ParallelComm.hpp \
+     parallel/moab/ParallelMergeMesh.hpp \
+     parallel/moab/ProcConfig.hpp \
+     parallel/moab/ParallelData.hpp
+
+  AM_CPPFLAGS += -I$(srcdir)/parallel
+
+EXTRA_DIST += parallel/CMakeLists.txt
+
 endif
 
 if ENABLE_metis
@@ -251,4 +385,6 @@ endif
 if HAVE_CGM
   AM_CPPFLAGS += @CGM_CPPFLAGS@ 
 endif
+
+EXTRA_DIST += CMakeLists.txt
 

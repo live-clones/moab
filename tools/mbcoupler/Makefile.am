@@ -10,7 +10,8 @@ AM_CPPFLAGS =  -DIS_BUILDING_MB \
                -I$(top_srcdir)/src/parallel \
                -I$(top_srcdir)/src/LocalDiscretization \
                -I$(top_srcdir)/src/moab/point_locater/lotte \
-               -I$(top_srcdir)/test 
+               -I$(top_srcdir)/test \
+               $(EIGEN3_INCLUDES)
 
 lib_LTLIBRARIES = libmbcoupler.la
 libmbcoupler_la_LIBADD = $(top_builddir)/src/libMOAB.la 
@@ -57,4 +58,5 @@ endif
 # Run parallel tests with mpiexec
 LOG_COMPILER = `if echo "$(PARALLEL_TESTS)" | $(GREP) "$$p" > /dev/null; then echo "${MPIEXEC} ${MPIEXEC_NP} ${NP}"; else echo ""; fi`
 
+EXTRA_DIST = CMakeLists.txt
 MOSTLYCLEANFILES = dum.h5m
