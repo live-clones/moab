@@ -20,6 +20,8 @@
 #include <set>
 #include <iostream>
 
+#include "MOAB_export.h"
+
 namespace moab {
 
     class ElemEvaluator;
@@ -275,7 +277,7 @@ namespace moab {
       std::vector<TreeNode> myTree;
       int splitsPerDir;
       EntityHandle startSetHandle;
-      static const char *treeName;
+      static MOAB_EXPORT const char *treeName;
     }; //class Bvh_tree
 
     inline unsigned int BVHTree::Bucket::bucket_index(int num_splits, const BoundBox &box, const BoundBox & interval, const unsigned int dim)

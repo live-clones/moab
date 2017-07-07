@@ -33,6 +33,8 @@
 #include <math.h>
 #include <ostream>
 
+#include "MOAB_export.h"
+
 namespace moab {
 
 class HomXform;
@@ -55,8 +57,8 @@ private:
 public:
   friend class HomXform;
 
-  static HomCoord unitv[3];
-  static HomCoord IDENTITY;
+  static MOAB_EXPORT HomCoord unitv[3];
+  static MOAB_EXPORT HomCoord IDENTITY;
 
     //! constructors
   HomCoord();
@@ -139,7 +141,7 @@ public:
 
   friend class HomCoord;
 
-  static HomXform IDENTITY;
+  static MOAB_EXPORT HomXform IDENTITY;
 
     //! constructor from matrix
   HomXform(const int matrix[16]);

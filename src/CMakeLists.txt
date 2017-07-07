@@ -1,3 +1,5 @@
+SET(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}
                     ${CMAKE_CURRENT_BINARY_DIR}
                     parallel
@@ -244,7 +246,8 @@ set( MOAB_INSTALL_HEADERS
         MBEntityType.h
         MBCN.h
         MBCN_protos.h
-        MBTagConventions.hpp )
+        MBTagConventions.hpp
+        moab/MOAB_export.h )
 
 set( MOAB_GENERATED_INSTALL_HEADERS
      ${CMAKE_CURRENT_BINARY_DIR}/moab/EntityHandle.hpp
@@ -303,6 +306,9 @@ add_library(
 target_include_directories(MOAB
   PUBLIC
   "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
+
+include(GenerateExportHeader)
+generate_export_header(MOAB)
 
 set_target_properties(
   MOAB

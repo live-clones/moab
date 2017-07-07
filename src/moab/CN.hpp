@@ -38,6 +38,8 @@
 
 #include "moab/EntityType.hpp"
 
+#include "MOAB_export.h"
+
 namespace moab {
 
 enum {
@@ -54,19 +56,19 @@ class CN
 private:
 
 //! entity names
-  static const char *entityTypeNames[];
-
+  static MOAB_EXPORT const char *entityTypeNames[];
+  
 //! declare private constructor, since we don't want to create any of these
   CN();
 
 //! the basis of the numbering system (normally 0 or 1, 0 by default)
-  static short int numberBasis;
+  static MOAB_EXPORT short int numberBasis;
 
 //! switch the basis
   static void SwitchBasis(const int old_basis, const int new_basis);
-
-  static short increasingInts[];
-
+  
+  static MOAB_EXPORT short increasingInts[];
+  
 public:
 
   enum { MAX_NODES_PER_ELEMENT = 27 };
@@ -106,7 +108,7 @@ public:
     //  conn[k][l] (l=0..CN::VerticesPerEntity[target_type[k]]) = vertex connectivity of sub-facet k,
     //    with respect to entity i's canonical vertex ordering, or self (j=2)
     // (not documented with Doxygen)
-  static const ConnMap mConnectivityMap[MBMAXTYPE][3];
+  static MOAB_EXPORT const ConnMap mConnectivityMap[MBMAXTYPE][3];
 
     // structure used to define reverse canonical ordering information
     // (not documented with Doxygen)
@@ -126,7 +128,7 @@ public:
   static const UpConnMap mUpConnMap[MBMAXTYPE][4][4];
 
     // Mid-node bits indexed by number of nodes in element
-  static const unsigned char midNodesPerType[MBMAXTYPE][MAX_NODES_PER_ELEMENT+1];
+  static MOAB_EXPORT const unsigned char midNodesPerType[MBMAXTYPE][MAX_NODES_PER_ELEMENT+1];
 
     //! Permutation and reverse permutation vectors
   static short int permuteVec[MBMAXTYPE][3][MAX_SUB_ENTITIES+1];
@@ -135,7 +137,7 @@ public:
   //! this const vector defines the starting and ending EntityType for
   //! each dimension, e.g. TypeDimensionMap[2] returns a pair of EntityTypes
   //! bounding dimension 2.
-  static const DimensionPair TypeDimensionMap[];
+  static MOAB_EXPORT const DimensionPair TypeDimensionMap[];
 
   //! get the basis of the numbering system
   static short int GetBasis();

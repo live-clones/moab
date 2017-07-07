@@ -10,6 +10,8 @@
 #include <vector>
 #include "assert.h"
 
+#include "MOAB_export.h"
+
 namespace moab {
 
 class StructuredElementSeq;
@@ -113,7 +115,7 @@ public:
   enum PartitionMethod {ALLJORKORI = 0, ALLJKBAL, SQIJ, SQJK, SQIJK, TRIVIAL, RCBZOLTAN, NOPART};
 
     //! Partition method names
-  static const char *PartitionMethodNames[NOPART + 1];
+  static MOAB_EXPORT const char *PartitionMethodNames[NOPART + 1];
 
     //! partition method used to partition global parametric space
   int partMethod;

@@ -249,7 +249,8 @@ nobase_libMOAB_la_include_HEADERS = \
   MBEntityType.h \
   MBCN.h \
   MBCN_protos.h \
-  MBTagConventions.hpp
+  MBTagConventions.hpp \
+  moab/MOAB_export.h
 
 verdictincludedir = $(includedir)/moab/verdict
 verdictinclude_HEADERS = \

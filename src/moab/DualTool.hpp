@@ -19,6 +19,8 @@
 
 #include "moab/Forward.hpp"
 
+#include "MOAB_export.h"
+
 namespace moab {
 
 /*!
@@ -32,10 +34,10 @@ class DualTool
 {
 public:
     //! tag name for dual surfaces
-  static const char *DUAL_SURFACE_TAG_NAME;
+  static MOAB_EXPORT const char *DUAL_SURFACE_TAG_NAME;
 
     //! tag name for dual curves
-  static const char *DUAL_CURVE_TAG_NAME;
+  static MOAB_EXPORT const char *DUAL_CURVE_TAG_NAME;
 
     //! tag name for dual cells
   static const char *IS_DUAL_CELL_TAG_NAME;
