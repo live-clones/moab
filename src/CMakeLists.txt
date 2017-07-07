@@ -243,6 +243,7 @@ set( MOAB_INSTALL_HEADERS
         moab/WriterIface.hpp
         moab/verdict.h
         moab/verdict/VerdictWrapper.hpp
+        moab/win32_config.h
         MBEntityType.h
         MBCN.h
         MBCN_protos.h

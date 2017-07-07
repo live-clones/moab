@@ -19,11 +19,7 @@
 
 #include "moab/Forward.hpp"
 
-#ifdef WIN32
-#include "MOAB_export.h"
-#else
-#define MOAB_EXPORT   
-#endif
+#include "moab/win32_config.h"
 
 namespace moab {
 
