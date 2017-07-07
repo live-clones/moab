@@ -20,7 +20,11 @@
 #include <set>
 #include <iostream>
 
+#ifdef WIN32
 #include "MOAB_export.h"
+#else
+#define MOAB_EXPORT
+#endif
 
 namespace moab {
 

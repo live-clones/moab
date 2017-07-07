@@ -33,7 +33,11 @@
 #include <math.h>
 #include <ostream>
 
+#ifdef WIN32
 #include "MOAB_export.h"
+#else
+#define MOAB_EXPORT
+#endif
 
 namespace moab {
 
