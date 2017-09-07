@@ -748,9 +748,23 @@ ErrorCode ReadNCDF::read_elements(const Tag* file_id_tag)
     }
     ExoIIElementType elem_type = 
       ExoIIUtil::static_element_name_to_type(&dum_str[0]);
+
     (*this_it).elemType = elem_type;
 
     int verts_per_element = ExoIIUtil::VerticesPerElement[(*this_it).elemType];
+
+    if (elem_type== EXOII_MAX_ELEM_TYPE && verts_per_element==0)
+    {
+      std::string types(&dum_str[0]);
+      std::string shell("SHELL");
+      if(types.compare(0, 5, shell)==0)
+      {
+        std::string num=types.substr(5);
+        // convert a number
+        verts_per_element = atoi(&num[0]);
+      }
+    }
+
     int number_nodes = (*this_it).numElements*verts_per_element;
     const EntityType mb_type = ExoIIUtil::ExoIIElementMBEntity[(*this_it).elemType];
 
@@ -877,7 +891,7 @@ ErrorCode ReadNCDF::read_elements(const Tag* file_id_tag)
         return MB_FAILURE;
 
     }
-    else // this is regular
+    else if (mb_type < MBMAXTYPE)// this is regular
     {
       // Allocate an array to read in connectivity data
       readMeshIface->get_element_connect(
@@ -961,6 +975,84 @@ ErrorCode ReadNCDF::read_elements(const Tag* file_id_tag)
         readMeshIface->assign_ids(*file_id_tag, range, this_it->startExoId);
       }
     } // end regular block (not polygon)
+    else
+    {
+      // new case, just a polygon with many edges, convert it to edges
+      if ( (*this_it).numElements==1)
+      {
+        // create this many edges here, as the number of nodes per element (considered
+        // actually a polygon:
+        // Allocate an array to read in connectivity data, as edges
+        readMeshIface->get_element_connect(
+            verts_per_element,
+            2,
+            MBEDGE,
+            this_it->startExoId,
+            this_it->startMBId,
+            conn);
+
+        // Create a range for this sequence of elements
+        EntityHandle start_range, end_range;
+        start_range = (*this_it).startMBId;
+        end_range = start_range + verts_per_element - 1;
+
+        Range new_range(start_range, end_range);
+        //Range<EntityHandle> new_range((*this_it).startMBId,
+        //                              (*this_it).startMBId + (*this_it).numElements - 1);
+
+        // Create a MBSet for this block and set the material tag
+
+        EntityHandle ms_handle;
+        if (mdbImpl->create_meshset(MESHSET_SET | MESHSET_TRACK_OWNER, ms_handle) != MB_SUCCESS)
+          return MB_FAILURE;
+
+        if (mdbImpl->add_entities(ms_handle, new_range) != MB_SUCCESS)
+          return MB_FAILURE;
+
+        // tmp_ptr is of type int* and points at the same place as conn
+        int* tmp_ptr = reinterpret_cast<int*>(conn);
+
+        // Read the connectivity into that memory,  this will take only part of the array
+        // 1/2 if sizeof(EntityHandle) == 64 bits.
+        count[0] = 1;
+        count[1] = verts_per_element;
+        fail = nc_get_vara_int(ncFile, nc_var, start, count, tmp_ptr);
+        if (NC_NOERR != fail) {
+          MB_SET_ERR(MB_FAILURE, "ReadNCDF:: Problem getting connectivity");
+        }
+
+        // Convert from exodus indices to vertex handles.
+        // Iterate backwards in case handles are larger than ints.
+        for (int i = number_nodes - 1; i >= 0; --i) {
+          if ((unsigned)tmp_ptr[i] >= nodesInLoadedBlocks.size()) {
+            MB_SET_ERR(MB_FAILURE, "Invalid node ID in block connectivity");
+          }
+          nodesInLoadedBlocks[tmp_ptr[i]] = 1;
+          conn[i] = static_cast<EntityHandle>(tmp_ptr[i]) + vertexOffset;
+        }
+        // now form edges, got backwards too
+        conn[2*number_nodes-1]=conn[0];
+        conn[2*number_nodes-2]=conn[number_nodes-1];
+        for (int i=number_nodes-2; i>=0; i--)
+        {
+          conn[2*i+1]=conn[i+1];
+          conn[2*i]= conn[i];
+        }
+
+        readMeshIface->update_adjacencies((*this_it).startMBId, number_nodes,
+                                          2, conn);
+
+        if (result == -1) {
+          MB_SET_ERR(MB_FAILURE, "ReadNCDF:: error getting element connectivity for block " << block_id);
+        }
+
+        // Set the block id with an offset
+        if (mdbImpl->tag_set_data(mMaterialSetTag, &ms_handle, 1, &block_id) != MB_SUCCESS)
+          return MB_FAILURE;
+        if (mdbImpl->tag_set_data(mGlobalIdTag, &ms_handle, 1, &block_id) != MB_SUCCESS)
+          return MB_FAILURE;
+      }
+    }
   }
 
   return MB_SUCCESS;
