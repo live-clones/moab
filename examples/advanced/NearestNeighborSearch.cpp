@@ -65,7 +65,7 @@ struct PointCloudAdaptor
     const coord_t d0=p1[0]-obj[offset];
     const coord_t d1=p1[1]-obj[offset+1];
     const coord_t d2=p1[2]-obj[offset+2];
-    return atan2((d0*d0+d1*d1+d2*d2),(std::sqrt(p1[0]*p1[0]+p1[1]*p1[1]+p1[2]*p1[2])*std::sqrt(obj[offset]*obj[offset]+obj[offset+1]*obj[offset+1]+obj[offset+2]*obj[offset+2])))*180/PI;
+    return atan2((d0*d0+d1*d1+d2*d2),(std::sqrt(p1[0]*p1[0]+p1[1]*p1[1]+p1[2]*p1[2])*std::sqrt(obj[offset]*obj[offset]+obj[offset+1]*obj[offset+1]+obj[offset+2]*obj[offset+2])))*180/M_PI;
   }
 
   inline coord_t kdtree_distance(const coord_t *p1, const size_t idx_p2, size_t size) const

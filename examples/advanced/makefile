@@ -4,7 +4,7 @@ include ../makefile.config
 default: all
 
 EXAMPLES =  ExtrudePoly
-PAREXAMPLES = LloydRelaxation CrystalRouterExample GenLargeMesh CoupleMGen
+PAREXAMPLES = LloydRelaxation CrystalRouterExample GenLargeMesh CoupleMGen NearestNeighborSearch
 EXOIIEXAMPLES = VisTags
 ALLEXAMPLES = ${EXAMPLES}
 
@@ -65,6 +65,15 @@ ifeq ("$(MOAB_MPI_ENABLED)-$(MOAB_HDF5_ENABLED)","yes-yes")
 endif
 
 run-CoupleMGen: CoupleMGen
+ifeq ("$(MOAB_MPI_ENABLED)-$(MOAB_HDF5_ENABLED)","yes-yes")
+	${RUNPARALLEL} ./CoupleMGen -M @NP@
+endif
+
+NearestNeighborSearch: NearestNeighborSearch.o ${MOAB_LIBDIR}/libMOAB.la
+	@echo "[CXXLD]  $@"
+	${VERBOSE}${MOAB_CXX} -o $@ $< ${MOAB_LIBS_LINK}
+
+run-NearestNeighborSearch: NearestNeighborSearch
 ifeq ("$(MOAB_MPI_ENABLED)-$(MOAB_HDF5_ENABLED)","yes-yes")
 	${RUNPARALLEL} ./CoupleMGen -M @NP@
 endif
