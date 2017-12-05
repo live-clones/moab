@@ -161,11 +161,11 @@ ErrorCode ReadCGNS::load_file(const char* filename,
 
       // Read nodes coordinates.
       cg_coord_read(filePtr, indexBase, indexZone, "CoordinateX",
-                    RealDouble, &beginPos, &endPos, coord_arrays[0]);
+                    CGNS_ENUMV( RealDouble ), &beginPos, &endPos, coord_arrays[0]);
       cg_coord_read(filePtr, indexBase, indexZone, "CoordinateY",
-                    RealDouble, &beginPos, &endPos, coord_arrays[1]);
+                    CGNS_ENUMV( RealDouble ), &beginPos, &endPos, coord_arrays[1]);
       cg_coord_read(filePtr, indexBase, indexZone, "CoordinateZ",
-                    RealDouble, &beginPos, &endPos, coord_arrays[2]);
+                    CGNS_ENUMV( RealDouble ), &beginPos, &endPos, coord_arrays[2]);
 
       // CGNS seems to always include the Z component, even if the mesh is 2D.
       // Check if Z is zero and determine mesh dimension.
@@ -175,11 +175,11 @@ ErrorCode ReadCGNS::load_file(const char* filename,
       for (long i = 0; i < num_verts; ++i, ++handle) {
         int index = i + 1;
 
-        node_id_map.insert(std::pair<long, EntityHandle>(index, handle)).second;
+        node_id_map.insert(std::pair<long, EntityHandle>(index, handle));
 
         sumZcoord += *(coord_arrays[2] + i);
       }
-      if (std::abs(sumZcoord) <= eps) mesh_dim = 2;
+      if (fabs(sumZcoord) <= eps) mesh_dim = 2;
 
       // Create reverse map from handle to id
       std::vector<int> ids(num_verts);
@@ -215,7 +215,7 @@ ErrorCode ReadCGNS::load_file(const char* filename,
       std::vector<int> volumeID(num_sections, 0);
 
       for (int section = 0; section < num_sections; ++section) {
-        ElementType_t elemsType;
+        CGNS_ENUMT( ElementType_t ) elemsType;
         int iparent_flag, nbndry;
         char sectionName[128];
         int verts_per_elem;
@@ -230,44 +230,44 @@ ErrorCode ReadCGNS::load_file(const char* filename,
         // Read element description in current section
 
         switch (elemsType) {
-          case BAR_2:
+          case CGNS_ENUMV( BAR_2 ):
             ent_type = MBEDGE;
             verts_per_elem = 2;
             break;
-          case TRI_3:
+          case CGNS_ENUMV( TRI_3 ):
             ent_type = MBTRI;
             verts_per_elem = 3;
             if (mesh_dim == 2)
               volumeID[section] = 1;
             break;
-          case QUAD_4:
+          case CGNS_ENUMV( QUAD_4 ):
             ent_type = MBQUAD;
             verts_per_elem = 4;
             if (mesh_dim == 2)
               volumeID[section] = 1;
             break;
-          case TETRA_4:
+          case CGNS_ENUMV( TETRA_4 ):
             ent_type = MBTET;
             verts_per_elem = 4;
             if (mesh_dim == 3)
               volumeID[section] = 1;
               break;
-          case PYRA_5:
+          case CGNS_ENUMV( PYRA_5 ):
             ent_type = MBPYRAMID;
             verts_per_elem = 5;
             if (mesh_dim == 3) volumeID[section] = 1;
               break;
-          case PENTA_6:
+          case CGNS_ENUMV( PENTA_6 ):
             ent_type = MBPRISM;
             verts_per_elem = 6;
             if (mesh_dim == 3) volumeID[section] = 1;
               break;
-          case HEXA_8:
+          case CGNS_ENUMV( HEXA_8 ):
             ent_type = MBHEX;
             verts_per_elem = 8;
             if (mesh_dim == 3) volumeID[section] = 1;
             break;
-          case MIXED:
+          case CGNS_ENUMV( MIXED ):
             ent_type = MBMAXTYPE;
             verts_per_elem = 0;
             break;
@@ -275,8 +275,8 @@ ErrorCode ReadCGNS::load_file(const char* filename,
             MB_SET_ERR(MB_INDEX_OUT_OF_RANGE, fileName << ": Trouble determining element type");
         }
 
-        if (elemsType == TETRA_4 || elemsType == PYRA_5 || elemsType == PENTA_6 || elemsType == HEXA_8 ||
-            elemsType == TRI_3   || elemsType == QUAD_4 || ((elemsType == BAR_2) && mesh_dim == 2)) {
+        if (elemsType == CGNS_ENUMV( TETRA_4 ) || elemsType == CGNS_ENUMV( PYRA_5 ) || elemsType == CGNS_ENUMV( PENTA_6 ) || elemsType == CGNS_ENUMV( HEXA_8 ) ||
+            elemsType == CGNS_ENUMV( TRI_3 )   || elemsType == CGNS_ENUMV( QUAD_4 ) || ((elemsType == CGNS_ENUMV( BAR_2 ) ) && mesh_dim == 2)) {
           // Read connectivity into conn_array directly
 
           cgsize_t iparentdata;
@@ -296,7 +296,7 @@ ErrorCode ReadCGNS::load_file(const char* filename,
           create_elements(sectionName, file_id_tag,
                           ent_type, verts_per_elem, section_offset, section_size , elemNodes);
         } // Homogeneous mesh type
-        else if (elemsType == MIXED) {
+        else if (elemsType == CGNS_ENUMV( MIXED )) {
           // We must first sort all elements connectivities into continuous vectors
 
           cgsize_t connDataSize;
@@ -321,31 +321,31 @@ ErrorCode ReadCGNS::load_file(const char* filename,
 
           int connIndex = 0;
           for (int i = beginPos; i <= endPos; i++) {
-            elemsType = ElementType_t(elemNodes[connIndex]);
+            elemsType = CGNS_ENUMT( ElementType_t )(elemNodes[connIndex]);
 
             // Get current cell node count.
             cg_npe(elemsType, &verts_per_elem);
 
             switch (elemsType) {
-              case BAR_2:
+              case CGNS_ENUMV( BAR_2 ):
                 count_EDGE += 1;
                 break;
-              case TRI_3:
+              case CGNS_ENUMV( TRI_3 ):
                 count_TRI += 1;
                 break;
-              case QUAD_4:
+              case CGNS_ENUMV( QUAD_4 ):
                 count_QUAD += 1;
                 break;
-              case TETRA_4:
+              case CGNS_ENUMV( TETRA_4 ):
                 count_TET += 1;
                 break;
-              case PYRA_5:
+              case CGNS_ENUMV( PYRA_5 ):
                 count_PYRA += 1;
                 break;
-              case PENTA_6:
+              case CGNS_ENUMV( PENTA_6 ):
                 count_PRISM += 1;
                 break;
-              case HEXA_8:
+              case CGNS_ENUMV( HEXA_8 ):
                 count_HEX += 1;
                 break;
               default:
@@ -372,43 +372,43 @@ ErrorCode ReadCGNS::load_file(const char* filename,
 
           connIndex = 0;
           for (int i = beginPos; i <= endPos; i++) {
-            elemsType = ElementType_t(elemNodes[connIndex]);
+            elemsType = CGNS_ENUMT( ElementType_t )(elemNodes[connIndex]);
 
             // Get current cell node count.
             cg_npe(elemsType, &verts_per_elem);
 
             switch (elemsType) {
-              case BAR_2:
+              case CGNS_ENUMV( BAR_2 ):
                 for (int j = 0; j < 2; ++j)
                   elemsConn_EDGE[idx_edge + j] = elemNodes[connIndex + j + 1];
                 idx_edge += 2;
                 break;
-              case TRI_3:
+              case CGNS_ENUMV( TRI_3 ):
                 for (int j = 0; j < 3; ++j)
                   elemsConn_TRI[idx_tri + j] = elemNodes[connIndex + j + 1];
                 idx_tri += 3;
                 break;
-              case QUAD_4:
+              case CGNS_ENUMV( QUAD_4 ):
                 for (int j = 0; j < 4; ++j)
                   elemsConn_QUAD[idx_quad + j] = elemNodes[connIndex + j + 1];
                 idx_quad += 4;
                 break;
-              case TETRA_4:
+              case CGNS_ENUMV( TETRA_4 ):
                 for (int j = 0; j < 4; ++j)
                   elemsConn_TET[idx_tet + j] = elemNodes[connIndex + j + 1];
                 idx_tet += 4;
                 break;
-              case PYRA_5:
+              case CGNS_ENUMV( PYRA_5 ):
                 for (int j = 0; j < 5; ++j)
                   elemsConn_PYRA[idx_pyra + j] = elemNodes[connIndex + j + 1];
                 idx_pyra += 5;
                 break;
-              case PENTA_6:
+              case CGNS_ENUMV( PENTA_6 ):
                 for (int j = 0; j < 6; ++j)
                   elemsConn_PRISM[idx_prism + j] = elemNodes[connIndex + j + 1];
                 idx_prism += 6;
                 break;
-              case HEXA_8:
+              case CGNS_ENUMV( HEXA_8 ):
                 for (int j = 0; j < 8; ++j)
                   elemsConn_HEX[idx_hex + j] = elemNodes[connIndex + j + 1];
                 idx_hex += 8;

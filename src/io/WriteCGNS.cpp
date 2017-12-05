@@ -11,7 +11,7 @@
 #include <fstream>
 #include <map>
 #include <set>
-
+#include <cmath>
 #include <iostream>
 
 namespace moab {
@@ -115,7 +115,7 @@ ErrorCode WriteCGNS::write_file(const char *file_name,
   isize[2] = 0;            // isize[2] = 0 for unsorted elements 
   // Create zone */
   // ZoneType_t: Unstructured
-  if ( cg_zone_write(IndexFile,IndexBase,ZoneName,isize,Unstructured,&IndexZone) ){
+  if ( cg_zone_write(IndexFile,IndexBase,ZoneName,isize,CGNS_ENUMV( Unstructured ),&IndexZone) ){
     std::cout << "Error creating CGNS zone\n";
     cg_error_exit();
   }  
@@ -347,33 +347,33 @@ ErrorCode WriteCGNS::write_coord_cgns(std::vector< moab::EntityHandle > &Nodes_)
 
   for (std::vector<moab::EntityHandle>::iterator i=Nodes_.begin(); i != Nodes_.end(); ++i){
     CoordX.push_back(*c);  // Put the X coordinate in CoordX vector
-    SumX += abs(*c);       // Sum all X coordinates
+    SumX += fabs(*c);       // Sum all X coordinates
     ++c;                   // Move to Y coordinate
     CoordY.push_back(*c);  // Put the Y coordinate in CoordY vector
-    SumY += abs(*c);       // Sum all Y coordinates
+    SumY += fabs(*c);       // Sum all Y coordinates
     ++c;                   // Move to Z coordinate
     CoordZ.push_back(*c);  // Put the Z coordinate in CoordZ vector
-    SumZ += abs(*c);       // Sum all Z coordinates
+    SumZ += fabs(*c);       // Sum all Z coordinates
     ++c;                   // Move to X coordinate
   }       
 
   // If X coordinate is not empty then write CoordX (user must use SIDS-standard names here)
   if ( SumX != 0 ){
-    if ( cg_coord_write(IndexFile,IndexBase,IndexZone,RealDouble,"CoordinateX",&CoordX[0],&IndexCoord[0]) ){
+    if ( cg_coord_write(IndexFile,IndexBase,IndexZone,CGNS_ENUMV( RealDouble ),"CoordinateX",&CoordX[0],&IndexCoord[0]) ){
         std::cout << " Error writing X coordinates.\n";
         cg_error_exit();
     }
   }
   // If Y coordinate is not empty then write CoordY (user must use SIDS-standard names here)
   if ( SumY != 0 ){
-    if ( cg_coord_write(IndexFile,IndexBase,IndexZone,RealDouble,"CoordinateY",&CoordY[0],&IndexCoord[1]) ){
+    if ( cg_coord_write(IndexFile,IndexBase,IndexZone,CGNS_ENUMV( RealDouble ),"CoordinateY",&CoordY[0],&IndexCoord[1]) ){
         std::cout << " Error writing Y coordinates.\n";
         cg_error_exit();
     }
   }
   // If Z coordinate is not empty then write CoordZ (user must use SIDS-standard names here)
   if ( SumZ != 0 ){
-    if ( cg_coord_write(IndexFile,IndexBase,IndexZone,RealDouble,"CoordinateZ",&CoordZ[0],&IndexCoord[2]) ){
+    if ( cg_coord_write(IndexFile,IndexBase,IndexZone,CGNS_ENUMV( RealDouble ),"CoordinateZ",&CoordZ[0],&IndexCoord[2]) ){
         std::cout << " Error writing Z coordinates.\n";
         cg_error_exit();
     }
@@ -432,9 +432,9 @@ ErrorCode WriteCGNS::set_tag_values( std::vector< Tag >& TagHandles,
     //int Number;
 
     // Set a data index for Edges and TagHandles[i]
-    if ( Sets[i].CGNSType == BAR_2 || Sets[i].CGNSType == TRI_3 || Sets[i].CGNSType == QUAD_4 ||
-         Sets[i].CGNSType == TETRA_4 || Sets[i].CGNSType == PYRA_5 || Sets[i].CGNSType == PENTA_6 ||
-         Sets[i].CGNSType == HEXA_8 || Sets[i].CGNSType == MIXED ){
+    if ( Sets[i].CGNSType == CGNS_ENUMV( BAR_2 ) || Sets[i].CGNSType == CGNS_ENUMV( TRI_3 ) || Sets[i].CGNSType == CGNS_ENUMV( QUAD_4 ) ||
+         Sets[i].CGNSType == CGNS_ENUMV( TETRA_4 ) || Sets[i].CGNSType == CGNS_ENUMV( PYRA_5 ) || Sets[i].CGNSType == CGNS_ENUMV( PENTA_6 ) ||
+         Sets[i].CGNSType == CGNS_ENUMV( HEXA_8 ) || Sets[i].CGNSType == CGNS_ENUMV( MIXED ) ){
 
       if ( Sets[i].NbEdges > 0 && physdim < 3 ){
         // Set a data index for Edges and TagHandles[i]
@@ -537,7 +537,7 @@ ErrorCode WriteCGNS::get_set_entities(int i, std::vector< Tag >& TagHandles,
   Sets[i].NbCells += Number;
   std::cout << "\tNumber of MBPYRAMID = " << Number << "\n";
 
-  // Get the number of MBPRISM entities - MBPRISM == PENTA_6
+  // Get the number of MBPRISM entities - MBPRISM == CGNS_ENUMV( PENTA_6 )
   // NbEntities[5] holds the number of MBPRISM in the "Sets"
   Number=0;
   rval = mbImpl->get_number_entities_by_type_and_tag( 0, MBPRISM, &TagHandles[i], 0, 1, Number );
@@ -590,39 +590,39 @@ ErrorCode WriteCGNS::get_cgns_type ( int i, std::vector<WriteCGNS::SetStruct> &S
   // if Sum > 1 then the Set is MIXED
   // if Sum = 0 then the Set is Homogeneous
   // else then the Set is empty
-  if ( Sum>1 ){ Sets[i].CGNSType = MIXED; }
+  if ( Sum>1 ){ Sets[i].CGNSType = CGNS_ENUMV( MIXED ); }
   else if ( Sum==1 ){ 
     int j=0;
     std::cout << "Homogeneous Type\n";
     while (j < (int)Sets[i].NbEntities.size() && Sets[i].NbEntities[j] != 1){ ++j; }
     switch ( j ){
       case 0 :
-        Sets[i].CGNSType = BAR_2;
+        Sets[i].CGNSType = CGNS_ENUMV( BAR_2 );
         break;
       case 1 :
-        Sets[i].CGNSType = TRI_3;
+        Sets[i].CGNSType = CGNS_ENUMV( TRI_3 );
         break;
       case 2 :
-        Sets[i].CGNSType = QUAD_4;
+        Sets[i].CGNSType = CGNS_ENUMV( QUAD_4 );
         break;
       case 3 :
-        Sets[i].CGNSType = TETRA_4;
+        Sets[i].CGNSType = CGNS_ENUMV( TETRA_4 );
         break;
       case 4 :
-        Sets[i].CGNSType = PYRA_5;
+        Sets[i].CGNSType = CGNS_ENUMV( PYRA_5 );
         break;
       case 5 :
-        Sets[i].CGNSType = PENTA_6;
+        Sets[i].CGNSType = CGNS_ENUMV( PENTA_6 );
         break;
       case 6 :
-        Sets[i].CGNSType = HEXA_8;
+        Sets[i].CGNSType = CGNS_ENUMV( HEXA_8 );
         break;
       default :
         std::cout << "It was not possible to identify the CGNSType\n";
         return MB_FAILURE;
     }
   }
-  else { Sets[i].CGNSType = ElementTypeNull; } // NOT SURE IF THAT'S THE RIGHT WAY....... 
+  else { Sets[i].CGNSType = CGNS_ENUMV( ElementTypeNull ); } // NOT SURE IF THAT'S THE RIGHT WAY....... 
 
   // Clear the test vector
   Test.clear();
@@ -673,7 +673,7 @@ ErrorCode WriteCGNS::get_conn_table( std::vector< moab::EntityHandle > &Elements
           // If the Set is MIXED type
           // push CGNS ENUM type of the entity
           // before the connectivity
-          if ( Sets[j].CGNSType == MIXED ){
+          if ( Sets[j].CGNSType == CGNS_ENUMV( MIXED ) ){
             ConnTable[j].push_back( moab_cgns_conv(*i) );   // moab_cgns_conv return an int which 
                                                             // represents the CGNS type
             Begin[j]++;
@@ -697,19 +697,19 @@ int WriteCGNS::moab_cgns_conv(const EntityHandle handle)
   EntityType MoabType = mbImpl->type_from_handle( handle );
   switch ( MoabType ){
     case MBEDGE :         /**< Mesh Edge */
-      return BAR_2;
+      return CGNS_ENUMV( BAR_2 );
     case MBTRI :          /**< Triangular element (including shells) */
-      return TRI_3;
+      return CGNS_ENUMV( TRI_3 );
     case MBQUAD :         /**< Quadrilateral element (including shells) */
-      return QUAD_4;
+      return CGNS_ENUMV( QUAD_4 );
     case MBTET :          /**< Tetrahedral element */
-      return TETRA_4;
+      return CGNS_ENUMV( TETRA_4 );
     case MBPYRAMID :      /**< Pyramid element */
-      return PYRA_5;
+      return CGNS_ENUMV( PYRA_5 );
     case MBPRISM :        /**< Wedge element */
-      return PENTA_6;
+      return CGNS_ENUMV( PENTA_6 );
     case MBHEX :          /**< Hexahedral element */
-      return HEXA_8;
+      return CGNS_ENUMV( HEXA_8 );
     default :
       std::cout << "It was not possible to identify the CGNSType\n";
       return 0;

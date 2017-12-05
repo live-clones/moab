@@ -28,13 +28,7 @@
 //Junior
 #if CGNS_VERSION < 3100
 # define cgsize_t int
-#else
-# if CG_BUILD_SCOPE
-#  error enumeration scoping needs to be off
-# endif
 #endif
-
-
 
 namespace moab {
 
@@ -70,7 +64,7 @@ public:
     // vector with the number of entities in the Sets
     // 0-MBEDGE | 1-MBTRI | 2-MBQUAD | 3-MBTET | 4-MBPYRAMID | 5-MBPRISM  | 6-MBHEX
     std::vector<cgsize_t> NbEntities; 
-    ElementType_t CGNSType;
+    CGNS_ENUMT( ElementType_t ) CGNSType;
 
     SetStruct(): IdSet(-1), NbEdges(0), NbFaces(0), NbCells(0) {};
     ~SetStruct() {};
