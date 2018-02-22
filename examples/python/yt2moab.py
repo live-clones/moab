@@ -74,7 +74,7 @@ def yt2moab_uniform_gridgen(mb,ds):
     #create vertices
     vert_handles = mb.create_vertices(coords)
 
-    print "Number of verts added to MOAB instance: ", vert_handles.size()
+    print ("Number of verts added to MOAB instance: ", vert_handles.size())
 
     #reset indices for connectivity loop
     i=0
@@ -138,9 +138,9 @@ def main():
 
     args = parse_args() 
     filename = args.filename
-    print filename
+    print (filename)
 
-    print "Loading yt dataset " + filename.split("/")[-1] + "..."
+    print ("Loading yt dataset " + filename.split("/")[-1] + "...")
     ds = yt.load(filename)
 
     #establish a moab instance for use
