@@ -268,7 +268,9 @@ ErrorCode Intx2Mesh::intersect_meshes(EntityHandle mbset1, EntityHandle mbset2,
   {
     if (rs22.size()<rs2.size())
     {
+#if defined(ENABLE_DEBUG) || defined(VERBOSE)
       std::cout<< " possible not connected arrival mesh; my_rank: " << my_rank << " counting: " << counting <<"\n";
+#endif
 #ifdef VERBOSE
 
       std::stringstream ffo;
@@ -464,10 +466,12 @@ ErrorCode Intx2Mesh::intersect_meshes(EntityHandle mbset1, EntityHandle mbset2,
 #endif
       } // end while (!localBlue.empty())
       double redRecovery=fabs((recoveredArea-areaRedCell)/areaRedCell); // 0 means everything got recovered
+#if defined(ENABLE_DEBUG) || defined(VERBOSE)
       if ( redRecovery > epsilon_1)
       {
-        std::cout << " red area: " << areaRedCell << " recovered :" <<recoveredArea << " redID: " << mb->id_from_handle(currentRed) << " countingStart:" << countingStart <<  "\n";
+        std::cout << " red area: " << areaRedCell << " recovered :" << recoveredArea << " redID: " << mb->id_from_handle(currentRed) << " countingStart:" << countingStart <<  "\n";
       }
+#endif
       // here, we are finished with redCurrent, take it out of the rs22 range (red, arrival mesh)
       rs22.erase(currentRed);
       // also, look at its neighbors, and add to the seeds a next one
