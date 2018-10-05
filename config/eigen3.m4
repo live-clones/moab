@@ -23,14 +23,10 @@ AC_DEFUN([FATHOM_CONFIGURE_EIGEN3],
               witheigeninc=no)
 
   dnl Fall back on default paths to Eigen's include files
-  if (test "x$witheigeninc" != "xno"); then
+  if (test "x$witheigeninc" != "xno" && test "x$witheigeninc" != "x"); then
     EIGEN3_DIR="$witheigeninc"
   elif test "x$EIGEN3_DIR" != x -a -f $EIGEN3_DIR/Eigen/Eigen; then
     echo "Environment EIGEN3_DIR=$EIGEN3_DIR"
-  elif test -f /usr/include/eigen3/Eigen/Eigen ; then
-    EIGEN3_DIR="/usr/include/eigen3"
-  elif test -f /usr/local/include/eigen3/Eigen/Eigen ; then
-    EIGEN3_DIR="/usr/local/include/eigen3"
   else
     EIGEN3_DIR=""
   fi
