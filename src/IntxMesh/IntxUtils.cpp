@@ -4,8 +4,15 @@
  *  Created on: Oct 3, 2012
  */
 
+#ifdef WIN32  /* windows */
+#  define _USE_MATH_DEFINES //For M_PI
+#endif
 #include <cmath>
 #include <cassert>
+#include <iostream>
+// this is for sstream
+#include <sstream>
+
 #include "moab/IntxMesh/IntxUtils.hpp"
 // this is from mbcoupler; maybe it should be moved somewhere in moab src
 // right now, add a dependency to mbcoupler
@@ -13,10 +20,6 @@
 #include "moab/MergeMesh.hpp"
 #include "moab/ReadUtilIface.hpp"
 #include "MBTagConventions.hpp"
-#include <iostream>
-// this is for sstream
-#include <sstream>
-//#include <algorithm>
 #define CHECKNEGATIVEAREA
 
 #ifdef CHECKNEGATIVEAREA

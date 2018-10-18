@@ -164,6 +164,7 @@
 #ifndef MOAB_RANGE_HPP
 #define MOAB_RANGE_HPP
 
+#include <string>
 #include <iterator>
 #include <iosfwd>
 #include <algorithm>

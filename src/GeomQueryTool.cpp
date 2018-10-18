@@ -1,5 +1,8 @@
 #include "moab/GeomQueryTool.hpp"
 
+#ifdef WIN32  /* windows */
+#  define _USE_MATH_DEFINES //For M_PI
+#endif
 #include <string>
 #include <iostream>
 #include <fstream>

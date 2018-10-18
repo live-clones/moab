@@ -34,6 +34,9 @@
  * <a href="pages.html">Full List of Documents</a>
  */
 
+#ifdef WIN32  /* windows */
+#  define _USE_MATH_DEFINES //For M_PI
+#endif
 #ifndef MOAB_INTERFACE_HPP
 #define MOAB_INTERFACE_HPP
 

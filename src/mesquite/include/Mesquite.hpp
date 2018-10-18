@@ -47,6 +47,10 @@
   #define MESQUITE_EXPORT
 #endif
 
+#ifdef WIN32  /* windows */
+#  define _USE_MATH_DEFINES //For M_PI
+#endif
+
 #include <cmath>
 #include <cfloat>
 #include <climits>
@@ -72,10 +76,6 @@
 */
 namespace MBMesquite
 {
-  // Windows has issues
-#ifndef M_PI
-  const double M_PI = 3.14159265358979323846;
-#endif
 
   typedef int StatusCode;
 
