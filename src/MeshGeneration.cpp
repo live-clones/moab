@@ -7,6 +7,9 @@
 #include "moab/MergeMesh.hpp"
 #include <iostream>
 #include <vector>
+#ifdef WIN32  /* windows */
+#include <time.h>
+#endif
 
 #ifdef MOAB_HAVE_MPI
 #include "moab_mpi.h"
