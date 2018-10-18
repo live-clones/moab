@@ -5,7 +5,6 @@
 #include <stdio.h>
 #include <iomanip>
 #include <fstream>
-#include <sys/time.h>
 #include <time.h>
 #include <math.h>
 #include <assert.h>
