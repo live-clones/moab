@@ -6,7 +6,8 @@
  */
 
 // Different platforms follow different conventions for usage
-#ifndef NT
+// Different platforms follow different conventions for usage
+#if !defined(_NT) && !defined(_MSC_VER) && !defined(__MINGW32__)
 #include <sys/resource.h>
 #endif
 #ifdef SOLARIS
