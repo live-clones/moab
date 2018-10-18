@@ -6,7 +6,6 @@
  */
 
 // Different platforms follow different conventions for usage
-// Different platforms follow different conventions for usage
 #if !defined(_NT) && !defined(_MSC_VER) && !defined(__MINGW32__)
 #include <sys/resource.h>
 #endif
@@ -409,6 +408,9 @@ void query_vert_to_elem(iMesh_Instance mesh)
 void print_time(const bool print_em, double &tot_time, double &utime, double &stime,
                 long &imem, long &rmem)
 {
+// Disabling this for windows
+  // Different platforms follow different conventions for usage
+#if !defined(_NT) && !defined(_MSC_VER) && !defined(__MINGW32__)
   struct rusage r_usage;
   getrusage(RUSAGE_SELF, &r_usage);
   utime = (double)r_usage.ru_utime.tv_sec +
@@ -430,7 +432,9 @@ void print_time(const bool print_em, double &tot_time, double &utime, double &st
   system("ps o args,drs,rss | grep perf | grep -v grep");  // RedHat 9.0 doesnt fill in actual memory data
 #endif
     //delete [] hex_array;
+#endif // if not on windows
 }
+
 
 void compute_edge(double *start, const int nelem,  const double xint,
                   const int stride)
