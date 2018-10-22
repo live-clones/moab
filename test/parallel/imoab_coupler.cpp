@@ -313,6 +313,7 @@ int main( int argc, char* argv[] )
   ierr = iMOAB_ApplyScalarProjectionWeights ( pid5,
                                             fieldname,
                                             fieldnameT,
+                                            0,
                                             strlen(fieldname),
                                             strlen(fieldnameT)
                                             );

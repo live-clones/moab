@@ -41,6 +41,7 @@ using namespace moab;
 #include <iostream>
 
 // #define VERBOSE
+// #define PVERBOSE
 
 // global variables ; should they be organized in a structure, for easier references?
 // or how do we keep them global?
@@ -1236,7 +1237,7 @@ ErrCode iMOAB_DefineTagStorage ( iMOAB_AppID pid, const iMOAB_String tag_storage
                      tagHandle, tagType, defaultVal );
 
     if ( MB_TAG_NOT_FOUND == rval )
-    {    	
+    {
 		rval = context.MBI->tag_get_handle ( tag_name.c_str(), *components_per_entity,
 						 tagDataType,
 						 tagHandle, tagType|MB_TAG_CREAT, defaultVal );
@@ -1492,8 +1493,7 @@ ErrCode iMOAB_SynchronizeTags ( iMOAB_AppID pid, int* num_tag, int* tag_indices,
 
     ParallelComm* pco = context.pcomms[*pid];
 
-    ErrorCode rval = pco->exchange_tags ( tags, tags, ent_exchange );
-	CHKERRVAL(rval);
+    ErrorCode rval = pco->exchange_tags ( tags, tags, ent_exchange );CHKERRVAL(rval);
 
 #else
     /* do nothing if serial */
@@ -1512,7 +1512,6 @@ ErrCode iMOAB_ReduceTagsMax ( iMOAB_AppID pid, int* tag_index, int* ent_type )
     appData& data = context.appDatas[*pid];
     Range ent_exchange;
     std::vector<Tag> tags;
-
 
 	if ( *tag_index < 0 || *tag_index >= ( int ) data.tagList.size() )
         { return 1 ; } // error in tag index
@@ -1569,9 +1568,6 @@ ErrCode iMOAB_GetNeighborElements ( iMOAB_AppID pid, iMOAB_LocalID* local_index,
 #if 0
 
 ErrCode iMOAB_GetNeighborVertices ( iMOAB_AppID pid, iMOAB_LocalID* local_vertex_ID, int* num_adjacent_vertices, iMOAB_LocalID* adjacent_vertex_IDs )
-{
-    return 0;
-}
 
 #endif
 
@@ -1882,7 +1878,7 @@ ErrCode iMOAB_ReceiveMesh ( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* sendin
         n = n + 2 + pack_array[n + 1];
     }
 
-#ifdef VERBOSE
+#ifdef PVERBOSE
     std:: cout << " receiver " << current_receiver << " at rank " <<
                receiver_rank << " will receive from " << senders_local.size() << " tasks: ";
 
@@ -1911,7 +1907,7 @@ ErrCode iMOAB_ReceiveMesh ( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* sendin
         // remove from local set the vertices
         rval = context.MBI->remove_entities ( local_set, local_verts );CHKERRVAL(rval);
 
-#ifdef VERBOSE
+#ifdef PVERBOSE
         std::cout << "current_receiver " << current_receiver << " local verts: " << local_verts.size() << "\n";
 #endif
         MergeMesh mm ( context.MBI );
@@ -1921,7 +1917,7 @@ ErrCode iMOAB_ReceiveMesh ( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* sendin
         Range new_verts; // local elems are local entities without vertices
         rval = context.MBI->get_connectivity ( local_elems, new_verts );CHKERRVAL(rval);
 
-#ifdef VERBOSE
+#ifdef PVERBOSE
         std::cout << "after merging: new verts: " << new_verts.size() << "\n";
 #endif
         rval = context.MBI->add_entities ( local_set, new_verts );CHKERRVAL(rval);
@@ -2109,7 +2105,6 @@ ErrCode iMOAB_FreeSenderBuffers ( iMOAB_AppID pid, MPI_Comm* join, int* rcompid 
 
 #define USE_API
 
-
 static ErrCode ComputeSphereRadius ( iMOAB_AppID pid, double* radius)
 {
     ErrorCode rval;
@@ -2139,12 +2134,8 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere ( iMOAB_AppID pid_src, iMOAB_AppID
     // Get the source and target data and pcomm objects
     appData& data_src = context.appDatas[*pid_src];
     appData& data_tgt = context.appDatas[*pid_tgt];
-	appData& data_intx = context.appDatas[*pid_intx];
+	  appData& data_intx = context.appDatas[*pid_intx];
     ParallelComm* pco_intx = context.pcomms[*pid_intx];
-
-	//  Sanity check: Check that the source and target meshes belong to the same pes. 
-    //  assert(pco_src->get_id() == pco_tgt->get_id());
-    //  assert(pco_src->get_id() == pco_intx->get_id());
 
     // Mesh intersection has already been computed; Return early.
     if(data_intx.remapper != NULL) return 0;
@@ -2154,7 +2145,9 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere ( iMOAB_AppID pid_src, iMOAB_AppID
     // Rescale the radius of both to compute the intersection
     ComputeSphereRadius(pid_src, &radius_source);
     ComputeSphereRadius(pid_tgt, &radius_target);
+#ifdef VERBOSE
     if (!pco_intx->rank()) std::cout << "Radius of spheres: source = " << radius_source << " and target = " << radius_target << "\n";
+#endif
 
 	// print verbosely about the problem setting
 	{
@@ -2179,9 +2172,9 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere ( iMOAB_AppID pid_src, iMOAB_AppID
 #endif
 	}
 
-	// set the context for the source and destination applications
-	data_intx.pid_src = pid_src;
-	data_intx.pid_dest = pid_tgt;
+    // set the context for the source and destination applications
+    data_intx.pid_src = pid_src;
+    data_intx.pid_dest = pid_tgt;
 
 	// Now allocate and initialize the remapper object
     data_intx.remapper = new moab::TempestRemapper ( context.MBI, pco_intx );
@@ -2205,10 +2198,10 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere ( iMOAB_AppID pid_src, iMOAB_AppID
     rval = data_intx.remapper->ConvertMeshToTempest ( moab::Remapper::SourceMesh );CHKERRVAL(rval);
     rval = data_intx.remapper->ConvertMeshToTempest ( moab::Remapper::TargetMesh );CHKERRVAL(rval);
 
-	// Compute intersections with MOAB
-	rval = data_intx.remapper->ComputeOverlapMesh ( epsrel, 1.0, 1.0, boxeps, false );CHKERRVAL(rval);
+	  // Compute intersections with MOAB
+	  rval = data_intx.remapper->ComputeOverlapMesh ( epsrel, 1.0, 1.0, boxeps, false );CHKERRVAL(rval);
     // rval = data_intx.remapper->ConvertMeshToTempest ( moab::Remapper::IntersectedMesh );CHKERRVAL(rval);
-	data_src.covering_set = data_intx.remapper->GetCoveringSet();
+	  data_src.covering_set = data_intx.remapper->GetCoveringSet();
 
     // Set the context for the OfflineMap computation
     data_intx.weightMap = new moab::TempestOfflineMap ( data_intx.remapper );
@@ -2247,7 +2240,9 @@ ErrCode iMOAB_CoverageGraph ( MPI_Comm * join, iMOAB_AppID pid_src,
         // report the sender and receiver tasks in the joint comm
         srcSenders = sendGraph->senders();
         receivers = sendGraph->receivers();
+#ifdef PVERBOSE
         std::cout << "senders: " << srcSenders.size() << " first sender: "<< srcSenders[0] << std::endl;
+#endif
       }
     }
     ParCommGraph * recvGraph = NULL; // will be non null on receiver tasks (intx tasks)
@@ -2263,7 +2258,9 @@ ErrCode iMOAB_CoverageGraph ( MPI_Comm * join, iMOAB_AppID pid_src,
         // report the sender and receiver tasks in the joint comm, from migrated mesh pt of view
         srcSenders = recvGraph->senders();
         receivers = recvGraph->receivers();
+#ifdef PVERBOSE
         std::cout << "receivers: " << receivers.size() << " first receiver: "<< receivers[0] << std::endl;
+#endif
       }
     }
 
@@ -2449,6 +2446,7 @@ ErrCode iMOAB_ComputeScalarProjectionWeights ( iMOAB_AppID pid_intx,
 ErrCode iMOAB_ApplyScalarProjectionWeights (   iMOAB_AppID pid_intersection, 
                                                const iMOAB_String src_solution_tag_name,
                                                const iMOAB_String dest_soln_tag_name,
+                                               int apply_transpose,
                                                int src_soln_tag_name_length,
                                                int dest_soln_tag_name_length )
 {
@@ -2479,7 +2477,7 @@ ErrCode iMOAB_ApplyScalarProjectionWeights (   iMOAB_AppID pid_intersection,
 
     // Compute the application of weights on the suorce solution data and store it in the destination solution vector data
     // Optionally, can also perform the transpose application of the weight matrix. Set the 3rd argument to true if this is needed
-    rval = weightMap->ApplyWeights(solSTagVals, solTTagVals, false);CHKERRVAL(rval);
+    rval = weightMap->ApplyWeights(solSTagVals, solTTagVals, (apply_transpose != 0));CHKERRVAL(rval);
 
     // The tag data is np*np*n_el_dest
     rval = context.MBI->tag_set_data ( tsolnTag, tgtEnts, &solTTagVals[0] );CHKERRVAL(rval);

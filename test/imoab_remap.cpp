@@ -19,7 +19,7 @@ const char* TestDir = STRINGIFY(MESHDIR);
 #error Specify MESHDIR to compile test
 #endif
 
-#define CHECKRC(rc, message)  if (0!=rc) { printf ("%s", message); return 1;}
+#define CHECKRC(rc, message)  if (0!=rc) { printf ("rc = %d; %s", rc, message); return 1;}
 
 // this test will be run in serial only
 int main(int argc, char * argv[])
@@ -145,10 +145,10 @@ int main(int argc, char * argv[])
   int num_components1 = disc_orders[0]*disc_orders[0], num_components2 = disc_orders[1]*disc_orders[1];
 
   rc = iMOAB_DefineTagStorage(pid1, fieldname, &tagTypes[0], &num_components1, &tagIndex[0],  strlen(fieldname) );
-  CHECKRC(rc, "failed to define the field tag");
+  CHECKRC(rc, "failed to define the field tag on source mesh");
 
   rc = iMOAB_DefineTagStorage(pid2, fieldnameT, &tagTypes[1], &num_components2, &tagIndex[1],  strlen(fieldnameT) );
-  CHECKRC(rc, "failed to define the field tag");
+  CHECKRC(rc, "failed to define the field tag on target mesh");
 
   /* Next compute the mesh intersection on the sphere between the source and target meshes */
   rc = iMOAB_ComputeMeshIntersectionOnSphere(pid1, pid2, pid3);
@@ -170,6 +170,7 @@ int main(int argc, char * argv[])
   rc = iMOAB_ApplyScalarProjectionWeights ( pid3,
                                             fieldname,
                                             fieldnameT,
+                                            0,
                                             strlen(fieldname),
                                             strlen(fieldnameT)
                                             );
