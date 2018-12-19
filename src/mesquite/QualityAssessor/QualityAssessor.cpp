@@ -1684,7 +1684,7 @@ void QualityAssessor::Assessor::print_histogram( std::ostream& stream,
          << std::endl << std::endl;
 }
 
-#ifdef _MSC_VER
+#ifdef _WIN32
 # define fileno(A) _fileno( (A) )
 #endif
 int QualityAssessor::get_terminal_width() const

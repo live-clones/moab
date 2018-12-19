@@ -89,7 +89,7 @@ void MBMesquite::MsqFPE::enable_trap_fpe()
 
 /* Next try Microsoft */
 
-#elif defined (_MSC_VER)
+#elif defined (_WIN32)
 
 #include <float.h>
 

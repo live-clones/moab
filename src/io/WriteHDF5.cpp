@@ -26,7 +26,7 @@
 //-------------------------------------------------------------------------
 
 #include <assert.h>
-#if defined(_MSC_VER)
+#if defined(_WIN32)
   typedef int id_t;
 #elif defined(__MINGW32__)
   #include <sys/time.h>

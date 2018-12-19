@@ -19,7 +19,7 @@
  * \author Michael Garland
  */
 
-#ifdef _MSC_VER  /* windows */
+#ifdef _WIN32  /* windows */
 #  define _USE_MATH_DEFINES //For M_PI
 #endif
 

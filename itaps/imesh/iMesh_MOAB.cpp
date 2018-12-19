@@ -34,7 +34,7 @@
 #include <stdio.h>
 #define MIN(a,b) (a < b ? a : b)
 
-#ifdef _MSC_VER
+#ifdef _WIN32
 # define snprintf(A,B,C,D) _snprintf((A),(B),(C),(D))
 #endif
 

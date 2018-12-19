@@ -47,7 +47,7 @@ Header file for the MBMesquite::QualityMetric class
 #include "Vector3D.hpp"
 #include "Matrix3D.hpp"
 
-#ifdef _MSC_VER
+#ifdef _WIN32
    typedef unsigned uint32_t;
 #elif defined(MOAB_HAVE_STDINT_H)
 #  include <stdint.h>

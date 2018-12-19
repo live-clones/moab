@@ -29,7 +29,7 @@
 
 #include "moab/MOABConfig.h"
 
-#ifdef _MSC_VER  //if vc
+#ifdef _WIN32  //if vc
   #ifdef MESQUITE_DLL_EXPORTS //if we are exporting as dll
     #define MESQUITE_EXPORT  __declspec(dllexport)
   #else                      //else we aren't exporting as dll

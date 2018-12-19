@@ -19,7 +19,7 @@
 
 #include "status.h"
 
-#ifdef _MSC_VER
+#ifdef _WIN32
 # define vsnprintf(A,B,C,D) _vsnprintf((A),(B),(C),(D))
 #endif
 

@@ -41,7 +41,7 @@
 #include "Bits.hpp"
 #include "Sample.hpp"
 
-#ifdef _MSC_VER
+#ifdef _WIN32
 # pragma warning( 4 : 4715 )
 #endif
 
