@@ -49,17 +49,21 @@ land_size=len(fin.dimensions["gridcell"])
 grid1d_ixy=fin.variables['grid1d_ixy'][:]
 
 mask_tag = mb.tag_get_handle("MASK",1,types.MB_TYPE_DOUBLE,types.MB_TAG_DENSE,True)
+index_tag = mb.tag_get_handle("IndexLand",1,types.MB_TYPE_DOUBLE,types.MB_TAG_DENSE,True)
 
 polys = mb.get_entities_by_type(0, types.MBPOLYGON)
 print 'number of polygons:', len(polys)
 
 npolys = len(polys)
 data = np.zeros(npolys)
+data2 = np.zeros(npolys)
 
 for e in xrange(land_size):
   data[grid1d_ixy[e]-1]= 1
+  data2[grid1d_ixy[e]-1]= e+1
   
 mb.tag_set_data(mask_tag,polys,data)
+mb.tag_set_data(index_tag,polys,data2)
 
 
 
