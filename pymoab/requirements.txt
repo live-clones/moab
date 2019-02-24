@@ -1,3 +1,4 @@
 setuptools
 numpy
 cython>=0.26
+mpi4py>=3.0.0

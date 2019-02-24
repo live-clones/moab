@@ -1,4 +1,7 @@
-"""MOAB Tag Class"""
+# distutils: language = c++
+"""
+MOAB Tag Class
+"""
 
 from pymoab cimport moab
 import numpy as np

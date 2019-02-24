@@ -1,4 +1,7 @@
-"""MOAB Structured Mesh Interface"""
+# distutils: language = c++
+"""
+MOAB Structured Mesh Interface
+"""
 
 cimport numpy as np
 import numpy as np

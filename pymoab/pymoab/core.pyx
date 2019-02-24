@@ -39,7 +39,7 @@ cdef class Core(object):
         """MOAB implementation number as a float."""
         return self.inst.impl_version()
 
-    def load_file(self, str fname, file_set = None, exceptions = ()):
+    def load_file(self, str fname, file_set = None, str readopts = '', exceptions = ()):
         """
         Load or import a file.
 
@@ -80,6 +80,7 @@ cdef class Core(object):
               if a parameter is not of the correct type
         """
         cdef bytes cfname = fname.encode('UTF-8')
+        cdef bytes opts = readopts.encode('UTF-8')
         cdef eh.EntityHandle fset
         cdef eh.EntityHandle* ptr
         if file_set != None:
@@ -88,10 +89,12 @@ cdef class Core(object):
         else:
             ptr = NULL
         cdef const char * file_name = cfname
-        cdef moab.ErrorCode err = self.inst.load_file(file_name,ptr)
+        cdef const char * fileopts = opts
+        cdef moab.ErrorCode err = self.inst.load_file(file_name,ptr,fileopts)
         check_error(err, exceptions)
 
-    def write_file(self, str fname, output_sets = None, output_tags = None, exceptions = ()):
+
+    def write_file(self, str fname, output_sets = None, output_tags = None, str writeopts = '', exceptions = ()):
         """
         Write or export a file.
 
@@ -132,6 +135,9 @@ cdef class Core(object):
         """
         cdef bytes cfname = fname.encode('UTF-8')
         cdef const char * file_name = cfname
+        cdef bytes opts = writeopts.encode('UTF-8')
+        # cdef const char * fileopts = opts
+        cdef const char * fileopts = <const char*>0
         cdef moab.ErrorCode err
         cdef int num_tags = 0
         cdef _tagArray ta = _tagArray()
@@ -154,9 +160,9 @@ cdef class Core(object):
               raise IOError("Only EntitySets should be passed to write file.")
         if output_sets or output_tags:
             err = self.inst.write_file(
-                file_name, <const char*> 0, <const char*> 0, deref(r.inst), ta.ptr, num_tags)
+                file_name, <const char*> 0, fileopts, deref(r.inst), ta.ptr, num_tags)
         else:
-          err = self.inst.write_file(file_name)
+          err = self.inst.write_file(file_name, <const char*> 0, fileopts)
 
         check_error(err, exceptions)
 
