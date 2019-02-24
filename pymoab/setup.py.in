@@ -15,10 +15,12 @@ if StrictVersion(Cython.__version__) < StrictVersion('0.26'):
     
 # setup moab include paths
 moab_root = '@abs_top_srcdir@'
-moab_source_include = moab_root + '/src/moab/'
-moab_other_source_include = moab_root + '/src/'
-moab_binary_include = '@abs_top_builddir@/src/'
-moab_lib_path = '@abs_top_builddir@/src/.libs/'
+moab_source_include = moab_root + '/src'
+moab_parallel_source_include = moab_root + '/src/parallel'
+moab_other_source_include = moab_root + '/src'
+moab_binary_include = '@abs_top_builddir@/src'
+moab_parallel_binary_include = '@abs_top_builddir@/src/parallel'
+moab_lib_path = '@abs_top_builddir@/src/.libs'
 pymoab_src_dir = '@abs_builddir@/pymoab'
 include_paths = [moab_source_include,
                  moab_other_source_include,
@@ -26,6 +28,9 @@ include_paths = [moab_source_include,
                  np.get_include(),
                  pymoab_src_dir]
 
+if "@enablempi@" == "yes":
+    include_paths.append(moab_parallel_source_include)
+    include_paths.append(moab_parallel_binary_include)
 
 os.environ["CC"] = "@CC@"
 os.environ["CXX"] = "@CXX@"

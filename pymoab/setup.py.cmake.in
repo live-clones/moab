@@ -15,16 +15,22 @@ if StrictVersion(Cython.__version__) < StrictVersion('0.26'):
 
 # setup moab include paths
 moab_root = '${CMAKE_SOURCE_DIR}'
-moab_source_include = moab_root + '/src/moab/'
-moab_other_source_include = moab_root + '/src/'
-moab_binary_include = '${CMAKE_BINARY_DIR}/src/'
-moab_lib_path = '${CMAKE_BINARY_DIR}/lib/'
+moab_source_include = moab_root + '/src'
+moab_parallel_source_include = moab_root + '/src/parallel'
+moab_other_source_include = moab_root + '/src'
+moab_binary_include = '${CMAKE_BINARY_DIR}/src'
+moab_parallel_binary_include = '${CMAKE_BINARY_DIR}/src/parallel'
+moab_lib_path = '${CMAKE_BINARY_DIR}/lib'
 pymoab_src_dir = '${CMAKE_CURRENT_BINARY_DIR}/pymoab/'
 include_paths = [moab_source_include,
-                moab_other_source_include,
-                moab_binary_include,
+                 moab_other_source_include,
+                 moab_binary_include,
                  np.get_include(),
                  pymoab_src_dir]
+
+if "${MOAB_HAVE_MPI}" == "yes":
+    include_paths.append(moab_parallel_source_include)
+    include_paths.append(moab_parallel_binary_include)
 
 os.environ["CC"] = "${CMAKE_C_COMPILER}"
 os.environ["CXX"] = "${CMAKE_CXX_COMPILER}"

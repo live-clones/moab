@@ -324,6 +324,8 @@ else
                      pymoab/pymoab/tag.pxd:pymoab/pymoab/tag.pxd
                      pymoab/pymoab/core.pyx:pymoab/pymoab/core.pyx
 		     pymoab/pymoab/core.pxd:pymoab/pymoab/core.pxd
+		     pymoab/pymoab/parallelcomm.pyx:pymoab/pymoab/parallelcomm.pyx
+		     pymoab/pymoab/parallelcomm.pxd:pymoab/pymoab/parallelcomm.pxd
 		     pymoab/pymoab/rng.pyx:pymoab/pymoab/rng.pyx
 		     pymoab/pymoab/rng.pxd:pymoab/pymoab/rng.pxd
 		     pymoab/pymoab/hcoord.pyx:pymoab/pymoab/hcoord.pyx
@@ -341,6 +343,7 @@ else
     # link test files to build location
     AC_CONFIG_LINKS([pymoab/tests/driver.py:pymoab/tests/driver.py
                      pymoab/tests/test_core.py:pymoab/tests/test_core.py
+		     pymoab/tests/test_parallelcomm.py:pymoab/tests/test_parallelcomm.py
 		     pymoab/tests/test_tag.py:pymoab/tests/test_tag.py
 		     pymoab/tests/test_scd.py:pymoab/tests/test_scd.py
 		     pymoab/tests/test_hom.py:pymoab/tests/test_hom.py
