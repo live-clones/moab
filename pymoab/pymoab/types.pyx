@@ -1,4 +1,7 @@
-"""Python wrappers for MOAB Types."""
+# distutils: language = c++
+"""
+Python wrappers for MOAB Types.
+"""
 
 from pymoab cimport moab
 from pymoab cimport tag_conventions
