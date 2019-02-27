@@ -201,6 +201,7 @@ set( MOAB_INSTALL_HEADERS
         moab/MeshGeneration.hpp
         moab/OrientedBox.hpp
         moab/OrientedBoxTreeTool.hpp
+        moab/PartitionerBase.hpp
         moab/ProgOptions.hpp
         moab/Range.hpp
         moab/RangeMap.hpp
