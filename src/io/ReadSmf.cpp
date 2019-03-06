@@ -87,6 +87,8 @@ ReadSmf::ReadSmf(Interface* impl)
   : mdbImpl(impl), mCurrentMeshHandle(0), lineNo(0), commandNo(0), versionMajor(0), versionMinor(0)
 {
   mdbImpl->query_interface(readMeshIface);
+  ivar.next_vertex = 0;
+  ivar.next_face = 0;
   _numNodes = _numFaces = 0;
   _numNodesInFile = _numElementsInFile = 0;
 }
@@ -392,7 +394,7 @@ ErrorCode ReadSmf::face(std::vector<std::string> & argv)
   if (MB_SUCCESS != err)
     return err;
 
-  int vert[3];
+  int vert[3] = {};
   char* endptr;
   for (unsigned int i = 0; i < argv.size(); i++) {
     vert[i] = strtol(argv[i].c_str(), &endptr, 0);

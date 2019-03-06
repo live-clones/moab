@@ -149,7 +149,7 @@ namespace moab{
     box.bMax *= -1;
 
     /*Communicate to all processors*/
-    MPI_Allreduce(&box, gbox, 6, MPI_DOUBLE, MPI_MIN, MPI_COMM_WORLD);
+    MPI_Allreduce( (void*)&box, gbox, 6, MPI_DOUBLE, MPI_MIN, MPI_COMM_WORLD);
 
     /*Assemble Global Bounding Box*/
     //Flip the max back
@@ -617,7 +617,7 @@ namespace moab{
     a_val = a*mul;
     b_val = b*mul;
     for(unsigned long i=0; i< mul;i++){
-      ulong t =tup.vul_rd[a_val];
+      Ulong t =tup.vul_rd[a_val];
       tup.vul_wr[a_val] = tup.vul_rd[b_val];
       tup.vul_wr[b_val] = t; 
       a_val++;

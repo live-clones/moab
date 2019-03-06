@@ -267,7 +267,7 @@ static void print_tag_counts( const std::vector<TagCounts>& counts )
   for (EntityType t = MBVERTEX; t != MBMAXTYPE; ++t) 
     if (widths[t])
       printf( " %s", dashes(widths[t]) );
-    printf("\n");
+  printf("\n");
     
     // print data
   for (size_t i = 0; i < counts.size(); ++i) {
@@ -309,7 +309,7 @@ static void print_stats( set_stats& stats )
   
   for (EntityType i = MBEDGE; i < MBMAXTYPE; ++i)
   {
-    stat_set& s = (i == MBMAXTYPE) ? stats.edge_uses : stats.stats[i];
+    stat_set& s = stats.stats[i];
 
     if (s.count == 0)
       continue;
@@ -653,9 +653,7 @@ int main( int argc, char* argv[] )
   
   int proc_id = 0;
 #ifdef MOAB_HAVE_MPI
-  int initd = 0;
-  MPI_Initialized(&initd);
-  if (!initd) MPI_Init(&argc,&argv);
+  MPI_Init(&argc,&argv);
   MPI_Comm_rank( MPI_COMM_WORLD, &proc_id );
 #endif
 
@@ -920,7 +918,9 @@ int main( int argc, char* argv[] )
     else
       print_stats( total_stats );
   }
-  
+#ifdef MOAB_HAVE_MPI
+  MPI_Finalize();
+#endif
   return 0;
 }
 

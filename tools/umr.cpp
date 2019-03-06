@@ -13,8 +13,8 @@
 
 #include "moab/Core.hpp"
 #include "moab/Interface.hpp"
-#include "../verdict/moab/VerdictWrapper.hpp"
-#include "../RefineMesh/moab/NestedRefine.hpp"
+#include "moab/verdict/VerdictWrapper.hpp"
+#include "moab/NestedRefine.hpp"
 
 #ifdef MOAB_HAVE_MPI
 #include "moab_mpi.h"
@@ -79,6 +79,7 @@ int main(int argc, char* argv[])
 
   int num_levels = 0, dim=0;
   std::vector<int> level_degrees;
+  bool optimize = false;
   bool do_flag = true;
   bool print_times = false, print_size=false, output = false;
   bool parallel = false, resolve_shared = false, exchange_ghosts = false;
@@ -117,6 +118,7 @@ int main(int argc, char* argv[])
         case 'V': qc_vol = true; cvol = strtod(argv[i+1], NULL); ++i; break;
         case 'q': only_quality = true; break;
         case 'o': output = true; break;
+        case 'O': optimize = true; break;
 #ifdef MOAB_HAVE_MPI
         case 'p':
             parallel = true;
@@ -153,8 +155,9 @@ int main(int argc, char* argv[])
 #endif
 
   ErrorCode error;
-  Core moab;
-  Interface *mb = &moab;
+
+  Core *moab = new Core;
+  Interface *mb = (Interface*)moab;
   EntityHandle fileset;
 
   //Create a fileset
@@ -192,10 +195,10 @@ int main(int argc, char* argv[])
   //Create the nestedrefine instance
 
 #ifdef MOAB_HAVE_MPI
-  ParallelComm *pc = new ParallelComm(&moab, MPI_COMM_WORLD);
-  NestedRefine uref(&moab,pc,fileset);
+  ParallelComm *pc = new ParallelComm(mb, MPI_COMM_WORLD);
+  NestedRefine * uref = new NestedRefine(moab, pc, fileset);
 #else
-  NestedRefine uref(&moab);
+  NestedRefine * uref = new NestedRefine(moab);
 #endif
 
   std::vector<EntityHandle> lsets;
@@ -205,7 +208,7 @@ int main(int argc, char* argv[])
   if (only_quality)
     {
       double vmax;
-      error = get_max_volume(moab, fileset, dim, vmax);MB_CHK_ERR(error);
+      error = get_max_volume(*moab, fileset, dim, vmax);MB_CHK_ERR(error);
 #ifdef MOAB_HAVE_MPI
       int rank = 0;
       MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -219,7 +222,7 @@ int main(int argc, char* argv[])
 
   //If a volume constraint is given, find an optimal degree sequence to reach the desired volume constraint.
   if (qc_vol){
-      error = get_degree_seq(moab, fileset, dim, cvol, num_levels, level_degrees);MB_CHK_ERR(error);
+      error = get_degree_seq(*moab, fileset, dim, cvol, num_levels, level_degrees);MB_CHK_ERR(error);
 
       if (dim==0)
         print_usage(argv[0], std::cerr);
@@ -241,15 +244,18 @@ int main(int argc, char* argv[])
     }
 
   std::cout<<"Starting hierarchy generation"<<std::endl;
-  error = uref.generate_mesh_hierarchy( num_levels, ldeg, lsets);MB_CHK_ERR(error);
+
+  std::cout<<"opt = "<<optimize<<std::endl;
+
+  error = uref->generate_mesh_hierarchy( num_levels, ldeg, lsets, optimize);MB_CHK_ERR(error);
 
   if (print_times)
     {
-      std::cout<<"Finished hierarchy generation in "<<uref.timeall.tm_total<<"  secs"<<std::endl;
+      std::cout<<"Finished hierarchy generation in "<<uref->timeall.tm_total<<"  secs"<<std::endl;
       if (parallel)
         {
-          std::cout<<"Time taken for refinement "<<uref.timeall.tm_refine<<"  secs"<<std::endl;
-          std::cout<<"Time taken for resolving shared interface "<<uref.timeall.tm_resolve<<"  secs"<<std::endl;
+          std::cout<<"Time taken for refinement "<<uref->timeall.tm_refine<<"  secs"<<std::endl;
+          std::cout<<"Time taken for resolving shared interface "<<uref->timeall.tm_resolve<<"  secs"<<std::endl;
         }
     }
   else
@@ -267,7 +273,7 @@ int main(int argc, char* argv[])
       if (qc_vol)
         {
           double volume;
-          error = get_max_volume(moab, fileset, dim, volume);MB_CHK_ERR(error);
+          error = get_max_volume(*moab, fileset, dim, volume);MB_CHK_ERR(error);
           std::cout<<"Mesh size for level 0"<<"  :: nverts = "<<ents[0].size()<<", nedges = "<<ents[1].size()<<", nfaces = "<<ents[2].size()<<", ncells = "<<ents[3].size()<<" :: Vmax = "<<volume<<std::endl;
         }
       else
@@ -287,7 +293,7 @@ int main(int argc, char* argv[])
           if (qc_vol)
             {
               double volume;
-              error = get_max_volume(moab, lsets[l+1], dim, volume);MB_CHK_ERR(error);
+              error = get_max_volume(*moab, lsets[l+1], dim, volume);MB_CHK_ERR(error);
               std::cout<<"Mesh size for level "<<l+1<<"  :: nverts = "<<ents[0].size()<<", nedges = "<<ents[1].size()<<", nfaces = "<<ents[2].size()<<", ncells = "<<ents[3].size()<<" :: Vmax = "<<volume<<std::endl;
             }
           else
@@ -320,7 +326,13 @@ int main(int argc, char* argv[])
         }
     }
 
+  delete uref;
+#ifdef MOAB_HAVE_MPI
+  delete pc;
+#endif
+
   delete [] ldeg;
+  delete moab;
 
 #ifdef MOAB_HAVE_MPI
   MPI_Finalize();

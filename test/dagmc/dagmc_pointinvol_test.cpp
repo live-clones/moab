@@ -13,22 +13,18 @@ using namespace moab;
 
 using moab::DagMC;
 
-#define DAG DagMC::instance()
+DagMC *DAG;
 
 #define CHKERR(A) do { if (MB_SUCCESS != (A)) { \
   std::cerr << "Failure (error code " << (A) << ") at " __FILE__ ":" \
             << __LINE__ << std::endl; \
   return A; } } while(false)
 
-#ifdef MESHDIR
-static const char input_file[] = STRINGIFY(MESHDIR) "/dagmc/test_geom.h5m";
-#else
-static const char input_file[] = STRINGIFY(MESHDIR) "/dagmc/test_geom.h5m";
-#endif
+std::string input_file = TestDir + "/test_geom.h5m";
 
 void dagmc_setup_test() 
 {
-  ErrorCode rval = DAG->load_file(input_file); // open the Dag file
+  ErrorCode rval = DAG->load_file(input_file.c_str()); // open the Dag file
   CHECK_ERR(rval);
   rval = DAG->init_OBBTree();
   CHECK_ERR(rval);
@@ -254,6 +250,9 @@ void dagmc_point_on_corner_8()
 int main(int /* argc */, char** /* argv */)
 {
   int result = 0;
+
+  DAG = new DagMC();
+  
   result += RUN_TEST(dagmc_setup_test); // setup problem
   result += RUN_TEST(dagmc_point_in); // point in centre
   // rays fired along cardinal directions 
@@ -276,7 +275,7 @@ int main(int /* argc */, char** /* argv */)
 	//result += RUN_TEST(dagmc_point_in({5.0, 0.0, 0.0}); // point in centre
 	//result += RUN_TEST(dagmc_point_in({-5.0, 0.0, 0.0}); // point in centre
 
-  DagMC::destroy();
-
+  delete DAG;
+  
   return result;
 }

@@ -31,7 +31,35 @@ NCHelperMPAS::NCHelperMPAS(ReadNC* readNC, int fileId, const FileOptions& opts, 
   ignoredVarNames.insert("verticesOnCell");
   ignoredVarNames.insert("edgesOnCell");
   ignoredVarNames.insert("cellsOnCell");
-
+  // ignore variables containing mesh related info, that are currently saved as variable tags on
+  // file set ; if needed, these should be saved as dense tags, and read accordingly, in parallel
+  ignoredVarNames.insert("weightsOnEdge");
+  ignoredVarNames.insert("angleEdge");
+  ignoredVarNames.insert("areaCell");
+  ignoredVarNames.insert("areaTriangle");
+  ignoredVarNames.insert("dcEdge");
+  ignoredVarNames.insert("dv1Edge");
+  ignoredVarNames.insert("dv2Edge");
+  ignoredVarNames.insert("fEdge");
+  ignoredVarNames.insert("fVertex");
+  ignoredVarNames.insert("h_s");
+  ignoredVarNames.insert("kiteAreasOnVertex");
+  ignoredVarNames.insert("latCell");
+  ignoredVarNames.insert("latEdge");
+  ignoredVarNames.insert("latVertex");
+  ignoredVarNames.insert("lonCell");
+  ignoredVarNames.insert("lonEdge");
+  ignoredVarNames.insert("lonVertex");
+  ignoredVarNames.insert("meshDensity");
+  ignoredVarNames.insert("xCell");
+  ignoredVarNames.insert("xEdge");
+  ignoredVarNames.insert("xVertex");
+  ignoredVarNames.insert("yCell");
+  ignoredVarNames.insert("yEdge");
+  ignoredVarNames.insert("yVertex");
+  ignoredVarNames.insert("zCell");
+  ignoredVarNames.insert("zEdge");
+  ignoredVarNames.insert("zVertex");
   // Ignore variables for index conversion
   ignoredVarNames.insert("indexToVertexID");
   ignoredVarNames.insert("indexToEdgeID");
@@ -111,7 +139,7 @@ ErrorCode NCHelperMPAS::init_mesh_vals()
   if ((vit = std::find(dimNames.begin(), dimNames.end(), "nVertLevels")) != dimNames.end())
     idx = vit - dimNames.begin();
   else {
-    MB_SET_ERR(MB_FAILURE, "Couldn't find 'nVertLevels' dimension");
+    std::cerr << "Warning: dimension nVertLevels not found in header.\nThe file may contain just the mesh" << std::endl;  
   }
   levDim = idx;
   nLevels = dimLens[idx];
@@ -385,7 +413,7 @@ ErrorCode NCHelperMPAS::create_mesh(Range& faces)
   if (procs >= 2) {
     int global_max_edges_per_cell;
     ParallelComm*& myPcomm = _readNC->myPcomm;
-    MPI_Allreduce(&local_max_edges_per_cell, &global_max_edges_per_cell, 1, MPI_INTEGER, MPI_MAX, myPcomm->proc_config().proc_comm());
+    MPI_Allreduce(&local_max_edges_per_cell, &global_max_edges_per_cell, 1, MPI_INT, MPI_MAX, myPcomm->proc_config().proc_comm());
     assert(local_max_edges_per_cell <= global_max_edges_per_cell);
     maxEdgesPerCell = global_max_edges_per_cell;
     if (0 == rank)

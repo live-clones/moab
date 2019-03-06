@@ -277,6 +277,7 @@ ErrorCode ScdInterface::create_scd_sequence(const HomCoord &low, const HomCoord 
     return MB_TYPE_OUT_OF_RANGE;
 
   Core *mbcore = dynamic_cast<Core*>(mbImpl);
+  assert(mbcore != NULL);
   SequenceManager *seq_mgr = mbcore->sequence_manager();
 
   EntitySequence *tmp_seq;
@@ -519,6 +520,7 @@ ScdBox::~ScdBox()
   if (boxSet) {
     // It is possible that the box set entity has been deleted (e.g. by Core::clean_up_failed_read)
     Core* mbcore = dynamic_cast<Core*>(scImpl->mbImpl);
+    assert(mbcore != NULL);
     if (mbcore->is_valid(boxSet)) {
       ScdBox* tmp_ptr = NULL;
       scImpl->mbImpl->tag_set_data(scImpl->box_set_tag(), &boxSet, 1, &tmp_ptr);
@@ -715,7 +717,7 @@ ErrorCode ScdInterface::tag_shared_vertices(ParallelComm *pcomm, ScdBox *box)
       send_reqs(procs.size(), MPI_REQUEST_NULL);
   std::vector<EntityHandle> rhandles(4*procs.size()), shandles(4);
   for (unsigned int i = 0; i < procs.size(); i++) {
-    int success = MPI_Irecv(&rhandles[4*i], 4*sizeof(EntityHandle),
+    int success = MPI_Irecv((void*)&rhandles[4*i], 4*sizeof(EntityHandle),
                             MPI_UNSIGNED_CHAR, procs[i],
                             1, pcomm->proc_config().proc_comm(), 
                             &recv_reqs[i]);
@@ -738,7 +740,7 @@ ErrorCode ScdInterface::tag_shared_vertices(ParallelComm *pcomm, ScdBox *box)
     shandles[3] = box->start_element();
   }
   for (unsigned int i = 0; i < procs.size(); i++) {
-    int success = MPI_Isend(&shandles[0], 4*sizeof(EntityHandle), MPI_UNSIGNED_CHAR, procs[i], 
+    int success = MPI_Isend((void*)&shandles[0], 4*sizeof(EntityHandle), MPI_UNSIGNED_CHAR, procs[i],
                             1, pcomm->proc_config().proc_comm(), &send_reqs[i]);
     if (success != MPI_SUCCESS) return MB_FAILURE;
   }

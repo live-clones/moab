@@ -7,11 +7,11 @@
 #include "moab/Core.hpp"
 #include "moab/ReadUtilIface.hpp"
 #include "moab/ElemEvaluator.hpp"
-#include "moab/LinearTri.hpp"
-#include "moab/LinearQuad.hpp"
-#include "moab/LinearHex.hpp"
-#include "moab/LinearTet.hpp"
-#include "moab/QuadraticHex.hpp"
+#include "moab/LocalDiscretization/LinearTri.hpp"
+#include "moab/LocalDiscretization/LinearQuad.hpp"
+#include "moab/LocalDiscretization/LinearHex.hpp"
+#include "moab/LocalDiscretization/LinearTet.hpp"
+#include "moab/LocalDiscretization/QuadraticHex.hpp"
 #include "moab/CartVect.hpp"
 #include "TestUtil.hpp"
 
@@ -137,7 +137,7 @@ int main()
 {
   int failures = 0;
   
-//  failures += RUN_TEST(test_linear_tri); currently failing linear tri, bad formulation, working on it...
+  failures += RUN_TEST(test_linear_tri); // currently failing linear tri, bad formulation, working on it...
   failures += RUN_TEST(test_linear_quad);
   failures += RUN_TEST(test_linear_hex);
   failures += RUN_TEST(test_quadratic_hex);

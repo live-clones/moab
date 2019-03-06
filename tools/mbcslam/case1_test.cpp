@@ -14,12 +14,12 @@
 #include <string.h>
 #include "moab/Core.hpp"
 #include "moab/Interface.hpp"
-#include "Intx2MeshOnSphere.hpp"
+#include "moab/IntxMesh/Intx2MeshOnSphere.hpp"
 #include <math.h>
 #include "moab/ProgOptions.hpp"
 #include "MBTagConventions.hpp"
-#include "../test/TestUtil.hpp"
-#include "CslamUtils.hpp"
+#include "TestUtil.hpp"
+#include "moab/IntxMesh/IntxUtils.hpp"
 
 // for M_PI
 #include <math.h>
@@ -73,7 +73,7 @@ ErrorCode manufacture_lagrange_mesh_on_sphere(Interface * mb,
     rval = mb->get_coords(&oldV, 1, &(posi[0]));
     if (MB_SUCCESS != rval)
       return rval;
-    // cslam utils, case 1
+    // Intx utils, case 1
     CartVect newPos;
     departure_point_case1(posi, t, delta_t, newPos);
     newPos = radius * newPos;
@@ -176,15 +176,19 @@ int main(int argc, char **argv)
 
   double radius = CubeSide / 2 * sqrt(3.); // input
 
-  worker.SetRadius(radius);
+  worker.set_radius_source_mesh(radius);
+  worker.set_radius_destination_mesh(radius);
 
   //worker.SetEntityType(MBQUAD);
 
-  worker.SetErrorTolerance(gtol);
+  worker.set_error_tolerance(gtol);
   std::cout << "error tolerance epsilon_1=" << gtol << "\n";
 
   EntityHandle outputSet;
   rval = mb.create_meshset(MESHSET_SET, outputSet);
+  if (MB_SUCCESS != rval)
+    return 1;
+  rval = worker.FindMaxEdges(lagrange_set, euler_set);
   if (MB_SUCCESS != rval)
     return 1;
   rval = worker.intersect_meshes(lagrange_set, euler_set, outputSet);

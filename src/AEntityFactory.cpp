@@ -713,7 +713,7 @@ ErrorCode AEntityFactory::get_down_adjacency_elements(EntityHandle source_entity
                                             create_adjacency_option);
   
     // make this a fixed size to avoid cost of working with STL vectors
-  EntityHandle vertex_array[27];
+  EntityHandle vertex_array[27] = {};
   ErrorCode temp_result;
 
   const EntityHandle *vertices = NULL;
@@ -804,11 +804,6 @@ ErrorCode AEntityFactory::get_down_adjacency_elements_poly(EntityHandle source_e
   ErrorCode result = get_adjacencies(source_entity, 0, false, vertex_array);
   if (MB_SUCCESS != result) return result;
 
-  if (target_dimension == 0) {
-    target_entities.insert( target_entities.end(), vertex_array.begin(), vertex_array.end() );
-    return MB_SUCCESS;
-  }
-
   ErrorCode tmp_result;
   if (source_type == MBPOLYGON) {
     result = MB_SUCCESS;
@@ -833,6 +828,7 @@ ErrorCode AEntityFactory::get_down_adjacency_elements_poly(EntityHandle source_e
         const EntityHandle *explicit_adjs;
         int num_exp;
         for (Range::iterator rit = adj_edges.begin(); rit != adj_edges.end(); ++rit) {
+          // TODO check return value
           this->get_adjacencies(*rit, explicit_adjs, num_exp);
           if (NULL != explicit_adjs &&
               std::find(explicit_adjs, explicit_adjs+num_exp, source_entity) != 
@@ -1231,7 +1227,7 @@ ErrorCode AEntityFactory::notify_change_connectivity(EntityHandle entity,
                                                         int number_verts)
 {
   EntityType source_type = TYPE_FROM_HANDLE(entity);
-  if (source_type == MBPOLYHEDRON || source_type == MBPOLYGON)
+  if (source_type == MBPOLYHEDRON )
     return MB_NOT_IMPLEMENTED;
 
   // find out which ones to add and which to remove
@@ -1551,7 +1547,9 @@ ErrorCode AEntityFactory::notify_delete_entity(EntityHandle entity)
   if (TYPE_FROM_HANDLE(entity) == MBVERTEX) {
     std::vector<EntityHandle> adj_entities;
     for (int dim = 1; dim < 4; ++dim) {
-      get_adjacencies(entity, dim, false, adj_entities);
+      ErrorCode rval = get_adjacencies(entity, dim, false, adj_entities);
+      if (rval != MB_SUCCESS && rval != MB_ENTITY_NOT_FOUND)
+        return rval;
       if (!adj_entities.empty())
         return MB_FAILURE;
     }

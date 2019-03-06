@@ -29,7 +29,7 @@ class Interface;
 class SharedSetData
 {
 public:
-  SharedSetData(Interface& moab, unsigned rank);
+  SharedSetData(Interface& moab, int pcID,  unsigned rank);
   
   ~SharedSetData();
   
@@ -84,7 +84,6 @@ public:
 private:
   
   Interface& mb;
-  unsigned myRank;
 
   /**\brief per-set tag data */
   struct SharedSetTagData 

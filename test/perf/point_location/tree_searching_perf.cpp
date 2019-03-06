@@ -40,6 +40,7 @@ int main(int argc, char **argv)
   po.addOpt<int>( "leaf,l", "Number of doublings of maximum number of elements per leaf", &dleafs);
   po.addOpt<int>( "max_depth,m", "Number of 5-intervals on maximum depth of tree", &ddeps);
   po.addOpt<int>( "npoints,n", "Number of query points", &npoints);
+  po.addOpt<int>( "dim,d", "Dimension of the mesh", &dim);
 //  po.addOpt<void>( "print,p", "Print tree details", &print_tree);
   po.parseCommandLine(argc, argv);
 
@@ -69,7 +70,7 @@ int main(int argc, char **argv)
   for (std::vector<int>::iterator int_it = ints.begin(); int_it != ints.end(); ++int_it) {
     Core mb;
     Range elems;
-    rval = create_hex_mesh(mb, elems, *int_it, 3);
+    rval = create_hex_mesh(mb, elems, *int_it, dim);
     if (MB_SUCCESS != rval) return rval;
     
       // iteration: tree depth
@@ -79,7 +80,7 @@ int main(int argc, char **argv)
       for (std::vector<int>::iterator leafs_it = leafs.begin(); leafs_it != leafs.end(); ++leafs_it) {
   
           // iteration: tree type
-        for (int tree_tp = 1; tree_tp < 2; tree_tp++) {
+        for (int tree_tp = 0; tree_tp < 2; tree_tp++) {
             // create tree
           Tree *tree;
           if (0 == tree_tp)
@@ -108,7 +109,7 @@ int main(int argc, char **argv)
                     << *leafs_it << " "
                     << *dep_it << " "
                     << *int_it << " "
-                    << (*int_it)*(*int_it)*(dim == 3 ? *int_it : 1) << " "
+                    << (*int_it)*(*int_it)*(*int_it) << " "
                     << cpu_time << " "
                     << perc_outside << " ";
 
@@ -151,7 +152,10 @@ ErrorCode test_locator(SpatialLocator &sl, int npoints, double &cpu_time, double
   
     // call spatial locator to locate points
   ErrorCode rval = sl.locate_points(test_pts[0].array(), npoints, &ents[0], test_res[0].array(), &is_in[0]);
-  if (MB_SUCCESS != rval) return rval;
+  if (MB_SUCCESS != rval) {
+    delete [] is_in;
+    return rval;
+  }
 
   cpu_time = ct.time_elapsed();
 

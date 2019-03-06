@@ -1,4 +1,4 @@
-/*! \page userguide User's Guide (MOAB 4.8.2)
+/*! \page userguide User's Guide 
  
   \subpage team 
  
@@ -16,15 +16,15 @@
  <h2>The MOAB Team, including: </h2>
  
  - Vijay S. Mahadevan (Argonne National Lab)
- - Timothy J. Tautges (CD-Adapco, Univ Wisconsin-Madison)
+ - Timothy J. Tautges (Siemens, Univ Wisconsin-Madison)
  - Iulian Grindeanu (Argonne National Lab) 
  - Rajeev Jain (Argonne National Lab)
  - Danqing Wu  (Argonne National Lab)
- - Navamita Ray (Argonne National Lab)
+ - Navamita Ray (Los Alamos National Lab)
  - Jane Hu (Univ Wisconsin-Madison)
  - Paul Wilson (Univ Wisconsin-Madison)
- - Patrick Shriwise (Univ Wisconsin-Madison)
- - Anthony Scopatz (Univ Wisconsin-Madison)
+ - Patrick Shriwise (Argonne National Lab)
+ - Anthony Scopatz (The University of South Carolina)
 
 
  <h2>Emeritus members:</h2>
@@ -83,15 +83,17 @@
 
   \ref implementation         
 
+  \ref pymoab
+
   \ref representation     
 
   \ref element    
 
-    \ref nineone  
+    \ref tenone  
 
-    \ref ninetwo        
+    \ref tentwo        
 
-    \ref ninethree      
+    \ref tenthree      
 
   \ref performance   
 
@@ -208,7 +210,7 @@ In its most fundamental form, a mesh need only be represented by its vertices an
 \ref contents
 
  \subsection twothree 2.3. Entity Sets
-Entity sets are used to store arbitrary collections of entities and other sets.  Sets are used for a variety of things in mesh-based applications, from the set of entities discretizing a given geometric model entity to the entities partitioned to a specific processor in a parallel finite element application.  MOAB entity sets can also store parent/child relations with other entity sets, with these relations distinct from contains relations.  Parent/child relations are useful for building directed graphs with graph nodes representing collections of mesh entities; this construct can be used, for example, to represent an interface of mesh faces shared by two distinct collections of mesh regions.  MOAB also defines one special set, the “root set” or the interface itself; all entities are part of this set by definition.  Defining a root set allows the use of a single set of MOAB API functions to query entities in the overall mesh as well as its subsets.
+Entity sets are also known as "mesh sets", or when the context is clear, not to be confused with std::set, just "sets". Entity sets are used to store arbitrary collections of entities and other sets.  Sets are used for a variety of things in mesh-based applications, from the set of entities discretizing a given geometric model entity to the entities partitioned to a specific processor in a parallel finite element application.  MOAB entity sets can also store parent/child relations with other entity sets, with these relations distinct from contains relations.  Parent/child relations are useful for building directed graphs with graph nodes representing collections of mesh entities; this construct can be used, for example, to represent an interface of mesh faces shared by two distinct collections of mesh regions.  MOAB also defines one special set, the “root set” or the interface itself; all entities are part of this set by definition.  Defining a root set allows the use of a single set of MOAB API functions to query entities in the overall mesh as well as its subsets.
 
 MOAB entity sets can be one of two distinct types: list-type entity sets preserve the order in which entities are added to the set, and can store a given entity handle multiple times in the same set; set-type sets are always ordered by handle, regardless of the order of addition to the set, and can store a given entity handle only once.  This characteristic is assigned when the set is created, and cannot be changed during the set’s lifetime.
 
@@ -428,17 +430,15 @@ A number of mesh-based services are often used in conjunction with a mesh librar
 
   \subsection fourone 4.1. Visualization
 
-Visualization is one of the most common needs associated with meshes.  The primary tool used to visualize MOAB meshes is VisIt [12].  Users can specify that VisIt read mesh directly out of the MOAB instance, by specifying the ITAPS_MOAB mesh format and a file readable by MOAB (see http://sigma.mcs.anl.gov/?p=429).
+Visualization is one of the most common needs associated with meshes.  The primary tool used to visualize MOAB meshes is VisIt [11].  Users can download a VisIt version that has the MOAB plugin compiled, then a file in hdf5 MOAB format (default extension h5m) can be read directly. 
 
-There are some initial capabilities in VisIt for limited viewing and manipulation of tag data and some types of entity sets.  Tag data is visualized using the same mechanisms used to view other field data in VisIt, e.g. using a pseudocolor plot; sets are viewed using VisIt’s SIL window, accessed by selecting the SIL icon in the data selection window.  xxx shows a vertex-based radiation temperature field computed by the Cooper rad-hydro code [1] for a subset of geometric volumes in a mesh.   
-
-Reorganization of VisIt’s set handling is also underway, to increase versatility and flexibility of this important mechanism.
+There are capabilities in VisIt for viewing and manipulation of tag data and some types of entity sets.  Dense tag data is visualized using the same mechanisms used to view other field data in VisIt, e.g. using a pseudocolor plot; Material sets, neumann and dirichlet sets and parallel partition sets can be visualized using the subset capability. Figure 2 shows a vertex-based radiation temperature field computed by the Cooper rad-hydro code [1] for a subset of geometric volumes in a mesh.   
 
  \ref contents
 
   \subsection fourtwo 4.2. Parallel Decomposition
 
-To support parallel simulation, applications often need to partition a mesh into parts, designed to balance the load and minimize communication between sets.  MOAB includes the MBZoltan tool for this purpose, constructed on the well-known Zoltan partitioning library [13].  After computing the partition using Zoltan, MBZoltan stores the partition as either tags on individual entities in the partition, or as tagged sets, one set per part.  Since a partition often exhibits locality similar to how the entities were created, storing it as sets (based on Range’s) is often more memory-efficient than an entity tag-based representation.  Figure below shows a couple of partitioned meshes computed with MBZoltan (and visualized in VisIt).
+To support parallel simulation, applications often need to partition a mesh into parts, designed to balance the load and minimize communication between sets.  MOAB includes the mbpart tool for this purpose, constructed on the well-known Zoltan partitioning library [12] and Metis [13].  After computing the partition using Zoltan or Metis, MOAB stores the partition as either tags on individual entities in the partition, or as tagged sets, one set per part.  Since a partition often exhibits locality similar to how the entities were created, storing it as sets (based on Range’s) is often more memory-efficient than an entity tag-based representation.  Figure below shows a couple of partitioned meshes computed with mbpart with -z option for Zoltan and visualized in VisIt.
 
 
  \image html vis_part.png
@@ -527,7 +527,7 @@ The following code fragment illustrates the use of ReadUtilIface to read a mesh 
 \code
 // get the read iface from moab
 ReadUtilIface *iface;
-ErrorCode rval = moab->get_interface("ReadUtilIface", &iface);
+ErrorCode rval = moab->query_interface(iface);
 
 // allocate a block of vertex handles and read xyz’s into them
 std::vector<double*> arrays;
@@ -560,7 +560,7 @@ The following code fragment shows how to use WriteUtilIface to write the vertex 
 using namespace moab;
 // get the write iface from moab
 WriteUtilIface *iface;
-ErrorCode rval = moab->get_interface("WriteUtilIface", &iface);
+ErrorCode rval = moab->query_interface(iface);
 
 // get all hexes the model, and choose the first 10 of those
 Range tmp_hexes, hexes, verts;
@@ -850,7 +850,7 @@ MOAB implements several specific methods for loading mesh into a parallel repres
 
 - BCAST_DELETE: the root processor reads and broadcasts the mesh; each processor then deletes the mesh not used by its part(s).
 
-The READ_DELETE and BCAST_DELETE methods are supported for all file types MOAB is able to read, while READ_PART is only implemented for MOAB’s native HDF5-based file format.
+The READ_DELETE and BCAST_DELETE methods are supported for all file types MOAB is able to read, while READ_PART is only implemented for MOAB’s native HDF5-based file format and netcdf and pnetcdf files from climate application.
 
 Various other options control the selection of part sets or other details of the parallel read process.  For example, the application can specify the tags, and optionally tag values, which identify parts, and whether those parts should be distributed according to tag value or using round-robin assignment.
 
@@ -919,7 +919,7 @@ Several example option strings controlling parallel reading and initialization a
 
 After creating the local mesh on each processor, an application can call the following functions in ParallelComm to establish information on shared mesh entities.  See the [http://ftp.mcs.anl.gov/pub/fathom/moab-docs/HelloParMOAB_8cpp-example.html example] in the MOAB source tree for a complete example of how this is done from an application.
 
-- ParallelComm::resolve_shared_entities (collective): Resolves shared entities between processors, based on GLOBAL_ID tag values of vertices.  Various forms are available, based on entities to be evaluated and maximum dimension for which entity sharing should be found.
+- ParallelComm::resolve_shared_entities (collective): Resolves shared entities between processors, based by default on GLOBAL_ID tag values of vertices. For meshes with more than 2 billion vertices, an opaque tag of size 8 should be used, in which a 64 bit integer is casted to that opaque tag.  Various forms are available, based on entities to be evaluated and maximum dimension for which entity sharing should be found.
 
 - ParallelComm::exchange_ghost_cells (collective): Exchange ghost entities with processors sharing an interface with this processor, based on specified ghost dimension (dimension of ghost entities exchanged), bridge dimension, number of layers, and type of adjacencies to ghost entities.  An entity is sent as a ghost if it is within that number of layers, across entities of the bridge dimension, with entities owned by the receiving processor, or if it is a lower-dimensional entity adjacent to a ghost entity and that option is requested.
 .
@@ -1018,7 +1018,7 @@ The second method for incorporating MOAB into an application’s build system is
 
   \section implementation  7.iMesh (ITAPS Mesh Interface) Implementation in MOAB
 
-iMesh is a common API to mesh data developed as part of the Interoperable Tools for Advanced Petascale Simulations (ITAPS) project [18].  Applications using the iMesh interface can operate on any implementation of that interface, including MOAB.  MOAB-based applications can take advantage of other services implemented on top of iMesh, including the MESQUITE mesh improvement toolkit [19] and the GRUMMP mesh improvement library [20].
+iMesh is a common API to mesh data developed as part of the Interoperable Tools for Advanced Petascale Simulations (ITAPS) project [19].  Applications using the iMesh interface can operate on any implementation of that interface, including MOAB.  MOAB-based applications can take advantage of other services implemented on top of iMesh, including the MESQUITE mesh improvement toolkit [20].
 
 MOAB’s native interface is accessed through the Interface abstract C++ base class.  Wrappers are not provided in other languages; rather, applications wanting to access MOAB from those languages should do so through iMesh.  In most cases, the data models and functionality available through MOAB and iMesh are identical.  However, there are a few differences, subtle and not-so-subtle, between the two:
 
@@ -1053,11 +1053,28 @@ Note that using the iMesh interface from Fortran-based applications requires a c
 
 <sup>6</sup>iMesh and MOAB both define adjacencies using the topological concept of closure.  Since the closure of an entity includes the entity itself, the d-dimensional entities on the closure of a given entity should include the entity itself.
 
- \ref contents
+  \ref contents
 
-  \section representation 8.Structured Mesh Representation
+  \section pymoab 8.Python Interface (PyMOAB)
 
-A structured mesh is defined as a D-dimensional mesh whose interior vertices have 2D connected edges.   Structured mesh can be stored without connectivity, if certain information is kept about the parametric space of each structured block of mesh.  MOAB can represent structured mesh with implicit connectivity, saving approximately 57% of the storage cost compared to an unstructured representation<sup>7</sup>.  Since connectivity must be computed on the fly, these queries execute a bit slower than those for unstructured mesh.  More information on the theory behind MOAB's structured mesh representation can be found in “MOAB-SD: Integrated structured and unstructured mesh representation”[17].
+A Python interface to MOAB's essential core functionality and a few other tools has been added as of Version 5.0. The pymoab module can be used to interactively interrogate existing mesh files or prototype MOAB-based algorithms. It can also be connected to other Python applications or modules for generation, manipulation, and visualization of a MOAB mesh and mesh data. Examples of this can be found in the laplaciansmoother.py and yt2moab.py files. Interaction with the PyMOAB interface is intended to be somewhat analagous to interaction with the MOAB C++ API. A simple example of file loading and mesh interrogation can be found in interrogate_mesh.py
+
+<B>PyMOAB uses NumPy internally </B> to represent data and vertex coordinates though other properly formed data structures can be used to create vertices, set data, etc. Data and vertex coordinates will always be returned in the form of NumPy arrays, however. 
+
+<B>EntityHandles</B> are represented by Python long integers. Arrays of these values are commonly returned from calls as MOAB Ranges.
+
+<B>MOAB ErrorCodes</B> - Errors are automatically checked internally by the PyMOAB instance, raising various exceptions depending on the error that occurs. These exceptions can be handled as raised from the functions or acceptable error values returned can also be specified via the exceptions parameter common to all PyMOAB functions in which case no exception will be raised.
+
+Documentation for PyMOAB functions is provided as part of this User's Guide, but can also be accessed in the Python interpreter by calling `help(<function_or_method>)`.
+
+Examples of PyMOAB usage can be found in the /examples/python/ directory.
+
+
+  \ref contents
+
+  \section representation 9.Structured Mesh Representation
+
+A structured mesh is defined as a D-dimensional mesh whose interior vertices have 2D connected edges.   Structured mesh can be stored without connectivity, if certain information is kept about the parametric space of each structured block of mesh.  MOAB can represent structured mesh with implicit connectivity, saving approximately 57% of the storage cost compared to an unstructured representation<sup>7</sup>.  Since connectivity must be computed on the fly, these queries execute a bit slower than those for unstructured mesh.  More information on the theory behind MOAB's structured mesh representation can be found in “MOAB-SD: Integrated structured and unstructured mesh representation”[18].
 
 Currently, MOAB's structured mesh representation can only be used by creating structured mesh at runtime; that is, structured mesh is saved/restored in an unstructured format in MOAB's HDF5-based native save format.  For more details on how to use MOAB's structured mesh representation, see the scdseq_test.cpp source file in the test/ directory.
 
@@ -1065,15 +1082,15 @@ Currently, MOAB's structured mesh representation can only be used by creating st
 
  \ref contents
 
-  \section element 9.Spectral Element Meshes
+  \section element 10.Spectral Element Meshes
 
-The Spectral Element Method (SEM) is a high-order method, using a polynomial Legendre interpolation basis with Gauss-Lobatto quadrature points, in contrast to the Lagrange basis used in (linear) finite elements [20].  SEM obtains exponential convergence with decreasing mesh characteristic sizes, and codes implementing this method typically have high floating-point intensity, making the method highly efficient on modern CPUs.  Most Nth-order SEM codes require tensor product cuboid (quad/hex) meshes, with each d-dimensional element containing (N+1)d degrees of freedom (DOFs).  There are various methods for representing SEM meshes and solution fields on them; this document discusses these methods and the tradeoffs between them.  The mesh parts of this discussion are given in terms of the iMesh mesh interface and its implementation by the MOAB mesh library [21].
+The Spectral Element Method (SEM) is a high-order method, using a polynomial Legendre interpolation basis with Gauss-Lobatto quadrature points, in contrast to the Lagrange basis used in (linear) finite elements [20].  SEM obtains exponential convergence with decreasing mesh characteristic sizes, and codes implementing this method typically have high floating-point intensity, making the method highly efficient on modern CPUs.  Most Nth-order SEM codes require tensor product cuboid (quad/hex) meshes, with each d-dimensional element containing (N+1)^d degrees of freedom (DOFs).  There are various methods for representing SEM meshes and solution fields on them; this document discusses these methods and the tradeoffs between them.  The mesh parts of this discussion are given in terms of the iMesh mesh interface and its implementation by the MOAB mesh library [21].
 
 The figure above shows a two-dimensional 3rd-order SEM mesh consisting of four quadrilaterals.  For this mesh, each quadrilateral has (N+1)^2=16 DOFs, with corner and edge degrees of freedom shared between neighboring quadrilaterals.
 
   \ref contents
 
-  \subsection nineone 9.1. Representations
+  \subsection tenone 10.1. Representations
 
 There are various representations of this mesh in a mesh database like MOAB, depending on how DOFs are related to mesh entities and tags on those entities.  We mention several possible representations:
 
@@ -1087,7 +1104,7 @@ As a convenience for applications, functions could also be provided for importan
 
   \ref contents
 
-  \subsection ninetwo 9.2. Tradeoffs
+  \subsection tentwo 10.2. Tradeoffs
 
 There are various competing tradeoffs in the various representation types.  These include:
 
@@ -1100,14 +1117,14 @@ The lower-memory option (storing variables on vertices and assembling into lexic
 
   \ref contents
 
-  \subsection ninethree 9.3. MOAB Representation
+  \subsection tenthree 10.3. MOAB Representation
 In choosing the right MOAB representation for spectral meshes, we are trying to balance a) minimal memory usage, b) access to properly-ordered and -aligned tag storage, and c) maximal compatibility with tools likely to use MOAB.  The solution we propose is to use a representation most like option 2) above, with a few optional behaviors based on application requirements.  
 
 In brief, we propose to represent elements using the linear, FE-ordered connectivity list (containing only corner vertices from the spectral element), with field variables written to either vertices, lexicographically-ordered arrays on elements, or both, and with a lexicographically-ordered array (stored on tag SPECTRAL_VERTICES) of all (corner+higher-order) vertices stored on elements.  In the either/or case, the choice will be evident from the tag size and the entities on which the tag is set.  In the both case, the tag name will have a “-LEX” suffix for the element tags, and the size of the element tag will be (N+1)^2 times that of the vertex-based tag.  Finally, the file set containing the spectral elements (or the root set, if no file set was input to the read) will contain a “SPECTRAL_ORDER” tag whose value is N.  These conventions are described in the “Metadata Information” document distributed with the MOAB source code.
 
   \ref contents
 
-  \section performance 10.Performance and Using MOAB Efficiently from Applications
+  \section performance 11.Performance and Using MOAB Efficiently from Applications
 
 MOAB is designed to operate efficiently on groups of entities and for large meshes.  Applications will be most efficient when they operate on entities in groups, especially groups which are close in their order of creation.  The MOAB API is structured to encourage operations on groups of entities.  Conversely, MOAB will not perform as well as other libraries if there are frequent deletion and creation of entities.  For those types of applications, a mesh library using a C++ object-based representation is more appropriate.  In this section, performance of MOAB when executing a variety of tasks is described, and compared to that of other representations.  Of course, these metrics are based on the particular models and environments where they are run, and may or may not be representative of other application types.
 
@@ -1122,7 +1139,7 @@ This test can be run on your system to determine the runtime and memory performa
 
   \ref contents
 
-  \section error-handling 11.Error Handling
+  \section error-handling 12.Error Handling
 
 Errors are handled through the routine MBError(). This routine calls MBTraceBackErrorHandler(), the default error handler which tries to print a traceback.
 
@@ -1163,7 +1180,7 @@ For example code on error handling, please refer to examples/TestErrorHandling.c
 
   \ref contents
 
-  \section conclusions 12.Conclusions and Future Plans
+  \section conclusions 13.Conclusions and Future Plans
 
 MOAB, a Mesh-Oriented datABase, provides a simple but powerful data abstraction to structured and unstructured mesh, and makes that abstraction available through a function API.  MOAB provides the mesh representation for the VERDE mesh verification tool, which demonstrates some of the powerful mesh metadata representation capabilities in MOAB.  MOAB includes modules that import mesh in the ExodusII, CUBIT .cub and Vtk file formats, as well as the capability to write mesh to ExodusII, all without licensing restrictions normally found in ExodusII-based applications.  MOAB also has the capability to represent and query structured mesh in a way that optimizes storage space using the parametric space of a structured mesh; see Ref. [17] for details.
 
@@ -1171,7 +1188,7 @@ Initial results have demonstrated that the data abstraction provided by MOAB is 
 
   \ref contents
 
-  \section references 13.References
+  \section references 14.References
 
 [1]	M. Fatenejad and G.A. Moses, “Cooper radiation hydrodynamics code..”
 
@@ -1179,7 +1196,7 @@ Initial results have demonstrated that the data abstraction provided by MOAB is 
 
 [3]	T.J. Tautges, MOAB Meta-Data Information, 2010.
 
-[4]	T.J. Tautges, “MOAB - ITAPS – Trac.”, http://trac.mcs.anl.gov/projects/ITAPS/wiki/MOAB
+[4]	T.J. Tautges, “MOAB - ITAPS – SIGMA.”, http://sigma.mcs.anl.gov/
 
 [5]	“MOAB Developers Email List.”, moab-dev@mcs.anl.gov.
 
@@ -1197,27 +1214,29 @@ Initial results have demonstrated that the data abstraction provided by MOAB is 
 
 [12]	K. Devine, E. Boman, R. Heaphy, B. Hendrickson, and C. Vaughan, “Zoltan Data Management Services for Parallel Dynamic Applications,” Computing in Science and Engineering,  vol. 4, 2002, pp. 90–97.
 
-[13]	T.J. Tautges, P.P.H. Wilson, J. Kraftcheck, B.F. Smith, and D.L. Henderson, “Acceleration Techniques for Direct Use of  CAD-Based Geometries in Monte Carlo Radiation Transport,” International Conference on Mathematics, Computational Methods & Reactor Physics (M&C 2009),  Saratoga Springs, NY: American Nuclear Society, 2009.
+[13]    METIS - Serial Graph Partitioning and Fill-reducing Matrix Ordering. http://glaros.dtc.umn.edu/gkhome/views/metis
 
-[14]	H. Kim and T. Tautges, “EBMesh: An Embedded Boundary Meshing Tool,” in preparation.
+[14]	T.J. Tautges, P.P.H. Wilson, J. Kraftcheck, B.F. Smith, and D.L. Henderson, “Acceleration Techniques for Direct Use of  CAD-Based Geometries in Monte Carlo Radiation Transport,” International Conference on Mathematics, Computational Methods & Reactor Physics (M&C 2009),  Saratoga Springs, NY: American Nuclear Society, 2009.
 
-[15]	G.D. Sjaardema, T.J. Tautges, T.J. Wilson, S.J. Owen, T.D. Blacker, W.J. Bohnhoff, T.L. Edwards, J.R. Hipp, R.R. Lober, and S.A. Mitchell, CUBIT mesh generation environment Volume 1: Users manual, Sandia National Laboratories, May 1994, 1994.
+[15]	H. Kim and T. Tautges, “EBMesh: An Embedded Boundary Meshing Tool,” in preparation.
 
-[16]	T.J. Tautges, “CGM: A geometry interface for mesh generation, analysis and other applications,” Engineering with Computers,  vol. 17, 2001, pp. 299-314.
+[16]	G.D. Sjaardema, T.J. Tautges, T.J. Wilson, S.J. Owen, T.D. Blacker, W.J. Bohnhoff, T.L. Edwards, J.R. Hipp, R.R. Lober, and S.A. Mitchell, CUBIT mesh generation environment Volume 1: Users manual, Sandia National Laboratories, May 1994, 1994.
 
-[17]	T. J. Tautges, MOAB-SD: Integrated structured and unstructured mesh representation, Engineering with Computers, vol. 20, no. 3, pp. 286-293, 2004.
+[17]	T.J. Tautges, “CGM: A geometry interface for mesh generation, analysis and other applications,” Engineering with Computers,  vol. 17, 2001, pp. 299-314.
 
-[18]	“Interoperable Technologies for Advanced Petascale Simulations (ITAPS),” Interoperable Technologies for Advanced Petascale Simulations (ITAPS).
+[18]	T. J. Tautges, MOAB-SD: Integrated structured and unstructured mesh representation, Engineering with Computers, vol. 20, no. 3, pp. 286-293, 2004.
 
-[19]	P. Knupp, “Mesh quality improvement for SciDAC applications,” Journal of Physics: Conference Series,  vol. 46, 2006, pp. 458-462.
+[19]	“Interoperable Technologies for Advanced Petascale Simulations (ITAPS),” Interoperable Technologies for Advanced Petascale Simulations (ITAPS).
 
-[20]	M. O. Deville, P. F. Fischer, and E. H. Mund, High-order methods for incompressible fluid flow. Cambridge, UK; New York: Cambridge University Press, 2002.
+[20]	P. Knupp, “Mesh quality improvement for SciDAC applications,” Journal of Physics: Conference Series,  vol. 46, 2006, pp. 458-462.
 
-[21]	T. J. Tautges, “MOAB Wiki.” [Online]. Available: http://trac.mcs.anl.gov/projects/ITAPS/wiki/MOAB. [Accessed: 30-Oct-2012].
+[21]	M. O. Deville, P. F. Fischer, and E. H. Mund, High-order methods for incompressible fluid flow. Cambridge, UK; New York: Cambridge University Press, 2002.
 
-[22]	T. J. Tautges, “Canonical numbering systems for finite-element codes,” International Journal for Numerical Methods in Biomedical Engineering, vol. 26, no. 12, pp. 1559–1572, 2010.
+[22]	T. J. Tautges, “MOAB Wiki.” [Online]. Available: http://sigma.mcs.anl.gov/moab-library [Accessed: 20-Oct-2016].
 
-[23]    V. Dyedov, N. Ray, D.Einstein, X. Jiao, T. Tautges, “AHF: Array-based half-facet data structure for mixed-dimensional and non-manifold meshes”, In Proceedings of 22nd International Meshing Roundtable, Orlando, Florida, October 2013.
+[23]	T. J. Tautges, “Canonical numbering systems for finite-element codes,” International Journal for Numerical Methods in Biomedical Engineering, vol. 26, no. 12, pp. 1559–1572, 2010.
+
+[24]    V. Dyedov, N. Ray, D.Einstein, X. Jiao, T. Tautges, “AHF: Array-based half-facet data structure for mixed-dimensional and non-manifold meshes”, In Proceedings of 22nd International Meshing Roundtable, Orlando, Florida, October 2013.
 
 
   \ref contents
@@ -1257,6 +1276,8 @@ Initial results have demonstrated that the data abstraction provided by MOAB is 
  
   \page building Building & Installing
  
+<h1> Standard Installation Instructions </h1>
+
   MOAB uses an autoconf and libtool-based build process by default.  The procedure used to build MOAB from scratch depends on whether the source code was obtained from a “tarball” or directly from the Subversion repository.  Assuming the latter, the following steps should be executed for building and installing MOAB:
   - Locate and build any required dependencies.  MOAB can be built with no dependencies on other libraries; this may be useful for applications only needing basic mesh representation and not needing to export mesh to formats implemented in other libraries.  MOAB’s native save/restore capability is built on HDF5-based files; applications needing to save and restore files from MOAB reliably should use this library.  MOAB also uses ExodusII, a netCDF-based file format developed at Sandia National Laboratories [10].  Applications needing to execute these tests should also build netCDF.  Note that MOAB uses netCDF’s C++ interface, which is not enabled by default in netCDF but can be enabled using the “–enable-cxx” option to netCDF’s configure script.
   - Unpack source code into <moab>, and change current working directory to that location.
@@ -1271,5 +1292,15 @@ Initial results have demonstrated that the data abstraction provided by MOAB is 
   .
 
 These steps are sufficient for building MOAB against HDF5 and netCDF.  By default, a small number of standard MOAB-based applications are also built, including mbconvert (a utility for reading and writing files), mbsize (for querying basic information about a mesh), and the iMesh interface (see Section 7).  Other utilities can be enabled using various other options to the configure script; for a complete list of build options, execute “./configure –help”.
- 
+
+<h1> Other MOAB Components </h1>
+
+<h2> PyMOAB </h2>
+
+  To install the PyMOAB module, add "--enable-pymoab" in the configuration step described above. PyMOAB will build using whatever version of Python is available on the system when the configuration command is executed. It requires the following packages to operate properly:
+    - Python's <a href=https://pypi.python.org/pypi/setuptools> setuptools </a> and <a href=https://docs.python.org/3/library/distutils.html> distutils </a> for building, linking, and distribution
+    - <a href=https://docs.python.org/3/library/distutils.html> NumPy </a> for management of data being passed into and out of the MOAB database
+
+  PyMOAB can be installed with a custom prefix path which can be set adding "PYMOAB_PREFIX=/path/to/custom/install/location" to the configuration command.
+
  */

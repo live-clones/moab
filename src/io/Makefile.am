@@ -9,9 +9,10 @@ endif
 noinst_LTLIBRARIES = libmoabio.la 
 libmoabio_la_LIBADD = $(NETCDF_LIBS) $(PNETCDF_LIBS) $(CGNS_LIBS) $(HDF5_LIBS) 
 
-AM_CPPFLAGS += -DIS_BUILDING_MB \
+AM_CPPFLAGS  = -DIS_BUILDING_MB \
                -DLOCDIR=src/io/ \
-               -I..  -I$(srcdir)/.. -I$(srcdir)/../moab -I$(srcdir)/../parallel
+               -I..  -I$(srcdir)/.. -I$(srcdir)/../moab -I$(srcdir)/../parallel \
+               $(EIGEN3_INCLUDES)
 
 if HAVE_NETCDF
   MOAB_NETCDF_SRCS = ReadNCDF.cpp  ReadNCDF.hpp \
@@ -97,7 +98,10 @@ else
 endif
 
 if HAVE_CGM
-  AM_CPPFLAGS += @CGM_CPPFLAGS@ 
+  AM_CPPFLAGS += @CGM_CPPFLAGS@
+if USING_DEV_CGM
+  AM_CPPFLAGS += -I$(CGM_DIR)/src
+endif
   MOAB_CGM_SRCS =  ReadCGM.cpp  ReadCGM.hpp
   libmoabio_la_LIBADD += @CGM_LIBS@
 else
@@ -126,6 +130,10 @@ libmoabio_la_SOURCES = \
   ReadMCNP5.hpp \
   ReadNASTRAN.cpp \
   ReadNASTRAN.hpp \
+  ReadRTT.cpp \
+  ReadRTT.hpp \
+  ReadOBJ.cpp \
+  ReadOBJ.hpp \
   ReadSmf.hpp \
   ReadSmf.cpp \
   ReadSms.hpp \
@@ -136,8 +144,6 @@ libmoabio_la_SOURCES = \
   ReadTemplate.hpp \
   ReadTetGen.cpp \
   ReadTetGen.hpp \
-  ReadTxt.cpp \
-  ReadTxt.hpp \
   ReadVtk.cpp \
   ReadVtk.hpp \
   SMF_State.cpp \
@@ -145,7 +151,6 @@ libmoabio_la_SOURCES = \
   Tqdcfr.cpp \
   Tqdcfr.hpp \
   VtkUtil.cpp \
-  VtkUtil.hpp \
   WriteAns.cpp \
   WriteAns.hpp \
   WriteGMV.cpp \
@@ -168,4 +173,7 @@ libmoabio_la_SOURCES = \
   $(MOAB_CGM_SRCS)
 
 libmoabio_la_includedir = $(includedir)
-nobase_libmoabio_la_include_HEADERS = moab/ExoIIInterface.hpp
+nobase_libmoabio_la_include_HEADERS = moab/ExoIIInterface.hpp moab/VtkUtil.hpp
+
+EXTRA_DIST = CMakeLists.txt
+

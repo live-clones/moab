@@ -1,11 +1,24 @@
 #ifndef TEST_UTIL_HPP
 #define TEST_UTIL_HPP
 
+#ifdef __cplusplus
+#include <string>
+#endif
 #include "moab/MOABConfig.h"
 /* Define these here because they are used by many tests
  * to find the add directory for input files */
 #define STRINGIFY_(X) #X
 #define STRINGIFY(X) STRINGIFY_(X)
+
+#ifdef MESHDIR
+#ifdef __cplusplus
+const std::string TestDir( STRINGIFY(MESHDIR) );
+#else
+const char* TestDir = STRINGIFY(MESHDIR);
+#endif
+#else
+#error Specify MESHDIR to compile test
+#endif
 
 /* How to use this test suite utility:
  * 1) Write tests that use the CHECK and CHECK_* macros defined below to assert test conditions.
@@ -70,7 +83,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <string>
 #ifdef __cplusplus
 #include <iostream>
 #include <vector>
@@ -250,8 +262,13 @@ inline void flag_error()
 #  include "Internals.hpp"
 #endif
 
+#ifndef TEST_USES_ERR_CODES
 typedef void (*test_func)(void);
 int run_test( test_func test, const char* func_name )
+#else
+typedef moab::ErrorCode (*test_func_err)(void);
+int run_test( test_func_err test, const char* func_name )
+#endif
 {
   printf("Running %s ...\n", func_name );
   

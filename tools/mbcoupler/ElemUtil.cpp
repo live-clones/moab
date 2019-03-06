@@ -13,13 +13,13 @@ namespace ElemUtil {
 /**\brief Class representing a 3-D mapping function (e.g. shape function for volume element) */
 class VolMap {
   public:
-      /**\brief Return $\vec \xi$ corresponding to logical center of element */
+      /**\brief Return \f$\vec \xi\f$ corresponding to logical center of element */
     virtual CartVect center_xi() const = 0;
-      /**\brief Evaluate mapping function (calculate $\vec x = F($\vec \xi)$ )*/
+      /**\brief Evaluate mapping function (calculate \f$\vec x = F($\vec \xi)\f$ )*/
     virtual CartVect evaluate( const CartVect& xi ) const = 0;
       /**\brief Evaluate Jacobian of mapping function */
     virtual Matrix3 jacobian( const CartVect& xi ) const = 0;
-      /**\brief Evaluate inverse of mapping function (calculate $\vec \xi = F^-1($\vec x)$ )*/
+      /**\brief Evaluate inverse of mapping function (calculate \f$\vec \xi = F^-1($\vec x)\f$ )*/
     bool solve_inverse( const CartVect& x, CartVect& xi, double tol ) const ;
 };
 
@@ -36,7 +36,7 @@ bool VolMap::solve_inverse( const CartVect& x, CartVect& xi, double tol ) const
     det = J.determinant();
     if (det < std::numeric_limits<double>::epsilon())
       return false;
-    xi -= J.inverse(1.0/det) * delta;
+    xi -= J.inverse() * delta;
     delta = evaluate( xi ) - x;
   }
   return true;
@@ -138,15 +138,15 @@ void nat_coords_trilinear_hex2(const CartVect hex[8],
   const int vertMap[nverts] = {0,1,3,2, 4,5,7,6}; //Map from nat to lex ordering
 
   const int n = 2; //linear
-  real coords[ndim*nverts]; //buffer
+  realType coords[ndim*nverts]; //buffer
 
-  real *xm[ndim];
+  realType *xm[ndim];
   for(int i=0; i<ndim; i++)
     xm[i] = coords + i*nverts;
 
   //stuff hex into coords
   for(int i=0; i<nverts; i++){
-    real vcoord[ndim];
+    realType vcoord[ndim];
     hex[i].get(vcoord);
 
     for(int d=0; d<ndim; d++)
@@ -156,7 +156,7 @@ void nat_coords_trilinear_hex2(const CartVect hex[8],
 
   double dist = 0.0;
   ElemUtil::hex_findpt(xm, n, xyz, ncoords, dist);
-  if (3*EPS < dist) {
+  if (3*MOAB_POLY_EPS < dist) {
       // outside element, set extremal values to something outside range
     for (int j = 0; j < 3; j++) {
       if (ncoords[j] < (-1.0-etol) || ncoords[j] > (1.0+etol))
@@ -212,7 +212,7 @@ bool point_in_trilinear_hex(const CartVect *hex,
 #include "errmem.h"
 }*/
 
-void hex_findpt(real *xm[3],
+void hex_findpt(realType *xm[3],
                 int n,
                 CartVect xyz,
                 CartVect &rst,
@@ -220,13 +220,13 @@ void hex_findpt(real *xm[3],
 {
 
   //compute stuff that only depends on the order -- could be cached
-  real *z[3];
+  realType *z[3];
   lagrange_data ld[3];
   opt_data_3 data;
 
   //triplicates
   for(int d=0; d<3; d++){
-    z[d] = tmalloc(real, n);
+    z[d] = tmalloc(realType, n);
     lobatto_nodes(z[d], n);
     lagrange_setup(&ld[d], z[d], n);
   }
@@ -234,12 +234,12 @@ void hex_findpt(real *xm[3],
   opt_alloc_3(&data, ld);
 
   //find nearest point
-  real x_star[3];
+  realType x_star[3];
   xyz.get(x_star);
 
-  real r[3] = {0, 0, 0 }; // initial guess for parametric coords
+  realType r[3] = {0, 0, 0 }; // initial guess for parametric coords
   unsigned c = opt_no_constraints_3;
-  dist = opt_findpt_3(&data, (const real **)xm, x_star, r, &c);
+  dist = opt_findpt_3(&data, (const realType **)xm, x_star, r, &c);
   //c tells us if we landed inside the element or exactly on a face, edge, or node
 
   //copy parametric coords back
@@ -263,20 +263,20 @@ void hex_findpt(real *xm[3],
 // rst: input: parametric coords of the point where we want to evaluate the field
 // value: output: value of field at rst
 
-void hex_eval(real *field,
+void hex_eval(realType *field,
 	      int n,
 	      CartVect rstCartVec,
 	      double &value)
 {
   int d;
-  real rst[3];
+  realType rst[3];
   rstCartVec.get(rst);
 
   //can cache stuff below
   lagrange_data ld[3];
-  real *z[3];
+  realType *z[3];
   for(d=0;d<3;++d){
-    z[d] = tmalloc(real, n);
+    z[d] = tmalloc(realType, n);
     lobatto_nodes(z[d], n);
     lagrange_setup(&ld[d], z[d], n);
   }
@@ -286,7 +286,7 @@ void hex_eval(real *field,
     nf = n*n,
     ne = n,
     nw = 2*n*n + 3*n;
-  real *od_work = tmalloc(real, 6*nf + 9*ne + nw);
+  realType *od_work = tmalloc(realType, 6*nf + 9*ne + nw);
 
   //piece that we shouldn't want to cache
   for(d=0; d<3; d++){
@@ -393,7 +393,7 @@ bool integrate_trilinear_hex(const CartVect* hex_corners,
         double w_k    = g_pts[k][0];
         double zeta_k = g_pts[k][1];
 
-        // Calculate the "real" space point given the "normal" point
+        // Calculate the "realType" space point given the "normal" point
         CartVect normal_pt(xi_i, eta_j, zeta_k);
 
         // Calculate the value of F(x(xi,eta,zeta),y(xi,eta,zeta),z(xi,eta,zeta)
@@ -464,11 +464,178 @@ namespace Element {
       det = J.determinant();
       if (det < std::numeric_limits<double>::epsilon())
         throw Map::EvaluationError(x, vertex);
-      xi -= J.inverse(1.0/det) * delta;
+      xi -= J.inverse() * delta;
       delta = evaluate( xi ) - x;
     }
     return xi;
   }// Map::ievaluate()
+
+  SphericalQuad::SphericalQuad(const std::vector<CartVect>& vertices): LinearQuad(vertices)
+  {
+    // project the vertices to the plane tangent at first vertex
+    v1=vertex[0]; // member data
+    double v1v1= v1%v1; // this is 1, in general, for unit sphere meshes
+    for (int j=1; j<4; j++)
+    {
+      // first, bring all vertices in the gnomonic plane
+      //  the new vertex will intersect the plane at vnew
+      //   so that (vnew-v1)%v1 is 0 ( vnew is in the tangent plane, i.e. normal to v1 )
+      // pos is the old position of the vertex, and it is in general on the sphere
+      // vnew = alfa*pos;  (alfa*pos-v1)%v1 = 0  <=> alfa*(pos%v1)=v1%v1 <=> alfa = v1v1/(pos%v1)
+      //  <=> vnew = ( v1v1/(pos%v1) )*pos
+      CartVect vnew =v1v1/(vertex[j]%v1)*vertex[j];
+      vertex[j]=vnew;
+    }
+    // will compute a transf matrix, such that a new point will be transformed with
+    // newpos =  transf * (vnew-v1), and it will be a point in the 2d plane
+    // the transformation matrix will be oriented in such a way that orientation will be positive
+    CartVect vx = vertex[1]-v1; // this will become Ox axis
+    // z axis will be along v1, in such a way that orientation of the quad is positive
+    // look at the first 2 edges
+    CartVect vz = vx*(vertex[2]-vertex[1]);
+    vz = vz/vz.length();
+
+    vx = vx/vx.length();
+
+    CartVect vy = vz*vx;
+    transf = Matrix3(vx[0], vx[1], vx[2], vy[0], vy[1], vy[2], vz[0], vz[1], vz[2]);
+    vertex[0]= CartVect(0.);
+    for (int j=1; j<4; j++)
+      vertex[j] = transf*(vertex[j]-v1);
+  }
+
+   CartVect SphericalQuad::ievaluate( const CartVect& x, double tol, const CartVect& x0) const
+   {
+     // project to the plane tangent at first vertex (gnomonic projection)
+     double v1v1= v1%v1;
+     CartVect vnew =v1v1/(x%v1)*x; // so that (vnew-v1)%v1 is 0
+     vnew =  transf*(vnew-v1);
+     // det will be positive now
+     return Map::ievaluate(vnew, tol, x0);
+   }
+
+   bool SphericalQuad::inside_box(const CartVect & pos, double & tol) const
+   {
+     // project to the plane tangent at first vertex
+      //CartVect v1=vertex[0];
+      double v1v1= v1%v1;
+      CartVect vnew =v1v1/(pos%v1)*pos; // so that (x-v1)%v1 is 0
+      vnew =  transf*(vnew-v1);
+      return Map::inside_box(vnew, tol);
+   }
+
+   const double LinearTri::corner[3][3] = { {0,0,0},
+                                            {1,0,0},
+                                            {0,1,0} };
+
+
+   LinearTri::LinearTri() : Map(0), det_T(0.0), det_T_inverse(0.0) {
+
+   }// LinearTri::LinearTri()
+
+
+   LinearTri::~LinearTri()
+     {}
+
+   void LinearTri::set_vertices(const std::vector<CartVect>& v) {
+     this->Map::set_vertices(v);
+     this->T = Matrix3(v[1][0]-v[0][0],v[2][0]-v[0][0], 0,
+                       v[1][1]-v[0][1],v[2][1]-v[0][1], 0,
+                       v[1][2]-v[0][2],v[2][2]-v[0][2], 1);
+     this->T_inverse = this->T.inverse();
+     this->det_T = this->T.determinant();
+     this->det_T_inverse = (this->det_T < 1e-12 ? std::numeric_limits<double>::max() : 1.0/this->det_T);
+   }// LinearTri::set_vertices()
+
+   bool LinearTri::inside_nat_space(const CartVect & xi, double & tol) const
+     {
+       // linear tri space is a triangle with vertices (0,0,0), (1,0,0), (0,1,0)
+       // first check if outside bigger box, then below the line x+y=1
+       return ( xi[0]>=-tol)  &&
+           ( xi[1]>=-tol)  &&
+           ( xi[2]>=-tol)  && ( xi[2] <= tol) &&
+           ( xi[0]+xi[1] < 1.0+tol) ;
+     }
+    CartVect LinearTri::ievaluate(const CartVect& x, double /*tol*/, const CartVect& /*x0*/) const
+    {
+      return this->T_inverse*(x-this->vertex[0]);
+    }// LinearTri::ievaluate
+
+   double LinearTri::evaluate_scalar_field(const CartVect& xi, const double *field_vertex_value) const {
+     double f0 = field_vertex_value[0];
+     double f = f0;
+     for (unsigned i = 1; i < 3; ++i) {
+       f += (field_vertex_value[i]-f0)*xi[i-1];
+     }
+     return f;
+   }// LinearTri::evaluate_scalar_field()
+
+   double LinearTri::integrate_scalar_field(const double *field_vertex_values) const {
+     double I(0.0);
+     for(unsigned int i = 0; i < 3; ++i) {
+       I += field_vertex_values[i];
+     }
+     I *= this->det_T/6.0; // TODO
+     return I;
+   }// LinearTri::integrate_scalar_field()
+
+   SphericalTri::SphericalTri(const std::vector<CartVect>& vertices)
+   {
+     vertex.resize(vertices.size()); vertex=vertices;
+     // project the vertices to the plane tangent at first vertex
+     v1=vertex[0]; // member data
+     double v1v1= v1%v1; // this is 1, in general, for unit sphere meshes
+     for (int j=1; j<3; j++)
+     {
+       // first, bring all vertices in the gnomonic plane
+       //  the new vertex will intersect the plane at vnew
+       //   so that (vnew-v1)%v1 is 0 ( vnew is in the tangent plane, i.e. normal to v1 )
+       // pos is the old position of the vertex, and it is in general on the sphere
+       // vnew = alfa*pos;  (alfa*pos-v1)%v1 = 0  <=> alfa*(pos%v1)=v1%v1 <=> alfa = v1v1/(pos%v1)
+       //  <=> vnew = ( v1v1/(pos%v1) )*pos
+       CartVect vnew =v1v1/(vertex[j]%v1)*vertex[j];
+       vertex[j]=vnew;
+     }
+     // will compute a transf matrix, such that a new point will be transformed with
+     // newpos =  transf * (vnew-v1), and it will be a point in the 2d plane
+     // the transformation matrix will be oriented in such a way that orientation will be positive
+     CartVect vx = vertex[1]-v1; // this will become Ox axis
+     // z axis will be along v1, in such a way that orientation of the quad is positive
+     // look at the first 2 edges
+     CartVect vz = vx*(vertex[2]-vertex[1]);
+     vz = vz/vz.length();
+
+     vx = vx/vx.length();
+
+     CartVect vy = vz*vx;
+     transf = Matrix3(vx[0], vx[1], vx[2], vy[0], vy[1], vy[2], vz[0], vz[1], vz[2]);
+     vertex[0]= CartVect(0.);
+     for (int j=1; j<3; j++)
+       vertex[j] = transf*(vertex[j]-v1);
+
+     LinearTri::set_vertices(vertex);
+   }
+
+  CartVect SphericalTri::ievaluate( const CartVect& x, double /*tol*/, const CartVect& /*x0*/) const
+  {
+    // project to the plane tangent at first vertex (gnomonic projection)
+    double v1v1= v1%v1;
+    CartVect vnew =v1v1/(x%v1)*x; // so that (vnew-v1)%v1 is 0
+    vnew =  transf*(vnew-v1);
+    // det will be positive now
+    return LinearTri::ievaluate(vnew);
+  }
+
+  bool SphericalTri::inside_box(const CartVect & pos, double & tol) const
+  {
+    // project to the plane tangent at first vertex
+     //CartVect v1=vertex[0];
+     double v1v1= v1%v1;
+     CartVect vnew =v1v1/(pos%v1)*pos; // so that (x-v1)%v1 is 0
+     vnew =  transf*(vnew-v1);
+     return Map::inside_box(vnew, tol);
+  }
+
 
 // filescope for static member data that is cached
   const double LinearEdge::corner[2][3] = {  { -1, 0, 0 },
@@ -710,7 +877,7 @@ namespace Element {
 
     return x;
   }
-  //virtual CartVect ievaluate(const CartVect& x, double tol) const ;
+
   bool QuadraticHex::inside_nat_space(const CartVect & xi, double & tol) const
   {// just look at the box+tol here
     return ( xi[0]>=-1.-tol) && (xi[0]<=1.+tol) &&
@@ -781,7 +948,7 @@ namespace Element {
                       v[1][2]-v[0][2],v[2][2]-v[0][2],v[3][2]-v[0][2]);
     this->T_inverse = this->T.inverse();
     this->det_T = this->T.determinant();
-    this->det_T_inverse = (0.0 == this->det_T ? HUGE : 1.0/this->det_T);
+    this->det_T_inverse = (this->det_T < 1e-12 ? std::numeric_limits<double>::max() : 1.0/this->det_T);
   }// LinearTet::set_vertices()
 
 
@@ -793,6 +960,11 @@ namespace Element {
     }
     return f;
   }// LinearTet::evaluate_scalar_field()
+
+  CartVect LinearTet::ievaluate(const CartVect& x, double /*tol*/, const CartVect& /*x0*/) const
+  {
+    return this->T_inverse*(x-this->vertex[0]);
+  }// LinearTet::ievaluate
 
   double LinearTet::integrate_scalar_field(const double *field_vertex_values) const {
     double I(0.0);
@@ -815,10 +987,10 @@ namespace Element {
 
   // filescope for static member data that is cached
   int SpectralHex::_n;
-  real *SpectralHex::_z[3];
+  realType *SpectralHex::_z[3];
   lagrange_data SpectralHex::_ld[3];
   opt_data_3 SpectralHex::_data;
-  real * SpectralHex::_odwork;
+  realType * SpectralHex::_odwork;
 
   bool SpectralHex::_init = false;
 
@@ -857,14 +1029,14 @@ namespace Element {
     _n = order;
     //triplicates! n is the same in all directions !!!
     for(int d=0; d<3; d++){
-      _z[d] = tmalloc(real, _n);
+      _z[d] = tmalloc(realType, _n);
       lobatto_nodes(_z[d], _n);
       lagrange_setup(&_ld[d], _z[d], _n);
     }
     opt_alloc_3(&_data, _ld);
 
     unsigned int nf = _n*_n, ne = _n, nw = 2*_n*_n + 3*_n;
-    _odwork = tmalloc(real, 6*nf + 9*ne + nw);
+    _odwork = tmalloc(realType, 6*nf + 9*ne + nw);
   }
   void SpectralHex::freedata()
   {
@@ -901,17 +1073,18 @@ namespace Element {
     return result;
   }
   // replicate the functionality of hex_findpt
-  CartVect SpectralHex::ievaluate(CartVect const & xyz) const
+  CartVect SpectralHex::ievaluate(CartVect const & xyz, double tol, const CartVect& x0) const
   {
     //find nearest point
-    real x_star[3];
+    realType x_star[3];
     xyz.get(x_star);
 
-    real r[3] = {0, 0, 0 }; // initial guess for parametric coords
+    realType r[3] = {0, 0, 0 }; // initial guess for parametric coords
+    x0.get(r);
     unsigned c = opt_no_constraints_3;
-    real dist = opt_findpt_3(&_data, (const real **)_xyz, x_star, r, &c);
+    realType dist = opt_findpt_3(&_data, (const realType **)_xyz, x_star, r, &c);
     // if it did not converge, get out with throw...
-    if (dist > 0.9e+30)
+    if (dist > 10*tol) // outside the element
     {
       std::vector<CartVect> dummy;
       throw Map::EvaluationError(xyz, dummy);
@@ -923,7 +1096,7 @@ namespace Element {
   }
   Matrix3  SpectralHex::jacobian(const CartVect& xi) const
   {
-    real x_i[3];
+    realType x_i[3];
     xi.get(x_i);
     // set the positions of GL nodes, before evaluations
     _data.elx[0]=_xyz[0];
@@ -1049,6 +1222,7 @@ namespace Element {
   }// LinearQuad::evaluate
 
   Matrix3 LinearQuad::jacobian( const CartVect& xi ) const {
+    // this basically ignores the z component: xi[2] or vertex[][2]
     Matrix3 J(0.0);
     for (unsigned i = 0; i < LinearQuad::corner_count; ++i) {
       const double   xi_p = 1 + xi[0]*corner[i][0];
@@ -1101,11 +1275,11 @@ namespace Element {
 
   // filescope for static member data that is cached
   int SpectralQuad::_n;
-  real *SpectralQuad::_z[2];
+  realType *SpectralQuad::_z[2];
   lagrange_data SpectralQuad::_ld[2];
   opt_data_2 SpectralQuad::_data;
-  real * SpectralQuad::_odwork;
-  real * SpectralQuad::_glpoints;
+  realType * SpectralQuad::_odwork;
+  realType * SpectralQuad::_glpoints;
   bool SpectralQuad::_init = false;
 
   SpectralQuad::SpectralQuad() : Map(0)
@@ -1143,15 +1317,15 @@ namespace Element {
     _n = order;
     //duplicates! n is the same in all directions !!!
     for(int d=0; d<2; d++){
-      _z[d] = tmalloc(real, _n);
+      _z[d] = tmalloc(realType, _n);
       lobatto_nodes(_z[d], _n);
       lagrange_setup(&_ld[d], _z[d], _n);
     }
     opt_alloc_2(&_data, _ld);
 
     unsigned int nf = _n*_n, ne = _n, nw = 2*_n*_n + 3*_n;
-    _odwork = tmalloc(real, 6*nf + 9*ne + nw);
-    _glpoints = tmalloc (real, 3*nf);
+    _odwork = tmalloc(realType, 6*nf + 9*ne + nw);
+    _glpoints = tmalloc (realType, 3*nf);
   }
 
   void SpectralQuad::freedata()
@@ -1189,15 +1363,15 @@ namespace Element {
     return result;
   }
   // replicate the functionality of hex_findpt
-  CartVect SpectralQuad::ievaluate(CartVect const & xyz) const
+  CartVect SpectralQuad::ievaluate(CartVect const & xyz, double /*tol*/, const CartVect& /*x0*/) const
   {
     //find nearest point
-    real x_star[3];
+    realType x_star[3];
     xyz.get(x_star);
 
-    real r[2] = {0, 0 }; // initial guess for parametric coords
+    realType r[2] = {0, 0 }; // initial guess for parametric coords
     unsigned c = opt_no_constraints_3;
-    real dist = opt_findpt_2(&_data, (const real **)_xyz, x_star, r, &c);
+    realType dist = opt_findpt_2(&_data, (const realType **)_xyz, x_star, r, &c);
     // if it did not converge, get out with throw...
     if (dist > 0.9e+30)
     {

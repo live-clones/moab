@@ -4,6 +4,7 @@
 #include "moab/FBEngine.hpp"
 #include "moab/Interface.hpp"
 #include "moab/GeomTopoTool.hpp"
+#include "moab/GeomUtil.hpp"
 #include "moab/OrientedBoxTreeTool.hpp"
 
 #include <stdlib.h>
@@ -28,7 +29,6 @@ namespace moab {
 // some tolerances for ray tracing and geometry intersections
 // these are involved in ray tracing, at least
 
-unsigned min_tolerace_intersections = 1000;
 double tolerance = 0.01; // TODO: how is this used ????
 double tolerance_segment = 0.01; // for segments intersection, points collapse, area coordinates for triangles
 // it should be a relative, not an absolute value
@@ -546,8 +546,7 @@ ErrorCode FBEngine::getEntBoundBox(EntityHandle gent, double* min_x,
     max_y = min_y;
     max_z = min_z;
   } else if (type == 1) {
-    rval = MB_FAILURE;
-    MBERRORR(rval, "iGeom_getEntBoundBox is not supported for Edge entity type.");
+    MBERRORR(MB_FAILURE, "iGeom_getEntBoundBox is not supported for Edge entity type.");
   } else if (type == 2 || type == 3) {
 
     EntityHandle root;
@@ -630,8 +629,7 @@ ErrorCode FBEngine::getVtxCoord(EntityHandle vertex_handle, double * x0,
   MBERRORR(rval, "Failed to get entity type in getVtxCoord.");
 
   if (type != 0) {
-    rval = MB_FAILURE;
-    MBERRORR(rval, "Entity is not a vertex type.");
+    MBERRORR(MB_FAILURE, "Entity is not a vertex type.");
   }
 
   Range entities;
@@ -754,8 +752,7 @@ ErrorCode FBEngine::getPntRayIntsct(double x, double y, double z, double dir_x,
     std::vector<EntityHandle> sets_out;
     std::vector<EntityHandle> facets_out;
     rval = _my_geomTopoTool->obb_tree()-> ray_intersect_sets(distances_out,
-        sets_out, facets_out, rootForFace, tolerance,
-        min_tolerace_intersections, point, dir);
+        sets_out, facets_out, rootForFace, tolerance, point, dir);
     unsigned int j;
     for (j = 0; j < distances_out.size(); j++)
       param_coords.push_back(distances_out[j]);
@@ -1297,8 +1294,7 @@ ErrorCode FBEngine::split_surface_with_direction(EntityHandle face, std::vector<
       std::vector<EntityHandle> sets_out;
       std::vector<EntityHandle> facets_out;
       rval = _my_geomTopoTool->obb_tree()-> ray_intersect_sets(distances_out,
-          sets_out, facets_out, rootForFace, tolerance,
-          min_tolerace_intersections, point, dir);
+          sets_out, facets_out, rootForFace, tolerance, point, dir);
       MBERRORR(rval, "Failed to get ray intersections.");
       if (distances_out.size() < 1)
         MBERRORR(MB_FAILURE, "Failed to get one intersection point, bad direction.");
@@ -1906,7 +1902,7 @@ ErrorCode  FBEngine::create_new_gedge(std::vector<EntityHandle> &nodesAlongPolyl
     MBERRORR(rval, "Failed to add parent child relation");
   }
   // finally, put the edge in the range of edges
-  _my_geomTopoTool->add_geo_set(new_geo_edge, 1);
+  rval = _my_geomTopoTool->add_geo_set(new_geo_edge, 1);MB_CHK_ERR(rval);
 
 
   return rval;

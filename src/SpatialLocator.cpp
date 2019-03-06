@@ -11,10 +11,9 @@
 #include "moab/ParallelComm.hpp"
 #endif
 
-bool debug = false;
-
 namespace moab 
 {
+  static bool debug = false;
 
     SpatialLocator::SpatialLocator(Interface *impl, Range &elems, Tree *tree, ElemEvaluator *eval) 
             : mbImpl(impl), myElems(elems), myDim(-1), myTree(tree), elemEval(eval), iCreatedTree(false),
@@ -297,7 +296,7 @@ namespace moab
           iargs[1] = TLforward_o.vi_rd[3*i+2];
           iargs[2] = locTable.get_n();
           TLsearch_results_o.push_back(iargs, NULL, NULL, NULL);
-          ulong ent_ulong=(ulong)ents[i];
+          Ulong ent_ulong=(Ulong)ents[i];
           sint forward= (sint)TLforward_o.vi_rd[3*i+1];
           locTable.push_back(&forward, NULL, &ent_ulong, &params[3*i]);
         }
@@ -474,7 +473,7 @@ namespace moab
     {
       int num_located = locTable.get_n() - std::count(locTable.vul_rd, locTable.vul_rd+locTable.get_n(), 0);
       if (num_located != (int)locTable.get_n()) {
-        unsigned long *nl = std::find(locTable.vul_rd, locTable.vul_rd+locTable.get_n(), 0);
+        Ulong *nl = std::find(locTable.vul_rd, locTable.vul_rd+locTable.get_n(), 0);
         if (nl) {
           int idx = nl - locTable.vul_rd;
           if (idx) {}

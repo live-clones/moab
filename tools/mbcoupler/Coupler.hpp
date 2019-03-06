@@ -43,7 +43,7 @@ class Coupler
 {
 public:
 
-  enum Method {CONSTANT, LINEAR_FE, QUADRATIC_FE, SPECTRAL};
+  enum Method {CONSTANT, LINEAR_FE, QUADRATIC_FE, SPECTRAL, SPHERICAL};
 
   enum IntegType {VOLUME};
 
@@ -65,6 +65,11 @@ public:
     /* Destructor
      */
   virtual ~Coupler();
+
+  /**
+   *  \brief Initialize the kdtree, locally and across communicator
+   */
+  ErrorCode initialize_tree();
 
     /* \brief Locate points on the source mesh
      * This function finds the element/processor/natural coordinates for the
@@ -426,6 +431,8 @@ public:
   inline const Range &my_range() const { return myRange; }
   inline TupleList *mapped_pts() const { return mappedPts; }
   inline int num_its() const { return numIts; }
+  // used for spherical tests
+  inline void set_spherical (bool arg1=true) {spherical=arg1;}
 
 private:
 
@@ -455,10 +462,6 @@ private:
     /* \brief MOAB instance
      */
   Interface *mbImpl;
-
-    /* \brief Initialize the kdtree, locally and across communicator
-     */
-  ErrorCode initialize_tree();
 
     /* \brief Kdtree for local mesh
      */
@@ -520,6 +523,9 @@ private:
   void * _spectralTarget;
   moab::Tag _xm1Tag, _ym1Tag, _zm1Tag;
   int _ntot;
+
+  // spherical coupling
+  bool spherical;
 };
 
 inline ErrorCode Coupler::interpolate(Coupler::Method method,

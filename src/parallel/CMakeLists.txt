@@ -5,6 +5,7 @@ set( moab_PARALLEL_SRCS
   ParallelMergeMesh.cpp
   ReadParallel.hpp      ReadParallel.cpp
   SharedSetData.hpp     SharedSetData.cpp
+  ParCommGraph.cpp 
   gs.cpp
 )
 
@@ -17,6 +18,7 @@ set(moab_PARALLEL_INSTALL_HDRS moab/gs.hpp
                                moab/ParallelMergeMesh.hpp
                                moab/ProcConfig.hpp
                                moab/ParallelData.hpp
+                               moab/ParCommGraph.hpp
                                MBParallelConventions.h )
 
 set( MOAB_GENERATED_INSTALL_PHEADERS
@@ -31,17 +33,20 @@ include_directories(
 
 if ( MOAB_HAVE_HDF5 AND MOAB_HAVE_HDF5_PARALLEL )
   set( moab_PARALLEL_SRCS ${moab_PARALLEL_SRCS}
-                          WriteHDF5Parallel.cpp )
-  
-  set( moab_PARALLEL_INSTALL_HDRS ${moab_PARALLEL_INSTALL_HDRS}
-                                  WriteHDF5Parallel.hpp )
+                          WriteHDF5Parallel.cpp 
+                          WriteHDF5Parallel.hpp )
 endif()
 
 if ( MOAB_HAVE_HDF5 )
   include_directories(
+    ${HDF5_INCLUDES}
     ${MOAB_SOURCE_DIR}/mhdf/include
   )
 endif ( MOAB_HAVE_HDF5 )
+
+if ( MOAB_HAVE_ZOLTAN )
+  include_directories( ${ZOLTAN_INCLUDE_DIR} )
+endif ( MOAB_HAVE_ZOLTAN )
 
 set_source_files_properties( ${moab_PARALLEL_SRCS}
   COMPILE_FLAGS "-DIS_BUILDING_MB -DSRCDIR=\"${MOAB_SOURCE_DIR}\" ${MOAB_DEFINES}"

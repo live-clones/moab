@@ -10,11 +10,12 @@ EXTRA_DIST = HommeMapping.nc \
 	     cubtest12.cub \
 	     cubtest14.cub \
 	     cubtest.jou \
-	     dum.sat \
 	     dum.stp \
 	     gmsh2.msh \
+       gmsh3.msh \
              airfoil_exterior.msh \
              t1.msh \
+             ghosts.msh \
 	     hex_2x2x2_ss.exo \
              ho_test.g \
              ho_test.cub \
@@ -28,13 +29,17 @@ EXTRA_DIST = HommeMapping.nc \
              three.smf \
              mpasx1.642.t.2.nc \
              2d_naca0012.cgns \
-             cube.sat \
              cube.stp \
-             cylcube.sat \
              cylcube.stp \
              poly8-10.vtk \
+             polyhedra.vtk \
+             polyg.exo \
+             polyh.exo \
              gcrm_r3.nc \
              mix.h5m \
              p8ex1.h5m \
-             oneside.h5m
-
+             oneside.h5m \
+             rtttest_v100.rtt \
+             rtttest_v101.rtt \
+             test.obj \
+             shuttle.obj

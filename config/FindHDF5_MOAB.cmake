@@ -5,29 +5,33 @@
 # HDF5_LIBRARIES   - List of fully qualified libraries to link against when using hdf5.
 # HDF5_FOUND       - Do not attempt to use hdf5 if "no" or undefined.
 
-set( HDF5_DIR "" CACHE PATH "Path to search for HDF5 header and library files" )
-set (HDF5_FOUND NO CACHE INTERNAL "Found HDF5 components successfully." )
-set( SZIP_DIR "" CACHE PATH "Path to search for SZIP header and library files" )
+set( HDF5_ROOT "" CACHE PATH "Path to search for HDF5 header and library files" )
+set( HDF5_FOUND NO CACHE INTERNAL "Found HDF5 components successfully." )
+set( SZIP_ROOT "" CACHE PATH "Path to search for SZIP header and library files" )
 
 # Try to find HDF5 with the CMake finder
-set(ENV{HDF5_ROOT} ${HDF5_DIR})
-find_package(HDF5)
-
+set(ENV{HDF5_ROOT} ${HDF5_ROOT})
+if (EXISTS ${HDF5_ROOT})
+   find_package(HDF5 COMPONENTS C HL NO_DEFAULT_PATH HINTS ${HDF5_ROOT})
+else()
+   find_package(HDF5 COMPONENTS C HL)
+endif(EXISTS ${HDF5_ROOT})
+ 
 if (HDF5_FOUND)
   # Translate to MOAB variables
   SET(HDF5_INCLUDES ${HDF5_INCLUDE_DIRS})
-  SET(HDF5_LIBRARIES ${HDF5_C_LIBRARIES})
-
+  SET(HDF5_LIBRARIES ${HDF5_HL_LIBRARIES} ${HDF5_C_LIBRARIES})
 else (HDF5_FOUND)
   # Try to find HDF5 ourselves
-  if(EXISTS "${HDF5_DIR}/share/cmake/hdf5/hdf5-config.cmake")
-    include(${HDF5_DIR}/share/cmake/hdf5/hdf5-config.cmake)
+  if(EXISTS "${HDF5_ROOT}/share/cmake/hdf5/hdf5-config.cmake")
+    include(${HDF5_ROOT}/share/cmake/hdf5/hdf5-config.cmake)
+    SET( HDF5_INCLUDES "${HDF5_INCLUDE_DIR}" )
   else()
 
     FIND_PATH(HDF5_INCLUDE_DIR
       NAMES hdf5.h H5public.h
-      HINTS ${HDF5_DIR}/include
-      HINTS ${HDF5_DIR}
+      HINTS ${HDF5_ROOT}/include
+      HINTS ${HDF5_ROOT}
       ENV CPLUS_INCLUDE_PATH
       NO_DEFAULT_PATH
       )
@@ -35,41 +39,41 @@ else (HDF5_FOUND)
     foreach (VARIANT dl sz z m )
       set (hdf5_deplibs_${VARIANT} "hdf5_deplibs_${VARIANT}-NOTFOUND" CACHE INTERNAL "HDF5 external library component ${VARIANT}." )
       FIND_LIBRARY(hdf5_deplibs_${VARIANT} ${VARIANT}
-        HINTS ${HDF5_DIR}/lib ${SZIP_DIR}/lib /lib /lib64 /usr/local/lib /usr/lib /opt/local/lib
+        HINTS ${HDF5_ROOT}/lib ${SZIP_ROOT}/lib /lib /lib64 /usr/local/lib /usr/lib /opt/local/lib
         )
       if (NOT ${hdf5_deplibs_${VARIANT}} MATCHES "(.*)NOTFOUND")
         list(APPEND HDF5_DEP_LIBRARIES ${hdf5_deplibs_${VARIANT}})
       endif (NOT ${hdf5_deplibs_${VARIANT}} MATCHES "(.*)NOTFOUND")
     endforeach()
 
-    FIND_LIBRARY(HDF5_BASE_LIBRARY NAMES libhdf5.a libhdf5d.a hdf5 hdf5d
-      HINTS ${HDF5_DIR} ${HDF5_DIR}/lib 
+    FIND_LIBRARY(HDF5_BASE_LIBRARY NAMES hdf5 hdf5d libhdf5.a libhdf5d.a
+      HINTS ${HDF5_ROOT} ${HDF5_ROOT}/lib 
       )
-    FIND_LIBRARY(HDF5_HLBASE_LIBRARY libhdf5_hl.a libhdf5_hld.a hdf5_hl hdf5_hld
-      HINTS ${HDF5_DIR} ${HDF5_DIR}/lib
+    FIND_LIBRARY(HDF5_HLBASE_LIBRARY hdf5_hl hdf5_hld libhdf5_hl.a libhdf5_hld.a
+      HINTS ${HDF5_ROOT} ${HDF5_ROOT}/lib
       )
 
     IF (NOT HDF5_FOUND)
       IF (HDF5_INCLUDE_DIR AND HDF5_BASE_LIBRARY)
-        FIND_LIBRARY(HDF5_CXX_LIBRARY libhdf5_cxx.a hdf5_cxx
-          HINTS ${HDF5_DIR} ${HDF5_DIR}/lib NO_DEFAULT_PATH
+        FIND_LIBRARY(HDF5_CXX_LIBRARY hdf5_cxx libhdf5_cxx.a
+          HINTS ${HDF5_ROOT} ${HDF5_ROOT}/lib NO_DEFAULT_PATH
           )
-        FIND_LIBRARY(HDF5_HLCXX_LIBRARY libhdf5_hl_cxx.a hdf5_hl_cxx
-          HINTS ${HDF5_DIR} ${HDF5_DIR}/lib NO_DEFAULT_PATH
+        FIND_LIBRARY(HDF5_HLCXX_LIBRARY hdf5_hl_cxx libhdf5_hl_cxx.a
+          HINTS ${HDF5_ROOT} ${HDF5_ROOT}/lib NO_DEFAULT_PATH
           )
-        FIND_LIBRARY(HDF5_FORT_LIBRARY libhdf5_fortran.a hdf5_fortran
-          HINTS ${HDF5_DIR} ${HDF5_DIR}/lib NO_DEFAULT_PATH
+        FIND_LIBRARY(HDF5_FORT_LIBRARY hdf5_fortran libhdf5_fortran.a
+          HINTS ${HDF5_ROOT} ${HDF5_ROOT}/lib NO_DEFAULT_PATH
           )
         FIND_LIBRARY(HDF5_HLFORT_LIBRARY
-          NAMES libhdf5hl_fortran.a libhdf5_hl_fortran.a hdf5hl_fortran hdf5_hl_fortran
-          HINTS ${HDF5_DIR} ${HDF5_DIR}/lib NO_DEFAULT_PATH
+          NAMES hdf5hl_fortran hdf5_hl_fortran libhdf5hl_fortran.a libhdf5_hl_fortran.a 
+          HINTS ${HDF5_ROOT} ${HDF5_ROOT}/lib NO_DEFAULT_PATH
           )
         SET( HDF5_INCLUDES "${HDF5_INCLUDE_DIR}" )
         if (HDF5_FORT_LIBRARY)
           FIND_PATH(HDF5_FORT_INCLUDE_DIR
             NAMES hdf5.mod
-            HINTS ${HDF5_DIR}/include
-            ${HDF5_DIR}/include/fortran
+            HINTS ${HDF5_ROOT}/include
+            ${HDF5_ROOT}/include/fortran
             )
           if (HDF5_FORT_INCLUDE_DIR AND NOT ${HDF5_FORT_INCLUDE_DIR} STREQUAL ${HDF5_INCLUDE_DIR})
             SET( HDF5_INCLUDES "${HDF5_INCLUDES} ${HDF5_FORT_INCLUDE_DIR}" )
@@ -107,16 +111,14 @@ else (HDF5_FOUND)
         SET( HDF5_FOUND YES )
       ELSE (HDF5_INCLUDE_DIR AND HDF5_BASE_LIBRARY)
         set( HDF5_FOUND NO )
-        message("finding HDF5 failed, please try to set the var HDF5_DIR")
+        message("finding HDF5 failed, please try to set the var HDF5_ROOT")
       ENDIF(HDF5_INCLUDE_DIR AND HDF5_BASE_LIBRARY)
     ENDIF (NOT HDF5_FOUND)
 
     #now we create fake targets to be used
-    if(EXISTS ${HDF5_DIR}/share/cmake/hdf5/hdf5-targets.cmake)
-      include(${HDF5_DIR}/share/cmake/hdf5/hdf5-targets.cmake)
-    endif()
+    include(${HDF5_ROOT}/share/cmake/hdf5/hdf5-targets.cmake OPTIONAL)
 
-  endif(EXISTS "${HDF5_DIR}/share/cmake/hdf5/hdf5-config.cmake")
+  endif(EXISTS "${HDF5_ROOT}/share/cmake/hdf5/hdf5-config.cmake")
 endif (HDF5_FOUND)
 
 message (STATUS "---   HDF5 Configuration ::")
@@ -126,7 +128,7 @@ message (STATUS "        LIBRARIES    : ${HDF5_LIBRARIES}")
 
 include (FindPackageHandleStandardArgs)
 find_package_handle_standard_args (
-  HDF5 "HDF5 not found, check environment variables HDF5_DIR"
+  HDF5 "HDF5 not found, check environment variables HDF5_ROOT"
   HDF5_INCLUDES
   HDF5_LIBRARIES
   )

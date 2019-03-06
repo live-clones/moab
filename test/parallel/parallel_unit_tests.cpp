@@ -1,10 +1,13 @@
 #include "moab/ParallelComm.hpp"
 #include "MBParallelConventions.h"
+#include "moab/ParCommGraph.hpp"
 #include "ReadParallel.hpp"
 #include "moab/FileOptions.hpp"
 #include "MBTagConventions.hpp"
 #include "moab/Core.hpp"
 #include "moab_mpi.h"
+#include "TestUtil.hpp"
+
 #include <iostream>
 #include <algorithm>
 #include <map>
@@ -13,10 +16,6 @@
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
 #include <unistd.h>
 #endif
-
-
-#define STRINGIFY_(X) #X
-#define STRINGIFY(X) STRINGIFY_(X)
 
 using namespace moab;
 
@@ -116,13 +115,13 @@ ErrorCode test_ghost_tag_exchange( const char* filename );
 // for all ghost entities (e.g. no default value)
 ErrorCode regression_ghost_tag_exchange_no_default( const char* filename );
 // Test owners for interface entities
-ErrorCode test_interface_owners( const char* );
+ErrorCode test_interface_owners( const char * );
 // Test data for shared interface entitites with one level of ghosting
-ErrorCode regression_owners_with_ghosting( const char* );
+ErrorCode regression_owners_with_ghosting( const char * );
 // Verify all sharing data for vertices with one level of ghosting
 ErrorCode test_ghosted_entity_shared_data( const char* );
 // Test assignment of global IDs
-ErrorCode test_assign_global_ids( const char* );
+ErrorCode test_assign_global_ids( const char * );
 // Test shared sets
 ErrorCode test_shared_sets( const char* );
 // Test reduce_tags
@@ -133,14 +132,21 @@ ErrorCode test_reduce_tag_failures( const char* );
 ErrorCode test_reduce_tag_explicit_dest(const char *);
 // Test delete_entities
 ErrorCode test_delete_entities(const char *);
-// Test ghsting polyhedra
+// Test ghosting polyhedra
 ErrorCode test_ghost_polyhedra(const char *);
+// Test failed read with too few parts in partition
+ErrorCode test_too_few_parts(const char *);
+// Test broken sequences due to ghosting
+ErrorCode test_sequences_after_ghosting(const char *);
+// Test trivial partition in use by iMOAB
+void test_trivial_partition();
+
 
 /**************************************************************************
                               Main Method
  **************************************************************************/
 
-#define RUN_TEST(A, B) run_test( &A, #A, B)
+#define RUN_TEST_ARG2(A, B) run_test( &A, #A, B)
 
 int run_test( ErrorCode (*func)(const char*), 
               const char* func_name,
@@ -168,15 +174,15 @@ int main( int argc, char* argv[] )
   MPI_Comm_size( MPI_COMM_WORLD, &size );
 
   int pause_proc = -1;
-  const char* filename = 0;
+  std::string filename;
   for (int i = 1; i < argc; ++i) {
     if (!strcmp(argv[i],"-p")) {
       ++i;
       assert(i < argc);
       pause_proc = atoi( argv[i] );
     }
-    else if (!filename) {
-      filename = argv[i];
+    else if (!filename.size()) {
+      filename = std::string(argv[i]);
     }
     else {
       std::cerr << "Invalid arg: \"" << argv[i] << '"' << std::endl
@@ -185,19 +191,18 @@ int main( int argc, char* argv[] )
     }
   }
 
-  if (!filename) {
-#ifdef MESHDIR
-    filename = STRINGIFY(MESHDIR) "/64bricks_512hex.h5m";
+  if (!filename.size()) {
+#ifdef MOAB_HAVE_HDF5
+    filename = TestDir + "/64bricks_512hex.h5m";
 #else
-#error Specify MESHDIR to compile test
+    filename = TestDir + "/64bricks_512hex.vtk";
 #endif
   }
-
-#ifdef MESHDIR
-  const char* filename2 = STRINGIFY(MESHDIR) "/64bricks_1khex.h5m";
-  const char* filename3 = STRINGIFY(MESHDIR) "/twoPolyh.h5m";
-#else
-#error Specify MESHDIR to compile test
+  std::cout << "Loading " << filename << "..\n";
+#ifdef MOAB_HAVE_HDF5
+  std::string filename2 = TestDir + "/64bricks_1khex.h5m";
+  std::string filename3 = TestDir + "/twoPolyh.h5m";
+  std::string filename4 = TestDir + "/onepart.h5m";
 #endif
 
   if (pause_proc != -1) {
@@ -216,28 +221,33 @@ int main( int argc, char* argv[] )
     MPI_Barrier( MPI_COMM_WORLD );
     std::cout << "Processor " << rank << " resuming" << std::endl;
   }
-
   
   int num_errors = 0;
-  
-  num_errors += RUN_TEST( test_elements_on_several_procs, filename );
-  num_errors += RUN_TEST( test_ghost_elements_3_2_1, filename );
-  num_errors += RUN_TEST( test_ghost_elements_3_2_2, filename );
-  num_errors += RUN_TEST( test_ghost_elements_3_0_1, filename );
-  num_errors += RUN_TEST( test_ghost_elements_2_0_1, filename );
-  num_errors += RUN_TEST( test_ghost_tag_exchange, filename );
-  num_errors += RUN_TEST( regression_ghost_tag_exchange_no_default, filename );
-  num_errors += RUN_TEST( test_interface_owners, filename );
-  num_errors += RUN_TEST( regression_owners_with_ghosting, filename );
-  num_errors += RUN_TEST( test_ghosted_entity_shared_data, filename );
-  num_errors += RUN_TEST( test_assign_global_ids, filename );
-  num_errors += RUN_TEST( test_shared_sets, 0 );
-  num_errors += RUN_TEST( test_reduce_tags, 0);
-  num_errors += RUN_TEST( test_reduce_tag_failures, 0);
-  num_errors += RUN_TEST( test_reduce_tag_explicit_dest, 0);
-  num_errors += RUN_TEST( test_delete_entities, filename2);
-  num_errors += RUN_TEST( test_ghost_polyhedra, filename3);
-  
+#ifdef MOAB_HAVE_HDF5
+  num_errors += RUN_TEST_ARG2( test_elements_on_several_procs, filename.c_str() );
+  num_errors += RUN_TEST_ARG2( test_ghost_elements_3_2_1, filename.c_str() );
+  num_errors += RUN_TEST_ARG2( test_ghost_elements_3_2_2, filename.c_str() );
+  num_errors += RUN_TEST_ARG2( test_ghost_elements_3_0_1, filename.c_str() );
+  num_errors += RUN_TEST_ARG2( test_ghost_elements_2_0_1, filename.c_str() );
+  num_errors += RUN_TEST_ARG2( test_ghost_tag_exchange, filename.c_str() );
+  num_errors += RUN_TEST_ARG2( regression_ghost_tag_exchange_no_default, filename.c_str() );
+  num_errors += RUN_TEST_ARG2( test_delete_entities, filename2.c_str());
+  num_errors += RUN_TEST_ARG2 (test_sequences_after_ghosting, filename2.c_str()) ;
+  if (2>=size) // run this one only on one or 2 processors; the file has only 2 parts in partition
+   num_errors += RUN_TEST_ARG2( test_ghost_polyhedra, filename3.c_str());
+  if (2==size)
+    num_errors += RUN_TEST_ARG2 ( test_too_few_parts, filename4.c_str());
+#endif
+  num_errors += RUN_TEST_ARG2( test_assign_global_ids, 0 );
+  num_errors += RUN_TEST_ARG2( test_shared_sets, 0 );
+  num_errors += RUN_TEST_ARG2( test_reduce_tags, 0);
+  num_errors += RUN_TEST_ARG2( test_reduce_tag_failures, 0);
+  num_errors += RUN_TEST_ARG2( test_reduce_tag_explicit_dest, 0);
+  num_errors += RUN_TEST_ARG2( test_interface_owners, 0 );
+  num_errors += RUN_TEST_ARG2( test_ghosted_entity_shared_data, 0 );
+  num_errors += RUN_TEST_ARG2( regression_owners_with_ghosting, 0 );
+  num_errors += RUN_TEST ( test_trivial_partition);
+
   if (rank == 0) {
     if (!num_errors) 
       std::cout << "All tests passed" << std::endl;
@@ -960,12 +970,21 @@ ErrorCode regression_ghost_tag_exchange_no_default( const char* filename )
   Interface& moab = mb_instance;
   ErrorCode rval;
 
+#ifdef MOAB_HAVE_HDF5
   rval = moab.load_file( filename, 0, 
                          "PARALLEL=READ_DELETE;"
                          "PARTITION=GEOM_DIMENSION;PARTITION_VAL=3;"
                          "PARTITION_DISTRIBUTE;"
                          "PARALLEL_RESOLVE_SHARED_ENTS;"
                          "PARALLEL_GHOSTS=3.2.1" );
+#else
+  rval = moab.load_file( filename, 0, 
+                         "PARALLEL=READ_BCAST;"
+                         "PARTITION=GEOM_DIMENSION;PARTITION_VAL=3;"
+                         "PARTITION_DISTRIBUTE;"
+                         "PARALLEL_RESOLVE_SHARED_ENTS;"
+                         "PARALLEL_GHOSTS=3.2.1" );
+#endif
   CHKERR(rval);
   
     // create a tag to exchange
@@ -1107,12 +1126,12 @@ ErrorCode test_interface_owners_common( int num_ghost_layers )
 // Common implementation for both:
 //   test_interface
 //   regression_interface_with_ghosting
-ErrorCode test_interface_owners( const char* )
+ErrorCode test_interface_owners( const char * )
 {
   return test_interface_owners_common(0);
 }
 
-ErrorCode regression_owners_with_ghosting( const char* )
+ErrorCode regression_owners_with_ghosting( const char * )
 {
   return test_interface_owners_common(1);
 }
@@ -1124,7 +1143,7 @@ struct VtxData {
   std::vector<EntityHandle> handles;
 };
 
-ErrorCode test_ghosted_entity_shared_data( const char* )
+ErrorCode test_ghosted_entity_shared_data( const char *)
 {
   ErrorCode rval;  
   Core moab_instance;
@@ -1232,7 +1251,7 @@ ErrorCode check_consistent_ids( Interface& mb,
 }
 
 
-ErrorCode test_assign_global_ids( const char* )
+ErrorCode test_assign_global_ids( const char *)
 {
   ErrorCode rval;  
   Core moab_instance;
@@ -1243,7 +1262,7 @@ ErrorCode test_assign_global_ids( const char* )
   MPI_Comm_rank( MPI_COMM_WORLD, &rank );
   MPI_Comm_size( MPI_COMM_WORLD, &size );
   
-    // build distributed quad mesh
+  // build distributed quad mesh
   Range quad_range;
   EntityHandle verts[9];
   int vert_ids[9];
@@ -1684,13 +1703,13 @@ ErrorCode test_delete_entities( const char* filename )
 }
 
 
-ErrorCode test_ghost_polyhedra( const char* filename3 )
+ErrorCode test_ghost_polyhedra( const char* filename )
 {
   Core mb_instance;
   Interface& moab = mb_instance;
   ErrorCode rval;
 
-  rval = moab.load_file( filename3, 0,
+  rval = moab.load_file( filename, 0,
                          "PARALLEL=READ_PART;"
                          "PARTITION=PARALLEL_PARTITION;"
                          "PARALLEL_RESOLVE_SHARED_ENTS;"
@@ -1699,3 +1718,153 @@ ErrorCode test_ghost_polyhedra( const char* filename3 )
 
   return MB_SUCCESS;
 }
+ErrorCode test_too_few_parts( const char* filename )
+{
+  Core mb_instance;
+  Interface& moab = mb_instance;
+  ErrorCode rval;
+
+  rval = moab.load_file( filename, 0,
+                         "PARALLEL=READ_PART;"
+                         "PARTITION=PARALLEL_PARTITION;"
+                         "PARALLEL_RESOLVE_SHARED_ENTS;" );
+  if(rval==MB_SUCCESS)
+    return MB_FAILURE;
+
+  return MB_SUCCESS;
+}
+
+ErrorCode test_sequences_after_ghosting( const char* filename )
+{
+  Core mb_instance;
+  Interface& moab = mb_instance;
+  ErrorCode rval;
+
+  rval = moab.load_file( filename, 0,
+                         "PARALLEL=READ_PART;"
+                         "PARTITION=PARALLEL_PARTITION;"
+                         "PARALLEL_RESOLVE_SHARED_ENTS;"
+                         "PARALLEL_GHOSTS=3.2.1;"
+                         "PARALLEL_SEQUENCE_FACTOR=1.5" );
+  CHKERR(rval);
+
+  // get all elements of dimension 3, and check they are on one sequence, with connect_iterate
+  Range elems;
+  rval = moab.get_entities_by_dimension(0, 3, elems);CHKERR(rval);
+  if (elems.psize()!=1)
+  {
+    std::cout << " elems.psize() = " << elems.psize() << "\n";
+    return MB_FAILURE;
+  }
+  // we want only one sequence
+  int count, vpere;
+  EntityHandle *conn_ptr;
+  rval = moab.connect_iterate(elems.begin(), elems.end(), conn_ptr, vpere, count ); CHKERR(rval);
+
+  if (count != (int) elems.size() )
+  {
+    std::cout << " more than one sequence:  elems.size() = " << elems.size() << "  count:" << count << "\n";
+    return MB_FAILURE;
+  }
+  // check also global id tag, which is dense
+  Tag id_tag;
+  rval = moab.tag_get_handle( GLOBAL_ID_TAG_NAME, 1, MB_TYPE_INTEGER, id_tag ); CHKERR(rval);
+  void * globalid_data= NULL;
+  rval = moab.tag_iterate( id_tag, elems.begin(), elems.end(), count, globalid_data); CHKERR(rval);
+  if (count != (int) elems.size() )
+  {
+    std::cout << " more than one tag sequence:  elems.size() = " << elems.size() << "  count:" << count << "\n";
+    return MB_FAILURE;
+  }
+
+  // repeat the tests for vertex sequences
+  // get all elements of dimension 3, and check they are on one sequence, with coords_iterate
+  Range verts;
+  rval = moab.get_entities_by_dimension(0, 0, verts);CHKERR(rval);
+  if (verts.psize()!=1)
+  {
+    std::cout << " verts.psize() = " << verts.psize() << "\n";
+    return MB_FAILURE;
+  }
+  //
+  double *x_ptr, *y_ptr, *z_ptr;
+  rval = moab.coords_iterate(verts.begin(), verts.end(), x_ptr, y_ptr, z_ptr, count); CHKERR(rval);
+
+
+  if (count != (int) verts.size() )
+  {
+    std::cout << " more than one sequence:  verts.size() = " << verts.size() << "  count:" << count << "\n";
+    return MB_FAILURE;
+  }
+
+  rval = moab.tag_iterate( id_tag, verts.begin(), verts.end(), count, globalid_data); CHKERR(rval);
+  if (count != (int) verts.size() )
+  {
+    std::cout << " more than one tag sequence:  verts.size() = " << verts.size() << "  count:" << count << "\n";
+    return MB_FAILURE;
+  }
+  return MB_SUCCESS;
+}
+
+// test trivial partition as used by iMOAB send/receive mesh methods
+// it is hooked to ParCommGraph, but it is really not dependent on anything from MOAB
+// these methods that are tested are just utilities
+
+void test_trivial_partition()
+{
+  // nothing is modified inside moab
+  // by these methods;
+  // to instantiate par com graph, we just need 2 groups!
+  // they can be overlapping !!!! we do not test that yet
+
+  // create 2 groups; one over task 0 and 1, one over 2
+  MPI_Group worldg;
+  MPI_Comm duplicate;
+  MPI_Comm_dup(MPI_COMM_WORLD, &duplicate);
+  MPI_Comm_group(duplicate, &worldg);
+
+  // this is usually run on 2 processes
+
+  int rank[2]={0,1};
+  MPI_Group gr1, gr2;
+  MPI_Group_incl(worldg, 2, rank, &gr1); // will contain 2 ranks, 0 and 1
+  MPI_Group_incl(worldg, 1, &rank[1], &gr2); // will contain 1 rank only (1)
+
+  int comp1=10, comp2 = 12;
+  ParCommGraph * pgr = new ParCommGraph(duplicate, gr1, gr2, comp1, comp2 );
+
+
+  std::map<int, Range> ranges_to_send;
+  std::vector<int> number_elems_per_part;
+  number_elems_per_part.push_back(6);  number_elems_per_part.push_back(10);
+
+  std::cout<<" send sizes " ;
+  for (int k=0; k< (int)number_elems_per_part.size(); k++)
+  {
+    std::cout<<" " << number_elems_per_part[k];
+  }
+  std::cout << "\n";
+
+  std::cout << "\n";
+  pgr->compute_trivial_partition ( number_elems_per_part);
+
+  Range verts(10, 20);
+  pgr->split_owned_range (0, verts);
+
+  for (std::map<int, Range>::iterator it = ranges_to_send.begin(); it!=ranges_to_send.end(); it++ )
+  {
+    Range & ran = it->second;
+    std::cout<< " receiver " << it->first << " receive range: [" << ran[0] << ", " << ran[ran.size()-1]  << "] \n";
+  }
+
+
+  delete (pgr);
+
+  MPI_Group_free(&worldg);
+  MPI_Group_free(&gr1);
+  MPI_Group_free(&gr2);
+  MPI_Comm_free(&duplicate);
+
+
+}
+

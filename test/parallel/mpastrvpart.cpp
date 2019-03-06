@@ -10,9 +10,7 @@
 
 using namespace moab;
 
-#ifdef MESHDIR
-static const char example[] = STRINGIFY(MESHDIR) "/io/mpasx1.642.t.2.nc";
-#endif
+std::string example = TestDir + "/io/mpasx1.642.t.2.nc";
 
 void test_read_onevar_trivial();
 void test_read_onevar_trivial_no_mixed_elements();
@@ -145,7 +143,7 @@ void read_one_cell_var(bool rcbzoltan, bool no_mixed_elements)
   if (no_mixed_elements)
     read_options += ";NO_MIXED_ELEMENTS";
 
-  ErrorCode rval = mb.load_file(example, NULL, read_options.c_str());
+  ErrorCode rval = mb.load_file(example.c_str(), NULL, read_options.c_str());
   CHECK_ERR(rval);
 
   // Get local edges
@@ -271,7 +269,7 @@ void read_mesh_parallel(bool rcbzoltan, bool no_mixed_elements)
   if (no_mixed_elements)
     read_options += ";NO_MIXED_ELEMENTS";
 
-  ErrorCode rval = mb.load_file(example, NULL, read_options.c_str());
+  ErrorCode rval = mb.load_file(example.c_str(), NULL, read_options.c_str());
   CHECK_ERR(rval);
 
   ParallelComm* pcomm = ParallelComm::get_pcomm(&mb, 0);
@@ -384,7 +382,7 @@ void read_mesh_parallel(bool rcbzoltan, bool no_mixed_elements)
   std::cout << "proc: " << rank << " verts:" << verts_num << "\n";
 
   int total_verts_num;
-  MPI_Reduce(&verts_num, &total_verts_num, 1, MPI_INTEGER, MPI_SUM, 0, pcomm->proc_config().proc_comm());
+  MPI_Reduce(&verts_num, &total_verts_num, 1, MPI_INT, MPI_SUM, 0, pcomm->proc_config().proc_comm());
   if (0 == rank) {
     std::cout << "total vertices: " << total_verts_num << "\n";
     CHECK_EQUAL(1280, total_verts_num);
@@ -393,7 +391,7 @@ void read_mesh_parallel(bool rcbzoltan, bool no_mixed_elements)
   std::cout << "proc: " << rank << " edges:" << edges_num << "\n";
 
   int total_edges_num;
-  MPI_Reduce(&edges_num, &total_edges_num, 1, MPI_INTEGER, MPI_SUM, 0, pcomm->proc_config().proc_comm());
+  MPI_Reduce(&edges_num, &total_edges_num, 1, MPI_INT, MPI_SUM, 0, pcomm->proc_config().proc_comm());
   if (0 == rank) {
     std::cout << "total edges: " << total_edges_num << "\n";
     CHECK_EQUAL(1920, total_edges_num);
@@ -402,7 +400,7 @@ void read_mesh_parallel(bool rcbzoltan, bool no_mixed_elements)
   std::cout << "proc: " << rank << " cells:" << cells_num << "\n";
 
   int total_cells_num;
-  MPI_Reduce(&cells_num, &total_cells_num, 1, MPI_INTEGER, MPI_SUM, 0, pcomm->proc_config().proc_comm());
+  MPI_Reduce(&cells_num, &total_cells_num, 1, MPI_INT, MPI_SUM, 0, pcomm->proc_config().proc_comm());
   if (0 == rank) {
     std::cout << "total cells: " << total_cells_num << "\n";
     CHECK_EQUAL(642, total_cells_num);
@@ -436,7 +434,7 @@ void gather_one_cell_var(int gather_set_rank)
   gather_set_option << ";GATHER_SET=" << gather_set_rank;
   read_options += gather_set_option.str();
 
-  rval = mb.load_file(example, &file_set, read_options.c_str());
+  rval = mb.load_file(example.c_str(), &file_set, read_options.c_str());
   CHECK_ERR(rval);
 
   ParallelComm* pcomm = ParallelComm::get_pcomm(&mb, 0);
@@ -513,7 +511,7 @@ void multiple_loads_of_same_file(bool no_mixed_elements)
   if (no_mixed_elements)
     read_options += ";NO_MIXED_ELEMENTS";
 
-  rval = mb.load_file(example, &file_set, read_options.c_str());
+  rval = mb.load_file(example.c_str(), &file_set, read_options.c_str());
   CHECK_ERR(rval);
 
   // Create mesh, no variable
@@ -521,7 +519,7 @@ void multiple_loads_of_same_file(bool no_mixed_elements)
   if (no_mixed_elements)
     read_options += ";NO_MIXED_ELEMENTS";
 
-  rval = mb.load_file(example, &file_set, read_options.c_str());
+  rval = mb.load_file(example.c_str(), &file_set, read_options.c_str());
   CHECK_ERR(rval);
 
   // Read variable ke at timestep 0, no mesh
@@ -529,7 +527,7 @@ void multiple_loads_of_same_file(bool no_mixed_elements)
   if (no_mixed_elements)
     read_options += ";NO_MIXED_ELEMENTS";
 
-  rval = mb.load_file(example, &file_set, read_options.c_str());
+  rval = mb.load_file(example.c_str(), &file_set, read_options.c_str());
   CHECK_ERR(rval);
 
   Range local_verts;

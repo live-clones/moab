@@ -1,20 +1,16 @@
 #include <iostream>
 #include <fstream>
-#include "SmoothFace.hpp"
-
 #include <algorithm>
 #include <iomanip>
+#include <cassert>
+#include <limits>
+#include "moab/OrientedBoxTreeTool.hpp"
+#include "SmoothFace.hpp"
 
-#include "assert.h"
-// included in the header now
-// #include "Range.hpp"
-// #include "CartVect.hpp"
-
-// some defines from CUBIT
 #define GEOMETRY_RESABS 1.e-6
-#define CUBIT_DBL_MAX 1.e+30
-//#define DBL_EPSILON  1.e-8
-#include <float.h>
+#define mbsqr(a) ((a)*(a))
+#define mbcube(a) (mbsqr(a) * (a))
+#define mbquart(a) (mbsqr(a) * mbsqr(a))
 
 namespace moab {
 
@@ -44,7 +40,9 @@ bool debug_surf_eval1 = false;
 
 SmoothFace::SmoothFace(Interface * mb, EntityHandle surface_set,
     GeomTopoTool * gTool) :
-  _mb(mb), _set(surface_set), _my_geomTopoTool(gTool), _evaluationsCounter(0)
+  _markTag(0), _gradientTag(0), _tangentsTag(0), _edgeCtrlTag(0),
+  _facetCtrlTag(0), _facetEdgeCtrlTag(0), _planeTag(0),
+  _mb(mb), _set(surface_set), _my_geomTopoTool(gTool), _obb_root(0), _evaluationsCounter(0)
 {
   //_smooth_face = NULL;
   //_mbOut->create_meshset(MESHSET_SET, _oSet); //will contain the
@@ -843,19 +841,19 @@ ErrorCode SmoothFace::eval_bezier_patch(EntityHandle tri, CartVect &areacoord,
   ctrl_pts[4] = vN[1]; //
 
   //i=4; j=0; k=0;
-  double B = quart(areacoord[0]);
+  double B = mbquart(areacoord[0]);
   pt += B * ctrl_pts[0];
 
   //i=3; j=1; k=0;
-  B = 4.0 * cube(areacoord[0]) * areacoord[1];
+  B = 4.0 * mbcube(areacoord[0]) * areacoord[1];
   pt += B * ctrl_pts[1];
 
   //i=2; j=2; k=0;
-  B = 6.0 * sqr(areacoord[0]) * sqr(areacoord[1]);
+  B = 6.0 * mbsqr(areacoord[0]) * mbsqr(areacoord[1]);
   pt += B * ctrl_pts[2];
 
   //i=1; j=3; k=0;
-  B = 4.0 * areacoord[0] * cube(areacoord[1]);
+  B = 4.0 * areacoord[0] * mbcube(areacoord[1]);
   pt += B * ctrl_pts[3];
 
   //edge = facet->edge(0);
@@ -867,19 +865,19 @@ ErrorCode SmoothFace::eval_bezier_patch(EntityHandle tri, CartVect &areacoord,
   ctrl_pts[4] = vN[2]; //
 
   //i=0; j=4; k=0;
-  B = quart(areacoord[1]);
+  B = mbquart(areacoord[1]);
   pt += B * ctrl_pts[0];
 
   //i=0; j=3; k=1;
-  B = 4.0 * cube(areacoord[1]) * areacoord[2];
+  B = 4.0 * mbcube(areacoord[1]) * areacoord[2];
   pt += B * ctrl_pts[1];
 
   //i=0; j=2; k=2;
-  B = 6.0 * sqr(areacoord[1]) * sqr(areacoord[2]);
+  B = 6.0 * mbsqr(areacoord[1]) * mbsqr(areacoord[2]);
   pt += B * ctrl_pts[2];
 
   //i=0; j=1; k=3;
-  B = 4.0 * areacoord[1] * cube(areacoord[2]);
+  B = 4.0 * areacoord[1] * mbcube(areacoord[2]);
   pt += B * ctrl_pts[3];
 
   //edge = facet->edge(1);
@@ -891,31 +889,31 @@ ErrorCode SmoothFace::eval_bezier_patch(EntityHandle tri, CartVect &areacoord,
   ctrl_pts[4] = vN[0]; //
 
   //i=0; j=0; k=4;
-  B = quart(areacoord[2]);
+  B = mbquart(areacoord[2]);
   pt += B * ctrl_pts[0];
 
   //i=1; j=0; k=3;
-  B = 4.0 * areacoord[0] * cube(areacoord[2]);
+  B = 4.0 * areacoord[0] * mbcube(areacoord[2]);
   pt += B * ctrl_pts[1];
 
   //i=2; j=0; k=2;
-  B = 6.0 * sqr(areacoord[0]) * sqr(areacoord[2]);
+  B = 6.0 * mbsqr(areacoord[0]) * mbsqr(areacoord[2]);
   pt += B * ctrl_pts[2];
 
   //i=3; j=0; k=1;
-  B = 4.0 * cube(areacoord[0]) * areacoord[2];
+  B = 4.0 * mbcube(areacoord[0]) * areacoord[2];
   pt += B * ctrl_pts[3];
 
   //i=2; j=1; k=1;
-  B = 12.0 * sqr(areacoord[0]) * areacoord[1] * areacoord[2];
+  B = 12.0 * mbsqr(areacoord[0]) * areacoord[1] * areacoord[2];
   pt += B * P_facet[0];
 
   //i=1; j=2; k=1;
-  B = 12.0 * areacoord[0] * sqr(areacoord[1]) * areacoord[2];
+  B = 12.0 * areacoord[0] * mbsqr(areacoord[1]) * areacoord[2];
   pt += B * P_facet[1];
 
   //i=1; j=1; k=2;
-  B = 12.0 * areacoord[0] * areacoord[1] * sqr(areacoord[2]);
+  B = 12.0 * areacoord[0] * areacoord[1] * mbsqr(areacoord[2]);
   pt += B * P_facet[2];
 
   return MB_SUCCESS;
@@ -999,7 +997,7 @@ void SmoothFace::facet_area_coordinate(EntityHandle facet,
         p[2][1], p[2][2]);
     if (fabs(area2) < tol)
     {
-      areacoord = CartVect(-CUBIT_DBL_MAX);// .set( -CUBIT_DBL_MAX, -CUBIT_DBL_MAX, -CUBIT_DBL_MAX );
+      areacoord = CartVect(-std::numeric_limits<double>::min());// .set( -std::numeric_limits<double>::min(), -std::numeric_limits<double>::min(), -std::numeric_limits<double>::min() );
     }
     else if (within_tolerance(p[0], pt_on_plane, GEOMETRY_RESABS))
     {
@@ -1035,7 +1033,7 @@ void SmoothFace::facet_area_coordinate(EntityHandle facet,
         p[2][0], p[2][2]);
     if (fabs(area2) < tol)
     {
-      areacoord = CartVect(-CUBIT_DBL_MAX);//.set( -CUBIT_DBL_MAX, -CUBIT_DBL_MAX, -CUBIT_DBL_MAX );
+      areacoord = CartVect(-std::numeric_limits<double>::min());//.set( -std::numeric_limits<double>::min(), -std::numeric_limits<double>::min(), -std::numeric_limits<double>::min() );
     }
     else if (within_tolerance(p[0], pt_on_plane, GEOMETRY_RESABS))
     {
@@ -1074,7 +1072,7 @@ void SmoothFace::facet_area_coordinate(EntityHandle facet,
         p[2][0], p[2][1]);
     if (fabs(area2) < tol)
     {
-      areacoord = CartVect(-CUBIT_DBL_MAX);//.set( -CUBIT_DBL_MAX, -CUBIT_DBL_MAX, -CUBIT_DBL_MAX );
+      areacoord = CartVect(-std::numeric_limits<double>::min());//.set( -std::numeric_limits<double>::min(), -std::numeric_limits<double>::min(), -std::numeric_limits<double>::min() );
     }
     else if (within_tolerance(p[0], pt_on_plane, GEOMETRY_RESABS))
     {
@@ -1133,7 +1131,8 @@ ErrorCode SmoothFace::project_to_facets(std::vector<EntityHandle> & facet_list,
     CartVect *closest_point_ptr, CartVect * normal_ptr)
 {
 
-  bool outside_facet, best_outside_facet = true;
+  bool outside_facet = false;
+  bool best_outside_facet = true;
   double mindist = 1.e20;
   CartVect close_point, best_point(mindist, mindist, mindist), best_areacoord;
   EntityHandle best_facet = 0L;// no best facet found yet
@@ -1871,27 +1870,27 @@ ErrorCode SmoothFace::eval_bezier_patch_normal(EntityHandle facet,
 
   //i=3; j=0; k=0;
   //double Bsum = 0.0;
-  double B = cube(areacoord[0]);
+  double B = mbcube(areacoord[0]);
   //Bsum += B;
   normal += B * Nijk[0];
 
   //i=2; j=1; k=0;
-  B = 3.0 * sqr(areacoord[0]) * areacoord[1];
+  B = 3.0 * mbsqr(areacoord[0]) * areacoord[1];
   //Bsum += B;
   normal += B * Nijk[1];
 
   //i=1; j=2; k=0;
-  B = 3.0 * areacoord[0] * sqr(areacoord[1]);
+  B = 3.0 * areacoord[0] * mbsqr(areacoord[1]);
   //Bsum += B;
   normal += B * Nijk[2];
 
   //i=0; j=3; k=0;
-  B = cube(areacoord[1]);
+  B = mbcube(areacoord[1]);
   //Bsum += B;
   normal += B * Nijk[3];
 
   //i=2; j=0; k=1;
-  B = 3.0 * sqr(areacoord[0]) * areacoord[2];
+  B = 3.0 * mbsqr(areacoord[0]) * areacoord[2];
   //Bsum += B;
   normal += B * Nijk[4];
 
@@ -1901,22 +1900,22 @@ ErrorCode SmoothFace::eval_bezier_patch_normal(EntityHandle facet,
   normal += B * Nijk[5];
 
   //i=0; j=2; k=1;
-  B = 3.0 * sqr(areacoord[1]) * areacoord[2];
+  B = 3.0 * mbsqr(areacoord[1]) * areacoord[2];
   //Bsum += B;
   normal += B * Nijk[6];
 
   //i=1; j=0; k=2;
-  B = 3.0 * areacoord[0] * sqr(areacoord[2]);
+  B = 3.0 * areacoord[0] * mbsqr(areacoord[2]);
   //Bsum += B;
   normal += B * Nijk[7];
 
   //i=0; j=1; k=2;
-  B = 3.0 * areacoord[1] * sqr(areacoord[2]);
+  B = 3.0 * areacoord[1] * mbsqr(areacoord[2]);
   //Bsum += B;
   normal += B * Nijk[8];
 
   //i=0; j=0; k=3;
-  B = cube(areacoord[2]);
+  B = mbcube(areacoord[2]);
   //Bsum += B;
   normal += B * Nijk[9];
 

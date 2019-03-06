@@ -49,7 +49,7 @@ namespace moab
 
  typedef EntityHandle HFacet;
 
-const int MAXSIZE = 100;
+const int MAXSIZE = 200;
 
 //! ENUM for the type of input mesh.
 enum MESHTYPE{
@@ -76,7 +76,7 @@ class HalfFacetRep{
 
 public:
 
-  HalfFacetRep(Core *impl,  ParallelComm *comm=0, moab::EntityHandle rset=0);
+  HalfFacetRep(Core *impl,  ParallelComm *comm=0, moab::EntityHandle rset=0, bool filter_ghosts=true);
 
   ~HalfFacetRep();
 
@@ -277,6 +277,8 @@ public:
 
   int find_total_edges_2d(Range &faces);
 
+  ErrorCode get_face_edges(EntityHandle fid, std::vector<EntityHandle> &edges);
+
   // 3D Maps and queries
 
   //! Given a range of cells, determines the sibling half-faces and stores them into SIBHFS_CID, SIBHFS_LFID tags.
@@ -347,6 +349,12 @@ public:
   ErrorCode get_up_adjacencies_edg_3d(EntityHandle cid,
                                       int leid, std::vector<EntityHandle> &adjents,
                                       std::vector<int> * leids = NULL, std::vector<int> *adj_orients = NULL);
+
+ ErrorCode get_up_adjacencies_edg_3d_comp( EntityHandle cid,
+                                                       int leid,
+                                                       std::vector<EntityHandle> &adjents,
+                                                       std::vector<int> *leids = NULL,
+                                                       std::vector<int> *adj_orients = NULL);
 
   //! Given an face, finds the cells incident on it.
   /** Given an face, it first finds a matching half-face in a cell corresponding to face, and then
@@ -443,6 +451,8 @@ public:
 
   ErrorCode set_incident_map(EntityType type, EntityHandle vid, std::vector<EntityHandle> &set_entid, std::vector<int> &set_lid);
 
+  bool check_nonmanifold_vertices(EntityType type, EntityHandle vid);
+
   /**********************
    *         Local Maps
    * ********************/
@@ -503,8 +513,10 @@ protected:
 
   Core *mb;
   ParallelComm *pcomm;
-  bool mInitAHFmaps;
   EntityHandle _rset;
+  bool _filterghost;
+  bool mInitAHFmaps;
+
   Range _verts, _edges, _faces, _cells;
 
   //AHF map storage containers for 1D, 2D, 3D

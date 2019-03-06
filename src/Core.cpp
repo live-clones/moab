@@ -26,7 +26,6 @@
 #include <vector>
 #include <string>
 #include <algorithm>
-#include "moab/Version.h"
 #include "moab/Core.hpp"
 #include "MeshSetSequence.hpp"
 #include "ElementSequence.hpp"
@@ -92,7 +91,6 @@
 #include "ExoIIUtil.hpp"
 #include "EntitySequence.hpp"
 #include "moab/FileOptions.hpp"
-#include "CoreOptions.hpp"
 #ifdef LINUX
 # include <dlfcn.h>
 # include <dirent.h>
@@ -153,8 +151,6 @@ static void warn_null_array_mesh_tag()
 #endif
 
 namespace moab {
-
-CoreOptions coreopts(1.0);
 
 using namespace std;
 
@@ -230,17 +226,11 @@ ErrorCode Core::initialize()
 #ifdef MOAB_HAVE_MPI
   int flag;
   if (MPI_SUCCESS == MPI_Initialized(&flag)) {
-    mpiFinalize = !flag;
-    if (mpiFinalize) {
-      char argv0[] = "MOAB";
-      int one = 1;
-      char* argv[] = { argv0, 0 };
-      char** ptr = argv;
-      MPI_Init( &one, &ptr );
+    if (flag){
+      writeMPELog = ! MPE_Initialized_logging();
+      if (writeMPELog)
+        (void)MPE_Init_log();
     }
-    writeMPELog = ! MPE_Initialized_logging();
-    if (writeMPELog)
-      (void)MPE_Init_log();
   }
 #endif
 
@@ -346,8 +336,6 @@ void Core::deinitialize()
       logfile = default_log;
     MPE_Finish_log( logfile );
   }
-  if (mpiFinalize)
-    MPI_Finalize();
 #endif
 
   if (initErrorHandlerInCore)
@@ -363,7 +351,7 @@ ErrorCode Core::query_interface_type( const std::type_info& type, void*& ptr )
   }
   else if (type == typeid(WriteUtilIface)) {
     if(!mMBWriteUtil)
-      mMBWriteUtil = new WriteUtil(this, mError);
+      mMBWriteUtil = new WriteUtil(this);
     ptr = static_cast<WriteUtilIface*>(mMBWriteUtil);
   }
   else if (type == typeid(ReaderWriterSet)) {
@@ -476,12 +464,12 @@ ErrorCode  Core::load_mesh( const char *file_name,
 
 ErrorCode Core::load_file( const char* file_name,
                                const EntityHandle* file_set,
-                               const char* options,
+                               const char* setoptions,
                                const char* set_tag_name,
                                const int* set_tag_vals,
                                int num_set_tag_vals )
 {
-  FileOptions opts(options);
+  FileOptions opts(setoptions);
   ErrorCode rval;
   ReaderIface::IDTag t = { set_tag_name, set_tag_vals, num_set_tag_vals };
   ReaderIface::SubsetList sl = { &t, 1, 0, 0 };
@@ -704,7 +692,7 @@ ErrorCode  Core::write_mesh(const char *file_name,
 
 ErrorCode Core::write_file( const char* file_name,
                                 const char* file_type,
-                                const char* options,
+                                const char* options_string,
                                 const EntityHandle* output_sets,
                                 int num_output_sets,
                                 const Tag* tag_list,
@@ -712,7 +700,7 @@ ErrorCode Core::write_file( const char* file_name,
 {
   Range range;
   std::copy( output_sets, output_sets+num_output_sets, range_inserter(range) );
-  return write_file( file_name, file_type, options, range, tag_list, num_tags );
+  return write_file( file_name, file_type, options_string, range, tag_list, num_tags );
 }
 
 ErrorCode Core::write_file( const char* file_name,
@@ -893,7 +881,7 @@ ErrorCode Core::coords_iterate(Range::const_iterator iter,
   ycoords_ptr = reinterpret_cast<double*>(vseq->data()->get_sequence_data(1)) + offset;
   zcoords_ptr = reinterpret_cast<double*>(vseq->data()->get_sequence_data(2)) + offset;
 
-  EntityHandle real_end = *(iter.end_of_block());
+  EntityHandle real_end = std::min(seq->end_handle(), *(iter.end_of_block()));
   if (*end) real_end = std::min(real_end, *end);
   count = real_end - *iter + 1;
 
@@ -1136,6 +1124,17 @@ ErrorCode  Core::set_coords(Range entity_handles, const double *coords)
 
   return status;
 
+}
+
+double Core::get_sequence_multiplier() const
+{
+  return sequenceManager->get_sequence_multiplier();
+}
+
+void Core::set_sequence_multiplier(double factor)
+{
+  assert(factor >= 1.0);
+  sequenceManager->set_sequence_multiplier(factor);
 }
 
   //! get global connectivity array for specified entity type
@@ -1708,6 +1707,7 @@ ErrorCode Core::connect_iterate(Range::const_iterator iter,
     return MB_ENTITY_NOT_FOUND;
 
   ElementSequence *eseq = dynamic_cast<ElementSequence*>(seq);
+  assert(eseq != NULL);
 
   connect = eseq->get_connectivity_array();
   if (!connect) {
@@ -1716,7 +1716,7 @@ ErrorCode Core::connect_iterate(Range::const_iterator iter,
 
   connect += eseq->nodes_per_element() * (*iter - eseq->start_handle());
 
-  EntityHandle real_end = *(iter.end_of_block());
+  EntityHandle real_end = std::min(eseq->end_handle(), *(iter.end_of_block()));
   if (*end) real_end = std::min(real_end, *end);
   count = real_end - *iter + 1;
 
@@ -3049,6 +3049,19 @@ ErrorCode Core::side_number(const EntityHandle parent,
     }
   }
 
+  if (TYPE_FROM_HANDLE(parent) == MBPOLYHEDRON ) {
+    // find the child in the parent_conn connectivity list, and call it a day ..
+    // it should work only for faces within a conn list
+    for (int i=0; i< num_parent_vertices; i++)
+      if (child == parent_conn[i])
+      {
+        sd_number = i;
+        sense =1 ; // always
+        offset =0;
+        return MB_SUCCESS;
+      }
+    return MB_FAILURE;
+  }
   result = get_connectivity(child, child_conn, num_child_vertices, true);MB_CHK_ERR(result);
 
     // call handle vector-based function
@@ -3242,18 +3255,18 @@ ErrorCode Core::side_element(const EntityHandle source_entity,
 
 //-------------------------Set Functions---------------------//
 
-ErrorCode Core::create_meshset(const unsigned int options,
+ErrorCode Core::create_meshset(const unsigned int setoptions,
                                    EntityHandle &ms_handle,
                                    int )
 {
-  return sequence_manager()->create_mesh_set( options, ms_handle );
+  return sequence_manager()->create_mesh_set( setoptions, ms_handle );
 }
 
 ErrorCode Core::get_meshset_options( const EntityHandle ms_handle,
-                                          unsigned int& options) const
+                                          unsigned int& setoptions) const
 {
   if (!ms_handle) { // root set
-    options = MESHSET_SET|MESHSET_TRACK_OWNER;
+    setoptions = MESHSET_SET|MESHSET_TRACK_OWNER;
     return MB_SUCCESS;
   }
 
@@ -3261,18 +3274,18 @@ ErrorCode Core::get_meshset_options( const EntityHandle ms_handle,
   if (!set)
     return MB_ENTITY_NOT_FOUND;
 
-  options = set->flags();
+  setoptions = set->flags();
   return MB_SUCCESS;
 }
 
 ErrorCode Core::set_meshset_options( const EntityHandle ms_handle,
-                                         const unsigned int options)
+                                         const unsigned int setoptions)
 {
   MeshSet* set = get_mesh_set( sequence_manager(), ms_handle );
   if (!set)
     return MB_ENTITY_NOT_FOUND;
 
-  return set->set_flags(options, ms_handle, a_entity_factory());
+  return set->set_flags(setoptions, ms_handle, a_entity_factory());
 }
 
 
@@ -3893,16 +3906,16 @@ ErrorCode Core::create_set_iterator(EntityHandle meshset,
                                     SetIterator *&set_iter)
 {
     // check the type of set
-  unsigned int options;
+  unsigned int setoptions;
   ErrorCode rval = MB_SUCCESS;
   if (meshset) {
-    rval = get_meshset_options(meshset, options);MB_CHK_ERR(rval);
+    rval = get_meshset_options(meshset, setoptions);MB_CHK_ERR(rval);
   }
 
-  if (!meshset || options & MESHSET_SET)
-    set_iter = new RangeSetIterator(this, meshset, chunk_size, ent_type, ent_dim, check_valid);
+  if (!meshset || (setoptions & MESHSET_SET))
+    set_iter = new (std::nothrow) RangeSetIterator(this, meshset, chunk_size, ent_type, ent_dim, check_valid);
   else
-    set_iter = new VectorSetIterator(this, meshset, chunk_size, ent_type, ent_dim, check_valid);
+    set_iter = new (std::nothrow) VectorSetIterator(this, meshset, chunk_size, ent_type, ent_dim, check_valid);
 
   setIterators.push_back(set_iter);
   return MB_SUCCESS;

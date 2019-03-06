@@ -5,7 +5,7 @@ AUTOMAKE_OPTIONS = foreign subdir-objects
 ACLOCAL_AMFLAGS = -I config
 
 # Subdirectories to build
-SUBDIRS = src MeshFiles $(itaps_dir) tools test 
+SUBDIRS = src MeshFiles $(itaps_dir) tools test $(pymoab_dir)
 
 if ENABLE_fbigeom
   itaps_dir_fbigeom = itaps
@@ -19,64 +19,115 @@ else
   itaps_dir = $(itaps_dir_fbigeom)
 endif
 
+if ENABLE_pymoab
+  pymoab_dir = pymoab
+else
+  pymoab_dir =
+endif
+
 # Utility target: build but don't run tests
 build-check:
 	$(MAKE) 'TESTS_ENVIRONMENT=: ' check
 
-doc_DATA = ANNOUNCE KNOWN_ISSUES LICENSE README README.IO README.IMESH RELEASE_NOTES
+doc_DATA = ANNOUNCE KNOWN_ISSUES LICENSE README.md RELEASE_NOTES
 
-examples_DATA = examples/CrystalRouterExample.cpp \
-                examples/DirectAccessNoHoles.cpp \
-                examples/DirectAccessNoHolesF90.F90 \
-                examples/DirectAccessWithHoles.cpp \
-                examples/ErrorHandlingSimulation.cpp \
-                examples/GenLargeMesh.cpp \
-                examples/GetEntities.cpp \
-                examples/HelloMOAB.cpp \
-                examples/HelloParMOAB.cpp \
-                examples/LloydRelaxation.cpp \
-                examples/LoadPartial.cpp \
-                examples/PointInElementSearch.cpp \
-                examples/PushParMeshIntoMoabF90.F90 \
-                examples/ReadWriteTest.cpp \
-                examples/ReduceExchangeTags.cpp \
-                examples/StructuredMesh.cpp \
-                examples/StructuredMeshSimple.cpp \
-                examples/SetsNTags.cpp \
-                examples/TestErrorHandling.cpp \
-                examples/TestErrorHandlingPar.cpp \
-                examples/TestExodusII.cpp \
-                examples/UniformRefinement.cpp \
-                examples/VisTags.cpp \
-                examples/makefile.in \
-                examples/makefile
+examples_DATA = \
+               examples/makefile \
+               examples/makefile.config \
+               examples/makefile.config.in \
+               examples/CMakeLists.txt
+examples_beginnerdir = $(datadir)/examples/beginner
+examples_beginner_DATA = \
+               examples/beginner/README \
+               examples/beginner/makefile \
+               examples/beginner/mbex1.cpp \
+               examples/beginner/mbex2.cpp \
+               examples/beginner/mbex3.cpp \
+               examples/beginner/mbex4.cpp
+examples_basicdir = $(datadir)/examples/basic
+examples_basic_DATA = \
+               examples/basic/makefile \
+               examples/basic/ErrorHandlingSimulation.cpp \
+               examples/basic/GetEntities.cpp \
+               examples/basic/HelloMOAB.cpp \
+               examples/basic/HelloParMOAB.cpp \
+               examples/basic/ReadWriteTest.cpp \
+               examples/basic/SetsNTags.cpp \
+               examples/basic/StructuredMeshSimple.cpp \
+               examples/basic/TestErrorHandling.cpp \
+               examples/basic/TestErrorHandlingPar.cpp \
+               examples/basic/TestExodusII.cpp \
+               examples/basic/UniformRefinement.cpp
+examples_intermediatedir = $(datadir)/examples/intermediate
+examples_intermediate_DATA = \
+               examples/intermediate/makefile \
+               examples/intermediate/DirectAccessNoHoles.cpp \
+               examples/intermediate/DirectAccessWithHoles.cpp \
+               examples/intermediate/LoadPartial.cpp \
+               examples/intermediate/PointInElementSearch.cpp \
+               examples/intermediate/ReduceExchangeTags.cpp
+examples_advanceddir = $(datadir)/examples/advanced
+examples_advanced_DATA = \
+               examples/advanced/makefile \
+               examples/advanced/CrystalRouterExample.cpp \
+               examples/advanced/ExtrudePoly.cpp \
+               examples/advanced/GenLargeMesh.cpp \
+               examples/advanced/LloydRelaxation.cpp \
+               examples/advanced/VisTags.cpp
+examples_fortrandir = $(datadir)/examples/fortran
+examples_fortran_DATA = \
+               examples/fortran/makefile \
+               examples/fortran/DirectAccessNoHolesF90.F90 \
+               examples/fortran/PushParMeshIntoMoabF90.F90
+examples_pythonexdir = $(datadir)/examples/python
+examples_pythonex_DATA = \
+               examples/python/makefile \
+               examples/python/laplaciansmoother.py
+examples_appsdir = $(datadir)/examples/apps
+examples_apps_DATA = \
+               examples/apps/makefile
+examples_apps_earthdir = $(datadir)/examples/apps
+examples_apps_earth_DATA = \
+               examples/apps/earth/makefile \
+               examples/apps/earth/ContinentsOnGlobe.cpp
 
-EXTRA_DIST = $(doc_DATA) $(examples_DATA)
+CMAKE_CONFIGURATION_FILES = CMakeLists.txt \
+			    config/AutoconfHeader.cmake      config/FindCGM.cmake        config/FindMetis.cmake     config/FindZoltan.cmake    config/ForceAddFlags.cmake \
+			    config/ResolveCompilerPaths.cmake  config/CMakeDistCheck.cmake      config/FindEigen3.cmake     config/FindNetCDF.cmake    config/Findgraphviz.cmake \
+			    config/GetAcInitVersion.cmake  config/TestBigEndian.cmake    config/CheckCompilerFlags.cmake  config/FindHDF5_MOAB.cmake  config/FindParMetis.cmake  \
+			    config/Findverdict.cmake   config/MOABConfig.cmake.cmake    config/CMakeReplicateConfig.sh    config/cmake_uninstall.cmake.in \
+			    config/TemplateSpecialization.cxx   config/MOABConfig.cmake.h.in
+
+EXTRA_DIST = $(doc_DATA) \
+						 debian \
+						 $(CMAKE_CONFIGURATION_FILES) \
+						 $(examples_DATA) \
+						 $(examples_beginner_DATA) \
+						 $(examples_basic_DATA) \
+						 $(examples_intermediate_DATA) \
+						 $(examples_advanced_DATA) \
+						 $(examples_fortran_DATA) \
+						 $(examples_pythonex_DATA) \
+						 $(examples_apps_DATA) \
+						 $(examples_apps_earth_DATA)
 
 # Automake doesn't seem to have a directory defined for
-# platform-dependent data (or include) files. So put 
+# platform-dependent data (or include) files. So put
 # in $(libdir).  Define a $(cfgdir) to get around automake's
 # check that only libraries are going in $(libdir)
 cfgdir = $(libdir)
-cfg_DATA = moab.make moab.config MOABConfig.cmake
+cfg_DATA = moab.make moab.config
+cmakedir = $(libdir)/cmake/MOAB
+cmake_DATA = MOABConfig.cmake config/ResolveCompilerPaths.cmake
 
 # By default, moab.make will define these to $(srcdir).  We
 # want to override that during the INSTALL of the file so
-# that the correct values are set (e.g. if someone does 
+# that the correct values are set (e.g. if someone does
 # 'make prefix=/foo install', we don't know the correct install
 # directory until we're doing the install.
 install-data-hook:
 	$(AM_V_at)echo "MOAB_LIBDIR=${libdir}" >> $(DESTDIR)$(cfgdir)/moab.make
 	$(AM_V_at)echo "MOAB_INCLUDES=-I${includedir}" >> $(DESTDIR)$(cfgdir)/moab.make
-	$(AM_V_at)echo "SET(MOAB_INCLUDE_DIRS \"${includedir}\")" >> $(DESTDIR)$(cfgdir)/MOABConfig.cmake
-# next line: get the post-substitution set of link commands, then filter out leading
-# and trailing spaces, then terminate with close-quote and close-paren
-	$(AM_V_at)echo "SET(MOAB_LIBRARIES \"@EXPORT_LDFLAGS@ @CXX_LDFLAGS@ -L$(libdir) -lMOAB @PNETCDF_LIBS@ @NETCDF_LIBS@ @CGNS_LIBS@ @HDF5_LIBS@ @CCMIO_LIBS@ @CGM_LIBS@ @ZOLTAN_LIBS@ @LIBS@" | \
-	   sed -e 's/^ *//;s/ *$$/\")$(echo -e "\n\r")/' >> $(DESTDIR)$(cfgdir)/MOABConfig.cmake
-# linker libs for DagMC
-	$(AM_V_at)echo "SET(DAGMC_LIBRARIES \"@EXPORT_LDFLAGS@ @CXX_LDFLAGS@ -L$(libdir) @DAGMC_LIBS@ -lMOAB @PNETCDF_LIBS@ @NETCDF_LIBS@ @CGNS_LIBS@ @HDF5_LIBS@ @CCMIO_LIBS@ @CGM_LIBS@ @ZOLTAN_LIBS@ @LIBS@" | \
-	   sed -e 's/^ *//;s/ *$$/\")$(echo -e "\n\r")/' >> $(DESTDIR)$(cfgdir)/MOABConfig.cmake
-
 
 # Generate a file to be installed in $libdir containing the configuration
 # options used for this MOAB build.
@@ -93,4 +144,3 @@ moab.config: config.status Makefile.am
 	  sed -e '/^ *$$/d' > $@
 
 CLEANFILES = moab.config a.out configs.sed
-

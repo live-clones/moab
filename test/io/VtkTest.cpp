@@ -14,11 +14,8 @@ using namespace moab;
 
 #include "TestUtil.hpp"
 
-#ifdef MESHDIR
-static const char poly_example[] = STRINGIFY(MESHDIR) "/io/poly8-10.vtk";
-#else
-static const char poly_example[] = "poly8-10.vtk";
-#endif
+std::string poly_example = TestDir + "/io/poly8-10.vtk";
+std::string polyhedra_example = TestDir + "/io/polyhedra.vtk";
 
 #define DECLARE_TEST(A) \
   bool test_ ## A(); \
@@ -56,6 +53,7 @@ DECLARE_TEST(quad8)
 DECLARE_TEST(quad9)
 DECLARE_TEST(polygon)
 DECLARE_TEST(polygon_mix)
+DECLARE_TEST(polyhedra)
 DECLARE_TEST(tet4)
 DECLARE_TEST(tet10)
 DECLARE_TEST(hex8)
@@ -413,10 +411,29 @@ bool test_polygon_mix()
   Core moab;
   Interface& mb = moab;
 
-  ErrorCode rval = mb.load_file(poly_example);
+  ErrorCode rval = mb.load_file(poly_example.c_str());
   if (MB_SUCCESS!=rval)
     return false;
 
+  return true;
+
+}
+bool test_polyhedra()
+{
+  // just read the polyhedra file
+  Core moab;
+  Interface& mb = moab;
+
+  ErrorCode rval = mb.load_file(polyhedra_example.c_str());
+  if (MB_SUCCESS!=rval)
+    return false;
+  Range polyhedras;
+  rval = mb.get_entities_by_type(0, MBPOLYHEDRON, polyhedras);
+  if (MB_SUCCESS!=rval)
+    return false;
+
+  if (10!=polyhedras.size())
+    return false;
   return true;
 
 }
@@ -1580,13 +1597,17 @@ bool test_write_free_nodes()
     assert(MB_SUCCESS == rval);
   }
 
-  rval = moab.write_mesh(  "tmp_file.vtk");
+  rval = moab.write_file(  "tmp_file.vtk");
+  CHECK(rval);
+
+  rval = moab.write_file(  "tmp_file2.vtk", 0, "CREATE_ONE_NODE_CELLS;");
   CHECK(rval);
 
     // read data back in
   moab.delete_mesh();
-  rval = moab.load_mesh( "tmp_file.vtk" );
+  rval = moab.load_file( "tmp_file.vtk" );
   remove( "tmp_file.vtk" );
+  remove( "tmp_file2.vtk" );
   CHECK(rval);
 
   return true;

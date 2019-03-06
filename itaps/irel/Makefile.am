@@ -1,9 +1,8 @@
 @IGEOM_CONFIG_OPTIONS@
 
 AUTOMAKE_OPTIONS = foreign
-BUILT_SOURCES = iRel_protos.h
 
-MESHDIR = $(abs_top_srcdir)/MeshFiles/unittest/irel
+MESHDIR = $(abs_top_srcdir)/MeshFiles/unittest
 AM_CPPFLAGS = -DSRCDIR=$(srcdir)
 
 # Don't loose the autoconf include path
@@ -11,7 +10,7 @@ ACLOCAL_AMFLAGS = -I m4
 
 AM_CPPFLAGS += -I$(top_builddir) $(IGEOM_DEFINES) $(IGEOM_INCLUDES) \
                -DMESHDIR=$(MESHDIR) \
-               -I$(top_srcdir)/src \
+               -I$(top_srcdir)/src -I$(top_builddir)/src \
                -I$(top_srcdir)/itaps -I$(top_builddir)/itaps/fbigeom \
                -I$(top_srcdir)/itaps/imesh -I$(top_builddir)/itaps/imesh \
                -I$(top_srcdir)/itaps/irel -I$(top_builddir)/itaps/irel
@@ -66,14 +65,20 @@ if HAVE_CGM
     libiRel_la_SOURCES += \
         GeomAssocPairSide.cpp \
         GeomAssocPairSide.hpp
+if USING_DEV_CGM
+    libiRel_la_LIBADD += \
+        ${IGEOM_LTFLAGS} ${IGEOM_LDFLAGS} ${CGM_DIR}/itaps/libiGeom.la
+    TEST_DEPS += ${CGM_DIR}/itaps/libiGeom.la
+else
     libiRel_la_LIBADD += \
         ${IGEOM_LTFLAGS} ${IGEOM_LDFLAGS} ${CGM_DIR}/lib/libiGeom.la
-    LIBS += ${CGM_LIBS}
     TEST_DEPS += ${CGM_DIR}/lib/libiGeom.la
+endif
+    LIBS += ${CGM_LIBS}
 endif
 TEST_DEPS += ${MOAB_CXX_LINKFLAGS} ${MOAB_CXX_LIBS}
 
-TESTS = test_entset test_both test_status 
+TESTS = test_entset test_both test_status normals
 if ENABLE_fbigeom
   TESTS+= test_entsetFB
 endif
@@ -94,6 +99,11 @@ test_status_SOURCES = test_status.cpp
 test_status_DEPENDENCIES = libiRel.la
 test_status_LDADD = $(TEST_DEPS)
 test_status_CPPFLAGS = $(AM_CPPFLAGS) -I$(top_srcdir)/test
+
+normals_SOURCES = normals.cpp
+normals_DEPENDENCIES = libiRel.la
+normals_LDADD = $(TEST_DEPS)
+normals_CPPFLAGS = $(AM_CPPFLAGS) -I$(top_srcdir)/test
 
 if ENABLE_fbigeom
 test_entsetFB_SOURCES = test_entsetFB.cpp
@@ -123,13 +133,5 @@ if ENABLE_fbigeom
 	$(AM_V_at)echo "FBIGEOM_LIBS=-lFBiGeomMOAB" >> $(DESTDIR)$(cfgdir)/iRel-Defs.inc
 endif
 
-CLEANFILES=iRel_protos.h
-
-#itaps/irel/iRel_FCDefs.h: itaps/iBase_FCDefs.h
-#	./config.status itaps/irel/iRel_FCDefs.h
-
-# DISTCLEANFILES = iRel_FCDefs.h
-
-iRel_protos.h: iRel.h $(top_srcdir)/itaps/mkprotos.sh Makefile.am
-	$(AM_V_GEN)$(top_srcdir)/itaps/mkprotos.sh iRel MOAB $< $@ MOAB_FCDefs.h
+EXTRA_DIST = CMakeLists.txt
 

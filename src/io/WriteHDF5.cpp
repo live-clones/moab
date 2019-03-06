@@ -47,7 +47,6 @@
 #include "MBTagConventions.hpp"
 #include "moab/CN.hpp"
 #include "moab/FileOptions.hpp"
-#include "moab/Version.h"
 #include "moab/CpuTimer.hpp"
 #include "IODebugTrack.hpp"
 #include "mhdf.h"
@@ -56,27 +55,7 @@
 #error Attempt to compile WriteHDF5 with HDF5 support disabled
 #endif
 
-/* Access HDF5 file handle for debugging
-#include <H5Fpublic.h>
-struct file { uint32_t magic; hid_t handle; };
-*/
-#undef DEBUG
-
 #undef BLOCKED_COORD_IO
-
-#ifdef DEBUG
-/*
-# include <H5Epublic.h>
-  extern "C" herr_t hdf_error_handler(void*)
-  {
-    H5Eprint(stderr);
-    assert(0);
-  }
-*/
-# define myassert(A) assert(A)
-#else
-# define myassert(A)
-#endif
 
 #ifdef MOAB_HAVE_VALGRIND
 #  include <valgrind/memcheck.h>
@@ -96,7 +75,7 @@ namespace moab {
 
 template <typename T> inline 
 void VALGRIND_MAKE_VEC_UNDEFINED(std::vector<T>& v) {
-  (void)VALGRIND_MAKE_MEM_UNDEFINED(&v[0], v.size() * sizeof(T));
+  (void)VALGRIND_MAKE_MEM_UNDEFINED( (T*)&v[0], v.size() * sizeof(T));
 }
 
 #define WRITE_HDF5_BUFFER_SIZE (40 * 1024 * 1024)
@@ -173,7 +152,7 @@ static herr_t handle_hdf5_error(void* data)
 do { \
   if (mhdf_isError(&(A))) { \
     MB_SET_ERR_CONT(mhdf_message(&(A))); \
-    myassert(0); \
+    assert(0); \
     return error(MB_FAILURE); \
   } \
 } while (false)
@@ -182,7 +161,7 @@ do { \
 do { \
   if (mhdf_isError(&(A))) { \
     MB_SET_ERR_CONT(mhdf_message(&(A))); \
-    myassert(0); \
+    assert(0); \
     mhdf_closeData(filePtr, (B), &(A)); \
     return error(MB_FAILURE); \
   } \
@@ -192,7 +171,7 @@ do { \
 do { \
   if (mhdf_isError(&(A))) { \
     MB_SET_ERR_CONT(mhdf_message(&(A))); \
-    myassert(0); \
+    assert(0); \
     mhdf_closeData(filePtr, (B)[0], &(A)); \
     mhdf_closeData(filePtr, (B)[1], &(A)); \
     return error(MB_FAILURE); \
@@ -203,7 +182,7 @@ do { \
 do { \
   if (mhdf_isError(&(A))) { \
     MB_SET_ERR_CONT(mhdf_message(&(A))); \
-    myassert(0); \
+    assert(0); \
     mhdf_closeData(filePtr, (B)[0], &(A)); \
     mhdf_closeData(filePtr, (B)[1], &(A)); \
     mhdf_closeData(filePtr, (B)[2], &(A)); \
@@ -215,7 +194,7 @@ do { \
 do { \
   if (mhdf_isError(&(A))) { \
     MB_SET_ERR_CONT(mhdf_message(&(A))); \
-    myassert(0); \
+    assert(0); \
     mhdf_closeData(filePtr, (B), &(A)); \
     if (C) mhdf_closeData(filePtr, (D), &(A)); \
     return error(MB_FAILURE); \
@@ -235,7 +214,7 @@ do { \
   if (MB_SUCCESS != (A)) { \
     MB_CHK_ERR_CONT((A)); \
     mhdf_closeData(filePtr, (B), &(C)); \
-    myassert(0); \
+    assert(0); \
     return error(A); \
   } \
 } while (false)
@@ -247,7 +226,7 @@ do { \
     mhdf_closeData(filePtr, (B)[0], &(C)); \
     mhdf_closeData(filePtr, (B)[1], &(C)); \
     write_finished(); \
-    myassert(0); \
+    assert(0); \
     return error(A); \
   } \
 } while (false)
@@ -260,7 +239,7 @@ do { \
     mhdf_closeData(filePtr, (B)[1], &(C)); \
     mhdf_closeData(filePtr, (B)[2], &(C)); \
     write_finished(); \
-    myassert(0); \
+    assert(0); \
     return error(A); \
   } \
 } while (false)
@@ -273,7 +252,7 @@ do { \
     if (C) \
       mhdf_closeData(filePtr, (D), &(E)); \
     write_finished(); \
-    myassert(0); \
+    assert(0); \
     return error(A); \
   } \
 } while (false)
@@ -351,6 +330,13 @@ ErrorCode WriteHDF5::assign_ids(const Range& entities, wid_t id)
                   (unsigned long)(ID_FROM_HANDLE(pi->first) + n - 1),
                   (unsigned long)id,
                   (unsigned long)(id + n - 1));
+    if (TYPE_FROM_HANDLE(pi->first) == MBPOLYGON || TYPE_FROM_HANDLE(pi->first) == MBPOLYHEDRON )
+    {
+      int num_vertices = 0;
+      const EntityHandle *conn=0;
+      iFace->get_connectivity(pi->first, conn, num_vertices );
+      dbgOut.printf(3, "  poly with %d verts/faces \n", num_vertices);
+    }
     if (!idMap.insert(pi->first, id, n).second)
       return error(MB_FAILURE);
     id += n;
@@ -1568,6 +1554,7 @@ ErrorCode range_to_blocked_list_templ(HandleRangeIter begin,
   size_t pairs_remaining = num_handles / 2;
   for (HandleRangeIter pi = begin; pi != end; ++pi) {
     EntityHandle h = pi->first;
+    WriteHDF5::wid_t local_mapped_from_subrange = 0;
     while (h <= pi->second) {
       ri = idMap.lower_bound(ri, idMap.end(), h);
       if (ri == idMap.end() || ri->begin > h) {
@@ -1575,12 +1562,20 @@ ErrorCode range_to_blocked_list_templ(HandleRangeIter begin,
         continue;
       }
 
-      WriteHDF5::wid_t n = pi->second - pi->first + 1;
+      WriteHDF5::wid_t n = pi->second - pi->first + 1 - local_mapped_from_subrange;
       if (n > ri->count)
         n = ri->count;
 
-      // See if we can append it to the previous range
+
       WriteHDF5::wid_t id = ri->value + (h - ri->begin);
+      // see if we can go to the end of the range
+      if (id + n > ri->value + ri->count) // we have to reduce n, because we cannot go over next subrange
+      {
+        if (ri->value + ri->count - id > 0)
+          n = ri->value + ri->count - id > 0;
+      }
+
+      // See if we can append it to the previous range
       if (!output_id_list.empty() &&
           output_id_list[output_id_list.size()-2] + output_id_list.back() == id) {
         output_id_list.back() += n;
@@ -1604,6 +1599,7 @@ ErrorCode range_to_blocked_list_templ(HandleRangeIter begin,
         output_id_list.push_back(id);
         output_id_list.push_back(n);
       }
+      local_mapped_from_subrange+=n; // we already mapped so many
       h += n;
     }
   }
@@ -3177,7 +3173,7 @@ void WriteHDF5::print_times(const double* t) const
             << "  create file:       " << t[CREATE_TIME] << std::endl
             << "    create nodes:    " << t[CREATE_NODE_TIME] << std::endl
             << "    negotiate types: " << t[NEGOTIATE_TYPES_TIME] << std::endl
-            << "    craete elem:     " << t[CREATE_ELEM_TIME] << std::endl
+            << "    create elem:     " << t[CREATE_ELEM_TIME] << std::endl
             << "    file id exch:    " << t[FILEID_EXCHANGE_TIME] << std::endl
             << "    create adj:      " << t[CREATE_ADJ_TIME] << std::endl
             << "    create set:      " << t[CREATE_SET_TIME] << std::endl

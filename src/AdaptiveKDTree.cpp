@@ -33,7 +33,8 @@ namespace moab {
 #define MB_AD_KD_TREE_USE_TWO_DOUBLE_TAG
 
     AdaptiveKDTree::AdaptiveKDTree(Interface *iface) 
-    : Tree(iface), planeTag(0), axisTag(0), splitsPerDir(3), planeSet(SUBDIVISION_SNAP)
+    : Tree(iface), planeTag(0), axisTag(0), splitsPerDir(3), planeSet(SUBDIVISION_SNAP),
+      spherical(false), radius(1.0)
     {
       boxTagName = treeName;
 
@@ -44,7 +45,8 @@ namespace moab {
 
     AdaptiveKDTree::AdaptiveKDTree(Interface* iface, const Range &entities, 
                                    EntityHandle *tree_root_set, FileOptions *opts) 
-            : Tree(iface), planeTag(0), axisTag(0), splitsPerDir(3), planeSet(SUBDIVISION_SNAP)
+            : Tree(iface), planeTag(0), axisTag(0), splitsPerDir(3), planeSet(SUBDIVISION_SNAP),
+              spherical(false), radius(1.0)
     {
       boxTagName = treeName;
       
@@ -88,7 +90,7 @@ namespace moab {
       
         // calculate bounding box of elements
       BoundBox box;
-      rval = box.update(*moab(), entities);
+      rval = box.update(*moab(), entities, spherical, radius);
       if (MB_SUCCESS != rval)
         return rval;
   
@@ -209,6 +211,17 @@ namespace moab {
       if (MB_SUCCESS == rval && (tmp_int < SUBDIVISION || tmp_int > VERTEX_SAMPLE)) return MB_FAILURE;
       else if (MB_ENTITY_NOT_FOUND == rval) planeSet = SUBDIVISION;
       else planeSet = (CandidatePlaneSet)(tmp_int);
+
+      bool tmp_bool;
+      rval = opts.get_toggle_option("SPHERICAL", false, spherical);
+      if (MB_SUCCESS != rval) spherical=false;
+
+      double tmp=1.0;
+      rval = opts.get_real_option("RADIUS", tmp);
+      if (MB_SUCCESS != rval)
+        radius=1.0;
+      else
+        radius = tmp;
 
       return MB_SUCCESS;
     }
@@ -480,7 +493,7 @@ namespace moab {
           return rval;
     
         iter.childVect.clear();
-        moab()->get_child_meshsets( h, iter.childVect );
+        rval = moab()->get_child_meshsets( h, iter.childVect );MB_CHK_ERR(rval);
         if (!iter.childVect.empty()) {
           moab()->remove_child_meshset( h, iter.childVect[0] );
           moab()->remove_child_meshset( h, iter.childVect[1] );
@@ -951,7 +964,7 @@ namespace moab {
       BoundBox tbox;
       for (i = set_begin; i != elems.end(); ++i) {
         tree_stats().constructLeafObjectTests++;
-        rval = tbox.update(*moab(), *i);
+        rval = tbox.update(*moab(), *i, spherical, radius);
         if (MB_SUCCESS != rval)
           return rval;
     
@@ -1045,9 +1058,6 @@ namespace moab {
       double metric_val = std::numeric_limits<unsigned>::max();
   
       ErrorCode r;
-      const CartVect box_min(iter.box_min());
-      const CartVect box_max(iter.box_max());
-      const CartVect diff(box_max - box_min);
         //const CartVect tol(eps*diff);
   
       Range entities, vertices;
@@ -1065,6 +1075,30 @@ namespace moab {
       if (MB_SUCCESS != r)
         return r;
   
+      // calculate bounding box of vertices
+      // decide based on the actual box the splitting plane
+      // do not decide based on iterator box.
+      // it could be too big
+      //BoundBox box;
+      //r = box.update(*moab(), vertices);
+      CartVect box_min;
+      CartVect box_max;
+      for (int dir = 0; dir < 3; dir++)
+      {
+        double amin=tmp_data[dir*nverts];
+        double amax = amin;
+        double * p=&tmp_data[dir*nverts+1];
+        for (unsigned int i=1; i<nverts; i++)
+        {
+          if (*p <amin) amin=*p;
+          if (*p >amax) amax=*p;
+          p++;
+        }
+        box_min[dir]=amin;
+        box_max[dir]=amax;
+      }
+      CartVect diff(box_max - box_min);
+
       for (int axis = 0; axis < 3; ++axis) {
         int plane_count = num_planes;
 
@@ -1945,7 +1979,7 @@ namespace moab {
             rval = moab()->get_coords( tri_conn, 3, tri_coords[0].array() );
             if (MB_SUCCESS != rval) return rval;
         
-            if (GeomUtil::ray_tri_intersect( tri_coords, ray_pt, ray_dir, tol, tri_t, &ray_end )) {
+            if (GeomUtil::ray_tri_intersect( tri_coords, ray_pt, ray_dir, tri_t, &ray_end )) {
               if (!max_ints) {
                 if (std::find(tris_out.begin(),tris_out.end(),*iter) == tris_out.end()) {
                   tris_out.push_back( *iter );

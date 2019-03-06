@@ -16,10 +16,11 @@ FBIGEOM_LIBS = $(FBIGEOM_LDFLAGS) -L$(MOAB_LIBDIR) \
                -L$(FBIGEOM_LIBDIR) -liMesh -lFBiGeomMOAB -lMOAB \
               @NETCDF_LIBS@ @PNETCDF_LIBS@ @HDF5_LIBS@ @DAMSEL_LIBS@ \
               @CGM_LDFLAGS@ @CGM_LIBS@ @CCMIO_LIBS@ @ZOLTAN_LIBS@ @PARMETIS_LIBS@ @METIS_LIBS@ \
+              @HYPRE_LIBS@ @LAPACK_LIBS@ @BLAS_LIBS@  \
               @FCLIBS@ @LIBS@
 
 FBIGEOM_INCLUDEDIR = @abs_srcdir@
 FBIGEOM_INCLUDEDIR2 = -I@abs_top_builddir@
 FBIGEOM_LIBDIR = @abs_builddir@/.libs
-MOAB_LIBDIR = @abs_builddir@/../../.libs
+MOAB_LIBDIR = @abs_top_builddir@/src/.libs
 
