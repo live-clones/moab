@@ -310,77 +310,11 @@ extern "C" {
  */
 /*@{*/
 
+
 /**
  *\defgroup mhdf_status Error handling
  */
 /*@{*/
-
-#define MHDF_MESSAGE_BUFFER_LEN 160
-
-/** \brief Struct used to return error status. */
-typedef struct struct_mhdf_Status { char message[MHDF_MESSAGE_BUFFER_LEN]; } mhdf_Status;
-
-/** \brief Return 1 if passed status object indicates an error.  Zero otherwise. */
-int 
-mhdf_isError( mhdf_Status const* );
-
-/** \brief Get the error message given a status object.  */
-const char*
-mhdf_message( mhdf_Status const* );
-
-/*@}*/
-
-/**
- *\defgroup mhdf_type Common element type names.
- */
-/*@{*/
-
-/** \brief Name to use for edge element */
-#define mhdf_EDGE_TYPE_NAME        "Edge"
-/** \brief Name to use for triangle element */
-#define mhdf_TRI_TYPE_NAME         "Tri"     
-/** \brief Name to use for quadrilateral element */
-#define mhdf_QUAD_TYPE_NAME        "Quad"    
-/** \brief Name to use for general polygon element */
-#define mhdf_POLYGON_TYPE_NAME     "Polygon" 
-/** \brief Name to use for tetrahedral element */
-#define mhdf_TET_TYPE_NAME         "Tet"     
-/** \brief Name to use for quad-based pyramid element */
-#define mhdf_PYRAMID_TYPE_NAME     "Pyramid" 
-/** \brief Name to use for triangular prism element */
-#define mhdf_PRISM_TYPE_NAME       "Prism"   
-/** \brief Name to use for knife element */
-#define mdhf_KNIFE_TYPE_NAME       "Knife"   
-/** \brief Name to use for quad-sided hexahedral element */
-#define mdhf_HEX_TYPE_NAME         "Hex"     
-/** \brief Name to use for general polyhedron specified as a arbitrary-length list of faces */
-#define mhdf_POLYHEDRON_TYPE_NAME  "Polyhedron" 
-/** \brief Name to use for hexagonal-based pyramid */
-#define mhdf_SEPTAHEDRON_TYPE_NAME "Septahedron" 
-
-/*@}*/
-
-/** \brief Enum for tag data type class
- *
- * Enumerates known types for tag data
- */
-enum mhdf_TagDataType {
-  mhdf_OPAQUE = 0, /**< Opaque/unknown type */
-  mhdf_INTEGER,    /**< Integer type */
-  mhdf_FLOAT,      /**< Floating point value */
-  mhdf_BITFIELD,   /**< Bit field */
-  mhdf_BOOLEAN,    /**< Boolean values stored as one byte each */
-  mhdf_ENTITY_ID   /**< Global ID referencing another entity in file */
-};
-
-/**\brief Type used when creating index tables
- *
- * The data type used by mhdf_create* functions that create tables
- * if indices (e.g. mhdf_createSetMeta, mhdf_createVarLenTag, etc.).
- */
-typedef long mhdf_index_t;
-#define MHDF_INDEX_TYPE H5T_NATIVE_LONG
-
 
 /**\brief Flag used to indicate if dataset is 1D with and array datatype
  *
