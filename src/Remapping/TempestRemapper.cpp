@@ -26,7 +26,7 @@
 #include "moab/Skinner.hpp"
 #include "MBParallelConventions.h"
 
-// #define VERBOSE
+#define VERBOSE
 
 namespace moab
 {
@@ -705,6 +705,11 @@ ErrorCode TempestRemapper::ComputeOverlapMesh ( double tolerance, double radius_
                 // coverage mesh used
 #ifdef MOAB_HAVE_MPI
                 if (is_parallel && size > 1) {
+                    rval = m_interface->write_file( "intxMesh.h5m",
+                        0, //const char* file_type = 0,
+                        "PARALLEL=WRITE_PART", //const char* options = 0,
+                        &m_overlap_set, 1); //const EntityHandle* output_sets = 0,
+                    MB_CHK_ERR ( rval );
                     rval = augment_overlap_set(); MB_CHK_ERR ( rval );
                 }
 #endif
