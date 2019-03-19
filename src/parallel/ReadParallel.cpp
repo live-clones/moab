@@ -541,11 +541,20 @@ ErrorCode ReadParallel::load_file(const char **file_names,
 
 //==================
       case PA_CHECK_GIDS_SERIAL:
+      {
           myDebug.tprint(1, "Checking global IDs.\n");
 
-          tmp_result = myPcomm->check_global_ids(file_set, 0, 1, true, false);
+          //
+          Range allEnts;
+          this->mbImpl->get_entities_by_handle(file_set, allEnts);
+          // subtract sets
+          Range sets= allEnts.subset_by_type(moab::MBENTITYSET);
+          allEnts = subtract(allEnts, sets);
+          EntityHandle lastCell = *(allEnts.rbegin());
+          int dimens = mbImpl->dimension_from_handle(lastCell);
+          tmp_result = myPcomm->check_global_ids(file_set, dimens, 1, false, false);
           break;
-
+      }
 //==================
       case PA_RESOLVE_SHARED_ENTS:
           myDebug.tprint(1, "Resolving shared entities.\n");
