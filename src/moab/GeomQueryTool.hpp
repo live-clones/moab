@@ -202,7 +202,7 @@ public:
    */
   ErrorCode find_volume(const double xyz[3],
                         EntityHandle& volume,
-                        const double *dir = nullptr);
+                        const double *dir = NULL);
 
   /**\brief Find volume for a given location using loop. (slow)
    *
@@ -215,7 +215,7 @@ public:
    */
   ErrorCode find_volume_slow(const double xyz[3],
                         EntityHandle& volume,
-                        const double *dir = nullptr);
+                        const double *dir = NULL);
 
 
   /**\brief Test if a point is inside or outsize a volume's axis-aligned bounding box

@@ -21,9 +21,9 @@ class CartVect
     inline CartVect()
       { }
       /**Initialze all three values to same scalar (typically zero)*/
-    explicit inline CartVect( double v )
+    explicit inline CartVect(const double& v )
       { d[0] = d[1] = d[2] = v; }
-    inline CartVect( double i, double j, double k )
+    inline CartVect(const double& i, const double& j, const double& k )
       { d[0] = i; d[1] = j; d[2] = k; }
       /**Initialze from array*/
     explicit inline CartVect( const double a[3] )
@@ -43,13 +43,13 @@ class CartVect
       /** Assign cross product to this */
     inline CartVect& operator*=( const CartVect& v );
 
-    inline CartVect& operator+=( double s )
+    inline CartVect& operator+=(const double& s )
       { d[0] += s; d[1] += s; d[2] += s; return *this; }
-    inline CartVect& operator-=( double s )
+    inline CartVect& operator-=(const double& s )
       { d[0] -= s; d[1] -= s; d[2] -= s; return *this; }
-    inline CartVect& operator*=( double s )
+    inline CartVect& operator*=(const double& s )
       { d[0] *= s; d[1] *= s; d[2] *= s; return *this; }
-    inline CartVect& operator/=( double s )
+    inline CartVect& operator/=(const double& s )
       { d[0] /= s; d[1] /= s; d[2] /= s; return *this; }
     inline bool operator==(const CartVect& v ) const
       { return d[0] == v[0] && d[1] == v[1] && d[2] == v[2]; }

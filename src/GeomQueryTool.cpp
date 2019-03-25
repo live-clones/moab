@@ -985,7 +985,11 @@ ErrorCode GeomQueryTool::find_volume(const double xyz[3],
   }
 
   moab::CartVect uvw(0.0);
-  if (dir) { uvw.get(dir); }
+  if (dir) {
+    uvw[0] = dir[0];
+    uvw[1] = dir[1];
+    uvw[2] = dir[2];
+  }
 
   if (uvw == 0.0) {
     uvw[0] = rand();
@@ -997,11 +1001,11 @@ ErrorCode GeomQueryTool::find_volume(const double xyz[3],
   // fire a ray along dir and get surface
   const double huge_val = std::numeric_limits<double>::max();
   double pos_ray_len = huge_val;
-  double neg_ray_len{}; // may need this for overlap cases
+  double neg_ray_len = 0.0; // may need this for overlap cases
 
   // min_tolerance_intersections is passed but not used in this call
-  const int min_tolerance_intersections{};
-  const int ray_orientation{};
+  const int min_tolerance_intersections = 0;
+  const int ray_orientation = 0;
 
   Tag senseTag = geomTopoTool->get_sense_tag();
   // numericalPrecision is used for box.intersect_ray and find triangles in the
@@ -1095,7 +1099,7 @@ ErrorCode GeomQueryTool::find_volume(const double xyz[3],
 
 ErrorCode GeomQueryTool::find_volume_slow(const double xyz[3],
                            EntityHandle& volume,
-                           const double *dir = nullptr)
+                           const double *dir)
 {
   ErrorCode rval;
   volume = 0;
@@ -1105,7 +1109,7 @@ ErrorCode GeomQueryTool::find_volume_slow(const double xyz[3],
   MB_CHK_SET_ERR(rval, "Failed to get all volumes in the model");
 
   Range::iterator it;
-  int result{};
+  int result = 0;
   for (it = all_vols.begin(); it != all_vols.end(); it++) {
     rval = point_in_volume(*it, xyz, result, dir);
     MB_CHK_SET_ERR(rval, "Failed in point in volume loop");
