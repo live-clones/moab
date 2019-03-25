@@ -976,138 +976,145 @@ ErrorCode GeomQueryTool::find_volume(const double xyz[3],
 {
   ErrorCode rval;
 
-  moab::CartVect uvw(0.0);
+  EntityHandle global_surf_tree_root = geomTopoTool->get_one_vol_root();
 
-  if (dir) {
-    std::copy(dir, dir+3, uvw.array());
+  // if geomTopoTool doesn't have a global tree, use a loop over vols (slow)
+  if (!global_surf_tree_root) {
+    rval = find_volume_slow(xyz, volume, dir);
+    return rval;
   }
 
-  if (uvw[0] == 0.0 && uvw[1] == 0.0 && uvw[2] == 0.0) {
+  moab::CartVect uvw(0.0);
+  if (dir) { uvw.get(dir); }
+
+  if (uvw == 0.0) {
     uvw[0] = rand();
     uvw[1] = rand();
     uvw[2] = rand();
   }
   uvw.normalize();
 
-  EntityHandle global_surf_tree_root = geomTopoTool->get_one_vol_root();
+  // fire a ray along dir and get surface
+  const double huge_val = std::numeric_limits<double>::max();
+  double pos_ray_len = huge_val;
+  double neg_ray_len{}; // may need this for overlap cases
 
-  // if geomTopoTool doesn't have a global tree, use a loop over vols (slow)
-  if (!global_surf_tree_root) {
+  // min_tolerance_intersections is passed but not used in this call
+  const int min_tolerance_intersections{};
+  const int ray_orientation{};
 
-    // get all volumes
-    Range all_vols;
-    rval = geomTopoTool->get_gsets_by_dimension(3, all_vols);
-    MB_CHK_SET_ERR(rval, "Failed to get all volumes in the model");
+  Tag senseTag = geomTopoTool->get_sense_tag();
+  // numericalPrecision is used for box.intersect_ray and find triangles in the
+  // neighborhood of edge/node intersections.
+  GQT_IntRegCtxt int_reg_ctxt(geomTopoTool->obb_tree(), xyz, dir, numericalPrecision,
+                              min_tolerance_intersections, &global_surf_tree_root,
+                              NULL, &senseTag, &ray_orientation, NULL);
 
-    Range::iterator it;
-    int result{};
-    for (it = all_vols.begin(); it != all_vols.end(); it++) {
-      rval = point_in_volume(*it, xyz, result, dir);
-      MB_CHK_SET_ERR(rval, "Failed in point in volume loop");
-      if (result) {
-        volume = *it;
-        break;
-      }
-    }
+  std::vector<double>       dists;
+  std::vector<EntityHandle> surfs;
+  std::vector<EntityHandle> facets;
+
+  OrientedBoxTreeTool::IntersectSearchWindow search_win(&pos_ray_len, &neg_ray_len);
+  rval = geomTopoTool->obb_tree()->ray_intersect_sets(dists, surfs, facets,
+                                                      global_surf_tree_root, numericalPrecision,
+                                                      xyz, uvw.array(), search_win, int_reg_ctxt, NULL);
+  MB_CHK_SET_ERR(rval, "Failed in global tree ray fire");
+
+  // if there was no intersection, no volume is found
+  if (dists.size() == 0) {
+    volume = 0;
+    return MB_ENTITY_NOT_FOUND;
+  }
+
+  if (dists.size() > 1) {
+    volume = 0;
+    return MB_ENTITY_NOT_FOUND;
+  }
+
+  // get the first facet, surface hit
+  EntityHandle facet = facets[0];
+  EntityHandle surf = surfs[0];
+
+  // get these now, we're going to use them no matter what
+  EntityHandle parent_vols[2];
+  rval = MBI->tag_get_data(senseTag, &surf, 1, parent_vols);
+  MB_CHK_SET_ERR(rval, "Failed to get sense data");
+
+  // get triangle normal
+  std::vector<EntityHandle> conn;
+  CartVect coords[3];
+  rval = MBI->get_connectivity(&facet, 1, conn);
+  MB_CHK_SET_ERR(rval, "Failed to get triangle connectivity");
+
+  rval = MBI->get_coords(&conn[0], 3, coords[0].array());
+  MB_CHK_SET_ERR(rval, "Failed to get triangle coordinates");
+
+  CartVect normal = (coords[1] - coords[0]) * (coords[2] - coords[0]);
+  normal.normalize();
+
+  CartVect direction(dir);
+
+  // if this is a "forward" intersection return the first sense entity
+  // otherwise return the second, "reverse" sense entity
+  double dot_prod = direction % normal;
+  int sense_idx =  dot_prod > 0.0 ? 0 : 1;
+
+  if (dot_prod != 0.0) {
+    volume = parent_vols[sense_idx];
+    return MB_SUCCESS;
   } else {
-    // fire a ray along dir and get surface
-    const double huge_val = std::numeric_limits<double>::max();
-    double pos_ray_len = huge_val;
-    double neg_ray_len{}; // may need this for overlap cases
+    //corner case (tangent intersection)
+    // we can at least limit the point_in_vol search to the two parent
+    // volumes of the nearest surface intersected
+    int result;
+    rval = point_in_volume(parent_vols[0], xyz, result);
+    MB_CHK_SET_ERR(rval, "Failed in point_in_volume for forward parent");
 
-    // min_tolerance_intersections is passed but not used in this call
-    const int min_tolerance_intersections{};
-    const int ray_orientation{};
-
-    Tag senseTag = geomTopoTool->get_sense_tag();
-    // numericalPrecision is used for box.intersect_ray and find triangles in the
-    // neighborhood of edge/node intersections.
-    GQT_IntRegCtxt int_reg_ctxt(geomTopoTool->obb_tree(), xyz, dir, numericalPrecision,
-                                min_tolerance_intersections, &global_surf_tree_root,
-                                NULL, &senseTag, &ray_orientation, NULL);
-
-    std::vector<double>       dists;
-    std::vector<EntityHandle> surfs;
-    std::vector<EntityHandle> facets;
-
-    OrientedBoxTreeTool::IntersectSearchWindow search_win(&pos_ray_len, &neg_ray_len);
-    rval = geomTopoTool->obb_tree()->ray_intersect_sets(dists, surfs, facets,
-                                                        global_surf_tree_root, numericalPrecision,
-                                                        xyz, uvw.array(), search_win, int_reg_ctxt, NULL);
-    MB_CHK_SET_ERR(rval, "Failed in global tree ray fire");
-
-    // if there was no intersection, no volume is found
-    if (dists.size() == 0) {
-      volume = 0;
-      return MB_ENTITY_NOT_FOUND;
-    }
-
-    if (dists.size() > 1) {
-      volume = 0;
-      return MB_ENTITY_NOT_FOUND;
-    }
-
-    // get the first facet, surface hit
-    EntityHandle facet = facets[0];
-    EntityHandle surf = surfs[0];
-
-    // get these now, we're going to use them no matter what
-    EntityHandle parent_vols[2];
-    rval = MBI->tag_get_data(senseTag, &surf, 1, parent_vols);
-    MB_CHK_SET_ERR(rval, "Failed to get sense data");
-
-    // get triangle normal
-    std::vector<EntityHandle> conn;
-    CartVect coords[3];
-    rval = MBI->get_connectivity(&facet, 1, conn);
-    MB_CHK_SET_ERR(rval, "Failed to get triangle connectivity");
-
-    rval = MBI->get_coords(&conn[0], 3, coords[0].array());
-    MB_CHK_SET_ERR(rval, "Failed to get triangle coordinates");
-
-    CartVect normal = (coords[1] - coords[0]) * (coords[2] - coords[0]);
-    normal.normalize();
-
-    CartVect direction(dir);
-
-    // if this is a "forward" intersection return the first sense entity
-    // otherwise return the second, "reverse" sense entity
-    double dot_prod = direction % normal;
-    int sense_idx =  dot_prod > 0.0 ? 0 : 1;
-
-    if (dot_prod != 0.0) {
-      volume = parent_vols[sense_idx];
+    if (result) {
+      volume = parent_vols[0];
       return MB_SUCCESS;
     } else {
-      //corner case (tangent intersection)
-      // we can at least limit the point_in_vol search to the two parent
-      // volumes of the nearest surface intersected
-      int result;
-      rval = point_in_volume(parent_vols[0], xyz, result);
+      // if not found in the forward volume, try the reverse volume
+      rval = point_in_volume(parent_vols[1], xyz, result);
       MB_CHK_SET_ERR(rval, "Failed in point_in_volume for forward parent");
-
-      if (result) {
-        volume = parent_vols[0];
-        return MB_SUCCESS;
-      } else {
-        // if not found in the forward volume, try the reverse volume
-        rval = point_in_volume(parent_vols[1], xyz, result);
-        MB_CHK_SET_ERR(rval, "Failed in point_in_volume for forward parent");
-      }
-
-      // if in neither, we're hosed
-      if (result) {
-        volume = parent_vols[1];
-        return MB_SUCCESS;
-      } else {
-        return MB_ENTITY_NOT_FOUND;
-      }
     }
 
+    // if in neither, we're hosed
+    if (result) {
+      volume = parent_vols[1];
+      return MB_SUCCESS;
+    } else {
+      return MB_ENTITY_NOT_FOUND;
+    }
   }
 
   // shouldn't get here
   return MB_FAILURE;
+}
+
+
+ErrorCode GeomQueryTool::find_volume_slow(const double xyz[3],
+                           EntityHandle& volume,
+                           const double *dir = nullptr)
+{
+  ErrorCode rval;
+  volume = 0;
+  // get all volumes
+  Range all_vols;
+  rval = geomTopoTool->get_gsets_by_dimension(3, all_vols);
+  MB_CHK_SET_ERR(rval, "Failed to get all volumes in the model");
+
+  Range::iterator it;
+  int result{};
+  for (it = all_vols.begin(); it != all_vols.end(); it++) {
+    rval = point_in_volume(*it, xyz, result, dir);
+    MB_CHK_SET_ERR(rval, "Failed in point in volume loop");
+    if (result) {
+      volume = *it;
+      break;
+    }
+  }
+  return volume ? MB_SUCCESS : MB_ENTITY_NOT_FOUND;
 }
 
 // detemine distance to nearest surface
