@@ -854,6 +854,8 @@ ErrorCode ParCommGraph::compute_partition (ParallelComm *pco, Range & owned, int
     return MB_SUCCESS; // nothing to do? empty partition is not allowed, maybe we should return error?
   Core * mb = (Core*)pco->get_moab();
 
+  double t1, t2, t3;
+  t1 = MPI_Wtime();
   int primaryDim = mb->dimension_from_handle(*owned.rbegin());
   int interfaceDim = primaryDim -1; // should be 1 or 2
   Range sharedEdges;
@@ -871,7 +873,8 @@ ErrorCode ParCommGraph::compute_partition (ParallelComm *pco, Range & owned, int
   int np;
   unsigned char pstatus;
 
-  std::map<int, int> adjCellsId;
+  std::multimap<int,int> extraGraphEdges;
+  //std::map<int, int> adjCellsId;
   std::map<int, int> extraCellsProc;
   // if method is 2, no need to do the exchange for adjacent cells across partition boundary
   // these maps above will be empty for method 2 (geometry)
@@ -919,15 +922,22 @@ ErrorCode ParCommGraph::compute_partition (ParallelComm *pco, Range & owned, int
     for (int i=0; i<ne; i++)
     {
       int sharedProc =  TLe.vi_rd[2*i] ; // this info is coming from here, originally
-      int  remoteCellID = TLe.vi_rd[2*i+1] ;
-      EntityHandle localCell = TLe.vul_rd[i] ; // this is now local cell on the this proc
-      adjCellsId [edgeToCell[localCell]] = remoteCellID;
+      int  remoteCellID = TLe.vi_rd[2*i+1] ; // this is the id of the remote cell, on sharedProc
+      EntityHandle localCell = TLe.vul_rd[i] ; // this is now local edge/face on this proc
+      int localCellId = edgeToCell[localCell]; // this is the local cell  adjacent to edge/face
+      // now, we will need to add to the graph the pair <localCellId, remoteCellID>
+      std::pair<int,int> extraAdj=std::make_pair(localCellId,remoteCellID);
+      extraGraphEdges.insert(extraAdj);
+      //adjCellsId [edgeToCell[localCell]] = remoteCellID;
       extraCellsProc[remoteCellID] = sharedProc;
 #if VERBOSE
       std::cout <<"local ID " << edgeToCell[localCell] << " remote cell ID: " << remoteCellID << "\n";
 #endif
     }
   }
+  t2 = MPI_Wtime();
+  if (rootSender)
+    std::cout<<" time preparing the input for Zoltan:" << t2-t1 << " seconds. \n";
   // so adj cells ids; need to call zoltan for parallel partition
 #ifdef MOAB_HAVE_ZOLTAN
   ZoltanPartitioner * mbZTool = new ZoltanPartitioner(mb);
@@ -937,7 +947,7 @@ ErrorCode ParCommGraph::compute_partition (ParallelComm *pco, Range & owned, int
     // in how many tasks do we want to be distributed?
     int numNewPartitions = (int)receiverTasks.size();
     Range primaryCells=owned.subset_by_dimension(primaryDim);
-    rval = mbZTool->partition_owned_cells(primaryCells, pco, adjCellsId, extraCellsProc,
+    rval = mbZTool->partition_owned_cells(primaryCells, pco, extraGraphEdges, extraCellsProc,
         numNewPartitions, distribution, met); MB_CHK_ERR ( rval );
     for (std::map<int, Range>::iterator mit=distribution.begin(); mit!=distribution.end(); mit++)
     {
@@ -947,7 +957,9 @@ ErrorCode ParCommGraph::compute_partition (ParallelComm *pco, Range & owned, int
     }
   }
 #endif
-
+  t3 = MPI_Wtime();
+  if (rootSender)
+    std::cout << " time spent by Zoltan " << t3-t2 << " seconds. \n";
   return MB_SUCCESS;
 }
 // at this moment, each sender task has split_ranges formed;

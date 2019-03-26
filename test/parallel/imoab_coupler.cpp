@@ -20,6 +20,7 @@
 #include "moab/iMOAB.h"
 #include "TestUtil.hpp"
 #include "moab/CpuTimer.hpp"
+#include "moab/ProgOptions.hpp"
 #include <iostream>
 #include <sstream>
 
@@ -71,42 +72,38 @@ int main( int argc, char* argv[] )
   // intxid is for intx atm / ocn on coupler pes
   int nghlay=0; // number of ghost layers for loading the file
   std::vector<int> groupTasks; // at most 2 tasks
-  // int startG1=0, startG2=0, endG1=size/2-1, endG2=size-1; // Support launch of imoab_coupler test on any combo of 2*x processes
-  // int startG1=0, startG2=1, endG1=0, endG2=1; // Support launch of imoab_coupler test on any combo of 2*x processes
+  int startG1=0, startG2=0, endG1=size/2-1, endG2=size-1; // Support launch of imoab_coupler test on any combo of 2*x processes
+  /* COMBOS THAT WORK */
   // int startG1=0, startG2=0, endG1=0, endG2=0; // Support launch of imoab_coupler test on any combo of 2*x processes
   // int startG1=0, startG2=0, endG1=1, endG2=0; // Support launch of imoab_coupler test on any combo of 2*x processes
   // int startG1=0, startG2=0, endG1=size-1, endG2=0; // Support launch of imoab_coupler test on any combo of 2*x processes
   // int startG1=0, startG2=0, endG1=0, endG2=1; // Support launch of imoab_coupler test on any combo of 2*x processes
   // int startG1=0, startG2=0, endG1=1, endG2=1; // Support launch of imoab_coupler test on any combo of 2*x processes
   // int startG1=0, startG2=0, endG1=size-1, endG2=size-1; // Support launch of imoab_coupler test on any combo of 2*x processes
-  int startG1=0, startG2=1, endG1=0, endG2=1; // Support launch of imoab_coupler test on any combo of 2*x processes
 
   // load atm on 2 proc, ocean on 2, migrate both to 2 procs, then compute intx
   // later, we need to compute weight matrix with tempestremap
+
   std::string filename1, filename2;
-#ifdef MOAB_HAVE_HDF5
+
   filename1 = TestDir + "/wholeATM_T.h5m";
   filename2 = TestDir + "/recMeshOcn.h5m";
-#endif
 
-  if (argc>2) {
-    filename1 = std::string(argv[1]);
-    filename2 = std::string(argv[2]);
-    if (argc>3) repartitioner_scheme = atoi(argv[3]);
-    if (argc>4)
-    {
-      int collocation;
-      collocation = atoi(argv[4]); // 0) original (half atm) 1) (half ocn) 2) collocated
-      if (1==collocation)
-      {
-        endG2=size/2-1; endG1=size-1;
-      }
-      else if (2==collocation)
-      {
-        endG2=size-1; endG1=size-1;
-      }
-    }
-  }
+
+  ProgOptions opts;
+
+  //std::string inputfile, outfile("out.h5m"), netcdfFile, variable_name, sefile_name;
+
+  opts.addOpt<std::string>("atmosphere,t", "atm filename (source)", &filename1);
+  opts.addOpt<std::string>("ocean,m", "ocean filename (target)", &filename2);
+
+  opts.addOpt<int>("startAtm,a", "start task for atmosphere layout", &startG1);
+  opts.addOpt<int>("endAtm,b", "end task for atmosphere layout", &endG1);
+  opts.addOpt<int>("startOcn,c", "start task for ocean layout", &startG2);
+  opts.addOpt<int>("endOcn,d", "end task for ocean layout", &endG2);
+  opts.addOpt<int>("partitioning,p", "partitioning option for migration", &repartitioner_scheme);
+
+  opts.parseCommandLine(argc, argv);
 
   if (!rank)
   {
@@ -365,20 +362,20 @@ int main( int argc, char* argv[] )
      CHECKRC(ierr, "cannot send tag values")
   }
   // receive on atm on coupler pes, that was redistributed according to coverage
-  ierr = iMOAB_ReceiveElementTag(pid3, &compid3, &compid1, "a2oTbot;a2oUbot;a2oVbot;", &jcomm, strlen("a2oTbot;a2oUbot;a2oVbot;"));
+  ierr = iMOAB_ReceiveElementTag(pid3, &compid1, &compid3, "a2oTbot;a2oUbot;a2oVbot;", &jcomm, strlen("a2oTbot;a2oUbot;a2oVbot;"));
   CHECKRC(ierr, "cannot receive tag values")
   POP_TIMER()
-
+  // we can now free the sender buffers
+  if (comm1 != MPI_COMM_NULL) {
+    ierr = iMOAB_FreeSenderBuffers(pid1, &jcomm, &compid3);
+    CHECKRC(ierr, "cannot free buffers used to resend atm mesh tag towards the coverage mesh")
+  }
 #ifdef VERBOSE
     char outputFileRecvd[] = "recvAtmCoup.h5m";
     ierr = iMOAB_WriteMesh(pid3, outputFileRecvd, writeOptions3,
         strlen(outputFileRecvd), strlen(writeOptions3) );
 #endif
-    // we can now free the sender buffers
-     if (comm1 != MPI_COMM_NULL) {
-       ierr = iMOAB_FreeSenderBuffers(pid1, &jcomm, &compid3);
-       CHECKRC(ierr, "cannot free buffers used to resend atm mesh tag towards the coverage mesh")
-     }
+
 
   /* We have the remapping weights now. Let us apply the weights onto the tag we defined 
      on the source mesh and get the projection on the target mesh */
@@ -425,16 +422,18 @@ int main( int argc, char* argv[] )
   // receive on component 2, ocean
   if (comm2 != MPI_COMM_NULL)
   {
-    ierr = iMOAB_ReceiveElementTag(pid2, &compid2, &compid4, "a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;",
+    ierr = iMOAB_ReceiveElementTag(pid2, &compid4, &compid2, "a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;",
         &jcomm, strlen("a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;"));
     CHECKRC(ierr, "cannot receive tag values from ocean mesh on coupler pes")
   }
 
-  ierr = iMOAB_FreeSenderBuffers(pid4, &jcomm, &compid4);
-
-  char outputFileOcn[] = "OcnWithProj.h5m";
-  ierr = iMOAB_WriteMesh(pid2, outputFileOcn, writeOptions2,
-      strlen(outputFileOcn), strlen(writeOptions2) );
+  ierr = iMOAB_FreeSenderBuffers(pid4, &jcomm, &compid2);
+  if (comm2 != MPI_COMM_NULL)
+  {
+    char outputFileOcn[] = "OcnWithProj.h5m";
+    ierr = iMOAB_WriteMesh(pid2, outputFileOcn, writeOptions2,
+        strlen(outputFileOcn), strlen(writeOptions2) );
+  }
 
 
   ierr = iMOAB_DeregisterApplication(pid5);
