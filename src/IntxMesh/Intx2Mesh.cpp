@@ -1301,7 +1301,7 @@ ErrorCode Intx2Mesh::resolve_intersection_sharing()
   {
 
     moab::ParallelMergeMesh pm(parcomm, epsilon_1);
-    ErrorCode rval = pm.merge(outSet, false, 2); // resolve only the output set, do not skip local merge, use dim 2
+    ErrorCode rval = pm.merge(outSet, true, 2); // resolve only the output set, skip local merge, use dim 2
     ERRORR(rval, "can't merge intersection ");
 
     // look at non-owned shared vertices, that could be part of original source set
