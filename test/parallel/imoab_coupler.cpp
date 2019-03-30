@@ -254,12 +254,13 @@ int main( int argc, char* argv[] )
 
 #ifdef VERBOSE
   std::stringstream outf;
-  outf<<"intx_0" << rank<<".h5m";
+  outf<<"intx_aug_" << rank<<".h5m";
   std::string intxfile=outf.str(); // write in serial the intx file, for debugging
   char writeOptions[] ="";
   ierr = iMOAB_WriteMesh(pid5, (char*)intxfile.c_str(), writeOptions, (int)intxfile.length(), strlen(writeOptions));
   CHECKRC(ierr, "cannot write intx file result" )
 #endif
+
 
   // the new graph will be for sending data from atm comp to coverage mesh;
   // it involves initial atm app; pid1; also migrate atm mesh on coupler pes, pid3

@@ -1299,11 +1299,12 @@ ErrorCode Intx2Mesh::resolve_intersection_sharing()
 {
   if (parcomm && parcomm->size()>1)
   {
-
+    ErrorCode rval;
+#if 1
     moab::ParallelMergeMesh pm(parcomm, epsilon_1);
-    ErrorCode rval = pm.merge(outSet, true, 2); // resolve only the output set, skip local merge, use dim 2
+    rval = pm.merge(outSet, true, 1); // resolve only the output set, skip local merge, use dim 2
     ERRORR(rval, "can't merge intersection ");
-
+#endif
     // look at non-owned shared vertices, that could be part of original source set
     // they should be removed from intx set reference, because they might not have a correspondent
     // on the other task
@@ -1342,6 +1343,9 @@ ErrorCode Intx2Mesh::resolve_intersection_sharing()
       EntityHandle newVertex;
       rval = mb->create_vertex(coords, newVertex);  MB_CHK_ERR(rval);
       duplicatedVerticesMap[vertex] = newVertex;
+//#ifdef VERBOSE
+      std::cout << " on rank " << my_rank << " create new vertex " << newVertex << " at " << coords[0] << " " << coords[1] << " "  << coords[2] << "\n";
+//#endif
     }
 
     // look now at connectedCells, and change their connectivities:

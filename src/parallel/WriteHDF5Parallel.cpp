@@ -2195,13 +2195,20 @@ ErrorCode WriteHDF5Parallel::exchange_file_ids(const Range& nonlocal)
   for (i = nonlocal.begin(); i != nonlocal.end(); ++i, ++j) {
     if (*j == 0) {
        int owner = -1;
-       myPcomm->get_owner(*i, owner);
-       const char* name = CN::EntityTypeName(TYPE_FROM_HANDLE(*i));
-       int id = ID_FROM_HANDLE(*i);
+       EntityHandle eh = *i;
+       myPcomm->get_owner(eh, owner);
+       const char* name = CN::EntityTypeName(TYPE_FROM_HANDLE(eh));
+       int id = ID_FROM_HANDLE(eh);
        MB_SET_ERR_CONT("Process " << myPcomm->proc_config().proc_rank() << " did not receive valid id handle for shared " << name << " " << id << " owned by process " << owner);
+       double coords[3];
+       iFace->get_coords(&eh, 1, coords);
+       Tag gid=iFace->globalId_tag();
+       int globalID = -1;
+       iFace->tag_get_data(gid, &eh, 1, &globalID);
+       MB_SET_ERR_CONT(" GLOBAL_ID: " << globalID << " coords: " << coords[0] << " " << coords[1] << " "  << coords[2]);
        dbgOut.printf(1, "Did not receive valid remote id for "
-                                "shared %s %d owned by process %d",
-                                name, id, owner);
+                                "shared %s %d with global id %d owned by process %d",
+                                name, id, globalID, owner);
        iFace->tag_delete(file_id_tag);
        return error(MB_FAILURE);
     }

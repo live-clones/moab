@@ -985,6 +985,14 @@ ErrorCode TempestRemapper::ComputeOverlapMesh ( double tolerance, double radius_
             rval = m_interface->write_mesh(ffc.str().c_str(), &m_covering_source_set, 1);MB_CHK_ERR(rval);
             rval = m_interface->write_mesh(fft.str().c_str(), &m_target_set, 1);MB_CHK_ERR(rval);
             rval = m_interface->write_mesh(ffo.str().c_str(), &m_overlap_set, 1);MB_CHK_ERR(rval);
+            moab::ParallelComm * pcomm= get_parallel_communicator();
+            std::ostringstream newopts;
+            int pcomId = pcomm->get_id();
+            newopts << "PARALLEL_COMM=" << pcomId << ";";
+            newopts << "PARALLEL=WRITE_PART;";
+            rval = m_interface->write_file ( "intx_par.h5m", 0, newopts.str().c_str(),
+                                                            &m_overlap_set, 1 ); MB_CHK_ERR(rval);
+
 #endif
             // because we do not want to work with elements in coverage set that do not participate in intersection,
             // remove them from the coverage set
@@ -1630,6 +1638,15 @@ ErrorCode TempestRemapper::augment_overlap_set()
   // add the new polygons to the overlap set
   // these will be ghosted, so will participate in conservation only
   rval = m_interface->add_entities(m_overlap_set, newPolygons); MB_CHK_ERR(rval);
+
+  // the new vertices and the new polygons should be ghosts, they do not really belong to
+  // the intx; they are ghosted just because we need a consistent way of computing weight matrix
+  std::vector<unsigned char> pstat;
+  pstat.resize(newPolygons.size(), PSTATUS_NOT_OWNED|PSTATUS_GHOST);
+  rval = m_interface->tag_set_data(m_pcomm->pstatus_tag(), newPolygons, &pstat[0]);MB_CHK_ERR(rval);
+
+  pstat.resize(newVerts.size(), PSTATUS_NOT_OWNED|PSTATUS_GHOST);
+  rval = m_interface->tag_set_data(m_pcomm->pstatus_tag(), newVerts, &pstat[0]);MB_CHK_ERR(rval);
 
   return MB_SUCCESS;
 }

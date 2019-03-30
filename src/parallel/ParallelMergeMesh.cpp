@@ -112,6 +112,10 @@ namespace moab{
       rval =  myMB->get_entities_by_dimension(meshset,dim,ents);MB_CHK_ERR(rval);// maybe dimension 2
     }
 
+    if (ents.empty() && dim==1)
+    {
+      rval =  myMB->get_entities_by_dimension(meshset,dim+1,ents);MB_CHK_ERR(rval);// maybe dimension has some ents
+    }
     //Merge Mesh Locally
     if (!skip_local_merge)
       {
