@@ -975,6 +975,7 @@ ErrorCode GeomQueryTool::find_volume(const double xyz[3],
                                      const double *dir)
 {
   ErrorCode rval;
+  volume = 0;
 
   EntityHandle global_surf_tree_root = geomTopoTool->get_one_vol_root();
 
@@ -996,6 +997,8 @@ ErrorCode GeomQueryTool::find_volume(const double xyz[3],
     uvw[1] = rand();
     uvw[2] = rand();
   }
+
+  // always normalize direction
   uvw.normalize();
 
   // fire a ray along dir and get surface
@@ -1083,7 +1086,7 @@ ErrorCode GeomQueryTool::find_volume(const double xyz[3],
       MB_CHK_SET_ERR(rval, "Failed in point_in_volume for forward parent");
     }
 
-    // if in neither, we're hosed
+    // if in neither, return not found
     if (result) {
       volume = parent_vols[1];
       return MB_SUCCESS;
@@ -1092,7 +1095,6 @@ ErrorCode GeomQueryTool::find_volume(const double xyz[3],
     }
   }
 
-  // shouldn't get here
   return MB_FAILURE;
 }
 
