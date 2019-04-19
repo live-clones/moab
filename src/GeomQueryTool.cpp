@@ -1013,7 +1013,7 @@ ErrorCode GeomQueryTool::find_volume(const double xyz[3],
   Tag senseTag = geomTopoTool->get_sense_tag();
   // numericalPrecision is used for box.intersect_ray and find triangles in the
   // neighborhood of edge/node intersections.
-  GQT_IntRegCtxt int_reg_ctxt(geomTopoTool->obb_tree(), xyz, dir, numericalPrecision,
+  GQT_IntRegCtxt int_reg_ctxt(geomTopoTool->obb_tree(), xyz, uvw.array(), numericalPrecision,
                               min_tolerance_intersections, &global_surf_tree_root,
                               NULL, &senseTag, &ray_orientation, NULL);
 
@@ -1033,14 +1033,15 @@ ErrorCode GeomQueryTool::find_volume(const double xyz[3],
     return MB_ENTITY_NOT_FOUND;
   }
 
-  if (dists.size() > 1) {
+  // we should get a negative and positive intersection
+  if (dists.size() > 2) {
     volume = 0;
     return MB_ENTITY_NOT_FOUND;
   }
 
-  // get the first facet, surface hit
-  EntityHandle facet = facets[0];
-  EntityHandle surf = surfs[0];
+  // get the positive distance facet, surface hit
+  EntityHandle facet = facets[1];
+  EntityHandle surf = surfs[1];
 
   // get these now, we're going to use them no matter what
   EntityHandle parent_vols[2];
@@ -1059,11 +1060,9 @@ ErrorCode GeomQueryTool::find_volume(const double xyz[3],
   CartVect normal = (coords[1] - coords[0]) * (coords[2] - coords[0]);
   normal.normalize();
 
-  CartVect direction(dir);
-
   // if this is a "forward" intersection return the first sense entity
   // otherwise return the second, "reverse" sense entity
-  double dot_prod = direction % normal;
+  double dot_prod = uvw % normal;
   int sense_idx =  dot_prod > 0.0 ? 0 : 1;
 
   if (dot_prod != 0.0) {
