@@ -939,7 +939,7 @@ class RayIntersectSets : public OrientedBoxTreeTool::Op
         assert(0 <= *(search_win.first));
       }
       if(search_win.second) {
-        assert(0 > *(search_win.second));
+        assert(0 >= *(search_win.second));
       }
 
     };

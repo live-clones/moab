@@ -78,7 +78,18 @@ void find_volume_tests() {
     { {-0.1, 0.0, 0.0}, { 0.0, 0.0, 0.0,}, 2, -1},
     { { 0.7, 0.0, 0.0}, { 0.0, 0.0, 0.0,}, 3, -1},
     { { 3.0, 0.0, 0.0}, { 0.0, 0.0, 0.0,}, 1, -1},
-    { {-5.0, 0.0, 0.0}, { 1.0, 0.0, 0.0,}, 4, -1} };
+    { {-5.0, 0.0, 0.0}, { 0.0, 0.0, 0.0,}, 4,  0},
+    { {-5.0, 0.0, 0.0}, { 1.0, 0.0, 0.0,}, 4, -1},
+    { {-5.0, 0.0, 0.0}, {-1.0, 0.0, 0.0,}, 0, -1},
+    { {10.0, 0.0, 0.0}, { 0.0, 0.0, 0.0,}, 1,  0},
+    { {10.0, 0.0, 0.0}, {-1.0, 0.0, 0.0,}, 4, -1},
+    { {10.0, 0.0, 0.0}, { 1.0, 0.0, 0.0,}, 0, -1},
+    { { 0.4, 0.0, 0.0}, { 0.0, 0.0, 0.0,}, 2,  3},
+    { { 0.4, 0.0, 0.0}, {-1.0, 0.0, 0.0,}, 3, -1},
+    { { 0.4, 0.0, 0.0}, { 1.0, 0.0, 0.0,}, 2, -1},
+    { { 0.6, 0.0, 0.0}, { 0.0, 0.0, 0.0,}, 3,  4},
+    { { 0.6, 0.0, 0.0}, {-1.0, 0.0, 0.0,}, 4, -1},
+    { { 0.6, 0.0, 0.0}, { 1.0, 0.0, 0.0,}, 3, -1} };
 
   int num_tests = sizeof(tests)/sizeof(FindVolTestResult);
 
@@ -106,11 +117,11 @@ void find_volume_tests() {
 
     // if the expected result is valid (non-negative),
     // make sure there's a match. Otherwise, set true.
-    bool a = test.resultA >= 0 ? vol_id == test.resultA : true;
-    bool b = test.resultB >= 0 ? vol_id == test.resultB : true;
+    bool a = test.resultA >= 0 ? vol_id == test.resultA : false;
+    bool b = test.resultB >= 0 ? vol_id == test.resultB : false;
     std::cout << "Volume found id: " << vol_id << "\n";
-    // make sure both checks passed
-    CHECK(a && b);
+    // make sure at least one of these checks passed
+    CHECK(a || b);
 
     // reset result and id for safety
     volume_found = 0;
