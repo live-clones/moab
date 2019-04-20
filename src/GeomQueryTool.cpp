@@ -979,6 +979,19 @@ ErrorCode GeomQueryTool::find_volume(const double xyz[3],
 
   EntityHandle global_surf_tree_root = geomTopoTool->get_one_vol_root();
 
+  // fast check - make sure point is in the implicit complement bounding box
+  int ic_result;
+  EntityHandle ic_handle;
+  rval = geomTopoTool->get_implicit_complement(ic_handle);
+  MB_CHK_SET_ERR(rval, "Failed to get the implicit complement handle");
+
+  rval = point_in_box(ic_handle, xyz, ic_result);
+  MB_CHK_SET_ERR(rval, "Failed to check implicit complement for containment");
+  if (ic_result == 0) {
+    volume = 0;
+    return MB_ENTITY_NOT_FOUND;
+  }
+
   // if geomTopoTool doesn't have a global tree, use a loop over vols (slow)
   if (!global_surf_tree_root) {
     rval = find_volume_slow(xyz, volume, dir);
@@ -1033,7 +1046,7 @@ ErrorCode GeomQueryTool::find_volume(const double xyz[3],
     return MB_ENTITY_NOT_FOUND;
   }
 
-  // we should get a negative and positive intersection
+  // we should only get a negative and positive intersection
   if (dists.size() > 2) {
     volume = 0;
     return MB_ENTITY_NOT_FOUND;
@@ -1078,7 +1091,6 @@ ErrorCode GeomQueryTool::find_volume(const double xyz[3],
 
     if (result) {
       volume = parent_vols[0];
-      return MB_SUCCESS;
     } else {
       // if not found in the forward volume, try the reverse volume
       rval = point_in_volume(parent_vols[1], xyz, result);
@@ -1088,7 +1100,6 @@ ErrorCode GeomQueryTool::find_volume(const double xyz[3],
     // if in neither, return not found
     if (result) {
       volume = parent_vols[1];
-      return MB_SUCCESS;
     } else {
       return MB_ENTITY_NOT_FOUND;
     }
@@ -1108,6 +1119,12 @@ ErrorCode GeomQueryTool::find_volume_slow(const double xyz[3],
   Range all_vols;
   rval = geomTopoTool->get_gsets_by_dimension(3, all_vols);
   MB_CHK_SET_ERR(rval, "Failed to get all volumes in the model");
+
+  EntityHandle impl_compl;
+  rval = geomTopoTool->get_implicit_complement(impl_compl);
+  if (rval == MB_SUCCESS) {
+    all_vols.insert(impl_compl);
+  }
 
   Range::iterator it;
   int result = 0;
