@@ -83,7 +83,7 @@ struct FindVolTestResult {
 // centered on the origin. Volume 3 is centered on (0.5, 0, 0).
 // Volume 4 is the implicit complement.
 
-// XY view of geometry:
+// XY slice of geometry:
 
 // ###########################                   #############################
 // #                         #                   #                           #
@@ -126,9 +126,9 @@ void find_volume_tests() {
     { { 0.4, 0.0, 0.0}, {-1.0, 0.0, 0.0}, 2,  3},   // 15
     { { 0.4, 0.0, 0.0}, { 1.0, 0.0, 0.0}, 2,  3},   // 16
     // Point in Vol 3 w/ different directions applied
-    { { 0.6, 0.0, 0.0}, { 0.0, 0.0, 0.0}, 3,  4},   // 17
-    { { 0.6, 0.0, 0.0}, {-1.0, 0.0, 0.0}, 3,  4},   // 18
-    { { 0.6, 0.0, 0.0}, { 1.0, 0.0, 0.0}, 3,  4} }; // 19
+    { { 0.6, 0.0, 0.0}, { 0.0, 0.0, 0.0}, 3, -1},   // 17
+    { { 0.6, 0.0, 0.0}, {-1.0, 0.0, 0.0}, 3, -1},   // 18
+    { { 0.6, 0.0, 0.0}, { 1.0, 0.0, 0.0}, 3, -1} }; // 19
 
   int num_tests = sizeof(tests)/sizeof(FindVolTestResult);
 

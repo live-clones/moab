@@ -1076,36 +1076,71 @@ ErrorCode GeomQueryTool::find_volume(const double xyz[3],
   // if this is a "forward" intersection return the first sense entity
   // otherwise return the second, "reverse" sense entity
   double dot_prod = uvw % normal;
-  int sense_idx =  dot_prod > 0.0 ? 0 : 1;
+  int idx =  dot_prod > 0.0 ? 0 : 1;
+  int piv_result = 0;
 
-  if (dot_prod != 0.0) {
-    volume = parent_vols[sense_idx];
-    return MB_SUCCESS;
-  } else {
+  if (dot_prod == 0.0) {
     //corner case (tangent intersection)
     // we can at least limit the point_in_vol search to the two parent
     // volumes of the nearest surface intersected
-    int result;
-    rval = point_in_volume(parent_vols[0], xyz, result);
+    rval = point_in_volume(parent_vols[0], xyz, piv_result);
     MB_CHK_SET_ERR(rval, "Failed in point_in_volume for forward parent");
 
-    if (result) {
-      volume = parent_vols[0];
+    if (piv_result) {
+      idx = 0;
     } else {
       // if not found in the forward volume, try the reverse volume
-      rval = point_in_volume(parent_vols[1], xyz, result);
+      rval = point_in_volume(parent_vols[1], xyz, piv_result);
       MB_CHK_SET_ERR(rval, "Failed in point_in_volume for forward parent");
     }
 
     // if in neither, return not found
-    if (result) {
-      volume = parent_vols[1];
+    if (piv_result) {
+      idx = 1;
     } else {
       return MB_ENTITY_NOT_FOUND;
     }
   }
 
-  return MB_FAILURE;
+  volume = parent_vols[idx];
+
+  // if we're in the implicit complement, we have more work to do
+  if (geomTopoTool->is_implicit_complement(volume)) {
+    // fire ray in opposite direction
+    uvw *= -1.0;
+
+    dists.clear();
+    surfs.clear();
+    facets.clear();
+
+    GQT_IntRegCtxt int_reg_ctxt_rev(geomTopoTool->obb_tree(), xyz, uvw.array(), numericalPrecision,
+                                    min_tolerance_intersections, &global_surf_tree_root,
+                                    NULL, &senseTag, &ray_orientation, NULL);
+
+    OrientedBoxTreeTool::IntersectSearchWindow search_win(&pos_ray_len, &neg_ray_len);
+    rval = geomTopoTool->obb_tree()->ray_intersect_sets(dists, surfs, facets,
+                                                        global_surf_tree_root, numericalPrecision,
+                                                        xyz, uvw.array(), search_win, int_reg_ctxt_rev, NULL);
+    MB_CHK_SET_ERR(rval, "Failed in global tree ray fire");
+
+    if (surfs.size() == 0) { return MB_SUCCESS; }
+
+    // get new possible volumes
+    rval = MBI->tag_get_data(senseTag, &(surfs[1]), 1, parent_vols);
+    MB_CHK_SET_ERR(rval, "Failed to get sense data");
+
+    // check the one that is not the IC for containment
+    EntityHandle other_vol = parent_vols[0] == ic_handle ? parent_vols[1] : parent_vols[0];
+
+    // check for containment
+    // if in the other volume, return that one over the IC
+    int piv_result;
+    rval = point_in_volume(other_vol, xyz, piv_result);
+    if (piv_result) { volume = other_vol; }
+
+  }
+
+  return MB_SUCCESS;
 }
 
 
