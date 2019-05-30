@@ -126,9 +126,9 @@ void find_volume_tests() {
     { { 0.4, 0.0, 0.0}, {-1.0, 0.0, 0.0}, 2,  3},   // 15
     { { 0.4, 0.0, 0.0}, { 1.0, 0.0, 0.0}, 2,  3},   // 16
     // Point in Vol 3 w/ different directions applied
-    { { 0.6, 0.0, 0.0}, { 0.0, 0.0, 0.0}, 3, -1},   // 17
-    { { 0.6, 0.0, 0.0}, {-1.0, 0.0, 0.0}, 3, -1},   // 18
-    { { 0.6, 0.0, 0.0}, { 1.0, 0.0, 0.0}, 3, -1} }; // 19
+    { { 0.6, 0.0, 0.0}, { 0.0, 0.0, 0.0}, 3, 4},   // 17
+    { { 0.6, 0.0, 0.0}, {-1.0, 0.0, 0.0}, 3, 4},   // 18
+    { { 0.6, 0.0, 0.0}, { 1.0, 0.0, 0.0}, 3, 4} }; // 19
 
   int num_tests = sizeof(tests)/sizeof(FindVolTestResult);
 
@@ -143,23 +143,27 @@ void find_volume_tests() {
       direction = test.dir;
     }
 
-    rval = GQT->find_volume(test.pnt,
-                            volume_found,
-                            direction);
-    // if not found, we will check later
-    if (rval != MB_ENTITY_NOT_FOUND) {
-      MB_CHK_SET_ERR_CONT(rval, "Failed in find_volume");
-    }
+    // if we're testing a random direction, run the test many times
+    int num_repeats = direction ? 10 : 1;
+    for (int j = 0; j < num_repeats; j++) {
+      rval = GQT->find_volume(test.pnt,
+                              volume_found,
+                              direction);
+      // if not found, we will check later
+      if (rval != MB_ENTITY_NOT_FOUND) {
+        MB_CHK_SET_ERR_CONT(rval, "Failed in find_volume");
+      }
 
-    rval = id_lookup(volume_found, vol_id);
-    MB_CHK_SET_ERR_CONT(rval, "Failed in id lookup");
+      rval = id_lookup(volume_found, vol_id);
+      MB_CHK_SET_ERR_CONT(rval, "Failed in id lookup");
 
-    std::cout << "Test " << i << ". Volume found id: " << vol_id << "\n";
-    // make sure at least one of these checks passed
-    CHECK(vol_id == test.resultA || vol_id == test.resultB);
+      std::cout << "Test " << i << ". Volume found id: " << vol_id << "\n";
+      // make sure at least one of these checks passed
+      CHECK(vol_id == test.resultA || vol_id == test.resultB);
 
-    // reset result and id for safety
-    volume_found = 0;
-    vol_id = -1;
-  }
+      // reset result and id for safety
+      volume_found = 0;
+      vol_id = -1;
+    } // repeat loop
+  } // test loop
 }
