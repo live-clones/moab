@@ -22,6 +22,34 @@ debug = true;
 
 namespace moab {
 
+  class FindVolumeIntRegCtxt : public OrientedBoxTreeTool::IntRegCtxt {
+
+  public:
+    FindVolumeIntRegCtxt() {
+      // initialize return vectors
+      // we only want one hit in this context
+      intersections.emplace_back(std::numeric_limits<double>::max());
+      sets.emplace_back(0);
+      facets.emplace_back(0);
+    }
+
+    ErrorCode register_intersection(EntityHandle set, EntityHandle tri, double dist,
+                                    OrientedBoxTreeTool::IntersectSearchWindow & search_win,
+                                    GeomUtil::intersection_type it) {
+      // update dist, set, and triangle hit if
+      // we found a new minimum distance
+      if (dist < intersections[0]) {
+          intersections[0] = dist;
+          sets[0] = set;
+          facets[0] = tri;
+      }
+
+      // limit future searches to this minimum length
+      search_win.first = &(intersections[0]);
+
+      return MB_SUCCESS;
+    }
+  };
 
   /** \class GQT_IntRegCtxt
    *
@@ -999,6 +1027,7 @@ ErrorCode GeomQueryTool::find_volume(const double xyz[3],
   }
 
   moab::CartVect uvw(0.0);
+
   if (dir) {
     uvw[0] = dir[0];
     uvw[1] = dir[1];
@@ -1019,47 +1048,41 @@ ErrorCode GeomQueryTool::find_volume(const double xyz[3],
   double pos_ray_len = huge_val;
   double neg_ray_len = 0.0; // may need this for overlap cases
 
-  // min_tolerance_intersections is passed but not used in this call
-  const int min_tolerance_intersections = 0;
-  const int ray_orientation = 0;
-
-  Tag senseTag = geomTopoTool->get_sense_tag();
-  // numericalPrecision is used for box.intersect_ray and find triangles in the
-  // neighborhood of edge/node intersections.
-  GQT_IntRegCtxt int_reg_ctxt(geomTopoTool->obb_tree(), xyz, uvw.array(), numericalPrecision,
-                              min_tolerance_intersections, &global_surf_tree_root,
-                              NULL, &senseTag, &ray_orientation, NULL);
-
+  // RIS output data
   std::vector<double>       dists;
   std::vector<EntityHandle> surfs;
   std::vector<EntityHandle> facets;
 
+  FindVolumeIntRegCtxt find_vol_reg_ctxt;
   OrientedBoxTreeTool::IntersectSearchWindow search_win(&pos_ray_len, &neg_ray_len);
-  rval = geomTopoTool->obb_tree()->ray_intersect_sets(dists, surfs, facets,
-                                                      global_surf_tree_root, numericalPrecision,
-                                                      xyz, uvw.array(), search_win, int_reg_ctxt, NULL);
+  rval = geomTopoTool->obb_tree()->ray_intersect_sets(dists,
+                                                      surfs,
+                                                      facets,
+                                                      global_surf_tree_root,
+                                                      numericalPrecision,
+                                                      xyz,
+                                                      uvw.array(),
+                                                      search_win,
+                                                      find_vol_reg_ctxt);
   MB_CHK_SET_ERR(rval, "Failed in global tree ray fire");
 
   // if there was no intersection, no volume is found
-  if (dists.size() == 0) {
-    volume = 0;
-    return MB_ENTITY_NOT_FOUND;
-  }
-
-  // we should only get a negative and positive intersection
-  if (dists.size() > 2) {
+  if (surfs[0] == 0) {
     volume = 0;
     return MB_ENTITY_NOT_FOUND;
   }
 
   // get the positive distance facet, surface hit
-  EntityHandle facet = facets[1];
-  EntityHandle surf = surfs[1];
+  EntityHandle facet = facets[0];
+  EntityHandle surf = surfs[0];
 
   // get these now, we're going to use them no matter what
-  EntityHandle parent_vols[2];
-  rval = MBI->tag_get_data(senseTag, &surf, 1, parent_vols);
+  EntityHandle fwd_vol, bwd_vol;
+  rval = geomTopoTool->get_surface_senses(surf, fwd_vol, bwd_vol);
   MB_CHK_SET_ERR(rval, "Failed to get sense data");
+  EntityHandle parent_vols[2];
+  parent_vols[0] = fwd_vol;
+  parent_vols[1] = bwd_vol;
 
   // get triangle normal
   std::vector<EntityHandle> conn;
