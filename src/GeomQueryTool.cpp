@@ -28,9 +28,9 @@ namespace moab {
     FindVolumeIntRegCtxt() {
       // initialize return vectors
       // we only want one hit in this context
-      intersections.emplace_back(std::numeric_limits<double>::max());
-      sets.emplace_back(0);
-      facets.emplace_back(0);
+      intersections.push_back(std::numeric_limits<double>::max());
+      sets.push_back(0);
+      facets.push_back(0);
     }
 
     ErrorCode register_intersection(EntityHandle set, EntityHandle tri, double dist,
