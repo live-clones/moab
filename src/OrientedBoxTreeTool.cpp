@@ -2047,4 +2047,3 @@ ErrorCode OrientedBoxTreeTool::stats( EntityHandle set, std::ostream& s )
 }
 
 } // namespace moab
-
