@@ -22,18 +22,38 @@ debug = true;
 
 namespace moab {
 
+  /** \class FindVolume_IntRegCtxt
+   *
+   *
+   *\brief An intersection context used for finding a volume
+   *
+   * This context is used to find the nearest intersection location
+   * and is intended for use with a global surface tree from
+   * the GeomTopoTool.
+   *
+   * The behavior of this context is relatively simple in that it
+   * returns only one intersection distance, surface, and facet.
+   * Intersections of any orientation are accepted. The positive
+   * value of the search window is limited to the current nearest
+   * intersection distance.
+   *
+   */
+
   class FindVolumeIntRegCtxt : public OrientedBoxTreeTool::IntRegCtxt {
 
   public:
+    // Constructor
     FindVolumeIntRegCtxt() {
       // initialize return vectors
-      // we only want one hit in this context
+      // only one hit is returned in this context
       intersections.push_back(std::numeric_limits<double>::max());
       sets.push_back(0);
       facets.push_back(0);
     }
 
-    ErrorCode register_intersection(EntityHandle set, EntityHandle tri, double dist,
+    ErrorCode register_intersection(EntityHandle set,
+                                    EntityHandle tri,
+                                    double dist,
                                     OrientedBoxTreeTool::IntersectSearchWindow & search_win,
                                     GeomUtil::intersection_type it) {
       // update dist, set, and triangle hit if
@@ -44,7 +64,7 @@ namespace moab {
           facets[0] = tri;
       }
 
-      // limit future searches to this minimum length
+      // limit future searches to the current minimum length
       search_win.first = &(intersections[0]);
 
       return MB_SUCCESS;
@@ -179,7 +199,7 @@ namespace moab {
       }
       // surfTriOrient will be used by plucker_ray_tri_intersect to avoid
       // intersections with wrong orientation.
-      if       (*geomVol == vols[0]) {
+      if (*geomVol == vols[0]) {
         *surfTriOrient = *desiredOrient*1;
       } else if(*geomVol == vols[1]) {
         *surfTriOrient = *desiredOrient*(-1);
