@@ -77,6 +77,9 @@ public:
     //! get function
   const int *hom_coord() const {return homCoord;}
 
+  // Getters needed for share windows
+  static HomCoord& getUnitv(int c);
+
     //! parameter-based access functions
   int i() const {return homCoord[0];}
   int j() const {return homCoord[1];}

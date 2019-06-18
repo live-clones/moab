@@ -18,6 +18,8 @@ set(
 
 add_library( mhdf OBJECT ${mhdf_LIB_SRCS} )
 
+if (NOT WIN32) # Need further work to prepare for windows
+
 add_executable( h5minfo include/mhdf.h example/info.c $<TARGET_OBJECTS:mhdf> )
 target_link_libraries( h5minfo ${HDF5_LIBRARIES} )
 install(
@@ -35,3 +37,5 @@ install(
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
   )
 target_link_libraries( h5mvalidate ${HDF5_LIBRARIES} )
+
+endif ()

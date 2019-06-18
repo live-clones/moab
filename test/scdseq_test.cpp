@@ -735,9 +735,9 @@ ErrorCode create_1d_3_sequences(ScdInterface *scdi,
     // add second vseq to this ebox, but reversed; parameter space should be such that the
     // last vertex in the second vseq occurs first, and so on
   result = ebox[1]->add_vbox(vbox[1],
-                             vseq1_minmax[1], ebox[1]->box_min()+HomCoord::unitv[0],
+                             vseq1_minmax[1], ebox[1]->box_min()+HomCoord::getUnitv(0),
                              vseq1_minmax[0], ebox[1]->box_max(),
-                             vseq1_minmax[1], ebox[1]->box_min()+HomCoord::unitv[0]);
+                             vseq1_minmax[1], ebox[1]->box_min()+HomCoord::getUnitv(0));
   CHECK_ERR(result);
 
     // create the third element sequence; make it use the third vseq (forward sense) and start
@@ -752,7 +752,7 @@ ErrorCode create_1d_3_sequences(ScdInterface *scdi,
     // first vertex only of that vseq
   result = ebox[2]->add_vbox(vbox[1],
                              vseq0_minmax[0], ebox[2]->box_min(),
-                             vseq0_minmax[0]+HomCoord::unitv[0], ebox[2]->box_min()-HomCoord::unitv[0],
+                             vseq0_minmax[0]+HomCoord::getUnitv(0), ebox[2]->box_min()-HomCoord::getUnitv(0),
                              vseq0_minmax[0], ebox[2]->box_min(),
                              true,
                              ebox[2]->box_min(),
@@ -761,9 +761,9 @@ ErrorCode create_1d_3_sequences(ScdInterface *scdi,
 
     // add third vseq to this ebox, forward orientation
   result = ebox[2]->add_vbox(vbox[2],
-                             vseq2_minmax[0], ebox[2]->box_min()+HomCoord::unitv[0],
+                             vseq2_minmax[0], ebox[2]->box_min()+HomCoord::getUnitv(0),
                              vseq2_minmax[1], ebox[2]->box_max(),
-                             vseq1_minmax[0], ebox[2]->box_min()+HomCoord::unitv[0]);
+                             vseq1_minmax[0], ebox[2]->box_min()+HomCoord::getUnitv(0));
   CHECK_ERR(result);
 
   return result;
@@ -833,11 +833,11 @@ ErrorCode create_2d_3_sequences(ScdInterface *scdi,
                                // p1: lower right of box 0, lower left of box 1
                              HomCoord(vbox0_minmax[1].i(), vbox0_minmax[0].j(), 0), ebox[1]->box_min(),
                                // p2: one up from p1
-                             HomCoord(vbox0_minmax[1].i(), vbox0_minmax[0].j(), 0)+HomCoord::unitv[1],
-                             ebox[1]->box_min()+HomCoord::unitv[1],
+                             HomCoord(vbox0_minmax[1].i(), vbox0_minmax[0].j(), 0)+HomCoord::getUnitv(1),
+                             ebox[1]->box_min()+HomCoord::getUnitv(1),
                                // p3: one right of p1
-                             HomCoord(vbox0_minmax[1].i(), vbox0_minmax[0].j(), 0)+HomCoord::unitv[0],
-                             ebox[1]->box_min()+HomCoord::unitv[0],
+                             HomCoord(vbox0_minmax[1].i(), vbox0_minmax[0].j(), 0)+HomCoord::getUnitv(0),
+                             ebox[1]->box_min()+HomCoord::getUnitv(0),
                                // set bb such that it's the right side of the vbox, left of local ebox
                              true,
                              ebox[1]->box_min(),
@@ -850,10 +850,10 @@ ErrorCode create_2d_3_sequences(ScdInterface *scdi,
                              vbox1_minmax[0],
                              HomCoord(ebox[1]->box_min().i()+1, ebox[1]->box_max().j(), 0),
                                // p2: one right from p1
-                             vbox1_minmax[0]+HomCoord::unitv[0],
+                             vbox1_minmax[0]+HomCoord::getUnitv(0),
                              HomCoord(ebox[1]->box_min().i()+2, ebox[1]->box_max().j(), 0),
                                // p3: one down from p1
-                             vbox1_minmax[0]+HomCoord::unitv[1],
+                             vbox1_minmax[0]+HomCoord::getUnitv(1),
                              HomCoord(ebox[1]->box_min().i()+1, ebox[1]->box_max().j()-1, 0));
   CHECK_ERR(result);
 
@@ -873,11 +873,11 @@ ErrorCode create_2d_3_sequences(ScdInterface *scdi,
                                // p1: bottom left
                              vbox1_minmax[1], ebox[2]->box_min(),
                                // p2: one right from p1
-                             vbox1_minmax[1]+HomCoord::unitv[0],
-                             ebox[2]->box_min()+HomCoord::unitv[0],
+                             vbox1_minmax[1]+HomCoord::getUnitv(0),
+                             ebox[2]->box_min()+HomCoord::getUnitv(0),
                                // p3: one up
-                             vbox1_minmax[1]-HomCoord::unitv[1],
-                             ebox[2]->box_min()+HomCoord::unitv[1],
+                             vbox1_minmax[1]-HomCoord::getUnitv(1),
+                             ebox[2]->box_min()+HomCoord::getUnitv(1),
                                // bb input such that we only get left side of ebox parameter space
                              true,
                              ebox[2]->box_min(),
@@ -890,10 +890,10 @@ ErrorCode create_2d_3_sequences(ScdInterface *scdi,
                                // p1: bottom right
                              vbox0_minmax[0], HomCoord(ebox[2]->box_max().i(), ebox[2]->box_min().j(),0),
                                // p2: one right from p1
-                             vbox0_minmax[0]+HomCoord::unitv[0],
+                             vbox0_minmax[0]+HomCoord::getUnitv(0),
                              HomCoord(ebox[2]->box_max().i()+1, ebox[2]->box_min().j(),0),
                                // p3: one up from p1
-                             vbox0_minmax[0]+HomCoord::unitv[1],
+                             vbox0_minmax[0]+HomCoord::getUnitv(1),
                              HomCoord(ebox[2]->box_max().i(), ebox[2]->box_min().j()+1,0),
                                // bb input such that we only get left side of ebox parameter space
                              true,
@@ -905,12 +905,12 @@ ErrorCode create_2d_3_sequences(ScdInterface *scdi,
     // add third vbox to this ebox
   result = ebox[2]->add_vbox(vbox[2],
                                // p1: top right and left one
-                             vbox2_minmax[0], ebox[2]->box_max()-HomCoord::unitv[0],
+                             vbox2_minmax[0], ebox[2]->box_max()-HomCoord::getUnitv(0),
                                // p2: one left of p1
-                             vbox2_minmax[0]+HomCoord::unitv[0], ebox[2]->box_max()-HomCoord::unitv[0]*2,
+                             vbox2_minmax[0]+HomCoord::getUnitv(0), ebox[2]->box_max()-HomCoord::getUnitv(0)*2,
                                // p3: one down from p1
-                             vbox2_minmax[0]+HomCoord::unitv[1], ebox[2]->box_max()-HomCoord::unitv[0] -
-                             HomCoord::unitv[1]);
+                             vbox2_minmax[0]+HomCoord::getUnitv(1), ebox[2]->box_max()-HomCoord::getUnitv(0) -
+                             HomCoord::getUnitv(1));
   CHECK_ERR(result);
 
   return result;
@@ -990,7 +990,7 @@ ErrorCode create_2dtri_3_sequences(ScdInterface *scdi,
                                // p1: origin in both systems
                              vbox0_minmax[0], ebox0_minmax[0],
                                // p2: one unit along the shared line (i in one, j in other)
-                             vbox0_minmax[0]+HomCoord::unitv[0], ebox0_minmax[0]+HomCoord::unitv[1],
+                             vbox0_minmax[0]+HomCoord::getUnitv(0), ebox0_minmax[0]+HomCoord::getUnitv(1),
                                // p3: arbitrary
                              vbox0_minmax[0], ebox0_minmax[0],
                                // set bb such that it's the jmin side of vbox
@@ -1002,13 +1002,13 @@ ErrorCode create_2dtri_3_sequences(ScdInterface *scdi,
     // add second vbox to this ebox, with different orientation but all of it (no bb input)
   result = ebox[1]->add_vbox(vbox[1],
                                // p1: origin/i+1 (vbox/ebox)
-                             vbox1_minmax[0], ebox1_minmax[0]+HomCoord::unitv[0],
+                             vbox1_minmax[0], ebox1_minmax[0]+HomCoord::getUnitv(0),
                                // p2: j+1 from p1
-                             vbox1_minmax[0]+HomCoord::unitv[1],
-                             ebox1_minmax[0]+HomCoord::unitv[0]+HomCoord::unitv[1],
+                             vbox1_minmax[0]+HomCoord::getUnitv(1),
+                             ebox1_minmax[0]+HomCoord::getUnitv(0)+HomCoord::getUnitv(1),
                                // p3: i+1 from p1
-                             vbox1_minmax[0]+HomCoord::unitv[0],
-                             ebox[1]->box_min()+HomCoord::unitv[0]*2);
+                             vbox1_minmax[0]+HomCoord::getUnitv(0),
+                             ebox[1]->box_min()+HomCoord::getUnitv(0)*2);
   CHECK_ERR(result);
 
     // create the third element sequence
@@ -1019,15 +1019,15 @@ ErrorCode create_2dtri_3_sequences(ScdInterface *scdi,
     // add shared side from second vbox to this ebox
   result = ebox[2]->add_vbox(vbox[1],
                                // p1: origin/j+1 (vbox/ebox)
-                             vbox1_minmax[0], ebox[2]->box_min()+HomCoord::unitv[1],
+                             vbox1_minmax[0], ebox[2]->box_min()+HomCoord::getUnitv(1),
                                // p2: i+1/j+2 (vbox/ebox)
-                             vbox1_minmax[0]+HomCoord::unitv[0],
-                             ebox[2]->box_min()+HomCoord::unitv[1]*2,
+                             vbox1_minmax[0]+HomCoord::getUnitv(0),
+                             ebox[2]->box_min()+HomCoord::getUnitv(1)*2,
                                // p3: arbitrary
-                             vbox1_minmax[0], ebox[2]->box_min()+HomCoord::unitv[1],
+                             vbox1_minmax[0], ebox[2]->box_min()+HomCoord::getUnitv(1),
                                // bb input such that we only get one side of ebox parameter space
                              true,
-                             ebox[2]->box_min()+HomCoord::unitv[1],
+                             ebox[2]->box_min()+HomCoord::getUnitv(1),
                              HomCoord(ebox[2]->box_min().i(), ebox[2]->box_max().j(), 0));
   CHECK_ERR(result);
 
@@ -1036,8 +1036,8 @@ ErrorCode create_2dtri_3_sequences(ScdInterface *scdi,
                                // p1: origin/origin
                              vbox1_minmax[0], ebox2_minmax[0],
                                // p2: j+1/i+1
-                             vbox1_minmax[0]+HomCoord::unitv[1],
-                             ebox2_minmax[0]+HomCoord::unitv[0],
+                             vbox1_minmax[0]+HomCoord::getUnitv(1),
+                             ebox2_minmax[0]+HomCoord::getUnitv(0),
                                // p3: arbitrary
                              vbox1_minmax[0], ebox2_minmax[0],
                                // bb input such that we only get one side of ebox parameter space
@@ -1049,11 +1049,11 @@ ErrorCode create_2dtri_3_sequences(ScdInterface *scdi,
     // add third vbox to this ebox
   result = ebox[2]->add_vbox(vbox[2],
                                // p1: origin/i+1,j+1
-                             vbox2_minmax[0], ebox[2]->box_min()+HomCoord::unitv[0]+HomCoord::unitv[1],
+                             vbox2_minmax[0], ebox[2]->box_min()+HomCoord::getUnitv(0)+HomCoord::getUnitv(1),
                                // p2: i+1 from p1
-                             vbox2_minmax[0]+HomCoord::unitv[0], ebox[2]->box_min()+HomCoord::unitv[0]*2+HomCoord::unitv[1],
+                             vbox2_minmax[0]+HomCoord::getUnitv(0), ebox[2]->box_min()+HomCoord::getUnitv(0)*2+HomCoord::getUnitv(1),
                                // p3: j+1 from p1
-                             vbox2_minmax[0]+HomCoord::unitv[1], ebox[2]->box_min()+HomCoord::unitv[0]+HomCoord::unitv[1]*2);
+                             vbox2_minmax[0]+HomCoord::getUnitv(1), ebox[2]->box_min()+HomCoord::getUnitv(0)+HomCoord::getUnitv(1)*2);
   CHECK_ERR(result);
 
   return result;
@@ -1139,9 +1139,9 @@ ErrorCode create_3dtri_3_sequences(ScdInterface *scdi,
                                // p1: origin in both systems
                              vbox0_minmax[0], ebox1_minmax[0],
                                // p2: one unit along the shared line (i in one, j in other)
-                             vbox0_minmax[0]+HomCoord::unitv[0], ebox1_minmax[0]+HomCoord::unitv[1],
+                             vbox0_minmax[0]+HomCoord::getUnitv(0), ebox1_minmax[0]+HomCoord::getUnitv(1),
                                // p3: +k in both (not arbitrary, since interface is 2d)
-                             vbox0_minmax[0]+HomCoord::unitv[2], ebox1_minmax[0]+HomCoord::unitv[2],
+                             vbox0_minmax[0]+HomCoord::getUnitv(2), ebox1_minmax[0]+HomCoord::getUnitv(2),
                                // set bb such that it's the jmin side of vbox
                              true,
                              ebox[1]->box_min(),
@@ -1152,13 +1152,13 @@ ErrorCode create_3dtri_3_sequences(ScdInterface *scdi,
     // add second vbox to this ebox, with different orientation but all of it (no bb input)
   result = ebox[1]->add_vbox(vbox[1],
                                // p1: origin/i+1 (vbox/ebox)
-                             vbox1_minmax[0], ebox1_minmax[0]+HomCoord::unitv[0],
+                             vbox1_minmax[0], ebox1_minmax[0]+HomCoord::getUnitv(0),
                                // p2: j+1 from p1
-                             vbox1_minmax[0]+HomCoord::unitv[1],
-                             ebox1_minmax[0]+HomCoord::unitv[0]+HomCoord::unitv[1],
+                             vbox1_minmax[0]+HomCoord::getUnitv(1),
+                             ebox1_minmax[0]+HomCoord::getUnitv(0)+HomCoord::getUnitv(1),
                                // p3: i+1 from p1
-                             vbox1_minmax[0]+HomCoord::unitv[0],
-                             ebox[1]->box_min()+HomCoord::unitv[0]*2);
+                             vbox1_minmax[0]+HomCoord::getUnitv(0),
+                             ebox[1]->box_min()+HomCoord::getUnitv(0)*2);
   CHECK_ERR(result);
 
     // create the third element sequence
@@ -1170,15 +1170,15 @@ ErrorCode create_3dtri_3_sequences(ScdInterface *scdi,
     // add shared side from second vbox to this ebox
   result = ebox[2]->add_vbox(vbox[1],
                                // p1: origin/j+1 (vbox/ebox)
-                             vbox1_minmax[0], ebox[2]->box_min()+HomCoord::unitv[1],
+                             vbox1_minmax[0], ebox[2]->box_min()+HomCoord::getUnitv(1),
                                // p2: i+1/j+2 (vbox/ebox)
-                             vbox1_minmax[0]+HomCoord::unitv[0],
-                             ebox[2]->box_min()+HomCoord::unitv[1]*2,
+                             vbox1_minmax[0]+HomCoord::getUnitv(0),
+                             ebox[2]->box_min()+HomCoord::getUnitv(1)*2,
                                // p3: +k in both (not arbitrary, since interface is 2d)
-                             vbox1_minmax[0]+HomCoord::unitv[2], ebox[2]->box_min()+HomCoord::unitv[1]+HomCoord::unitv[2],
+                             vbox1_minmax[0]+HomCoord::getUnitv(2), ebox[2]->box_min()+HomCoord::getUnitv(1)+HomCoord::getUnitv(2),
                                // bb input such that we only get one side of ebox parameter space
                              true,
-                             ebox[2]->box_min()+HomCoord::unitv[1],
+                             ebox[2]->box_min()+HomCoord::getUnitv(1),
                              HomCoord(ebox[2]->box_min().i(), ebox[2]->box_max().j(),
                                       ebox[2]->box_max().k()));
   CHECK_ERR(result);
@@ -1188,10 +1188,10 @@ ErrorCode create_3dtri_3_sequences(ScdInterface *scdi,
                                // p1: origin/origin
                              vbox0_minmax[0], ebox2_minmax[0],
                                // p2: j+1/i+1
-                             vbox0_minmax[0]+HomCoord::unitv[1],
-                             ebox2_minmax[0]+HomCoord::unitv[0],
+                             vbox0_minmax[0]+HomCoord::getUnitv(1),
+                             ebox2_minmax[0]+HomCoord::getUnitv(0),
                                // p3: +k in both (not arbitrary, since interface is 2d)
-                             vbox0_minmax[0]+HomCoord::unitv[2], ebox[2]->box_min()+HomCoord::unitv[2],
+                             vbox0_minmax[0]+HomCoord::getUnitv(2), ebox[2]->box_min()+HomCoord::getUnitv(2),
                                // bb input such that we only get one side of ebox parameter space
                              true,
                              ebox2_minmax[0],
@@ -1202,11 +1202,11 @@ ErrorCode create_3dtri_3_sequences(ScdInterface *scdi,
     // add third vbox to this ebox
   result = ebox[2]->add_vbox(vbox[2],
                                // p1: origin/i+1,j+1
-                             vbox2_minmax[0], ebox[2]->box_min()+HomCoord::unitv[0]+HomCoord::unitv[1],
+                             vbox2_minmax[0], ebox[2]->box_min()+HomCoord::getUnitv(0)+HomCoord::getUnitv(1),
                                // p2: i+1 from p1
-                             vbox2_minmax[0]+HomCoord::unitv[0], ebox[2]->box_min()+HomCoord::unitv[0]*2+HomCoord::unitv[1],
+                             vbox2_minmax[0]+HomCoord::getUnitv(0), ebox[2]->box_min()+HomCoord::getUnitv(0)*2+HomCoord::getUnitv(1),
                                // p3: j+1 from p1
-                             vbox2_minmax[0]+HomCoord::unitv[1], ebox[2]->box_min()+HomCoord::unitv[0]+HomCoord::unitv[1]*2);
+                             vbox2_minmax[0]+HomCoord::getUnitv(1), ebox[2]->box_min()+HomCoord::getUnitv(0)+HomCoord::getUnitv(1)*2);
   CHECK_ERR(result);
 
   return result;

@@ -443,8 +443,10 @@ public:
                      HomCoord from2, HomCoord to2,
                      HomCoord from3, HomCoord to3,
                      bool bb_input = false,
-                     const HomCoord &bb_min = HomCoord::unitv[0],
-                     const HomCoord &bb_max = HomCoord::unitv[0]);
+                     const HomCoord &bb_min = HomCoord::getUnitv(0),
+                     const HomCoord &bb_max = HomCoord::getUnitv(0));
+                     // const HomCoord &bb_min = HomCoord::unitv[0],
+                     // const HomCoord &bb_max = HomCoord::unitv[0]);
 
     //! Return whether this box has all its vertices defined
     /** Tests whether vertex boxs added with add_vbox have completely defined the vertex parametric
@@ -1453,15 +1455,7 @@ inline const int *ScdBox::locally_periodic() const
   return locallyPeriodic;
 }
 
-inline std::ostream &operator<<(std::ostream &str, const ScdParData &pd)
-{
-  str << "Partition method = " << ScdParData::PartitionMethodNames[pd.partMethod] << ", gDims = ("
-      << pd.gDims[0] << "," << pd.gDims[1] << "," << pd.gDims[2] << ")-("
-      << pd.gDims[3] << "," << pd.gDims[4] << "," << pd.gDims[5] << "), gPeriodic = ("
-      << pd.gPeriodic[0] << "," << pd.gPeriodic[1] << "," << pd.gPeriodic[2] << "), pDims = ("
-      << pd.pDims[0] << "," << pd.pDims[1] << "," << pd.pDims[2] << ")" << std::endl;
-  return str;
-}
+std::ostream &operator<<(std::ostream &str, const ScdParData &pd);
 
 } // namespace moab
 #endif

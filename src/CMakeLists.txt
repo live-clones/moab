@@ -302,6 +302,7 @@ add_library(
   ${MOABPAR_OBJECTS}
   ${MDHF_OBJ}
   )
+SciFixupLibrary(MOAB MOAB MOAB)
 
 target_include_directories(MOAB
   PUBLIC
@@ -319,11 +320,18 @@ set_target_properties(
   SOVERSION ${MOAB_VERSION_MAJOR}
   )
 
+<<<<<<< HEAD
 message(STATUS "MOAB_LIBS = ${MOAB_LIBS}.")
 target_link_libraries(
   MOAB
   ${CMAKE_EXE_LINKER_FLAGS} ${MOAB_DEP_LIBRARIES} ${MOAB_LIBS} ${MOAB_CGM_LIBS} ${MPI_LIBRARIES} ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES}
   )
+=======
+set(MOAB_ALL_LIBS ${MOAB_DEP_LIBRARIES} ${MOAB_LIBS} ${MOAB_CGM_LIBS})
+list(APPEND MOAB_ALL_LIBS "${MPI_LIBRARY}")
+list(APPEND MOAB_ALL_LIBS ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES})
+target_link_libraries(MOAB "${MOAB_ALL_LIBS}")
+>>>>>>> Port to Windows shared
 
 install(
   TARGETS MOAB

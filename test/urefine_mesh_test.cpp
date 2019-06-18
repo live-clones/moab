@@ -2,7 +2,7 @@
 #include <iostream>
 #include <string>
 #include <sstream>
-//#include <sys/time.h>
+#include <ctime>
 #include <vector>
 #include <algorithm>
 #include "moab/Core.hpp"
@@ -379,7 +379,7 @@ ErrorCode refine_entities(Interface *mb,  ParallelComm* pc, EntityHandle fset, i
   //bool opt = false;
   error = uref.generate_mesh_hierarchy( num_levels,level_degrees, set, opt); CHECK_ERR(error);
   std::cout<<"Finished hierarchy generation in "<<uref.timeall.tm_total<<"  secs"<<std::endl;
-  #ifdef MOAB_HAVE_MPI
+#ifdef MOAB_HAVE_MPI
   if (pc)
     {
       std::cout<<"Time taken for refinement "<<uref.timeall.tm_refine<<"  secs"<<std::endl;

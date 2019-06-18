@@ -139,6 +139,9 @@ public:
   //! bounding dimension 2.
   static MOAB_EXPORT const DimensionPair TypeDimensionMap[];
 
+  /// Get the dimension pair corresponding to a dimension
+  static DimensionPair getDimPair(int entity_type);
+
   //! get the basis of the numbering system
   static short int GetBasis();
 
@@ -146,56 +149,44 @@ public:
   static void SetBasis(const int in_basis);
 
   //! return the string type name for this type
-  static inline
-  const char *EntityTypeName(const EntityType this_type);
+  static const char *EntityTypeName(const EntityType this_type);
 
   //! given a name, find the corresponding entity type
   static EntityType EntityTypeFromName(const char *name);
 
   //! return the topological entity dimension
-  static inline
-  short int Dimension(const EntityType t);
+  static short int Dimension(const EntityType t);
 
   //! return the number of (corner) vertices contained in the specified type.
-  static inline
-  short int VerticesPerEntity(const EntityType t);
+  static short int VerticesPerEntity(const EntityType t);
 
   //! return the number of sub-entities bounding the entity.
-  static inline
-  short int NumSubEntities(const EntityType t, const int d);
+  static short int NumSubEntities(const EntityType t, const int d);
 
   //! return the type of a particular sub-entity.
   //! \param this_type Type of entity for which sub-entity type is being queried
   //! \param sub_dimension Topological dimension of sub-entity whose type is being queried
   //! \param index Index of sub-entity whose type is being queried
   //! \return type Entity type of sub-entity with specified dimension and index
-  static inline
-  EntityType SubEntityType(const EntityType this_type,
-                             const int sub_dimension,
-                             const int index);
+  static EntityType SubEntityType(const EntityType this_type,
+      const int sub_dimension, const int index);
 
   //! return the vertex indices of the specified sub-entity.
   //! \param this_type Type of entity for which sub-entity connectivity is being queried
   //! \param sub_dimension Dimension of sub-entity
   //! \param sub_index Index of sub-entity
   //! \param sub_entity_conn Connectivity of sub-entity (returned to calling function)
-  static inline
-  void SubEntityVertexIndices(const EntityType this_type,
-                              const int sub_dimension,
-                              const int sub_index,
-                              int sub_entity_conn[]);
+  static void inline SubEntityVertexIndices(const EntityType this_type,
+      const int sub_dimension, const int sub_index, int sub_entity_conn[]);
 
   //! return the vertex indices of the specified sub-entity.
   //! \param this_type Type of entity for which sub-entity connectivity is being queried
   //! \param sub_dimension Dimension of sub-entity
   //! \param sub_index Index of sub-entity
   //! \param num_sub_ent_vertices the number of vertices in the sub-entity
-  static inline
-  const short* SubEntityVertexIndices( const EntityType this_type,
-                                       const int sub_dimension,
-                                       const int sub_index,
-                                       EntityType& sub_type,
-                                       int& num_sub_ent_vertices );
+  static const short* SubEntityVertexIndices( const EntityType this_type,
+      const int sub_dimension, const int sub_index, EntityType& sub_type,
+      int& num_sub_ent_vertices );
 
   //! return the node indices of the specified sub-entity.
   //! \param this_topo            The topology of the queried element type
@@ -470,61 +461,10 @@ public:
                          const int subfacet_dim, const int subfacet_index);
 };
 
-  //! get the basis of the numbering system
+//! get the basis of the numbering system
 inline short int CN::GetBasis() {return numberBasis;}
 
-inline const char *CN::EntityTypeName(const EntityType this_type)
-{
-  return entityTypeNames[this_type];
-}
-
-inline short int CN::Dimension(const EntityType t)
-{
-  return mConnectivityMap[t][0].topo_dimension;
-}
-
-inline short int CN::VerticesPerEntity(const EntityType t)
-{
-  return (MBVERTEX == t ? (short int) 1 : mConnectivityMap[t][mConnectivityMap[t][0].topo_dimension-1].num_corners_per_sub_element[0]);
-}
-
-inline short int CN::NumSubEntities(const EntityType t, const int d)
-{
-  return (t != MBVERTEX && d > 0 ? mConnectivityMap[t][d-1].num_sub_elements :
-          (d ? (short int) -1 : VerticesPerEntity(t)));
-}
-
-  //! return the type of a particular sub-entity.
-inline EntityType CN::SubEntityType(const EntityType this_type,
-                                        const int sub_dimension,
-                                        const int index)
-{
-
-  return (!sub_dimension ? MBVERTEX :
-          (Dimension(this_type) == sub_dimension && 0 == index ? this_type :
-          mConnectivityMap[this_type][sub_dimension-1].target_type[index]));
-}
-
-inline const short* CN::SubEntityVertexIndices( const EntityType this_type,
-                                                  const int sub_dimension,
-                                                  const int index,
-                                                  EntityType& sub_type,
-                                                  int& n )
-{
-  if (sub_dimension == 0) {
-    n = 1;
-    sub_type = MBVERTEX;
-    return increasingInts + index;
-  }
-  else {
-    const CN::ConnMap& map = mConnectivityMap[this_type][sub_dimension-1];
-    sub_type = map.target_type[index];
-    n = map.num_corners_per_sub_element[index];
-    return map.conn[index];
-  }
-}
-
-  //! return the connectivity of the specified sub-entity.
+//! return the connectivity of the specified sub-entity.
 inline void CN::SubEntityVertexIndices(const EntityType this_type,
                                          const int sub_dimension,
                                          const int index,
@@ -574,9 +514,11 @@ inline void CN::HasMidNodes(const EntityType this_type, const int num_nodes,
   mid_nodes[3] = (bits & (1<<3)) >> 3;
 }
 
+
 //! Set permutation or reverse permutation vector
-inline void CN::setPermutation(const EntityType t, const int dim, short int *pvec,
-                                 const int num_entries, const bool is_reverse)
+inline void CN::setPermutation(const EntityType t, const int dim,
+    short int *pvec,
+    const int num_entries, const bool is_reverse)
 {
   short int *this_vec = permuteVec[t][dim], *that_vec = revPermuteVec[t][dim];
   if (is_reverse) {

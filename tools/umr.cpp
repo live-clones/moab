@@ -1,14 +1,12 @@
 #include <iostream>
-#include <stdlib.h>
 #include <vector>
 #include <string>
-#include <stdio.h>
 #include <iomanip>
 #include <fstream>
-#include <time.h>
-#include <math.h>
-#include <assert.h>
-#include <float.h>
+#include <ctime>
+#include <cmath>
+#include <cassert>
+#include <limits>
 
 #include "moab/Core.hpp"
 #include "moab/Interface.hpp"

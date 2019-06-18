@@ -25,7 +25,8 @@
 #include <stdlib.h>
 #include "moab/PartitionerBase.hpp"
 #include "zoltan_cpp.h"
-#include <time.h>
+// #include <time.h>
+#include <ctime>
 
 #ifdef MOAB_HAVE_CGM
 #include <map>

@@ -65,6 +65,11 @@ void CN::SetBasis(const int in_basis)
   numberBasis = in_basis;
 }
 
+/// Get the dimension pair corresponding to a dimension
+DimensionPair CN::getDimPair(int entity_type) {
+  return TypeDimensionMap[entity_type];
+}
+
 //! return a type for the given name
 EntityType CN::EntityTypeFromName(const char *name)
 {
@@ -662,6 +667,10 @@ void CN::HONodeParent( EntityType elem_type,
   }
 }
 
+const char* CN::EntityTypeName(const EntityType this_type) {
+  return entityTypeNames[this_type];
+}
+
 } // namespace moab
 
 
@@ -1044,6 +1053,47 @@ inline int rev_permute_this(EntityType t,
   }
 
   return 0;
+}
+
+short int CN::Dimension(const EntityType t)
+{
+  return mConnectivityMap[t][0].topo_dimension;
+}
+
+short int CN::VerticesPerEntity(const EntityType t)
+{
+  return (MBVERTEX == t ? (short int) 1 : mConnectivityMap[t][mConnectivityMap[t][0].topo_dimension-1].num_corners_per_sub_element[0]);
+}
+
+short int CN::NumSubEntities(const EntityType t, const int d)
+{
+  return (t != MBVERTEX && d > 0 ? mConnectivityMap[t][d-1].num_sub_elements :
+          (d ? (short int) -1 : VerticesPerEntity(t)));
+}
+
+  //! return the type of a particular sub-entity.
+EntityType CN::SubEntityType(const EntityType this_type,
+                                        const int sub_dimension,
+                                        const int index)
+{
+  return (!sub_dimension ? MBVERTEX :
+          (Dimension(this_type) == sub_dimension && 0 == index ? this_type :
+          mConnectivityMap[this_type][sub_dimension-1].target_type[index]));
+}
+
+const short* CN::SubEntityVertexIndices( const EntityType this_type,
+    const int sub_dimension, const int index, EntityType& sub_type, int& n) {
+  if (sub_dimension == 0) {
+    n = 1;
+    sub_type = MBVERTEX;
+    return increasingInts + index;
+  }
+  else {
+    const CN::ConnMap& map = mConnectivityMap[this_type][sub_dimension-1];
+    sub_type = map.target_type[index];
+    n = map.num_corners_per_sub_element[index];
+    return map.conn[index];
+  }
 }
 
 //! Permute this vector

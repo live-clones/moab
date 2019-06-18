@@ -6,7 +6,7 @@
  */
 
 // Different platforms follow different conventions for usage
-#if !defined(_NT) && !defined(_MSC_VER) && !defined(__MINGW32__)
+#ifndef _WIN32
 #include <sys/resource.h>
 #endif
 #ifdef SOLARIS
@@ -405,12 +405,12 @@ void query_vert_to_elem(iMesh_Instance mesh)
   free(all_verts);
 }
 
-void print_time(const bool print_em, double &tot_time, double &utime, double &stime,
-                long &imem, long &rmem)
+void print_time(const bool print_em, double &tot_time, double &utime,
+    double &stime, long &imem, long &rmem)
 {
-// Disabling this for windows
+  // Disabling this for windows
   // Different platforms follow different conventions for usage
-#if !defined(_NT) && !defined(_MSC_VER) && !defined(__MINGW32__)
+#ifndef _WIN32 // Windows does not have rusage
   struct rusage r_usage;
   getrusage(RUSAGE_SELF, &r_usage);
   utime = (double)r_usage.ru_utime.tv_sec +
