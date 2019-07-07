@@ -50,11 +50,7 @@ int main() {
 
 ErrorCode id_lookup(EntityHandle eh, int& id) {
   ErrorCode rval;
-  if (!id_tag) {
-    // can be replaced with MBI->globalId_tag() soon
-    rval = MBI->tag_get_handle(GLOBAL_ID_TAG_NAME, id_tag);
-    MB_CHK_ERR(rval);
-  }
+  if (!id_tag) { id_tag = MBI->globalId_tag(); }
 
   rval = MBI->tag_get_data(id_tag, &eh, 1, (void*)&id);
   MB_CHK_SET_ERR(rval, "Failed to lookup volume id");
@@ -126,17 +122,29 @@ void find_volume_tests() {
     { { 0.4, 0.0, 0.0}, {-1.0, 0.0, 0.0}, 2,  3},   // 15
     { { 0.4, 0.0, 0.0}, { 1.0, 0.0, 0.0}, 2,  3},   // 16
     // Point in Vol 3 w/ different directions applied
-    { { 0.6, 0.0, 0.0}, { 0.0, 0.0, 0.0}, 3, 4},   // 17
-    { { 0.6, 0.0, 0.0}, {-1.0, 0.0, 0.0}, 3, 4},   // 18
-    { { 0.6, 0.0, 0.0}, { 1.0, 0.0, 0.0}, 3, 4} }; // 19
+    { { 0.6, 0.0, 0.0}, { 0.0, 0.0, 0.0}, 3, 4},    // 17
+    { { 0.6, 0.0, 0.0}, {-1.0, 0.0, 0.0}, 3, 4},    // 18
+    { { 0.6, 0.0, 0.0}, { 1.0, 0.0, 0.0}, 3, 4},    // 19
+    // Point on surface of volume 1 w/ tangent direction
+    { { 3.0, 0.5, 0.0}, {1.0,  0.0, 0.0}, 1, -1},   // 20
+    { { 3.0, 0.5, 0.0}, {-1.0, 0.0, 0.0}, 1, -1},   // 21
+    // Point on surface of volume 1 w/ non-tangent direction
+    { { 3.0, 0.5, 0.0}, {0.0,  1.0, 0.0}, 1, -1},   // 22
+    { { 3.0, 0.5, 0.0}, {0.0, -1.0, 0.0}, 4, -1},   // 23
+    // Checks that the neg ray distance doesn't affect results
+    // Location: Positive Y Surface of Volume 2
+    { {0.6, 0.25000000000001, 0.0}, {0.0,  1.0, 0.0}, 0, -1}, // 24
+    { {0.6, 0.25000000000001, 0.0}, {0.0, -1.0, 0.0}, 4, -1}  // 25
+  };
+
 
   int num_tests = sizeof(tests)/sizeof(FindVolTestResult);
 
   EntityHandle volume_found;
   int vol_id;
-  for (int i = 0; i < num_tests; i++) {
+  for (int i = 1; i < num_tests + 1; i++) {
 
-    const FindVolTestResult& test = tests[i];
+    const FindVolTestResult& test = tests[i-1];
 
     const double* direction = NULL;
     if (test.dir[0] != 0.0 || test.dir[1] != 0.0 || test.dir[2] != 0.0) {
@@ -144,7 +152,7 @@ void find_volume_tests() {
     }
 
     // if we're testing a random direction, run the test many times
-    int num_repeats = direction ? 10 : 1;
+    int num_repeats = direction ? 1 : 10;
     for (int j = 0; j < num_repeats; j++) {
       rval = GQT->find_volume(test.pnt,
                               volume_found,

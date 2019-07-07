@@ -1066,7 +1066,6 @@ ErrorCode GeomQueryTool::find_volume(const double xyz[3],
   // fire a ray along dir and get surface
   const double huge_val = std::numeric_limits<double>::max();
   double pos_ray_len = huge_val;
-  double neg_ray_len = 0.0; // may need this for overlap cases
 
   // RIS output data
   std::vector<double>       dists;
@@ -1074,7 +1073,7 @@ ErrorCode GeomQueryTool::find_volume(const double xyz[3],
   std::vector<EntityHandle> facets;
 
   FindVolumeIntRegCtxt find_vol_reg_ctxt;
-  OrientedBoxTreeTool::IntersectSearchWindow search_win(&pos_ray_len, &neg_ray_len);
+  OrientedBoxTreeTool::IntersectSearchWindow search_win(&pos_ray_len, NULL);
   rval = geomTopoTool->obb_tree()->ray_intersect_sets(dists,
                                                       surfs,
                                                       facets,
@@ -1087,7 +1086,7 @@ ErrorCode GeomQueryTool::find_volume(const double xyz[3],
   MB_CHK_SET_ERR(rval, "Failed in global tree ray fire");
 
   // if there was no intersection, no volume is found
-  if (surfs[0] == 0) {
+  if (surfs.size() == 0 || surfs[0] == 0 ) {
     volume = 0;
     return MB_ENTITY_NOT_FOUND;
   }
@@ -1161,12 +1160,6 @@ ErrorCode GeomQueryTool::find_volume_slow(const double xyz[3],
   Range all_vols;
   rval = geomTopoTool->get_gsets_by_dimension(3, all_vols);
   MB_CHK_SET_ERR(rval, "Failed to get all volumes in the model");
-
-  EntityHandle impl_compl;
-  rval = geomTopoTool->get_implicit_complement(impl_compl);
-  if (rval == MB_SUCCESS) {
-    all_vols.insert(impl_compl);
-  }
 
   Range::iterator it;
   int result = 0;
