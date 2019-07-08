@@ -58,17 +58,25 @@ namespace moab {
                                     GeomUtil::intersection_type it) {
       // update dist, set, and triangle hit if
       // we found a new minimum distance
-      if (dist < intersections[0]) {
-          intersections[0] = dist;
-          sets[0] = set;
-          facets[0] = tri;
-      }
+      double abs_dist = abs(dist);
+      if (abs_dist < abs(intersections[0])) {
+        intersections[0] = dist;
+        sets[0] = set;
+        facets[0] = tri;
 
-      // limit future searches to the current minimum length
-      search_win.first = &(intersections[0]);
+        // narrow search window based on the hit distance
+        pos = abs_dist;
+        neg = -abs_dist;
+        search_win.first = &pos;
+        search_win.second = &neg;
+      }
 
       return MB_SUCCESS;
     }
+
+    // storage for updated window values during search
+    double pos;
+    double neg;
   };
 
   /** \class GQT_IntRegCtxt
@@ -1066,6 +1074,7 @@ ErrorCode GeomQueryTool::find_volume(const double xyz[3],
   // fire a ray along dir and get surface
   const double huge_val = std::numeric_limits<double>::max();
   double pos_ray_len = huge_val;
+  double neg_ray_len = -huge_val;
 
   // RIS output data
   std::vector<double>       dists;
@@ -1073,7 +1082,7 @@ ErrorCode GeomQueryTool::find_volume(const double xyz[3],
   std::vector<EntityHandle> facets;
 
   FindVolumeIntRegCtxt find_vol_reg_ctxt;
-  OrientedBoxTreeTool::IntersectSearchWindow search_win(&pos_ray_len, NULL);
+  OrientedBoxTreeTool::IntersectSearchWindow search_win(&pos_ray_len, &neg_ray_len);
   rval = geomTopoTool->obb_tree()->ray_intersect_sets(dists,
                                                       surfs,
                                                       facets,
@@ -1114,6 +1123,9 @@ ErrorCode GeomQueryTool::find_volume(const double xyz[3],
 
   CartVect normal = (coords[1] - coords[0]) * (coords[2] - coords[0]);
   normal.normalize();
+
+  // reverse direction if a hit in the negative direction is found
+  if (dists[0] < 0) { uvw *= -1; }
 
   // if this is a "forward" intersection return the first sense entity
   // otherwise return the second, "reverse" sense entity
