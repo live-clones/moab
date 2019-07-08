@@ -1134,26 +1134,9 @@ ErrorCode GeomQueryTool::find_volume(const double xyz[3],
   int piv_result = 0;
 
   if (dot_prod == 0.0) {
-    //corner case (tangent intersection)
-    // we can at least limit the point_in_vol search to the two parent
-    // volumes of the nearest surface intersected
-    rval = point_in_volume(parent_vols[0], xyz, piv_result);
-    MB_CHK_SET_ERR(rval, "Failed in point_in_volume for forward parent");
-
-    if (piv_result) {
-      idx = 0;
-    } else {
-      // if not found in the forward volume, try the reverse volume
-      rval = point_in_volume(parent_vols[1], xyz, piv_result);
-      MB_CHK_SET_ERR(rval, "Failed in point_in_volume for forward parent");
-    }
-
-    // if in neither, return not found
-    if (piv_result) {
-      idx = 1;
-    } else {
-      return MB_ENTITY_NOT_FOUND;
-    }
+    std::cerr << "Tangent dot product in find_volume. Shouldn't be here." << std::endl;
+    volume = 0;
+    return MB_FAILURE;
   }
 
   volume = parent_vols[idx];
