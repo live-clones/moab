@@ -58,8 +58,8 @@ namespace moab {
                                     GeomUtil::intersection_type it) {
       // update dist, set, and triangle hit if
       // we found a new minimum distance
-      double abs_dist = abs(dist);
-      if (abs_dist < abs(intersections[0])) {
+      double abs_dist = fabs(dist);
+      if (abs_dist < fabs(intersections[0])) {
         intersections[0] = dist;
         sets[0] = set;
         facets[0] = tri;
