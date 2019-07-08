@@ -101,15 +101,15 @@ void find_volume_tests() {
   const struct FindVolTestResult tests[] = {
     // one point unambiguously placed in each volume
     // and the implicit complement
-    { {-0.1, 0.0, 0.0}, { 0.0, 0.0, 0.0}, 2, -1},   // 1
-    { { 0.6, 0.0, 0.0}, { 0.0, 0.0, 0.0}, 3, -1},   // 2
+    { {-0.1, 0.0, 0.0}, { 0.0, 0.0, 0.0}, 2,  4},    // 1
+    { { 0.6, 0.0, 0.0}, { 0.0, 0.0, 0.0}, 3,  4},    // 2
     { { 3.0, 0.0, 0.0}, { 0.0, 0.0, 0.0}, 1, -1},   // 3
-    { {-5.0, 0.0, 0.0}, { 0.0, 0.0, 0.0}, 4,  0},   // 4
+    { {-5.0, 0.0, 0.0}, { 0.0, 0.0, 0.0}, 0, -1},   // 4
     // Point on the negative side of the geometry
     { {-5.0, 0.0, 0.0}, { 1.0, 0.0, 0.0}, 0, -1},   // 5
     { {-5.0, 0.0, 0.0}, {-1.0, 0.0, 0.0}, 0, -1},   // 6
     // Point on the positive side of the geometry
-    { {10.0, 0.0, 0.0}, { 0.0, 0.0, 0.0}, 1,  0},   // 7
+    { {10.0, 0.0, 0.0}, { 0.0, 0.0, 0.0}, 0, -1},   // 7
     { {10.0, 0.0, 0.0}, {-1.0, 0.0, 0.0}, 0, -1},   // 8
     { {10.0, 0.0, 0.0}, { 1.0, 0.0, 0.0}, 0, -1},   // 9
     // Point between the volumes
@@ -133,15 +133,29 @@ void find_volume_tests() {
     { { 3.0, 0.5, 0.0}, {0.0, -1.0, 0.0}, 4, -1},   // 23
     // Checks that the neg ray distance doesn't affect results
     // Location: Positive Y Surface of Volume 2
-    { {0.6, 0.25000000000001, 0.0}, {0.0,  1.0, 0.0}, 0, -1}, // 24
-    { {0.6, 0.25000000000001, 0.0}, {0.0, -1.0, 0.0}, 4, -1}  // 25
+    { { 0.6, 0.25000000000001, 0.0}, {0.0,  1.0, 0.0}, 4, 0}, // 24
+    { { 0.6, 0.25000000000001, 0.0}, {0.0, -1.0, 0.0}, 4, -1}, // 25
+    /// ON-SURFACE POINT TESTS (not checked using PIV loop) \\\
+    // Point on surface of volume 1 w/ random directions
+    { { 3.0, 0.5, 0.0}, {0.0, 0.0, 0.0}, 1, 4},  // 26
+    // Point on surface of volume 2 w/ random directions
+    { { 0.6, 0.23, 0.0}, {0.0, 0.0, 0.0}, 3, 4} // 27
   };
-
 
   int num_tests = sizeof(tests)/sizeof(FindVolTestResult);
 
   EntityHandle volume_found;
   int vol_id;
+
+  bool using_find_volume_slow = GTT->get_one_vol_root() == 0;
+
+  // Skip the last two tests
+  if (using_find_volume_slow) {
+    std::cout << "Skipping last two tests when"
+              << "using find_volume_slow (PIV loop)" << std::endl;
+    num_tests -= 2;
+  }
+
   for (int i = 1; i < num_tests + 1; i++) {
 
     const FindVolTestResult& test = tests[i-1];
@@ -152,7 +166,7 @@ void find_volume_tests() {
     }
 
     // if we're testing a random direction, run the test many times
-    int num_repeats = direction ? 1 : 10;
+    int num_repeats = direction ? 1 : 100;
     for (int j = 0; j < num_repeats; j++) {
       rval = GQT->find_volume(test.pnt,
                               volume_found,

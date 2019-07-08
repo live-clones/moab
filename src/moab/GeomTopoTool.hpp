@@ -312,7 +312,7 @@ private:
 
   bool m_rootSets_vector;
   std::map<EntityHandle, EntityHandle>  mapRootSets;
-  EntityHandle oneVolRootSet;
+  EntityHandle oneVolRootSet = 0;
 
     //! Creates a volume for undefined space in the model
     // The implicit complement is composed of all surfaces that only
