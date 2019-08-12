@@ -816,10 +816,10 @@ ErrorCode ReadHDF5::load_file_partial(const ReaderIface::IDTag* subset_list,
     _times[SUBSET_IDS_TIME] = timer->time_elapsed();
 
   if (num_parts) {
-    if (num_parts>(int)file_ids.size())
+    /*if (num_parts>(int)file_ids.size())
     {
       MB_SET_ERR(MB_FAILURE, "Only " << file_ids.size() << " parts to distribute to " << num_parts << " processes.");
-    }
+    }*/
     rval = get_partition(file_ids, num_parts, part_number);
     if (MB_SUCCESS != rval)
       MB_SET_ERR(rval, "ReadHDF5 Failure");
@@ -1408,8 +1408,8 @@ ErrorCode ReadHDF5::read_nodes(const Range& node_file_ids)
 
   CHECK_OPEN_HANDLES;
 
-  if (node_file_ids.empty())
-    return MB_SUCCESS;
+  /*if (node_file_ids.empty())
+    return MB_SUCCESS;*/
 
   int cdim;
   rval = iFace->get_dimension(cdim);
@@ -1429,10 +1429,13 @@ ErrorCode ReadHDF5::read_nodes(const Range& node_file_ids)
   EntityHandle handle;
   std::vector<double*> arrays(dim);
   const size_t num_nodes = node_file_ids.size();
-  rval = readUtil->get_node_coords(dim, (int)num_nodes, 0, handle, arrays);
-  if (MB_SUCCESS != rval) {
-    mhdf_closeData(filePtr, data_id, &status);
-    MB_SET_ERR(rval, "ReadHDF5 Failure");
+  if (num_nodes>0)
+  {
+    rval = readUtil->get_node_coords(dim, (int)num_nodes, 0, handle, arrays);
+    if (MB_SUCCESS != rval) {
+      mhdf_closeData(filePtr, data_id, &status);
+      MB_SET_ERR(rval, "ReadHDF5 Failure");
+    }
   }
 
   if (blockedCoordinateIO) {
@@ -1940,12 +1943,16 @@ ErrorCode ReadHDF5::read_sets(const Range& file_ids)
   for (size_t i = 0; i < flags.size(); ++i, ++si)
     flags[i] = setMeta[*si - fileInfo->sets.start_id][3] & ~(long)mhdf_SET_RANGE_BIT;
   EntityHandle start_handle;
-  rval = readUtil->create_entity_sets(flags.size(), &flags[0], 0, start_handle);
-  if (MB_SUCCESS != rval)
-    MB_SET_ERR(rval, "ReadHDF5 Failure");
-  rval = insert_in_id_map(file_ids, start_handle);
-  if (MB_SUCCESS != rval)
-    MB_SET_ERR(rval, "ReadHDF5 Failure");
+  // the files ids could be empty, for empty partitions
+  if (!file_ids.empty())
+  {
+    rval = readUtil->create_entity_sets(flags.size(), &flags[0], 0, start_handle);
+    if (MB_SUCCESS != rval)
+      MB_SET_ERR(rval, "ReadHDF5 Failure");
+    rval = insert_in_id_map(file_ids, start_handle);
+    if (MB_SUCCESS != rval)
+      MB_SET_ERR(rval, "ReadHDF5 Failure");
+  }
 
   // Read contents
   if (fileInfo->have_set_contents) {
@@ -2462,6 +2469,7 @@ ErrorCode ReadHDF5::read_set_data(const Range& set_file_ids,
   size_t count, offset;
 
   int nn = 0;
+/*
 #ifdef  MOAB_HAVE_MPI
   if (nativeParallel && mode==CONTENT && myPcomm->proc_config().proc_size()>1 && data_offsets.empty())
   {
@@ -2470,6 +2478,11 @@ ErrorCode ReadHDF5::read_set_data(const Range& set_file_ids,
     MPI_Abort(myPcomm->proc_config().proc_comm(), 1);
   }
 #endif
+*/
+  if ( (0==set_file_ids.size()) && (data.done()) && moab::ReadHDF5::CONTENT == mode)
+    // do at least one null read, it is needed in parallel
+    data.null_read();
+
   while (!data.done()) {
     dbgOut.printf(3, "Reading chunk %d of %s\n", ++nn, data.get_debug_desc());
     try {
