@@ -3811,10 +3811,8 @@ ErrorCode ParallelComm::get_remote_handles(EntityHandle *local_vec, EntityHandle
 
     // Resolve dim is maximal dim of entities in proc_ents
     if (-1 == resolve_dim) {
-      if (proc_ents.empty())
-        return MB_ENTITY_NOT_FOUND;
-
-      resolve_dim = mbImpl->dimension_from_handle(*proc_ents.rbegin());
+      if (!proc_ents.empty())
+        resolve_dim = mbImpl->dimension_from_handle(*proc_ents.rbegin());
     }
 
     // proc_ents should all be of same dimension
@@ -3858,10 +3856,21 @@ ErrorCode ParallelComm::get_remote_handles(EntityHandle *local_vec, EntityHandle
       else if (resolve_dim == 3)
         shared_dim = 2;
     }
-
-    if (shared_dim < 0 || resolve_dim < 0) {
-      MB_SET_ERR(MB_FAILURE, "Unable to guess shared_dim or resolve_dim");
+    int max_global_resolve_dim=-1;
+    int err = MPI_Allreduce( &resolve_dim, &max_global_resolve_dim, 1, MPI_INT, MPI_MAX,  proc_config().proc_comm() );
+    if (MPI_SUCCESS!=err)
+    {
+      MB_SET_ERR(MB_FAILURE, "Unable to guess global resolve_dim");
     }
+    if (shared_dim < 0 || resolve_dim < 0) {
+      //MB_SET_ERR(MB_FAILURE, "Unable to guess shared_dim or resolve_dim");
+      resolve_dim = max_global_resolve_dim;
+      shared_dim = resolve_dim-1;
+    }
+
+    if (resolve_dim<0 || shared_dim<0)
+      return MB_SUCCESS;
+      // no task has any mesh, get out
 
     // Get the skin entities by dimension
     Range tmp_skin_ents[4];

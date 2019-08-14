@@ -202,7 +202,7 @@ int main( int argc, char* argv[] )
 #ifdef MOAB_HAVE_HDF5
   std::string filename2 = TestDir + "/64bricks_1khex.h5m";
   std::string filename3 = TestDir + "/twoPolyh.h5m";
-  std::string filename4 = TestDir + "/onepart.h5m";
+  std::string filename4 = TestDir + "/mpas_4.h5m";
 #endif
 
   if (pause_proc != -1) {
@@ -235,8 +235,7 @@ int main( int argc, char* argv[] )
   num_errors += RUN_TEST_ARG2 (test_sequences_after_ghosting, filename2.c_str()) ;
   if (2>=size) // run this one only on one or 2 processors; the file has only 2 parts in partition
    num_errors += RUN_TEST_ARG2( test_ghost_polyhedra, filename3.c_str());
-  if (2==size)
-    num_errors += RUN_TEST_ARG2 ( test_too_few_parts, filename4.c_str());
+  num_errors += RUN_TEST_ARG2 ( test_too_few_parts, filename4.c_str());
 #endif
   num_errors += RUN_TEST_ARG2( test_assign_global_ids, 0 );
   num_errors += RUN_TEST_ARG2( test_shared_sets, 0 );
@@ -247,7 +246,6 @@ int main( int argc, char* argv[] )
   num_errors += RUN_TEST_ARG2( test_ghosted_entity_shared_data, 0 );
   num_errors += RUN_TEST_ARG2( regression_owners_with_ghosting, 0 );
   num_errors += RUN_TEST ( test_trivial_partition);
-
   if (rank == 0) {
     if (!num_errors)
       std::cout << "All tests passed" << std::endl;
@@ -1724,11 +1722,11 @@ ErrorCode test_too_few_parts( const char* filename )
   rval = moab.load_file( filename, 0,
                          "PARALLEL=READ_PART;"
                          "PARTITION=PARALLEL_PARTITION;"
-                         "PARALLEL_RESOLVE_SHARED_ENTS;" );
-  if(rval==MB_SUCCESS)
-    return MB_FAILURE;
+                         "PARALLEL_RESOLVE_SHARED_ENTS;DEBUG_IO=4;DEBUG_PIO=3;" );
+  //if(rval==MB_SUCCESS)
+    //return MB_FAILURE;
 
-  return MB_SUCCESS;
+  return rval;
 }
 
 ErrorCode test_sequences_after_ghosting( const char* filename )
