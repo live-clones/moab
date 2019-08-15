@@ -1408,8 +1408,8 @@ ErrorCode ReadHDF5::read_nodes(const Range& node_file_ids)
 
   CHECK_OPEN_HANDLES;
 
-  /*if (node_file_ids.empty())
-    return MB_SUCCESS;*/
+  if (node_file_ids.empty() && !nativeParallel)
+    return MB_SUCCESS;
 
   int cdim;
   rval = iFace->get_dimension(cdim);
