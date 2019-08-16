@@ -816,9 +816,10 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
 
         // Finite volume input / Finite volume output
         if ( ( eInputType  == DiscretizationType_FV ) &&
-                ( eOutputType == DiscretizationType_FV )
-           )
+                ( eOutputType == DiscretizationType_FV ))
         {
+          if(m_meshInputCov->faces.size()>0)
+          {
             // Generate reverse node array and edge map
             m_meshInputCov->ConstructReverseNodeArray();
             m_meshInputCov->ConstructEdgeMap();
@@ -833,6 +834,7 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
             // Construct remap
             if ( is_root ) dbgprint.printf ( 0, "Calculating remap weights\n" );
             LinearRemapFVtoFV_Tempest_MOAB ( nPin );
+          }
         }
         else if ( eInputType == DiscretizationType_FV )
         {
@@ -1357,11 +1359,66 @@ int moab::TempestOnlineMap::IsConservative (double dTolerance)
     const DataArray1D<double>& dTargetAreas = this->GetTargetAreas();
     const DataArray1D<double>& dSourceAreas = this->GetSourceAreas();
 
-    // Calculate column sums
-    std::vector<int> dColumnsUnique;
-    std::vector<double> dColumnSums;
-    std::vector<int> dColumnIndices;
-    std::vector<double> dColumnSumsTotal;
+    if ( size > 1 )
+    {
+        if ( rank ) return true;
+        SparseMatrix<double>& m_mapRemapGlobal = m_weightMapGlobal->GetSparseMatrix();
+        m_mapRemapGlobal.GetEntries ( dataRows, dataCols, dataEntries );
+    }
+    else
+        m_mapRemap.GetEntries ( dataRows, dataCols, dataEntries );
+
+    // Verify all entries are in the range [0,1]
+    bool fMonotone = true;
+    for ( unsigned i = 0; i < dataRows.GetRows(); i++ )
+    {
+        if ( ( dataEntries[i] < -dTolerance ) ||
+                ( dataEntries[i] > 1.0 + dTolerance )
+           )
+        {
+            fMonotone = false;
+
+            Announce ( "TempestOnlineMap is not monotone in entry (%i): %1.15e",
+                       i, dataEntries[i] );
+        }
+    }
+
+    return fMonotone;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+#ifdef MOAB_HAVE_EIGEN
+void moab::TempestOnlineMap::InitVectors()
+{
+    //assert(m_weightMatrix.rows() != 0 && m_weightMatrix.cols() != 0);
+    m_rowVector.resize( m_weightMatrix.rows() );
+    m_colVector.resize( m_weightMatrix.cols() );
+}
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+
+#ifdef MOAB_HAVE_MPI
+moab::ErrorCode moab::TempestOnlineMap::gather_all_to_root()   // Collective
+{
+// #define VERBOSE
+    Mesh globalMesh;
+    int ierr, rootProc = 0, nprocs = size;
+    moab::ErrorCode rval;
+
+    // Write SparseMatrix entries
+    DataArray1D<int> vecRow;
+    DataArray1D<int> vecCol;
+    DataArray1D<double> vecS;
+
+    moab::DebugOutput dbgprint ( std::cout, rank, 0 );
+    dbgprint.set_prefix("[TempestOnlineMap]: ");
+
+    m_mapRemap.GetEntries ( vecRow, vecCol, vecS );
+    const DataArray1D<double>& dOrigSourceAreas = m_meshInput->vecFaceArea;
+    const DataArray1D<double>& dSourceAreas = m_meshInputCov->vecFaceArea;
+    const DataArray1D<double>& dTargetAreas = m_meshOutput->vecFaceArea;
 
     int nColumns = m_mapRemap.GetColumns();
     m_mapRemap.GetEntries ( dataRows, dataCols, dataEntries );
