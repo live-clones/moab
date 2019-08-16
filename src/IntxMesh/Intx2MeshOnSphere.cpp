@@ -798,39 +798,61 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set(EntityHandle & initial_distr
   // look at the value of orgSendProcTag for one mesh cell; if -1, no need to forward that; if !=-1,
   // we know that this mesh was migrated, we need to find out more about origin of cell
   int orig_sender =-1;
-  EntityHandle oneCell= meshCells[0];
-  rval = mb->tag_get_data(orgSendProcTag, &oneCell, 1, &orig_sender); MB_CHK_SET_ERR(rval, "can't get original sending processor value");
-
-  int migrated_mesh = 0;
-  if (orig_sender != -1) migrated_mesh = 1; //
-
+  EntityHandle oneCell= 0;
   // decide if we need to transfer global DOFs info attached to each HOMME coarse cell; first we need to decide if the mesh
   // has that tag; will affect the size of the tuple list involved in the crystal routing
   int size_gdofs_tag=0;
   std::vector<int> valsDOFs;
   Tag gdsTag;
   rval = mb->tag_get_handle("GLOBAL_DOFS", gdsTag);
-  if (MB_SUCCESS == rval && gdsTag)
+
+  if (meshCells.size()>0)
   {
-    DataType dtype;
-    rval = mb->tag_get_data_type(gdsTag, dtype);
-    if (MB_SUCCESS == rval && MB_TYPE_INTEGER == dtype)
+    oneCell = meshCells[0]; // it is possible we do not have any cells, even after migration
+    rval = mb->tag_get_data(orgSendProcTag, &oneCell, 1, &orig_sender); MB_CHK_SET_ERR(rval, "can't get original sending processor value");
+    if (gdsTag)
     {
-      // find the values on first cell
-      int lenTag = 0;
-      rval = mb->tag_get_length(gdsTag, lenTag);
-      if (MB_SUCCESS == rval && lenTag > 0)
+      DataType dtype;
+      rval = mb->tag_get_data_type(gdsTag, dtype);
+      if (MB_SUCCESS == rval && MB_TYPE_INTEGER == dtype)
       {
-        valsDOFs.resize(lenTag);
-        rval = mb->tag_get_data(gdsTag, &oneCell, 1, &valsDOFs[0]);
-        if (MB_SUCCESS == rval && valsDOFs[0]>0 )
+        // find the values on first cell
+        int lenTag = 0;
+        rval = mb->tag_get_length(gdsTag, lenTag);
+        if (MB_SUCCESS == rval && lenTag > 0)
         {
-          // first value positive means we really need to transport this data during coverage
-          size_gdofs_tag = lenTag;
+          valsDOFs.resize(lenTag);
+          rval = mb->tag_get_data(gdsTag, &oneCell, 1, &valsDOFs[0]);
+          if (MB_SUCCESS == rval && valsDOFs[0]>0 )
+          {
+            // first value positive means we really need to transport this data during coverage
+            size_gdofs_tag = lenTag;
+          }
         }
       }
     }
   }
+  // another collective call, to see if the mesh is migrated and if the GLOBAL_DOFS tag need to be transferred
+  // over to the coverage mesh
+  // it is possible that there is no initial mesh source mesh on the task, so we do not know that info from the tag
+  // but TupleList needs to be sized uniformly for all tasks
+  // do a collective MPI_MAX to see if it is migrated and if we have (collectively) a GLOBAL_DOFS task
+
+
+  int local_int_array[2], global_int_array[2];
+  local_int_array[0]=orig_sender;
+  local_int_array[1]=size_gdofs_tag;
+    // now reduce over all processors
+  int mpi_err = MPI_Allreduce(local_int_array, global_int_array, 2, MPI_INT, MPI_MAX, parcomm->proc_config().proc_comm());
+  if (MPI_SUCCESS != mpi_err) return MB_FAILURE;
+  orig_sender=global_int_array[0];
+  size_gdofs_tag = global_int_array[1];
+  valsDOFs.resize(size_gdofs_tag);
+
+  // finally, we have correct global info, we can decide if mesh was migrated and if we have global dofs tag that need to be
+  // sent with coverage info
+  int migrated_mesh = 0;
+  if (orig_sender != -1) migrated_mesh = 1; //
   // if size_gdofs_tag>0, we are sure valsDOFs got resized to what we need
 
   // get all mesh verts1
