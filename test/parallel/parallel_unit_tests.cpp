@@ -202,7 +202,7 @@ int main( int argc, char* argv[] )
 #ifdef MOAB_HAVE_HDF5
   std::string filename2 = TestDir + "/64bricks_1khex.h5m";
   std::string filename3 = TestDir + "/twoPolyh.h5m";
-  std::string filename4 = TestDir + "/mpas_4.h5m";
+  std::string filename4 = TestDir + "/onepart.h5m";
 #endif
 
   if (pause_proc != -1) {
@@ -1722,7 +1722,7 @@ ErrorCode test_too_few_parts( const char* filename )
   rval = moab.load_file( filename, 0,
                          "PARALLEL=READ_PART;"
                          "PARTITION=PARALLEL_PARTITION;"
-                         "PARALLEL_RESOLVE_SHARED_ENTS;DEBUG_IO=4;DEBUG_PIO=3;" );
+                         "PARALLEL_RESOLVE_SHARED_ENTS;" );
   //if(rval==MB_SUCCESS)
     //return MB_FAILURE;
 
