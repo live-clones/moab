@@ -2479,7 +2479,7 @@ ErrorCode ReadHDF5::read_set_data(const Range& set_file_ids,
   }
 #endif
 */
-  if ( (0==set_file_ids.size()) && (data.done()) && moab::ReadHDF5::CONTENT == mode)
+  if ( (1 >= set_file_ids.size()) && (data.done()) && moab::ReadHDF5::CONTENT == mode)
     // do at least one null read, it is needed in parallel
     data.null_read();
 
