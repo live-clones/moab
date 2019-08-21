@@ -810,7 +810,6 @@ ErrCode iMOAB_ApplyScalarProjectionWeights (   iMOAB_AppID pid_intersection,
 
 /**
   \brief Dump info about communication graph.
-
   <B>Operations:</B> Collective per sender or receiver group
 
   \param[in] pid  (iMOAB_AppID)                            The unique pointer to the application ID

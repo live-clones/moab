@@ -130,6 +130,9 @@ ErrorCode migrate_smart(const char*filename, const char * outfile, int partMetho
       CHECKRC(ierr, "can't load mesh ")
       ierr = iMOAB_SendMesh(pid1, &jcomm, &group2, &compid2, &partMethod); // send to component 2
       CHECKRC(ierr, "cannot send elements" )
+#ifdef VERBOSE
+      iMOAB_DumpCommGraph(pid1,  &compid1,  &compid2, "Send");
+#endif
   }
 
   if (comm2 != MPI_COMM_NULL) {
@@ -139,6 +142,9 @@ ErrorCode migrate_smart(const char*filename, const char * outfile, int partMetho
      wopts   = "PARALLEL=WRITE_PART;";
      ierr = iMOAB_WriteMesh(pid2, (char*)outfile , (char*)wopts.c_str(), strlen(outfile), strlen(wopts.c_str()) );
      CHECKRC(ierr, "cannot write received mesh" )
+#ifdef VERBOSE
+     iMOAB_DumpCommGraph(pid2,  &compid1,  &compid2, "Recv");
+#endif
   }
 
   MPI_Barrier(jcomm);
