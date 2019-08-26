@@ -2376,6 +2376,7 @@ static ErrCode ComputeSphereRadius ( iMOAB_AppID pid, double* radius)
 ErrCode iMOAB_ComputeMeshIntersectionOnSphere ( iMOAB_AppID pid_src, iMOAB_AppID pid_tgt, iMOAB_AppID pid_intx)
 {
     ErrorCode rval;
+    bool validate = true;
 
     double radius_source=1.0;
     double radius_target=1.0;
@@ -2390,15 +2391,16 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere ( iMOAB_AppID pid_src, iMOAB_AppID
     ParallelComm* pco_intx = context.pcomms[*pid_intx];
 #endif
 
-	//  Sanity check: Check that the source and target meshes belong to the same pes.
-    //  assert(pco_src->get_id() == pco_tgt->get_id());
-    //  assert(pco_src->get_id() == pco_intx->get_id());
-
     // Mesh intersection has already been computed; Return early.
     if(data_intx.remapper != NULL) return 0;
 
+    bool is_parallel = false, is_root = true;
+    int rank=0;
 #ifdef MOAB_HAVE_MPI
     if (pco_intx) {
+        rank = pco_intx->rank();
+        is_parallel = (pco_intx->size() > 1);
+        is_root = (rank == 0);
         rval = pco_intx->check_all_shared_handles();CHKERRVAL(rval);
     }
 #endif
@@ -2475,6 +2477,38 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere ( iMOAB_AppID pid_src, iMOAB_AppID
     //     rval = ScaleToRadius(context.MBI, data_tgt.file_set, radius_target);CHKERRVAL(rval);
     // }
 
+    // Mapping computation done
+    if (validate)
+    {
+        const double radius = 1.0 /*2.0*acos(-1.0)*/;
+        double local_areas[3], global_areas[3]; // Array for Initial area, and through Method 1 and Method 2
+        local_areas[0] = area_on_sphere_lHuiller ( context.MBI, context.appDatas[*(context.appDatas[*pid_intx].pid_dest)].file_set, radius );
+        local_areas[1] = area_on_sphere_lHuiller ( context.MBI, context.appDatas[*pid_intx].file_set, radius );
+        local_areas[2] = area_on_sphere ( context.MBI, context.appDatas[*pid_intx].file_set, radius );
+
+#ifdef MOAB_HAVE_MPI
+        if (is_parallel)
+            MPI_Allreduce ( &local_areas[0], &global_areas[0], 3, MPI_DOUBLE, MPI_SUM, pco_intx->comm() );
+        else {
+            global_areas[0] = local_areas[0];
+            global_areas[1] = local_areas[1];
+            global_areas[2] = local_areas[2];
+        }
+#else
+        global_areas[0] = local_areas[0];
+        global_areas[1] = local_areas[1];
+        global_areas[2] = local_areas[2];
+#endif
+
+        if ( is_root )
+        {
+            printf ( "initial area: %12.10f\n", global_areas[0] );
+            printf ( "area with l'Huiller: %12.10f with Girard: %12.10f\n", global_areas[1], global_areas[2] );
+            printf ( "  relative difference areas = %12.10e\n", fabs ( global_areas[1] - global_areas[2] ) / global_areas[1] );
+            printf ( "  relative error = %12.10e\n", fabs ( global_areas[1] - global_areas[0] ) / global_areas[1] );
+        }
+    }
+
     return 0;
 }
 
@@ -2501,22 +2535,6 @@ ErrCode iMOAB_ComputeScalarProjectionWeights ( iMOAB_AppID pid_intx,
 
     // Get the source and target data and pcomm objects
 	appData& data_intx = context.appDatas[*pid_intx];
-#ifdef MOAB_HAVE_MPI
-    ParallelComm* pco_intx = context.pcomms[*pid_intx];
-#endif
-
-    bool is_parallel = false, is_root = true;
-    int rank=0;
-#ifdef MOAB_HAVE_MPI
-    int flagInit;
-    MPI_Initialized( &flagInit );
-    if (flagInit) {
-        is_parallel = true;
-        assert(pco_intx != NULL);
-        rank = pco_intx->rank();
-        is_root = (rank == 0);
-    }
-#endif
 
 	// Setup computation of weights
     // Set the context for the remapping weights computation
@@ -2534,7 +2552,7 @@ ErrCode iMOAB_ComputeScalarProjectionWeights ( iMOAB_AppID pid_intx,
                                            true, (fMonotoneTypeID ? *fMonotoneTypeID : 0),            // bool fBubble=false, int fMonotoneTypeID=0,
 										   (fVolumetric ? *fVolumetric > 0 : false),  // bool fVolumetric=false,
                                            (fNoConservation ? *fNoConservation > 0 : false), // bool fNoConservation=false,
-                                           false, // bool fNoCheck=false,
+                                           (fValidate ? *fValidate : false), // bool fNoCheck=false,
                                            source_solution_tag_dof_name, target_solution_tag_dof_name,
 										   "", //"",   // std::string strVariables="", std::string strOutputMap="",
 										   "", "",   // std::string strInputData="", std::string strOutputData="",
@@ -2543,38 +2561,6 @@ ErrCode iMOAB_ComputeScalarProjectionWeights ( iMOAB_AppID pid_intx,
 										   false, false   // bool fInputConcave = false, bool fOutputConcave = false
 										 );CHKERRVAL(rval);
 
-    // Mapping computation done
-	if (fValidate && *fValidate)
-	{
-		const double radius = 1.0 /*2.0*acos(-1.0)*/;
-		double local_areas[3], global_areas[3]; // Array for Initial area, and through Method 1 and Method 2
-		local_areas[0] = area_on_sphere_lHuiller ( context.MBI, context.appDatas[*(context.appDatas[*pid_intx].pid_dest)].file_set, radius );
-		local_areas[1] = area_on_sphere_lHuiller ( context.MBI, context.appDatas[*pid_intx].file_set, radius );
-		local_areas[2] = area_on_sphere ( context.MBI, context.appDatas[*pid_intx].file_set, radius );
-
-#ifdef MOAB_HAVE_MPI
-		if (is_parallel)
-            MPI_Allreduce ( &local_areas[0], &global_areas[0], 3, MPI_DOUBLE, MPI_SUM, pco_intx->comm() );
-        else {
-            global_areas[0] = local_areas[0];
-            global_areas[1] = local_areas[1];
-            global_areas[2] = local_areas[2];
-        }
-#else
-        global_areas[0] = local_areas[0];
-        global_areas[1] = local_areas[1];
-        global_areas[2] = local_areas[2];
-#endif
-
-		if ( is_root )
-		{
-			printf ( "initial area: %12.10f\n", global_areas[0] );
-			printf ( "area with l'Huiller: %12.10f with Girard: %12.10f\n", global_areas[1], global_areas[2] );
-			printf ( "  relative difference areas = %12.10e\n", fabs ( global_areas[1] - global_areas[2] ) / global_areas[1] );
-			printf ( "  relative error = %12.10e\n", fabs ( global_areas[1] - global_areas[0] ) / global_areas[1] );
-		}
-	}
-	
 	return 0;
 }
 
