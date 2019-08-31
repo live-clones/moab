@@ -1074,7 +1074,6 @@ ErrorCode ParCommGraph::send_graph_partition (ParallelComm *pco, MPI_Comm jcomm)
     }
     dbfileSender.close();
 #endif
-    //
     for (int k=0; k<nSenders; k++)
     {
       int indexInBuff = displs[k];
@@ -1103,7 +1102,6 @@ ErrorCode ParCommGraph::send_graph_partition (ParallelComm *pco, MPI_Comm jcomm)
     }
     dbfile.close();
 #endif
-
     // this is the same as trivial partition
     ErrorCode rval = send_graph(jcomm); MB_CHK_ERR ( rval );
   }
