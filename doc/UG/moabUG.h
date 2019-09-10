@@ -119,7 +119,7 @@ MOAB is used in several ways in various applications.  MOAB serves as the underl
 
 The remainder of this report is organized as follows.  Section 2, “Getting Started”, provides a few simple examples of using MOAB to perform simple tasks on a mesh.  Section 3 discusses the MOAB data model in more detail, including some aspects of the implementation.  Section 4 summarizes the MOAB function API.  Section 5 describes some of the tools included with MOAB, and the implementation of mesh readers/writers for MOAB.  Section 6 describes how to build MOAB-based applications.  Section 7 contains a brief description of MOAB’s relation to the iMesh mesh interface.  Sections 8 and 9 discuss MOAB's representations of structured and spectral element meshes, respectively.  Section 10 gives helpful hints for accessing MOAB in an efficient manner from applications.  Section 11 gives a conclusion and future plans for MOAB development.  Section 12 gives references cited in this report.
 
-Several other sources of information about MOAB may also be of interest to readers.  Meta-data conventions define how sets and /or tags are used together to represent various commonly-used simulation constructs; conventions used by MOAB are described in Ref [4], which is also included in the MOAB source distribution.  This document is maintained separately from this document, since it is expected to change over time.  The MOAB project maintains a wiki [5], which links to most MOAB-related information.  MOAB also uses several mailing lists [6],[7] for MOAB-related discussions.  Potential users are encouraged to interact with the MOAB team using these mailing lists.
+Several other sources of information about MOAB may also be of interest to readers.  Meta-data conventions define how sets and /or tags are used together to represent various commonly-used simulation constructs; conventions used by MOAB are described in Ref [4], which is also included in the MOAB source distribution.  This document is maintained separately from this document, since it is expected to change over time.  MOAB also uses several mailing lists [5], [6] for MOAB-related discussions and release announcements.  Potential users are encouraged to interact with the MOAB team using these mailing lists and watch the SIGMA website [4] for updates.
 
 <sup>1</sup> Non-namespaced names are also provided for backward compatibility, with the “MB” prefix added to the class or variable name.
 
@@ -1196,11 +1196,11 @@ Initial results have demonstrated that the data abstraction provided by MOAB is 
 
 [3]	T.J. Tautges, MOAB Meta-Data Information, 2010.
 
-[4]	T.J. Tautges, “MOAB - ITAPS – SIGMA.”, http://sigma.mcs.anl.gov/
+[4]	T.J. Tautges, “SIGMA -- MOAB.”, http://sigma.mcs.anl.gov/
 
-[5]	“MOAB Developers Email List.”, moab-dev@mcs.anl.gov.
+[5]	“MOAB Users and Developers Email List.”, moab-dev@mcs.anl.gov.
 
-[6]	“MOAB Users Email List.”, moab@mcs.anl.gov.
+[6]	“MOAB Announcement Email List.”, moab-announce@mcs.anl.gov.
 
 [7]	“MOAB online documentation.”, http://ftp.mcs.anl.gov/pub/fathom/moab-docs/index.html
 
@@ -1214,7 +1214,7 @@ Initial results have demonstrated that the data abstraction provided by MOAB is 
 
 [12]	K. Devine, E. Boman, R. Heaphy, B. Hendrickson, and C. Vaughan, “Zoltan Data Management Services for Parallel Dynamic Applications,” Computing in Science and Engineering,  vol. 4, 2002, pp. 90–97.
 
-[13]    METIS - Serial Graph Partitioning and Fill-reducing Matrix Ordering. http://glaros.dtc.umn.edu/gkhome/views/metis
+[13]  METIS - Serial Graph Partitioning and Fill-reducing Matrix Ordering. http://glaros.dtc.umn.edu/gkhome/views/metis
 
 [14]	T.J. Tautges, P.P.H. Wilson, J. Kraftcheck, B.F. Smith, and D.L. Henderson, “Acceleration Techniques for Direct Use of  CAD-Based Geometries in Monte Carlo Radiation Transport,” International Conference on Mathematics, Computational Methods & Reactor Physics (M&C 2009),  Saratoga Springs, NY: American Nuclear Society, 2009.
 
