@@ -203,8 +203,6 @@ if ( ENABLE_BLASLAPACK  )
 
   SET (ENABLE_FORTRAN ON)
 
-  # Find Eigen3 is optional
-  FIND_PACKAGE(Eigen3 OPTIONAL_COMPONENTS)
 else (ENABLE_BLASLAPACK)
   # Find Eigen3 is required
   FIND_PACKAGE(Eigen3 REQUIRED)
