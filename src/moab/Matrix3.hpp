@@ -36,32 +36,10 @@
 #include "moab/Types.hpp"
 #include "moab/CartVect.hpp"
 
-#ifdef MOAB_HAVE_EIGEN
 
-#ifdef __GNUC__
-// save diagnostic state
-#pragma GCC diagnostic push
-// turn off the specific warning. Can also use "-Wshadow"
-#pragma GCC diagnostic ignored "-Wshadow"
-#endif
-
-#define EIGEN_DEFAULT_TO_ROW_MAJOR
-#define EIGEN_INITIALIZE_MATRICES_BY_ZERO
-// #define EIGEN_NO_STATIC_ASSERT
-#include "Eigen/Dense"
-
-#ifdef __GNUC__
-// turn the warnings back on
-#pragma GCC diagnostic pop
-#endif
-
-#else // Check for LAPACK
+#ifdef MOAB_HAVE_LAPACK
 
 // We will rely on LAPACK directly
-#ifndef MOAB_HAVE_LAPACK
-#error Need either Eigen3 or BLAS/LAPACK libraries
-#endif
-
 #define MOAB_dsyevd MOAB_FC_FUNC(dsyevd, DSYEVD)
 #define MOAB_dsyevr MOAB_FC_FUNC(dsyevr, DSYEVR)
 #define MOAB_dgeev  MOAB_FC_FUNC(dgeev, DGEEV)
@@ -112,6 +90,30 @@ void MOAB_dgetri ( int* N, double* A,
 
 #include <cstring>
 #define MOAB_DMEMZERO(a,b) memset(a, 0, b*sizeof(double))
+
+
+#else // Check for Eigen3
+
+#ifndef MOAB_HAVE_EIGEN
+#error Need either Eigen3 or BLAS/LAPACK libraries
+#endif
+
+#ifdef __GNUC__
+// save diagnostic state
+#pragma GCC diagnostic push
+// turn off the specific warning. Can also use "-Wshadow"
+#pragma GCC diagnostic ignored "-Wshadow"
+#endif
+
+#define EIGEN_DEFAULT_TO_ROW_MAJOR
+#define EIGEN_INITIALIZE_MATRICES_BY_ZERO
+// #define EIGEN_NO_STATIC_ASSERT
+#include "Eigen/Dense"
+
+#ifdef __GNUC__
+// turn the warnings back on
+#pragma GCC diagnostic pop
+#endif
 
 #endif
 
