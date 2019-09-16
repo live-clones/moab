@@ -927,7 +927,7 @@ inline CartVect operator*( const CartVect& v, const Matrix3& m){
 } // namespace moab
 
 
-#ifndef MOAB_HAVE_EIGEN
+#ifdef MOAB_HAVE_LAPACK
 #undef MOAB_DMEMZERO
 #endif
 
