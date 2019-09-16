@@ -36,7 +36,11 @@
 #include "moab/Types.hpp"
 #include "moab/CartVect.hpp"
 
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
+
+#ifndef MOAB_HAVE_EIGEN
+#error Need either Eigen3 or BLAS/LAPACK libraries
+#endif
 
 #ifdef __GNUC__
 // save diagnostic state
@@ -58,9 +62,6 @@
 #else // Check for LAPACK
 
 // We will rely on LAPACK directly
-#ifndef MOAB_HAVE_LAPACK
-#error Need either Eigen3 or BLAS/LAPACK libraries
-#endif
 
 #define MOAB_dsyevd MOAB_FC_FUNC(dsyevd, DSYEVD)
 #define MOAB_dsyevr MOAB_FC_FUNC(dsyevr, DSYEVR)
@@ -163,7 +164,7 @@ public:
 
 private:
 
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
   Eigen::Matrix3d _mat;
 #else
   double _mat[size];
@@ -173,14 +174,14 @@ public:
 
   //Default Constructor
   inline Matrix3() {
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
     _mat.fill(0.0);
 #else
     MOAB_DMEMZERO(_mat, Matrix3::size);
 #endif
   }
 
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
   inline Matrix3(Eigen::Matrix3d mat) : _mat(mat) {
   }
 #endif
@@ -188,7 +189,7 @@ public:
   //TODO: Deprecate this.
   //Then we can go from three Constructors to one.
   inline Matrix3( double diagonal ) {
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
     _mat << diagonal, 0.0, 0.0,
             0.0, diagonal, 0.0,
             0.0, 0.0, diagonal;
@@ -199,7 +200,7 @@ public:
   }
 
   inline Matrix3( const CartVect & diagonal ) {
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
     _mat << diagonal[0], 0.0, 0.0,
             0.0, diagonal[1], 0.0,
             0.0, 0.0, diagonal[2];
@@ -217,7 +218,7 @@ public:
   //*but* it doesn't really matter anything else
   //will fail to compile.
   inline Matrix3( const std::vector<double> & diagonal ) {
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
     _mat << diagonal[0], 0.0, 0.0,
             0.0, diagonal[1], 0.0,
             0.0, 0.0, diagonal[2];
@@ -232,7 +233,7 @@ public:
   inline Matrix3( double v00, double v01, double v02,
                 double v10, double v11, double v12,
                 double v20, double v21, double v22 ) {
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
     _mat << v00, v01, v02,
             v10, v11, v12,
             v20, v21, v22;
@@ -247,7 +248,7 @@ public:
   //Copy constructor
   Matrix3 ( const Matrix3 & f)
   {
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
     _mat = f._mat;
 #else
     memcpy(_mat, f._mat, size*sizeof(double));
@@ -260,7 +261,7 @@ public:
                   const Vector & row1,
                   const Vector & row2,
                   const bool isRow) {
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
     if (isRow) {
       _mat << row0[0], row0[1], row0[2],
               row1[0], row1[1], row1[2],
@@ -300,7 +301,7 @@ public:
    *
    */
   inline Matrix3( const double v[size] ) {
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
     _mat << v[0], v[1], v[2],
             v[3], v[4], v[5],
             v[6], v[7], v[8];
@@ -310,7 +311,7 @@ public:
   }
 
   inline void copyto( double v[Matrix3::size] ) {
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
     std::copy(_mat.data(), _mat.data()+size, v);
 #else
     memcpy(v, _mat, size*sizeof(double));
@@ -318,7 +319,7 @@ public:
   }
 
   inline Matrix3& operator=( const Matrix3& m ){
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
     _mat = m._mat;
 #else
     memcpy(_mat, m._mat, size*sizeof(double));
@@ -327,7 +328,7 @@ public:
   }
 
   inline Matrix3& operator=( const double v[size] ){
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
     _mat << v[0], v[1], v[2],
             v[3], v[4], v[5],
             v[6], v[7], v[8];
@@ -339,7 +340,7 @@ public:
 
   inline double* operator[]( unsigned i )
   {
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
     return _mat.row(i).data();
 #else
     return &_mat[i*3]; // Row Major
@@ -348,7 +349,7 @@ public:
 
   inline const double* operator[]( unsigned i ) const
   {
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
     return _mat.row(i).data();
 #else
     return &_mat[i*3];
@@ -357,7 +358,7 @@ public:
 
   inline double& operator()(unsigned r, unsigned c)
   {
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
     return _mat(r,c);
 #else
     return _mat[r*3+c];
@@ -366,7 +367,7 @@ public:
 
   inline double operator()(unsigned r, unsigned c) const
   {
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
     return _mat(r,c);
 #else
     return _mat[r*3+c];
@@ -375,7 +376,7 @@ public:
 
   inline double& operator()(unsigned i)
   {
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
     return _mat(i);
 #else
     return _mat[i];
@@ -384,7 +385,7 @@ public:
 
   inline double operator()(unsigned i) const
   {
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
     return _mat(i);
 #else
     return _mat[i];
@@ -394,7 +395,7 @@ public:
   // get pointer to array of nine doubles
   inline double* array()
   {
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
     return _mat.data();
 #else
     return _mat;
@@ -403,7 +404,7 @@ public:
 
   inline const double* array() const
   {
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
     return _mat.data();
 #else
     return _mat;
@@ -411,7 +412,7 @@ public:
   }
 
   inline Matrix3& operator+=( const Matrix3& m ){
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
     _mat += m._mat;
 #else
     for (int i=0; i < Matrix3::size; ++i) _mat[i] += m._mat[i];
@@ -420,7 +421,7 @@ public:
   }
 
   inline Matrix3& operator-=( const Matrix3& m ){
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
     _mat -= m._mat;
 #else
     for (int i=0; i < Matrix3::size; ++i) _mat[i] -= m._mat[i];
@@ -429,7 +430,7 @@ public:
   }
 
   inline Matrix3& operator*=( double s ){
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
     _mat *= s;
 #else
     for (int i=0; i < Matrix3::size; ++i) _mat[i] *= s;
@@ -438,7 +439,7 @@ public:
   }
 
   inline Matrix3& operator/=( double s ){
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
     _mat /= s;
 #else
     for (int i=0; i < Matrix3::size; ++i) _mat[i] /= s;
@@ -447,7 +448,7 @@ public:
   }
 
   inline Matrix3& operator*=( const Matrix3& m ){
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
     _mat *= m._mat;
 #else
     // Uncomment below if you want point-wise multiplication instead (.*)
@@ -468,7 +469,7 @@ public:
 
   inline bool is_symmetric() {
     const double EPS = 1e-13;
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
     if ((fabs(_mat(1) - _mat(3)) < EPS) && (fabs(_mat(2) - _mat(6)) < EPS) && (fabs(_mat(5) - _mat(7)) < EPS))
       return true;
 #else
@@ -479,7 +480,7 @@ public:
   }
 
   inline bool is_positive_definite() {
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
     double subdet6 = _mat(1)*_mat(5)-_mat(2)*_mat(4);
     double subdet7 = _mat(2)*_mat(3)-_mat(0)*_mat(5);
     double subdet8 = _mat(0)*_mat(4)-_mat(1)*_mat(3);
@@ -501,7 +502,7 @@ public:
   inline ErrorCode eigen_decomposition(Vector& evals, Matrix3& evecs)
   {
     const bool bisSymmetric = this->is_symmetric();
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
     if (bisSymmetric) {
       Eigen::SelfAdjointEigenSolver<Eigen::Matrix3d> eigensolver(this->_mat);
       if (eigensolver.info() != Eigen::Success)
@@ -598,7 +599,7 @@ public:
 
   inline void transpose_inplace()
   {
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
     _mat.transposeInPlace();
 #else
     Matrix3 mtmp(*this);
@@ -613,7 +614,7 @@ public:
 
   inline Matrix3 transpose() const
   {
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
     return Matrix3( _mat.transpose() );
 #else
     Matrix3 mtmp(*this);
@@ -629,7 +630,7 @@ public:
 
   template <typename Vector>
   inline void copycol(int index, Vector& vol) {
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
   	_mat.col(index).swap(vol);
 #else
     switch(index) {
@@ -649,7 +650,7 @@ public:
   inline void swapcol(int srcindex, int destindex) {
     assert(srcindex < Matrix3::size);
     assert(destindex < Matrix3::size);
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
   	_mat.col(srcindex).swap(_mat.col(destindex));
 #else
     CartVect svol = this->vcol<CartVect>(srcindex);
@@ -682,7 +683,7 @@ public:
   template <typename Vector>
   inline Vector vcol(int index) const {
     assert(index < Matrix3::size);
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
   	return _mat.col(index);
 #else
     switch(index) {
@@ -699,7 +700,7 @@ public:
 
   inline void colscale(int index, double scale) {
     assert(index < Matrix3::size);
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
   	_mat.col(index) *= scale;
 #else
     switch(index) {
@@ -718,7 +719,7 @@ public:
 
   inline void rowscale(int index, double scale) {
     assert(index < Matrix3::size);
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
   	_mat.row(index) *= scale;
 #else
     switch(index) {
@@ -737,7 +738,7 @@ public:
 
   inline CartVect col(int index) const{
     assert(index < Matrix3::size);
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
     Eigen::Vector3d mvec = _mat.col(index);
     return CartVect(mvec[0], mvec[1], mvec[2]);
 #else
@@ -755,7 +756,7 @@ public:
 
   inline CartVect row(int index) const{
     assert(index < Matrix3::size);
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
     Eigen::Vector3d mvec = _mat.row(index);
     return CartVect(mvec[0], mvec[1], mvec[2]);
 #else
@@ -776,7 +777,7 @@ public:
   friend Matrix3 operator*( const Matrix3& a, const Matrix3& b );
 
   inline double determinant() const{
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
   	return _mat.determinant();
 #else
     return (_mat[0] * _mat[4] * _mat[8]
@@ -789,7 +790,7 @@ public:
   }
 
   inline Matrix3 inverse() const {
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
     return Matrix3(_mat.inverse());
 #else
     // return Matrix::compute_inverse( *this, this->determinant() );
@@ -811,7 +812,7 @@ public:
   inline bool invert() {
     bool invertible=false;
     double d_determinant;
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
     Eigen::Matrix3d invMat;
     _mat.computeInverseAndDetWithCheck(invMat, d_determinant, invertible);
     if (!Util::is_finite(d_determinant))
@@ -841,7 +842,7 @@ public:
   inline double subdet( int r, int c ) const{
     assert(r >= 0 && c >= 0);
     if (r < 0 || c < 0) return DBL_MAX;
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
     const int r1 = (r+1)%3, r2 = (r+2)%3;
     const int c1 = (c+1)%3, c2 = (c+2)%3;
     return _mat(r1,c1)*_mat(r2,c2) - _mat(r1,c2)*_mat(r2,c1);
@@ -853,7 +854,7 @@ public:
   }
 
   inline void print( std::ostream& s ) const {
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
     s <<  "| " << _mat(0) << " " << _mat(1) << " " << _mat(2)
       << " | " << _mat(3) << " " << _mat(4) << " " << _mat(5)
       << " | " << _mat(6) << " " << _mat(7) << " " << _mat(8)
@@ -878,7 +879,7 @@ inline Matrix3 outer_product( const Vector & u,
 }
 
 inline Matrix3 operator+( const Matrix3& a, const Matrix3& b ) {
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
   return Matrix3(a._mat + b._mat);
 #else
   Matrix3 s(a);
@@ -888,7 +889,7 @@ inline Matrix3 operator+( const Matrix3& a, const Matrix3& b ) {
 }
 
 inline Matrix3 operator-( const Matrix3& a, const Matrix3& b ){
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
   return Matrix3(a._mat - b._mat);
 #else
   Matrix3 s(a);
@@ -898,7 +899,7 @@ inline Matrix3 operator-( const Matrix3& a, const Matrix3& b ){
 }
 
 inline Matrix3 operator*( const Matrix3& a, const Matrix3& b ) {
-#ifdef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_LAPACK
   return Matrix3(a._mat * b._mat);
 #else
   return Matrix::mmult3(a, b);
