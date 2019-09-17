@@ -715,6 +715,32 @@ ErrCode iMOAB_ReceiveElementTag(iMOAB_AppID pid, int* scompid, int* rcompid, con
 ErrCode iMOAB_ComputeMeshIntersectionOnSphere ( iMOAB_AppID pid_source, iMOAB_AppID pid_target, iMOAB_AppID pid_intersection);
 
 /**
+  \brief Compute the intersection of DoFs corresponding to surface meshes defined on a sphere. The resulting intersected mesh essentially
+  contains a communication pattern or a permutation matrix that couples both the source and destination DoFs.
+
+  <B>Operations:</B> Collective on coupler tasks
+
+  \param[in]  pid_source (iMOAB_AppID)               The unique pointer to the source application ID
+  \param[in]  pid_target (iMOAB_AppID)               The unique pointer to the destination application ID
+  \param[in/out] pid_intersection (iMOAB_AppID)      The unique pointer to the intersection application ID
+  \param[in] source_solution_tag_dof_name   (iMOAB_String) The global DoF IDs corresponding to participating degrees-of-freedom for the source discretization
+  \param[in] disc_order_source   (int *)                   The discretization order for the solution field on the source grid
+  \param[in] target_solution_tag_dof_name   (iMOAB_String) The global DoF IDs corresponding to participating degrees-of-freedom for the target discretization
+  \param[in] disc_order_target   (int *)                   The discretization order for the solution field on the source grid
+  \param[in] source_solution_tag_dof_name_length   (int)   The length of the source solution DoF tag name string
+  \param[in] target_solution_tag_dof_name_length   (int)   The length of the target solution DoF tag name string
+*/
+ErrCode iMOAB_ComputePointDoFIntersection ( iMOAB_AppID pid_src, iMOAB_AppID pid_tgt, iMOAB_AppID pid_intx, 
+                                               const iMOAB_String disc_method_source, int* disc_order_source,
+                                               const iMOAB_String source_solution_tag_dof_name, 
+                                               const iMOAB_String disc_method_target, int* disc_order_target,
+                                               const iMOAB_String target_solution_tag_dof_name, 
+                                               int disc_method_source_length,
+                                               int disc_method_target_length,
+                                               int source_solution_tag_dof_name_length,
+                                               int target_solution_tag_dof_name_length );
+
+/**
   \brief Recompute the communication graph between component and coupler, considering intx coverage .
   \note
   Original communication graph used an initial partition, while during intx some of the source elements were sent to
@@ -729,7 +755,6 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere ( iMOAB_AppID pid_source, iMOAB_Ap
   \param[in]  pid_migr (iMOAB_AppID)                 moab id for the migrated mesh on coupler PEs
   \param[in]  migrcomp (int*)                        external id of migrated application to coupler PEs
   \param[in]  pid_intx (iMOAB_AppID)                 moab id for intersection mesh (on coupler PEs)
-
   */
 ErrCode iMOAB_CoverageGraph(MPI_Comm* join, iMOAB_AppID pid_src, int* scompid, iMOAB_AppID pid_migr, int* migrcomp, iMOAB_AppID pid_intx);
 
