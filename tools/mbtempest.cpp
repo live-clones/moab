@@ -399,7 +399,8 @@ int main ( int argc, char* argv[] )
 
         // Compute intersections with MOAB
         ctx.timer_push ( "setup and compute mesh intersections" );
-        rval = remapper.ComputeOverlapMesh ( epsrel, 1.0, 1.0, 0.1, false, ctx.rrmGrids ); MB_CHK_ERR ( rval );
+        rval = remapper.ConstructCoveringSet ( epsrel, 1.0, 1.0, 0.1, ctx.rrmGrids ); MB_CHK_ERR ( rval );
+        rval = remapper.ComputeOverlapMesh ( false ); MB_CHK_ERR ( rval );
         ctx.timer_pop();
 
         {

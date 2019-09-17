@@ -69,11 +69,11 @@ public:
 
     moab::ErrorCode LoadMesh(Remapper::IntersectionContext ctx, std::string inputFilename, TempestMeshType type);
 
-    moab::ErrorCode ComputeOverlapMesh(double tolerance=1e-8, 
+    moab::ErrorCode ConstructCoveringSet ( double tolerance=1e-8, 
                                         double radius_src=1.0, double radius_tgt=1.0, 
-                                        double boxeps=0.1, 
-                                        bool use_tempest=false,
-                                        bool regional_mesh=false);
+                                        double boxeps=0.1, bool regional_mesh=false );
+
+    moab::ErrorCode ComputeOverlapMesh( bool use_tempest=false );
 
     // Converters between MOAB and Tempest representations
     moab::ErrorCode ConvertTempestMesh(Remapper::IntersectionContext ctx);
@@ -140,7 +140,7 @@ private:
     // private methods
     moab::ErrorCode load_tempest_mesh_private(std::string inputFilename, Mesh** tempest_mesh);
 
-    moab::ErrorCode convert_mesh_to_tempest_private(Mesh* mesh, moab::EntityHandle meshset, moab::Range& entities);
+    moab::ErrorCode convert_mesh_to_tempest_private(Mesh* mesh, moab::EntityHandle meshset, moab::Range& entities, moab::Range* pverts);
 
     moab::ErrorCode convert_tempest_mesh_private(TempestMeshType type, Mesh* mesh, moab::EntityHandle& meshset);
 
@@ -151,14 +151,18 @@ private:
     Mesh* m_source;
     TempestMeshType m_source_type;
     moab::Range m_source_entities;
+    moab::Range m_covering_source_vertices, m_source_vertices;
     moab::EntityHandle m_source_set;
     int max_source_edges;
+    bool point_cloud_source;
 
     Mesh* m_target;
     TempestMeshType m_target_type;
     moab::Range m_target_entities;
+    moab::Range m_target_vertices;
     moab::EntityHandle m_target_set;
     int max_target_edges;
+    bool point_cloud_target;
 
     // Overlap meshes
     Mesh* m_overlap;
@@ -166,7 +170,9 @@ private:
     moab::Range m_overlap_entities;
     moab::EntityHandle m_overlap_set;
     std::vector<std::pair<int,int> > m_sorted_overlap_order;
-    // Mesh* m_sorted_overlap;
+
+    // Intersection context on a sphere
+    moab::Intx2MeshOnSphere *mbintx;
 
     // Parallel - migrated mesh that is in the local view
     Mesh* m_covering_source;
