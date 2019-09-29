@@ -2638,6 +2638,9 @@ ErrCode iMOAB_ComputePointDoFIntersection ( iMOAB_AppID pid_src, iMOAB_AppID pid
         tdata.covering_set2 = tdata.remapper->GetCoveringSet();
 #endif
 
+    // Now let us re-convert the MOAB mesh back to Tempest representation
+    rval = tdata.remapper->ComputeGlobalLocalMaps();MB_CHK_ERR(rval);
+
     return 0;
 }
 

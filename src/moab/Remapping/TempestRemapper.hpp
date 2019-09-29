@@ -124,6 +124,11 @@ public:
                                           moab::Range* secondary_entities,
                                           const std::string dofTagName, int nP);
 
+    /// <summary>
+    ///     Compute the local and global IDs for elements in source/target/coverage meshes.
+    /// </summary>
+    moab::ErrorCode ComputeGlobalLocalMaps();
+
     // public members
     bool meshValidate;  // Validate the mesh after loading from file
 
@@ -132,8 +137,6 @@ public:
     static const bool verbose = true;
 
 private:
-
-    moab::ErrorCode associate_src_tgt_in_overlap_mesh();
 
     moab::ErrorCode convert_overlap_mesh_sorted_by_source();
 
