@@ -62,7 +62,8 @@ public:
     {
         DiscretizationType_FV,
         DiscretizationType_CGLL,
-        DiscretizationType_DGLL
+        DiscretizationType_DGLL,
+        DiscretizationType_PCLOUD
     };
 
 	///	<summary>
@@ -152,8 +153,14 @@ private:
 	moab::ErrorCode remove_ghosted_overlap_entities (moab::Range& sharedGhostEntities);
 
 	///	<summary>
+	///		Compute the remapping weights as a permutation matrix that relates DoFs on the source mesh
+	///     to DoFs on the target mesh.
+	///	</summary>
+	void LinearRemapNN_MOAB( );
+
+	///	<summary>
 	///		Compute the remapping weights for a FV field defined on the source to a 
-	///   FV field defined on the target mesh.
+	///     FV field defined on the target mesh.
 	///	</summary>
 	void LinearRemapFVtoFV_Tempest_MOAB( int nOrder );
 
@@ -227,23 +234,6 @@ private:
 	);
 
 	///	<summary>
-	///		Store the tag names associated with global DoF ids for source and target meshes
-	///	</summary>
-	moab::ErrorCode set_dofmap_tags(const std::string srcDofTagName, 
-								  const std::string tgtDofTagName);
-
-	///	<summary>
-	///		Compute the association between the solution tag global DoF numbering and
-	///		the local matrix numbering so that matvec operations can be performed
-	///     consistently.
-	///	</summary>
-	moab::ErrorCode set_dofmap_association(DiscretizationType srcType, bool isSrcContinuous, 
-		DataArray3D<int>* srcdataGLLNodes, DataArray3D<int>* srcdataGLLNodesSrc,
-		DiscretizationType destType, bool isDestContinuous, 
-		DataArray3D<int>* tgtdataGLLNodes);
-
-
-	///	<summary>
 	///		Copy the local matrix from Tempest SparseMatrix representation (ELL)
 	///		to the parallel CSR Eigen Matrix for scalable application of matvec
 	///     needed for projections.
@@ -264,6 +254,22 @@ public:
 	typedef WeightDRowVector WeightRowVector;
 	typedef WeightDColVector WeightColVector;
 	typedef WeightRMatrix WeightMatrix;
+
+	///	<summary>
+	///		Store the tag names associated with global DoF ids for source and target meshes
+	///	</summary>
+	moab::ErrorCode SetDOFmapTags(const std::string srcDofTagName, 
+								  const std::string tgtDofTagName);
+
+	///	<summary>
+	///		Compute the association between the solution tag global DoF numbering and
+	///		the local matrix numbering so that matvec operations can be performed
+	///     consistently.
+	///	</summary>
+	moab::ErrorCode SetDOFmapAssociation(DiscretizationType srcType, bool isSrcContinuous, 
+		DataArray3D<int>* srcdataGLLNodes, DataArray3D<int>* srcdataGLLNodesSrc,
+		DiscretizationType destType, bool isDestContinuous, 
+		DataArray3D<int>* tgtdataGLLNodes);
 
 	///	<summary>
 	///		Get the raw reference to the Eigen weight matrix representing the projection from source to destination mesh.
@@ -398,6 +404,7 @@ public:
 	DataArray3D<int> dataGLLNodesSrc, dataGLLNodesSrcCov, dataGLLNodesDest;
 	DiscretizationType m_srcDiscType, m_destDiscType;
 	int m_nTotDofs_Src, m_nTotDofs_SrcCov, m_nTotDofs_Dest;
+	
 	// Key details about the current map
 	int m_nDofsPEl_Src, m_nDofsPEl_Dest;
 	DiscretizationType m_eInputType, m_eOutputType;
