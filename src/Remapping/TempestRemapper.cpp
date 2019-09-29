@@ -544,7 +544,7 @@ ErrorCode TempestRemapper::convert_overlap_mesh_sorted_by_source()
 }
 
 // Should be ordered as Source, Target, Overlap
-ErrorCode TempestRemapper::associate_src_tgt_in_overlap_mesh()
+ErrorCode TempestRemapper::ComputeGlobalLocalMaps()
 {
     ErrorCode rval;
 
@@ -951,6 +951,7 @@ ErrorCode TempestRemapper::ConstructCoveringSet ( double tolerance, double radiu
             m_covering_source_set = m_source_set;
             m_covering_source = m_source;
             m_covering_source_entities = m_source_entities; // this is a tempest mesh object; careful about incrementing the reference?
+            m_covering_source_vertices = m_source_vertices; // this is a tempest mesh object; careful about incrementing the reference?
         }
 #ifdef MOAB_HAVE_MPI
     }
@@ -1073,10 +1074,10 @@ ErrorCode TempestRemapper::ComputeOverlapMesh ( bool use_tempest )
                   intxCov.insert(covEnts[loc_gid_to_lid_covsrc[blueParent]]);
                 }
 
-                Range notNeededCovCells = moab::subtract(covEnts, intxCov);
-                // remove now from coverage set the cells that are not needed
-                rval = m_interface->remove_entities(m_covering_source_set, notNeededCovCells); MB_CHK_ERR ( rval );
-                covEnts = moab::subtract(covEnts, notNeededCovCells);
+                // Range notNeededCovCells = moab::subtract(covEnts, intxCov);
+                // // remove now from coverage set the cells that are not needed
+                // rval = m_interface->remove_entities(m_covering_source_set, notNeededCovCells); MB_CHK_ERR ( rval );
+                // covEnts = moab::subtract(covEnts, notNeededCovCells);
 #ifdef VERBOSE
                 std::cout << " total participating elements in the covering set: " << intxCov.size() << "\n";
                 std::cout << " remove from coverage set elements that are not intersected: " << notNeededCovCells.size() << "\n";
@@ -1104,7 +1105,7 @@ ErrorCode TempestRemapper::ComputeOverlapMesh ( bool use_tempest )
         rval = positive_orientation(m_interface, m_overlap_set, 1.0 /*radius*/);MB_CHK_ERR(rval);
 
         // Now let us re-convert the MOAB mesh back to Tempest representation
-        rval = this->associate_src_tgt_in_overlap_mesh();MB_CHK_ERR(rval);
+        rval = this->ComputeGlobalLocalMaps();MB_CHK_ERR(rval);
 
         rval = this->convert_overlap_mesh_sorted_by_source();MB_CHK_ERR(rval);
 
