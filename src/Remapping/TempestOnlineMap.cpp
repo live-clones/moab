@@ -164,7 +164,7 @@ static void ParseVariableList (
 
 ///////////////////////////////////////////////////////////////////////////////
 
-moab::ErrorCode moab::TempestOnlineMap::set_dofmap_tags(const std::string srcDofTagName, const std::string tgtDofTagName)
+moab::ErrorCode moab::TempestOnlineMap::SetDOFmapTags(const std::string srcDofTagName, const std::string tgtDofTagName)
 {
     moab::ErrorCode rval;
 
@@ -186,7 +186,7 @@ moab::ErrorCode moab::TempestOnlineMap::set_dofmap_tags(const std::string srcDof
                                                 &m_remapper->m_source_entities, 
                                                 srcDofTagName, m_nDofsPEl_Src);MB_CHK_ERR(rval);
 
-        rval = m_interface->tag_get_handle ( srcDofTagName.c_str(), m_nDofsPEl_Src*m_nDofsPEl_Src, 
+        rval = m_interface->tag_get_handle ( srcDofTagName.c_str(), m_nDofsPEl_Src * m_nDofsPEl_Src, 
                                         MB_TYPE_INTEGER,
                                         this->m_dofTagSrc, MB_TAG_ANY);MB_CHK_ERR(rval);
     }
@@ -208,7 +208,7 @@ moab::ErrorCode moab::TempestOnlineMap::set_dofmap_tags(const std::string srcDof
                                                     m_remapper->m_target_entities, NULL, 
                                                     tgtDofTagName, m_nDofsPEl_Dest);MB_CHK_ERR(rval);
 
-        rval = m_interface->tag_get_handle ( tgtDofTagName.c_str(), m_nDofsPEl_Dest*m_nDofsPEl_Dest, 
+        rval = m_interface->tag_get_handle ( tgtDofTagName.c_str(), m_nDofsPEl_Dest * m_nDofsPEl_Dest, 
                                         MB_TYPE_INTEGER,
                                         this->m_dofTagDest, MB_TAG_ANY);MB_CHK_ERR(rval);
     }
@@ -219,8 +219,9 @@ moab::ErrorCode moab::TempestOnlineMap::set_dofmap_tags(const std::string srcDof
 
 ///////////////////////////////////////////////////////////////////////////////
 
-moab::ErrorCode moab::TempestOnlineMap::set_dofmap_association(DiscretizationType srcType, bool isSrcContinuous, DataArray3D<int>* srcdataGLLNodes, DataArray3D<int>* srcdataGLLNodesSrc,
-    DiscretizationType destType, bool isTgtContinuous, DataArray3D<int>* tgtdataGLLNodes)
+moab::ErrorCode moab::TempestOnlineMap::SetDOFmapAssociation(DiscretizationType srcType, bool isSrcContinuous, 
+                                                            DataArray3D<int>* srcdataGLLNodes, DataArray3D<int>* srcdataGLLNodesSrc,
+                                                            DiscretizationType destType, bool isTgtContinuous, DataArray3D<int>* tgtdataGLLNodes)
 {
     moab::ErrorCode rval;
     std::vector<bool> dgll_cgll_row_ldofmap, dgll_cgll_col_ldofmap, dgll_cgll_covcol_ldofmap;
@@ -405,13 +406,25 @@ moab::ErrorCode moab::TempestOnlineMap::set_dofmap_association(DiscretizationTyp
 #endif
 
     // Now compute the mapping and store it for the covering mesh
-    col_dofmap.resize (m_remapper->m_covering_source_entities.size() * m_nDofsPEl_Src * m_nDofsPEl_Src, UINT_MAX);
-    col_ldofmap.resize (m_remapper->m_covering_source_entities.size() * m_nDofsPEl_Src * m_nDofsPEl_Src, UINT_MAX);
-    col_gdofmap.resize (m_remapper->m_covering_source_entities.size() * m_nDofsPEl_Src * m_nDofsPEl_Src, UINT_MAX);
-    src_soln_gdofs.resize(m_remapper->m_covering_source_entities.size()*m_nDofsPEl_Src*m_nDofsPEl_Src, UINT_MAX);
-    rval = m_interface->tag_get_data ( m_dofTagSrc, m_remapper->m_covering_source_entities, &src_soln_gdofs[0] );MB_CHK_ERR(rval);
+    if (m_remapper->point_cloud_source)
+    {
+        assert(m_nDofsPEl_Src == 1);
+        col_dofmap.resize (m_remapper->m_covering_source_vertices.size(), UINT_MAX);
+        col_ldofmap.resize (m_remapper->m_covering_source_vertices.size(), UINT_MAX);
+        col_gdofmap.resize (m_remapper->m_covering_source_vertices.size(), UINT_MAX);
+        src_soln_gdofs.resize(m_remapper->m_covering_source_vertices.size(), UINT_MAX);
+        rval = m_interface->tag_get_data ( m_dofTagSrc, m_remapper->m_covering_source_vertices, &src_soln_gdofs[0] );MB_CHK_ERR(rval);
+    }
+    else
+    {
+        col_dofmap.resize (m_remapper->m_covering_source_entities.size() * m_nDofsPEl_Src * m_nDofsPEl_Src, UINT_MAX);
+        col_ldofmap.resize (m_remapper->m_covering_source_entities.size() * m_nDofsPEl_Src * m_nDofsPEl_Src, UINT_MAX);
+        col_gdofmap.resize (m_remapper->m_covering_source_entities.size() * m_nDofsPEl_Src * m_nDofsPEl_Src, UINT_MAX);
+        src_soln_gdofs.resize(m_remapper->m_covering_source_entities.size() * m_nDofsPEl_Src * m_nDofsPEl_Src, UINT_MAX);
+        rval = m_interface->tag_get_data ( m_dofTagSrc, m_remapper->m_covering_source_entities, &src_soln_gdofs[0] );MB_CHK_ERR(rval);
+    }
     m_nTotDofs_SrcCov = 0;
-    if (srcdataGLLNodes == NULL || srcType == DiscretizationType_FV) { /* we only have a mapping for elements as DoFs */
+    if (srcdataGLLNodes == NULL) { /* we only have a mapping for elements as DoFs */
         for (unsigned i=0; i < col_dofmap.size(); ++i) {
             col_dofmap[i] = i;
             col_ldofmap[i] = i;
@@ -446,15 +459,27 @@ moab::ErrorCode moab::TempestOnlineMap::set_dofmap_association(DiscretizationTyp
         }
     }
 
-    srccol_dofmap.resize (m_remapper->m_source_entities.size() * m_nDofsPEl_Src * m_nDofsPEl_Src, UINT_MAX);
-    srccol_ldofmap.resize (m_remapper->m_source_entities.size() * m_nDofsPEl_Src * m_nDofsPEl_Src, UINT_MAX);
-    srccol_gdofmap.resize (m_remapper->m_source_entities.size() * m_nDofsPEl_Src * m_nDofsPEl_Src, UINT_MAX);
-    locsrc_soln_gdofs.resize(m_remapper->m_source_entities.size()*m_nDofsPEl_Src*m_nDofsPEl_Src, UINT_MAX);
-    rval = m_interface->tag_get_data ( m_dofTagSrc, m_remapper->m_source_entities, &locsrc_soln_gdofs[0] );MB_CHK_ERR(rval);
+    if (m_remapper->point_cloud_source)
+    {
+        assert(m_nDofsPEl_Src == 1);
+        srccol_dofmap.resize (m_remapper->m_source_vertices.size(), UINT_MAX);
+        srccol_ldofmap.resize (m_remapper->m_source_vertices.size(), UINT_MAX);
+        srccol_gdofmap.resize (m_remapper->m_source_vertices.size(), UINT_MAX);
+        locsrc_soln_gdofs.resize(m_remapper->m_source_vertices.size(), UINT_MAX);
+        rval = m_interface->tag_get_data ( m_dofTagSrc, m_remapper->m_source_vertices, &locsrc_soln_gdofs[0] );MB_CHK_ERR(rval);
+    }
+    else
+    {
+        srccol_dofmap.resize (m_remapper->m_source_entities.size() * m_nDofsPEl_Src * m_nDofsPEl_Src, UINT_MAX);
+        srccol_ldofmap.resize (m_remapper->m_source_entities.size() * m_nDofsPEl_Src * m_nDofsPEl_Src, UINT_MAX);
+        srccol_gdofmap.resize (m_remapper->m_source_entities.size() * m_nDofsPEl_Src * m_nDofsPEl_Src, UINT_MAX);
+        locsrc_soln_gdofs.resize(m_remapper->m_source_entities.size() * m_nDofsPEl_Src * m_nDofsPEl_Src, UINT_MAX);
+        rval = m_interface->tag_get_data ( m_dofTagSrc, m_remapper->m_source_entities, &locsrc_soln_gdofs[0] );MB_CHK_ERR(rval);
+    }
 
     // Now compute the mapping and store it for the original source mesh
     m_nTotDofs_Src = 0;
-    if (srcdataGLLNodesSrc == NULL || srcType == DiscretizationType_FV) { /* we only have a mapping for elements as DoFs */
+    if (srcdataGLLNodesSrc == NULL) { /* we only have a mapping for elements as DoFs */
         for (unsigned i=0; i < srccol_dofmap.size(); ++i) {
             srccol_dofmap[i] = i;
             srccol_ldofmap[i] = i;
@@ -486,16 +511,28 @@ moab::ErrorCode moab::TempestOnlineMap::set_dofmap_association(DiscretizationTyp
         }
     }
 
-    row_dofmap.resize (m_remapper->m_target_entities.size() * m_nDofsPEl_Dest * m_nDofsPEl_Dest, UINT_MAX);
-    row_ldofmap.resize (m_remapper->m_target_entities.size() * m_nDofsPEl_Dest * m_nDofsPEl_Dest, UINT_MAX);
-    row_gdofmap.resize (m_remapper->m_target_entities.size() * m_nDofsPEl_Dest * m_nDofsPEl_Dest, UINT_MAX);
-    tgt_soln_gdofs.resize(m_remapper->m_target_entities.size()*m_nDofsPEl_Dest*m_nDofsPEl_Dest, UINT_MAX);
-    rval = m_interface->tag_get_data ( m_dofTagDest, m_remapper->m_target_entities, &tgt_soln_gdofs[0] );MB_CHK_ERR(rval);
+    if (m_remapper->point_cloud_target)
+    {
+        assert(m_nDofsPEl_Dest == 1);
+        row_dofmap.resize (m_remapper->m_target_vertices.size(), UINT_MAX);
+        row_ldofmap.resize (m_remapper->m_target_vertices.size(), UINT_MAX);
+        row_gdofmap.resize (m_remapper->m_target_vertices.size(), UINT_MAX);
+        tgt_soln_gdofs.resize(m_remapper->m_target_vertices.size(), UINT_MAX);
+        rval = m_interface->tag_get_data ( m_dofTagDest, m_remapper->m_target_vertices, &tgt_soln_gdofs[0] );MB_CHK_ERR(rval);
+    }
+    else
+    {
+        row_dofmap.resize (m_remapper->m_target_entities.size() * m_nDofsPEl_Dest * m_nDofsPEl_Dest, UINT_MAX);
+        row_ldofmap.resize (m_remapper->m_target_entities.size() * m_nDofsPEl_Dest * m_nDofsPEl_Dest, UINT_MAX);
+        row_gdofmap.resize (m_remapper->m_target_entities.size() * m_nDofsPEl_Dest * m_nDofsPEl_Dest, UINT_MAX);
+        tgt_soln_gdofs.resize(m_remapper->m_target_entities.size()*m_nDofsPEl_Dest*m_nDofsPEl_Dest, UINT_MAX);
+        rval = m_interface->tag_get_data ( m_dofTagDest, m_remapper->m_target_entities, &tgt_soln_gdofs[0] );MB_CHK_ERR(rval);
+    }
 
     // Now compute the mapping and store it for the target mesh
     // To access the GID for each row: row_gdofmap [ row_ldofmap [ 0 : local_ndofs ] ] = GDOF
     m_nTotDofs_Dest = 0;
-    if (tgtdataGLLNodes == NULL || destType == DiscretizationType_FV) { /* we only have a mapping for elements as DoFs */
+    if (tgtdataGLLNodes == NULL) { /* we only have a mapping for elements as DoFs */
         for (unsigned i=0; i < row_dofmap.size(); ++i) {
             row_dofmap[i] = i;
             row_ldofmap[i] = i;
@@ -560,6 +597,10 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
     dbgprint.set_prefix("[TempestOnlineMap]: ");
     moab::ErrorCode rval;
 
+    const bool m_bPointCloudSource = (m_remapper->point_cloud_source);
+    const bool m_bPointCloudTarget = (m_remapper->point_cloud_target);
+    const bool m_bPointCloud = m_bPointCloudSource || m_bPointCloudTarget;
+
     try
     {
         // Check command line parameters (data arguments)
@@ -591,6 +632,10 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
         {
             eInputType = DiscretizationType_DGLL;
         }
+        else if ( strInputType == "pcloud" )
+        {
+            eInputType = DiscretizationType_PCLOUD;
+        }
         else
         {
             _EXCEPTION1 ( "Invalid \"in_type\" value (%s), expected [fv|cgll|dgll]",
@@ -608,6 +653,10 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
         else if ( strOutputType == "dgll" )
         {
             eOutputType = DiscretizationType_DGLL;
+        }
+        else if ( strOutputType == "pcloud" )
+        {
+            eOutputType = DiscretizationType_PCLOUD;
         }
         else
         {
@@ -639,119 +688,129 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
         m_eInputType = eInputType;
         m_eOutputType = eOutputType;
 
-        rval = set_dofmap_tags(srcDofTagName, tgtDofTagName);MB_CHK_ERR(rval);
+        rval = SetDOFmapTags(srcDofTagName, tgtDofTagName);MB_CHK_ERR(rval);
 
-        // Calculate Face areas
-        if ( is_root ) dbgprint.printf ( 0, "Calculating input mesh Face areas\n" );
-        double dTotalAreaInput_loc = m_meshInput->CalculateFaceAreas(fInputConcave);
-        double dTotalAreaInput = dTotalAreaInput_loc;
-#ifdef MOAB_HAVE_MPI
-        if (m_pcomm) MPI_Reduce ( &dTotalAreaInput_loc, &dTotalAreaInput, 1, MPI_DOUBLE, MPI_SUM, 0, m_pcomm->comm() );
-#endif
-        if ( is_root ) dbgprint.printf ( 0, "Input Mesh Geometric Area: %1.15e\n", dTotalAreaInput );
-
-        // Input mesh areas
-        m_meshInputCov->CalculateFaceAreas(fInputConcave);
-        if ( eInputType == DiscretizationType_FV )
+        double dTotalAreaInput = 0.0, dTotalAreaOutput = 0.0;
+        if (!m_bPointCloudSource)
         {
-            this->SetSourceAreas ( m_meshInputCov->vecFaceArea );
-            if (m_meshInputCov->vecMask.IsAttached()) {
-                this->SetSourceMask(m_meshInputCov->vecMask);
-            }
-        }
+            // Calculate Face areas
+            if ( is_root ) dbgprint.printf ( 0, "Calculating input mesh Face areas\n" );
+            double dTotalAreaInput_loc = m_meshInput->CalculateFaceAreas(fInputConcave);
+            dTotalAreaInput = dTotalAreaInput_loc;
+    #ifdef MOAB_HAVE_MPI
+            if (m_pcomm) MPI_Reduce ( &dTotalAreaInput_loc, &dTotalAreaInput, 1, MPI_DOUBLE, MPI_SUM, 0, m_pcomm->comm() );
+    #endif
+            if ( is_root ) dbgprint.printf ( 0, "Input Mesh Geometric Area: %1.15e\n", dTotalAreaInput );
 
-        // Calculate Face areas
-        if ( is_root ) dbgprint.printf ( 0, "Calculating output mesh Face areas\n" );
-        double dTotalAreaOutput_loc = m_meshOutput->CalculateFaceAreas(fOutputConcave);
-        double dTotalAreaOutput = dTotalAreaOutput_loc;
-#ifdef MOAB_HAVE_MPI
-        if (m_pcomm) MPI_Reduce ( &dTotalAreaOutput_loc, &dTotalAreaOutput, 1, MPI_DOUBLE, MPI_SUM, 0, m_pcomm->comm() );
-#endif
-        if ( is_root ) dbgprint.printf ( 0, "Output Mesh Geometric Area: %1.15e\n", dTotalAreaOutput );
-
-        // Output mesh areas
-        if ( eOutputType == DiscretizationType_FV )
-        {
-            this->SetTargetAreas ( m_meshOutput->vecFaceArea );
-            if (m_meshOutput->vecMask.IsAttached()) {
-                this->SetTargetMask(m_meshOutput->vecMask);
-            }
-        }
-
-        // Verify that overlap mesh is in the correct order
-        int ixSourceFaceMax = ( -1 );
-        int ixTargetFaceMax = ( -1 );
-
-        if ( m_meshOverlap->vecSourceFaceIx.size() !=
-                m_meshOverlap->vecTargetFaceIx.size()
-           )
-        {
-            _EXCEPTIONT ( "Invalid overlap mesh:\n"
-                          "    Possible mesh file corruption?" );
-        }
-
-        for ( unsigned i = 0; i < m_meshOverlap->vecSourceFaceIx.size(); i++ )
-        {
-            if ( m_meshOverlap->vecSourceFaceIx[i] + 1 > ixSourceFaceMax )
+            // Input mesh areas
+            m_meshInputCov->CalculateFaceAreas(fInputConcave);
+            if ( eInputType == DiscretizationType_FV )
             {
-                ixSourceFaceMax = m_meshOverlap->vecSourceFaceIx[i] + 1;
-            }
-            if ( m_meshOverlap->vecTargetFaceIx[i] + 1 > ixTargetFaceMax )
-            {
-                ixTargetFaceMax = m_meshOverlap->vecTargetFaceIx[i] + 1;
+                this->SetSourceAreas ( m_meshInputCov->vecFaceArea );
+                if (m_meshInputCov->vecMask.IsAttached()) {
+                    this->SetSourceMask(m_meshInputCov->vecMask);
+                }
             }
         }
 
-        // Check for forward correspondence in overlap mesh
-        if ( m_meshInput->faces.size() - ixSourceFaceMax == 0 )
+        if (!m_bPointCloudTarget)
         {
-            if ( is_root ) dbgprint.printf ( 0, "Overlap mesh forward correspondence found\n" );
-        }
-        else if ( m_meshOutput->faces.size() - ixSourceFaceMax == 0 )
-        {   // Check for reverse correspondence in overlap mesh
-            if ( is_root ) dbgprint.printf ( 0, "Overlap mesh reverse correspondence found (reversing)\n" );
+            // Calculate Face areas
+            if ( is_root ) dbgprint.printf ( 0, "Calculating output mesh Face areas\n" );
+            double dTotalAreaOutput_loc = m_meshOutput->CalculateFaceAreas(fOutputConcave);
+            dTotalAreaOutput = dTotalAreaOutput_loc;
+    #ifdef MOAB_HAVE_MPI
+            if (m_pcomm) MPI_Reduce ( &dTotalAreaOutput_loc, &dTotalAreaOutput, 1, MPI_DOUBLE, MPI_SUM, 0, m_pcomm->comm() );
+    #endif
+            if ( is_root ) dbgprint.printf ( 0, "Output Mesh Geometric Area: %1.15e\n", dTotalAreaOutput );
 
-            // Reorder overlap mesh
-            m_meshOverlap->ExchangeFirstAndSecondMesh();
-        }
-        // else
-        // {   // No correspondence found
-        //     _EXCEPTION4 ( "Invalid overlap mesh:\n"
-        //                   "    No correspondence found with input and output meshes (%i,%i) vs (%i,%i)",
-        //                   m_meshInputCov->faces.size(), m_meshOutput->faces.size(), ixSourceFaceMax, ixTargetFaceMax );
-        // }
-
-
-        // Calculate Face areas
-        if ( is_root ) dbgprint.printf ( 0, "Calculating overlap mesh Face areas\n" );
-        double dTotalAreaOverlap_loc = m_meshOverlap->CalculateFaceAreas(false);
-        double dTotalAreaOverlap = dTotalAreaOverlap_loc;
-#ifdef MOAB_HAVE_MPI
-        if (m_pcomm) MPI_Reduce ( &dTotalAreaOverlap_loc, &dTotalAreaOverlap, 1, MPI_DOUBLE, MPI_SUM, 0, m_pcomm->comm() );
-#endif
-        if ( is_root ) dbgprint.printf ( 0, "Overlap Mesh Area: %1.15e\n", dTotalAreaOverlap );
-
-        // Partial cover
-        if ( fabs ( dTotalAreaOverlap - dTotalAreaInput ) > 1.0e-10 )
-        {
-            if ( !fNoCheck )
+            // Output mesh areas
+            if ( eOutputType == DiscretizationType_FV )
             {
-                if ( is_root ) dbgprint.printf ( 0, "WARNING: Significant mismatch between overlap mesh area "
-                                                            "and input mesh area.\n  Automatically enabling --nocheck\n" );
-                fNoCheck = true;
+                this->SetTargetAreas ( m_meshOutput->vecFaceArea );
+                if (m_meshOutput->vecMask.IsAttached()) {
+                    this->SetTargetMask(m_meshOutput->vecMask);
+                }
             }
         }
 
+        if (!m_bPointCloud)
+        {
+            // Verify that overlap mesh is in the correct order
+            int ixSourceFaceMax = ( -1 );
+            int ixTargetFaceMax = ( -1 );
 
-        /*
-            // Recalculate input mesh area from overlap mesh
-            if (fabs(dTotalAreaOverlap - dTotalAreaInput) > 1.0e-10) {
-                dbgprint.printf(0, "Overlap mesh only covers a sub-area of the sphere\n");
-                dbgprint.printf(0, "Recalculating source mesh areas\n");
-                dTotalAreaInput = m_meshInput->CalculateFaceAreasFromOverlap(m_meshOverlap);
-                dbgprint.printf(0, "New Input Mesh Geometric Area: %1.15e\n", dTotalAreaInput);
+            if ( m_meshOverlap->vecSourceFaceIx.size() !=
+                    m_meshOverlap->vecTargetFaceIx.size()
+               )
+            {
+                _EXCEPTIONT ( "Invalid overlap mesh:\n"
+                              "    Possible mesh file corruption?" );
             }
-        */
+
+            for ( unsigned i = 0; i < m_meshOverlap->vecSourceFaceIx.size(); i++ )
+            {
+                if ( m_meshOverlap->vecSourceFaceIx[i] + 1 > ixSourceFaceMax )
+                {
+                    ixSourceFaceMax = m_meshOverlap->vecSourceFaceIx[i] + 1;
+                }
+                if ( m_meshOverlap->vecTargetFaceIx[i] + 1 > ixTargetFaceMax )
+                {
+                    ixTargetFaceMax = m_meshOverlap->vecTargetFaceIx[i] + 1;
+                }
+            }
+
+            // Check for forward correspondence in overlap mesh
+            if ( m_meshInput->faces.size() - ixSourceFaceMax == 0 )
+            {
+                if ( is_root ) dbgprint.printf ( 0, "Overlap mesh forward correspondence found\n" );
+            }
+            else if ( m_meshOutput->faces.size() - ixSourceFaceMax == 0 )
+            {   // Check for reverse correspondence in overlap mesh
+                if ( is_root ) dbgprint.printf ( 0, "Overlap mesh reverse correspondence found (reversing)\n" );
+
+                // Reorder overlap mesh
+                m_meshOverlap->ExchangeFirstAndSecondMesh();
+            }
+            // else
+            // {   // No correspondence found
+            //     _EXCEPTION4 ( "Invalid overlap mesh:\n"
+            //                   "    No correspondence found with input and output meshes (%i,%i) vs (%i,%i)",
+            //                   m_meshInputCov->faces.size(), m_meshOutput->faces.size(), ixSourceFaceMax, ixTargetFaceMax );
+            // }
+
+
+            // Calculate Face areas
+            if ( is_root ) dbgprint.printf ( 0, "Calculating overlap mesh Face areas\n" );
+            double dTotalAreaOverlap_loc = m_meshOverlap->CalculateFaceAreas(false);
+            double dTotalAreaOverlap = dTotalAreaOverlap_loc;
+    #ifdef MOAB_HAVE_MPI
+            if (m_pcomm) MPI_Reduce ( &dTotalAreaOverlap_loc, &dTotalAreaOverlap, 1, MPI_DOUBLE, MPI_SUM, 0, m_pcomm->comm() );
+    #endif
+            if ( is_root ) dbgprint.printf ( 0, "Overlap Mesh Area: %1.15e\n", dTotalAreaOverlap );
+
+            // Partial cover
+            if ( fabs ( dTotalAreaOverlap - dTotalAreaInput ) > 1.0e-10 )
+            {
+                if ( !fNoCheck )
+                {
+                    if ( is_root ) dbgprint.printf ( 0, "WARNING: Significant mismatch between overlap mesh area "
+                                                                "and input mesh area.\n  Automatically enabling --nocheck\n" );
+                    fNoCheck = true;
+                }
+            }
+
+            /*
+                // Recalculate input mesh area from overlap mesh
+                if (fabs(dTotalAreaOverlap - dTotalAreaInput) > 1.0e-10) {
+                    dbgprint.printf(0, "Overlap mesh only covers a sub-area of the sphere\n");
+                    dbgprint.printf(0, "Recalculating source mesh areas\n");
+                    dTotalAreaInput = m_meshInput->CalculateFaceAreasFromOverlap(m_meshOverlap);
+                    dbgprint.printf(0, "New Input Mesh Geometric Area: %1.15e\n", dTotalAreaInput);
+                }
+            */
+        }
+
         // Finite volume input / Finite volume output
         if ( ( eInputType  == DiscretizationType_FV ) &&
                 ( eOutputType == DiscretizationType_FV )
@@ -766,7 +825,7 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
             this->InitializeTargetCoordinatesFromMeshFV ( *m_meshOutput );
 
             // Finite volume input / Finite element output
-            rval = this->set_dofmap_association(eInputType, false, NULL, NULL, eOutputType, false, NULL);MB_CHK_ERR(rval);
+            rval = this->SetDOFmapAssociation(eInputType, false, NULL, NULL, eOutputType, false, NULL);MB_CHK_ERR(rval);
 
             // Construct remap
             if ( is_root ) dbgprint.printf ( 0, "Calculating remap weights\n" );
@@ -818,7 +877,7 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
             m_meshInputCov->ConstructEdgeMap();
 
             // Finite volume input / Finite element output
-            rval = this->set_dofmap_association(eInputType, false, NULL, NULL, 
+            rval = this->SetDOFmapAssociation(eInputType, false, NULL, NULL, 
                 eOutputType, (eOutputType == DiscretizationType_CGLL), &dataGLLNodesDest);MB_CHK_ERR(rval);
 
             // Generate remap weights
@@ -854,6 +913,80 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
                     fContinuous,
                     fNoConservation );
             }
+            
+        }
+        else if ( ( eInputType  == DiscretizationType_PCLOUD ) ||
+                ( eOutputType == DiscretizationType_PCLOUD )
+           )
+        {
+            DataArray3D<double> dataGLLJacobian;
+            if (!m_bPointCloudSource)
+            {
+                // Generate reverse node array and edge map
+                m_meshInputCov->ConstructReverseNodeArray();
+                m_meshInputCov->ConstructEdgeMap();
+
+                // Initialize coordinates for map
+                if (eInputType == DiscretizationType_FV) {
+                    this->InitializeSourceCoordinatesFromMeshFV ( *m_meshInputCov );
+                }
+                else
+                {
+                    if ( is_root ) dbgprint.printf ( 0, "Generating input mesh meta data\n" );
+                    DataArray3D<double> dataGLLJacobianSrc;
+                    GenerateMetaData (
+                        *m_meshInputCov,
+                        nPin,
+                        fBubble,
+                        dataGLLNodesSrcCov,
+                        dataGLLJacobian );
+                    GenerateMetaData (
+                        *m_meshInput,
+                        nPin,
+                        fBubble,
+                        dataGLLNodesSrc,
+                        dataGLLJacobianSrc );
+                }
+            }
+            else { /* Source is a point cloud dataset */
+
+            }
+
+            if (!m_bPointCloudTarget)
+            {
+                // Generate reverse node array and edge map
+                m_meshOutput->ConstructReverseNodeArray();
+                m_meshOutput->ConstructEdgeMap();
+
+                // Initialize coordinates for map
+                if (eOutputType == DiscretizationType_FV) {
+                    this->InitializeSourceCoordinatesFromMeshFV ( *m_meshOutput );
+                }
+                else
+                {
+                    if ( is_root ) dbgprint.printf ( 0, "Generating output mesh meta data\n" );
+                    GenerateMetaData (
+                        *m_meshOutput,
+                        nPout,
+                        fBubble,
+                        dataGLLNodesDest,
+                        dataGLLJacobian );
+                }
+            }
+            else { /* Target is a point cloud dataset */
+
+            }
+
+            // Finite volume input / Finite element output
+            rval = this->SetDOFmapAssociation(eInputType, (eInputType == DiscretizationType_CGLL), 
+                                                (m_bPointCloudSource || eInputType == DiscretizationType_FV ? NULL : &dataGLLNodesSrcCov), 
+                                                (m_bPointCloudSource || eInputType == DiscretizationType_FV ? NULL : &dataGLLNodesSrc), 
+                                                eOutputType, (eOutputType == DiscretizationType_CGLL), 
+                                                (m_bPointCloudTarget ? NULL : &dataGLLNodesDest));MB_CHK_ERR(rval);
+
+            // Construct remap
+            if ( is_root ) dbgprint.printf ( 0, "Calculating remap weights with Nearest-Neighbor method\n" );
+            LinearRemapNN_MOAB();
         }
         else if (
             ( eInputType != DiscretizationType_FV ) &&
@@ -925,7 +1058,7 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
             }
 
             // Finite element input / Finite volume output
-            rval = this->set_dofmap_association(eInputType, (eInputType == DiscretizationType_CGLL), &dataGLLNodesSrcCov, &dataGLLNodesSrc, 
+            rval = this->SetDOFmapAssociation(eInputType, (eInputType == DiscretizationType_CGLL), &dataGLLNodesSrcCov, &dataGLLNodesSrc, 
                 eOutputType, false, NULL);MB_CHK_ERR(rval);
 
             // Generate remap
@@ -948,14 +1081,14 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
         }
         else if (
             ( eInputType  != DiscretizationType_FV ) &&
-            ( eOutputType != DiscretizationType_FV )
+            ( (eOutputType != DiscretizationType_FV || eOutputType != DiscretizationType_PCLOUD) )
         )
         {
             DataArray3D<double> dataGLLJacobianIn, dataGLLJacobianSrc;
             DataArray3D<double> dataGLLJacobianOut;
 
             // Input metadata
-            if ( is_root ) dbgprint.printf ( 0, "Generating input mesh meta data" );
+            if ( is_root ) dbgprint.printf ( 0, "Generating input mesh meta data\n" );
             double dNumericalAreaIn_loc =
                 GenerateMetaData (
                     *m_meshInputCov,
@@ -987,7 +1120,7 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
             }
 
             // Output metadata
-            if ( is_root ) dbgprint.printf ( 0, "Generating output mesh meta data" );
+            if ( is_root ) dbgprint.printf ( 0, "Generating output mesh meta data\n" );
             double dNumericalAreaOut_loc =
                 GenerateMetaData (
                     *m_meshOutput,
@@ -1051,7 +1184,7 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
             }
 
             // Input Finite Element to Output Finite Element
-            rval = this->set_dofmap_association(eInputType, (eInputType == DiscretizationType_CGLL), &dataGLLNodesSrcCov, &dataGLLNodesSrc, 
+            rval = this->SetDOFmapAssociation(eInputType, (eInputType == DiscretizationType_CGLL), &dataGLLNodesSrcCov, &dataGLLNodesSrc, 
                 eOutputType, (eOutputType == DiscretizationType_CGLL), &dataGLLNodesDest);MB_CHK_ERR(rval);
 
             // Generate remap
