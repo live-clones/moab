@@ -182,12 +182,11 @@ int main(int argc, char * argv[])
   // m_covering_source = new Mesh();
   // rval = convert_mesh_to_tempest_private ( m_covering_source, m_covering_source_set, m_covering_source_entities, &m_covering_source_vertices ); MB_CHK_SET_ERR ( rval, "Can't convert source Tempest mesh" );
   
-
   ierr = iMOAB_ComputePointDoFIntersection(atmPID, lndPID, atmlndPID, 
                                           disc_methods[0], &disc_orders[0], dof_tag_names[0], 
                                           disc_methods[2], &disc_orders[2], dof_tag_names[2],
                                           strlen(disc_methods[0]), strlen(dof_tag_names[0]), 
-                                          strlen(disc_methods[1]), strlen(dof_tag_names[1]));
+                                          strlen(disc_methods[2]), strlen(dof_tag_names[2]));
   CHECKIERR(ierr, "failed to compute point-cloud mapping");
 
   /* We have the mesh intersection now. Let us compute the remapping weights */
