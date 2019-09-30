@@ -650,10 +650,12 @@ ErrCode iMOAB_UpdateMeshInfo ( iMOAB_AppID pid )
             if ( data.primary_elems.empty() )
             {
               // no elements of dimension 1 or 2 or 3; it could happen for point clouds
-              return 0;
+              data.point_cloud = true;
             }
         }
     }
+
+    data.point_cloud = (data.primary_elems.size() == 0 && data.all_verts.size() > 0);
 
 #ifdef MOAB_HAVE_MPI
     int flagInit;
@@ -781,8 +783,6 @@ ErrCode iMOAB_GetMeshInfo ( iMOAB_AppID pid, int* num_visible_vertices, int* num
         num_visible_vertexBC[0] = num_visible_vertexBC[2];
         num_visible_vertexBC[1] = 0;
     }
-
-    data.point_cloud = (data.primary_elems.size() == 0 && data.all_verts.size() > 0);
 
     return 0;
 }
@@ -1719,10 +1719,8 @@ ErrCode iMOAB_ResolveSharedEntities (  iMOAB_AppID pid, int* num_verts, int* mar
       return 1;
     }
 
-
     int rank = pco->rank();
     rval = context.MBI->tag_set_data ( part_tag, &cset, 1, &rank );CHKERRVAL(rval);
-
 
 #endif
     return 0;
@@ -1740,11 +1738,9 @@ ErrCode iMOAB_DetermineGhostEntities (  iMOAB_AppID pid, int* ghost_dim, int* nu
     ParallelComm* pco = context.pcomms[*pid];
 
     int addl_ents = 0; //maybe we should be passing this too; most of the time we do not need additional ents
+    // collective call
     ErrorCode rval = pco->exchange_ghost_cells ( *ghost_dim, *bridge_dim,
-                     *num_ghost_layers, addl_ents, true, true, &data.file_set ); // collective call
-
-    if ( rval != MB_SUCCESS )
-    { return 1; }
+                     *num_ghost_layers, addl_ents, true, true, &data.file_set ); CHKERRVAL ( rval );
 
     // now re-establish all mesh info; will reconstruct mesh info, based solely on what is in the file set
     int rc = iMOAB_UpdateMeshInfo ( pid );
@@ -1766,9 +1762,7 @@ ErrCode iMOAB_SetGlobalInfo ( iMOAB_AppID pid, int* num_global_verts, int* num_g
 ErrCode iMOAB_GetGlobalInfo ( iMOAB_AppID pid, int* num_global_verts, int* num_global_elems )
 {
     appData& data = context.appDatas[*pid];
-
     if ( NULL != num_global_verts ) { *num_global_verts = data.num_global_vertices; }
-
     if ( NULL != num_global_elems ) { *num_global_elems = data.num_global_elements; }
 
     return 0;
@@ -1841,31 +1835,20 @@ ErrCode iMOAB_SendMesh ( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* receiving
       { return 1; }
 
       // every sender computes the trivial partition, it is cheap, and we need to send it anyway to each sender
-      rval = cgraph->compute_trivial_partition ( number_elems_per_part );
+      rval = cgraph->compute_trivial_partition ( number_elems_per_part ); CHKERRVAL ( rval );
 
-      if ( MB_SUCCESS != rval )
-      { return 1; }
-
-      rval = cgraph->send_graph ( *global );
-
-      if ( MB_SUCCESS != rval )
-      { return 1; }
+      rval = cgraph->send_graph ( *global ); CHKERRVAL ( rval );
     }
     else // *method != 0, so it is either graph or geometric, parallel
     {
       // owned are the primary elements on this app
-        rval = cgraph->compute_partition(pco, owned, *method);
-        if ( rval != MB_SUCCESS )
-        { return 1; }
+        rval = cgraph->compute_partition(pco, owned, *method); CHKERRVAL ( rval );
+
         // basically, send the graph to the receiver side, with unblocking send
-        rval = cgraph->send_graph_partition (pco, *global );
-        if ( MB_SUCCESS != rval )
-        { return 1; }
+        rval = cgraph->send_graph_partition (pco, *global ); CHKERRVAL ( rval );
     }
     // pco is needed to pack, not for communication
-    rval = cgraph->send_mesh_parts ( *global, pco, owned );
-
-    if ( rval != MB_SUCCESS ) { return 1; }
+    rval = cgraph->send_mesh_parts ( *global, pco, owned ); CHKERRVAL ( rval );
 
     // mark for deletion
     MPI_Group_free(&senderGroup);
@@ -1940,7 +1923,7 @@ ErrCode iMOAB_ReceiveMesh ( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* sendin
   Tag idtag;
   rval = context.MBI->tag_get_handle ( "GLOBAL_ID", idtag );CHKERRVAL(rval);
 
-  // data.point_cloud = false;
+//   data.point_cloud = false;
   if ( ( int ) senders_local.size() >= 2 )// need to remove duplicate vertices
   // that might come from different senders
   {
@@ -1993,7 +1976,6 @@ ErrCode iMOAB_ReceiveMesh ( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* sendin
     std::cout <<" can't get par part tag.\n";
     return 1;
   }
-
 
   int rank = pco->rank();
   rval = context.MBI->tag_set_data ( part_tag, &local_set, 1, &rank );CHKERRVAL(rval);
@@ -2093,9 +2075,7 @@ ErrCode iMOAB_SendElementTag(iMOAB_AppID pid, int* scompid, int* rcompid, const 
 
   // pco is needed to pack, and for moab instance, not for communication!
   // still use nonblocking communication, over the joint comm
-  rval = cgraph->send_tag_values ( *join, pco, owned, tagHandles );
-
-  if ( MB_SUCCESS != rval ) { return 1; }
+  rval = cgraph->send_tag_values ( *join, pco, owned, tagHandles ); CHKERRVAL ( rval );
   // now, send to each corr_tasks[i] tag data for corr_sizes[i] primary entities
 
   return 0;
@@ -2149,11 +2129,11 @@ ErrCode iMOAB_ReceiveElementTag(iMOAB_AppID pid, int* scompid, int* rcompid, con
 
   if ( data.file_set != data.covering_set) // coverage mesh is different from original mesh, it means we are on a source mesh, after intx
   {
-    rval = context.MBI->get_entities_by_dimension(data.covering_set, 2, owned); if ( MB_SUCCESS != rval ) { return 1; }
+    rval = context.MBI->get_entities_by_dimension(data.covering_set, 2, owned); CHKERRVAL ( rval );
   }
   // pco is needed to pack, and for moab instance, not for communication!
   // still use nonblocking communication
-  rval = cgraph->receive_tag_values ( *join, pco, owned, tagHandles );
+  rval = cgraph->receive_tag_values ( *join, pco, owned, tagHandles ); CHKERRVAL ( rval );
 
   if ( data.file_set != data.covering_set) // coverage mesh is different from original mesh, it means we are on a source mesh, after intx
   {
@@ -2165,7 +2145,6 @@ ErrCode iMOAB_ReceiveElementTag(iMOAB_AppID pid, int* scompid, int* rcompid, con
 #endif
   }
 
-  if ( MB_SUCCESS != rval ) { return 1; }
   // now, send to each corr_tasks[i] tag data for corr_sizes[i] primary entities
 
   return 0;
@@ -2387,6 +2366,7 @@ static ErrCode ComputeSphereRadius ( iMOAB_AppID pid, double* radius)
 ErrCode iMOAB_ComputeMeshIntersectionOnSphere ( iMOAB_AppID pid_src, iMOAB_AppID pid_tgt, iMOAB_AppID pid_intx)
 {
     ErrorCode rval;
+    ErrCode ierr;
     bool validate = true;
 
     double radius_source=1.0;
@@ -2417,7 +2397,7 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere ( iMOAB_AppID pid_src, iMOAB_AppID
     }
 #endif
 
-    ErrCode ierr = iMOAB_UpdateMeshInfo(pid_src); CHKIERRVAL(ierr);
+    ierr = iMOAB_UpdateMeshInfo(pid_src); CHKIERRVAL(ierr);
     ierr = iMOAB_UpdateMeshInfo(pid_tgt); CHKIERRVAL(ierr);
 
     // Rescale the radius of both to compute the intersection
@@ -2540,6 +2520,7 @@ ErrCode iMOAB_ComputePointDoFIntersection ( iMOAB_AppID pid_src, iMOAB_AppID pid
                                                int target_solution_tag_dof_name_length )
 {
     ErrorCode rval;
+    ErrCode ierr;
 
     double radius_source=1.0;
     double radius_target=1.0;
@@ -2568,7 +2549,7 @@ ErrCode iMOAB_ComputePointDoFIntersection ( iMOAB_AppID pid_src, iMOAB_AppID pid
     }
 #endif
 
-    ErrCode ierr = iMOAB_UpdateMeshInfo(pid_src); CHKIERRVAL(ierr);
+    ierr = iMOAB_UpdateMeshInfo(pid_src); CHKIERRVAL(ierr);
     ierr = iMOAB_UpdateMeshInfo(pid_tgt); CHKIERRVAL(ierr);
 
     // Rescale the radius of both to compute the intersection
