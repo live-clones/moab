@@ -61,7 +61,7 @@ struct TempestMapAppData
     iMOAB_AppID pid_src;
     iMOAB_AppID pid_dest;
     // Only the intersection context would assign this set reference
-    moab::EntityHandle covering_set2;
+    // moab::EntityHandle covering_set2;
 };
 #endif
 
@@ -2127,6 +2127,7 @@ ErrCode iMOAB_ReceiveElementTag(iMOAB_AppID pid, int* scompid, int* rcompid, con
     tagHandles.push_back(tagHandle);
   }
 
+  std::cout << pco->rank() << ". Looking to receive data for tags: " << tag_name << " and file set = " << (data.file_set) << " covering = " << data.covering_set << "\n";
   if ( data.file_set != data.covering_set) // coverage mesh is different from original mesh, it means we are on a source mesh, after intx
   {
     rval = context.MBI->get_entities_by_dimension(data.covering_set, 2, owned); CHKERRVAL ( rval );
@@ -2135,6 +2136,7 @@ ErrCode iMOAB_ReceiveElementTag(iMOAB_AppID pid, int* scompid, int* rcompid, con
   // still use nonblocking communication
   rval = cgraph->receive_tag_values ( *join, pco, owned, tagHandles ); CHKERRVAL ( rval );
 
+  std::cout << pco->rank() << ". Looking to receive data for tags: " << tag_name << "\n";
   if ( data.file_set != data.covering_set) // coverage mesh is different from original mesh, it means we are on a source mesh, after intx
   {
 #ifdef VERBOSE
@@ -2466,7 +2468,8 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere ( iMOAB_AppID pid_src, iMOAB_AppID
     // rval = data_intx.remapper->ConvertMeshToTempest ( moab::Remapper::IntersectedMesh );CHKERRVAL(rval);
 
 #ifdef MOAB_HAVE_MPI
-    tdata.covering_set2 = tdata.remapper->GetCoveringSet();
+    // tdata.covering_set2 = tdata.remapper->GetCoveringSet();
+    data_intx.covering_set = tdata.remapper->GetCoveringSet();
 #endif
 
     // if (radii_scaled) { /* the radii are different, so lets rescale back */
@@ -2615,8 +2618,8 @@ ErrCode iMOAB_ComputePointDoFIntersection ( iMOAB_AppID pid_src, iMOAB_AppID pid
     rval = tdata.remapper->ConstructCoveringSet ( epsrel, 1.0, 1.0, boxeps, false );CHKERRVAL(rval);
 
 #ifdef MOAB_HAVE_MPI
-    if (!tdata.covering_set2)
-        tdata.covering_set2 = tdata.remapper->GetCoveringSet();
+    // tdata.covering_set2 = tdata.remapper->GetCoveringSet();
+    data_intx.covering_set = tdata.remapper->GetCoveringSet();
 #endif
 
     // Now let us re-convert the MOAB mesh back to Tempest representation
