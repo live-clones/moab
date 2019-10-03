@@ -2702,7 +2702,6 @@ ErrCode iMOAB_ApplyScalarProjectionWeights (   iMOAB_AppID pid_intersection,
     moab::TempestRemapper* remapper = tdata.remapper;
     moab::TempestOnlineMap* weightMap = tdata.weightMaps[std::string(solution_weights_identifier)];
 
-
     // we assume that there are separators ";" between the tag names
     std::vector<std::string> srcNames;
     std::vector<std::string> tgtNames;
@@ -2730,25 +2729,64 @@ ErrCode iMOAB_ApplyScalarProjectionWeights (   iMOAB_AppID pid_intersection,
       tgtTagHandles.push_back(tagHandle);
     }
 
-    moab::Range& covSrcEnts = remapper->GetMeshEntities(moab::Remapper::CoveringMesh);
-    moab::Range& tgtEnts = remapper->GetMeshEntities(moab::Remapper::TargetMesh);
+    std::vector<double> solSTagVals;
+    std::vector<double> solTTagVals;
 
-    std::vector<double> solSTagVals(covSrcEnts.size()*weightMap->GetSourceNDofsPerElement()*weightMap->GetSourceNDofsPerElement(), -1.0);
-    std::vector<double> solTTagVals(tgtEnts.size()*weightMap->GetDestinationNDofsPerElement()*weightMap->GetDestinationNDofsPerElement(), -1.0);
+    moab::Range sents, tents;
+    if (data_intx.point_cloud)
+    {
+        appData& data_src = context.appDatas[*tdata.pid_src];
+        appData& data_tgt = context.appDatas[*tdata.pid_dest];
+        if (data_src.point_cloud)
+        {
+            moab::Range& covSrcEnts = remapper->GetMeshVertices(moab::Remapper::CoveringMesh);
+            solSTagVals.resize(covSrcEnts.size(), -1.0);
+            sents = covSrcEnts;
+        }
+        else
+        {
+            moab::Range& covSrcEnts = remapper->GetMeshEntities(moab::Remapper::CoveringMesh);
+            solSTagVals.resize(covSrcEnts.size()*weightMap->GetSourceNDofsPerElement()*weightMap->GetSourceNDofsPerElement(), -1.0);
+            sents = covSrcEnts;
+        }
+        if (data_tgt.point_cloud)
+        {
+            moab::Range& tgtEnts = remapper->GetMeshVertices(moab::Remapper::TargetMesh);
+            solTTagVals.resize(tgtEnts.size(), -1.0);
+            tents = tgtEnts;
+        }
+        else
+        {
+            moab::Range& tgtEnts = remapper->GetMeshEntities(moab::Remapper::TargetMesh);
+            solTTagVals.resize(tgtEnts.size()*weightMap->GetDestinationNDofsPerElement()*weightMap->GetDestinationNDofsPerElement(), -1.0);
+            tents = tgtEnts;
+        }
+    }
+    else
+    {
+        moab::Range& covSrcEnts = remapper->GetMeshEntities(moab::Remapper::CoveringMesh);
+        moab::Range& tgtEnts = remapper->GetMeshEntities(moab::Remapper::TargetMesh);
+        solSTagVals.resize(covSrcEnts.size()*weightMap->GetSourceNDofsPerElement()*weightMap->GetSourceNDofsPerElement(), -1.0);
+        solTTagVals.resize(tgtEnts.size()*weightMap->GetDestinationNDofsPerElement()*weightMap->GetDestinationNDofsPerElement(), -1.0);
+
+        sents = covSrcEnts;
+        tents = tgtEnts;
+    }
+    
 
     for (size_t i=0; i < srcTagHandles.size(); i++ )
     {
       // The tag data is np*np*n_el_src
       Tag ssolnTag = srcTagHandles[i];
       Tag tsolnTag = tgtTagHandles[i];
-      rval = context.MBI->tag_get_data (ssolnTag , covSrcEnts, &solSTagVals[0] );CHKERRVAL(rval);
+      rval = context.MBI->tag_get_data (ssolnTag, sents, &solSTagVals[0] );CHKERRVAL(rval);
 
       // Compute the application of weights on the suorce solution data and store it in the destination solution vector data
       // Optionally, can also perform the transpose application of the weight matrix. Set the 3rd argument to true if this is needed
       rval = weightMap->ApplyWeights(solSTagVals, solTTagVals, false);CHKERRVAL(rval);
 
       // The tag data is np*np*n_el_dest
-      rval = context.MBI->tag_set_data (tsolnTag , tgtEnts, &solTTagVals[0] );CHKERRVAL(rval);
+      rval = context.MBI->tag_set_data (tsolnTag , tents, &solTTagVals[0] );CHKERRVAL(rval);
 
 #ifdef VERBOSE
       ParallelComm* pco_intx = context.pcomms[*pid_intersection];

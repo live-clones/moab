@@ -273,15 +273,15 @@ int main(int argc, char * argv[])
    */
   {
     // free allocated data
-    char outputFileOv[]  = "fIntxOverlap.h5m";
-    char outputFileTgt[] = "fIntxTarget.h5m";
+    char outputFileOcnTgt[] = "fIntxOcnTarget.h5m";
+    char outputFileLndTgt[]  = "fIntxLndTarget.h5m";
     char writeOptions[] ="";
 
-    ierr = iMOAB_WriteMesh(ocnPID, outputFileTgt, writeOptions,
-      strlen(outputFileTgt), strlen(writeOptions) );
+    ierr = iMOAB_WriteMesh(ocnPID, outputFileOcnTgt, writeOptions,
+      strlen(outputFileOcnTgt), strlen(writeOptions) );
 
-    ierr = iMOAB_WriteMesh(lndPID, outputFileOv, writeOptions,
-      strlen(outputFileOv), strlen(writeOptions) );
+    ierr = iMOAB_WriteMesh(lndPID, outputFileLndTgt, writeOptions,
+      strlen(outputFileLndTgt), strlen(writeOptions) );
   }
 
   /*

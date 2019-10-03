@@ -85,16 +85,7 @@ extern void GetAdjacentFaceVectorByEdge (
 
 void moab::TempestOnlineMap::LinearRemapNN_MOAB ()
 {
-    /* Should the columns be the global size of the matrix ? */
-    m_weightMatrix.resize(m_nTotDofs_Dest, m_nTotDofs_SrcCov);
-    InitVectors();
-
-#ifdef VERBOSE
-    int locrows = std::max(m_mapRemap.GetRows(), m_nTotDofs_Dest);
-    int loccols = std::max(m_mapRemap.GetColumns(), m_nTotDofs_SrcCov);
-
-    std::cout << m_weightMatrix.rows() << ", " <<  locrows << ", " <<  m_weightMatrix.cols() << ", " << loccols << "\n";
-#endif
+    /* m_mapRemap size = (m_nTotDofs_Dest X m_nTotDofs_SrcCov)  */
 
 #ifdef VVERBOSE
     {
@@ -115,7 +106,6 @@ void moab::TempestOnlineMap::LinearRemapNN_MOAB ()
     for (unsigned it=0; it < col_gdofmap.size(); ++it)
         src_gl[ col_gdofmap[it] ] = col_dofmap[it];
 
-    m_weightMatrix.reserve(row_gdofmap.size()); // 1 entry per row
     std::map<unsigned,unsigned>::iterator iter;
     for (unsigned it=0; it < row_gdofmap.size(); ++it) {
         unsigned row = row_gdofmap[it], irow = row_dofmap[it];
@@ -123,16 +113,10 @@ void moab::TempestOnlineMap::LinearRemapNN_MOAB ()
         iter = src_gl.find(row);
         assert(iter != src_gl.end());
         unsigned icol = src_gl[ row ];
-        // std::cout << "\t Coupling between " << irow << " and " << icol << "\n";
 
-        m_weightMatrix.insert(irow, icol) = 1.0;
+        // Set the permutation matrix in local space
+        m_mapRemap(irow, icol) = 1.0;
     }
-
-    m_weightMatrix.makeCompressed();
-
-    assert(m_weightMatrix.rows() != 0 && m_weightMatrix.cols() != 0);
-    m_rowVector.resize( m_weightMatrix.rows() );
-    m_colVector.resize( m_weightMatrix.cols() );
 
     return;
 }
