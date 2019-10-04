@@ -548,6 +548,13 @@ ErrorCode TempestRemapper::ComputeGlobalLocalMaps()
 {
     ErrorCode rval;
 
+    if (0 == m_covering_source)
+    {
+      m_covering_source = new Mesh();
+      rval = convert_mesh_to_tempest_private ( m_covering_source, m_covering_source_set,
+          m_covering_source_entities, &m_covering_source_vertices ); MB_CHK_SET_ERR ( rval, "Can't convert source Tempest mesh" );
+
+    }
     gid_to_lid_src.clear(); lid_to_gid_src.clear();
     gid_to_lid_covsrc.clear(); lid_to_gid_covsrc.clear();
     gid_to_lid_tgt.clear(); lid_to_gid_tgt.clear();
