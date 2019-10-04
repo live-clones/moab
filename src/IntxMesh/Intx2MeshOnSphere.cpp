@@ -635,6 +635,13 @@ ErrorCode Intx2MeshOnSphere::build_processor_euler_boxes(EntityHandle euler_set,
 
   assert(parcomm != NULL);
 
+  if (num_local_verts==0)
+  {
+    // it is probably point cloud, get the local vertices from set
+    rval = mb->get_entities_by_dimension(euler_set, 0, local_verts); MB_CHK_SET_ERR(rval, "can't get local vertices from set");
+    num_local_verts = (int) local_verts.size();
+    localEnts = local_verts;
+  }
   // will use 6 gnomonic planes to decide boxes for each gnomonic plane
   // each gnomonic box will be 2d, min, max
   double gnom_box[24];
@@ -665,10 +672,21 @@ ErrorCode Intx2MeshOnSphere::build_processor_euler_boxes(EntityHandle euler_set,
   for (Range::iterator it=localEnts.begin(); it!= localEnts.end(); it++ )
   {
     EntityHandle cell = *it;
+    EntityType typeCell = mb->type_from_handle(cell); // could be vertex, for point cloud
     // get coordinates, and decide gnomonic planes for it
     int nnodes;
     const EntityHandle * conn=NULL;
-    rval = mb->get_connectivity(cell, conn, nnodes); MB_CHK_SET_ERR(rval, "can't get connectivity");
+    EntityHandle c[1];
+    if (typeCell!=MBVERTEX)
+    {
+      rval = mb->get_connectivity(cell, conn, nnodes); MB_CHK_SET_ERR(rval, "can't get connectivity");
+    }
+    else
+    {
+      nnodes = 1;
+      c[0] = cell; //actual node
+      conn = &c[0];
+    }
     // get coordinates of vertices involved with this
     std::vector<double> elco(3*nnodes);
     std::set<int> planes;
