@@ -494,7 +494,7 @@ ErrorCode ParCommGraph::receive_mesh(MPI_Comm jcomm, ParallelComm *pco, EntityHa
 
       newEnts.merge(entities);
       // make these in split ranges
-      split_ranges_recv[sender1]=local_primary_ents;
+      split_ranges[sender1]=local_primary_ents;
 
 #ifdef VERBOSE
       std::ostringstream partial_outFile;
@@ -732,7 +732,7 @@ ErrorCode ParCommGraph::receive_tag_values (MPI_Comm jcomm, ParallelComm *pco, R
     //rval = split_owned_range ( owned);MB_CHK_ERR ( rval );
 
     // use the buffers data structure to allocate memory for receiving the tags
-    for (std::map<int, Range>::iterator it=split_ranges_recv.begin(); it!=split_ranges_recv.end(); it++)
+    for (std::map<int, Range>::iterator it=split_ranges.begin(); it!=split_ranges.end(); it++)
     {
       int sender_proc = it->first;
       Range ents = it->second; // primary entities, with the tag data, we will receive
@@ -1159,7 +1159,7 @@ ErrorCode ParCommGraph::dump_comm_information(std::string prefix, int is_send)
     }
     else // just after migration; this is now sender map!
     {
-      for ( std::map<int , Range >::iterator mit =split_ranges_recv.begin(); mit!=split_ranges_recv.end(); mit++ )
+      for ( std::map<int , Range >::iterator mit =split_ranges.begin(); mit!=split_ranges.end(); mit++ )
       {
         int sender_proc = mit->first;
         Range & eids = mit->second;

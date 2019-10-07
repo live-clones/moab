@@ -204,9 +204,6 @@ namespace moab {
 	  // these will be now used to store ranges to be sent from current sender to each receiver in joint comm
 	  std::map<int, Range> split_ranges;
 
-	  // these will be now used to store ranges received from each sender in joint comm (receiver side)
-	  std::map<int, Range> split_ranges_recv;
-
 	  std::vector<MPI_Request> sendReqs; // there will be multiple requests, 2 for comm graph, 2 for each Buffer
 	  // there are as many buffers as sender_graph[rankInJoin].size()
 
