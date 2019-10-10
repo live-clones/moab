@@ -548,6 +548,8 @@ ErrCode iMOAB_LoadMesh ( iMOAB_AppID pid, const iMOAB_String filename, const iMO
 #endif
     ErrorCode rval = context.MBI->load_file ( filename, &context.appDatas[*pid].file_set, newopts.str().c_str() );CHKERRVAL(rval);
 
+    context.appDatas[*pid].covering_set = context.appDatas[*pid].file_set;
+
 #ifdef VERBOSE
 
     // some debugging stuff
@@ -2127,7 +2129,9 @@ ErrCode iMOAB_ReceiveElementTag(iMOAB_AppID pid, int* scompid, int* rcompid, con
     tagHandles.push_back(tagHandle);
   }
 
+#ifdef VERBOSE
   std::cout << pco->rank() << ". Looking to receive data for tags: " << tag_name << " and file set = " << (data.file_set) << " covering = " << data.covering_set << "\n";
+#endif
   if ( data.file_set != data.covering_set) // coverage mesh is different from original mesh, it means we are on a source mesh, after intx
   {
     rval = context.MBI->get_entities_by_dimension(data.covering_set, 2, owned); CHKERRVAL ( rval );
@@ -2136,16 +2140,16 @@ ErrCode iMOAB_ReceiveElementTag(iMOAB_AppID pid, int* scompid, int* rcompid, con
   // still use nonblocking communication
   rval = cgraph->receive_tag_values ( *join, pco, owned, tagHandles ); CHKERRVAL ( rval );
 
+#ifdef VERBOSE
   std::cout << pco->rank() << ". Looking to receive data for tags: " << tag_name << "\n";
   if ( data.file_set != data.covering_set) // coverage mesh is different from original mesh, it means we are on a source mesh, after intx
   {
-#ifdef VERBOSE
     std::ostringstream outfile;
     int rank = pco->rank();
     outfile << "CovMeshWithTag_0" << rank << ".h5m";
     rval = context.MBI->write_file ( outfile.str().c_str(), 0, 0, &(data.covering_set), 1 );CHKERRVAL(rval); // coverage mesh
-#endif
   }
+#endif
 
   // now, send to each corr_tasks[i] tag data for corr_sizes[i] primary entities
 
@@ -2512,15 +2516,7 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere ( iMOAB_AppID pid_src, iMOAB_AppID
     return 0;
 }
 
-ErrCode iMOAB_ComputePointDoFIntersection ( iMOAB_AppID pid_src, iMOAB_AppID pid_tgt, iMOAB_AppID pid_intx, 
-                                               const iMOAB_String disc_method_source, int* disc_order_source,
-                                               const iMOAB_String source_solution_tag_dof_name, 
-                                               const iMOAB_String disc_method_target, int* disc_order_target,
-                                               const iMOAB_String target_solution_tag_dof_name, 
-                                               int disc_method_source_length,
-                                               int disc_method_target_length,
-                                               int source_solution_tag_dof_name_length,
-                                               int target_solution_tag_dof_name_length )
+ErrCode iMOAB_ComputePointDoFIntersection ( iMOAB_AppID pid_src, iMOAB_AppID pid_tgt, iMOAB_AppID pid_intx )
 {
     ErrorCode rval;
     ErrCode ierr;
@@ -2529,10 +2525,6 @@ ErrCode iMOAB_ComputePointDoFIntersection ( iMOAB_AppID pid_src, iMOAB_AppID pid
     double radius_target=1.0;
     const double epsrel=1e-15;
     const double boxeps=1.e-8;
-
-    assert(disc_order_source && disc_order_target && *disc_order_source > 0 && *disc_order_target > 0);
-    assert(disc_method_source_length > 0 && disc_method_target_length > 0);
-    assert(source_solution_tag_dof_name_length > 0 && target_solution_tag_dof_name_length > 0);
 
     // Get the source and target data and pcomm objects
     appData& data_src = context.appDatas[*pid_src];
@@ -2816,7 +2808,8 @@ ErrCode iMOAB_ApplyScalarProjectionWeights (   iMOAB_AppID pid_intersection,
           std::stringstream sstr;
           sstr << "outputCovSrcDest_" << i << "_" << pco_intx->rank() << ".h5m";
           // EntityHandle sets[2] = {data_intx.file_set, data_intx.covering_set};
-          EntityHandle sets[2] = {data_intx.covering_set, context.appDatas[*data_intx.pid_dest].file_set};
+          EntityHandle covering_set = data.remapper->GetCoveringSet()
+          EntityHandle sets[2] = {covering_set, context.appDatas[*data_intx.pid_dest].file_set};
           rval = context.MBI->write_file ( sstr.str().c_str(), NULL, "", sets, 2 ); MB_CHK_ERR ( rval );
       }
       {

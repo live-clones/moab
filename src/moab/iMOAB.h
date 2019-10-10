@@ -730,15 +730,7 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere ( iMOAB_AppID pid_source, iMOAB_Ap
   \param[in] source_solution_tag_dof_name_length   (int)   The length of the source solution DoF tag name string
   \param[in] target_solution_tag_dof_name_length   (int)   The length of the target solution DoF tag name string
 */
-ErrCode iMOAB_ComputePointDoFIntersection ( iMOAB_AppID pid_src, iMOAB_AppID pid_tgt, iMOAB_AppID pid_intx, 
-                                               const iMOAB_String disc_method_source, int* disc_order_source,
-                                               const iMOAB_String source_solution_tag_dof_name, 
-                                               const iMOAB_String disc_method_target, int* disc_order_target,
-                                               const iMOAB_String target_solution_tag_dof_name, 
-                                               int disc_method_source_length,
-                                               int disc_method_target_length,
-                                               int source_solution_tag_dof_name_length,
-                                               int target_solution_tag_dof_name_length );
+ErrCode iMOAB_ComputePointDoFIntersection ( iMOAB_AppID pid_src, iMOAB_AppID pid_tgt, iMOAB_AppID pid_intx );
 
 /**
   \brief Recompute the communication graph between component and coupler, considering intx coverage .

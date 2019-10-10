@@ -156,7 +156,7 @@ private:
 	///		Compute the remapping weights as a permutation matrix that relates DoFs on the source mesh
 	///     to DoFs on the target mesh.
 	///	</summary>
-	void LinearRemapNN_MOAB( );
+	moab::ErrorCode LinearRemapNN_MOAB( bool use_GID_matching=false, bool strict_check=false );
 
 	///	<summary>
 	///		Compute the remapping weights for a FV field defined on the source to a 
@@ -370,16 +370,6 @@ public:
 	WeightColVector m_colVector;
 
 #endif
-
-	///	<summary>
-	///		The DataArray1D that stores the global (GID-based) areas of the source mesh.
-	///	</summary>
-	// DataArray1D<double> m_areasSrcGlobal;
-	
-	///	<summary>
-	///		The DataArray1D that stores the global (GID-based) areas of the target mesh.
-	///	</summary>
-	// DataArray1D<double> m_areasTgtGlobal;
 
 	///	<summary>
 	///		The reference to the moab::Core object that contains source/target and overlap sets.

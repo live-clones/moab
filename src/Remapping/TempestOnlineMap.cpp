@@ -986,7 +986,7 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
 
             // Construct remap
             if ( is_root ) dbgprint.printf ( 0, "Calculating remap weights with Nearest-Neighbor method\n" );
-            LinearRemapNN_MOAB();
+            LinearRemapNN_MOAB(true /*use_GID_matching*/, false /*strict_check*/ );
         }
         else if (
             ( eInputType != DiscretizationType_FV ) &&
