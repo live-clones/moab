@@ -239,6 +239,7 @@ ErrCode iMOAB_RegisterApplication ( const iMOAB_String app_name,
     appData app_data;
     app_data.file_set = file_set;
     app_data.external_id = * compid; // will be used mostly for par comm graph
+    app_data.covering_set = app_data.file_set;
 
 #ifdef MOAB_HAVE_TEMPESTREMAP
     app_data.tempestData.remapper = NULL; // Only allocate as needed
@@ -547,8 +548,6 @@ ErrCode iMOAB_LoadMesh ( iMOAB_AppID pid, const iMOAB_String filename, const iMO
 
 #endif
     ErrorCode rval = context.MBI->load_file ( filename, &context.appDatas[*pid].file_set, newopts.str().c_str() );CHKERRVAL(rval);
-
-    context.appDatas[*pid].covering_set = context.appDatas[*pid].file_set;
 
 #ifdef VERBOSE
 
@@ -2777,18 +2776,25 @@ ErrCode iMOAB_ApplyScalarProjectionWeights (   iMOAB_AppID pid_intersection,
       // Optionally, can also perform the transpose application of the weight matrix. Set the 3rd argument to true if this is needed
       rval = weightMap->ApplyWeights(solSTagVals, solTTagVals, false);CHKERRVAL(rval);
 
+      std::cout << "Data on source mesh: " << solSTagVals[0] << ", " << solSTagVals[1] << ", " << solSTagVals[2] << "\n";
+      std::cout << "Data on target mesh: " << solTTagVals[0] << ", " << solTTagVals[1] << ", " << solTTagVals[2] << "\n";
+
       // The tag data is np*np*n_el_dest
       rval = context.MBI->tag_set_data (tsolnTag , tents, &solTTagVals[0] );CHKERRVAL(rval);
+    }
 
+#define VERBOSE
 #ifdef VERBOSE
       ParallelComm* pco_intx = context.pcomms[*pid_intersection];
 
+      int ivar=0;
       {
+          Tag ssolnTag = srcTagHandles[ivar];
           std::stringstream sstr;
-          sstr << "covsrcTagData_" << i << "_" << pco_intx->rank() << ".txt";
+          sstr << "covsrcTagData_" << ivar << "_" << pco_intx->rank() << ".txt";
           std::ofstream output_file ( sstr.str().c_str() );
-          for (unsigned i=0; i < covSrcEnts.size(); ++i) {
-              EntityHandle elem = covSrcEnts[i];
+          for (unsigned i=0; i < sents.size(); ++i) {
+              EntityHandle elem = sents[i];
               std::vector<double> locsolSTagVals(16);
               rval = context.MBI->tag_get_data ( ssolnTag, &elem, 1, &locsolSTagVals[0] );CHKERRVAL(rval);
               output_file << "\n" << remapper->GetGlobalID(Remapper::CoveringMesh, i) << "-- \n\t";
@@ -2800,21 +2806,21 @@ ErrCode iMOAB_ApplyScalarProjectionWeights (   iMOAB_AppID pid_intersection,
       }
       {
           std::stringstream sstr;
-          sstr << "outputSrcDest_" << i << "_"<< pco_intx->rank() << ".h5m";
-          EntityHandle sets[2] = {context.appDatas[*data_intx.pid_src].file_set, context.appDatas[*data_intx.pid_dest].file_set};
+          sstr << "outputSrcDest_" << ivar << "_"<< pco_intx->rank() << ".h5m";
+          EntityHandle sets[2] = {context.appDatas[*tdata.pid_src].file_set, context.appDatas[*tdata.pid_dest].file_set};
           rval = context.MBI->write_file ( sstr.str().c_str(), NULL, "", sets, 2 ); MB_CHK_ERR ( rval );
       }
       {
           std::stringstream sstr;
-          sstr << "outputCovSrcDest_" << i << "_" << pco_intx->rank() << ".h5m";
+          sstr << "outputCovSrcDest_" << ivar << "_" << pco_intx->rank() << ".h5m";
           // EntityHandle sets[2] = {data_intx.file_set, data_intx.covering_set};
-          EntityHandle covering_set = data.remapper->GetCoveringSet()
-          EntityHandle sets[2] = {covering_set, context.appDatas[*data_intx.pid_dest].file_set};
+          EntityHandle covering_set = remapper->GetCoveringSet();
+          EntityHandle sets[2] = {covering_set, context.appDatas[*tdata.pid_dest].file_set};
           rval = context.MBI->write_file ( sstr.str().c_str(), NULL, "", sets, 2 ); MB_CHK_ERR ( rval );
       }
       {
           std::stringstream sstr;
-          sstr << "colvector_" << i << "_" << pco_intx->rank() << ".txt";
+          sstr << "colvector_" << ivar << "_" << pco_intx->rank() << ".txt";
           std::ofstream output_file ( sstr.str().c_str() );
           for (unsigned i = 0; i < solSTagVals.size(); ++i)
               output_file << i << " " << weightMap->col_dofmap[i] << " " << weightMap->col_gdofmap[i] << " " << solSTagVals[i] << "\n";
@@ -2822,7 +2828,8 @@ ErrCode iMOAB_ApplyScalarProjectionWeights (   iMOAB_AppID pid_intersection,
           output_file.close();
       }
 #endif
-    }
+#undef VERBOSE
+
     return 0;
 }
 
