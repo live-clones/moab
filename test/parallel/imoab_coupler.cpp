@@ -316,12 +316,8 @@ int main( int argc, char* argv[] )
   POP_TIMER(globalComm, rankInGlobalComm)
 
   PUSH_TIMER("Compute ATM-LND mesh intersection")
-  ierr = iMOAB_ComputePointDoFIntersection(cplAtmPID, cplLndPID, cplAtmLndPID, 
-                                          disc_methods[0], &disc_orders[0], dof_tag_names[0], 
-                                          disc_methods[2], &disc_orders[2], dof_tag_names[2],
-                                          strlen(disc_methods[0]), strlen(dof_tag_names[0]), 
-                                          strlen(disc_methods[2]), strlen(dof_tag_names[2]));
-  CHECKIERR(ierr, "failed to compute point-cloud mapping");
+  // ierr = iMOAB_ComputePointDoFIntersection(cplAtmPID, cplLndPID, cplAtmLndPID);
+  // CHECKIERR(ierr, "failed to compute point-cloud mapping");
   POP_TIMER(atmComm, rankInAtmComm)
 
 
@@ -360,23 +356,23 @@ int main( int argc, char* argv[] )
   MPI_Barrier(MPI_COMM_WORLD);
 
   // PUSH_TIMER("Compute LND coverage graph for ATM mesh")
-  // ierr = iMOAB_CoverageGraph(&atmComm, cmpAtmPID,  &cmpatm, cplAtmPID,  &cplatm, cplAtmOcnPID); // it happens over joint communicator
+  // ierr = iMOAB_CoverageGraph(&atmComm, cmpAtmPID,  &cmpatm, cplAtmPID,  &cplatm, cplAtmLndPID); // it happens over joint communicator
   // CHECKIERR(ierr, "cannot recompute direct coverage graph" )
   // POP_TIMER(atmComm, rankInAtmComm)
 
   /* Compute the weights to preoject the solution from ATM component to LND compoenent */
   PUSH_TIMER("Compute ATM-LND remapping weights")
-  ierr = iMOAB_ComputeScalarProjectionWeights ( cplAtmLndPID,
-                                              weights_identifiers[1],
-                                              disc_methods[0], &disc_orders[0],
-                                              disc_methods[2], &disc_orders[2],
-                                              &fMonotoneTypeID, &fVolumetric, &fNoConserve, &fValidate,
-                                              dof_tag_names[0], dof_tag_names[2],
-                                              strlen(weights_identifiers[1]),
-                                              strlen(disc_methods[0]), strlen(disc_methods[2]),
-                                              strlen(dof_tag_names[0]), strlen(dof_tag_names[2])
-                                            );
-  CHECKIERR(ierr, "failed to compute remapping projection weights for ATM-LND scalar non-conservative field");
+  // ierr = iMOAB_ComputeScalarProjectionWeights ( cplAtmLndPID,
+  //                                             weights_identifiers[1],
+  //                                             disc_methods[0], &disc_orders[0],
+  //                                             disc_methods[2], &disc_orders[2],
+  //                                             &fMonotoneTypeID, &fVolumetric, &fNoConserve, &fValidate,
+  //                                             dof_tag_names[0], dof_tag_names[2],
+  //                                             strlen(weights_identifiers[1]),
+  //                                             strlen(disc_methods[0]), strlen(disc_methods[2]),
+  //                                             strlen(dof_tag_names[0]), strlen(dof_tag_names[2])
+  //                                           );
+  // CHECKIERR(ierr, "failed to compute remapping projection weights for ATM-LND scalar non-conservative field");
   POP_TIMER(atmComm, rankInAtmComm)
 
   const char* bottomTempField = "a2oTbot";
@@ -452,7 +448,6 @@ int main( int argc, char* argv[] )
   }
   // receive on atm on coupler pes, that was redistributed according to coverage
   ierr = iMOAB_ReceiveElementTag(cplAtmPID, &cmpatm, &cplatm, "a2oTbot;a2oUbot;a2oVbot;", &globalComm, strlen("a2oTbot;a2oUbot;a2oVbot;"));
-  printf("Ierr = %d\n", ierr);
   CHECKIERR(ierr, "cannot receive tag values")
   POP_TIMER(globalComm, rankInGlobalComm)
 
@@ -466,9 +461,6 @@ int main( int argc, char* argv[] )
     ierr = iMOAB_WriteMesh(cplAtmPID, outputFileRecvd, writeOptions3,
         strlen(outputFileRecvd), strlen(writeOptions3) );
 #endif
-
-  
-  return 0;
 
   /* We have the remapping weights now. Let us apply the weights onto the tag we defined
      on the source mesh and get the projection on the target mesh */
