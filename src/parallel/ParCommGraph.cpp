@@ -13,7 +13,7 @@
 #endif
 
 namespace moab {
-
+#define VERBOSE
 ParCommGraph::ParCommGraph(MPI_Comm joincomm, MPI_Group group1, MPI_Group group2, int coid1, int coid2) :
   comm(joincomm), compid1(coid1), compid2(coid2)
 {
@@ -781,7 +781,13 @@ ErrorCode ParCommGraph::receive_tag_values (MPI_Comm jcomm, ParallelComm *pco, R
       for (std::vector<int>::iterator it=eids.begin(); it!=eids.end(); it++)
       {
         int eID = *it;
-        EntityHandle eh = gidToHandle[eID];
+        std::map<int, EntityHandle>::iterator mit = gidToHandle.find(eID);
+        if (mit==gidToHandle.end())
+        {
+          std::cout << " on rank: "<< rankInJoin << " cannot find entity handle with global ID " << eID << "\n";
+          return MB_FAILURE;
+        }
+        EntityHandle eh = mit->second;
         for (i=0; i<tag_handles.size(); i++)
         {
           rval = mb->tag_set_data(tag_handles[i], &eh, 1, (void*)(buffer->buff_ptr) );  MB_CHK_ERR ( rval );
@@ -943,7 +949,7 @@ ErrorCode ParCommGraph::compute_partition (ParallelComm *pco, Range & owned, int
   {
     rval= pco->get_shared_entities(/*int other_proc*/ -1, sharedEdges, interfaceDim, /*const bool iface*/ true);MB_CHK_ERR ( rval );
 
-#if VERBOSE
+#ifdef VERBOSE
     std::cout <<" on sender task " << pco->rank() << " number of shared interface cells " << sharedEdges.size() << "\n";
 #endif
      // find to what processors we need to send the ghost info about the edge
@@ -997,7 +1003,7 @@ ErrorCode ParCommGraph::compute_partition (ParallelComm *pco, Range & owned, int
       extraGraphEdges.insert(extraAdj);
       //adjCellsId [edgeToCell[localCell]] = remoteCellID;
       extraCellsProc[remoteCellID] = sharedProc;
-#if VERBOSE
+#ifdef VERBOSE
       std::cout <<"local ID " << edgeToCell[localCell] << " remote cell ID: " << remoteCellID << "\n";
 #endif
     }
