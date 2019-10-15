@@ -318,7 +318,7 @@ int main( int argc, char* argv[] )
   PUSH_TIMER("Compute ATM-LND mesh intersection")
   // ierr = iMOAB_ComputePointDoFIntersection(cplAtmPID, cplLndPID, cplAtmLndPID);
   // CHECKIERR(ierr, "failed to compute point-cloud mapping");
-  POP_TIMER(atmComm, rankInAtmComm)
+  POP_TIMER(globalComm, rankInGlobalComm)
 
 
 #ifdef VERBOSE
@@ -373,7 +373,7 @@ int main( int argc, char* argv[] )
   //                                             strlen(dof_tag_names[0]), strlen(dof_tag_names[2])
   //                                           );
   // CHECKIERR(ierr, "failed to compute remapping projection weights for ATM-LND scalar non-conservative field");
-  POP_TIMER(atmComm, rankInAtmComm)
+  POP_TIMER(globalComm, rankInGlobalComm)
 
   const char* bottomTempField = "a2oTbot";
   const char* bottomTempProjectedField = "a2oTbot_proj";
