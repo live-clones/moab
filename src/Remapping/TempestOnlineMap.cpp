@@ -168,7 +168,9 @@ moab::ErrorCode moab::TempestOnlineMap::SetDOFmapTags(const std::string srcDofTa
 {
     moab::ErrorCode rval;
 
-    rval = m_interface->tag_get_handle ( srcDofTagName.c_str(), m_nDofsPEl_Src*m_nDofsPEl_Src, MB_TYPE_INTEGER,
+    int tagSize = 0;
+    tagSize = (m_eInputType == DiscretizationType_FV ? 1 : m_nDofsPEl_Src*m_nDofsPEl_Src);
+    rval = m_interface->tag_get_handle ( srcDofTagName.c_str(), tagSize, MB_TYPE_INTEGER,
                              this->m_dofTagSrc, MB_TAG_ANY );
 
     if (rval == moab::MB_TAG_NOT_FOUND && m_eInputType != DiscretizationType_FV)
@@ -192,7 +194,8 @@ moab::ErrorCode moab::TempestOnlineMap::SetDOFmapTags(const std::string srcDofTa
     }
     else MB_CHK_ERR(rval);
 
-    rval = m_interface->tag_get_handle ( tgtDofTagName.c_str(), m_nDofsPEl_Dest*m_nDofsPEl_Dest, MB_TYPE_INTEGER,
+    tagSize = (m_eOutputType == DiscretizationType_FV ? 1 : m_nDofsPEl_Dest*m_nDofsPEl_Dest);
+    rval = m_interface->tag_get_handle ( tgtDofTagName.c_str(), tagSize, MB_TYPE_INTEGER,
                              this->m_dofTagDest, MB_TAG_ANY );
     if (rval == moab::MB_TAG_NOT_FOUND && m_eOutputType != DiscretizationType_FV)
     {
@@ -406,6 +409,7 @@ moab::ErrorCode moab::TempestOnlineMap::SetDOFmapAssociation(DiscretizationType 
 #endif
 
     // Now compute the mapping and store it for the covering mesh
+    int srcTagSize = (m_eInputType == DiscretizationType_FV ? 1 : m_nDofsPEl_Src * m_nDofsPEl_Src);
     if (m_remapper->point_cloud_source)
     {
         assert(m_nDofsPEl_Src == 1);
@@ -414,13 +418,14 @@ moab::ErrorCode moab::TempestOnlineMap::SetDOFmapAssociation(DiscretizationType 
         col_gdofmap.resize (m_remapper->m_covering_source_vertices.size(), UINT_MAX);
         src_soln_gdofs.resize(m_remapper->m_covering_source_vertices.size(), UINT_MAX);
         rval = m_interface->tag_get_data ( m_dofTagSrc, m_remapper->m_covering_source_vertices, &src_soln_gdofs[0] );MB_CHK_ERR(rval);
+        srcTagSize = 1;
     }
     else
     {
-        col_dofmap.resize (m_remapper->m_covering_source_entities.size() * m_nDofsPEl_Src * m_nDofsPEl_Src, UINT_MAX);
-        col_ldofmap.resize (m_remapper->m_covering_source_entities.size() * m_nDofsPEl_Src * m_nDofsPEl_Src, UINT_MAX);
-        col_gdofmap.resize (m_remapper->m_covering_source_entities.size() * m_nDofsPEl_Src * m_nDofsPEl_Src, UINT_MAX);
-        src_soln_gdofs.resize(m_remapper->m_covering_source_entities.size() * m_nDofsPEl_Src * m_nDofsPEl_Src, UINT_MAX);
+        col_dofmap.resize (m_remapper->m_covering_source_entities.size() * srcTagSize, UINT_MAX);
+        col_ldofmap.resize (m_remapper->m_covering_source_entities.size() * srcTagSize, UINT_MAX);
+        col_gdofmap.resize (m_remapper->m_covering_source_entities.size() * srcTagSize, UINT_MAX);
+        src_soln_gdofs.resize(m_remapper->m_covering_source_entities.size() * srcTagSize, UINT_MAX);
         rval = m_interface->tag_get_data ( m_dofTagSrc, m_remapper->m_covering_source_entities, &src_soln_gdofs[0] );MB_CHK_ERR(rval);
     }
     m_nTotDofs_SrcCov = 0;
@@ -434,7 +439,7 @@ moab::ErrorCode moab::TempestOnlineMap::SetDOFmapAssociation(DiscretizationType 
         }
     }
     else {
-        if (isSrcContinuous) dgll_cgll_covcol_ldofmap.resize (m_remapper->m_covering_source_entities.size() * m_nDofsPEl_Src * m_nDofsPEl_Src, false);
+        if (isSrcContinuous) dgll_cgll_covcol_ldofmap.resize (m_remapper->m_covering_source_entities.size() * srcTagSize, false);
         // Put these remap coefficients into the SparseMatrix map
         for ( unsigned j = 0; j < m_remapper->m_covering_source_entities.size(); j++ )
         {
@@ -443,7 +448,7 @@ moab::ErrorCode moab::TempestOnlineMap::SetDOFmapAssociation(DiscretizationType 
                 for ( int q = 0; q < m_nDofsPEl_Src; q++)
                 {
                     const int ldof = (*srcdataGLLNodes)[p][q][j] - 1;
-                    const int idof = j * m_nDofsPEl_Src * m_nDofsPEl_Src + p * m_nDofsPEl_Src + q;
+                    const int idof = j * srcTagSize + p * m_nDofsPEl_Src + q;
                     if ( isSrcContinuous && !dgll_cgll_covcol_ldofmap[ldof] ) {
                         m_nTotDofs_SrcCov++;
                         dgll_cgll_covcol_ldofmap[ldof] = true;
@@ -470,10 +475,10 @@ moab::ErrorCode moab::TempestOnlineMap::SetDOFmapAssociation(DiscretizationType 
     }
     else
     {
-        srccol_dofmap.resize (m_remapper->m_source_entities.size() * m_nDofsPEl_Src * m_nDofsPEl_Src, UINT_MAX);
-        srccol_ldofmap.resize (m_remapper->m_source_entities.size() * m_nDofsPEl_Src * m_nDofsPEl_Src, UINT_MAX);
-        srccol_gdofmap.resize (m_remapper->m_source_entities.size() * m_nDofsPEl_Src * m_nDofsPEl_Src, UINT_MAX);
-        locsrc_soln_gdofs.resize(m_remapper->m_source_entities.size() * m_nDofsPEl_Src * m_nDofsPEl_Src, UINT_MAX);
+        srccol_dofmap.resize (m_remapper->m_source_entities.size() * srcTagSize, UINT_MAX);
+        srccol_ldofmap.resize (m_remapper->m_source_entities.size() * srcTagSize, UINT_MAX);
+        srccol_gdofmap.resize (m_remapper->m_source_entities.size() * srcTagSize, UINT_MAX);
+        locsrc_soln_gdofs.resize(m_remapper->m_source_entities.size() * srcTagSize, UINT_MAX);
         rval = m_interface->tag_get_data ( m_dofTagSrc, m_remapper->m_source_entities, &locsrc_soln_gdofs[0] );MB_CHK_ERR(rval);
     }
 
@@ -488,7 +493,7 @@ moab::ErrorCode moab::TempestOnlineMap::SetDOFmapAssociation(DiscretizationType 
         }
     }
     else {
-        if (isSrcContinuous) dgll_cgll_col_ldofmap.resize(m_remapper->m_source_entities.size() * m_nDofsPEl_Src * m_nDofsPEl_Src, false);
+        if (isSrcContinuous) dgll_cgll_col_ldofmap.resize(m_remapper->m_source_entities.size() * srcTagSize, false);
         // Put these remap coefficients into the SparseMatrix map
         for ( unsigned j = 0; j < m_remapper->m_source_entities.size(); j++ )
         {
@@ -497,7 +502,7 @@ moab::ErrorCode moab::TempestOnlineMap::SetDOFmapAssociation(DiscretizationType 
                 for ( int q = 0; q < m_nDofsPEl_Src; q++ )
                 {
                     const int ldof = (*srcdataGLLNodesSrc)[p][q][j] - 1;
-                    const int idof = j * m_nDofsPEl_Src * m_nDofsPEl_Src + p * m_nDofsPEl_Src + q;
+                    const int idof = j * srcTagSize + p * m_nDofsPEl_Src + q;
                     if ( isSrcContinuous && !dgll_cgll_col_ldofmap[ldof] ) {
                         m_nTotDofs_Src++;
                         dgll_cgll_col_ldofmap[ldof] = true;
@@ -511,6 +516,7 @@ moab::ErrorCode moab::TempestOnlineMap::SetDOFmapAssociation(DiscretizationType 
         }
     }
 
+    int tgtTagSize = (m_eOutputType == DiscretizationType_FV ? 1 : m_nDofsPEl_Dest * m_nDofsPEl_Dest);
     if (m_remapper->point_cloud_target)
     {
         assert(m_nDofsPEl_Dest == 1);
@@ -519,13 +525,14 @@ moab::ErrorCode moab::TempestOnlineMap::SetDOFmapAssociation(DiscretizationType 
         row_gdofmap.resize (m_remapper->m_target_vertices.size(), UINT_MAX);
         tgt_soln_gdofs.resize(m_remapper->m_target_vertices.size(), UINT_MAX);
         rval = m_interface->tag_get_data ( m_dofTagDest, m_remapper->m_target_vertices, &tgt_soln_gdofs[0] );MB_CHK_ERR(rval);
+        tgtTagSize = 1;
     }
     else
     {
-        row_dofmap.resize (m_remapper->m_target_entities.size() * m_nDofsPEl_Dest * m_nDofsPEl_Dest, UINT_MAX);
-        row_ldofmap.resize (m_remapper->m_target_entities.size() * m_nDofsPEl_Dest * m_nDofsPEl_Dest, UINT_MAX);
-        row_gdofmap.resize (m_remapper->m_target_entities.size() * m_nDofsPEl_Dest * m_nDofsPEl_Dest, UINT_MAX);
-        tgt_soln_gdofs.resize(m_remapper->m_target_entities.size()*m_nDofsPEl_Dest*m_nDofsPEl_Dest, UINT_MAX);
+        row_dofmap.resize (m_remapper->m_target_entities.size() * tgtTagSize, UINT_MAX);
+        row_ldofmap.resize (m_remapper->m_target_entities.size() * tgtTagSize, UINT_MAX);
+        row_gdofmap.resize (m_remapper->m_target_entities.size() * tgtTagSize, UINT_MAX);
+        tgt_soln_gdofs.resize(m_remapper->m_target_entities.size() * tgtTagSize, UINT_MAX);
         rval = m_interface->tag_get_data ( m_dofTagDest, m_remapper->m_target_entities, &tgt_soln_gdofs[0] );MB_CHK_ERR(rval);
     }
 
@@ -542,7 +549,7 @@ moab::ErrorCode moab::TempestOnlineMap::SetDOFmapAssociation(DiscretizationType 
         }
     }
     else {
-        if (isTgtContinuous) dgll_cgll_row_ldofmap.resize (m_remapper->m_target_entities.size() * m_nDofsPEl_Dest * m_nDofsPEl_Dest, false);
+        if (isTgtContinuous) dgll_cgll_row_ldofmap.resize (m_remapper->m_target_entities.size() * tgtTagSize, false);
         // Put these remap coefficients into the SparseMatrix map
         for ( unsigned j = 0; j < m_remapper->m_target_entities.size(); j++ )
         {
@@ -551,7 +558,7 @@ moab::ErrorCode moab::TempestOnlineMap::SetDOFmapAssociation(DiscretizationType 
                 for ( int q = 0; q < m_nDofsPEl_Dest; q++ )
                 {
                     const int ldof = (*tgtdataGLLNodes)[p][q][j] - 1;
-                    const int idof = j * m_nDofsPEl_Dest * m_nDofsPEl_Dest + p * m_nDofsPEl_Dest + q;
+                    const int idof = j * tgtTagSize + p * m_nDofsPEl_Dest + q;
                     if ( isTgtContinuous && !dgll_cgll_row_ldofmap[ldof] ) {
                         m_nTotDofs_Dest++;
                         dgll_cgll_row_ldofmap[ldof] = true;

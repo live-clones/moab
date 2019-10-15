@@ -316,9 +316,9 @@ int main( int argc, char* argv[] )
   POP_TIMER(globalComm, rankInGlobalComm)
 
   PUSH_TIMER("Compute ATM-LND mesh intersection")
-  // ierr = iMOAB_ComputePointDoFIntersection(cplAtmPID, cplLndPID, cplAtmLndPID);
-  // CHECKIERR(ierr, "failed to compute point-cloud mapping");
-  POP_TIMER(globalComm, rankInGlobalComm)
+  ierr = iMOAB_ComputePointDoFIntersection(cplAtmPID, cplLndPID, cplAtmLndPID);
+  CHECKIERR(ierr, "failed to compute point-cloud mapping");
+  POP_TIMER(atmComm, rankInAtmComm)
 
 
 #ifdef VERBOSE
@@ -362,24 +362,24 @@ int main( int argc, char* argv[] )
 
   /* Compute the weights to preoject the solution from ATM component to LND compoenent */
   PUSH_TIMER("Compute ATM-LND remapping weights")
-  // ierr = iMOAB_ComputeScalarProjectionWeights ( cplAtmLndPID,
-  //                                             weights_identifiers[1],
-  //                                             disc_methods[0], &disc_orders[0],
-  //                                             disc_methods[2], &disc_orders[2],
-  //                                             &fMonotoneTypeID, &fVolumetric, &fNoConserve, &fValidate,
-  //                                             dof_tag_names[0], dof_tag_names[2],
-  //                                             strlen(weights_identifiers[1]),
-  //                                             strlen(disc_methods[0]), strlen(disc_methods[2]),
-  //                                             strlen(dof_tag_names[0]), strlen(dof_tag_names[2])
-  //                                           );
-  // CHECKIERR(ierr, "failed to compute remapping projection weights for ATM-LND scalar non-conservative field");
-  POP_TIMER(globalComm, rankInGlobalComm)
+  ierr = iMOAB_ComputeScalarProjectionWeights ( cplAtmLndPID,
+                                              weights_identifiers[1],
+                                              disc_methods[0], &disc_orders[0],
+                                              disc_methods[2], &disc_orders[2],
+                                              &fMonotoneTypeID, &fVolumetric, &fNoConserve, &fValidate,
+                                              dof_tag_names[0], dof_tag_names[2],
+                                              strlen(weights_identifiers[1]),
+                                              strlen(disc_methods[0]), strlen(disc_methods[2]),
+                                              strlen(dof_tag_names[0]), strlen(dof_tag_names[2])
+                                            );
+  CHECKIERR(ierr, "failed to compute remapping projection weights for ATM-LND scalar non-conservative field");
+  POP_TIMER(atmComm, rankInAtmComm)
 
   const char* bottomTempField = "a2oTbot";
   const char* bottomTempProjectedField = "a2oTbot_proj";
   int tagIndex[2];
   int tagTypes[2] = { DENSE_DOUBLE, DENSE_DOUBLE } ;
-  int atmCompNDoFs = disc_orders[0]*disc_orders[0], ocnCompNDoFs = disc_orders[1]*disc_orders[1];
+  int atmCompNDoFs = disc_orders[0]*disc_orders[0], ocnCompNDoFs = 1/*FV*/;
 
   ierr = iMOAB_DefineTagStorage(cplAtmPID, bottomTempField, &tagTypes[0], &atmCompNDoFs, &tagIndex[0],  strlen(bottomTempField) );
   CHECKIERR(ierr, "failed to define the field tag a2oTbot");

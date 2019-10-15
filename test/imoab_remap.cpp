@@ -166,7 +166,7 @@ int main(int argc, char * argv[])
   int tagIndex[4];
   // int entTypes[2] = {1, 1}; /* both on elements; */
   int tagTypes[2] = { DENSE_DOUBLE, DENSE_DOUBLE } ;
-  int atmCompNDoFs = disc_orders[0]*disc_orders[0], ocnCompNDoFs = disc_orders[1]*disc_orders[1];
+  int atmCompNDoFs = disc_orders[0]*disc_orders[0], ocnCompNDoFs = 1 /*FV*/;
 
   ierr = iMOAB_DefineTagStorage(atmPID, bottomTempField, &tagTypes[0], &atmCompNDoFs, &tagIndex[0],  strlen(bottomTempField) );
   CHECKIERR(ierr, "failed to define the field tag on ATM");
@@ -183,20 +183,15 @@ int main(int argc, char * argv[])
   ierr = iMOAB_DefineTagStorage(lndPID, bottomTempProjectedField, &tagTypes[1], &ocnCompNDoFs, &tagIndex[3],  strlen(bottomTempProjectedField) );
   CHECKIERR(ierr, "failed to define the field tag on LND");
 
-  /* Next compute the mesh intersection on the sphere between the source and target meshes */
+  /* Next compute the mesh intersection on the sphere between the source (ATM) and target (OCN) meshes */
   ierr = iMOAB_ComputeMeshIntersectionOnSphere(atmPID, ocnPID, atmocnPID);
   CHECKIERR(ierr, "failed to compute mesh intersection between ATM and OCN");
 
-  /* Next compute the mesh intersection on the sphere between the source and target meshes */
-  // ierr = iMOAB_ComputeMeshIntersectionOnSphere(atmPID, lndPID, atmlndPID);
-  // CHECKIERR(ierr, "failed to compute mesh intersection");
-  // No need to comoute intersection, but still need to compute coverage nad translate covering set to Tempest datastructure
-  // m_covering_source = new Mesh();
-  // rval = convert_mesh_to_tempest_private ( m_covering_source, m_covering_source_set, m_covering_source_entities, &m_covering_source_vertices ); MB_CHK_SET_ERR ( rval, "Can't convert source Tempest mesh" );
-  
+  /* Next compute the mesh intersection on the sphere between the source (ATM) and target (LND) meshes */
   ierr = iMOAB_ComputePointDoFIntersection(atmPID, lndPID, atmlndPID);
   CHECKIERR(ierr, "failed to compute point-cloud mapping ATM-LND");
 
+  /* Next compute the mesh intersection on the sphere between the source (LND) and target (ATM) meshes */
   ierr = iMOAB_ComputePointDoFIntersection(lndPID, atmPID, lndatmPID);
   CHECKIERR(ierr, "failed to compute point-cloud mapping LND-ATM");
 
