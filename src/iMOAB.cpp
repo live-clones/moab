@@ -60,8 +60,6 @@ struct TempestMapAppData
     std::map<std::string,moab::TempestOnlineMap*> weightMaps;
     iMOAB_AppID pid_src;
     iMOAB_AppID pid_dest;
-    // Only the intersection context would assign this set reference
-    // moab::EntityHandle covering_set2;
 };
 #endif
 
@@ -87,9 +85,9 @@ struct appData
     std::map< std::string, Tag> tagMap;
     std::vector<Tag>  tagList;
     bool point_cloud;
-    moab::EntityHandle covering_set;
 
 #ifdef MOAB_HAVE_MPI
+    moab::EntityHandle covering_set;
     // constructor for this ParCommGraph takes the joint comm and the MPI groups for each application
     std::vector<ParCommGraph*> pgraph; // created in order of other applications that communicate with this one
 #endif
@@ -239,7 +237,9 @@ ErrCode iMOAB_RegisterApplication ( const iMOAB_String app_name,
     appData app_data;
     app_data.file_set = file_set;
     app_data.external_id = * compid; // will be used mostly for par comm graph
+#ifdef MOAB_HAVE_MPI
     app_data.covering_set = app_data.file_set;
+#endif
 
 #ifdef MOAB_HAVE_TEMPESTREMAP
     app_data.tempestData.remapper = NULL; // Only allocate as needed
@@ -2471,8 +2471,8 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere ( iMOAB_AppID pid_src, iMOAB_AppID
     // rval = data_intx.remapper->ConvertMeshToTempest ( moab::Remapper::IntersectedMesh );CHKERRVAL(rval);
 
 #ifdef MOAB_HAVE_MPI
-    // tdata.covering_set2 = tdata.remapper->GetCoveringSet();
     data_intx.covering_set = tdata.remapper->GetCoveringSet();
+    data_src.covering_set = tdata.remapper->GetCoveringSet();
 #endif
 
     // if (radii_scaled) { /* the radii are different, so lets rescale back */
@@ -2609,8 +2609,11 @@ ErrCode iMOAB_ComputePointDoFIntersection ( iMOAB_AppID pid_src, iMOAB_AppID pid
     rval = tdata.remapper->ConstructCoveringSet ( epsrel, 1.0, 1.0, boxeps, false );CHKERRVAL(rval);
 
 #ifdef MOAB_HAVE_MPI
-    // tdata.covering_set2 = tdata.remapper->GetCoveringSet();
+    /* VSM: This context should be set on the data_src but it would overwrite the source 
+       covering set context in case it is coupled to another APP as well. 
+       This needs a redesign. */
     data_intx.covering_set = tdata.remapper->GetCoveringSet();
+    // data_src.covering_set = tdata.remapper->GetCoveringSet();
 #endif
 
     // Now let us re-convert the MOAB mesh back to Tempest representation
