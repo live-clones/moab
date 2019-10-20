@@ -671,11 +671,12 @@ ErrCode iMOAB_ReceiveMesh ( iMOAB_AppID pid, MPI_Comm* join, MPI_Group* sendingG
    \param[in]  rcompid  (int*)                        external id of application that receives the mesh
    \param[in]  tag_storage_name(const iMOAB_String)   name of the tags; concatenated, separated by ";"
    \param[in]  join (MPI_Comm)                        communicator that overlaps both groups
+   \param[in]  context_id (int*)                      id of the other component in intersection; -1 if original migrate
    \param[in]  tag_storage_name_length (int)          The length of the tag_storage_name string
  */
 
 ErrCode iMOAB_SendElementTag(iMOAB_AppID pid, int* scompid, int* rcompid, const iMOAB_String tag_storage_name,
-    MPI_Comm* join, int tag_storage_name_length);
+    MPI_Comm* join, int * context_id, int tag_storage_name_length);
 
 /**
   \brief migrate (receive) a list of tags, from a sender group of tasks to a receiver group of tasks
@@ -686,10 +687,11 @@ ErrCode iMOAB_SendElementTag(iMOAB_AppID pid, int* scompid, int* rcompid, const 
    \param[in]  rcompid ( int *)                       external id of application that receives the tag data
    \param[in]  tag_storage_name (iMOAB_String)        name of the tags to be received; concatenated, separated by ";"
    \param[in]  join (MPI_Comm)                        communicator that overlaps both groups
+   \param[in]  context_id (int*)                      id of the other component in intersection; -1 if original migrate
    \param[in]  tag_storage_name_length (int)          The length of the tag_storage_name string
  */
 ErrCode iMOAB_ReceiveElementTag(iMOAB_AppID pid, int* scompid, int* rcompid, const iMOAB_String tag_storage_name,
-    MPI_Comm* join, int tag_storage_name_length);
+    MPI_Comm* join, int * context_id, int tag_storage_name_length);
 
 #ifdef MOAB_HAVE_TEMPESTREMAP
 
@@ -723,23 +725,20 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere ( iMOAB_AppID pid_source, iMOAB_Ap
   \param[in]  pid_source (iMOAB_AppID)               The unique pointer to the source application ID
   \param[in]  pid_target (iMOAB_AppID)               The unique pointer to the destination application ID
   \param[in/out] pid_intersection (iMOAB_AppID)      The unique pointer to the intersection application ID
-  \param[in] source_solution_tag_dof_name   (iMOAB_String) The global DoF IDs corresponding to participating degrees-of-freedom for the source discretization
-  \param[in] disc_order_source   (int *)                   The discretization order for the solution field on the source grid
-  \param[in] target_solution_tag_dof_name   (iMOAB_String) The global DoF IDs corresponding to participating degrees-of-freedom for the target discretization
-  \param[in] disc_order_target   (int *)                   The discretization order for the solution field on the source grid
-  \param[in] source_solution_tag_dof_name_length   (int)   The length of the source solution DoF tag name string
-  \param[in] target_solution_tag_dof_name_length   (int)   The length of the target solution DoF tag name string
 */
 ErrCode iMOAB_ComputePointDoFIntersection ( iMOAB_AppID pid_src, iMOAB_AppID pid_tgt, iMOAB_AppID pid_intx );
 
+
 /**
-  \brief Recompute the communication graph between component and coupler, considering intx coverage .
+  \brief Recompute the communication graph between component and coupler, considering intersection coverage .
   \note
-  Original communication graph used an initial partition, while during intx some of the source elements were sent to
-  multiple tasks; send back the intx coverage information for a direct communication between tasks on coupler and
-  interested tasks on the component source mesh
+  Original communication graph for source used an initial partition, while during intersection some of the source
+  elements were sent to multiple tasks; send back the intersection coverage information for a direct communication
+  between source cx mesh on coupler tasks and source cc mesh on interested tasks on the component.
   The intersection tasks will send to the original source component tasks, in a nonblocking way, the ids of all the cells
-  involved in intx with the target cells
+  involved in intersection with the target cells.
+  The new ParCommGraph between cc source mesh and cx source mesh will be used just for tag migration, later on;
+  The original ParCommGraph will stay unchanged, because this source mesh could be used for other intersection (atm with lnd) ?
   on component source tasks, we will wait for information; from each intx task, will receive cells ids involved in intx
   \param[in]  join (MPI_Comm)                        communicator that overlaps component source PEs and coupler PEs
   \param[in]  pid_src (iMOAB_AppID)                  moab id for the component mesh on component PE
@@ -747,8 +746,9 @@ ErrCode iMOAB_ComputePointDoFIntersection ( iMOAB_AppID pid_src, iMOAB_AppID pid
   \param[in]  pid_migr (iMOAB_AppID)                 moab id for the migrated mesh on coupler PEs
   \param[in]  migrcomp (int*)                        external id of migrated application to coupler PEs
   \param[in]  pid_intx (iMOAB_AppID)                 moab id for intersection mesh (on coupler PEs)
+  \param[in]  context_id (int*)                      id of the other component in intersection
   */
-ErrCode iMOAB_CoverageGraph(MPI_Comm* join, iMOAB_AppID pid_src, int* scompid, iMOAB_AppID pid_migr, int* migrcomp, iMOAB_AppID pid_intx);
+ErrCode iMOAB_CoverageGraph(MPI_Comm* join, iMOAB_AppID pid_src, int* scompid, iMOAB_AppID pid_migr, int* migrcomp, iMOAB_AppID pid_intx, int * context_id);
 
 /**
   \brief Compute the projection weights to transfer a solution from a source surface mesh to a destination mesh defined on a sphere. 
@@ -815,6 +815,25 @@ ErrCode iMOAB_ApplyScalarProjectionWeights (   iMOAB_AppID pid_intersection,
                                                int solution_weights_identifier_length,
                                                int source_solution_tag_name_length,
                                                int target_solution_tag_name_length );
+
+/**
+  \brief Dump info about communication graph.
+
+  <B>Operations:</B> Collective per sender or receiver group
+
+  \param[in] pid  (iMOAB_AppID)                            The unique pointer to the application ID
+  \param[in] scompid  (int*)                               (sender) component id
+  \param[in] rcompid  (int*)                               (receiver) component id                                                           names are separated by ";", the same way as for tag migration
+  \param[in] is_sender (int*)                              is it called from sender or receiver side
+  \param[in] prefix  (iMOAB_String)                        prefix for file names; to differentiate stages
+  \param[in] prefix_len   (int)                            The length of the prefix string
+*/
+ErrCode iMOAB_DumpCommGraph                 (  iMOAB_AppID pid,
+                                               int* scompid,
+                                               int *rcompid,
+                                               int * is_sender,
+                                               const iMOAB_String prefix,
+                                               int prefix_length);
 
 #endif
 

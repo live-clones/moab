@@ -13,7 +13,7 @@
 #endif
 
 namespace moab {
-#define VERBOSE
+//#define VERBOSE
 ParCommGraph::ParCommGraph(MPI_Comm joincomm, MPI_Group group1, MPI_Group group2, int coid1, int coid2) :
   comm(joincomm), compid1(coid1), compid2(coid2)
 {
@@ -44,6 +44,29 @@ ParCommGraph::ParCommGraph(MPI_Comm joincomm, MPI_Group group1, MPI_Group group2
   if (0==rankInGroup2)rootReceiver=true;
   recomputed_send_graph = false;
   comm_graph = NULL;
+  context_id = -1;
+  cover_set = 0; // refers to nothing yet
+}
+
+// copy constructor will copy only few basic things; split ranges will not be copied
+ParCommGraph::ParCommGraph(const ParCommGraph & src)
+{
+  comm = src.comm;
+  senderTasks = src.senderTasks;  // these are the sender tasks in joint comm
+  receiverTasks = src.receiverTasks; // these are all the receiver tasks in joint comm
+  rootSender= src.rootSender;
+  rootReceiver = src.rootReceiver;
+  rankInGroup1 = src.rankInGroup1;
+  rankInGroup2 = src.rankInGroup2; // group 1 is sender, 2 is receiver
+  rankInJoin = src.rankInJoin;
+  joinSize = src.joinSize;
+  compid1 = src.compid1;
+  compid2 = src.compid2;
+  comm_graph = NULL;
+  recomputed_send_graph = src.recomputed_send_graph;
+  context_id = src.context_id;
+  cover_set = src.cover_set;
+  return;
 }
 
 ParCommGraph::~ParCommGraph() {
@@ -707,7 +730,7 @@ ErrorCode ParCommGraph::receive_tag_values (MPI_Comm jcomm, ParallelComm *pco, R
     //std::map<int, Range> split_ranges;
     //rval = split_owned_range ( owned);MB_CHK_ERR ( rval );
 
-    // use the buffers data structure to allocate memory for sending the tags
+    // use the buffers data structure to allocate memory for receiving the tags
     for (std::map<int, Range>::iterator it=split_ranges.begin(); it!=split_ranges.end(); it++)
     {
       int sender_proc = it->first;
@@ -809,55 +832,6 @@ ErrorCode ParCommGraph::receive_tag_values (MPI_Comm jcomm, ParallelComm *pco, R
 #endif
 
     }
-
-  }
-  return MB_SUCCESS;
-}
-
-ErrorCode ParCommGraph::distribute_sender_graph_info(MPI_Comm senderComm, std::vector<int> &sendingInfo )
-{
-  // only the root of the sender has all info
-  // it will use direct send/receives, for number of elems to be sent to each receiver, in an array
-  if (rootSender)
-  {
-    // just append the local info for the array , and send some data for each receiver
-    int nrecv0 = (int) recv_graph[senderTasks[0]].size();
-    for (int k=0; k<nrecv0; k++)
-    {
-      sendingInfo.push_back(recv_graph[senderTasks[0]][k]);
-      sendingInfo.push_back(recv_sizes[senderTasks[0]][k]);
-    }
-    // the rest of the info will be sent for each sender task
-    for (int j=1; j< (int) senderTasks.size(); j++)
-    {
-      std::vector<int> array_to_send;
-      // in the sender comm and sender group , rank to send to is j
-      for (int k=0; k<(int) recv_graph[senderTasks[j]].size(); k++)
-      {
-        array_to_send.push_back( recv_graph[senderTasks[j]][k]);
-        array_to_send.push_back( recv_sizes[senderTasks[j]][k]);
-      }
-
-      int ierr = MPI_Send(&array_to_send[0], (int)array_to_send.size(), MPI_INT, j, 11, senderComm);
-      if (MPI_SUCCESS != ierr)
-        return MB_FAILURE;
-    }
-  }
-  else
-  {
-    // expect to receive some info about where to send local data
-    // local array it is max the size of 2 times nreceivers;
-    int sizeBuffMax = 2 * (int) receiverTasks.size();
-    std::vector<int> data(sizeBuffMax);
-    MPI_Status status;
-    int ierr = MPI_Recv(&data[0], sizeBuffMax, MPI_INT, 0, 11, senderComm, &status);
-    if (MPI_SUCCESS != ierr)
-      return MB_FAILURE;
-    int count;
-    // find out how much data we actually got
-    MPI_Get_count(&status, MPI_INT, &count);
-    for (int k=0; k<count; k++)
-      sendingInfo.push_back(data[k]);
 
   }
   return MB_SUCCESS;
@@ -1078,6 +1052,27 @@ ErrorCode ParCommGraph::send_graph_partition (ParallelComm *pco, MPI_Comm jcomm)
   // now form the graph to be sent to the other side; only on root
   if ( is_root_sender() )
   {
+#ifdef  GRAPH_INFO
+    std::ofstream dbfileSender;
+    std::stringstream outf;
+    outf << "S_"<<compid1<<"_R_"<<compid2<<"_SenderGraph.txt";
+    dbfileSender.open (outf.str().c_str());
+    dbfileSender << " number senders: " << nSenders<< "\n";
+    dbfileSender << " senderRank \treceivers \n";
+    for (int k=0; k<nSenders; k++)
+    {
+      int indexInBuff = displs[k];
+      int senderTask = senderTasks[k];
+      dbfileSender << senderTask << "\t\t";
+      for (int j=0; j<counts[k]; j++)
+      {
+        int recvTask = buffer[indexInBuff+j];
+        dbfileSender << recvTask << " " ;
+      }
+      dbfileSender << "\n";
+    }
+    dbfileSender.close();
+#endif
     //
     for (int k=0; k<nSenders; k++)
     {
@@ -1089,13 +1084,91 @@ ErrorCode ParCommGraph::send_graph_partition (ParallelComm *pco, MPI_Comm jcomm)
         recv_graph[recvTask].push_back(senderTask); // this will be packed and sent to root receiver, with nonblocking send
       }
     }
-    std::vector<int> packed_recv_array;
+#ifdef  GRAPH_INFO
+    std::ofstream dbfile;
+    std::stringstream outf2;
+    outf2 << "S_"<<compid1<<"_R_"<<compid2<<"_RecvGraph.txt";
+    dbfile.open (outf2.str().c_str());
+    dbfile << " number receivers: " << recv_graph.size() << "\n";
+    dbfile << " receiverRank \tsenders \n";
+    for (std::map<int, std::vector<int> >::iterator mit= recv_graph.begin() ; mit != recv_graph.end(); mit++)
+    {
+      int recvTask = mit->first;
+      std::vector<int> &senders = mit->second;
+      dbfile << recvTask << "\t\t";
+      for (std::vector<int>::iterator vit=senders.begin(); vit!=senders.end(); vit++)
+        dbfile << *vit << " ";
+      dbfile << "\n";
+    }
+    dbfile.close();
+#endif
 
     // this is the same as trivial partition
     ErrorCode rval = send_graph(jcomm); MB_CHK_ERR ( rval );
   }
 
 
+  return MB_SUCCESS;
+}
+// method to expose local graph info: sender id, receiver id, sizes of elements to send, after or before
+// intersection
+ErrorCode ParCommGraph::dump_comm_information(std::string prefix, int is_send)
+{
+  //
+  if (-1!=rankInGroup1 && 1==is_send) // it is a sender task
+  {
+    std::ofstream dbfile;
+    std::stringstream outf;
+    outf << prefix << "_sender_" << rankInGroup1 << "_joint"<< rankInJoin << ".txt";
+    dbfile.open (outf.str().c_str());
+
+    if (recomputed_send_graph)
+    {
+      for (std::map<int ,std::vector<int> >::iterator mit =send_IDs_map.begin(); mit!=send_IDs_map.end(); mit++)
+      {
+        int receiver_proc = mit->first;
+        std::vector<int> & eids = mit->second;
+        dbfile << "receiver: "  << receiver_proc << " size:" << eids.size() << "\n";
+      }
+    }
+    else // just after migration
+    {
+      for ( std::map<int , Range >::iterator mit =split_ranges.begin(); mit!=split_ranges.end(); mit++ )
+      {
+        int receiver_proc = mit->first;
+        Range & eids = mit->second;
+        dbfile << "receiver: "  << receiver_proc << " size:" << eids.size() << "\n";
+      }
+    }
+    dbfile.close();
+  }
+  if (-1!=rankInGroup2 && 0 == is_send) // it is a receiver task
+  {
+    std::ofstream dbfile;
+    std::stringstream outf;
+    outf << prefix << "_receiver_" << rankInGroup2 << "_joint"<< rankInJoin << ".txt";
+    dbfile.open (outf.str().c_str());
+
+    if (recomputed_send_graph)
+    {
+      for (std::map<int ,std::vector<int> >::iterator mit =recv_IDs_map.begin(); mit!=recv_IDs_map.end(); mit++)
+      {
+        int sender_proc = mit->first;
+        std::vector<int> & eids = mit->second;
+        dbfile << "sender: "  << sender_proc << " size:" << eids.size() << "\n";
+      }
+    }
+    else // just after migration; this is now sender map!
+    {
+      for ( std::map<int , Range >::iterator mit =split_ranges.begin(); mit!=split_ranges.end(); mit++ )
+      {
+        int sender_proc = mit->first;
+        Range & eids = mit->second;
+        dbfile << "sender: "  << sender_proc << " size:" << eids.size() << "\n";
+      }
+    }
+    dbfile.close();
+  }
   return MB_SUCCESS;
 }
 } // namespace moab

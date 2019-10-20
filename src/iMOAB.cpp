@@ -67,7 +67,7 @@ struct TempestMapAppData
 struct appData
 {
     EntityHandle file_set;
-    int   external_id;  // external component id, unique for application
+    int   global_id;  // external component id, unique for application
     Range all_verts;
     Range local_verts; // it could include shared, but not owned at the interface
     // these vertices would be all_verts if no ghosting was required
@@ -87,7 +87,6 @@ struct appData
     bool point_cloud;
 
 #ifdef MOAB_HAVE_MPI
-    moab::EntityHandle covering_set;
     // constructor for this ParCommGraph takes the joint comm and the MPI groups for each application
     std::vector<ParCommGraph*> pgraph; // created in order of other applications that communicate with this one
 #endif
@@ -236,10 +235,7 @@ ErrCode iMOAB_RegisterApplication ( const iMOAB_String app_name,
 
     appData app_data;
     app_data.file_set = file_set;
-    app_data.external_id = * compid; // will be used mostly for par comm graph
-#ifdef MOAB_HAVE_MPI
-    app_data.covering_set = app_data.file_set;
-#endif
+    app_data.global_id = * compid; // will be used mostly for par comm graph
 
 #ifdef MOAB_HAVE_TEMPESTREMAP
     app_data.tempestData.remapper = NULL; // Only allocate as needed
@@ -1788,7 +1784,7 @@ ErrCode iMOAB_SendMesh ( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* receiving
 
     // instantiate the par comm graph
     // ParCommGraph::ParCommGraph(MPI_Comm joincomm, MPI_Group group1, MPI_Group group2, int coid1, int coid2)
-    ParCommGraph* cgraph = new ParCommGraph ( *global, senderGroup, *receivingGroup, context.appDatas[*pid].external_id, *rcompid );
+    ParCommGraph* cgraph = new ParCommGraph ( *global, senderGroup, *receivingGroup, context.appDatas[*pid].global_id, *rcompid );
     // we should search if we have another pcomm with the same comp ids in the list already
     // sort of check existing comm graphs in the list context.appDatas[*pid].pgraph
     context.appDatas[*pid].pgraph.push_back ( cgraph );
@@ -1871,7 +1867,7 @@ ErrCode iMOAB_ReceiveMesh ( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* sendin
   int ierr = MPI_Comm_group ( receive, &receiverGroup );CHKIERRVAL(ierr);
 
   // instantiate the par comm graph
-  ParCommGraph* cgraph = new ParCommGraph ( *global, *sendingGroup, receiverGroup, *scompid, context.appDatas[*pid].external_id );
+  ParCommGraph* cgraph = new ParCommGraph ( *global, *sendingGroup, receiverGroup, *scompid, context.appDatas[*pid].global_id );
   // TODO we should search if we have another pcomm with the same comp ids in the list already
   // sort of check existing comm graphs in the list context.appDatas[*pid].pgraph
   context.appDatas[*pid].pgraph.push_back ( cgraph );
@@ -1965,7 +1961,21 @@ ErrCode iMOAB_ReceiveMesh ( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* sendin
     // still need to resolve shared entities (in this case, vertices )
     rval = pco->resolve_shared_ents ( local_set, -1, -1, &idtag );CHKERRVAL(rval);
   }
-
+  else
+  {
+    // if partition tag exists, set it to current rank; just to make it visible in VisIt
+    Tag densePartTag;
+    rval = context.MBI->tag_get_handle("partition", densePartTag);
+    if (NULL!=densePartTag && MB_SUCCESS==rval)
+    {
+      Range local_verts;
+      rval = context.MBI->get_entities_by_dimension ( local_set, 0, local_verts );CHKERRVAL(rval);
+      std::vector<int> vals;
+      int rank = pco->rank();
+      vals.resize(local_verts.size(), rank);
+      rval = context.MBI->tag_set_data ( densePartTag, local_verts, &vals[0]); CHKERRVAL(rval);
+    }
+  }
   // set the parallel partition tag
   Tag part_tag;
   int dum_id = -1;
@@ -1990,7 +2000,9 @@ ErrCode iMOAB_ReceiveMesh ( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* sendin
   return 0;
 }
 
-ErrCode FindParCommGraph(iMOAB_AppID pid, int *scompid, int *rcompid, ParCommGraph *& cgraph, int * sense)
+/// the new find par comm graph also looks at context if it is >=1 )
+// TODO replace with a map of parcommgraphs, instead of a vector
+ErrCode FindParCommGraph(iMOAB_AppID pid, int *scompid, int *rcompid, ParCommGraph *& cgraph,  int * context_id, int * sense )
 {
   //appData& data = context.appDatas[*pid];
   cgraph = NULL;
@@ -2003,15 +2015,23 @@ ErrCode FindParCommGraph(iMOAB_AppID pid, int *scompid, int *rcompid, ParCommGra
     ParCommGraph * pg=vpg[i];
     if ( (pg-> get_component_id1() == *scompid )&& (pg-> get_component_id2() == *rcompid ))
     {
-      cgraph = pg;
-      *sense = 1;
-      break;
+      if ( (*context_id < 0 ) ||
+         ( (*context_id >=1 ) && ( *context_id == pg-> get_context_id() ) )  )
+      {
+        cgraph = pg;
+        *sense = 1;
+        break;
+      }
     }
     if ( (pg-> get_component_id2() == *scompid )&& (pg-> get_component_id1() == *rcompid ))
     {
-      cgraph = pg;
-      *sense = -1;
-      break;
+      if ( (*context_id < 0 ) ||
+         ( (*context_id >=1 ) && ( *context_id == pg-> get_context_id() ) )  )
+      {
+        cgraph = pg;
+        *sense = -1;
+        break;
+      }
     }
   }
   if ( i< vpg.size() && NULL!=cgraph )
@@ -2039,14 +2059,14 @@ void split_tag_names(std::string input_names, std::string & separator, std::vect
 }
 
 ErrCode iMOAB_SendElementTag(iMOAB_AppID pid, int* scompid, int* rcompid, const iMOAB_String tag_storage_name,
-    MPI_Comm* join, int tag_storage_name_length)
+    MPI_Comm* join, int * context_id, int tag_storage_name_length)
 {
   // first, based on the scompid and rcompid, find the parCommGraph corresponding to this exchange
   // instantiate the par comm graph
   // ParCommGraph::ParCommGraph(MPI_Comm joincomm, MPI_Group group1, MPI_Group group2, int coid1, int coid2)
   ParCommGraph* cgraph = NULL;
   int sense  = 0;
-  int ierr = FindParCommGraph(pid, scompid, rcompid, cgraph, &sense);CHKIERRVAL(ierr);
+  int ierr = FindParCommGraph(pid, scompid, rcompid, cgraph, context_id, &sense);CHKIERRVAL(ierr);
   if ( NULL == cgraph ) { return 1; }
 
   ParallelComm* pco = context.pcomms[*pid];
@@ -2083,7 +2103,7 @@ ErrCode iMOAB_SendElementTag(iMOAB_AppID pid, int* scompid, int* rcompid, const 
 }
 
 ErrCode iMOAB_ReceiveElementTag(iMOAB_AppID pid, int* scompid, int* rcompid, const iMOAB_String tag_storage_name,
-    MPI_Comm* join, int tag_storage_name_length)
+    MPI_Comm* join, int * context_id, int tag_storage_name_length)
 {
   appData& data = context.appDatas[*pid];
   // first, based on the scompid and rcompid, find the parCommGraph corresponding to this exchange
@@ -2091,17 +2111,23 @@ ErrCode iMOAB_ReceiveElementTag(iMOAB_AppID pid, int* scompid, int* rcompid, con
   // ParCommGraph::ParCommGraph(MPI_Comm joincomm, MPI_Group group1, MPI_Group group2, int coid1, int coid2)
   ParCommGraph* cgraph = NULL;
   int sense  = 0;
-  int ierr = FindParCommGraph(pid, scompid, rcompid, cgraph, &sense);CHKIERRVAL(ierr);
+  int ierr = FindParCommGraph(pid, scompid, rcompid, cgraph, context_id, &sense);CHKIERRVAL(ierr);
   if ( NULL == cgraph ) { return 1; }
 
   ParallelComm* pco = context.pcomms[*pid];
-  Range& owned = context.appDatas[*pid].owned_elems;
+  Range owned = context.appDatas[*pid].owned_elems;
 
   // how do I know if this receiver already participated in an intersection driven by coupler?
   // also, what if this was the "source" mesh in intx?
   // in that case, the elements might have been instantiated in the coverage set locally, the "owned"
   // range can be different
   // the elements are now in tempestRemap coverage_set
+  EntityHandle cover_set = cgraph->get_cover_set();
+  ErrorCode rval ;
+  if (0!=cover_set)
+  {
+    rval = context.MBI->get_entities_by_dimension ( cover_set, 2, owned); CHKERRVAL ( rval );
+  }
   /*
    * data_intx.remapper exists though only on the intersection application
    *  how do we get from here ( we know the pid that receives, and the commgraph used by migrate mesh )
@@ -2119,7 +2145,6 @@ ErrCode iMOAB_ReceiveElementTag(iMOAB_AppID pid, int* scompid, int* rcompid, con
   std::vector<Tag> tagHandles;
   std::string separator(";");
   split_tag_names( tag_name, separator, tagNames);
-  ErrorCode rval ;
   for (size_t i=0; i < tagNames.size(); i++ )
   {
     Tag tagHandle;
@@ -2129,28 +2154,15 @@ ErrCode iMOAB_ReceiveElementTag(iMOAB_AppID pid, int* scompid, int* rcompid, con
   }
 
 #ifdef VERBOSE
-  std::cout << pco->rank() << ". Looking to receive data for tags: " << tag_name << " and file set = " << (data.file_set) << " covering = " << data.covering_set << "\n";
+  std::cout << pco->rank() << ". Looking to receive data for tags: " << tag_name << " and file set = " << (data.file_set) << "\n";
 #endif
-  if ( data.file_set != data.covering_set) // coverage mesh is different from original mesh, it means we are on a source mesh, after intx
-  {
-    rval = context.MBI->get_entities_by_dimension(data.covering_set, 2, owned); CHKERRVAL ( rval );
-  }
   // pco is needed to pack, and for moab instance, not for communication!
   // still use nonblocking communication
   rval = cgraph->receive_tag_values ( *join, pco, owned, tagHandles ); CHKERRVAL ( rval );
 
 #ifdef VERBOSE
   std::cout << pco->rank() << ". Looking to receive data for tags: " << tag_name << "\n";
-  if ( data.file_set != data.covering_set) // coverage mesh is different from original mesh, it means we are on a source mesh, after intx
-  {
-    std::ostringstream outfile;
-    int rank = pco->rank();
-    outfile << "CovMeshWithTag_0" << rank << ".h5m";
-    rval = context.MBI->write_file ( outfile.str().c_str(), 0, 0, &(data.covering_set), 1 );CHKERRVAL(rval); // coverage mesh
-  }
 #endif
-
-  // now, send to each corr_tasks[i] tag data for corr_sizes[i] primary entities
 
   return 0;
 }
@@ -2162,7 +2174,7 @@ ErrCode iMOAB_FreeSenderBuffers ( iMOAB_AppID pid, MPI_Comm* join, int* rcompid 
     // this will be called on sender side only
     appData& data = context.appDatas[*pid];
     std::vector<ParCommGraph*>& pgrs = context.appDatas[*pid].pgraph;
-    int ext_id = data.external_id;
+    int ext_id = data.global_id;
     ParCommGraph* pg = NULL;
 
     for ( size_t i = 0; i < pgrs.size(); i++ )
@@ -2190,7 +2202,7 @@ ErrCode iMOAB_FreeSenderBuffers ( iMOAB_AppID pid, MPI_Comm* join, int* rcompid 
 //  in the intersection
 ErrCode iMOAB_CoverageGraph ( MPI_Comm * join, iMOAB_AppID pid_src,
                               int* scompid, iMOAB_AppID pid_migr,
-                              int* migrcomp, iMOAB_AppID pid_intx )
+                              int* migrcomp, iMOAB_AppID pid_intx, int * other_comp_id )
 {
     // first, based on the scompid and migrcomp, find the parCommGraph corresponding to this exchange
     ErrorCode rval;
@@ -2199,9 +2211,13 @@ ErrCode iMOAB_CoverageGraph ( MPI_Comm * join, iMOAB_AppID pid_src,
     ParCommGraph* sendGraph = NULL;
     int sense = 0;
     int ierr;
+    int other = -1;
     if (*pid_src>=0)
     {
-      ierr = FindParCommGraph(pid_src, scompid, migrcomp, sendGraph, &sense);
+      // find the original one first
+      // based on this one, we will build the modified one
+
+      ierr = FindParCommGraph(pid_src, scompid, migrcomp, sendGraph, &other, &sense);
       if ( 0 != ierr || NULL == sendGraph || sense != 1) {
         std::cout<<" probably not on component source PEs \n";
       }
@@ -2219,7 +2235,8 @@ ErrCode iMOAB_CoverageGraph ( MPI_Comm * join, iMOAB_AppID pid_src,
     int senseRec = 0;
     if (*pid_migr>=0)
     {
-      ierr = FindParCommGraph(pid_migr, scompid, migrcomp, recvGraph, &senseRec);
+      // find the original one
+      ierr = FindParCommGraph(pid_migr, scompid, migrcomp, recvGraph, &other, &senseRec);
       if ( 0 != ierr || NULL == recvGraph ) {
         std::cout << " not on receive PEs for migrated mesh \n";
       }
@@ -2317,7 +2334,18 @@ ErrCode iMOAB_CoverageGraph ( MPI_Comm * join, iMOAB_AppID pid_src,
         dbfile.close();
 #endif
         if ( NULL != recvGraph )
-            recvGraph->SetReceivingAfterCoverage ( idsFromProcs );
+        {
+          ParCommGraph * recvGraph1 = new ParCommGraph(*recvGraph); // just copy
+          recvGraph1->set_context_id(*other_comp_id);
+          recvGraph1->SetReceivingAfterCoverage ( idsFromProcs );
+          // this par comm graph will need to use the coverage set
+          // so we are for sure on intx pes (the receiver is the coupler mesh)
+          assert(*pid_intx>=0);
+          appData& dataIntx = context.appDatas[*pid_intx];
+          EntityHandle cover_set = dataIntx.tempestData.remapper->GetMeshSet(Remapper::CoveringMesh);
+          recvGraph1->set_cover_set(cover_set);
+          context.appDatas[*pid_migr].pgraph.push_back(recvGraph1);
+        }
         for ( std::map<int, std::set<int> >::iterator mit = idsFromProcs.begin(); mit != idsFromProcs.end(); mit++ )
         {
             int procToSendTo = mit->first;
@@ -2339,10 +2367,32 @@ ErrCode iMOAB_CoverageGraph ( MPI_Comm * join, iMOAB_AppID pid_src,
     // a test to know if we are on the sender tasks (original component, in this case, atmosphere)
     if ( NULL != sendGraph )
     {
-        // collect TLcovIDs tuple, will set in a local map/set, the ids that are sent to each receiver task
-        rval = sendGraph->settle_send_graph ( TLcovIDs ); CHKERRVAL ( rval );
+      // collect TLcovIDs tuple, will set in a local map/set, the ids that are sent to each receiver task
+      ParCommGraph * sendGraph1 = new ParCommGraph(*sendGraph); // just copy
+      sendGraph1->set_context_id(*other_comp_id);
+      context.appDatas[*pid_src].pgraph.push_back(sendGraph1);
+      rval = sendGraph1->settle_send_graph ( TLcovIDs ); CHKERRVAL ( rval );
     }
     return 0;// success
+}
+
+ErrCode iMOAB_DumpCommGraph                 (  iMOAB_AppID pid,
+                                               int* scompid,
+                                               int *rcompid , int * is_sender,
+                                               const iMOAB_String prefix,
+                                               int length_prefix)
+{
+    ParCommGraph* cgraph = NULL;
+    int sense  = 0;
+    int other = -1;
+    int ierr = FindParCommGraph(pid, scompid, rcompid, cgraph, &other, &sense);CHKIERRVAL(ierr);
+    std::string prefix_str(prefix);
+    if ( length_prefix < ( int ) strlen ( prefix ) )
+    {
+      prefix_str = prefix_str.substr ( 0, length_prefix );
+    }
+    cgraph->dump_comm_information(prefix_str, *is_sender);
+    return 0;
 }
 
 #endif // MOAB_HAVE_MPI
@@ -2469,11 +2519,6 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere ( iMOAB_AppID pid_src, iMOAB_AppID
     // Next, compute intersections with MOAB.
     rval = tdata.remapper->ComputeOverlapMesh ( false );CHKERRVAL(rval);
     // rval = data_intx.remapper->ConvertMeshToTempest ( moab::Remapper::IntersectedMesh );CHKERRVAL(rval);
-
-#ifdef MOAB_HAVE_MPI
-    data_intx.covering_set = tdata.remapper->GetCoveringSet();
-    data_src.covering_set = tdata.remapper->GetCoveringSet();
-#endif
 
     // if (radii_scaled) { /* the radii are different, so lets rescale back */
     //     rval = ScaleToRadius(context.MBI, data_src.file_set, radius_source);CHKERRVAL(rval);
@@ -2612,7 +2657,7 @@ ErrCode iMOAB_ComputePointDoFIntersection ( iMOAB_AppID pid_src, iMOAB_AppID pid
     /* VSM: This context should be set on the data_src but it would overwrite the source 
        covering set context in case it is coupled to another APP as well. 
        This needs a redesign. */
-    data_intx.covering_set = tdata.remapper->GetCoveringSet();
+    //data_intx.covering_set = tdata.remapper->GetCoveringSet();
     // data_src.covering_set = tdata.remapper->GetCoveringSet();
 #endif
 
