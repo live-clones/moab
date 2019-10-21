@@ -2839,7 +2839,7 @@ ErrCode iMOAB_ApplyScalarProjectionWeights (   iMOAB_AppID pid_intersection,
       {
           Tag ssolnTag = srcTagHandles[ivar];
           std::stringstream sstr;
-          sstr << "covsrcTagData_" << ivar << "_" << pco_intx->rank() << ".txt";
+          sstr << "covsrcTagData_" << *pid_intersection << "_"<< ivar << "_" << pco_intx->rank() << ".txt";
           std::ofstream output_file ( sstr.str().c_str() );
           for (unsigned i=0; i < sents.size(); ++i) {
               EntityHandle elem = sents[i];
@@ -2854,13 +2854,13 @@ ErrCode iMOAB_ApplyScalarProjectionWeights (   iMOAB_AppID pid_intersection,
       }
       {
           std::stringstream sstr;
-          sstr << "outputSrcDest_" << ivar << "_"<< pco_intx->rank() << ".h5m";
+          sstr << "outputSrcDest_" << *pid_intersection << "_"<< ivar << "_"<< pco_intx->rank() << ".h5m";
           EntityHandle sets[2] = {context.appDatas[*tdata.pid_src].file_set, context.appDatas[*tdata.pid_dest].file_set};
           rval = context.MBI->write_file ( sstr.str().c_str(), NULL, "", sets, 2 ); MB_CHK_ERR ( rval );
       }
       {
           std::stringstream sstr;
-          sstr << "outputCovSrcDest_" << ivar << "_" << pco_intx->rank() << ".h5m";
+          sstr << "outputCovSrcDest_" << *pid_intersection << "_" << ivar << "_" << pco_intx->rank() << ".h5m";
           // EntityHandle sets[2] = {data_intx.file_set, data_intx.covering_set};
           EntityHandle covering_set = remapper->GetCoveringSet();
           EntityHandle sets[2] = {covering_set, context.appDatas[*tdata.pid_dest].file_set};
@@ -2868,7 +2868,7 @@ ErrCode iMOAB_ApplyScalarProjectionWeights (   iMOAB_AppID pid_intersection,
       }
       {
           std::stringstream sstr;
-          sstr << "colvector_" << ivar << "_" << pco_intx->rank() << ".txt";
+          sstr << "colvector_" << *pid_intersection << "_" << ivar << "_" << pco_intx->rank() << ".txt";
           std::ofstream output_file ( sstr.str().c_str() );
           for (unsigned i = 0; i < solSTagVals.size(); ++i)
               output_file << i << " " << weightMap->col_dofmap[i] << " " << weightMap->col_gdofmap[i] << " " << solSTagVals[i] << "\n";
