@@ -1081,23 +1081,24 @@ ErrorCode TempestRemapper::ComputeOverlapMesh ( bool use_tempest )
                   intxCov.insert(covEnts[loc_gid_to_lid_covsrc[blueParent]]);
                 }
 
-                Range notNeededCovCells = moab::subtract(covEnts, intxCov);
-                // remove now from coverage set the cells that are not needed
-                rval = m_interface->remove_entities(m_covering_source_set, notNeededCovCells); MB_CHK_ERR ( rval );
-                covEnts = moab::subtract(covEnts, notNeededCovCells);
-#ifdef VERBOSE
-                std::cout << " total participating elements in the covering set: " << intxCov.size() << "\n";
-                std::cout << " remove from coverage set elements that are not intersected: " << notNeededCovCells.size() << "\n";
-#endif
-                // some source elements cover multiple target partitions; the conservation logic requires to know
-                // all overlap elements for a source element; they need to be communicated from the other target partitions
-                //
-                // so first we have to identify source (coverage) elements that cover multiple target partitions
-
-                // we will then mark the source, we will need to migrate the overlap elements that cover this to the original
-                // source for the source element; then distribute the overlap elements to all processors that have the
-                // coverage mesh used
                 if (size > 1) {
+                    Range notNeededCovCells = moab::subtract(covEnts, intxCov);
+                    // remove now from coverage set the cells that are not needed
+                    rval = m_interface->remove_entities(m_covering_source_set, notNeededCovCells); MB_CHK_ERR ( rval );
+                    covEnts = moab::subtract(covEnts, notNeededCovCells);
+ #ifdef VERBOSE
+                    std::cout << " total participating elements in the covering set: " << intxCov.size() << "\n";
+                    std::cout << " remove from coverage set elements that are not intersected: " << notNeededCovCells.size() << "\n";
+ #endif
+                    // some source elements cover multiple target partitions; the conservation logic requires to know
+                    // all overlap elements for a source element; they need to be communicated from the other target partitions
+                    //
+                    // so first we have to identify source (coverage) elements that cover multiple target partitions
+
+                    // we will then mark the source, we will need to migrate the overlap elements that cover this to the original
+                    // source for the source element; then distribute the overlap elements to all processors that have the
+                    // coverage mesh used
+
                     rval = augment_overlap_set(); MB_CHK_ERR ( rval );
                 }
             }
