@@ -1053,6 +1053,7 @@ ErrorCode TempestRemapper::ComputeOverlapMesh ( bool use_tempest )
             // because we do not want to work with elements in coverage set that do not participate in intersection,
             // remove them from the coverage set
             // we will not delete them yet, just remove from the set !
+            if (!point_cloud_target)
             {
                 Range covEnts;
                 rval = m_interface->get_entities_by_dimension ( m_covering_source_set, 2, covEnts ); MB_CHK_ERR ( rval );
