@@ -333,10 +333,11 @@ int main( int argc, char* argv[] )
   // it involves initial atm app; cmpAtmPID; also migrate atm mesh on coupler pes, cplAtmPID
   // results are in cplAtmOcnPID, intx mesh; remapper also has some info about coverage mesh
   // after this, the sending of tags from atm pes to coupler pes will use the new par comm graph, that has more precise info about
-  // what to send ; every time, we will send also the element global id, which should uniquely identify the element
+  // what to send for ocean cover ; every time, we will
+  //  use the element global id, which should uniquely identify the element
   PUSH_TIMER("Compute OCN coverage graph for ATM mesh")
   ierr = iMOAB_CoverageGraph(&globalComm, cmpAtmPID,  &cmpatm, cplAtmPID,  &cplatm, cplAtmOcnPID, &cplocn); // it happens over joint communicator
-  CHECKIERR(ierr, "cannot recompute direct coverage graph" )
+  CHECKIERR(ierr, "cannot recompute direct coverage graph for ocean" )
   POP_TIMER(globalComm, rankInGlobalComm)
 
   PUSH_TIMER("Compute ATM-LND mesh intersection")
@@ -344,6 +345,18 @@ int main( int argc, char* argv[] )
   CHECKIERR(ierr, "failed to compute point-cloud mapping");
   POP_TIMER(globalComm, rankInGlobalComm)
 
+  // the new graph will be for sending data from atm comp to coverage mesh for land mesh;
+  // it involves initial atm app; cmpAtmPID; also migrate atm mesh on coupler pes, cplAtmPID
+  // results are in cplAtmLndPID, intx mesh; remapper also has some info about coverage mesh
+  // after this, the sending of tags from atm pes to coupler pes will use the new par comm graph, that has more precise info about
+  // what to send (specifically for land cover); every time,
+  /// we will use the element global id, which should uniquely identify the element
+  PUSH_TIMER("Compute LND coverage graph for ATM mesh")
+  ierr = iMOAB_CoverageGraph(&globalComm, cmpAtmPID,  &cmpatm, cplAtmPID,  &cplatm, cplAtmLndPID, &cpllnd); // it happens over joint communicator
+  CHECKIERR(ierr, "cannot recompute direct coverage graph for land" )
+  POP_TIMER(globalComm, rankInGlobalComm)
+
+  MPI_Barrier(MPI_COMM_WORLD);
 
 #ifdef VERBOSE
   std::stringstream outf;
@@ -369,11 +382,6 @@ int main( int argc, char* argv[] )
   POP_TIMER(globalComm, rankInGlobalComm)
 
   MPI_Barrier(MPI_COMM_WORLD);
-
-  // PUSH_TIMER("Compute LND coverage graph for ATM mesh")
-  // ierr = iMOAB_CoverageGraph(&atmComm, cmpAtmPID,  &cmpatm, cplAtmPID,  &cplatm, cplAtmLndPID); // it happens over joint communicator
-  // CHECKIERR(ierr, "cannot recompute direct coverage graph" )
-  // POP_TIMER(atmComm, rankInAtmComm)
 
   /* Compute the weights to preoject the solution from ATM component to LND compoenent */
   PUSH_TIMER("Compute ATM-LND remapping weights")
@@ -454,9 +462,6 @@ int main( int argc, char* argv[] )
 
   PUSH_TIMER("Send/receive data from component to coupler")
   if (atmComm != MPI_COMM_NULL ){
-
-    // basically, adjust the migration of the tag we want to project; it was sent initially with
-    // trivial partitioning, now we need to adjust it for "coverage" mesh
      // as always, use nonblocking sends
     // this is for projection to ocean:
      ierr = iMOAB_SendElementTag(cmpAtmPID, &cmpatm, &cplatm, "a2oTbot;a2oUbot;a2oVbot;", &globalComm, &cplocn, strlen("a2oTbot;a2oUbot;a2oVbot;"));
@@ -473,7 +478,7 @@ int main( int argc, char* argv[] )
     CHECKIERR(ierr, "cannot free buffers used to resend atm mesh tag towards the coverage mesh")
   }
 #ifdef VERBOSE
-    char outputFileRecvd[] = "recvAtmCoup.h5m";
+    char outputFileRecvd[] = "recvAtmCoupOcn.h5m";
     ierr = iMOAB_WriteMesh(cplAtmPID, outputFileRecvd, writeOptions3,
         strlen(outputFileRecvd), strlen(writeOptions3) );
 #endif
@@ -493,12 +498,9 @@ int main( int argc, char* argv[] )
   CHECKIERR(ierr, "failed to compute projection weight application");
   POP_TIMER(globalComm, rankInGlobalComm)
 
-  char outputFileTgt[] = "fIntxTarget.h5m";
-#ifdef MOAB_HAVE_MPI
-    char writeOptions2[] ="PARALLEL=WRITE_PART";
-#else
-    char writeOptions2[] ="";
-#endif
+  char outputFileTgt[] = "fOcnOnCpl.h5m";
+  char writeOptions2[] ="PARALLEL=WRITE_PART";
+
   ierr = iMOAB_WriteMesh(cplOcnPID, outputFileTgt, writeOptions2,
     strlen(outputFileTgt), strlen(writeOptions2) );
 
@@ -540,10 +542,54 @@ int main( int argc, char* argv[] )
         strlen(outputFileOcn), strlen(writeOptions2) );
   }
 
-  MPI_Barrier(MPI_COMM_WORLD);
+// start land proj:
+
+  PUSH_TIMER("Send/receive data from component atm to coupler, in land context")
+  if (atmComm != MPI_COMM_NULL ){
+
+     // as always, use nonblocking sends
+    // this is for projection to land:
+     ierr = iMOAB_SendElementTag(cmpAtmPID, &cmpatm, &cplatm, "a2oTbot;a2oUbot;a2oVbot;", &globalComm, &cpllnd, strlen("a2oTbot;a2oUbot;a2oVbot;"));
+     CHECKIERR(ierr, "cannot send tag values")
+  }
+  // receive on atm on coupler pes, that was redistributed according to coverage, for land context
+  ierr = iMOAB_ReceiveElementTag(cplAtmPID, &cmpatm, &cplatm, "a2oTbot;a2oUbot;a2oVbot;", &globalComm, &cpllnd, strlen("a2oTbot;a2oUbot;a2oVbot;"));
+  CHECKIERR(ierr, "cannot receive tag values")
+  POP_TIMER(globalComm, rankInGlobalComm)
+
+  // we can now free the sender buffers
+  if (atmComm != MPI_COMM_NULL) {
+    ierr = iMOAB_FreeSenderBuffers(cmpAtmPID, &globalComm, &cplatm);
+    CHECKIERR(ierr, "cannot free buffers used to resend atm mesh tag towards the coverage mesh")
+  }
+#ifdef VERBOSE
+    char outputFileRecvd[] = "recvAtmCoupLnd.h5m";
+    ierr = iMOAB_WriteMesh(cplAtmPID, outputFileRecvd, writeOptions3,
+        strlen(outputFileRecvd), strlen(writeOptions3) );
+#endif
+
+  /* We have the remapping weights now. Let us apply the weights onto the tag we defined
+     on the source mesh and get the projection on the target mesh */
+  PUSH_TIMER("Apply Scalar projection weights for land")
+  ierr = iMOAB_ApplyScalarProjectionWeights ( cplAtmLndPID, weights_identifiers[1],
+                                            concat_fieldname,
+                                            concat_fieldnameT,
+                                            strlen(weights_identifiers[1]),
+                                            strlen(concat_fieldname),
+                                            strlen(concat_fieldnameT)
+                                            );
+  CHECKIERR(ierr, "failed to compute projection weight application");
+  POP_TIMER(globalComm, rankInGlobalComm)
+
+  char outputFileTgt2[] = "fLndOnCpl.h5m";
+
+  ierr = iMOAB_WriteMesh(cplLndPID, outputFileTgt2, writeOptions2,
+    strlen(outputFileTgt2), strlen(writeOptions2) );
+
+  // end land proj
+
   ierr = iMOAB_DeregisterApplication(cplAtmOcnPID);
   CHECKIERR(ierr, "cannot deregister app intx AO" )
-
 
 #endif
 
