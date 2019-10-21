@@ -2868,6 +2868,20 @@ ErrCode iMOAB_ApplyScalarProjectionWeights (   iMOAB_AppID pid_intersection,
       }
       {
           std::stringstream sstr;
+          sstr << "covMesh_" << *pid_intersection << "_" << "_" << pco_intx->rank() << ".vtk";
+          // EntityHandle sets[2] = {data_intx.file_set, data_intx.covering_set};
+          EntityHandle covering_set = remapper->GetCoveringSet();
+          rval = context.MBI->write_file ( sstr.str().c_str(), NULL, "", &covering_set, 1 ); MB_CHK_ERR ( rval );
+      }
+      {
+          std::stringstream sstr;
+          sstr << "tgtMesh_" << *pid_intersection << "_" << "_" << pco_intx->rank() << ".vtk";
+          // EntityHandle sets[2] = {data_intx.file_set, data_intx.covering_set};
+          EntityHandle target_set = remapper->GetMeshSet(Remapper::TargetMesh) ;
+          rval = context.MBI->write_file ( sstr.str().c_str(), NULL, "", &target_set, 1 ); MB_CHK_ERR ( rval );
+      }
+      {
+          std::stringstream sstr;
           sstr << "colvector_" << *pid_intersection << "_" << ivar << "_" << pco_intx->rank() << ".txt";
           std::ofstream output_file ( sstr.str().c_str() );
           for (unsigned i = 0; i < solSTagVals.size(); ++i)
