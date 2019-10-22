@@ -531,8 +531,7 @@ int main( int argc, char* argv[] )
   // first, send from cplocn to cplocn, from ocnComm, using common joint comm
       // as always, use nonblocking sends
   // original graph
-  int other = -1;
-  ierr = iMOAB_SendElementTag(cplOcnPID, &cplocn, &cmpocn, "a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;", &globalComm, &other,
+  ierr = iMOAB_SendElementTag(cplOcnPID, &cplocn, &cmpocn, "a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;", &globalComm, &context_id,
       strlen("a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;"));
   CHECKIERR(ierr, "cannot send tag values back to ocean pes")
 
@@ -540,7 +539,7 @@ int main( int argc, char* argv[] )
   if (ocnComm != MPI_COMM_NULL)
   {
     ierr = iMOAB_ReceiveElementTag(cmpOcnPID, &cplocn, &cmpocn, "a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;",
-        &globalComm, &other, strlen("a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;"));
+        &globalComm, &context_id, strlen("a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;"));
     CHECKIERR(ierr, "cannot receive tag values from ocean mesh on coupler pes")
   }
 
@@ -599,12 +598,43 @@ int main( int argc, char* argv[] )
     strlen(outputFileTgt2), strlen(writeOptions2) );
 
   // end land proj
+  // send the tags back to land pes, from land mesh on coupler pes
+  // send from cplLndPID to cmpLndPID, using common joint comm
+      // as always, use nonblocking sends
+  // original graph
+  // int context_id = -1;
+  ierr = iMOAB_SendElementTag(cplLndPID, &cpllnd, &cmplnd, "a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;", &globalComm, &context_id,
+      strlen("a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;"));
+  CHECKIERR(ierr, "cannot send tag values back to land pes")
+
+  // receive on component 3, land
+  if (lndComm != MPI_COMM_NULL)
+  {
+    ierr = iMOAB_ReceiveElementTag(cmpLndPID, &cpllnd, &cmplnd, "a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;",
+        &globalComm, &context_id, strlen("a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;"));
+    CHECKIERR(ierr, "cannot receive tag values from land mesh on coupler pes")
+  }
+
+  MPI_Barrier(MPI_COMM_WORLD);
+
+  ierr = iMOAB_FreeSenderBuffers(cplLndPID, &context_id);
+  if (lndComm != MPI_COMM_NULL)
+  {
+    char outputFileLnd[] = "LndWithProj.h5m";
+    ierr = iMOAB_WriteMesh(cmpLndPID, outputFileLnd, writeOptions2,
+        strlen(outputFileLnd), strlen(writeOptions2) );
+  }
 #ifdef OCN_ON
   ierr = iMOAB_DeregisterApplication(cplAtmOcnPID);
   CHECKIERR(ierr, "cannot deregister app intx AO" )
 #endif
 
 #endif
+
+  if (lndComm != MPI_COMM_NULL) {
+    ierr = iMOAB_DeregisterApplication(cmpLndPID);
+    CHECKIERR(ierr, "cannot deregister app Land" )
+  }
 
 #ifdef OCN_ON
   if (ocnComm != MPI_COMM_NULL) {
@@ -616,13 +646,17 @@ int main( int argc, char* argv[] )
     ierr = iMOAB_DeregisterApplication(cmpAtmPID);
     CHECKIERR(ierr, "cannot deregister app ATM1" )
   }
+
+  ierr = iMOAB_DeregisterApplication(cplLndPID);
+  CHECKIERR(ierr, "cannot deregister app LandX" )
+
 #ifdef OCN_ON
   ierr = iMOAB_DeregisterApplication(cplOcnPID);
   CHECKIERR(ierr, "cannot deregister app OCNX" )
+#endif
 
   ierr = iMOAB_DeregisterApplication(cplAtmPID);
-  CHECKIERR(ierr, "cannot deregister app OCNX" )
-#endif
+  CHECKIERR(ierr, "cannot deregister app AtmX" )
 
   ierr = iMOAB_Finalize();
   CHECKIERR(ierr, "did not finalize iMOAB" )
