@@ -42,7 +42,7 @@ using namespace moab;
 
 // #define VERBOSE
 
-//#define OCN_ON
+#define OCN_ON
 
 int main( int argc, char* argv[] )
 {

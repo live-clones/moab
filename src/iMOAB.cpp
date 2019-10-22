@@ -2273,7 +2273,7 @@ ErrCode iMOAB_CoverageGraph ( MPI_Comm * join, iMOAB_AppID pid_src,
 
         appData& dataIntx = context.appDatas[*pid_intx];
         Tag parentTag ;
-        rval = context.MBI->tag_get_handle ( "BlueParent", parentTag ); CHKERRVAL ( rval ); // id of the blue, source element
+        rval = context.MBI->tag_get_handle ( "BlueParent", parentTag ); CHKERRVAL ( rval ); // global id of the blue, source element
         if ( !parentTag )
             return 1; // fatal error, abort
         Tag orgSendProcTag ;
@@ -2303,6 +2303,36 @@ ErrCode iMOAB_CoverageGraph ( MPI_Comm * join, iMOAB_AppID pid_src,
             std::set<int> &setInts = idsFromProcs[origProc];
             setInts.insert ( gidCell );
             //std::cout << origProc << " id:" << gidCell << " size: " << setInts.size() << std::endl;
+        }
+        // if we have no intx cells, it means we are on point clouds; quick fix just use all cells from
+        // coverage set
+        if (cells.empty())
+        {
+          // get coverage set
+          assert(*pid_intx>=0);
+          appData& dataIntx = context.appDatas[*pid_intx];
+          EntityHandle cover_set = dataIntx.tempestData.remapper->GetMeshSet(Remapper::CoveringMesh);
+          // get all cells from coverage set
+          //Range allCellsCov;
+          Tag gidTag;
+          rval = context.MBI->tag_get_handle ( "GLOBAL_ID", gidTag ); CHKERRVAL ( rval );
+          rval = context.MBI->get_entities_by_dimension ( cover_set, 2, cells ); CHKERRVAL ( rval );
+          // look at their orig_sending_processor
+          for ( Range::iterator it = cells.begin(); it != cells.end(); it++ )
+          {
+              EntityHandle covCell = *it;
+              int gidCell, origProc; // look at o
+
+              rval = context.MBI->tag_get_data ( gidTag, &covCell, 1, &gidCell ); CHKERRVAL ( rval );
+              rval = context.MBI->tag_get_data ( orgSendProcTag, &covCell, 1, &origProc ); CHKERRVAL ( rval );
+              // we have augmented the overlap set with ghost cells ; in that case, the orig_sending_processor is not set
+              // so it will be -1;
+              if (origProc<0) // it cannot < 0, I think
+                continue;
+              std::set<int> &setInts = idsFromProcs[origProc];
+              setInts.insert ( gidCell );
+              //std::cout << origProc << " id:" << gidCell << " size: " << setInts.size() << std::endl;
+          }
         }
 #ifdef VERBOSE
         std::ofstream dbfile;
