@@ -33,7 +33,7 @@ program MigrateMesh
     integer iMOAB_LoadMesh, iMOAB_SendMesh, iMOAB_ReceiveMesh, iMOAB_WriteMesh
     integer iMOAB_FreeSenderBuffers
     integer iMOAB_DeregisterApplication, iMOAB_Finalize
-    integer repart_scheme 
+    integer repart_scheme , context_id
 
     call MPI_INIT(ierr)
     call MPI_Comm_dup(MPI_COMM_WORLD, gcomm, ierr)
@@ -61,6 +61,8 @@ program MigrateMesh
     startG1 = sz/2
     endG1 = sz-1
     sizeG1 = endG1 - startG1 + 1
+    ! used for new API in iMOAB, for tag migrate, release buffers
+    context_id = -1
     
     do i=1, sizeG1
       groupTasks (i) = startG1+i-1
@@ -139,22 +141,24 @@ program MigrateMesh
     if (comm2 /= MPI_COMM_NULL) then
        ierr = iMOAB_ReceiveMesh(pid2, gcomm, group1, compid1); ! receive from component 1
        call errorout(ierr, 'cannot receive elements' )
+    endif
+
+    ! we can now free the sender buffers
+    if (comm1 /= MPI_COMM_NULL) then
+
+       ierr = iMOAB_FreeSenderBuffers(pid1, context_id)
+    endif
+    call MPI_Barrier(gcomm, ierr)
+    call errorout(ierr, 'cannot stop at barrier' )
+
+if (comm2 /= MPI_COMM_NULL) then
        outfile = 'receivedMesh.h5m'//CHAR(0)
        wopts   = 'PARALLEL=WRITE_PART;'//CHAR(0)
-       print *, "from ", rank, wopts, outfile
-
 !      write out the mesh file to disk
        ierr = iMOAB_WriteMesh(pid2, trim(outfile), trim(wopts))
        call errorout(ierr, 'cannot write received mesh' )
     endif
 
-    call MPI_Barrier(gcomm, ierr)
-    call errorout(ierr, 'cannot stop at barrier' )
-
-    ! we can now free the sender buffers
-    if (comm1 /= MPI_COMM_NULL) then
-       ierr = iMOAB_FreeSenderBuffers(pid1, gcomm, compid2)
-    endif
 
     if (comm2 /= MPI_COMM_NULL) then
        ierr = iMOAB_DeregisterApplication(pid2)

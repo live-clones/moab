@@ -644,11 +644,10 @@ ErrCode iMOAB_SendMesh ( iMOAB_AppID pid, MPI_Comm* join, MPI_Group* receivingGr
    \brief during nonblocking send, buffers were allocated, to keep data until received
    Free them after requests are completed
    \param[in]  pid (iMOAB_AppID)                      The unique pointer to the application ID sender mesh
-   \param[in]  join (MPI_Comm)                        communicator that overlaps both groups (sender and receiver)
-   \param[in]  rcompid  (int*)                        external id of application that receives the mesh
+   \param[in]  context_id  (int*)                     context used for sending, to identify the communication graph
    */
 
-ErrCode iMOAB_FreeSenderBuffers ( iMOAB_AppID pid, MPI_Comm* join, int* rcompid );
+ErrCode iMOAB_FreeSenderBuffers ( iMOAB_AppID pid, int* context_d );
 
 /**
   \brief migrate (receive) a set of elements from a sender group of tasks
@@ -822,15 +821,13 @@ ErrCode iMOAB_ApplyScalarProjectionWeights (   iMOAB_AppID pid_intersection,
   <B>Operations:</B> Collective per sender or receiver group
 
   \param[in] pid  (iMOAB_AppID)                            The unique pointer to the application ID
-  \param[in] scompid  (int*)                               (sender) component id
-  \param[in] rcompid  (int*)                               (receiver) component id                                                           names are separated by ";", the same way as for tag migration
+  \param[in] context_id  (int*)                            context id                                                       names are separated by ";", the same way as for tag migration
   \param[in] is_sender (int*)                              is it called from sender or receiver side
   \param[in] prefix  (iMOAB_String)                        prefix for file names; to differentiate stages
   \param[in] prefix_len   (int)                            The length of the prefix string
 */
 ErrCode iMOAB_DumpCommGraph                 (  iMOAB_AppID pid,
-                                               int* scompid,
-                                               int *rcompid,
+                                               int* context_id,
                                                int * is_sender,
                                                const iMOAB_String prefix,
                                                int prefix_length);

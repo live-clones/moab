@@ -539,7 +539,7 @@ ErrorCode ParCommGraph::receive_mesh(MPI_Comm jcomm, ParallelComm *pco, EntityHa
 }
 
 // VSM: Why is the communicator never used. Remove the argument ?
-ErrorCode ParCommGraph::release_send_buffers(MPI_Comm /*jcomm*/)
+ErrorCode ParCommGraph::release_send_buffers()
 {
   int ierr, nsize = (int)sendReqs.size();
   std::vector<MPI_Status> mult_status;

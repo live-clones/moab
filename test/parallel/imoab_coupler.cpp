@@ -85,7 +85,7 @@ int main( int argc, char* argv[] )
   int nghlay=0; // number of ghost layers for loading the file
   std::vector<int> groupTasks; // at most 2 tasks
   int startG1=0, startG2=0, endG1=numProcesses-1, endG2=numProcesses-1, startG3=startG1, endG3=endG1; // Support launch of imoab_coupler test on any combo of 2*x processes
-
+  int context_id = -1; // used now for freeing buffers
   // int startG1=0, startG2=0, endG1=0, endG2=0; // Support launch of imoab_coupler test on any combo of 2*x processes
   // int startG1=0, startG2=0, endG1=1, endG2=0; // Support launch of imoab_coupler test on any combo of 2*x processes
   // int startG1=0, startG2=0, endG1=numProcesses-1, endG2=0; // Support launch of imoab_coupler test on any combo of 2*x processes
@@ -225,7 +225,7 @@ int main( int argc, char* argv[] )
 
   // we can now free the sender buffers
   if (atmComm != MPI_COMM_NULL) {
-    ierr = iMOAB_FreeSenderBuffers(cmpAtmPID, &globalComm, &cplatm);
+    ierr = iMOAB_FreeSenderBuffers(cmpAtmPID, &context_id);
     CHECKIERR(ierr, "cannot free buffers used to send atm mesh")
   }
 
@@ -255,7 +255,7 @@ int main( int argc, char* argv[] )
   POP_TIMER(globalComm, rankInGlobalComm)
 
   if (ocnComm != MPI_COMM_NULL) {
-    ierr = iMOAB_FreeSenderBuffers(cmpOcnPID, &globalComm, &cplocn);
+    ierr = iMOAB_FreeSenderBuffers(cmpOcnPID, &context_id);
     CHECKIERR(ierr, "cannot free buffers used to send ocn mesh")
   }
 
@@ -297,8 +297,8 @@ int main( int argc, char* argv[] )
   CHECKIERR(ierr, "cannot receive elements on LNDX app")
   POP_TIMER(globalComm, rankInGlobalComm)
 
-  if (ocnComm != MPI_COMM_NULL) {
-    ierr = iMOAB_FreeSenderBuffers(cmpLndPID, &globalComm, &cpllnd);
+  if (lndComm != MPI_COMM_NULL) {
+    ierr = iMOAB_FreeSenderBuffers(cmpLndPID, &context_id);
     CHECKIERR(ierr, "cannot free buffers used to send lnd mesh")
   }
 
@@ -489,7 +489,7 @@ int main( int argc, char* argv[] )
 
   // we can now free the sender buffers
   if (atmComm != MPI_COMM_NULL) {
-    ierr = iMOAB_FreeSenderBuffers(cmpAtmPID, &globalComm, &cplatm);
+    ierr = iMOAB_FreeSenderBuffers(cmpAtmPID,  &cplocn); // context is for ocean
     CHECKIERR(ierr, "cannot free buffers used to resend atm mesh tag towards the coverage mesh")
   }
 #ifdef VERBOSE
@@ -546,7 +546,7 @@ int main( int argc, char* argv[] )
 
   MPI_Barrier(MPI_COMM_WORLD);
 
-  ierr = iMOAB_FreeSenderBuffers(cplOcnPID, &globalComm, &cmpocn);
+  ierr = iMOAB_FreeSenderBuffers(cplOcnPID, &context_id);
   if (ocnComm != MPI_COMM_NULL)
   {
     char outputFileOcn[] = "OcnWithProj.h5m";
@@ -571,8 +571,8 @@ int main( int argc, char* argv[] )
 
   // we can now free the sender buffers
   if (atmComm != MPI_COMM_NULL) {
-    ierr = iMOAB_FreeSenderBuffers(cmpAtmPID, &globalComm, &cplatm);
-    CHECKIERR(ierr, "cannot free buffers used to resend atm mesh tag towards the coverage mesh")
+    ierr = iMOAB_FreeSenderBuffers(cmpAtmPID, &cpllnd);
+    CHECKIERR(ierr, "cannot free buffers used to resend atm tag towards the coverage mesh for land context")
   }
 #ifdef VERBOSE
     char outputFileRecvd[] = "recvAtmCoupLnd.h5m";

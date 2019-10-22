@@ -142,7 +142,7 @@ namespace moab {
     ErrorCode receive_mesh(MPI_Comm jcomm, ParallelComm *pco, EntityHandle local_set,
         std::vector<int> &senders_local);
 
-	  ErrorCode release_send_buffers(MPI_Comm jcomm);
+	  ErrorCode release_send_buffers();
 
 	  ErrorCode send_tag_values (MPI_Comm jcomm, ParallelComm *pco, Range & owned,
 	      std::vector<Tag> & tag_handles );

@@ -139,6 +139,7 @@ ErrorCode migrate(const char*filename, const char * outfile)
   // the par comm graph is unique between components
   compid1 = 4;
   compid2 = 7;
+  int context_id = -1; // default context
 
   int appID1;
   iMOAB_AppID pid1=&appID1;
@@ -180,7 +181,7 @@ ErrorCode migrate(const char*filename, const char * outfile)
 
   // we can now free the sender buffers
   if (comm1 != MPI_COMM_NULL)
-     ierr = iMOAB_FreeSenderBuffers(pid1, &jcomm, &compid2);
+     ierr = iMOAB_FreeSenderBuffers(pid1, &context_id);
 
   // exchange tag, from component to component
   // one is receiving, one is sending the tag; the one that is sending needs to have communicator
@@ -194,8 +195,6 @@ ErrorCode migrate(const char*filename, const char * outfile)
   fileAfterTagMigr.erase(sizen-4, 4);// erase extension .h5m
   fileAfterTagMigr = fileAfterTagMigr + "_tag.h5m";
 
-  // original graph, no intx involved
-  int other = -1;
   // now send a tag from component 2, towards component 1
   if (comm2 != MPI_COMM_NULL ){
      ierr = iMOAB_DefineTagStorage(pid2, "element_field", &tagType, &size_tag, &tagIndex2,  strlen("element_field") );
@@ -204,7 +203,7 @@ ErrorCode migrate(const char*filename, const char * outfile)
 
     // first, send from compid2 to compid1, from comm2, using common joint comm
      // as always, use nonblocking sends
-     ierr = iMOAB_SendElementTag(pid2, &compid2, &compid1, "element_field", &jcomm, &other, strlen("element_field"));
+     ierr = iMOAB_SendElementTag(pid2, &compid2, &compid1, "element_field", &jcomm, &context_id, strlen("element_field"));
      CHECKRC(ierr, "cannot send tag values")
   }
   // receive on component 1
@@ -213,7 +212,7 @@ ErrorCode migrate(const char*filename, const char * outfile)
      ierr = iMOAB_DefineTagStorage(pid1, "element_field", &tagType, &size_tag, &tagIndex1,  strlen("element_field") );
      CHECKRC(ierr, "failed to get tag DFIELD ");
 
-     ierr = iMOAB_ReceiveElementTag(pid1, &compid2, &compid1, "element_field", &jcomm, &other, strlen("element_field"));
+     ierr = iMOAB_ReceiveElementTag(pid1, &compid2, &compid1, "element_field", &jcomm, &context_id, strlen("element_field"));
      CHECKRC(ierr, "cannot send tag values")
      std::string wopts;
      wopts   = "PARALLEL=WRITE_PART;";
@@ -226,7 +225,7 @@ ErrorCode migrate(const char*filename, const char * outfile)
 
     // we can now free the sender buffers
   if (comm2 != MPI_COMM_NULL)
-     ierr = iMOAB_FreeSenderBuffers(pid2, &jcomm, &compid1);
+     ierr = iMOAB_FreeSenderBuffers(pid2, &context_id);
 
   if (comm2 != MPI_COMM_NULL) {
     ierr = iMOAB_DeregisterApplication(pid2);
