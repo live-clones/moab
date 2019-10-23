@@ -4229,7 +4229,10 @@ ErrorCode ParallelComm::get_remote_handles(EntityHandle *local_vec, EntityHandle
       iface_ents = subtract(iface_ents, rmv_ents);
       // Compress the pstat vector (removing 0x0's)
       std::remove_if(pstat.begin(), pstat.end(),
-                     std::bind2nd(std::equal_to<unsigned char>(), 0x0));
+          std::bind(std::equal_to<unsigned char>(), std::placeholders::_1, 0x0)
+          );
+                     // std::bind2nd(std::equal_to<unsigned char>(), 0x0));
+// https://stackoverflow.com/questions/32739018/a-replacement-for-stdbind2nd
       // Fold the not_owned bit into remaining values
       unsigned int sz = iface_ents.size();
       for (i = 0; i < sz; i++)

@@ -1225,7 +1225,8 @@ ErrorCode ReadHDF5::search_tag_values(int tag_index,
     // Convert from table indices to file IDs and add to result list
     std::sort(indices.begin(), indices.end(), std::greater<EntityHandle>());
     std::transform(indices.begin(), indices.end(), range_inserter(file_ids),
-                   std::bind1st(std::plus<long>(), start_id));
+        // std::bind1st(std::plus<long>(), start_id));
+        std::bind(std::plus<long>(), start_id, std::placeholders::_1));
     indices.clear();
   }
 
