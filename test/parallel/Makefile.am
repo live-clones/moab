@@ -44,11 +44,16 @@ TESTS = pcomm_unit \
 
 if HAVE_HDF5_PARALLEL
   HDF5_TESTS = parallel_hdf5_test mhdf_parallel parallel_write_test \
-         parallel_adj parmerge_test augment_with_ghosts uref_hirec_test_parallel migrate_test imoab_coupler \
+         parallel_adj parmerge_test augment_with_ghosts uref_hirec_test_parallel migrate_test \
          ghost_thin_layers 
+
 if HAVE_ZOLTAN
-         HDF5_TESTS += migrate_nontrivial
-endif 
+  HDF5_TESTS += migrate_nontrivial
+endif
+
+if HAVE_TEMPESTREMAP
+  HDF5_TESTS += imoab_coupler
+endif
 
 else
   HDF5_TESTS =
