@@ -23,6 +23,7 @@ using namespace moab;
     #include <H5Tpublic.h>
 #endif
 
+#include "moab/CartVect.hpp"
 #include "MBTagConventions.hpp"
 #include "moab/MeshTopoUtil.hpp"
 #include "moab/ReadUtilIface.hpp"
@@ -1539,7 +1540,6 @@ ErrCode iMOAB_SynchronizeTags ( iMOAB_AppID pid, int* num_tag, int* tag_indices,
 
 ErrCode iMOAB_ReduceTagsMax ( iMOAB_AppID pid, int* tag_index, int* ent_type )
 {
-
 #ifdef MOAB_HAVE_MPI
     appData& data = context.appDatas[*pid];
     Range ent_exchange;
@@ -1571,7 +1571,6 @@ ErrCode iMOAB_ReduceTagsMax ( iMOAB_AppID pid, int* tag_index, int* ent_type )
 #endif
     return 0;
 }
-
 
 ErrCode iMOAB_GetNeighborElements ( iMOAB_AppID pid, iMOAB_LocalID* local_index, int* num_adjacent_elements, iMOAB_LocalID* adjacent_element_IDs )
 {
@@ -1606,7 +1605,6 @@ ErrCode iMOAB_GetNeighborVertices ( iMOAB_AppID pid, iMOAB_LocalID* local_vertex
 
 #endif
 
-
 ErrCode iMOAB_CreateVertices ( iMOAB_AppID pid, int* coords_len, int* dim, double* coordinates )
 {
     ErrorCode rval;
@@ -1625,7 +1623,6 @@ ErrCode iMOAB_CreateVertices ( iMOAB_AppID pid, int* coords_len, int* dim, doubl
     data.all_verts.merge ( data.local_verts );
     return 0;
 }
-
 
 ErrCode iMOAB_CreateElements ( iMOAB_AppID pid, int* num_elem, int* type,  int* num_nodes_per_element,  int* connectivity,
                                int* block_ID )
@@ -1688,6 +1685,23 @@ ErrCode iMOAB_CreateElements ( iMOAB_AppID pid, int* num_elem, int* type,  int* 
 
     /// add the new ents to the clock set
     rval = context.MBI->add_entities ( block_set, new_elems );CHKERRVAL(rval);
+
+    return 0;
+}
+
+ErrCode iMOAB_SetGlobalInfo ( iMOAB_AppID pid, int* num_global_verts, int* num_global_elems )
+{
+    appData& data = context.appDatas[*pid];
+    data.num_global_vertices = *num_global_verts;
+    data.num_global_elements = *num_global_elems;
+    return 0;
+}
+
+ErrCode iMOAB_GetGlobalInfo ( iMOAB_AppID pid, int* num_global_verts, int* num_global_elems )
+{
+    appData& data = context.appDatas[*pid];
+    if ( NULL != num_global_verts ) { *num_global_verts = data.num_global_vertices; }
+    if ( NULL != num_global_elems ) { *num_global_elems = data.num_global_elements; }
 
     return 0;
 }
@@ -1765,27 +1779,6 @@ ErrCode iMOAB_DetermineGhostEntities (  iMOAB_AppID pid, int* ghost_dim, int* nu
     return rc;
 }
 
-#endif // #ifdef MOAB_HAVE_MPI
-
-ErrCode iMOAB_SetGlobalInfo ( iMOAB_AppID pid, int* num_global_verts, int* num_global_elems )
-{
-    appData& data = context.appDatas[*pid];
-    data.num_global_vertices = *num_global_verts;
-    data.num_global_elements = *num_global_elems;
-    return 0;
-}
-
-ErrCode iMOAB_GetGlobalInfo ( iMOAB_AppID pid, int* num_global_verts, int* num_global_elems )
-{
-    appData& data = context.appDatas[*pid];
-    if ( NULL != num_global_verts ) { *num_global_verts = data.num_global_vertices; }
-    if ( NULL != num_global_elems ) { *num_global_elems = data.num_global_elements; }
-
-    return 0;
-}
-
-#ifdef MOAB_HAVE_MPI
-
 ErrCode iMOAB_SendMesh ( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* receivingGroup, int* rcompid, int * method )
 {
     int ierr=0;
@@ -1831,12 +1824,12 @@ ErrCode iMOAB_SendMesh ( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* receiving
       int rank = pco->rank();
       number_elems_per_part.resize ( size ); //
       number_elems_per_part[rank] = local_owned_elem;
-  #if (MPI_VERSION >= 2)
+#if (MPI_VERSION >= 2)
       // Use "in place" option
       ierr = MPI_Allgather ( MPI_IN_PLACE, 0, MPI_DATATYPE_NULL,
                              &number_elems_per_part[0], 1, MPI_INTEGER,
                              sender );
-  #else
+#else
       {
           std::vector<int> all_tmp ( size );
           ierr = MPI_Allgather ( &number_elems_per_part[rank], 1, MPI_INTEGER,
@@ -1844,7 +1837,7 @@ ErrCode iMOAB_SendMesh ( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* receiving
                                  sender );
           number_elems_per_part = all_tmp;
       }
-  #endif
+#endif
 
       if ( ierr != 0 )
       { return 1; }
@@ -1869,7 +1862,6 @@ ErrCode iMOAB_SendMesh ( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* receiving
     MPI_Group_free(&senderGroup);
     return 0;
 }
-
 
 ErrCode iMOAB_ReceiveMesh ( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* sendingGroup,
                             int* scompid )
@@ -2018,8 +2010,7 @@ ErrCode iMOAB_ReceiveMesh ( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* sendin
   return 0;
 }
 
-
-void split_tag_names(std::string input_names, std::string & separator, std::vector<std::string> & list_tag_names)
+static void split_tag_names(std::string input_names, std::string & separator, std::vector<std::string> & list_tag_names)
 {
   size_t pos = 0;
   std::string token;
@@ -2144,7 +2135,6 @@ ErrCode iMOAB_ReceiveElementTag(iMOAB_AppID pid, int* scompid, int* rcompid, con
   return 0;
 }
 
-
 ErrCode iMOAB_FreeSenderBuffers ( iMOAB_AppID pid, int* context_id )
 {
     // need first to find the pgraph that holds the information we need
@@ -2158,7 +2148,7 @@ ErrCode iMOAB_FreeSenderBuffers ( iMOAB_AppID pid, int* context_id )
     return 0;
 }
 
-
+#ifdef MOAB_HAVE_TEMPESTREMAP
 // this call must be collective on the joint communicator
 //  intersection tasks on coupler will need to send to the components tasks the list of
 // id elements that are relevant: they intersected some of the target elements (which are not needed here)
@@ -2256,7 +2246,6 @@ ErrCode iMOAB_CoverageGraph ( MPI_Comm * join, iMOAB_AppID pid_src,
             setInts.insert ( gidCell );
         }
 
-#ifdef MOAB_HAVE_TEMPESTREMAP
         // if we have no intx cells, it means we are on point clouds; quick fix just use all cells from
         // coverage set
         if (cells.empty())
@@ -2286,7 +2275,6 @@ ErrCode iMOAB_CoverageGraph ( MPI_Comm * join, iMOAB_AppID pid_src,
               setInts.insert ( gidCell );
           }
         }
-#endif
 
 #ifdef VERBOSE
         std::ofstream dbfile;
@@ -2374,16 +2362,18 @@ ErrCode iMOAB_DumpCommGraph                 (  iMOAB_AppID pid,
     return 0;
 }
 
-#endif // MOAB_HAVE_MPI
+
+#endif // #ifdef MOAB_HAVE_TEMPESTREMAP
+
+#endif // #ifdef MOAB_HAVE_MPI
 
 #ifdef MOAB_HAVE_TEMPESTREMAP
 
 #define USE_API
-
 static ErrCode ComputeSphereRadius ( iMOAB_AppID pid, double* radius)
 {
     ErrorCode rval;
-    CartVect pos;
+    moab::CartVect pos;
 
     Range& verts = context.appDatas[*pid].all_verts;
     moab::EntityHandle firstVertex = (verts[0]);
@@ -2873,7 +2863,6 @@ ErrCode iMOAB_ApplyScalarProjectionWeights (   iMOAB_AppID pid_intersection,
 
     return 0;
 }
-
 
 #endif // MOAB_HAVE_TEMPESTREMAP
 
