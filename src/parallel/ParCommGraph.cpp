@@ -12,8 +12,9 @@
 #include "moab/ZoltanPartitioner.hpp"
 #endif
 
+// #define VERBOSE
+
 namespace moab {
-#define VERBOSE
 ParCommGraph::ParCommGraph(MPI_Comm joincomm, MPI_Group group1, MPI_Group group2, int coid1, int coid2) :
   comm(joincomm), compid1(coid1), compid2(coid2)
 {

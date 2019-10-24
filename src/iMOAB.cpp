@@ -2793,7 +2793,7 @@ ErrCode iMOAB_ApplyScalarProjectionWeights (   iMOAB_AppID pid_intersection,
       rval = context.MBI->tag_set_data (tsolnTag , tents, &solTTagVals[0] );CHKERRVAL(rval);
     }
 
-#define VERBOSE
+// #define VERBOSE
 #ifdef VERBOSE
       ParallelComm* pco_intx = context.pcomms[*pid_intersection];
 
@@ -2830,14 +2830,14 @@ ErrCode iMOAB_ApplyScalarProjectionWeights (   iMOAB_AppID pid_intersection,
       }
       {
           std::stringstream sstr;
-          sstr << "covMesh_" << *pid_intersection << "_" << "_" << pco_intx->rank() << ".vtk";
+          sstr << "covMesh_" << *pid_intersection << "_" << pco_intx->rank() << ".vtk";
           // EntityHandle sets[2] = {data_intx.file_set, data_intx.covering_set};
           EntityHandle covering_set = remapper->GetCoveringSet();
           rval = context.MBI->write_file ( sstr.str().c_str(), NULL, "", &covering_set, 1 ); MB_CHK_ERR ( rval );
       }
       {
           std::stringstream sstr;
-          sstr << "tgtMesh_" << *pid_intersection << "_" << "_" << pco_intx->rank() << ".vtk";
+          sstr << "tgtMesh_" << *pid_intersection<< "_" << pco_intx->rank() << ".vtk";
           // EntityHandle sets[2] = {data_intx.file_set, data_intx.covering_set};
           EntityHandle target_set = remapper->GetMeshSet(Remapper::TargetMesh) ;
           rval = context.MBI->write_file ( sstr.str().c_str(), NULL, "", &target_set, 1 ); MB_CHK_ERR ( rval );
@@ -2852,7 +2852,7 @@ ErrCode iMOAB_ApplyScalarProjectionWeights (   iMOAB_AppID pid_intersection,
           output_file.close();
       }
 #endif
-#undef VERBOSE
+// #undef VERBOSE
 
     return 0;
 }
