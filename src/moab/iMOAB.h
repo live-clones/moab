@@ -727,7 +727,6 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere ( iMOAB_AppID pid_source, iMOAB_Ap
 */
 ErrCode iMOAB_ComputePointDoFIntersection ( iMOAB_AppID pid_src, iMOAB_AppID pid_tgt, iMOAB_AppID pid_intx );
 
-
 /**
   \brief Recompute the communication graph between component and coupler, considering intersection coverage .
   \note
@@ -832,12 +831,12 @@ ErrCode iMOAB_DumpCommGraph                 (  iMOAB_AppID pid,
                                                const iMOAB_String prefix,
                                                int prefix_length);
 
-#endif
+#endif // #ifdef MOAB_HAVE_TEMPESTREMAP
 
-#endif
+#endif // #ifdef MOAB_HAVE_MPI
 
 #ifdef __cplusplus
 }
-#endif
+#endif // #ifdef __cplusplus
 
-#endif
+#endif // #ifndef IMOAB_H
