@@ -17,15 +17,13 @@ jobs:
     # Dependencies
     #   This would typically go in either a build or a build-and-test job when using workflows
     # Run the setup and install any pre-dependencies for building MOAB 
-    - run: |-
-        sudo apt-get install libhdf5-mpich2-dev libmetis-dev
+    - run: |
+        sudo apt-get -yy install libhdf5-mpich2-dev libmetis-dev
         autoreconf -fi
     # Run the actual configuration command
-    - run: ./configure --with-hdf5=/usr --with-metis=/usr --with-mpi=/usr && make all -j4
-    # Test
-    #   This would typically be a build job when using workflows, possibly combined with build
-    # This is based on your 1.0 configuration file or project settings
     - run: |
+        ./configure --with-hdf5=/usr --with-metis=/usr --with-mpi=/usr
+        make all -j4
         make check -j4
 
   distartifacts:
@@ -49,9 +47,11 @@ jobs:
     # Dependencies
     #   This would typically go in either a build or a build-and-test job when using workflows
     # Run the setup and install any pre-dependencies for building MOAB 
-    - run: |-
+    - run: |
         # 'See docs on artifact collection here https://circleci.com/docs/2.0/artifacts/'
         mkdir -p $CIRCLE_ARTIFACTS $CIRCLE_TEST_REPORTS
+        autoreconf -fi
+        ./configure
         make dist
         mv moab-*.tar.gz ${CIRCLE_ARTIFACTS}/moab-${CIRCLE_BRANCH}.tar.gz
     #   If you break your build into multiple jobs with workflows, you will probably want to do the parts of this that are relevant in each
@@ -77,5 +77,5 @@ workflows:
               only: 
                 - master
                 - develop
-                - circle*
+                - circleci-20-test
 
