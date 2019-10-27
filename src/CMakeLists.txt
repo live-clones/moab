@@ -5,10 +5,15 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}
                     ${MOAB_BINARY_DIR}/src/parallel )
 
 if(MOAB_HAVE_MPI AND MPI_FOUND)
+  message(STATUS "Adding parallel subdirectory.")
   add_subdirectory(parallel)
   set( MOAB_MPI moabpar )
   set( MOABPAR_OBJECTS $<TARGET_OBJECTS:moabpar> )
-  set( MPI_LIBRARIES ${MPI_LIBRARY} ${MPI_EXTRA_LIBRARY} )
+  set( MPI_LIBRARIES ${MPI_LIBRARY})
+  if (MPI_EXTRA_LIBRARY)
+    list(APPEND MPI_LIBRARIES ${MPI_EXTRA_LIBRARY})
+  endif ()
+  message(STATUS "MPI_LIBRARIES = ${MPI_LIBRARIES}.")
 endif()
 
 #Create the moab/EntityHandle.hpp file
@@ -18,7 +23,9 @@ file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/moab/EntityHandle.hpp.in" "${outstring2}
 configure_file(${CMAKE_CURRENT_BINARY_DIR}/moab/EntityHandle.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/moab/EntityHandle.hpp)
 
 set(moab_link_lib)
+message(STATUS "Adding io subdirectory.")
 add_subdirectory(io)
+message(STATUS "Adding IntxMesh subdirectory.")
 add_subdirectory(IntxMesh)
 
 if (ENABLE_MESQUITE AND MOAB_HAVE_CGM)
