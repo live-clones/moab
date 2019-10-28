@@ -171,9 +171,11 @@ void Util::face_centers(Interface *MB, EntityHandle handle, std::vector<Coord> &
 
 // Explicit template specializations
 template bool Util::is_finite<double>(double value);
-template bool Util::is_finite<int>(int value);
-template bool Util::is_finite<unsigned int>(unsigned int value);
-template bool Util::is_finite<long>(long value);
+// isnan, isinf are for floats only
+// http://www.cplusplus.com/reference/cmath/isnan
+// template bool Util::is_finite<int>(int value);
+// template bool Util::is_finite<unsigned int>(unsigned int value);
+// template bool Util::is_finite<long>(long value);
 
 } // namespace moab
 
