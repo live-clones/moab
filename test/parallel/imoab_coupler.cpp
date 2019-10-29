@@ -133,8 +133,8 @@ int main( int argc, char* argv[] )
   opts.addOpt<int>("endLnd,f", "end task for land layout", &endG3);
 #endif
 
-  opts.addOpt<int>("startCoupler,k", "start task for coupler layout", &startG4);
-  opts.addOpt<int>("endCoupler,l", "end task for coupler layout", &endG4);
+  opts.addOpt<int>("startCoupler,g", "start task for coupler layout", &startG4);
+  opts.addOpt<int>("endCoupler,h", "end task for coupler layout", &endG4);
 
   opts.addOpt<int>("partitioning,p", "partitioning option for migration", &repartitioner_scheme);
 
