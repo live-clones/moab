@@ -666,15 +666,13 @@ ErrCode iMOAB_ReceiveMesh ( iMOAB_AppID pid, MPI_Comm* join, MPI_Group* sendingG
   <B>Operations:</B> Collective over the sender group, nonblocking sends
 
    \param[in]  pid (iMOAB_AppID)                      The unique pointer to the application ID source mesh
-   \param[in]  scompid  (int*)                        external id of application that sends the tags
-   \param[in]  rcompid  (int*)                        external id of application that receives the mesh
    \param[in]  tag_storage_name(const iMOAB_String)   name of the tags; concatenated, separated by ";"
    \param[in]  join (MPI_Comm)                        communicator that overlaps both groups
    \param[in]  context_id (int*)                      id of the other component in intersection; -1 if original migrate
    \param[in]  tag_storage_name_length (int)          The length of the tag_storage_name string
  */
 
-ErrCode iMOAB_SendElementTag(iMOAB_AppID pid, int* scompid, int* rcompid, const iMOAB_String tag_storage_name,
+ErrCode iMOAB_SendElementTag(iMOAB_AppID pid, const iMOAB_String tag_storage_name,
     MPI_Comm* join, int * context_id, int tag_storage_name_length);
 
 /**
@@ -682,14 +680,12 @@ ErrCode iMOAB_SendElementTag(iMOAB_AppID pid, int* scompid, int* rcompid, const 
   <B>Operations:</B> Collective over the receiver group, blocking receives
 
    \param[in]  pid (iMOAB_AppID)                      The unique pointer to the application ID  mesh (receiver)
-   \param[in]  scompid ( int *)                       external id of application that sends the tag data
-   \param[in]  rcompid ( int *)                       external id of application that receives the tag data
    \param[in]  tag_storage_name (iMOAB_String)        name of the tags to be received; concatenated, separated by ";"
    \param[in]  join (MPI_Comm)                        communicator that overlaps both groups
    \param[in]  context_id (int*)                      id of the other component in intersection; -1 if original migrate
    \param[in]  tag_storage_name_length (int)          The length of the tag_storage_name string
  */
-ErrCode iMOAB_ReceiveElementTag(iMOAB_AppID pid, int* scompid, int* rcompid, const iMOAB_String tag_storage_name,
+ErrCode iMOAB_ReceiveElementTag(iMOAB_AppID pid, const iMOAB_String tag_storage_name,
     MPI_Comm* join, int * context_id, int tag_storage_name_length);
 
 #ifdef MOAB_HAVE_TEMPESTREMAP
@@ -740,13 +736,11 @@ ErrCode iMOAB_ComputePointDoFIntersection ( iMOAB_AppID pid_src, iMOAB_AppID pid
   on component source tasks, we will wait for information; from each intx task, will receive cells ids involved in intx
   \param[in]  join (MPI_Comm)                        communicator that overlaps component source PEs and coupler PEs
   \param[in]  pid_src (iMOAB_AppID)                  moab id for the component mesh on component PE
-  \param[in]  scompid (int*)                         external id of application source
   \param[in]  pid_migr (iMOAB_AppID)                 moab id for the migrated mesh on coupler PEs
-  \param[in]  migrcomp (int*)                        external id of migrated application to coupler PEs
   \param[in]  pid_intx (iMOAB_AppID)                 moab id for intersection mesh (on coupler PEs)
   \param[in]  context_id (int*)                      id of the other component in intersection
   */
-ErrCode iMOAB_CoverageGraph(MPI_Comm* join, iMOAB_AppID pid_src, int* scompid, iMOAB_AppID pid_migr, int* migrcomp, iMOAB_AppID pid_intx, int * context_id);
+ErrCode iMOAB_CoverageGraph(MPI_Comm* join, iMOAB_AppID pid_src, iMOAB_AppID pid_migr, iMOAB_AppID pid_intx, int * context_id);
 
 /**
   \brief Compute the projection weights to transfer a solution from a source surface mesh to a destination mesh defined on a sphere. 

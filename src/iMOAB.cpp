@@ -2029,12 +2029,10 @@ static void split_tag_names(std::string input_names, std::string & separator, st
   return ;
 }
 
-ErrCode iMOAB_SendElementTag(iMOAB_AppID pid, int* scompid, int* rcompid, const iMOAB_String tag_storage_name,
+ErrCode iMOAB_SendElementTag(iMOAB_AppID pid, const iMOAB_String tag_storage_name,
     MPI_Comm* join, int * context_id, int tag_storage_name_length)
 {
-  // first, based on the scompid and rcompid, find the parCommGraph corresponding to this exchange
-  // instantiate the par comm graph
-  // ParCommGraph::ParCommGraph(MPI_Comm joincomm, MPI_Group group1, MPI_Group group2, int coid1, int coid2)
+
   appData& data = context.appDatas[*pid];
   std::map<int,ParCommGraph*>::iterator mt=data.pgraph.find(*context_id);
   if ( mt == data.pgraph.end() ) { return 1; }
@@ -2072,13 +2070,11 @@ ErrCode iMOAB_SendElementTag(iMOAB_AppID pid, int* scompid, int* rcompid, const 
   return 0;
 }
 
-ErrCode iMOAB_ReceiveElementTag(iMOAB_AppID pid, int* scompid, int* rcompid, const iMOAB_String tag_storage_name,
+ErrCode iMOAB_ReceiveElementTag(iMOAB_AppID pid, const iMOAB_String tag_storage_name,
     MPI_Comm* join, int * context_id, int tag_storage_name_length)
 {
   appData& data = context.appDatas[*pid];
-  // first, based on the scompid and rcompid, find the parCommGraph corresponding to this exchange
-  // instantiate the par comm graph
-  // ParCommGraph::ParCommGraph(MPI_Comm joincomm, MPI_Group group1, MPI_Group group2, int coid1, int coid2)
+
   std::map<int,ParCommGraph*>::iterator mt=data.pgraph.find(*context_id);
   if ( mt == data.pgraph.end() ) { return 1; }
   ParCommGraph* cgraph = mt->second;
@@ -2155,8 +2151,8 @@ ErrCode iMOAB_FreeSenderBuffers ( iMOAB_AppID pid, int* context_id )
 // id elements that are relevant: they intersected some of the target elements (which are not needed here)
 //  in the intersection
 ErrCode iMOAB_CoverageGraph ( MPI_Comm * join, iMOAB_AppID pid_src,
-                              int* scompid, iMOAB_AppID pid_migr,
-                              int* migrcomp, iMOAB_AppID pid_intx, int * context_id )
+                              iMOAB_AppID pid_migr,
+                              iMOAB_AppID pid_intx, int * context_id )
 {
     // first, based on the scompid and migrcomp, find the parCommGraph corresponding to this exchange
     ErrorCode rval;

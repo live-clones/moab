@@ -462,7 +462,7 @@ int main( int argc, char* argv[] )
     // what to send for ocean cover ; every time, we will
     //  use the element global id, which should uniquely identify the element
     PUSH_TIMER("Compute OCN coverage graph for ATM mesh")
-    ierr = iMOAB_CoverageGraph(&atmCouComm, cmpAtmPID,  &cmpatm, cplAtmPID,  &cplatm, cplAtmOcnPID, &cplocn); // it happens over joint communicator
+    ierr = iMOAB_CoverageGraph(&atmCouComm, cmpAtmPID,  cplAtmPID,  cplAtmOcnPID, &cplocn); // it happens over joint communicator
     CHECKIERR(ierr, "cannot recompute direct coverage graph for ocean" )
     POP_TIMER(atmCouComm, rankInAtmComm) // hijack this rank
   }
@@ -484,7 +484,7 @@ int main( int argc, char* argv[] )
     // what to send (specifically for land cover); every time,
     /// we will use the element global id, which should uniquely identify the element
     PUSH_TIMER("Compute LND coverage graph for ATM mesh")
-    ierr = iMOAB_CoverageGraph(&atmCouComm, cmpAtmPID,  &cmpatm, cplAtmPID,  &cplatm, cplAtmLndPID, &cpllnd); // it happens over joint communicator
+    ierr = iMOAB_CoverageGraph(&atmCouComm, cmpAtmPID,  cplAtmPID,  cplAtmLndPID, &cpllnd); // it happens over joint communicator
     CHECKIERR(ierr, "cannot recompute direct coverage graph for land" )
     POP_TIMER(atmCouComm, rankInAtmComm) // hijack this rank
   }
@@ -624,12 +624,12 @@ int main( int argc, char* argv[] )
   if (atmComm != MPI_COMM_NULL ){
      // as always, use nonblocking sends
     // this is for projection to ocean:
-     ierr = iMOAB_SendElementTag(cmpAtmPID, &cmpatm, &cplatm, "a2oTbot;a2oUbot;a2oVbot;", &atmCouComm, &cplocn, strlen("a2oTbot;a2oUbot;a2oVbot;"));
+     ierr = iMOAB_SendElementTag(cmpAtmPID, "a2oTbot;a2oUbot;a2oVbot;", &atmCouComm, &cplocn, strlen("a2oTbot;a2oUbot;a2oVbot;"));
      CHECKIERR(ierr, "cannot send tag values")
   }
   if (couComm != MPI_COMM_NULL) {
     // receive on atm on coupler pes, that was redistributed according to coverage
-    ierr = iMOAB_ReceiveElementTag(cplAtmPID, &cmpatm, &cplatm, "a2oTbot;a2oUbot;a2oVbot;", &atmCouComm, &cplocn, strlen("a2oTbot;a2oUbot;a2oVbot;"));
+    ierr = iMOAB_ReceiveElementTag(cplAtmPID, "a2oTbot;a2oUbot;a2oVbot;", &atmCouComm, &cplocn, strlen("a2oTbot;a2oUbot;a2oVbot;"));
     CHECKIERR(ierr, "cannot receive tag values")
   }
   POP_TIMER(MPI_COMM_WORLD, rankInGlobalComm)
@@ -681,7 +681,7 @@ int main( int argc, char* argv[] )
       // as always, use nonblocking sends
   // original graph (context is -1_
   if (couComm != MPI_COMM_NULL){
-    ierr = iMOAB_SendElementTag(cplOcnPID, &cplocn, &cmpocn, "a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;", &ocnCouComm, &context_id,
+    ierr = iMOAB_SendElementTag(cplOcnPID, "a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;", &ocnCouComm, &context_id,
         strlen("a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;"));
     CHECKIERR(ierr, "cannot send tag values back to ocean pes")
   }
@@ -689,7 +689,7 @@ int main( int argc, char* argv[] )
   // receive on component 2, ocean
   if (ocnComm != MPI_COMM_NULL)
   {
-    ierr = iMOAB_ReceiveElementTag(cmpOcnPID, &cplocn, &cmpocn, "a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;",
+    ierr = iMOAB_ReceiveElementTag(cmpOcnPID, "a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;",
         &ocnCouComm, &context_id, strlen("a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;"));
     CHECKIERR(ierr, "cannot receive tag values from ocean mesh on coupler pes")
   }
@@ -714,12 +714,12 @@ int main( int argc, char* argv[] )
 
      // as always, use nonblocking sends
     // this is for projection to land:
-     ierr = iMOAB_SendElementTag(cmpAtmPID, &cmpatm, &cplatm, "a2oTbot;a2oUbot;a2oVbot;", &atmCouComm, &cpllnd, strlen("a2oTbot;a2oUbot;a2oVbot;"));
+     ierr = iMOAB_SendElementTag(cmpAtmPID, "a2oTbot;a2oUbot;a2oVbot;", &atmCouComm, &cpllnd, strlen("a2oTbot;a2oUbot;a2oVbot;"));
      CHECKIERR(ierr, "cannot send tag values")
   }
   if (couComm != MPI_COMM_NULL){
     // receive on atm on coupler pes, that was redistributed according to coverage, for land context
-    ierr = iMOAB_ReceiveElementTag(cplAtmPID, &cmpatm, &cplatm, "a2oTbot;a2oUbot;a2oVbot;", &atmCouComm, &cpllnd, strlen("a2oTbot;a2oUbot;a2oVbot;"));
+    ierr = iMOAB_ReceiveElementTag(cplAtmPID, "a2oTbot;a2oUbot;a2oVbot;", &atmCouComm, &cpllnd, strlen("a2oTbot;a2oUbot;a2oVbot;"));
     CHECKIERR(ierr, "cannot receive tag values")
   }
   POP_TIMER(MPI_COMM_WORLD, rankInGlobalComm)
@@ -778,14 +778,14 @@ int main( int argc, char* argv[] )
     CHECKIERR(ierr, "failed to define the field tag for receiving back the tag a2oVbot_proj on lnd pes");
   }
   if (couComm != MPI_COMM_NULL){
-    ierr = iMOAB_SendElementTag(cplLndPID, &cpllnd, &cmplnd, "a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;", &lndCouComm, &context_id,
+    ierr = iMOAB_SendElementTag(cplLndPID, "a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;", &lndCouComm, &context_id,
         strlen("a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;"));
     CHECKIERR(ierr, "cannot send tag values back to land pes")
   }
   // receive on component 3, land
   if (lndComm != MPI_COMM_NULL)
   {
-    ierr = iMOAB_ReceiveElementTag(cmpLndPID, &cpllnd, &cmplnd, "a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;",
+    ierr = iMOAB_ReceiveElementTag(cmpLndPID, "a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;",
         &lndCouComm, &context_id, strlen("a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;"));
     CHECKIERR(ierr, "cannot receive tag values from land mesh on coupler pes")
   }

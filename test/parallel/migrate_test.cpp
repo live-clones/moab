@@ -203,7 +203,7 @@ ErrorCode migrate(const char*filename, const char * outfile)
 
     // first, send from compid2 to compid1, from comm2, using common joint comm
      // as always, use nonblocking sends
-     ierr = iMOAB_SendElementTag(pid2, &compid2, &compid1, "element_field", &jcomm, &context_id, strlen("element_field"));
+     ierr = iMOAB_SendElementTag(pid2, "element_field", &jcomm, &context_id, strlen("element_field"));
      CHECKRC(ierr, "cannot send tag values")
   }
   // receive on component 1
@@ -212,7 +212,7 @@ ErrorCode migrate(const char*filename, const char * outfile)
      ierr = iMOAB_DefineTagStorage(pid1, "element_field", &tagType, &size_tag, &tagIndex1,  strlen("element_field") );
      CHECKRC(ierr, "failed to get tag DFIELD ");
 
-     ierr = iMOAB_ReceiveElementTag(pid1, &compid2, &compid1, "element_field", &jcomm, &context_id, strlen("element_field"));
+     ierr = iMOAB_ReceiveElementTag(pid1, "element_field", &jcomm, &context_id, strlen("element_field"));
      CHECKRC(ierr, "cannot send tag values")
      std::string wopts;
      wopts   = "PARALLEL=WRITE_PART;";
