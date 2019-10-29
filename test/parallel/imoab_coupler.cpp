@@ -134,7 +134,7 @@ int main( int argc, char* argv[] )
 #endif
 
   opts.addOpt<int>("startCoupler,g", "start task for coupler layout", &startG4);
-  opts.addOpt<int>("endCoupler,h", "end task for coupler layout", &endG4);
+  opts.addOpt<int>("endCoupler,j", "end task for coupler layout", &endG4);
 
   opts.addOpt<int>("partitioning,p", "partitioning option for migration", &repartitioner_scheme);
 
@@ -192,9 +192,9 @@ int main( int argc, char* argv[] )
   groupTasks.resize(numProcesses, 0);
   MPI_Group couPEGroup;
   for (int i=startG4; i<=endG4; i++)
-    groupTasks [i-startG3] = i;
+    groupTasks [i-startG4] = i;
 
-  ierr = MPI_Group_incl(jgroup, endG3-startG3+1, &groupTasks[0], &couPEGroup);
+  ierr = MPI_Group_incl(jgroup, endG4-startG4+1, &groupTasks[0], &couPEGroup);
   CHECKIERR(ierr, "Cannot create couPEGroup")
 
   // create 3 communicators, one for each group
@@ -223,7 +223,7 @@ int main( int argc, char* argv[] )
   int COU_COMM_TAG = 4;
   MPI_Comm couComm;
   // lndComm is for land app
-  ierr = MPI_Comm_create_group(MPI_COMM_WORLD, lndPEGroup, COU_COMM_TAG, &couComm);
+  ierr = MPI_Comm_create_group(MPI_COMM_WORLD, couPEGroup, COU_COMM_TAG, &couComm);
   CHECKIERR(ierr, "Cannot create lndComm")
 
   // now, create the joint communicators atm_coupler, ocn_coupler, land_coupler
