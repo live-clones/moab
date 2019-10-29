@@ -2793,9 +2793,6 @@ ErrCode iMOAB_ApplyScalarProjectionWeights (   iMOAB_AppID pid_intersection,
       // Optionally, can also perform the transpose application of the weight matrix. Set the 3rd argument to true if this is needed
       rval = weightMap->ApplyWeights(solSTagVals, solTTagVals, false);CHKERRVAL(rval);
 
-      std::cout << "Data on source mesh: " << solSTagVals[0] << ", " << solSTagVals[1] << ", " << solSTagVals[2] << "\n";
-      std::cout << "Data on target mesh: " << solTTagVals[0] << ", " << solTTagVals[1] << ", " << solTTagVals[2] << "\n";
-
       // The tag data is np*np*n_el_dest
       rval = context.MBI->tag_set_data (tsolnTag , tents, &solTTagVals[0] );CHKERRVAL(rval);
     }
