@@ -1931,16 +1931,17 @@ ErrCode iMOAB_ReceiveMesh ( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* sendin
   rval = context.MBI->tag_get_handle ( "GLOBAL_ID", idtag );CHKERRVAL(rval);
 
 //   data.point_cloud = false;
-  if ( ( int ) senders_local.size() >= 2 )// need to remove duplicate vertices
-  // that might come from different senders
-  {
-    Range local_ents;
-    rval = context.MBI->get_entities_by_handle ( local_set, local_ents );CHKERRVAL(rval);
+  Range local_ents;
+  rval = context.MBI->get_entities_by_handle ( local_set, local_ents );CHKERRVAL(rval);
 
-    Range local_verts = local_ents.subset_by_type ( MBVERTEX );
-    // do not do merge if point cloud
-    if ( !local_ents.all_of_type(MBVERTEX) )
+  // do not do merge if point cloud
+  if ( !local_ents.all_of_type(MBVERTEX) )
+  {
+    if ( ( int ) senders_local.size() >= 2 )// need to remove duplicate vertices
+    // that might come from different senders
     {
+
+      Range local_verts = local_ents.subset_by_type ( MBVERTEX );
       Range local_elems = subtract ( local_ents, local_verts );
 
       // remove from local set the vertices
@@ -1962,9 +1963,9 @@ ErrCode iMOAB_ReceiveMesh ( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* sendin
       rval = context.MBI->add_entities ( local_set, new_verts );CHKERRVAL(rval);
 
     }
-    else
-      data.point_cloud = true;
   }
+  else
+    data.point_cloud = true;
 
   if (!data.point_cloud)
   {
