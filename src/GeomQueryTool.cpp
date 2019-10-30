@@ -498,10 +498,40 @@ namespace moab {
     }
   }
 
+GeomQueryTool::GeomQueryTool(Interface* impl,
+                             bool find_geomsets,
+                             EntityHandle modelRootSet,
+                             bool p_rootSets_vector,
+                             bool restore_rootSets,
+                             bool trace_counting,
+                             double overlap_thickness,
+                             double numerical_precision) :
+  owns_gtt(true)
+{
+  geomTopoTool = new GeomTopoTool(impl,
+                                  find_geomsets,
+                                  modelRootSet,
+                                  p_rootSets_vector,
+                                  restore_rootSets);
 
+  senseTag = geomTopoTool->get_sense_tag();
+
+  obbTreeTool = geomTopoTool->obb_tree();
+  MBI = geomTopoTool->get_moab_instance();
+
+  counting = trace_counting;
+  overlapThickness = overlap_thickness;
+  numericalPrecision = numerical_precision;
+
+  // reset query counters
+  n_pt_in_vol_calls = 0;
+  n_ray_fire_calls = 0;
+}
 
 GeomQueryTool::GeomQueryTool(GeomTopoTool* geomtopotool, bool trace_counting,
-                             double overlap_thickness, double numerical_precision){
+                             double overlap_thickness, double numerical_precision) :
+  owns_gtt(false)
+{
 
   geomTopoTool = geomtopotool;
 
@@ -519,7 +549,9 @@ GeomQueryTool::GeomQueryTool(GeomTopoTool* geomtopotool, bool trace_counting,
   n_ray_fire_calls = 0;
 }
 
-GeomQueryTool::~GeomQueryTool() {}
+GeomQueryTool::~GeomQueryTool() {
+  if (owns_gtt) { delete geomTopoTool; }
+}
 
 ErrorCode GeomQueryTool::initialize() {
 
@@ -802,7 +834,7 @@ ErrorCode GeomQueryTool::point_in_volume(const EntityHandle volume,
                               min_tolerance_intersections, &root, &volume,
                               &senseTag, NULL,
                               history ? &(history->prev_facets) : NULL );
-  
+
   OrientedBoxTreeTool::IntersectSearchWindow search_win(&ray_length,(double*)NULL);
   rval = geomTopoTool->obb_tree()->ray_intersect_sets( dists, surfs, facets, root, numericalPrecision,
                                                        xyz, ray_direction, search_win, int_reg_ctxt);
