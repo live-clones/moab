@@ -341,7 +341,7 @@ int main( int argc, char* argv[] )
   RUN_TEST( test_ray_fire );
   RUN_TEST( test_point_in_volume );
 
-  // clear moab and dagmc instance
+  // clear moab instance
   rval = gqt->moab_instance()->delete_mesh();
   if (MB_SUCCESS != rval) {
     std::cerr << "Failed to delete mesh." << std::endl;
@@ -391,6 +391,100 @@ int main( int argc, char* argv[] )
 #endif
 
   delete gtt;
+  delete gqt;
+
+  // clear moab instance
+  rval = gqt->moab_instance()->delete_mesh();
+  if (MB_SUCCESS != rval) {
+    std::cerr << "Failed to delete mesh." << std::endl;
+    return 2;
+  }
+
+  rval = write_geometry( filename );
+  if (MB_SUCCESS != rval) {
+    remove( filename );
+    std::cerr << "Failed to create input file: " << filename << std::endl;
+    return 1;
+  }
+
+  // Re-run all tests with the alternate constructor
+  std::cout << "Re-running tests with MBI constructor" << std::endl;
+
+  rval = MBI->load_file( filename );
+  remove( filename );
+  if (MB_SUCCESS != rval) {
+    std::cerr << "Failed to load file." << std::endl;
+    return 2;
+  }
+
+  gqt = new GeomQueryTool(MBI);
+
+  rval = gqt->initialize();
+  if (MB_SUCCESS != rval) {
+    std::cerr << "Failed to initialize the GeometryQueryTool." << std::endl;
+    return 2;
+  }
+
+  RUN_TEST( test_ray_fire );
+  RUN_TEST( test_closest_to_location );
+  RUN_TEST( test_point_in_volume );
+  RUN_TEST( test_measure_volume );
+  RUN_TEST( test_measure_area );
+  RUN_TEST( test_surface_sense );
+
+  // change settings to use overlap-tolerant mode (arbitrary thickness)
+  overlap_thickness = 0.1;
+  gqt->set_overlap_thickness( overlap_thickness );
+  RUN_TEST( test_ray_fire );
+  RUN_TEST( test_point_in_volume );
+
+  // clear moab and dagmc instance
+  rval = gqt->moab_instance()->delete_mesh();
+  if (MB_SUCCESS != rval) {
+    std::cerr << "Failed to delete mesh." << std::endl;
+    return 2;
+  }
+
+  // Now load a different geometry: two cubes that slightly overlap
+  rval = overlap_write_geometry( filename );
+  if (MB_SUCCESS != rval) {
+    remove( filename );
+    std::cerr << "Failed to create input file: " << filename << std::endl;
+    return 1;
+  }
+
+   delete gqt;
+
+  rval = MBI->load_file( filename );
+  remove( filename );
+  if (MB_SUCCESS != rval) {
+    std::cerr << "Failed to load file with overlaps." << std::endl;
+    return 2;
+  }
+
+  gqt = new GeomQueryTool(MBI);
+
+  rval = gqt->initialize();
+  if (MB_SUCCESS != rval) {
+    std::cerr << "Failed to initialize the GeometryQueryTool." << std::endl;
+    return 2;
+  }
+
+  // change settings to use overlap-tolerant mode (with a large enough thickness)
+  overlap_thickness = 3;
+  gqt->set_overlap_thickness( overlap_thickness );
+  RUN_TEST( overlap_test_ray_fire );
+  RUN_TEST( overlap_test_point_in_volume );
+  RUN_TEST( overlap_test_measure_volume );
+  RUN_TEST( overlap_test_measure_area );
+  RUN_TEST( overlap_test_surface_sense );
+  RUN_TEST( overlap_test_tracking );
+
+#ifdef MOAB_HAVE_MPI
+  fail = MPI_Finalize();
+  if (fail) return fail;
+#endif
+
   delete gqt;
 
   delete MBI;
@@ -1186,5 +1280,3 @@ ErrorCode overlap_test_tracking( GeomQueryTool * gqt )
 
   return MB_SUCCESS;
 }
-
-
