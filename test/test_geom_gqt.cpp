@@ -290,7 +290,7 @@ int main( int argc, char* argv[] )
 
 #ifdef MOAB_HAVE_MPI
   int fail = MPI_Init(&argc, &argv);
-  if (fail) return fail;
+  if (fail) return 1;
 #endif
 
   rval = write_geometry( filename );
@@ -419,8 +419,8 @@ int run_overlap_tests(GeomQueryTool* gqt)
   RUN_TEST( overlap_test_tracking );
 
 #ifdef MOAB_HAVE_MPI
-  fail = MPI_Finalize();
-  if (fail) return fail;
+  int fail = MPI_Finalize();
+  if (fail) return 1;
 #endif
 
   return errors;
