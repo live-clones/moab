@@ -290,7 +290,7 @@ int main( int argc, char* argv[] )
 
 #ifdef MOAB_HAVE_MPI
   int fail = MPI_Init(&argc, &argv);
-  if (fail) return 1;
+  if (fail) return fail;
 #endif
 
   rval = write_geometry( filename );
@@ -373,6 +373,11 @@ int main( int argc, char* argv[] )
   delete gqt;
   delete MBI;
 
+#ifdef MOAB_HAVE_MPI
+  fail = MPI_Finalize();
+  if (fail) return fail;
+#endif
+
   return errors;
 }
 
@@ -417,11 +422,6 @@ int run_overlap_tests(GeomQueryTool* gqt)
   RUN_TEST( overlap_test_measure_area );
   RUN_TEST( overlap_test_surface_sense );
   RUN_TEST( overlap_test_tracking );
-
-#ifdef MOAB_HAVE_MPI
-  int fail = MPI_Finalize();
-  if (fail) return 1;
-#endif
 
   return errors;
 }
