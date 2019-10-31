@@ -36,6 +36,14 @@
 #include "moab/Types.hpp"
 #include "moab/CartVect.hpp"
 
+#if defined(MOAB_FC_FUNC_)
+#define MOAB_FC_WRAPPER MOAB_FC_FUNC_
+#elif defined(MOAB_FC_FUNC)
+#define MOAB_FC_WRAPPER MOAB_FC_FUNC
+#else
+#define MOAB_FC_WRAPPER(name,NAME) name
+#endif
+
 #ifndef MOAB_HAVE_LAPACK
 
 #ifndef MOAB_HAVE_EIGEN
@@ -63,11 +71,11 @@
 
 // We will rely on LAPACK directly
 
-#define MOAB_dsyevd MOAB_FC_FUNC(dsyevd, DSYEVD)
-#define MOAB_dsyevr MOAB_FC_FUNC(dsyevr, DSYEVR)
-#define MOAB_dgeev  MOAB_FC_FUNC(dgeev, DGEEV)
-#define MOAB_dgetrf MOAB_FC_FUNC(dgetrf, DGETRF)
-#define MOAB_dgetri MOAB_FC_FUNC(dgetri, DGETRI)
+#define MOAB_dsyevd MOAB_FC_WRAPPER(dsyevd, DSYEVD)
+#define MOAB_dsyevr MOAB_FC_WRAPPER(dsyevr, DSYEVR)
+#define MOAB_dgeev  MOAB_FC_WRAPPER(dgeev, DGEEV)
+#define MOAB_dgetrf MOAB_FC_WRAPPER(dgetrf, DGETRF)
+#define MOAB_dgetri MOAB_FC_WRAPPER(dgetri, DGETRI)
 
 extern "C" {
 
