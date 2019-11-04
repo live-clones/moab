@@ -8,7 +8,13 @@ if(MOAB_HAVE_MPI AND MPI_FOUND)
   add_subdirectory(parallel)
   set( MOAB_MPI moabpar )
   set( MOABPAR_OBJECTS $<TARGET_OBJECTS:moabpar> )
-  set( MPI_LIBRARIES ${MPI_LIBRARY} ${MPI_EXTRA_LIBRARY} )
+  # find_package(MPI) sets MPI_LIBARY, not MPI_LIBRARIES
+  if (MPI_LIBARY AND NOT MPI_LIBRARIES)
+    set(MPI_LIBRARIES ${MPI_LIBRARY})
+  endif ()
+  if (MPI_EXTRA_LIBRARY)
+    list(APPEND MPI_LIBRARIES ${MPI_EXTRA_LIBRARY})
+  endif ()
 endif()
 
 #Create the moab/EntityHandle.hpp file
@@ -283,6 +289,7 @@ set_target_properties(
   SOVERSION ${MOAB_VERSION_MAJOR}
   )
 
+message(STATUS "MOAB_LIBS = ${MOAB_LIBS}.")
 target_link_libraries(
   MOAB
   ${CMAKE_EXE_LINKER_FLAGS} ${MOAB_DEP_LIBRARIES} ${MOAB_LIBS} ${MOAB_CGM_LIBS} ${MPI_LIBRARIES} ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES}
