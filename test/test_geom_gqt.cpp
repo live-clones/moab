@@ -309,7 +309,7 @@ int main( int argc, char* argv[] )
   errors += run_regular_tests(gqt);
 
   // clear out moab instance
-  rval = gqt->moab_instance()->delete_mesh();
+  rval = MBI->delete_mesh();
   MB_CHK_SET_ERR(rval, "Failed to delete mesh");
 
   delete gtt;
