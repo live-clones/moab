@@ -172,6 +172,7 @@ set( MOAB_INSTALL_HEADERS
         moab/Forward.hpp
         moab/GeomUtil.hpp
         moab/iMOAB.h
+        moab/imoab_protos.h
         moab/Interface.hpp
         moab/IntxMesh/Intx2Mesh.hpp
         moab/IntxMesh/IntxUtils.hpp
@@ -189,6 +190,8 @@ set( MOAB_INSTALL_HEADERS
         moab/point_locater/element_maps/quadratic_hex_map.hpp
         moab/point_locater/point_locater.hpp
         moab/point_locater/parametrizer.hpp
+        moab/DiscreteGeometry/DGMSolver.hpp
+        moab/DiscreteGeometry/HiReconstruction.hpp
         moab/ElemEvaluator.hpp
         moab/LocalDiscretization/LinearHex.hpp
         moab/LocalDiscretization/LinearQuad.hpp
