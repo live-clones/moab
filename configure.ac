@@ -520,8 +520,6 @@ else
   VERSION_STRING="AC_PACKAGE_STRING (Beta)"
 fi
 AC_DEFINE_UNQUOTED(VERSION_STRING,"${VERSION_STRING}",[MOAB Version String])
-LIBTOOL_VERSION="$VERSION_MAJOR:$VERSION_MINOR:$VERSION_PATCH"
-AC_SUBST(LIBTOOL_VERSION)
 
 ################################################################################
 #                Create libtool script
