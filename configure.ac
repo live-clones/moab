@@ -520,7 +520,11 @@ else
   VERSION_STRING="AC_PACKAGE_STRING (Beta)"
 fi
 AC_DEFINE_UNQUOTED(VERSION_STRING,"${VERSION_STRING}",[MOAB Version String])
-LIBTOOL_VERSION="$VERSION_MAJOR:$VERSION_MINOR:$VERSION_PATCH"
+
+# reverse engineer the parameters for libtool's version-info option to accomplish
+# the .so naming we desire based on the version number
+LIBTOOL_CURRENT=`expr $VERSION_MAJOR + $VERSION_PATCH`
+LIBTOOL_VERSION="$LIBTOOL_CURRENT:$VERSION_MINOR:$VERSION_PATCH"
 AC_SUBST(LIBTOOL_VERSION)
 
 ################################################################################
