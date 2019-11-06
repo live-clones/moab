@@ -76,6 +76,8 @@ libiMesh_la_includedir = $(includedir)
 
 libiMesh_la_LIBADD = $(top_builddir)/src/libMOAB.la
 
+libiMesh_la_LDFLAGS = -version-info @LIBTOOL_VERSION@
+
 # Automake doesn't seem to have a directory defined for
 # platform-dependent data (or include) files. So put
 # in $(libdir).  Define a $(cfgdir) to get around automake's
