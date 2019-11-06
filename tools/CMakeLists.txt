@@ -115,6 +115,7 @@ if ( MOAB_BUILD_MBCONVERT )
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     )
   SET(MOAB_DOCS ${MOAB_DOCS} README.mbconvert)
+  INSTALL(FILES mbconvert.man DESTINATION share/man/man1 RENAME mbconvert.1)
 endif ( )
 
 # MBHONODES
