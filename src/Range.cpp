@@ -462,8 +462,8 @@ Range::iterator Range::erase( iterator iter1, iterator iter2)
 
       dead->mPrev->mNext = dead->mNext;
       dead->mNext->mPrev = dead->mPrev;
-      dead->mPrev = dead->mNext = 0;
-      delete dead;
+      //dead->mPrev = dead->mNext = 0;
+      delete_pair_node( dead );
     }
 
     result = iter2;
