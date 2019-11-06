@@ -67,7 +67,7 @@
 #elif defined(MOAB_FC_FUNC)
 #define MOAB_FC_WRAPPER MOAB_FC_FUNC
 #else
-#define MOAB_FC_WRAPPER(name,NAME) name
+#define MOAB_FC_WRAPPER(name,NAME) name ## _
 #endif
 
 // We will rely on LAPACK directly
