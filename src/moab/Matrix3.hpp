@@ -36,13 +36,6 @@
 #include "moab/Types.hpp"
 #include "moab/CartVect.hpp"
 
-#if defined(MOAB_FC_FUNC_)
-#define MOAB_FC_WRAPPER MOAB_FC_FUNC_
-#elif defined(MOAB_FC_FUNC)
-#define MOAB_FC_WRAPPER MOAB_FC_FUNC
-#else
-#define MOAB_FC_WRAPPER(name,NAME) name
-#endif
 
 #ifndef MOAB_HAVE_LAPACK
 
@@ -67,7 +60,15 @@
 #pragma GCC diagnostic pop
 #endif
 
-#else // Check for LAPACK
+#else 
+
+#if defined(MOAB_FC_FUNC_)
+#define MOAB_FC_WRAPPER MOAB_FC_FUNC_
+#elif defined(MOAB_FC_FUNC)
+#define MOAB_FC_WRAPPER MOAB_FC_FUNC
+#else
+#define MOAB_FC_WRAPPER(name,NAME) name
+#endif
 
 // We will rely on LAPACK directly
 
