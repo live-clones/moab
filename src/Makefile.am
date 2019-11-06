@@ -4,6 +4,7 @@ AUTOMAKE_OPTIONS = foreign subdir-objects
 # Things to build
 lib_LTLIBRARIES = libMOAB.la
 AM_CPPFLAGS =
+libMOAB_la_LDFLAGS = -version-info @LIBTOOL_VERSION@
 
 # Subdirectories to build
 SUBDIRS = io .
