@@ -86,7 +86,7 @@ examples_pythonex_DATA = \
 examples_appsdir = $(datadir)/examples/apps
 examples_apps_DATA = \
                examples/apps/makefile
-examples_apps_earthdir = $(datadir)/examples/apps
+examples_apps_earthdir = $(datadir)/examples/apps/earth
 examples_apps_earth_DATA = \
                examples/apps/earth/makefile \
                examples/apps/earth/ContinentsOnGlobe.cpp
