@@ -186,29 +186,37 @@ set_target_properties(MOAB PROPERTIES LINK_SEARCH_END_STATIC 1)
 set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
 endif ( BUILD_SHARED_LIBS EQUAL OFF )
 
+set (MOAB_HAVE_BLAS OFF CACHE INTERNAL "Configured MOAB with BLAS library support." )
+set (MOAB_HAVE_LAPACK OFF CACHE INTERNAL "Configured MOAB with LAPACK library support." )
+
 if ( ENABLE_BLASLAPACK  )
   # Find BLAS
   FIND_PACKAGE(BLAS REQUIRED)
-  set (MOAB_HAVE_BLAS OFF CACHE INTERNAL "Configured MOAB with BLAS library support." )
   if (BLAS_FOUND)
     set(MOAB_HAVE_BLAS ON)
   endif(BLAS_FOUND)
 
   # Find LAPACK
   FIND_PACKAGE(LAPACK REQUIRED)
-  set (MOAB_HAVE_LAPACK OFF CACHE INTERNAL "Configured MOAB with LAPACK library support." )
   if (LAPACK_FOUND)
     set(MOAB_HAVE_LAPACK ON)
   endif(LAPACK_FOUND)
 
-  SET (ENABLE_FORTRAN ON)
-
-  # Find Eigen3 is optional
-  FIND_PACKAGE(Eigen3 OPTIONAL_COMPONENTS)
-else (ENABLE_BLASLAPACK)
-  # Find Eigen3 is required
-  FIND_PACKAGE(Eigen3 REQUIRED)
 endif (ENABLE_BLASLAPACK)
+
+if ( LAPACK_FOUND )
+  
+  SET (ENABLE_FORTRAN ON)
+    
+  # Eigen3 is optional if LAPACK has been found
+  FIND_PACKAGE(Eigen3 OPTIONAL_COMPONENTS)
+
+else ( LAPACK_FOUND )
+    
+  # Find Eigen3 is required if LAPACK is not found (or requested)
+  FIND_PACKAGE(Eigen3 REQUIRED)
+  
+endif ( LAPACK_FOUND )
 
 set (MOAB_HAVE_EIGEN OFF CACHE INTERNAL "Configured MOAB with Eigen3 library support." )
 if ( EIGEN3_FOUND )
