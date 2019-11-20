@@ -1177,7 +1177,7 @@ int moab::TempestOnlineMap::IsConsistent (double dTolerance)
         return OfflineMap::IsConsistent(dTolerance);
 
     // Only the root processor will perform the checks on the global matrix
-    if ( rank ) return true;
+    if ( rank ) return 0;
 
     // Get map entries
     DataArray1D<int> dataRows;
@@ -1218,7 +1218,7 @@ int moab::TempestOnlineMap::IsConservative (double dTolerance)
         return OfflineMap::IsConservative(dTolerance);
 
     // Only the root processor will perform the checks on the global matrix
-    if ( rank ) return true;
+    if ( rank ) return 0;
 
     // Get map entries
     DataArray1D<int> dataRows;
@@ -1264,7 +1264,7 @@ int moab::TempestOnlineMap::IsMonotone (double dTolerance)
         return OfflineMap::IsMonotone(dTolerance);
 
     // Only the root processor will perform the checks on the global matrix
-    if ( rank ) return true;
+    if ( rank ) return 0;
 
     // Get map entries
     DataArray1D<int> dataRows;
