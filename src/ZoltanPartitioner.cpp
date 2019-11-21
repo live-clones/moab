@@ -130,7 +130,7 @@ ErrorCode ZoltanPartitioner::balance_mesh(const char *zmethod,
   Zoltan_Initialize(argcArg, argvArg, &version);
 
   // Create Zoltan object.  This calls Zoltan_Create.
-  if (NULL == myZZ) myZZ = new Zoltan(MPI_COMM_WORLD);
+  if (NULL == myZZ) myZZ = new Zoltan(mbpc->comm());
 
   if (NULL == zmethod || !strcmp(zmethod, "RCB"))
     SetRCB_Parameters();
@@ -270,7 +270,7 @@ ErrorCode  ZoltanPartitioner::repartition(std::vector<double> & x,std::vector<do
   Zoltan_Initialize(argcArg, argvArg, &version);
 
   // Create Zoltan object.  This calls Zoltan_Create.
-  if (NULL == myZZ) myZZ = new Zoltan(MPI_COMM_WORLD);
+  if (NULL == myZZ) myZZ = new Zoltan(mbpc->comm());
 
   if (NULL == zmethod || !strcmp(zmethod, "RCB"))
     SetRCB_Parameters();
@@ -492,7 +492,7 @@ ErrorCode ZoltanPartitioner::partition_mesh_and_geometry(const double part_geom_
   Zoltan_Initialize(argcArg, argvArg, &version);
 
   // Create Zoltan object.  This calls Zoltan_Create.
-  if (NULL == myZZ) myZZ = new Zoltan(MPI_COMM_WORLD);
+  if (NULL == myZZ) myZZ = new Zoltan(mbpc->comm());
 
   if (NULL == zmethod || !strcmp(zmethod, "RCB"))
     SetRCB_Parameters();
@@ -1715,17 +1715,17 @@ int ZoltanPartitioner::mbInitializePoints(int npts, double *pts, int *ids,
     sendProcs = nborProcs + (sendNborId - adjs);
 
     for (i = 1; i < mbpc->proc_config().proc_size(); i++) {
-      MPI_Send(&numPts[i], 1, MPI_INT, i, 0x00, MPI_COMM_WORLD);
-      MPI_Send(sendPts, 3 * numPts[i], MPI_DOUBLE, i, 0x01, MPI_COMM_WORLD);
-      MPI_Send(sendIds, numPts[i], MPI_INT, i, 0x03, MPI_COMM_WORLD);
-      MPI_Send(sendEdges, numPts[i], MPI_INT, i, 0x06, MPI_COMM_WORLD);
+      MPI_Send(&numPts[i], 1, MPI_INT, i, 0x00, mbpc->comm());
+      MPI_Send(sendPts, 3 * numPts[i], MPI_DOUBLE, i, 0x01, mbpc->comm());
+      MPI_Send(sendIds, numPts[i], MPI_INT, i, 0x03, mbpc->comm());
+      MPI_Send(sendEdges, numPts[i], MPI_INT, i, 0x06, mbpc->comm());
       sum = 0;
 
       for (j = 0; j < numPts[i]; j++)
         sum += sendEdges[j];
 
-      MPI_Send(sendNborId, sum, MPI_INT, i, 0x07, MPI_COMM_WORLD);
-      MPI_Send(sendProcs, sum, MPI_INT, i, 0x08, MPI_COMM_WORLD);
+      MPI_Send(sendNborId, sum, MPI_INT, i, 0x07, mbpc->comm());
+      MPI_Send(sendProcs, sum, MPI_INT, i, 0x08, mbpc->comm());
       sendPts += (3 * numPts[i]);
       sendIds += numPts[i];
       sendEdges += numPts[i];
@@ -1736,14 +1736,14 @@ int ZoltanPartitioner::mbInitializePoints(int npts, double *pts, int *ids,
     free(numPts);
   }
   else {
-    MPI_Recv(&mySize, 1, MPI_INT, 0, 0x00, MPI_COMM_WORLD, &stat);
+    MPI_Recv(&mySize, 1, MPI_INT, 0, 0x00, mbpc->comm(), &stat);
     pts = (double *)malloc(sizeof(double) * 3 * mySize);
     ids = (int *)malloc(sizeof(int) * mySize);
     length = (int *)malloc(sizeof(int) * mySize);
     if (obj_weights != NULL) obj_weights = (double *)malloc(sizeof(double) * mySize);
-    MPI_Recv(pts, 3 * mySize, MPI_DOUBLE, 0, 0x01, MPI_COMM_WORLD, &stat);
-    MPI_Recv(ids, mySize, MPI_INT, 0, 0x03, MPI_COMM_WORLD, &stat);
-    MPI_Recv(length, mySize, MPI_INT, 0, 0x06, MPI_COMM_WORLD, &stat);
+    MPI_Recv(pts, 3 * mySize, MPI_DOUBLE, 0, 0x01, mbpc->comm(), &stat);
+    MPI_Recv(ids, mySize, MPI_INT, 0, 0x03, mbpc->comm(), &stat);
+    MPI_Recv(length, mySize, MPI_INT, 0, 0x06, mbpc->comm(), &stat);
     sum = 0;
 
     for (j = 0; j < mySize; j++)
@@ -1752,8 +1752,8 @@ int ZoltanPartitioner::mbInitializePoints(int npts, double *pts, int *ids,
     adjs = (int *)malloc(sizeof(int) * sum);
     if (edge_weights != NULL) edge_weights = (double *)malloc(sizeof(double) * sum);
     nborProcs = (int *)malloc(sizeof(int) * sum);
-    MPI_Recv(adjs, sum, MPI_INT, 0, 0x07, MPI_COMM_WORLD, &stat);
-    MPI_Recv(nborProcs, sum, MPI_INT, 0, 0x08, MPI_COMM_WORLD, &stat);
+    MPI_Recv(adjs, sum, MPI_INT, 0, 0x07, mbpc->comm(), &stat);
+    MPI_Recv(nborProcs, sum, MPI_INT, 0, 0x08, mbpc->comm(), &stat);
   }
 
   Points = pts;
@@ -1797,16 +1797,16 @@ void ZoltanPartitioner::mbFinalizePoints(int npts, int numExport,
       recvA = MyAssignment + NumPoints;
 
     for (i = 1; i< (int) mbpc->proc_config().proc_size(); i++) {
-      MPI_Recv(&numPts, 1, MPI_INT, i, 0x04, MPI_COMM_WORLD, &stat);
-      MPI_Recv(recvA, numPts, MPI_INT, i, 0x05, MPI_COMM_WORLD, &stat);
+      MPI_Recv(&numPts, 1, MPI_INT, i, 0x04, mbpc->comm(), &stat);
+      MPI_Recv(recvA, numPts, MPI_INT, i, 0x05, mbpc->comm(), &stat);
       recvA += numPts;
     }
 
     *assignment = MyAssignment;
   }
   else {
-    MPI_Send(&NumPoints, 1, MPI_INT, 0, 0x04, MPI_COMM_WORLD);
-    MPI_Send(MyAssignment, NumPoints, MPI_INT, 0, 0x05, MPI_COMM_WORLD);
+    MPI_Send(&NumPoints, 1, MPI_INT, 0, 0x04, mbpc->comm());
+    MPI_Send(MyAssignment, NumPoints, MPI_INT, 0, 0x05, mbpc->comm());
     free(MyAssignment);
   }
 }
@@ -1817,7 +1817,7 @@ int ZoltanPartitioner::mbGlobalSuccess(int rc)
   unsigned int i;
   int *vals = (int *)malloc(mbpc->proc_config().proc_size() * sizeof(int));
 
-  MPI_Allgather(&rc, 1, MPI_INT, vals, 1, MPI_INT, MPI_COMM_WORLD);
+  MPI_Allgather(&rc, 1, MPI_INT, vals, 1, MPI_INT, mbpc->comm());
 
   for (i = 0; i<mbpc->proc_config().proc_size(); i++) {
     if (vals[i] != ZOLTAN_OK) {
@@ -1849,7 +1849,7 @@ void ZoltanPartitioner::mbPrintGlobalResult(const char *s,
     v2 = (int *)malloc(4 * mbpc->proc_config().proc_size() * sizeof(int));
   }
 
-  MPI_Gather(v1, 4, MPI_INT, v2, 4, MPI_INT, 0, MPI_COMM_WORLD);
+  MPI_Gather(v1, 4, MPI_INT, v2, 4, MPI_INT, 0, mbpc->comm());
 
   if (mbpc->proc_config().proc_rank() == 0) {
     fprintf(stdout, "======%s======\n", s);
