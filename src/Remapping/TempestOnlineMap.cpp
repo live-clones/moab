@@ -1171,10 +1171,14 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool moab::TempestOnlineMap::IsConsistent (
-    double dTolerance
-)
+int moab::TempestOnlineMap::IsConsistent (double dTolerance)
 {
+    if ( size == 1 )
+        return OfflineMap::IsConsistent(dTolerance);
+
+    // Only the root processor will perform the checks on the global matrix
+    if ( rank ) return 0;
+
     // Get map entries
     DataArray1D<int> dataRows;
     DataArray1D<int> dataCols;
@@ -1182,18 +1186,9 @@ bool moab::TempestOnlineMap::IsConsistent (
 
     // Calculate row sums
     DataArray1D<double> dRowSums;
-    if ( size > 1 )
-    {
-        if ( rank ) return true;
-        SparseMatrix<double>& m_mapRemapGlobal = m_weightMapGlobal->GetSparseMatrix();
-        m_mapRemapGlobal.GetEntries ( dataRows, dataCols, dataEntries );
-        dRowSums.Allocate ( m_mapRemapGlobal.GetRows() );
-    }
-    else
-    {
-        m_mapRemap.GetEntries ( dataRows, dataCols, dataEntries );
-        dRowSums.Allocate ( m_mapRemap.GetRows() );
-    }
+    SparseMatrix<double>& m_mapRemapGlobal = m_weightMapGlobal->GetSparseMatrix();
+    m_mapRemapGlobal.GetEntries ( dataRows, dataCols, dataEntries );
+    dRowSums.Allocate ( m_mapRemapGlobal.GetRows() );
 
     for ( unsigned i = 0; i < dataRows.GetRows(); i++ )
     {
@@ -1201,12 +1196,12 @@ bool moab::TempestOnlineMap::IsConsistent (
     }
 
     // Verify all row sums are equal to 1
-    bool fConsistent = true;
+    int fConsistent = 0;
     for ( unsigned i = 0; i < dRowSums.GetRows(); i++ )
     {
         if ( fabs ( dRowSums[i] - 1.0 ) > dTolerance )
         {
-            fConsistent = false;
+            fConsistent++;
             Announce ( "TempestOnlineMap is not consistent in row %i (%1.15e)",
                        i, dRowSums[i] );
         }
@@ -1217,10 +1212,14 @@ bool moab::TempestOnlineMap::IsConsistent (
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool moab::TempestOnlineMap::IsConservative (
-    double dTolerance
-)
+int moab::TempestOnlineMap::IsConservative (double dTolerance)
 {
+    if ( size == 1 )
+        return OfflineMap::IsConservative(dTolerance);
+
+    // Only the root processor will perform the checks on the global matrix
+    if ( rank ) return 0;
+
     // Get map entries
     DataArray1D<int> dataRows;
     DataArray1D<int> dataCols;
@@ -1230,18 +1229,10 @@ bool moab::TempestOnlineMap::IsConservative (
 
     // Calculate column sums
     DataArray1D<double> dColumnSums;
-    if ( size > 1 )
-    {
-        if ( rank ) return true;
-        SparseMatrix<double>& m_mapRemapGlobal = m_weightMapGlobal->GetSparseMatrix();
-        m_mapRemapGlobal.GetEntries ( dataRows, dataCols, dataEntries );
-        dColumnSums.Allocate ( m_mapRemapGlobal.GetColumns() );
-    }
-    else
-    {
-        m_mapRemap.GetEntries ( dataRows, dataCols, dataEntries );
-        dColumnSums.Allocate ( m_mapRemap.GetColumns() );
-    }
+
+    SparseMatrix<double>& m_mapRemapGlobal = m_weightMapGlobal->GetSparseMatrix();
+    m_mapRemapGlobal.GetEntries ( dataRows, dataCols, dataEntries );
+    dColumnSums.Allocate ( m_mapRemapGlobal.GetColumns() );
 
     for ( unsigned i = 0; i < dataRows.GetRows(); i++ )
     {
@@ -1250,12 +1241,12 @@ bool moab::TempestOnlineMap::IsConservative (
     }
 
     // Verify all column sums equal the input Jacobian
-    bool fConservative = true;
+    int fConservative = 0;
     for ( unsigned i = 0; i < dColumnSums.GetRows(); i++ )
     {
         if ( fabs ( dColumnSums[i] - dSourceAreas[i] ) > dTolerance )
         {
-            fConservative = false;
+            fConservative++;
             Announce ( "TempestOnlineMap is not conservative in column "
                        "%i (%1.15e / %1.15e)",
                        i, dColumnSums[i], dSourceAreas[i] );
@@ -1267,34 +1258,31 @@ bool moab::TempestOnlineMap::IsConservative (
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool moab::TempestOnlineMap::IsMonotone (
-    double dTolerance
-)
+int moab::TempestOnlineMap::IsMonotone (double dTolerance)
 {
+    if ( size == 1 )
+        return OfflineMap::IsMonotone(dTolerance);
+
+    // Only the root processor will perform the checks on the global matrix
+    if ( rank ) return 0;
+
     // Get map entries
     DataArray1D<int> dataRows;
     DataArray1D<int> dataCols;
     DataArray1D<double> dataEntries;
 
-    if ( size > 1 )
-    {
-        if ( rank ) return true;
-        SparseMatrix<double>& m_mapRemapGlobal = m_weightMapGlobal->GetSparseMatrix();
-        m_mapRemapGlobal.GetEntries ( dataRows, dataCols, dataEntries );
-    }
-    else
-        m_mapRemap.GetEntries ( dataRows, dataCols, dataEntries );
+    SparseMatrix<double>& m_mapRemapGlobal = m_weightMapGlobal->GetSparseMatrix();
+    m_mapRemapGlobal.GetEntries ( dataRows, dataCols, dataEntries );
 
     // Verify all entries are in the range [0,1]
-    bool fMonotone = true;
+    int fMonotone = 0;
     for ( unsigned i = 0; i < dataRows.GetRows(); i++ )
     {
         if ( ( dataEntries[i] < -dTolerance ) ||
                 ( dataEntries[i] > 1.0 + dTolerance )
            )
         {
-            fMonotone = false;
-
+            fMonotone++;
             Announce ( "TempestOnlineMap is not monotone in entry (%i): %1.15e",
                        i, dataEntries[i] );
         }

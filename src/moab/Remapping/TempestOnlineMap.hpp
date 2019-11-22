@@ -106,23 +106,17 @@ public:
 	///	<summary>
 	///		Determine if the map is first-order accurate.
 	///	</summary>
-	virtual bool IsConsistent(
-		double dTolerance
-	);
+	virtual int IsConsistent(double dTolerance);
 
 	///	<summary>
 	///		Determine if the map is conservative.
 	///	</summary>
-	virtual bool IsConservative(
-		double dTolerance
-	);
+	virtual int IsConservative(double dTolerance);
 
 	///	<summary>
 	///		Determine if the map is monotone.
 	///	</summary>
-	virtual bool IsMonotone(
-		double dTolerance
-	);
+	virtual int IsMonotone(double dTolerance);
 
 	///	<summary>
 	///		If we computed the reduction, get the vector representing the source areas for all entities in the mesh

@@ -374,7 +374,7 @@ AC_DEFUN([CHECK_SOURCE_RECOMPILATION_HASH],
       defaultshasum="`cat $2/HEAD_HASH`"
     fi
     AC_CACHE_VAL([ac_cv_sha_$1], [ac_cv_sha_$1="0"])
-    if (test -f "$2/HEAD_HASH2" || !$new_download); then
+    if (test -f "$2/HEAD_HASH2" || $new_download -eq false); then
       hashdiff="`diff $2/HEAD_HASH $2/HEAD_HASH2 | wc -l | xargs`"
       if (test "x$hashdiff" != "x0" || test $need_configuration); then # hashes are different
         recompile_and_install=true
