@@ -136,12 +136,6 @@ public:
 private:
 
 	///	<summary>
-	///		Gather the mapping matrix that was computed in different processors and accumulate the data
-	///     on the root so that OfflineMap can be generated in parallel.
-	///	</summary>
-	moab::ErrorCode gather_all_to_root();
-
-	///	<summary>
 	///		Remove all the ghosted overlap entities that were accumulated to enable conservation in parallel
 	///	</summary>
 	moab::ErrorCode remove_ghosted_overlap_entities (moab::Range& sharedGhostEntities);
@@ -346,17 +340,6 @@ public:
 	///	</summary>
 	moab::TempestRemapper* m_remapper;
 
-	///	<summary>
-	///		The SparseMatrix representing this operator.
-	///	</summary>
-	// SparseMatrix<double> m_mapRemapGlobal;
-	OfflineMap* m_weightMapGlobal;
-
-	///	<summary>
-	///		The boolean flag representing whether the root process has the updated global view.
-	///	</summary>
-	bool m_globalMapAvailable;
-
 #ifdef MOAB_HAVE_EIGEN
 
 	WeightMatrix m_weightMatrix;
@@ -403,40 +386,6 @@ public:
 	bool is_parallel, is_root;
 	int rank, size;
 };
-
-///////////////////////////////////////////////////////////////////////////////
-
-inline
-const DataArray1D<double>& TempestOnlineMap::GetGlobalSourceAreas() const
-{
-#ifdef MOAB_HAVE_MPI
-  if (m_pcomm->size() > 1) {
-        return m_weightMapGlobal->GetSourceAreas();
-	}
-	else {
-		return this->GetSourceAreas();
-	}
-#else
-  return this->GetSourceAreas();
-#endif
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-inline
-const DataArray1D<double>& TempestOnlineMap::GetGlobalTargetAreas() const
-{
-#ifdef MOAB_HAVE_MPI
-  if (m_pcomm->size() > 1) {
-        return m_weightMapGlobal->GetTargetAreas();
-	}
-	else {
-		return this->GetTargetAreas();
-	}
-#else
-  return this->GetTargetAreas();
-#endif
-}
 
 
 ///////////////////////////////////////////////////////////////////////////////
