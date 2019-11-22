@@ -285,7 +285,10 @@ CLEANFILES = mb_big_test.g \
              outTempestICOD.g \
              outTempestOV.g \
              geom_missing_obb.h5m \
-             geom_w_obbs.h5m
+             geom_w_obbs.h5m \
+             fIntxLndTarget.h5m \
+             fIntxAtmTarget.h5m \
+             fIntxOcnTarget.h5m
 
 # Utility target: build but don't run tests
 build-check:
