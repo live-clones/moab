@@ -53,6 +53,9 @@ if ENABLE_mbconvert
   bin_PROGRAMS += mbconvert
   dist_man1_MANS += mbconvert.man
   doc_DATA += README.mbconvert
+if ENABLE_mbtempest
+mbconvert_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
+endif
 endif
 
 if ENABLE_hexmodops
