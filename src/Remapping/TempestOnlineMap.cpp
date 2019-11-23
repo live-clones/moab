@@ -1580,14 +1580,6 @@ moab::ErrorCode moab::TempestOnlineMap::WriteParallelMap (std::string strOutputF
     std::vector<int> smatrowvals(weightMatNNZ),smatcolvals(weightMatNNZ);
     const double* smatvals = m_weightMatrix.valuePtr();
     int maxrow=0, maxcol=0, offset=0;
-#if 0
-    // Sanity check = brute force computation of max global ID for rows and columns
-    // for (unsigned idof = 0; idof < col_gdofmap.size(); ++idof) {
-    //     maxcol = (col_gdofmap[ idof ] > maxcol) ? col_gdofmap[ idof ] : maxcol;
-    // }
-    // for (unsigned idof = 0; idof < row_gdofmap.size(); ++idof)
-    //     maxrow = (row_gdofmap[ idof ] > maxrow) ? row_gdofmap[ idof ] : maxrow;
-#endif
 
     // Loop over the matrix entries and find the max global ID for rows and columns
     for (int k=0; k < m_weightMatrix.outerSize(); ++k)
