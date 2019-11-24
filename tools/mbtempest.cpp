@@ -60,6 +60,7 @@ struct ToolContext
         bool fNoConservation;
         bool fVolumetric;
         bool rrmGrids;
+        bool fBubble, fInputConcave, fOutputConcave;
 
 #ifdef MOAB_HAVE_MPI
         ToolContext ( moab::Interface* icore, moab::ParallelComm* p_pcomm ) :
@@ -72,7 +73,8 @@ struct ToolContext
 #endif
             blockSize ( 5 ), outFilename ( "output.exo" ), intxFilename ( "" ), meshType ( moab::TempestRemapper::DEFAULT ),
             computeDual ( false ), computeWeights ( false ), ensureMonotonicity ( 0 ), 
-            fNoConservation ( false ), fVolumetric ( false ), rrmGrids ( false )
+            fNoConservation ( false ), fVolumetric ( false ), rrmGrids ( false ),
+            fBubble(false), fInputConcave(false), fOutputConcave(false)
         {
             inFilenames.resize ( 2 );
             doftag_names.resize( 2 );
@@ -457,14 +459,14 @@ int main ( int argc, char* argv[] )
 
             rval = weightMap->GenerateRemappingWeights ( ctx.disc_methods[0], ctx.disc_methods[1],        // std::string strInputType, std::string strOutputType,
                                                    ctx.disc_orders[0],  ctx.disc_orders[1],  // int nPin=4, int nPout=4,
-                                                   false, ctx.ensureMonotonicity,            // bool fBubble=false, int fMonotoneTypeID=0,
+                                                   ctx.fBubble, ctx.ensureMonotonicity,            // bool fBubble=false, int fMonotoneTypeID=0,
                                                    ctx.fVolumetric, ctx.fNoConservation, false, // bool fVolumetric=false, bool fNoConservation=false, bool fNoCheck=false,
                                                    ctx.doftag_names[0], ctx.doftag_names[1],
                                                    "", //"",   // std::string strVariables="", std::string strOutputMap="",
                                                    "", "",   // std::string strInputData="", std::string strOutputData="",
                                                    "", false,  // std::string strNColName="", bool fOutputDouble=false,
                                                    "", false, 0.0,   // std::string strPreserveVariables="", bool fPreserveAll=false, double dFillValueOverride=0.0,
-                                                   false, false   // bool fInputConcave = false, bool fOutputConcave = false
+                                                   ctx.fInputConcave, ctx.fOutputConcave   // bool fInputConcave = false, bool fOutputConcave = false
                                                  );MB_CHK_ERR ( rval );
             ctx.timer_pop();
 
@@ -498,8 +500,32 @@ int main ( int argc, char* argv[] )
                 sstr.str("");
                 sstr << ctx.outFilename.substr(0, lastindex) << ".h5m";
 
+				// Write the map file to disk in parallel
                 rval = weightMap->WriteParallelMap(sstr.str().c_str());MB_CHK_ERR ( rval );
 
+                // Write out the metadata information for the map file
+                if (proc_id == 1) {
+                    sstr.str("");
+                    sstr << ctx.outFilename.substr(0, lastindex) << ".meta";
+
+                    std::ofstream metafile(sstr.str());
+                    metafile << "Generator = MOAB-TempestRemap (mbtempest) Offline Regridding Weight Generator" << std::endl;
+                    metafile << "bubble = " << (ctx.fBubble ? "true" : "false") << std::endl;
+                    metafile << "concave_dst = " << (ctx.fInputConcave ? "true" : "false") << std::endl;
+                    metafile << "concave_src = " << (ctx.fOutputConcave ? "true" : "false") << std::endl;
+                    metafile << "domain_a = " << ctx.inFilenames[0] << std::endl;
+                    metafile << "domain_b = " << ctx.inFilenames[1] << std::endl;
+                    metafile << "grid_file_dst = " << ctx.inFilenames[1] << std::endl;
+                    metafile << "grid_file_ovr = " << (ctx.intxFilename.size() ? ctx.intxFilename : "outOverlap.h5m") << std::endl;
+                    metafile << "grid_file_src = " << ctx.inFilenames[0] << std::endl;
+                    metafile << "mono_type = " << ctx.ensureMonotonicity << std::endl;
+                    metafile << "np_dst = " << ctx.disc_orders[1] << std::endl;
+                    metafile << "np_src = " << ctx.disc_orders[0] << std::endl;
+                    metafile << "type_dst = " << ctx.disc_methods[1] << std::endl;
+                    metafile << "type_src = " << ctx.disc_methods[0] << std::endl;
+                    metafile << "version = " << "MOAB v5.1.0+" << std::endl;
+                    metafile.close();
+                }
             }
 
             delete weightMap;

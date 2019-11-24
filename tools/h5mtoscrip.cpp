@@ -1,4 +1,3 @@
-// 
 // Usage:
 // tools/mbslavepart -d 2 -m mpas/x1.2562.grid.h5m -s mpas/x1.10242.grid.h5m -o mpas_slave.h5m -e 1e-8 -b 1e-6 -O
 // 
@@ -7,6 +6,7 @@
 #include <cmath>
 #include <vector>
 #include <string>
+#include <fstream>
 #include <iomanip>
 
 #include "moab/ProgOptions.hpp"
@@ -333,6 +333,25 @@ ErrorCode get_vartag_data(moab::Interface* mbCore, Tag tag, moab::Range& sets, i
   return moab::MB_SUCCESS;
 }
 
+void ReadFileMetaData(std::string& metaFilename, std::map<std::string, std::string>& metadataVals)
+{
+  std::ifstream metafile;
+  std::string line;
+
+  metafile.open(metaFilename.c_str());
+  metadataVals["Title"] = "MOAB-TempestRemap (MBTR) Offline Regridding Weight Converter (h5mtoscrip)";
+  std::string key, value;
+  while (std::getline(metafile, line))
+  {
+    size_t lastindex = line.find_last_of("=");
+    key = line.substr(0, lastindex-1);
+    value = line.substr(lastindex+2, line.length());
+
+    metadataVals[std::string(key)] = std::string(value);
+  }
+  metafile.close();
+}
+
 int main(int argc, char* argv[])
 {
   moab::ErrorCode rval;
@@ -379,14 +398,33 @@ int main(int argc, char* argv[])
     NcError error_temp(NcError::verbose_fatal);
 
     // Open an output file
-    NcFile ncMap(scripfile.c_str(), NcFile::Replace, NULL, 0, NcFile::Netcdf4);
+    NcFile ncMap(scripfile.c_str(), NcFile::Replace, NULL, 0, NcFile::Offset64Bits);
     if (!ncMap.is_valid()) {
       _EXCEPTION1("Unable to open output map file \"%s\"",
         scripfile.c_str());
     }
 
-    // Attributes
-    ncMap.add_att("Title", "MOAB-TempestRemap (MBTR) Offline Regridding Weight Converter (h5mtoscrip)");
+    {
+      // NetCDF-SCRIP Global Attributes
+      std::map<std::string, std::string> mapAttributes;
+      size_t lastindex = h5mfilename.find_last_of(".");
+      std::stringstream sstr;
+      sstr << h5mfilename.substr(0, lastindex) << ".meta";
+      std::string metaFilename = sstr.str();
+      ReadFileMetaData(metaFilename, mapAttributes);
+      mapAttributes["Command"] = "Converted with MOAB:h5mtoscrip with --w=" + h5mfilename + " and --s=" + scripfile;
+
+      // Add global attributes
+      std::map<std::string, std::string>::const_iterator iterAttributes =
+        mapAttributes.begin();
+      for (; iterAttributes != mapAttributes.end(); iterAttributes++) {
+
+        std::cout << iterAttributes->first << " -- " << iterAttributes->second << std::endl;
+        ncMap.add_att(
+          iterAttributes->first.c_str(),
+          iterAttributes->second.c_str());
+      }
+    }
 
     Tag globalIDTag, materialSetTag;
     globalIDTag = mbCore->globalId_tag();
@@ -396,7 +434,6 @@ int main(int argc, char* argv[])
     // Get sets entities, by type
     moab::Range meshsets;
     rval = mbCore->get_entities_by_type_and_tag(0, MBENTITYSET, &globalIDTag, NULL, 1, meshsets, moab::Interface::UNION, true);MB_CHK_ERR(rval);
-    // assert(meshsets.size() == 3); // we do not expect anything more than 3
 
     moab::EntityHandle rootset = 0;
     ///////////////////////////////////////////////////////////////////////////
@@ -788,16 +825,7 @@ int main(int argc, char* argv[])
     varS->set_cur((long)0);
     varS->put(&(mat_vals[0]), NNZ);
 
-    // Add global attributes
-    std::map<std::string, std::string> mapAttributes;
-    mapAttributes["Command"] = "Converted with MBTR:h5mtoscrip";
-    std::map<std::string, std::string>::const_iterator iterAttributes =
-      mapAttributes.begin();
-    for (; iterAttributes != mapAttributes.end(); iterAttributes++) {
-      ncMap.add_att(
-        iterAttributes->first.c_str(),
-        iterAttributes->second.c_str());
-    }
+    ncMap.close();
 
     // rval = mbCore->write_file(scripfile.c_str());MB_CHK_ERR(rval);
   }
