@@ -51,7 +51,7 @@ IF(CMAKE_VERSION VERSION_EQUAL "3.0.0" OR CMAKE_VERSION VERSION_GREATER "3.0.0")
   cmake_policy(SET CMP0020 NEW)
   cmake_policy(SET CMP0042 OLD)
 ENDIF ()
-if (CMAKE_VERSION VERSION_GREATER "3.11.0")
+if (NOT (CMAKE_VERSION VERSION_LESS "3.12.0"))
 # Allow use of <PackageName>_ROOT as a cmake variable
   cmake_policy(SET CMP0074 NEW)
 endif ()
