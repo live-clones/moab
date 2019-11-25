@@ -130,6 +130,11 @@ if test "xyes" = "x$ENABLE_FORTRAN" && test "x" != "x$FC"; then
   ])
 fi
 
+
+# Check how to add std-c++0x flag enabled
+# VSM: This is a hard requirement from 5.1.1+
+AX_CXX_COMPILE_STDCXX_0X
+
 ################################################################################
 #                           Basic Portability Stuff
 ################################################################################
@@ -982,8 +987,6 @@ if (test "x$WITH_TEMPEST" != "xno" && test "x$WITH_TEMPEST" != "x"); then
     AC_DEFINE([HAVE_TEMPESTREMAP],[1],[Enable use of TempestRemap library API for computing intersection and remapping for Climate problems])
     HAVE_TEMPEST=yes
 
-    # We also need std-c++11 enabled
-    AX_CXX_COMPILE_STDCXX_0X
   fi
 fi
 AM_CONDITIONAL( HAVE_TEMPESTREMAP, [test "x$HAVE_TEMPEST" = "xyes"] )
