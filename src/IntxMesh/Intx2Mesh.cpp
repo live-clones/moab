@@ -56,7 +56,7 @@ ErrorCode Intx2Mesh::FindMaxEdgesInSet(EntityHandle eset, int & max_edges)
   Range cells;
   ErrorCode rval = mb->get_entities_by_dimension(eset, 2, cells);MB_CHK_ERR(rval);
 
-  max_edges = 3; // should be at least 3
+  max_edges = 0; // can be 0 for point clouds
   for (Range::iterator cit=cells.begin(); cit!=cells.end(); cit++)
   {
     EntityHandle cell = *cit;

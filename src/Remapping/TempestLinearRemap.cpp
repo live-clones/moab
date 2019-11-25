@@ -17,9 +17,10 @@
 #include "SparseMatrix.h"
 #include "OverlapMesh.h"
 
-#include "moab/Remapping/TempestOnlineMap.hpp"
 #include "DebugOutput.hpp"
+#include "moab/AdaptiveKDTree.hpp"
 
+#include "moab/Remapping/TempestOnlineMap.hpp"
 #include "netcdfcpp.h"
 
 #ifdef MOAB_HAVE_EIGEN
@@ -80,6 +81,67 @@ extern void GetAdjacentFaceVectorByEdge (
     int nRequiredFaceSetSize,
     AdjacentFaceVector & vecFaces
 );
+
+///////////////////////////////////////////////////////////////////////////////
+
+moab::ErrorCode moab::TempestOnlineMap::LinearRemapNN_MOAB (bool use_GID_matching, bool strict_check)
+{
+    /* m_mapRemap size = (m_nTotDofs_Dest X m_nTotDofs_SrcCov)  */
+
+#ifdef VVERBOSE
+    {
+        std::ofstream output_file ( "rowcolindices.txt", std::ios::out );
+        output_file << m_nTotDofs_Dest << " " << m_nTotDofs_SrcCov << " " << row_gdofmap.size() << " " << row_ldofmap.size() << " " << col_gdofmap.size() << " " << col_ldofmap.size() << "\n";
+        output_file << "Rows \n";
+        for (unsigned iv=0; iv < row_gdofmap.size(); iv++)
+            output_file << row_gdofmap[iv] << " " << row_dofmap[iv] << "\n";
+        output_file << "Cols \n";
+        for (unsigned iv=0; iv < col_gdofmap.size(); iv++)
+            output_file << col_gdofmap[iv] << " " << col_dofmap[iv] << "\n";
+        output_file.flush(); // required here
+        output_file.close();
+    }
+#endif
+
+    if (use_GID_matching)
+    {
+        std::map<unsigned, unsigned> src_gl;
+        for (unsigned it=0; it < col_gdofmap.size(); ++it)
+            src_gl[ col_gdofmap[it] ] = col_dofmap[it];
+
+        std::map<unsigned,unsigned>::iterator iter;
+        for (unsigned it=0; it < row_gdofmap.size(); ++it) {
+            unsigned row = row_gdofmap[it];
+            iter = src_gl.find(row);
+            if (strict_check && iter == src_gl.end())
+            {
+                std::cout << "Searching for global target DOF " << row << " but could not find correspondence in source mesh.\n";
+                assert(false);
+            }
+            else if (iter == src_gl.end())
+            {
+                continue;
+            }
+            else
+            {
+                unsigned icol = src_gl[ row ];
+                unsigned irow = row_dofmap[it];
+
+                // Set the permutation matrix in local space
+                m_mapRemap(irow, icol) = 1.0;
+            }
+        }
+
+        return moab::MB_SUCCESS;
+    }
+    else
+    {
+        /* Create a Kd-tree to perform local queries to find nearest neighbors */
+        
+
+        return moab::MB_SUCCESS;
+    }
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 

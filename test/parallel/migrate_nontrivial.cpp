@@ -90,6 +90,7 @@ ErrorCode migrate_smart(const char*filename, const char * outfile, int partMetho
 
   // create 2 communicators, one for each group
   int tagcomm1 = 1, tagcomm2 = 2;
+  int context_id = -1; // plain migrate, default context
   MPI_Comm comm1, comm2;
   ierr = MPI_Comm_create_group(jcomm, group1, tagcomm1, &comm1);
   CHECKRC(ierr, "can't create comm1")
@@ -144,7 +145,7 @@ ErrorCode migrate_smart(const char*filename, const char * outfile, int partMetho
 
   // we can now free the sender buffers
   if (comm1 != MPI_COMM_NULL)
-     ierr = iMOAB_FreeSenderBuffers(pid1, &jcomm, &compid2);
+     ierr = iMOAB_FreeSenderBuffers(pid1, &context_id);
 
   if (comm2 != MPI_COMM_NULL) {
     ierr = iMOAB_DeregisterApplication(pid2);

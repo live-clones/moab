@@ -1,15 +1,31 @@
 /*
  * ParCommGraph.hpp
  *
- *  will be used to setup communication between 2 separate meshes, on
- *  different communicators;
+ *  will be used to setup communication between 2 distributed meshes, in which one mesh was migrated from the other.
+ *  (one example is atmosphere mesh migrated to coupler pes)
+ *
  *  there are 3 communicators in play, one for each mesh, and one for the joined
  *  communicator, that spans both sets of processes
  *
- *  various methods should be available to partition meshes between the 2 communicators
+ *  various methods should be available to migrate meshes; trivial, using graph partitioner (Zoltan PHG)
+ *  and using a geometric partitioner  (Zoltan RCB)
+ *
  *  communicators are represented by their MPI groups, not by their communicators, because
- *  the groups are always defined, irrespective of what tasks are they on.
+ *  the groups are always defined, irrespective of what tasks are they on. Communicators can be MPI_NULL,
+ *  while MPI_Groups are always defined
+ *
  *  Some of the methods in here are executed over the sender communicator, some are over the receiver communicator
+ *
+ *  The name "graph" is in the sense of a bipartite graph, in which we can separate senders and receivers tasks
+ *
+ *  The info stored in the ParCommGraph helps in migrating fields (MOAB tags) from component to the coupler and back
+ *
+ *  So initially the ParCommGraph is assisting in mesh migration (from component to coupler) and then is used
+ *  to migrate tag data from component to coupler and back from coupler to component.
+ *
+ *  The same class is used after intersection (which is done on the coupler pes between 2 different component
+ *   migrated meshes) and it alters communication pattern between the original component pes and coupler pes;
+ *
  *
  */
 #include "moab_mpi.h"
@@ -29,13 +45,37 @@ namespace moab {
 	  // ParCommGraph();
 	  virtual ~ParCommGraph();
 
-	  // collective constructor, will be called on all sender tasks and receiver tasks
+	  /**
+	   * \brief collective constructor, will be called on all sender tasks and receiver tasks
+	   * \param[in]  joincomm  joint MPI communicator that covers both sender and receiver MPI groups
+	   * \param[in]  group1   MPI group formed with sender tasks; (sender usually loads the mesh in a migrate scenario)
+	   * \param[in]  group2   MPI group formed with receiver tasks; (receiver usually receives the mesh in a migrate scenario)
+	   * \param[in]  coid1    sender component unique identifier in a coupled application (in climate simulations could be the Atmosphere Comp id = 5
+	   *                        or Ocean Comp ID , 17)
+	   * \param[in]  coid2    receiver component unique identifier in a coupled application (it is usually the coupler, 2, in E3SM)
+	   *
+	   * this graph will be formed on sender and receiver tasks, and, in principle, will hold info about how the local
+	   * entities are distributed on the other side
+	   *
+	   * Its major role is to help in migration of data, from component to the coupler and vice-versa;
+	   * Each local entity has a corresponding task (or tasks) on the other side, to where the data needs to be sent
+	   *
+	   * important data stored in ParCommGraph, immediately it is created
+	   *   - all sender and receiver tasks ids, with respect to the joint communicator
+	   *   - local rank in sender and receiver group (-1 if not part of the respective group)
+	   *   - rank in the joint communicator (from 0)
+	   */
 	  ParCommGraph(MPI_Comm joincomm, MPI_Group group1, MPI_Group group2, int coid1, int coid2);
+
+	  /**
+	  * \brief copy constructor will copy only the senders, receivers, compid1, etc
+	  */
+    ParCommGraph(const ParCommGraph&);
 
 	  /**
 	    \brief  Based on the number of elements on each task in group 1, partition for group 2, trivially
 
-     <B>Operations:</B> Local, usually called on root process of the group
+     <B>Operations:</B> it is called on every receiver task; decides how are all elements distributed
 
       Note:  establish how many elements are sent from each task in group 1 to tasks in group 2
             This call is usually made on a root / master process, and will construct local maps that are member data,
@@ -44,32 +84,28 @@ namespace moab {
 
        \param[in]  numElemsPerTaskInGroup1 (std::vector<int> &)  number of elements on each sender task
 	   */
+
 	  ErrorCode compute_trivial_partition (std::vector<int> & numElemsPerTaskInGroup1);
+
 
 	  /**
 	     \brief  pack information about receivers view of the graph, for future sending to receiver root
 
-        <B>Operations:</B> Local, usually called on root process of the group
+        <B>Operations:</B> Local, called on root process of the senders group
 
 	     \param[out] packed_recv_array
-	       packed data will be sent eventually to the root of receivers, and distributed from there, and
+	       packed data will be sent to the root of receivers, and distributed from there, and
 	         will have this information, for each receiver, concatenated
-	          receiver 1 task, number of senders for receiver 1, then sender tasks for receiver 1, receiver 2 task,
-	            number of senders for receiver 2, sender tasks for receiver 2, etc
+	       receiver 1 task, number of senders for receiver 1, then sender tasks for receiver 1, receiver 2 task,
+	          number of senders for receiver 2, sender tasks for receiver 2, etc
+	      Note: only the root of senders will compute this, and send it over to the receiver root, which will
+	      distribute it over each receiver; We do not pack the sizes of data to be sent, only the senders for
+	      each of the receivers (could be of size O(n^2) , where n is the number of tasks ; but in general, it should be
+	      more like O(n) ). Each sender sends to a "finite" number of receivers, and each receiver receives from a finite
+	      number of senders). We need this info to decide how to set up the send/receive waiting game for non-blocking
+	      communication )
 	   */
 	  ErrorCode pack_receivers_graph(std::vector<int> & packed_recv_array );
-
-	  /**
-	   * \brief  distribute send information (as decided on root) to all senders in the group
-	   * <B>Operations:</B> collective, needs to be called on all tasks on sender group
-	   *
-	   * sending info will contain the rank of the receivers and number of elements
-	   *   (sizes) for each receiver  recv1, size1, recv2, size2, ...
-	   *   size of the array will be the number of receivers times 2
-	   * \param[in]      senderComm(MPI_Comm)
-	   * \param[out]     sendingInfo(std::vector<int> & )
-	   */
-	  ErrorCode distribute_sender_graph_info(MPI_Comm senderComm, std::vector<int> &sendingInfo );
 
 	  // get methods for private data
 	  bool is_root_sender() { return rootSender;}
@@ -82,6 +118,12 @@ namespace moab {
 
 	  int get_component_id1(){return compid1;}
 	  int get_component_id2(){return compid2;}
+
+	  int get_context_id(){return context_id;}
+	  void set_context_id( int other_id ) { context_id = other_id;}
+
+	  EntityHandle get_cover_set(){return cover_set;}
+	  void set_cover_set( EntityHandle cover ) { cover_set = cover;}
 
 	  // return local graph for a specific task
 	  ErrorCode split_owned_range (int sender_rank, Range & owned);
@@ -100,7 +142,7 @@ namespace moab {
     ErrorCode receive_mesh(MPI_Comm jcomm, ParallelComm *pco, EntityHandle local_set,
         std::vector<int> &senders_local);
 
-	  ErrorCode release_send_buffers(MPI_Comm jcomm);
+	  ErrorCode release_send_buffers();
 
 	  ErrorCode send_tag_values (MPI_Comm jcomm, ParallelComm *pco, Range & owned,
 	      std::vector<Tag> & tag_handles );
@@ -119,6 +161,14 @@ namespace moab {
 
 	  // new partition calculation
 	  ErrorCode compute_partition (ParallelComm *pco, Range & owned, int met);
+
+	  // dump local information about graph
+	  ErrorCode dump_comm_information(std::string prefix, int is_send);
+
+	  /*
+	   *  is this original migrate graph ? if yes, sending tag data is easier ?
+	   */
+	  bool original_migrate() { return !recomputed_send_graph;}
 	private:
 	  /**
       \brief find ranks of a group with respect to an encompassing communicator
@@ -139,6 +189,8 @@ namespace moab {
 	  int rankInGroup1, rankInGroup2; // group 1 is sender, 2 is receiver
 	  int rankInJoin, joinSize;
 	  int compid1, compid2;
+	  int context_id; // used to identify the other comp for intersection
+	  EntityHandle cover_set; // will be initialized only if it is the receiver parcomm graph, in CoverageGraph
 
 	  // communication graph from group1 to group2;
 	  //  graph[task1] = vec1; // vec1 is a stl vector of tasks in group2

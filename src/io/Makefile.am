@@ -67,6 +67,7 @@ else
 endif
 
 if HAVE_HDF5
+  AM_CPPFLAGS += $(HDF5_CPPFLAGS)
   libmoabio_la_LIBADD += mhdf/libmhdf.la
   MOAB_HDF5_SRCS = HDF5Common.cpp \
                    HDF5Common.hpp \
