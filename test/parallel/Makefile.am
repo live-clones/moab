@@ -35,7 +35,7 @@ TESTS = pcomm_unit \
         scdtest \
         pcomm_serial \
         par_spatial_locator_test \
-        parallel_unit_tests imoab_ptest2 \
+        parallel_unit_tests \
         uber_parallel_test \
         hireconst_test_parallel \
         $(NETCDF_TESTS) \
@@ -52,7 +52,16 @@ if HAVE_ZOLTAN
 endif
 
 if HAVE_TEMPESTREMAP
+  migrate_test_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS) $(FCLIBS)
+  migrate_nontrivial_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS) $(FCLIBS)
+else
+	migrate_test_LDADD = $(LDADD) $(FCLIBS)
+	migrate_nontrivial_LDADD = $(LDADD) $(FCLIBS)
+endif
+
+if HAVE_TEMPESTREMAP
   HDF5_TESTS += imoab_coupler
+  imoab_coupler_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
 endif
 
 else
@@ -87,7 +96,14 @@ endif
 
 IMOAB_TESTS =
 if ENABLE_FORTRAN
-   IMOAB_TESTS += imoab_ptest
+   IMOAB_TESTS += imoab_ptest imoab_ptest2
+if HAVE_TEMPESTREMAP
+  imoab_ptest_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS) $(FCLIBS)
+  imoab_ptest2_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS) $(FCLIBS)
+else
+	imoab_ptest_LDADD = $(LDADD) $(FCLIBS)
+	imoab_ptest2_LDADD = $(LDADD) $(FCLIBS)
+endif
 endif
 
 IMESH_TESTS =
@@ -141,7 +157,6 @@ parallel_adj_SOURCES = ../adj_moab_test.cpp
 parmerge_test_SOURCES = parmerge_test.cpp
 augment_with_ghosts_SOURCES = augment_with_ghosts.cpp
 imoab_ptest_SOURCES = imoab_ptest.F
-imoab_ptest_LDADD = $(LDADD) $(FCLIBS)
 imoab_ptest2_SOURCES = imoab_ptest2.cpp
 hireconst_test_parallel_SOURCES = hireconst_test_parallel.cpp
 uref_hirec_test_parallel_SOURCES = uref_hirec_test_parallel.cpp ../geomObject.cpp
@@ -204,7 +219,8 @@ MOSTLYCLEANFILES = mhdf_ll.h5m \
                    migrate12.h5m migrate21.h5m migrate11.h5m migrate22.h5m \
                    migrate11_tag.h5m migrate21_tag.h5m migrate12_tag.h5m migrate22_tag.h5m \
                    intx_00.h5m intx_01.h5m fIntxTarget.h5m recvTarget.h5m OcnWithProj.h5m \
-                   migrate_graph.h5m migrate_geom.h5m
+                   migrate_graph.h5m migrate_geom.h5m \
+                   recvLnd.h5m LndWithProj.h5m fOcnOnCpl.h5m recvOcn.h5m
 
 FORTDEFS = $(FCDEFS)
 PPFCCOMPILE = $(FC) $(FORTDEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \

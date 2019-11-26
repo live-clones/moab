@@ -846,13 +846,26 @@ int main( int argc, char* argv[] )
   ierr = iMOAB_Finalize();
   CHECKIERR(ierr, "did not finalize iMOAB" )
 
+  // free atm coupler group and comm
+  if (MPI_COMM_NULL != atmCouComm) MPI_Comm_free(&atmCouComm);
+  MPI_Group_free(&joinAtmCouGroup);
   if (MPI_COMM_NULL != atmComm) MPI_Comm_free(&atmComm);
+
 #ifdef ENABLE_ATMOCN_COUPLING
   if (MPI_COMM_NULL != ocnComm) MPI_Comm_free(&ocnComm);
+  // free ocn - coupler group and comm
+  if (MPI_COMM_NULL != ocnCouComm) MPI_Comm_free(&ocnCouComm);
+  MPI_Group_free(&joinOcnCouGroup);
 #endif
+
 #ifdef ENABLE_ATMLND_COUPLING
   if (MPI_COMM_NULL != lndComm) MPI_Comm_free(&lndComm);
+  // free land - coupler group and comm
+  if (MPI_COMM_NULL != lndCouComm) MPI_Comm_free(&lndCouComm);
+  MPI_Group_free(&joinLndCouGroup);
 #endif
+
+  if (MPI_COMM_NULL != couComm)    MPI_Comm_free(&couComm);
 
   MPI_Group_free(&atmPEGroup);
 #ifdef ENABLE_ATMOCN_COUPLING
@@ -861,7 +874,10 @@ int main( int argc, char* argv[] )
 #ifdef ENABLE_ATMLND_COUPLING
   MPI_Group_free(&lndPEGroup);
 #endif
+  MPI_Group_free(&couPEGroup);
   MPI_Group_free(&jgroup);
+
+  MPI_Finalize();
 
   return 0;
 }

@@ -73,7 +73,6 @@ moab::TempestOnlineMap::TempestOnlineMap ( moab::TempestRemapper* remapper ) : O
     m_meshInputCov = remapper->GetCoveringMesh();
     m_meshOutput = remapper->GetMesh ( moab::Remapper::TargetMesh );
     m_meshOverlap = remapper->GetMesh ( moab::Remapper::IntersectedMesh );
-    m_globalMapAvailable = false;
 
     is_parallel = false;
     is_root = true;
@@ -104,8 +103,6 @@ moab::TempestOnlineMap::TempestOnlineMap ( moab::TempestRemapper* remapper ) : O
     dimSizes[0] = m_meshOutput->faces.size();
     this->InitializeTargetDimensions(dimNames, dimSizes);
 
-    m_weightMapGlobal = NULL;
-
     // Build a matrix of source and target discretization so that we know how to assign
     // the global DoFs in parallel for the mapping weights
     // For example, FV->FV: rows X cols = faces_source X faces_target
@@ -115,7 +112,6 @@ moab::TempestOnlineMap::TempestOnlineMap ( moab::TempestRemapper* remapper ) : O
 
 moab::TempestOnlineMap::~TempestOnlineMap()
 {
-    delete m_weightMapGlobal;
     m_interface = NULL;
 #ifdef MOAB_HAVE_MPI
     m_pcomm = NULL;
@@ -993,7 +989,7 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
 
             // Construct remap
             if ( is_root ) dbgprint.printf ( 0, "Calculating remap weights with Nearest-Neighbor method\n" );
-            LinearRemapNN_MOAB(true /*use_GID_matching*/, false /*strict_check*/ );
+            rval = LinearRemapNN_MOAB(true /*use_GID_matching*/, false /*strict_check*/ );MB_CHK_ERR(rval);
         }
         else if (
             ( eInputType != DiscretizationType_FV ) &&
@@ -1236,20 +1232,8 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
         // rval = m_interface->add_entities(m_meshOverlapSet, sharedGhostEntities);MB_CHK_SET_ERR(rval, "Adding entities dim 2 failed");
 #endif
 
-#ifdef VERBOSE
-        if ( !m_globalMapAvailable && size > 1 ) {
-            // gather weights to root process to perform consistency/conservation checks
-            rval = this->gather_all_to_root();MB_CHK_ERR(rval);
-        }
-#endif
-
         // Verify consistency, conservation and monotonicity
-        // gather weights to root process to perform consistency/conservation checks
-#ifndef VERBOSE
-        if ( !fNoCheck && size == 1)
-#else
         if ( !fNoCheck )
-#endif
         {
             if ( is_root ) dbgprint.printf ( 0, "Verifying map" );
             this->IsConsistent ( 1.0e-8 );
@@ -1313,11 +1297,11 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
 
 int moab::TempestOnlineMap::IsConsistent (double dTolerance)
 {
-    if ( size == 1 )
-        return OfflineMap::IsConsistent(dTolerance);
+#ifndef MOAB_HAVE_MPI
+    
+    return OfflineMap::IsConsistent(dTolerance);
 
-    // Only the root processor will perform the checks on the global matrix
-    if ( rank ) return 0;
+#else
 
     // Get map entries
     DataArray1D<int> dataRows;
@@ -1326,9 +1310,8 @@ int moab::TempestOnlineMap::IsConsistent (double dTolerance)
 
     // Calculate row sums
     DataArray1D<double> dRowSums;
-    SparseMatrix<double>& m_mapRemapGlobal = m_weightMapGlobal->GetSparseMatrix();
-    m_mapRemapGlobal.GetEntries ( dataRows, dataCols, dataEntries );
-    dRowSums.Allocate ( m_mapRemapGlobal.GetRows() );
+    m_mapRemap.GetEntries ( dataRows, dataCols, dataEntries );
+    dRowSums.Allocate ( m_mapRemap.GetRows() );
 
     for ( unsigned i = 0; i < dataRows.GetRows(); i++ )
     {
@@ -1347,72 +1330,150 @@ int moab::TempestOnlineMap::IsConsistent (double dTolerance)
         }
     }
 
-    return fConsistent;
+    int ierr;
+    int fConsistentGlobal = 0;
+    ierr = MPI_Allreduce(&fConsistent, &fConsistentGlobal, 1, MPI_INT, MPI_SUM, m_pcomm->comm());
+    if ( ierr != MPI_SUCCESS ) return -1;
+
+    return fConsistentGlobal;
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 int moab::TempestOnlineMap::IsConservative (double dTolerance)
 {
-    if ( size == 1 )
-        return OfflineMap::IsConservative(dTolerance);
+#ifndef MOAB_HAVE_MPI
 
-    // Only the root processor will perform the checks on the global matrix
-    if ( rank ) return 0;
+    return OfflineMap::IsConservative(dTolerance);
 
+#else
+
+    int ierr;
     // Get map entries
     DataArray1D<int> dataRows;
     DataArray1D<int> dataCols;
     DataArray1D<double> dataEntries;
-    const DataArray1D<double>& dTargetAreas = this->GetGlobalTargetAreas();
-    const DataArray1D<double>& dSourceAreas = this->GetGlobalSourceAreas();
+    const DataArray1D<double>& dTargetAreas = this->GetTargetAreas();
+    const DataArray1D<double>& dSourceAreas = this->GetSourceAreas();
 
     // Calculate column sums
-    DataArray1D<double> dColumnSums;
+    std::vector<int> dColumnsUnique;
+    std::vector<double> dColumnSums;
+    std::vector<int> dColumnIndices;
+    std::vector<double> dColumnSumsTotal;
 
-    SparseMatrix<double>& m_mapRemapGlobal = m_weightMapGlobal->GetSparseMatrix();
-    m_mapRemapGlobal.GetEntries ( dataRows, dataCols, dataEntries );
-    dColumnSums.Allocate ( m_mapRemapGlobal.GetColumns() );
+    int nColumns = m_mapRemap.GetColumns();
+    m_mapRemap.GetEntries ( dataRows, dataCols, dataEntries );
+    dColumnSums.resize ( nColumns );
+    dColumnsUnique.resize ( nColumns );
 
     for ( unsigned i = 0; i < dataRows.GetRows(); i++ )
     {
         dColumnSums[dataCols[i]] +=
-            dataEntries[i] * dTargetAreas[dataRows[i]];
+            dataEntries[i] * dTargetAreas[dataRows[i]] / dSourceAreas[dataCols[i]];
+
+        // GID for column DoFs: col_gdofmap[ dataCols[i] ]
+        int colGID = col_gdofmap[ dataCols[i] ] + 1;
+        dColumnsUnique[ dataCols[i] ] = colGID;
     }
 
-    // Verify all column sums equal the input Jacobian
-    int fConservative = 0;
-    for ( unsigned i = 0; i < dColumnSums.GetRows(); i++ )
+    int rootProc = 0;
+    std::vector<int> nElementsInProc;
+    if (!rank) nElementsInProc.resize(size*2);
+    int senddata[2] = {m_nTotDofs_SrcCov, m_nTotDofs_Src};
+    ierr = MPI_Gather ( senddata, 2, MPI_INTEGER, nElementsInProc.data(), 2, MPI_INTEGER, rootProc, m_pcomm->comm() );
+    if ( ierr != MPI_SUCCESS ) return -1;
+    int nTotColumns = 0, nTotColumnsUnq = 0;
+
+    std::vector<int> displs, rcount;
+    if (!rank)
     {
-        if ( fabs ( dColumnSums[i] - dSourceAreas[i] ) > dTolerance )
+        for (int ir = 0; ir < size; ++ir)
         {
-            fConservative++;
-            Announce ( "TempestOnlineMap is not conservative in column "
-                       "%i (%1.15e / %1.15e)",
-                       i, dColumnSums[i], dSourceAreas[i] );
+            nTotColumns += nElementsInProc[ir*2];
+            nTotColumnsUnq += nElementsInProc[ir*2+1];
+        }
+
+        dColumnIndices.resize ( nTotColumns );
+        dColumnSumsTotal.resize ( nTotColumns );
+        
+        // For the necessary setup to gather all data to root
+        {
+            displs.resize ( size, 0 );
+            rcount.resize ( size, 0 );
+            int gsum = 0;
+            for ( int i = 0; i < size; ++i )
+            {
+                displs[i] = gsum;
+                rcount[i] = nElementsInProc[i*2];
+                gsum += rcount[i];
+            }
         }
     }
 
+    // Gather all ColumnSums to root process and accumulate
+    // We expect that the sums of all columns equate to 1.0 within user specified tolerance
+    // Need to do a gatherv here since different processes have different number of elements
+    // MPI_Reduce(&dColumnSums[0], &dColumnSumsTotal[0], m_mapRemap.GetColumns(), MPI_DOUBLE, MPI_SUM, 0, m_pcomm->comm());
+    ierr = MPI_Gatherv ( &dColumnsUnique[0], nColumns, MPI_INTEGER, &dColumnIndices[0], rcount.data(), displs.data(), MPI_INTEGER, rootProc, m_pcomm->comm() );
+    if ( ierr != MPI_SUCCESS ) return -1;
+    ierr = MPI_Gatherv ( &dColumnSums[0], nColumns, MPI_DOUBLE, &dColumnSumsTotal[0], rcount.data(), displs.data(), MPI_DOUBLE, rootProc, m_pcomm->comm() );
+    if ( ierr != MPI_SUCCESS ) return -1;
+
+    // Clean out unwanted arrays now
+    dColumnSums.clear();
+    dColumnsUnique.clear();
+
+    // Verify all column sums equal the input Jacobian
+    int fConservative = 0;
+    if (!rank)
+    {
+        displs.push_back(nTotColumns);
+        std::vector<double> dColumnSumsOnRoot(nTotColumnsUnq, 0.0);
+        for ( int ir = 0; ir < size; ir++ )
+        {
+            for ( int ips = displs[ir]; ips < displs[ir+1]; ips++ )
+            {
+                dColumnSumsOnRoot[ dColumnIndices[ips] ] += dColumnSumsTotal[ips];
+            }
+        }
+
+        for ( int i = 0; i < nTotColumnsUnq; i++ )
+        {
+            if ( fabs ( dColumnSumsOnRoot[i] - 1.0 ) > dTolerance )
+            {
+                fConservative++;
+                Announce ( "TempestOnlineMap is not conservative in column "
+                        "%i (%1.15e)", i, dColumnSumsOnRoot[i] );
+            }
+        }
+    }
+
+    // TODO: Just do a broadcast from root instead of a reduction
+    ierr = MPI_Bcast(&fConservative, 1, MPI_INT, rootProc, m_pcomm->comm());
+    if ( ierr != MPI_SUCCESS ) return -1;
+
     return fConservative;
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 int moab::TempestOnlineMap::IsMonotone (double dTolerance)
 {
-    if ( size == 1 )
-        return OfflineMap::IsMonotone(dTolerance);
+#ifndef MOAB_HAVE_MPI
 
-    // Only the root processor will perform the checks on the global matrix
-    if ( rank ) return 0;
+    return OfflineMap::IsMonotone(dTolerance);
+
+#else
 
     // Get map entries
     DataArray1D<int> dataRows;
     DataArray1D<int> dataCols;
     DataArray1D<double> dataEntries;
 
-    SparseMatrix<double>& m_mapRemapGlobal = m_weightMapGlobal->GetSparseMatrix();
-    m_mapRemapGlobal.GetEntries ( dataRows, dataCols, dataEntries );
+    m_mapRemap.GetEntries ( dataRows, dataCols, dataEntries );
 
     // Verify all entries are in the range [0,1]
     int fMonotone = 0;
@@ -1423,12 +1484,19 @@ int moab::TempestOnlineMap::IsMonotone (double dTolerance)
            )
         {
             fMonotone++;
+
             Announce ( "TempestOnlineMap is not monotone in entry (%i): %1.15e",
                        i, dataEntries[i] );
         }
     }
 
-    return fMonotone;
+    int ierr;
+    int fMonotoneGlobal = 0;
+    ierr = MPI_Allreduce(&fMonotone, &fMonotoneGlobal, 1, MPI_INT, MPI_SUM, m_pcomm->comm());
+    if ( ierr != MPI_SUCCESS ) return -1;
+
+    return fMonotoneGlobal;
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1444,515 +1512,12 @@ void moab::TempestOnlineMap::InitVectors()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifdef MOAB_HAVE_MPI
-moab::ErrorCode moab::TempestOnlineMap::gather_all_to_root()   // Collective
-{
-// #define VERBOSE
-    Mesh globalMesh;
-    int ierr, rootProc = 0, nprocs = size;
-    moab::ErrorCode rval;
-
-    // Write SparseMatrix entries
-    DataArray1D<int> vecRow;
-    DataArray1D<int> vecCol;
-    DataArray1D<double> vecS;
-
-    moab::DebugOutput dbgprint ( std::cout, rank, 0 );
-    dbgprint.set_prefix("[TempestOnlineMap]: ");
-
-    m_mapRemap.GetEntries ( vecRow, vecCol, vecS );
-    const DataArray1D<double>& dOrigSourceAreas = m_meshInput->vecFaceArea;
-    const DataArray1D<double>& dSourceAreas = m_meshInputCov->vecFaceArea;
-    const DataArray1D<double>& dTargetAreas = m_meshOutput->vecFaceArea;
-
-    // Translate the index in Row and Col to global_id and dump it out
-
-    // Communicate the necessary data
-    const int NDATA = 7;
-    int gnnz = 0, gsrc = 0, gsrccov = 0, gtar = 0, gsrcdofs = 0, gsrccovdofs = 0, gtgtdofs = 0;
-    std::vector<int> rootSizesData, rowcolsv;
-    DataArray1D<int> rows, cols, srcelmindx, tgtelmindx;
-    {
-        // First, accumulate the sizes of rows and columns of the matrix
-        if ( !rank ) rootSizesData.resize ( size * NDATA );
-
-        int sendarray[NDATA];
-        sendarray[0] = vecS.GetRows();
-        sendarray[1] = dOrigSourceAreas.GetRows();
-        sendarray[2] = dTargetAreas.GetRows();
-        sendarray[3] = dSourceAreas.GetRows();
-        sendarray[4] = m_nTotDofs_Src;
-        sendarray[5] = m_nTotDofs_Dest;
-        sendarray[6] = m_nTotDofs_SrcCov;
-        
-        ierr = MPI_Gather ( sendarray, NDATA, MPI_INTEGER, rootSizesData.data(), NDATA, MPI_INTEGER, rootProc, m_pcomm->comm() );
-        if ( ierr != MPI_SUCCESS ) return moab::MB_FAILURE;
-
-        if ( !rank )
-        {
-            for ( int i = 0; i < nprocs; ++i )
-            {
-                unsigned offset = NDATA * i;
-                gnnz     += rootSizesData[offset];
-                gsrc     += rootSizesData[offset + 1];
-                gtar     += rootSizesData[offset + 2];
-                gsrccov  += rootSizesData[offset + 3];
-                gsrcdofs += rootSizesData[offset + 4];
-                gtgtdofs += rootSizesData[offset + 5];
-                gsrccovdofs  += rootSizesData[offset + 6];
-            }
-            rowcolsv.resize ( 2 * gnnz + gsrc + gtar );
-            rows.Allocate ( gnnz ); // we are assuming rows = cols
-            cols.Allocate ( gnnz ); // we are assuming rows = cols
-
-            // Let us allocate our global offline map object
-            m_weightMapGlobal = new OfflineMap();
-            std::vector<std::string> dimNames(1);
-            std::vector<int> dimSizes(1);
-            dimNames[0] = "num_elem";
-            dimSizes[0] = gsrc;
-            m_weightMapGlobal->InitializeSourceDimensions(dimNames, dimSizes);
-            dimSizes[0] = gtar;
-            m_weightMapGlobal->InitializeTargetDimensions(dimNames, dimSizes);
-
-            /*
-                VSM: do we need to gather the entire mesh ?!?!
-                The following initialization can't work correctly without the mesh on the root process
-            */
-            if (m_srcDiscType == DiscretizationType_FV) /* unsure if we actually care about the type for this */
-                m_weightMapGlobal->InitializeSourceCoordinatesFromMeshFV ( *m_meshInput );
-            else
-                m_weightMapGlobal->InitializeSourceCoordinatesFromMeshFE ( *m_meshInput, m_nDofsPEl_Src, dataGLLNodesSrc );
-
-            if (m_destDiscType == DiscretizationType_FV)  /* unsure if we actually care about the type for this */
-                m_weightMapGlobal->InitializeTargetCoordinatesFromMeshFV ( *m_meshOutput );
-            else
-                m_weightMapGlobal->InitializeTargetCoordinatesFromMeshFE ( *m_meshOutput, m_nDofsPEl_Dest, dataGLLNodesDest );
-
-            DataArray1D<double>& m_areasSrcGlobal = m_weightMapGlobal->GetSourceAreas();
-            m_areasSrcGlobal.Allocate ( gsrcdofs ); srcelmindx.Allocate ( gsrc );
-            DataArray1D<double>& m_areasTgtGlobal = m_weightMapGlobal->GetTargetAreas();
-            m_areasTgtGlobal.Allocate ( gtgtdofs ); tgtelmindx.Allocate ( gtar );
-
-#ifdef VERBOSE
-            dbgprint.printf ( 0, "Received global dimensions: %zu, %zu\n", vecRow.GetRows(), rows.GetRows() );
-            dbgprint.printf ( 0, "Global: n(source) = %d, n(srccov) = %d, and n(target) = %d\n", gsrc, gsrccov, gtar );
-            dbgprint.printf ( 0, "Operator size = %d X %d and NNZ = %d\n", gsrcdofs, gtgtdofs, gnnz );
-#endif
-        }
-    }
-
-#ifdef VERBOSE
-    {
-        std::stringstream sstr;
-        sstr << "rowscols_" << rank << ".txt";
-        std::ofstream output_file ( sstr.str().c_str() );
-        output_file << "VALUES\n";
-        for ( unsigned ip = 0; ip < vecS.GetRows(); ++ip )
-        {
-            output_file << ip << " (" << row_gdofmap[row_ldofmap[vecRow[ip]]] << ", " << col_gdofmap[col_ldofmap[vecCol[ip]]] << ") = " << vecS[ip] << "\n";
-
-        }
-        output_file.flush(); // required here
-        output_file.close();
-    }
-#endif
-
-    {
-        // Next, accumulate the row and column values for the matrices (in local indexing)
-        // Let's gather the data in the following order:
-        //      1) row indices,
-        //      2) column indices,
-        //      3) GID for source elements,
-        //      4) GID for target elements
-        //
-        const int nR = 2 * vecS.GetRows() + dOrigSourceAreas.GetRows() + dTargetAreas.GetRows();
-        std::vector<int> sendarray ( nR );
-        for ( unsigned ix = 0; ix < vecS.GetRows(); ++ix )
-        {
-            sendarray[ix] = row_gdofmap[row_ldofmap[vecRow[ix]]];
-        }
-        for ( unsigned ix = 0, offset = vecS.GetRows(); ix < vecS.GetRows(); ++ix )
-        {
-            sendarray[offset + ix] = col_gdofmap[col_ldofmap[vecCol[ix]]];
-        }
-
-        {
-            moab::Tag gidtag;
-            rval = m_interface->tag_get_handle ( "GLOBAL_ID", gidtag ); MB_CHK_ERR ( rval );
-            rval = m_interface->tag_get_data ( gidtag, m_remapper->m_source_entities, &sendarray[2 * vecS.GetRows()] ); MB_CHK_ERR ( rval );
-            rval = m_interface->tag_get_data ( gidtag, m_remapper->m_target_entities, &sendarray[2 * vecS.GetRows() + dOrigSourceAreas.GetRows()] ); MB_CHK_ERR ( rval );
-        }
-
-        std::vector<int> displs, rcount;
-        if ( !rank )
-        {
-            displs.resize ( size, 0 );
-            rcount.resize ( size, 0 );
-            int gsum = 0;
-            for ( int i = 0; i < nprocs; ++i )
-            {
-                displs[i] = gsum;
-                rcount[i] = 2 * rootSizesData[NDATA * i] + rootSizesData[NDATA * i + 1] + rootSizesData[NDATA * i + 2];
-                /* + rootSizesData[NDATA * i + 3] + rootSizesData[NDATA * i + 4] */
-                gsum += rcount[i];
-            }
-            assert ( rowcolsv.size() - gsum == 0 );
-        }
-
-        // Both rows and columns have a size of "rowsize"
-        ierr = MPI_Gatherv ( &sendarray[0], nR, MPI_INTEGER, &rowcolsv[0], &rcount[0], &displs[0], MPI_INTEGER, rootProc, m_pcomm->comm() );
-
-        if ( !rank )
-        {
-#ifdef VERBOSE
-            std::ofstream output_file ( "rows-cols.txt", std::ios::out );
-            output_file << "ROWS\n";
-#endif
-            for ( int ip = 0, offset = 0; ip < nprocs; ++ip )
-            {
-                int istart = displs[ip], iend = istart + rootSizesData[NDATA * ip];
-                for ( int i = istart; i < iend; ++i, ++offset )
-                {
-                    rows[offset] = rowcolsv[i];
-#ifdef VERBOSE
-                    output_file << offset << " " << rows[offset] << "\n";
-#endif
-                }
-            }
-#ifdef VERBOSE
-            output_file << "COLS\n";
-#endif
-            for ( int ip = 0, offset = 0; ip < nprocs; ++ip )
-            {
-                int istart = displs[ip] + rootSizesData[NDATA * ip], iend = istart + rootSizesData[NDATA * ip];
-                for ( int i = istart; i < iend; ++i, ++offset )
-                {
-                    cols[offset] = rowcolsv[i];
-#ifdef VERBOSE
-                    output_file << offset << " " << cols[offset] << "\n";
-#endif
-                }
-            }
-#ifdef VERBOSE
-            output_file.flush(); // required here
-            output_file.close();
-#endif
-            for ( int ip = 0, offset = 0; ip < nprocs; ++ip )
-            {
-                int istart = displs[ip] + 2 * rootSizesData[NDATA * ip], iend = istart + rootSizesData[NDATA * ip + 1];
-                for ( int i = istart; i < iend; ++i, ++offset )
-                {
-                    srcelmindx[offset] = rowcolsv[i];
-                }
-            }
-            for ( int ip = 0, offset = 0; ip < nprocs; ++ip )
-            {
-                int istart = displs[ip] + 2 * rootSizesData[NDATA * ip] + rootSizesData[NDATA * ip + 1], iend = istart + rootSizesData[NDATA * ip + 2];
-                for ( int i = istart; i < iend; ++i, ++offset )
-                {
-                    tgtelmindx[offset] = rowcolsv[i];
-                }
-            }
-        } /* (!rank) */
-        rowcolsv.clear();
-    }
-
-    int nSc = m_dSourceVertexLon.GetColumns();
-    int nTc = m_dTargetVertexLon.GetColumns();
-    {
-        // Next, accumulate the row and column values for the matrices (in local indexing)
-        // Let's gather the data in the following order:
-        //      1) matrix weights,
-        //      2) source element areas,
-        //      3) target element areas,
-        //      4) source element: m_dSourceCenterLon
-        //      5) source element: m_dSourceCenterLat
-        //      6) target element: m_dTargetCenterLon
-        //      7) target element: m_dTargetCenterLat
-        //
-        const int nR = vecS.GetRows() + dOrigSourceAreas.GetRows() + dTargetAreas.GetRows() + 2*m_nTotDofs_Src*(1+nSc) + 2*m_nTotDofs_Dest*(1+nTc);
-
-        std::vector<double> sendarray ( nR );
-        int locoffset = 0;
-        std::copy ( ( double* ) vecS, ( double* ) vecS + vecS.GetRows(), sendarray.begin() + locoffset); locoffset += vecS.GetRows();
-        std::copy ( ( const double* ) dOrigSourceAreas, ( const double* ) dOrigSourceAreas + dOrigSourceAreas.GetRows(), sendarray.begin() + locoffset ); locoffset += dOrigSourceAreas.GetRows();
-        std::copy ( ( const double* ) dTargetAreas, ( const double* ) dTargetAreas + dTargetAreas.GetRows(), sendarray.begin() + locoffset ); locoffset += dTargetAreas.GetRows();
-
-#ifdef VERBOSE
-        std::cout << "[" << rank << "] " <<  m_nTotDofs_Src << ", m_dSourceCenterLon.size() = " << m_dSourceCenterLon.GetRows() << " and " << m_nTotDofs_Dest << ", m_dTargetCenterLon.size() = " << m_dTargetCenterLon.GetRows() << "\n";
-#endif
-
-        // TODO: VSM: Need a way to figure out how to transfer the buffer easily from m_dSourceVertexLon/m_dSourceVertexLat variables
-#if 0
-        std::copy ( ( const double* ) m_dSourceCenterLon, ( const double* ) m_dSourceCenterLon + m_dSourceCenterLon.GetRows(), sendarray.begin() + locoffset ); locoffset += m_dSourceCenterLon.GetRows();
-        std::copy ( ( const double* ) m_dSourceCenterLat, ( const double* ) m_dSourceCenterLat + m_dSourceCenterLat.GetRows(), sendarray.begin() + locoffset ); locoffset += m_dSourceCenterLat.GetRows();
-
-        double* dSCLon = m_dSourceVertexLon();
-        std::copy ( dSCLon, dSCLon + m_dSourceVertexLon.GetRows()*nSc, sendarray.begin() + locoffset ); locoffset += m_dSourceVertexLon.GetRows()*nSc;
-        double* dSCLat = m_dSourceVertexLat();
-        std::copy ( dSCLat, dSCLat + m_dSourceVertexLat.GetRows()*nSc, sendarray.begin() + locoffset ); locoffset += m_dSourceVertexLat.GetRows()*nSc;
-
-        std::copy ( ( const double* ) m_dTargetCenterLon, ( const double* ) m_dTargetCenterLon + m_dTargetCenterLon.GetRows(), sendarray.begin() + locoffset ); locoffset += m_dTargetCenterLon.GetRows();
-        std::copy ( ( const double* ) m_dTargetCenterLat, ( const double* ) m_dTargetCenterLat + m_dTargetCenterLat.GetRows(), sendarray.begin() + locoffset ); locoffset += m_dTargetCenterLat.GetRows();
-
-        double** dTCLon = m_dTargetVertexLon;
-        std::copy ( dTCLon, dTCLon + m_dTargetVertexLon.GetRows()*nTc, sendarray.begin() + locoffset ); locoffset += m_dTargetVertexLon.GetRows()*nTc;
-        double** dTCLat = m_dTargetVertexLat;
-        std::copy ( dTCLat, dTCLat + m_dTargetVertexLat.GetRows()*nTc, sendarray.begin() + locoffset ); locoffset += m_dTargetVertexLat.GetRows()*nTc;
-#endif
-        std::vector<int> displs, rcount;
-        int gsum = 0;
-        if ( !rank )
-        {
-            displs.resize ( size, 0 );
-            rcount.resize ( size, 0 );
-            for ( int i = 0; i < nprocs; ++i )
-            {
-                displs[i] = gsum;
-                rcount[i] = rootSizesData[NDATA * i] + rootSizesData[NDATA * i + 1] + rootSizesData[NDATA * i + 2] +
-                            2 * rootSizesData[NDATA * i + 4] * (1 + nSc) +
-                            2 * rootSizesData[NDATA * i + 5] * (1 + nTc);
-                gsum += rcount[i];
-            }
-        }
-
-        std::vector<double> rowcolsvals ( (!rank ? gnnz + gsrc + gtar + 2*gsrcdofs*(1+nSc) + 2*gtgtdofs*(1+nTc) : 0 ) );
-        // Both rows and columns have a size of "rowsize"
-        ierr = MPI_Gatherv ( sendarray.data(), sendarray.size(), MPI_DOUBLE, rowcolsvals.data(), &rcount[0], &displs[0], MPI_DOUBLE, rootProc, m_pcomm->comm() );
-
-        if ( !rank )
-        {
-            SparseMatrix<double>& spmat = m_weightMapGlobal->GetSparseMatrix();
-            {
-#ifdef VERBOSE
-                std::ofstream output_file ( "rows-cols.txt", std::ios::app );
-                output_file << "VALUES\n";
-#endif
-                for ( int ip = 0, offset = 0; ip < nprocs; ++ip )
-                {
-                    for ( int i = displs[ip]; i < displs[ip] + rootSizesData[NDATA * ip]; ++i, ++offset )
-                    {
-                        // globvalues[offset] = rowcolsvals[i];
-                        spmat(rows[offset], cols[offset]) += rowcolsvals[i];
-#ifdef VERBOSE
-                        output_file << offset << " (" << rows[offset] << ", " << cols[offset] << ") = " << rowcolsvals[i] << "\n";
-#endif
-                    }
-               }
-#ifdef VERBOSE
-                output_file.flush(); // required here
-                output_file.close();
-#endif
-
-            }
-            // m_mapRemapGlobal.SetEntries(rows, cols, globvalues);
-            // m_weightMapGlobal->GetSparseMatrix().AddEntries ( rows, cols, globvalues );
-
-            {
-                DataArray1D<double>& m_areasSrcGlobal = m_weightMapGlobal->GetSourceAreas();
-                DataArray1D<double>& m_areasTgtGlobal = m_weightMapGlobal->GetTargetAreas();
-                // Store the global source and target elements areas
-#ifdef VERBOSE
-                std::ofstream output_file ( "source-target-areas.txt" );
-                output_file << "Source areas (nelems = " << gsrc << ")\n";
-#endif
-                int offset = 0;
-                for ( int ip = 0; ip < nprocs; ++ip )
-                {
-                    int istart = displs[ip] + rootSizesData[NDATA * ip], iend = istart + rootSizesData[NDATA * ip + 1];
-                    for ( int i = istart; i < iend; ++i, ++offset )
-                    {
-                        // assert(offset < gsrcdofs && srcelmindx[offset] <= gsrcdofs);
-                        m_areasSrcGlobal[srcelmindx[offset]] = rowcolsvals[i];
-                    }
-                }
-
-#ifdef VERBOSE
-                for ( unsigned i = 0; i < m_areasSrcGlobal.GetRows(); ++i )
-                    output_file << srcelmindx[i] << " " << m_areasSrcGlobal[i] << "\n";
-#endif
-
-                offset = 0;
-                for ( int ip = 0; ip < nprocs; ++ip )
-                {
-                    int istart = displs[ip] + rootSizesData[NDATA * ip] + rootSizesData[NDATA * ip + 1], iend = istart + rootSizesData[NDATA * ip + 2];
-                    for ( int i = istart; i < iend; ++i, ++offset )
-                    {
-                        // assert(offset < gtgtdofs && tgtelmindx[offset] < gtgtdofs);
-                        m_areasTgtGlobal[tgtelmindx[offset]] = rowcolsvals[i];
-                    }
-                }
-#ifdef VERBOSE
-                output_file << "Target areas (nelems = " << gtar << ")\n";
-                for ( unsigned i = 0; i < m_areasTgtGlobal.GetRows(); ++i )
-                    output_file << tgtelmindx[i] << " " << m_areasTgtGlobal[i] << "\n";
-#endif
-#ifdef VERBOSE
-                output_file.flush(); // required here
-                output_file.close();
-#endif
-            }
-
-            DataArray1D<double>& dSourceCenterLon = m_weightMapGlobal->GetSourceCenterLon();
-            DataArray1D<double>& dSourceCenterLat = m_weightMapGlobal->GetSourceCenterLat();
-            dSourceCenterLon.Allocate(gsrcdofs);
-            dSourceCenterLat.Allocate(gsrcdofs);
-            {
-                int offset = 0;
-                for ( int ip = 0; ip < nprocs; ++ip )
-                {
-                    int ibase = rootSizesData[NDATA * ip] + rootSizesData[NDATA * ip + 1] + rootSizesData[NDATA * ip + 2];
-                    int istart = displs[ip] + ibase, iend = istart + rootSizesData[NDATA * ip + 4];
-                    for ( int i = istart; i < iend; ++i, ++offset )
-                    {
-                        // assert(offset < gsrcdofs && srcelmindx[offset] <= gsrcdofs);
-                        // dSourceCenterLon[srcelmindx[offset]] = rowcolsvals[i];
-                        dSourceCenterLon[offset] = rowcolsvals[i];
-                    }
-                }
-
-                offset = 0;
-                for ( int ip = 0; ip < nprocs; ++ip )
-                {
-                    int ibase = rootSizesData[NDATA * ip] + rootSizesData[NDATA * ip + 1] + rootSizesData[NDATA * ip + 2] + rootSizesData[NDATA * ip + 4];
-                    int istart = displs[ip] + ibase, iend = istart + rootSizesData[NDATA * ip + 4];
-                    for ( int i = istart; i < iend; ++i, ++offset )
-                    {
-                        // dSourceCenterLat[srcelmindx[offset]] = rowcolsvals[i];
-                        dSourceCenterLat[offset] = rowcolsvals[i];
-                    }
-                }
-            }
-
-
-            DataArray2D<double>& dSourceVertexLon = m_weightMapGlobal->GetSourceVertexLon();
-            DataArray2D<double>& dSourceVertexLat = m_weightMapGlobal->GetSourceVertexLat();
-            dSourceVertexLon.Allocate(gsrcdofs, nSc);
-            dSourceVertexLat.Allocate(gsrcdofs, nSc);
-            {
-                int ioffset = 0;
-                for ( int ip = 0; ip < nprocs; ++ip )
-                {
-                    int ibase = rootSizesData[NDATA * ip] + rootSizesData[NDATA * ip + 1] + rootSizesData[NDATA * ip + 2] + 2 * rootSizesData[NDATA * ip + 4];
-                    int istart = displs[ip] + ibase, iend = istart + rootSizesData[NDATA * ip + 4] * nSc;
-                    for ( int i = istart; i < iend; ++i, ++ioffset )
-                    {
-                        for ( int joffset = 0; joffset < nSc; ++joffset)
-                            dSourceVertexLon[ioffset][joffset] = rowcolsvals[i+joffset];
-                        i += nSc;
-                    }
-                }
-
-                ioffset = 0;
-                for ( int ip = 0; ip < nprocs; ++ip )
-                {
-                    int ibase = rootSizesData[NDATA * ip] + rootSizesData[NDATA * ip + 1] + rootSizesData[NDATA * ip + 2] + 2 * rootSizesData[NDATA * ip + 4] + rootSizesData[NDATA * ip + 4] * nSc;
-                    int istart = displs[ip] + ibase, iend = istart + rootSizesData[NDATA * ip + 4] * nSc;
-                    for ( int i = istart; i < iend; ++i, ++ioffset )
-                    {
-                        for ( int joffset = 0; joffset < nSc; ++joffset)
-                            dSourceVertexLat[ioffset][joffset] = rowcolsvals[i+joffset];
-                        i += nSc;
-                    }
-                }
-            }
-
-            DataArray1D<double>& dTargetCenterLon = m_weightMapGlobal->GetTargetCenterLon();
-            DataArray1D<double>& dTargetCenterLat = m_weightMapGlobal->GetTargetCenterLat();
-            dTargetCenterLon.Allocate(gtgtdofs);
-            dTargetCenterLat.Allocate(gtgtdofs);
-            {
-                int offset = 0;
-                for ( int ip = 0; ip < nprocs; ++ip )
-                {
-                    int ibase = rootSizesData[NDATA * ip] + rootSizesData[NDATA * ip + 1] + rootSizesData[NDATA * ip + 2] + 2 * rootSizesData[NDATA * ip + 4] * (1+nSc);
-                    int istart = displs[ip] + ibase, iend = istart + rootSizesData[NDATA * ip + 5];
-                    for ( int i = istart; i < iend; ++i, ++offset )
-                    {
-                        // assert(offset < gsrcdofs && srcelmindx[offset] <= gsrcdofs);
-                        // dTargetCenterLon[tgtelmindx[offset]] = rowcolsvals[i];
-                        dTargetCenterLon[offset] = rowcolsvals[i];
-                    }
-                }
-
-                offset = 0;
-                for ( int ip = 0; ip < nprocs; ++ip )
-                {
-                    int ibase = rootSizesData[NDATA * ip] + rootSizesData[NDATA * ip + 1] + rootSizesData[NDATA * ip + 2] + 2 * rootSizesData[NDATA * ip + 4] * (1+nSc) + rootSizesData[NDATA * ip + 5];
-                    int istart = displs[ip] + ibase, iend = istart + rootSizesData[NDATA * ip + 5];
-                    for ( int i = istart; i < iend; ++i, ++offset )
-                    {
-                        // dTargetCenterLat[tgtelmindx[offset]] = rowcolsvals[i];
-                        dTargetCenterLat[offset] = rowcolsvals[i];
-                    }
-                }
-            }
-
-            DataArray2D<double>& dTargetVertexLon = m_weightMapGlobal->GetTargetVertexLon();
-            DataArray2D<double>& dTargetVertexLat = m_weightMapGlobal->GetTargetVertexLat();
-            dTargetVertexLon.Allocate(gtgtdofs, nTc);
-            dTargetVertexLat.Allocate(gtgtdofs, nTc);
-            {
-                int ioffset = 0;
-                int nc = dTargetVertexLon.GetColumns();
-                for ( int ip = 0; ip < nprocs; ++ip )
-                {
-                    int ibase = rootSizesData[NDATA * ip] + rootSizesData[NDATA * ip + 1] + rootSizesData[NDATA * ip + 2] + 2 * rootSizesData[NDATA * ip + 4] * (1+nSc) + 2 * rootSizesData[NDATA * ip + 5];
-                    int istart = displs[ip] + ibase, iend = istart + rootSizesData[NDATA * ip + 5]*nTc;
-                    for ( int i = istart; i < iend; ++i, ++ioffset )
-                    {
-                        for ( int joffset = 0; joffset < nc; ++joffset)
-                            dTargetVertexLon[ioffset][joffset] = rowcolsvals[i+joffset];
-                        i += nc;
-                    }
-                }
-
-                ioffset = 0;
-                for ( int ip = 0; ip < nprocs; ++ip )
-                {
-                    int ibase = rootSizesData[NDATA * ip] + rootSizesData[NDATA * ip + 1] + rootSizesData[NDATA * ip + 2] + 2 * rootSizesData[NDATA * ip + 4] * (1+nSc) + 2 * rootSizesData[NDATA * ip + 5] + rootSizesData[NDATA * ip + 5]*nTc;
-                    int istart = displs[ip] + ibase, iend = istart + rootSizesData[NDATA * ip + 5]*nTc;
-                    for ( int i = istart; i < iend; ++i, ++ioffset )
-                    {
-                        for ( int joffset = 0; joffset < nc; ++joffset)
-                            dTargetVertexLat[ioffset][joffset] = rowcolsvals[i+joffset];
-                        i += nc;
-                    }
-                }
-            }
-        }
-
-    }
-    rootSizesData.clear();
-
-    // Update all processes that we have a global view of the map available
-    // on the root process
-    m_globalMapAvailable = true;
-
-// #ifdef VERBOSE
-    if ( !rank )
-    {
-        dbgprint.printf ( 0, "Writing out file outGlobalView.nc\n" );
-        std::map<std::string, std::string> mapAttributes;
-        std::stringstream sstr;
-        sstr << "MOAB mbtempest workflow with weights gathered on root process from " << nprocs << " processes.";
-        mapAttributes["Creator"] = sstr.str();
-        m_weightMapGlobal->Write ( "outGlobalView.nc", mapAttributes, NcFile::Netcdf4 );
-    }
-// #endif
-// #undef VERBOSE
-    return moab::MB_SUCCESS;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
 moab::ErrorCode moab::TempestOnlineMap::remove_ghosted_overlap_entities (moab::Range& sharedGhostEntities)
 {
+    sharedGhostEntities.clear();
+#ifdef MOAB_HAVE_MPI
     moab::ErrorCode rval;
 
-#ifdef MOAB_HAVE_MPI
-    sharedGhostEntities.clear();
     // Remove entities in the intersection mesh that are part of the ghosted overlap
     if (is_parallel && size > 1)
     {
@@ -2015,14 +1580,6 @@ moab::ErrorCode moab::TempestOnlineMap::WriteParallelMap (std::string strOutputF
     std::vector<int> smatrowvals(weightMatNNZ),smatcolvals(weightMatNNZ);
     const double* smatvals = m_weightMatrix.valuePtr();
     int maxrow=0, maxcol=0, offset=0;
-#if 0
-    // Sanity check = brute force computation of max global ID for rows and columns
-    // for (unsigned idof = 0; idof < col_gdofmap.size(); ++idof) {
-    //     maxcol = (col_gdofmap[ idof ] > maxcol) ? col_gdofmap[ idof ] : maxcol;
-    // }
-    // for (unsigned idof = 0; idof < row_gdofmap.size(); ++idof)
-    //     maxrow = (row_gdofmap[ idof ] > maxrow) ? row_gdofmap[ idof ] : maxrow;
-#endif
 
     // Loop over the matrix entries and find the max global ID for rows and columns
     for (int k=0; k < m_weightMatrix.outerSize(); ++k)
@@ -2167,6 +1724,3 @@ moab::ErrorCode moab::TempestOnlineMap::WriteParallelMap (std::string strOutputF
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
-#endif
-

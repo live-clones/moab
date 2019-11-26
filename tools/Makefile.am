@@ -20,6 +20,10 @@ else
 endif
 endif
 
+if HAVE_TEMPESTREMAP
+  LDADD += $(TEMPESTREMAP_LIBS)
+endif
+
 if HAVE_CGM
   geometry_DIR = geometry
 else
@@ -50,6 +54,7 @@ endif
 endif
 
 if ENABLE_mbconvert
+  mbconvert_SOURCES = convert.cpp
   bin_PROGRAMS += mbconvert
   dist_man1_MANS += mbconvert.man
   doc_DATA += README.mbconvert
@@ -176,9 +181,7 @@ if ENABLE_mbtempest
   AM_CPPFLAGS += $(TEMPESTREMAP_INCLUDE) -I$(top_srcdir)/src/Remapping -I$(top_srcdir)/src/IntxMesh
   bin_PROGRAMS += mbtempest h5mtoscrip
 mbtempest_SOURCES = mbtempest.cpp
-mbtempest_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
 h5mtoscrip_SOURCES = h5mtoscrip.cpp
-h5mtoscrip_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
 endif
 
 if ENABLE_mbmerge
@@ -201,7 +204,6 @@ SUBDIRS = . \
           $(mesquite_DIR) \
           $(geometry_DIR)
 
-mbconvert_SOURCES = convert.cpp
 mbgsets_SOURCES = gsets.cpp
 hexmodops_SOURCES = makeops.cpp
 mbsize_SOURCES = measure.cpp measure.hpp size.cpp
