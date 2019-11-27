@@ -354,7 +354,7 @@ ErrorCode TempestRemapper::convert_mesh_to_tempest_private ( Mesh* mesh, EntityH
     {
         rval = m_interface->get_entities_by_dimension ( mesh_set, 0, verts ); MB_CHK_ERR ( rval );
     }
-    assert(verts.size() > 0); // If not, this may be an invalid mesh
+    //assert(verts.size() > 0); // If not, this may be an invalid mesh ! possible for unbalanced loads
 
     for ( unsigned iface = 0; iface < elems.size(); ++iface )
     {
