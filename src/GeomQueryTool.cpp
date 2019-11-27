@@ -22,6 +22,62 @@ debug = true;
 
 namespace moab {
 
+  /** \class FindVolume_IntRegCtxt
+   *
+   *
+   *\brief An intersection context used for finding a volume
+   *
+   * This context is used to find the nearest intersection location
+   * and is intended for use with a global surface tree from
+   * the GeomTopoTool.
+   *
+   * The behavior of this context is relatively simple in that it
+   * returns only one intersection distance, surface, and facet.
+   * Intersections of any orientation are accepted. The positive
+   * value of the search window is limited to the current nearest
+   * intersection distance.
+   *
+   */
+
+  class FindVolumeIntRegCtxt : public OrientedBoxTreeTool::IntRegCtxt {
+
+  public:
+    // Constructor
+    FindVolumeIntRegCtxt() {
+      // initialize return vectors
+      // only one hit is returned in this context
+      intersections.push_back(std::numeric_limits<double>::max());
+      sets.push_back(0);
+      facets.push_back(0);
+    }
+
+    ErrorCode register_intersection(EntityHandle set,
+                                    EntityHandle tri,
+                                    double dist,
+                                    OrientedBoxTreeTool::IntersectSearchWindow & search_win,
+                                    GeomUtil::intersection_type it) {
+      // update dist, set, and triangle hit if
+      // we found a new minimum distance
+      double abs_dist = fabs(dist);
+      if (abs_dist < fabs(intersections[0])) {
+        intersections[0] = dist;
+        sets[0] = set;
+        facets[0] = tri;
+
+        // narrow search window based on the hit distance
+        pos = abs_dist;
+        neg = -abs_dist;
+        search_win.first = &pos;
+        search_win.second = &neg;
+      }
+
+      return MB_SUCCESS;
+    }
+
+    // storage for updated window values during search
+    double pos;
+    double neg;
+  };
 
   /** \class GQT_IntRegCtxt
    *
@@ -151,7 +207,7 @@ namespace moab {
       }
       // surfTriOrient will be used by plucker_ray_tri_intersect to avoid
       // intersections with wrong orientation.
-      if       (*geomVol == vols[0]) {
+      if (*geomVol == vols[0]) {
         *surfTriOrient = *desiredOrient*1;
       } else if(*geomVol == vols[1]) {
         *surfTriOrient = *desiredOrient*(-1);
@@ -970,7 +1026,148 @@ ErrorCode GeomQueryTool::point_in_volume_slow( EntityHandle volume, const double
   return MB_SUCCESS;
 }
 
+ErrorCode GeomQueryTool::find_volume(const double xyz[3],
+                                     EntityHandle& volume,
+                                     const double *dir)
+{
+  ErrorCode rval;
+  volume = 0;
 
+  EntityHandle global_surf_tree_root = geomTopoTool->get_one_vol_root();
+
+  // fast check - make sure point is in the implicit complement bounding box
+  int ic_result;
+  EntityHandle ic_handle;
+  rval = geomTopoTool->get_implicit_complement(ic_handle);
+  MB_CHK_SET_ERR(rval, "Failed to get the implicit complement handle");
+
+  rval = point_in_box(ic_handle, xyz, ic_result);
+  MB_CHK_SET_ERR(rval, "Failed to check implicit complement for containment");
+  if (ic_result == 0) {
+    volume = 0;
+    return MB_ENTITY_NOT_FOUND;
+  }
+
+  // if geomTopoTool doesn't have a global tree, use a loop over vols (slow)
+  if (!global_surf_tree_root) {
+    rval = find_volume_slow(xyz, volume, dir);
+    return rval;
+  }
+
+  moab::CartVect uvw(0.0);
+
+  if (dir) {
+    uvw[0] = dir[0];
+    uvw[1] = dir[1];
+    uvw[2] = dir[2];
+  }
+
+  if (uvw == 0.0) {
+    uvw[0] = rand();
+    uvw[1] = rand();
+    uvw[2] = rand();
+  }
+
+  // always normalize direction
+  uvw.normalize();
+
+  // fire a ray along dir and get surface
+  const double huge_val = std::numeric_limits<double>::max();
+  double pos_ray_len = huge_val;
+  double neg_ray_len = -huge_val;
+
+  // RIS output data
+  std::vector<double>       dists;
+  std::vector<EntityHandle> surfs;
+  std::vector<EntityHandle> facets;
+
+  FindVolumeIntRegCtxt find_vol_reg_ctxt;
+  OrientedBoxTreeTool::IntersectSearchWindow search_win(&pos_ray_len, &neg_ray_len);
+  rval = geomTopoTool->obb_tree()->ray_intersect_sets(dists,
+                                                      surfs,
+                                                      facets,
+                                                      global_surf_tree_root,
+                                                      numericalPrecision,
+                                                      xyz,
+                                                      uvw.array(),
+                                                      search_win,
+                                                      find_vol_reg_ctxt);
+  MB_CHK_SET_ERR(rval, "Failed in global tree ray fire");
+
+  // if there was no intersection, no volume is found
+  if (surfs.size() == 0 || surfs[0] == 0 ) {
+    volume = 0;
+    return MB_ENTITY_NOT_FOUND;
+  }
+
+  // get the positive distance facet, surface hit
+  EntityHandle facet = facets[0];
+  EntityHandle surf = surfs[0];
+
+  // get these now, we're going to use them no matter what
+  EntityHandle fwd_vol, bwd_vol;
+  rval = geomTopoTool->get_surface_senses(surf, fwd_vol, bwd_vol);
+  MB_CHK_SET_ERR(rval, "Failed to get sense data");
+  EntityHandle parent_vols[2];
+  parent_vols[0] = fwd_vol;
+  parent_vols[1] = bwd_vol;
+
+  // get triangle normal
+  std::vector<EntityHandle> conn;
+  CartVect coords[3];
+  rval = MBI->get_connectivity(&facet, 1, conn);
+  MB_CHK_SET_ERR(rval, "Failed to get triangle connectivity");
+
+  rval = MBI->get_coords(&conn[0], 3, coords[0].array());
+  MB_CHK_SET_ERR(rval, "Failed to get triangle coordinates");
+
+  CartVect normal = (coords[1] - coords[0]) * (coords[2] - coords[0]);
+  normal.normalize();
+
+  // reverse direction if a hit in the negative direction is found
+  if (dists[0] < 0) { uvw *= -1; }
+
+  // if this is a "forward" intersection return the first sense entity
+  // otherwise return the second, "reverse" sense entity
+  double dot_prod = uvw % normal;
+  int idx =  dot_prod > 0.0 ? 0 : 1;
+  int piv_result = 0;
+
+  if (dot_prod == 0.0) {
+    std::cerr << "Tangent dot product in find_volume. Shouldn't be here." << std::endl;
+    volume = 0;
+    return MB_FAILURE;
+  }
+
+  volume = parent_vols[idx];
+
+  return MB_SUCCESS;
+}
+
+
+ErrorCode GeomQueryTool::find_volume_slow(const double xyz[3],
+                           EntityHandle& volume,
+                           const double *dir)
+{
+  ErrorCode rval;
+  volume = 0;
+  // get all volumes
+  Range all_vols;
+  rval = geomTopoTool->get_gsets_by_dimension(3, all_vols);
+  MB_CHK_SET_ERR(rval, "Failed to get all volumes in the model");
+
+  Range::iterator it;
+  int result = 0;
+  for (it = all_vols.begin(); it != all_vols.end(); it++) {
+    rval = point_in_volume(*it, xyz, result, dir);
+    MB_CHK_SET_ERR(rval, "Failed in point in volume loop");
+    if (result) {
+      volume = *it;
+      break;
+    }
+  }
+  return volume ? MB_SUCCESS : MB_ENTITY_NOT_FOUND;
+}
 
 // detemine distance to nearest surface
   ErrorCode GeomQueryTool::closest_to_location( EntityHandle volume, const double coords[3], double& result,

@@ -190,6 +190,34 @@ public:
    */
   ErrorCode point_in_volume_slow( const EntityHandle volume, const double xyz[3], int& result );
 
+  /**\brief Find volume for a given location.
+   *
+   * Determines which volume contains the point if possible. If no volume is found,
+   * a null EntityHandle is returned along with a MB_ENTITY_NOT_FOUND ErrorCode.
+   * @param xyz The location to test
+   * @param volume Set to volume handle containing the location if found
+   * @param dir Optional direction to use for underlying ray fire query.  Used to ensure
+   *        consistent results when a ray direction is known.  If NULL or {0,0,0} is
+   *        given, a random direction will be used.
+   */
+  ErrorCode find_volume(const double xyz[3],
+                        EntityHandle& volume,
+                        const double *dir = NULL);
+
+  /**\brief Find volume for a given location using loop. (slow)
+   *
+   * Loops over all volumes in the model, checking for point containment
+   * @param xyz The location to test
+   * @param volume Set to volume handle containing the location if found
+   * @param dir Optional direction to use for underlying ray fire query.  Used to ensure
+   *        consistent results when a ray direction is known.  If NULL or {0,0,0} is
+   *        given, a random direction will be used.
+   */
+  ErrorCode find_volume_slow(const double xyz[3],
+                        EntityHandle& volume,
+                        const double *dir = NULL);
+
+
   /**\brief Test if a point is inside or outsize a volume's axis-aligned bounding box
    *
    * This is used as a fast way to determine whether a point is inside or outside of a volume

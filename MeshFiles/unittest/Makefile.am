@@ -55,6 +55,7 @@ EXTRA_DIST = 125hex.g \
              spectral.h5m \
              tet_brick.vtk \
              test_geom.h5m \
+             find_vol_test_geom.h5m \
              sphere_quads_5.vtk \
              sphere_quads_20.vtk \
              sphere_tris_5.vtk \
@@ -72,5 +73,3 @@ EXTRA_DIST = 125hex.g \
              wholeATM_T.h5m \
              wholeLnd.h5m \
              recMeshOcn.h5m
-
-
