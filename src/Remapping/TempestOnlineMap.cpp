@@ -674,6 +674,7 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
 
         DiscretizationType eInputType;
         DiscretizationType eOutputType;
+        int fNoCheckGlob = (fNoCheck ? 1 : 0);
 
         if ( strInputType == "fv" )
         {
@@ -845,15 +846,20 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
             if ( is_root ) dbgprint.printf ( 0, "Overlap Mesh Area: %1.15e\n", dTotalAreaOverlap );
 
             // Partial cover
-            if ( fabs ( dTotalAreaOverlap - dTotalAreaInput ) > 1.0e-10 )
+            int fNoCheckLoc = fNoCheckGlob;
+            if ( fabs ( dTotalAreaOutput - dTotalAreaInput ) > 1.0e-10 && fabs ( dTotalAreaOverlap - dTotalAreaInput ) > 1.0e-10 )
             {
-                if ( !fNoCheck )
+                if ( !fNoCheckGlob )
                 {
-                    if ( is_root ) dbgprint.printf ( 0, "WARNING: Significant mismatch between overlap mesh area "
-                                                                "and input mesh area.\n  Automatically enabling --nocheck\n" );
-                    fNoCheck = true;
+                    dbgprint.printf ( rank, "WARNING: Significant mismatch between overlap mesh area "
+                                                "and input mesh area.\n  Automatically enabling --nocheck\n" );
+                    fNoCheckGlob = 1;
                 }
             }
+
+#ifdef MOAB_HAVE_MPI
+            if (m_pcomm) MPI_Allreduce ( &fNoCheckLoc, &fNoCheckGlob, 1, MPI_INTEGER, MPI_MAX, m_pcomm->comm() );
+#endif
 
             /*
                 // Recalculate input mesh area from overlap mesh
@@ -1395,7 +1401,7 @@ int moab::TempestOnlineMap::IsConsistent (double dTolerance)
 
     int ierr;
     int fConsistentGlobal = 0;
-    ierr = MPI_Allreduce(&fConsistent, &fConsistentGlobal, 1, MPI_INT, MPI_SUM, m_pcomm->comm());
+    ierr = MPI_Allreduce(&fConsistent, &fConsistentGlobal, 1, MPI_INTEGER, MPI_SUM, m_pcomm->comm());
     if ( ierr != MPI_SUCCESS ) return -1;
 
     return fConsistentGlobal;
@@ -1528,7 +1534,7 @@ int moab::TempestOnlineMap::IsConservative (double dTolerance)
     }
 
     // TODO: Just do a broadcast from root instead of a reduction
-    ierr = MPI_Bcast(&fConservative, 1, MPI_INT, rootProc, m_pcomm->comm());
+    ierr = MPI_Bcast(&fConservative, 1, MPI_INTEGER, rootProc, m_pcomm->comm());
     if ( ierr != MPI_SUCCESS ) return -1;
 
     return fConservative;
@@ -1569,7 +1575,7 @@ int moab::TempestOnlineMap::IsMonotone (double dTolerance)
 
     int ierr;
     int fMonotoneGlobal = 0;
-    ierr = MPI_Allreduce(&fMonotone, &fMonotoneGlobal, 1, MPI_INT, MPI_SUM, m_pcomm->comm());
+    ierr = MPI_Allreduce(&fMonotone, &fMonotoneGlobal, 1, MPI_INTEGER, MPI_SUM, m_pcomm->comm());
     if ( ierr != MPI_SUCCESS ) return -1;
 
     return fMonotoneGlobal;
