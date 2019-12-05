@@ -226,7 +226,7 @@ if (test "x" != "x$HDF5_DIR" && test "xno" != "x$HDF5_DIR"); then
   fi
  
   # Check for IBM parallel IO library
-  if test "x$enablempi" != "xno"; then
+  if (test "x$enablempi" != "xno" && test "x$MB_BLUEGENE_CONF" != "xno"); then
     AC_CHECK_LIB([gpfs],[gpfs_stat],[LIBS="-lgpfs $LIBS"])
   fi
 
