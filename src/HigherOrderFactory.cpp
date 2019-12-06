@@ -942,7 +942,9 @@ HigherOrderFactory::tag_for_deletion( EntityHandle parent_handle,
 
       // remove meshsets
       adj_list_1.erase(std::remove_if(adj_list_1.begin(), adj_list_1.end(),
-           std::bind2nd(std::greater<EntityHandle>(),low_meshset)), adj_list_1.end());
+         std::bind(std::greater<EntityHandle>(), std::placeholders::_1, low_meshset)), adj_list_1.end());
+         // std::bind2nd(std::greater<EntityHandle>(),low_meshset)), adj_list_1.end());
+// https://stackoverflow.com/questions/32739018/a-replacement-for-stdbind2nd
 
       size_t i;
       for( i=1; i<connectivity.size(); i++)
@@ -952,7 +954,9 @@ HigherOrderFactory::tag_for_deletion( EntityHandle parent_handle,
 
         // remove meshsets
         adj_list_2.erase(std::remove_if(adj_list_2.begin(), adj_list_2.end(),
-             std::bind2nd(std::greater<EntityHandle>(),low_meshset)), adj_list_2.end());
+            std::bind(std::greater<EntityHandle>(), std::placeholders::_1, low_meshset)), adj_list_2.end());
+            // std::bind2nd(std::greater<EntityHandle>(),low_meshset)), adj_list_2.end());
+// https://stackoverflow.com/questions/32739018/a-replacement-for-stdbind2nd
 
         //intersect the 2 lists
         adj_entities.clear();

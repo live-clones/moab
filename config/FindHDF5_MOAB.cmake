@@ -10,7 +10,9 @@ set( HDF5_FOUND NO CACHE INTERNAL "Found HDF5 components successfully." )
 set( SZIP_ROOT "" CACHE PATH "Path to search for SZIP header and library files" )
 
 # Try to find HDF5 with the CMake finder
-set(ENV{HDF5_ROOT} ${HDF5_ROOT})
+if (CMAKE_VERSION VERSION_LESS "3.12.0")
+  set(ENV{HDF5_ROOT} ${HDF5_ROOT})
+endif ()
 if (EXISTS ${HDF5_ROOT})
    find_package(HDF5 COMPONENTS C HL NO_DEFAULT_PATH HINTS ${HDF5_ROOT})
 else()
@@ -22,8 +24,10 @@ if (HDF5_FOUND)
   SET(HDF5_INCLUDES ${HDF5_INCLUDE_DIRS})
   SET(HDF5_LIBRARIES ${HDF5_HL_LIBRARIES} ${HDF5_C_LIBRARIES})
 else (HDF5_FOUND)
-  # Try to find HDF5 ourselves
-  if(EXISTS "${HDF5_ROOT}/share/cmake/hdf5/hdf5-config.cmake")
+  # Try to find HDF5 ourselves.
+  # Below is simply a duplication of effort.
+  if (EXISTS "${HDF5_ROOT}/share/cmake/hdf5/hdf5-config.cmake")
+    message(STATUS "${HDF5_ROOT}/share/cmake/hdf5/hdf5-config.cmake exists.")
     include(${HDF5_ROOT}/share/cmake/hdf5/hdf5-config.cmake)
     SET( HDF5_INCLUDES "${HDF5_INCLUDE_DIR}" )
   endif ()
@@ -119,7 +123,7 @@ else (HDF5_FOUND)
     #now we create fake targets to be used
     include(${HDF5_ROOT}/share/cmake/hdf5/hdf5-targets.cmake OPTIONAL)
 
-  endif(EXISTS "${HDF5_ROOT}/share/cmake/hdf5/hdf5-config.cmake")
+  endif ()
 endif (HDF5_FOUND)
 
 message (STATUS "---   HDF5 Configuration ::")
