@@ -667,8 +667,8 @@ int main(int argc, char* argv[])
           }
         }
     }
-    // Write out the mesh using TempestRemap
-    tempestMesh->Write(out);
+   // Write out the mesh using TempestRemap
+    tempestMesh->Write(out, NcFile::Netcdf4);
   }
   else {
 #endif
