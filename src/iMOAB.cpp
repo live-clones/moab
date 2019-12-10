@@ -1706,6 +1706,25 @@ ErrCode iMOAB_GetGlobalInfo ( iMOAB_AppID pid, int* num_global_verts, int* num_g
     return 0;
 }
 
+static void split_tag_names(std::string input_names, std::string & separator, std::vector<std::string> & list_tag_names)
+{
+  size_t pos = 0;
+  std::string token;
+  while ((pos = input_names.find(separator)) != std::string::npos) {
+      token = input_names.substr(0, pos);
+      list_tag_names.push_back(token);
+      //std::cout << token << std::endl;
+      input_names.erase(0, pos + separator.length());
+  }
+  if (!input_names.empty())
+  {
+    // if leftover something, or if not ended with delimiter
+    list_tag_names.push_back(input_names);
+  }
+  return ;
+}
+
+
 #ifdef MOAB_HAVE_MPI
 
 // this makes sense only for parallel runs
@@ -2009,24 +2028,6 @@ ErrCode iMOAB_ReceiveMesh ( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* sendin
   MPI_Group_free(&receiverGroup);
 
   return 0;
-}
-
-static void split_tag_names(std::string input_names, std::string & separator, std::vector<std::string> & list_tag_names)
-{
-  size_t pos = 0;
-  std::string token;
-  while ((pos = input_names.find(separator)) != std::string::npos) {
-      token = input_names.substr(0, pos);
-      list_tag_names.push_back(token);
-      //std::cout << token << std::endl;
-      input_names.erase(0, pos + separator.length());
-  }
-  if (!input_names.empty())
-  {
-    // if leftover something, or if not ended with delimiter
-    list_tag_names.push_back(input_names);
-  }
-  return ;
 }
 
 ErrCode iMOAB_SendElementTag(iMOAB_AppID pid, const iMOAB_String tag_storage_name,
