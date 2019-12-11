@@ -688,6 +688,21 @@ ErrCode iMOAB_SendElementTag(iMOAB_AppID pid, const iMOAB_String tag_storage_nam
 ErrCode iMOAB_ReceiveElementTag(iMOAB_AppID pid, const iMOAB_String tag_storage_name,
     MPI_Comm* join, int * context_id, int tag_storage_name_length);
 
+/**
+\brief compute a comm graph between 2 moab apps, based on ID matching
+<B>Operations:</B> Collective
+
+ \param[in]  pid1 (iMOAB_AppID)                     The unique pointer to the first application ID
+ \param[in]  pid2 (iMOAB_AppID)                     The unique pointer to the second application ID
+ \param[in]  join (MPI_Comm)                        communicator that overlaps both groups
+ \param[in]  group1 (MPI_Group *)                   MPI group for first comp
+ \param[in]  group2 (MPI_Group *)                   MPI group for second comp
+ \param[in]  type1 (int *)                          type of mesh (spectral with GLOBAL_DOFS, etc)
+ \param[in]  type2 (int *)                          type of mesh (point cloud with GLOBAL_ID, etc)
+*/
+ErrCode iMOAB_ComputeCommGraph(iMOAB_AppID  pid1, iMOAB_AppID  pid2,  MPI_Comm* join,
+    MPI_Group* group1, MPI_Group* group2, int * type1, int * type2);
+
 #ifdef MOAB_HAVE_TEMPESTREMAP
 
 /**

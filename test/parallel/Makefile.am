@@ -45,7 +45,7 @@ TESTS = pcomm_unit \
 if HAVE_HDF5_PARALLEL
   HDF5_TESTS = parallel_hdf5_test mhdf_parallel parallel_write_test \
          parallel_adj parmerge_test augment_with_ghosts uref_hirec_test_parallel migrate_test \
-         ghost_thin_layers 
+         ghost_thin_layers commgraph_test 
 
 if HAVE_ZOLTAN
   HDF5_TESTS += migrate_nontrivial
@@ -164,6 +164,7 @@ migrate_test_SOURCES = migrate_test.cpp
 imoab_coupler_SOURCES = imoab_coupler.cpp
 migrate_nontrivial_SOURCES = migrate_nontrivial.cpp
 ghost_thin_layers_SOURCES = ghost_thin_layers.cpp
+commgraph_test_SOURCES = commgraph_test.cpp
 
 if ENABLE_imesh
 if HAVE_HDF5_PARALLEL

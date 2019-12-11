@@ -2146,6 +2146,17 @@ ErrCode iMOAB_FreeSenderBuffers ( iMOAB_AppID pid, int* context_id )
     return 0;
 }
 
+/**
+\brief compute a comm graph between 2 moab apps, based on ID matching
+<B>Operations:</B> Collective
+*/
+ErrCode iMOAB_ComputeCommGraph(iMOAB_AppID  pid1, iMOAB_AppID  pid2,  MPI_Comm* join,
+    MPI_Group* group1, MPI_Group* group2, int * type1, int * type2)
+{
+  return 0;
+}
+
+
 #ifdef MOAB_HAVE_TEMPESTREMAP
 // this call must be collective on the joint communicator
 //  intersection tasks on coupler will need to send to the components tasks the list of
