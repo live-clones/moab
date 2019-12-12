@@ -72,11 +72,27 @@
 
 // We will rely on LAPACK directly
 
+#ifdef WIN32
+
+// Should use second form below for windows but
+// needed to do this to make it work.
+// TODO: Need to clean this up
+#define MOAB_dsyevd MOAB_FC_FUNC(dsyevd, DSYEVD)
+#define MOAB_dsyevr MOAB_FC_FUNC(dsyevr, DSYEVR)
+#define MOAB_dgeev  MOAB_FC_FUNC(dgeev, DGEEV)
+#define MOAB_dgetrf MOAB_FC_FUNC(dgetrf, DGETRF)
+#define MOAB_dgetri MOAB_FC_FUNC(dgetri, DGETRI)
+
+#else
+
 #define MOAB_dsyevd MOAB_FC_WRAPPER(dsyevd, DSYEVD)
 #define MOAB_dsyevr MOAB_FC_WRAPPER(dsyevr, DSYEVR)
 #define MOAB_dgeev  MOAB_FC_WRAPPER(dgeev, DGEEV)
 #define MOAB_dgetrf MOAB_FC_WRAPPER(dgetrf, DGETRF)
 #define MOAB_dgetri MOAB_FC_WRAPPER(dgetri, DGETRI)
+
+#endif
+
 
 extern "C" {
 
