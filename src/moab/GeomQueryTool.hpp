@@ -104,7 +104,17 @@ public:
 
   };
 
-  // Constructor
+  // Constructors
+
+  GeomQueryTool(Interface *impl,
+                bool find_geoments = false,
+                EntityHandle modelRootSet = 0,
+                bool p_rootSets_vector = true,
+                bool restore_rootSets = true,
+                bool trace_counting = false,
+                double overlap_thickness = 0.,
+                double numerical_precision = 0.001);
+
   GeomQueryTool(GeomTopoTool* geomtopotool, bool trace_counting = false,
                 double overlap_thickness = 0., double numerical_precision = 0.001);
 
@@ -354,6 +364,7 @@ public:
 private:
 
   GeomTopoTool* geomTopoTool;
+  bool owns_gtt;
   Interface* MBI;
   OrientedBoxTreeTool* obbTreeTool;
   bool counting;
