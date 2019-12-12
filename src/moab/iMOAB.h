@@ -699,9 +699,12 @@ ErrCode iMOAB_ReceiveElementTag(iMOAB_AppID pid, const iMOAB_String tag_storage_
  \param[in]  group2 (MPI_Group *)                   MPI group for second comp
  \param[in]  type1 (int *)                          type of mesh (spectral with GLOBAL_DOFS, etc)
  \param[in]  type2 (int *)                          type of mesh (point cloud with GLOBAL_ID, etc)
+ \param[in]  comp1 (int*)                           id of the other component 1
+ \param[in]  cpmp2 (int*)                           id of the other component 2
+
 */
 ErrCode iMOAB_ComputeCommGraph(iMOAB_AppID  pid1, iMOAB_AppID  pid2,  MPI_Comm* join,
-    MPI_Group* group1, MPI_Group* group2, int * type1, int * type2);
+    MPI_Group* group1, MPI_Group* group2, int * type1, int * type2, int *comp1, int *comp2);
 
 #ifdef MOAB_HAVE_TEMPESTREMAP
 

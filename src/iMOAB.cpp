@@ -2151,8 +2151,165 @@ ErrCode iMOAB_FreeSenderBuffers ( iMOAB_AppID pid, int* context_id )
 <B>Operations:</B> Collective
 */
 ErrCode iMOAB_ComputeCommGraph(iMOAB_AppID  pid1, iMOAB_AppID  pid2,  MPI_Comm* join,
-    MPI_Group* group1, MPI_Group* group2, int * type1, int * type2)
+    MPI_Group* group1, MPI_Group* group2, int * type1, int * type2, int *comp1, int *comp2)
 {
+  int ierr=0;
+  ErrorCode rval=MB_SUCCESS;
+  int localRank=0, numProcs=1;
+  MPI_Comm_rank( *join, &localRank );
+  MPI_Comm_size( *join, &numProcs );
+  // instantiate the par comm graph
+  // ParCommGraph::ParCommGraph(MPI_Comm joincomm, MPI_Group group1, MPI_Group group2, int coid1, int coid2)
+  ParCommGraph* cgraph = new ParCommGraph ( *join, *group1, *group2, *comp1, *comp2 );
+  // we should search if we have another pcomm with the same comp ids in the list already
+  // sort of check existing comm graphs in the map context.appDatas[*pid].pgraph
+  if (*pid1>=0) context.appDatas[*pid1].pgraph[-1] = cgraph ;
+  if (*pid2>=0) context.appDatas[*pid2].pgraph[-1] = cgraph ;
+  // each model has a list of global ids that will need to be sent by gs to rendezvous the other model
+  // on the joint comm
+  TupleList TLcomp1;
+  TLcomp1.initialize ( 4, 0, 0, 0, 0 ); // to proc, marker, element local index, index in el
+  TupleList TLcomp2;
+  TLcomp2.initialize ( 4, 0, 0, 0, 0 ); // to proc, marker, element local index, index in el
+  // will push_back a new tuple, if needed
+
+  TLcomp1.enableWriteAccess();
+
+  // tags of interest are either GLOBAL_DOFS or GLOBAL_ID
+  Tag tagType1;
+  rval = context.MBI->tag_get_handle ( "GLOBAL_DOFS", tagType1 ); CHKERRVAL ( rval );
+  // find the values on first cell
+  int lenTagType1 = 1;
+  if (tagType1) {
+    rval = context.MBI->tag_get_length(tagType1, lenTagType1); CHKERRVAL ( rval ); // usually it is 16
+  }
+  Tag tagType2;
+  rval = context.MBI->tag_get_handle ( "GLOBAL_ID", tagType2 ); CHKERRVAL ( rval );
+
+  // populate first tuple
+  if (*pid1>=0)
+  {
+    EntityHandle fset1 = context.appDatas[*pid1].file_set;
+    Range ents_of_interest;
+    std::vector<int> values;
+    int stride = 1;
+    if (*type1==1)
+    {
+      assert(tagType1);
+      rval = context.MBI->get_entities_by_type(fset1,MBQUAD,ents_of_interest  ); CHKERRVAL ( rval );
+      values.resize(ents_of_interest.size()*lenTagType1);
+      rval = context.MBI->tag_get_data(tagType1, ents_of_interest, &values[0]);; CHKERRVAL ( rval );
+      stride = lenTagType1;
+    }
+    else if (*type1==2)
+    {
+      rval = context.MBI->get_entities_by_type(fset1,MBVERTEX,ents_of_interest  ); CHKERRVAL ( rval );
+      values.resize(ents_of_interest.size());
+      rval = context.MBI->tag_get_data(tagType2, ents_of_interest, &values[0]); ; CHKERRVAL ( rval );// just global ids
+      stride = 1;
+    }
+    else
+    {
+      CHKERRVAL ( MB_FAILURE ); // we know only type 1 or 2
+    }
+    // now fill the tuple list with info and markers
+    TLcomp1.resize(ents_of_interest.size()*stride);
+    for (int ie = 0; ie<(int)ents_of_interest.size(); ie++)
+    {
+      for (int j=0; j<stride; j++)
+      {
+        //to proc, marker, element local index, index in el
+        int marker = values[ie*stride+j];
+        int to_proc = marker%numProcs;
+        int n=TLcomp1.get_n();
+        TLcomp1.vi_wr[4 * n] = to_proc; // send to processor
+        TLcomp1.vi_wr[4 * n + 1] = marker;
+        TLcomp1.vi_wr[4 * n + 2] = ie;
+        TLcomp1.vi_wr[4 * n + 3] = j;
+        TLcomp1.inc_n();
+      }
+    }
+  }
+
+  ProcConfig pc ( *join ); // proc config does the crystal router
+  pc.crystal_router()->gs_transfer ( 1, TLcomp1, 0 ); // communication towards joint tasks, with markers
+  // sort by value (key 1)
+//#ifdef VERBOSE
+  std::stringstream ff1;
+  ff1 << "TLcomp1_"<< localRank << ".txt";
+  TLcomp1.print_to_file(ff1.str().c_str());
+//#endif
+  moab::TupleList::buffer sort_buffer;
+  sort_buffer.buffer_init(TLcomp1.get_n());
+  TLcomp1.sort(1, &sort_buffer);
+  sort_buffer.reset();
+//#ifdef VERBOSE
+  // after sorting
+  TLcomp1.print_to_file(ff1.str().c_str());
+//#endif
+  // do the same, for the other component, number2, with type2
+  // start copy
+  TLcomp2.enableWriteAccess();
+  // populate second tuple
+  if (*pid2>=0)
+  {
+    EntityHandle fset2 = context.appDatas[*pid2].file_set;
+    Range ents_of_interest;
+    std::vector<int> values;
+    int stride = 1;
+    if (*type2==1)
+    {
+      assert(tagType1);
+      rval = context.MBI->get_entities_by_type(fset2,MBQUAD,ents_of_interest  ); CHKERRVAL ( rval );
+      values.resize(ents_of_interest.size()*lenTagType1);
+      rval = context.MBI->tag_get_data(tagType1, ents_of_interest, &values[0]);; CHKERRVAL ( rval );
+      stride = lenTagType1;
+    }
+    else if (*type2==2)
+    {
+      rval = context.MBI->get_entities_by_type(fset2,MBVERTEX,ents_of_interest  ); CHKERRVAL ( rval );
+      values.resize(ents_of_interest.size());
+      rval = context.MBI->tag_get_data(tagType2, ents_of_interest, &values[0]); ; CHKERRVAL ( rval );// just global ids
+      stride = 1;
+    }
+    else
+    {
+      CHKERRVAL ( MB_FAILURE ); // we know only type 1 or 2
+    }
+    // now fill the tuple list with info and markers
+    TLcomp2.resize(ents_of_interest.size()*stride);
+    for (int ie = 0; ie<(int)ents_of_interest.size(); ie++)
+    {
+      for (int j=0; j<stride; j++)
+      {
+        //to proc, marker, element local index, index in el
+        int marker = values[ie*stride+j];
+        int to_proc = marker%numProcs;
+        int n=TLcomp2.get_n();
+        TLcomp2.vi_wr[4 * n] = to_proc; // send to processor
+        TLcomp2.vi_wr[4 * n + 1] = marker;
+        TLcomp2.vi_wr[4 * n + 2] = ie;
+        TLcomp2.vi_wr[4 * n + 3] = j;
+        TLcomp2.inc_n();
+      }
+    }
+  }
+
+    //ProcConfig pc ( *join ); // proc config does the crystal router
+  pc.crystal_router()->gs_transfer ( 1, TLcomp2, 0 ); // communication towards joint tasks, with markers
+  // sort by value (key 1)
+  //#ifdef VERBOSE
+  std::stringstream ff2;
+  ff2 << "TLcomp2_"<< localRank << ".txt";
+  TLcomp2.print_to_file(ff2.str().c_str());
+//#endif
+  sort_buffer.buffer_reserve(TLcomp2.get_n());
+  TLcomp2.sort(1, &sort_buffer);
+  sort_buffer.reset();
+  // end copy
+  TLcomp2.print_to_file(ff2.str().c_str());
+  // need to send back the info, from the rendezvous point, for each of the
+
   return 0;
 }
 

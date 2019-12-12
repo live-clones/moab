@@ -190,11 +190,15 @@ int main( int argc, char* argv[] )
   }
   int type1 = 1; // spectral mesh, with GLOBAL_DOFS tags on cells
   int type2 = 2; // point cloud mesh, with GLOBAL_ID tag on vertices
-  ierr = iMOAB_ComputeCommGraph(cmpAtmPID, physAtmPID, &joinComm, &atmPEGroup, &atmPhysGroup,
-      &type1, &type2);
-  // it will generate parcomm graph between atm and atmPhys models
-  // 2 meshes, that are distributed in parallel
-  CHECKIERR(ierr, "Cannot compute comm graph between the two apps ")
+  {
+    if (MPI_COMM_NULL != joinComm)
+    ierr = iMOAB_ComputeCommGraph(cmpAtmPID, physAtmPID, &joinComm, &atmPEGroup, &atmPhysGroup,
+          &type1, &type2, &cmpatm, &physatm);
+    // it will generate parcomm graph between atm and atmPhys models
+    // 2 meshes, that are distributed in parallel
+    CHECKIERR(ierr, "Cannot compute comm graph between the two apps ")
+  }
+
 
   if (atmComm != MPI_COMM_NULL)
   {
