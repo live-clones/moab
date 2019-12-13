@@ -883,6 +883,25 @@ void ParCommGraph::SetReceivingAfterCoverage(std::map<int, std::set<int> > & ids
   return;
 }
 
+void ParCommGraph::settle_comm_by_ids( TupleList &  TLBackToComp )
+{
+  int n = TLBackToComp.get_n();
+  //third_method = true; // do not rely only on involved_IDs_map.size(); this can be 0 in some cases
+  std::map<int, std::set<int>> uniqueIDs;
+  for (int i=0; i<n; i++)
+  {
+    int to_proc= TLBackToComp.vi_wr[3 * i + 2];
+    int globalId = TLBackToComp.vi_wr[3 * i + 1 ];
+    uniqueIDs[to_proc].insert(globalId);
+  }
+  for (std::map<int, std::set<int>>::iterator it=uniqueIDs.begin(); it!=uniqueIDs.end(); it++)
+  {
+    int procId = it->first;
+    std::set<int> & nums = it->second;
+    for (std::set<int>::iterator sst=nums.begin(); sst!=nums.end(); sst++ )
+      involved_IDs_map[procId].push_back(*sst);
+  }
+}
 // new partition calculation
 ErrorCode ParCommGraph::compute_partition (ParallelComm *pco, Range & owned, int met)
 {

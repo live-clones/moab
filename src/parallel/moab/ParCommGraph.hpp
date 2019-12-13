@@ -169,6 +169,7 @@ namespace moab {
 	  // this will set after_cov_rec_sizes
 	  void SetReceivingAfterCoverage(std::map<int, std::set<int> > & idsFromProcs); // will make sense only on receivers, right now after cov
 
+	  void settle_comm_by_ids( TupleList &  TLBackToComp );
 	  // new partition calculation
 	  ErrorCode compute_partition (ParallelComm *pco, Range & owned, int met);
 

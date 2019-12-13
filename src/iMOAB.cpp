@@ -2162,10 +2162,11 @@ ErrCode iMOAB_ComputeCommGraph(iMOAB_AppID  pid1, iMOAB_AppID  pid2,  MPI_Comm* 
   // instantiate the par comm graph
   // ParCommGraph::ParCommGraph(MPI_Comm joincomm, MPI_Group group1, MPI_Group group2, int coid1, int coid2)
   ParCommGraph* cgraph = new ParCommGraph ( *join, *group1, *group2, *comp1, *comp2 );
+  ParCommGraph* cgraph_rev = new ParCommGraph ( *join, *group2, *group1, *comp2, *comp1 );
   // we should search if we have another pcomm with the same comp ids in the list already
   // sort of check existing comm graphs in the map context.appDatas[*pid].pgraph
   if (*pid1>=0) context.appDatas[*pid1].pgraph[*comp2] = cgraph ; // the context will be the other comp
-  if (*pid2>=0) context.appDatas[*pid2].pgraph[*comp1] = cgraph ;
+  if (*pid2>=0) context.appDatas[*pid2].pgraph[*comp1] = cgraph_rev ; // from 2 to 1
   // each model has a list of global ids that will need to be sent by gs to rendezvous the other model
   // on the joint comm
   TupleList TLcomp1;
@@ -2403,9 +2404,10 @@ ErrCode iMOAB_ComputeCommGraph(iMOAB_AppID  pid1, iMOAB_AppID  pid2,  MPI_Comm* 
       indexInTLComp1 += size1;
       indexInTLComp2 += size2;
     }
-    pc.crystal_router()->gs_transfer ( 1, TLBackToComp1, 0 ); // communication towards original tasks, with info about
-    pc.crystal_router()->gs_transfer ( 1, TLBackToComp2, 0 );
   }
+  pc.crystal_router()->gs_transfer ( 1, TLBackToComp1, 0 ); // communication towards original tasks, with info about
+  pc.crystal_router()->gs_transfer ( 1, TLBackToComp2, 0 );
+
 
   if (*pid1>=0)
   {
@@ -2424,7 +2426,9 @@ ErrCode iMOAB_ComputeCommGraph(iMOAB_AppID  pid1, iMOAB_AppID  pid2,  MPI_Comm* 
 #ifdef VERBOSE
     TLBackToComp1.print_to_file(f1.str().c_str());
 #endif
-    // so we are now on pid1, we know how to
+    // so we are now on pid1, we know now each marker were it has to go
+    // add a new method to ParCommGraph, to set up the involved_IDs_map
+    cgraph->settle_comm_by_ids( TLBackToComp1);
   }
   if (*pid2>=0)
   {
@@ -2443,7 +2447,8 @@ ErrCode iMOAB_ComputeCommGraph(iMOAB_AppID  pid1, iMOAB_AppID  pid2,  MPI_Comm* 
 #ifdef VERBOSE
     TLBackToComp2.print_to_file(f2.str().c_str());
 #endif
-    // so we are now on pid1, we know how to
+    cgraph_rev->settle_comm_by_ids( TLBackToComp2);
+    //
   }
   return 0;
 }
