@@ -225,8 +225,7 @@ namespace moab {
 
 	  // these will be used now after coverage, quick fix; they will also be populated by iMOAB_CoverageGraph
 	  bool recomputed_send_graph; // this should be false , set to true in settle send graph, to use send_IDs_map
-	  std::map<int ,std::vector<int> > send_IDs_map; // maybe moab::Range instead of std::vector<int> // these will be on sender side
-	  std::map<int, std::vector<int> > recv_IDs_map; // receiver side, after coverage, how many elements need to be received from each sender process
+	  std::map<int ,std::vector<int> > involved_IDs_map; // replace send and recv IDs_mapp with involved_IDs_map
 
 };
 

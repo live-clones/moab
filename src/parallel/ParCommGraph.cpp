@@ -591,8 +591,8 @@ ErrorCode ParCommGraph::send_tag_values (MPI_Comm jcomm, ParallelComm *pco, Rang
 
 
 
-  // bool specified_ids = send_IDs_map.size() > 0;
-  bool specified_ids = recomputed_send_graph; // in cases when sender is completely over land, send_IDs_map can still be size 0
+  // bool specified_ids = involved_IDs_map.size() > 0;
+  bool specified_ids = recomputed_send_graph; // in cases when sender is completely over land, involved_IDs_map can still be size 0
   int indexReq=0;
   if (!specified_ids) // original send
   {
@@ -639,8 +639,8 @@ ErrorCode ParCommGraph::send_tag_values (MPI_Comm jcomm, ParallelComm *pco, Rang
       gidToHandle[gids[i++]] = eh;
     }
     // now, pack the data and send it
-    sendReqs.resize(send_IDs_map.size());
-    for (std::map<int ,std::vector<int> >::iterator mit =send_IDs_map.begin(); mit!=send_IDs_map.end(); mit++)
+    sendReqs.resize(involved_IDs_map.size());
+    for (std::map<int ,std::vector<int> >::iterator mit =involved_IDs_map.begin(); mit!=involved_IDs_map.end(); mit++)
     {
       int receiver_proc = mit->first;
       std::vector<int> & eids = mit->second;
@@ -725,7 +725,7 @@ ErrorCode ParCommGraph::receive_tag_values (MPI_Comm jcomm, ParallelComm *pco, R
 
 
 
-  bool specified_ids = recv_IDs_map.size() > 0;
+  bool specified_ids = involved_IDs_map.size() > 0;
   if (!specified_ids)
   {
     //std::map<int, Range> split_ranges;
@@ -777,7 +777,7 @@ ErrorCode ParCommGraph::receive_tag_values (MPI_Comm jcomm, ParallelComm *pco, R
     }
     //
     // now, unpack the data and set it to the tag
-    for (std::map<int ,std::vector<int> >::iterator mit =recv_IDs_map.begin(); mit!=recv_IDs_map.end(); mit++)
+    for (std::map<int ,std::vector<int> >::iterator mit =involved_IDs_map.begin(); mit!=involved_IDs_map.end(); mit++)
     {
       int sender_proc = mit->first;
       std::vector<int> & eids = mit->second;
@@ -840,18 +840,18 @@ ErrorCode ParCommGraph::receive_tag_values (MPI_Comm jcomm, ParallelComm *pco, R
 
 ErrorCode ParCommGraph::settle_send_graph(TupleList & TLcovIDs)
 {
-  // fill send_IDs_map with data
+  // fill involved_IDs_map with data
   // will have "receiving proc" and global id of element
   int n = TLcovIDs.get_n();
-  recomputed_send_graph = true; // do not rely only on send_IDs_map.size(); this can be 0 in some cases
+  recomputed_send_graph = true; // do not rely only on involved_IDs_map.size(); this can be 0 in some cases
   for (int i=0; i<n; i++)
   {
     int to_proc= TLcovIDs.vi_wr[2 * i];
     int globalIdElem= TLcovIDs.vi_wr[2 * i + 1 ];
-    send_IDs_map[to_proc].push_back(globalIdElem);
+    involved_IDs_map[to_proc].push_back(globalIdElem);
   }
 #ifdef VERBOSE
-  for (std::map<int ,std::vector<int> >::iterator mit=send_IDs_map.begin(); mit!=send_IDs_map.end(); mit++)
+  for (std::map<int ,std::vector<int> >::iterator mit=involved_IDs_map.begin(); mit!=involved_IDs_map.end(); mit++)
   {
     std::cout <<" towards task " << mit->first << " send: " << mit->second.size() << " cells "<< std::endl;
     for (size_t i=0; i< mit->second.size() ; i++)
@@ -864,15 +864,15 @@ ErrorCode ParCommGraph::settle_send_graph(TupleList & TLcovIDs)
   return MB_SUCCESS;
 }
 
-// this will set recv_IDs_map will store all ids to be received from one sender task
+// this will set involved_IDs_map will store all ids to be received from one sender task
 void ParCommGraph::SetReceivingAfterCoverage(std::map<int, std::set<int> > & idsFromProcs) // will make sense only on receivers, right now after cov
 {
   for (std::map<int, std::set<int> >::iterator mt=idsFromProcs.begin(); mt!=idsFromProcs.end(); mt++)
   {
     int fromProc = mt->first;
     std::set<int> & setIds = mt->second;
-    recv_IDs_map[fromProc].resize( setIds.size() );
-    std::vector<int>  & listIDs = recv_IDs_map[fromProc];
+    involved_IDs_map[fromProc].resize( setIds.size() );
+    std::vector<int>  & listIDs = involved_IDs_map[fromProc];
     size_t indx = 0;
     for ( std::set<int>::iterator st= setIds.begin(); st!=setIds.end(); st++)
     {
@@ -1123,7 +1123,7 @@ ErrorCode ParCommGraph::dump_comm_information(std::string prefix, int is_send)
 
     if (recomputed_send_graph)
     {
-      for (std::map<int ,std::vector<int> >::iterator mit =send_IDs_map.begin(); mit!=send_IDs_map.end(); mit++)
+      for (std::map<int ,std::vector<int> >::iterator mit =involved_IDs_map.begin(); mit!=involved_IDs_map.end(); mit++)
       {
         int receiver_proc = mit->first;
         std::vector<int> & eids = mit->second;
@@ -1150,7 +1150,7 @@ ErrorCode ParCommGraph::dump_comm_information(std::string prefix, int is_send)
 
     if (recomputed_send_graph)
     {
-      for (std::map<int ,std::vector<int> >::iterator mit =recv_IDs_map.begin(); mit!=recv_IDs_map.end(); mit++)
+      for (std::map<int ,std::vector<int> >::iterator mit =involved_IDs_map.begin(); mit!=involved_IDs_map.end(); mit++)
       {
         int sender_proc = mit->first;
         std::vector<int> & eids = mit->second;
