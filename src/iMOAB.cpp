@@ -2150,6 +2150,7 @@ ErrCode iMOAB_FreeSenderBuffers ( iMOAB_AppID pid, int* context_id )
 \brief compute a comm graph between 2 moab apps, based on ID matching
 <B>Operations:</B> Collective
 */
+#define VERBOSE
 ErrCode iMOAB_ComputeCommGraph(iMOAB_AppID  pid1, iMOAB_AppID  pid2,  MPI_Comm* join,
     MPI_Group* group1, MPI_Group* group2, int * type1, int * type2, int *comp1, int *comp2)
 {
@@ -2163,8 +2164,8 @@ ErrCode iMOAB_ComputeCommGraph(iMOAB_AppID  pid1, iMOAB_AppID  pid2,  MPI_Comm* 
   ParCommGraph* cgraph = new ParCommGraph ( *join, *group1, *group2, *comp1, *comp2 );
   // we should search if we have another pcomm with the same comp ids in the list already
   // sort of check existing comm graphs in the map context.appDatas[*pid].pgraph
-  if (*pid1>=0) context.appDatas[*pid1].pgraph[-1] = cgraph ;
-  if (*pid2>=0) context.appDatas[*pid2].pgraph[-1] = cgraph ;
+  if (*pid1>=0) context.appDatas[*pid1].pgraph[*comp2] = cgraph ; // the context will be the other comp
+  if (*pid2>=0) context.appDatas[*pid2].pgraph[*comp1] = cgraph ;
   // each model has a list of global ids that will need to be sent by gs to rendezvous the other model
   // on the joint comm
   TupleList TLcomp1;
@@ -2186,40 +2187,44 @@ ErrCode iMOAB_ComputeCommGraph(iMOAB_AppID  pid1, iMOAB_AppID  pid2,  MPI_Comm* 
   Tag tagType2;
   rval = context.MBI->tag_get_handle ( "GLOBAL_ID", tagType2 ); CHKERRVAL ( rval );
 
+  int strideComp1 = 1;
+  int sizeComp1 = 0;
   // populate first tuple
   if (*pid1>=0)
   {
     EntityHandle fset1 = context.appDatas[*pid1].file_set;
     Range ents_of_interest;
     std::vector<int> values;
-    int stride = 1;
     if (*type1==1)
     {
       assert(tagType1);
-      rval = context.MBI->get_entities_by_type(fset1,MBQUAD,ents_of_interest  ); CHKERRVAL ( rval );
-      values.resize(ents_of_interest.size()*lenTagType1);
+      rval = context.MBI->get_entities_by_type(fset1,MBQUAD,ents_of_interest); CHKERRVAL ( rval );
+      sizeComp1 = (int)ents_of_interest.size();
+      values.resize(sizeComp1*lenTagType1);
       rval = context.MBI->tag_get_data(tagType1, ents_of_interest, &values[0]);; CHKERRVAL ( rval );
-      stride = lenTagType1;
+      strideComp1 = lenTagType1;
+
     }
     else if (*type1==2)
     {
       rval = context.MBI->get_entities_by_type(fset1,MBVERTEX,ents_of_interest  ); CHKERRVAL ( rval );
-      values.resize(ents_of_interest.size());
+      sizeComp1 = (int)ents_of_interest.size();
+      values.resize(sizeComp1);
       rval = context.MBI->tag_get_data(tagType2, ents_of_interest, &values[0]); ; CHKERRVAL ( rval );// just global ids
-      stride = 1;
+      strideComp1 = 1;
     }
     else
     {
       CHKERRVAL ( MB_FAILURE ); // we know only type 1 or 2
     }
     // now fill the tuple list with info and markers
-    TLcomp1.resize(ents_of_interest.size()*stride);
-    for (int ie = 0; ie<(int)ents_of_interest.size(); ie++)
+    TLcomp1.resize(sizeComp1*lenTagType1);
+    for (int ie = 0; ie<sizeComp1; ie++)
     {
-      for (int j=0; j<stride; j++)
+      for (int j=0; j<strideComp1; j++)
       {
         //to proc, marker, element local index, index in el
-        int marker = values[ie*stride+j];
+        int marker = values[ie*strideComp1+j];
         int to_proc = marker%numProcs;
         int n=TLcomp1.get_n();
         TLcomp1.vi_wr[4 * n] = to_proc; // send to processor
@@ -2234,56 +2239,57 @@ ErrCode iMOAB_ComputeCommGraph(iMOAB_AppID  pid1, iMOAB_AppID  pid2,  MPI_Comm* 
   ProcConfig pc ( *join ); // proc config does the crystal router
   pc.crystal_router()->gs_transfer ( 1, TLcomp1, 0 ); // communication towards joint tasks, with markers
   // sort by value (key 1)
-//#ifdef VERBOSE
+#ifdef VERBOSE
   std::stringstream ff1;
   ff1 << "TLcomp1_"<< localRank << ".txt";
-  TLcomp1.print_to_file(ff1.str().c_str());
-//#endif
+  TLcomp1.print_to_file(ff1.str().c_str());// it will append!
+#endif
   moab::TupleList::buffer sort_buffer;
   sort_buffer.buffer_init(TLcomp1.get_n());
   TLcomp1.sort(1, &sort_buffer);
   sort_buffer.reset();
-//#ifdef VERBOSE
+#ifdef VERBOSE
   // after sorting
-  TLcomp1.print_to_file(ff1.str().c_str());
-//#endif
+  TLcomp1.print_to_file(ff1.str().c_str()); // it will append!
+#endif
   // do the same, for the other component, number2, with type2
   // start copy
   TLcomp2.enableWriteAccess();
   // populate second tuple
+  int sizeComp2 = 0, strideComp2 = 1;
   if (*pid2>=0)
   {
     EntityHandle fset2 = context.appDatas[*pid2].file_set;
     Range ents_of_interest;
     std::vector<int> values;
-    int stride = 1;
     if (*type2==1)
     {
       assert(tagType1);
       rval = context.MBI->get_entities_by_type(fset2,MBQUAD,ents_of_interest  ); CHKERRVAL ( rval );
-      values.resize(ents_of_interest.size()*lenTagType1);
+      sizeComp2 = (int)ents_of_interest.size();
+      strideComp2 = lenTagType1;
+      values.resize(sizeComp2*strideComp2);
       rval = context.MBI->tag_get_data(tagType1, ents_of_interest, &values[0]);; CHKERRVAL ( rval );
-      stride = lenTagType1;
     }
     else if (*type2==2)
     {
       rval = context.MBI->get_entities_by_type(fset2,MBVERTEX,ents_of_interest  ); CHKERRVAL ( rval );
-      values.resize(ents_of_interest.size());
+      sizeComp2 = (int)ents_of_interest.size();
+      values.resize(sizeComp2); // stride is 1 here
       rval = context.MBI->tag_get_data(tagType2, ents_of_interest, &values[0]); ; CHKERRVAL ( rval );// just global ids
-      stride = 1;
     }
     else
     {
       CHKERRVAL ( MB_FAILURE ); // we know only type 1 or 2
     }
     // now fill the tuple list with info and markers
-    TLcomp2.resize(ents_of_interest.size()*stride);
-    for (int ie = 0; ie<(int)ents_of_interest.size(); ie++)
+    TLcomp2.resize(sizeComp2*strideComp2);
+    for (int ie = 0; ie<sizeComp2; ie++)
     {
-      for (int j=0; j<stride; j++)
+      for (int j=0; j<strideComp2; j++)
       {
         //to proc, marker, element local index, index in el
-        int marker = values[ie*stride+j];
+        int marker = values[ie*strideComp2+j];
         int to_proc = marker%numProcs;
         int n=TLcomp2.get_n();
         TLcomp2.vi_wr[4 * n] = to_proc; // send to processor
@@ -2298,21 +2304,150 @@ ErrCode iMOAB_ComputeCommGraph(iMOAB_AppID  pid1, iMOAB_AppID  pid2,  MPI_Comm* 
     //ProcConfig pc ( *join ); // proc config does the crystal router
   pc.crystal_router()->gs_transfer ( 1, TLcomp2, 0 ); // communication towards joint tasks, with markers
   // sort by value (key 1)
-  //#ifdef VERBOSE
+#ifdef VERBOSE
   std::stringstream ff2;
   ff2 << "TLcomp2_"<< localRank << ".txt";
   TLcomp2.print_to_file(ff2.str().c_str());
-//#endif
+#endif
   sort_buffer.buffer_reserve(TLcomp2.get_n());
   TLcomp2.sort(1, &sort_buffer);
   sort_buffer.reset();
   // end copy
+#ifdef VERBOSE
   TLcomp2.print_to_file(ff2.str().c_str());
-  // need to send back the info, from the rendezvous point, for each of the
+#endif
+  // need to send back the info, from the rendezvous point, for each of the values
+  /* so go over each value, on local process in joint communicator
+  for example, TLcomp1 has in the test commgraph_test these values, on proc 0 (for all values marker%nProcs=0)
+  Printing Tuple TLcomp1_0.txt===================
+    0 | 2 | 0 | 1 |
+    0 | 2 | 241 | 13 |
+    0 | 4 | 0 | 3 |
+    0 | 4 | 1 | 0 |
+    0 | 4 | 241 | 15 |
+    0 | 4 | 242 | 12 |
+    ...
+    while TLcomp2 has
+    Printing Tuple TLcomp2_0.txt===================
+    0 | 2 | 848 | 0 |
+    0 | 4 | 880 | 0 |
+    0 | 6 | 912 | 0 |
+    0 | 8 | 944 | 0 |
+    0 | 10 | 976 | 0 |
 
+    So global DOF with id 2 appears 2 times on proc 0 for comp1 (spectral), on local quads 0 and 241 from proc 0, at
+    indices 1 and 13, respectively; global DOF 2 appears for comp2 only on vertex with local index 848
+
+  so dof 2 on proc 0, needs to know this: for transfering data in initial direction, the data from entity 0 at index 1
+  will go to entity 848 at index 0, on proc 0 (so no communication, just copy data form buffer)
+  at the same time, when communicating from dof 2 on point cloud, need to send data to two positions in element 0, index 1 and
+  element 241 , index 13;
+
+
+
+  now have to send back the info needed for communication;
+   loop in in sync over both TLComp1 and TLComp2, in local process;
+    So, build new tuple lists, to send synchronous communication
+    populate them at the same time, based on marker, that is indexed
+  */
+
+  TupleList TLBackToComp1;
+  TLBackToComp1.initialize ( 3, 0, 0, 0, 0 ); // to proc, marker, from proc on comp2,
+  TLBackToComp1.enableWriteAccess();
+
+  TupleList TLBackToComp2;
+  TLBackToComp2.initialize ( 3, 0, 0, 0, 0 ); // to proc, marker,  from proc,
+  TLBackToComp2.enableWriteAccess();
+
+  int n1 = TLcomp1.get_n();
+  int n2 = TLcomp2.get_n();
+
+  int indexInTLComp1 = 0;
+  int indexInTLComp2 = 0; // advance both, according to the marker
+  if (n1 > 0 && n2 > 0)
+  {
+
+    while (indexInTLComp1 < n1 && indexInTLComp2 < n2) // if any is over, we are done
+    {
+      int currentValue = TLcomp1.vi_rd[4*indexInTLComp1+1];
+      if (currentValue != TLcomp2.vi_rd[4*indexInTLComp2+1])
+      {
+        // we have a big problem; basically, we are saying that
+        // dof currentValue is on one model and not on the other
+      }
+      int size1 = 1;
+      int size2 = 1;
+      while (indexInTLComp1+size1<n1 && currentValue==TLcomp1.vi_rd[4*(indexInTLComp1+size1)+1] )
+        size1++;
+      while (indexInTLComp2+size2<n2 && currentValue==TLcomp2.vi_rd[4*(indexInTLComp2+size2)+1] )
+        size2++;
+      // must be found in both lists, find the start and end indices
+      for (int i1 = 0; i1<size1; i1++)
+      {
+        for (int i2=0; i2<size2; i2++)
+        {
+          // send the info back to components
+          int n = TLBackToComp1.get_n();
+          TLBackToComp1.reserve();
+          TLBackToComp1.vi_wr[3*n] = TLcomp1.vi_rd[4*(indexInTLComp1+i1)]; // send back to the proc marker came from, info from comp2
+          TLBackToComp1.vi_wr[3*n+1] = currentValue; // initial value (resend?)
+          TLBackToComp1.vi_wr[3*n+2] = TLcomp2.vi_rd[4*(indexInTLComp2+i2)]; // from proc on comp2
+          n = TLBackToComp2.get_n();
+          TLBackToComp2.reserve();
+          TLBackToComp2.vi_wr[3*n] = TLcomp2.vi_rd[4*(indexInTLComp2+i2)]; // send back info to original
+          TLBackToComp2.vi_wr[3*n+1] = currentValue; // initial value (resend?)
+          TLBackToComp2.vi_wr[3*n+2] = TLcomp1.vi_rd[4*(indexInTLComp1+i1)]; // from proc on comp1
+          // what if there are repeated markers in TLcomp2? increase just index2
+        }
+      }
+      indexInTLComp1 += size1;
+      indexInTLComp2 += size2;
+    }
+    pc.crystal_router()->gs_transfer ( 1, TLBackToComp1, 0 ); // communication towards original tasks, with info about
+    pc.crystal_router()->gs_transfer ( 1, TLBackToComp2, 0 );
+  }
+
+  if (*pid1>=0)
+  {
+    // we are on original comp 1 tasks
+    // before ordering
+    // now for each value in TLBackToComp1.vi_rd[3*i+1], on current proc, we know the
+    // processors it communicates with
+#ifdef VERBOSE
+    std::stringstream f1;
+    f1 << "TLBack1_"<< localRank << ".txt";
+    TLBackToComp1.print_to_file(f1.str().c_str());
+#endif
+    sort_buffer.buffer_reserve(TLBackToComp1.get_n());
+    TLBackToComp1.sort(1, &sort_buffer);
+    sort_buffer.reset();
+#ifdef VERBOSE
+    TLBackToComp1.print_to_file(f1.str().c_str());
+#endif
+    // so we are now on pid1, we know how to
+  }
+  if (*pid2>=0)
+  {
+    // we are on original comp 1 tasks
+    // before ordering
+    // now for each value in TLBackToComp1.vi_rd[3*i+1], on current proc, we know the
+    // processors it communicates with
+#ifdef VERBOSE
+    std::stringstream f2;
+    f2 << "TLBack2_"<< localRank << ".txt";
+    TLBackToComp2.print_to_file(f2.str().c_str());
+#endif
+    sort_buffer.buffer_reserve(TLBackToComp2.get_n());
+    TLBackToComp2.sort(2, &sort_buffer);
+    sort_buffer.reset();
+#ifdef VERBOSE
+    TLBackToComp2.print_to_file(f2.str().c_str());
+#endif
+    // so we are now on pid1, we know how to
+  }
   return 0;
 }
-
+#undef VERBOSE
 
 #ifdef MOAB_HAVE_TEMPESTREMAP
 // this call must be collective on the joint communicator

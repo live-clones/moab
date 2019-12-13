@@ -199,7 +199,8 @@ int main( int argc, char* argv[] )
     CHECKIERR(ierr, "Cannot compute comm graph between the two apps ")
   }
 
-
+  // comment out communication yet
+#if 0
   if (atmComm != MPI_COMM_NULL)
   {
     // call send tag;
@@ -212,7 +213,7 @@ int main( int argc, char* argv[] )
     ierr = iMOAB_ReceiveElementTag(physAtmPID, "a2oTbot;a2oUbot;a2oVbot;", &joinComm, &physatm, strlen("a2oTbot;a2oUbot;a2oVbot;"));
         CHECKIERR(ierr, "cannot receive tag values")
   }
-
+#endif
   if (physComm != MPI_COMM_NULL)
   {
     ierr = iMOAB_WriteMesh(physAtmPID, (char*)atmPhysOutFilename.c_str(), fileWriteOptions,

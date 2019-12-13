@@ -5,7 +5,8 @@
  *  (one example is atmosphere mesh migrated to coupler pes)
  *
  *  there are 3 communicators in play, one for each mesh, and one for the joined
- *  communicator, that spans both sets of processes
+ *  communicator, that spans both sets of processes; to send mesh or tag data we need to use the joint communicator,
+ *  use nonblocking MPI_iSend and blocking MPI_Recv receives
  *
  *  various methods should be available to migrate meshes; trivial, using graph partitioner (Zoltan PHG)
  *  and using a geometric partitioner  (Zoltan RCB)
@@ -15,6 +16,7 @@
  *  while MPI_Groups are always defined
  *
  *  Some of the methods in here are executed over the sender communicator, some are over the receiver communicator
+ *  They can switch places, what was sender becomes the receiver and viceversa
  *
  *  The name "graph" is in the sense of a bipartite graph, in which we can separate senders and receivers tasks
  *
@@ -25,6 +27,14 @@
  *
  *  The same class is used after intersection (which is done on the coupler pes between 2 different component
  *   migrated meshes) and it alters communication pattern between the original component pes and coupler pes;
+ *
+ *   We added a new way to send tags between 2 models; the first application of the new method is to send tag
+ *   from atm dynamics model (spectral elements, with np x np tags defined on each element, according to the
+ *   GLOBAL_DOFS tag associated
+ *   to each element) towards the atm physics model, which is just a point cloud of vertices distributed
+ *   differently to the physics model pes; matching is done using GLOBAL_ID tag on vertices;
+ *   Right now, we assume that the models are on different pes, but the
+ *   joint communicator covers both and that the ids of the tasks are with respect to the joint communicator
  *
  *
  */
