@@ -16,7 +16,7 @@ from libcpp.vector cimport vector
 from libcpp.string cimport string as std_string
 from libc.stdlib cimport malloc
 
-from collections import Iterable
+from collections.abc import Iterable
 
 cdef void* null = NULL
 
