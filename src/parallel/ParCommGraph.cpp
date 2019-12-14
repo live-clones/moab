@@ -43,7 +43,7 @@ ParCommGraph::ParCommGraph(MPI_Comm joincomm, MPI_Group group1, MPI_Group group2
 
   if (0==rankInGroup1)rootSender=true;
   if (0==rankInGroup2)rootReceiver=true;
-  recomputed_send_graph = false;
+  graph_type = INITIAL_MIGRATE; // 0
   comm_graph = NULL;
   context_id = -1;
   cover_set = 0; // refers to nothing yet
@@ -64,7 +64,7 @@ ParCommGraph::ParCommGraph(const ParCommGraph & src)
   compid1 = src.compid1;
   compid2 = src.compid2;
   comm_graph = NULL;
-  recomputed_send_graph = src.recomputed_send_graph;
+  graph_type = src.graph_type;
   context_id = src.context_id;
   cover_set = src.cover_set;
   return;
@@ -589,12 +589,8 @@ ErrorCode ParCommGraph::send_tag_values (MPI_Comm jcomm, ParallelComm *pco, Rang
 #endif
   }
 
-
-
-  // bool specified_ids = involved_IDs_map.size() > 0;
-  bool specified_ids = recomputed_send_graph; // in cases when sender is completely over land, involved_IDs_map can still be size 0
   int indexReq=0;
-  if (!specified_ids) // original send
+  if (graph_type == INITIAL_MIGRATE) // original send
   {
     // use the buffers data structure to allocate memory for sending the tags
     sendReqs.resize(split_ranges.size());
@@ -622,7 +618,7 @@ ErrorCode ParCommGraph::send_tag_values (MPI_Comm jcomm, ParallelComm *pco, Rang
       localSendBuffs.push_back(buffer); // we will release them after nonblocking sends are completed
     }
   }
-  else
+  else if (graph_type == COVERAGE)
   {
     // we know that we will need to send some tag data in a specific order
     // first, get the ids of the local elements, from owned Range; arrange the buffer in order of increasing global id
@@ -689,6 +685,10 @@ ErrorCode ParCommGraph::send_tag_values (MPI_Comm jcomm, ParallelComm *pco, Rang
       localSendBuffs.push_back(buffer); // we will release them after nonblocking sends are completed
     }
   }
+  else if (graph_type == DOF_BASED)
+  {
+    // need to fill it up, in the case
+  }
 
   return MB_SUCCESS;
 }
@@ -723,10 +723,7 @@ ErrorCode ParCommGraph::receive_tag_values (MPI_Comm jcomm, ParallelComm *pco, R
 #endif
   }
 
-
-
-  bool specified_ids = involved_IDs_map.size() > 0;
-  if (!specified_ids)
+  if (graph_type == INITIAL_MIGRATE)
   {
     //std::map<int, Range> split_ranges;
     //rval = split_owned_range ( owned);MB_CHK_ERR ( rval );
@@ -759,7 +756,7 @@ ErrorCode ParCommGraph::receive_tag_values (MPI_Comm jcomm, ParallelComm *pco, R
 
     }
   }
-  else // receive buffer, then extract tag data, in a loop
+  else if (graph_type == COVERAGE)// receive buffer, then extract tag data, in a loop
   {
     // we know that we will need to receive some tag data in a specific order (by ids stored)
     // first, get the ids of the local elements, from owned Range; unpack the buffer in order
@@ -843,7 +840,7 @@ ErrorCode ParCommGraph::settle_send_graph(TupleList & TLcovIDs)
   // fill involved_IDs_map with data
   // will have "receiving proc" and global id of element
   int n = TLcovIDs.get_n();
-  recomputed_send_graph = true; // do not rely only on involved_IDs_map.size(); this can be 0 in some cases
+  graph_type = COVERAGE; // do not rely only on involved_IDs_map.size(); this can be 0 in some cases
   for (int i=0; i<n; i++)
   {
     int to_proc= TLcovIDs.vi_wr[2 * i];
@@ -880,6 +877,7 @@ void ParCommGraph::SetReceivingAfterCoverage(std::map<int, std::set<int> > & ids
       listIDs[indx++]=valueID;
     }
   }
+  graph_type = COVERAGE;
   return;
 }
 
@@ -901,6 +899,7 @@ void ParCommGraph::settle_comm_by_ids( TupleList &  TLBackToComp )
     for (std::set<int>::iterator sst=nums.begin(); sst!=nums.end(); sst++ )
       involved_IDs_map[procId].push_back(*sst);
   }
+  graph_type = DOF_BASED;
 }
 // new partition calculation
 ErrorCode ParCommGraph::compute_partition (ParallelComm *pco, Range & owned, int met)
@@ -1140,7 +1139,7 @@ ErrorCode ParCommGraph::dump_comm_information(std::string prefix, int is_send)
     outf << prefix << "_sender_" << rankInGroup1 << "_joint"<< rankInJoin << ".txt";
     dbfile.open (outf.str().c_str());
 
-    if (recomputed_send_graph)
+    if (graph_type == COVERAGE)
     {
       for (std::map<int ,std::vector<int> >::iterator mit =involved_IDs_map.begin(); mit!=involved_IDs_map.end(); mit++)
       {
@@ -1149,7 +1148,7 @@ ErrorCode ParCommGraph::dump_comm_information(std::string prefix, int is_send)
         dbfile << "receiver: "  << receiver_proc << " size:" << eids.size() << "\n";
       }
     }
-    else // just after migration
+    else if (graph_type == INITIAL_MIGRATE)// just after migration
     {
       for ( std::map<int , Range >::iterator mit =split_ranges.begin(); mit!=split_ranges.end(); mit++ )
       {
@@ -1157,6 +1156,10 @@ ErrorCode ParCommGraph::dump_comm_information(std::string prefix, int is_send)
         Range & eids = mit->second;
         dbfile << "receiver: "  << receiver_proc << " size:" << eids.size() << "\n";
       }
+    }
+    else if (graph_type == DOF_BASED)// just after migration
+    {
+      // TODO
     }
     dbfile.close();
   }
@@ -1167,7 +1170,7 @@ ErrorCode ParCommGraph::dump_comm_information(std::string prefix, int is_send)
     outf << prefix << "_receiver_" << rankInGroup2 << "_joint"<< rankInJoin << ".txt";
     dbfile.open (outf.str().c_str());
 
-    if (recomputed_send_graph)
+    if (graph_type == COVERAGE)
     {
       for (std::map<int ,std::vector<int> >::iterator mit =involved_IDs_map.begin(); mit!=involved_IDs_map.end(); mit++)
       {
@@ -1176,7 +1179,7 @@ ErrorCode ParCommGraph::dump_comm_information(std::string prefix, int is_send)
         dbfile << "sender: "  << sender_proc << " size:" << eids.size() << "\n";
       }
     }
-    else // just after migration; this is now sender map!
+    else if (graph_type == INITIAL_MIGRATE)// just after migration
     {
       for ( std::map<int , Range >::iterator mit =split_ranges.begin(); mit!=split_ranges.end(); mit++ )
       {
@@ -1184,6 +1187,10 @@ ErrorCode ParCommGraph::dump_comm_information(std::string prefix, int is_send)
         Range & eids = mit->second;
         dbfile << "sender: "  << sender_proc << " size:" << eids.size() << "\n";
       }
+    }
+    else if (graph_type == DOF_BASED)// just after migration
+    {
+      // TODO
     }
     dbfile.close();
   }

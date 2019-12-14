@@ -52,7 +52,14 @@ namespace moab {
 
 	class ParCommGraph {
 	public:
-	  // ParCommGraph();
+
+
+	  enum TypeGraph
+    {
+      INITIAL_MIGRATE,
+      COVERAGE,
+      DOF_BASED
+    };
 	  virtual ~ParCommGraph();
 
 	  /**
@@ -175,7 +182,6 @@ namespace moab {
 
 	  // dump local information about graph
 	  ErrorCode dump_comm_information(std::string prefix, int is_send);
-	  bool original_migrate() { return !recomputed_send_graph;}
 	private:
 	  /**
       \brief find ranks of a group with respect to an encompassing communicator
@@ -225,7 +231,7 @@ namespace moab {
 	  // so what we know is that the local range corresponds to remote corr_sizes[i] size ranges on tasks corr_tasks[i]
 
 	  // these will be used now after coverage, quick fix; they will also be populated by iMOAB_CoverageGraph
-	  bool recomputed_send_graph; // this should be false , set to true in settle send graph, to use send_IDs_map
+	  TypeGraph graph_type; // this should be false , set to true in settle send graph, to use send_IDs_map
 	  std::map<int ,std::vector<int> > involved_IDs_map; // replace send and recv IDs_mapp with involved_IDs_map
 
 };
