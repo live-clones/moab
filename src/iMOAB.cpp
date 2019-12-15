@@ -2170,9 +2170,9 @@ ErrCode iMOAB_ComputeCommGraph(iMOAB_AppID  pid1, iMOAB_AppID  pid2,  MPI_Comm* 
   // each model has a list of global ids that will need to be sent by gs to rendezvous the other model
   // on the joint comm
   TupleList TLcomp1;
-  TLcomp1.initialize ( 4, 0, 0, 0, 0 ); // to proc, marker, element local index, index in el
+  TLcomp1.initialize ( 2, 0, 0, 0, 0 ); // to proc, marker
   TupleList TLcomp2;
-  TLcomp2.initialize ( 4, 0, 0, 0, 0 ); // to proc, marker, element local index, index in el
+  TLcomp2.initialize ( 2, 0, 0, 0, 0 ); // to proc, marker
   // will push_back a new tuple, if needed
 
   TLcomp1.enableWriteAccess();
@@ -2190,19 +2190,19 @@ ErrCode iMOAB_ComputeCommGraph(iMOAB_AppID  pid1, iMOAB_AppID  pid2,  MPI_Comm* 
 
   int strideComp1 = 1;
   int sizeComp1 = 0;
+  std::vector<int> valuesComp1;
   // populate first tuple
   if (*pid1>=0)
   {
     EntityHandle fset1 = context.appDatas[*pid1].file_set;
     Range ents_of_interest;
-    std::vector<int> values;
     if (*type1==1)
     {
       assert(tagType1);
       rval = context.MBI->get_entities_by_type(fset1,MBQUAD,ents_of_interest); CHKERRVAL ( rval );
       sizeComp1 = (int)ents_of_interest.size();
-      values.resize(sizeComp1*lenTagType1);
-      rval = context.MBI->tag_get_data(tagType1, ents_of_interest, &values[0]);; CHKERRVAL ( rval );
+      valuesComp1.resize(sizeComp1*lenTagType1);
+      rval = context.MBI->tag_get_data(tagType1, ents_of_interest, &valuesComp1[0]);; CHKERRVAL ( rval );
       strideComp1 = lenTagType1;
 
     }
@@ -2210,8 +2210,8 @@ ErrCode iMOAB_ComputeCommGraph(iMOAB_AppID  pid1, iMOAB_AppID  pid2,  MPI_Comm* 
     {
       rval = context.MBI->get_entities_by_type(fset1,MBVERTEX,ents_of_interest  ); CHKERRVAL ( rval );
       sizeComp1 = (int)ents_of_interest.size();
-      values.resize(sizeComp1);
-      rval = context.MBI->tag_get_data(tagType2, ents_of_interest, &values[0]); ; CHKERRVAL ( rval );// just global ids
+      valuesComp1.resize(sizeComp1);
+      rval = context.MBI->tag_get_data(tagType2, ents_of_interest, &valuesComp1[0]); ; CHKERRVAL ( rval );// just global ids
       strideComp1 = 1;
     }
     else
@@ -2225,13 +2225,11 @@ ErrCode iMOAB_ComputeCommGraph(iMOAB_AppID  pid1, iMOAB_AppID  pid2,  MPI_Comm* 
       for (int j=0; j<strideComp1; j++)
       {
         //to proc, marker, element local index, index in el
-        int marker = values[ie*strideComp1+j];
+        int marker = valuesComp1[ie*strideComp1+j];
         int to_proc = marker%numProcs;
         int n=TLcomp1.get_n();
-        TLcomp1.vi_wr[4 * n] = to_proc; // send to processor
-        TLcomp1.vi_wr[4 * n + 1] = marker;
-        TLcomp1.vi_wr[4 * n + 2] = ie;
-        TLcomp1.vi_wr[4 * n + 3] = j;
+        TLcomp1.vi_wr[2 * n] = to_proc; // send to processor
+        TLcomp1.vi_wr[2 * n + 1] = marker;
         TLcomp1.inc_n();
       }
     }
@@ -2257,27 +2255,27 @@ ErrCode iMOAB_ComputeCommGraph(iMOAB_AppID  pid1, iMOAB_AppID  pid2,  MPI_Comm* 
   // start copy
   TLcomp2.enableWriteAccess();
   // populate second tuple
+  std::vector<int> valuesComp2;
   int sizeComp2 = 0, strideComp2 = 1;
   if (*pid2>=0)
   {
     EntityHandle fset2 = context.appDatas[*pid2].file_set;
     Range ents_of_interest;
-    std::vector<int> values;
     if (*type2==1)
     {
       assert(tagType1);
       rval = context.MBI->get_entities_by_type(fset2,MBQUAD,ents_of_interest  ); CHKERRVAL ( rval );
       sizeComp2 = (int)ents_of_interest.size();
       strideComp2 = lenTagType1;
-      values.resize(sizeComp2*strideComp2);
-      rval = context.MBI->tag_get_data(tagType1, ents_of_interest, &values[0]);; CHKERRVAL ( rval );
+      valuesComp2.resize(sizeComp2*strideComp2);
+      rval = context.MBI->tag_get_data(tagType1, ents_of_interest, &valuesComp2[0]);; CHKERRVAL ( rval );
     }
     else if (*type2==2)
     {
       rval = context.MBI->get_entities_by_type(fset2,MBVERTEX,ents_of_interest  ); CHKERRVAL ( rval );
       sizeComp2 = (int)ents_of_interest.size();
-      values.resize(sizeComp2); // stride is 1 here
-      rval = context.MBI->tag_get_data(tagType2, ents_of_interest, &values[0]); ; CHKERRVAL ( rval );// just global ids
+      valuesComp2.resize(sizeComp2); // stride is 1 here
+      rval = context.MBI->tag_get_data(tagType2, ents_of_interest, &valuesComp2[0]); ; CHKERRVAL ( rval );// just global ids
     }
     else
     {
@@ -2290,13 +2288,11 @@ ErrCode iMOAB_ComputeCommGraph(iMOAB_AppID  pid1, iMOAB_AppID  pid2,  MPI_Comm* 
       for (int j=0; j<strideComp2; j++)
       {
         //to proc, marker, element local index, index in el
-        int marker = values[ie*strideComp2+j];
+        int marker = valuesComp2[ie*strideComp2+j];
         int to_proc = marker%numProcs;
         int n=TLcomp2.get_n();
-        TLcomp2.vi_wr[4 * n] = to_proc; // send to processor
-        TLcomp2.vi_wr[4 * n + 1] = marker;
-        TLcomp2.vi_wr[4 * n + 2] = ie;
-        TLcomp2.vi_wr[4 * n + 3] = j;
+        TLcomp2.vi_wr[2 * n] = to_proc; // send to processor
+        TLcomp2.vi_wr[2 * n + 1] = marker;
         TLcomp2.inc_n();
       }
     }
@@ -2385,19 +2381,19 @@ ErrCode iMOAB_ComputeCommGraph(iMOAB_AppID  pid1, iMOAB_AppID  pid2,  MPI_Comm* 
       // must be found in both lists, find the start and end indices
       for (int i1 = 0; i1<size1; i1++)
       {
-        for (int i2=0; i2<size2; i2++)
+        for (int i2 = 0; i2<size2; i2++)
         {
           // send the info back to components
           int n = TLBackToComp1.get_n();
           TLBackToComp1.reserve();
-          TLBackToComp1.vi_wr[3*n] = TLcomp1.vi_rd[4*(indexInTLComp1+i1)]; // send back to the proc marker came from, info from comp2
+          TLBackToComp1.vi_wr[3*n] = TLcomp1.vi_rd[2*(indexInTLComp1+i1)]; // send back to the proc marker came from, info from comp2
           TLBackToComp1.vi_wr[3*n+1] = currentValue; // initial value (resend?)
-          TLBackToComp1.vi_wr[3*n+2] = TLcomp2.vi_rd[4*(indexInTLComp2+i2)]; // from proc on comp2
+          TLBackToComp1.vi_wr[3*n+2] = TLcomp2.vi_rd[2*(indexInTLComp2+i2)]; // from proc on comp2
           n = TLBackToComp2.get_n();
           TLBackToComp2.reserve();
-          TLBackToComp2.vi_wr[3*n] = TLcomp2.vi_rd[4*(indexInTLComp2+i2)]; // send back info to original
+          TLBackToComp2.vi_wr[3*n] = TLcomp2.vi_rd[2*(indexInTLComp2+i2)]; // send back info to original
           TLBackToComp2.vi_wr[3*n+1] = currentValue; // initial value (resend?)
-          TLBackToComp2.vi_wr[3*n+2] = TLcomp1.vi_rd[4*(indexInTLComp1+i1)]; // from proc on comp1
+          TLBackToComp2.vi_wr[3*n+2] = TLcomp1.vi_rd[2*(indexInTLComp1+i1)]; // from proc on comp1
           // what if there are repeated markers in TLcomp2? increase just index2
         }
       }
@@ -2428,7 +2424,7 @@ ErrCode iMOAB_ComputeCommGraph(iMOAB_AppID  pid1, iMOAB_AppID  pid2,  MPI_Comm* 
 #endif
     // so we are now on pid1, we know now each marker were it has to go
     // add a new method to ParCommGraph, to set up the involved_IDs_map
-    cgraph->settle_comm_by_ids( TLBackToComp1);
+    cgraph->settle_comm_by_ids( TLBackToComp1, valuesComp1);
   }
   if (*pid2>=0)
   {
@@ -2447,7 +2443,7 @@ ErrCode iMOAB_ComputeCommGraph(iMOAB_AppID  pid1, iMOAB_AppID  pid2,  MPI_Comm* 
 #ifdef VERBOSE
     TLBackToComp2.print_to_file(f2.str().c_str());
 #endif
-    cgraph_rev->settle_comm_by_ids( TLBackToComp2);
+    cgraph_rev->settle_comm_by_ids( TLBackToComp2, valuesComp2);
     //
   }
   return 0;

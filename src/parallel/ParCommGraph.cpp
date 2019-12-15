@@ -580,6 +580,10 @@ ErrorCode ParCommGraph::send_tag_values (MPI_Comm jcomm, ParallelComm *pco, Rang
   {
     int bytes_per_tag;
     rval = mb-> tag_get_bytes(tag_handles[i],  bytes_per_tag) ;MB_CHK_ERR ( rval );
+    int tag_size1; // length
+    rval = mb-> tag_get_length(tag_handles[i], tag_size1) ; MB_CHK_ERR ( rval );
+    if (graph_type == DOF_BASED)
+      bytes_per_tag = bytes_per_tag/tag_size1; // we know we have one double per tag , per ID sent; could be 8 for double, 4 for int, etc
     total_bytes_per_entity +=bytes_per_tag;
     vect_bytes_per_tag.push_back(bytes_per_tag);
 #ifdef VERBOSE
@@ -687,9 +691,63 @@ ErrorCode ParCommGraph::send_tag_values (MPI_Comm jcomm, ParallelComm *pco, Rang
   }
   else if (graph_type == DOF_BASED)
   {
-    // need to fill it up, in the case
-  }
+    // need to fill up the buffer, in the order desired, send it
+    // get all the tags, for all owned entities, and pack the buffers accordingly
+    // we do not want to get the tags by entity, it may be too expensive
+    std::vector< std::vector<double>> valuesTags;
+    valuesTags.resize(tag_handles.size());
+    for (size_t i=0; i<tag_handles.size(); i++)
+    {
 
+      int bytes_per_tag;
+      rval = mb-> tag_get_bytes(tag_handles[i],  bytes_per_tag) ;MB_CHK_ERR ( rval );
+      valuesTags[i].resize(owned.size()*bytes_per_tag);
+      // fill the whole array, we will pick up from here
+      rval = mb->tag_get_data(tag_handles[i], owned, (void*)( &(valuesTags[i][0])) );MB_CHK_ERR ( rval );
+    }
+    // now, pack the data and send it
+    sendReqs.resize(involved_IDs_map.size());
+    for (std::map<int ,std::vector<int> >::iterator mit =involved_IDs_map.begin(); mit!=involved_IDs_map.end(); mit++)
+    {
+      int receiver_proc = mit->first;
+      std::vector<int> & eids = mit->second;
+      std::vector<int> & index_in_values = map_index[receiver_proc];
+      std::vector<int> & index_ptr = map_ptr[receiver_proc]; // this is eids.size()+1;
+      int size_buffer = 4 + total_bytes_per_entity*(int)eids.size(); // hopefully, below 2B; if more, we have a big problem ...
+      ParallelComm::Buffer * buffer = new ParallelComm::Buffer(size_buffer);
+      buffer->reset_ptr(sizeof(int));
+#ifdef VERBOSE
+      std::ofstream dbfile;
+      std::stringstream outf;
+      outf << "from_" << rankInJoin <<"_send_to_" << receiver_proc << ".txt";
+      dbfile.open (outf.str().c_str());
+      dbfile << "from "  << rankInJoin << " send to " << receiver_proc << "\n";
+#endif
+      // copy tag data to buffer->buff_ptr, and send the buffer
+      // pack data by tag, to be consistent with above
+      int j=0;
+      for (std::vector<int>::iterator it=eids.begin(); it!=eids.end(); it++, j++)
+      {
+        int eID = *it;
+        // now, we know the id; where do we copy this from ?
+        /// look just for the index in owned[]
+        // index_in_values
+        int index_in_v = index_in_values[index_ptr[j]];
+        for (size_t i=0; i<tag_handles.size(); i++)
+        {
+          // right now, move just doubles; but it could be any type of tag
+          *( (double*)(buffer->buff_ptr) )  = valuesTags[i][index_in_v];
+          buffer->buff_ptr+=8; // we know we are working with doubles only !!!
+        }
+      };
+      *((int*)buffer->mem_ptr) = size_buffer;
+      //int size_pack = buffer->get_current_size(); // debug check
+      ierr = MPI_Isend(buffer->mem_ptr, size_buffer, MPI_CHAR, receiver_proc, 222, jcomm, &sendReqs[indexReq]); // we have to use global communicator
+      if (ierr!=0) return MB_FAILURE;
+      indexReq++;
+      localSendBuffs.push_back(buffer); // we will release them after nonblocking sends are completed
+    }
+  }
   return MB_SUCCESS;
 }
 
@@ -832,9 +890,68 @@ ErrorCode ParCommGraph::receive_tag_values (MPI_Comm jcomm, ParallelComm *pco, R
     }
 
   }
+  else if (graph_type == DOF_BASED)
+  {
+    // need to fill up the values for each tag, in the order desired, from the buffer received
+    //
+    // get all the tags, for all owned entities, and pack the buffers accordingly
+    // we do not want to get the tags by entity, it may be too expensive
+    std::vector< std::vector<double>> valuesTags;
+    valuesTags.resize(tag_handles.size());
+    for (size_t i=0; i<tag_handles.size(); i++)
+    {
+      int bytes_per_tag;
+      rval = mb-> tag_get_bytes(tag_handles[i],  bytes_per_tag) ;MB_CHK_ERR ( rval );
+      valuesTags[i].resize(owned.size()*bytes_per_tag);
+      // fill the whole array, we will pick up from here
+      // we will fill this array, using data from received buffer
+      //rval = mb->tag_get_data(owned, (void*)( &(valuesTags[i][0])) );MB_CHK_ERR ( rval );
+    }
+    // now, pack the data and send it
+    sendReqs.resize(involved_IDs_map.size());
+    for (std::map<int ,std::vector<int> >::iterator mit =involved_IDs_map.begin(); mit!=involved_IDs_map.end(); mit++)
+    {
+      int receiver_proc = mit->first;
+      std::vector<int> & eids = mit->second;
+      std::vector<int> & index_in_values = map_index[receiver_proc];
+      std::vector<int> & index_ptr = map_ptr[receiver_proc]; // this is eids.size()+1;
+      int size_buffer = 4 + total_bytes_per_entity*(int)eids.size(); // hopefully, below 2B; if more, we have a big problem ...
+      ParallelComm::Buffer * buffer = new ParallelComm::Buffer(size_buffer);
+      buffer->reset_ptr(sizeof(int));
+
+      // use the values in buffer to populate valuesTag arrays, fill it up!
+      int j=0;
+      for (std::vector<int>::iterator it=eids.begin(); it!=eids.end(); it++, j++)
+      {
+        int eID = *it;
+        // now, we know the id; where do we copy this from ?
+        /// look just for the index in owned[]
+        // index_in_values
+
+        for (size_t i=0; i<tag_handles.size(); i++)
+        {
+          // right now, move just doubles; but it could be any type of tag
+          double val = *((double*)(buffer->buff_ptr));
+          buffer->buff_ptr+=8; // we know we are working with doubles only !!!
+          for (int k = index_ptr[j]; k< index_ptr[j+1]; k++)
+            valuesTags[i][ index_in_values[k] ]= val;
+        }
+      }
+    }
+    // now we populated the values for all tags; set now the tags!
+    for (size_t i=0; i<tag_handles.size(); i++)
+    {
+
+      // we will fill this array, using data from received buffer
+      rval = mb->tag_set_data(tag_handles[i], owned, (void*)( &(valuesTags[i][0])) );MB_CHK_ERR ( rval );
+    }
+
+  }
   return MB_SUCCESS;
 }
-
+/*
+ * for example
+ */
 ErrorCode ParCommGraph::settle_send_graph(TupleList & TLcovIDs)
 {
   // fill involved_IDs_map with data
@@ -881,16 +998,22 @@ void ParCommGraph::SetReceivingAfterCoverage(std::map<int, std::set<int> > & ids
   return;
 }
 
-void ParCommGraph::settle_comm_by_ids( TupleList &  TLBackToComp )
+void ParCommGraph::settle_comm_by_ids(TupleList & TLBackToComp, std::vector<int> & valuesComp)
 {
   int n = TLBackToComp.get_n();
   //third_method = true; // do not rely only on involved_IDs_map.size(); this can be 0 in some cases
   std::map<int, std::set<int>> uniqueIDs;
+  std::map<int, std::map<int, int>> countsOnProc;
   for (int i=0; i<n; i++)
   {
     int to_proc= TLBackToComp.vi_wr[3 * i + 2];
     int globalId = TLBackToComp.vi_wr[3 * i + 1 ];
     uniqueIDs[to_proc].insert(globalId);
+    std::map<int, int> & counts = countsOnProc[to_proc];
+    if ( counts.find(globalId)== counts.end() )
+      counts[globalId] = 1;
+    else
+      counts[globalId]++;
   }
   for (std::map<int, std::set<int>>::iterator it=uniqueIDs.begin(); it!=uniqueIDs.end(); it++)
   {
@@ -899,7 +1022,43 @@ void ParCommGraph::settle_comm_by_ids( TupleList &  TLBackToComp )
     for (std::set<int>::iterator sst=nums.begin(); sst!=nums.end(); sst++ )
       involved_IDs_map[procId].push_back(*sst);
   }
+  for (std::map<int ,std::vector<int> >::iterator mit=involved_IDs_map.begin();
+      mit!=involved_IDs_map.end(); mit++)
+  {
+    int procId = mit->first;
+    std::vector<int> & gids = mit->second;
+    // map_ptr
+    std::map<int, int> & counts = countsOnProc[procId];
+    std::vector<int> & indx = map_ptr[procId];
+    indx.resize(gids.size()+1);
+    indx[0]=0;
+    std::vector<int> indices;
+    indices.resize(gids.size());
+    for (size_t j=0; j<gids.size(); j++)
+    {
+      indices[j] = indx[j];
+      indx[j+1] = indx[j]+counts[gids[j]];
+    }
+    // now loop thru values array, and if value in gids, advance its index
+    std::vector<int> & indexArr = map_index[procId];
+    indexArr.resize(indx[gids.size()]);
+    for (size_t k=0; k<valuesComp.size(); k++)
+    {
+      int val = valuesComp[k];
+      size_t indx1 = std::lower_bound(gids.begin(), gids.end(), val)  - gids.begin();
+      if (val == gids[indx1])
+      {
+        // at indices[indx1]
+        indexArr[indices[indx1]] = k;
+        indices[indx1]++;
+      }
+    }
+  }
+
   graph_type = DOF_BASED;
+  // now we need to fill back and forth information, needed to fill the arrays
+  // for example, from spectral to involved_IDs_map, in case we want to send data from
+  // spectral to phys
 }
 // new partition calculation
 ErrorCode ParCommGraph::compute_partition (ParallelComm *pco, Range & owned, int met)
