@@ -2154,7 +2154,6 @@ ErrCode iMOAB_FreeSenderBuffers ( iMOAB_AppID pid, int* context_id )
 ErrCode iMOAB_ComputeCommGraph(iMOAB_AppID  pid1, iMOAB_AppID  pid2,  MPI_Comm* join,
     MPI_Group* group1, MPI_Group* group2, int * type1, int * type2, int *comp1, int *comp2)
 {
-  int ierr=0;
   ErrorCode rval=MB_SUCCESS;
   int localRank=0, numProcs=1;
   MPI_Comm_rank( *join, &localRank );
@@ -2188,8 +2187,6 @@ ErrCode iMOAB_ComputeCommGraph(iMOAB_AppID  pid1, iMOAB_AppID  pid2,  MPI_Comm* 
   Tag tagType2;
   rval = context.MBI->tag_get_handle ( "GLOBAL_ID", tagType2 ); CHKERRVAL ( rval );
 
-  int strideComp1 = 1;
-  int sizeComp1 = 0;
   std::vector<int> valuesComp1;
   // populate first tuple
   if (*pid1>=0)
@@ -2200,38 +2197,33 @@ ErrCode iMOAB_ComputeCommGraph(iMOAB_AppID  pid1, iMOAB_AppID  pid2,  MPI_Comm* 
     {
       assert(tagType1);
       rval = context.MBI->get_entities_by_type(fset1,MBQUAD,ents_of_interest); CHKERRVAL ( rval );
-      sizeComp1 = (int)ents_of_interest.size();
-      valuesComp1.resize(sizeComp1*lenTagType1);
+      valuesComp1.resize(ents_of_interest.size()*lenTagType1);
       rval = context.MBI->tag_get_data(tagType1, ents_of_interest, &valuesComp1[0]);; CHKERRVAL ( rval );
-      strideComp1 = lenTagType1;
 
     }
     else if (*type1==2)
     {
       rval = context.MBI->get_entities_by_type(fset1,MBVERTEX,ents_of_interest  ); CHKERRVAL ( rval );
-      sizeComp1 = (int)ents_of_interest.size();
-      valuesComp1.resize(sizeComp1);
+      valuesComp1.resize(ents_of_interest.size());
       rval = context.MBI->tag_get_data(tagType2, ents_of_interest, &valuesComp1[0]); ; CHKERRVAL ( rval );// just global ids
-      strideComp1 = 1;
     }
     else
     {
       CHKERRVAL ( MB_FAILURE ); // we know only type 1 or 2
     }
     // now fill the tuple list with info and markers
-    TLcomp1.resize(sizeComp1*lenTagType1);
-    for (int ie = 0; ie<sizeComp1; ie++)
+    // because we will send only the ids, order and compress the list
+    std::set<int> uniq(valuesComp1.begin(), valuesComp1.end());
+    TLcomp1.resize(uniq.size());
+    for (std::set<int>::iterator sit = uniq.begin(); sit!=uniq.end(); sit++)
     {
-      for (int j=0; j<strideComp1; j++)
-      {
-        //to proc, marker, element local index, index in el
-        int marker = valuesComp1[ie*strideComp1+j];
-        int to_proc = marker%numProcs;
-        int n=TLcomp1.get_n();
-        TLcomp1.vi_wr[2 * n] = to_proc; // send to processor
-        TLcomp1.vi_wr[2 * n + 1] = marker;
-        TLcomp1.inc_n();
-      }
+      //to proc, marker, element local index, index in el
+      int marker = *sit;
+      int to_proc = marker%numProcs;
+      int n=TLcomp1.get_n();
+      TLcomp1.vi_wr[2 * n] = to_proc; // send to processor
+      TLcomp1.vi_wr[2 * n + 1] = marker;
+      TLcomp1.inc_n();
     }
   }
 
@@ -2256,7 +2248,6 @@ ErrCode iMOAB_ComputeCommGraph(iMOAB_AppID  pid1, iMOAB_AppID  pid2,  MPI_Comm* 
   TLcomp2.enableWriteAccess();
   // populate second tuple
   std::vector<int> valuesComp2;
-  int sizeComp2 = 0, strideComp2 = 1;
   if (*pid2>=0)
   {
     EntityHandle fset2 = context.appDatas[*pid2].file_set;
@@ -2265,16 +2256,13 @@ ErrCode iMOAB_ComputeCommGraph(iMOAB_AppID  pid1, iMOAB_AppID  pid2,  MPI_Comm* 
     {
       assert(tagType1);
       rval = context.MBI->get_entities_by_type(fset2,MBQUAD,ents_of_interest  ); CHKERRVAL ( rval );
-      sizeComp2 = (int)ents_of_interest.size();
-      strideComp2 = lenTagType1;
-      valuesComp2.resize(sizeComp2*strideComp2);
+      valuesComp2.resize(ents_of_interest.size()*lenTagType1);
       rval = context.MBI->tag_get_data(tagType1, ents_of_interest, &valuesComp2[0]);; CHKERRVAL ( rval );
     }
     else if (*type2==2)
     {
       rval = context.MBI->get_entities_by_type(fset2,MBVERTEX,ents_of_interest  ); CHKERRVAL ( rval );
-      sizeComp2 = (int)ents_of_interest.size();
-      valuesComp2.resize(sizeComp2); // stride is 1 here
+      valuesComp2.resize(ents_of_interest.size()); // stride is 1 here
       rval = context.MBI->tag_get_data(tagType2, ents_of_interest, &valuesComp2[0]); ; CHKERRVAL ( rval );// just global ids
     }
     else
@@ -2282,23 +2270,19 @@ ErrCode iMOAB_ComputeCommGraph(iMOAB_AppID  pid1, iMOAB_AppID  pid2,  MPI_Comm* 
       CHKERRVAL ( MB_FAILURE ); // we know only type 1 or 2
     }
     // now fill the tuple list with info and markers
-    TLcomp2.resize(sizeComp2*strideComp2);
-    for (int ie = 0; ie<sizeComp2; ie++)
+    std::set<int> uniq(valuesComp2.begin(), valuesComp2.end());
+    TLcomp2.resize(uniq.size());
+    for (std::set<int>::iterator sit = uniq.begin(); sit!=uniq.end(); sit++)
     {
-      for (int j=0; j<strideComp2; j++)
-      {
-        //to proc, marker, element local index, index in el
-        int marker = valuesComp2[ie*strideComp2+j];
-        int to_proc = marker%numProcs;
-        int n=TLcomp2.get_n();
-        TLcomp2.vi_wr[2 * n] = to_proc; // send to processor
-        TLcomp2.vi_wr[2 * n + 1] = marker;
-        TLcomp2.inc_n();
-      }
+      //to proc, marker, element local index, index in el
+      int marker = *sit;
+      int to_proc = marker%numProcs;
+      int n=TLcomp2.get_n();
+      TLcomp2.vi_wr[2 * n] = to_proc; // send to processor
+      TLcomp2.vi_wr[2 * n + 1] = marker;
+      TLcomp2.inc_n();
     }
   }
-
-    //ProcConfig pc ( *join ); // proc config does the crystal router
   pc.crystal_router()->gs_transfer ( 1, TLcomp2, 0 ); // communication towards joint tasks, with markers
   // sort by value (key 1)
 #ifdef VERBOSE
@@ -2315,32 +2299,6 @@ ErrCode iMOAB_ComputeCommGraph(iMOAB_AppID  pid1, iMOAB_AppID  pid2,  MPI_Comm* 
 #endif
   // need to send back the info, from the rendezvous point, for each of the values
   /* so go over each value, on local process in joint communicator
-  for example, TLcomp1 has in the test commgraph_test these values, on proc 0 (for all values marker%nProcs=0)
-  Printing Tuple TLcomp1_0.txt===================
-    0 | 2 | 0 | 1 |
-    0 | 2 | 241 | 13 |
-    0 | 4 | 0 | 3 |
-    0 | 4 | 1 | 0 |
-    0 | 4 | 241 | 15 |
-    0 | 4 | 242 | 12 |
-    ...
-    while TLcomp2 has
-    Printing Tuple TLcomp2_0.txt===================
-    0 | 2 | 848 | 0 |
-    0 | 4 | 880 | 0 |
-    0 | 6 | 912 | 0 |
-    0 | 8 | 944 | 0 |
-    0 | 10 | 976 | 0 |
-
-    So global DOF with id 2 appears 2 times on proc 0 for comp1 (spectral), on local quads 0 and 241 from proc 0, at
-    indices 1 and 13, respectively; global DOF 2 appears for comp2 only on vertex with local index 848
-
-  so dof 2 on proc 0, needs to know this: for transfering data in initial direction, the data from entity 0 at index 1
-  will go to entity 848 at index 0, on proc 0 (so no communication, just copy data form buffer)
-  at the same time, when communicating from dof 2 on point cloud, need to send data to two positions in element 0, index 1 and
-  element 241 , index 13;
-
-
 
   now have to send back the info needed for communication;
    loop in in sync over both TLComp1 and TLComp2, in local process;
@@ -2366,17 +2324,17 @@ ErrCode iMOAB_ComputeCommGraph(iMOAB_AppID  pid1, iMOAB_AppID  pid2,  MPI_Comm* 
 
     while (indexInTLComp1 < n1 && indexInTLComp2 < n2) // if any is over, we are done
     {
-      int currentValue = TLcomp1.vi_rd[4*indexInTLComp1+1];
-      if (currentValue != TLcomp2.vi_rd[4*indexInTLComp2+1])
+      int currentValue = TLcomp1.vi_rd[2*indexInTLComp1+1];
+      if (currentValue != TLcomp2.vi_rd[2*indexInTLComp2+1])
       {
         // we have a big problem; basically, we are saying that
         // dof currentValue is on one model and not on the other
       }
       int size1 = 1;
       int size2 = 1;
-      while (indexInTLComp1+size1<n1 && currentValue==TLcomp1.vi_rd[4*(indexInTLComp1+size1)+1] )
+      while (indexInTLComp1+size1<n1 && currentValue==TLcomp1.vi_rd[2*(indexInTLComp1+size1)+1] )
         size1++;
-      while (indexInTLComp2+size2<n2 && currentValue==TLcomp2.vi_rd[4*(indexInTLComp2+size2)+1] )
+      while (indexInTLComp2+size2<n2 && currentValue==TLcomp2.vi_rd[2*(indexInTLComp2+size2)+1] )
         size2++;
       // must be found in both lists, find the start and end indices
       for (int i1 = 0; i1<size1; i1++)
