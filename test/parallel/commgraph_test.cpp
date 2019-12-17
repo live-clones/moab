@@ -77,6 +77,7 @@ int main( int argc, char* argv[] )
 
   std::string atmPhysFilename = TestDir + "/AtmPhys.h5m";
   std::string atmPhysOutFilename = "outPhys.h5m";
+  std::string atmFilename2 = "wholeATM_new.h5m";
   int rankInPhysComm = -1;
   // this will be the physics atm com id; it should be actually 5
   int physatm = 5;  // component ids are unique over all pes, and established in advance;
@@ -199,8 +200,6 @@ int main( int argc, char* argv[] )
     CHECKIERR(ierr, "Cannot compute comm graph between the two apps ")
   }
 
-  // comment out communication yet
-
   if (atmComm != MPI_COMM_NULL)
   {
     // call send tag;
@@ -234,7 +233,7 @@ int main( int argc, char* argv[] )
   // we can now free the sender buffers
   if (atmComm != MPI_COMM_NULL) {
     ierr = iMOAB_FreeSenderBuffers(cmpAtmPID, &physatm);
-    CHECKIERR(ierr, "cannot free buffers used to resend atm tag towards the coverage mesh for land context")
+    CHECKIERR(ierr, "cannot free buffers")
   }
 
   if (physComm != MPI_COMM_NULL)
@@ -242,6 +241,37 @@ int main( int argc, char* argv[] )
     ierr = iMOAB_WriteMesh(physAtmPID, (char*)atmPhysOutFilename.c_str(), fileWriteOptions,
           atmPhysOutFilename.length(), strlen(fileWriteOptions) );
   }
+  if (physComm != MPI_COMM_NULL)
+  {
+    ierr = iMOAB_SendElementTag(physAtmPID, "a2oTbot_1;", &joinComm, &cmpatm, strlen("a2oTbot_1;"));
+    CHECKIERR(ierr, "cannot send tag values")
+  }
+  // receive it in a different tag
+  if (atmComm != MPI_COMM_NULL) {
+    // need to define tag storage
+    const char* bottomTempField = "a2oTbot_2";
+    int tagType = DENSE_DOUBLE;
+    int ndof=16;
+    int tagIndex = 0;
+    ierr = iMOAB_DefineTagStorage(cmpAtmPID, bottomTempField, &tagType, &ndof, &tagIndex,  strlen(bottomTempField) );
+    CHECKIERR(ierr, "failed to define the field tag a2oTbot");
+
+    ierr = iMOAB_ReceiveElementTag(cmpAtmPID, "a2oTbot_2;", &joinComm, &physatm, strlen("a2oTbot_2;"));
+    CHECKIERR(ierr, "cannot receive tag values a2oTbot_2")
+
+  }
+  // now send back one tag , into a different tag, and see if we get the same values back
+  // we can now free the sender buffers
+  if (physComm != MPI_COMM_NULL) {
+    ierr = iMOAB_FreeSenderBuffers(physAtmPID, &cmpatm);
+    CHECKIERR(ierr, "cannot free buffers ")
+  }
+  if (atmComm != MPI_COMM_NULL)
+  {
+    ierr = iMOAB_WriteMesh(cmpAtmPID, (char*)atmFilename2.c_str(), fileWriteOptions,
+        atmFilename2.length(), strlen(fileWriteOptions) );
+  }
+
   ierr = iMOAB_Finalize();
   CHECKIERR(ierr, "did not finalize iMOAB" )
 

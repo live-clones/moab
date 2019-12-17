@@ -2039,7 +2039,11 @@ ErrCode iMOAB_SendElementTag(iMOAB_AppID pid, const iMOAB_String tag_storage_nam
   if ( mt == data.pgraph.end() ) { return 1; }
   ParCommGraph* cgraph = mt->second;
   ParallelComm* pco = context.pcomms[*pid];
-  Range& owned = context.appDatas[*pid].owned_elems;
+  Range owned = data.owned_elems;
+  if (data.point_cloud)
+  {
+    owned = data.local_verts;
+  }
 
   std::string tag_name ( tag_storage_name );
 
