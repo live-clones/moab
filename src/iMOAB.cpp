@@ -2081,7 +2081,7 @@ ErrCode iMOAB_ReceiveElementTag(iMOAB_AppID pid, const iMOAB_String tag_storage_
   ParCommGraph* cgraph = mt->second;
 
   ParallelComm* pco = context.pcomms[*pid];
-  Range owned = context.appDatas[*pid].owned_elems;
+  Range owned = data.owned_elems;
 
   // how do I know if this receiver already participated in an intersection driven by coupler?
   // also, what if this was the "source" mesh in intx?
@@ -2093,6 +2093,10 @@ ErrCode iMOAB_ReceiveElementTag(iMOAB_AppID pid, const iMOAB_String tag_storage_
   if (0!=cover_set)
   {
     rval = context.MBI->get_entities_by_dimension ( cover_set, 2, owned); CHKERRVAL ( rval );
+  }
+  if (data.point_cloud)
+  {
+    owned = data.local_verts;
   }
   /*
    * data_intx.remapper exists though only on the intersection application
@@ -2150,7 +2154,7 @@ ErrCode iMOAB_FreeSenderBuffers ( iMOAB_AppID pid, int* context_id )
 \brief compute a comm graph between 2 moab apps, based on ID matching
 <B>Operations:</B> Collective
 */
-#define VERBOSE
+//#define VERBOSE
 ErrCode iMOAB_ComputeCommGraph(iMOAB_AppID  pid1, iMOAB_AppID  pid2,  MPI_Comm* join,
     MPI_Group* group1, MPI_Group* group2, int * type1, int * type2, int *comp1, int *comp2)
 {
@@ -2329,6 +2333,8 @@ ErrCode iMOAB_ComputeCommGraph(iMOAB_AppID  pid1, iMOAB_AppID  pid2,  MPI_Comm* 
       {
         // we have a big problem; basically, we are saying that
         // dof currentValue is on one model and not on the other
+        std::cout << " currentValue:" << currentValue << " TLcomp2.vi_rd[2*indexInTLComp2+1]: " << TLcomp2.vi_rd[2*indexInTLComp2+1] << "\n";
+        std::cout <<" values are missing between components ; ";
       }
       int size1 = 1;
       int size2 = 1;
@@ -2382,7 +2388,7 @@ ErrCode iMOAB_ComputeCommGraph(iMOAB_AppID  pid1, iMOAB_AppID  pid2,  MPI_Comm* 
 #endif
     // so we are now on pid1, we know now each marker were it has to go
     // add a new method to ParCommGraph, to set up the involved_IDs_map
-    cgraph->settle_comm_by_ids( TLBackToComp1, valuesComp1);
+    cgraph->settle_comm_by_ids(*comp1, TLBackToComp1, valuesComp1);
   }
   if (*pid2>=0)
   {
@@ -2401,12 +2407,12 @@ ErrCode iMOAB_ComputeCommGraph(iMOAB_AppID  pid1, iMOAB_AppID  pid2,  MPI_Comm* 
 #ifdef VERBOSE
     TLBackToComp2.print_to_file(f2.str().c_str());
 #endif
-    cgraph_rev->settle_comm_by_ids( TLBackToComp2, valuesComp2);
+    cgraph_rev->settle_comm_by_ids(*comp2, TLBackToComp2, valuesComp2);
     //
   }
   return 0;
 }
-#undef VERBOSE
+//#undef VERBOSE
 
 #ifdef MOAB_HAVE_TEMPESTREMAP
 // this call must be collective on the joint communicator

@@ -179,7 +179,7 @@ namespace moab {
 	  // strideComp is np x np, or 1, in our cases
 	  // will fill up ordered lists for corresponding IDs on the other component
 	  // will form back and forth information, from ordered list of IDs, to valuesComp
-	  void settle_comm_by_ids( TupleList &  TLBackToComp , std::vector<int> & valuesComp);
+	  void settle_comm_by_ids( int comp, TupleList &  TLBackToComp , std::vector<int> & valuesComp);
 	  // new partition calculation
 	  ErrorCode compute_partition (ParallelComm *pco, Range & owned, int met);
 

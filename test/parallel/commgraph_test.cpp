@@ -200,7 +200,7 @@ int main( int argc, char* argv[] )
   }
 
   // comment out communication yet
-#if 0
+
   if (atmComm != MPI_COMM_NULL)
   {
     // call send tag;
@@ -210,10 +210,33 @@ int main( int argc, char* argv[] )
 
   if (physComm != MPI_COMM_NULL)
   {
-    ierr = iMOAB_ReceiveElementTag(physAtmPID, "a2oTbot;a2oUbot;a2oVbot;", &joinComm, &physatm, strlen("a2oTbot;a2oUbot;a2oVbot;"));
+    // need to define tag storage
+    const char* bottomTempField = "a2oTbot_1";
+    const char* bottomUVelField = "a2oUbot_1";
+    const char* bottomVVelField = "a2oVbot_1";
+    int tagType = DENSE_DOUBLE;
+    int ndof=1;
+    int tagIndex = 0;
+    ierr = iMOAB_DefineTagStorage(physAtmPID, bottomTempField, &tagType, &ndof, &tagIndex,  strlen(bottomTempField) );
+    CHECKIERR(ierr, "failed to define the field tag a2oTbot");
+
+    ierr = iMOAB_DefineTagStorage(physAtmPID, bottomUVelField, &tagType, &ndof, &tagIndex,  strlen(bottomUVelField) );
+    CHECKIERR(ierr, "failed to define the field tag a2oUbot");
+
+    ierr = iMOAB_DefineTagStorage(physAtmPID, bottomVVelField, &tagType, &ndof, &tagIndex,  strlen(bottomVVelField) );
+    CHECKIERR(ierr, "failed to define the field tag a2oVbot");
+
+
+    ierr = iMOAB_ReceiveElementTag(physAtmPID, "a2oTbot_1;a2oUbot_1;a2oVbot_1;", &joinComm, &cmpatm, strlen("a2oTbot_1;a2oUbot_1;a2oVbot_1;"));
         CHECKIERR(ierr, "cannot receive tag values")
   }
-#endif
+
+  // we can now free the sender buffers
+  if (atmComm != MPI_COMM_NULL) {
+    ierr = iMOAB_FreeSenderBuffers(cmpAtmPID, &physatm);
+    CHECKIERR(ierr, "cannot free buffers used to resend atm tag towards the coverage mesh for land context")
+  }
+
   if (physComm != MPI_COMM_NULL)
   {
     ierr = iMOAB_WriteMesh(physAtmPID, (char*)atmPhysOutFilename.c_str(), fileWriteOptions,
