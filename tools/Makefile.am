@@ -47,7 +47,7 @@ EXTRA_DIST = README.hexmodops \
              CMakeLists.txt
 
 if HAVE_HDF5
-  bin_PROGRAMS += compareFiles
+  bin_PROGRAMS += compareFiles mbaddpcdata
 if HAVE_NETCDF
   bin_PROGRAMS += mbaddnc mbaddchunk
 endif
@@ -218,6 +218,7 @@ mbhonodes_SOURCES = honodes.cpp
 mbaddnc_SOURCES = addncdata.cpp
 mbaddchunk_SOURCES = mbaddchunk.cpp
 compareFiles_SOURCES = compareFiles.cpp
+mbaddpcdata_SOURCES = addPCdata.cpp
 
 bin_PROGRAMS += mbslavepart
 mbslavepart_SOURCES = mbslavepart.cpp
