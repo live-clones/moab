@@ -2332,19 +2332,27 @@ ErrCode iMOAB_ComputeCommGraph(iMOAB_AppID  pid1, iMOAB_AppID  pid2,  MPI_Comm* 
 
     while (indexInTLComp1 < n1 && indexInTLComp2 < n2) // if any is over, we are done
     {
-      int currentValue = TLcomp1.vi_rd[2*indexInTLComp1+1];
-      if (currentValue != TLcomp2.vi_rd[2*indexInTLComp2+1])
+      int currentValue1 = TLcomp1.vi_rd[2*indexInTLComp1+1];
+      int currentValue2 = TLcomp2.vi_rd[2*indexInTLComp2+1];
+      if (currentValue1 < currentValue2)
       {
         // we have a big problem; basically, we are saying that
         // dof currentValue is on one model and not on the other
-        std::cout << " currentValue:" << currentValue << " TLcomp2.vi_rd[2*indexInTLComp2+1]: " << TLcomp2.vi_rd[2*indexInTLComp2+1] << "\n";
-        std::cout <<" values are missing between components ; ";
+        //std::cout << " currentValue1:" << currentValue1 << " missing in comp2" << "\n";
+        indexInTLComp1++;
+        continue;
+      }
+      if (currentValue1 > currentValue2)
+      {
+        //std::cout << " currentValue2:" << currentValue2 << " missing in comp1" << "\n";
+        indexInTLComp2++;
+        continue;
       }
       int size1 = 1;
       int size2 = 1;
-      while (indexInTLComp1+size1<n1 && currentValue==TLcomp1.vi_rd[2*(indexInTLComp1+size1)+1] )
+      while (indexInTLComp1+size1<n1 && currentValue1==TLcomp1.vi_rd[2*(indexInTLComp1+size1)+1] )
         size1++;
-      while (indexInTLComp2+size2<n2 && currentValue==TLcomp2.vi_rd[2*(indexInTLComp2+size2)+1] )
+      while (indexInTLComp2+size2<n2 && currentValue2==TLcomp2.vi_rd[2*(indexInTLComp2+size2)+1] )
         size2++;
       // must be found in both lists, find the start and end indices
       for (int i1 = 0; i1<size1; i1++)
@@ -2355,12 +2363,12 @@ ErrCode iMOAB_ComputeCommGraph(iMOAB_AppID  pid1, iMOAB_AppID  pid2,  MPI_Comm* 
           int n = TLBackToComp1.get_n();
           TLBackToComp1.reserve();
           TLBackToComp1.vi_wr[3*n] = TLcomp1.vi_rd[2*(indexInTLComp1+i1)]; // send back to the proc marker came from, info from comp2
-          TLBackToComp1.vi_wr[3*n+1] = currentValue; // initial value (resend?)
+          TLBackToComp1.vi_wr[3*n+1] = currentValue1; // initial value (resend?)
           TLBackToComp1.vi_wr[3*n+2] = TLcomp2.vi_rd[2*(indexInTLComp2+i2)]; // from proc on comp2
           n = TLBackToComp2.get_n();
           TLBackToComp2.reserve();
           TLBackToComp2.vi_wr[3*n] = TLcomp2.vi_rd[2*(indexInTLComp2+i2)]; // send back info to original
-          TLBackToComp2.vi_wr[3*n+1] = currentValue; // initial value (resend?)
+          TLBackToComp2.vi_wr[3*n+1] = currentValue1; // initial value (resend?)
           TLBackToComp2.vi_wr[3*n+2] = TLcomp1.vi_rd[2*(indexInTLComp1+i1)]; // from proc on comp1
           // what if there are repeated markers in TLcomp2? increase just index2
         }

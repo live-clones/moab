@@ -14,17 +14,21 @@
  * phys grid is very sprinkled in the partition, spectral mesh is more compact; For correct
  * identification/correspondence in parallel, it would make sense to use boxes for the spectral mesh
  *
- * Or, we could employ our friends the crystal router, in which we use rendezvous algorithm, to set
+ * We employ our friends the crystal router, in which we use rendezvous algorithm, to set
  * up the communication pattern
  *
  * input: wholeATM_T.h5m file, on 128 procs, the same file that is used by imoab_coupler test
  * input: AtmPhys.h5m file, which contains the physics grid, distributed on 16 processes
+ * input 2: wholeLND.h5m, which is land distributed on 16 processes too
  *
  * The communication pattern will be established using a rendezvous method, based on the marker
  * (in this case, GLOBAL_ID on vertices on phys grid and GLOBAL_DOFS tag on spectral elements)
  *
  * in the end, we need to modify tag migrate to move data between these types of components, by
  * ID
+ *
+ * wholeLnd.h5m has holes in the ID space, that we need to account for;
+ * In the end, this could be used to send data directly from Dyn atm to land; or to lnd on coupler ?
  *
  *
  */
