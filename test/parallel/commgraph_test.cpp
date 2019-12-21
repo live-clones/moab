@@ -47,7 +47,7 @@
 #include <iostream>
 #include <sstream>
 
-#define CHECKIERR(rc, message)  if (0!=rc) { printf ("%s. ErrorCode = %d\n", message, rc); return 1;}
+#define CHECKIERR(rc, message)  if (0!=rc) { printf ("%s. ErrorCode = %d\n", message, rc); CHECK(0);}
 
 using namespace moab;
 
@@ -55,68 +55,91 @@ using namespace moab;
 
 
 
-int main( int argc, char* argv[] )
+//declare some variables outside main method
+// easier to pass them around to the test
+int ierr;
+int rankInGlobalComm, numProcesses;
+MPI_Group jgroup;
+std::string atmFilename = TestDir + "/wholeATM_T.h5m";
+// on a regular case,  5 ATM
+// cmpatm is for atm on atm pes ! it has the spectral mesh
+// cmpphys is for atm on atm phys pes ! it has the point cloud , phys grid
+
+//
+int rankInAtmComm = -1;
+// it is the spectral mesh unique comp id
+int cmpatm=605;  // component ids are unique over all pes, and established in advance;
+
+std::string atmPhysFilename = TestDir + "/AtmPhys.h5m";
+std::string atmPhysOutFilename = "outPhys.h5m";
+std::string atmFilename2 = "wholeATM_new.h5m";
+int rankInPhysComm = -1;
+// this will be the physics atm com id; it should be actually 5
+int physatm = 5;  // component ids are unique over all pes, and established in advance;
+
+//int rankInJointComm = -1;
+
+int nghlay=0; // number of ghost layers for loading the file
+
+std::vector<int> groupTasks;
+int startG1=0, startG2=0, endG1=numProcesses-1, endG2=numProcesses-1;
+int typeA = 1; // spectral mesh, with GLOBAL_DOFS tags on cells
+int typeB = 2; // point cloud mesh, with GLOBAL_ID tag on vertices
+
+std::string readopts("PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_SHARED_ENTS");
+std::string readoptsPC("PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION");
+std::string fileWriteOptions("PARALLEL=WRITE_PART");
+std::string tagT("a2oTbot");
+std::string tagU("a2oUbot");
+std::string tagV("a2oVbot");
+std::string separ(";");
+std::string tagT1("a2oTbot_1");
+std::string tagU1("a2oUbot_1");
+std::string tagV1("a2oVbot_1");
+std::string tagT2("a2oTbot_2"); // just one send
+
+
+
+int commgraphtest();
+
+void testspectral_phys()
 {
-  int ierr;
-  int rankInGlobalComm, numProcesses;
-  MPI_Group jgroup;
-  std::string readopts("PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_SHARED_ENTS");
-  std::string readoptsPC("PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION");
+  // no changes
+  commgraphtest();
+}
 
-  MPI_Init(&argc, &argv);
-  MPI_Comm_rank( MPI_COMM_WORLD, &rankInGlobalComm );
-  MPI_Comm_size( MPI_COMM_WORLD, &numProcesses );
+void testspectral_lnd()
+{
+  // first model is spectral, second is land
+  atmPhysFilename= TestDir + "/wholeLnd.h5m";
+  atmPhysOutFilename = std::string("outLnd.h5m");
+  atmFilename2 = std::string("wholeATM_lnd.h5m");
+  commgraphtest();
+}
 
-  MPI_Comm_group(MPI_COMM_WORLD, &jgroup);// all processes in global group
+void testphysatm_lnd()
+{
+  //use for first file the output "outPhys.h5m" from first test
+  atmFilename = std::string("outPhys.h5m");
+  atmPhysFilename= std::string("outLnd.h5m");
+  atmPhysOutFilename = std::string("physAtm_lnd.h5m");
+  atmFilename2 = std::string("physBack_lnd.h5m");
+  tagT = tagT1;
+  tagU = tagU1;
+  tagV = tagV1;
+  tagT1 = std::string("newT");
+  tagT2 = std::string("newT2");
+  typeA = 2;
+  commgraphtest();
 
-  std::string atmFilename = TestDir + "/wholeATM_T.h5m";
-  // on a regular case,  5 ATM
-  // cmpatm is for atm on atm pes ! it has the spectral mesh
-  // cmpphys is for atm on atm phys pes ! it has the point cloud , phys grid
-
-  //
-  int rankInAtmComm = -1;
-  // it is the spectral mesh unique comp id
-  int cmpatm=605;  // component ids are unique over all pes, and established in advance;
-
-  std::string atmPhysFilename = TestDir + "/AtmPhys.h5m";
-  std::string atmPhysOutFilename = "outPhys.h5m";
-  std::string atmFilename2 = "wholeATM_new.h5m";
-  int rankInPhysComm = -1;
-  // this will be the physics atm com id; it should be actually 5
-  int physatm = 5;  // component ids are unique over all pes, and established in advance;
-
-  //int rankInJointComm = -1;
-
-  int nghlay=0; // number of ghost layers for loading the file
-
-  std::vector<int> groupTasks;
-  int startG1=0, startG2=0, endG1=numProcesses-1, endG2=numProcesses-1;
-
-  // default: load atm on 2 proc, phys grid on 2 procs, establish comm graph, then migrate
-  // data from atm pes to phys pes, and back
-
-  ProgOptions opts;
-  opts.addOpt<std::string>("atmosphere,t", "atm mesh filename ", &atmFilename);
-
-  opts.addOpt<std::string>("physics,m", "atm phys mesh filename", &atmPhysFilename);
-
-  opts.addOpt<int>("startAtm,a", "start task for atmosphere layout", &startG1);
-  opts.addOpt<int>("endAtm,b", "end task for atmosphere layout", &endG1);
-
-  opts.addOpt<int>("startPhys,c", "start task for physics layout", &startG2);
-  opts.addOpt<int>("endPhys,d", "end task for physics layout", &endG2);
-
-  opts.addOpt<std::string>("output_phys,o", "output atm phys mesh filename", &atmPhysOutFilename);
-
-  opts.parseCommandLine(argc, argv);
-
-  char fileWriteOptions[] ="PARALLEL=WRITE_PART";
+}
+int commgraphtest()
+{
 
   if (!rankInGlobalComm)
   {
-    std::cout << " atm file: " << atmFilename << "\n   on tasks : " << startG1 << ":"<<endG1 <<
-        "\n physics file: " << atmPhysFilename << "\n     on tasks : " << startG2 << ":" << endG2 << "\n  ";
+    std::cout << " first  file: " << atmFilename << "\n   on tasks : " << startG1 << ":"<<endG1 <<
+        "\n second file: " << atmPhysFilename << "\n     on tasks : " << startG2 << ":" << endG2 << "\n  ";
   }
 
   // load files on 2 different communicators, groups
@@ -162,7 +185,7 @@ int main( int argc, char* argv[] )
   ierr = MPI_Comm_create_group(MPI_COMM_WORLD, joinAtmPhysAtmGroup, JOIN_COMM_TAG, &joinComm);
   CHECKIERR(ierr, "Cannot create joint atm cou communicator")
 
-  ierr = iMOAB_Initialize(argc, argv); // not really needed anything from argc, argv, yet; maybe we should
+  ierr = iMOAB_Initialize(0, NULL); // not really needed anything from argc, argv, yet; maybe we should
   CHECKIERR(ierr, "Cannot initialize iMOAB")
 
   int cmpAtmAppID =-1;
@@ -177,8 +200,11 @@ int main( int argc, char* argv[] )
     ierr = iMOAB_RegisterApplication("ATM1", &atmComm, &cmpatm, cmpAtmPID);
     CHECKIERR(ierr, "Cannot register ATM App")
 
-    // load atm mesh
-    ierr = iMOAB_LoadMesh(cmpAtmPID, atmFilename.c_str(), readopts.c_str(), &nghlay, atmFilename.length(), readopts.length() );
+    // load first model
+    std::string rdopts = readopts;
+    if (typeA==2)
+      rdopts = readoptsPC; // point cloud
+    ierr = iMOAB_LoadMesh(cmpAtmPID, atmFilename.c_str(), rdopts.c_str(), &nghlay, atmFilename.length(), rdopts.length() );
     CHECKIERR(ierr, "Cannot load ATM mesh")
   }
 
@@ -189,16 +215,15 @@ int main( int argc, char* argv[] )
     ierr = iMOAB_RegisterApplication("PhysATM", &physComm, &physatm, physAtmPID);
     CHECKIERR(ierr, "Cannot register PHYS ATM App")
 
-    // load phys atm mesh
+    // load phys atm mesh all tests  this is PC
     ierr = iMOAB_LoadMesh(physAtmPID, atmPhysFilename.c_str(), readoptsPC.c_str(), &nghlay, atmPhysFilename.length(), readoptsPC.length() );
     CHECKIERR(ierr, "Cannot load Phys ATM mesh")
   }
-  int type1 = 1; // spectral mesh, with GLOBAL_DOFS tags on cells
-  int type2 = 2; // point cloud mesh, with GLOBAL_ID tag on vertices
+
   {
     if (MPI_COMM_NULL != joinComm)
     ierr = iMOAB_ComputeCommGraph(cmpAtmPID, physAtmPID, &joinComm, &atmPEGroup, &atmPhysGroup,
-          &type1, &type2, &cmpatm, &physatm);
+          &typeA, &typeB, &cmpatm, &physatm);
     // it will generate parcomm graph between atm and atmPhys models
     // 2 meshes, that are distributed in parallel
     CHECKIERR(ierr, "Cannot compute comm graph between the two apps ")
@@ -207,30 +232,31 @@ int main( int argc, char* argv[] )
   if (atmComm != MPI_COMM_NULL)
   {
     // call send tag;
-    ierr = iMOAB_SendElementTag(cmpAtmPID, "a2oTbot;a2oUbot;a2oVbot;", &joinComm, &physatm, strlen("a2oTbot;a2oUbot;a2oVbot;"));
+    std::string tags=tagT+separ+tagU+separ+tagV+separ;
+    ierr = iMOAB_SendElementTag(cmpAtmPID, tags.c_str(), &joinComm, &physatm, tags.length());
     CHECKIERR(ierr, "cannot send tag values")
   }
 
   if (physComm != MPI_COMM_NULL)
   {
     // need to define tag storage
-    const char* bottomTempField = "a2oTbot_1";
-    const char* bottomUVelField = "a2oUbot_1";
-    const char* bottomVVelField = "a2oVbot_1";
+    std::string tags1=tagT1+separ+tagU1+separ+tagV1+separ;
     int tagType = DENSE_DOUBLE;
     int ndof=1;
+    if (typeB==1)
+      ndof=16;
     int tagIndex = 0;
-    ierr = iMOAB_DefineTagStorage(physAtmPID, bottomTempField, &tagType, &ndof, &tagIndex,  strlen(bottomTempField) );
+    ierr = iMOAB_DefineTagStorage(physAtmPID, tagT1.c_str(), &tagType, &ndof, &tagIndex,  tagT1.length() );
     CHECKIERR(ierr, "failed to define the field tag a2oTbot");
 
-    ierr = iMOAB_DefineTagStorage(physAtmPID, bottomUVelField, &tagType, &ndof, &tagIndex,  strlen(bottomUVelField) );
+    ierr = iMOAB_DefineTagStorage(physAtmPID, tagU1.c_str(), &tagType, &ndof, &tagIndex,  tagU1.length() );
     CHECKIERR(ierr, "failed to define the field tag a2oUbot");
 
-    ierr = iMOAB_DefineTagStorage(physAtmPID, bottomVVelField, &tagType, &ndof, &tagIndex,  strlen(bottomVVelField) );
+    ierr = iMOAB_DefineTagStorage(physAtmPID, tagV1.c_str(), &tagType, &ndof, &tagIndex,  tagV1.length() );
     CHECKIERR(ierr, "failed to define the field tag a2oVbot");
 
 
-    ierr = iMOAB_ReceiveElementTag(physAtmPID, "a2oTbot_1;a2oUbot_1;a2oVbot_1;", &joinComm, &cmpatm, strlen("a2oTbot_1;a2oUbot_1;a2oVbot_1;"));
+    ierr = iMOAB_ReceiveElementTag(physAtmPID, tags1.c_str(), &joinComm, &cmpatm, tags1.length());
         CHECKIERR(ierr, "cannot receive tag values")
   }
 
@@ -242,25 +268,27 @@ int main( int argc, char* argv[] )
 
   if (physComm != MPI_COMM_NULL)
   {
-    ierr = iMOAB_WriteMesh(physAtmPID, (char*)atmPhysOutFilename.c_str(), fileWriteOptions,
-          atmPhysOutFilename.length(), strlen(fileWriteOptions) );
+    ierr = iMOAB_WriteMesh(physAtmPID, (char*)atmPhysOutFilename.c_str(), (char*)fileWriteOptions.c_str(),
+          atmPhysOutFilename.length(), fileWriteOptions.length() );
   }
   if (physComm != MPI_COMM_NULL)
   {
-    ierr = iMOAB_SendElementTag(physAtmPID, "a2oTbot_1;", &joinComm, &cmpatm, strlen("a2oTbot_1;"));
+    // send back first tag only
+    ierr = iMOAB_SendElementTag(physAtmPID, tagT1.c_str(), &joinComm, &cmpatm, tagT1.length());
     CHECKIERR(ierr, "cannot send tag values")
   }
   // receive it in a different tag
   if (atmComm != MPI_COMM_NULL) {
     // need to define tag storage
-    const char* bottomTempField = "a2oTbot_2";
     int tagType = DENSE_DOUBLE;
     int ndof=16;
+    if (typeA==2)
+      ndof=1;
     int tagIndex = 0;
-    ierr = iMOAB_DefineTagStorage(cmpAtmPID, bottomTempField, &tagType, &ndof, &tagIndex,  strlen(bottomTempField) );
-    CHECKIERR(ierr, "failed to define the field tag a2oTbot");
+    ierr = iMOAB_DefineTagStorage(cmpAtmPID, tagT2.c_str(), &tagType, &ndof, &tagIndex,  tagT2.length() );
+    CHECKIERR(ierr, "failed to define the field tag a2oTbot_2");
 
-    ierr = iMOAB_ReceiveElementTag(cmpAtmPID, "a2oTbot_2;", &joinComm, &physatm, strlen("a2oTbot_2;"));
+    ierr = iMOAB_ReceiveElementTag(cmpAtmPID, tagT2.c_str(), &joinComm, &physatm, tagT2.length());
     CHECKIERR(ierr, "cannot receive tag values a2oTbot_2")
 
   }
@@ -272,8 +300,19 @@ int main( int argc, char* argv[] )
   }
   if (atmComm != MPI_COMM_NULL)
   {
-    ierr = iMOAB_WriteMesh(cmpAtmPID, (char*)atmFilename2.c_str(), fileWriteOptions,
-        atmFilename2.length(), strlen(fileWriteOptions) );
+    ierr = iMOAB_WriteMesh(cmpAtmPID, (char*)atmFilename2.c_str(), (char*)fileWriteOptions.c_str(),
+        atmFilename2.length(), fileWriteOptions.length() );
+  }
+
+  // unregister in reverse order
+  if (physComm != MPI_COMM_NULL){
+    ierr = iMOAB_DeregisterApplication(physAtmPID);
+    CHECKIERR(ierr, "cannot deregister second app model" )
+  }
+
+  if (atmComm != MPI_COMM_NULL) {
+    ierr = iMOAB_DeregisterApplication(cmpAtmPID);
+    CHECKIERR(ierr, "cannot deregister first app model" )
   }
 
   ierr = iMOAB_Finalize();
@@ -291,9 +330,55 @@ int main( int argc, char* argv[] )
   if (MPI_COMM_NULL != joinComm) MPI_Comm_free(&joinComm);
   MPI_Group_free(&joinAtmPhysAtmGroup);
 
+  return 0;
+}
+int main( int argc, char* argv[] )
+{
+
+
+  MPI_Init(&argc, &argv);
+  MPI_Comm_rank( MPI_COMM_WORLD, &rankInGlobalComm );
+  MPI_Comm_size( MPI_COMM_WORLD, &numProcesses );
+
+  MPI_Comm_group(MPI_COMM_WORLD, &jgroup);// all processes in global group
+
+  // default: load atm on 2 proc, phys grid on 2 procs, establish comm graph, then migrate
+  // data from atm pes to phys pes, and back
+  startG1=0, startG2=0, endG1=numProcesses-1, endG2=numProcesses-1;
+
+  ProgOptions opts;
+  opts.addOpt<std::string>("modelA,m", "first model file ", &atmFilename);
+  opts.addOpt<int>("typeA,t", " type of first model ", &typeA);
+
+
+  opts.addOpt<std::string>("modelB,n", "second model file", &atmPhysFilename);
+  opts.addOpt<int>("typeB,v", " type of the second model ", &typeB);
+
+  opts.addOpt<int>("startAtm,a", "start task for first model layout", &startG1);
+  opts.addOpt<int>("endAtm,b", "end task for first model layout", &endG1);
+
+  opts.addOpt<int>("startPhys,c", "start task for second model layout", &startG2);
+  opts.addOpt<int>("endPhys,d", "end task for second model layout", &endG2);
+
+  opts.addOpt<std::string>("output,o", "output filename", &atmPhysOutFilename);
+
+  opts.addOpt<std::string>("output,o", "output filename", &atmFilename2);
+
+  opts.parseCommandLine(argc, argv);
+
+  int num_err = 0;
+  num_err += RUN_TEST( testspectral_phys );
+
+  //
+  if (argc == 1)
+  {
+    num_err += RUN_TEST( testspectral_lnd );
+    num_err += RUN_TEST( testphysatm_lnd );
+  }
   MPI_Group_free(&jgroup);
 
   MPI_Finalize();
-  return 0;
+
+  return num_err;
 }
 
