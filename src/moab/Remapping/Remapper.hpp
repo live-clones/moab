@@ -84,7 +84,12 @@ public:
     }
 
 	  if (readopts)
-	    opts = opts + ";" + std::string(readopts);
+    {
+      if (opts.size())
+        opts = opts + ";" + std::string(readopts);
+      else
+        opts = std::string(readopts);
+    }
 
 	  if (!m_pcomm->rank()) std::cout << "Reading file (" << filename << ") with options = [" << opts << "]\n";
 #else
