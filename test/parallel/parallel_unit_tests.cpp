@@ -235,8 +235,7 @@ int main( int argc, char* argv[] )
   num_errors += RUN_TEST_ARG2 (test_sequences_after_ghosting, filename2.c_str()) ;
   if (2>=size) // run this one only on one or 2 processors; the file has only 2 parts in partition
    num_errors += RUN_TEST_ARG2( test_ghost_polyhedra, filename3.c_str());
-  if (2==size)
-    num_errors += RUN_TEST_ARG2 ( test_too_few_parts, filename4.c_str());
+  num_errors += RUN_TEST_ARG2 ( test_too_few_parts, filename4.c_str());
 #endif
   num_errors += RUN_TEST_ARG2( test_assign_global_ids, 0 );
   num_errors += RUN_TEST_ARG2( test_shared_sets, 0 );
@@ -247,7 +246,6 @@ int main( int argc, char* argv[] )
   num_errors += RUN_TEST_ARG2( test_ghosted_entity_shared_data, 0 );
   num_errors += RUN_TEST_ARG2( regression_owners_with_ghosting, 0 );
   num_errors += RUN_TEST ( test_trivial_partition);
-
   if (rank == 0) {
     if (!num_errors)
       std::cout << "All tests passed" << std::endl;
@@ -1725,10 +1723,10 @@ ErrorCode test_too_few_parts( const char* filename )
                          "PARALLEL=READ_PART;"
                          "PARTITION=PARALLEL_PARTITION;"
                          "PARALLEL_RESOLVE_SHARED_ENTS;" );
-  if(rval==MB_SUCCESS)
-    return MB_FAILURE;
+  //if(rval==MB_SUCCESS)
+    //return MB_FAILURE;
 
-  return MB_SUCCESS;
+  return rval;
 }
 
 ErrorCode test_sequences_after_ghosting( const char* filename )

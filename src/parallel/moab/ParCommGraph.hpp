@@ -164,10 +164,6 @@ namespace moab {
 
 	  // dump local information about graph
 	  ErrorCode dump_comm_information(std::string prefix, int is_send);
-
-	  /*
-	   *  is this original migrate graph ? if yes, sending tag data is easier ?
-	   */
 	  bool original_migrate() { return !recomputed_send_graph;}
 	private:
 	  /**

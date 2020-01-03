@@ -307,7 +307,7 @@ ErrorCode TempestRemapper::ConvertMeshToTempest ( Remapper::IntersectionContext 
         if ( !m_source ) m_source = new Mesh();
         if ( outputEnabled ) std::cout << "\nConverting (source) MOAB to TempestRemap Mesh representation ...\n";
         rval = convert_mesh_to_tempest_private ( m_source, m_source_set, m_source_entities, &m_source_vertices );
-        if (m_source_entities.size() == 0) {
+        if (m_source_entities.size() == 0 && m_source_vertices.size() != 0) {
             this->point_cloud_source = true;
         }
     }
@@ -316,7 +316,7 @@ ErrorCode TempestRemapper::ConvertMeshToTempest ( Remapper::IntersectionContext 
         if ( !m_target ) m_target = new Mesh();
         if ( outputEnabled ) std::cout << "\nConverting (target) MOAB to TempestRemap Mesh representation ...\n";
         rval = convert_mesh_to_tempest_private ( m_target, m_target_set, m_target_entities, &m_target_vertices );
-        if (m_target_entities.size() == 0)
+        if (m_target_entities.size() == 0 && m_target_vertices.size() != 0)
             this->point_cloud_target = true;
     }
     else if ( ctx != Remapper::DEFAULT )     // Overlap mesh
@@ -354,7 +354,7 @@ ErrorCode TempestRemapper::convert_mesh_to_tempest_private ( Mesh* mesh, EntityH
     {
         rval = m_interface->get_entities_by_dimension ( mesh_set, 0, verts ); MB_CHK_ERR ( rval );
     }
-    assert(verts.size() > 0); // If not, this may be an invalid mesh
+    //assert(verts.size() > 0); // If not, this may be an invalid mesh ! possible for unbalanced loads
 
     for ( unsigned iface = 0; iface < elems.size(); ++iface )
     {
@@ -999,11 +999,11 @@ ErrorCode TempestRemapper::ComputeOverlapMesh ( bool use_tempest )
     }
     else
     {
+        Tag gidtag = m_interface->globalId_tag();
+        moab::EntityHandle subrange[2];
+        int gid[2];
+        if (m_source_entities.size()>1)
         {  // Let us do some sanity checking to fix ID if they have are setup incorrectly
-            Tag gidtag = m_interface->globalId_tag();
-
-            moab::EntityHandle subrange[2];
-            int gid[2];
             subrange[0] = m_source_entities[0];
             subrange[1] = m_source_entities[1];
             rval = m_interface->tag_get_data(gidtag, subrange, 2, gid ); MB_CHK_ERR ( rval );
@@ -1018,7 +1018,9 @@ ErrorCode TempestRemapper::ComputeOverlapMesh ( bool use_tempest )
                 rval = assign_vertex_element_IDs( m_interface, gidtag, m_source_set, 2, 1); MB_CHK_ERR ( rval );
 #endif
             }
-
+        }
+        if (m_target_entities.size()>1)
+        {
             subrange[0] = m_target_entities[0];
             subrange[1] = m_target_entities[1];
             rval = m_interface->tag_get_data(gidtag, subrange, 2, gid ); MB_CHK_ERR ( rval );
@@ -1454,67 +1456,68 @@ ErrorCode TempestRemapper::augment_overlap_set()
   // first count source elements that are "spread" over multiple processes
   // TLc is ordered now by source ID; loop over them
   int n = TLc.get_n(); // total number of overlap elements received on current task;
-  int currentSourceID = TLc.vi_rd[sizeTuple*0 + 1]; // we  have written sizeTuple*0 for "clarity"
-  int proc0 = TLc.vi_rd[sizeTuple*0];
   std::map<int, int> currentProcsCount;
-  currentProcsCount[proc0]=1; //
-
   // form a map from proc to sets of vertex indices that will be sent using TLv2
   // will form a map between a source cell ID and tasks/targets that are partially overlapped by these sources
   std::map< int, std::set<int> > sourcesForTasks;
   int sizeOfTLc2 = 0; // only increase when we will have to send data
-
-  for( int i=1; i<n; i++)
+  if (n>0)
   {
-    int proc = TLc.vi_rd[sizeTuple*i];
-    int sourceID = TLc.vi_rd[sizeTuple*i+1];
-    if (sourceID==currentSourceID)
-    {
-      if (currentProcsCount.find(proc)==currentProcsCount.end())
-      {
-        currentProcsCount[proc]=1;
-      }
-      else
-       currentProcsCount[proc]++;
-    }
-    if (sourceID!=currentSourceID || ((n-1) == i)) // we study the current source if we reach the last
-    {
-      // we have found a new source id, need to reset the proc counts, and establish if we need to send data
-      if (currentProcsCount.size() > 1)
-      {
-#ifdef VERBOSE
-        std::cout << " source element " << currentSourceID << " intersects with " << currentProcsCount.size() << " target partitions\n";
-        for (std::map<int, int>::iterator it=currentProcsCount.begin(); it != currentProcsCount.end(); it++)
-        {
-          int procID = it->first;
-          int numOverCells = it->second;
-          std::cout << "   task:"<< procID << " " << numOverCells << " cells\n";
-        }
+    int currentSourceID = TLc.vi_rd[sizeTuple*0 + 1]; // we  have written sizeTuple*0 for "clarity"
+    int proc0 = TLc.vi_rd[sizeTuple*0];
+    currentProcsCount[proc0]=1; //
 
-#endif
-        // estimate what we need to send
-        for (std::map<int, int>::iterator it1=currentProcsCount.begin(); it1 != currentProcsCount.end(); it1++)
-        {
-          int proc1 = it1->first;
-          sourcesForTasks[currentSourceID].insert(proc1);
-          for (std::map<int, int>::iterator it2=currentProcsCount.begin(); it2 != currentProcsCount.end(); it2++)
-          {
-            int proc2 = it2->first;
-            if (proc1!=proc2)
-              sizeOfTLc2 += it2->second;
-          }
-        }
-        // mark vertices in TLv tuple that need to be sent
-      }
-      if (sourceID!=currentSourceID) // maybe we are not at the end, so continue on
+    for( int i=1; i<n; i++)
+    {
+      int proc = TLc.vi_rd[sizeTuple*i];
+      int sourceID = TLc.vi_rd[sizeTuple*i+1];
+      if (sourceID==currentSourceID)
       {
-        currentSourceID = sourceID;
-        currentProcsCount.clear();
-        currentProcsCount[proc]=1;
+        if (currentProcsCount.find(proc)==currentProcsCount.end())
+        {
+          currentProcsCount[proc]=1;
+        }
+        else
+         currentProcsCount[proc]++;
+      }
+      if (sourceID!=currentSourceID || ((n-1) == i)) // we study the current source if we reach the last
+      {
+        // we have found a new source id, need to reset the proc counts, and establish if we need to send data
+        if (currentProcsCount.size() > 1)
+        {
+  #ifdef VERBOSE
+          std::cout << " source element " << currentSourceID << " intersects with " << currentProcsCount.size() << " target partitions\n";
+          for (std::map<int, int>::iterator it=currentProcsCount.begin(); it != currentProcsCount.end(); it++)
+          {
+            int procID = it->first;
+            int numOverCells = it->second;
+            std::cout << "   task:"<< procID << " " << numOverCells << " cells\n";
+          }
+
+  #endif
+          // estimate what we need to send
+          for (std::map<int, int>::iterator it1=currentProcsCount.begin(); it1 != currentProcsCount.end(); it1++)
+          {
+            int proc1 = it1->first;
+            sourcesForTasks[currentSourceID].insert(proc1);
+            for (std::map<int, int>::iterator it2=currentProcsCount.begin(); it2 != currentProcsCount.end(); it2++)
+            {
+              int proc2 = it2->first;
+              if (proc1!=proc2)
+                sizeOfTLc2 += it2->second;
+            }
+          }
+          // mark vertices in TLv tuple that need to be sent
+        }
+        if (sourceID!=currentSourceID) // maybe we are not at the end, so continue on
+        {
+          currentSourceID = sourceID;
+          currentProcsCount.clear();
+          currentProcsCount[proc]=1;
+        }
       }
     }
   }
-
 // begin a loop to send the needed cells to the processes; also mark the vertices that need to be sent, put them in a
   // set
 

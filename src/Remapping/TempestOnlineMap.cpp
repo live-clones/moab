@@ -819,20 +819,24 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
                 ( eOutputType == DiscretizationType_FV )
            )
         {
-            // Generate reverse node array and edge map
-            m_meshInputCov->ConstructReverseNodeArray();
-            m_meshInputCov->ConstructEdgeMap();
+            if(m_meshInputCov->faces.size()>0)
+            {
 
-            // Initialize coordinates for map
-            this->InitializeSourceCoordinatesFromMeshFV ( *m_meshInputCov );
-            this->InitializeTargetCoordinatesFromMeshFV ( *m_meshOutput );
+              // Generate reverse node array and edge map
+              m_meshInputCov->ConstructReverseNodeArray();
+              m_meshInputCov->ConstructEdgeMap();
 
-            // Finite volume input / Finite element output
-            rval = this->SetDOFmapAssociation(eInputType, false, NULL, NULL, eOutputType, false, NULL);MB_CHK_ERR(rval);
+              // Initialize coordinates for map
+              this->InitializeSourceCoordinatesFromMeshFV ( *m_meshInputCov );
+              this->InitializeTargetCoordinatesFromMeshFV ( *m_meshOutput );
 
-            // Construct remap
-            if ( is_root ) dbgprint.printf ( 0, "Calculating remap weights\n" );
-            LinearRemapFVtoFV_Tempest_MOAB ( nPin );
+              // Finite volume input / Finite element output
+              rval = this->SetDOFmapAssociation(eInputType, false, NULL, NULL, eOutputType, false, NULL);MB_CHK_ERR(rval);
+
+              // Construct remap
+              if ( is_root ) dbgprint.printf ( 0, "Calculating remap weights\n" );
+              LinearRemapFVtoFV_Tempest_MOAB ( nPin );
+            }
         }
         else if ( eInputType == DiscretizationType_FV )
         {
@@ -1232,7 +1236,15 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
         // rval = m_interface->add_entities(m_meshOverlapSet, sharedGhostEntities);MB_CHK_SET_ERR(rval, "Adding entities dim 2 failed");
 #endif
 
-        // Verify consistency, conservation and monotonicity
+        // Verify consistency, conservation and monotonicity, globally
+#ifdef MOAB_HAVE_MPI
+        // first, we have to agree if checks are needed globally
+        // if there is at least one that does not want checks, no-one should do checks
+        int fck_int_loc = fNoCheck ? 1 : 0;
+        int fck_int_glob = fck_int_loc;
+        if (m_pcomm) MPI_Allreduce ( &fck_int_loc, &fck_int_glob, 1, MPI_INT, MPI_MAX, m_pcomm->comm() );
+        fNoCheck = (0==fck_int_glob)? false : true;
+#endif
         if ( !fNoCheck )
         {
             if ( is_root ) dbgprint.printf ( 0, "Verifying map" );
@@ -1504,7 +1516,7 @@ int moab::TempestOnlineMap::IsMonotone (double dTolerance)
 #ifdef MOAB_HAVE_EIGEN
 void moab::TempestOnlineMap::InitVectors()
 {
-    assert(m_weightMatrix.rows() != 0 && m_weightMatrix.cols() != 0);
+    //assert(m_weightMatrix.rows() != 0 && m_weightMatrix.cols() != 0);
     m_rowVector.resize( m_weightMatrix.rows() );
     m_colVector.resize( m_weightMatrix.cols() );
 }
