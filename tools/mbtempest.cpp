@@ -602,7 +602,7 @@ moab::ErrorCode CreateTempestMesh ( ToolContext& ctx, moab::TempestRemapper& rem
         const double radius_src = 1.0 /*2.0*acos(-1.0)*/;
         const double radius_dest = 1.0 /*2.0*acos(-1.0)*/;
 
-        const char* additional_read_opts = "NO_SET_CONTAINING_PARENTS";
+        const char* additional_read_opts = (ctx.n_procs > 1 ? "NO_SET_CONTAINING_PARENTS;" : "");
         // Load the source mesh and validate
         rval = remapper.LoadNativeMesh ( ctx.inFilenames[0], ctx.meshsets[0], additional_read_opts ); MB_CHK_ERR ( rval );
         // Rescale the radius of both to compute the intersection
