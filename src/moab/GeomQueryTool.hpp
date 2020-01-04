@@ -90,7 +90,7 @@ public:
     /**
      * @return Boolean indicating if this entity is in the RayHistory
      */
-    bool in_history(EntityHandle ent);
+    bool in_history(EntityHandle ent) const;
 
     /**
      * Add entity to the RayHistory

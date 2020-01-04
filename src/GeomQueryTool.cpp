@@ -651,7 +651,7 @@ ErrorCode GeomQueryTool::RayHistory::get_last_intersection(EntityHandle& last_fa
   }
 }
 
-bool GeomQueryTool::RayHistory::in_history(EntityHandle ent) {
+bool GeomQueryTool::RayHistory::in_history(EntityHandle ent) const {
   return std::find(prev_facets.begin(), prev_facets.end(), ent) != prev_facets.end();
 }
 
