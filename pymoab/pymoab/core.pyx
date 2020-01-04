@@ -1,4 +1,6 @@
 """Implements core functionality."""
+import sys
+
 from cython.operator cimport dereference as deref
 
 cimport numpy as np
@@ -16,7 +18,10 @@ from libcpp.vector cimport vector
 from libcpp.string cimport string as std_string
 from libc.stdlib cimport malloc
 
-from collections.abc import Iterable
+if sys.version_info < (3, 0):
+    from collections import Iterable
+else:
+    from collections.abc import Iterable
 
 cdef void* null = NULL
 
