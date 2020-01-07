@@ -1088,8 +1088,7 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
         }
         else if (
             ( eInputType  != DiscretizationType_FV ) &&
-            ( (eOutputType != DiscretizationType_FV || eOutputType != DiscretizationType_PCLOUD) )
-        )
+            ( eOutputType != DiscretizationType_FV ) )
         {
             DataArray3D<double> dataGLLJacobianIn, dataGLLJacobianSrc;
             DataArray3D<double> dataGLLJacobianOut;
@@ -1118,12 +1117,12 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
 #ifdef MOAB_HAVE_MPI
             if (m_pcomm) MPI_Allreduce ( &dNumericalAreaSrc_loc, &dNumericalAreaIn, 1, MPI_DOUBLE, MPI_SUM, m_pcomm->comm() );
 #endif
-            if ( is_root ) dbgprint.printf ( 0, "Input Mesh Numerical Area: %1.15e", dNumericalAreaIn );
+            if ( is_root ) dbgprint.printf ( 0, "Input Mesh Numerical Area: %1.15e\n", dNumericalAreaIn );
 
             if ( fabs ( dNumericalAreaIn - dTotalAreaInput ) > 1.0e-12 )
             {
                 dbgprint.printf ( 0, "WARNING: Significant mismatch between input mesh "
-                                  "numerical area and geometric area" );
+                                  "numerical area and geometric area\n" );
             }
 
             // Output metadata
@@ -1140,12 +1139,12 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
 #ifdef MOAB_HAVE_MPI
             if (m_pcomm) MPI_Allreduce ( &dNumericalAreaOut_loc, &dNumericalAreaOut, 1, MPI_DOUBLE, MPI_SUM, m_pcomm->comm() );
 #endif
-            if ( is_root ) dbgprint.printf ( 0, "Output Mesh Numerical Area: %1.15e", dNumericalAreaOut );
+            if ( is_root ) dbgprint.printf ( 0, "Output Mesh Numerical Area: %1.15e\n", dNumericalAreaOut );
 
             if ( fabs ( dNumericalAreaOut - dTotalAreaOutput ) > 1.0e-12 )
             {
                 if ( is_root ) dbgprint.printf ( 0, "WARNING: Significant mismatch between output mesh "
-                                                            "numerical area and geometric area" );
+                                                            "numerical area and geometric area\n" );
             }
 
             // Initialize coordinates for map
@@ -1360,6 +1359,7 @@ int moab::TempestOnlineMap::IsConservative (double dTolerance)
     return OfflineMap::IsConservative(dTolerance);
 
 #else
+    // return OfflineMap::IsConservative(dTolerance);
 
     int ierr;
     // Get map entries
@@ -1372,65 +1372,71 @@ int moab::TempestOnlineMap::IsConservative (double dTolerance)
     // Calculate column sums
     std::vector<int> dColumnsUnique;
     std::vector<double> dColumnSums;
-    std::vector<int> dColumnIndices;
-    std::vector<double> dColumnSumsTotal;
 
     int nColumns = m_mapRemap.GetColumns();
     m_mapRemap.GetEntries ( dataRows, dataCols, dataEntries );
-    dColumnSums.resize ( nColumns );
-    dColumnsUnique.resize ( nColumns );
+    dColumnSums.resize ( m_nTotDofs_SrcCov, 0.0 );
+    dColumnsUnique.resize ( m_nTotDofs_SrcCov, -1 );
 
-    for ( unsigned i = 0; i < dataRows.GetRows(); i++ )
+    for ( unsigned i = 0; i < dataEntries.GetRows(); i++ )
     {
-        dColumnSums[dataCols[i]] +=
-            dataEntries[i] * dTargetAreas[dataRows[i]] / dSourceAreas[dataCols[i]];
+        dColumnSums[dataCols[i]] += dataEntries[i] * dTargetAreas[dataRows[i]];//  / dSourceAreas[dataCols[i]];
 
-        // GID for column DoFs: col_gdofmap[ dataCols[i] ]
-        int colGID = col_gdofmap[ dataCols[i] ] + 1;
+        assert(dataCols[i] < m_nTotDofs_SrcCov);
+
+        // GID for column DoFs: col_gdofmap[ col_ldofmap [ dataCols[i] ] ]
+        int colGID = col_gdofmap[ col_ldofmap [ dataCols[i] ] ];
+        // int colGID = col_dofmap [ col_ldofmap [ dataCols[i] ] ];
         dColumnsUnique[ dataCols[i] ] = colGID;
+
+        // std::cout << "Column dataCols[i]=" << dataCols[i] << " with GID = " << colGID << std::endl;
     }
 
     int rootProc = 0;
     std::vector<int> nElementsInProc;
-    if (!rank) nElementsInProc.resize(size*2);
-    int senddata[2] = {m_nTotDofs_SrcCov, m_nTotDofs_Src};
-    ierr = MPI_Gather ( senddata, 2, MPI_INTEGER, nElementsInProc.data(), 2, MPI_INTEGER, rootProc, m_pcomm->comm() );
+    const int nDATA = 3;
+    if (!rank) nElementsInProc.resize(size*nDATA);
+    int senddata[nDATA] = {nColumns, m_nTotDofs_SrcCov, m_nTotDofs_Src};
+    ierr = MPI_Gather ( senddata, nDATA, MPI_INTEGER, nElementsInProc.data(), nDATA, MPI_INTEGER, rootProc, m_pcomm->comm() );
     if ( ierr != MPI_SUCCESS ) return -1;
-    int nTotColumns = 0, nTotColumnsUnq = 0;
 
+    int nTotVals = 0, nTotColumns = 0, nTotColumnsUnq = 0;
+    std::vector<int> dColumnIndices;
+    std::vector<double> dColumnSourceAreas;
+    std::vector<double> dColumnSumsTotal;
     std::vector<int> displs, rcount;
-    if (!rank)
+    if (rank == rootProc)
     {
+        displs.resize ( size+1, 0 );
+        rcount.resize ( size, 0 );
+        int gsum = 0;
         for (int ir = 0; ir < size; ++ir)
         {
-            nTotColumns += nElementsInProc[ir*2];
-            nTotColumnsUnq += nElementsInProc[ir*2+1];
+            nTotVals += nElementsInProc[ir*nDATA];
+            nTotColumns += nElementsInProc[ir*nDATA+1];
+            nTotColumnsUnq += nElementsInProc[ir*nDATA+2];
+
+            displs[ir] = gsum;
+            rcount[ir] = nElementsInProc[ir*nDATA+1];
+            gsum += rcount[ir];
         }
 
-        dColumnIndices.resize ( nTotColumns );
-        dColumnSumsTotal.resize ( nTotColumns );
-        
-        // For the necessary setup to gather all data to root
-        {
-            displs.resize ( size, 0 );
-            rcount.resize ( size, 0 );
-            int gsum = 0;
-            for ( int i = 0; i < size; ++i )
-            {
-                displs[i] = gsum;
-                rcount[i] = nElementsInProc[i*2];
-                gsum += rcount[i];
-            }
-        }
+        dColumnIndices.resize ( nTotColumns, -1 );
+        dColumnSumsTotal.resize ( nTotColumns, 0.0 );
+        dColumnSourceAreas.resize ( nTotColumns, 0.0 );
+
+        // std::cout << "Total columns: " << nTotVals << " cols: " << nTotColumns << " and unique ones: " << nTotColumnsUnq << std::endl;
     }
 
     // Gather all ColumnSums to root process and accumulate
     // We expect that the sums of all columns equate to 1.0 within user specified tolerance
     // Need to do a gatherv here since different processes have different number of elements
     // MPI_Reduce(&dColumnSums[0], &dColumnSumsTotal[0], m_mapRemap.GetColumns(), MPI_DOUBLE, MPI_SUM, 0, m_pcomm->comm());
-    ierr = MPI_Gatherv ( &dColumnsUnique[0], nColumns, MPI_INTEGER, &dColumnIndices[0], rcount.data(), displs.data(), MPI_INTEGER, rootProc, m_pcomm->comm() );
+    ierr = MPI_Gatherv ( &dColumnsUnique[0], m_nTotDofs_SrcCov, MPI_INTEGER, &dColumnIndices[0], rcount.data(), displs.data(), MPI_INTEGER, rootProc, m_pcomm->comm() );
     if ( ierr != MPI_SUCCESS ) return -1;
-    ierr = MPI_Gatherv ( &dColumnSums[0], nColumns, MPI_DOUBLE, &dColumnSumsTotal[0], rcount.data(), displs.data(), MPI_DOUBLE, rootProc, m_pcomm->comm() );
+    ierr = MPI_Gatherv ( &dColumnSums[0], m_nTotDofs_SrcCov, MPI_DOUBLE, &dColumnSumsTotal[0], rcount.data(), displs.data(), MPI_DOUBLE, rootProc, m_pcomm->comm() );
+    if ( ierr != MPI_SUCCESS ) return -1;
+    ierr = MPI_Gatherv ( &dSourceAreas[0], m_nTotDofs_SrcCov, MPI_DOUBLE, &dColumnSourceAreas[0], rcount.data(), displs.data(), MPI_DOUBLE, rootProc, m_pcomm->comm() );
     if ( ierr != MPI_SUCCESS ) return -1;
 
     // Clean out unwanted arrays now
@@ -1439,25 +1445,32 @@ int moab::TempestOnlineMap::IsConservative (double dTolerance)
 
     // Verify all column sums equal the input Jacobian
     int fConservative = 0;
-    if (!rank)
+    if (rank == rootProc)
     {
-        displs.push_back(nTotColumns);
-        std::vector<double> dColumnSumsOnRoot(nTotColumnsUnq, 0.0);
+        displs[size] = (nTotColumns);
+        // std::vector<double> dColumnSumsOnRoot(nTotColumnsUnq, 0.0);
+        std::map<int, double> dColumnSumsOnRoot;
+        std::map<int, double> dColumnSourceAreasOnRoot;
         for ( int ir = 0; ir < size; ir++ )
         {
             for ( int ips = displs[ir]; ips < displs[ir+1]; ips++ )
             {
-                dColumnSumsOnRoot[ dColumnIndices[ips] ] += dColumnSumsTotal[ips];
+                assert(dColumnIndices[ips] < nTotColumnsUnq);
+                dColumnSumsOnRoot[ dColumnIndices[ips] ] += dColumnSumsTotal[ips];// / dColumnSourceAreas[ips];
+                dColumnSourceAreasOnRoot[ dColumnIndices[ips] ] += dColumnSourceAreas[ips];
+                // dColumnSourceAreas[ dColumnIndices[ips] ]
             }
         }
 
-        for ( int i = 0; i < nTotColumnsUnq; i++ )
+        for(std::map<int, double>::iterator it = dColumnSumsOnRoot.begin(); it != dColumnSumsOnRoot.end(); ++it)
         {
-            if ( fabs ( dColumnSumsOnRoot[i] - 1.0 ) > dTolerance )
+            if ( fabs ( it->second - dColumnSourceAreasOnRoot[it->first] ) > dTolerance )
+            // if ( fabs ( it->second - 1.0 ) > dTolerance )
             {
                 fConservative++;
                 Announce ( "TempestOnlineMap is not conservative in column "
-                        "%i (%1.15e)", i, dColumnSumsOnRoot[i] );
+                        // "%i (%1.15e)", it->first, it->second );
+                        "%i (%1.15e)", it->first, it->second / dColumnSourceAreasOnRoot[it->first] );
             }
         }
     }
