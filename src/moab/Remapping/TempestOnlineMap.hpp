@@ -391,17 +391,17 @@ public:
 ///////////////////////////////////////////////////////////////////////////////
 
 inline
-int moab::TempestOnlineMap::GetRowGlobalDoF(int localID) const
+int moab::TempestOnlineMap::GetRowGlobalDoF(int localRowID) const
 {
-    return row_gdofmap[ localID ];
+    return row_gdofmap [ row_ldofmap [ localRowID ] ];
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 inline
-int moab::TempestOnlineMap::GetColGlobalDoF(int localID) const
+int moab::TempestOnlineMap::GetColGlobalDoF(int localColID) const
 {
-    return col_gdofmap[ localID ];
+    return col_gdofmap [ col_ldofmap [ localColID ] ];
 }
 
 
