@@ -224,7 +224,7 @@ moab::ErrorCode moab::TempestOnlineMap::SetDOFmapAssociation(DiscretizationType 
 {
     moab::ErrorCode rval;
     std::vector<bool> dgll_cgll_row_ldofmap, dgll_cgll_col_ldofmap, dgll_cgll_covcol_ldofmap;
-    std::vector<unsigned> src_soln_gdofs, locsrc_soln_gdofs, tgt_soln_gdofs;
+    std::vector<int> src_soln_gdofs, locsrc_soln_gdofs, tgt_soln_gdofs;
 
     // We are assuming that these are element based tags that are sized: np * np
     m_srcDiscType = srcType;
@@ -424,6 +424,58 @@ moab::ErrorCode moab::TempestOnlineMap::SetDOFmapAssociation(DiscretizationType 
         src_soln_gdofs.resize(m_remapper->m_covering_source_entities.size() * srcTagSize, UINT_MAX);
         rval = m_interface->tag_get_data ( m_dofTagSrc, m_remapper->m_covering_source_entities, &src_soln_gdofs[0] );MB_CHK_ERR(rval);
     }
+
+#ifdef ALTERNATE_NUMBERING_IMPLEMENTATION
+    unsigned maxSrcIndx = 0;
+
+    // for ( unsigned j = 0; j < m_covering_source_entities.size(); j++ )
+    std::vector<int> locdofs(srcTagSize);
+    std::map<Node, moab::EntityHandle> mapLocalMBNodes;
+    double elcoords[3];
+    for (unsigned iel=0; iel < m_remapper->m_covering_source_entities.size(); ++iel) {
+        EntityHandle eh = m_remapper->m_covering_source_entities[iel];
+        rval = m_interface->get_coords(&eh, 1, elcoords);MB_CHK_ERR(rval);
+        Node elCentroid(elcoords[0],elcoords[1],elcoords[2]);
+        mapLocalMBNodes.insert(std::pair<Node, moab::EntityHandle>(elCentroid, eh));
+    }
+
+    const NodeVector & nodes = m_remapper->m_covering_source->nodes;
+    for (unsigned j = 0; j < m_remapper->m_covering_source->faces.size(); j++)
+    {
+        const Face & face = m_remapper->m_covering_source->faces[j];
+
+        Node centroid;
+        centroid.x = centroid.y = centroid.z = 0.0;
+        for (unsigned l=0; l < face.edges.size(); ++l) {
+            centroid.x += nodes[face[l]].x;
+            centroid.y += nodes[face[l]].y;
+            centroid.z += nodes[face[l]].z;
+        }
+        const double factor = 1.0/face.edges.size();
+        centroid.x *= factor;
+        centroid.y *= factor;
+        centroid.z *= factor;
+
+        EntityHandle current_eh;
+        if (mapLocalMBNodes.find(centroid) != mapLocalMBNodes.end())
+        {
+            current_eh = mapLocalMBNodes[centroid];
+        }
+
+        rval = m_interface->tag_get_data ( m_dofTagSrc, &current_eh, 1, &locdofs[0] );MB_CHK_ERR(rval);
+        for ( int p = 0; p < m_nDofsPEl_Src; p++ )
+        {
+            for ( int q = 0; q < m_nDofsPEl_Src; q++)
+            {
+                const int ldof = (*srcdataGLLNodes)[p][q][j] - 1;
+                const int idof = p * m_nDofsPEl_Src + q;
+                maxSrcIndx = (ldof > maxSrcIndx ? ldof : maxSrcIndx);
+                std::cout << "Col: " << current_eh << ", " << m_remapper->lid_to_gid_covsrc[j] << ", " <<  idof << ", " << ldof << ", " << locdofs[idof] - 1 << ", " << maxSrcIndx << "\n";
+            }
+        }
+    }
+#endif
+
     m_nTotDofs_SrcCov = 0;
     if (srcdataGLLNodes == NULL) { /* we only have a mapping for elements as DoFs */
         for (unsigned i=0; i < col_dofmap.size(); ++i) {
@@ -563,7 +615,7 @@ moab::ErrorCode moab::TempestOnlineMap::SetDOFmapAssociation(DiscretizationType 
                     row_dofmap[ idof ] = ldof;
                     row_ldofmap[ ldof ] = idof;
                     row_gdofmap[ idof ] = tgt_soln_gdofs[idof] - 1;
-                    if (vprint) std::cout << "Row: " << idof << ", " << ldof << ", " << tgt_soln_gdofs[idof] - 1 << "\n";
+                    if (vprint) std::cout << "Row: " << m_remapper->lid_to_gid_tgt[j] << ", " <<  idof << ", " << ldof << ", " << row_gdofmap[idof] << ", " << m_nTotDofs_Dest << "\n";
                 }
             }
         }
