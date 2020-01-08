@@ -758,10 +758,12 @@ int main(int argc, char* argv[])
 
     for (int innz = 0; innz < NNZ; ++innz)
     {
+#ifdef VERBOSE
       if (fabs(mapMatrix(mat_rows[innz], mat_cols[innz])) > 1e-12) 
       {
         printf("Adding to existing loc: (%d, %d) = %12.8f\n", mat_rows[innz], mat_cols[innz], mapMatrix(mat_rows[innz], mat_cols[innz]));
       }
+#endif
       mapMatrix(mat_rows[innz], mat_cols[innz]) += mat_vals[innz];
     }
 
@@ -782,7 +784,7 @@ int main(int argc, char* argv[])
     // Output the number of sets
     printf("Primary sets: %15zu\n", sets.size());
     printf("Original NNZ: %18d\n", NNZ);
-    printf("Consolidated Total NNZ: %18d\n", nS);
+    printf("Consolidated Total NNZ: %8d\n", nS);
     printf("Conservative weights ? %6d\n", (bConserved > 0));
     printf("Monotone weights ? %10d\n", (bMonotonicity > 0));
 
@@ -834,7 +836,6 @@ int main(int argc, char* argv[])
 
     // Increment vecRow and vecCol: make it 1-based
     for (int i = 0; i < nS; i++) {
-      // std::cout << "A(" << vecRow[i] << ", " << vecCol[i] << ") = " << vecS[i] << std::endl;
       vecRow[i]++;
       vecCol[i]++;
     }
