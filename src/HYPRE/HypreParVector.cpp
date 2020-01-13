@@ -149,7 +149,7 @@ namespace moab
     return *this;
   }
 
-  HYPRE_Int HypreParVector::resize(HYPRE_Int glob_size, HYPRE_Int p_irstart, HYPRE_Int p_irend)
+  HYPRE_Int HypreParVector::resize(HYPRE_Int /*glob_size*/, HYPRE_Int p_irstart, HYPRE_Int p_irend)
   {
     if (initialized ||
         x != NULL) MB_SET_ERR_RET_VAL("Vector is already initialized and partitioned", -1);
