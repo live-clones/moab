@@ -190,7 +190,7 @@ fi
 
 # Supported HDF5 versions: 1.8.10, 1.8.12, 1.8.13, 1.8.18, 1.10
 # Arguments: 1) Default Version Number, 2) Download by default ?
-AUSCM_CONFIGURE_DOWNLOAD_HDF5([1.8.19],[no])
+AUSCM_CONFIGURE_DOWNLOAD_HDF5([1.10.1],[no])
 
 enablehdf5=no
 if (test "x" != "x$HDF5_DIR" && test "xno" != "x$HDF5_DIR"); then

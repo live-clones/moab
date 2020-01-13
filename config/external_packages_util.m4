@@ -645,13 +645,15 @@ AC_DEFUN([AUSCM_CONFIGURE_DOWNLOAD_HDF5],[
   # Set the default HDF5 download version
   m4_pushdef([HDF5_DOWNLOAD_VERSION],[$1])dnl
 
+  HDF5_DOWNLOAD_SRC_VERSION=$1
+
   # Invoke the download-hdf5 command
   m4_case( HDF5_DOWNLOAD_VERSION, 
-                                  [1.10.1], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([HDF5], [https://support.hdfgroup.org/ftp/HDF5/current/src/hdf5-1.10.1.tar.gz], [$2] ) ],
-                                  [1.8.19], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([HDF5], [https://support.hdfgroup.org/ftp/HDF5/prev-releases/hdf5-1.8/hdf5-1.8.19/src/hdf5-1.8.19.tar.gz], [$2] ) ],
-                                  [1.8.15p1], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([HDF5], [https://support.hdfgroup.org/ftp/HDF5/prev-releases/hdf5-1.8/hdf5-1.8.15-patch1/src/hdf5-1.8.15-patch1.tar.gz], [$2] ) ],
-                                  [1.8.12], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([HDF5], [https://support.hdfgroup.org/ftp/HDF5/prev-releases/hdf5-1.8/hdf5-1.8.12/src/hdf5-1.8.12.tar.gz], [$2] ) ],
-                                  [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([HDF5], [https://support.hdfgroup.org/ftp/HDF5/prev-releases/hdf5-1.8/hdf5-1.8.19/src/hdf5-1.8.19.tar.gz], [$2] ) ] 
+                                  [1.10.6], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([HDF5], [https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.6/src/hdf5-1.10.6.tar.gz], [$2] ) ],
+                                  [1.10.1], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([HDF5], [https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.1/src/hdf5-1.10.1.tar.gz], [$2] ) ],
+                                  [1.8.21], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([HDF5], [https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8/hdf5-1.8.21/src/hdf5-1.8.21.tar.gz], [$2] ) ],
+                                  [1.8.12], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([HDF5], [https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8/hdf5-1.8.12/src/hdf5-1.8.12.tar.gz], [$2] ) ],
+                                  [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([HDF5], [https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.1/src/hdf5-1.10.1.tar.gz], [$2] ) ] 
           )
 
   if (test "x$downloadhdf5" == "xyes") ; then
@@ -733,6 +735,8 @@ AC_DEFUN([AUSCM_AUTOMATED_CONFIGURE_HDF5],[
     # VSM: Adding --enable-debug=all is causing problems in h5legacy test. So disabling debug symbols for HDF5.
     #if (test "$enable_debug" != "no"); then
     #  configure_command="$configure_command --enable-debug"
+    #  For version 1.10.x, use option
+    #      --enable-build-mode=debug
     #fi
     if (test "$enable_shared" != "no"); then
       configure_command="$configure_command --enable-shared"
@@ -741,7 +745,11 @@ AC_DEFUN([AUSCM_AUTOMATED_CONFIGURE_HDF5],[
       configure_command="$configure_command --enable-fortran"
     fi
     if (test "$enable_cxx_optimize" != "no"); then
-      configure_command="$configure_command --enable-production=yes"
+      if (test "$HDF5_DOWNLOAD_SRC_VERSION" != "1.8.12" || test "$HDF5_DOWNLOAD_SRC_VERSION" != "1.8.21"); then
+        configure_command="$configure_command --enable-build-mode=production"
+      else
+        configure_command="$configure_command --enable-production=yes"
+      fi
     fi
     if (test "$enablempi" != "no"); then
       configure_command="$configure_command --enable-parallel"
