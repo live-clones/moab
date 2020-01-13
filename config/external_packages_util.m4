@@ -836,11 +836,12 @@ AC_DEFUN([AUSCM_CONFIGURE_DOWNLOAD_NETCDF],[
   m4_pushdef([NETCDF_DOWNLOAD_VERSION],[$1])dnl
 
   # Invoke the download-netcdf command
-  m4_case( NETCDF_DOWNLOAD_VERSION, [4.4.1], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([NetCDF], [ftp://ftp.unidata.ucar.edu/pub/netcdf/netcdf-4.4.1.tar.gz], [$2] ) ],
-                                  [4.3.3], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([NetCDF], [ftp://ftp.unidata.ucar.edu/pub/netcdf/netcdf-4.3.3.1.tar.gz], [$2] ) ],
-                                  [4.3.2], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([NetCDF], [ftp://ftp.unidata.ucar.edu/pub/netcdf/old/netcdf-4.3.2.tar.gz], [$2] ) ],
-                                  [4.2.0], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([NetCDF], [ftp://ftp.unidata.ucar.edu/pub/netcdf/old/netcdf-4.2.1.1.tar.gz], [$2] ) ],
-                                  [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([NetCDF], [ftp://ftp.unidata.ucar.edu/pub/netcdf/old/netcdf-4.3.2.tar.gz], [$2] ) ] )
+  m4_case( NETCDF_DOWNLOAD_VERSION, 
+                                  [4.7.3], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([NetCDF], [https://github.com/Unidata/netcdf-c/archive/v4.7.3.tar.gz], [$2] ) ],
+                                  [4.6.3], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([NetCDF], [https://github.com/Unidata/netcdf-c/archive/v4.6.3.tar.gz], [$2] ) ],
+                                  [4.5.0], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([NetCDF], [https://github.com/Unidata/netcdf-c/archive/v4.5.0.tar.gz], [$2] ) ],
+                                  [4.4.1], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([NetCDF], [https://github.com/Unidata/netcdf-c/archive/v4.4.1.1.tar.gz], [$2] ) ],
+                                  [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([NetCDF], [https://github.com/Unidata/netcdf-c/archive/v4.6.3.tar.gz], [$2] ) ] )
 
   if (test "x$downloadnetcdf" == "xyes") ; then
     # download the latest NetCDF sources, configure and install

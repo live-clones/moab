@@ -49,9 +49,9 @@ AC_DEFUN([FATHOM_CHECK_NETCDF_LIMITS],[
 #######################################################################################
 AC_DEFUN([FATHOM_CHECK_NETCDF],[
 
-  # Supported NetCDF versions: 4.3.3, 4.3.2, 4.2.1
+  # Supported NetCDF versions: 4.4.1.1, 4.5.0, 4.6.3, 4.7.3
   # Arguments: 1) Default Version Number, 2) Download by default ?
-  AUSCM_CONFIGURE_DOWNLOAD_NETCDF([4.3.3],[no])
+  AUSCM_CONFIGURE_DOWNLOAD_NETCDF([4.6.3],[no])
 
 AC_MSG_CHECKING([if NetCDF support is enabled])
 AC_ARG_WITH(netcdf, 
