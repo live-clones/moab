@@ -474,13 +474,6 @@ int main ( int argc, char* argv[] )
                                                  );MB_CHK_ERR ( rval );
             ctx.timer_pop();
 
-
-            /*
-               ctx.timer_push ( "apply weights onto a vector" );
-               rval = weightMap->ApplyWeights ( srcVals, tgtvals, false);MB_CHK_ERR ( rval );
-               ctx.timer_pop();
-            */
-
             /*
             * the file can be written in parallel, and it will contain additional tags defined by the user
             * we may extend the method to write only desired tags to the file
