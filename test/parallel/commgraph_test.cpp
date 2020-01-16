@@ -220,8 +220,9 @@ int commgraphtest()
     CHECKIERR(ierr, "Cannot load Phys ATM mesh")
   }
 
+
+  if (MPI_COMM_NULL != joinComm)
   {
-    if (MPI_COMM_NULL != joinComm)
     ierr = iMOAB_ComputeCommGraph(cmpAtmPID, physAtmPID, &joinComm, &atmPEGroup, &atmPhysGroup,
           &typeA, &typeB, &cmpatm, &physatm);
     // it will generate parcomm graph between atm and atmPhys models
