@@ -460,7 +460,6 @@ int main ( int argc, char* argv[] )
             ctx.timer_pop();
 
             ctx.timer_push ( "compute weights with TempestRemap" );
-
             rval = weightMap->GenerateRemappingWeights ( ctx.disc_methods[0], ctx.disc_methods[1],      // std::string strInputType, std::string strOutputType,
                                                    ctx.disc_orders[0],  ctx.disc_orders[1],             // int nPin=4, int nPout=4,
                                                    ctx.fNoBubble, ctx.ensureMonotonicity,               // bool fNoBubble=true, int fMonotoneTypeID=0,
