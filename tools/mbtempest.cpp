@@ -60,7 +60,7 @@ struct ToolContext
         bool fNoConservation;
         bool fVolumetric;
         bool rrmGrids;
-        bool fBubble, fInputConcave, fOutputConcave;
+        bool fNoBubble, fInputConcave, fOutputConcave, fNoCheck;
 
 #ifdef MOAB_HAVE_MPI
         ToolContext ( moab::Interface* icore, moab::ParallelComm* p_pcomm ) :
@@ -74,7 +74,7 @@ struct ToolContext
             blockSize ( 5 ), outFilename ( "output.exo" ), intxFilename ( "" ), meshType ( moab::TempestRemapper::DEFAULT ),
             computeDual ( false ), computeWeights ( false ), ensureMonotonicity ( 0 ), 
             fNoConservation ( false ), fVolumetric ( false ), rrmGrids ( false ),
-            fBubble(false), fInputConcave(false), fOutputConcave(false)
+            fNoBubble(false), fInputConcave(false), fOutputConcave(false), fNoCheck(false)
         {
             inFilenames.resize ( 2 );
             doftag_names.resize( 2 );
@@ -460,8 +460,8 @@ int main ( int argc, char* argv[] )
 
             rval = weightMap->GenerateRemappingWeights ( ctx.disc_methods[0], ctx.disc_methods[1],        // std::string strInputType, std::string strOutputType,
                                                    ctx.disc_orders[0],  ctx.disc_orders[1],  // int nPin=4, int nPout=4,
-                                                   ctx.fBubble, ctx.ensureMonotonicity,            // bool fBubble=true, int fMonotoneTypeID=0,
-                                                   ctx.fVolumetric, ctx.fNoConservation, false, // bool fVolumetric=false, bool fNoConservation=false, bool fNoCheck=false,
+                                                   ctx.fNoBubble, ctx.ensureMonotonicity,            // bool fNoBubble=true, int fMonotoneTypeID=0,
+                                                   ctx.fVolumetric, ctx.fNoConservation, ctx.fNoCheck, // bool fVolumetric=false, bool fNoConservation=false, bool fNoCheck=false,
                                                    ctx.doftag_names[0], ctx.doftag_names[1],
                                                    "", //"",   // std::string strVariables="", std::string strOutputMap="",
                                                    "", "",   // std::string strInputData="", std::string strOutputData="",
@@ -511,19 +511,19 @@ int main ( int argc, char* argv[] )
 
                     std::ofstream metafile(sstr.str());
                     metafile << "Generator = MOAB-TempestRemap (mbtempest) Offline Regridding Weight Generator" << std::endl;
-                    metafile << "bubble = " << (ctx.fBubble ? "true" : "false") << std::endl;
-                    metafile << "concave_dst = " << (ctx.fInputConcave ? "true" : "false") << std::endl;
-                    metafile << "concave_src = " << (ctx.fOutputConcave ? "true" : "false") << std::endl;
                     metafile << "domain_a = " << ctx.inFilenames[0] << std::endl;
                     metafile << "domain_b = " << ctx.inFilenames[1] << std::endl;
+                    metafile << "grid_file_src = " << ctx.inFilenames[0] << std::endl;
                     metafile << "grid_file_dst = " << ctx.inFilenames[1] << std::endl;
                     metafile << "grid_file_ovr = " << (ctx.intxFilename.size() ? ctx.intxFilename : "outOverlap.h5m") << std::endl;
-                    metafile << "grid_file_src = " << ctx.inFilenames[0] << std::endl;
                     metafile << "mono_type = " << ctx.ensureMonotonicity << std::endl;
-                    metafile << "np_dst = " << ctx.disc_orders[1] << std::endl;
                     metafile << "np_src = " << ctx.disc_orders[0] << std::endl;
-                    metafile << "type_dst = " << ctx.disc_methods[1] << std::endl;
+                    metafile << "np_dst = " << ctx.disc_orders[1] << std::endl;
                     metafile << "type_src = " << ctx.disc_methods[0] << std::endl;
+                    metafile << "type_dst = " << ctx.disc_methods[1] << std::endl;
+                    metafile << "bubble = " << (ctx.fNoBubble ? "false" : "true") << std::endl;
+                    metafile << "concave_src = " << (ctx.fInputConcave ? "true" : "false") << std::endl;
+                    metafile << "concave_dst = " << (ctx.fOutputConcave ? "true" : "false") << std::endl;
                     metafile << "version = " << "MOAB v5.1.0+" << std::endl;
                     metafile.close();
                 }
