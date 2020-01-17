@@ -460,7 +460,7 @@ int main ( int argc, char* argv[] )
 
             rval = weightMap->GenerateRemappingWeights ( ctx.disc_methods[0], ctx.disc_methods[1],        // std::string strInputType, std::string strOutputType,
                                                    ctx.disc_orders[0],  ctx.disc_orders[1],  // int nPin=4, int nPout=4,
-                                                   ctx.fBubble, ctx.ensureMonotonicity,            // bool fBubble=false, int fMonotoneTypeID=0,
+                                                   ctx.fBubble, ctx.ensureMonotonicity,            // bool fBubble=true, int fMonotoneTypeID=0,
                                                    ctx.fVolumetric, ctx.fNoConservation, false, // bool fVolumetric=false, bool fNoConservation=false, bool fNoCheck=false,
                                                    ctx.doftag_names[0], ctx.doftag_names[1],
                                                    "", //"",   // std::string strVariables="", std::string strOutputMap="",
@@ -645,7 +645,7 @@ moab::ErrorCode CreateTempestMesh ( ToolContext& ctx, moab::TempestRemapper& rem
     }
     else   // default
     {
-        err = GenerateCSMesh ( *tempest_mesh, ctx.blockSize, true, ctx.outFilename, "NetCDF4" );
+        err = GenerateCSMesh ( *tempest_mesh, ctx.blockSize, ctx.outFilename, "NetCDF4" );
 
         if ( err ) { rval = moab::MB_FAILURE; }
         else

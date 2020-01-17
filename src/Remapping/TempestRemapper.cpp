@@ -700,7 +700,7 @@ ErrorCode TempestRemapper::GenerateCSMeshMetadata(
 
     // create a temporary CS mesh
     // NOTE: This will not work for RRM grids. Need to run HOMME for that case anyway
-    err = GenerateCSMesh ( csMesh, res, true, "", "NetCDF4" );
+    err = GenerateCSMesh ( csMesh, res, "", "NetCDF4" );
     if ( err ) { MB_CHK_SET_ERR(MB_FAILURE, "Failed to generate CS mesh through TempestRemap");; }
 
     rval = this->GenerateMeshMetadata(csMesh, ntot_elements, ents, secondary_ents, dofTagName, nP);MB_CHK_SET_ERR(rval, "Failed in call to GenerateMeshMetadata");
