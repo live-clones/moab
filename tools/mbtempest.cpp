@@ -504,8 +504,7 @@ int main ( int argc, char* argv[] )
                 size_t lastindex = ctx.outFilename.find_last_of(".");
                 sstr.str("");
                 sstr << ctx.outFilename.substr(0, lastindex) << ".h5m";
-
-				// Write the map file to disk in parallel
+                // Write the map file to disk in parallel
                 rval = weightMap->WriteParallelMap(sstr.str().c_str());MB_CHK_ERR ( rval );
 
                 // Write out the metadata information for the map file
