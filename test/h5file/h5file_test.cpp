@@ -225,9 +225,7 @@ EntityHandle make_set( unsigned int options,
       moab_error( "add_entities" );
   }
 
-  ErrorCode rval;
   Tag id_tag = iface->globalId_tag();
-
   if (MB_SUCCESS != iface->tag_set_data( id_tag, &handle, 1, &id ))
     moab_error( "tag_set_data" );
 
