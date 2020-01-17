@@ -424,6 +424,7 @@ int main(int argc, char* argv[])
           iterAttributes->first.c_str(),
           iterAttributes->second.c_str());
       }
+      std::cout << "\n";
     }
 
     Tag globalIDTag, materialSetTag;
@@ -492,14 +493,24 @@ int main(int argc, char* argv[])
     }
 
     Tag srcIDTag, srcAreaTag, tgtIDTag, tgtAreaTag;
-    Tag smatRowdataTag, smatColdataTag, smatValsdataTag;
     rval = mbCore->tag_get_handle( "SourceGIDS" , srcIDTag);MB_CHK_ERR(rval);
     rval = mbCore->tag_get_handle( "SourceAreas" , srcAreaTag);MB_CHK_ERR(rval);
     rval = mbCore->tag_get_handle( "TargetGIDS" , tgtIDTag);MB_CHK_ERR(rval);
     rval = mbCore->tag_get_handle( "TargetAreas" , tgtAreaTag);MB_CHK_ERR(rval);
+    Tag smatRowdataTag, smatColdataTag, smatValsdataTag;
     rval = mbCore->tag_get_handle( "SMAT_ROWS" , smatRowdataTag);MB_CHK_ERR(rval);
     rval = mbCore->tag_get_handle( "SMAT_COLS" , smatColdataTag);MB_CHK_ERR(rval);
     rval = mbCore->tag_get_handle( "SMAT_VALS" , smatValsdataTag);MB_CHK_ERR(rval);
+    Tag srcCenterLon, srcCenterLat, tgtCenterLon, tgtCenterLat;
+    rval = mbCore->tag_get_handle( "SourceCoordCenterLon" , srcCenterLon);MB_CHK_ERR(rval);
+    rval = mbCore->tag_get_handle( "SourceCoordCenterLat" , srcCenterLat);MB_CHK_ERR(rval);
+    rval = mbCore->tag_get_handle( "TargetCoordCenterLon" , tgtCenterLon);MB_CHK_ERR(rval);
+    rval = mbCore->tag_get_handle( "TargetCoordCenterLat" , tgtCenterLat);MB_CHK_ERR(rval);
+    Tag srcVertexLon, srcVertexLat, tgtVertexLon, tgtVertexLat;
+    rval = mbCore->tag_get_handle( "SourceCoordVertexLon" , srcVertexLon);MB_CHK_ERR(rval);
+    rval = mbCore->tag_get_handle( "SourceCoordVertexLat" , srcVertexLat);MB_CHK_ERR(rval);
+    rval = mbCore->tag_get_handle( "TargetCoordVertexLon" , tgtVertexLon);MB_CHK_ERR(rval);
+    rval = mbCore->tag_get_handle( "TargetCoordVertexLat" , tgtVertexLat);MB_CHK_ERR(rval);
 
     // Get sets entities, by type
     moab::Range sets;
@@ -565,47 +576,29 @@ int main(int argc, char* argv[])
     NcDim * dimNB = ncMap.add_dim("n_b", nDofB);
 
     // Source and Target verticecs per elements
-    NcDim * dimNVA = ncMap.add_dim("nv_a", (nA == nDofA ? nVA : 1));
-    NcDim * dimNVB = ncMap.add_dim("nv_b", (nB == nDofB ? nVB : 1));
+    const int nva = (nA == nDofA ? nVA : 1);
+    const int nvb = (nB == nDofB ? nVB : 1);
+    NcDim * dimNVA = ncMap.add_dim("nv_a", nva);
+    NcDim * dimNVB = ncMap.add_dim("nv_b", nvb);
 
     // Source and Target verticecs per elements
-    NcDim * dimNEA = ncMap.add_dim("ne_a", nA);
-    NcDim * dimNEB = ncMap.add_dim("ne_b", nB);
+    // NcDim * dimNEA = ncMap.add_dim("ne_a", nA);
+    // NcDim * dimNEB = ncMap.add_dim("ne_b", nB);
 
-    bool writeXYCoords = false;
     if (writeXYCoords)
     {
-      // TODO: This is only true for FV source and target mesh representations
-      // For CG/DG representations, we really need the actual location of the global 
-      // GLL quadrature points in RLL notation
-      // NOTE: So when either source or target is not FV (nA != nDofA), we need to do
-      // something special. Also change the variable definition below as well.
-
-      // TODO: This is only true for FV source and target mesh representations
-      // For CG/DG representations, we really need the actual location of the global 
-      // GLL quadrature points in RLL notation
-      moab::Range src_elems, tgt_elems;
-      moab::Range src_verts, tgt_verts;
-      rval = mbCore->get_entities_by_dimension(source_mesh, 2, src_elems);MB_CHK_ERR(rval);
-      rval = mbCore->get_entities_by_dimension(source_mesh, 0, src_verts);MB_CHK_ERR(rval);
-      rval = mbCore->get_entities_by_dimension(target_mesh, 2, tgt_elems);MB_CHK_ERR(rval);
-      rval = mbCore->get_entities_by_dimension(target_mesh, 0, tgt_verts);MB_CHK_ERR(rval);
-      std::vector<int> src_elgid(src_elems.size()), tgt_elgid(tgt_elems.size());
-      rval = mbCore->tag_get_data(globalIDTag, src_elems, src_elgid.data());MB_CHK_ERR(rval);
-      rval = mbCore->tag_get_data(globalIDTag, tgt_elems, tgt_elgid.data());MB_CHK_ERR(rval);
-
       // Write coordinates
-      NcVar * varYCA = ncMap.add_var("yc_a", ncDouble, dimNEA/*dimNA*/);
-      NcVar * varYCB = ncMap.add_var("yc_b", ncDouble, dimNEB/*dimNB*/);
+      NcVar * varYCA = ncMap.add_var("yc_a", ncDouble, dimNA/*dimNA*/);
+      NcVar * varYCB = ncMap.add_var("yc_b", ncDouble, dimNB/*dimNB*/);
 
-      NcVar * varXCA = ncMap.add_var("xc_a", ncDouble, dimNEA/*dimNA*/);
-      NcVar * varXCB = ncMap.add_var("xc_b", ncDouble, dimNEB/*dimNB*/);
+      NcVar * varXCA = ncMap.add_var("xc_a", ncDouble, dimNA/*dimNA*/);
+      NcVar * varXCB = ncMap.add_var("xc_b", ncDouble, dimNB/*dimNB*/);
 
-      NcVar * varYVA = ncMap.add_var("yv_a", ncDouble, dimNEA/*dimNA*/, dimNVA);
-      NcVar * varYVB = ncMap.add_var("yv_b", ncDouble, dimNEB/*dimNB*/, dimNVB);
+      NcVar * varYVA = ncMap.add_var("yv_a", ncDouble, dimNA/*dimNA*/, dimNVA);
+      NcVar * varYVB = ncMap.add_var("yv_b", ncDouble, dimNB/*dimNB*/, dimNVB);
 
-      NcVar * varXVA = ncMap.add_var("xv_a", ncDouble, dimNEA/*dimNA*/, dimNVA);
-      NcVar * varXVB = ncMap.add_var("xv_b", ncDouble, dimNEB/*dimNB*/, dimNVB);
+      NcVar * varXVA = ncMap.add_var("xv_a", ncDouble, dimNA/*dimNA*/, dimNVA);
+      NcVar * varXVB = ncMap.add_var("xv_b", ncDouble, dimNB/*dimNB*/, dimNVB);
 
       varYCA->add_att("units", "degrees");
       varYCB->add_att("units", "degrees");
@@ -619,118 +612,96 @@ int main(int argc, char* argv[])
       varXVA->add_att("units", "degrees");
       varXVB->add_att("units", "degrees");
 
-      double coords[3];
-      DataArray1D<double> dSourceCenterLat, dSourceCenterLon;
-      DataArray2D<double> dSourceVertexLat, dSourceVertexLon;
-      dSourceCenterLat.Allocate(nDofA);
-      dSourceCenterLon.Allocate(nDofA);
-      dSourceVertexLat.Allocate(nA, nVA);
-      dSourceVertexLon.Allocate(nA, nVA);
+      std::vector<double> src_centerlat, src_centerlon;
+      int srccenter_size;
+      rval = get_vartag_data(mbCore, srcCenterLat, sets, srccenter_size, src_centerlat);MB_CHK_SET_ERR(rval, "Getting source mesh areas failed");
+      rval = get_vartag_data(mbCore, srcCenterLon, sets, srccenter_size, src_centerlon);MB_CHK_SET_ERR(rval, "Getting target mesh areas failed");
+      std::vector<double> src_glob_centerlat(nDofA, 0.0), src_glob_centerlon(nDofA, 0.0);
+      std::vector<int> src_elem_ordering;
+      for (int i=0; i < srccenter_size; ++i) {
+          assert(i < srcID_size);
+          assert(src_gids[i] < nDofA);
 
-      {
-        for (unsigned i=0; i < src_elems.size(); ++i)
-        {
-          const EntityHandle& elem = src_elems[i];
-          rval = mbCore->get_coords(&elem, 1, coords);MB_CHK_ERR(rval);
-          double mag = std::sqrt(coords[0]*coords[0]+coords[1]*coords[1]+coords[2]*coords[2]);
-          coords[0] /= mag;
-          coords[1] /= mag;
-          coords[2] /= mag;
-
-          XYZtoRLL_Deg(
-            coords[0], coords[1], coords[2],
-            dSourceCenterLat[src_elgid[i]-1],
-            dSourceCenterLon[src_elgid[i]-1]);
-
-          const EntityHandle* conn;
-          int nnodes=0;
-          rval = mbCore->get_connectivity(elem, conn, nnodes);MB_CHK_ERR(rval);
-          std::cout << "nVA = " << nVA << " and nnodes = " << nnodes << std::endl;
-          assert(nVA >= nnodes);
-          std::vector<double> vcoords(nnodes*3);
-          rval = mbCore->get_coords(conn, nnodes, &vcoords[0]);MB_CHK_ERR(rval);
-
-          for (int iv=0; iv < nnodes; ++iv)
+          src_elem_ordering.push_back(src_gids[i]);
+          if (src_centerlat[i] > src_glob_centerlat[src_gids[i]] || src_centerlon[i] > src_glob_centerlon[src_gids[i]])
           {
-            const int offset = iv*3;
-            double magc = std::sqrt(coords[0]*coords[0]+coords[1]*coords[1]+coords[2]*coords[2]);
-            vcoords[offset+0] /= magc;
-            vcoords[offset+1] /= magc;
-            vcoords[offset+2] /= magc;
-            XYZtoRLL_Deg(vcoords[offset+0], vcoords[offset+1], vcoords[offset+2],
-                        dSourceVertexLat[i][iv], dSourceVertexLon[i][iv]);
+            src_glob_centerlat[src_gids[i]] = src_centerlat[i];
+            src_glob_centerlon[src_gids[i]] = src_centerlon[i];
           }
+      }
 
-          // If we have less nodes than nVA - copy the last node over
-          for (int iv=nnodes; iv < nVA; ++iv)
+      std::vector<double> tgt_centerlat, tgt_centerlon;
+      int tgtcenter_size;
+      rval = get_vartag_data(mbCore, tgtCenterLat, sets, tgtcenter_size, tgt_centerlat);MB_CHK_SET_ERR(rval, "Getting source mesh areas failed");
+      rval = get_vartag_data(mbCore, tgtCenterLon, sets, tgtcenter_size, tgt_centerlon);MB_CHK_SET_ERR(rval, "Getting target mesh areas failed");
+      std::vector<double> tgt_glob_centerlat(nDofB, 0.0), tgt_glob_centerlon(nDofB, 0.0);
+      std::vector<int> tgt_elem_ordering;
+      for (int i=0; i < tgtcenter_size; ++i) {
+          assert(i < tgtID_size);
+          assert(tgt_gids[i] < nDofB);
+
+          tgt_elem_ordering.push_back(tgt_gids[i]);
+          if (tgt_centerlat[i] > tgt_glob_centerlat[tgt_gids[i]] || tgt_centerlon[i] > tgt_glob_centerlon[tgt_gids[i]])
           {
-            dSourceVertexLat[i][iv] = dSourceVertexLat[i][nnodes-1];
-            dSourceVertexLon[i][iv] = dSourceVertexLon[i][nnodes-1];
+            tgt_glob_centerlat[tgt_gids[i]] = tgt_centerlat[i];
+            tgt_glob_centerlon[tgt_gids[i]] = tgt_centerlon[i];
+          }
+      }
+
+      varYCA->put(&(src_glob_centerlat[0]), nDofA);
+      varYCB->put(&(tgt_glob_centerlat[0]), nDofB);
+      varXCA->put(&(src_glob_centerlon[0]), nDofA);
+      varXCB->put(&(tgt_glob_centerlon[0]), nDofB);
+
+      src_centerlat.clear();
+      src_centerlon.clear();
+      tgt_centerlat.clear();
+      tgt_centerlon.clear();
+      // std::cout << "Source mesh = " << source_mesh << " and target_mesh = " << target_mesh << " and overlap_mesh = " << overlap_mesh << std::endl;
+
+      std::vector<double> src_glob_vertexlat(nDofA*nva, 0.0), src_glob_vertexlon(nDofA*nva, 0.0);
+      if (nva > 1)
+      {
+        std::vector<double> src_vertexlat, src_vertexlon;
+        int srcvertex_size;
+        rval = get_vartag_data(mbCore, srcVertexLat, sets, srcvertex_size, src_vertexlat);MB_CHK_SET_ERR(rval, "Getting source mesh areas failed");
+        rval = get_vartag_data(mbCore, srcVertexLon, sets, srcvertex_size, src_vertexlon);MB_CHK_SET_ERR(rval, "Getting target mesh areas failed");
+        int offset = 0;
+        for (unsigned vIndex = 0; vIndex < src_elem_ordering.size(); ++vIndex)
+        {
+            const int boffset = src_elem_ordering[vIndex]*nva;
+            for (int vNV = 0; vNV < nva; ++vNV, ++offset)
+            {
+              src_glob_vertexlat[boffset+vNV] = src_vertexlat[offset];
+              src_glob_vertexlon[boffset+vNV] = src_vertexlon[offset];
+            }
+        }
+      }
+
+      std::vector<double> tgt_glob_vertexlat(nDofB*nvb, 0.0), tgt_glob_vertexlon(nDofB*nvb, 0.0);
+      if (nvb > 1)
+      {
+        std::vector<double> tgt_vertexlat, tgt_vertexlon;
+        int tgtvertex_size;
+        rval = get_vartag_data(mbCore, tgtVertexLat, sets, tgtvertex_size, tgt_vertexlat);MB_CHK_SET_ERR(rval, "Getting source mesh areas failed");
+        rval = get_vartag_data(mbCore, tgtVertexLon, sets, tgtvertex_size, tgt_vertexlon);MB_CHK_SET_ERR(rval, "Getting target mesh areas failed");
+        int offset = 0;
+        for (unsigned vIndex = 0; vIndex < tgt_elem_ordering.size(); ++vIndex)
+        {
+          const int boffset = tgt_elem_ordering[vIndex]*nvb;
+          for (int vNV = 0; vNV < nvb; ++vNV, ++offset)
+          {
+            tgt_glob_vertexlat[boffset+vNV] = tgt_vertexlat[offset];
+            tgt_glob_vertexlon[boffset+vNV] = tgt_vertexlon[offset];
           }
         }
       }
 
-      DataArray1D<double> dTargetCenterLat, dTargetCenterLon;
-      DataArray2D<double> dTargetVertexLat, dTargetVertexLon;
-      dTargetCenterLat.Allocate(nDofB);
-      dTargetCenterLon.Allocate(nDofB);
-      dTargetVertexLat.Allocate(nB, nVB);
-      dTargetVertexLon.Allocate(nB, nVB);
+      varYVA->put(&(src_glob_vertexlat[0]), nDofA, nva);
+      varYVB->put(&(tgt_glob_vertexlat[0]), nDofB, nvb);
 
-      {
-        for (unsigned i=0; i < tgt_elems.size(); ++i)
-        {
-          const EntityHandle& elem = tgt_elems[i];
-          rval = mbCore->get_coords(&elem, 1, coords);MB_CHK_ERR(rval);
-          double mag = std::sqrt(coords[0]*coords[0]+coords[1]*coords[1]+coords[2]*coords[2]);
-          coords[0] /= mag;
-          coords[1] /= mag;
-          coords[2] /= mag;
-
-          XYZtoRLL_Deg(
-            coords[0], coords[1], coords[2],
-            dTargetCenterLat[tgt_elgid[i]-1],
-            dTargetCenterLon[tgt_elgid[i]-1]);
-
-          const EntityHandle* conn;
-          int nnodes=0;
-          rval = mbCore->get_connectivity(elem, conn, nnodes);MB_CHK_ERR(rval);
-          assert(nVB >= nnodes);
-          std::vector<double> vcoords(nnodes*3);
-          rval = mbCore->get_coords(conn, nnodes, &vcoords[0]);MB_CHK_ERR(rval);
-
-          for (int iv=0; iv < nnodes; ++iv)
-          {
-            const int offset = iv*3;
-            double magc = std::sqrt(coords[0]*coords[0]+coords[1]*coords[1]+coords[2]*coords[2]);
-            vcoords[offset+0] /= magc;
-            vcoords[offset+1] /= magc;
-            vcoords[offset+2] /= magc;
-            XYZtoRLL_Deg(vcoords[offset+0], vcoords[offset+1], vcoords[offset+2],
-                        dTargetVertexLat[i][iv], dTargetVertexLon[i][iv]);
-          }
-          // If we have less nodes than nVA - copy the last node over
-          for (int iv=nnodes; iv < nVA; ++iv)
-          {
-            dTargetVertexLat[i][iv] = dTargetVertexLat[i][nnodes-1];
-            dTargetVertexLon[i][iv] = dTargetVertexLon[i][nnodes-1];
-          }
-        }
-      }
-
-      varYCA->put(&(dSourceCenterLat[0]), nA/*DofA*/);
-      varYCB->put(&(dTargetCenterLat[0]), nB/*nDofB*/);
-
-      varXCA->put(&(dSourceCenterLon[0]), nA/*nDofA*/);
-      varXCB->put(&(dTargetCenterLon[0]), nB/*nDofB*/);
-
-      std::cout << "Source mesh = " << source_mesh << " and target_mesh = " << target_mesh << " and overlap_mesh = " << overlap_mesh << std::endl;
-
-      varYVA->put(&(dSourceVertexLat[0][0]), nA, nVA);
-      varYVB->put(&(dTargetVertexLat[0][0]), nB, nVB);
-
-      varXVA->put(&(dSourceVertexLon[0][0]), nA, nVA);
-      varXVB->put(&(dTargetVertexLon[0][0]), nB, nVB);
+      varXVA->put(&(src_glob_vertexlon[0]), nDofA, nva);
+      varXVB->put(&(tgt_glob_vertexlon[0]), nDofB, nvb);
     }
 
     // Write areas
