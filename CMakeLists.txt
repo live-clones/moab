@@ -488,7 +488,7 @@ SET(MOAB_DOCS ${MOAB_DOCS}
 )  
 install(FILES ${MOAB_DOCS} DESTINATION share/doc/moab)
 
-CONFIGURE_FILE(examples/makefile.config.in "${PROJECT_BINARY_DIR}/share/examples/makefile.config" @ONLY)
+CONFIGURE_FILE(examples/makefile.config.cmake "${PROJECT_BINARY_DIR}/share/examples/makefile.config" @ONLY)
 install(FILES ${PROJECT_BINARY_DIR}/share/examples/makefile.config
   DESTINATION share/examples)
   
