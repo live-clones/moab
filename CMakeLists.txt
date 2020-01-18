@@ -529,11 +529,13 @@ SET(MOAB_EXAMPLES ${MOAB_EXAMPLES}
   examples/advanced/ExtrudePoly.cpp 
   examples/advanced/GenLargeMesh.cpp 
   examples/advanced/LloydRelaxation.cpp 
-  examples/advanced/VisTags.cpp )
+  examples/advanced/VisTags.cpp
+  examples/advanced/CoupleMGen.cpp )
 SET(MOAB_EXAMPLES ${MOAB_EXAMPLES}
   examples/fortran/makefile 
   examples/fortran/DirectAccessNoHolesF90.F90 
-  examples/fortran/PushParMeshIntoMoabF90.F90 )
+  examples/fortran/PushParMeshIntoMoabF90.F90
+  examples/fortran/MigrateMesh.F90 )
 SET(MOAB_EXAMPLES ${MOAB_EXAMPLES}
   examples/python/makefile 
   examples/python/laplaciansmoother.py )
@@ -541,7 +543,8 @@ SET(MOAB_EXAMPLES ${MOAB_EXAMPLES}
   examples/apps/makefile )
 SET(MOAB_EXAMPLES ${MOAB_EXAMPLES}
   examples/apps/earth/makefile 
-  examples/apps/earth/ContinentsOnGlobe.cpp )
+  examples/apps/earth/ContinentsOnGlobe.cpp 
+  examples/apps/earth/BoundaryContinents.cpp )
 
 include(AutoconfHeader)
 moab_install_docs(${MOAB_EXAMPLES})
