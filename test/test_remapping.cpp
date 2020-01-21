@@ -79,7 +79,7 @@ void test_tempest_cs_create()
 
   std::cout << "Creating TempestRemap Cubed-Sphere Mesh ...\n";
   Mesh tempest_mesh;
-  int ierr = GenerateCSMesh(tempest_mesh, blockSize, false, outFilename, "NetCDF4");
+  int ierr = GenerateCSMesh(tempest_mesh, blockSize, outFilename, "NetCDF4");
   CHECK_EQUAL(ierr, 0);
 
   // Compute the surface area of CS mesh
