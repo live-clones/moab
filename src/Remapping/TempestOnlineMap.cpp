@@ -749,7 +749,7 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
         double dTotalAreaInput = 0.0, dTotalAreaOutput = 0.0;
         if (!m_bPointCloudSource)
         {
-            // Calculate Face areas
+            // Calculate Input Mesh Face areas
             if ( is_root ) dbgprint.printf ( 0, "Calculating input mesh Face areas\n" );
             double dTotalAreaInput_loc = m_meshInput->CalculateFaceAreas(fInputConcave);
             dTotalAreaInput = dTotalAreaInput_loc;
@@ -760,18 +760,11 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
 
             // Input mesh areas
             m_meshInputCov->CalculateFaceAreas(fInputConcave);
-            if ( eInputType == DiscretizationType_FV )
-            {
-                this->SetSourceAreas ( m_meshInputCov->vecFaceArea );
-                if (m_meshInputCov->vecMask.IsAttached()) {
-                    this->SetSourceMask(m_meshInputCov->vecMask);
-                }
-            }
         }
 
         if (!m_bPointCloudTarget)
         {
-            // Calculate Face areas
+            // Calculate Output Mesh Face areas
             if ( is_root ) dbgprint.printf ( 0, "Calculating output mesh Face areas\n" );
             double dTotalAreaOutput_loc = m_meshOutput->CalculateFaceAreas(fOutputConcave);
             dTotalAreaOutput = dTotalAreaOutput_loc;
@@ -779,15 +772,6 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
             if (m_pcomm) MPI_Reduce ( &dTotalAreaOutput_loc, &dTotalAreaOutput, 1, MPI_DOUBLE, MPI_SUM, 0, m_pcomm->comm() );
     #endif
             if ( is_root ) dbgprint.printf ( 0, "Output Mesh Geometric Area: %1.15e\n", dTotalAreaOutput );
-
-            // Output mesh areas
-            if ( eOutputType == DiscretizationType_FV )
-            {
-                this->SetTargetAreas ( m_meshOutput->vecFaceArea );
-                if (m_meshOutput->vecMask.IsAttached()) {
-                    this->SetTargetMask(m_meshOutput->vecMask);
-                }
-            }
         }
 
         if (!m_bPointCloud)
@@ -804,16 +788,13 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
                               "    Possible mesh file corruption?" );
             }
 
-            for ( unsigned i = 0; i < m_meshOverlap->vecSourceFaceIx.size(); i++ )
+            for ( unsigned i = 0; i < m_meshOverlap->faces.size(); i++ )
             {
                 if ( m_meshOverlap->vecSourceFaceIx[i] + 1 > ixSourceFaceMax )
-                {
                     ixSourceFaceMax = m_meshOverlap->vecSourceFaceIx[i] + 1;
-                }
+
                 if ( m_meshOverlap->vecTargetFaceIx[i] + 1 > ixTargetFaceMax )
-                {
                     ixTargetFaceMax = m_meshOverlap->vecTargetFaceIx[i] + 1;
-                }
             }
 
             // Check for forward correspondence in overlap mesh
@@ -835,7 +816,6 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
             //                   m_meshInputCov->faces.size(), m_meshOutput->faces.size(), ixSourceFaceMax, ixTargetFaceMax );
             // }
 
-
             // Calculate Face areas
             if ( is_root ) dbgprint.printf ( 0, "Calculating overlap mesh Face areas\n" );
             double dTotalAreaOverlap_loc = m_meshOverlap->CalculateFaceAreas(false);
@@ -844,6 +824,53 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
             if (m_pcomm) MPI_Reduce ( &dTotalAreaOverlap_loc, &dTotalAreaOverlap, 1, MPI_DOUBLE, MPI_SUM, 0, m_pcomm->comm() );
     #endif
             if ( is_root ) dbgprint.printf ( 0, "Overlap Mesh Area: %1.15e\n", dTotalAreaOverlap );
+
+            // Correct areas to match the areas calculated in the overlap mesh
+            // if (fCorrectAreas)
+            {
+                if ( is_root ) dbgprint.printf ( 0, "Correcting source/target areas to overlap mesh areas\n");
+                DataArray1D<double> dSourceArea(m_meshInputCov->faces.size());
+                DataArray1D<double> dTargetArea(m_meshOutput->faces.size());
+
+                _ASSERT(m_meshOverlap->vecSourceFaceIx.size() == m_meshOverlap->faces.size());
+                _ASSERT(m_meshOverlap->vecTargetFaceIx.size() == m_meshOverlap->faces.size());
+                _ASSERT(m_meshOverlap->vecFaceArea.GetRows() == m_meshOverlap->faces.size());
+
+                _ASSERT(m_meshInputCov->vecFaceArea.GetRows() == m_meshInputCov->faces.size());
+                _ASSERT(m_meshOutput->vecFaceArea.GetRows() == m_meshOutput->faces.size());
+
+                for (size_t i = 0; i < m_meshOverlap->faces.size(); i++) {
+                    dSourceArea[ m_meshOverlap->vecSourceFaceIx[i] ] += m_meshOverlap->vecFaceArea[i];
+                    dTargetArea[ m_meshOverlap->vecTargetFaceIx[i] ] += m_meshOverlap->vecFaceArea[i];
+                }
+
+                for (size_t i = 0; i < m_meshInputCov->faces.size(); i++) {
+                    if (fabs(dSourceArea[i] - m_meshInputCov->vecFaceArea[i]) < 1.0e-10) {
+                        m_meshInputCov->vecFaceArea[i] = dSourceArea[i];
+                    }
+                }
+                for (size_t i = 0; i < m_meshOutput->faces.size(); i++) {
+                    if (fabs(dTargetArea[i] - m_meshOutput->vecFaceArea[i]) < 1.0e-10) {
+                        m_meshOutput->vecFaceArea[i] = dTargetArea[i];
+                    }
+                }
+            }
+
+            // Set source mesh areas in map
+            if (!m_bPointCloudSource && eInputType == DiscretizationType_FV) {
+                this->SetSourceAreas(m_meshInputCov->vecFaceArea);
+                if (m_meshInputCov->vecMask.IsAttached()) {
+                    this->SetSourceMask(m_meshInputCov->vecMask);
+                }
+            }
+
+            // Set target mesh areas in map
+            if (!m_bPointCloudTarget && eOutputType == DiscretizationType_FV) {
+                this->SetTargetAreas(m_meshOutput->vecFaceArea);
+                if (m_meshOutput->vecMask.IsAttached()) {
+                    this->SetTargetMask(m_meshOutput->vecMask);
+                }
+            }
 
             // Partial cover
             int fNoCheckLoc = fNoCheckGlob;
@@ -1084,12 +1111,15 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
 #ifdef MOAB_HAVE_MPI
             if (m_pcomm) MPI_Allreduce ( &dNumericalArea_loc, &dNumericalArea, 1, MPI_DOUBLE, MPI_SUM, m_pcomm->comm() );
 #endif
-            if ( is_root ) dbgprint.printf ( 0, "Input Mesh Numerical Area: %1.15e\n", dNumericalArea );
-
-            if ( fabs ( dNumericalArea - dTotalAreaInput ) > 1.0e-12 )
+            if ( is_root )
             {
-                dbgprint.printf ( 0, "WARNING: Significant mismatch between input mesh "
-                                  "numerical area and geometric area\n" );
+                dbgprint.printf ( 0, "Input Mesh Numerical Area: %1.15e\n", dNumericalArea );
+
+                if ( fabs ( dNumericalArea - dTotalAreaInput ) > 1.0e-12 )
+                {
+                    dbgprint.printf ( 0, "WARNING: Significant mismatch between input mesh "
+                                    "numerical area and geometric area\n" );
+                }
             }
 
             if ( dataGLLNodesSrcCov.GetSubColumns() != m_meshInputCov->faces.size() )
