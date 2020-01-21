@@ -368,7 +368,8 @@ int main ( int argc, char* argv[] )
             int err = GenerateOfflineMapWithMeshes (  weightMap, *ctx.meshes[0], *ctx.meshes[1], *ctx.meshes[2],
                       "", "",     // std::string strInputMeta, std::string strOutputMeta,
                       ctx.disc_methods[0], ctx.disc_methods[1], // std::string strInputType, std::string strOutputType,
-                      ctx.disc_orders[0], ctx.disc_orders[1]  // int nPin=4, int nPout=4,
+                      ctx.disc_orders[0], ctx.disc_orders[1],  // int nPin=4, int nPout=4,
+                      ctx.fNoBubble, true, ctx.ensureMonotonicity // bool fNoBubble = false, bool fCorrectAreas = false, int fMonotoneTypeID = 0
                                                    );
             ctx.timer_pop();
 
