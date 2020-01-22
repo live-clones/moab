@@ -230,6 +230,8 @@ if (test "x$enable_blaslapack" != "xno"); then
   LIBS="$LAPACK_LIBS $BLAS_LIBS $LIBS"
 fi
 
+AC_SUBST(enable_blaslapack)
+
 ################################################################################
 #                                 pymoab
 ################################################################################
@@ -523,6 +525,12 @@ else
   VERSION_STRING="AC_PACKAGE_STRING (Beta)"
 fi
 AC_DEFINE_UNQUOTED(VERSION_STRING,"${VERSION_STRING}",[MOAB Version String])
+
+# reverse engineer the parameters for libtool's version-info option to accomplish
+# the .so naming we desire based on the version number
+LIBTOOL_CURRENT=`expr $VERSION_MAJOR + $VERSION_PATCH`
+LIBTOOL_VERSION="$LIBTOOL_CURRENT:$VERSION_MINOR:$VERSION_PATCH"
+AC_SUBST(LIBTOOL_VERSION)
 
 ################################################################################
 #                Create libtool script
@@ -1726,8 +1734,8 @@ fi
 # echo "Other details"
 # echo "Static: $enable_static"
 # echo "Shared: $enable_shared"
-# echo "BLAS: $enableblas"
-# echo "LAPACK: $enablelapack"
+# echo "BLAS: $enable_blaslapack"
+# echo "LAPACK: $enable_blaslapack"
 # echo "Zoltan: $enablezoltan"
 # echo "Zlib: $enablezlib"
 # echo "SZip: $enableszip"

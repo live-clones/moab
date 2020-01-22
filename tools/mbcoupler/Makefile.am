@@ -28,7 +28,7 @@ libmbcoupler_la_include_HEADERS = \
    DataCoupler.hpp \
    ElemUtil.hpp
 
-libmbcoupler_la_includedir = $(includedir)
+libmbcoupler_la_includedir = $(includedir)/mbcoupler
 
 # Automake doesn't seem to have a directory defined for
 # platform-dependent data (or include) files. So put

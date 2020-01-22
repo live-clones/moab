@@ -466,7 +466,7 @@ endif (ENABLE_FORTRAN)
 CONFIGURE_FILE(config/MOABConfig.cmake.h.in "${PROJECT_BINARY_DIR}/src/moab/MOABConfig.h" @ONLY)
 
 CONFIGURE_FILE(config/MOABConfig.cmake.cmake "${PROJECT_BINARY_DIR}/MOABConfig.cmake" @ONLY)
-CONFIGURE_FILE(moab.make.in "${PROJECT_BINARY_DIR}/lib/moab.make" @ONLY)
+CONFIGURE_FILE(moab.make.cmake "${PROJECT_BINARY_DIR}/lib/moab.make" @ONLY)
 if ( MOAB_HAVE_FBIGEOM )
   CONFIGURE_FILE(itaps/fbigeom/FBiGeom-Defs.inc.in "${PROJECT_BINARY_DIR}/lib/FBiGeom-Defs.inc" @ONLY)
   install(
@@ -479,10 +479,21 @@ if ( MOAB_HAVE_IMESH )
   CONFIGURE_FILE(itaps/imesh/iMesh-Defs.inc.in "${PROJECT_BINARY_DIR}/lib/iMesh-Defs.inc" @ONLY)
   INSTALL(
     FILES "${PROJECT_BINARY_DIR}/lib/iMesh-Defs.inc"
-    "${PROJECT_BINARY_DIR}/lib/moab.make"
     DESTINATION ${CMAKE_INSTALL_LIBDIR}
     )
 endif ( MOAB_HAVE_IMESH )
+INSTALL(
+  FILES "${PROJECT_BINARY_DIR}/lib/moab.make"
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  )
+INSTALL(
+  CODE
+  "file(APPEND  ${CMAKE_INSTALL_FULL_LIBDIR}/moab.make MOAB_LIBDIR=${CMAKE_INSTALL_FULL_LIBDIR}\\n )"
+  )
+INSTALL(
+  CODE
+  "file(APPEND  ${CMAKE_INSTALL_FULL_LIBDIR}/moab.make MOAB_INCLUDES=-I${CMAKE_INSTALL_FULL_INCLUDEDIR}\\n )"
+  )
 INSTALL(
   FILES "${PROJECT_BINARY_DIR}/MOABConfig.cmake"
   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/MOAB/
@@ -496,5 +507,77 @@ ADD_CUSTOM_TARGET(
   uninstall
   COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake
   )
+
+###################
+# INSTALL documentation and examples
+####################
+
+SET(MOAB_DOCS ${MOAB_DOCS}
+  ANNOUNCE KNOWN_ISSUES LICENSE README.md RELEASE_NOTES
+)  
+install(FILES ${MOAB_DOCS} DESTINATION share/doc/moab)
+
+CONFIGURE_FILE(examples/makefile.config.cmake "${PROJECT_BINARY_DIR}/share/examples/makefile.config" @ONLY)
+install(FILES ${PROJECT_BINARY_DIR}/share/examples/makefile.config
+  DESTINATION share/examples)
+  
+SET(MOAB_EXAMPLES
+  examples/makefile 
+  examples/makefile.config.in 
+  examples/CMakeLists.txt )
+SET(MOAB_EXAMPLES ${MOAB_EXAMPLES}
+  examples/beginner/README 
+  examples/beginner/makefile 
+  examples/beginner/mbex1.cpp 
+  examples/beginner/mbex2.cpp 
+  examples/beginner/mbex3.cpp 
+  examples/beginner/mbex4.cpp )
+SET(MOAB_EXAMPLES ${MOAB_EXAMPLES}
+  examples/basic/makefile 
+  examples/basic/ErrorHandlingSimulation.cpp 
+  examples/basic/GetEntities.cpp 
+  examples/basic/HelloMOAB.cpp 
+  examples/basic/HelloParMOAB.cpp 
+  examples/basic/ReadWriteTest.cpp
+  examples/basic/SetsNTags.cpp 
+  examples/basic/StructuredMeshSimple.cpp 
+  examples/basic/TestErrorHandling.cpp 
+  examples/basic/TestErrorHandlingPar.cpp 
+  examples/basic/TestExodusII.cpp 
+  examples/basic/UniformRefinement.cpp )
+SET(MOAB_EXAMPLES ${MOAB_EXAMPLES}
+  examples/intermediate/makefile 
+  examples/intermediate/DirectAccessNoHoles.cpp 
+  examples/intermediate/DirectAccessWithHoles.cpp 
+  examples/intermediate/LoadPartial.cpp 
+  examples/intermediate/PointInElementSearch.cpp 
+  examples/intermediate/ReduceExchangeTags.cpp )
+SET(MOAB_EXAMPLES ${MOAB_EXAMPLES}
+  examples/advanced/makefile 
+  examples/advanced/CrystalRouterExample.cpp 
+  examples/advanced/ExtrudePoly.cpp 
+  examples/advanced/GenLargeMesh.cpp 
+  examples/advanced/LloydRelaxation.cpp 
+  examples/advanced/VisTags.cpp
+  examples/advanced/CoupleMGen.cpp )
+SET(MOAB_EXAMPLES ${MOAB_EXAMPLES}
+  examples/fortran/makefile 
+  examples/fortran/DirectAccessNoHolesF90.F90 
+  examples/fortran/PushParMeshIntoMoabF90.F90
+  examples/fortran/MigrateMesh.F90 )
+SET(MOAB_EXAMPLES ${MOAB_EXAMPLES}
+  examples/python/makefile 
+  examples/python/laplaciansmoother.py )
+SET(MOAB_EXAMPLES ${MOAB_EXAMPLES}
+  examples/apps/makefile )
+SET(MOAB_EXAMPLES ${MOAB_EXAMPLES}
+  examples/apps/earth/makefile 
+  examples/apps/earth/ContinentsOnGlobe.cpp 
+  examples/apps/earth/BoundaryContinents.cpp )
+
+include(AutoconfHeader)
+moab_install_docs(${MOAB_EXAMPLES})
+
+
 
 # All done.
