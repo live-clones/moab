@@ -832,15 +832,21 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
                 DataArray1D<double> dSourceArea(m_meshInputCov->faces.size());
                 DataArray1D<double> dTargetArea(m_meshOutput->faces.size());
 
-                _ASSERT(m_meshOverlap->vecSourceFaceIx.size() == m_meshOverlap->faces.size());
-                _ASSERT(m_meshOverlap->vecTargetFaceIx.size() == m_meshOverlap->faces.size());
-                _ASSERT(m_meshOverlap->vecFaceArea.GetRows() == m_meshOverlap->faces.size());
+                assert(m_meshOverlap->vecSourceFaceIx.size() == m_meshOverlap->faces.size());
+                assert(m_meshOverlap->vecTargetFaceIx.size() == m_meshOverlap->faces.size());
+                assert(m_meshOverlap->vecFaceArea.GetRows() == m_meshOverlap->faces.size());
 
-                _ASSERT(m_meshInputCov->vecFaceArea.GetRows() == m_meshInputCov->faces.size());
-                _ASSERT(m_meshOutput->vecFaceArea.GetRows() == m_meshOutput->faces.size());
+                assert(m_meshInputCov->vecFaceArea.GetRows() == m_meshInputCov->faces.size());
+                assert(m_meshOutput->vecFaceArea.GetRows() == m_meshOutput->faces.size());
 
                 for (size_t i = 0; i < m_meshOverlap->faces.size(); i++) {
+                    if (m_meshOverlap->vecSourceFaceIx[i] < 0 || m_meshOverlap->vecTargetFaceIx[i] < 0)
+                      continue; // skip this cell since it is ghosted
+
+                    // let us recompute the source/target areas based on overlap mesh areas
+                    assert( static_cast<size_t>(m_meshOverlap->vecSourceFaceIx[i]) < m_meshInputCov->faces.size() );
                     dSourceArea[ m_meshOverlap->vecSourceFaceIx[i] ] += m_meshOverlap->vecFaceArea[i];
+                    assert( static_cast<size_t>(m_meshOverlap->vecTargetFaceIx[i]) < m_meshOutput->faces.size()  );
                     dTargetArea[ m_meshOverlap->vecTargetFaceIx[i] ] += m_meshOverlap->vecFaceArea[i];
                 }
 
