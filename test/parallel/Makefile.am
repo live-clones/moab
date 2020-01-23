@@ -54,9 +54,11 @@ endif
 if HAVE_TEMPESTREMAP
 migrate_test_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS) $(FCLIBS)
 migrate_nontrivial_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS) $(FCLIBS)
+commgraph_test_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS) $(FCLIBS)
 else
 migrate_test_LDADD = $(LDADD) $(FCLIBS)
 migrate_nontrivial_LDADD = $(LDADD) $(FCLIBS)
+commgraph_test_LDADD = $(LDADD) $(FCLIBS)
 endif
 
 if HAVE_TEMPESTREMAP
