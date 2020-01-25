@@ -386,7 +386,14 @@ ErrorCode Intx2Mesh::intersect_meshes_slow(EntityHandle mbset1, EntityHandle mbs
     recoveredArea = (recoveredArea-areaRedCell)/areaRedCell; // replace now with recovery fract
 
   }
+  // before cleaning up , we need to settle the position of the intersection points
+  // on the boundary edges
+  // this needs to be collective, so we should maybe wait something
+#ifdef MOAB_HAVE_MPI
+  rval = resolve_intersection_sharing();MB_CHK_SET_ERR(rval, "can't correct position, Intx2Mesh.cpp \n");
+#endif
 
+  this->clean();
   return MB_SUCCESS;
 }
 // main interface; this will do the advancing front trick
