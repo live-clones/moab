@@ -17,12 +17,42 @@
 #include "moab/IntxMesh/Intx2MeshOnSphere.hpp"
 #include "moab/IntxMesh/IntxUtils.hpp"
 #include "TestUtil.hpp"
+#include "moab/ProgOptions.hpp"
 #include <math.h>
 
 using namespace moab;
 
 int main(int argc, char* argv[])
 {
+
+  std::string firstModel, secondModel, outputFile;
+
+  firstModel = TestDir + "/mbcslam/lagrangeHomme.vtk";
+  secondModel = TestDir + "/mbcslam/eulerHomme.vtk";
+
+  ProgOptions opts;
+  opts.addOpt<std::string>("first,t", "first mesh filename (source)", &firstModel);
+  opts.addOpt<std::string>("second,m", "second mesh filename (target)", &secondModel);
+  opts.addOpt<std::string>("outputFile,o", "output intersection file", &outputFile);
+
+  double R = 1.; // input
+  double epsrel=1.e-8;
+  double boxeps=1.e-4;
+  outputFile = "intx.h5m";
+  opts.addOpt<double>("radius,R", "radius for model intx", &R);
+  opts.addOpt<double>("epsilon,e", "relative error in intx", &epsrel);
+  opts.addOpt<double>("boxerror,b", "relative error for box boundaries", &boxeps);
+
+
+  int output_fraction = 1;
+  int write_files_rank = 0;
+  int brute_force = 0;
+
+  opts.addOpt<int>("outputFraction,f", "output fraction of areas", &output_fraction);
+  opts.addOpt<int>("writeFiles,w", "write files of interest", &write_files_rank);
+  opts.addOpt<int>("kdtreeOption,k", "use kd tree for intersection", &brute_force);
+
+  opts.parseCommandLine(argc, argv);
   int rank=0, size=1;
 #ifdef MOAB_HAVE_MPI
   MPI_Init(&argc, &argv);
@@ -30,39 +60,11 @@ int main(int argc, char* argv[])
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 #endif
 
-  bool output_fraction = true;
-  bool write_files_rank = false;
-  bool brute_force = false;
+
+
   // check command line arg second grid is red, arrival, first mesh is blue, departure
   // will will keep the
-  const char *filename_mesh1 = STRINGIFY(MESHDIR) "/mbcslam/lagrangeHomme.vtk";
-  const char *filename_mesh2 = STRINGIFY(MESHDIR) "/mbcslam/eulerHomme.vtk";
-  double R = 6. * sqrt(3.) / 2; // input
-  double epsrel=1.e-8;
-  double boxeps=1.e-4;
-  const char *newFile = "intx.h5m";
-  if (argc == 9)
-  {
-    filename_mesh1 = argv[1];
-    filename_mesh2 = argv[2];
-    R = atof(argv[3]);
-    epsrel = atof(argv[4]);
-    newFile = argv[5];
-    brute_force = (bool) atoi(argv[6]); // could be 0 or 1, default false
-    output_fraction = (bool) atoi(argv[7]); // could be 0 or 1, default true
-    write_files_rank = (bool) atoi(argv[8]); // could be 0 or 1, false or true (default false)
-  }
-  else
-  {
-    printf("Usage: mpiexec -np <N> %s <mesh_filename1> <mesh_filename2> <radius> <epsrel> <newFile>  <brute_force (bool)> <output_fraction (bool)> <write_files (bool)> \n",
-        argv[0]);
-    if (argc != 1)
-      return 1;
-    printf("No files specified.  Defaulting to: %s  %s  %f %f %s \n",
-        filename_mesh1, filename_mesh2, R, epsrel, newFile);
-  }
-
-  std::string opts = (size == 1 ? "" : std::string("PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION")+
+  std::string optsRead = (size == 1 ? "" : std::string("PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION")+
         std::string(";PARALLEL_RESOLVE_SHARED_ENTS"));
 
   // read meshes in 2 file sets
@@ -72,17 +74,23 @@ int main(int argc, char* argv[])
   EntityHandle sf1, sf2, outputSet;
 
   // create meshsets and load files
-  if (0==rank)
-    std::cout << "Creating mesh sets\n";
+
   rval = mb->create_meshset(MESHSET_SET, sf1);MB_CHK_ERR(rval);
   rval = mb->create_meshset(MESHSET_SET, sf2);MB_CHK_ERR(rval);
   if (0==rank)
-    std::cout << "Loading mesh file 1\n";
-  rval = mb->load_file(filename_mesh1, &sf1, opts.c_str());MB_CHK_ERR(rval);
+    std::cout << "Loading mesh file " <<firstModel << "\n";
+  rval = mb->load_file(firstModel.c_str(), &sf1, optsRead.c_str());MB_CHK_ERR(rval);
   if (0==rank)
-    std::cout << "Loading mesh file 2\n";
-  rval = mb->load_file(filename_mesh2, &sf2, opts.c_str());MB_CHK_ERR(rval);
+    std::cout << "Loading mesh file " << secondModel << "\n";
+  rval = mb->load_file(secondModel.c_str(), &sf2, optsRead.c_str());MB_CHK_ERR(rval);
 
+  if (0==rank)
+  {
+    std::cout << "Radius:  " << R << "\n";
+    std::cout << "relative eps:  " << epsrel << "\n";
+    std::cout << "box eps:  " << boxeps << "\n";
+    std::cout << " use kd tree for intersection: " << brute_force << "\n";
+  }
   rval = mb->create_meshset(MESHSET_SET, outputSet);MB_CHK_ERR(rval);
 
   // fix radius of both meshes, to be consistent with input R
@@ -228,10 +236,11 @@ int main(int argc, char* argv[])
   std::cout<< "On rank : " << rank << " arrival area: " << arrival_area<<
       "  intersection area:" << intx_area << " rel error: " << fabs((intx_area-arrival_area)/arrival_area) << "\n";
 
-  rval = mb->write_file(newFile, 0, "PARALLEL=WRITE_PART", &outputSet, 1);MB_CHK_SET_ERR(rval,"failed to write intx file");
-
 #ifdef MOAB_HAVE_MPI
+  rval = mb->write_file(outputFile.c_str(), 0, "PARALLEL=WRITE_PART", &outputSet, 1);MB_CHK_SET_ERR(rval,"failed to write intx file");
   MPI_Finalize();
+#else
+  rval = mb->write_file(outputFile.c_str(), 0, 0, &outputSet, 1);MB_CHK_SET_ERR(rval,"failed to write intx file");
 #endif
   return 0;
 }
