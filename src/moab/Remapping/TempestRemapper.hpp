@@ -212,6 +212,13 @@ public:
                                           moab::Range* secondary_entities,
                                           const std::string dofTagName, int nP);
 
+    typedef double (*sample_function)(double, double);
+
+    moab::ErrorCode DefineAnalyticalSolution ( moab::Tag& solnTag, const std::string& solnName, Remapper::IntersectionContext ctx, 
+                                                const std::string& discMethod, 
+                                                int discOrder,
+                                                sample_function testFunction);
+
     /// <summary>
     ///     Compute the local and global IDs for elements in source/target/coverage meshes.
     /// </summary>
@@ -242,7 +249,7 @@ private:
     Mesh* m_source;
     TempestMeshType m_source_type;
     moab::Range m_source_entities;
-    moab::Range m_covering_source_vertices, m_source_vertices;
+    moab::Range m_source_vertices;
     moab::EntityHandle m_source_set;
     int max_source_edges;
     bool point_cloud_source;
@@ -270,6 +277,7 @@ private:
     Mesh* m_covering_source;
     moab::EntityHandle m_covering_source_set;
     moab::Range m_covering_source_entities;
+    moab::Range m_covering_source_vertices;
 
     /* local to glboal and global to local ID maps */
     std::map<int,int> gid_to_lid_src, gid_to_lid_covsrc, gid_to_lid_tgt;
