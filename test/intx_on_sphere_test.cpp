@@ -32,6 +32,7 @@ int main(int argc, char* argv[])
 
   bool output_fraction = true;
   bool write_files_rank = false;
+  bool brute_force = false;
   // check command line arg second grid is red, arrival, first mesh is blue, departure
   // will will keep the
   const char *filename_mesh1 = STRINGIFY(MESHDIR) "/mbcslam/lagrangeHomme.vtk";
@@ -40,23 +41,24 @@ int main(int argc, char* argv[])
   double epsrel=1.e-8;
   double boxeps=1.e-4;
   const char *newFile = "intx.h5m";
-  if (argc == 8)
+  if (argc == 9)
   {
     filename_mesh1 = argv[1];
     filename_mesh2 = argv[2];
     R = atof(argv[3]);
     epsrel = atof(argv[4]);
     newFile = argv[5];
-    output_fraction = (bool) atoi(argv[6]); // could be 0 or 1, default true
-    write_files_rank = (bool) atoi(argv[7]); // could be 0 or 1, false or true (default false)
+    brute_force = (bool) atoi(argv[6]); // could be 0 or 1, default false
+    output_fraction = (bool) atoi(argv[7]); // could be 0 or 1, default true
+    write_files_rank = (bool) atoi(argv[8]); // could be 0 or 1, false or true (default false)
   }
   else
   {
-    printf("Usage: mpiexec -np <N> %s <mesh_filename1> <mesh_filename2> <radius> <epsrel> <newFile> <output_fraction (bool)> <write_files (bool)> \n",
+    printf("Usage: mpiexec -np <N> %s <mesh_filename1> <mesh_filename2> <radius> <epsrel> <newFile>  <brute_force (bool)> <output_fraction (bool)> <write_files (bool)> \n",
         argv[0]);
     if (argc != 1)
       return 1;
-    printf("No files specified.  Defaulting to: %s  %s  %f %f %s\n",
+    printf("No files specified.  Defaulting to: %s  %s  %f %f %s \n",
         filename_mesh1, filename_mesh2, R, epsrel, newFile);
   }
 
@@ -189,7 +191,14 @@ int main(int argc, char* argv[])
 #ifdef MOAB_HAVE_MPI
   double elapsed = MPI_Wtime();
 #endif
-  rval = worker.intersect_meshes(covering_set, sf2, outputSet);MB_CHK_SET_ERR(rval,"failed to intersect meshes");
+  if (brute_force)
+  {
+    rval = worker.intersect_meshes_slow(covering_set, sf2, outputSet);MB_CHK_SET_ERR(rval,"failed to intersect meshes with slow method");
+  }
+  else
+  {
+    rval = worker.intersect_meshes(covering_set, sf2, outputSet);MB_CHK_SET_ERR(rval,"failed to intersect meshes");
+  }
 #ifdef MOAB_HAVE_MPI
   elapsed = MPI_Wtime() - elapsed;
   if (0==rank)
@@ -219,7 +228,7 @@ int main(int argc, char* argv[])
   std::cout<< "On rank : " << rank << " arrival area: " << arrival_area<<
       "  intersection area:" << intx_area << " rel error: " << fabs((intx_area-arrival_area)/arrival_area) << "\n";
 
-  // rval = mb->write_file(newFile, 0, "PARALLEL=WRITE_PART", &outputSet, 1);MB_CHK_SET_ERR(rval,"failed to write intx file");
+  rval = mb->write_file(newFile, 0, "PARALLEL=WRITE_PART", &outputSet, 1);MB_CHK_SET_ERR(rval,"failed to write intx file");
 
 #ifdef MOAB_HAVE_MPI
   MPI_Finalize();

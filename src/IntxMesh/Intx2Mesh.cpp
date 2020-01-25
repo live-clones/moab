@@ -237,6 +237,158 @@ ErrorCode Intx2Mesh::DetermineOrderedNeighbors(EntityHandle inputSet, int max_ed
 }
 
 
+// slow interface; this will not do the advancing front trick
+// some are triangles, some are quads, some are polygons ...
+ErrorCode Intx2Mesh::intersect_meshes_slow(EntityHandle mbset1, EntityHandle mbset2,
+   EntityHandle & outputSet)
+{
+  ErrorCode rval;
+  mbs1 = mbset1; // set 1 is departure, and it is completely covering the euler set on proc
+  mbs2 = mbset2;
+  outSet = outputSet;
+  rval = mb->get_entities_by_dimension(mbs1, 2, rs1);MB_CHK_ERR(rval);
+  rval = mb->get_entities_by_dimension(mbs2, 2, rs2);MB_CHK_ERR(rval);
+// from create tags, copy relevant ones
+  if (redParentTag)
+    mb->tag_delete(redParentTag);
+  if(blueParentTag)
+    mb->tag_delete(blueParentTag);
+  if (countTag)
+    mb->tag_delete(countTag);
+
+  // create red edges if they do not exist yet; so when they are looked upon, they are found
+  // this is the only call that is potentially NlogN, in the whole method
+  rval = mb->get_adjacencies(rs2, 1, true, RedEdges, Interface::UNION);MB_CHK_SET_ERR(rval, "can't get adjacent red edges");
+
+  int indx = 0;
+  extraNodesVec.resize(RedEdges.size());
+  for (Range::iterator eit = RedEdges.begin(); eit != RedEdges.end(); ++eit, indx++)
+  {
+    std::vector<EntityHandle> * nv = new std::vector<EntityHandle>;
+    extraNodesVec[indx]=nv;
+  }
+
+  int defaultInt = -1;
+
+  rval = mb->tag_get_handle("RedParent", 1, MB_TYPE_INTEGER, redParentTag,
+      MB_TAG_DENSE | MB_TAG_CREAT, &defaultInt);MB_CHK_SET_ERR(rval, "can't create positive tag");
+
+  rval = mb->tag_get_handle("BlueParent", 1, MB_TYPE_INTEGER, blueParentTag,
+      MB_TAG_DENSE | MB_TAG_CREAT, &defaultInt);MB_CHK_SET_ERR(rval, "can't create negative tag");
+
+  rval = mb->tag_get_handle("Counting", 1, MB_TYPE_INTEGER, countTag,
+        MB_TAG_DENSE | MB_TAG_CREAT, &defaultInt);MB_CHK_SET_ERR(rval, "can't create Counting tag");
+
+  // for red cells, save a dense tag with the bordering edges, so we do not have to search for them each time
+  // edges were for sure created before (redEdges)
+  std::vector<EntityHandle> zeroh(max_edges_2, 0);
+  rval = mb->tag_get_handle("__redEdgeNeighbors", max_edges_2, MB_TYPE_HANDLE, neighRedEdgeTag,
+      MB_TAG_DENSE | MB_TAG_CREAT, &zeroh[0] );MB_CHK_SET_ERR(rval, "can't create red edge neighbors tag");
+  for (Range::iterator rit=rs2.begin(); rit!=rs2.end(); rit++ )
+  {
+    EntityHandle redCell= *rit;
+    int num_nodes=0;
+    rval = mb->get_connectivity(redCell, redConn, num_nodes);MB_CHK_SET_ERR(rval, "can't get  red conn");
+    // account for padded polygons
+    while ( redConn[num_nodes-2]==redConn[num_nodes-1] && num_nodes>3)
+      num_nodes--;
+
+    int i = 0;
+    for (i = 0; i < num_nodes; i++)
+    {
+      EntityHandle v[2] = { redConn[i], redConn[(i + 1) % num_nodes] };// this is fine even for padded polygons
+      std::vector<EntityHandle> adj_entities;
+      rval = mb->get_adjacencies(v, 2, 1, false, adj_entities,
+          Interface::INTERSECT);
+      if (rval != MB_SUCCESS || adj_entities.size() < 1)
+        return rval; // get out , big error
+      zeroh[i] = adj_entities[0]; // should be only one edge between 2 nodes
+      // also, even if number of edges is less than max_edges_2, they will be ignored, even if the tag is dense
+    }
+    // now set the value of the tag
+    rval = mb->tag_set_data(neighRedEdgeTag, &redCell, 1, &(zeroh[0]));MB_CHK_SET_ERR(rval, "can't set edge red tag");
+  }
+
+  // create the kd tree on source cells, and intersect all targets in an expensive loop
+  // build a kd tree with the rs1 (source) cells
+  AdaptiveKDTree kd(mb);
+  EntityHandle tree_root = 0;
+  rval  = kd.build_tree(rs1, &tree_root);MB_CHK_ERR(rval);
+
+  for (Range::iterator it = rs2.begin(); it != rs2.end(); ++it)
+  {
+    EntityHandle tcell = *it;
+    // find vertex positions
+    const EntityHandle * conn = NULL;
+    int nnodes=0;
+    rval = mb->get_connectivity(tcell, conn, nnodes); MB_CHK_ERR(rval);
+    // find leaves close to those positions
+    std::vector<double> positions;
+    positions.resize(nnodes*3);
+    rval = mb->get_coords(conn, nnodes, &positions[0]); MB_CHK_ERR(rval);
+    int nsidesRed; // will be initialized now
+    double areaRedCell = setup_red_cell(tcell, nsidesRed); // this is the area in the gnomonic plane
+    double recoveredArea = 0;
+
+    // distance to search will be based on average edge length
+    double av_len =0;
+    for (int k=0; k<nnodes; k++)
+    {
+      int ik=(k+1)%nnodes;
+      double len1=0;
+      for (int j=0; j<3; j++)
+      {
+        double len2 = positions[3*k+j]-positions[3*ik+j];
+        len1 += len2*len2;
+      }
+      av_len += sqrt(len1);
+    }
+    if (nnodes>0)
+      av_len /= nnodes;
+    // find leaves within a distance from each vertex of target
+    // in those leaves, collect all cells; we will try for an intx in there
+    Range close_source_cells;
+    std::vector<EntityHandle> leaves;
+    for (int i=0; i<nnodes; i++)
+    {
+
+      leaves.clear();
+      rval = kd.distance_search(&positions[3*i], av_len, leaves, epsilon_1, epsilon_1);MB_CHK_ERR(rval);
+
+      for (std::vector<EntityHandle>::iterator j = leaves.begin(); j != leaves.end(); ++j) {
+          Range tmp;
+          rval = mb->get_entities_by_dimension( *j, 2, tmp ); MB_CHK_ERR(rval);
+
+          close_source_cells.merge( tmp.begin(), tmp.end() );
+      }
+    }
+
+    for (Range::iterator it2 = close_source_cells.begin(); it2 != close_source_cells.end() ; ++it2)
+    {
+      EntityHandle startBlue = *it2;
+      double area = 0;
+      // if area is > 0 , we have intersections
+      double P[10*MAXEDGES]; // max 8 intx points + 8 more in the polygon
+      //
+      int nP = 0;
+      int nb[MAXEDGES], nr[MAXEDGES]; // sides 3 or 4? also, check boxes first
+      int nsRed, nsBlue;
+      rval = computeIntersectionBetweenRedAndBlue(tcell, startBlue, P, nP, area, nb, nr,
+          nsBlue, nsRed, true);MB_CHK_ERR(rval);
+      if (area > 0)
+      {
+        if (nP > 1) { // this will also construct triangles/polygons in the new mesh, if needed
+          rval = findNodes(tcell, nsidesRed, startBlue, nsBlue, P, nP);MB_CHK_ERR(rval);
+        }
+        recoveredArea+=area;
+      }
+    }
+    recoveredArea = (recoveredArea-areaRedCell)/areaRedCell; // replace now with recovery fract
+
+  }
+
+  return MB_SUCCESS;
+}
 // main interface; this will do the advancing front trick
 // some are triangles, some are quads, some are polygons ...
 ErrorCode Intx2Mesh::intersect_meshes(EntityHandle mbset1, EntityHandle mbset2,

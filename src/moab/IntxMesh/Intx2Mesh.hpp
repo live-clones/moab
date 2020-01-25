@@ -62,6 +62,12 @@ public:
   ErrorCode intersect_meshes(EntityHandle mbs1, EntityHandle mbs2,
        EntityHandle & outputSet);
 
+  /*
+   *  slower intx, use kd tree only, no adjacency, no adv front
+   */
+  ErrorCode intersect_meshes_slow(EntityHandle mbset1, EntityHandle mbset2,
+       EntityHandle & outputSet);
+
   // mark could be (3 or 4, depending on type: ) no, it could go to 10
   // no, it will be MAXEDGES = 10
   // this is pure abstract, this needs to be implemented by
