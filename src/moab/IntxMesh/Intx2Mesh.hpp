@@ -65,7 +65,7 @@ public:
   /*
    *  slower intx, use kd tree only, no adjacency, no adv front
    */
-  ErrorCode intersect_meshes_slow(EntityHandle mbset1, EntityHandle mbset2,
+  ErrorCode intersect_meshes_kdtree(EntityHandle mbset1, EntityHandle mbset2,
        EntityHandle & outputSet);
 
   // mark could be (3 or 4, depending on type: ) no, it could go to 10

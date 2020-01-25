@@ -193,7 +193,7 @@ int main(int argc, char* argv[])
 #endif
   if (brute_force)
   {
-    rval = worker.intersect_meshes_slow(covering_set, sf2, outputSet);MB_CHK_SET_ERR(rval,"failed to intersect meshes with slow method");
+    rval = worker.intersect_meshes_kdtree(covering_set, sf2, outputSet);MB_CHK_SET_ERR(rval,"failed to intersect meshes with slow method");
   }
   else
   {

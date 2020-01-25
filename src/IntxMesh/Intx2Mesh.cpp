@@ -239,7 +239,7 @@ ErrorCode Intx2Mesh::DetermineOrderedNeighbors(EntityHandle inputSet, int max_ed
 
 // slow interface; this will not do the advancing front trick
 // some are triangles, some are quads, some are polygons ...
-ErrorCode Intx2Mesh::intersect_meshes_slow(EntityHandle mbset1, EntityHandle mbset2,
+ErrorCode Intx2Mesh::intersect_meshes_kdtree(EntityHandle mbset1, EntityHandle mbset2,
    EntityHandle & outputSet)
 {
   ErrorCode rval;
@@ -353,7 +353,7 @@ ErrorCode Intx2Mesh::intersect_meshes_slow(EntityHandle mbset1, EntityHandle mbs
     {
 
       leaves.clear();
-      rval = kd.distance_search(&positions[3*i], av_len, leaves, epsilon_1, epsilon_1);MB_CHK_ERR(rval);
+      rval = kd.distance_search(&positions[3*i], av_len, leaves, 0.005, epsilon_1);MB_CHK_ERR(rval);
 
       for (std::vector<EntityHandle>::iterator j = leaves.begin(); j != leaves.end(); ++j) {
           Range tmp;
@@ -362,7 +362,13 @@ ErrorCode Intx2Mesh::intersect_meshes_slow(EntityHandle mbset1, EntityHandle mbs
           close_source_cells.merge( tmp.begin(), tmp.end() );
       }
     }
-
+#ifdef VERBOSE
+    if (close_source_cells.empty())
+    {
+      std::cout << " there are no close source cells to target cell " << tcell << " id from handle "
+          << mb->id_from_handle(tcell) << "\n";
+    }
+#endif
     for (Range::iterator it2 = close_source_cells.begin(); it2 != close_source_cells.end() ; ++it2)
     {
       EntityHandle startBlue = *it2;
