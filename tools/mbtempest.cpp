@@ -44,6 +44,7 @@ struct ToolContext
         moab::ParallelComm* pcomm;
 #endif
         const int proc_id, n_procs;
+        moab::DebugOutput outputFormatter;
         int blockSize;
         std::vector<std::string> inFilenames;
         std::vector<Mesh*> meshes;
@@ -56,6 +57,7 @@ struct ToolContext
         moab::TempestRemapper::TempestMeshType meshType;
         bool computeDual;
         bool computeWeights;
+        bool verifyWeights;
         int ensureMonotonicity;
         bool fNoConservation;
         bool fVolumetric;
@@ -67,19 +69,23 @@ struct ToolContext
         ToolContext ( moab::Interface* icore, moab::ParallelComm* p_pcomm ) :
             mbcore(icore), pcomm(p_pcomm),
             proc_id ( pcomm->rank() ), n_procs ( pcomm->size() ),
+            outputFormatter ( std::cout, pcomm->rank(), 0 ),
 #else
         ToolContext ( moab::Interface* icore ) :
             mbcore(icore),
             proc_id ( 0 ), n_procs ( 1 ),
+            outputFormatter ( std::cout, 0, 0 )
 #endif
             blockSize ( 5 ), outFilename ( "output.exo" ), intxFilename ( "" ), meshType ( moab::TempestRemapper::DEFAULT ),
-            computeDual ( false ), computeWeights ( false ), ensureMonotonicity ( 0 ), 
+            computeDual ( false ), computeWeights ( false ), verifyWeights ( false ), ensureMonotonicity ( 0 ), 
             fNoConservation ( false ), fVolumetric ( false ), rrmGrids ( false ), kdtreeSearch ( true ),
             fNoBubble(false), fInputConcave(false), fOutputConcave(false), fNoCheck(false)
         {
             inFilenames.resize ( 2 );
             doftag_names.resize( 2 );
             timer = new moab::CpuTimer();
+
+            outputFormatter.set_prefix("[MBTempest]: ");
         }
 
         ~ToolContext()
@@ -146,6 +152,7 @@ struct ToolContext
             opts.addOpt<void> ( "rrmgrids", "At least one of the meshes is a regionally refined grid (relevant to accelerate intersection computation)", &rrmGrids );
             opts.addOpt<void> ( "nocheck", "Do not check the generated map for conservation and consistency", &fNoCheck );
             opts.addOpt<void> ( "advfront,a", "Use the advancing front intersection instead of the Kd-tree based algorithm to compute mesh intersections" );
+            opts.addOpt<void> ( "verify", "Verify the accuracy of the maps by projecting analytical functions from source to target grid by applying the maps", &verifyWeights );
             opts.addOpt<int> ( "monotonic,n", "Ensure monotonicity in the weight generation", &ensureMonotonicity );
             opts.addOpt<std::string> ( "load,l", "Input mesh filenames (a source and target mesh)", &expectedFName );
             opts.addOpt<int> ( "order,o", "Discretization orders for the source and target solution fields", &expectedOrder );
@@ -229,7 +236,11 @@ struct ToolContext
 };
 
 // Forward declare some methods
-moab::ErrorCode CreateTempestMesh ( ToolContext&, moab::TempestRemapper& remapper, Mesh* );
+static moab::ErrorCode CreateTempestMesh ( ToolContext&, moab::TempestRemapper& remapper, Mesh* );
+inline double sample_slow_harmonic ( double dLon, double dLat );
+inline double sample_fast_harmonic ( double dLon, double dLat );
+inline double sample_constant ( double dLon, double dLat );
+inline double sample_stationary_vortex ( double dLon, double dLat );
 
 int main ( int argc, char* argv[] )
 {
@@ -253,13 +264,17 @@ int main ( int argc, char* argv[] )
     moab::ParallelComm* pcomm = new moab::ParallelComm ( mbCore, MPI_COMM_WORLD, 0 );
 
     runCtx = new ToolContext( mbCore, pcomm );
+    const char *writeOptions = (nprocs > 1 ? "PARALLEL=WRITE_PART" : "");
 #else
     runCtx = new ToolContext( mbCore );
+    const char *writeOptions = "";
 #endif
     runCtx->ParseCLOptions ( argc, argv );
 
     const double radius_src = 1.0 /*2.0*acos(-1.0)*/;
     const double radius_dest = 1.0 /*2.0*acos(-1.0)*/;
+
+    moab::DebugOutput& outputFormatter = runCtx->outputFormatter;
 
 #ifdef MOAB_HAVE_MPI
     moab::TempestRemapper remapper ( mbCore, pcomm );
@@ -301,12 +316,12 @@ int main ( int argc, char* argv[] )
             moab::Range rintxverts, rintxelems;
             rval = mbCore->get_entities_by_dimension ( runCtx->meshsets[0], 0, rintxverts ); MB_CHK_ERR ( rval );
             rval = mbCore->get_entities_by_dimension ( runCtx->meshsets[0], 2, rintxelems ); MB_CHK_ERR ( rval );
-            printf ( "The red set contains %lu vertices and %lu elements \n", rintxverts.size(), rintxelems.size() );
+            outputFormatter.printf ( 0,  "The source set contains %lu vertices and %lu elements \n", rintxverts.size(), rintxelems.size() );
 
             moab::Range bintxverts, bintxelems;
             rval = mbCore->get_entities_by_dimension ( runCtx->meshsets[1], 0, bintxverts ); MB_CHK_ERR ( rval );
             rval = mbCore->get_entities_by_dimension ( runCtx->meshsets[1], 2, bintxelems ); MB_CHK_ERR ( rval );
-            printf ( "The blue set contains %lu vertices and %lu elements \n", bintxverts.size(), bintxelems.size() );
+            outputFormatter.printf ( 0,  "The target set contains %lu vertices and %lu elements \n", bintxverts.size(), bintxelems.size() );
         }
 
         moab::EntityHandle intxset; // == remapper.GetMeshSet(moab::Remapper::OverlapMesh);
@@ -354,17 +369,17 @@ int main ( int argc, char* argv[] )
             moab::Range intxelems, intxverts;
             rval = mbCore->get_entities_by_dimension ( intxset, 2, intxelems ); MB_CHK_ERR ( rval );
             rval = mbCore->get_entities_by_dimension ( intxset, 0, intxverts, true ); MB_CHK_ERR ( rval );
-            printf ( "The intersection set contains %lu elements and %lu vertices \n", intxelems.size(), intxverts.size() );
+            outputFormatter.printf ( 0,  "The intersection set contains %lu elements and %lu vertices \n", intxelems.size(), intxverts.size() );
 
             double initial_sarea = area_on_sphere_lHuiller ( mbCore, runCtx->meshsets[0], radius_src ); // use the target to compute the initial area
             double initial_tarea = area_on_sphere_lHuiller ( mbCore, runCtx->meshsets[1], radius_dest ); // use the target to compute the initial area
             double area_method1 = area_on_sphere_lHuiller ( mbCore, intxset, radius_src );
             double area_method2 = area_on_sphere ( mbCore, intxset, radius_src );
 
-            printf ( "initial area: source = %12.10f, target = %12.10f\n", initial_sarea, initial_tarea );
-            printf ( " area with l'Huiller: %12.10f with Girard: %12.10f\n", area_method1, area_method2 );
-            printf ( " relative difference areas = %12.10e\n", fabs ( area_method1 - area_method2 ) / area_method1 );
-            printf ( " relative error w.r.t source = %12.10e, and target = %12.10e\n", fabs ( area_method1 - initial_sarea ) / area_method1, fabs ( area_method1 - initial_tarea ) / area_method1 );
+            outputFormatter.printf ( 0,  "initial areas: source = %12.10f, target = %12.10f \n", initial_sarea, initial_tarea );
+            outputFormatter.printf ( 0,  " area with l'Huiller: %12.10f with Girard: %12.10f\n", area_method1, area_method2 );
+            outputFormatter.printf ( 0,  " relative difference areas = %12.10e\n", fabs ( area_method1 - area_method2 ) / area_method1 );
+            outputFormatter.printf ( 0,  " relative error w.r.t source = %12.10e, target = %12.10e \n", fabs ( area_method1 - initial_sarea ) / area_method1, fabs ( area_method1 - initial_tarea ) / area_method1 );
         }
 
         // Write out our computed intersection file
@@ -401,14 +416,14 @@ int main ( int argc, char* argv[] )
             rval = mbCore->get_entities_by_dimension ( runCtx->meshsets[0], 2, rintxelems ); MB_CHK_ERR ( rval );
             rval = fix_degenerate_quads ( mbCore, runCtx->meshsets[0] ); MB_CHK_ERR ( rval );
             rval = positive_orientation ( mbCore, runCtx->meshsets[0], radius_src ); MB_CHK_ERR ( rval );
-            if ( !proc_id ) printf ( "The red set contains %lu vertices and %lu elements \n", rintxverts.size(), rintxelems.size() );
+            if ( !proc_id ) outputFormatter.printf ( 0,  "The source set contains %lu vertices and %lu elements \n", rintxverts.size(), rintxelems.size() );
 
             moab::Range bintxverts, bintxelems;
             rval = mbCore->get_entities_by_dimension ( runCtx->meshsets[1], 0, bintxverts ); MB_CHK_ERR ( rval );
             rval = mbCore->get_entities_by_dimension ( runCtx->meshsets[1], 2, bintxelems ); MB_CHK_ERR ( rval );
             rval = fix_degenerate_quads ( mbCore, runCtx->meshsets[1] ); MB_CHK_ERR ( rval );
             rval = positive_orientation ( mbCore, runCtx->meshsets[1], radius_dest ); MB_CHK_ERR ( rval );
-            if ( !proc_id ) printf ( "The blue set contains %lu vertices and %lu elements \n", bintxverts.size(), bintxelems.size() );
+            if ( !proc_id ) outputFormatter.printf ( 0,  "The target set contains %lu vertices and %lu elements \n", bintxverts.size(), bintxelems.size() );
         }
 
         // First compute the covering set such that the target elements are fully covered by the lcoal source grid
@@ -440,10 +455,10 @@ int main ( int argc, char* argv[] )
 #endif
             if ( !proc_id )
             {
-                printf ( "initial area: source = %12.14f, target = %12.14f, overlap with l'Huiller: %12.14f\n", global_areas[0], global_areas[1], global_areas[2] );
-                // printf ( " area with l'Huiller: %12.14f with Girard: %12.14f\n", global_areas[2], global_areas[3] );
-                // printf ( " relative difference areas = %12.10e\n", fabs ( global_areas[2] - global_areas[3] ) / global_areas[2] );
-                printf ( " relative error w.r.t source = %12.14e, and target = %12.14e\n", fabs ( global_areas[0] - global_areas[2] ) / global_areas[0], fabs ( global_areas[1] - global_areas[2] ) / global_areas[1] );
+                outputFormatter.printf ( 0, "initial area: source = %12.14f, target = %12.14f, overlap with l'Huiller: %12.14f\n", global_areas[0], global_areas[1], global_areas[2] );
+                // outputFormatter.printf ( 0, " area with l'Huiller: %12.14f with Girard: %12.14f\n", global_areas[2], global_areas[3] );
+                // outputFormatter.printf ( 0, " relative difference areas = %12.10e\n", fabs ( global_areas[2] - global_areas[3] ) / global_areas[2] );
+                outputFormatter.printf ( 0, " relative error w.r.t source = %12.14e, and target = %12.14e\n", fabs ( global_areas[0] - global_areas[2] ) / global_areas[0], fabs ( global_areas[1] - global_areas[2] ) / global_areas[1] );
             }
         }
 
@@ -468,12 +483,13 @@ int main ( int argc, char* argv[] )
 #endif
             rval = mbCore->add_entities(writableOverlapSet, ovEnts);MB_CHK_SET_ERR(rval, "Deleting ghosted entities failed");
 
-            // Write out our computed intersection file
             size_t lastindex = runCtx->intxFilename.find_last_of(".");
             sstr.str("");
             sstr << runCtx->intxFilename.substr(0, lastindex) << ".h5m";
             if(!runCtx->proc_id) std::cout << "Writing out the MOAB intersection mesh file to " << sstr.str() << std::endl;
-            rval = mbCore->write_file ( sstr.str().c_str(), NULL, "PARALLEL=WRITE_PART", &writableOverlapSet, 1 ); MB_CHK_ERR ( rval );
+
+            // Write out our computed intersection file
+            rval = mbCore->write_file ( sstr.str().c_str(), NULL, writeOptions, &writableOverlapSet, 1 ); MB_CHK_ERR ( rval );
         }
 
         if ( runCtx->computeWeights )
@@ -541,6 +557,18 @@ int main ( int argc, char* argv[] )
                 }
             }
 
+            if ( runCtx->verifyWeights )
+            {
+                runCtx->timer_push ( "describe a solution on source grid" );
+                moab::Tag analyticalFunction;
+                rval = remapper.DefineAnalyticalSolution ( analyticalFunction, "sinx", moab::Remapper::SourceMesh, 
+                                                            runCtx->disc_methods[0], 
+                                                            runCtx->disc_orders[0],
+                                                            &sample_slow_harmonic);MB_CHK_ERR ( rval );
+                runCtx->timer_pop();
+                // rval = mbCore->write_file ( "srcWithSolnTag.h5m", NULL, writeOptions, &runCtx->meshsets[0], 1 ); MB_CHK_ERR ( rval );
+            }
+
             delete weightMap;
         }
     }
@@ -557,12 +585,13 @@ int main ( int argc, char* argv[] )
 }
 
 
-moab::ErrorCode CreateTempestMesh ( ToolContext& ctx, moab::TempestRemapper& remapper, Mesh* tempest_mesh )
+static moab::ErrorCode CreateTempestMesh ( ToolContext& ctx, moab::TempestRemapper& remapper, Mesh* tempest_mesh )
 {
     moab::ErrorCode rval = moab::MB_SUCCESS;
     int err;
+    moab::DebugOutput& outputFormatter = ctx.outputFormatter;
 
-    if ( !ctx.proc_id ) { printf ( "Creating TempestRemap Mesh object ...\n" ); }
+    if ( !ctx.proc_id ) { outputFormatter.printf ( 0,  "Creating TempestRemap Mesh object ...\n" ); }
 
     if ( ctx.meshType == moab::TempestRemapper::OVERLAP_FILES )
     {
@@ -676,3 +705,66 @@ moab::ErrorCode CreateTempestMesh ( ToolContext& ctx, moab::TempestRemapper& rem
 
     return rval;
 }
+
+
+///////////////////////////////////////////////
+//         Test functions
+
+double sample_slow_harmonic ( double dLon, double dLat )
+{
+  return (2.0 + cos(dLat) * cos(dLat) * cos(2.0 * dLon));
+}
+
+double sample_fast_harmonic ( double dLon, double dLat )
+{
+  return (2.0 + pow(sin(2.0 * dLat), 16.0) * cos(16.0 * dLon));
+	//return (2.0 + pow(cos(2.0 * dLat), 16.0) * cos(16.0 * dLon));
+}
+
+double sample_constant ( double /*dLon*/, double /*dLat*/ )
+{
+  return 1.0;
+}
+
+double sample_stationary_vortex ( double dLon, double dLat )
+{
+  const double dLon0 = 0.0;
+  const double dLat0 = 0.6;
+  const double dR0 = 3.0;
+  const double dD = 5.0;
+  const double dT = 6.0;
+
+  ///		Find the rotated longitude and latitude of a point on a sphere
+  ///		with pole at (dLonC, dLatC).
+  {
+    double dSinC = sin(dLat0);
+    double dCosC = cos(dLat0);
+    double dCosT = cos(dLat);
+    double dSinT = sin(dLat);
+
+    double dTrm  = dCosT * cos(dLon - dLon0);
+    double dX = dSinC * dTrm - dCosC * dSinT;
+    double dY = dCosT * sin(dLon - dLon0);
+    double dZ = dSinC * dSinT + dCosC * dTrm;
+
+    dLon = atan2(dY, dX);
+    if (dLon < 0.0) {
+        dLon += 2.0 * M_PI;
+    }
+    dLat = asin(dZ);
+  }
+
+  double dRho = dR0 * cos(dLat);
+  double dVt = 3.0 * sqrt(3.0) / 2.0 / cosh(dRho) / cosh(dRho) * tanh(dRho);
+
+  double dOmega;
+  if (dRho == 0.0) {
+    dOmega = 0.0;
+  } else {
+    dOmega = dVt / dRho;
+  }
+
+  return (1.0 - tanh(dRho / dD * sin(dLon - dOmega * dT)));
+}
+
+///////////////////////////////////////////////
