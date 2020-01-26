@@ -1831,7 +1831,9 @@ ErrorCode TempestRemapper::DefineAnalyticalSolution ( moab::Tag& solnTag, const 
                                                 Remapper::IntersectionContext ctx,
                                                 const std::string& discMethod,
                                                 int discOrder,
-                                                sample_function testFunction)
+                                                sample_function testFunction,
+                                                moab::Tag* clonedSolnTag,
+                                                std::string cloneSolnName)
 {
   moab::ErrorCode rval;
   const bool outputEnabled = ( TempestRemapper::verbose && is_root );
@@ -1859,6 +1861,14 @@ ErrorCode TempestRemapper::DefineAnalyticalSolution ( moab::Tag& solnTag, const 
 
   // Let us create teh solution tag with appropriate information for name, discretization order (DoF space)
   rval = m_interface->tag_get_handle ( solnName.c_str(), discOrder*discOrder, MB_TYPE_DOUBLE, solnTag, MB_TAG_DENSE | MB_TAG_CREAT ); MB_CHK_ERR ( rval );
+  if (clonedSolnTag != NULL)
+  {
+    if (cloneSolnName.size() == 0)
+    {
+      cloneSolnName = solnName + std::string("Cloned");
+    }
+    rval = m_interface->tag_get_handle ( cloneSolnName.c_str(), discOrder*discOrder, MB_TYPE_DOUBLE, *clonedSolnTag, MB_TAG_DENSE | MB_TAG_CREAT ); MB_CHK_ERR ( rval );
+  }
 
   // Triangular quadrature rule
   const int TriQuadratureOrder = 10;
@@ -2049,6 +2059,9 @@ ErrorCode TempestRemapper::DefineAnalyticalSolution ( moab::Tag& solnTag, const 
         dVar[i] /= dNodeArea[i];
       }
     }
+
+    // Set the tag data
+    rval = m_interface->tag_set_data ( solnTag, entities, &dVar[0] );MB_CHK_ERR ( rval );
   }
   else
   {
