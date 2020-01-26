@@ -214,10 +214,17 @@ public:
 
     typedef double (*sample_function)(double, double);
 
-    moab::ErrorCode DefineAnalyticalSolution ( moab::Tag& solnTag, const std::string& solnName, Remapper::IntersectionContext ctx, 
+    /// <summary>
+    ///     Define an analytical solution over the given (source or target) mesh, as specificed in the context.
+    ///     This routine will define a tag that is compatible with the specified discretization method type and order
+    ///     and sample the solution exactly using the analytical function provided by the user.
+    /// </summary>
+    moab::ErrorCode DefineAnalyticalSolution ( moab::Tag& exactSolnTag, const std::string& solnName, Remapper::IntersectionContext ctx, 
                                                 const std::string& discMethod, 
                                                 int discOrder,
-                                                sample_function testFunction);
+                                                sample_function testFunction,
+                                                moab::Tag* clonedSolnTag=NULL,
+                                                std::string cloneSolnName="");
 
     /// <summary>
     ///     Compute the local and global IDs for elements in source/target/coverage meshes.
