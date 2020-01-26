@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
   opts.addOpt<std::string>("outputFile,o", "output intersection file", &outputFile);
 
   double R = 1.; // input
-  double epsrel=1.e-8;
+  double epsrel=1.e-9;
   double boxeps=1.e-4;
   outputFile = "intx.h5m";
   opts.addOpt<double>("radius,R", "radius for model intx", &R);
