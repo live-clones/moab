@@ -548,7 +548,7 @@ int main ( int argc, char* argv[] )
                                                             ctx.disc_orders[0],
                                                             testFunction);MB_CHK_ERR ( rval );
                 ctx.timer_pop();
-                // rval = mbCore->write_file ( "srcWithSolnTag.h5m", NULL, writeOptions, &ctx.meshsets[0], 1 ); MB_CHK_ERR ( rval );
+                rval = mbCore->write_file ( "srcWithSolnTag.h5m", NULL, writeOptions, &ctx.meshsets[0], 1 ); MB_CHK_ERR ( rval );
 
                 ctx.timer_push ( "describe a solution on target grid" );
                 moab::Tag tgtAnalyticalFunction;
@@ -559,8 +559,18 @@ int main ( int argc, char* argv[] )
                                                             testFunction,
                                                             &tgtProjectedFunction,
                                                             "ProjectedSolnTgt");MB_CHK_ERR ( rval );
-                // rval = mbCore->write_file ( "tgtWithSolnTag.h5m", NULL, writeOptions, &ctx.meshsets[1], 1 ); MB_CHK_ERR ( rval );
+                rval = mbCore->write_file ( "tgtWithSolnTag.h5m", NULL, writeOptions, &ctx.meshsets[1], 1 ); MB_CHK_ERR ( rval );
                 ctx.timer_pop();
+
+                ctx.timer_push ( "compute solution projection on target grid" );
+                rval = weightMap->ApplyWeights(srcAnalyticalFunction, tgtProjectedFunction);MB_CHK_ERR ( rval );
+                ctx.timer_pop();
+                rval = mbCore->write_file ( "tgtWithSolnTag2.h5m", NULL, writeOptions, &ctx.meshsets[1], 1 ); MB_CHK_ERR ( rval );
+                
+
+                // ctx.timer_push ( "compute error metrics against analytical solution on target grid" );
+                // rval = weightMap->ComputeMetrics(tgtAnalyticalFunction, tgtSolution);MB_CHK_ERR ( rval );
+                // ctx.timer_pop();
             }
 
             delete weightMap;

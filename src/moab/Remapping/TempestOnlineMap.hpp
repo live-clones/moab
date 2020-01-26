@@ -315,11 +315,18 @@ public:
     int GetColGlobalDoF(int localID) const;
 
 	///	<summary>
-	///		Apply the weight matrix onto the source vector provided as input, and return the column vector (solution projection) after the application 
-	///     Compute:        \p tgtVals = A * \srcVals, or 
-	///     if (transpose)  \p tgtVals = A^T * \srcVals
+	///		Apply the weight matrix onto the source vector provided as input, and return the column vector (solution projection) after the map application
+	///     Compute:        \p tgtVals = A(S->T) * \srcVals, or
+	///     if (transpose)  \p tgtVals = [A(T->S)]^T * \srcVals
 	///	</summary>
 	moab::ErrorCode ApplyWeights (std::vector<double>& srcVals, std::vector<double>& tgtVals, bool transpose=false);
+
+	///	<summary>
+	///		Apply the weight matrix onto the source vector (tag) provided as input, and return the column vector (solution projection) in a tag, after the map application
+	///     Compute:        \p tgtVals = A(S->T) * \srcVals, or
+	///     if (transpose)  \p tgtVals = [A(T->S)]^T * \srcVals
+	///	</summary>
+	moab::ErrorCode ApplyWeights (  moab::Tag srcSolutionTag, moab::Tag tgtSolutionTag, bool transpose=false );
 
 	///	<summary>
 	///		Parallel I/O with NetCDF to write out the SCRIP file from multiple processors.
