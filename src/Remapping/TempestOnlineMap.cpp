@@ -1834,3 +1834,62 @@ moab::ErrorCode moab::TempestOnlineMap::WriteParallelMap (std::string strOutputF
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+
+moab::ErrorCode moab::TempestOnlineMap::ApplyWeights (  moab::Tag srcSolutionTag, moab::Tag tgtSolutionTag, bool transpose )
+{
+    moab::ErrorCode rval;
+
+    std::vector<double> solSTagVals;
+    std::vector<double> solTTagVals;
+
+    moab::Range sents, tents;
+    if (m_remapper->point_cloud_source || m_remapper->point_cloud_target)
+    {
+        if (m_remapper->point_cloud_source)
+        {
+            moab::Range& covSrcEnts = m_remapper->GetMeshVertices(moab::Remapper::CoveringMesh);
+            solSTagVals.resize(covSrcEnts.size(), -1.0);
+            sents = covSrcEnts;
+        }
+        else
+        {
+            moab::Range& covSrcEnts = m_remapper->GetMeshEntities(moab::Remapper::CoveringMesh);
+            solSTagVals.resize(covSrcEnts.size()*this->GetSourceNDofsPerElement()*this->GetSourceNDofsPerElement(), -1.0);
+            sents = covSrcEnts;
+        }
+        if (m_remapper->point_cloud_target)
+        {
+            moab::Range& tgtEnts = m_remapper->GetMeshVertices(moab::Remapper::TargetMesh);
+            solTTagVals.resize(tgtEnts.size(), -1.0);
+            tents = tgtEnts;
+        }
+        else
+        {
+            moab::Range& tgtEnts = m_remapper->GetMeshEntities(moab::Remapper::TargetMesh);
+            solTTagVals.resize(tgtEnts.size()*this->GetDestinationNDofsPerElement()*this->GetDestinationNDofsPerElement(), -1.0);
+            tents = tgtEnts;
+        }
+    }
+    else
+    {
+        moab::Range& covSrcEnts = m_remapper->GetMeshEntities(moab::Remapper::CoveringMesh);
+        moab::Range& tgtEnts = m_remapper->GetMeshEntities(moab::Remapper::TargetMesh);
+        solSTagVals.resize(covSrcEnts.size()*this->GetSourceNDofsPerElement()*this->GetSourceNDofsPerElement(), -1.0);
+        solTTagVals.resize(tgtEnts.size()*this->GetDestinationNDofsPerElement()*this->GetDestinationNDofsPerElement(), -1.0);
+
+        sents = covSrcEnts;
+        tents = tgtEnts;
+    }
+    
+    // The tag data is np*np*n_el_src
+    rval = m_interface->tag_get_data (srcSolutionTag, sents, &solSTagVals[0] );MB_CHK_SET_ERR(rval, "Getting local tag data failed");
+
+    // Compute the application of weights on the suorce solution data and store it in the destination solution vector data
+    // Optionally, can also perform the transpose application of the weight matrix. Set the 3rd argument to true if this is needed
+    rval = this->ApplyWeights(solSTagVals, solTTagVals, transpose);MB_CHK_SET_ERR(rval, "Applying remap operator onto source vector data failed");
+
+    // The tag data is np*np*n_el_dest
+    rval = m_interface->tag_set_data (tgtSolutionTag , tents, &solTTagVals[0] );MB_CHK_SET_ERR(rval, "Setting local tag data failed");
+
+    return moab::MB_SUCCESS;
+}

@@ -582,6 +582,15 @@ int main ( int argc, char* argv[] )
                                                             "ProjectedSolnTgt");MB_CHK_ERR ( rval );
                 // rval = mbCore->write_file ( "tgtWithSolnTag.h5m", NULL, writeOptions, &ctx.meshsets[1], 1 ); MB_CHK_ERR ( rval );
                 runCtx->timer_pop();
+
+                runCtx->timer_push ( "compute solution projection on target grid" );
+                rval = weightMap->ApplyWeights(srcAnalyticalFunction, tgtProjectedFunction);MB_CHK_ERR ( rval );
+                runCtx->timer_pop();
+                // rval = mbCore->write_file ( "tgtWithSolnTag2.h5m", NULL, writeOptions, &ctx.meshsets[1], 1 ); MB_CHK_ERR ( rval );
+                
+                // runCtx->timer_push ( "compute error metrics against analytical solution on target grid" );
+                // rval = weightMap->ComputeMetrics(tgtAnalyticalFunction, tgtSolution);MB_CHK_ERR ( rval );
+                // runCtx->timer_pop();
             }
 
             delete weightMap;
