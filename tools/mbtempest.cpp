@@ -61,7 +61,7 @@ struct ToolContext
         bool fVolumetric;
         bool rrmGrids;
         bool fNoBubble, fInputConcave, fOutputConcave, fNoCheck;
-        bool bruteForce;
+        bool kdtreeSearch;
 
 #ifdef MOAB_HAVE_MPI
         ToolContext ( moab::Interface* icore, moab::ParallelComm* p_pcomm ) :
@@ -74,7 +74,7 @@ struct ToolContext
 #endif
             blockSize ( 5 ), outFilename ( "output.exo" ), intxFilename ( "" ), meshType ( moab::TempestRemapper::DEFAULT ),
             computeDual ( false ), computeWeights ( false ), ensureMonotonicity ( 0 ), 
-            fNoConservation ( false ), fVolumetric ( false ), rrmGrids ( false ), bruteForce ( false ),
+            fNoConservation ( false ), fVolumetric ( false ), rrmGrids ( false ), kdtreeSearch ( true ),
             fNoBubble(false), fInputConcave(false), fOutputConcave(false), fNoCheck(false)
         {
             inFilenames.resize ( 2 );
@@ -133,6 +133,7 @@ struct ToolContext
             std::string expectedMethod = "fv";
             std::string expectedDofTagName = "GLOBAL_ID";
             int expectedOrder = 1;
+            bool advFront = false;
 
             opts.addOpt<int> ( "type,t", "Type of mesh (default=CS; Choose from [CS=0, RLL=1, ICO=2, OVERLAP_FILES=3, OVERLAP_MEMORY=4, OVERLAP_MOAB=5])", &imeshType );
             opts.addOpt<int> ( "res,r", "Resolution of the mesh (default=5)", &blockSize );
@@ -141,7 +142,7 @@ struct ToolContext
             opts.addOpt<void> ( "noconserve,c", "Do not apply conservation to the resultant weights (relevant only when computing weights)", &fNoConservation );
             opts.addOpt<void> ( "volumetric,v", "Apply a volumetric projection to compute the weights (relevant only when computing weights)", &fVolumetric );
             opts.addOpt<void> ( "rrmgrids", "At least one of the meshes is a regionally refined grid (relevant to accelerate intersection computation)", &rrmGrids );
-            opts.addOpt<void> ( "brute,b", "Use brute force method to compute mesh intersections", &bruteForce );
+            opts.addOpt<void> ( "advfront,a", "Use the advancing front intersection instead of the Kd-tree based algorithm to compute mesh intersections", &advFront );
             opts.addOpt<int> ( "monotonic,n", "Ensure monotonicity in the weight generation", &ensureMonotonicity );
             opts.addOpt<std::string> ( "load,l", "Input mesh filenames (a source and target mesh)", &expectedFName );
             opts.addOpt<int> ( "order,o", "Discretization orders for the source and target solution fields", &expectedOrder );
@@ -149,6 +150,9 @@ struct ToolContext
             opts.addOpt<std::string> ( "global_id,g", "Tag name that contains the global DoF IDs for source and target solution fields", &expectedDofTagName );
             opts.addOpt<std::string> ( "file,f", "Output remapping weights filename", &outFilename );
             opts.addOpt<std::string> ( "intx,i", "Output TempestRemap intersection mesh filename", &intxFilename );
+
+            // By default - use Kd-tree based search; if user asks for advancing front, disable Kd-tree algorithm
+            kdtreeSearch = !advFront;
 
             opts.parseCommandLine ( argc, argv );
 
@@ -405,7 +409,7 @@ int main ( int argc, char* argv[] )
         // Compute intersections with MOAB
         ctx.timer_push ( "setup and compute mesh intersections" );
         rval = remapper.ConstructCoveringSet ( epsrel, 1.0, 1.0, 0.1, ctx.rrmGrids ); MB_CHK_ERR ( rval );
-        rval = remapper.ComputeOverlapMesh ( ctx.bruteForce, false ); MB_CHK_ERR ( rval );
+        rval = remapper.ComputeOverlapMesh ( ctx.kdtreeSearch, false ); MB_CHK_ERR ( rval );
         ctx.timer_pop();
 
         {
@@ -435,14 +439,6 @@ int main ( int argc, char* argv[] )
 
         if ( ctx.intxFilename.size() )
         {
-            // Call to write out the intersection meshes in the TempestRemap format so that it can be used directly with GenerateOfflineMap
-            // The call arguments are as follows: 
-            //      (std::string strOutputFileName, const bool fAllParallel, const bool fInputConcave, const bool fOutputConcave);
-#ifdef MOAB_HAVE_MPI
-//            rval = remapper.WriteTempestIntersectionMesh(ctx.intxFilename, true, false, false);MB_CHK_ERR ( rval ); 
-#else
-//            rval = remapper.WriteTempestIntersectionMesh(ctx.intxFilename, false, false, false);MB_CHK_ERR ( rval );
-#endif
             // Write out our computed intersection file
             size_t lastindex = ctx.intxFilename.find_last_of(".");
             sstr.str("");

@@ -979,7 +979,7 @@ ErrorCode TempestRemapper::ConstructCoveringSet ( double tolerance, double radiu
     return rval;
 }
 
-ErrorCode TempestRemapper::ComputeOverlapMesh ( bool brute_force, bool use_tempest )
+ErrorCode TempestRemapper::ComputeOverlapMesh ( bool kdtree_search, bool use_tempest )
 {
     ErrorCode rval;
 
@@ -1050,7 +1050,7 @@ ErrorCode TempestRemapper::ComputeOverlapMesh ( bool brute_force, bool use_tempe
         }
 
         // Now perform the actual parallel intersection between the source and the target meshes
-        if (brute_force)
+        if (kdtree_search)
         {
           rval = mbintx->intersect_meshes_kdtree ( m_covering_source_set, m_target_set, m_overlap_set ); MB_CHK_SET_ERR ( rval, "Can't compute the intersection of meshes on the sphere with brute-force" );
         }

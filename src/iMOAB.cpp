@@ -2385,7 +2385,7 @@ static ErrCode ComputeSphereRadius ( iMOAB_AppID pid, double* radius)
     return 0;
 }
 
-ErrCode iMOAB_ComputeMeshIntersectionOnSphere ( iMOAB_AppID pid_src, iMOAB_AppID pid_tgt, iMOAB_AppID pid_intx)
+ErrCode iMOAB_ComputeMeshIntersectionOnSphere ( iMOAB_AppID pid_src, iMOAB_AppID pid_tgt, iMOAB_AppID pid_intx )
 {
     ErrorCode rval;
     ErrCode ierr;
@@ -2429,7 +2429,7 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere ( iMOAB_AppID pid_src, iMOAB_AppID
     // std::cout << "Radius of spheres: source = " << radius_source << " and target = " << radius_target << "\n";
 #endif
     // print verbosely about the problem setting
-    bool use_brute_force = false;
+    bool use_kdtree_search = false;
     double srctgt_areas[2], srctgt_areas_glb[2];
     {
         moab::Range rintxverts, rintxelems;
@@ -2458,7 +2458,7 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere ( iMOAB_AppID pid_src, iMOAB_AppID
         srctgt_areas_glb[1] = srctgt_areas[1];
 #endif
         printf ( "initial area: source = %12.14f, target = %12.14f\n", srctgt_areas_glb[0], srctgt_areas_glb[1] );
-        use_brute_force = (srctgt_areas_glb[0] < srctgt_areas_glb[1]);
+        use_kdtree_search = (srctgt_areas_glb[0] < srctgt_areas_glb[1]);
     }
 
     data_intx.dimension = data_tgt.dimension;
@@ -2496,7 +2496,7 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere ( iMOAB_AppID pid_src, iMOAB_AppID
     rval = tdata.remapper->ConstructCoveringSet ( epsrel, 1.0, 1.0, boxeps, false );CHKERRVAL(rval);
 
     // Next, compute intersections with MOAB.
-    rval = tdata.remapper->ComputeOverlapMesh ( use_brute_force, false );CHKERRVAL(rval);
+    rval = tdata.remapper->ComputeOverlapMesh ( use_kdtree_search, false );CHKERRVAL(rval);
     // rval = data_intx.remapper->ConvertMeshToTempest ( moab::Remapper::IntersectedMesh );CHKERRVAL(rval);
 
     // if (radii_scaled) { /* the radii are different, so lets rescale back */
