@@ -539,13 +539,11 @@ int main ( int argc, char* argv[] )
             if ( ctx.verifyWeights )
             {
                 // Let us pick a sampling test function for solution evaluation
-                moab::TempestRemapper::sample_function testFunction = &sample_slow_harmonic;
+                moab::TempestOnlineMap::sample_function testFunction = &sample_slow_harmonic;
 
                 ctx.timer_push ( "describe a solution on source grid" );
                 moab::Tag srcAnalyticalFunction;
-                rval = remapper.DefineAnalyticalSolution ( srcAnalyticalFunction, "AnalyticalSolnSrcExact", moab::Remapper::SourceMesh, 
-                                                            ctx.disc_methods[0], 
-                                                            ctx.disc_orders[0],
+                rval = weightMap->DefineAnalyticalSolution ( srcAnalyticalFunction, "AnalyticalSolnSrcExact", moab::Remapper::SourceMesh, 
                                                             testFunction);MB_CHK_ERR ( rval );
                 ctx.timer_pop();
                 rval = mbCore->write_file ( "srcWithSolnTag.h5m", NULL, writeOptions, &ctx.meshsets[0], 1 ); MB_CHK_ERR ( rval );
@@ -553,9 +551,7 @@ int main ( int argc, char* argv[] )
                 ctx.timer_push ( "describe a solution on target grid" );
                 moab::Tag tgtAnalyticalFunction;
                 moab::Tag tgtProjectedFunction;
-                rval = remapper.DefineAnalyticalSolution ( tgtAnalyticalFunction, "AnalyticalSolnTgtExact", moab::Remapper::TargetMesh, 
-                                                            ctx.disc_methods[1],
-                                                            ctx.disc_orders[1],
+                rval = weightMap->DefineAnalyticalSolution ( tgtAnalyticalFunction, "AnalyticalSolnTgtExact", moab::Remapper::TargetMesh, 
                                                             testFunction,
                                                             &tgtProjectedFunction,
                                                             "ProjectedSolnTgt");MB_CHK_ERR ( rval );

@@ -15,6 +15,9 @@
 #include "Announce.h"
 #include "DataArray3D.h"
 #include "FiniteElementTools.h"
+#include "TriangularQuadrature.h"
+#include "GaussQuadrature.h"
+#include "GaussLobattoQuadrature.h"
 #include "SparseMatrix.h"
 #include "STLStringHelper.h"
 
@@ -1944,3 +1947,381 @@ moab::ErrorCode moab::TempestOnlineMap::ApplyWeights (  moab::Tag srcSolutionTag
 
     return moab::MB_SUCCESS;
 }
+
+
+moab::ErrorCode moab::TempestOnlineMap::DefineAnalyticalSolution ( moab::Tag& solnTag, const std::string& solnName,
+                                                moab::Remapper::IntersectionContext ctx,
+                                                sample_function testFunction,
+                                                moab::Tag* clonedSolnTag,
+                                                std::string cloneSolnName)
+{
+  moab::ErrorCode rval;
+  const bool outputEnabled = ( is_root );
+  int discOrder;
+  DiscretizationType discMethod;
+  moab::EntityHandle meshset;
+  moab::Range entities;
+  Mesh* trmesh;
+  switch(ctx)
+  {
+    case Remapper::SourceMesh:
+      meshset = m_remapper->m_covering_source_set;
+      trmesh = m_remapper->m_covering_source;
+      entities = (m_remapper->point_cloud_source ? m_remapper->m_covering_source_vertices : m_remapper->m_covering_source_entities);
+      discOrder = m_nDofsPEl_Src;
+      discMethod = m_eInputType;
+      break;
+
+    case Remapper::TargetMesh:
+      meshset = m_remapper->m_target_set;
+      trmesh = m_remapper->m_target;
+      entities = (m_remapper->point_cloud_target ? m_remapper->m_target_vertices : m_remapper->m_target_entities);
+      discOrder = m_nDofsPEl_Dest;
+      discMethod = m_eOutputType;
+      break;
+
+    default:
+      if (outputEnabled) std::cout << "Invalid context specified for defining an analytical solution tag" << std::endl;
+      return moab::MB_FAILURE;
+  }
+
+  // Let us create teh solution tag with appropriate information for name, discretization order (DoF space)
+  rval = m_interface->tag_get_handle ( solnName.c_str(), discOrder*discOrder, MB_TYPE_DOUBLE, solnTag, MB_TAG_DENSE | MB_TAG_CREAT ); MB_CHK_ERR ( rval );
+  if (clonedSolnTag != NULL)
+  {
+    if (cloneSolnName.size() == 0)
+    {
+      cloneSolnName = solnName + std::string("Cloned");
+    }
+    rval = m_interface->tag_get_handle ( cloneSolnName.c_str(), discOrder*discOrder, MB_TYPE_DOUBLE, *clonedSolnTag, MB_TAG_DENSE | MB_TAG_CREAT ); MB_CHK_ERR ( rval );
+  }
+
+  // Triangular quadrature rule
+  const int TriQuadratureOrder = 10;
+
+  if (outputEnabled) std::cout << "Using triangular quadrature of order " <<  TriQuadratureOrder << std::endl;
+
+  TriangularQuadratureRule triquadrule(TriQuadratureOrder);
+
+  const int TriQuadraturePoints = triquadrule.GetPoints();
+
+  const DataArray2D<double> & TriQuadratureG = triquadrule.GetG();
+  const DataArray1D<double> & TriQuadratureW = triquadrule.GetW();
+
+  // Output data
+  DataArray1D<double> dVar;
+  DataArray1D<double> dVarMB; // re-arranged local MOAB vector
+
+  // Nodal geometric area
+  DataArray1D<double> dNodeArea;
+
+  // Calculate element areas
+  // trmesh->CalculateFaceAreas(fContainsConcaveFaces);
+
+  if ( discMethod == DiscretizationType_CGLL || discMethod == DiscretizationType_DGLL )
+  {
+    /* Get the spectral points and sample the functionals accordingly */
+    const bool fGLL = true;
+    const bool fGLLIntegrate = false;
+
+    // Generate grid metadata
+    DataArray3D<int> dataGLLNodes;
+    DataArray3D<double> dataGLLJacobian;
+
+    GenerateMetaData(*trmesh, discOrder, false, dataGLLNodes, dataGLLJacobian);
+
+    // Number of elements
+    int nElements = trmesh->faces.size();
+
+    // Verify all elements are quadrilaterals
+    for (int k = 0; k < nElements; k++) {
+      const Face & face = trmesh->faces[k];
+
+      if (face.edges.size() != 4) {
+        _EXCEPTIONT("Non-quadrilateral face detected; "
+          "incompatible with --gll");
+      }
+    }
+
+    // Number of unique nodes
+    int iMaxNode = 0;
+    for (int i = 0; i < discOrder; i++) {
+      for (int j = 0; j < discOrder; j++) {
+        for (int k = 0; k < nElements; k++) {
+          if (dataGLLNodes[i][j][k] > iMaxNode) {
+            iMaxNode = dataGLLNodes[i][j][k];
+          }
+        }
+      }
+    }
+
+    // Get Gauss-Lobatto quadrature nodes
+    DataArray1D<double> dG;
+    DataArray1D<double> dW;
+
+    GaussLobattoQuadrature::GetPoints(discOrder, 0.0, 1.0, dG, dW);
+
+    // Get Gauss quadrature nodes
+    const int nGaussP = 10;
+
+    DataArray1D<double> dGaussG;
+    DataArray1D<double> dGaussW;
+
+    GaussQuadrature::GetPoints(nGaussP, 0.0, 1.0, dGaussG, dGaussW);
+
+    std::cout << "Max node size = " << iMaxNode << " Num elements = " << nElements << std::endl;
+    std::cout << "Disc order = " << discOrder << std::endl;
+
+    // Allocate data
+    dVar.Allocate(iMaxNode);
+    dVarMB.Allocate(discOrder*discOrder*nElements);
+    dNodeArea.Allocate(iMaxNode);
+
+    // Sample data
+    for (int k = 0; k < nElements; k++) {
+
+      const Face & face = trmesh->faces[k];
+
+      // Sample data at GLL nodes
+      if (fGLL) {
+		for (int i = 0; i < discOrder; i++)
+        {
+          for (int j = 0; j < discOrder; j++)
+          {
+
+            // Apply local map
+            Node node;
+            Node dDx1G;
+            Node dDx2G;
+
+            ApplyLocalMap(
+              face,
+              trmesh->nodes,
+              dG[i],
+              dG[j],
+              node,
+              dDx1G,
+              dDx2G);
+
+            // Sample data at this point
+            double dNodeLon = atan2(node.y, node.x);
+            if (dNodeLon < 0.0) {
+              dNodeLon += 2.0 * M_PI;
+            }
+            double dNodeLat = asin(node.z);
+
+            double dSample = (*testFunction)(dNodeLon, dNodeLat);
+
+            std::cout << "dataGLLNodes[j][i][k]-1 = " << dataGLLNodes[j][i][k]-1 << ", dSample = " << dSample << std::endl;
+
+            dVar[dataGLLNodes[j][i][k]-1] = dSample;
+          }
+        }
+        // High-order Gaussian integration over basis function
+      }
+      else {
+        DataArray2D<double> dCoeff(discOrder, discOrder);
+
+        for (int p = 0; p < nGaussP; p++) {
+          for (int q = 0; q < nGaussP; q++) {
+
+            // Apply local map
+            Node node;
+            Node dDx1G;
+            Node dDx2G;
+
+            ApplyLocalMap(
+              face,
+              trmesh->nodes,
+              dGaussG[p],
+              dGaussG[q],
+              node,
+              dDx1G,
+              dDx2G);
+
+            // Cross product gives local Jacobian
+            Node nodeCross = CrossProduct(dDx1G, dDx2G);
+
+            double dJacobian = sqrt(
+                nodeCross.x * nodeCross.x
+              + nodeCross.y * nodeCross.y
+              + nodeCross.z * nodeCross.z);
+
+            // Find components of quadrature point in basis
+            // of the first Face
+            SampleGLLFiniteElement(
+              0,
+              discOrder,
+              dGaussG[p],
+              dGaussG[q],
+              dCoeff);
+
+            // Sample data at this point
+            double dNodeLon = atan2(node.y, node.x);
+            if (dNodeLon < 0.0) {
+              dNodeLon += 2.0 * M_PI;
+            }
+            double dNodeLat = asin(node.z);
+
+            double dSample = (*testFunction)(dNodeLon, dNodeLat);
+
+            // Integrate
+            for (int i = 0; i < discOrder; i++) {
+              for (int j = 0; j < discOrder; j++) {
+
+                double dNodalArea =
+                  dCoeff[i][j]
+                  * dGaussW[p]
+                  * dGaussW[q]
+                  * dJacobian;
+
+                dVar[dataGLLNodes[i][j][k]-1] += dSample * dNodalArea;
+
+                dNodeArea[dataGLLNodes[i][j][k]-1] += dNodalArea;
+              }
+            }
+
+          }
+        }
+      }
+    }
+	
+    // Divide by area
+    if (fGLLIntegrate) {
+      for (size_t i = 0; i < dVar.GetRows(); i++) {
+        dVar[i] /= dNodeArea[i];
+      }
+    }
+
+    // Let us rearrange the data based on DoF ID specification
+    if (ctx == Remapper::SourceMesh)
+    {
+        for ( unsigned j = 0; j < entities.size(); j++ )
+            for ( int p = 0; p < discOrder; p++ )
+                for ( int q = 0; q < discOrder; q++ )
+                {
+                    const int ldof = dataGLLNodesSrcCov[p][q][j] - 1;
+                    const int idof = j * discOrder * discOrder + p * discOrder + q;
+                    // srccol_dofmap[ idof ] = ldof;
+                    // srccol_ldofmap[ ldof ] = idof;
+                    // srccol_gdofmap[ idof ] = locsrc_soln_gdofs[idof] - 1;
+                    dVarMB [ idof ] = dVar[ col_dofmap[ idof ] ];
+                }
+    }
+    else
+    {
+        for ( unsigned j = 0; j < entities.size(); j++ )
+            for ( int p = 0; p < discOrder; p++ )
+                for ( int q = 0; q < discOrder; q++ )
+                {
+                    const int ldof = dataGLLNodesDest[p][q][j] - 1;
+                    const int idof = j * discOrder * discOrder + p * discOrder + q;
+                    // srccol_dofmap[ idof ] = ldof;
+                    // srccol_ldofmap[ ldof ] = idof;
+                    // srccol_gdofmap[ idof ] = locsrc_soln_gdofs[idof] - 1;
+                    dVarMB [ idof ] = dVar[ row_dofmap[ idof ] ];
+                }
+    }
+    
+    // Set the tag data
+    rval = m_interface->tag_set_data ( solnTag, entities, &dVarMB[0] );MB_CHK_ERR ( rval );
+  }
+  else
+  {
+    assert(discOrder == 1);
+    if ( discMethod == DiscretizationType_FV )
+    {
+      /* Compute an element-wise integral to store the sampled solution based on Quadrature rules */
+      // Resize the array
+      dVar.Allocate(trmesh->faces.size());
+
+      std::vector<Node>& nodes = trmesh->nodes;
+
+      // Loop through all Faces
+      for (size_t i = 0; i < trmesh->faces.size(); i++) {
+
+        const Face & face = trmesh->faces[i];
+
+        // Loop through all sub-triangles
+        for (size_t j = 0; j < face.edges.size()-2; j++) {
+
+          const Node & node0 = nodes[face[0]];
+          const Node & node1 = nodes[face[j+1]];
+          const Node & node2 = nodes[face[j+2]];
+
+          // Triangle area
+          Face faceTri(3);
+          faceTri.SetNode(0, face[0]);
+          faceTri.SetNode(1, face[j+1]);
+          faceTri.SetNode(2, face[j+2]);
+
+          double dTriangleArea = CalculateFaceArea(faceTri, nodes);
+
+          // Calculate the element average
+          double dTotalSample = 0.0;
+
+          // Loop through all quadrature points
+          for (int k = 0; k < TriQuadraturePoints; k++) {
+            Node node(
+                TriQuadratureG[k][0] * node0.x
+              + TriQuadratureG[k][1] * node1.x
+              + TriQuadratureG[k][2] * node2.x,
+                TriQuadratureG[k][0] * node0.y
+              + TriQuadratureG[k][1] * node1.y
+              + TriQuadratureG[k][2] * node2.y,
+                TriQuadratureG[k][0] * node0.z
+              + TriQuadratureG[k][1] * node1.z
+              + TriQuadratureG[k][2] * node2.z);
+
+            double dMagnitude = node.Magnitude();
+            node.x /= dMagnitude;
+            node.y /= dMagnitude;
+            node.z /= dMagnitude;
+
+            double dLon = atan2(node.y, node.x);
+            if (dLon < 0.0) {
+              dLon += 2.0 * M_PI;
+            }
+            double dLat = asin(node.z);
+
+            double dSample = (*testFunction)(dLon, dLat);
+
+            dTotalSample += dSample * TriQuadratureW[k] * dTriangleArea;
+          }
+
+          dVar[i] += dTotalSample / trmesh->vecFaceArea[i];
+        }
+      }
+      rval = m_interface->tag_set_data ( solnTag, entities, &dVar[0] );MB_CHK_ERR ( rval );
+    }
+    else /* discMethod == DiscretizationType_PCLOUD */
+    {
+      /* Get the coordinates of the vertices and sample the functionals accordingly */
+      std::vector<Node>& nodes = trmesh->nodes;
+
+      // Resize the array
+      dVar.Allocate(nodes.size());
+
+      for (size_t j = 0; j < nodes.size(); j++) {
+        Node& node = nodes[j];
+        double dMagnitude = node.Magnitude();
+        node.x /= dMagnitude;
+        node.y /= dMagnitude;
+        node.z /= dMagnitude;
+        double dLon = atan2(node.y, node.x);
+        if (dLon < 0.0) {
+          dLon += 2.0 * M_PI;
+        }
+        double dLat = asin(node.z);
+
+        double dSample = (*testFunction)(dLon, dLat);
+        dVar[j] = dSample;
+      }
+
+      rval = m_interface->tag_set_data ( solnTag, entities, &dVar[0] );MB_CHK_ERR ( rval );
+    }
+  }
+
+  return moab::MB_SUCCESS;
+}
+

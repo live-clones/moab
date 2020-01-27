@@ -231,17 +231,6 @@ private:
 #endif
 
 public:
-#ifdef MOAB_HAVE_EIGEN
-
-	typedef Eigen::Matrix< double, 1, Eigen::Dynamic > WeightDRowVector;
-	typedef Eigen::Matrix< double, Eigen::Dynamic, 1 > WeightDColVector;
-	typedef Eigen::SparseVector<double> WeightSVector;
-	typedef Eigen::SparseMatrix<double, Eigen::RowMajor> WeightRMatrix;
-	typedef Eigen::SparseMatrix<double, Eigen::ColMajor> WeightCMatrix;
-
-	typedef WeightDRowVector WeightRowVector;
-	typedef WeightDColVector WeightColVector;
-	typedef WeightRMatrix WeightMatrix;
 
 	///	<summary>
 	///		Store the tag names associated with global DoF ids for source and target meshes
@@ -259,6 +248,18 @@ public:
 		DiscretizationType destType, bool isDestContinuous, 
 		DataArray3D<int>* tgtdataGLLNodes);
 
+#ifdef MOAB_HAVE_EIGEN
+
+	typedef Eigen::Matrix< double, 1, Eigen::Dynamic > WeightDRowVector;
+	typedef Eigen::Matrix< double, Eigen::Dynamic, 1 > WeightDColVector;
+	typedef Eigen::SparseVector<double> WeightSVector;
+	typedef Eigen::SparseMatrix<double, Eigen::RowMajor> WeightRMatrix;
+	typedef Eigen::SparseMatrix<double, Eigen::ColMajor> WeightCMatrix;
+
+	typedef WeightDRowVector WeightRowVector;
+	typedef WeightDColVector WeightColVector;
+	typedef WeightRMatrix WeightMatrix;
+
 	///	<summary>
 	///		Get the raw reference to the Eigen weight matrix representing the projection from source to destination mesh.
 	///	</summary>
@@ -274,7 +275,9 @@ public:
 	///	</summary>
 	WeightColVector& GetColVector();
 
-  ///	<summary>
+#endif
+
+	///	<summary>
 	///		Get the number of total Degrees-Of-Freedom defined on the source mesh.
 	///	</summary>
 	int GetSourceGlobalNDofs();
@@ -338,7 +341,17 @@ public:
 	///	</summary>
 	moab::ErrorCode WriteParallelMap (std::string strOutputFile) const;
 
-#endif
+    typedef double (*sample_function)(double, double);
+
+    /// <summary>
+    ///     Define an analytical solution over the given (source or target) mesh, as specificed in the context.
+    ///     This routine will define a tag that is compatible with the specified discretization method type and order
+    ///     and sample the solution exactly using the analytical function provided by the user.
+    /// </summary>
+    moab::ErrorCode DefineAnalyticalSolution ( moab::Tag& exactSolnTag, const std::string& solnName, Remapper::IntersectionContext ctx, 
+                                                sample_function testFunction,
+                                                moab::Tag* clonedSolnTag=NULL,
+                                                std::string cloneSolnName="");
 
 public:
 
