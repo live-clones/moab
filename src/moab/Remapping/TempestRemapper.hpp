@@ -73,7 +73,7 @@ public:
                                         double radius_src=1.0, double radius_tgt=1.0, 
                                         double boxeps=0.1, bool regional_mesh=false );
 
-    moab::ErrorCode ComputeOverlapMesh( bool use_tempest=false );
+    moab::ErrorCode ComputeOverlapMesh( bool brute_force=false, bool use_tempest=false );
 
     // Converters between MOAB and Tempest representations
     moab::ErrorCode ConvertTempestMesh(Remapper::IntersectionContext ctx);

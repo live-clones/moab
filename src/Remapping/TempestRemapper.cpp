@@ -979,7 +979,7 @@ ErrorCode TempestRemapper::ConstructCoveringSet ( double tolerance, double radiu
     return rval;
 }
 
-ErrorCode TempestRemapper::ComputeOverlapMesh ( bool use_tempest )
+ErrorCode TempestRemapper::ComputeOverlapMesh ( bool brute_force, bool use_tempest )
 {
     ErrorCode rval;
 
@@ -1050,7 +1050,14 @@ ErrorCode TempestRemapper::ComputeOverlapMesh ( bool use_tempest )
         }
 
         // Now perform the actual parallel intersection between the source and the target meshes
-        rval = mbintx->intersect_meshes ( m_covering_source_set, m_target_set, m_overlap_set ); MB_CHK_SET_ERR ( rval, "Can't compute the intersection of meshes on the sphere" );
+        if (brute_force)
+        {
+          rval = mbintx->intersect_meshes_kdtree ( m_covering_source_set, m_target_set, m_overlap_set ); MB_CHK_SET_ERR ( rval, "Can't compute the intersection of meshes on the sphere with brute-force" );
+        }
+        else
+        {
+          rval = mbintx->intersect_meshes ( m_covering_source_set, m_target_set, m_overlap_set ); MB_CHK_SET_ERR ( rval, "Can't compute the intersection of meshes on the sphere" );
+        }
 
 #ifdef MOAB_HAVE_MPI
         if (is_parallel || rrmgrids)
