@@ -560,26 +560,24 @@ int main ( int argc, char* argv[] )
             if ( runCtx->verifyWeights )
             {
                 // Let us pick a sampling test function for solution evaluation
-                moab::TempestRemapper::sample_function testFunction = &sample_slow_harmonic;
+                moab::TempestOnlineMap::sample_function testFunction = &sample_slow_harmonic;
 
                 runCtx->timer_push ( "describe a solution on source grid" );
                 moab::Tag srcAnalyticalFunction;
-                rval = remapper.DefineAnalyticalSolution ( srcAnalyticalFunction, "AnalyticalSolnSrcExact", moab::Remapper::SourceMesh, 
-                                                            runCtx->disc_methods[0], 
-                                                            runCtx->disc_orders[0],
-                                                            testFunction);MB_CHK_ERR ( rval );
+                rval = weightMap->DefineAnalyticalSolution ( srcAnalyticalFunction, "AnalyticalSolnSrcExact", 
+                                                             moab::Remapper::SourceMesh, 
+                                                             testFunction);MB_CHK_ERR ( rval );
                 runCtx->timer_pop();
                 // rval = mbCore->write_file ( "srcWithSolnTag.h5m", NULL, writeOptions, &ctx.meshsets[0], 1 ); MB_CHK_ERR ( rval );
 
                 runCtx->timer_push ( "describe a solution on target grid" );
                 moab::Tag tgtAnalyticalFunction;
                 moab::Tag tgtProjectedFunction;
-                rval = remapper.DefineAnalyticalSolution ( tgtAnalyticalFunction, "AnalyticalSolnTgtExact", moab::Remapper::TargetMesh, 
-                                                            runCtx->disc_methods[1],
-                                                            runCtx->disc_orders[1],
-                                                            testFunction,
-                                                            &tgtProjectedFunction,
-                                                            "ProjectedSolnTgt");MB_CHK_ERR ( rval );
+                rval = weightMap->DefineAnalyticalSolution ( tgtAnalyticalFunction, "AnalyticalSolnTgtExact", 
+                                                             moab::Remapper::TargetMesh, 
+                                                             testFunction,
+                                                             &tgtProjectedFunction,
+                                                             "ProjectedSolnTgt");MB_CHK_ERR ( rval );
                 // rval = mbCore->write_file ( "tgtWithSolnTag.h5m", NULL, writeOptions, &ctx.meshsets[1], 1 ); MB_CHK_ERR ( rval );
                 runCtx->timer_pop();
 
