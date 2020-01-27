@@ -237,7 +237,15 @@ int main(int argc, char* argv[])
       "  intersection area:" << intx_area << " rel error: " << fabs((intx_area-arrival_area)/arrival_area) << "\n";
 
 #ifdef MOAB_HAVE_MPI
+#ifdef MOAB_HAVE_HDF5_PARALLEL
   rval = mb->write_file(outputFile.c_str(), 0, "PARALLEL=WRITE_PART", &outputSet, 1);MB_CHK_SET_ERR(rval,"failed to write intx file");
+#else
+  // write intx set on rank 0, in serial; we cannot write in parallel
+  if (0==rank)
+  {
+    rval = mb->write_file(outputFile.c_str(), 0, 0, &outputSet, 1);MB_CHK_SET_ERR(rval,"failed to write intx file");
+  }
+#endif
   MPI_Finalize();
 #else
   rval = mb->write_file(outputFile.c_str(), 0, 0, &outputSet, 1);MB_CHK_SET_ERR(rval,"failed to write intx file");
