@@ -60,8 +60,8 @@ struct ToolContext
         bool fNoConservation;
         bool fVolumetric;
         bool rrmGrids;
-        bool fNoBubble, fInputConcave, fOutputConcave, fNoCheck;
         bool kdtreeSearch;
+        bool fNoBubble, fInputConcave, fOutputConcave, fNoCheck;
 
 #ifdef MOAB_HAVE_MPI
         ToolContext ( moab::Interface* icore, moab::ParallelComm* p_pcomm ) :
