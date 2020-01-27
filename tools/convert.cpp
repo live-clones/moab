@@ -632,11 +632,14 @@ int main(int argc, char* argv[])
   std::vector<int> gids(faces.size());
   result = gMB->tag_get_data(gidTag, faces, &gids[0]);MB_CHK_ERR(result);
 
-#ifdef MOAB_HAVE_MPI
   if (faces.size() > 1 && gids[0] == gids[1]) {
+#ifdef MOAB_HAVE_MPI
     result = pcomm->assign_global_ids(srcmesh, 2, 1, false);MB_CHK_ERR(result);
-  }
+#else
+    result = remapper->assign_vertex_element_IDs( gMB, gidTag, srcmesh, 2, 1);MB_CHK_ERR(result);
+    result = remapper->assign_vertex_element_IDs( gMB, gidTag, srcmesh, 0, 1);MB_CHK_ERR(result);
 #endif
+  }
 
   // VSM: If user requested explicitly for some metadata, we need to generate the DoF ID tag
   // and set the appropriate numbering based on specified discretization order
@@ -646,8 +649,29 @@ int main(int argc, char* argv[])
   }
 
   if (tempestout) {
+    // Check if our MOAB mesh has RED and BLUE tags; this would indicate we are converting an overlap grid
+    {
+        Tag bluePtag, redPtag;
+        ErrorCode rval1 = gMB->tag_get_handle ( "BlueParent", bluePtag );
+        ErrorCode rval2 = gMB->tag_get_handle ( "RedParent", redPtag );
+        if (rval1 == MB_SUCCESS && rval2 == MB_SUCCESS)
+        {
+          const int nOverlapFaces = faces.size();
+          // Overlap mesh: resize the source and target connection arrays
+          tempestMesh->vecSourceFaceIx.resize ( nOverlapFaces ); // 0-based indices corresponding to source mesh
+          tempestMesh->vecTargetFaceIx.resize ( nOverlapFaces ); // 0-based indices corresponding to target mesh
+          result = gMB->tag_get_data ( bluePtag,  faces, &tempestMesh->vecSourceFaceIx[0] ); MB_CHK_ERR ( result );
+          result = gMB->tag_get_data ( redPtag,  faces, &tempestMesh->vecTargetFaceIx[0] ); MB_CHK_ERR ( result );
+          for (int ie = 0; ie < nOverlapFaces; ++ie)
+          {
+            // Our element Global IDs are 1-based
+            tempestMesh->vecSourceFaceIx[ie]--;
+            tempestMesh->vecTargetFaceIx[ie]--;
+          }
+        }
+    }
    // Write out the mesh using TempestRemap
-    tempestMesh->Write(out);
+    tempestMesh->Write(out, NcFile::Netcdf4);
   }
   else {
 #endif

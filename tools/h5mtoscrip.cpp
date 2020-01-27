@@ -565,60 +565,60 @@ int main(int argc, char* argv[])
     NcDim * dimNB = ncMap.add_dim("n_b", nDofB);
 
     // Source and Target verticecs per elements
-    NcDim * dimNVA = ncMap.add_dim("nv_a", nVA);
-    NcDim * dimNVB = ncMap.add_dim("nv_b", nVB);
+    NcDim * dimNVA = ncMap.add_dim("nv_a", (nA == nDofA ? nVA : 1));
+    NcDim * dimNVB = ncMap.add_dim("nv_b", (nB == nDofB ? nVB : 1));
 
     // Source and Target verticecs per elements
     NcDim * dimNEA = ncMap.add_dim("ne_a", nA);
     NcDim * dimNEB = ncMap.add_dim("ne_b", nB);
 
-    // TODO: This is only true for FV source and target mesh representations
-    // For CG/DG representations, we really need the actual location of the global 
-    // GLL quadrature points in RLL notation
-    // NOTE: So when either source or target is not FV (nA != nDofA), we need to do
-    // something special. Also change the variable definition below as well.
-
-    // Write coordinates
-    NcVar * varYCA = ncMap.add_var("yc_a", ncDouble, dimNEA/*dimNA*/);
-    NcVar * varYCB = ncMap.add_var("yc_b", ncDouble, dimNEB/*dimNB*/);
-
-    NcVar * varXCA = ncMap.add_var("xc_a", ncDouble, dimNEA/*dimNA*/);
-    NcVar * varXCB = ncMap.add_var("xc_b", ncDouble, dimNEB/*dimNB*/);
-
-    NcVar * varYVA = ncMap.add_var("yv_a", ncDouble, dimNEA/*dimNA*/, dimNVA);
-    NcVar * varYVB = ncMap.add_var("yv_b", ncDouble, dimNEB/*dimNB*/, dimNVB);
-
-    NcVar * varXVA = ncMap.add_var("xv_a", ncDouble, dimNEA/*dimNA*/, dimNVA);
-    NcVar * varXVB = ncMap.add_var("xv_b", ncDouble, dimNEB/*dimNB*/, dimNVB);
-
-    varYCA->add_att("units", "degrees");
-    varYCB->add_att("units", "degrees");
-
-    varXCA->add_att("units", "degrees");
-    varXCB->add_att("units", "degrees");
-
-    varYVA->add_att("units", "degrees");
-    varYVB->add_att("units", "degrees");
-
-    varXVA->add_att("units", "degrees");
-    varXVB->add_att("units", "degrees");
-
-    // TODO: This is only true for FV source and target mesh representations
-    // For CG/DG representations, we really need the actual location of the global 
-    // GLL quadrature points in RLL notation
-    moab::Range src_elems, tgt_elems;
-    moab::Range src_verts, tgt_verts;
-    rval = mbCore->get_entities_by_dimension(source_mesh, 2, src_elems);MB_CHK_ERR(rval);
-    rval = mbCore->get_entities_by_dimension(source_mesh, 0, src_verts);MB_CHK_ERR(rval);
-    rval = mbCore->get_entities_by_dimension(target_mesh, 2, tgt_elems);MB_CHK_ERR(rval);
-    rval = mbCore->get_entities_by_dimension(target_mesh, 0, tgt_verts);MB_CHK_ERR(rval);
-    std::vector<int> src_elgid(src_elems.size()), tgt_elgid(tgt_elems.size());
-    rval = mbCore->tag_get_data(globalIDTag, src_elems, src_elgid.data());MB_CHK_ERR(rval);
-    rval = mbCore->tag_get_data(globalIDTag, tgt_elems, tgt_elgid.data());MB_CHK_ERR(rval);
-
     bool writeXYCoords = false;
     if (writeXYCoords)
     {
+      // TODO: This is only true for FV source and target mesh representations
+      // For CG/DG representations, we really need the actual location of the global 
+      // GLL quadrature points in RLL notation
+      // NOTE: So when either source or target is not FV (nA != nDofA), we need to do
+      // something special. Also change the variable definition below as well.
+
+      // TODO: This is only true for FV source and target mesh representations
+      // For CG/DG representations, we really need the actual location of the global 
+      // GLL quadrature points in RLL notation
+      moab::Range src_elems, tgt_elems;
+      moab::Range src_verts, tgt_verts;
+      rval = mbCore->get_entities_by_dimension(source_mesh, 2, src_elems);MB_CHK_ERR(rval);
+      rval = mbCore->get_entities_by_dimension(source_mesh, 0, src_verts);MB_CHK_ERR(rval);
+      rval = mbCore->get_entities_by_dimension(target_mesh, 2, tgt_elems);MB_CHK_ERR(rval);
+      rval = mbCore->get_entities_by_dimension(target_mesh, 0, tgt_verts);MB_CHK_ERR(rval);
+      std::vector<int> src_elgid(src_elems.size()), tgt_elgid(tgt_elems.size());
+      rval = mbCore->tag_get_data(globalIDTag, src_elems, src_elgid.data());MB_CHK_ERR(rval);
+      rval = mbCore->tag_get_data(globalIDTag, tgt_elems, tgt_elgid.data());MB_CHK_ERR(rval);
+
+      // Write coordinates
+      NcVar * varYCA = ncMap.add_var("yc_a", ncDouble, dimNEA/*dimNA*/);
+      NcVar * varYCB = ncMap.add_var("yc_b", ncDouble, dimNEB/*dimNB*/);
+
+      NcVar * varXCA = ncMap.add_var("xc_a", ncDouble, dimNEA/*dimNA*/);
+      NcVar * varXCB = ncMap.add_var("xc_b", ncDouble, dimNEB/*dimNB*/);
+
+      NcVar * varYVA = ncMap.add_var("yv_a", ncDouble, dimNEA/*dimNA*/, dimNVA);
+      NcVar * varYVB = ncMap.add_var("yv_b", ncDouble, dimNEB/*dimNB*/, dimNVB);
+
+      NcVar * varXVA = ncMap.add_var("xv_a", ncDouble, dimNEA/*dimNA*/, dimNVA);
+      NcVar * varXVB = ncMap.add_var("xv_b", ncDouble, dimNEB/*dimNB*/, dimNVB);
+
+      varYCA->add_att("units", "degrees");
+      varYCB->add_att("units", "degrees");
+
+      varXCA->add_att("units", "degrees");
+      varXCB->add_att("units", "degrees");
+
+      varYVA->add_att("units", "degrees");
+      varYVB->add_att("units", "degrees");
+
+      varXVA->add_att("units", "degrees");
+      varXVB->add_att("units", "degrees");
+
       double coords[3];
       DataArray1D<double> dSourceCenterLat, dSourceCenterLon;
       DataArray2D<double> dSourceVertexLat, dSourceVertexLon;
@@ -733,7 +733,6 @@ int main(int argc, char* argv[])
       varXVB->put(&(dTargetVertexLon[0][0]), nB, nVB);
     }
 
-
     // Write areas
     NcVar * varAreaA = ncMap.add_var("area_a", ncDouble, dimNA);
     varAreaA->put(&(src_glob_areas[0]), nDofA);
@@ -753,6 +752,30 @@ int main(int argc, char* argv[])
     rval = get_vartag_data(mbCore, smatValsdataTag, sets, val_sizes, mat_vals);MB_CHK_SET_ERR(rval, "Getting matrix values failed");
     assert(val_sizes == NNZ);
 
+    // Let us form the matrix in-memory and consolidate shared DoF rows from shared-process contributions
+    // SparseMatrix<double> mapMatrix(nDofB, nDofA);
+    SparseMatrix<double> mapMatrix;
+
+    for (int innz = 0; innz < NNZ; ++innz)
+    {
+#ifdef VERBOSE
+      if (fabs(mapMatrix(mat_rows[innz], mat_cols[innz])) > 1e-12) 
+      {
+        printf("Adding to existing loc: (%d, %d) = %12.8f\n", mat_rows[innz], mat_cols[innz], mapMatrix(mat_rows[innz], mat_cols[innz]));
+      }
+#endif
+      mapMatrix(mat_rows[innz], mat_cols[innz]) += mat_vals[innz];
+    }
+
+    // Write SparseMatrix entries
+    DataArray1D<int> vecRow;
+    DataArray1D<int> vecCol;
+    DataArray1D<double> vecS;
+
+    mapMatrix.GetEntries(vecRow, vecCol, vecS);
+
+    int nS = vecS.GetRows();
+
     // Print more information about what we are converting:
     // Source elements/vertices/type (Discretization ?)
     // Target elements/vertices/type (Discretization ?)
@@ -760,7 +783,8 @@ int main(int argc, char* argv[])
     // Rmeapping weights matrix: rows/cols/NNZ
     // Output the number of sets
     printf("Primary sets: %15zu\n", sets.size());
-    printf("Total NNZ: %18d\n", NNZ);
+    printf("Original NNZ: %18d\n", NNZ);
+    printf("Consolidated Total NNZ: %8d\n", nS);
     printf("Conservative weights ? %6d\n", (bConserved > 0));
     printf("Monotone weights ? %10d\n", (bMonotonicity > 0));
 
@@ -779,10 +803,10 @@ int main(int argc, char* argv[])
       DataArray1D<double> dFracA(nDofA);
       DataArray1D<double> dFracB(nDofB);
     
-      for (unsigned i = 0; i < mat_vals.size(); i++) {
-        // std::cout << i << " - mat_vals = " << mat_vals[i] << " dFracA = " << mat_vals[i] / src_glob_areas[mat_cols[i]] * tgt_glob_areas[mat_rows[i]] << std::endl;
-        dFracA[mat_cols[i]] += mat_vals[i] / src_glob_areas[mat_cols[i]] * tgt_glob_areas[mat_rows[i]];
-        dFracB[mat_rows[i]] += mat_vals[i];
+      for (int i = 0; i < nS; i++) {
+        // std::cout << i << " - mat_vals = " << mat_vals[i] << " dFracA = " << mat_vals[i] / src_glob_areas[vecCol[i]] * tgt_glob_areas[vecRow[i]] << std::endl;
+        dFracA[vecCol[i]] += vecS[i] / src_glob_areas[vecCol[i]] * tgt_glob_areas[vecRow[i]];
+        dFracB[vecRow[i]] += vecS[i];
       }
 
       NcVar * varFracA = ncMap.add_var("frac_a", ncDouble, dimNA);
@@ -797,7 +821,7 @@ int main(int argc, char* argv[])
     }
 
     // Write out data
-    NcDim * dimNS = ncMap.add_dim("n_s", NNZ);
+    NcDim * dimNS = ncMap.add_dim("n_s", nS);
 
     NcVar * varRow = ncMap.add_var("row", ncInt, dimNS);
     varRow->add_att("name", "sparse matrix target dof index");
@@ -811,19 +835,19 @@ int main(int argc, char* argv[])
     varS->add_att("name", "sparse matrix coefficient");
 
     // Increment vecRow and vecCol: make it 1-based
-    for (unsigned i = 0; i < mat_cols.size(); i++) {
-      mat_rows[i]++;
-      mat_cols[i]++;
+    for (int i = 0; i < nS; i++) {
+      vecRow[i]++;
+      vecCol[i]++;
     }
 
     varRow->set_cur((long)0);
-    varRow->put(&(mat_rows[0]), NNZ);
+    varRow->put(&(vecRow[0]), nS);
 
     varCol->set_cur((long)0);
-    varCol->put(&(mat_cols[0]), NNZ);
+    varCol->put(&(vecCol[0]), nS);
 
     varS->set_cur((long)0);
-    varS->put(&(mat_vals[0]), NNZ);
+    varS->put(&(vecS[0]), nS);
 
     ncMap.close();
 

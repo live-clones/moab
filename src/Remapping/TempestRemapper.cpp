@@ -15,6 +15,7 @@
 #include <string>
 #include <iostream>
 #include <cassert>
+#include "DebugOutput.hpp"
 #include "moab/Remapping/TempestRemapper.hpp"
 #include "moab/ReadUtilIface.hpp"
 
@@ -210,8 +211,11 @@ ErrorCode TempestRemapper::convert_tempest_mesh_private ( TempestMeshType meshTy
     const NodeVector& nodes = mesh->nodes;
     const FaceVector& faces = mesh->faces;
 
+    moab::DebugOutput dbgprint ( std::cout, this->rank, 0 );
+    dbgprint.set_prefix("[TempestToMOAB]: ");
+
     ReadUtilIface* iface;
-    rval = m_interface->query_interface ( iface ); MB_CHK_SET_ERR ( rval, "Can't get reader interface" );
+    rval = m_interface->query_interface ( iface );MB_CHK_SET_ERR ( rval, "Can't get reader interface" );
 
     // Set the data for the vertices
     std::vector<double*> arrays;
@@ -225,14 +229,14 @@ ErrorCode TempestRemapper::convert_tempest_mesh_private ( TempestMeshType meshTy
         arrays[2][iverts] = node.z;
     }
     Range mbverts ( startv, startv + nodes.size() - 1 );
-    m_interface->add_entities ( mesh_set, mbverts );
+    rval = m_interface->add_entities ( mesh_set, mbverts );MB_CHK_SET_ERR ( rval, "Can't add entities" );
 
     // Let us first perform a full pass assuming arbitrary polygons. This is especially true for overlap meshes.
     //   1. We do a first pass over faces, decipher edge size and group into categories based on element type
     //   2. Next we loop over type, and add blocks of elements into MOAB
     //   3. For each block within the loop, also update the connectivity of elements.
     {
-        if ( outputEnabled ) std::cout << "..Mesh size: Nodes [" << nodes.size() << "] Elements [" << faces.size() << "].\n";
+        if ( outputEnabled ) dbgprint.printf(0, "..Mesh size: Nodes [%zu]  Elements [%zu].\n", nodes.size(), faces.size());
         const int NMAXPOLYEDGES = 15;
         std::vector<unsigned> nPolys ( NMAXPOLYEDGES, 0 );
         std::vector<std::vector<int> > typeNSeqs ( NMAXPOLYEDGES );
@@ -247,7 +251,6 @@ ErrorCode TempestRemapper::convert_tempest_mesh_private ( TempestMeshType meshTy
         {
             if ( !nPolys[iType] ) continue; // Nothing to do
 
-            if ( outputEnabled ) std::cout << "....Block " << iBlock++ << " Polygons [" << iType << "] Elements [" << nPolys[iType] << "].\n";
             const unsigned num_v_per_elem = iType;
             EntityHandle starte; // Connectivity
             EntityHandle* conn;
@@ -256,12 +259,15 @@ ErrorCode TempestRemapper::convert_tempest_mesh_private ( TempestMeshType meshTy
             switch ( num_v_per_elem )
             {
             case 3:
+                if ( outputEnabled ) dbgprint.printf(0, "....Block %d: Triangular Elements [%u].\n", iBlock++, nPolys[iType]);
                 rval = iface->get_element_connect ( nPolys[iType], num_v_per_elem, MBTRI, 0, starte, conn ); MB_CHK_SET_ERR ( rval, "Can't get element connectivity" );
                 break;
             case 4:
+                if ( outputEnabled ) dbgprint.printf(0, "....Block %d: Quadrilateral Elements [%u].\n", iBlock++, nPolys[iType]);
                 rval = iface->get_element_connect ( nPolys[iType], num_v_per_elem, MBQUAD, 0, starte, conn ); MB_CHK_SET_ERR ( rval, "Can't get element connectivity" );
                 break;
             default:
+                if ( outputEnabled ) dbgprint.printf(0, "....Block %d: Polygonal [%u] Elements [%u].\n", iBlock++, iType, nPolys[iType]);
                 rval = iface->get_element_connect ( nPolys[iType], num_v_per_elem, MBPOLYGON, 0, starte, conn ); MB_CHK_SET_ERR ( rval, "Can't get element connectivity" );
                 break;
             }
@@ -272,10 +278,10 @@ ErrorCode TempestRemapper::convert_tempest_mesh_private ( TempestMeshType meshTy
             for ( unsigned ifaces = 0, offset = 0; ifaces < typeNSeqs[iType].size(); ++ifaces )
             {
                 const Face& face = faces[typeNSeqs[iType][ifaces]];
-                conn[offset++] = startv + face.edges[0].node[1];
-                for ( unsigned iedges = 1; iedges < face.edges.size(); ++iedges )
+                // conn[offset++] = startv + face.edges[0].node[0];
+                for ( unsigned iedges = 0; iedges < face.edges.size(); ++iedges )
                 {
-                    conn[offset++] = startv + face.edges[iedges].node[1];
+                    conn[offset++] = startv + face.edges[iedges].node[0];
                 }
             }
 
@@ -356,6 +362,15 @@ ErrorCode TempestRemapper::convert_mesh_to_tempest_private ( Mesh* mesh, EntityH
     }
     //assert(verts.size() > 0); // If not, this may be an invalid mesh ! possible for unbalanced loads
 
+    std::map<EntityHandle, int> indxMap;
+    bool useRange = true;
+    if (verts.compactness() > 0.01) {
+        int j=0;
+        for (Range::iterator it=verts.begin(); it!=verts.end(); it++)
+          indxMap[*it]=j++;
+        useRange = false;
+    }
+
     for ( unsigned iface = 0; iface < elems.size(); ++iface )
     {
         Face& face = faces[iface];
@@ -369,7 +384,7 @@ ErrorCode TempestRemapper::convert_mesh_to_tempest_private ( Mesh* mesh, EntityH
         face.edges.resize ( nnodesf );
         for ( int iverts = 0; iverts < nnodesf; ++iverts )
         {
-            int indx = verts.index ( connectface[iverts] );
+            int indx = (useRange ? verts.index ( connectface[iverts] ) : indxMap[ connectface[iverts] ] );
             assert ( indx >= 0 );
             face.SetNode ( iverts, indx );
         }
@@ -553,7 +568,6 @@ ErrorCode TempestRemapper::ComputeGlobalLocalMaps()
       m_covering_source = new Mesh();
       rval = convert_mesh_to_tempest_private ( m_covering_source, m_covering_source_set,
           m_covering_source_entities, &m_covering_source_vertices ); MB_CHK_SET_ERR ( rval, "Can't convert source Tempest mesh" );
-
     }
     gid_to_lid_src.clear(); lid_to_gid_src.clear();
     gid_to_lid_covsrc.clear(); lid_to_gid_covsrc.clear();
@@ -822,7 +836,6 @@ ErrorCode TempestRemapper::GenerateMeshMetadata(
                 // Determine if this is a unique Node
                 std::map<Node, int>::const_iterator iter = mapNodes.find(nodeGLL);
                 if (iter == mapNodes.end()) {
-
                     // Insert new unique node into map
                     int ixNode = static_cast<int>(mapNodes.size());
                     mapNodes.insert(std::pair<Node, int>(nodeGLL, ixNode));
@@ -832,8 +845,7 @@ ErrorCode TempestRemapper::GenerateMeshMetadata(
                     dataGLLnodes[j][i][k] = iter->second + 1;
                 }
 
-                if (locElem) dofIDs[j*nP+i] = dataGLLnodes[j][i][k];
-
+                dofIDs[j*nP+i] = dataGLLnodes[j][i][k];
             }
         }
 
@@ -1106,8 +1118,8 @@ ErrorCode TempestRemapper::ComputeOverlapMesh ( bool use_tempest )
                 }
             }
 
-            m_covering_source = new Mesh();
-            rval = convert_mesh_to_tempest_private ( m_covering_source, m_covering_source_set, m_covering_source_entities, &m_covering_source_vertices ); MB_CHK_SET_ERR ( rval, "Can't convert source Tempest mesh" );
+            // m_covering_source = new Mesh();
+            // rval = convert_mesh_to_tempest_private ( m_covering_source, m_covering_source_set, m_covering_source_entities, &m_covering_source_vertices ); MB_CHK_SET_ERR ( rval, "Can't convert source Tempest mesh" );
         }
 #endif
 

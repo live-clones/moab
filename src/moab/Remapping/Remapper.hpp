@@ -74,19 +74,29 @@ public:
 #ifdef MOAB_HAVE_MPI
 	  size_t lastindex = filename.find_last_of(".");
 	  std::string extension = filename.substr(lastindex+1, filename.size());
-	  std::string popts;
-	  if (extension != "h5m")
-	  	popts = std::string("PARALLEL=BCAST_DELETE;PARTITION=TRIVIAL;PARALLEL_RESOLVE_SHARED_ENTS");
-	  else
-	  	popts = std::string("PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_SHARED_ENTS");
+	  std::string opts = "";
+	  if (m_pcomm->size() > 1)
+    {
+      if (extension != "h5m")
+        opts = std::string("PARALLEL=BCAST_DELETE;PARTITION=TRIVIAL;PARALLEL_RESOLVE_SHARED_ENTS");
+      else
+        opts = std::string("PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_SHARED_ENTS");
+    }
 
-	  const std::string opts = (m_pcomm->size() > 1 ? popts : "" );
+	  if (readopts)
+    {
+      if (opts.size())
+        opts = opts + ";" + std::string(readopts);
+      else
+        opts = std::string(readopts);
+    }
+
 	  if (!m_pcomm->rank()) std::cout << "Reading file (" << filename << ") with options = [" << opts << "]\n";
 #else
-	  const std::string opts = std::string("");
-	  std::cout << "Reading file (" << filename << ") with empty options\n";
+	  const std::string opts = std::string((readopts ? readopts : ""));
+	  std::cout << "Reading file (" << filename << ") with options = [" << opts << "]\n";
 #endif
-	  return m_interface->load_file(filename.c_str(), &meshset, (readopts ? readopts : opts.c_str()));
+	  return m_interface->load_file(filename.c_str(), &meshset, opts.c_str());
 	}
 
 protected:

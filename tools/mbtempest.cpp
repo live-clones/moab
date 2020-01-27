@@ -434,9 +434,9 @@ int main ( int argc, char* argv[] )
             // The call arguments are as follows: 
             //      (std::string strOutputFileName, const bool fAllParallel, const bool fInputConcave, const bool fOutputConcave);
 #ifdef MOAB_HAVE_MPI
-            rval = remapper.WriteTempestIntersectionMesh(ctx.intxFilename, true, false, false);MB_CHK_ERR ( rval ); 
+//            rval = remapper.WriteTempestIntersectionMesh(ctx.intxFilename, true, false, false);MB_CHK_ERR ( rval ); 
 #else
-            rval = remapper.WriteTempestIntersectionMesh(ctx.intxFilename, false, false, false);MB_CHK_ERR ( rval );
+//            rval = remapper.WriteTempestIntersectionMesh(ctx.intxFilename, false, false, false);MB_CHK_ERR ( rval );
 #endif
             // Write out our computed intersection file
             size_t lastindex = ctx.intxFilename.find_last_of(".");
@@ -602,15 +602,16 @@ moab::ErrorCode CreateTempestMesh ( ToolContext& ctx, moab::TempestRemapper& rem
         const double radius_src = 1.0 /*2.0*acos(-1.0)*/;
         const double radius_dest = 1.0 /*2.0*acos(-1.0)*/;
 
+        const char* additional_read_opts = (ctx.n_procs > 1 ? "NO_SET_CONTAINING_PARENTS;" : "");
         // Load the source mesh and validate
-        rval = remapper.LoadNativeMesh ( ctx.inFilenames[0], ctx.meshsets[0], 0 ); MB_CHK_ERR ( rval );
+        rval = remapper.LoadNativeMesh ( ctx.inFilenames[0], ctx.meshsets[0], additional_read_opts ); MB_CHK_ERR ( rval );
         // Rescale the radius of both to compute the intersection
         rval = ScaleToRadius(ctx.mbcore, ctx.meshsets[0], radius_src);MB_CHK_ERR ( rval );
         rval = remapper.ConvertMeshToTempest ( moab::Remapper::SourceMesh ); MB_CHK_ERR ( rval );
         ctx.meshes[0] = remapper.GetMesh ( moab::Remapper::SourceMesh );
 
         // Load the target mesh and validate
-        rval = remapper.LoadNativeMesh ( ctx.inFilenames[1], ctx.meshsets[1], 0 ); MB_CHK_ERR ( rval );
+        rval = remapper.LoadNativeMesh ( ctx.inFilenames[1], ctx.meshsets[1], additional_read_opts ); MB_CHK_ERR ( rval );
         rval = ScaleToRadius(ctx.mbcore, ctx.meshsets[1], radius_dest);MB_CHK_ERR ( rval );
         rval = remapper.ConvertMeshToTempest ( moab::Remapper::TargetMesh ); MB_CHK_ERR ( rval );
         ctx.meshes[1] = remapper.GetMesh ( moab::Remapper::TargetMesh );
