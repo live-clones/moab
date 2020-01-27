@@ -411,8 +411,8 @@ int main ( int argc, char* argv[] )
         {
             double local_areas[4], global_areas[4]; // Array for Initial area, and through Method 1 and Method 2
             // local_areas[0] = area_on_sphere_lHuiller ( mbCore, ctx.meshsets[1], radius_src );
-            local_areas[0] = area_on_sphere ( mbCore, ctx.meshsets[0], radius_src );
-            local_areas[1] = area_on_sphere ( mbCore, ctx.meshsets[1], radius_dest );
+            local_areas[0] = area_on_sphere_lHuiller ( mbCore, ctx.meshsets[0], radius_src );
+            local_areas[1] = area_on_sphere_lHuiller ( mbCore, ctx.meshsets[1], radius_dest );
             local_areas[2] = area_on_sphere_lHuiller ( mbCore, ctx.meshsets[2], radius_src );
             local_areas[3] = area_on_sphere ( mbCore, ctx.meshsets[2], radius_src );
 

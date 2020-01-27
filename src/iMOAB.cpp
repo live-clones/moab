@@ -2429,12 +2429,15 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere ( iMOAB_AppID pid_src, iMOAB_AppID
     // std::cout << "Radius of spheres: source = " << radius_source << " and target = " << radius_target << "\n";
 #endif
     // print verbosely about the problem setting
+    bool use_brute_force = false;
+    double srctgt_areas[2], srctgt_areas_glb[2];
     {
         moab::Range rintxverts, rintxelems;
         rval = context.MBI->get_entities_by_dimension ( data_src.file_set, 0, rintxverts );CHKERRVAL(rval);
         rval = context.MBI->get_entities_by_dimension ( data_src.file_set, data_src.dimension, rintxelems );CHKERRVAL(rval);
         rval = fix_degenerate_quads ( context.MBI, data_src.file_set );CHKERRVAL(rval);
         rval = positive_orientation ( context.MBI, data_src.file_set, radius_source );CHKERRVAL(rval);
+        srctgt_areas[0] = area_on_sphere_lHuiller ( context.MBI, data_src.file_set, radius_source );
 #ifdef VERBOSE
         std::cout << "The red set contains " << rintxverts.size() << " vertices and " << rintxelems.size() << " elements \n";
 #endif
@@ -2444,9 +2447,18 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere ( iMOAB_AppID pid_src, iMOAB_AppID
         rval = context.MBI->get_entities_by_dimension ( data_tgt.file_set, data_tgt.dimension, bintxelems );CHKERRVAL(rval);
         rval = fix_degenerate_quads ( context.MBI, data_tgt.file_set );CHKERRVAL(rval);
         rval = positive_orientation ( context.MBI, data_tgt.file_set, radius_target );CHKERRVAL(rval);
+        srctgt_areas[1] = area_on_sphere_lHuiller ( context.MBI, data_tgt.file_set, radius_target );
 #ifdef VERBOSE
         std::cout << "The blue set contains " << bintxverts.size() << " vertices and " << bintxelems.size() << " elements \n";
 #endif
+#ifdef MOAB_HAVE_MPI
+        MPI_Allreduce ( &srctgt_areas[0], &srctgt_areas_glb[0], 2, MPI_DOUBLE, MPI_SUM, pco_intx->comm() );
+#else
+        srctgt_areas_glb[0] = srctgt_areas[0];
+        srctgt_areas_glb[1] = srctgt_areas[1];
+#endif
+        printf ( "initial area: source = %12.14f, target = %12.14f\n", srctgt_areas_glb[0], srctgt_areas_glb[1] );
+        use_brute_force = (srctgt_areas_glb[0] < srctgt_areas_glb[1]);
     }
 
     data_intx.dimension = data_tgt.dimension;
@@ -2484,7 +2496,7 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere ( iMOAB_AppID pid_src, iMOAB_AppID
     rval = tdata.remapper->ConstructCoveringSet ( epsrel, 1.0, 1.0, boxeps, false );CHKERRVAL(rval);
 
     // Next, compute intersections with MOAB.
-    rval = tdata.remapper->ComputeOverlapMesh ( false );CHKERRVAL(rval);
+    rval = tdata.remapper->ComputeOverlapMesh ( use_brute_force, false );CHKERRVAL(rval);
     // rval = data_intx.remapper->ConvertMeshToTempest ( moab::Remapper::IntersectedMesh );CHKERRVAL(rval);
 
     // if (radii_scaled) { /* the radii are different, so lets rescale back */
@@ -2495,32 +2507,32 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere ( iMOAB_AppID pid_src, iMOAB_AppID
     // Mapping computation done
     if (validate)
     {
-        const double radius = 1.0 /*2.0*acos(-1.0)*/;
-        double local_areas[3], global_areas[3]; // Array for Initial area, and through Method 1 and Method 2
-        local_areas[0] = area_on_sphere_lHuiller ( context.MBI, context.appDatas[*(context.appDatas[*pid_intx].tempestData.pid_dest)].file_set, radius );
-        local_areas[1] = area_on_sphere_lHuiller ( context.MBI, context.appDatas[*pid_intx].file_set, radius );
-        local_areas[2] = area_on_sphere ( context.MBI, context.appDatas[*pid_intx].file_set, radius );
+        double local_areas[2], global_areas[4]; // Array for Initial area, and through Method 1 and Method 2
+        local_areas[0] = area_on_sphere_lHuiller ( context.MBI, data_intx.file_set, radius_source );
+        local_areas[1] = area_on_sphere ( context.MBI, data_intx.file_set, radius_source );
+
+        global_areas[0] = srctgt_areas_glb[0];
+        global_areas[1] = srctgt_areas_glb[1];
 
 #ifdef MOAB_HAVE_MPI
-        if (is_parallel)
-            MPI_Allreduce ( &local_areas[0], &global_areas[0], 3, MPI_DOUBLE, MPI_SUM, pco_intx->comm() );
-        else {
-            global_areas[0] = local_areas[0];
-            global_areas[1] = local_areas[1];
-            global_areas[2] = local_areas[2];
+        if (is_parallel) {
+            MPI_Allreduce ( &local_areas[0], &global_areas[2], 2, MPI_DOUBLE, MPI_SUM, pco_intx->comm() );
+        }
+        else
+        {
+            global_areas[2] = local_areas[0];
+            global_areas[3] = local_areas[1];
         }
 #else
-        global_areas[0] = local_areas[0];
-        global_areas[1] = local_areas[1];
-        global_areas[2] = local_areas[2];
+        global_areas[2] = local_areas[0];
+        global_areas[3] = local_areas[1];
 #endif
-
         if ( is_root )
         {
-            printf ( "initial area: %12.10f\n", global_areas[0] );
-            printf ( "area with l'Huiller: %12.10f with Girard: %12.10f\n", global_areas[1], global_areas[2] );
-            printf ( "  relative difference areas = %12.10e\n", fabs ( global_areas[1] - global_areas[2] ) / global_areas[1] );
-            printf ( "  relative error = %12.10e\n", fabs ( global_areas[1] - global_areas[0] ) / global_areas[1] );
+            printf ( "initial area: source = %12.14f, target = %12.14f\n", global_areas[0], global_areas[1] );
+            printf ( " area with l'Huiller: %12.14f with Girard: %12.14f\n", global_areas[2], global_areas[3] );
+            printf ( " relative difference areas = %12.10e\n", fabs ( global_areas[2] - global_areas[3] ) / global_areas[2] );
+            printf ( " relative error w.r.t source = %12.14e, and target = %12.14e\n", fabs ( global_areas[2] - global_areas[0] ) / global_areas[2], fabs ( global_areas[2] - global_areas[1] ) / global_areas[2] );
         }
     }
 
