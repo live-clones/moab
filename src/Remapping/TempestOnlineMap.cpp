@@ -2018,9 +2018,6 @@ moab::ErrorCode moab::TempestOnlineMap::DefineAnalyticalSolution ( moab::Tag& so
 
     GaussQuadrature::GetPoints(nGaussP, 0.0, 1.0, dGaussG, dGaussW);
 
-    std::cout << "Max node size = " << iMaxNode << " Num elements = " << nElements << std::endl;
-    std::cout << "Disc order = " << discOrder << std::endl;
-
     // Allocate data
     dVar.Allocate(iMaxNode);
     dVarMB.Allocate(discOrder*discOrder*nElements);
@@ -2060,8 +2057,6 @@ moab::ErrorCode moab::TempestOnlineMap::DefineAnalyticalSolution ( moab::Tag& so
             double dNodeLat = asin(node.z);
 
             double dSample = (*testFunction)(dNodeLon, dNodeLat);
-
-            std::cout << "dataGLLNodes[j][i][k]-1 = " << dataGLLNodes[j][i][k]-1 << ", dSample = " << dSample << std::endl;
 
             dVar[dataGLLNodes[j][i][k]-1] = dSample;
           }
@@ -2149,11 +2144,7 @@ moab::ErrorCode moab::TempestOnlineMap::DefineAnalyticalSolution ( moab::Tag& so
             for ( int p = 0; p < discOrder; p++ )
                 for ( int q = 0; q < discOrder; q++ )
                 {
-                    // const int ldof = dataGLLNodesSrcCov[p][q][j] - 1;
                     const int idof = j * discOrder * discOrder + p * discOrder + q;
-                    // srccol_dofmap[ idof ] = ldof;
-                    // srccol_ldofmap[ ldof ] = idof;
-                    // srccol_gdofmap[ idof ] = locsrc_soln_gdofs[idof] - 1;
                     dVarMB [ idof ] = dVar[ col_dofmap[ idof ] ];
                 }
     }
@@ -2163,11 +2154,7 @@ moab::ErrorCode moab::TempestOnlineMap::DefineAnalyticalSolution ( moab::Tag& so
             for ( int p = 0; p < discOrder; p++ )
                 for ( int q = 0; q < discOrder; q++ )
                 {
-                    // const int ldof = dataGLLNodesDest[p][q][j] - 1;
                     const int idof = j * discOrder * discOrder + p * discOrder + q;
-                    // srccol_dofmap[ idof ] = ldof;
-                    // srccol_ldofmap[ ldof ] = idof;
-                    // srccol_gdofmap[ idof ] = locsrc_soln_gdofs[idof] - 1;
                     dVarMB [ idof ] = dVar[ row_dofmap[ idof ] ];
                 }
     }
