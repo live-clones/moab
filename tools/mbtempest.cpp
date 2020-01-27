@@ -348,14 +348,15 @@ int main ( int argc, char* argv[] )
             rval = mbCore->get_entities_by_dimension ( intxset, 0, intxverts, true ); MB_CHK_ERR ( rval );
             printf ( "The intersection set contains %lu elements and %lu vertices \n", intxelems.size(), intxverts.size() );
 
-            double initial_area = area_on_sphere_lHuiller ( mbCore, ctx.meshsets[0], radius_src ); // use the target to compute the initial area
+            double initial_sarea = area_on_sphere_lHuiller ( mbCore, ctx.meshsets[0], radius_src ); // use the target to compute the initial area
+            double initial_tarea = area_on_sphere_lHuiller ( mbCore, ctx.meshsets[1], radius_dest ); // use the target to compute the initial area
             double area_method1 = area_on_sphere_lHuiller ( mbCore, intxset, radius_src );
             double area_method2 = area_on_sphere ( mbCore, intxset, radius_src );
 
-            printf ( "initial area: %12.10f\n", initial_area );
+            printf ( "initial area: source = %12.10f, target = %12.10f\n", initial_sarea, initial_tarea );
             printf ( " area with l'Huiller: %12.10f with Girard: %12.10f\n", area_method1, area_method2 );
             printf ( " relative difference areas = %12.10e\n", fabs ( area_method1 - area_method2 ) / area_method1 );
-            printf ( " relative error = %12.10e\n", fabs ( area_method1 - initial_area ) / area_method1 );
+            printf ( " relative error w.r.t source = %12.10e, and target = %12.10e\n", fabs ( area_method1 - initial_sarea ) / area_method1, fabs ( area_method1 - initial_tarea ) / area_method1 );
         }
 
         // Write out our computed intersection file
@@ -408,25 +409,27 @@ int main ( int argc, char* argv[] )
         ctx.timer_pop();
 
         {
-            double local_areas[3], global_areas[3]; // Array for Initial area, and through Method 1 and Method 2
+            double local_areas[4], global_areas[4]; // Array for Initial area, and through Method 1 and Method 2
             // local_areas[0] = area_on_sphere_lHuiller ( mbCore, ctx.meshsets[1], radius_src );
-            local_areas[0] = area_on_sphere ( mbCore, ctx.meshsets[1], radius_src );
-            local_areas[1] = area_on_sphere_lHuiller ( mbCore, ctx.meshsets[2], radius_src );
-            local_areas[2] = area_on_sphere ( mbCore, ctx.meshsets[2], radius_src );
+            local_areas[0] = area_on_sphere ( mbCore, ctx.meshsets[0], radius_src );
+            local_areas[1] = area_on_sphere ( mbCore, ctx.meshsets[1], radius_dest );
+            local_areas[2] = area_on_sphere_lHuiller ( mbCore, ctx.meshsets[2], radius_src );
+            local_areas[3] = area_on_sphere ( mbCore, ctx.meshsets[2], radius_src );
 
 #ifdef MOAB_HAVE_MPI
-            MPI_Allreduce ( &local_areas[0], &global_areas[0], 3, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
+            MPI_Allreduce ( &local_areas[0], &global_areas[0], 4, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
 #else
             global_areas[0] = local_areas[0];
             global_areas[1] = local_areas[1];
             global_areas[2] = local_areas[2];
+            global_areas[3] = local_areas[3];
 #endif
             if ( !proc_id )
             {
-                printf ( "initial area: %12.10f\n", global_areas[0] );
-                printf ( " area with l'Huiller: %12.10f with Girard: %12.10f\n", global_areas[1], global_areas[2] );
-                printf ( " relative difference areas = %12.10e\n", fabs ( global_areas[1] - global_areas[2] ) / global_areas[1] );
-                printf ( " relative error = %12.10e\n", fabs ( global_areas[1] - global_areas[0] ) / global_areas[1] );
+                printf ( "initial area: source = %12.14f, target = %12.14f\n", global_areas[0], global_areas[1] );
+                printf ( " area with l'Huiller: %12.14f with Girard: %12.14f\n", global_areas[2], global_areas[3] );
+                printf ( " relative difference areas = %12.10e\n", fabs ( global_areas[2] - global_areas[3] ) / global_areas[2] );
+                printf ( " relative error w.r.t source = %12.14e, and target = %12.14e\n", fabs ( global_areas[2] - global_areas[0] ) / global_areas[2], fabs ( global_areas[2] - global_areas[1] ) / global_areas[2] );
             }
         }
 
