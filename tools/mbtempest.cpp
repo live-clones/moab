@@ -539,7 +539,7 @@ int main ( int argc, char* argv[] )
             if ( ctx.verifyWeights )
             {
                 // Let us pick a sampling test function for solution evaluation
-                moab::TempestOnlineMap::sample_function testFunction = &sample_slow_harmonic;
+                moab::TempestOnlineMap::sample_function testFunction = &sample_stationary_vortex; // &sample_slow_harmonic;
 
                 ctx.timer_push ( "describe a solution on source grid" );
                 moab::Tag srcAnalyticalFunction;
@@ -562,11 +562,11 @@ int main ( int argc, char* argv[] )
                 rval = weightMap->ApplyWeights(srcAnalyticalFunction, tgtProjectedFunction);MB_CHK_ERR ( rval );
                 ctx.timer_pop();
                 rval = mbCore->write_file ( "tgtWithSolnTag2.h5m", NULL, writeOptions, &ctx.meshsets[1], 1 ); MB_CHK_ERR ( rval );
-                
 
-                // ctx.timer_push ( "compute error metrics against analytical solution on target grid" );
-                // rval = weightMap->ComputeMetrics(tgtAnalyticalFunction, tgtSolution);MB_CHK_ERR ( rval );
-                // ctx.timer_pop();
+                ctx.timer_push ( "compute error metrics against analytical solution on target grid" );
+                std::map<std::string, double> errMetrics;
+                rval = weightMap->ComputeMetrics(moab::Remapper::TargetMesh, tgtAnalyticalFunction, tgtProjectedFunction, errMetrics, true);MB_CHK_ERR ( rval );
+                ctx.timer_pop();
             }
 
             delete weightMap;
