@@ -344,6 +344,12 @@ public:
                                                 moab::Tag* clonedSolnTag=NULL,
                                                 std::string cloneSolnName="");
 
+    /// <summary>
+    ///     Compute the error between a sampled (exact) solution and a projected solution in various error norms.
+    /// </summary>
+	moab::ErrorCode ComputeMetrics ( Remapper::IntersectionContext ctx, moab::Tag& exactTag, moab::Tag& approxTag, 
+									 std::map<std::string, double>& metrics, bool verbose = true );
+
 public:
 
 	///	<summary>

@@ -2274,3 +2274,83 @@ moab::ErrorCode moab::TempestOnlineMap::DefineAnalyticalSolution ( moab::Tag& so
   return moab::MB_SUCCESS;
 }
 
+moab::ErrorCode moab::TempestOnlineMap::ComputeMetrics ( moab::Remapper::IntersectionContext ctx, moab::Tag& exactTag, moab::Tag& approxTag, 
+                                                            std::map<std::string, double>& metrics, bool verbose )
+{
+    moab::ErrorCode rval;
+    const bool outputEnabled = ( is_root );
+    int discOrder;
+    DiscretizationType discMethod;
+    moab::EntityHandle meshset;
+    moab::Range entities;
+    Mesh* trmesh;
+    switch(ctx)
+    {
+        case Remapper::SourceMesh:
+            meshset = m_remapper->m_covering_source_set;
+            trmesh = m_remapper->m_covering_source;
+            entities = (m_remapper->point_cloud_source ? m_remapper->m_covering_source_vertices : m_remapper->m_covering_source_entities);
+            discOrder = m_nDofsPEl_Src;
+            discMethod = m_eInputType;
+            break;
+
+        case Remapper::TargetMesh:
+            meshset = m_remapper->m_target_set;
+            trmesh = m_remapper->m_target;
+            entities = (m_remapper->point_cloud_target ? m_remapper->m_target_vertices : m_remapper->m_target_entities);
+            discOrder = m_nDofsPEl_Dest;
+            discMethod = m_eOutputType;
+            break;
+
+        default:
+            if (outputEnabled) std::cout << "Invalid context specified for defining an analytical solution tag" << std::endl;
+            return moab::MB_FAILURE;
+    }
+
+    // Let us create teh solution tag with appropriate information for name, discretization order (DoF space)
+    std::string exactTagName, projTagName;
+    const int ntotsize = entities.size() * discOrder * discOrder;
+    int ntotsize_glob = 0;
+    std::vector<double> exactSolution(ntotsize, 0.0), projSolution(ntotsize, 0.0);
+    rval = m_interface->tag_get_name ( exactTag, exactTagName );MB_CHK_ERR ( rval );
+    rval = m_interface->tag_get_data ( exactTag, entities, &exactSolution[0] );MB_CHK_ERR ( rval );
+    rval = m_interface->tag_get_name ( approxTag, projTagName );MB_CHK_ERR ( rval );
+    rval = m_interface->tag_get_data ( approxTag, entities, &projSolution[0] );MB_CHK_ERR ( rval );
+
+    std::vector<double> errnorms(3, 0.0), globerrnorms(3, 0.0); //  L1Err, L2Err, LinfErr
+    for (int i = 0; i < ntotsize; ++i)
+    {
+        const double error = fabs( exactSolution[i] - projSolution[i] );
+        errnorms[0]  += error;
+        errnorms[1]  += error * error;
+        errnorms[2] = (error > errnorms[2] ? error : errnorms[2]);
+    }
+#ifdef MOAB_HAVE_MPI
+    if (m_pcomm)
+    {
+        MPI_Reduce ( &ntotsize, &ntotsize_glob, 1, MPI_INTEGER, MPI_SUM, 0, m_pcomm->comm() );
+        MPI_Reduce ( &errnorms[0], &globerrnorms[0], 2, MPI_DOUBLE, MPI_SUM, 0, m_pcomm->comm() );
+        MPI_Reduce ( &errnorms[2], &globerrnorms[2], 1, MPI_DOUBLE, MPI_MAX, 0, m_pcomm->comm() );
+    }
+#else
+    ntotsize_glob = ntotsize;
+    globerrnorms = errnorms;
+#endif
+    globerrnorms[0] = (globerrnorms[0]/ntotsize_glob);
+    globerrnorms[1] = std::sqrt(globerrnorms[1]/ntotsize_glob);
+
+    metrics.clear();
+    metrics["L1Error"] = globerrnorms[0];
+    metrics["L2Error"] = globerrnorms[1];
+    metrics["LinfError"] = globerrnorms[2];
+
+    if (verbose && is_root)
+    {
+        std::cout << "Error metrics when comparing " << projTagName << " against " << exactTagName << std::endl;
+        std::cout << "\t L_1 error   = " << globerrnorms[0] << std::endl;
+        std::cout << "\t L_2 error   = " << globerrnorms[1] << std::endl;
+        std::cout << "\t L_inf error = " << globerrnorms[2] << std::endl;
+    }
+
+    return moab::MB_SUCCESS;
+}
