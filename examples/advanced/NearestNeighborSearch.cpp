@@ -18,7 +18,7 @@
 #include "moab/SpatialLocator.hpp"
 #include "moab/ProgOptions.hpp"
 
-#include "nanoflann.hpp"
+#include "moab/nanoflann.hpp"
 
 using namespace moab;
 using namespace std;
@@ -176,7 +176,7 @@ ErrorCode kdtree_demo(const int dim, const size_t N, Core* mb=NULL, moab::Parall
 
     // Query at random places in the tree
     CartVect params;
-    int is_inside = 1;
+    //int is_inside = 1;
     int num_inside = 0;
     EntityHandle elem;
     bool multiple_leaves = true;
@@ -365,6 +365,11 @@ int main(int argc, char **argv)
   int num_queries = 100;
   int num_dim = 3;
   std::stringstream sstr;
+  int proc_id = 0, size = 1;
+
+  MPI_Init(&argc,&argv);
+  MPI_Comm_rank( MPI_COMM_WORLD, &proc_id );
+  MPI_Comm_size( MPI_COMM_WORLD, &size );
 
   ProgOptions opts;
 
@@ -414,6 +419,8 @@ int main(int argc, char **argv)
   rval = kdtree_demo<double>(num_dim, num_queries, &mb, pcomm, false);MB_CHK_SET_ERR(rval, "Error with Kdtree demo with MOAB Instance");
   // MOAB AdaptiveKDTree based queries
   //rval = kdtree_demo<double>(num_dim, num_queries, &mb, true);MB_CHK_SET_ERR(rval, "Error with Kdtree demo with MOAB Instance");
+
+  MPI_Finalize();
 
   return 0;
 }
