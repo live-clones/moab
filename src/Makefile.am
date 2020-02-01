@@ -214,6 +214,7 @@ nobase_libMOAB_la_include_HEADERS = \
   moab/iMOAB.h \
   moab/imoab_protos.h \
   moab/LloydSmoother.hpp \
+  moab/nanoflann.hpp \
   moab/NestedRefine.hpp \
   moab/NestedRefineTemplates.hpp \
   moab/Matrix3.hpp \
