@@ -1017,6 +1017,9 @@ ErrorCode TempestRemapper::ConstructCoveringSet ( double tolerance, double radiu
 ErrorCode TempestRemapper::ComputeOverlapMesh ( bool kdtree_search, bool use_tempest )
 {
     ErrorCode rval;
+    const bool outputEnabled = (this->rank == 0);
+    moab::DebugOutput dbgprint ( std::cout, this->rank, 0 );
+    dbgprint.set_prefix("[ComputeOverlapMesh]: ");
 
     // const double radius = 1.0 /*2.0*acos(-1.0)*/;
     // const double boxeps = 0.1;
@@ -1087,10 +1090,12 @@ ErrorCode TempestRemapper::ComputeOverlapMesh ( bool kdtree_search, bool use_tem
         // Now perform the actual parallel intersection between the source and the target meshes
         if (kdtree_search)
         {
+          if (outputEnabled) dbgprint.printf(0, "Computing intersection mesh with the Kd-tree search algorithm");
           rval = mbintx->intersect_meshes_kdtree ( m_covering_source_set, m_target_set, m_overlap_set ); MB_CHK_SET_ERR ( rval, "Can't compute the intersection of meshes on the sphere with brute-force" );
         }
         else
         {
+          if (outputEnabled) dbgprint.printf(0, "Computing intersection mesh with the advancing-front propagation algorithm");
           rval = mbintx->intersect_meshes ( m_covering_source_set, m_target_set, m_overlap_set ); MB_CHK_SET_ERR ( rval, "Can't compute the intersection of meshes on the sphere" );
         }
 
