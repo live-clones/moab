@@ -705,7 +705,8 @@ ErrorCode ZoltanPartitioner::assemble_graph(const int dimension,
     // assign global ids
   if(assign_global_ids)
   {
-    result = mbpc->assign_global_ids(0, dimension); RR;
+    EntityHandle rootset = 0;
+    result = mbpc->assign_global_ids(rootset, dimension, 1, true, true); RR;
   }
 
     // now assemble the graph, calling MeshTopoUtil to get bridge adjacencies through d-1 dimensional
