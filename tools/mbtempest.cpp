@@ -133,7 +133,6 @@ struct ToolContext
             std::string expectedMethod = "fv";
             std::string expectedDofTagName = "GLOBAL_ID";
             int expectedOrder = 1;
-            bool advFront = false;
 
             opts.addOpt<int> ( "type,t", "Type of mesh (default=CS; Choose from [CS=0, RLL=1, ICO=2, OVERLAP_FILES=3, OVERLAP_MEMORY=4, OVERLAP_MOAB=5])", &imeshType );
             opts.addOpt<int> ( "res,r", "Resolution of the mesh (default=5)", &blockSize );
@@ -142,8 +141,8 @@ struct ToolContext
             opts.addOpt<void> ( "noconserve,c", "Do not apply conservation to the resultant weights (relevant only when computing weights)", &fNoConservation );
             opts.addOpt<void> ( "volumetric,v", "Apply a volumetric projection to compute the weights (relevant only when computing weights)", &fVolumetric );
             opts.addOpt<void> ( "rrmgrids", "At least one of the meshes is a regionally refined grid (relevant to accelerate intersection computation)", &rrmGrids );
-            opts.addOpt<void> ( "advfront,a", "Use the advancing front intersection instead of the Kd-tree based algorithm to compute mesh intersections", &advFront );
             opts.addOpt<void> ( "nocheck", "Do not check the generated map for conservation and consistency", &fNoCheck );
+            opts.addOpt<void> ( "advfront,a", "Use the advancing front intersection instead of the Kd-tree based algorithm to compute mesh intersections" );
             opts.addOpt<int> ( "monotonic,n", "Ensure monotonicity in the weight generation", &ensureMonotonicity );
             opts.addOpt<std::string> ( "load,l", "Input mesh filenames (a source and target mesh)", &expectedFName );
             opts.addOpt<int> ( "order,o", "Discretization orders for the source and target solution fields", &expectedOrder );
@@ -152,10 +151,10 @@ struct ToolContext
             opts.addOpt<std::string> ( "file,f", "Output remapping weights filename", &outFilename );
             opts.addOpt<std::string> ( "intx,i", "Output TempestRemap intersection mesh filename", &intxFilename );
 
-            // By default - use Kd-tree based search; if user asks for advancing front, disable Kd-tree algorithm
-            kdtreeSearch = !advFront;
-
             opts.parseCommandLine ( argc, argv );
+
+            // By default - use Kd-tree based search; if user asks for advancing front, disable Kd-tree algorithm
+            kdtreeSearch = opts.numOptSet("advfront,a") == 0;
 
             switch ( imeshType )
             {
