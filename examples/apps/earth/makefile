@@ -20,6 +20,10 @@ BoundaryContinents: BoundaryContinents.o ${MOAB_LIBDIR}/libMOAB.la
 	@echo "[CXXLD]  $@"
 	${VERBOSE}${MOAB_CXX} -o $@ $< ${MOAB_LIBS_LINK}
 
+addpcdata: addPCdata.o ${MOAB_LIBDIR}/libMOAB.la
+	@echo "[CXXLD]  $@"
+	${VERBOSE}${MOAB_CXX} -o $@ $< ${MOAB_LIBS_LINK}
+
 run-BoundaryContinents: BoundaryContinents
 	${RUNSERIAL} ./BoundaryContinents
 
