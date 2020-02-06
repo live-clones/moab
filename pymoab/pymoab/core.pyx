@@ -1385,6 +1385,13 @@ cdef class Core(object):
 
         return np.asarray(ehs_out, dtype = np.uint64)
 
+    def set_connectivity(self, entity_handle, connect, exceptions=()):
+        cdef int num_connect = len(connect)
+        cdef moab.ErrorCode err
+        cdef np.ndarray[eh.EntityHandle] arr = _eh_array(connect)
+        err = self.inst.set_connectivity(<unsigned long> entity_handle, <eh.EntityHandle*> arr.data, num_connect)
+        check_error(err, exceptions)
+
     def get_coords(self, entities, exceptions = ()):
         """
         Returns the xyz coordinate information for a set of vertices.
