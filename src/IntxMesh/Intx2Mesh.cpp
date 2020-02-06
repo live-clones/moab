@@ -347,7 +347,8 @@ ErrorCode Intx2Mesh::intersect_meshes_kdtree(EntityHandle mbset1, EntityHandle m
   {
     // basically, the sag for an arc of length max_length on a circle of radius 1
     tolerance = 1. - sqrt(1-max_length*max_length/4);
-    if (!my_rank) std::cout << "tolerance for kd tree :" << tolerance << "\n";
+    tolerance = 1.5*tolerance; // why ?
+    if (!my_rank) std::cout <<" max edge length: " <<  max_length << "  tolerance for kd tree: " << tolerance << "\n";
   }
   for (Range::iterator it = rs2.begin(); it != rs2.end(); ++it)
   {
@@ -357,12 +358,11 @@ ErrorCode Intx2Mesh::intersect_meshes_kdtree(EntityHandle mbset1, EntityHandle m
     int nnodes=0;
     rval = mb->get_connectivity(tcell, conn, nnodes); MB_CHK_ERR(rval);
     // find leaves close to those positions
+    double areaRedCell = setup_red_cell(tcell, nnodes); // this is the area in the gnomonic plane
+    double recoveredArea = 0;
     std::vector<double> positions;
     positions.resize(nnodes*3);
     rval = mb->get_coords(conn, nnodes, &positions[0]); MB_CHK_ERR(rval);
-    int nsidesRed; // will be initialized now
-    double areaRedCell = setup_red_cell(tcell, nsidesRed); // this is the area in the gnomonic plane
-    double recoveredArea = 0;
 
     // distance to search will be based on average edge length
     double av_len =0;
@@ -418,7 +418,7 @@ ErrorCode Intx2Mesh::intersect_meshes_kdtree(EntityHandle mbset1, EntityHandle m
       if (area > 0)
       {
         if (nP > 1) { // this will also construct triangles/polygons in the new mesh, if needed
-          rval = findNodes(tcell, nsidesRed, startBlue, nsBlue, P, nP);MB_CHK_ERR(rval);
+          rval = findNodes(tcell, nnodes, startBlue, nsBlue, P, nP);MB_CHK_ERR(rval);
         }
         recoveredArea+=area;
       }
