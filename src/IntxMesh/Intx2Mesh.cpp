@@ -315,6 +315,40 @@ ErrorCode Intx2Mesh::intersect_meshes_kdtree(EntityHandle mbset1, EntityHandle m
   EntityHandle tree_root = 0;
   rval  = kd.build_tree(rs1, &tree_root);MB_CHK_ERR(rval);
 
+  // find out max edge on source mesh;
+  double max_length = 0;
+  {
+    std::vector<double> coords;
+    coords.resize(3*max_edges_1);
+    for (Range::iterator it=rs1.begin(); it!=rs1.end(); it++)
+    {
+      const EntityHandle *conn = NULL;
+      int nnodes;
+      rval = mb->get_connectivity(*it, conn, nnodes);MB_CHK_SET_ERR(rval, "can't get connectivity");
+      while ( conn[nnodes-2]==redConn[nnodes-1] && nnodes>3)
+        nnodes--;
+      rval = mb->get_coords(conn, nnodes, &coords[0]);MB_CHK_SET_ERR(rval, "can't get coordinates");
+      for (int j=0; j<nnodes; j++)
+      {
+        int next=(j+1)%nnodes;
+        double leng;
+        leng =(coords[3*j]-coords[3*next])*(coords[3*j]-coords[3*next])+
+            (coords[3*j+1]-coords[3*next+1])*(coords[3*j+1]-coords[3*next+1])+
+            (coords[3*j+2]-coords[3*next+2])*(coords[3*j+2]-coords[3*next+2]);
+        leng = sqrt(leng);
+        if (leng>max_length)
+          max_length = leng;
+      }
+    }
+  }
+  // maximum sag on a spherical mesh make sense only for intx on a sphere, with radius 1 :(
+  double tolerance=1.e-15;
+  if (max_length < 1.)
+  {
+    // basically, the sag for an arc of length max_length on a circle of radius 1
+    tolerance = 1. - sqrt(1-max_length*max_length/4);
+    if (!my_rank) std::cout << "tolerance for kd tree :" << tolerance << "\n";
+  }
   for (Range::iterator it = rs2.begin(); it != rs2.end(); ++it)
   {
     EntityHandle tcell = *it;
@@ -353,7 +387,7 @@ ErrorCode Intx2Mesh::intersect_meshes_kdtree(EntityHandle mbset1, EntityHandle m
     {
 
       leaves.clear();
-      rval = kd.distance_search(&positions[3*i], av_len, leaves, 0.005, epsilon_1);MB_CHK_ERR(rval);
+      rval = kd.distance_search(&positions[3*i], av_len, leaves, tolerance, epsilon_1);MB_CHK_ERR(rval);
 
       for (std::vector<EntityHandle>::iterator j = leaves.begin(); j != leaves.end(); ++j) {
           Range tmp;
