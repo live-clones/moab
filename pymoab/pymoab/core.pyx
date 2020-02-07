@@ -1386,6 +1386,33 @@ cdef class Core(object):
         return np.asarray(ehs_out, dtype = np.uint64)
 
     def set_connectivity(self, entity_handle, connect, exceptions=()):
+        """
+        Sets the connectivity for an EntityHandle.
+
+        Example
+        -------
+        # new PyMOAB instance
+        mb = core.Core()
+        #create 3 vertices and get the list of entity handles
+        coords = np.array((0,0,0,1,0,0,1,1,1),dtype='float64')
+        verts = mb.create_vertices(coords)
+        # set the connectivity of an existing triangle with new verts
+        mb.set_connectivity(tri_eh, verts)
+
+        Parameters
+        ----------
+        entity_handle : EntityHandle to set connectivity of. Must be an
+            element.
+        connect : Vector of EntityHandles for new connectivity of
+            entity_handle.
+
+        Raises
+        ------
+        MOAB ErrorCode
+            if a MOAB error occurs
+        ValueError
+            if an EntityHandle is not of the correct datatype
+        """
         cdef int num_connect = len(connect)
         cdef moab.ErrorCode err
         cdef np.ndarray[eh.EntityHandle] arr = _eh_array(connect)

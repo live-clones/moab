@@ -207,9 +207,11 @@ cdef extern from "moab/Core.hpp" namespace "moab":
                                    vector[EntityHandle] & connectivity,
                                    bool corners_only,
                                    vector[int] * offsets)
+
         ErrorCode set_connectivity(const EntityHandle entity_handle,
                                    EntityHandle* connect,
                                    const int num_connect)
+
         ErrorCode tag_get_handle(const char* name,
                                  int size,
                                  DataType type,
