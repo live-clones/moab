@@ -766,7 +766,7 @@ ErrorCode Intx2MeshOnSphere::build_processor_euler_boxes(EntityHandle euler_set,
 
   return MB_SUCCESS;
 }
-
+//#define VERBOSE
 // this will use the bounding boxes for the (euler)/ fix  mesh that are already established
 // will distribute the mesh to other procs, so that on each task, the covering set covers the local bounding box
 // this means it will cover the second (local) mesh set;
@@ -832,6 +832,7 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set(EntityHandle & initial_distr
       }
     }
   }
+
   // another collective call, to see if the mesh is migrated and if the GLOBAL_DOFS tag need to be transferred
   // over to the coverage mesh
   // it is possible that there is no initial mesh source mesh on the task, so we do not know that info from the tag
@@ -847,6 +848,9 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set(EntityHandle & initial_distr
   if (MPI_SUCCESS != mpi_err) return MB_FAILURE;
   orig_sender=global_int_array[0];
   size_gdofs_tag = global_int_array[1];
+#ifdef VERBOSE
+  std::cout <<"proc: " << my_rank << " size_gdofs_tag:" << size_gdofs_tag <<"\n";
+#endif
   valsDOFs.resize(size_gdofs_tag);
 
   // finally, we have correct global info, we can decide if mesh was migrated and if we have global dofs tag that need to be
@@ -965,6 +969,9 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set(EntityHandle & initial_distr
     // add the vertices to it
     if (range_to_P.empty())
       continue; // nothing to send to proc p
+#ifdef VERBOSE
+      std::cout <<" proc : " << my_rank << " to proc " << p <<" send " << range_to_P.size() << " cells " << " psize: " << range_to_P.psize()<< "\n";
+#endif
     Range vertsToP;
     rval = mb->get_connectivity(range_to_P, vertsToP);MB_CHK_SET_ERR(rval, "can't get connectivity");
     numq = numq + range_to_P.size();
@@ -1121,6 +1128,7 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set(EntityHandle & initial_distr
   // a cell should be received from one proc only; so why are we so worried about duplicated elements?
   // a vertex can be received from multiple sources, that is fine
 
+
   for (int i = 0; i < n; i++)
   {
     int globalIdEl = TLq.vi_rd[sizeTuple * i + 1];
@@ -1179,8 +1187,12 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set(EntityHandle & initial_distr
 
   // now, create a new set, covering_set
   rval = mb->add_entities(covering_set, local_q);MB_CHK_SET_ERR(rval,  "can't add entities to new mesh set ");
+#ifdef VERBOSE
+  std::cout << " proc " << my_rank << " add " << local_q.size() << " cells to covering set \n";
+#endif
   return MB_SUCCESS;
 }
 
 #endif // MOAB_HAVE_MPI
+//#undef VERBOSE
 } /* namespace moab */

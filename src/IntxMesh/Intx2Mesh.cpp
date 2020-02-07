@@ -325,7 +325,7 @@ ErrorCode Intx2Mesh::intersect_meshes_kdtree(EntityHandle mbset1, EntityHandle m
       const EntityHandle *conn = NULL;
       int nnodes;
       rval = mb->get_connectivity(*it, conn, nnodes);MB_CHK_SET_ERR(rval, "can't get connectivity");
-      while ( conn[nnodes-2]==redConn[nnodes-1] && nnodes>3)
+      while ( conn[nnodes-2]==conn[nnodes-1] && nnodes>3)
         nnodes--;
       rval = mb->get_coords(conn, nnodes, &coords[0]);MB_CHK_SET_ERR(rval, "can't get coordinates");
       for (int j=0; j<nnodes; j++)
