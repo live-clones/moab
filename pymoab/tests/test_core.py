@@ -577,6 +577,23 @@ def test_get_conn():
         print("Shouldn't be here. Test fails.")
         raise(IndexErrorx)
 
+def test_set_conn():
+
+    mb = core.Core()
+    coords = np.array((0,0,0,1,0,0,1,1,1),dtype='float64')
+    verts = mb.create_vertices(coords)
+    #create element
+    verts = np.array(((verts[0],verts[1],verts[2]),),dtype='uint64')
+    tri = mb.create_elements(types.MBTRI,verts)
+    # make new verts to set new connectivity
+    verts_new = mb.create_vertices(coords)
+    mb.set_connectivity(tri[0], verts_new)
+
+    #get the adjacencies of the triangle (vertices)
+    # check the returned EHs match the new vertice entity handles
+    conn = mb.get_connectivity(tri)
+    CHECK_EQ(list(conn), list(verts_new))
+
 def test_type_from_handle():
     mb = core.Core()
     # create vertices
@@ -1128,6 +1145,7 @@ if __name__ == "__main__":
              test_add_entity,
              test_tag_failures,
              test_adj,
+             test_set_conn,
              test_type_from_handle,
              test_meshsets,
              test_rs,
