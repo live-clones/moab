@@ -87,10 +87,10 @@ ErrorCode TempestRemapper::initialize(bool initialize_fsets)
 TempestRemapper::~TempestRemapper()
 {
     // destroy all meshes
-    if ( m_source ) delete m_source;
-    if ( m_target ) delete m_target;
-    if ( m_overlap ) delete m_overlap;
-    if ( m_covering_source && is_parallel) delete m_covering_source;
+    if ( m_source ) { delete m_source; m_source = NULL; }
+    if ( m_target ) {delete m_target; m_target = NULL; }
+    if ( m_overlap ) {delete m_overlap; m_overlap = NULL; }
+    if ( m_covering_source && is_parallel) {delete m_covering_source; m_covering_source = NULL;}
 
     point_cloud_source = false;
     point_cloud_target = false;
