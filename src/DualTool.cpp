@@ -842,9 +842,6 @@ ErrorCode DualTool::construct_dual_hyperplanes(const int dim,
     (num_hexes == 0 && dim == 2))
     return MB_FAILURE;
 
-    // get tag name for this dimension hyperplane
-  Tag gid_tag = mbImpl->globalId_tag();
-
   Tag hp_tag = (1 == dim ? dualCurve_tag() : dualSurface_tag());
 
     // two stacks: one completely untreated entities, and the other untreated

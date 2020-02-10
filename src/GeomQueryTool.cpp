@@ -55,7 +55,7 @@ namespace moab {
                                     EntityHandle tri,
                                     double dist,
                                     OrientedBoxTreeTool::IntersectSearchWindow & search_win,
-                                    GeomUtil::intersection_type it) {
+                                    GeomUtil::intersection_type /*it*/) {
       // update dist, set, and triangle hit if
       // we found a new minimum distance
       double abs_dist = fabs(dist);
@@ -1163,7 +1163,6 @@ ErrorCode GeomQueryTool::find_volume(const double xyz[3],
   // otherwise return the second, "reverse" sense entity
   double dot_prod = uvw % normal;
   int idx =  dot_prod > 0.0 ? 0 : 1;
-  int piv_result = 0;
 
   if (dot_prod == 0.0) {
     std::cerr << "Tangent dot product in find_volume. Shouldn't be here." << std::endl;

@@ -212,7 +212,6 @@ namespace moab {
       else if (MB_ENTITY_NOT_FOUND == rval) planeSet = SUBDIVISION;
       else planeSet = (CandidatePlaneSet)(tmp_int);
 
-      bool tmp_bool;
       rval = opts.get_toggle_option("SPHERICAL", false, spherical);
       if (MB_SUCCESS != rval) spherical=false;
 
