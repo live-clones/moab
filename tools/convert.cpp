@@ -24,6 +24,7 @@
 #include "moab/Range.hpp"
 #include "MBTagConventions.hpp"
 #include "moab/ReaderWriterSet.hpp"
+#include "moab/ReorderTool.hpp"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -363,6 +364,8 @@ int main(int argc, char* argv[])
 #endif
 
 #endif
+  bool use_overlap_context = false;
+  Tag srcParentTag, tgtParentTag;
   for (j = in.begin(); j != in.end(); ++j) {
     reset_times();
 
@@ -386,12 +389,32 @@ int main(int argc, char* argv[])
     else if (tempestout)
     {
       moab::EntityHandle& srcmesh = remapper->GetMeshSet ( moab::Remapper::SourceMesh );
+      moab::EntityHandle& ovmesh = remapper->GetMeshSet ( moab::Remapper::OverlapMesh );
 
-      // convert
+      // load the mesh in MOAB format
       result = remapper->LoadNativeMesh(*j, srcmesh, 0);MB_CHK_ERR(result);
 
-      // Load the meshes and validate
-      result = remapper->ConvertMeshToTempest ( moab::Remapper::SourceMesh ); MB_CHK_ERR ( result );
+      // Check if our MOAB mesh has RED and BLUE tags; this would indicate we are converting an overlap grid
+      ErrorCode rval1 = gMB->tag_get_handle ( "SourceParent", srcParentTag );
+      ErrorCode rval2 = gMB->tag_get_handle ( "TargetParent", tgtParentTag );
+      if (rval1 == MB_SUCCESS && rval2 == MB_SUCCESS)
+      {
+        use_overlap_context = true;
+        ovmesh = srcmesh;
+
+        // Load the meshes and validate
+        Tag order;
+        ReorderTool reorder_tool(&core);
+        result = reorder_tool.handle_order_from_int_tag(srcParentTag, -1, order);MB_CHK_ERR ( result );
+        result = reorder_tool.reorder_entities(order);MB_CHK_ERR ( result );
+        result = gMB->tag_delete(order);MB_CHK_ERR ( result );
+        result = remapper->ConvertMeshToTempest ( moab::Remapper::OverlapMesh ); MB_CHK_ERR ( result );
+      }
+      else
+      {
+        // Load the meshes and validate
+        result = remapper->ConvertMeshToTempest ( moab::Remapper::SourceMesh ); MB_CHK_ERR ( result );
+      }
     }
     else
       result = gMB->load_file( j->c_str(), 0, read_options.c_str() );
@@ -617,8 +640,8 @@ int main(int argc, char* argv[])
   reset_times();
 #ifdef MOAB_HAVE_TEMPESTREMAP
   Range faces;
-  Mesh* tempestMesh = remapper->GetMesh ( moab::Remapper::SourceMesh );
-  moab::EntityHandle& srcmesh = remapper->GetMeshSet ( moab::Remapper::SourceMesh );
+  Mesh* tempestMesh = remapper->GetMesh ( (use_overlap_context ? moab::Remapper::OverlapMesh : moab::Remapper::SourceMesh) );
+  moab::EntityHandle& srcmesh = remapper->GetMeshSet ( (use_overlap_context ? moab::Remapper::OverlapMesh : moab::Remapper::SourceMesh) );
   result = gMB->get_entities_by_dimension(srcmesh, 2, faces); MB_CHK_ERR(result);
   int ntot_elements = 0, nelements = faces.size();
 #ifdef MOAB_HAVE_MPI
@@ -650,25 +673,20 @@ int main(int argc, char* argv[])
 
   if (tempestout) {
     // Check if our MOAB mesh has RED and BLUE tags; this would indicate we are converting an overlap grid
+    if (use_overlap_context)
     {
-        Tag bluePtag, redPtag;
-        ErrorCode rval1 = gMB->tag_get_handle ( "BlueParent", bluePtag );
-        ErrorCode rval2 = gMB->tag_get_handle ( "RedParent", redPtag );
-        if (rval1 == MB_SUCCESS && rval2 == MB_SUCCESS)
-        {
-          const int nOverlapFaces = faces.size();
-          // Overlap mesh: resize the source and target connection arrays
-          tempestMesh->vecSourceFaceIx.resize ( nOverlapFaces ); // 0-based indices corresponding to source mesh
-          tempestMesh->vecTargetFaceIx.resize ( nOverlapFaces ); // 0-based indices corresponding to target mesh
-          result = gMB->tag_get_data ( bluePtag,  faces, &tempestMesh->vecSourceFaceIx[0] ); MB_CHK_ERR ( result );
-          result = gMB->tag_get_data ( redPtag,  faces, &tempestMesh->vecTargetFaceIx[0] ); MB_CHK_ERR ( result );
-          for (int ie = 0; ie < nOverlapFaces; ++ie)
-          {
-            // Our element Global IDs are 1-based
-            tempestMesh->vecSourceFaceIx[ie]--;
-            tempestMesh->vecTargetFaceIx[ie]--;
-          }
-        }
+      const int nOverlapFaces = faces.size();
+      // Overlap mesh: resize the source and target connection arrays
+      tempestMesh->vecSourceFaceIx.resize ( nOverlapFaces ); // 0-based indices corresponding to source mesh
+      tempestMesh->vecTargetFaceIx.resize ( nOverlapFaces ); // 0-based indices corresponding to target mesh
+      result = gMB->tag_get_data ( srcParentTag,  faces, &tempestMesh->vecSourceFaceIx[0] ); MB_CHK_ERR ( result );
+      result = gMB->tag_get_data ( tgtParentTag,  faces, &tempestMesh->vecTargetFaceIx[0] ); MB_CHK_ERR ( result );
+      for (int ie = 0; ie < nOverlapFaces; ++ie)
+      {
+        // Our element Global IDs are 1-based
+        tempestMesh->vecSourceFaceIx[ie]--;
+        tempestMesh->vecTargetFaceIx[ie]--;
+      }
     }
    // Write out the mesh using TempestRemap
     tempestMesh->Write(out, NcFile::Netcdf4);
