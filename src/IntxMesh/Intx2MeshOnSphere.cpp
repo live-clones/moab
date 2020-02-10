@@ -31,76 +31,76 @@ Intx2MeshOnSphere::~Intx2MeshOnSphere()
 /*
  * return also the area for robustness verification
  */
-double Intx2MeshOnSphere::setup_red_cell(EntityHandle red, int & nsRed) {
+double Intx2MeshOnSphere::setup_tgt_cell(EntityHandle tgt, int & nsTgt) {
 
-  // get coordinates of the red quad, to decide the gnomonic plane
+  // get coordinates of the target quad, to decide the gnomonic plane
   double cellArea =0;
 
   int num_nodes;
-  ErrorCode rval = mb->get_connectivity(red, redConn, num_nodes);MB_CHK_ERR_RET_VAL(rval,cellArea);
+  ErrorCode rval = mb->get_connectivity(tgt, tgtConn, num_nodes);MB_CHK_ERR_RET_VAL(rval,cellArea);
 
-  nsRed = num_nodes;
+  nsTgt = num_nodes;
   // account for possible padded polygons
-  while (redConn[nsRed-2]==redConn[nsRed-1] && nsRed>3)
-    nsRed--;
+  while (tgtConn[nsTgt-2]==tgtConn[nsTgt-1] && nsTgt>3)
+    nsTgt--;
 
   //CartVect coords[4];
-  rval = mb->get_coords(redConn, nsRed, &(redCoords[0][0]));MB_CHK_ERR_RET_VAL(rval,cellArea);
+  rval = mb->get_coords(tgtConn, nsTgt, &(tgtCoords[0][0]));MB_CHK_ERR_RET_VAL(rval,cellArea);
 
-  CartVect middle = redCoords[0];
-  for (int i=1; i<nsRed; i++)
-    middle += redCoords[i];
-  middle = 1./nsRed * middle;
+  CartVect middle = tgtCoords[0];
+  for (int i=1; i<nsTgt; i++)
+    middle += tgtCoords[i];
+  middle = 1./nsTgt * middle;
 
   decide_gnomonic_plane(middle, plane);// output the plane
-  for (int j = 0; j < nsRed; j++)
+  for (int j = 0; j < nsTgt; j++)
   {
     // populate coords in the plane for intersection
     // they should be oriented correctly, positively
-    rval = gnomonic_projection(redCoords[j],  Rdest, plane, redCoords2D[2 * j],
-        redCoords2D[2 * j + 1]);MB_CHK_ERR_RET_VAL(rval,cellArea);
+    rval = gnomonic_projection(tgtCoords[j],  Rdest, plane, tgtCoords2D[2 * j],
+        tgtCoords2D[2 * j + 1]);MB_CHK_ERR_RET_VAL(rval,cellArea);
   }
 
-  for (int j=1; j<nsRed-1; j++)
-    cellArea += area2D(&redCoords2D[0], &redCoords2D[2*j], &redCoords2D[2*j+2]);
+  for (int j=1; j<nsTgt-1; j++)
+    cellArea += area2D(&tgtCoords2D[0], &tgtCoords2D[2*j], &tgtCoords2D[2*j+2]);
 
-  // take red coords in order and compute area in plane
+  // take target coords in order and compute area in plane
   return cellArea;
 }
 
 /* the elements are convex for sure, then do a gnomonic projection of both,
  *  compute intersection in the plane, then go back to the sphere for the points
  *  */
-ErrorCode Intx2MeshOnSphere::computeIntersectionBetweenRedAndBlue(EntityHandle red, EntityHandle blue,
+ErrorCode Intx2MeshOnSphere::computeIntersectionBetweenTgtAndSrc(EntityHandle tgt, EntityHandle src,
     double * P, int & nP, double & area, int markb[MAXEDGES], int markr[MAXEDGES],
-    int & nsBlue, int & nsRed, bool check_boxes_first)
+    int & nsBlue, int & nsTgt, bool check_boxes_first)
 {
-  // the area will be used from now on, to see how well we fill the red cell with polygons
+  // the area will be used from now on, to see how well we fill the target cell with polygons
   // the points will be at most 40; they will describe a convex patch, after the points will be ordered and
   // collapsed (eliminate doubles)
 
-  //CartVect bluecoords[4];
+  //CartVect srccoords[4];
   int num_nodes=0;
-  ErrorCode rval = mb->get_connectivity(blue, blueConn, num_nodes);MB_CHK_ERR(rval);
+  ErrorCode rval = mb->get_connectivity(src, srcConn, num_nodes);MB_CHK_ERR(rval);
   nsBlue = num_nodes;
   // account for possible padded polygons
-  while (blueConn[nsBlue-2]==blueConn[nsBlue-1] && nsBlue>3)
+  while (srcConn[nsBlue-2]==srcConn[nsBlue-1] && nsBlue>3)
     nsBlue--;
-  rval = mb->get_coords(blueConn, nsBlue, &(blueCoords[0][0]));MB_CHK_ERR(rval);
+  rval = mb->get_coords(srcConn, nsBlue, &(srcCoords[0][0]));MB_CHK_ERR(rval);
 
   area = 0.;
-  nP = 0; // number of intersection points we are marking the boundary of blue!
+  nP = 0; // number of intersection points we are marking the boundary of src!
   if (check_boxes_first)
   {
     // look at the boxes formed with vertices; if they are far away, return false early
-    // make sure the red is setup already
-    setup_red_cell(red, nsRed); // we do not need area here
-    // use here gnomonic plane (plane) to see where blue is
-    bool overlap3d = GeomUtil::bounding_boxes_overlap(redCoords, nsRed, blueCoords, nsBlue, box_error);
+    // make sure the target is setup already
+    setup_tgt_cell(tgt, nsTgt); // we do not need area here
+    // use here gnomonic plane (plane) to see where source is
+    bool overlap3d = GeomUtil::bounding_boxes_overlap(tgtCoords, nsTgt, srcCoords, nsBlue, box_error);
     int planeb;
-    CartVect mid3 = (blueCoords[0]+blueCoords[1]+blueCoords[2])/3;
+    CartVect mid3 = (srcCoords[0]+srcCoords[1]+srcCoords[2])/3;
     decide_gnomonic_plane(mid3, planeb);
-    if (!overlap3d && (plane!=planeb)) // plane was set at setup_red_cell
+    if (!overlap3d && (plane!=planeb)) // plane was set at setup_tgt_cell
       return MB_SUCCESS; // no error, but no intersection, decide early to get out
     // if same plane, still check for gnomonic plane in 2d
     // if no overlap in 2d, get out
@@ -108,10 +108,10 @@ ErrorCode Intx2MeshOnSphere::computeIntersectionBetweenRedAndBlue(EntityHandle r
     {
       for (int j=0; j<nsBlue; j++)
       {
-        rval = gnomonic_projection(blueCoords[j], Rsrc, plane, blueCoords2D[2 * j],
-            blueCoords2D[2 * j + 1]);MB_CHK_ERR(rval);
+        rval = gnomonic_projection(srcCoords[j], Rsrc, plane, srcCoords2D[2 * j],
+            srcCoords2D[2 * j + 1]);MB_CHK_ERR(rval);
       }
-      bool overlap2d = GeomUtil::bounding_boxes_overlap_2d (blueCoords2D, nsBlue, redCoords2D, nsRed, box_error);
+      bool overlap2d = GeomUtil::bounding_boxes_overlap_2d (srcCoords2D, nsBlue, tgtCoords2D, nsTgt, box_error);
       if (!overlap2d)
         return MB_SUCCESS; // we are sure they are not overlapping in 2d , either
     }
@@ -120,55 +120,55 @@ ErrorCode Intx2MeshOnSphere::computeIntersectionBetweenRedAndBlue(EntityHandle r
 #ifdef ENABLE_DEBUG
   if (dbg_1)
   {
-    std::cout << "red " << mb->id_from_handle(red) << "\n";
-    for (int j = 0; j < nsRed; j++)
+    std::cout << "tgt " << mb->id_from_handle(tgt) << "\n";
+    for (int j = 0; j < nsTgt; j++)
     {
-      std::cout << redCoords[j] << "\n";
+      std::cout << tgtCoords[j] << "\n";
     }
-    std::cout << "blue " << mb->id_from_handle(blue) << "\n";
+    std::cout << "src " << mb->id_from_handle(src) << "\n";
     for (int j = 0; j < nsBlue; j++)
     {
-      std::cout << blueCoords[j] << "\n";
+      std::cout << srcCoords[j] << "\n";
     }
-    mb->list_entities(&red, 1);
-    mb->list_entities(&blue, 1);
+    mb->list_entities(&tgt, 1);
+    mb->list_entities(&src, 1);
   }
 #endif
 
   for (int j=0; j<nsBlue; j++)
   {
-    rval = gnomonic_projection(blueCoords[j], Rsrc, plane, blueCoords2D[2 * j],
-        blueCoords2D[2 * j + 1]);MB_CHK_ERR(rval);
+    rval = gnomonic_projection(srcCoords[j], Rsrc, plane, srcCoords2D[2 * j],
+        srcCoords2D[2 * j + 1]);MB_CHK_ERR(rval);
   }
 
 #ifdef ENABLE_DEBUG
   if (dbg_1)
   {
     std::cout << "gnomonic plane: " << plane << "\n";
-    std::cout << " red                                blue\n";
-    for (int j = 0; j < nsRed; j++)
+    std::cout << " target                                src\n";
+    for (int j = 0; j < nsTgt; j++)
     {
-      std::cout << redCoords2D[2 * j] << " " << redCoords2D[2 * j + 1] << "\n";
+      std::cout << tgtCoords2D[2 * j] << " " << tgtCoords2D[2 * j + 1] << "\n";
     }
     for (int j = 0; j < nsBlue; j++)
     {
-      std::cout << blueCoords2D[2 * j] << " " << blueCoords2D[2 * j + 1] << "\n";
+      std::cout << srcCoords2D[2 * j] << " " << srcCoords2D[2 * j + 1] << "\n";
     }
   }
 #endif
 
-  rval = EdgeIntersections2(blueCoords2D, nsBlue, redCoords2D, nsRed, markb, markr, P, nP);MB_CHK_ERR(rval);
+  rval = EdgeIntersections2(srcCoords2D, nsBlue, tgtCoords2D, nsTgt, markb, markr, P, nP);MB_CHK_ERR(rval);
 
-  int side[MAXEDGES] = { 0 };// this refers to what side? blue or red?
-  int extraPoints = borderPointsOfXinY2(blueCoords2D, nsBlue, redCoords2D, nsRed, &(P[2 * nP]), side, epsilon_area);
+  int side[MAXEDGES] = { 0 };// this refers to what side? source or tgt?
+  int extraPoints = borderPointsOfXinY2(srcCoords2D, nsBlue, tgtCoords2D, nsTgt, &(P[2 * nP]), side, epsilon_area);
   if (extraPoints >= 1)
   {
     for (int k = 0; k < nsBlue; k++)
     {
       if (side[k])
       {
-        // this means that vertex k of blue is inside convex red; mark edges k-1 and k in blue,
-        //   as being "intersected" by red; (even though they might not be intersected by other edges,
+        // this means that vertex k of source is inside convex tgt; mark edges k-1 and k in src,
+        //   as being "intersected" by tgt; (even though they might not be intersected by other edges,
         //   the fact that their apex is inside, is good enough)
         markb[k] = 1;
         markb[(k + nsBlue-1) % nsBlue] = 1; // it is the previous edge, actually, but instead of doing -1, it is
@@ -180,16 +180,16 @@ ErrorCode Intx2MeshOnSphere::computeIntersectionBetweenRedAndBlue(EntityHandle r
   }
   nP += extraPoints;
 
-  extraPoints = borderPointsOfXinY2(redCoords2D, nsRed, blueCoords2D, nsBlue, &(P[2 * nP]), side, epsilon_area);
+  extraPoints = borderPointsOfXinY2(tgtCoords2D, nsTgt, srcCoords2D, nsBlue, &(P[2 * nP]), side, epsilon_area);
   if (extraPoints >= 1)
   {
-    for (int k = 0; k < nsRed; k++)
+    for (int k = 0; k < nsTgt; k++)
     {
       if (side[k])
       {
-        // this is to mark that red edges k-1 and k are intersecting blue
+        // this is to mark that target edges k-1 and k are intersecting src
         markr[k] = 1;
-        markr[(k + nsRed-1) % nsRed] = 1; // it is the previous edge, actually, but instead of doing -1, it is
+        markr[(k + nsTgt-1) % nsTgt] = 1; // it is the previous edge, actually, but instead of doing -1, it is
         // better to do modulo +3 (modulo 4)
         // null side b for next call
       }
@@ -216,7 +216,7 @@ ErrorCode Intx2MeshOnSphere::computeIntersectionBetweenRedAndBlue(EntityHandle r
       double orientedArea = area2D(&P[2*k], &P[2 * k1], &P[2 * k2]);
       if (orientedArea<0)
       {
-        std::cout <<" oriented area is negative: " << orientedArea << " k:"<< k << " target, src:" << tgt << " " << src << " \n";
+        std::cout <<" oriented area is negative: " << orientedArea << " k:"<< k << " target, src:" << target << " " << source << " \n";
       }
     }
 #endif
@@ -231,31 +231,31 @@ ErrorCode Intx2MeshOnSphere::computeIntersectionBetweenRedAndBlue(EntityHandle r
 // also, we could just create new vertices every time, and merge only in the end;
 // could be too expensive, and the tolerance for merging could be an
 // interesting topic
-ErrorCode Intx2MeshOnSphere::findNodes(EntityHandle red, int nsRed, EntityHandle blue, int nsBlue,
+ErrorCode Intx2MeshOnSphere::findNodes(EntityHandle tgt, int nsTgt, EntityHandle src, int nsBlue,
     double * iP, int nP)
 {
 #ifdef ENABLE_DEBUG
-  // first of all, check against red and blue vertices
+  // first of all, check against target and source vertices
   //
   if (dbg_1)
   {
-    std::cout << "red, blue, nP, P " << mb->id_from_handle(red) << " "
-        << mb->id_from_handle(blue) << " " << nP << "\n";
+    std::cout << "tgt, src, nP, P " << mb->id_from_handle(tgt) << " "
+        << mb->id_from_handle(src) << " " << nP << "\n";
     for (int n = 0; n < nP; n++)
       std::cout << " \t" << iP[2 * n] << "\t" << iP[2 * n + 1] << "\n";
 
   }
 #endif
 
-  // get the edges for the red triangle; the extra points will be on those edges, saved as
+  // get the edges for the target triangle; the extra points will be on those edges, saved as
   // lists (unordered)
 
-  // first get the list of edges adjacent to the red cell
-  // use the neighRedEdgeTag
-  EntityHandle adjRedEdges[MAXEDGES];
-  ErrorCode rval = mb->tag_get_data(neighRedEdgeTag, &red, 1, &(adjRedEdges[0])); MB_CHK_SET_ERR(rval, "can't get edge red tag");
-  // we know that we have only nsRed edges here; [nsRed, MAXEDGES) are ignored, but it is small potatoes
-  // some of them will be handles to the initial vertices from blue or red meshes
+  // first get the list of edges adjacent to the target cell
+  // use the neighTgtEdgeTag
+  EntityHandle adjTgtEdges[MAXEDGES];
+  ErrorCode rval = mb->tag_get_data(neighTgtEdgeTag, &tgt, 1, &(adjTgtEdges[0])); MB_CHK_SET_ERR(rval, "can't get edge target tag");
+  // we know that we have only nsTgt edges here; [nsTgt, MAXEDGES) are ignored, but it is small potatoes
+  // some of them will be handles to the initial vertices from source or target meshes
 
   std::vector<EntityHandle> foundIds;
   foundIds.resize(nP);
@@ -271,48 +271,48 @@ ErrorCode Intx2MeshOnSphere::findNodes(EntityHandle red, int nsRed, EntityHandle
     CartVect pos;
     reverse_gnomonic_projection(pp[0], pp[1], Rdest, plane, pos);
     int found = 0;
-    // first, are they on vertices from red or blue?
-    // priority is the red mesh (mb2?)
+    // first, are they on vertices from target or src?
+    // priority is the target mesh (mb2?)
     int j = 0;
     EntityHandle outNode = (EntityHandle) 0;
-    for (j = 0; j < nsRed && !found; j++)
+    for (j = 0; j < nsTgt && !found; j++)
     {
-      //int node = redTri.v[j];
-      double d2 = dist2(pp, &redCoords2D[2 * j]);
+      //int node = tgtTri.v[j];
+      double d2 = dist2(pp, &tgtCoords2D[2 * j]);
       if (d2 < epsilon_1)
       {
 
-        foundIds[i] = redConn[j]; // no new node
+        foundIds[i] = tgtConn[j]; // no new node
         found = 1;
 #ifdef  CHECK_CONVEXITY
         oldNodes ++;
 #endif
 #ifdef ENABLE_DEBUG
         if (dbg_1)
-          std::cout << "  red node j:" << j << " id:"
-              << mb->id_from_handle(redConn[j]) << " 2d coords:" << redCoords2D[2 * j] << "  "
-              << redCoords2D[2 * j + 1] << " d2: " << d2 << " \n";
+          std::cout << "  target node j:" << j << " id:"
+              << mb->id_from_handle(tgtConn[j]) << " 2d coords:" << tgtCoords2D[2 * j] << "  "
+              << tgtCoords2D[2 * j + 1] << " d2: " << d2 << " \n";
 #endif
       }
     }
 
     for (j = 0; j < nsBlue && !found; j++)
     {
-      //int node = blueTri.v[j];
-      double d2 = dist2(pp, &blueCoords2D[2 * j]);
+      //int node = srcTri.v[j];
+      double d2 = dist2(pp, &srcCoords2D[2 * j]);
       if (d2 < epsilon_1)
       {
-        // suspect is blueConn[j] corresponding in mbOut
+        // suspect is srcConn[j] corresponding in mbOut
 
-        foundIds[i] = blueConn[j]; // no new node
+        foundIds[i] = srcConn[j]; // no new node
         found = 1;
 #ifdef  CHECK_CONVEXITY
         oldNodes ++;
 #endif
 #ifdef ENABLE_DEBUG
         if (dbg_1)
-          std::cout << "  blue node " << j << " "
-              << mb->id_from_handle(blueConn[j]) << " d2:" << d2 << " \n";
+          std::cout << "  source node " << j << " "
+              << mb->id_from_handle(srcConn[j]) << " d2:" << d2 << " \n";
 #endif
       }
 
@@ -324,13 +324,13 @@ ErrorCode Intx2MeshOnSphere::findNodes(EntityHandle red, int nsRed, EntityHandle
       // look at the minimum area, not at the first below some tolerance
       double minArea  = 1.e+38;
       int index_min=-1;
-      for (j = 0; j < nsRed; j++)
+      for (j = 0; j < nsTgt; j++)
       {
-        int j1 = (j + 1) % nsRed;
-        double area = fabs(area2D(&redCoords2D[2 * j], &redCoords2D[2 * j1], pp));
+        int j1 = (j + 1) % nsTgt;
+        double area = fabs(area2D(&tgtCoords2D[2 * j], &tgtCoords2D[2 * j1], pp));
         // how to check if pp is between redCoords2D[j] and redCoords2D[j1] ?
         // they should form a straight line; the sign should be -1
-        double checkx = dist2(&redCoords2D[2*j],pp)+dist2(&redCoords2D[2*j1],pp)-dist2(&redCoords2D[2*j],&redCoords2D[2*j1]);
+        double checkx = dist2(&tgtCoords2D[2*j],pp)+dist2(&tgtCoords2D[2*j1],pp)-dist2(&tgtCoords2D[2*j],&tgtCoords2D[2*j1]);
         if (area<minArea && checkx<2*epsilon_1) // round off error or not?
         {
           index_min = j;
@@ -341,10 +341,10 @@ ErrorCode Intx2MeshOnSphere::findNodes(EntityHandle red, int nsRed, EntityHandle
       {
         // found the edge; now find if there is a point in the list here
         //std::vector<EntityHandle> * expts = extraNodesMap[tgtEdges[j]];
-        int indx = RedEdges.index(adjRedEdges[index_min]);
+        int indx = TgtEdges.index(adjTgtEdges[index_min]);
         if (indx<0) // CID 181166 (#1 of 1): Argument cannot be negative (NEGATIVE_RETURNS)
         {
-          std::cerr<<" error in adjacent red edge: " << mb->id_from_handle(adjRedEdges[index_min])<< "\n";
+          std::cerr<<" error in adjacent target edge: " << mb->id_from_handle(adjTgtEdges[index_min])<< "\n";
           return MB_FAILURE;
         }
         std::vector<EntityHandle> * expts = extraNodesVec[indx];
@@ -390,13 +390,13 @@ ErrorCode Intx2MeshOnSphere::findNodes(EntityHandle red, int nsRed, EntityHandle
     }
     if (!found)
     {
-      std::cout << " red quad: ";
-      for (int j1 = 0; j1 < nsRed; j1++)
+      std::cout << " target quad: ";
+      for (int j1 = 0; j1 < nsTgt; j1++)
       {
-        std::cout << redCoords2D[2 * j1] << " " << redCoords2D[2 * j1 + 1] << "\n";
+        std::cout << tgtCoords2D[2 * j1] << " " << tgtCoords2D[2 * j1 + 1] << "\n";
       }
-      std::cout << " a point pp is not on a red quad " << *pp << " " << pp[1]
-          << " red quad " << mb->id_from_handle(red) << " \n";
+      std::cout << " a point pp is not on a target quad " << *pp << " " << pp[1]
+          << " target quad " << mb->id_from_handle(tgt) << " \n";
       return MB_FAILURE;
     }
   }
@@ -424,21 +424,21 @@ ErrorCode Intx2MeshOnSphere::findNodes(EntityHandle red, int nsRed, EntityHandle
     rval = mb->create_element(MBPOLYGON, &foundIds[0], nP, polyNew);MB_CHK_ERR(rval);
     rval = mb->add_entities(outSet, &polyNew, 1);MB_CHK_ERR(rval);
 
-    // tag it with the global ids from red and blue elements
+    // tag it with the global ids from target and source elements
     int globalID;
-    rval = mb->tag_get_data(gid, &blue, 1, &globalID);MB_CHK_ERR(rval);
-    rval = mb->tag_set_data(blueParentTag, &polyNew, 1, &globalID);MB_CHK_ERR(rval);
-    // if(!parcomm->rank()) std::cout << "Setting parent for " << mb->id_from_handle(polyNew) << " : Blue = " << globalID << ", " << mb->id_from_handle(blue) << "\t\n";
-    rval = mb->tag_get_data(gid, &red, 1, &globalID);MB_CHK_ERR(rval);
-    rval = mb->tag_set_data(redParentTag, &polyNew, 1, &globalID);MB_CHK_ERR(rval);
-    // if(parcomm->rank()) std::cout << "Setting parent for " << mb->id_from_handle(polyNew) << " : Red = " << globalID << ", " << mb->id_from_handle(red) << "\n";
+    rval = mb->tag_get_data(gid, &src, 1, &globalID);MB_CHK_ERR(rval);
+    rval = mb->tag_set_data(srcParentTag, &polyNew, 1, &globalID);MB_CHK_ERR(rval);
+    // if(!parcomm->rank()) std::cout << "Setting parent for " << mb->id_from_handle(polyNew) << " : Blue = " << globalID << ", " << mb->id_from_handle(src) << "\t\n";
+    rval = mb->tag_get_data(gid, &tgt, 1, &globalID);MB_CHK_ERR(rval);
+    rval = mb->tag_set_data(tgtParentTag, &polyNew, 1, &globalID);MB_CHK_ERR(rval);
+    // if(parcomm->rank()) std::cout << "Setting parent for " << mb->id_from_handle(polyNew) << " : target = " << globalID << ", " << mb->id_from_handle(tgt) << "\n";
 
     counting++;
     rval = mb->tag_set_data(countTag, &polyNew, 1, &counting);MB_CHK_ERR(rval);
     if (orgSendProcTag)
     {
       int org_proc=-1;
-      rval = mb->tag_get_data(orgSendProcTag, &blue, 1, &org_proc);MB_CHK_ERR(rval);
+      rval = mb->tag_get_data(orgSendProcTag, &src, 1, &org_proc);MB_CHK_ERR(rval);
       rval = mb->tag_set_data(orgSendProcTag, &polyNew, 1, &org_proc);MB_CHK_ERR(rval);// yet another tag
     }
 #ifdef  CHECK_CONVEXITY
@@ -466,7 +466,7 @@ ErrorCode Intx2MeshOnSphere::findNodes(EntityHandle red, int nsRed, EntityHandle
         std::cout << " old verts: " << oldNodes << " other intx:" << otherIntx << "\n";
 
 
-        std::cout <<"rank:" << my_rank << " oriented area in 3d is negative: " << orientedArea << " k:"<< k << " target, src:" << tgt << " " << src << " \n";
+        std::cout <<"rank:" << my_rank << " oriented area in 3d is negative: " << orientedArea << " k:"<< k << " target, src:" << target << " " << source << " \n";
       }
     }
 #endif
@@ -512,11 +512,11 @@ ErrorCode Intx2MeshOnSphere::update_tracer_data(EntityHandle out_set, Tag & tagE
   Range polys;
   rval = mb->get_entities_by_dimension(out_set, 2, polys);MB_CHK_SET_ERR(rval, "can't get polygons out");
 
-  // rs2 is the red range, arrival; rs1 is blue, departure;
+  // rs2 is the target range, arrival; rs1 is src, departure;
   // there is a connection between rs1 and rs2, through the corrTag
   // corrTag is __correlation
-  // basically, mb->tag_get_data(corrTag, &(redPoly), 1, &bluePoly);
-  // also,  mb->tag_get_data(corrTag, &(bluePoly), 1, &redPoly);
+  // basically, mb->tag_get_data(corrTag, &(tgtPoly), 1, &srcPoly);
+  // also,  mb->tag_get_data(corrTag, &(srcPoly), 1, &tgtPoly);
   // we start from rs2 existing, then we have to update something
 
   // tagElem will have multiple tracers
@@ -542,7 +542,7 @@ ErrorCode Intx2MeshOnSphere::update_tracer_data(EntityHandle out_set, Tag & tagE
         remote_cells_with_tracers->vi_wr[2*i]=remote_cells->vi_wr[2*i];
         remote_cells_with_tracers->vi_wr[2*i+1]=remote_cells->vi_wr[2*i+1];
         //    remote_cells->vr_wr[i] = 0.; will have a different tuple for communication
-        remote_cells_with_tracers->vul_wr[i]=   remote_cells->vul_wr[i];// this is the corresponding red cell (arrival)
+        remote_cells_with_tracers->vul_wr[i]=   remote_cells->vul_wr[i];// this is the corresponding target cell (arrival)
         for (int k=0; k<numTracers; k++)
           remote_cells_with_tracers->vr_wr[numTracers*i+k] = 0; // initialize tracers to be transported
         remote_cells_with_tracers->inc_n();
@@ -552,62 +552,62 @@ ErrorCode Intx2MeshOnSphere::update_tracer_data(EntityHandle out_set, Tag & tagE
     remote_cells = NULL;
   }
 #endif
-  // for each polygon, we have 2 indices: red and blue parents
-  // we need index blue to update index red?
+  // for each polygon, we have 2 indices: target and source parents
+  // we need index source to update index tgt?
   std::vector<double> newValues(rs2.size()*numTracers, 0.);// initialize with 0 all of them
-  // area of the polygon * conc on red (old) current quantity
-  // finally, divide by the area of the red
+  // area of the polygon * conc on target (old) current quantity
+  // finally, divide by the area of the tgt
   double check_intx_area=0.;
   for (Range::iterator it= polys.begin(); it!=polys.end(); ++it)
   {
     EntityHandle poly=*it;
-    int blueIndex, redIndex;
-    rval =  mb->tag_get_data(blueParentTag, &poly, 1, &blueIndex);MB_CHK_SET_ERR(rval, "can't get blue tag");
+    int srcIndex, tgtIndex;
+    rval =  mb->tag_get_data(srcParentTag, &poly, 1, &srcIndex);MB_CHK_SET_ERR(rval, "can't get source tag");
 
-    EntityHandle blue = rs1[blueIndex-1]; // big assumption, it should work for meshes where global id is the same
+    EntityHandle src = rs1[srcIndex-1]; // big assumption, it should work for meshes where global id is the same
     // as element handle (ordered from 1 to number of elements); should be OK for Homme meshes
-    rval =  mb->tag_get_data(redParentTag, &poly, 1, &redIndex);MB_CHK_SET_ERR(rval, "can't get red tag");
-    //EntityHandle red = rs2[redIndex];
-    // big assumption here, red and blue are "parallel" ;we should have an index from
-    // blue to red (so a deformed blue corresponds to an arrival red)
+    rval =  mb->tag_get_data(tgtParentTag, &poly, 1, &tgtIndex);MB_CHK_SET_ERR(rval, "can't get target tag");
+    //EntityHandle target = rs2[tgtIndex];
+    // big assumption here, target and source are "parallel" ;we should have an index from
+    // source to target (so a deformed source corresponds to an arrival tgt)
     /// TODO: VSM: Its unclear whether we need the source or destination radius here.
     double radius = Rsrc;
     double areap = area_spherical_element(mb, poly, radius);
     check_intx_area+=areap;
-    // so the departure cell at time t (blueIndex) covers a portion of a redCell
-    // that quantity will be transported to the redCell at time t+dt
-    // the blue corresponds to a red arrival
-    EntityHandle redArr;
-    rval = mb->tag_get_data(corrTag, &blue, 1, &redArr);
-    if (0==redArr || MB_TAG_NOT_FOUND==rval)
+    // so the departure cell at time t (srcIndex) covers a portion of a tgtCell
+    // that quantity will be transported to the tgtCell at time t+dt
+    // the source corresponds to a target arrival
+    EntityHandle tgtArr;
+    rval = mb->tag_get_data(corrTag, &src, 1, &tgtArr);
+    if (0==tgtArr || MB_TAG_NOT_FOUND==rval)
     {
 #ifdef MOAB_HAVE_MPI
       if (!remote_cells_with_tracers)
         MB_CHK_SET_ERR( MB_FAILURE, "no remote cells, failure\n");
       // maybe the element is remote, from another processor
-      int global_id_blue;
-      rval = mb->tag_get_data(gid, &blue, 1, &global_id_blue);
-      MB_CHK_SET_ERR(rval, "can't get arrival red for corresponding blue gid");
+      int global_id_src;
+      rval = mb->tag_get_data(gid, &src, 1, &global_id_src);
+      MB_CHK_SET_ERR(rval, "can't get arrival target for corresponding source gid");
       // find the
-      int index_in_remote = remote_cells_with_tracers->find(1, global_id_blue);
+      int index_in_remote = remote_cells_with_tracers->find(1, global_id_src);
       if (index_in_remote==-1)
         MB_CHK_SET_ERR( MB_FAILURE, "can't find the global id element in remote cells\n");
       for (int k=0; k<numTracers; k++)
         remote_cells_with_tracers->vr_wr[index_in_remote*numTracers+k] +=
-            currentVals[numTracers*(redIndex-1)+k]*areap;
+            currentVals[numTracers*(tgtIndex-1)+k]*areap;
 #endif
     }
     else if (MB_SUCCESS==rval)
     {
-      int arrRedIndex = rs2.index(redArr);
-      if (-1 == arrRedIndex)
-        MB_CHK_SET_ERR(MB_FAILURE, "can't find the red arrival index");
+      int arrTgtIndex = rs2.index(tgtArr);
+      if (-1 == arrTgtIndex)
+        MB_CHK_SET_ERR(MB_FAILURE, "can't find the target arrival index");
       for (int k=0; k<numTracers; k++)
-        newValues[numTracers*arrRedIndex+k] += currentVals[(redIndex-1)*numTracers+k]*areap;
+        newValues[numTracers*arrTgtIndex+k] += currentVals[(tgtIndex-1)*numTracers+k]*areap;
     }
 
     else
-      MB_CHK_SET_ERR(rval, "can't get arrival red for corresponding ");
+      MB_CHK_SET_ERR(rval, "can't get arrival target for corresponding ");
   }
   // now, send back the remote_cells_with_tracers to the processors they came from, with the updated values for
   // the tracer mass in a cell
@@ -616,21 +616,21 @@ ErrorCode Intx2MeshOnSphere::update_tracer_data(EntityHandle out_set, Tag & tagE
   {
     // so this means that some cells will be sent back with tracer info to the procs they were sent from
     (parcomm->proc_config().crystal_router())->gs_transfer(1, *remote_cells_with_tracers, 0);
-    // now, look at the global id, find the proper "red" cell with that index and update its mass
+    // now, look at the global id, find the proper "tgt" cell with that index and update its mass
     //remote_cells->print("remote cells after routing");
     int n = remote_cells_with_tracers->get_n();
     for (int j=0; j<n; j++)
     {
-      EntityHandle redCell = remote_cells_with_tracers->vul_rd[j];// entity handle sent back
-      int arrRedIndex = rs2.index(redCell);
-      if (-1 == arrRedIndex)
-        MB_CHK_SET_ERR(MB_FAILURE, "can't find the red arrival index");
+      EntityHandle tgtCell = remote_cells_with_tracers->vul_rd[j];// entity handle sent back
+      int arrTgtIndex = rs2.index(tgtCell);
+      if (-1 == arrTgtIndex)
+        MB_CHK_SET_ERR(MB_FAILURE, "can't find the target arrival index");
       for (int k=0; k<numTracers; k++)
-        newValues[arrRedIndex*numTracers+k] += remote_cells_with_tracers->vr_rd[j*numTracers+k];
+        newValues[arrTgtIndex*numTracers+k] += remote_cells_with_tracers->vr_rd[j*numTracers+k];
     }
   }
 #endif /* MOAB_HAVE_MPI */
-  // now divide by red area (current)
+  // now divide by target area (current)
   int j=0;
   Range::iterator iter = rs2.begin();
   void * data=NULL; //used for stored area
@@ -1076,7 +1076,7 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set(EntityHandle & initial_distr
     Range Q = range_to_P.subset_by_dimension(2);
     for (Range::iterator it = Q.begin(); it != Q.end(); ++it)
     {
-      EntityHandle q = *it; // this is a second mesh cell (or blue, lagrange set)
+      EntityHandle q = *it; // this is a second mesh cell (or src, lagrange set)
       int global_id;
       rval = mb->tag_get_data(gid, &q, 1, &global_id);MB_CHK_SET_ERR(rval, "can't get gid for polygon");
       int n = TLq.get_n(); // current size

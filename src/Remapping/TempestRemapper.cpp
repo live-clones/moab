@@ -487,9 +487,9 @@ ErrorCode TempestRemapper::convert_overlap_mesh_sorted_by_source()
 
     std::vector<std::pair<int, int> > sorted_overlap_order ( m_overlap_entities.size() );
     {
-        Tag bluePtag, redPtag;
-        rval = m_interface->tag_get_handle ( "BlueParent", bluePtag ); MB_CHK_ERR ( rval );
-        rval = m_interface->tag_get_handle ( "RedParent", redPtag ); MB_CHK_ERR ( rval );
+        Tag srcParentTag, tgtParentTag;
+        rval = m_interface->tag_get_handle ( "SourceParent", srcParentTag ); MB_CHK_ERR ( rval );
+        rval = m_interface->tag_get_handle ( "TargetParent", tgtParentTag ); MB_CHK_ERR ( rval );
         // Overlap mesh: resize the source and target connection arrays
         m_overlap->vecSourceFaceIx.resize ( m_overlap_entities.size() );
         m_overlap->vecTargetFaceIx.resize ( m_overlap_entities.size() );
@@ -497,8 +497,8 @@ ErrorCode TempestRemapper::convert_overlap_mesh_sorted_by_source()
         // Overlap mesh: resize the source and target connection arrays
         std::vector<int> rbids_src ( m_overlap_entities.size() ), rbids_tgt ( m_overlap_entities.size() );
         std::vector<int> ghFlags;
-        rval = m_interface->tag_get_data ( bluePtag,  m_overlap_entities, &rbids_src[0] ); MB_CHK_ERR ( rval );
-        rval = m_interface->tag_get_data ( redPtag,  m_overlap_entities, &rbids_tgt[0] ); MB_CHK_ERR ( rval );
+        rval = m_interface->tag_get_data ( srcParentTag,  m_overlap_entities, &rbids_src[0] ); MB_CHK_ERR ( rval );
+        rval = m_interface->tag_get_data ( tgtParentTag,  m_overlap_entities, &rbids_tgt[0] ); MB_CHK_ERR ( rval );
         for ( size_t ix = 0; ix < m_overlap_entities.size(); ++ix )
         {
             sorted_overlap_order[ix].first = gid_to_lid_covsrc[rbids_src[ix]];
@@ -1130,14 +1130,14 @@ ErrorCode TempestRemapper::ComputeOverlapMesh ( bool kdtree_search, bool use_tem
 
                 Range intxCov;
                 Range intxCells;
-                Tag blueParentHandleTag;
-                rval = m_interface->tag_get_handle("BlueParent", blueParentHandleTag);  MB_CHK_ERR ( rval );
+                Tag srcParentTag;
+                rval = m_interface->tag_get_handle("SourceParent", srcParentTag);  MB_CHK_ERR ( rval );
                 rval = m_interface->get_entities_by_dimension(m_overlap_set, 2, intxCells);  MB_CHK_ERR ( rval );
                 for (Range::iterator it=intxCells.begin(); it!=intxCells.end(); it++)
                 {
                   EntityHandle intxCell= *it;
                   int blueParent=-1;
-                  rval = m_interface->tag_get_data(blueParentHandleTag, &intxCell, 1, &blueParent ); MB_CHK_ERR ( rval );
+                  rval = m_interface->tag_get_data(srcParentTag, &intxCell, 1, &blueParent ); MB_CHK_ERR ( rval );
                   // if (is_root) std::cout << "Found intersecting element: " << blueParent << ", " << gid_to_lid_covsrc[blueParent] << "\n";
                   assert(blueParent >= 0);
                   intxCov.insert(covEnts[loc_gid_to_lid_covsrc[blueParent]]);
@@ -1245,8 +1245,8 @@ ErrorCode TempestRemapper::augment_overlap_set()
 
   std::set<int>  affectedSourceCellsIds;
   Tag targetParentTag, sourceParentTag; // do not use blue/red, as it is more confusing
-  rval = m_interface->tag_get_handle("RedParent", targetParentTag);  MB_CHK_ERR(rval);
-  rval = m_interface->tag_get_handle("BlueParent", sourceParentTag);  MB_CHK_ERR(rval);
+  rval = m_interface->tag_get_handle("TargetParent", targetParentTag);  MB_CHK_ERR(rval);
+  rval = m_interface->tag_get_handle("SourceParent", sourceParentTag);  MB_CHK_ERR(rval);
   for (Range::iterator it=overlapCells.begin(); it!=overlapCells.end(); it++)
   {
     EntityHandle intxCell= *it;

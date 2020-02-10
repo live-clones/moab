@@ -2493,7 +2493,7 @@ ErrCode iMOAB_CoverageGraph ( MPI_Comm * join, iMOAB_AppID pid_src,
         appData& dataIntx = context.appDatas[*pid_intx];
         Tag parentTag, orgSendProcTag ;
 
-        rval = context.MBI->tag_get_handle ( "BlueParent", parentTag ); CHKERRVAL ( rval ); // global id of the blue, source element
+        rval = context.MBI->tag_get_handle ( "SourceParent", parentTag ); CHKERRVAL ( rval ); // global id of the blue, source element
         if ( !parentTag )
             return 1; // fatal error, abort
 

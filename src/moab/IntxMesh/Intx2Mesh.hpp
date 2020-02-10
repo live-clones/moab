@@ -76,24 +76,24 @@ public:
   // so P must be dimensioned to 4*MAXEDGES (2*2*MAXEDGES)
   // so, if you intersect 2 convex polygons with MAXEDGES , you will get a convex polygon
   // with 2*MAXEDGES, at most
-  // will also return the number of nodes of red and blue elements
-  virtual ErrorCode computeIntersectionBetweenRedAndBlue(EntityHandle red,
-      EntityHandle blue, double * P, int & nP, double & area,
-      int markb[MAXEDGES], int markr[MAXEDGES], int & nsidesBlue,
-      int & nsidesRed, bool check_boxes_first=false)=0;
+  // will also return the number of nodes of tgt and src elements
+  virtual ErrorCode computeIntersectionBetweenTgtAndSrc(EntityHandle tgt,
+      EntityHandle src, double * P, int & nP, double & area,
+      int markb[MAXEDGES], int markr[MAXEDGES], int & nsidesSrc,
+      int & nsidesTgt, bool check_boxes_first=false)=0;
 
   // this is also abstract
-  virtual ErrorCode findNodes(EntityHandle red, int nsRed, EntityHandle blue, int nsBlue,
+  virtual ErrorCode findNodes(EntityHandle tgt, int nsTgt, EntityHandle src, int nsSrc,
       double * iP, int nP)=0;
 
-  // this is also computing the area of the red cell in plane (gnomonic plane for sphere)
+  // this is also computing the area of the tgt cell in plane (gnomonic plane for sphere)
   // setting the local variables:
-  // this will be done once per red cell, and once per localQueue for blue cells
-  //  const EntityHandle * redConn;
+  // this will be done once per tgt cell, and once per localQueue for src cells
+  //  const EntityHandle * tgtConn;
   // CartVect redCoords[MAXEDGES];
   // double redCoords2D[MAXEDGES2]; // these are in plane
 
-  virtual double setup_red_cell(EntityHandle red, int & nsRed)= 0;
+  virtual double setup_tgt_cell(EntityHandle tgt, int & nsTgt)= 0;
 
   virtual ErrorCode FindMaxEdgesInSet(EntityHandle eset, int & max_edges);
   virtual ErrorCode FindMaxEdges(EntityHandle set1, EntityHandle set2); // this needs to be called before any covering communication in parallel
@@ -167,46 +167,46 @@ protected: // so it can be accessed in derived classes, InPlane and OnSphere
 
   EntityHandle mbs1;
   EntityHandle mbs2;
-  Range rs1;// range set 1 (departure set, lagrange set, blue set, manufactured set, target mesh)
-  Range rs2;// range set 2 (arrival set, euler set, red set, initial set, source mesh)
+  Range rs1;// range set 1 (departure set, lagrange set, src set, manufactured set, target mesh)
+  Range rs2;// range set 2 (arrival set, euler set, tgt set, initial set, source mesh)
 
   EntityHandle outSet; // will contain intersection
   Tag gid; // global id tag will be used to set the parents of the intersection cell
 
   // tags used in computation, advancing front
-  Tag RedFlagTag; // to mark red quads already considered
+  Tag TgtFlagTag; // to mark tgt quads already considered
 
-  Range RedEdges; //
+  Range TgtEdges; //
 
-  // red parent and blue parent tags
+  // tgt parent and src parent tags
   // these will be on the out mesh
-  Tag redParentTag;
-  Tag blueParentTag;
+  Tag tgtParentTag;
+  Tag srcParentTag;
   Tag countTag;
 
-  Tag blueNeighTag; // will store neighbors for navigating easily in advancing front, for first mesh (blue, target, lagrange)
-  Tag redNeighTag; // will store neighbors for navigating easily in advancing front, for second mesh (red, source, euler)
+  Tag srcNeighTag; // will store neighbors for navigating easily in advancing front, for first mesh (src, target, lagrange)
+  Tag tgtNeighTag; // will store neighbors for navigating easily in advancing front, for second mesh (tgt, source, euler)
 
-  Tag neighRedEdgeTag; // will store edge borders for each red cell
+  Tag neighTgtEdgeTag; // will store edge borders for each tgt cell
 
   Tag orgSendProcTag; /// for coverage mesh, will store the original sender
 
   //EntityType type; // this will be tri, quad or MBPOLYGON...
 
-  const EntityHandle * redConn;
-  const EntityHandle * blueConn;
-  CartVect redCoords[MAXEDGES];
-  CartVect blueCoords[MAXEDGES];
-  double redCoords2D[MAXEDGES2]; // these are in plane
-  double blueCoords2D[MAXEDGES2]; // these are in plane
+  const EntityHandle * tgtConn;
+  const EntityHandle * srcConn;
+  CartVect tgtCoords[MAXEDGES];
+  CartVect srcCoords[MAXEDGES];
+  double tgtCoords2D[MAXEDGES2]; // these are in plane
+  double srcCoords2D[MAXEDGES2]; // these are in plane
 
 #ifdef ENABLE_DEBUG
   static int dbg_1;
   std::ofstream mout_1[6]; // some debug files
 #endif
-  // for each red edge, we keep a vector of extra nodes, coming from intersections
-  // use the index in RedEdges range
-  // so the extra nodes on each red edge are kept track of
+  // for each tgt edge, we keep a vector of extra nodes, coming from intersections
+  // use the index in TgtEdges range
+  // so the extra nodes on each tgt edge are kept track of
   // only entity handles are in the vector, not the actual coordinates;
   // actual coordinates are retrieved every time, which could be expensive
   // maybe we should store the coordinates too, along with entity handles (more memory used, faster to retrieve)
@@ -228,8 +228,8 @@ protected: // so it can be accessed in derived classes, InPlane and OnSphere
   TupleList * remote_cells_with_tracers; // these will be used now to update tracers on remote procs
   std::map<int, EntityHandle> globalID_to_eh;// needed for parallel, mostly
 #endif
-  int max_edges_1; // maximum number of edges in the lagrange set (first set, blue)
-  int max_edges_2; // maximum number of edges in the euler set (second set, red)
+  int max_edges_1; // maximum number of edges in the lagrange set (first set, src)
+  int max_edges_2; // maximum number of edges in the euler set (second set, tgt)
   int counting;
 
 };
