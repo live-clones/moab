@@ -347,7 +347,7 @@ ErrorCode TempestRemapper::ConvertMeshToTempest ( Remapper::IntersectionContext 
     {
         if ( !m_source ) m_source = new Mesh();
         if ( outputEnabled ) std::cout << "\nConverting (source) MOAB to TempestRemap Mesh representation ...\n";
-        rval = convert_mesh_to_tempest_private ( m_source, m_source_set, m_source_entities, &m_source_vertices );
+        rval = convert_mesh_to_tempest_private ( m_source, m_source_set, m_source_entities, &m_source_vertices );MB_CHK_SET_ERR ( rval, "Can't convert source mesh to Tempest" );
         if (m_source_entities.size() == 0 && m_source_vertices.size() != 0) {
             this->point_cloud_source = true;
         }
@@ -356,15 +356,15 @@ ErrorCode TempestRemapper::ConvertMeshToTempest ( Remapper::IntersectionContext 
     {
         if ( !m_target ) m_target = new Mesh();
         if ( outputEnabled ) std::cout << "\nConverting (target) MOAB to TempestRemap Mesh representation ...\n";
-        rval = convert_mesh_to_tempest_private ( m_target, m_target_set, m_target_entities, &m_target_vertices );
+        rval = convert_mesh_to_tempest_private ( m_target, m_target_set, m_target_entities, &m_target_vertices );MB_CHK_SET_ERR ( rval, "Can't convert target mesh to Tempest" );
         if (m_target_entities.size() == 0 && m_target_vertices.size() != 0)
             this->point_cloud_target = true;
     }
-    else if ( ctx != Remapper::DEFAULT )     // Overlap mesh
+    else if ( ctx == Remapper::OverlapMesh )     // Overlap mesh
     {
         if ( !m_overlap ) m_overlap = new Mesh();
         if ( outputEnabled ) std::cout << "\nConverting (overlap) MOAB to TempestRemap Mesh representation ...\n";
-        rval = convert_mesh_to_tempest_private ( m_overlap, m_overlap_set, m_overlap_entities, NULL );
+        rval = convert_overlap_mesh_sorted_by_source();MB_CHK_SET_ERR ( rval, "Can't convert overlap mesh to Tempest" );
     }
     else
     {

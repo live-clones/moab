@@ -72,7 +72,7 @@ moab::TempestOnlineMap::TempestOnlineMap ( moab::TempestRemapper* remapper ) : O
     m_meshInput = remapper->GetMesh ( moab::Remapper::SourceMesh );
     m_meshInputCov = remapper->GetCoveringMesh();
     m_meshOutput = remapper->GetMesh ( moab::Remapper::TargetMesh );
-    m_meshOverlap = remapper->GetMesh ( moab::Remapper::IntersectedMesh );
+    m_meshOverlap = remapper->GetMesh ( moab::Remapper::OverlapMesh );
 
     is_parallel = false;
     is_root = true;
@@ -1325,7 +1325,7 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
         moab::Range sharedGhostEntities;
         rval = this->remove_ghosted_overlap_entities(sharedGhostEntities); MB_CHK_ERR ( rval );
         /* Use the following call to re-add them back */
-        // moab::EntityHandle m_meshOverlapSet = m_remapper->GetMeshSet ( moab::Remapper::IntersectedMesh );
+        // moab::EntityHandle m_meshOverlapSet = m_remapper->GetMeshSet ( moab::Remapper::OverlapMesh );
         // rval = m_interface->add_entities(m_meshOverlapSet, sharedGhostEntities);MB_CHK_SET_ERR(rval, "Adding entities dim 2 failed");
 #endif
 
@@ -1641,7 +1641,7 @@ moab::ErrorCode moab::TempestOnlineMap::remove_ghosted_overlap_entities (moab::R
     if (is_parallel && size > 1)
     {
         moab::Range allents;
-        moab::EntityHandle m_meshOverlapSet = m_remapper->GetMeshSet ( moab::Remapper::IntersectedMesh );
+        moab::EntityHandle m_meshOverlapSet = m_remapper->GetMeshSet ( moab::Remapper::OverlapMesh );
         rval = m_interface->get_entities_by_dimension(m_meshOverlapSet, 2, allents);MB_CHK_SET_ERR(rval, "Getting entities dim 2 failed");
 
         moab::Range sharedents;

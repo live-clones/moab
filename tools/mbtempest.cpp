@@ -288,8 +288,8 @@ int main ( int argc, char* argv[] )
         // Load the meshes and validate
         rval = remapper.ConvertTempestMesh ( moab::Remapper::SourceMesh ); MB_CHK_ERR ( rval );
         rval = remapper.ConvertTempestMesh ( moab::Remapper::TargetMesh ); MB_CHK_ERR ( rval );
-        remapper.SetMeshType ( moab::Remapper::IntersectedMesh, moab::TempestRemapper::OVERLAP_FILES );
-        rval = remapper.ConvertTempestMesh ( moab::Remapper::IntersectedMesh ); MB_CHK_ERR ( rval );
+        remapper.SetMeshType ( moab::Remapper::OverlapMesh, moab::TempestRemapper::OVERLAP_FILES );
+        rval = remapper.ConvertTempestMesh ( moab::Remapper::OverlapMesh ); MB_CHK_ERR ( rval );
         rval = mbCore->write_mesh ( "tempest_intersection.h5m", &ctx.meshsets[2], 1 ); MB_CHK_ERR ( rval );
 
         // print verbosely about the problem setting
@@ -305,7 +305,7 @@ int main ( int argc, char* argv[] )
             printf ( "The blue set contains %lu vertices and %lu elements \n", bintxverts.size(), bintxelems.size() );
         }
 
-        moab::EntityHandle intxset; // == remapper.GetMeshSet(moab::Remapper::IntersectedMesh);
+        moab::EntityHandle intxset; // == remapper.GetMeshSet(moab::Remapper::OverlapMesh);
 
         // Compute intersections with MOAB
         {
@@ -451,7 +451,7 @@ int main ( int argc, char* argv[] )
 
         if ( ctx.computeWeights )
         {
-            ctx.meshes[2] = remapper.GetMesh ( moab::Remapper::IntersectedMesh );
+            ctx.meshes[2] = remapper.GetMesh ( moab::Remapper::OverlapMesh );
 
             ctx.timer_push ( "setup computation of weights" );
             // Call to generate the remapping weights with the tempest meshes
@@ -573,7 +573,7 @@ moab::ErrorCode CreateTempestMesh ( ToolContext& ctx, moab::TempestRemapper& rem
         ctx.meshes.resize ( 3 );
         ctx.meshsets[0] = remapper.GetMeshSet ( moab::Remapper::SourceMesh );
         ctx.meshsets[1] = remapper.GetMeshSet ( moab::Remapper::TargetMesh );
-        ctx.meshsets[2] = remapper.GetMeshSet ( moab::Remapper::IntersectedMesh );
+        ctx.meshsets[2] = remapper.GetMeshSet ( moab::Remapper::OverlapMesh );
 
         // First the source
         rval = remapper.LoadMesh ( moab::Remapper::SourceMesh, ctx.inFilenames[0], moab::TempestRemapper::DEFAULT ); MB_CHK_ERR ( rval );
@@ -590,8 +590,8 @@ moab::ErrorCode CreateTempestMesh ( ToolContext& ctx, moab::TempestRemapper& rem
         if ( err ) { rval = moab::MB_FAILURE; }
         else
         {
-            remapper.SetMesh ( moab::Remapper::IntersectedMesh, tempest_mesh );
-            ctx.meshes[2] = remapper.GetMesh ( moab::Remapper::IntersectedMesh );
+            remapper.SetMesh ( moab::Remapper::OverlapMesh, tempest_mesh );
+            ctx.meshes[2] = remapper.GetMesh ( moab::Remapper::OverlapMesh );
             // ctx.meshes.push_back(*tempest_mesh);
         }
     }
@@ -601,7 +601,7 @@ moab::ErrorCode CreateTempestMesh ( ToolContext& ctx, moab::TempestRemapper& rem
         ctx.meshes.resize ( 3 );
         ctx.meshsets[0] = remapper.GetMeshSet ( moab::Remapper::SourceMesh );
         ctx.meshsets[1] = remapper.GetMeshSet ( moab::Remapper::TargetMesh );
-        ctx.meshsets[2] = remapper.GetMeshSet ( moab::Remapper::IntersectedMesh );
+        ctx.meshsets[2] = remapper.GetMeshSet ( moab::Remapper::OverlapMesh );
 
         const double radius_src = 1.0 /*2.0*acos(-1.0)*/;
         const double radius_dest = 1.0 /*2.0*acos(-1.0)*/;

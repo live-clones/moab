@@ -204,7 +204,7 @@ Mesh* TempestRemapper::GetMesh(Remapper::IntersectionContext ctx)
             return m_source;
         case Remapper::TargetMesh:
             return m_target;
-        case Remapper::IntersectedMesh:
+        case Remapper::OverlapMesh:
             return m_overlap;
         case Remapper::CoveringMesh:
             return m_covering_source;
@@ -229,7 +229,7 @@ void TempestRemapper::SetMesh(Remapper::IntersectionContext ctx, Mesh* mesh, boo
             if (overwrite && m_target) delete m_target;
             m_target = mesh;
             break;
-        case Remapper::IntersectedMesh:
+        case Remapper::OverlapMesh:
             if (!overwrite && m_overlap) return;
             if (overwrite && m_overlap) delete m_overlap;
             m_overlap = mesh;
@@ -254,7 +254,7 @@ moab::EntityHandle& TempestRemapper::GetMeshSet(Remapper::IntersectionContext ct
             return m_source_set;
         case Remapper::TargetMesh:
             return m_target_set;
-        case Remapper::IntersectedMesh:
+        case Remapper::OverlapMesh:
             return m_overlap_set;
         case Remapper::CoveringMesh:
             return m_covering_source_set;
@@ -273,7 +273,7 @@ moab::EntityHandle TempestRemapper::GetMeshSet(Remapper::IntersectionContext ctx
             return m_source_set;
         case Remapper::TargetMesh:
             return m_target_set;
-        case Remapper::IntersectedMesh:
+        case Remapper::OverlapMesh:
             return m_overlap_set;
         case Remapper::CoveringMesh:
             return m_covering_source_set;
@@ -293,7 +293,7 @@ moab::Range& TempestRemapper::GetMeshEntities(Remapper::IntersectionContext ctx)
             return m_source_entities;
         case Remapper::TargetMesh:
             return m_target_entities;
-        case Remapper::IntersectedMesh:
+        case Remapper::OverlapMesh:
             return m_overlap_entities;
         case Remapper::CoveringMesh:
             return m_covering_source_entities;
@@ -312,7 +312,7 @@ const moab::Range& TempestRemapper::GetMeshEntities(Remapper::IntersectionContex
             return m_source_entities;
         case Remapper::TargetMesh:
             return m_target_entities;
-        case Remapper::IntersectedMesh:
+        case Remapper::OverlapMesh:
             return m_overlap_entities;
         case Remapper::CoveringMesh:
             return m_covering_source_entities;
@@ -367,7 +367,7 @@ void TempestRemapper::SetMeshType(Remapper::IntersectionContext ctx, TempestRema
         case Remapper::TargetMesh:
             m_target_type = type;
             break;
-        case Remapper::IntersectedMesh:
+        case Remapper::OverlapMesh:
             m_overlap_type = type;
             break;
         case Remapper::DEFAULT:
@@ -385,7 +385,7 @@ TempestRemapper::TempestMeshType TempestRemapper::GetMeshType(Remapper::Intersec
             return m_source_type;
         case Remapper::TargetMesh:
             return m_target_type;
-        case Remapper::IntersectedMesh:
+        case Remapper::OverlapMesh:
             return m_overlap_type;
         case Remapper::DEFAULT:
         default:
@@ -414,7 +414,7 @@ int TempestRemapper::GetGlobalID(Remapper::IntersectionContext ctx, int localID)
             return lid_to_gid_tgt[localID];
         case Remapper::CoveringMesh:
             return lid_to_gid_covsrc[localID];
-        case Remapper::IntersectedMesh:
+        case Remapper::OverlapMesh:
         case Remapper::DEFAULT:
         default:
             return -1;
@@ -433,7 +433,7 @@ int TempestRemapper::GetLocalID(Remapper::IntersectionContext ctx, int globalID)
         case Remapper::CoveringMesh:
             return gid_to_lid_covsrc[globalID];
         case Remapper::DEFAULT:
-        case Remapper::IntersectedMesh:
+        case Remapper::OverlapMesh:
         default:
             return -1;
     }
