@@ -308,8 +308,8 @@ ErrorCode TempestRemapper::convert_tempest_mesh_private ( TempestMeshType meshTy
 
                 if (storeParentInfo)
                 {
-                  srcParent[ifaces] = mesh->vecSourceFaceIx[fIndex];
-                  tgtParent[ifaces] = mesh->vecTargetFaceIx[fIndex];
+                  srcParent[ifaces] = mesh->vecSourceFaceIx[fIndex]+1;
+                  tgtParent[ifaces] = mesh->vecTargetFaceIx[fIndex]+1;
                 }
 
             }
