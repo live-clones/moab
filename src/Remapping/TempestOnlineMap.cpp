@@ -1322,11 +1322,13 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
         // }
 
 #ifdef MOAB_HAVE_MPI
-        moab::Range sharedGhostEntities;
-        rval = this->remove_ghosted_overlap_entities(sharedGhostEntities); MB_CHK_ERR ( rval );
-        /* Use the following call to re-add them back */
-        // moab::EntityHandle m_meshOverlapSet = m_remapper->GetMeshSet ( moab::Remapper::OverlapMesh );
-        // rval = m_interface->add_entities(m_meshOverlapSet, sharedGhostEntities);MB_CHK_SET_ERR(rval, "Adding entities dim 2 failed");
+        {
+            // Remove ghosted entities from overlap set
+            moab::Range ghostedEnts;
+            rval = m_remapper->GetOverlapAugmentedEntities(ghostedEnts); MB_CHK_ERR ( rval );
+            moab::EntityHandle m_meshOverlapSet = m_remapper->GetMeshSet ( moab::Remapper::OverlapMesh );
+            rval = m_interface->remove_entities(m_meshOverlapSet, ghostedEnts);MB_CHK_SET_ERR(rval, "Deleting ghosted entities failed");
+        }
 #endif
 
         // Verify consistency, conservation and monotonicity, globally
@@ -1630,46 +1632,6 @@ void moab::TempestOnlineMap::InitVectors()
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-
-moab::ErrorCode moab::TempestOnlineMap::remove_ghosted_overlap_entities (moab::Range& sharedGhostEntities)
-{
-    sharedGhostEntities.clear();
-#ifdef MOAB_HAVE_MPI
-    moab::ErrorCode rval;
-
-    // Remove entities in the intersection mesh that are part of the ghosted overlap
-    if (is_parallel && size > 1)
-    {
-        moab::Range allents;
-        moab::EntityHandle m_meshOverlapSet = m_remapper->GetMeshSet ( moab::Remapper::OverlapMesh );
-        rval = m_interface->get_entities_by_dimension(m_meshOverlapSet, 2, allents);MB_CHK_SET_ERR(rval, "Getting entities dim 2 failed");
-
-        moab::Range sharedents;
-        moab::Tag ghostTag;
-        std::vector<int> ghFlags(allents.size());
-        rval = m_interface->tag_get_handle ( "ORIG_PROC", ghostTag ); MB_CHK_ERR ( rval );
-        rval = m_interface->tag_get_data ( ghostTag,  allents, &ghFlags[0] ); MB_CHK_ERR ( rval );
-        for (unsigned i=0; i < allents.size(); ++i)
-            if (ghFlags[i]>=0) // it means it is a ghost overlap element
-                sharedents.insert(allents[i]); // this should not participate in smat!
-
-        allents = subtract(allents,sharedents);
-
-        // Get connectivity from all ghosted elements and filter out
-        // the vertices that are not owned
-        moab::Range ownedverts, sharedverts;
-        rval = m_interface->get_connectivity(allents, ownedverts);MB_CHK_SET_ERR(rval, "Deleting entities dim 0 failed");
-        rval = m_interface->get_connectivity(sharedents, sharedverts);MB_CHK_SET_ERR(rval, "Deleting entities dim 0 failed");
-        sharedverts = subtract(sharedverts,ownedverts);                    
-        rval = m_interface->remove_entities(m_meshOverlapSet, sharedents);MB_CHK_SET_ERR(rval, "Deleting entities dim 2 failed");
-        rval = m_interface->remove_entities(m_meshOverlapSet, sharedverts);MB_CHK_SET_ERR(rval, "Deleting entities dim 0 failed");
-
-        sharedGhostEntities.merge(sharedents);
-        sharedGhostEntities.merge(sharedverts);
-    }
-#endif
-    return moab::MB_SUCCESS;
-}
 
 moab::ErrorCode moab::TempestOnlineMap::WriteParallelMap (std::string strOutputFile)  const
 {

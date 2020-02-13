@@ -133,6 +133,11 @@ public:
     /// </summary>
     moab::ErrorCode ComputeGlobalLocalMaps();
 
+	///	<summary>
+	///		Get all the ghosted overlap entities that were accumulated to enable conservation in parallel
+	///	</summary>
+	moab::ErrorCode GetOverlapAugmentedEntities (moab::Range& sharedGhostEntities);
+
     // public members
     bool meshValidate;  // Validate the mesh after loading from file
 

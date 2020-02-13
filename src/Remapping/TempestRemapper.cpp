@@ -475,6 +475,45 @@ bool IntPairComparator ( const std::pair<int, int> &a, const std::pair<int, int>
         return a.first < b.first;
 }
 
+moab::ErrorCode moab::TempestRemapper::GetOverlapAugmentedEntities (moab::Range& sharedGhostEntities)
+{
+    sharedGhostEntities.clear();
+#ifdef MOAB_HAVE_MPI
+    moab::ErrorCode rval;
+
+    // Remove entities in the intersection mesh that are part of the ghosted overlap
+    if (is_parallel && size > 1)
+    {
+        moab::Range allents;
+        rval = m_interface->get_entities_by_dimension(m_overlap_set, 2, allents);MB_CHK_SET_ERR(rval, "Getting entities dim 2 failed");
+
+        moab::Range sharedents;
+        moab::Tag ghostTag;
+        std::vector<int> ghFlags(allents.size());
+        rval = m_interface->tag_get_handle ( "ORIG_PROC", ghostTag ); MB_CHK_ERR ( rval );
+        rval = m_interface->tag_get_data ( ghostTag,  allents, &ghFlags[0] ); MB_CHK_ERR ( rval );
+        for (unsigned i=0; i < allents.size(); ++i)
+            if (ghFlags[i]>=0) // it means it is a ghost overlap element
+                sharedents.insert(allents[i]); // this should not participate in smat!
+
+        allents = subtract(allents,sharedents);
+
+        // Get connectivity from all ghosted elements and filter out
+        // the vertices that are not owned
+        moab::Range ownedverts, sharedverts;
+        rval = m_interface->get_connectivity(allents, ownedverts);MB_CHK_SET_ERR(rval, "Deleting entities dim 0 failed");
+        rval = m_interface->get_connectivity(sharedents, sharedverts);MB_CHK_SET_ERR(rval, "Deleting entities dim 0 failed");
+        sharedverts = subtract(sharedverts,ownedverts);
+        // rval = m_interface->remove_entities(m_overlap_set, sharedents);MB_CHK_SET_ERR(rval, "Deleting entities dim 2 failed");
+        // rval = m_interface->remove_entities(m_overlap_set, sharedverts);MB_CHK_SET_ERR(rval, "Deleting entities dim 0 failed");
+
+        sharedGhostEntities.merge(sharedents);
+        sharedGhostEntities.merge(sharedverts);
+    }
+#endif
+    return moab::MB_SUCCESS;
+}
+
 ErrorCode TempestRemapper::convert_overlap_mesh_sorted_by_source()
 {
     ErrorCode rval;

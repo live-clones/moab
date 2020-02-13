@@ -440,13 +440,30 @@ int main ( int argc, char* argv[] )
 
         if ( ctx.intxFilename.size() )
         {
+            moab::EntityHandle writableOverlapSet;
+            rval = mbCore->create_meshset ( moab::MESHSET_SET, writableOverlapSet ); MB_CHK_SET_ERR ( rval, "Can't create new set" );
+            moab::EntityHandle meshOverlapSet = remapper.GetMeshSet ( moab::Remapper::OverlapMesh );
+            moab::Range ovEnts;
+            rval = mbCore->get_entities_by_dimension ( meshOverlapSet, 2, ovEnts ); MB_CHK_SET_ERR ( rval, "Can't create new set" );
+            rval = mbCore->get_entities_by_dimension ( meshOverlapSet, 0, ovEnts ); MB_CHK_SET_ERR ( rval, "Can't create new set" );
+#ifdef MOAB_HAVE_MPI
+            // Do not remove ghosted entities if we still haven't computed weights
+            // Remove ghosted entities from overlap set before writing the new mesh set to file
+            if (nprocs > 1)
+            {
+                moab::Range ghostedEnts;
+                rval = remapper.GetOverlapAugmentedEntities(ghostedEnts); MB_CHK_ERR ( rval );
+                ovEnts = moab::subtract(ovEnts, ghostedEnts);
+            }
+#endif
+            rval = mbCore->add_entities(writableOverlapSet, ovEnts);MB_CHK_SET_ERR(rval, "Deleting ghosted entities failed");
+
             // Write out our computed intersection file
             size_t lastindex = ctx.intxFilename.find_last_of(".");
             sstr.str("");
             sstr << ctx.intxFilename.substr(0, lastindex) << ".h5m";
             if(!ctx.proc_id) std::cout << "Writing out the MOAB intersection mesh file to " << sstr.str() << std::endl;
-            rval = mbCore->write_file ( sstr.str().c_str(), NULL, "PARALLEL=WRITE_PART", &ctx.meshsets[2], 1 ); MB_CHK_ERR ( rval );
-
+            rval = mbCore->write_file ( sstr.str().c_str(), NULL, "PARALLEL=WRITE_PART", &writableOverlapSet, 1 ); MB_CHK_ERR ( rval );
         }
 
         if ( ctx.computeWeights )

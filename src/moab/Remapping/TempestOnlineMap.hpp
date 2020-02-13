@@ -136,11 +136,6 @@ public:
 private:
 
 	///	<summary>
-	///		Remove all the ghosted overlap entities that were accumulated to enable conservation in parallel
-	///	</summary>
-	moab::ErrorCode remove_ghosted_overlap_entities (moab::Range& sharedGhostEntities);
-
-	///	<summary>
 	///		Compute the remapping weights as a permutation matrix that relates DoFs on the source mesh
 	///     to DoFs on the target mesh.
 	///	</summary>
