@@ -197,7 +197,7 @@ int main ( int argc, char* argv[] )
       {
         areaDiff -= sourceAreasIntx[sourceID];
       }
-      areaDiff = areaDiff/sourceAreas[sourceID];
+
       rval = mb->tag_set_data(diffTag, &cell, 1, &areaDiff);
     }
     rval = mb->write_file( source_verif.c_str(),0, 0,&sset, 1);MB_CHK_ERR(rval);
@@ -215,7 +215,7 @@ int main ( int argc, char* argv[] )
       {
         areaDiff -= targetAreasIntx[targetID];
       }
-      areaDiff = areaDiff/targetAreas[targetID];
+
       rval = mb->tag_set_data(diffTag, &cell, 1, &areaDiff);
     }
     rval = mb->write_file(target_verif.c_str(), 0, 0, &tset, 1);MB_CHK_ERR(rval);
