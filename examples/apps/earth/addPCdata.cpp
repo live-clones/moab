@@ -1,5 +1,4 @@
-/*
- * addPCdata.cpp
+/** @example addPCdata.cpp  Add point cloud data
  * this tool will take an existing h5m fine atm mesh file and add data from an h5m  type file with point cloud mesh
  * will support mainly showing the data with Visit
  *
@@ -45,6 +44,12 @@ int main(int argc, char* argv[])
   std::cout << "variable to copy: " << variable_name << "\n";
   std::cout << "output file: " << outfile << "\n";
 
+
+  if (inputfile.empty())
+  {
+    opts.printHelp();
+    return 0;
+  }
   ErrorCode rval;
   Core *mb = new Core();
 

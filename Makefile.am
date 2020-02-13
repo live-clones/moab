@@ -89,7 +89,8 @@ examples_apps_DATA = \
 examples_apps_earthdir = $(datadir)/examples/apps/earth
 examples_apps_earth_DATA = \
                examples/apps/earth/makefile \
-               examples/apps/earth/ContinentsOnGlobe.cpp
+               examples/apps/earth/ContinentsOnGlobe.cpp \
+	       examples/apps/earth/addPCdata.cpp 
 
 CMAKE_CONFIGURATION_FILES = CMakeLists.txt \
 			    config/AutoconfHeader.cmake      config/FindCGM.cmake        config/FindMetis.cmake     config/FindZoltan.cmake    config/ForceAddFlags.cmake \
