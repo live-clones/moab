@@ -32,9 +32,9 @@
 #include "moab/ParallelComm.hpp"
 #include "MBParallelConventions.h"
 #include "moab/Core.hpp"
-#include "Coupler.hpp"
+#include "mbcoupler/Coupler.hpp"
 #include "moab_mpi.h"
-#include "ElemUtil.hpp"
+#include "mbcoupler/ElemUtil.hpp"
 #include "moab/MeshGeneration.hpp"
 #include "moab/ProgOptions.hpp"
 

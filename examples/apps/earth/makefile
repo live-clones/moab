@@ -28,7 +28,7 @@ addPCdata: addPCdata.o ${MOAB_LIBDIR}/libMOAB.la
 	${VERBOSE}${MOAB_CXX} -o $@ $< ${MOAB_LIBS_LINK}
 
 run-addPCdata: addPCdata
-	${RUNSERIAL} ./addpcdata
+	${RUNSERIAL} ./addPCdata
 
 
 run: all $(addprefix run-,$(ALLEXAMPLES))
