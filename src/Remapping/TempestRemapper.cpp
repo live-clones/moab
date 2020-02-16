@@ -86,20 +86,28 @@ ErrorCode TempestRemapper::initialize(bool initialize_fsets)
 
 TempestRemapper::~TempestRemapper()
 {
-    // destroy all meshes
-    if ( m_source ) { delete m_source; m_source = NULL; }
-    if ( m_target ) {delete m_target; m_target = NULL; }
-    if ( m_overlap ) {delete m_overlap; m_overlap = NULL; }
-    if ( m_covering_source && is_parallel) {delete m_covering_source; m_covering_source = NULL;}
+  this->clear();
+}
 
-    point_cloud_source = false;
-    point_cloud_target = false;
+ErrorCode TempestRemapper::clear()
+{
+  // destroy all meshes
+  if ( m_source ) { delete m_source; m_source = NULL; }
+  if ( m_target ) {delete m_target; m_target = NULL; }
+  if ( m_overlap ) {delete m_overlap; m_overlap = NULL; }
+  if ( m_covering_source && is_parallel) {delete m_covering_source; m_covering_source = NULL;}
 
-    m_source_entities.clear();
-    m_target_entities.clear();
-    m_overlap_entities.clear();
-    gid_to_lid_src.clear(); gid_to_lid_tgt.clear(); gid_to_lid_covsrc.clear();
-    lid_to_gid_src.clear(); lid_to_gid_tgt.clear(); lid_to_gid_covsrc.clear();
+  point_cloud_source = false;
+  point_cloud_target = false;
+
+  m_source_entities.clear(); m_source_vertices.clear();
+  m_covering_source_entities.clear(); m_covering_source_vertices.clear();
+  m_target_entities.clear(); m_target_vertices.clear();
+  m_overlap_entities.clear();
+  gid_to_lid_src.clear(); gid_to_lid_tgt.clear(); gid_to_lid_covsrc.clear();
+  lid_to_gid_src.clear(); lid_to_gid_tgt.clear(); lid_to_gid_covsrc.clear();
+
+  return MB_SUCCESS;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -625,7 +633,7 @@ ErrorCode TempestRemapper::convert_overlap_mesh_sorted_by_source()
     m_overlap->RemoveCoincidentNodes();
 
     // Generate reverse node array and edge map
-    if ( constructEdgeMap ) m_overlap->ConstructEdgeMap(false);
+    // if ( constructEdgeMap ) m_overlap->ConstructEdgeMap(false);
     // m_overlap->ConstructReverseNodeArray();
 
     // m_overlap->Validate();
@@ -642,6 +650,7 @@ ErrorCode TempestRemapper::ComputeGlobalLocalMaps()
       m_covering_source = new Mesh();
       rval = convert_mesh_to_tempest_private ( m_covering_source, m_covering_source_set,
           m_covering_source_entities, &m_covering_source_vertices ); MB_CHK_SET_ERR ( rval, "Can't convert source Tempest mesh" );
+      // std::cout << "ComputeGlobalLocalMaps: " << rank << ", " << " covering entities = [" << m_covering_source_vertices.size() << ", " << m_covering_source_entities.size() << "]\n";
     }
     gid_to_lid_src.clear(); lid_to_gid_src.clear();
     gid_to_lid_covsrc.clear(); lid_to_gid_covsrc.clear();
@@ -970,6 +979,7 @@ ErrorCode TempestRemapper::ConstructCoveringSet ( double tolerance, double radiu
         rval = mbintx->build_processor_euler_boxes ( m_target_set, local_verts ); MB_CHK_ERR ( rval );
 
         rval = m_interface->create_meshset ( moab::MESHSET_SET, m_covering_source_set ); MB_CHK_SET_ERR ( rval, "Can't create new set" );
+
         rval = mbintx->construct_covering_set ( m_source_set, m_covering_source_set ); MB_CHK_ERR ( rval );
     }
     else

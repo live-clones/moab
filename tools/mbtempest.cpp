@@ -84,7 +84,8 @@ struct ToolContext
 
         ~ToolContext()
         {
-            this->clear();
+            // for (unsigned i=0; i < meshes.size(); ++i) delete meshes[i];
+            meshes.clear();
             inFilenames.clear();
             disc_orders.clear();
             disc_methods.clear();
@@ -93,12 +94,6 @@ struct ToolContext
             intxFilename.clear();
             meshsets.clear();
             delete timer;
-        }
-
-        void clear()
-        {
-            for (unsigned i=0; i < meshes.size(); ++i) delete meshes[i];
-            meshes.clear();
         }
 
         void timer_push ( std::string operation )
@@ -245,14 +240,15 @@ int main ( int argc, char* argv[] )
 
     if ( NULL == mbCore ) { return 1; }
 
+    ToolContext *runCtx;
 #ifdef MOAB_HAVE_MPI
     moab::ParallelComm* pcomm = new moab::ParallelComm ( mbCore, MPI_COMM_WORLD, 0 );
 
-    ToolContext ctx ( mbCore, pcomm );
+    runCtx = new ToolContext( mbCore, pcomm );
 #else
-    ToolContext ctx ( mbCore );
+    runCtx = new ToolContext( mbCore );
 #endif
-    ctx.ParseCLOptions ( argc, argv );
+    runCtx->ParseCLOptions ( argc, argv );
 
     const double radius_src = 1.0 /*2.0*acos(-1.0)*/;
     const double radius_dest = 1.0 /*2.0*acos(-1.0)*/;
@@ -267,19 +263,19 @@ int main ( int argc, char* argv[] )
     remapper.initialize();
 
     Mesh* tempest_mesh = new Mesh();
-    ctx.timer_push ( "create Tempest mesh" );
-    rval = CreateTempestMesh ( ctx, remapper, tempest_mesh ); MB_CHK_ERR ( rval );
-    ctx.timer_pop();
+    runCtx->timer_push ( "create Tempest mesh" );
+    rval = CreateTempestMesh ( *runCtx, remapper, tempest_mesh ); MB_CHK_ERR ( rval );
+    runCtx->timer_pop();
 
     // Some constant parameters
     const double epsrel = 1.e-15;
     const double boxeps = 1e-6;
 
-    if ( ctx.meshType == moab::TempestRemapper::OVERLAP_MEMORY )
+    if ( runCtx->meshType == moab::TempestRemapper::OVERLAP_MEMORY )
     {
         // Compute intersections with MOAB
         // For the overlap method, choose between: "fuzzy", "exact" or "mixed"
-        assert ( ctx.meshes.size() == 3 );
+        assert ( runCtx->meshes.size() == 3 );
 
 #ifdef MOAB_HAVE_MPI
         rval = pcomm->check_all_shared_handles(); MB_CHK_ERR ( rval );
@@ -290,18 +286,18 @@ int main ( int argc, char* argv[] )
         rval = remapper.ConvertTempestMesh ( moab::Remapper::TargetMesh ); MB_CHK_ERR ( rval );
         remapper.SetMeshType ( moab::Remapper::OverlapMesh, moab::TempestRemapper::OVERLAP_FILES );
         rval = remapper.ConvertTempestMesh ( moab::Remapper::OverlapMesh ); MB_CHK_ERR ( rval );
-        rval = mbCore->write_mesh ( "tempest_intersection.h5m", &ctx.meshsets[2], 1 ); MB_CHK_ERR ( rval );
+        rval = mbCore->write_mesh ( "tempest_intersection.h5m", &runCtx->meshsets[2], 1 ); MB_CHK_ERR ( rval );
 
         // print verbosely about the problem setting
         {
             moab::Range rintxverts, rintxelems;
-            rval = mbCore->get_entities_by_dimension ( ctx.meshsets[0], 0, rintxverts ); MB_CHK_ERR ( rval );
-            rval = mbCore->get_entities_by_dimension ( ctx.meshsets[0], 2, rintxelems ); MB_CHK_ERR ( rval );
+            rval = mbCore->get_entities_by_dimension ( runCtx->meshsets[0], 0, rintxverts ); MB_CHK_ERR ( rval );
+            rval = mbCore->get_entities_by_dimension ( runCtx->meshsets[0], 2, rintxelems ); MB_CHK_ERR ( rval );
             printf ( "The red set contains %lu vertices and %lu elements \n", rintxverts.size(), rintxelems.size() );
 
             moab::Range bintxverts, bintxelems;
-            rval = mbCore->get_entities_by_dimension ( ctx.meshsets[1], 0, bintxverts ); MB_CHK_ERR ( rval );
-            rval = mbCore->get_entities_by_dimension ( ctx.meshsets[1], 2, bintxelems ); MB_CHK_ERR ( rval );
+            rval = mbCore->get_entities_by_dimension ( runCtx->meshsets[1], 0, bintxverts ); MB_CHK_ERR ( rval );
+            rval = mbCore->get_entities_by_dimension ( runCtx->meshsets[1], 2, bintxelems ); MB_CHK_ERR ( rval );
             printf ( "The blue set contains %lu vertices and %lu elements \n", bintxverts.size(), bintxelems.size() );
         }
 
@@ -310,7 +306,7 @@ int main ( int argc, char* argv[] )
         // Compute intersections with MOAB
         {
             // Create the intersection on the sphere object
-            ctx.timer_push ( "setup the intersector" );
+            runCtx->timer_push ( "setup the intersector" );
 
             moab::Intx2MeshOnSphere* mbintx = new moab::Intx2MeshOnSphere ( mbCore );
             mbintx->set_error_tolerance ( epsrel );
@@ -320,27 +316,27 @@ int main ( int argc, char* argv[] )
 #ifdef MOAB_HAVE_MPI
             mbintx->set_parallel_comm ( pcomm );
 #endif
-            rval = mbintx->FindMaxEdges ( ctx.meshsets[0], ctx.meshsets[1] ); MB_CHK_ERR ( rval );
+            rval = mbintx->FindMaxEdges ( runCtx->meshsets[0], runCtx->meshsets[1] ); MB_CHK_ERR ( rval );
 
 #ifdef MOAB_HAVE_MPI
             moab::Range local_verts;
-            rval = mbintx->build_processor_euler_boxes ( ctx.meshsets[1], local_verts ); MB_CHK_ERR ( rval );
+            rval = mbintx->build_processor_euler_boxes ( runCtx->meshsets[1], local_verts ); MB_CHK_ERR ( rval );
 
-            ctx.timer_pop();
+            runCtx->timer_pop();
 
             moab::EntityHandle covering_set;
-            ctx.timer_push ( "communicate the mesh" );
-            rval = mbintx->construct_covering_set ( ctx.meshsets[0], covering_set ); MB_CHK_ERR ( rval ); // lots of communication if mesh is distributed very differently
-            ctx.timer_pop();
+            runCtx->timer_push ( "communicate the mesh" );
+            rval = mbintx->construct_covering_set ( runCtx->meshsets[0], covering_set ); MB_CHK_ERR ( rval ); // lots of communication if mesh is distributed very differently
+            runCtx->timer_pop();
 #else
-            moab::EntityHandle covering_set = ctx.meshsets[0];
+            moab::EntityHandle covering_set = runCtx->meshsets[0];
 #endif
             // Now let's invoke the MOAB intersection algorithm in parallel with a
             // source and target mesh set representing two different decompositions
-            ctx.timer_push ( "compute intersections with MOAB" );
+            runCtx->timer_push ( "compute intersections with MOAB" );
             rval = mbCore->create_meshset ( moab::MESHSET_SET, intxset ); MB_CHK_SET_ERR ( rval, "Can't create new set" );
-            rval = mbintx->intersect_meshes ( covering_set, ctx.meshsets[1], intxset ); MB_CHK_SET_ERR ( rval, "Can't compute the intersection of meshes on the sphere" );
-            ctx.timer_pop();
+            rval = mbintx->intersect_meshes ( covering_set, runCtx->meshsets[1], intxset ); MB_CHK_SET_ERR ( rval, "Can't compute the intersection of meshes on the sphere" );
+            runCtx->timer_pop();
 
             // free the memory
             delete mbintx;
@@ -352,8 +348,8 @@ int main ( int argc, char* argv[] )
             rval = mbCore->get_entities_by_dimension ( intxset, 0, intxverts, true ); MB_CHK_ERR ( rval );
             printf ( "The intersection set contains %lu elements and %lu vertices \n", intxelems.size(), intxverts.size() );
 
-            double initial_sarea = area_on_sphere_lHuiller ( mbCore, ctx.meshsets[0], radius_src ); // use the target to compute the initial area
-            double initial_tarea = area_on_sphere_lHuiller ( mbCore, ctx.meshsets[1], radius_dest ); // use the target to compute the initial area
+            double initial_sarea = area_on_sphere_lHuiller ( mbCore, runCtx->meshsets[0], radius_src ); // use the target to compute the initial area
+            double initial_tarea = area_on_sphere_lHuiller ( mbCore, runCtx->meshsets[1], radius_dest ); // use the target to compute the initial area
             double area_method1 = area_on_sphere_lHuiller ( mbCore, intxset, radius_src );
             double area_method2 = area_on_sphere ( mbCore, intxset, radius_src );
 
@@ -366,25 +362,25 @@ int main ( int argc, char* argv[] )
         // Write out our computed intersection file
         rval = mbCore->write_mesh ( "moab_intersection.h5m", &intxset, 1 ); MB_CHK_ERR ( rval );
 
-        if ( ctx.computeWeights )
+        if ( runCtx->computeWeights )
         {
-            ctx.timer_push ( "compute weights with the Tempest meshes" );
+            runCtx->timer_push ( "compute weights with the Tempest meshes" );
             // Call to generate an offline map with the tempest meshes
             OfflineMap weightMap;
-            int err = GenerateOfflineMapWithMeshes (  weightMap, *ctx.meshes[0], *ctx.meshes[1], *ctx.meshes[2],
+            int err = GenerateOfflineMapWithMeshes (  weightMap, *runCtx->meshes[0], *runCtx->meshes[1], *runCtx->meshes[2],
                       "", "",     // std::string strInputMeta, std::string strOutputMeta,
-                      ctx.disc_methods[0], ctx.disc_methods[1], // std::string strInputType, std::string strOutputType,
-                      ctx.disc_orders[0], ctx.disc_orders[1],  // int nPin=4, int nPout=4,
-                      ctx.fNoBubble, true, ctx.ensureMonotonicity // bool fNoBubble = false, bool fCorrectAreas = false, int fMonotoneTypeID = 0
+                      runCtx->disc_methods[0], runCtx->disc_methods[1], // std::string strInputType, std::string strOutputType,
+                      runCtx->disc_orders[0], runCtx->disc_orders[1],  // int nPin=4, int nPout=4,
+                      runCtx->fNoBubble, true, runCtx->ensureMonotonicity // bool fNoBubble = false, bool fCorrectAreas = false, int fMonotoneTypeID = 0
                                                    );
-            ctx.timer_pop();
+            runCtx->timer_pop();
 
             std::map<std::string, std::string> mapAttributes;
             if ( err ) { rval = moab::MB_FAILURE; }
             else { weightMap.Write ( "outWeights.nc", mapAttributes ); }
         }
     }
-    else if ( ctx.meshType == moab::TempestRemapper::OVERLAP_MOAB )
+    else if ( runCtx->meshType == moab::TempestRemapper::OVERLAP_MOAB )
     {
         // Usage: mpiexec -n 2 tools/mbtempest -t 5 -l mycs_2.h5m -l myico_2.h5m -f myoverlap_2.h5m
 #ifdef MOAB_HAVE_MPI
@@ -393,33 +389,33 @@ int main ( int argc, char* argv[] )
         // print verbosely about the problem setting
         {
             moab::Range rintxverts, rintxelems;
-            rval = mbCore->get_entities_by_dimension ( ctx.meshsets[0], 0, rintxverts ); MB_CHK_ERR ( rval );
-            rval = mbCore->get_entities_by_dimension ( ctx.meshsets[0], 2, rintxelems ); MB_CHK_ERR ( rval );
-            rval = fix_degenerate_quads ( mbCore, ctx.meshsets[0] ); MB_CHK_ERR ( rval );
-            rval = positive_orientation ( mbCore, ctx.meshsets[0], radius_src ); MB_CHK_ERR ( rval );
+            rval = mbCore->get_entities_by_dimension ( runCtx->meshsets[0], 0, rintxverts ); MB_CHK_ERR ( rval );
+            rval = mbCore->get_entities_by_dimension ( runCtx->meshsets[0], 2, rintxelems ); MB_CHK_ERR ( rval );
+            rval = fix_degenerate_quads ( mbCore, runCtx->meshsets[0] ); MB_CHK_ERR ( rval );
+            rval = positive_orientation ( mbCore, runCtx->meshsets[0], radius_src ); MB_CHK_ERR ( rval );
             if ( !proc_id ) printf ( "The red set contains %lu vertices and %lu elements \n", rintxverts.size(), rintxelems.size() );
 
             moab::Range bintxverts, bintxelems;
-            rval = mbCore->get_entities_by_dimension ( ctx.meshsets[1], 0, bintxverts ); MB_CHK_ERR ( rval );
-            rval = mbCore->get_entities_by_dimension ( ctx.meshsets[1], 2, bintxelems ); MB_CHK_ERR ( rval );
-            rval = fix_degenerate_quads ( mbCore, ctx.meshsets[1] ); MB_CHK_ERR ( rval );
-            rval = positive_orientation ( mbCore, ctx.meshsets[1], radius_dest ); MB_CHK_ERR ( rval );
+            rval = mbCore->get_entities_by_dimension ( runCtx->meshsets[1], 0, bintxverts ); MB_CHK_ERR ( rval );
+            rval = mbCore->get_entities_by_dimension ( runCtx->meshsets[1], 2, bintxelems ); MB_CHK_ERR ( rval );
+            rval = fix_degenerate_quads ( mbCore, runCtx->meshsets[1] ); MB_CHK_ERR ( rval );
+            rval = positive_orientation ( mbCore, runCtx->meshsets[1], radius_dest ); MB_CHK_ERR ( rval );
             if ( !proc_id ) printf ( "The blue set contains %lu vertices and %lu elements \n", bintxverts.size(), bintxelems.size() );
         }
 
         // Compute intersections with MOAB
-        ctx.timer_push ( "setup and compute mesh intersections" );
-        rval = remapper.ConstructCoveringSet ( epsrel, 1.0, 1.0, 0.1, ctx.rrmGrids ); MB_CHK_ERR ( rval );
-        rval = remapper.ComputeOverlapMesh ( ctx.kdtreeSearch, false ); MB_CHK_ERR ( rval );
-        ctx.timer_pop();
+        runCtx->timer_push ( "setup and compute mesh intersections" );
+        rval = remapper.ConstructCoveringSet ( epsrel, 1.0, 1.0, 0.1, runCtx->rrmGrids ); MB_CHK_ERR ( rval );
+        rval = remapper.ComputeOverlapMesh ( runCtx->kdtreeSearch, false ); MB_CHK_ERR ( rval );
+        runCtx->timer_pop();
 
         {
             double local_areas[4], global_areas[4]; // Array for Initial area, and through Method 1 and Method 2
-            // local_areas[0] = area_on_sphere_lHuiller ( mbCore, ctx.meshsets[1], radius_src );
-            local_areas[0] = area_on_sphere_lHuiller ( mbCore, ctx.meshsets[0], radius_src );
-            local_areas[1] = area_on_sphere_lHuiller ( mbCore, ctx.meshsets[1], radius_dest );
-            local_areas[2] = area_on_sphere_lHuiller ( mbCore, ctx.meshsets[2], radius_src );
-            local_areas[3] = area_on_sphere ( mbCore, ctx.meshsets[2], radius_src );
+            // local_areas[0] = area_on_sphere_lHuiller ( mbCore, runCtx->meshsets[1], radius_src );
+            local_areas[0] = area_on_sphere_lHuiller ( mbCore, runCtx->meshsets[0], radius_src );
+            local_areas[1] = area_on_sphere_lHuiller ( mbCore, runCtx->meshsets[1], radius_dest );
+            local_areas[2] = area_on_sphere_lHuiller ( mbCore, runCtx->meshsets[2], radius_src );
+            local_areas[3] = area_on_sphere ( mbCore, runCtx->meshsets[2], radius_src );
 
 #ifdef MOAB_HAVE_MPI
             MPI_Allreduce ( &local_areas[0], &global_areas[0], 4, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
@@ -431,14 +427,14 @@ int main ( int argc, char* argv[] )
 #endif
             if ( !proc_id )
             {
-                printf ( "initial area: source = %12.14f, target = %12.14f\n", global_areas[0], global_areas[1] );
-                printf ( " area with l'Huiller: %12.14f with Girard: %12.14f\n", global_areas[2], global_areas[3] );
-                printf ( " relative difference areas = %12.10e\n", fabs ( global_areas[2] - global_areas[3] ) / global_areas[2] );
-                printf ( " relative error w.r.t source = %12.14e, and target = %12.14e\n", fabs ( global_areas[2] - global_areas[0] ) / global_areas[2], fabs ( global_areas[2] - global_areas[1] ) / global_areas[2] );
+                printf ( "initial area: source = %12.14f, target = %12.14f, overlap with l'Huiller: %12.14f\n", global_areas[0], global_areas[1], global_areas[2] );
+                // printf ( " area with l'Huiller: %12.14f with Girard: %12.14f\n", global_areas[2], global_areas[3] );
+                // printf ( " relative difference areas = %12.10e\n", fabs ( global_areas[2] - global_areas[3] ) / global_areas[2] );
+                printf ( " relative error w.r.t source = %12.14e, and target = %12.14e\n", fabs ( global_areas[0] - global_areas[2] ) / global_areas[0], fabs ( global_areas[1] - global_areas[2] ) / global_areas[1] );
             }
         }
 
-        if ( ctx.intxFilename.size() )
+        if ( runCtx->intxFilename.size() )
         {
             moab::EntityHandle writableOverlapSet;
             rval = mbCore->create_meshset ( moab::MESHSET_SET, writableOverlapSet ); MB_CHK_SET_ERR ( rval, "Can't create new set" );
@@ -459,92 +455,74 @@ int main ( int argc, char* argv[] )
             rval = mbCore->add_entities(writableOverlapSet, ovEnts);MB_CHK_SET_ERR(rval, "Deleting ghosted entities failed");
 
             // Write out our computed intersection file
-            size_t lastindex = ctx.intxFilename.find_last_of(".");
+            size_t lastindex = runCtx->intxFilename.find_last_of(".");
             sstr.str("");
-            sstr << ctx.intxFilename.substr(0, lastindex) << ".h5m";
-            if(!ctx.proc_id) std::cout << "Writing out the MOAB intersection mesh file to " << sstr.str() << std::endl;
+            sstr << runCtx->intxFilename.substr(0, lastindex) << ".h5m";
+            if(!runCtx->proc_id) std::cout << "Writing out the MOAB intersection mesh file to " << sstr.str() << std::endl;
             rval = mbCore->write_file ( sstr.str().c_str(), NULL, "PARALLEL=WRITE_PART", &writableOverlapSet, 1 ); MB_CHK_ERR ( rval );
         }
 
-        if ( ctx.computeWeights )
+        if ( runCtx->computeWeights )
         {
-            ctx.meshes[2] = remapper.GetMesh ( moab::Remapper::OverlapMesh );
+            runCtx->meshes[2] = remapper.GetMesh ( moab::Remapper::OverlapMesh );
 
-            ctx.timer_push ( "setup computation of weights" );
+            runCtx->timer_push ( "setup computation of weights" );
             // Call to generate the remapping weights with the tempest meshes
             moab::TempestOnlineMap* weightMap = new moab::TempestOnlineMap ( &remapper );
-            ctx.timer_pop();
+            runCtx->timer_pop();
 
-            ctx.timer_push ( "compute weights with TempestRemap" );
+            runCtx->timer_push ( "compute weights with TempestRemap" );
 
-            rval = weightMap->GenerateRemappingWeights ( ctx.disc_methods[0], ctx.disc_methods[1],      // std::string strInputType, std::string strOutputType,
-                                                   ctx.disc_orders[0],  ctx.disc_orders[1],             // int nPin=4, int nPout=4,
-                                                   ctx.fNoBubble, ctx.ensureMonotonicity,               // bool fNoBubble=true, int fMonotoneTypeID=0,
-                                                   ctx.fVolumetric, ctx.fNoConservation, ctx.fNoCheck,  // bool fVolumetric=false, bool fNoConservation=false, bool fNoCheck=false,
-                                                   ctx.doftag_names[0], ctx.doftag_names[1],
-                                                   "", //"",                                            // std::string strVariables="", std::string strOutputMap="",
-                                                   "", "",                                              // std::string strInputData="", std::string strOutputData="",
-                                                   "", false,                                           // std::string strNColName="", bool fOutputDouble=false,
-                                                   "", false, 0.0,                                      // std::string strPreserveVariables="", bool fPreserveAll=false, double dFillValueOverride=0.0,
-                                                   ctx.fInputConcave, ctx.fOutputConcave                // bool fInputConcave = false, bool fOutputConcave = false
+            rval = weightMap->GenerateRemappingWeights ( runCtx->disc_methods[0], runCtx->disc_methods[1],         // std::string strInputType, std::string strOutputType,
+                                                   runCtx->disc_orders[0],  runCtx->disc_orders[1],                // int nPin=4, int nPout=4,
+                                                   runCtx->fNoBubble, runCtx->ensureMonotonicity,                  // bool fNoBubble=true, int fMonotoneTypeID=0,
+                                                   runCtx->fVolumetric, runCtx->fNoConservation, runCtx->fNoCheck, // bool fVolumetric=false, bool fNoConservation=false, bool fNoCheck=false,
+                                                   runCtx->doftag_names[0], runCtx->doftag_names[1],               // std::string source_tag_name, std::string target_tag_name,
+                                                   "", //"",                                                       // std::string strVariables="",
+                                                   "", "",                                                         // std::string strInputData="", std::string strOutputData="",
+                                                   "", true,                                                       // std::string strNColName="", bool fOutputDouble=true,
+                                                   "", false, 0.0,                                                 // std::string strPreserveVariables="", bool fPreserveAll=false, double dFillValueOverride=0.0,
+                                                   runCtx->fInputConcave, runCtx->fOutputConcave                   // bool fInputConcave = false, bool fOutputConcave = false
                                                  );MB_CHK_ERR ( rval );
-            ctx.timer_pop();
-
-
-            /*
-               ctx.timer_push ( "apply weights onto a vector" );
-               rval = weightMap->ApplyWeights ( srcVals, tgtvals, false);MB_CHK_ERR ( rval );
-               ctx.timer_pop();
-            */
+            runCtx->timer_pop();
 
             /*
-            * the file can be written in parallel, and it will contain additional tags defined by the user
-            * we may extend the method to write only desired tags to the file
+            * Invoke the CheckMap routine on the TempestRemap serial interface directly, if running on a single process
             */
             if (nprocs == 1) {
-                // free allocated data
-                char outputFileTgt[]  = "fIntxTarget.h5m";
-#ifdef MOAB_HAVE_MPI
-                const char *writeOptions = (nprocs > 1 ? "PARALLEL=WRITE_PART" : "");
-#else
-                const char *writeOptions = "";
-#endif
-
-                rval = mbCore->write_file ( outputFileTgt, NULL, writeOptions, &ctx.meshsets[2], 1 ); MB_CHK_ERR ( rval );
-
                 const double dNormalTolerance = 1.0E-8;
                 const double dStrictTolerance = 1.0E-12;
-                weightMap->CheckMap(!ctx.fNoCheck, !ctx.fNoCheck, !ctx.fNoCheck && (ctx.ensureMonotonicity), dNormalTolerance, dStrictTolerance);
+                weightMap->CheckMap(!runCtx->fNoCheck, !runCtx->fNoCheck, !runCtx->fNoCheck && (runCtx->ensureMonotonicity), dNormalTolerance, dStrictTolerance);
             }
 
-            if ( ctx.outFilename.size() )
+            if ( runCtx->outFilename.size() )
             {
-                size_t lastindex = ctx.outFilename.find_last_of(".");
+                size_t lastindex = runCtx->outFilename.find_last_of(".");
                 sstr.str("");
-                sstr << ctx.outFilename.substr(0, lastindex) << ".h5m";
+                sstr << runCtx->outFilename.substr(0, lastindex) << ".h5m";
                 // Write the map file to disk in parallel
                 rval = weightMap->WriteParallelMap(sstr.str().c_str());MB_CHK_ERR ( rval );
 
                 // Write out the metadata information for the map file
                 if (proc_id == 0) {
                     sstr.str("");
-                    sstr << ctx.outFilename.substr(0, lastindex) << ".meta";
+                    sstr << runCtx->outFilename.substr(0, lastindex) << ".meta";
 
                     std::ofstream metafile(sstr.str());
                     metafile << "Generator = MOAB-TempestRemap (mbtempest) Offline Regridding Weight Generator" << std::endl;
-                    metafile << "domain_a = " << ctx.inFilenames[0] << std::endl;
-                    metafile << "domain_b = " << ctx.inFilenames[1] << std::endl;
-                    metafile << "grid_file_src = " << ctx.inFilenames[0] << std::endl;
-                    metafile << "grid_file_dst = " << ctx.inFilenames[1] << std::endl;
-                    metafile << "grid_file_ovr = " << (ctx.intxFilename.size() ? ctx.intxFilename : "outOverlap.h5m") << std::endl;
-                    metafile << "mono_type = " << ctx.ensureMonotonicity << std::endl;
-                    metafile << "np_src = " << ctx.disc_orders[0] << std::endl;
-                    metafile << "np_dst = " << ctx.disc_orders[1] << std::endl;
-                    metafile << "type_src = " << ctx.disc_methods[0] << std::endl;
-                    metafile << "type_dst = " << ctx.disc_methods[1] << std::endl;
-                    metafile << "bubble = " << (ctx.fNoBubble ? "false" : "true") << std::endl;
-                    metafile << "concave_src = " << (ctx.fInputConcave ? "true" : "false") << std::endl;
-                    metafile << "concave_dst = " << (ctx.fOutputConcave ? "true" : "false") << std::endl;
+                    metafile << "domain_a = " << runCtx->inFilenames[0] << std::endl;
+                    metafile << "domain_b = " << runCtx->inFilenames[1] << std::endl;
+                    metafile << "grid_file_src = " << runCtx->inFilenames[0] << std::endl;
+                    metafile << "grid_file_dst = " << runCtx->inFilenames[1] << std::endl;
+                    metafile << "grid_file_ovr = " << (runCtx->intxFilename.size() ? runCtx->intxFilename : "outOverlap.h5m") << std::endl;
+                    metafile << "mono_type = " << runCtx->ensureMonotonicity << std::endl;
+                    metafile << "np_src = " << runCtx->disc_orders[0] << std::endl;
+                    metafile << "np_dst = " << runCtx->disc_orders[1] << std::endl;
+                    metafile << "type_src = " << runCtx->disc_methods[0] << std::endl;
+                    metafile << "type_dst = " << runCtx->disc_methods[1] << std::endl;
+                    metafile << "bubble = " << (runCtx->fNoBubble ? "false" : "true") << std::endl;
+                    metafile << "concave_src = " << (runCtx->fInputConcave ? "true" : "false") << std::endl;
+                    metafile << "concave_dst = " << (runCtx->fOutputConcave ? "true" : "false") << std::endl;
                     metafile << "version = " << "MOAB v5.1.0+" << std::endl;
                     metafile.close();
                 }
@@ -555,7 +533,8 @@ int main ( int argc, char* argv[] )
     }
 
     // Clean up
-    ctx.clear();
+    remapper.clear();
+    delete runCtx;
     delete mbCore;
 
 #ifdef MOAB_HAVE_MPI
