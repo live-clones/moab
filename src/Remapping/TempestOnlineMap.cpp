@@ -425,6 +425,9 @@ moab::ErrorCode moab::TempestOnlineMap::SetDOFmapAssociation(DiscretizationType 
         rval = m_interface->tag_get_data ( m_dofTagSrc, m_remapper->m_covering_source_entities, &src_soln_gdofs[0] );MB_CHK_ERR(rval);
     }
 
+    // std::cout << "TOnlineMap: Process: " << rank << " and covering entities = [" << col_dofmap.size() << ", " << src_soln_gdofs.size() << "]\n";
+    // MPI_Barrier(MPI_COMM_WORLD);
+
 #ifdef ALTERNATE_NUMBERING_IMPLEMENTATION
     unsigned maxSrcIndx = 0;
 
@@ -910,24 +913,20 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
                 ( eOutputType == DiscretizationType_FV )
            )
         {
-            if(m_meshInputCov->faces.size()>0)
-            {
+            // Generate reverse node array and edge map
+            if (m_meshInputCov->revnodearray.size() == 0) m_meshInputCov->ConstructReverseNodeArray();
+            if (m_meshInputCov->edgemap.size() == 0) m_meshInputCov->ConstructEdgeMap(false);
 
-              // Generate reverse node array and edge map
-              m_meshInputCov->ConstructReverseNodeArray();
-              m_meshInputCov->ConstructEdgeMap();
+            // Initialize coordinates for map
+            this->InitializeSourceCoordinatesFromMeshFV ( *m_meshInputCov );
+            this->InitializeTargetCoordinatesFromMeshFV ( *m_meshOutput );
 
-              // Initialize coordinates for map
-              this->InitializeSourceCoordinatesFromMeshFV ( *m_meshInputCov );
-              this->InitializeTargetCoordinatesFromMeshFV ( *m_meshOutput );
+            // Finite volume input / Finite element output
+            rval = this->SetDOFmapAssociation(eInputType, false, NULL, NULL, eOutputType, false, NULL);MB_CHK_ERR(rval);
 
-              // Finite volume input / Finite element output
-              rval = this->SetDOFmapAssociation(eInputType, false, NULL, NULL, eOutputType, false, NULL);MB_CHK_ERR(rval);
-
-              // Construct remap
-              if ( is_root ) dbgprint.printf ( 0, "Calculating remap weights\n" );
-              LinearRemapFVtoFV_Tempest_MOAB ( nPin );
-            }
+            // Construct remap
+            if ( is_root ) dbgprint.printf ( 0, "Calculating remap weights\n" );
+            LinearRemapFVtoFV_Tempest_MOAB ( nPin );
         }
         else if ( eInputType == DiscretizationType_FV )
         {
@@ -971,8 +970,8 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
             }
 
             // Generate reverse node array and edge map
-            m_meshInputCov->ConstructReverseNodeArray();
-            m_meshInputCov->ConstructEdgeMap();
+            if (m_meshInputCov->revnodearray.size() == 0) m_meshInputCov->ConstructReverseNodeArray();
+            if (m_meshInputCov->edgemap.size() == 0) m_meshInputCov->ConstructEdgeMap(false);
 
             // Finite volume input / Finite element output
             rval = this->SetDOFmapAssociation(eInputType, false, NULL, NULL, 
@@ -1021,8 +1020,8 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
             if (!m_bPointCloudSource)
             {
                 // Generate reverse node array and edge map
-                m_meshInputCov->ConstructReverseNodeArray();
-                m_meshInputCov->ConstructEdgeMap();
+                if (m_meshInputCov->revnodearray.size() == 0) m_meshInputCov->ConstructReverseNodeArray();
+                if (m_meshInputCov->edgemap.size() == 0) m_meshInputCov->ConstructEdgeMap(false);
 
                 // Initialize coordinates for map
                 if (eInputType == DiscretizationType_FV) {
@@ -1053,8 +1052,8 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
             if (!m_bPointCloudTarget)
             {
                 // Generate reverse node array and edge map
-                m_meshOutput->ConstructReverseNodeArray();
-                m_meshOutput->ConstructEdgeMap();
+                if (m_meshOutput->revnodearray.size() == 0) m_meshOutput->ConstructReverseNodeArray();
+                if (m_meshOutput->edgemap.size() == 0) m_meshOutput->ConstructEdgeMap(false);
 
                 // Initialize coordinates for map
                 if (eOutputType == DiscretizationType_FV) {
@@ -1476,7 +1475,7 @@ int moab::TempestOnlineMap::IsConservative (double dTolerance)
 
     for ( unsigned i = 0; i < dataEntries.GetRows(); i++ )
     {
-        dColumnSums[dataCols[i]] += dataEntries[i] * dTargetAreas[dataRows[i]];//  / dSourceAreas[dataCols[i]];
+        dColumnSums[dataCols[i]] += dataEntries[i] * dTargetAreas[dataRows[i]] / dSourceAreas[dataCols[i]];
 
         assert(dataCols[i] < m_nTotDofs_SrcCov);
 
@@ -1519,9 +1518,7 @@ int moab::TempestOnlineMap::IsConservative (double dTolerance)
 
         dColumnIndices.resize ( nTotColumns, -1 );
         dColumnSumsTotal.resize ( nTotColumns, 0.0 );
-        dColumnSourceAreas.resize ( nTotColumns, 0.0 );
-
-        // std::cout << "Total columns: " << nTotVals << " cols: " << nTotColumns << " and unique ones: " << nTotColumnsUnq << std::endl;
+        // dColumnSourceAreas.resize ( nTotColumns, 0.0 );
     }
 
     // Gather all ColumnSums to root process and accumulate
@@ -1532,8 +1529,8 @@ int moab::TempestOnlineMap::IsConservative (double dTolerance)
     if ( ierr != MPI_SUCCESS ) return -1;
     ierr = MPI_Gatherv ( &dColumnSums[0], m_nTotDofs_SrcCov, MPI_DOUBLE, &dColumnSumsTotal[0], rcount.data(), displs.data(), MPI_DOUBLE, rootProc, m_pcomm->comm() );
     if ( ierr != MPI_SUCCESS ) return -1;
-    ierr = MPI_Gatherv ( &dSourceAreas[0], m_nTotDofs_SrcCov, MPI_DOUBLE, &dColumnSourceAreas[0], rcount.data(), displs.data(), MPI_DOUBLE, rootProc, m_pcomm->comm() );
-    if ( ierr != MPI_SUCCESS ) return -1;
+    // ierr = MPI_Gatherv ( &dSourceAreas[0], m_nTotDofs_SrcCov, MPI_DOUBLE, &dColumnSourceAreas[0], rcount.data(), displs.data(), MPI_DOUBLE, rootProc, m_pcomm->comm() );
+    // if ( ierr != MPI_SUCCESS ) return -1;
 
     // Clean out unwanted arrays now
     dColumnSums.clear();
@@ -1546,27 +1543,27 @@ int moab::TempestOnlineMap::IsConservative (double dTolerance)
         displs[size] = (nTotColumns);
         // std::vector<double> dColumnSumsOnRoot(nTotColumnsUnq, 0.0);
         std::map<int, double> dColumnSumsOnRoot;
-        std::map<int, double> dColumnSourceAreasOnRoot;
+        // std::map<int, double> dColumnSourceAreasOnRoot;
         for ( int ir = 0; ir < size; ir++ )
         {
             for ( int ips = displs[ir]; ips < displs[ir+1]; ips++ )
             {
                 assert(dColumnIndices[ips] < nTotColumnsUnq);
                 dColumnSumsOnRoot[ dColumnIndices[ips] ] += dColumnSumsTotal[ips];// / dColumnSourceAreas[ips];
-                dColumnSourceAreasOnRoot[ dColumnIndices[ips] ] += dColumnSourceAreas[ips];
+                // dColumnSourceAreasOnRoot[ dColumnIndices[ips] ] = dColumnSourceAreas[ips];
                 // dColumnSourceAreas[ dColumnIndices[ips] ]
             }
         }
 
         for(std::map<int, double>::iterator it = dColumnSumsOnRoot.begin(); it != dColumnSumsOnRoot.end(); ++it)
         {
-            if ( fabs ( it->second - dColumnSourceAreasOnRoot[it->first] ) > dTolerance )
-            // if ( fabs ( it->second - 1.0 ) > dTolerance )
+            // if ( fabs ( it->second - dColumnSourceAreasOnRoot[it->first] ) > dTolerance )
+            if ( fabs ( it->second - 1.0 ) > dTolerance )
             {
                 fConservative++;
                 Announce ( "TempestOnlineMap is not conservative in column "
                         // "%i (%1.15e)", it->first, it->second );
-                        "%i (%1.15e)", it->first, it->second / dColumnSourceAreasOnRoot[it->first] );
+                        "%i (%1.15e)", it->first, it->second /* / dColumnSourceAreasOnRoot[it->first] */);
             }
         }
     }
@@ -1619,17 +1616,6 @@ int moab::TempestOnlineMap::IsMonotone (double dTolerance)
     return fMonotoneGlobal;
 #endif
 }
-
-///////////////////////////////////////////////////////////////////////////////
-
-#ifdef MOAB_HAVE_EIGEN
-void moab::TempestOnlineMap::InitVectors()
-{
-    //assert(m_weightMatrix.rows() != 0 && m_weightMatrix.cols() != 0);
-    m_rowVector.resize( m_weightMatrix.rows() );
-    m_colVector.resize( m_weightMatrix.cols() );
-}
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 

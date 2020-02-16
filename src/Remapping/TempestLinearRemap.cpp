@@ -153,7 +153,7 @@ void moab::TempestOnlineMap::LinearRemapFVtoFV_Tempest_MOAB (
     const int TriQuadRuleOrder = 4;
 
     // Verify ReverseNodeArray has been calculated
-    if ( m_meshInputCov->revnodearray.size() == 0 )
+    if ( m_meshInputCov->faces.size() > 0 && m_meshInputCov->revnodearray.size() == 0 )
     {
         _EXCEPTIONT ( "ReverseNodeArray has not been calculated for m_meshInput" );
     }
@@ -189,7 +189,7 @@ void moab::TempestOnlineMap::LinearRemapFVtoFV_Tempest_MOAB (
 
     // Current overlap face
     int ixOverlap = 0;
-    const unsigned outputFrequency = (m_meshInputCov->faces.size()/10);
+    const unsigned outputFrequency = (m_meshInputCov->faces.size()/10)+1;
 
     // Loop through all faces on m_meshInput
     for ( size_t ixFirst = 0; ixFirst < m_meshInputCov->faces.size(); ixFirst++ )
@@ -330,9 +330,16 @@ void moab::TempestOnlineMap::copy_tempest_sparsemat_to_eigen3()
 #define VERBOSE_ACTIVATED
 // #define VERBOSE
 #endif
+    if (m_nTotDofs_Dest <= 0 || m_nTotDofs_SrcCov <= 0)
+    {
+      // std::cout << rank << ": rowsize = " <<  m_nTotDofs_Dest << ", colsize = " << m_nTotDofs_SrcCov << "\n";
+      return; // No need to allocate if either rows or cols size are zero
+    }
+
     /* Should the columns be the global size of the matrix ? */
     m_weightMatrix.resize(m_nTotDofs_Dest, m_nTotDofs_SrcCov);
-    InitVectors();
+    m_rowVector.resize( m_weightMatrix.rows() );
+    m_colVector.resize( m_weightMatrix.cols() );
 
 #ifdef VERBOSE
     int locrows = std::max(m_mapRemap.GetRows(), m_nTotDofs_Dest);
@@ -824,7 +831,7 @@ void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB (
 
     // Current Overlap Face
     int ixOverlap = 0;
-    const unsigned outputFrequency = (m_meshInputCov->faces.size()/10);
+    const unsigned outputFrequency = (m_meshInputCov->faces.size()/10)+1;
 
     // Loop over all input Faces
     for ( size_t ixFirst = 0; ixFirst < m_meshInputCov->faces.size(); ixFirst++ )
@@ -1283,7 +1290,7 @@ void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_MOAB (
 
     // Loop through all faces on m_meshInput
     ixOverlap = 0;
-    const unsigned outputFrequency = (m_meshInputCov->faces.size()/10);
+    const unsigned outputFrequency = (m_meshInputCov->faces.size()/10)+1;
 
     if ( is_root ) dbgprint.printf ( 0, "Building conservative distribution maps\n" );
     for ( size_t ixFirst = 0; ixFirst < m_meshInputCov->faces.size(); ixFirst++ )
@@ -1861,7 +1868,7 @@ void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_Pointwise_MOAB (
     DataArray1D<bool> fSecondNodeFound ( dataNodalAreaOut.GetRows() );
 
     ixOverlap = 0;
-    const unsigned outputFrequency = (m_meshInputCov->faces.size()/10);
+    const unsigned outputFrequency = (m_meshInputCov->faces.size()/10)+1;
 
     // Loop through all faces on m_meshInputCov
     for ( size_t ixFirst = 0; ixFirst < m_meshInputCov->faces.size(); ixFirst++ )

@@ -351,10 +351,13 @@ ErrorCode TempestRemapper::ConvertMeshToTempest ( Remapper::IntersectionContext 
     ErrorCode rval;
     const bool outputEnabled = ( TempestRemapper::verbose && is_root );
 
+    moab::DebugOutput dbgprint ( std::cout, this->rank, 0 );
+    dbgprint.set_prefix("[MOABToTempest]: ");
+
     if ( ctx == Remapper::SourceMesh )
     {
         if ( !m_source ) m_source = new Mesh();
-        if ( outputEnabled ) std::cout << "\nConverting (source) MOAB to TempestRemap Mesh representation ...\n";
+        if ( outputEnabled ) dbgprint.printf(0, "Converting (source) MOAB to TempestRemap Mesh representation ...\n");
         rval = convert_mesh_to_tempest_private ( m_source, m_source_set, m_source_entities, &m_source_vertices );MB_CHK_SET_ERR ( rval, "Can't convert source mesh to Tempest" );
         if (m_source_entities.size() == 0 && m_source_vertices.size() != 0) {
             this->point_cloud_source = true;
@@ -363,7 +366,7 @@ ErrorCode TempestRemapper::ConvertMeshToTempest ( Remapper::IntersectionContext 
     else if ( ctx == Remapper::TargetMesh )
     {
         if ( !m_target ) m_target = new Mesh();
-        if ( outputEnabled ) std::cout << "\nConverting (target) MOAB to TempestRemap Mesh representation ...\n";
+        if ( outputEnabled ) dbgprint.printf(0, "Converting (target) MOAB to TempestRemap Mesh representation ...\n");
         rval = convert_mesh_to_tempest_private ( m_target, m_target_set, m_target_entities, &m_target_vertices );MB_CHK_SET_ERR ( rval, "Can't convert target mesh to Tempest" );
         if (m_target_entities.size() == 0 && m_target_vertices.size() != 0)
             this->point_cloud_target = true;
@@ -371,7 +374,7 @@ ErrorCode TempestRemapper::ConvertMeshToTempest ( Remapper::IntersectionContext 
     else if ( ctx == Remapper::OverlapMesh )     // Overlap mesh
     {
         if ( !m_overlap ) m_overlap = new Mesh();
-        if ( outputEnabled ) std::cout << "\nConverting (overlap) MOAB to TempestRemap Mesh representation ...\n";
+        if ( outputEnabled ) dbgprint.printf(0, "Converting (overlap) MOAB to TempestRemap Mesh representation ...\n");
         rval = convert_overlap_mesh_sorted_by_source();MB_CHK_SET_ERR ( rval, "Can't convert overlap mesh to Tempest" );
     }
     else
@@ -456,10 +459,6 @@ ErrorCode TempestRemapper::convert_mesh_to_tempest_private ( Mesh* mesh, EntityH
     // Generate reverse node array and edge map
     if ( constructEdgeMap ) mesh->ConstructEdgeMap(false);
     // mesh->ConstructReverseNodeArray();
-
-    // moab::Range face_edges_all;
-    // rval = m_interface->get_adjacencies ( elems, 1, false, face_edges_all, moab::Interface::UNION); MB_CHK_ERR ( rval );
-    // rval = m_interface->delete_entities(face_edges_all);MB_CHK_ERR(rval);
 
     // mesh->Validate();
 
@@ -630,7 +629,7 @@ ErrorCode TempestRemapper::convert_overlap_mesh_sorted_by_source()
     verts.clear();
 
     m_overlap->RemoveZeroEdges();
-    m_overlap->RemoveCoincidentNodes();
+    m_overlap->RemoveCoincidentNodes(false);
 
     // Generate reverse node array and edge map
     // if ( constructEdgeMap ) m_overlap->ConstructEdgeMap(false);
@@ -981,6 +980,12 @@ ErrorCode TempestRemapper::ConstructCoveringSet ( double tolerance, double radiu
         rval = m_interface->create_meshset ( moab::MESHSET_SET, m_covering_source_set ); MB_CHK_SET_ERR ( rval, "Can't create new set" );
 
         rval = mbintx->construct_covering_set ( m_source_set, m_covering_source_set ); MB_CHK_ERR ( rval );
+        // if (rank == 1)
+        // {
+        //     moab::Range ents;
+        //     m_interface->get_entities_by_dimension(m_covering_source_set, 2, ents);
+        //     m_interface->remove_entities(m_covering_source_set, ents);
+        // }
     }
     else
     {

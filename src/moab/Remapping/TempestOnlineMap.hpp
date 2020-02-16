@@ -129,10 +129,6 @@ public:
 	///	</summary>
 	const DataArray1D<double>& GetGlobalTargetAreas() const;
 
-#ifdef MOAB_HAVE_EIGEN
-	void InitVectors();
-#endif
-
 private:
 
 	///	<summary>
