@@ -129,6 +129,14 @@ struct ToolContext
             std::string expectedDofTagName = "GLOBAL_ID";
             int expectedOrder = 1;
 
+            if (!proc_id)
+            {
+                std::cout << "Command line options provided to mbtempest:\n  ";
+                for(int iarg=0; iarg < argc; ++iarg)
+                    std::cout << argv[iarg] << " ";
+                std::cout << std::endl << std::endl;
+            }
+
             opts.addOpt<int> ( "type,t", "Type of mesh (default=CS; Choose from [CS=0, RLL=1, ICO=2, OVERLAP_FILES=3, OVERLAP_MEMORY=4, OVERLAP_MOAB=5])", &imeshType );
             opts.addOpt<int> ( "res,r", "Resolution of the mesh (default=5)", &blockSize );
             opts.addOpt<void> ( "dual,d", "Output the dual of the mesh (generally relevant only for ICO mesh)", &computeDual );
@@ -461,6 +469,8 @@ int main ( int argc, char* argv[] )
             if(!runCtx->proc_id) std::cout << "Writing out the MOAB intersection mesh file to " << sstr.str() << std::endl;
             rval = mbCore->write_file ( sstr.str().c_str(), NULL, "PARALLEL=WRITE_PART", &writableOverlapSet, 1 ); MB_CHK_ERR ( rval );
         }
+
+        if(!runCtx->proc_id) std::cout << std::endl;
 
         if ( runCtx->computeWeights )
         {
