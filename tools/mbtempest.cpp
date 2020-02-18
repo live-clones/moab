@@ -411,12 +411,17 @@ int main ( int argc, char* argv[] )
             if ( !proc_id ) printf ( "The blue set contains %lu vertices and %lu elements \n", bintxverts.size(), bintxelems.size() );
         }
 
-        // Compute intersections with MOAB
-        runCtx->timer_push ( "setup and compute mesh intersections" );
+        // First compute the covering set such that the target elements are fully covered by the lcoal source grid
+        runCtx->timer_push ( "construct covering set for intersection" );
         rval = remapper.ConstructCoveringSet ( epsrel, 1.0, 1.0, 0.1, runCtx->rrmGrids ); MB_CHK_ERR ( rval );
+        runCtx->timer_pop();
+
+        // Compute intersections with MOAB with either the Kd-tree or the advancing front algorithm 
+        runCtx->timer_push ( "setup and compute mesh intersections" );
         rval = remapper.ComputeOverlapMesh ( runCtx->kdtreeSearch, false ); MB_CHK_ERR ( rval );
         runCtx->timer_pop();
 
+        // print some diagnostic checks to see if the overlap grid resolved the input meshes correctly
         {
             double local_areas[4], global_areas[4]; // Array for Initial area, and through Method 1 and Method 2
             // local_areas[0] = area_on_sphere_lHuiller ( mbCore, runCtx->meshsets[1], radius_src );
@@ -450,6 +455,7 @@ int main ( int argc, char* argv[] )
             moab::Range ovEnts;
             rval = mbCore->get_entities_by_dimension ( meshOverlapSet, 2, ovEnts ); MB_CHK_SET_ERR ( rval, "Can't create new set" );
             rval = mbCore->get_entities_by_dimension ( meshOverlapSet, 0, ovEnts ); MB_CHK_SET_ERR ( rval, "Can't create new set" );
+
 #ifdef MOAB_HAVE_MPI
             // Do not remove ghosted entities if we still haven't computed weights
             // Remove ghosted entities from overlap set before writing the new mesh set to file
@@ -470,11 +476,10 @@ int main ( int argc, char* argv[] )
             rval = mbCore->write_file ( sstr.str().c_str(), NULL, "PARALLEL=WRITE_PART", &writableOverlapSet, 1 ); MB_CHK_ERR ( rval );
         }
 
-        if(!runCtx->proc_id) std::cout << std::endl;
-
         if ( runCtx->computeWeights )
         {
             runCtx->meshes[2] = remapper.GetMesh ( moab::Remapper::OverlapMesh );
+            if(!runCtx->proc_id) std::cout << std::endl;
 
             runCtx->timer_push ( "setup computation of weights" );
             // Call to generate the remapping weights with the tempest meshes
@@ -496,9 +501,7 @@ int main ( int argc, char* argv[] )
                                                  );MB_CHK_ERR ( rval );
             runCtx->timer_pop();
 
-            /*
-            * Invoke the CheckMap routine on the TempestRemap serial interface directly, if running on a single process
-            */
+            // Invoke the CheckMap routine on the TempestRemap serial interface directly, if running on a single process
             if (nprocs == 1) {
                 const double dNormalTolerance = 1.0E-8;
                 const double dStrictTolerance = 1.0E-12;
