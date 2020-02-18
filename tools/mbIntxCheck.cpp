@@ -250,8 +250,33 @@ int main ( int argc, char* argv[] )
     rval = mb->write_file( source_verif.c_str(),0, 0,&sset, 1);MB_CHK_ERR(rval);
     if (areaErrSource > 0)
     {
-      std::string filterSource = std::string("filt_")+source_verif;
-      rval = mb->write_file( filterSource.c_str(),0, 0,&errorSourceSet, 1);
+      Range sourceErrorCells;
+      rval = mb->get_entities_by_handle(errorSourceSet, sourceErrorCells);MB_CHK_ERR(rval);
+      EntityHandle errorSourceIntxSet;
+      rval = mb->create_meshset(MESHSET_SET, errorSourceIntxSet);MB_CHK_ERR(rval);
+      if ( !sourceErrorCells.empty())
+      {
+        // add the intx cells that have these as source parent
+        std::vector<int> sourceIDs ;
+        sourceIDs.resize(sourceErrorCells.size());
+        rval = mb->tag_get_data(gidTag, sourceErrorCells, &sourceIDs[0]); MB_CHK_SET_ERR(rval, "can't get source IDs");
+        std::sort(sourceIDs.begin(), sourceIDs.end());
+        for (Range::iterator eit = intxCells.begin(); eit != intxCells.end(); ++eit)
+        {
+          EntityHandle cell = *eit;
+          int sourceID;
+          rval = mb->tag_get_data(sourceParentTag, &cell, 1, &sourceID);MB_CHK_ERR(rval);
+          std::vector<int>::iterator j = std::lower_bound( sourceIDs.begin(), sourceIDs.end(), sourceID );
+          if ( (j!=sourceIDs.end()) && (*j == sourceID))
+          {
+            rval = mb->add_entities(errorSourceIntxSet, &cell, 1); ;MB_CHK_ERR(rval);
+          }
+        }
+        std::string filtersource = std::string("filt_")+source_verif;
+        rval = mb->write_file( filtersource.c_str(),0, 0,&errorSourceSet, 1);
+        std::string filterIntxsource = std::string("filtIntx_")+source_verif;
+        rval = mb->write_file( filterIntxsource.c_str(),0, 0,&errorSourceIntxSet, 1);
+      }
     }
 
 
@@ -286,6 +311,8 @@ int main ( int argc, char* argv[] )
       rval = mb->get_entities_by_handle(errorTargetSet, targetErrorCells);MB_CHK_ERR(rval);
       if ( !targetErrorCells.empty())
       {
+        EntityHandle errorTargetIntxSet;
+        rval = mb->create_meshset(MESHSET_SET, errorTargetIntxSet);MB_CHK_ERR(rval);
         // add the intx cells that have these as target parent
         std::vector<int> targetIDs ;
         targetIDs.resize(targetErrorCells.size());
@@ -299,11 +326,13 @@ int main ( int argc, char* argv[] )
           std::vector<int>::iterator j = std::lower_bound( targetIDs.begin(), targetIDs.end(), targetID );
           if ( (j!=targetIDs.end()) && (*j == targetID))
           {
-            rval = mb->add_entities(errorTargetSet, &cell, 1); ;MB_CHK_ERR(rval);
+            rval = mb->add_entities(errorTargetIntxSet, &cell, 1); ;MB_CHK_ERR(rval);
           }
         }
         std::string filterTarget = std::string("filt_")+target_verif;
         rval = mb->write_file( filterTarget.c_str(),0, 0,&errorTargetSet, 1);
+        std::string filterIntxtarget = std::string("filtIntx_")+target_verif;
+        rval = mb->write_file( filterIntxtarget.c_str(),0, 0,&errorTargetIntxSet, 1);
       }
     }
 
