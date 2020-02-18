@@ -45,7 +45,7 @@ int main ( int argc, char* argv[] )
     std::string sourceFile, targetFile, intxFile;
     std::string source_verif("outS.h5m"), target_verif("outt.h5m");
     int sphere = 1;
-
+    int oldNamesParents = 1;
     ProgOptions opts;
 
     opts.addOpt<std::string> ( "source,s", "source file ", &sourceFile );
@@ -55,6 +55,7 @@ int main ( int argc, char* argv[] )
     opts.addOpt<std::string> ( "verif_target,w", "output target verification ", &target_verif );
 
     opts.addOpt<int> ( "sphere,p", "mesh on a sphere", &sphere );
+    opts.addOpt<int> ( "old_convention,n", "old names for parent tags", &oldNamesParents );
 
     opts.parseCommandLine ( argc, argv );
     // load meshes in parallel if needed
@@ -75,14 +76,14 @@ int main ( int argc, char* argv[] )
     rval = mb->create_meshset(MESHSET_SET, ixset);MB_CHK_ERR(rval);
     if (0==rank)
       std::cout << "Loading source file \n";
-    rval = mb->load_file(sourceFile.c_str(), &sset, opts_read.c_str());MB_CHK_ERR(rval);
+    rval = mb->load_file(sourceFile.c_str(), &sset, opts_read.c_str()); MB_CHK_SET_ERR(rval, "failed reading source file");
     if (0==rank)
       std::cout << "Loading target file \n";
-    rval = mb->load_file(targetFile.c_str(), &tset, opts_read.c_str());MB_CHK_ERR(rval);
+    rval = mb->load_file(targetFile.c_str(), &tset, opts_read.c_str()); MB_CHK_SET_ERR(rval, "failed reading target file");
 
     if (0==rank)
       std::cout << "Loading intersection file \n";
-    rval = mb->load_file(intxFile.c_str(), &ixset, opts_read.c_str());MB_CHK_ERR(rval);
+    rval = mb->load_file(intxFile.c_str(), &ixset, opts_read.c_str()); MB_CHK_SET_ERR(rval, "failed reading intersection file");
     double R = 1.;
     if (sphere){
       // fix radius of both meshes, to be consistent with radius 1
@@ -100,8 +101,16 @@ int main ( int argc, char* argv[] )
 
     Tag sourceParentTag;
     Tag targetParentTag;
-    rval = mb->tag_get_handle("RedParent", targetParentTag);MB_CHK_ERR(rval);
-    rval =  mb->tag_get_handle("BlueParent", sourceParentTag);MB_CHK_ERR(rval);
+    if (oldNamesParents)
+    {
+      rval = mb->tag_get_handle("RedParent", targetParentTag);MB_CHK_SET_ERR(rval, "can't find target parent tag");
+      rval =  mb->tag_get_handle("BlueParent", sourceParentTag);MB_CHK_SET_ERR(rval, "can't find source parent tag");
+    }
+    else {
+      rval = mb->tag_get_handle("TargetParent", targetParentTag);MB_CHK_SET_ERR(rval, "can't find target parent tag");
+      rval =  mb->tag_get_handle("SourceParent", sourceParentTag);MB_CHK_SET_ERR(rval, "can't find source parent tag");
+    }
+
 
     std::map<int, double> sourceAreas;
     std::map<int, double> targetAreas;
