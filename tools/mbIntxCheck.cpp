@@ -46,6 +46,8 @@ int main ( int argc, char* argv[] )
     std::string source_verif("outS.h5m"), target_verif("outt.h5m");
     int sphere = 1;
     int oldNamesParents = 1;
+    double areaErrSource = -1;
+    double areaErrTarget = -1;
     ProgOptions opts;
 
     opts.addOpt<std::string> ( "source,s", "source file ", &sourceFile );
@@ -53,6 +55,8 @@ int main ( int argc, char* argv[] )
     opts.addOpt<std::string> ( "intersection,i", "intersection file ", &intxFile );
     opts.addOpt<std::string> ( "verif_source,v", "output source verification ", &source_verif );
     opts.addOpt<std::string> ( "verif_target,w", "output target verification ", &target_verif );
+    opts.addOpt<double> ( "threshold_source,m", "error source threshold ", &areaErrSource );
+    opts.addOpt<double> ( "threshold_target,q", "error target threshold ", &areaErrTarget );
 
     opts.addOpt<int> ( "sphere,p", "mesh on a sphere", &sphere );
     opts.addOpt<int> ( "old_convention,n", "old names for parent tags", &oldNamesParents );
@@ -112,6 +116,12 @@ int main ( int argc, char* argv[] )
     }
 
 
+    // error sets, for better visualization
+    EntityHandle errorSourceSet;
+    rval = mb->create_meshset(MESHSET_SET, errorSourceSet);MB_CHK_ERR(rval);
+    EntityHandle errorTargetSet;
+    rval = mb->create_meshset(MESHSET_SET, errorTargetSet);MB_CHK_ERR(rval);
+
     std::map<int, double> sourceAreas;
     std::map<int, double> targetAreas;
 
@@ -119,6 +129,9 @@ int main ( int argc, char* argv[] )
     std::map<int, double> targetAreasIntx;
 
     Tag gidTag = mb->globalId_tag();
+
+    Tag areaTag;
+    rval = mb->tag_get_handle("OrigArea", 1, MB_TYPE_DOUBLE, areaTag, MB_TAG_DENSE | MB_TAG_CREAT);MB_CHK_ERR(rval);
 
     for (Range::iterator eit = sourceCells.begin(); eit != sourceCells.end(); ++eit)
     {
@@ -137,6 +150,7 @@ int main ( int argc, char* argv[] )
       int sourceID;
       rval = mb->tag_get_data(gidTag, &cell, 1, &sourceID);MB_CHK_ERR(rval);
       sourceAreas[sourceID] = area;
+      rval = mb->tag_set_data(areaTag, &cell, 1, &area);MB_CHK_ERR(rval);
     }
     for (Range::iterator eit = targetCells.begin(); eit != targetCells.end(); ++eit)
     {
@@ -155,6 +169,7 @@ int main ( int argc, char* argv[] )
       int targetID;
       rval = mb->tag_get_data(gidTag, &cell, 1, &targetID);MB_CHK_ERR(rval);
       targetAreas[targetID] = area;
+      rval = mb->tag_set_data(areaTag, &cell, 1, &area);MB_CHK_ERR(rval);
     }
 
     for (Range::iterator eit = intxCells.begin(); eit != intxCells.end(); ++eit)
@@ -194,6 +209,7 @@ int main ( int argc, char* argv[] )
     Tag diffTag;
     rval = mb->tag_get_handle("AreaDiff", 1, MB_TYPE_DOUBLE, diffTag, MB_TAG_DENSE | MB_TAG_CREAT);MB_CHK_ERR(rval);
 
+
     for (Range::iterator eit = sourceCells.begin(); eit != sourceCells.end(); ++eit)
     {
       EntityHandle cell = *eit;
@@ -206,10 +222,19 @@ int main ( int argc, char* argv[] )
       {
         areaDiff -= sourceAreasIntx[sourceID];
       }
-
       rval = mb->tag_set_data(diffTag, &cell, 1, &areaDiff);
+      // add to errorSourceSet set if needed
+      if ( (areaErrSource > 0) && (fabs(areaDiff) > areaErrSource))
+      {
+        rval = mb->add_entities(errorSourceSet, &cell, 1);MB_CHK_ERR(rval);
+      }
     }
     rval = mb->write_file( source_verif.c_str(),0, 0,&sset, 1);MB_CHK_ERR(rval);
+    if (areaErrSource > 0)
+    {
+      std::string filterSource = std::string("filt_")+source_verif;
+      rval = mb->write_file( filterSource.c_str(),0, 0,&errorSourceSet, 1);
+    }
 
 
     for (Range::iterator eit = targetCells.begin(); eit != targetCells.end(); ++eit)
@@ -226,9 +251,19 @@ int main ( int argc, char* argv[] )
       }
 
       rval = mb->tag_set_data(diffTag, &cell, 1, &areaDiff);
+      // add to errorTargetSet set if needed
+      if ( (areaErrTarget > 0) && (fabs(areaDiff) > areaErrTarget))
+      {
+        rval = mb->add_entities(errorTargetSet, &cell, 1);MB_CHK_ERR(rval);
+      }
+
     }
     rval = mb->write_file(target_verif.c_str(), 0, 0, &tset, 1);MB_CHK_ERR(rval);
-
+    if (areaErrTarget > 0)
+    {
+      std::string filterTarget = std::string("filt_")+target_verif;
+      rval = mb->write_file( filterTarget.c_str(),0, 0,&errorTargetSet, 1);
+    }
 
     return 0;
 }
