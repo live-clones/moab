@@ -73,20 +73,18 @@ int main ( int argc, char* argv[] )
     EntityHandle sset, tset, ixset;
 
     // create meshsets and load files
-    if (0==rank)
-      std::cout << "Creating mesh sets\n";
     rval = mb->create_meshset(MESHSET_SET, sset);MB_CHK_ERR(rval);
     rval = mb->create_meshset(MESHSET_SET, tset);MB_CHK_ERR(rval);
     rval = mb->create_meshset(MESHSET_SET, ixset);MB_CHK_ERR(rval);
     if (0==rank)
-      std::cout << "Loading source file \n";
+      std::cout << "Loading source file " << sourceFile<< "\n";
     rval = mb->load_file(sourceFile.c_str(), &sset, opts_read.c_str()); MB_CHK_SET_ERR(rval, "failed reading source file");
     if (0==rank)
-      std::cout << "Loading target file \n";
+      std::cout << "Loading target file " << targetFile << "\n";
     rval = mb->load_file(targetFile.c_str(), &tset, opts_read.c_str()); MB_CHK_SET_ERR(rval, "failed reading target file");
 
     if (0==rank)
-      std::cout << "Loading intersection file \n";
+      std::cout << "Loading intersection file "<< intxFile<< "\n";
     rval = mb->load_file(intxFile.c_str(), &ixset, opts_read.c_str()); MB_CHK_SET_ERR(rval, "failed reading intersection file");
     double R = 1.;
     if (sphere){
@@ -131,11 +129,15 @@ int main ( int argc, char* argv[] )
     std::map<int, int> sourceNbIntx;
     std::map<int, int> targetNbIntx;
 
+    std::map<int, EntityHandle> sourceMap;
+    std::map<int, EntityHandle> targetMap;
+
     Tag gidTag = mb->globalId_tag();
 
     Tag areaTag;
     rval = mb->tag_get_handle("OrigArea", 1, MB_TYPE_DOUBLE, areaTag, MB_TAG_DENSE | MB_TAG_CREAT);MB_CHK_ERR(rval);
 
+    Range non_convex_intx_cells;
     for (Range::iterator eit = sourceCells.begin(); eit != sourceCells.end(); ++eit)
     {
       EntityHandle cell = *eit;
@@ -154,6 +156,7 @@ int main ( int argc, char* argv[] )
       rval = mb->tag_get_data(gidTag, &cell, 1, &sourceID);MB_CHK_ERR(rval);
       sourceAreas[sourceID] = area;
       rval = mb->tag_set_data(areaTag, &cell, 1, &area);MB_CHK_ERR(rval);
+      sourceMap[sourceID]=cell;
     }
     for (Range::iterator eit = targetCells.begin(); eit != targetCells.end(); ++eit)
     {
@@ -173,6 +176,7 @@ int main ( int argc, char* argv[] )
       rval = mb->tag_get_data(gidTag, &cell, 1, &targetID);MB_CHK_ERR(rval);
       targetAreas[targetID] = area;
       rval = mb->tag_set_data(areaTag, &cell, 1, &area);MB_CHK_ERR(rval);
+      targetMap[targetID] = cell;
     }
 
     for (Range::iterator eit = intxCells.begin(); eit != intxCells.end(); ++eit)
@@ -188,7 +192,8 @@ int main ( int argc, char* argv[] )
       rval = mb->get_coords(verts, num_nodes, &coords[0]);
       if (MB_SUCCESS != rval)
         return -1;
-      double intx_area = area_spherical_polygon_lHuiller(&coords[0], num_nodes, R);
+      int check_sign = 1;
+      double intx_area = area_spherical_polygon_lHuiller_check_sign(&coords[0], num_nodes, R, &check_sign);
 
       rval = mb->tag_set_data(areaTag, &cell, 1, &intx_area); ;MB_CHK_ERR(rval);
       int sourceID, targetID;
@@ -217,6 +222,15 @@ int main ( int argc, char* argv[] )
       {
         targetAreasIntx[targetID] += intx_area;
         targetNbIntx[targetID]++;
+      }
+      if (intx_area<0)
+      {
+        std::cout << "negative intx area: " << intx_area << " n:" << num_nodes <<  " parents: " << sourceID << " " << targetID << "\n";
+      }
+      if (check_sign < 0)
+      {
+        non_convex_intx_cells.insert(cell);
+        std::cout << " non-convex polygon: " << intx_area << " n:" << num_nodes <<  " parents: " << sourceID << " " << targetID << "\n";
       }
     }
     Tag diffTag;
@@ -247,6 +261,8 @@ int main ( int argc, char* argv[] )
         rval = mb->add_entities(errorSourceSet, &cell, 1);MB_CHK_ERR(rval);
       }
     }
+    if (0==rank)
+      std::cout << "write source verification file " << source_verif << "\n";
     rval = mb->write_file( source_verif.c_str(),0, 0,&sset, 1);MB_CHK_ERR(rval);
     if (areaErrSource > 0)
     {
@@ -304,6 +320,8 @@ int main ( int argc, char* argv[] )
       }
 
     }
+    if (0==rank)
+      std::cout << "write target verification file " << target_verif << "\n";
     rval = mb->write_file(target_verif.c_str(), 0, 0, &tset, 1);MB_CHK_ERR(rval);
     if (areaErrTarget > 0)
     {
@@ -336,5 +354,38 @@ int main ( int argc, char* argv[] )
       }
     }
 
+    if (!non_convex_intx_cells.empty())
+    {
+
+      Range sourceCells;
+      Range targetCells;
+      for (Range::iterator it=non_convex_intx_cells.begin(); it!=non_convex_intx_cells.end(); it++)
+      {
+        EntityHandle cellIntx= *it;
+        int sourceID, targetID;
+        rval = mb->tag_get_data(sourceParentTag, &cellIntx, 1, &sourceID);MB_CHK_ERR(rval);
+        rval = mb->tag_get_data(targetParentTag, &cellIntx, 1, &targetID);MB_CHK_ERR(rval);
+        sourceCells.insert(sourceMap[sourceID]);
+        targetCells.insert(targetMap[targetID]);
+
+      }
+      EntityHandle nonConvexSet;
+      rval = mb->create_meshset(MESHSET_SET, nonConvexSet);MB_CHK_ERR(rval);
+      rval = mb->add_entities(nonConvexSet, non_convex_intx_cells);
+      rval = mb->write_file( "nonConvex.h5m",0, 0,&nonConvexSet, 1); MB_CHK_ERR(rval);
+
+      EntityHandle sSet;
+      rval = mb->create_meshset(MESHSET_SET, sSet);MB_CHK_ERR(rval);
+      rval = mb->add_entities(sSet, sourceCells);
+      rval = mb->write_file( "nonConvexSource.h5m",0, 0,&sSet, 1); MB_CHK_ERR(rval);
+      EntityHandle tSet;
+      rval = mb->create_meshset(MESHSET_SET, tSet);MB_CHK_ERR(rval);
+      rval = mb->add_entities(tSet, targetCells);
+      rval = mb->write_file( "nonConvexTarget.h5m",0, 0,&tSet, 1); MB_CHK_ERR(rval);
+      rval = mb->add_entities(nonConvexSet, sourceCells);
+      rval = mb->add_entities(nonConvexSet, targetCells);
+      rval = mb->write_file( "nonConvexAll.h5m",0, 0,&nonConvexSet, 1); MB_CHK_ERR(rval);
+
+    }
     return 0;
 }

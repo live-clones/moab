@@ -114,6 +114,8 @@ double area_spherical_triangle_lHuiller(double * A, double * B, double * C, doub
 
 double area_spherical_polygon_lHuiller (double * A, int N, double Radius);
 
+double area_spherical_polygon_lHuiller_check_sign(double * A, int N, double Radius, int * sign);
+
 double area_on_sphere(Interface * mb, EntityHandle set, double R);
 
 double area_on_sphere_lHuiller(Interface * mb, EntityHandle set, double R);
