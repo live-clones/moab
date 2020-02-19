@@ -693,7 +693,7 @@ static moab::ErrorCode CreateTempestMesh ( ToolContext& ctx, moab::TempestRemapp
     }
     else if ( ctx.meshType == moab::TempestRemapper::RLL )
     {
-        err = GenerateRLLMesh ( *tempest_mesh,                  // Mesh& meshOut,
+        err = GenerateRLLMesh ( *tempest_mesh,                    // Mesh& meshOut,
                                 ctx.blockSize * 2, ctx.blockSize, // int nLongitudes, int nLatitudes,
                                 0.0, 360.0,                       // double dLonBegin, double dLonEnd,
                                 -90.0, 90.0,                      // double dLatBegin, double dLatEnd,
