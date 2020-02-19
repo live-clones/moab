@@ -1816,8 +1816,9 @@ moab::ErrorCode moab::TempestOnlineMap::WriteParallelMap (std::string strOutputF
 #endif
 
     // EntityHandle sets[3] = {m_remapper->m_source_set, m_remapper->m_target_set, m_remapper->m_overlap_set};
-    // rval = m_interface->write_file ( strOutputFile.c_str(), NULL, writeOptions, sets, 3 ); MB_CHK_ERR ( rval );
-    rval = m_interface->write_file ( strOutputFile.c_str(), NULL, writeOptions ); MB_CHK_ERR ( rval );
+    EntityHandle sets[1] = {m_remapper->m_overlap_set};
+    rval = m_interface->write_file ( strOutputFile.c_str(), NULL, writeOptions, sets, 1 ); MB_CHK_ERR ( rval );
+    // rval = m_interface->write_file ( strOutputFile.c_str(), NULL, writeOptions ); MB_CHK_ERR ( rval );
 
 #ifdef WRITE_SCRIP_FILE
     sstr.str("");
