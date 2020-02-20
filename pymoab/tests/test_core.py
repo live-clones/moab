@@ -588,10 +588,9 @@ def test_set_conn():
     # make new verts to set new connectivity
     verts_new = mb.create_vertices(coords)
     mb.set_connectivity(tri[0], verts_new)
-
-    #get the adjacencies of the triangle (vertices)
-    # check the returned EHs match the new vertice entity handles
+    # get the adjacencies of the triangle (vertices)
     conn = mb.get_connectivity(tri)
+    # check the returned EHs match the new vertices entity handles
     CHECK_EQ(list(conn), list(verts_new))
 
 def test_type_from_handle():
