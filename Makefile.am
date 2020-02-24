@@ -48,6 +48,7 @@ examples_basicdir = $(datadir)/examples/basic
 examples_basic_DATA = \
                examples/basic/makefile \
                examples/basic/ErrorHandlingSimulation.cpp \
+               examples/basic/DeleteEdges.cpp \
                examples/basic/GetEntities.cpp \
                examples/basic/HelloMOAB.cpp \
                examples/basic/HelloParMOAB.cpp \
@@ -57,6 +58,7 @@ examples_basic_DATA = \
                examples/basic/TestErrorHandling.cpp \
                examples/basic/TestErrorHandlingPar.cpp \
                examples/basic/TestExodusII.cpp \
+               examples/basic/ReadPartFile.cpp \
                examples/basic/UniformRefinement.cpp
 examples_intermediatedir = $(datadir)/examples/intermediate
 examples_intermediate_DATA = \
@@ -73,12 +75,14 @@ examples_advanced_DATA = \
                examples/advanced/ExtrudePoly.cpp \
                examples/advanced/GenLargeMesh.cpp \
                examples/advanced/LloydRelaxation.cpp \
+               examples/advanced/CoupleMGen.cpp \
                examples/advanced/VisTags.cpp
 examples_fortrandir = $(datadir)/examples/fortran
 examples_fortran_DATA = \
                examples/fortran/makefile \
                examples/fortran/DirectAccessNoHolesF90.F90 \
-               examples/fortran/PushParMeshIntoMoabF90.F90
+               examples/fortran/PushParMeshIntoMoabF90.F90 \
+               examples/fortran/MigrateMesh.F90
 examples_pythonexdir = $(datadir)/examples/python
 examples_pythonex_DATA = \
                examples/python/makefile \
@@ -89,7 +93,9 @@ examples_apps_DATA = \
 examples_apps_earthdir = $(datadir)/examples/apps/earth
 examples_apps_earth_DATA = \
                examples/apps/earth/makefile \
-               examples/apps/earth/ContinentsOnGlobe.cpp
+               examples/apps/earth/ContinentsOnGlobe.cpp \
+               examples/apps/earth/BoundaryContinents.cpp \
+               examples/apps/earth/addPCdata.cpp 
 
 CMAKE_CONFIGURATION_FILES = CMakeLists.txt \
 			    config/AutoconfHeader.cmake      config/FindCGM.cmake        config/FindMetis.cmake     config/FindZoltan.cmake    config/ForceAddFlags.cmake \

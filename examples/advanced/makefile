@@ -58,15 +58,15 @@ run-GenLargeMesh: GenLargeMesh
 	${RUNSERIAL} ./GenLargeMesh -A 2 -B 2 -C 5
 	${RUNSERIAL} ./GenLargeMesh -A 2 -B 2 -C 5 -f
 ifeq ("$(MOAB_MPI_ENABLED)-$(MOAB_HDF5_ENABLED)","yes-yes")
-	${RUNPARALLEL} ./GenLargeMesh -M @NP@ -N 1 -K 1 -A 1 -B 2 -C 2 -r
-	${RUNPARALLEL} ./GenLargeMesh -M @NP@ -N 1 -K 1 -A 1 -B 2 -C 2 -d 10.0 -b 2 -r
-	${RUNPARALLEL} ./GenLargeMesh -M @NP@ -N 1 -K 1 -A 1 -B 2 -C 2 -d 10.0 -b 2 -r -f
-	${RUNPARALLEL} ./GenLargeMesh -M @NP@  -b 10  -A 1 -C 1 -B 1 -r -G
+	${RUNPARALLEL} ./GenLargeMesh -M $(NPROCS) -N 1 -K 1 -A 1 -B 2 -C 2 -r
+	${RUNPARALLEL} ./GenLargeMesh -M $(NPROCS) -N 1 -K 1 -A 1 -B 2 -C 2 -d 10.0 -b 2 -r
+	${RUNPARALLEL} ./GenLargeMesh -M $(NPROCS) -N 1 -K 1 -A 1 -B 2 -C 2 -d 10.0 -b 2 -r -f
+	${RUNPARALLEL} ./GenLargeMesh -M $(NPROCS)  -b 10  -A 1 -C 1 -B 1 -r -G
 endif
 
 run-CoupleMGen: CoupleMGen
 ifeq ("$(MOAB_MPI_ENABLED)-$(MOAB_HDF5_ENABLED)","yes-yes")
-	${RUNPARALLEL} ./CoupleMGen -M @NP@
+	${RUNPARALLEL} ./CoupleMGen -M $(NPROCS)
 endif
 
 

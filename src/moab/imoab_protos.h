@@ -56,6 +56,7 @@
 #define iMOAB_SendElementTag                 IMOAB_FC_WRAPPER( imoab_sendelementtag, IMOAB_SENDELEMENTTAG )
 #define iMOAB_ReceiveElementTag              IMOAB_FC_WRAPPER( imoab_receiveelementtag, IMOAB_RECEIVEELEMENTTAG )
 #define iMOAB_DumpCommGraph                  IMOAB_FC_WRAPPER( imoab_dumpcommgraph, IMOAB_DUMPCOMMGRAPH)
+#define iMOAB_ComputeCommGraph               IMOAB_FC_WRAPPER( imoab_computecommgraph, IMOAB_COMPUTECOMMGRAPH)
 #ifdef MOAB_HAVE_TEMPESTREMAP
 #define iMOAB_ComputeMeshIntersectionOnSphere IMOAB_FC_WRAPPER( imoab_computemeshintersectiononsphere, IMOAB_COMPUTEMESHINTERSECTIONONSPHERE)
 #define iMOAB_ComputePointDoFIntersection    IMOAB_FC_WRAPPER( imoab_computepointdofintersection, IMOAB_COMPUTEPOINTDOFINTERSECTION)

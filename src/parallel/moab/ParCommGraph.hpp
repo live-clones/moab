@@ -5,7 +5,8 @@
  *  (one example is atmosphere mesh migrated to coupler pes)
  *
  *  there are 3 communicators in play, one for each mesh, and one for the joined
- *  communicator, that spans both sets of processes
+ *  communicator, that spans both sets of processes; to send mesh or tag data we need to use the joint communicator,
+ *  use nonblocking MPI_iSend and blocking MPI_Recv receives
  *
  *  various methods should be available to migrate meshes; trivial, using graph partitioner (Zoltan PHG)
  *  and using a geometric partitioner  (Zoltan RCB)
@@ -15,6 +16,7 @@
  *  while MPI_Groups are always defined
  *
  *  Some of the methods in here are executed over the sender communicator, some are over the receiver communicator
+ *  They can switch places, what was sender becomes the receiver and viceversa
  *
  *  The name "graph" is in the sense of a bipartite graph, in which we can separate senders and receivers tasks
  *
@@ -25,6 +27,14 @@
  *
  *  The same class is used after intersection (which is done on the coupler pes between 2 different component
  *   migrated meshes) and it alters communication pattern between the original component pes and coupler pes;
+ *
+ *   We added a new way to send tags between 2 models; the first application of the new method is to send tag
+ *   from atm dynamics model (spectral elements, with np x np tags defined on each element, according to the
+ *   GLOBAL_DOFS tag associated
+ *   to each element) towards the atm physics model, which is just a point cloud of vertices distributed
+ *   differently to the physics model pes; matching is done using GLOBAL_ID tag on vertices;
+ *   Right now, we assume that the models are on different pes, but the
+ *   joint communicator covers both and that the ids of the tasks are with respect to the joint communicator
  *
  *
  */
@@ -42,7 +52,14 @@ namespace moab {
 
 	class ParCommGraph {
 	public:
-	  // ParCommGraph();
+
+
+	  enum TypeGraph
+    {
+      INITIAL_MIGRATE,
+      COVERAGE,
+      DOF_BASED
+    };
 	  virtual ~ParCommGraph();
 
 	  /**
@@ -159,12 +176,15 @@ namespace moab {
 	  // this will set after_cov_rec_sizes
 	  void SetReceivingAfterCoverage(std::map<int, std::set<int> > & idsFromProcs); // will make sense only on receivers, right now after cov
 
+	  // strideComp is np x np, or 1, in our cases
+	  // will fill up ordered lists for corresponding IDs on the other component
+	  // will form back and forth information, from ordered list of IDs, to valuesComp
+	  void settle_comm_by_ids( int comp, TupleList &  TLBackToComp , std::vector<int> & valuesComp);
 	  // new partition calculation
 	  ErrorCode compute_partition (ParallelComm *pco, Range & owned, int met);
 
 	  // dump local information about graph
 	  ErrorCode dump_comm_information(std::string prefix, int is_send);
-	  bool original_migrate() { return !recomputed_send_graph;}
 	private:
 	  /**
       \brief find ranks of a group with respect to an encompassing communicator
@@ -214,10 +234,11 @@ namespace moab {
 	  // so what we know is that the local range corresponds to remote corr_sizes[i] size ranges on tasks corr_tasks[i]
 
 	  // these will be used now after coverage, quick fix; they will also be populated by iMOAB_CoverageGraph
-	  bool recomputed_send_graph; // this should be false , set to true in settle send graph, to use send_IDs_map
-	  std::map<int ,std::vector<int> > send_IDs_map; // maybe moab::Range instead of std::vector<int> // these will be on sender side
-	  std::map<int, std::vector<int> > recv_IDs_map; // receiver side, after coverage, how many elements need to be received from each sender process
-
+	  TypeGraph graph_type; // this should be false , set to true in settle send graph, to use send_IDs_map
+	  std::map<int ,std::vector<int> > involved_IDs_map; // replace send and recv IDs_mapp with involved_IDs_map
+// used only for third method: DOF_BASED
+	  std::map<int, std::vector<int>> map_index; // from index in involved[] to index in values[] of tag, for each corr task
+	  std::map<int, std::vector<int>> map_ptr; //  lmap[ie], lmap[ie+1], pointer into map_index[corrTask]
 };
 
 } // namespace moab

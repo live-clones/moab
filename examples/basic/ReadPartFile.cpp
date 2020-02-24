@@ -1,6 +1,7 @@
-/** @example ReadVarTag.cpp
+/** @example ReadPartFile.cpp
  *
- * read variable sparse tag on a set
+ * read partition file created by a Zoltan process, that used the global ids for
+ * identification of entities
  */
 
 
@@ -36,7 +37,7 @@ int main(int argc, char **argv)
   else
   {
     cerr << " usage is " << argv[0] << " <input file> <part file> <#parts> <output file> \n";
-    exit(1);
+    exit(0);
   }
   ifstream inFile;
   inFile.open(part_file_name.c_str());

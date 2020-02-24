@@ -26,6 +26,7 @@ MESH_DIR="@abs_top_srcdir@/MeshFiles/unittest"
 
 RUNSERIAL =
 ifeq ("$(MOAB_MPI_ENABLED)","yes")
+NPROCS = @NP@
 RUNPARALLEL = @MPIEXEC@ @MPIEXEC_NP@ @NP@
 else
 RUNPARALLEL =

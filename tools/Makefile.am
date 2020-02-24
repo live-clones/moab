@@ -47,7 +47,7 @@ EXTRA_DIST = README.hexmodops \
              CMakeLists.txt
 
 if HAVE_HDF5
-  bin_PROGRAMS += compareFiles
+  bin_PROGRAMS += compareFiles 
 if HAVE_NETCDF
   bin_PROGRAMS += mbaddnc mbaddchunk
 endif

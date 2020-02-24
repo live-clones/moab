@@ -573,7 +573,8 @@ SET(MOAB_EXAMPLES ${MOAB_EXAMPLES}
 SET(MOAB_EXAMPLES ${MOAB_EXAMPLES}
   examples/apps/earth/makefile 
   examples/apps/earth/ContinentsOnGlobe.cpp 
-  examples/apps/earth/BoundaryContinents.cpp )
+  examples/apps/earth/BoundaryContinents.cpp 
+  examples/apps/earth/addPCdata.cpp )
 
 include(AutoconfHeader)
 moab_install_docs(${MOAB_EXAMPLES})

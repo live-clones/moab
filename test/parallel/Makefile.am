@@ -45,7 +45,7 @@ TESTS = pcomm_unit \
 if HAVE_HDF5_PARALLEL
   HDF5_TESTS = parallel_hdf5_test mhdf_parallel parallel_write_test \
          parallel_adj parmerge_test augment_with_ghosts uref_hirec_test_parallel migrate_test \
-         ghost_thin_layers 
+         ghost_thin_layers commgraph_test 
 
 if HAVE_ZOLTAN
   HDF5_TESTS += migrate_nontrivial
@@ -54,9 +54,11 @@ endif
 if HAVE_TEMPESTREMAP
 migrate_test_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS) $(FCLIBS)
 migrate_nontrivial_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS) $(FCLIBS)
+commgraph_test_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS) $(FCLIBS)
 else
 migrate_test_LDADD = $(LDADD) $(FCLIBS)
 migrate_nontrivial_LDADD = $(LDADD) $(FCLIBS)
+commgraph_test_LDADD = $(LDADD) $(FCLIBS)
 endif
 
 if HAVE_TEMPESTREMAP
@@ -164,6 +166,7 @@ migrate_test_SOURCES = migrate_test.cpp
 imoab_coupler_SOURCES = imoab_coupler.cpp
 migrate_nontrivial_SOURCES = migrate_nontrivial.cpp
 ghost_thin_layers_SOURCES = ghost_thin_layers.cpp
+commgraph_test_SOURCES = commgraph_test.cpp
 
 if ENABLE_imesh
 if HAVE_HDF5_PARALLEL
@@ -214,13 +217,14 @@ MOSTLYCLEANFILES = mhdf_ll.h5m \
                    TaskMesh_n2.1.h5m \
                    testReadGhost_n2.0.h5m \
                    testReadGhost_n2.1.h5m \
-                   whole.h5m \
+                   whole.h5m wholeF.h5m \
                    recvMesh.h5m \
                    migrate12.h5m migrate21.h5m migrate11.h5m migrate22.h5m \
                    migrate11_tag.h5m migrate21_tag.h5m migrate12_tag.h5m migrate22_tag.h5m \
                    intx_00.h5m intx_01.h5m fIntxTarget.h5m recvTarget.h5m OcnWithProj.h5m \
                    migrate_graph.h5m migrate_geom.h5m \
-                   recvLnd.h5m LndWithProj.h5m fOcnOnCpl.h5m recvOcn.h5m
+                   recvLnd.h5m LndWithProj.h5m fOcnOnCpl.h5m recvOcn.h5m outPhys.h5m wholeATM_new.h5m \
+                   outLnd.h5m wholeATM_lnd.h5m physAtm_lnd.h5m physBack_lnd.h5m 
 
 FORTDEFS = $(FCDEFS)
 PPFCCOMPILE = $(FC) $(FORTDEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \

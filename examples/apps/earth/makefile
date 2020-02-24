@@ -4,7 +4,7 @@ include ../../makefile.config
 default: all
 
 ifeq ("$(MOAB_HDF5_ENABLED)","yes")
-ALLEXAMPLES += ContinentsOnGlobe BoundaryContinents
+ALLEXAMPLES += ContinentsOnGlobe BoundaryContinents addPCdata
 endif
 
 all: $(ALLEXAMPLES)
@@ -22,6 +22,14 @@ BoundaryContinents: BoundaryContinents.o ${MOAB_LIBDIR}/libMOAB.la
 
 run-BoundaryContinents: BoundaryContinents
 	${RUNSERIAL} ./BoundaryContinents
+
+addPCdata: addPCdata.o ${MOAB_LIBDIR}/libMOAB.la
+	@echo "[CXXLD]  $@"
+	${VERBOSE}${MOAB_CXX} -o $@ $< ${MOAB_LIBS_LINK}
+
+run-addPCdata: addPCdata
+	${RUNSERIAL} ./addPCdata
+
 
 run: all $(addprefix run-,$(ALLEXAMPLES))
 
