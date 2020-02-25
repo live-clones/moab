@@ -638,7 +638,8 @@ moab::ErrorCode CreateTempestMesh ( ToolContext& ctx, moab::TempestRemapper& rem
                                 0.0, 360.0,                       // double dLonBegin, double dLonEnd,
                                 -90.0, 90.0,                      // double dLatBegin, double dLatEnd,
                                 false, false, false,              // bool fGlobalCap, bool fFlipLatLon, bool fForceGlobal,
-                                "" /*ctx.inFilename*/, ctx.outFilename, "NetCDF4",  // std::string strInputFile, std::string strOutputFile, std::string strOutputFormat
+                                "" /*ctx.inFilename*/, "", "",    // std::string strInputFile, std::string strInputFileLonName, std::string strInputFileLatName,
+                                ctx.outFilename, "NetCDF4",       // std::string strOutputFile, std::string strOutputFormat
                                 true                              // bool fVerbose
                               );
 
