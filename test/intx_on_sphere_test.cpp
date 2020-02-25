@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
   opts.addOpt<double>("boxerror,b", "relative error for box boundaries", &boxeps);
 
 
-  int output_fraction = 1;
+  int output_fraction = 0;
   int write_files_rank = 0;
   int brute_force = 0;
 
@@ -97,6 +97,7 @@ int main(int argc, char* argv[])
   rval = ScaleToRadius(mb, sf1, R); MB_CHK_ERR(rval);
   rval = ScaleToRadius(mb, sf2, R); MB_CHK_ERR(rval);
 
+#if 0
   // std::cout << "Fix orientation etc ..\n";
   //IntxUtils; those calls do nothing for a good mesh
   rval = fix_degenerate_quads(mb, sf1);MB_CHK_ERR(rval);
@@ -104,6 +105,7 @@ int main(int argc, char* argv[])
 
   rval = positive_orientation(mb, sf1, R);MB_CHK_ERR(rval);
   rval = positive_orientation(mb, sf2, R);MB_CHK_ERR(rval);
+#endif
 
 #ifdef MOAB_HAVE_MPI
   ParallelComm* pcomm = ParallelComm::get_pcomm(mb, 0);
@@ -183,9 +185,7 @@ int main(int argc, char* argv[])
     }
     if (write_files_rank)
     {
-      std::stringstream outf, cof;
-      outf<<"first_mesh" << rank<<".h5m";
-      rval = mb->write_file(outf.str().c_str(), 0, 0, &sf1, 1); MB_CHK_ERR(rval);
+      std::stringstream cof;
       cof<<"covering_mesh" << rank<<".h5m";
       rval = mb->write_file(cof.str().c_str(), 0, 0, &covering_set, 1); MB_CHK_ERR(rval);
     }
