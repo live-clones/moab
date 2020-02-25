@@ -623,6 +623,7 @@ mhdf_getFileSummary( mhdf_FileHandle file_handle,
       return NULL;
     }
     result ->numEntSets = ptr;
+    for (unsigned ii=0; ii < 5; ++ii) result->numEntSets[ii] = 0;
 
     ptr = realloc_data( &result, 5*sizeof(int*), status );
     if (NULL==ptr || mhdf_isError( status )) {
