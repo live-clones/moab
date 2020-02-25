@@ -143,6 +143,7 @@ struct ToolContext
             opts.addOpt<void> ( "volumetric,v", "Apply a volumetric projection to compute the weights (relevant only when computing weights)", &fVolumetric );
             opts.addOpt<void> ( "rrmgrids", "At least one of the meshes is a regionally refined grid (relevant to accelerate intersection computation)", &rrmGrids );
             opts.addOpt<void> ( "advfront,a", "Use the advancing front intersection instead of the Kd-tree based algorithm to compute mesh intersections", &advFront );
+            opts.addOpt<void> ( "nocheck", "Do not check the generated map for conservation and consistency", &fNoCheck );
             opts.addOpt<int> ( "monotonic,n", "Ensure monotonicity in the weight generation", &ensureMonotonicity );
             opts.addOpt<std::string> ( "load,l", "Input mesh filenames (a source and target mesh)", &expectedFName );
             opts.addOpt<int> ( "order,o", "Discretization orders for the source and target solution fields", &expectedOrder );
@@ -374,7 +375,8 @@ int main ( int argc, char* argv[] )
             int err = GenerateOfflineMapWithMeshes (  weightMap, *ctx.meshes[0], *ctx.meshes[1], *ctx.meshes[2],
                       "", "",     // std::string strInputMeta, std::string strOutputMeta,
                       ctx.disc_methods[0], ctx.disc_methods[1], // std::string strInputType, std::string strOutputType,
-                      ctx.disc_orders[0], ctx.disc_orders[1]  // int nPin=4, int nPout=4,
+                      ctx.disc_orders[0], ctx.disc_orders[1],  // int nPin=4, int nPout=4,
+                      ctx.fNoBubble, true, ctx.ensureMonotonicity // bool fNoBubble = false, bool fCorrectAreas = false, int fMonotoneTypeID = 0
                                                    );
             ctx.timer_pop();
 
@@ -459,16 +461,16 @@ int main ( int argc, char* argv[] )
 
             ctx.timer_push ( "compute weights with TempestRemap" );
 
-            rval = weightMap->GenerateRemappingWeights ( ctx.disc_methods[0], ctx.disc_methods[1],        // std::string strInputType, std::string strOutputType,
-                                                   ctx.disc_orders[0],  ctx.disc_orders[1],  // int nPin=4, int nPout=4,
-                                                   ctx.fNoBubble, ctx.ensureMonotonicity,            // bool fNoBubble=true, int fMonotoneTypeID=0,
-                                                   ctx.fVolumetric, ctx.fNoConservation, ctx.fNoCheck, // bool fVolumetric=false, bool fNoConservation=false, bool fNoCheck=false,
+            rval = weightMap->GenerateRemappingWeights ( ctx.disc_methods[0], ctx.disc_methods[1],      // std::string strInputType, std::string strOutputType,
+                                                   ctx.disc_orders[0],  ctx.disc_orders[1],             // int nPin=4, int nPout=4,
+                                                   ctx.fNoBubble, ctx.ensureMonotonicity,               // bool fNoBubble=true, int fMonotoneTypeID=0,
+                                                   ctx.fVolumetric, ctx.fNoConservation, ctx.fNoCheck,  // bool fVolumetric=false, bool fNoConservation=false, bool fNoCheck=false,
                                                    ctx.doftag_names[0], ctx.doftag_names[1],
-                                                   "", //"",   // std::string strVariables="", std::string strOutputMap="",
-                                                   "", "",   // std::string strInputData="", std::string strOutputData="",
-                                                   "", false,  // std::string strNColName="", bool fOutputDouble=false,
-                                                   "", false, 0.0,   // std::string strPreserveVariables="", bool fPreserveAll=false, double dFillValueOverride=0.0,
-                                                   ctx.fInputConcave, ctx.fOutputConcave   // bool fInputConcave = false, bool fOutputConcave = false
+                                                   "", //"",                                            // std::string strVariables="", std::string strOutputMap="",
+                                                   "", "",                                              // std::string strInputData="", std::string strOutputData="",
+                                                   "", false,                                           // std::string strNColName="", bool fOutputDouble=false,
+                                                   "", false, 0.0,                                      // std::string strPreserveVariables="", bool fPreserveAll=false, double dFillValueOverride=0.0,
+                                                   ctx.fInputConcave, ctx.fOutputConcave                // bool fInputConcave = false, bool fOutputConcave = false
                                                  );MB_CHK_ERR ( rval );
             ctx.timer_pop();
 
@@ -494,6 +496,9 @@ int main ( int argc, char* argv[] )
 
                 rval = mbCore->write_file ( outputFileTgt, NULL, writeOptions, &ctx.meshsets[2], 1 ); MB_CHK_ERR ( rval );
 
+                const double dNormalTolerance = 1.0E-8;
+                const double dStrictTolerance = 1.0E-12;
+                weightMap->CheckMap(!ctx.fNoCheck, !ctx.fNoCheck, !ctx.fNoCheck && (ctx.ensureMonotonicity), dNormalTolerance, dStrictTolerance);
             }
 
             if ( ctx.outFilename.size() )
@@ -501,12 +506,11 @@ int main ( int argc, char* argv[] )
                 size_t lastindex = ctx.outFilename.find_last_of(".");
                 sstr.str("");
                 sstr << ctx.outFilename.substr(0, lastindex) << ".h5m";
-
-				// Write the map file to disk in parallel
+                // Write the map file to disk in parallel
                 rval = weightMap->WriteParallelMap(sstr.str().c_str());MB_CHK_ERR ( rval );
 
                 // Write out the metadata information for the map file
-                if (proc_id == 1) {
+                if (proc_id == 0) {
                     sstr.str("");
                     sstr << ctx.outFilename.substr(0, lastindex) << ".meta";
 

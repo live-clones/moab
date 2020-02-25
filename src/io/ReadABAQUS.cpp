@@ -73,7 +73,7 @@ ReadABAQUS::ReadABAQUS(Interface* impl)
   mMatNameTag        = 0;
 
   //! Get and cache predefined tag handles
-  int zero = 0, negone = -1, negonearr[] = {-1, -1, -1, -1};
+  int negone = -1, negonearr[] = {-1, -1, -1, -1};
   mMaterialSetTag  = get_tag(MATERIAL_SET_TAG_NAME,  1, MB_TAG_SPARSE, MB_TYPE_INTEGER, &negone);
   mDirichletSetTag = get_tag(DIRICHLET_SET_TAG_NAME, 1, MB_TAG_SPARSE, MB_TYPE_INTEGER, &negone);
   mNeumannSetTag   = get_tag(NEUMANN_SET_TAG_NAME,   1, MB_TAG_SPARSE, MB_TYPE_INTEGER, &negone);

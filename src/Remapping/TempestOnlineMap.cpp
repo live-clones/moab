@@ -674,6 +674,7 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
 
         DiscretizationType eInputType;
         DiscretizationType eOutputType;
+        int fNoCheckGlob = (fNoCheck ? 1 : 0);
 
         if ( strInputType == "fv" )
         {
@@ -748,7 +749,7 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
         double dTotalAreaInput = 0.0, dTotalAreaOutput = 0.0;
         if (!m_bPointCloudSource)
         {
-            // Calculate Face areas
+            // Calculate Input Mesh Face areas
             if ( is_root ) dbgprint.printf ( 0, "Calculating input mesh Face areas\n" );
             double dTotalAreaInput_loc = m_meshInput->CalculateFaceAreas(fInputConcave);
             dTotalAreaInput = dTotalAreaInput_loc;
@@ -759,18 +760,11 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
 
             // Input mesh areas
             m_meshInputCov->CalculateFaceAreas(fInputConcave);
-            if ( eInputType == DiscretizationType_FV )
-            {
-                this->SetSourceAreas ( m_meshInputCov->vecFaceArea );
-                if (m_meshInputCov->vecMask.IsAttached()) {
-                    this->SetSourceMask(m_meshInputCov->vecMask);
-                }
-            }
         }
 
         if (!m_bPointCloudTarget)
         {
-            // Calculate Face areas
+            // Calculate Output Mesh Face areas
             if ( is_root ) dbgprint.printf ( 0, "Calculating output mesh Face areas\n" );
             double dTotalAreaOutput_loc = m_meshOutput->CalculateFaceAreas(fOutputConcave);
             dTotalAreaOutput = dTotalAreaOutput_loc;
@@ -778,15 +772,6 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
             if (m_pcomm) MPI_Reduce ( &dTotalAreaOutput_loc, &dTotalAreaOutput, 1, MPI_DOUBLE, MPI_SUM, 0, m_pcomm->comm() );
     #endif
             if ( is_root ) dbgprint.printf ( 0, "Output Mesh Geometric Area: %1.15e\n", dTotalAreaOutput );
-
-            // Output mesh areas
-            if ( eOutputType == DiscretizationType_FV )
-            {
-                this->SetTargetAreas ( m_meshOutput->vecFaceArea );
-                if (m_meshOutput->vecMask.IsAttached()) {
-                    this->SetTargetMask(m_meshOutput->vecMask);
-                }
-            }
         }
 
         if (!m_bPointCloud)
@@ -803,16 +788,13 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
                               "    Possible mesh file corruption?" );
             }
 
-            for ( unsigned i = 0; i < m_meshOverlap->vecSourceFaceIx.size(); i++ )
+            for ( unsigned i = 0; i < m_meshOverlap->faces.size(); i++ )
             {
                 if ( m_meshOverlap->vecSourceFaceIx[i] + 1 > ixSourceFaceMax )
-                {
                     ixSourceFaceMax = m_meshOverlap->vecSourceFaceIx[i] + 1;
-                }
+
                 if ( m_meshOverlap->vecTargetFaceIx[i] + 1 > ixTargetFaceMax )
-                {
                     ixTargetFaceMax = m_meshOverlap->vecTargetFaceIx[i] + 1;
-                }
             }
 
             // Check for forward correspondence in overlap mesh
@@ -834,7 +816,6 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
             //                   m_meshInputCov->faces.size(), m_meshOutput->faces.size(), ixSourceFaceMax, ixTargetFaceMax );
             // }
 
-
             // Calculate Face areas
             if ( is_root ) dbgprint.printf ( 0, "Calculating overlap mesh Face areas\n" );
             double dTotalAreaOverlap_loc = m_meshOverlap->CalculateFaceAreas(false);
@@ -844,16 +825,74 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
     #endif
             if ( is_root ) dbgprint.printf ( 0, "Overlap Mesh Area: %1.15e\n", dTotalAreaOverlap );
 
-            // Partial cover
-            if ( fabs ( dTotalAreaOverlap - dTotalAreaInput ) > 1.0e-10 )
+            // Correct areas to match the areas calculated in the overlap mesh
+            // if (fCorrectAreas)
             {
-                if ( !fNoCheck )
-                {
-                    if ( is_root ) dbgprint.printf ( 0, "WARNING: Significant mismatch between overlap mesh area "
-                                                                "and input mesh area.\n  Automatically enabling --nocheck\n" );
-                    fNoCheck = true;
+                if ( is_root ) dbgprint.printf ( 0, "Correcting source/target areas to overlap mesh areas\n");
+                DataArray1D<double> dSourceArea(m_meshInputCov->faces.size());
+                DataArray1D<double> dTargetArea(m_meshOutput->faces.size());
+
+                assert(m_meshOverlap->vecSourceFaceIx.size() == m_meshOverlap->faces.size());
+                assert(m_meshOverlap->vecTargetFaceIx.size() == m_meshOverlap->faces.size());
+                assert(m_meshOverlap->vecFaceArea.GetRows() == m_meshOverlap->faces.size());
+
+                assert(m_meshInputCov->vecFaceArea.GetRows() == m_meshInputCov->faces.size());
+                assert(m_meshOutput->vecFaceArea.GetRows() == m_meshOutput->faces.size());
+
+                for (size_t i = 0; i < m_meshOverlap->faces.size(); i++) {
+                    if (m_meshOverlap->vecSourceFaceIx[i] < 0 || m_meshOverlap->vecTargetFaceIx[i] < 0)
+                      continue; // skip this cell since it is ghosted
+
+                    // let us recompute the source/target areas based on overlap mesh areas
+                    assert( static_cast<size_t>(m_meshOverlap->vecSourceFaceIx[i]) < m_meshInputCov->faces.size() );
+                    dSourceArea[ m_meshOverlap->vecSourceFaceIx[i] ] += m_meshOverlap->vecFaceArea[i];
+                    assert( static_cast<size_t>(m_meshOverlap->vecTargetFaceIx[i]) < m_meshOutput->faces.size()  );
+                    dTargetArea[ m_meshOverlap->vecTargetFaceIx[i] ] += m_meshOverlap->vecFaceArea[i];
+                }
+
+                for (size_t i = 0; i < m_meshInputCov->faces.size(); i++) {
+                    if (fabs(dSourceArea[i] - m_meshInputCov->vecFaceArea[i]) < 1.0e-10) {
+                        m_meshInputCov->vecFaceArea[i] = dSourceArea[i];
+                    }
+                }
+                for (size_t i = 0; i < m_meshOutput->faces.size(); i++) {
+                    if (fabs(dTargetArea[i] - m_meshOutput->vecFaceArea[i]) < 1.0e-10) {
+                        m_meshOutput->vecFaceArea[i] = dTargetArea[i];
+                    }
                 }
             }
+
+            // Set source mesh areas in map
+            if (!m_bPointCloudSource && eInputType == DiscretizationType_FV) {
+                this->SetSourceAreas(m_meshInputCov->vecFaceArea);
+                if (m_meshInputCov->vecMask.IsAttached()) {
+                    this->SetSourceMask(m_meshInputCov->vecMask);
+                }
+            }
+
+            // Set target mesh areas in map
+            if (!m_bPointCloudTarget && eOutputType == DiscretizationType_FV) {
+                this->SetTargetAreas(m_meshOutput->vecFaceArea);
+                if (m_meshOutput->vecMask.IsAttached()) {
+                    this->SetTargetMask(m_meshOutput->vecMask);
+                }
+            }
+
+            // Partial cover
+            int fNoCheckLoc = fNoCheckGlob;
+            if ( fabs ( dTotalAreaOutput - dTotalAreaInput ) > 1.0e-10 && fabs ( dTotalAreaOverlap - dTotalAreaInput ) > 1.0e-10 )
+            {
+                if ( !fNoCheckGlob )
+                {
+                    dbgprint.printf ( rank, "WARNING: Significant mismatch between overlap mesh area "
+                                                "and input mesh area.\n  Automatically enabling --nocheck\n" );
+                    fNoCheckGlob = 1;
+                }
+            }
+
+#ifdef MOAB_HAVE_MPI
+            if (m_pcomm) MPI_Allreduce ( &fNoCheckLoc, &fNoCheckGlob, 1, MPI_INTEGER, MPI_MAX, m_pcomm->comm() );
+#endif
 
             /*
                 // Recalculate input mesh area from overlap mesh
@@ -1078,12 +1117,15 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
 #ifdef MOAB_HAVE_MPI
             if (m_pcomm) MPI_Allreduce ( &dNumericalArea_loc, &dNumericalArea, 1, MPI_DOUBLE, MPI_SUM, m_pcomm->comm() );
 #endif
-            if ( is_root ) dbgprint.printf ( 0, "Input Mesh Numerical Area: %1.15e\n", dNumericalArea );
-
-            if ( fabs ( dNumericalArea - dTotalAreaInput ) > 1.0e-12 )
+            if ( is_root )
             {
-                dbgprint.printf ( 0, "WARNING: Significant mismatch between input mesh "
-                                  "numerical area and geometric area\n" );
+                dbgprint.printf ( 0, "Input Mesh Numerical Area: %1.15e\n", dNumericalArea );
+
+                if ( fabs ( dNumericalArea - dTotalAreaInput ) > 1.0e-12 )
+                {
+                    dbgprint.printf ( 0, "WARNING: Significant mismatch between input mesh "
+                                    "numerical area and geometric area\n" );
+                }
             }
 
             if ( dataGLLNodesSrcCov.GetSubColumns() != m_meshInputCov->faces.size() )
@@ -1395,7 +1437,7 @@ int moab::TempestOnlineMap::IsConsistent (double dTolerance)
 
     int ierr;
     int fConsistentGlobal = 0;
-    ierr = MPI_Allreduce(&fConsistent, &fConsistentGlobal, 1, MPI_INT, MPI_SUM, m_pcomm->comm());
+    ierr = MPI_Allreduce(&fConsistent, &fConsistentGlobal, 1, MPI_INTEGER, MPI_SUM, m_pcomm->comm());
     if ( ierr != MPI_SUCCESS ) return -1;
 
     return fConsistentGlobal;
@@ -1528,7 +1570,7 @@ int moab::TempestOnlineMap::IsConservative (double dTolerance)
     }
 
     // TODO: Just do a broadcast from root instead of a reduction
-    ierr = MPI_Bcast(&fConservative, 1, MPI_INT, rootProc, m_pcomm->comm());
+    ierr = MPI_Bcast(&fConservative, 1, MPI_INTEGER, rootProc, m_pcomm->comm());
     if ( ierr != MPI_SUCCESS ) return -1;
 
     return fConservative;
@@ -1569,7 +1611,7 @@ int moab::TempestOnlineMap::IsMonotone (double dTolerance)
 
     int ierr;
     int fMonotoneGlobal = 0;
-    ierr = MPI_Allreduce(&fMonotone, &fMonotoneGlobal, 1, MPI_INT, MPI_SUM, m_pcomm->comm());
+    ierr = MPI_Allreduce(&fMonotone, &fMonotoneGlobal, 1, MPI_INTEGER, MPI_SUM, m_pcomm->comm());
     if ( ierr != MPI_SUCCESS ) return -1;
 
     return fMonotoneGlobal;
@@ -1638,22 +1680,31 @@ moab::ErrorCode moab::TempestOnlineMap::WriteParallelMap (std::string strOutputF
     int tot_tgt_ents = m_remapper->m_target_entities.size();
     int tot_src_size = this->m_dSourceAreas.GetRows();
     int tot_tgt_size = this->m_dTargetAreas.GetRows();
+    int tot_vsrc_size = this->m_dSourceVertexLon.GetRows()*this->m_dSourceVertexLon.GetColumns();
+    int tot_vtgt_size = this->m_dTargetVertexLon.GetRows()*this->m_dTargetVertexLon.GetColumns();
 
     const int weightMatNNZ = m_weightMatrix.nonZeros();
-    moab::Tag tagMapMetaData, tagMapIndexRow, tagMapIndexCol, tagMapValues, srcEleIDs, tgtEleIDs, srcAreaValues, tgtAreaValues, srcMaskValues, tgtMaskValues;
-    moab::Tag tagSrcCoordsLon, tagSrcCoordsLat, tagTgtCoordsLon, tagTgtCoordsLat;
+    moab::Tag tagMapMetaData, tagMapIndexRow, tagMapIndexCol, tagMapValues, srcEleIDs, tgtEleIDs;
     rval = m_interface->tag_get_handle("SMAT_DATA", 13, moab::MB_TYPE_INTEGER, tagMapMetaData, moab::MB_TAG_CREAT|moab::MB_TAG_SPARSE);MB_CHK_SET_ERR(rval, "Retrieving tag handles failed");
     rval = m_interface->tag_get_handle("SMAT_ROWS", weightMatNNZ, moab::MB_TYPE_INTEGER, tagMapIndexRow, moab::MB_TAG_CREAT|moab::MB_TAG_SPARSE|moab::MB_TAG_VARLEN);MB_CHK_SET_ERR(rval, "Retrieving tag handles failed");
     rval = m_interface->tag_get_handle("SMAT_COLS", weightMatNNZ, moab::MB_TYPE_INTEGER, tagMapIndexCol, moab::MB_TAG_CREAT|moab::MB_TAG_SPARSE|moab::MB_TAG_VARLEN);MB_CHK_SET_ERR(rval, "Retrieving tag handles failed");
     rval = m_interface->tag_get_handle("SMAT_VALS", weightMatNNZ, moab::MB_TYPE_DOUBLE, tagMapValues, moab::MB_TAG_CREAT|moab::MB_TAG_SPARSE|moab::MB_TAG_VARLEN);MB_CHK_SET_ERR(rval, "Retrieving tag handles failed");
     rval = m_interface->tag_get_handle("SourceGIDS", tot_src_size, moab::MB_TYPE_INTEGER, srcEleIDs, moab::MB_TAG_CREAT|moab::MB_TAG_SPARSE|moab::MB_TAG_VARLEN);MB_CHK_SET_ERR(rval, "Retrieving tag handles failed");
     rval = m_interface->tag_get_handle("TargetGIDS", tot_tgt_size, moab::MB_TYPE_INTEGER, tgtEleIDs, moab::MB_TAG_CREAT|moab::MB_TAG_SPARSE|moab::MB_TAG_VARLEN);MB_CHK_SET_ERR(rval, "Retrieving tag handles failed");
+    moab::Tag srcAreaValues, tgtAreaValues;
     rval = m_interface->tag_get_handle("SourceAreas", tot_src_size, moab::MB_TYPE_DOUBLE, srcAreaValues, moab::MB_TAG_CREAT|moab::MB_TAG_SPARSE|moab::MB_TAG_VARLEN);MB_CHK_SET_ERR(rval, "Retrieving tag handles failed");
     rval = m_interface->tag_get_handle("TargetAreas", tot_tgt_size, moab::MB_TYPE_DOUBLE, tgtAreaValues, moab::MB_TAG_CREAT|moab::MB_TAG_SPARSE|moab::MB_TAG_VARLEN);MB_CHK_SET_ERR(rval, "Retrieving tag handles failed");
-    rval = m_interface->tag_get_handle("SourceCoordinatesLon", tot_src_size, moab::MB_TYPE_DOUBLE, tagSrcCoordsLon, moab::MB_TAG_CREAT|moab::MB_TAG_SPARSE|moab::MB_TAG_VARLEN);MB_CHK_SET_ERR(rval, "Retrieving tag handles failed");
-    rval = m_interface->tag_get_handle("SourceCoordinatesLat", tot_src_size, moab::MB_TYPE_DOUBLE, tagSrcCoordsLat, moab::MB_TAG_CREAT|moab::MB_TAG_SPARSE|moab::MB_TAG_VARLEN);MB_CHK_SET_ERR(rval, "Retrieving tag handles failed");
-    rval = m_interface->tag_get_handle("TargetCoordinatesLon", tot_tgt_size, moab::MB_TYPE_DOUBLE, tagTgtCoordsLon, moab::MB_TAG_CREAT|moab::MB_TAG_SPARSE|moab::MB_TAG_VARLEN);MB_CHK_SET_ERR(rval, "Retrieving tag handles failed");
-    rval = m_interface->tag_get_handle("TargetCoordinatesLat", tot_tgt_size, moab::MB_TYPE_DOUBLE, tagTgtCoordsLat, moab::MB_TAG_CREAT|moab::MB_TAG_SPARSE|moab::MB_TAG_VARLEN);MB_CHK_SET_ERR(rval, "Retrieving tag handles failed");
+    moab::Tag tagSrcCoordsCLon, tagSrcCoordsCLat, tagTgtCoordsCLon, tagTgtCoordsCLat;
+    rval = m_interface->tag_get_handle("SourceCoordCenterLon", tot_src_size, moab::MB_TYPE_DOUBLE, tagSrcCoordsCLon, moab::MB_TAG_CREAT|moab::MB_TAG_SPARSE|moab::MB_TAG_VARLEN);MB_CHK_SET_ERR(rval, "Retrieving tag handles failed");
+    rval = m_interface->tag_get_handle("SourceCoordCenterLat", tot_src_size, moab::MB_TYPE_DOUBLE, tagSrcCoordsCLat, moab::MB_TAG_CREAT|moab::MB_TAG_SPARSE|moab::MB_TAG_VARLEN);MB_CHK_SET_ERR(rval, "Retrieving tag handles failed");
+    rval = m_interface->tag_get_handle("TargetCoordCenterLon", tot_tgt_size, moab::MB_TYPE_DOUBLE, tagTgtCoordsCLon, moab::MB_TAG_CREAT|moab::MB_TAG_SPARSE|moab::MB_TAG_VARLEN);MB_CHK_SET_ERR(rval, "Retrieving tag handles failed");
+    rval = m_interface->tag_get_handle("TargetCoordCenterLat", tot_tgt_size, moab::MB_TYPE_DOUBLE, tagTgtCoordsCLat, moab::MB_TAG_CREAT|moab::MB_TAG_SPARSE|moab::MB_TAG_VARLEN);MB_CHK_SET_ERR(rval, "Retrieving tag handles failed");
+    moab::Tag tagSrcCoordsVLon, tagSrcCoordsVLat, tagTgtCoordsVLon, tagTgtCoordsVLat;
+    rval = m_interface->tag_get_handle("SourceCoordVertexLon", tot_vsrc_size, moab::MB_TYPE_DOUBLE, tagSrcCoordsVLon, moab::MB_TAG_CREAT|moab::MB_TAG_SPARSE|moab::MB_TAG_VARLEN);MB_CHK_SET_ERR(rval, "Retrieving tag handles failed");
+    rval = m_interface->tag_get_handle("SourceCoordVertexLat", tot_vsrc_size, moab::MB_TYPE_DOUBLE, tagSrcCoordsVLat, moab::MB_TAG_CREAT|moab::MB_TAG_SPARSE|moab::MB_TAG_VARLEN);MB_CHK_SET_ERR(rval, "Retrieving tag handles failed");
+    rval = m_interface->tag_get_handle("TargetCoordVertexLon", tot_vtgt_size, moab::MB_TYPE_DOUBLE, tagTgtCoordsVLon, moab::MB_TAG_CREAT|moab::MB_TAG_SPARSE|moab::MB_TAG_VARLEN);MB_CHK_SET_ERR(rval, "Retrieving tag handles failed");
+    rval = m_interface->tag_get_handle("TargetCoordVertexLat", tot_vtgt_size, moab::MB_TYPE_DOUBLE, tagTgtCoordsVLat, moab::MB_TAG_CREAT|moab::MB_TAG_SPARSE|moab::MB_TAG_VARLEN);MB_CHK_SET_ERR(rval, "Retrieving tag handles failed");
+    moab::Tag srcMaskValues, tgtMaskValues;
     if (m_iSourceMask.IsAttached()) {
         rval = m_interface->tag_get_handle("SourceMask", m_iSourceMask.GetRows(), moab::MB_TYPE_INTEGER, srcMaskValues, moab::MB_TAG_CREAT|moab::MB_TAG_SPARSE|moab::MB_TAG_VARLEN);MB_CHK_SET_ERR(rval, "Retrieving tag handles failed");
     }
@@ -1773,18 +1824,31 @@ moab::ErrorCode moab::TempestOnlineMap::WriteParallelMap (std::string strOutputF
     dsize = /*m_remapper->m_target->vecFaceArea.GetRows()*/m_dTargetAreas.GetRows();
     rval = m_interface->tag_set_by_ptr(tgtAreaValues, &m_meshOverlapSet, 1, &tgtareavals_d, &dsize);MB_CHK_SET_ERR(rval, "Setting local tag data failed");
 
-    /* Set the source and target areas */
-    const void* srccoordslonvals_d = /*m_remapper->m_source->vecFaceArea*/ &m_dSourceCenterLon[0];
-    const void* tgtcoordslonvals_d = /*m_remapper->m_target->vecFaceArea*/ &m_dTargetCenterLon[0];
-    const void* srccoordslatvals_d = /*m_remapper->m_source->vecFaceArea*/ &m_dSourceCenterLat[0];
-    const void* tgtcoordslatvals_d = /*m_remapper->m_target->vecFaceArea*/ &m_dTargetCenterLat[0];
+    /* Set the coordinates for source and target center vertices */
+    const void* srccoordsclonvals_d = &m_dSourceCenterLon[0];
+    const void* srccoordsclatvals_d = &m_dSourceCenterLat[0];
     dsize = m_dSourceAreas.GetRows();
-    rval = m_interface->tag_set_by_ptr(tagSrcCoordsLon, &m_meshOverlapSet, 1, &srccoordslonvals_d, &dsize);MB_CHK_SET_ERR(rval, "Setting local tag data failed");
-    rval = m_interface->tag_set_by_ptr(tagSrcCoordsLat, &m_meshOverlapSet, 1, &srccoordslatvals_d, &dsize);MB_CHK_SET_ERR(rval, "Setting local tag data failed");
+    rval = m_interface->tag_set_by_ptr(tagSrcCoordsCLon, &m_meshOverlapSet, 1, &srccoordsclonvals_d, &dsize);MB_CHK_SET_ERR(rval, "Setting local tag data failed");
+    rval = m_interface->tag_set_by_ptr(tagSrcCoordsCLat, &m_meshOverlapSet, 1, &srccoordsclatvals_d, &dsize);MB_CHK_SET_ERR(rval, "Setting local tag data failed");
+    const void* tgtcoordsclonvals_d = &m_dTargetCenterLon[0];
+    const void* tgtcoordsclatvals_d = &m_dTargetCenterLat[0];
     dsize = m_dTargetAreas.GetRows();
-    rval = m_interface->tag_set_by_ptr(tagTgtCoordsLon, &m_meshOverlapSet, 1, &tgtcoordslonvals_d, &dsize);MB_CHK_SET_ERR(rval, "Setting local tag data failed");
-    rval = m_interface->tag_set_by_ptr(tagTgtCoordsLat, &m_meshOverlapSet, 1, &tgtcoordslatvals_d, &dsize);MB_CHK_SET_ERR(rval, "Setting local tag data failed");
+    rval = m_interface->tag_set_by_ptr(tagTgtCoordsCLon, &m_meshOverlapSet, 1, &tgtcoordsclonvals_d, &dsize);MB_CHK_SET_ERR(rval, "Setting local tag data failed");
+    rval = m_interface->tag_set_by_ptr(tagTgtCoordsCLat, &m_meshOverlapSet, 1, &tgtcoordsclatvals_d, &dsize);MB_CHK_SET_ERR(rval, "Setting local tag data failed");
 
+    /* Set the coordinates for source and target element vertices */
+    const void* srccoordsvlonvals_d = &(m_dSourceVertexLon[0][0]);
+    const void* srccoordsvlatvals_d = &(m_dSourceVertexLat[0][0]);
+    dsize = m_dSourceVertexLon.GetRows()*m_dSourceVertexLon.GetColumns();
+    rval = m_interface->tag_set_by_ptr(tagSrcCoordsVLon, &m_meshOverlapSet, 1, &srccoordsvlonvals_d, &dsize);MB_CHK_SET_ERR(rval, "Setting local tag data failed");
+    rval = m_interface->tag_set_by_ptr(tagSrcCoordsVLat, &m_meshOverlapSet, 1, &srccoordsvlatvals_d, &dsize);MB_CHK_SET_ERR(rval, "Setting local tag data failed");
+    const void* tgtcoordsvlonvals_d = &(m_dTargetVertexLon[0][0]);
+    const void* tgtcoordsvlatvals_d = &(m_dTargetVertexLat[0][0]);
+    dsize = m_dTargetVertexLon.GetRows()*m_dTargetVertexLon.GetColumns();
+    rval = m_interface->tag_set_by_ptr(tagTgtCoordsVLon, &m_meshOverlapSet, 1, &tgtcoordsvlonvals_d, &dsize);MB_CHK_SET_ERR(rval, "Setting local tag data failed");
+    rval = m_interface->tag_set_by_ptr(tagTgtCoordsVLat, &m_meshOverlapSet, 1, &tgtcoordsvlatvals_d, &dsize);MB_CHK_SET_ERR(rval, "Setting local tag data failed");
+
+    /* Set the masks for source and target meshes if available */
     if (m_iSourceMask.IsAttached()) {
         const void* srcmaskvals_d = m_iSourceMask;
         dsize = m_iSourceMask.GetRows();
@@ -1796,7 +1860,6 @@ moab::ErrorCode moab::TempestOnlineMap::WriteParallelMap (std::string strOutputF
         dsize = m_iTargetMask.GetRows();
         rval = m_interface->tag_set_by_ptr(tgtMaskValues, &m_meshOverlapSet, 1, &tgtmaskvals_d, &dsize);MB_CHK_SET_ERR(rval, "Setting local tag data failed");
     }
-
 
 #ifdef MOAB_HAVE_MPI
     const char *writeOptions = (this->size > 1 ? "PARALLEL=WRITE_PART" : "");

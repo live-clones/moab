@@ -4346,7 +4346,7 @@ ErrorCode ParallelComm::get_remote_handles(EntityHandle *local_vec, EntityHandle
                                                 PARALLEL_PARTITION_TAG_NAME};
     int num_tags = sizeof(shared_set_tag_names) / sizeof(shared_set_tag_names[0]);
     Range candidate_sets;
-    ErrorCode result;
+    ErrorCode result=MB_FAILURE;
 
     // If we're not given an ID tag to use to globally identify sets,
     // then fall back to using known tag values

@@ -70,7 +70,7 @@ ReadOBJ::ReadOBJ(Interface* impl)
   assert(NULL != readMeshIface);
 
   // Get all handles
-  int negone = -1, zero = 0;
+  int negone = -1;
   ErrorCode rval;
   rval = MBI->tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER,
       			geom_tag, MB_TAG_SPARSE|MB_TAG_CREAT, &negone);
