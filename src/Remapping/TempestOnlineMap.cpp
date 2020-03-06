@@ -412,8 +412,6 @@ moab::ErrorCode moab::TempestOnlineMap::SetDOFmapAssociation(DiscretizationType 
     if (m_remapper->point_cloud_source)
     {
         assert(m_nDofsPEl_Src == 1);
-        col_dofmap.resize (m_remapper->m_covering_source_vertices.size(), UINT_MAX);
-        col_ldofmap.resize (m_remapper->m_covering_source_vertices.size(), UINT_MAX);
         col_gdofmap.resize (m_remapper->m_covering_source_vertices.size(), UINT_MAX);
         src_soln_gdofs.resize(m_remapper->m_covering_source_vertices.size(), UINT_MAX);
         rval = m_interface->tag_get_data ( m_dofTagSrc, m_remapper->m_covering_source_vertices, &src_soln_gdofs[0] );MB_CHK_ERR(rval);
@@ -421,8 +419,6 @@ moab::ErrorCode moab::TempestOnlineMap::SetDOFmapAssociation(DiscretizationType 
     }
     else
     {
-        col_dofmap.resize (m_remapper->m_covering_source_entities.size() * srcTagSize, UINT_MAX);
-        col_ldofmap.resize (m_remapper->m_covering_source_entities.size() * srcTagSize, UINT_MAX);
         col_gdofmap.resize (m_remapper->m_covering_source_entities.size() * srcTagSize, UINT_MAX);
         src_soln_gdofs.resize(m_remapper->m_covering_source_entities.size() * srcTagSize, UINT_MAX);
         rval = m_interface->tag_get_data ( m_dofTagSrc, m_remapper->m_covering_source_entities, &src_soln_gdofs[0] );MB_CHK_ERR(rval);
@@ -484,9 +480,7 @@ moab::ErrorCode moab::TempestOnlineMap::SetDOFmapAssociation(DiscretizationType 
 
     m_nTotDofs_SrcCov = 0;
     if (srcdataGLLNodes == NULL) { /* we only have a mapping for elements as DoFs */
-        for (unsigned i=0; i < col_dofmap.size(); ++i) {
-            col_dofmap[i] = i;
-            col_ldofmap[i] = i;
+        for (unsigned i=0; i < col_gdofmap.size(); ++i) {
             col_gdofmap[i] = src_soln_gdofs[i]-1;
             if (vprint) std::cout << "Col: " << i << ", " << col_gdofmap[i] << "\n";
             m_nTotDofs_SrcCov++;
@@ -508,10 +502,8 @@ moab::ErrorCode moab::TempestOnlineMap::SetDOFmapAssociation(DiscretizationType 
                         dgll_cgll_covcol_ldofmap[ldof] = true;
                     }
                     if ( !isSrcContinuous ) m_nTotDofs_SrcCov++;
-                    col_dofmap[ idof ] = ldof;
-                    col_ldofmap[ ldof ] = idof;
                     assert(src_soln_gdofs[idof] > 0);
-                    col_gdofmap[ idof ] = src_soln_gdofs[idof] - 1;
+                    col_gdofmap[ ldof ] = src_soln_gdofs[idof] - 1;
                     if (vprint) std::cout << "Col: " << m_remapper->lid_to_gid_covsrc[j] << ", " <<  idof << ", " << ldof << ", " << col_gdofmap[idof] << ", " << m_nTotDofs_SrcCov << "\n";
                 }
             }
@@ -521,16 +513,12 @@ moab::ErrorCode moab::TempestOnlineMap::SetDOFmapAssociation(DiscretizationType 
     if (m_remapper->point_cloud_source)
     {
         assert(m_nDofsPEl_Src == 1);
-        srccol_dofmap.resize (m_remapper->m_source_vertices.size(), UINT_MAX);
-        srccol_ldofmap.resize (m_remapper->m_source_vertices.size(), UINT_MAX);
         srccol_gdofmap.resize (m_remapper->m_source_vertices.size(), UINT_MAX);
         locsrc_soln_gdofs.resize(m_remapper->m_source_vertices.size(), UINT_MAX);
         rval = m_interface->tag_get_data ( m_dofTagSrc, m_remapper->m_source_vertices, &locsrc_soln_gdofs[0] );MB_CHK_ERR(rval);
     }
     else
     {
-        srccol_dofmap.resize (m_remapper->m_source_entities.size() * srcTagSize, UINT_MAX);
-        srccol_ldofmap.resize (m_remapper->m_source_entities.size() * srcTagSize, UINT_MAX);
         srccol_gdofmap.resize (m_remapper->m_source_entities.size() * srcTagSize, UINT_MAX);
         locsrc_soln_gdofs.resize(m_remapper->m_source_entities.size() * srcTagSize, UINT_MAX);
         rval = m_interface->tag_get_data ( m_dofTagSrc, m_remapper->m_source_entities, &locsrc_soln_gdofs[0] );MB_CHK_ERR(rval);
@@ -539,9 +527,7 @@ moab::ErrorCode moab::TempestOnlineMap::SetDOFmapAssociation(DiscretizationType 
     // Now compute the mapping and store it for the original source mesh
     m_nTotDofs_Src = 0;
     if (srcdataGLLNodesSrc == NULL) { /* we only have a mapping for elements as DoFs */
-        for (unsigned i=0; i < srccol_dofmap.size(); ++i) {
-            srccol_dofmap[i] = i;
-            srccol_ldofmap[i] = i;
+        for (unsigned i=0; i < srccol_gdofmap.size(); ++i) {
             srccol_gdofmap[i] = locsrc_soln_gdofs[i]-1;
             m_nTotDofs_Src++;
         }
@@ -562,8 +548,6 @@ moab::ErrorCode moab::TempestOnlineMap::SetDOFmapAssociation(DiscretizationType 
                         dgll_cgll_col_ldofmap[ldof] = true;
                     }
                     if ( !isSrcContinuous ) m_nTotDofs_Src++;
-                    srccol_dofmap[ idof ] = ldof;
-                    srccol_ldofmap[ ldof ] = idof;
                     srccol_gdofmap[ idof ] = locsrc_soln_gdofs[idof] - 1;
                 }
             }
@@ -574,8 +558,6 @@ moab::ErrorCode moab::TempestOnlineMap::SetDOFmapAssociation(DiscretizationType 
     if (m_remapper->point_cloud_target)
     {
         assert(m_nDofsPEl_Dest == 1);
-        row_dofmap.resize (m_remapper->m_target_vertices.size(), UINT_MAX);
-        row_ldofmap.resize (m_remapper->m_target_vertices.size(), UINT_MAX);
         row_gdofmap.resize (m_remapper->m_target_vertices.size(), UINT_MAX);
         tgt_soln_gdofs.resize(m_remapper->m_target_vertices.size(), UINT_MAX);
         rval = m_interface->tag_get_data ( m_dofTagDest, m_remapper->m_target_vertices, &tgt_soln_gdofs[0] );MB_CHK_ERR(rval);
@@ -583,8 +565,6 @@ moab::ErrorCode moab::TempestOnlineMap::SetDOFmapAssociation(DiscretizationType 
     }
     else
     {
-        row_dofmap.resize (m_remapper->m_target_entities.size() * tgtTagSize, UINT_MAX);
-        row_ldofmap.resize (m_remapper->m_target_entities.size() * tgtTagSize, UINT_MAX);
         row_gdofmap.resize (m_remapper->m_target_entities.size() * tgtTagSize, UINT_MAX);
         tgt_soln_gdofs.resize(m_remapper->m_target_entities.size() * tgtTagSize, UINT_MAX);
         rval = m_interface->tag_get_data ( m_dofTagDest, m_remapper->m_target_entities, &tgt_soln_gdofs[0] );MB_CHK_ERR(rval);
@@ -594,9 +574,7 @@ moab::ErrorCode moab::TempestOnlineMap::SetDOFmapAssociation(DiscretizationType 
     // To access the GID for each row: row_gdofmap [ row_ldofmap [ 0 : local_ndofs ] ] = GDOF
     m_nTotDofs_Dest = 0;
     if (tgtdataGLLNodes == NULL) { /* we only have a mapping for elements as DoFs */
-        for (unsigned i=0; i < row_dofmap.size(); ++i) {
-            row_dofmap[i] = i;
-            row_ldofmap[i] = i;
+        for (unsigned i=0; i < row_gdofmap.size(); ++i) {
             row_gdofmap[i] = tgt_soln_gdofs[i]-1;
             if (vprint) std::cout << "Row: " << i << ", " << row_gdofmap[i] << "\n";
             m_nTotDofs_Dest++;
@@ -618,8 +596,6 @@ moab::ErrorCode moab::TempestOnlineMap::SetDOFmapAssociation(DiscretizationType 
                         dgll_cgll_row_ldofmap[ldof] = true;
                     }
                     if ( !isTgtContinuous ) m_nTotDofs_Dest++;
-                    row_dofmap[ idof ] = ldof;
-                    row_ldofmap[ ldof ] = idof;
                     row_gdofmap[ idof ] = tgt_soln_gdofs[idof] - 1;
                     if (vprint) std::cout << "Row: " << m_remapper->lid_to_gid_tgt[j] << ", " <<  idof << ", " << ldof << ", " << row_gdofmap[idof] << ", " << m_nTotDofs_Dest << "\n";
                 }
@@ -631,7 +607,7 @@ moab::ErrorCode moab::TempestOnlineMap::SetDOFmapAssociation(DiscretizationType 
 #if defined(MOAB_HAVE_EIGEN) && defined(VERBOSE)
     if (vprint)
     {
-        std::cout << "[" << rank << "]" << "DoFs: row = " << m_nTotDofs_Dest << ", " << row_dofmap.size() << ", col = " << m_nTotDofs_Src << ", " << m_nTotDofs_SrcCov << ", " << col_dofmap.size() << "\n";
+        std::cout << "[" << rank << "]" << "DoFs: row = " << m_nTotDofs_Dest << ", " << row_gdofmap.size() << ", col = " << m_nTotDofs_Src << ", " << m_nTotDofs_SrcCov << ", " << col_gdofmap.size() << "\n";
         // std::cout << "Max col_dofmap: " << maxcol << ", Min col_dofmap" << mincol << "\n";
     }
 #endif
@@ -1434,8 +1410,9 @@ int moab::TempestOnlineMap::IsConsistent (double dTolerance)
         if ( fabs ( dRowSums[i] - 1.0 ) > dTolerance )
         {
             fConsistent++;
+            int rowGID = row_gdofmap[ i ];
             Announce ( "TempestOnlineMap is not consistent in row %i (%1.15e)",
-                       i, dRowSums[i] );
+                       rowGID, dRowSums[i] );
         }
     }
 
@@ -1483,8 +1460,8 @@ int moab::TempestOnlineMap::IsConservative (double dTolerance)
         assert(dataCols[i] < m_nTotDofs_SrcCov);
 
         // GID for column DoFs: col_gdofmap[ col_ldofmap [ dataCols[i] ] ]
-        int colGID = col_gdofmap[ col_ldofmap [ dataCols[i] ] ];
-        // int colGID = col_dofmap [ col_ldofmap [ dataCols[i] ] ];
+        int colGID = this->GetColGlobalDoF ( dataCols[i] ); // col_gdofmap[ col_ldofmap [ dataCols[i] ] ];
+        // int colGID = col_gdofmap[ col_ldofmap [ dataCols[i] ] ];
         dColumnsUnique[ dataCols[i] ] = colGID;
 
         // std::cout << "Column dataCols[i]=" << dataCols[i] << " with GID = " << colGID << std::endl;
@@ -1517,6 +1494,8 @@ int moab::TempestOnlineMap::IsConservative (double dTolerance)
             displs[ir] = gsum;
             rcount[ir] = nElementsInProc[ir*nDATA+1];
             gsum += rcount[ir];
+
+            printf("%d: nTotColumns: %d, Displs: %d, rcount: %d, gsum = %d\n", ir, nTotColumns, displs[ir], rcount[ir], gsum);
         }
 
         dColumnIndices.resize ( nTotColumns, -1 );
@@ -1551,6 +1530,8 @@ int moab::TempestOnlineMap::IsConservative (double dTolerance)
         {
             for ( int ips = displs[ir]; ips < displs[ir+1]; ips++ )
             {
+                if (dColumnIndices[ips] < 0) continue;
+                // printf("%d, %d: dColumnIndices[ips]: %d\n", ir, ips, dColumnIndices[ips]);
                 assert(dColumnIndices[ips] < nTotColumnsUnq);
                 dColumnSumsOnRoot[ dColumnIndices[ips] ] += dColumnSumsTotal[ips];// / dColumnSourceAreas[ips];
                 // dColumnSourceAreasOnRoot[ dColumnIndices[ips] ] = dColumnSourceAreas[ips];
@@ -2145,7 +2126,7 @@ moab::ErrorCode moab::TempestOnlineMap::DefineAnalyticalSolution ( moab::Tag& so
                 for ( int q = 0; q < discOrder; q++ )
                 {
                     const int idof = j * discOrder * discOrder + p * discOrder + q;
-                    dVarMB [ idof ] = dVar[ col_dofmap[ idof ] ];
+                    dVarMB [ idof ] = dVar[ idof ];
                 }
     }
     else
@@ -2155,7 +2136,7 @@ moab::ErrorCode moab::TempestOnlineMap::DefineAnalyticalSolution ( moab::Tag& so
                 for ( int q = 0; q < discOrder; q++ )
                 {
                     const int idof = j * discOrder * discOrder + p * discOrder + q;
-                    dVarMB [ idof ] = dVar[ row_dofmap[ idof ] ];
+                    dVarMB [ idof ] = dVar[ idof ];
                 }
     }
     

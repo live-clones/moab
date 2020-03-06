@@ -381,9 +381,9 @@ public:
 	///		The original tag data and local to global DoF mapping to associate matrix values to solution
 	///	<summary>
 	moab::Tag m_dofTagSrc, m_dofTagDest;
-	std::vector<unsigned> row_dofmap, col_dofmap, srccol_dofmap;
+	// std::vector<unsigned> row_dofmap, col_dofmap, srccol_dofmap;
 	std::vector<unsigned> row_gdofmap, col_gdofmap, srccol_gdofmap;
-	std::vector<unsigned> row_ldofmap, col_ldofmap, srccol_ldofmap;
+	// std::vector<unsigned> row_ldofmap, col_ldofmap, srccol_ldofmap;
 
 	DataArray3D<int> dataGLLNodesSrc, dataGLLNodesSrcCov, dataGLLNodesDest;
 	DiscretizationType m_srcDiscType, m_destDiscType;
@@ -410,7 +410,7 @@ public:
 inline
 int moab::TempestOnlineMap::GetRowGlobalDoF(int localRowID) const
 {
-    return row_gdofmap [ row_ldofmap [ localRowID ] ];
+    return row_gdofmap [ localRowID ];
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -418,7 +418,7 @@ int moab::TempestOnlineMap::GetRowGlobalDoF(int localRowID) const
 inline
 int moab::TempestOnlineMap::GetColGlobalDoF(int localColID) const
 {
-    return col_gdofmap [ col_ldofmap [ localColID ] ];
+    return col_gdofmap [ localColID ];
 }
 
 

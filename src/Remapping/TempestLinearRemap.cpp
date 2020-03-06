@@ -107,7 +107,7 @@ moab::ErrorCode moab::TempestOnlineMap::LinearRemapNN_MOAB (bool use_GID_matchin
     {
         std::map<unsigned, unsigned> src_gl;
         for (unsigned it=0; it < col_gdofmap.size(); ++it)
-            src_gl[ col_gdofmap[it] ] = col_dofmap[it];
+            src_gl[ col_gdofmap[it] ] = it;
 
         std::map<unsigned,unsigned>::iterator iter;
         for (unsigned it=0; it < row_gdofmap.size(); ++it) {
@@ -125,7 +125,7 @@ moab::ErrorCode moab::TempestOnlineMap::LinearRemapNN_MOAB (bool use_GID_matchin
             else
             {
                 unsigned icol = src_gl[ row ];
-                unsigned irow = row_dofmap[it];
+                unsigned irow = it;
 
                 // Set the permutation matrix in local space
                 m_mapRemap(irow, icol) = 1.0;
@@ -700,26 +700,26 @@ moab::ErrorCode moab::TempestOnlineMap::ApplyWeights (std::vector<double>& srcVa
     if (transpose) {
         // Permute the source data first
         for (unsigned i=0; i < srcVals.size(); ++i) {
-            m_rowVector(row_dofmap[i]) = srcVals[i]; // permute and set the row (source) vector properly
+            m_rowVector(i) = srcVals[i]; // permute and set the row (source) vector properly
         }
 
         m_colVector = m_weightMatrix.adjoint() * m_rowVector;
 
         // Permute the resulting target data back
         for (unsigned i=0; i < tgtVals.size(); ++i) {
-            tgtVals[i] = m_colVector(col_dofmap[i]); // permute and set the row (source) vector properly
+            tgtVals[i] = m_colVector(i); // permute and set the row (source) vector properly
         }
     }
     else {
         // Permute the source data first
 #ifdef VERBOSE
-        output_file << "ColVector: " << m_colVector.size() << ", SrcVals: " << srcVals.size() << ", Sizes: " << m_nTotDofs_SrcCov << ", " << col_dofmap.size() << "\n";
+        output_file << "ColVector: " << m_colVector.size() << ", SrcVals: " << srcVals.size() << ", Sizes: " << m_nTotDofs_SrcCov << ", " << col_gdofmap.size() << "\n";
 #endif
         for (unsigned i=0; i < srcVals.size(); ++i) {
-            assert(m_colVector.size()-col_dofmap[i]>0);
-            m_colVector(col_dofmap[i]) = srcVals[i]; // permute and set the row (source) vector properly
+            // assert(m_colVector.size()-col_dofmap[i]>0);
+            m_colVector(i) = srcVals[i]; // permute and set the row (source) vector properly
 #ifdef VERBOSE
-            output_file << "Col: " << i << ", " << col_dofmap[i] << ", GID: " << col_gdofmap[i] << ", Data = " << srcVals[i]  << ", " << m_colVector(col_dofmap[i]) << "\n";
+            output_file << "Col: " << i << ", GID: " << col_gdofmap[i] << ", Data = " << srcVals[i]  << ", " << m_colVector(i) << "\n";
 #endif
         }
 
@@ -727,12 +727,12 @@ moab::ErrorCode moab::TempestOnlineMap::ApplyWeights (std::vector<double>& srcVa
 
         // Permute the resulting target data back
 #ifdef VERBOSE
-        output_file << "RowVector: " << m_rowVector.size() << ", TgtVals:" << tgtVals.size() << ", Sizes: " << m_nTotDofs_Dest << ", " << row_dofmap.size() << "\n";
+        output_file << "RowVector: " << m_rowVector.size() << ", TgtVals:" << tgtVals.size() << ", Sizes: " << m_nTotDofs_Dest << ", " << row_gdofmap.size() << "\n";
 #endif
         for (unsigned i=0; i < tgtVals.size(); ++i) {
-            tgtVals[i] = m_rowVector(row_dofmap[i]); // permute and set the row (source) vector properly
+            tgtVals[i] = m_rowVector(i); // permute and set the row (source) vector properly
 #ifdef VERBOSE
-            output_file << "Row: " << i << ", " << row_dofmap[i] << ", GID: " << row_gdofmap[i] << ", Data = " << m_rowVector(row_dofmap[i]) << "\n";
+            output_file << "Row: " << i << ", GID: " << row_gdofmap[i] << ", Data = " << m_rowVector(i) << "\n";
 #endif
         }
     }
