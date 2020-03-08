@@ -13,7 +13,7 @@
 #include "MBTagConventions.hpp"
 
 // #define ENABLE_DEBUG
-
+//#define CHECK_CONVEXITY
 namespace moab {
 
 
@@ -207,6 +207,19 @@ ErrorCode Intx2MeshOnSphere::computeIntersectionBetweenRedAndBlue(EntityHandle r
   {
     for (int k = 1; k < nP - 1; k++)
       area += area2D(P, &P[2 * k], &P[2 * k + 2]);
+#ifdef  CHECK_CONVEXITY
+    // each edge should be large enough that we can compute angles between edges
+    for (int k=0; k<nP; k++)
+    {
+      int k1 = (k+1)%nP;
+      int k2 = (k1+1)%nP;
+      double orientedArea = area2D(&P[2*k], &P[2 * k1], &P[2 * k2]);
+      if (orientedArea<0)
+      {
+        std::cout <<" oriented area is negative: " << orientedArea << " k:"<< k << " target, src:" << tgt << " " << src << " \n";
+      }
+    }
+#endif
   }
 
   return MB_SUCCESS; // no error
@@ -246,6 +259,11 @@ ErrorCode Intx2MeshOnSphere::findNodes(EntityHandle red, int nsRed, EntityHandle
 
   std::vector<EntityHandle> foundIds;
   foundIds.resize(nP);
+#ifdef  CHECK_CONVEXITY
+  int npBefore1 = nP;
+  int oldNodes =0;
+  int otherIntx = 0;
+#endif
   for (int i = 0; i < nP; i++)
   {
     double * pp = &iP[2 * i]; // iP+2*i
@@ -266,6 +284,9 @@ ErrorCode Intx2MeshOnSphere::findNodes(EntityHandle red, int nsRed, EntityHandle
 
         foundIds[i] = redConn[j]; // no new node
         found = 1;
+#ifdef  CHECK_CONVEXITY
+        oldNodes ++;
+#endif
 #ifdef ENABLE_DEBUG
         if (dbg_1)
           std::cout << "  red node j:" << j << " id:"
@@ -285,6 +306,9 @@ ErrorCode Intx2MeshOnSphere::findNodes(EntityHandle red, int nsRed, EntityHandle
 
         foundIds[i] = blueConn[j]; // no new node
         found = 1;
+#ifdef  CHECK_CONVEXITY
+        oldNodes ++;
+#endif
 #ifdef ENABLE_DEBUG
         if (dbg_1)
           std::cout << "  blue node " << j << " "
@@ -293,75 +317,74 @@ ErrorCode Intx2MeshOnSphere::findNodes(EntityHandle red, int nsRed, EntityHandle
       }
 
     }
+
     if (!found)
     {
       // find the edge it belongs, first, on the red element
-      //
+      // look at the minimum area, not at the first below some tolerance
+      double minArea  = 1.e+38;
+      int index_min=-1;
       for (j = 0; j < nsRed; j++)
       {
         int j1 = (j + 1) % nsRed;
-        double area = area2D(&redCoords2D[2 * j], &redCoords2D[2 * j1], pp);
-#ifdef ENABLE_DEBUG
-        if (dbg_1)
-          std::cout << "   edge " << j << ": "
-              << mb->id_from_handle(adjRedEdges[j]) << " " << redConn[j] << " "
-              << redConn[j1] << "  area : " << area << "\n";
-#endif
-        if (fabs(area) < epsilon_1/2) // this should be some sort of machine epsilon
+        double area = fabs(area2D(&redCoords2D[2 * j], &redCoords2D[2 * j1], pp));
+        // how to check if pp is between redCoords2D[j] and redCoords2D[j1] ?
+        // they should form a straight line; the sign should be -1
+        double checkx = dist2(&redCoords2D[2*j],pp)+dist2(&redCoords2D[2*j1],pp)-dist2(&redCoords2D[2*j],&redCoords2D[2*j1]);
+        if (area<minArea && checkx<2*epsilon_1) // round off error or not?
         {
-          // found the edge; now find if there is a point in the list here
-          //std::vector<EntityHandle> * expts = extraNodesMap[redEdges[j]];
-          int indx = RedEdges.index(adjRedEdges[j]);
-          if (indx<0) // CID 181166 (#1 of 1): Argument cannot be negative (NEGATIVE_RETURNS)
+          index_min = j;
+          minArea = area;
+        }
+      }
+      if (minArea < epsilon_1/2) // we found the smallest area, so we think we found the target edge it belongs
+      {
+        // found the edge; now find if there is a point in the list here
+        //std::vector<EntityHandle> * expts = extraNodesMap[tgtEdges[j]];
+        int indx = RedEdges.index(adjRedEdges[index_min]);
+        if (indx<0) // CID 181166 (#1 of 1): Argument cannot be negative (NEGATIVE_RETURNS)
+        {
+          std::cerr<<" error in adjacent red edge: " << mb->id_from_handle(adjRedEdges[index_min])<< "\n";
+          return MB_FAILURE;
+        }
+        std::vector<EntityHandle> * expts = extraNodesVec[indx];
+        // if the points pp is between extra points, then just give that id
+        // if not, create a new point, (check the id)
+        // get the coordinates of the extra points so far
+        int nbExtraNodesSoFar = expts->size();
+        if (nbExtraNodesSoFar>0)
+        {
+          std::vector<CartVect>  coords1;
+          coords1.resize(nbExtraNodesSoFar);
+          mb->get_coords(&(*expts)[0], nbExtraNodesSoFar, &(coords1[0][0]));
+          //std::list<int>::iterator it;
+          for (int k = 0; k < nbExtraNodesSoFar && !found; k++)
           {
-            std::cerr<<" error in adjacent red edge: " << mb->id_from_handle(adjRedEdges[j])<< "\n";
-            return MB_FAILURE;
-          }
-          std::vector<EntityHandle> * expts = extraNodesVec[indx];
-          // if the points pp is between extra points, then just give that id
-          // if not, create a new point, (check the id)
-          // get the coordinates of the extra points so far
-          int nbExtraNodesSoFar = expts->size();
-          if (nbExtraNodesSoFar>0)
-          {
-            std::vector<CartVect>  coords1;
-            coords1.resize(nbExtraNodesSoFar);
-            mb->get_coords(&(*expts)[0], nbExtraNodesSoFar, &(coords1[0][0]));
-            //std::list<int>::iterator it;
-            for (int k = 0; k < nbExtraNodesSoFar && !found; k++)
+            //int pnt = *it;
+            double d2 = (pos - coords1[k]).length();
+            if (d2 < 2*epsilon_1) // is this below machine precision?
             {
-              //int pnt = *it;
-              double d2 = (pos - coords1[k]).length_squared();
-              if (d2 < epsilon_1)
-              {
-                found = 1;
-                foundIds[i] = (*expts)[k];
-#ifdef ENABLE_DEBUG
-                if (dbg_1)
-                  std::cout << " found node:" << foundIds[i] << std::endl;
+              found = 1;
+              foundIds[i] = (*expts)[k];
+#ifdef  CHECK_CONVEXITY
+              otherIntx ++;
 #endif
-              }
             }
           }
-          if (!found)
-          {
-            // create a new point in 2d (at the intersection)
-            //foundIds[i] = m_num2dPoints;
-            //expts.push_back(m_num2dPoints);
-            // need to create a new node in mbOut
-            // this will be on the edge, and it will be added to the local list
-            rval = mb->create_vertex(pos.array(), outNode); MB_CHK_ERR(rval);
-            (*expts).push_back(outNode);
-            // CID 181168; avoid leak storage error
-            rval = mb->add_entities(outSet, &outNode, 1); MB_CHK_ERR(rval);
-            foundIds[i] = outNode;
-            found = 1;
-#ifdef ENABLE_DEBUG
-            if (dbg_1)
-              std::cout << " new node: " << outNode << std::endl;
-#endif
-          }
-
+        }
+        if (!found)
+        {
+          // create a new point in 2d (at the intersection)
+          //foundIds[i] = m_num2dPoints;
+          //expts.push_back(m_num2dPoints);
+          // need to create a new node in mbOut
+          // this will be on the edge, and it will be added to the local list
+          rval = mb->create_vertex(pos.array(), outNode); MB_CHK_ERR(rval);
+          (*expts).push_back(outNode);
+          // CID 181168; avoid leak storage error
+          rval = mb->add_entities(outSet, &outNode, 1); MB_CHK_ERR(rval);
+          foundIds[i] = outNode;
+          found = 1;
         }
       }
     }
@@ -389,6 +412,9 @@ ErrorCode Intx2MeshOnSphere::findNodes(EntityHandle red, int nsRed, EntityHandle
   // we may have to reduce nP
   // it is possible that some nodes are collapsed after intersection only
   // nodes will always be in order (convex intersection)
+#ifdef  CHECK_CONVEXITY
+  int npBefore2 = nP;
+#endif
   correct_polygon(&foundIds[0], nP);
   // now we can build the triangles, from P array, with foundIds
   // we will put them in the out set
@@ -415,6 +441,35 @@ ErrorCode Intx2MeshOnSphere::findNodes(EntityHandle red, int nsRed, EntityHandle
       rval = mb->tag_get_data(orgSendProcTag, &blue, 1, &org_proc);MB_CHK_ERR(rval);
       rval = mb->tag_set_data(orgSendProcTag, &polyNew, 1, &org_proc);MB_CHK_ERR(rval);// yet another tag
     }
+#ifdef  CHECK_CONVEXITY
+    // each edge should be large enough that we can compute angles between edges
+    std::vector<double>  coords;
+    coords.resize(3*nP);
+    rval = mb->get_coords(&foundIds[0], nP, &coords[0]); MB_CHK_ERR(rval);
+    std::vector<CartVect> posi(nP);
+    rval = mb->get_coords(&foundIds[0], nP, &(posi[0][0])); MB_CHK_ERR(rval);
+
+    for (int k=0; k<nP; k++)
+    {
+      int k1 = (k+1)%nP;
+      int k2 = (k1+1)%nP;
+      double orientedArea = area_spherical_triangle_lHuiller(&coords[3*k], &coords[3 * k1], &coords[3 * k2], Rdest);
+      if (orientedArea<0)
+      {
+        std::cout << " np before 1 , 2, current " << npBefore1 << " " << npBefore2 << " " << nP << "\n";
+        for (int i=0; i< nP; i++)
+        {
+          int nexti= (i+1)%nP;
+          double lengthEdge = (posi[i]-posi[nexti]).length();
+          std::cout << " " << foundIds[i] << " edge en:" << lengthEdge << "\n";
+        }
+        std::cout << " old verts: " << oldNodes << " other intx:" << otherIntx << "\n";
+
+
+        std::cout <<"rank:" << my_rank << " oriented area in 3d is negative: " << orientedArea << " k:"<< k << " target, src:" << tgt << " " << src << " \n";
+      }
+    }
+#endif
 
 #ifdef ENABLE_DEBUG
     if (dbg_1)
@@ -766,7 +821,7 @@ ErrorCode Intx2MeshOnSphere::build_processor_euler_boxes(EntityHandle euler_set,
 
   return MB_SUCCESS;
 }
-
+//#define VERBOSE
 // this will use the bounding boxes for the (euler)/ fix  mesh that are already established
 // will distribute the mesh to other procs, so that on each task, the covering set covers the local bounding box
 // this means it will cover the second (local) mesh set;
@@ -832,6 +887,7 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set(EntityHandle & initial_distr
       }
     }
   }
+
   // another collective call, to see if the mesh is migrated and if the GLOBAL_DOFS tag need to be transferred
   // over to the coverage mesh
   // it is possible that there is no initial mesh source mesh on the task, so we do not know that info from the tag
@@ -847,6 +903,9 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set(EntityHandle & initial_distr
   if (MPI_SUCCESS != mpi_err) return MB_FAILURE;
   orig_sender=global_int_array[0];
   size_gdofs_tag = global_int_array[1];
+#ifdef VERBOSE
+  std::cout <<"proc: " << my_rank << " size_gdofs_tag:" << size_gdofs_tag <<"\n";
+#endif
   valsDOFs.resize(size_gdofs_tag);
 
   // finally, we have correct global info, we can decide if mesh was migrated and if we have global dofs tag that need to be
@@ -965,6 +1024,9 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set(EntityHandle & initial_distr
     // add the vertices to it
     if (range_to_P.empty())
       continue; // nothing to send to proc p
+#ifdef VERBOSE
+      std::cout <<" proc : " << my_rank << " to proc " << p <<" send " << range_to_P.size() << " cells " << " psize: " << range_to_P.psize()<< "\n";
+#endif
     Range vertsToP;
     rval = mb->get_connectivity(range_to_P, vertsToP);MB_CHK_SET_ERR(rval, "can't get connectivity");
     numq = numq + range_to_P.size();
@@ -1121,6 +1183,7 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set(EntityHandle & initial_distr
   // a cell should be received from one proc only; so why are we so worried about duplicated elements?
   // a vertex can be received from multiple sources, that is fine
 
+
   for (int i = 0; i < n; i++)
   {
     int globalIdEl = TLq.vi_rd[sizeTuple * i + 1];
@@ -1179,8 +1242,14 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set(EntityHandle & initial_distr
 
   // now, create a new set, covering_set
   rval = mb->add_entities(covering_set, local_q);MB_CHK_SET_ERR(rval,  "can't add entities to new mesh set ");
+#ifdef VERBOSE
+  std::cout << " proc " << my_rank << " add " << local_q.size() << " cells to covering set \n";
+#endif
   return MB_SUCCESS;
 }
 
 #endif // MOAB_HAVE_MPI
+//#undef VERBOSE
+#undef CHECK_CONVEXITY
+
 } /* namespace moab */

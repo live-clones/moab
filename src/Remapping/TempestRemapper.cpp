@@ -231,6 +231,21 @@ ErrorCode TempestRemapper::convert_tempest_mesh_private ( TempestMeshType meshTy
     Range mbverts ( startv, startv + nodes.size() - 1 );
     rval = m_interface->add_entities ( mesh_set, mbverts );MB_CHK_SET_ERR ( rval, "Can't add entities" );
 
+
+    Tag srcParentTag, tgtParentTag;
+    std::vector<int> srcParent, tgtParent;
+    bool storeParentInfo = (mesh->vecSourceFaceIx.size() > 0);
+
+    if (storeParentInfo)
+    {
+      int defaultInt = -1;
+      rval = m_interface->tag_get_handle("RedParent", 1, MB_TYPE_INTEGER, tgtParentTag,
+            MB_TAG_DENSE | MB_TAG_CREAT, &defaultInt);MB_CHK_SET_ERR(rval, "can't create positive tag");
+
+        rval = m_interface->tag_get_handle("BlueParent", 1, MB_TYPE_INTEGER, srcParentTag,
+            MB_TAG_DENSE | MB_TAG_CREAT, &defaultInt);MB_CHK_SET_ERR(rval, "can't create negative tag");
+    }
+
     // Let us first perform a full pass assuming arbitrary polygons. This is especially true for overlap meshes.
     //   1. We do a first pass over faces, decipher edge size and group into categories based on element type
     //   2. Next we loop over type, and add blocks of elements into MOAB
@@ -275,14 +290,28 @@ ErrorCode TempestRemapper::convert_tempest_mesh_private ( TempestMeshType meshTy
             Range mbcells ( starte, starte + nPolys[iType] - 1 );
             m_interface->add_entities ( mesh_set, mbcells );
 
+            if (storeParentInfo)
+            {
+              srcParent.resize(mbcells.size(), -1);
+              tgtParent.resize(mbcells.size(), -1);
+            }
+
             for ( unsigned ifaces = 0, offset = 0; ifaces < typeNSeqs[iType].size(); ++ifaces )
             {
-                const Face& face = faces[typeNSeqs[iType][ifaces]];
+                const int fIndex = typeNSeqs[iType][ifaces];
+                const Face& face = faces[fIndex];
                 // conn[offset++] = startv + face.edges[0].node[0];
                 for ( unsigned iedges = 0; iedges < face.edges.size(); ++iedges )
                 {
                     conn[offset++] = startv + face.edges[iedges].node[0];
                 }
+
+                if (storeParentInfo)
+                {
+                  srcParent[ifaces] = mesh->vecSourceFaceIx[fIndex]+1;
+                  tgtParent[ifaces] = mesh->vecTargetFaceIx[fIndex]+1;
+                }
+
             }
 
             if (meshType == OVERLAP_FILES)
@@ -293,6 +322,12 @@ ErrorCode TempestRemapper::convert_tempest_mesh_private ( TempestMeshType meshTy
                 Range edges;
                 rval = m_interface->get_adjacencies ( mbcells, 1, true, edges,
                                                       Interface::UNION ); MB_CHK_SET_ERR ( rval, "Can't get edges" );
+            }
+
+            if (storeParentInfo)
+            {
+              rval = m_interface->tag_set_data(srcParentTag, mbcells, &srcParent[0]);MB_CHK_SET_ERR ( rval, "Can't set tag data" );
+              rval = m_interface->tag_set_data(tgtParentTag, mbcells, &tgtParent[0]);MB_CHK_SET_ERR ( rval, "Can't set tag data" );
             }
         }
     }
@@ -979,7 +1014,7 @@ ErrorCode TempestRemapper::ConstructCoveringSet ( double tolerance, double radiu
     return rval;
 }
 
-ErrorCode TempestRemapper::ComputeOverlapMesh ( bool use_tempest )
+ErrorCode TempestRemapper::ComputeOverlapMesh ( bool kdtree_search, bool use_tempest )
 {
     ErrorCode rval;
 
@@ -1050,7 +1085,14 @@ ErrorCode TempestRemapper::ComputeOverlapMesh ( bool use_tempest )
         }
 
         // Now perform the actual parallel intersection between the source and the target meshes
-        rval = mbintx->intersect_meshes ( m_covering_source_set, m_target_set, m_overlap_set ); MB_CHK_SET_ERR ( rval, "Can't compute the intersection of meshes on the sphere" );
+        if (kdtree_search)
+        {
+          rval = mbintx->intersect_meshes_kdtree ( m_covering_source_set, m_target_set, m_overlap_set ); MB_CHK_SET_ERR ( rval, "Can't compute the intersection of meshes on the sphere with brute-force" );
+        }
+        else
+        {
+          rval = mbintx->intersect_meshes ( m_covering_source_set, m_target_set, m_overlap_set ); MB_CHK_SET_ERR ( rval, "Can't compute the intersection of meshes on the sphere" );
+        }
 
 #ifdef MOAB_HAVE_MPI
         if (is_parallel || rrmgrids)

@@ -16,7 +16,11 @@
 // this is for sstream
 #include <sstream>
 //#include <algorithm>
+#define CHECKNEGATIVEAREA
 
+#ifdef CHECKNEGATIVEAREA
+#include <iomanip>
+#endif
 #include <queue>
 
 namespace moab {
@@ -25,6 +29,7 @@ namespace moab {
 #define MAXEDGES 10
 
 #define CHECK_ERR( A )   if (MB_SUCCESS!=A) { std::cout << "error:" <<  __LINE__ <<" " << __FILE__ "\n"; return rval;}
+
 
 // vec utilities that could be common between quads on a plane or sphere
 double dist2(double * a, double * b) {
@@ -516,90 +521,7 @@ CartVect spherical_to_cart(SphereCoords & sc) {
   res[2] = sc.R * sin(sc.lat);             // z
   return res;
 }
-// remove dependency to coupler now
-#if 0
-ErrorCode SpectralVisuMesh(Interface * mb, Range & input, int NP, EntityHandle & outputSet, double tolerance)
-{
-  ErrorCode rval = MB_SUCCESS;
 
-  // this will compute the gl points on parametric element
-  moab::Element::SpectralQuad specQuad(NP);
-  Range fineElem;
-
-  std::vector<int> gids(input.size()*(NP-1)*(NP-1));// total number of "linear" elements
-  // get all edges? or not? Form all gl points + quads, then merge, then output
-  int startGid=0;
-  for (Range::iterator it=input.begin(); it!=input.end(); ++it)
-  {
-    const moab::EntityHandle * conn4 = NULL;
-    int num_nodes = 0;
-    rval = mb->get_connectivity(*it, conn4, num_nodes);
-    if (moab::MB_SUCCESS != rval)
-    {
-      std::cout << "can't get connectivity for quad \n";
-      return rval;
-    }
-    assert(num_nodes==4);
-
-    std::vector<CartVect> verts(4);
-    rval = mb->get_coords(conn4, num_nodes, &(verts[0][0]));
-    if (moab::MB_SUCCESS != rval)
-    {
-      std::cout << "can't get coords for quad \n";
-      return rval;
-    }
-
-    specQuad.set_vertices(verts);
-    specQuad.compute_gl_positions();
-    double * xyz[3];
-    int size;
-    specQuad.get_gl_points(xyz[0], xyz[1], xyz[2], size);
-    assert(NP*NP==size);
-    // these points are in lexicographic order;
-    std::vector<EntityHandle> nodes(size);
-    for (int i=0; i<size; i++)
-    {
-      double coords[3]= {xyz[0][i], xyz[1][i], xyz[2][i]};
-      rval = mb->create_vertex(coords, nodes[i] );
-      if (rval!=moab::MB_SUCCESS)
-      return rval;
-    }
-    // create (NP-1)^2 quads, one by one (sic)
-    for (int i=0; i<NP-1; i++)
-    {
-      for (int j=0; j<NP-1; j++)
-      {
-        EntityHandle connec[4]= {nodes[ i*NP+j], nodes[i*NP+j+1],
-          nodes[(i+1)*NP+j+1], nodes[(i+1)*NP+j]};
-        EntityHandle element_handle;
-        rval = mb->create_element(MBQUAD, connec, 4, element_handle);
-        if (rval!=moab::MB_SUCCESS)
-        return rval;
-        fineElem.insert(element_handle);
-        gids[startGid]=startGid+1;
-        startGid++;
-      }
-    }
-
-  }
-
-  mb->add_entities(outputSet, fineElem);
-  // merge all nodes
-  MergeMesh mgtool(mb);
-  rval = mgtool.merge_entities(fineElem, tolerance);
-  if (MB_SUCCESS!=rval)
-  return rval;
-  Tag gidTag;
-  rval = mb->tag_get_handle("GLOBAL_ID", 1, MB_TYPE_INTEGER,
-      gidTag, MB_TAG_DENSE|MB_TAG_CREAT);
-  if (MB_SUCCESS!=rval)
-  return rval;
-  rval = mb->tag_set_data(gidTag, fineElem, &gids[0]);
-
-  return rval;
-}
-// remove for the time being dependency on coupler
-#endif
 ErrorCode ScaleToRadius(Interface * mb, EntityHandle set, double R) {
   Range nodes;
   ErrorCode rval = mb->get_entities_by_type(set, MBVERTEX, nodes, true); // recursive
@@ -736,8 +658,25 @@ double area_spherical_triangle_lHuiller(double * ptA, double * ptB,
   double E = 4 * atan(sqrt(tmp));
   if (E != E)
     std::cout << " NaN at spherical triangle area \n";
-  return sign * E * Radius * Radius;
+  double area=sign * E * Radius * Radius;
+
+#ifdef CHECKNEGATIVEAREA
+  if (area<0)
+  {
+    std::cout << "negative area: " << area << "\n";
+    std::cout << std::setprecision(15);
+    std::cout <<"vA: " <<vA << "\n";
+    std::cout <<"vB: " <<vB << "\n";
+    std::cout <<"vC: " <<vC << "\n";
+    std::cout << "sign: " << sign << "\n";
+    std::cout << " a: " << a << "\n";
+    std::cout << " b: " << b << "\n";
+    std::cout << " c: " << c << "\n";
+  }
+#endif
+  return area;
 }
+#undef CHECKNEGATIVEAREA
 
 double area_spherical_polygon_lHuiller(double * A, int N, double Radius) {
   // this should work for non-convex polygons too
@@ -754,6 +693,27 @@ double area_spherical_polygon_lHuiller(double * A, int N, double Radius) {
   }
   return area;
 }
+
+double area_spherical_polygon_lHuiller_check_sign(double * A, int N, double Radius, int * sign) {
+  // this should work for non-convex polygons too
+  // assume that the A, A+3, ..., A+3*(N-1) are the coordinates
+  //
+  // assume that the orientation is positive;
+  // if negative orientation, the area will be negative
+  if (N <= 2)
+    return 0.;
+  *sign = 1; // assume positive orientain
+  double area = 0.;
+  for (int i = 1; i < N - 1; i++) {
+    int i1 = i + 1;
+    double areaTriangle = area_spherical_triangle_lHuiller(A, A + 3 * i, A + 3 * i1, Radius);
+    if (areaTriangle<0)
+      *sign = -1; // signal that we have at least one triangle with negative orientation ; possible nonconvex polygon
+    area += areaTriangle;
+  }
+  return area;
+}
+
 
 double area_on_sphere(Interface * mb, EntityHandle set, double R) {
   // get all entities of dimension 2

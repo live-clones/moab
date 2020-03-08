@@ -123,7 +123,7 @@ MOSTLYCLEANFILES = mb_write.g \
                    fIntxOverlap.h5m fIntxTarget.h5m fnew.h5m fnew2.h5m out1.h5m \
                    intx.vtk \
                    polyWithEdges.vtk \
-                   intx1.vtk
+                   intx1.vtk intx.h5m
 
 # Tests and such
 test_Matrix3_SOURCES = test_Matrix3.cpp

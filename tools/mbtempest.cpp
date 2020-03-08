@@ -60,6 +60,7 @@ struct ToolContext
         bool fNoConservation;
         bool fVolumetric;
         bool rrmGrids;
+        bool kdtreeSearch;
         bool fNoBubble, fInputConcave, fOutputConcave, fNoCheck;
 
 #ifdef MOAB_HAVE_MPI
@@ -73,7 +74,7 @@ struct ToolContext
 #endif
             blockSize ( 5 ), outFilename ( "output.exo" ), intxFilename ( "" ), meshType ( moab::TempestRemapper::DEFAULT ),
             computeDual ( false ), computeWeights ( false ), ensureMonotonicity ( 0 ), 
-            fNoConservation ( false ), fVolumetric ( false ), rrmGrids ( false ),
+            fNoConservation ( false ), fVolumetric ( false ), rrmGrids ( false ), kdtreeSearch ( true ),
             fNoBubble(false), fInputConcave(false), fOutputConcave(false), fNoCheck(false)
         {
             inFilenames.resize ( 2 );
@@ -132,6 +133,7 @@ struct ToolContext
             std::string expectedMethod = "fv";
             std::string expectedDofTagName = "GLOBAL_ID";
             int expectedOrder = 1;
+            bool advFront = false;
 
             opts.addOpt<int> ( "type,t", "Type of mesh (default=CS; Choose from [CS=0, RLL=1, ICO=2, OVERLAP_FILES=3, OVERLAP_MEMORY=4, OVERLAP_MOAB=5])", &imeshType );
             opts.addOpt<int> ( "res,r", "Resolution of the mesh (default=5)", &blockSize );
@@ -140,6 +142,7 @@ struct ToolContext
             opts.addOpt<void> ( "noconserve,c", "Do not apply conservation to the resultant weights (relevant only when computing weights)", &fNoConservation );
             opts.addOpt<void> ( "volumetric,v", "Apply a volumetric projection to compute the weights (relevant only when computing weights)", &fVolumetric );
             opts.addOpt<void> ( "rrmgrids", "At least one of the meshes is a regionally refined grid (relevant to accelerate intersection computation)", &rrmGrids );
+            opts.addOpt<void> ( "advfront,a", "Use the advancing front intersection instead of the Kd-tree based algorithm to compute mesh intersections", &advFront );
             opts.addOpt<void> ( "nocheck", "Do not check the generated map for conservation and consistency", &fNoCheck );
             opts.addOpt<int> ( "monotonic,n", "Ensure monotonicity in the weight generation", &ensureMonotonicity );
             opts.addOpt<std::string> ( "load,l", "Input mesh filenames (a source and target mesh)", &expectedFName );
@@ -148,6 +151,9 @@ struct ToolContext
             opts.addOpt<std::string> ( "global_id,g", "Tag name that contains the global DoF IDs for source and target solution fields", &expectedDofTagName );
             opts.addOpt<std::string> ( "file,f", "Output remapping weights filename", &outFilename );
             opts.addOpt<std::string> ( "intx,i", "Output TempestRemap intersection mesh filename", &intxFilename );
+
+            // By default - use Kd-tree based search; if user asks for advancing front, disable Kd-tree algorithm
+            kdtreeSearch = !advFront;
 
             opts.parseCommandLine ( argc, argv );
 
@@ -347,14 +353,15 @@ int main ( int argc, char* argv[] )
             rval = mbCore->get_entities_by_dimension ( intxset, 0, intxverts, true ); MB_CHK_ERR ( rval );
             printf ( "The intersection set contains %lu elements and %lu vertices \n", intxelems.size(), intxverts.size() );
 
-            double initial_area = area_on_sphere_lHuiller ( mbCore, ctx.meshsets[0], radius_src ); // use the target to compute the initial area
+            double initial_sarea = area_on_sphere_lHuiller ( mbCore, ctx.meshsets[0], radius_src ); // use the target to compute the initial area
+            double initial_tarea = area_on_sphere_lHuiller ( mbCore, ctx.meshsets[1], radius_dest ); // use the target to compute the initial area
             double area_method1 = area_on_sphere_lHuiller ( mbCore, intxset, radius_src );
             double area_method2 = area_on_sphere ( mbCore, intxset, radius_src );
 
-            printf ( "initial area: %12.10f\n", initial_area );
+            printf ( "initial area: source = %12.10f, target = %12.10f\n", initial_sarea, initial_tarea );
             printf ( " area with l'Huiller: %12.10f with Girard: %12.10f\n", area_method1, area_method2 );
             printf ( " relative difference areas = %12.10e\n", fabs ( area_method1 - area_method2 ) / area_method1 );
-            printf ( " relative error = %12.10e\n", fabs ( area_method1 - initial_area ) / area_method1 );
+            printf ( " relative error w.r.t source = %12.10e, and target = %12.10e\n", fabs ( area_method1 - initial_sarea ) / area_method1, fabs ( area_method1 - initial_tarea ) / area_method1 );
         }
 
         // Write out our computed intersection file
@@ -404,48 +411,42 @@ int main ( int argc, char* argv[] )
         // Compute intersections with MOAB
         ctx.timer_push ( "setup and compute mesh intersections" );
         rval = remapper.ConstructCoveringSet ( epsrel, 1.0, 1.0, 0.1, ctx.rrmGrids ); MB_CHK_ERR ( rval );
-        rval = remapper.ComputeOverlapMesh ( false ); MB_CHK_ERR ( rval );
+        rval = remapper.ComputeOverlapMesh ( ctx.kdtreeSearch, false ); MB_CHK_ERR ( rval );
         ctx.timer_pop();
 
         {
-            double local_areas[3], global_areas[3]; // Array for Initial area, and through Method 1 and Method 2
+            double local_areas[4], global_areas[4]; // Array for Initial area, and through Method 1 and Method 2
             // local_areas[0] = area_on_sphere_lHuiller ( mbCore, ctx.meshsets[1], radius_src );
-            local_areas[0] = area_on_sphere ( mbCore, ctx.meshsets[1], radius_src );
-            local_areas[1] = area_on_sphere_lHuiller ( mbCore, ctx.meshsets[2], radius_src );
-            local_areas[2] = area_on_sphere ( mbCore, ctx.meshsets[2], radius_src );
+            local_areas[0] = area_on_sphere_lHuiller ( mbCore, ctx.meshsets[0], radius_src );
+            local_areas[1] = area_on_sphere_lHuiller ( mbCore, ctx.meshsets[1], radius_dest );
+            local_areas[2] = area_on_sphere_lHuiller ( mbCore, ctx.meshsets[2], radius_src );
+            local_areas[3] = area_on_sphere ( mbCore, ctx.meshsets[2], radius_src );
 
 #ifdef MOAB_HAVE_MPI
-            MPI_Allreduce ( &local_areas[0], &global_areas[0], 3, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
+            MPI_Allreduce ( &local_areas[0], &global_areas[0], 4, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
 #else
             global_areas[0] = local_areas[0];
             global_areas[1] = local_areas[1];
             global_areas[2] = local_areas[2];
+            global_areas[3] = local_areas[3];
 #endif
             if ( !proc_id )
             {
-                printf ( "initial area: %12.10f\n", global_areas[0] );
-                printf ( " area with l'Huiller: %12.10f with Girard: %12.10f\n", global_areas[1], global_areas[2] );
-                printf ( " relative difference areas = %12.10e\n", fabs ( global_areas[1] - global_areas[2] ) / global_areas[1] );
-                printf ( " relative error = %12.10e\n", fabs ( global_areas[1] - global_areas[0] ) / global_areas[1] );
+                printf ( "initial area: source = %12.14f, target = %12.14f\n", global_areas[0], global_areas[1] );
+                printf ( " area with l'Huiller: %12.14f with Girard: %12.14f\n", global_areas[2], global_areas[3] );
+                printf ( " relative difference areas = %12.10e\n", fabs ( global_areas[2] - global_areas[3] ) / global_areas[2] );
+                printf ( " relative error w.r.t source = %12.14e, and target = %12.14e\n", fabs ( global_areas[2] - global_areas[0] ) / global_areas[2], fabs ( global_areas[2] - global_areas[1] ) / global_areas[2] );
             }
         }
 
         if ( ctx.intxFilename.size() )
         {
-            // Call to write out the intersection meshes in the TempestRemap format so that it can be used directly with GenerateOfflineMap
-            // The call arguments are as follows: 
-            //      (std::string strOutputFileName, const bool fAllParallel, const bool fInputConcave, const bool fOutputConcave);
-#ifdef MOAB_HAVE_MPI
-//            rval = remapper.WriteTempestIntersectionMesh(ctx.intxFilename, true, false, false);MB_CHK_ERR ( rval ); 
-#else
-//            rval = remapper.WriteTempestIntersectionMesh(ctx.intxFilename, false, false, false);MB_CHK_ERR ( rval );
-#endif
             // Write out our computed intersection file
             size_t lastindex = ctx.intxFilename.find_last_of(".");
             sstr.str("");
             sstr << ctx.intxFilename.substr(0, lastindex) << ".h5m";
             if(!ctx.proc_id) std::cout << "Writing out the MOAB intersection mesh file to " << sstr.str() << std::endl;
-            rval = mbCore->write_file ( sstr.str().c_str(), NULL, "PARALLEL=WRITE_PART", &ctx.meshsets[0], 3 ); MB_CHK_ERR ( rval );
+            rval = mbCore->write_file ( sstr.str().c_str(), NULL, "PARALLEL=WRITE_PART", &ctx.meshsets[2], 1 ); MB_CHK_ERR ( rval );
 
         }
 
@@ -637,7 +638,8 @@ moab::ErrorCode CreateTempestMesh ( ToolContext& ctx, moab::TempestRemapper& rem
                                 0.0, 360.0,                       // double dLonBegin, double dLonEnd,
                                 -90.0, 90.0,                      // double dLatBegin, double dLatEnd,
                                 false, false, false,              // bool fGlobalCap, bool fFlipLatLon, bool fForceGlobal,
-                                "" /*ctx.inFilename*/, ctx.outFilename, "NetCDF4",  // std::string strInputFile, std::string strOutputFile, std::string strOutputFormat
+                                "" /*ctx.inFilename*/, "", "",    // std::string strInputFile, std::string strInputFileLonName, std::string strInputFileLatName,
+                                ctx.outFilename, "NetCDF4",       // std::string strOutputFile, std::string strOutputFormat
                                 true                              // bool fVerbose
                               );
 

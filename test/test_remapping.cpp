@@ -101,7 +101,8 @@ void test_tempest_rll_create()
                              0.0, 360.0,
                              -90.0, 90.0,
                              false, false, true,
-                             "", outFilename, "NetCDF4",
+                             "", "", "",    // std::string strInputFile, std::string strInputFileLonName, std::string strInputFileLatName,
+                             outFilename, "NetCDF4",       // std::string strOutputFile, std::string strOutputFormat
                              false);
   CHECK_EQUAL(ierr, 0);
 
