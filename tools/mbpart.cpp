@@ -25,9 +25,12 @@ typedef int PartType;
 
 #include <iostream>
 #include <sstream>
+#include <cmath>
 #include <stdlib.h>
 #include <list>
 #include <time.h>
+
+#include "moab/IntxMesh/IntxUtils.hpp"
 
 using namespace moab;
 
@@ -554,10 +557,41 @@ int main(int argc, char* argv[])
 
     if (moab_use_zoltan && moab_partition_slave && p == 0) {
       t = clock();
+      spherical_coords = true;
+      double master_radius, slave_radius;
+      if (spherical_coords) {
+        EntityHandle rootset = 0;
+        Range masterverts;
+        rval = mb.get_entities_by_dimension(rootset, 0, masterverts); MB_CHK_SET_ERR ( rval, "Can't create vertices on master set" );
+        double points[6];
+        EntityHandle mfrontback[2] = {masterverts[0], masterverts[masterverts.size()-1]};
+        rval = mb.get_coords(&mfrontback[0], 2, points);MB_CHK_ERR(rval);
+        master_radius = 0.5*(std::sqrt(points[0]*points[0]+points[1]*points[1]+points[2]*points[2]) + std::sqrt(points[3]*points[3]+points[4]*points[4]+points[5]*points[5]));
+        std::cout << "Master radius = " << master_radius << "\n";
+      }
       EntityHandle slaveset;
       rval = mb.create_meshset ( moab::MESHSET_SET, slaveset ); MB_CHK_SET_ERR ( rval, "Can't create new set" );
       rval = mb.load_file(slave_file_name.c_str(), &slaveset, options);
+      if (spherical_coords) {
+        double points[6];
+        Range slaveverts;
+        rval = mb.get_entities_by_dimension(slaveset, 0, slaveverts); MB_CHK_SET_ERR ( rval, "Can't create vertices on master set" );
+        EntityHandle sfrontback[2] = {slaveverts[0], slaveverts[slaveverts.size()-1]};
+        rval = mb.get_coords(&sfrontback[0], 2, points);MB_CHK_ERR(rval);
+        slave_radius = 0.5*(std::sqrt(points[0]*points[0]+points[1]*points[1]+points[2]*points[2]) + std::sqrt(points[3]*points[3]+points[4]*points[4]+points[5]*points[5]));
+        std::cout << "Slave radius = " << slave_radius << "\n";
+        // Let us rescale both master and slave meshes to a unit sphere
+        rval = ScaleToRadius(&mb, slaveset, master_radius);MB_CHK_ERR(rval);
+        std::cout << "Rescale slave to radius = " << master_radius << "\n";
+      }
+
       rval = zoltan_tool->partition_inferred_mesh(slaveset, part_dim);
+
+      if (spherical_coords) {
+        // rescale both the slave mesh back to its original radius
+        rval = ScaleToRadius(&mb, slaveset, slave_radius);MB_CHK_ERR(rval);
+        std::cout << "Rescale slave to radius = " << slave_radius << "\n";
+      }
       if (print_time) {
         std::cout << "Time taken to infer slave mesh partitions = " 
                   << (clock() - t) / (double) CLOCKS_PER_SEC << " seconds" << std::endl;
