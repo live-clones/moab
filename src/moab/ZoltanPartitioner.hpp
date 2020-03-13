@@ -124,6 +124,12 @@ using namespace moab;
                                       const bool partition_tagged_ents = false,
                                       const char *aggregating_tag = NULL,
                                       const bool print_time = false);
+    
+    // given a processor assignment returned from Zoltan, use that to infer a partition
+      // to generate processor assignment for a new MOAB mesh in specified fileset
+    ErrorCode partition_inferred_mesh(EntityHandle sfileset, 
+                                      int part_dim = 3,
+                                      const bool write_as_sets = true);
 
       // given a processor assignment returned from Zoltan, write that as a
       // processor assignment to MOAB

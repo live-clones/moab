@@ -107,6 +107,10 @@ int main(int argc, char* argv[])
   int power = -1;
   opts.addOpt<int>("power,M", "Generate multiple partitions, in powers of 2, up to 2^(pow)", &power);
 
+  bool moab_partition_slave = false;
+  std::string slave_file_name = "";
+  opts.addOpt<std::string>("inferred", "(Zoltan) Specify inferred mesh file name to impose partition.", &slave_file_name);
+
   bool reorder = false;
   opts.addOpt<void>("reorder,R", "Reorder mesh to group entities by partition", &reorder);
 
@@ -189,6 +193,8 @@ int main(int argc, char* argv[])
     opts.printHelp();
     return EXIT_FAILURE;
   }
+
+  if (slave_file_name.size()) moab_partition_slave = true;
 
   if (moab_use_zoltan) {
     if (part_geom_mesh_size < 0.)
@@ -541,6 +547,41 @@ int main(int argc, char* argv[])
     if (print_time)
       std::cout << "Wrote \"" << tmp_output_file.str() << "\" in "
                 << (clock() - t) / (double) CLOCKS_PER_SEC << " seconds" << std::endl;
+
+#ifdef MOAB_HAVE_ZOLTAN
+
+  printf("MOAB inferred mesh name: %s, flag = %d, %d, %d\n", slave_file_name.c_str(), moab_use_zoltan, moab_partition_slave, p);
+
+    if (moab_use_zoltan && moab_partition_slave && p == 0) {
+      t = clock();
+      EntityHandle slaveset;
+      rval = mb.create_meshset ( moab::MESHSET_SET, slaveset ); MB_CHK_SET_ERR ( rval, "Can't create new set" );
+      rval = mb.load_file(slave_file_name.c_str(), &slaveset, options);
+      rval = zoltan_tool->partition_inferred_mesh(slaveset, part_dim);
+      if (print_time) {
+        std::cout << "Time taken to infer slave mesh partitions = " 
+                  << (clock() - t) / (double) CLOCKS_PER_SEC << " seconds" << std::endl;
+      }
+
+      size_t lastindex = slave_file_name.find_last_of("."); 
+      std::string inferred_output_file = slave_file_name.substr(0, lastindex) + "_inferred" + slave_file_name.substr(lastindex, slave_file_name.size());
+      
+      // Save the resulting mesh
+      std::cout << "Saving inferred file to " << inferred_output_file << "..." << std::endl;
+      rval = mb.write_file(inferred_output_file.c_str(), 0, 0, &slaveset, 1);
+      if (MB_SUCCESS != rval)
+      {
+        std::cerr << tmp_output_file.str() << " : failed to write file." << std::endl;
+        std::cerr << "  Error code: " << mb.get_error_string(rval) << " ("
+                  << rval << ")" << std::endl;
+        std::string errstr;
+        mb.get_last_error(errstr);
+        if (!errstr.empty())
+          std::cerr << "  Error message: " << errstr << std::endl;
+        return 2;
+      }
+    }
+#endif
 
     num_parts *= 2;
   }

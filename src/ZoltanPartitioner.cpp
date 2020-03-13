@@ -346,6 +346,79 @@ ErrorCode  ZoltanPartitioner::repartition(std::vector<double> & x,std::vector<do
   return MB_SUCCESS;
 }
 
+ErrorCode ZoltanPartitioner::partition_inferred_mesh(EntityHandle sfileset, int part_dim, const bool write_as_sets)
+{
+  // Zoltan &zz,               // Zoltan class populated by a geometric
+                            // partition with parameter KEEP_CUTS=1
+  // int nCoords,              // Number of coordinates whose part 
+  //                           // assignment should be inferred
+  // double *x,                // x coordinates (length nCoords)
+  // double *y,                // y coordinates (length nCoords)
+  // double *z,                // z coordinates (length nCoords)
+  // int *part_assignments     // Output:  part assignments inferred for 
+                            // each coordinate (x_i,y_i,z_i) 
+                            // (length nCoords)
+  ErrorCode result;
+
+  moab::Range elverts;
+  result = mbImpl->get_entities_by_dimension(sfileset, part_dim, elverts); RR;
+
+  std::vector<double> elcoords(elverts.size()*3);
+  result = mbImpl->get_coords(elverts, &elcoords[0]); RR;
+
+  std::map<int, std::vector<EntityHandle> > part_assignments;
+
+  int part, proc;
+
+  // Loop over coordinates
+  for (size_t iel = 0; iel < elverts.size(); iel++) {
+
+    // Gather coordinates into temporary array
+    double *ecoords = &elcoords[iel*3];
+
+    // Compute the coordinate's part assignment
+    myZZ->LB_Point_PP_Assign(ecoords, proc, part);
+
+    // Store the part assignment in the return array
+    part_assignments[part].push_back(elverts[iel]);
+  }
+
+    // get the partition set tag
+  Tag part_set_tag;
+  int dum_id = -1;
+  result = mbImpl->tag_get_handle("PARALLEL_PARTITION", 1, MB_TYPE_INTEGER,
+                                  part_set_tag, MB_TAG_SPARSE|MB_TAG_CREAT, &dum_id); RR;
+
+  std::map<int, std::vector<EntityHandle> >::iterator it;
+  for (it = part_assignments.begin(); it != part_assignments.end(); ++it)
+  {
+    int partnum = it->first;
+    std::vector<EntityHandle>& partvec = it->second;
+
+    if (write_as_sets)
+    {
+      EntityHandle partNset;
+      result = mbImpl->create_meshset ( moab::MESHSET_SET, partNset ); RR;
+      result = mbImpl->add_entities(partNset, &partvec[0], partvec.size()); RR;
+      // result = mbImpl->add_entities(sfileset, partNset); RR;
+      result = mbImpl->add_parent_child(sfileset, partNset); RR;
+      // std::cout << "Part " << partnum << " contains " << partvec.size() << " elements \n";
+        // assign partitions as a sparse tag by grouping elements under sets
+      result = mbImpl->tag_set_data(part_set_tag, &partNset, 1, &partnum); RR;
+    }
+    else
+    {
+      /* assign as a dense vector to all elements 
+         allocate integer-size partitions */
+      std::vector<int> assignment(partvec.size(), partnum); // initialize all values to partnum
+      result = mbImpl->tag_set_data(part_set_tag, &partvec[0], partvec.size(), &assignment[0]); RR;
+    }
+  }
+
+  return MB_SUCCESS;
+}
+
+
 ErrorCode ZoltanPartitioner::partition_mesh_and_geometry(const double part_geom_mesh_size,
                                         const int nparts,
                                         const char *zmethod,
@@ -705,7 +778,8 @@ ErrorCode ZoltanPartitioner::assemble_graph(const int dimension,
     // assign global ids
   if(assign_global_ids)
   {
-    result = mbpc->assign_global_ids(0, dimension); RR;
+    EntityHandle rootset = 0;
+    result = mbpc->assign_global_ids(rootset, dimension, 1, true, true); RR;
   }
 
     // now assemble the graph, calling MeshTopoUtil to get bridge adjacencies through d-1 dimensional
@@ -1586,7 +1660,7 @@ void ZoltanPartitioner::SetRCB_Parameters()
   // RCB parameters:
 
   myZZ->Set_Param("RCB_OUTPUT_LEVEL", "1");
-  //myZZ->Set_Param("KEEP_CUTS", "1");              // save decomposition
+  myZZ->Set_Param("KEEP_CUTS", "1");              // save decomposition
   //myZZ->Set_Param("RCB_RECTILINEAR_BLOCKS", "1"); // don't split point on boundary
 }
 
