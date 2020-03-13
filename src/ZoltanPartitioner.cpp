@@ -384,10 +384,15 @@ ErrorCode ZoltanPartitioner::partition_inferred_mesh(EntityHandle sfileset, int 
   }
 
     // get the partition set tag
-  Tag part_set_tag;
-  int dum_id = -1;
-  result = mbImpl->tag_get_handle("PARALLEL_PARTITION", 1, MB_TYPE_INTEGER,
-                                  part_set_tag, MB_TAG_SPARSE|MB_TAG_CREAT, &dum_id); RR;
+  Tag part_set_tag = mbpc->partition_tag();
+
+  // If some entity sets exist, let us delete those first.
+  if (write_as_sets)
+  {
+    moab::Range oldpsets;
+    result = mbImpl->get_entities_by_type_and_tag(sfileset, MBENTITYSET, &part_set_tag, NULL, 1, oldpsets, Interface::UNION); RR;
+    result = mbImpl->remove_entities(sfileset, oldpsets); RR;
+  }
 
   std::map<int, std::vector<EntityHandle> >::iterator it;
   for (it = part_assignments.begin(); it != part_assignments.end(); ++it)
@@ -402,7 +407,7 @@ ErrorCode ZoltanPartitioner::partition_inferred_mesh(EntityHandle sfileset, int 
       result = mbImpl->add_entities(partNset, &partvec[0], partvec.size()); RR;
       // result = mbImpl->add_entities(sfileset, partNset); RR;
       result = mbImpl->add_parent_child(sfileset, partNset); RR;
-      // std::cout << "Part " << partnum << " contains " << partvec.size() << " elements \n";
+      std::cout << "Part " << partnum << " contains " << partvec.size() << " elements \n";
         // assign partitions as a sparse tag by grouping elements under sets
       result = mbImpl->tag_set_data(part_set_tag, &partNset, 1, &partnum); RR;
     }
