@@ -346,18 +346,8 @@ ErrorCode  ZoltanPartitioner::repartition(std::vector<double> & x,std::vector<do
   return MB_SUCCESS;
 }
 
-ErrorCode ZoltanPartitioner::partition_inferred_mesh(EntityHandle sfileset, int part_dim, const bool write_as_sets)
+ErrorCode ZoltanPartitioner::partition_inferred_mesh(EntityHandle sfileset, size_t num_parts, int part_dim, const bool write_as_sets)
 {
-  // Zoltan &zz,               // Zoltan class populated by a geometric
-                            // partition with parameter KEEP_CUTS=1
-  // int nCoords,              // Number of coordinates whose part 
-  //                           // assignment should be inferred
-  // double *x,                // x coordinates (length nCoords)
-  // double *y,                // y coordinates (length nCoords)
-  // double *z,                // z coordinates (length nCoords)
-  // int *part_assignments     // Output:  part assignments inferred for 
-                            // each coordinate (x_i,y_i,z_i) 
-                            // (length nCoords)
   ErrorCode result;
 
   moab::Range elverts;
@@ -405,10 +395,9 @@ ErrorCode ZoltanPartitioner::partition_inferred_mesh(EntityHandle sfileset, int 
       EntityHandle partNset;
       result = mbImpl->create_meshset ( moab::MESHSET_SET, partNset ); RR;
       result = mbImpl->add_entities(partNset, &partvec[0], partvec.size()); RR;
-      // result = mbImpl->add_entities(sfileset, partNset); RR;
       result = mbImpl->add_parent_child(sfileset, partNset); RR;
-      std::cout << "Part " << partnum << " contains " << partvec.size() << " elements \n";
-        // assign partitions as a sparse tag by grouping elements under sets
+      // std::cout << "Part " << partnum << " contains " << partvec.size() << " elements \n";
+      // assign partitions as a sparse tag by grouping elements under sets
       result = mbImpl->tag_set_data(part_set_tag, &partNset, 1, &partnum); RR;
     }
     else
@@ -418,6 +407,12 @@ ErrorCode ZoltanPartitioner::partition_inferred_mesh(EntityHandle sfileset, int 
       std::vector<int> assignment(partvec.size(), partnum); // initialize all values to partnum
       result = mbImpl->tag_set_data(part_set_tag, &partvec[0], partvec.size(), &assignment[0]); RR;
     }
+  }
+
+  if (part_assignments.size() != num_parts)
+  {
+    std::cout << "ERROR: The inference yielded lesser number of parts (" << part_assignments.size() 
+              << ") than requested by user (" << num_parts << ").\n";
   }
 
   return MB_SUCCESS;

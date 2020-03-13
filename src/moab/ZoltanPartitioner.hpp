@@ -128,6 +128,7 @@ using namespace moab;
     // given a processor assignment returned from Zoltan, use that to infer a partition
       // to generate processor assignment for a new MOAB mesh in specified fileset
     ErrorCode partition_inferred_mesh(EntityHandle sfileset, 
+                                      size_t num_parts, 
                                       int part_dim = 3,
                                       const bool write_as_sets = true);
 
