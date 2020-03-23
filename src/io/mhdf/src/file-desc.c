@@ -617,22 +617,23 @@ mhdf_getFileSummary( mhdf_FileHandle file_handle,
      * dirichlet sets
      *  to determine number of parts, etc
      *   this is needed for iMOAB and VisIt plugin */
-    ptr = realloc_data( &result, 5*sizeof(int), status );
+    const int NPRIMARY_SETS=5;
+    ptr = realloc_data( &result, NPRIMARY_SETS*sizeof(int), status );
     if (NULL==ptr || mhdf_isError( status )) {
       free( array );
       return NULL;
     }
     result ->numEntSets = ptr;
-    for (unsigned ii=0; ii < 5; ++ii) result->numEntSets[ii] = 0;
+    for (i=0; i < NPRIMARY_SETS; ++i) result->numEntSets[i] = 0;
 
-    ptr = realloc_data( &result, 5*sizeof(int*), status );
+    ptr = realloc_data( &result, NPRIMARY_SETS*sizeof(int*), status );
     if (NULL==ptr || mhdf_isError( status )) {
       free( array );
       return NULL;
     }
     result -> defTagsEntSets = ptr;
 
-    ptr = realloc_data( &result, 5*sizeof(int*), status );
+    ptr = realloc_data( &result, NPRIMARY_SETS*sizeof(int*), status );
     if (NULL==ptr || mhdf_isError( status )) {
       free( array );
       return NULL;
@@ -643,7 +644,7 @@ mhdf_getFileSummary( mhdf_FileHandle file_handle,
     for (i=0; i<numtags; i++)
     {
       tag_desc = &(result->tags[i]);
-      for (k=0; k<5; k++)  /* number of default tags to consider */
+      for (k=0; k<NPRIMARY_SETS; k++)  /* number of default tags to consider */
       {
         if (strcmp(pname[k],tag_desc->name)==0)
         {
