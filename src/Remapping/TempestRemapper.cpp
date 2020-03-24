@@ -192,17 +192,17 @@ ErrorCode TempestRemapper::ConvertTempestMesh ( Remapper::IntersectionContext ct
     if ( ctx == Remapper::SourceMesh )
     {
         if ( outputEnabled ) std::cout << "Converting (source) TempestRemap Mesh object to MOAB representation ...\n";
-        return convert_tempest_mesh_private ( m_source_type, m_source, m_source_set );
+        return convert_tempest_mesh_private ( m_source_type, m_source, m_source_set, m_source_entities, &m_source_vertices );
     }
     else if ( ctx == Remapper::TargetMesh )
     {
         if ( outputEnabled ) std::cout << "Converting (target) TempestRemap Mesh object to MOAB representation ...\n";
-        return convert_tempest_mesh_private ( m_target_type, m_target, m_target_set );
+        return convert_tempest_mesh_private ( m_target_type, m_target, m_target_set, m_target_entities, &m_target_vertices );
     }
     else if ( ctx != Remapper::DEFAULT )
     {
         if ( outputEnabled ) std::cout << "Converting (overlap) TempestRemap Mesh object to MOAB representation ...\n";
-        return convert_tempest_mesh_private ( m_overlap_type, m_overlap, m_overlap_set );
+        return convert_tempest_mesh_private ( m_overlap_type, m_overlap, m_overlap_set, m_overlap_entities, NULL );
     }
     else
     {
@@ -211,7 +211,7 @@ ErrorCode TempestRemapper::ConvertTempestMesh ( Remapper::IntersectionContext ct
 }
 
 
-ErrorCode TempestRemapper::convert_tempest_mesh_private ( TempestMeshType meshType, Mesh* mesh, EntityHandle& mesh_set )
+ErrorCode TempestRemapper::convert_tempest_mesh_private ( TempestMeshType meshType, Mesh* mesh, EntityHandle& mesh_set, Range& entities, Range* vertices )
 {
     ErrorCode rval;
 
@@ -225,8 +225,11 @@ ErrorCode TempestRemapper::convert_tempest_mesh_private ( TempestMeshType meshTy
     ReadUtilIface* iface;
     rval = m_interface->query_interface ( iface );MB_CHK_SET_ERR ( rval, "Can't get reader interface" );
 
+    Tag gidTag = m_interface->globalId_tag();
+
     // Set the data for the vertices
     std::vector<double*> arrays;
+    std::vector<int> gidsv ( nodes.size() );
     EntityHandle startv;
     rval = iface->get_node_coords ( 3, nodes.size(), 0, startv, arrays ); MB_CHK_SET_ERR ( rval, "Can't get node coords" );
     for ( unsigned iverts = 0; iverts < nodes.size(); ++iverts )
@@ -235,9 +238,14 @@ ErrorCode TempestRemapper::convert_tempest_mesh_private ( TempestMeshType meshTy
         arrays[0][iverts] = node.x;
         arrays[1][iverts] = node.y;
         arrays[2][iverts] = node.z;
+        gidsv[iverts] = iverts+1;
     }
     Range mbverts ( startv, startv + nodes.size() - 1 );
     rval = m_interface->add_entities ( mesh_set, mbverts );MB_CHK_SET_ERR ( rval, "Can't add entities" );
+    rval = m_interface->tag_set_data(gidTag, mbverts, &gidsv[0]);MB_CHK_SET_ERR ( rval, "Can't set global_id tag" );
+
+    gidsv.clear();
+    entities.clear();
 
 
     Tag srcParentTag, tgtParentTag;
@@ -304,6 +312,7 @@ ErrorCode TempestRemapper::convert_tempest_mesh_private ( TempestMeshType meshTy
               tgtParent.resize(mbcells.size(), -1);
             }
 
+            std::vector<int> gids ( typeNSeqs[iType].size() );
             for ( unsigned ifaces = 0, offset = 0; ifaces < typeNSeqs[iType].size(); ++ifaces )
             {
                 const int fIndex = typeNSeqs[iType][ifaces];
@@ -320,7 +329,9 @@ ErrorCode TempestRemapper::convert_tempest_mesh_private ( TempestMeshType meshTy
                   tgtParent[ifaces] = mesh->vecTargetFaceIx[fIndex]+1;
                 }
 
+                gids[ifaces] = typeNSeqs[iType][ifaces] + 1;
             }
+            rval = m_interface->tag_set_data(gidTag, mbcells, &gids[0]);MB_CHK_SET_ERR ( rval, "Can't set global_id tag" );
 
             if (meshType == OVERLAP_FILES)
             {
@@ -337,8 +348,12 @@ ErrorCode TempestRemapper::convert_tempest_mesh_private ( TempestMeshType meshTy
               rval = m_interface->tag_set_data(srcParentTag, mbcells, &srcParent[0]);MB_CHK_SET_ERR ( rval, "Can't set tag data" );
               rval = m_interface->tag_set_data(tgtParentTag, mbcells, &tgtParent[0]);MB_CHK_SET_ERR ( rval, "Can't set tag data" );
             }
+            entities.merge(mbcells);
         }
     }
+
+    if (vertices)
+      *vertices = mbverts;
 
     return MB_SUCCESS;
 }
@@ -515,7 +530,7 @@ moab::ErrorCode moab::TempestRemapper::GetOverlapAugmentedEntities (moab::Range&
         // rval = m_interface->remove_entities(m_overlap_set, sharedverts);MB_CHK_SET_ERR(rval, "Deleting entities dim 0 failed");
 
         sharedGhostEntities.merge(sharedents);
-        sharedGhostEntities.merge(sharedverts);
+        // sharedGhostEntities.merge(sharedverts);
     }
 #endif
     return moab::MB_SUCCESS;
@@ -531,21 +546,22 @@ ErrorCode TempestRemapper::convert_overlap_mesh_sorted_by_source()
     // Allocate for the overlap mesh
     if ( !m_overlap ) m_overlap = new Mesh();
 
-    std::vector<std::pair<int, int> > sorted_overlap_order ( m_overlap_entities.size() );
+    size_t n_overlap_entitites = m_overlap_entities.size();
+
+    std::vector<std::pair<int, int> > sorted_overlap_order ( n_overlap_entitites );
     {
         Tag srcParentTag, tgtParentTag;
         rval = m_interface->tag_get_handle ( "SourceParent", srcParentTag ); MB_CHK_ERR ( rval );
         rval = m_interface->tag_get_handle ( "TargetParent", tgtParentTag ); MB_CHK_ERR ( rval );
         // Overlap mesh: resize the source and target connection arrays
-        m_overlap->vecSourceFaceIx.resize ( m_overlap_entities.size() );
-        m_overlap->vecTargetFaceIx.resize ( m_overlap_entities.size() );
+        m_overlap->vecTargetFaceIx.resize ( n_overlap_entitites );
+        m_overlap->vecSourceFaceIx.resize ( n_overlap_entitites );
 
         // Overlap mesh: resize the source and target connection arrays
-        std::vector<int> rbids_src ( m_overlap_entities.size() ), rbids_tgt ( m_overlap_entities.size() );
-        std::vector<int> ghFlags;
+        std::vector<int> rbids_src ( n_overlap_entitites ), rbids_tgt ( n_overlap_entitites );
         rval = m_interface->tag_get_data ( srcParentTag,  m_overlap_entities, &rbids_src[0] ); MB_CHK_ERR ( rval );
         rval = m_interface->tag_get_data ( tgtParentTag,  m_overlap_entities, &rbids_tgt[0] ); MB_CHK_ERR ( rval );
-        for ( size_t ix = 0; ix < m_overlap_entities.size(); ++ix )
+        for ( size_t ix = 0; ix < n_overlap_entitites; ++ix )
         {
             sorted_overlap_order[ix].first = gid_to_lid_covsrc[rbids_src[ix]];
             sorted_overlap_order[ix].second = ix;
@@ -553,15 +569,16 @@ ErrorCode TempestRemapper::convert_overlap_mesh_sorted_by_source()
         std::sort ( sorted_overlap_order.begin(), sorted_overlap_order.end(), IntPairComparator );
         // sorted_overlap_order[ie].second , ie=0,nOverlap-1 is the order such that overlap elems are ordered by source parent
 
+        std::vector<int> ghFlags;
         if (is_parallel && size > 1)
         {
           Tag ghostTag;
-          ghFlags.resize(m_overlap_entities.size());
+          ghFlags.resize(n_overlap_entitites);
           rval = m_interface->tag_get_handle ( "ORIG_PROC", ghostTag ); MB_CHK_ERR ( rval );
           rval = m_interface->tag_get_data ( ghostTag,  m_overlap_entities, &ghFlags[0] ); MB_CHK_ERR ( rval );
 
         }
-        for ( unsigned ie = 0; ie < m_overlap_entities.size(); ++ie )
+        for ( unsigned ie = 0; ie < n_overlap_entitites; ++ie )
         {
             int ix = sorted_overlap_order[ie].second; // original index of the element
             m_overlap->vecSourceFaceIx[ie] = gid_to_lid_covsrc[rbids_src[ix]];
@@ -573,7 +590,7 @@ ErrorCode TempestRemapper::convert_overlap_mesh_sorted_by_source()
     }
 
     FaceVector& faces = m_overlap->faces;
-    faces.resize ( m_overlap_entities.size() );
+    faces.resize ( n_overlap_entitites );
 
     Range verts;
     // let us now get the vertices from all the elements
@@ -584,7 +601,7 @@ ErrorCode TempestRemapper::convert_overlap_mesh_sorted_by_source()
     bool useRange = true;
     if (verts.compactness() > 0.01) {
         int j=0;
-        for (Range::iterator it=verts.begin(); it!=verts.end(); it++)
+        for (Range::iterator it=verts.begin(); it!=verts.end(); ++it)
           indxMap[*it]=j++;
         useRange = false;
     }

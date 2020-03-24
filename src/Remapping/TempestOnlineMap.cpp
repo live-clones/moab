@@ -1495,7 +1495,7 @@ int moab::TempestOnlineMap::IsConservative (double dTolerance)
             rcount[ir] = nElementsInProc[ir*nDATA+1];
             gsum += rcount[ir];
 
-            printf("%d: nTotColumns: %d, Displs: %d, rcount: %d, gsum = %d\n", ir, nTotColumns, displs[ir], rcount[ir], gsum);
+            // printf("%d: nTotColumns: %d, Displs: %d, rcount: %d, gsum = %d\n", ir, nTotColumns, displs[ir], rcount[ir], gsum);
         }
 
         dColumnIndices.resize ( nTotColumns, -1 );

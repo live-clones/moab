@@ -244,7 +244,7 @@ private:
 
     moab::ErrorCode convert_mesh_to_tempest_private(Mesh* mesh, moab::EntityHandle meshset, moab::Range& entities, moab::Range* pverts);
 
-    moab::ErrorCode convert_tempest_mesh_private(TempestMeshType type, Mesh* mesh, moab::EntityHandle& meshset);
+    moab::ErrorCode convert_tempest_mesh_private(TempestMeshType type, Mesh* mesh, moab::EntityHandle& meshset, moab::Range& entities, moab::Range* vertices);
 
     moab::ErrorCode augment_overlap_set();
 

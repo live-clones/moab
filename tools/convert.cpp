@@ -346,6 +346,9 @@ int main(int argc, char* argv[])
       return USAGE_ERROR;
     }
   }
+
+  Tag id_tag = gMB->globalId_tag();
+
     // Read the input file.
 #ifdef MOAB_HAVE_TEMPESTREMAP
   if (tempestin && in.size()>1)
@@ -370,7 +373,7 @@ int main(int argc, char* argv[])
     reset_times();
 
 #ifdef MOAB_HAVE_TEMPESTREMAP
-    remapper->meshValidate = true;
+    remapper->meshValidate = false;
     //remapper->constructEdgeMap = true;
     remapper->initialize();
 
@@ -385,6 +388,36 @@ int main(int argc, char* argv[])
 
       // Load the meshes and validate
       result = remapper->ConvertTempestMesh(moab::Remapper::SourceMesh);
+
+      const size_t nOverlapFaces = tempestMesh->faces.size();
+      if (tempestMesh->vecSourceFaceIx.size() == nOverlapFaces && tempestMesh->vecSourceFaceIx.size() == nOverlapFaces)
+      {
+        int defaultInt = -1;
+        use_overlap_context = true;
+        // Check if our MOAB mesh has RED and BLUE tags; this would indicate we are converting an overlap grid
+        result = gMB->tag_get_handle("TargetParent", 1, MB_TYPE_INTEGER, tgtParentTag,
+            MB_TAG_DENSE | MB_TAG_CREAT, &defaultInt);MB_CHK_SET_ERR(result, "can't create target parent tag");
+
+        result = gMB->tag_get_handle("SourceParent", 1, MB_TYPE_INTEGER, srcParentTag,
+            MB_TAG_DENSE | MB_TAG_CREAT, &defaultInt);MB_CHK_SET_ERR(result, "can't create source parent tag");
+
+        const Range& faces = remapper->GetMeshEntities(moab::Remapper::SourceMesh);
+
+        std::vector<int> gids(faces.size()), srcpar(faces.size()), tgtpar(faces.size());
+        result = gMB->tag_get_data(id_tag, faces, &gids[0]);MB_CHK_ERR ( result );
+
+        for (unsigned ii = 0; ii < faces.size(); ++ii) {
+          srcpar[ii] = tempestMesh->vecSourceFaceIx[gids[ii]-1];
+          tgtpar[ii] = tempestMesh->vecTargetFaceIx[gids[ii]-1];
+        }
+
+        result = gMB->tag_set_data ( srcParentTag, faces, &srcpar[0] ); MB_CHK_ERR ( result );
+        result = gMB->tag_set_data ( tgtParentTag, faces, &tgtpar[0] ); MB_CHK_ERR ( result );
+
+        srcpar.clear();
+        tgtpar.clear();
+        gids.clear();
+      }
     }
     else if (tempestout)
     {
@@ -401,6 +434,10 @@ int main(int argc, char* argv[])
       {
         use_overlap_context = true;
         ovmesh = srcmesh;
+
+        Tag countTag;
+        result = gMB->tag_get_handle ( "Counting", countTag );
+        // std::vector<int> count_ids()
 
         // Load the meshes and validate
         Tag order;
@@ -451,10 +488,9 @@ int main(int argc, char* argv[])
   bool have_sets = have_geom;
 
     // Get geometry tags
-  Tag dim_tag, id_tag;
+  Tag dim_tag;
   if (have_geom)
   {
-    id_tag = gMB->globalId_tag();
     if (id_tag == 0)
     {
       std::cerr << "No ID tag defined."  << std::endl;
@@ -655,7 +691,7 @@ int main(int argc, char* argv[])
   std::vector<int> gids(faces.size());
   result = gMB->tag_get_data(gidTag, faces, &gids[0]);MB_CHK_ERR(result);
 
-  if (faces.size() > 1 && gids[0] == gids[1]) {
+  if (faces.size() > 1 && gids[0] == gids[1] && !use_overlap_context) {
 #ifdef MOAB_HAVE_MPI
     result = pcomm->assign_global_ids(srcmesh, 2, 1, false);MB_CHK_ERR(result);
 #else
@@ -681,14 +717,8 @@ int main(int argc, char* argv[])
       tempestMesh->vecTargetFaceIx.resize ( nOverlapFaces ); // 0-based indices corresponding to target mesh
       result = gMB->tag_get_data ( srcParentTag,  faces, &tempestMesh->vecSourceFaceIx[0] ); MB_CHK_ERR ( result );
       result = gMB->tag_get_data ( tgtParentTag,  faces, &tempestMesh->vecTargetFaceIx[0] ); MB_CHK_ERR ( result );
-      for (int ie = 0; ie < nOverlapFaces; ++ie)
-      {
-        // Our element Global IDs are 1-based
-        tempestMesh->vecSourceFaceIx[ie]--;
-        tempestMesh->vecTargetFaceIx[ie]--;
-      }
     }
-   // Write out the mesh using TempestRemap
+    // Write out the mesh using TempestRemap
     tempestMesh->Write(out, NcFile::Netcdf4);
   }
   else {
