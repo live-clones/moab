@@ -25,288 +25,6 @@
 
 using namespace moab;
 
-#if 0
-void WriteNetCDF4(
-  const std::string & scripfile,
-  const std::map<std::string, std::string> & mapAttributes,
-  NcFile::FileFormat eOutputFormat
-) {
-  // Temporarily change rval reporting
-  NcError error_temp(NcError::verbose_fatal);
-
-  // Open an output file
-  NcFile ncMap(scripfile.c_str(), NcFile::Replace, NULL, 0, eOutputFormat);
-  if (!ncMap.is_valid()) {
-    _EXCEPTION1("Unable to open output map file \"%s\"",
-      scripfile.c_str());
-  }
-
-  // Attributes
-  ncMap.add_att("Title", "TempestRemap Offline Regridding Weight Generator");
-
-  // Map dimensions
-  int nA = (int)(m_dSourceAreas.GetRows());
-  int nB = (int)(m_dTargetAreas.GetRows());
-
-  // Write output dimensions entries
-  int nSrcGridDims = (int)(m_vecSourceDimSizes.size());
-  int nDstGridDims = (int)(m_vecTargetDimSizes.size());
-
-  NcDim * dimSrcGridRank = ncMap.add_dim("src_grid_rank", nSrcGridDims);
-  NcDim * dimDstGridRank = ncMap.add_dim("dst_grid_rank", nDstGridDims);
-
-  NcVar * varSrcGridDims =
-    ncMap.add_var("src_grid_dims", ncInt, dimSrcGridRank);
-  NcVar * varDstGridDims =
-    ncMap.add_var("dst_grid_dims", ncInt, dimDstGridRank);
-
-  char szDim[64];
-  if ((nSrcGridDims == 1) && (m_vecSourceDimSizes[0] != nA)) {
-    varSrcGridDims->put(&nA, 1);
-    varSrcGridDims->add_att("name0", "num_dof");
-
-  } else {
-    for (int i = 0; i < m_vecSourceDimSizes.size(); i++) {
-      varSrcGridDims->set_cur(nSrcGridDims - i - 1);
-      varSrcGridDims->put(&(m_vecSourceDimSizes[i]), 1);
-    }
-
-    for (int i = 0; i < m_vecSourceDimSizes.size(); i++) {
-      sprintf(szDim, "name%i", i);
-      varSrcGridDims->add_att(szDim,
-        m_vecSourceDimNames[nSrcGridDims - i - 1].c_str());
-    }
-  }
-
-  if ((nDstGridDims == 1) && (m_vecTargetDimSizes[0] != nB)) {
-    varDstGridDims->put(&nB, 1);
-    varDstGridDims->add_att("name0", "num_dof");
-
-  } else {
-    for (int i = 0; i < m_vecTargetDimSizes.size(); i++) {
-      varDstGridDims->set_cur(nDstGridDims - i - 1);
-      varDstGridDims->put(&(m_vecTargetDimSizes[i]), 1);
-    }
-
-    for (int i = 0; i < m_vecTargetDimSizes.size(); i++) {
-      sprintf(szDim, "name%i", i);
-      varDstGridDims->add_att(szDim,
-        m_vecTargetDimNames[nDstGridDims - i - 1].c_str());
-    }
-  }
-
-  // Source and Target mesh resolutions
-  NcDim * dimNA = ncMap.add_dim("n_a", nA);
-  NcDim * dimNB = ncMap.add_dim("n_b", nB);
-
-  // Number of nodes per Face
-  int nSourceNodesPerFace = m_dSourceVertexLon.GetColumns();
-  int nTargetNodesPerFace = m_dTargetVertexLon.GetColumns();
-
-  NcDim * dimNVA = ncMap.add_dim("nv_a", nSourceNodesPerFace);
-  NcDim * dimNVB = ncMap.add_dim("nv_b", nTargetNodesPerFace);
-
-  // Write coordinates
-  NcVar * varYCA = ncMap.add_var("yc_a", ncDouble, dimNA);
-  NcVar * varYCB = ncMap.add_var("yc_b", ncDouble, dimNB);
-
-  NcVar * varXCA = ncMap.add_var("xc_a", ncDouble, dimNA);
-  NcVar * varXCB = ncMap.add_var("xc_b", ncDouble, dimNB);
-
-  NcVar * varYVA = ncMap.add_var("yv_a", ncDouble, dimNA, dimNVA);
-  NcVar * varYVB = ncMap.add_var("yv_b", ncDouble, dimNB, dimNVB);
-
-  NcVar * varXVA = ncMap.add_var("xv_a", ncDouble, dimNA, dimNVA);
-  NcVar * varXVB = ncMap.add_var("xv_b", ncDouble, dimNB, dimNVB);
-
-  varYCA->add_att("units", "degrees");
-  varYCB->add_att("units", "degrees");
-
-  varXCA->add_att("units", "degrees");
-  varXCB->add_att("units", "degrees");
-
-  varYVA->add_att("units", "degrees");
-  varYVB->add_att("units", "degrees");
-
-  varXVA->add_att("units", "degrees");
-  varXVB->add_att("units", "degrees");
-
-  // Verify dimensionality
-  if (m_dSourceCenterLon.GetRows() != nA) {
-    _EXCEPTIONT("Mismatch between m_dSourceCenterLon and nA");
-  }
-  if (m_dSourceCenterLat.GetRows() != nA) {
-    _EXCEPTIONT("Mismatch between m_dSourceCenterLat and nA");
-  }
-  if (m_dTargetCenterLon.GetRows() != nB) {
-    _EXCEPTIONT("Mismatch between m_dTargetCenterLon and nB");
-  }
-  if (m_dTargetCenterLat.GetRows() != nB) {
-    _EXCEPTIONT("Mismatch between m_dTargetCenterLat and nB");
-  }
-  if (m_dSourceVertexLon.GetRows() != nA) {
-    _EXCEPTIONT("Mismatch between m_dSourceVertexLon and nA");
-  }
-  if (m_dSourceVertexLat.GetRows() != nA) {
-    _EXCEPTIONT("Mismatch between m_dSourceVertexLat and nA");
-  }
-  if (m_dTargetVertexLon.GetRows() != nB) {
-    _EXCEPTIONT("Mismatch between m_dTargetVertexLon and nB");
-  }
-  if (m_dTargetVertexLat.GetRows() != nB) {
-    _EXCEPTIONT("Mismatch between m_dTargetVertexLat and nB");
-  }
-
-  varYCA->put(&(m_dSourceCenterLat[0]), nA);
-  varYCB->put(&(m_dTargetCenterLat[0]), nB);
-
-  varXCA->put(&(m_dSourceCenterLon[0]), nA);
-  varXCB->put(&(m_dTargetCenterLon[0]), nB);
-
-  varYVA->put(&(m_dSourceVertexLat[0][0]), nA, nSourceNodesPerFace);
-  varYVB->put(&(m_dTargetVertexLat[0][0]), nB, nTargetNodesPerFace);
-
-  varXVA->put(&(m_dSourceVertexLon[0][0]), nA, nSourceNodesPerFace);
-  varXVB->put(&(m_dTargetVertexLon[0][0]), nB, nTargetNodesPerFace);
-
-  // Write vector centers
-  if ((m_dVectorTargetCenterLat.GetRows() != 0) &&
-    (m_dVectorTargetCenterLon.GetRows() != 0)
-  ) {
-    NcDim * dimLatB =
-      ncMap.add_dim("lat_b", m_dVectorTargetCenterLat.GetRows());
-    NcDim * dimLonB =
-      ncMap.add_dim("lon_b", m_dVectorTargetCenterLon.GetRows());
-
-    NcVar * varLatCB = ncMap.add_var("latc_b", ncDouble, dimLatB);
-    NcVar * varLonCB = ncMap.add_var("lonc_b", ncDouble, dimLonB);
-
-    varLatCB->put(&(m_dVectorTargetCenterLat[0]), dimLatB->size());
-    varLonCB->put(&(m_dVectorTargetCenterLon[0]), dimLonB->size());
-
-    NcDim * dimBounds = ncMap.add_dim("bnds", 2);
-    NcVar * varLatBounds =
-      ncMap.add_var("lat_bnds", ncDouble, dimLatB, dimBounds);
-    NcVar * varLonBounds =
-      ncMap.add_var("lon_bnds", ncDouble, dimLonB, dimBounds);
-
-    varLatBounds->put(&(m_dVectorTargetBoundsLat[0][0]),
-      m_dVectorTargetBoundsLat.GetRows(), 2);
-    varLonBounds->put(&(m_dVectorTargetBoundsLon[0][0]),
-      m_dVectorTargetBoundsLon.GetRows(), 2);
-  }
-
-  // Write areas
-  NcVar * varAreaA = ncMap.add_var("area_a", ncDouble, dimNA);
-  varAreaA->put(&(m_dSourceAreas[0]), nA);
-  varAreaA->add_att("units", "steradians");
-
-  NcVar * varAreaB = ncMap.add_var("area_b", ncDouble, dimNB);
-  varAreaB->put(&(m_dTargetAreas[0]), nB);
-  varAreaB->add_att("units", "steradians");
-
-  // Write masks
-  if (m_iSourceMask.IsAttached()) {
-    NcVar * varMaskA = ncMap.add_var("mask_a", ncInt, dimNA);
-    varMaskA->put(&(m_iSourceMask[0]), nA);
-    varMaskA->add_att("units", "unitless");
-
-    if (!m_iTargetMask.IsAttached()) {
-      NcVar * varMaskB = ncMap.add_var("mask_b", ncInt, dimNB);
-      DataArray1D<int> iTargetMaskTemp(nB);
-      for (int i = 0; i < nB; i++) {
-        iTargetMaskTemp[i] = 1;
-      }
-      varMaskB->put(&(iTargetMaskTemp[0]), nB);
-      varMaskB->add_att("units", "unitless");
-    }
-  }
-
-  if (m_iTargetMask.IsAttached()) {
-    if (!m_iSourceMask.IsAttached()) {
-      NcVar * varMaskA = ncMap.add_var("mask_a", ncInt, dimNA);
-      DataArray1D<int> iSourceMaskTemp(nA);
-      for (int i = 0; i < nA; i++) {
-        iSourceMaskTemp[i] = 1;
-      }
-      varMaskA->put(&(iSourceMaskTemp[0]), nA);
-      varMaskA->add_att("units", "unitless");
-    }
-
-    NcVar * varMaskB = ncMap.add_var("mask_b", ncInt, dimNB);
-    varMaskB->put(&(m_iTargetMask[0]), nB);
-    varMaskB->add_att("units", "unitless");
-  }
-
-  // Write SparseMatrix entries
-  DataArray1D<int> vecRow;
-  DataArray1D<int> vecCol;
-  DataArray1D<double> vecS;
-
-  m_mapRemap.GetEntries(vecRow, vecCol, vecS);
-
-  // Calculate and write fractional coverage arrays
-  {
-    DataArray1D<double> dFracA(nA);
-    DataArray1D<double> dFracB(nB);
-  
-    for (int i = 0; i < vecS.GetRows(); i++) {
-      dFracA[vecCol[i]] += vecS[i] / m_dSourceAreas[vecCol[i]] * m_dTargetAreas[vecRow[i]];
-      dFracB[vecRow[i]] += vecS[i];
-    }
-
-    NcVar * varFracA = ncMap.add_var("frac_a", ncDouble, dimNA);
-    varFracA->put(&(dFracA[0]), nA);
-    varFracA->add_att("name", "fraction of target coverage of source dof");
-    varFracA->add_att("units", "unitless");
-
-    NcVar * varFracB = ncMap.add_var("frac_b", ncDouble, dimNB);
-    varFracB->put(&(dFracB[0]), nB);
-    varFracB->add_att("name", "fraction of source coverage of target dof");
-    varFracB->add_att("units", "unitless");
-  }
-
-  // Increment vecRow and vecCol
-  for (int i = 0; i < vecRow.GetRows(); i++) {
-    vecRow[i]++;
-    vecCol[i]++;
-  }
-
-  // Write out data
-  int nS = vecRow.GetRows();
-  NcDim * dimNS = ncMap.add_dim("n_s", nS);
-
-  NcVar * varRow = ncMap.add_var("row", ncInt, dimNS);
-  varRow->add_att("name", "sparse matrix target dof index");
-  varRow->add_att("first_index", "1");
-
-  NcVar * varCol = ncMap.add_var("col", ncInt, dimNS);
-  varCol->add_att("name", "sparse matrix source dof index");
-  varCol->add_att("first_index", "1");
-
-  NcVar * varS = ncMap.add_var("S", ncDouble, dimNS);
-  varS->add_att("name", "sparse matrix coefficient");
-
-  varRow->set_cur((long)0);
-  varRow->put(&(vecRow[0]), nS);
-
-  varCol->set_cur((long)0);
-  varCol->put(&(vecCol[0]), nS);
-
-  varS->set_cur((long)0);
-  varS->put(&(vecS[0]), nS);
-
-  // Add global attributes
-  std::map<std::string, std::string>::const_iterator iterAttributes =
-    mapAttributes.begin();
-  for (; iterAttributes != mapAttributes.end(); iterAttributes++) {
-    ncMap.add_att(
-      iterAttributes->first.c_str(),
-      iterAttributes->second.c_str());
-  }
-}
-#endif
-
 template<typename T>
 ErrorCode get_vartag_data(moab::Interface* mbCore, Tag tag, moab::Range& sets, int& out_data_size, std::vector<T>& data)
 {
@@ -525,9 +243,12 @@ int main(int argc, char* argv[])
     rval = get_vartag_data(mbCore, srcAreaTag, sets, srcArea_size, src_areas);MB_CHK_SET_ERR(rval, "Getting source mesh areas failed");
     rval = get_vartag_data(mbCore, tgtAreaTag, sets, tgtArea_size, tgt_areas);MB_CHK_SET_ERR(rval, "Getting target mesh areas failed");
 
+    assert(srcArea_size == srcID_size);
+    assert(tgtArea_size == tgtID_size);
+
     std::vector<double> src_glob_areas(nDofA, 0.0), tgt_glob_areas(nDofB, 0.0);
     for (int i=0; i < srcArea_size; ++i) {
-        // std::cout << "Found ID = " << src_gids[i] << " and area = " << src_areas[i] << std::endl;
+        std::cout << "Found ID = " << src_gids[i] << " and area = " << src_areas[i] << std::endl;
         assert(i < srcID_size);
         assert(src_gids[i] < nDofA);
         if (src_areas[i] > src_glob_areas[src_gids[i]])
@@ -672,6 +393,7 @@ int main(int argc, char* argv[])
             const int boffset = src_elem_ordering[vIndex]*nva;
             for (int vNV = 0; vNV < nva; ++vNV, ++offset)
             {
+              assert(offset < srcvertex_size);
               src_glob_vertexlat[boffset+vNV] = src_vertexlat[offset];
               src_glob_vertexlon[boffset+vNV] = src_vertexlon[offset];
             }
@@ -691,6 +413,7 @@ int main(int argc, char* argv[])
           const int boffset = tgt_elem_ordering[vIndex]*nvb;
           for (int vNV = 0; vNV < nvb; ++vNV, ++offset)
           {
+            assert(offset < tgtvertex_size);
             tgt_glob_vertexlat[boffset+vNV] = tgt_vertexlat[offset];
             tgt_glob_vertexlon[boffset+vNV] = tgt_vertexlon[offset];
           }
