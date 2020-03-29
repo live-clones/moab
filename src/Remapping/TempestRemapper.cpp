@@ -255,10 +255,10 @@ ErrorCode TempestRemapper::convert_tempest_mesh_private ( TempestMeshType meshTy
     if (storeParentInfo)
     {
       int defaultInt = -1;
-      rval = m_interface->tag_get_handle("RedParent", 1, MB_TYPE_INTEGER, tgtParentTag,
+      rval = m_interface->tag_get_handle("TargetParent", 1, MB_TYPE_INTEGER, tgtParentTag,
             MB_TAG_DENSE | MB_TAG_CREAT, &defaultInt);MB_CHK_SET_ERR(rval, "can't create positive tag");
 
-        rval = m_interface->tag_get_handle("BlueParent", 1, MB_TYPE_INTEGER, srcParentTag,
+        rval = m_interface->tag_get_handle("SourceParent", 1, MB_TYPE_INTEGER, srcParentTag,
             MB_TAG_DENSE | MB_TAG_CREAT, &defaultInt);MB_CHK_SET_ERR(rval, "can't create negative tag");
     }
 
@@ -563,7 +563,7 @@ ErrorCode TempestRemapper::convert_overlap_mesh_sorted_by_source()
         rval = m_interface->tag_get_data ( tgtParentTag,  m_overlap_entities, &rbids_tgt[0] ); MB_CHK_ERR ( rval );
         for ( size_t ix = 0; ix < n_overlap_entitites; ++ix )
         {
-            sorted_overlap_order[ix].first = gid_to_lid_covsrc[rbids_src[ix]];
+            sorted_overlap_order[ix].first = (gid_to_lid_covsrc.size() ? gid_to_lid_covsrc[rbids_src[ix]] : rbids_src[ix]);
             sorted_overlap_order[ix].second = ix;
         }
         std::sort ( sorted_overlap_order.begin(), sorted_overlap_order.end(), IntPairComparator );
@@ -581,11 +581,11 @@ ErrorCode TempestRemapper::convert_overlap_mesh_sorted_by_source()
         for ( unsigned ie = 0; ie < n_overlap_entitites; ++ie )
         {
             int ix = sorted_overlap_order[ie].second; // original index of the element
-            m_overlap->vecSourceFaceIx[ie] = gid_to_lid_covsrc[rbids_src[ix]];
+            m_overlap->vecSourceFaceIx[ie] = (gid_to_lid_covsrc.size() ? gid_to_lid_covsrc[rbids_src[ix]] : rbids_src[ix]-1);
             if (is_parallel && size > 1 && ghFlags[ix]>=0) // it means it is a ghost overlap element
               m_overlap->vecTargetFaceIx[ie]=-1; // this should not participate in smat!
             else
-              m_overlap->vecTargetFaceIx[ie] = gid_to_lid_tgt[rbids_tgt[ix]];
+              m_overlap->vecTargetFaceIx[ie] = (gid_to_lid_tgt.size() ? gid_to_lid_tgt[rbids_tgt[ix]] : rbids_tgt[ix]-1);
         }
     }
 

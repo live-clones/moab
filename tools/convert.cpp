@@ -709,7 +709,7 @@ int main(int argc, char* argv[])
 
   if (tempestout) {
     // Check if our MOAB mesh has RED and BLUE tags; this would indicate we are converting an overlap grid
-    if (use_overlap_context)
+    if (use_overlap_context && false)
     {
       const int nOverlapFaces = faces.size();
       // Overlap mesh: resize the source and target connection arrays
