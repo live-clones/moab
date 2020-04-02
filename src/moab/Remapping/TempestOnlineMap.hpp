@@ -231,17 +231,6 @@ private:
 #endif
 
 public:
-#ifdef MOAB_HAVE_EIGEN
-
-	typedef Eigen::Matrix< double, 1, Eigen::Dynamic > WeightDRowVector;
-	typedef Eigen::Matrix< double, Eigen::Dynamic, 1 > WeightDColVector;
-	typedef Eigen::SparseVector<double> WeightSVector;
-	typedef Eigen::SparseMatrix<double, Eigen::RowMajor> WeightRMatrix;
-	typedef Eigen::SparseMatrix<double, Eigen::ColMajor> WeightCMatrix;
-
-	typedef WeightDRowVector WeightRowVector;
-	typedef WeightDColVector WeightColVector;
-	typedef WeightRMatrix WeightMatrix;
 
 	///	<summary>
 	///		Store the tag names associated with global DoF ids for source and target meshes
@@ -259,6 +248,18 @@ public:
 		DiscretizationType destType, bool isDestContinuous, 
 		DataArray3D<int>* tgtdataGLLNodes);
 
+#ifdef MOAB_HAVE_EIGEN
+
+	typedef Eigen::Matrix< double, 1, Eigen::Dynamic > WeightDRowVector;
+	typedef Eigen::Matrix< double, Eigen::Dynamic, 1 > WeightDColVector;
+	typedef Eigen::SparseVector<double> WeightSVector;
+	typedef Eigen::SparseMatrix<double, Eigen::RowMajor> WeightRMatrix;
+	typedef Eigen::SparseMatrix<double, Eigen::ColMajor> WeightCMatrix;
+
+	typedef WeightDRowVector WeightRowVector;
+	typedef WeightDColVector WeightColVector;
+	typedef WeightRMatrix WeightMatrix;
+
 	///	<summary>
 	///		Get the raw reference to the Eigen weight matrix representing the projection from source to destination mesh.
 	///	</summary>
@@ -274,7 +275,9 @@ public:
 	///	</summary>
 	WeightColVector& GetColVector();
 
-  ///	<summary>
+#endif
+
+	///	<summary>
 	///		Get the number of total Degrees-Of-Freedom defined on the source mesh.
 	///	</summary>
 	int GetSourceGlobalNDofs();
@@ -315,11 +318,18 @@ public:
     int GetColGlobalDoF(int localID) const;
 
 	///	<summary>
-	///		Apply the weight matrix onto the source vector provided as input, and return the column vector (solution projection) after the application 
-	///     Compute:        \p tgtVals = A * \srcVals, or 
-	///     if (transpose)  \p tgtVals = A^T * \srcVals
+	///		Apply the weight matrix onto the source vector provided as input, and return the column vector (solution projection) after the map application
+	///     Compute:        \p tgtVals = A(S->T) * \srcVals, or
+	///     if (transpose)  \p tgtVals = [A(T->S)]^T * \srcVals
 	///	</summary>
 	moab::ErrorCode ApplyWeights (std::vector<double>& srcVals, std::vector<double>& tgtVals, bool transpose=false);
+
+	///	<summary>
+	///		Apply the weight matrix onto the source vector (tag) provided as input, and return the column vector (solution projection) in a tag, after the map application
+	///     Compute:        \p tgtVals = A(S->T) * \srcVals, or
+	///     if (transpose)  \p tgtVals = [A(T->S)]^T * \srcVals
+	///	</summary>
+	moab::ErrorCode ApplyWeights (  moab::Tag srcSolutionTag, moab::Tag tgtSolutionTag, bool transpose=false );
 
 	///	<summary>
 	///		Parallel I/O with NetCDF to write out the SCRIP file from multiple processors.
@@ -331,7 +341,23 @@ public:
 	///	</summary>
 	moab::ErrorCode WriteParallelMap (std::string strOutputFile) const;
 
-#endif
+    typedef double (*sample_function)(double, double);
+
+    /// <summary>
+    ///     Define an analytical solution over the given (source or target) mesh, as specificed in the context.
+    ///     This routine will define a tag that is compatible with the specified discretization method type and order
+    ///     and sample the solution exactly using the analytical function provided by the user.
+    /// </summary>
+    moab::ErrorCode DefineAnalyticalSolution ( moab::Tag& exactSolnTag, const std::string& solnName, Remapper::IntersectionContext ctx, 
+                                                sample_function testFunction,
+                                                moab::Tag* clonedSolnTag=NULL,
+                                                std::string cloneSolnName="");
+
+    /// <summary>
+    ///     Compute the error between a sampled (exact) solution and a projected solution in various error norms.
+    /// </summary>
+	moab::ErrorCode ComputeMetrics ( Remapper::IntersectionContext ctx, moab::Tag& exactTag, moab::Tag& approxTag, 
+									 std::map<std::string, double>& metrics, bool verbose = true );
 
 public:
 
