@@ -330,7 +330,7 @@ public:
 	///	<summary>
 	///		Parallel I/O with HDF5 to write out the remapping weights from multiple processors.
 	///	</summary>
-	moab::ErrorCode WriteParallelMap (std::string strOutputFile) const;
+	moab::ErrorCode WriteParallelMap (std::string strOutputFile);
 
     typedef double (*sample_function)(double, double);
 
