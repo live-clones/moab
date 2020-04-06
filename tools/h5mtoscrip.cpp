@@ -248,7 +248,7 @@ int main(int argc, char* argv[])
 
     std::vector<double> src_glob_areas(nDofA, 0.0), tgt_glob_areas(nDofB, 0.0);
     for (int i=0; i < srcArea_size; ++i) {
-        std::cout << "Found ID = " << src_gids[i] << " and area = " << src_areas[i] << std::endl;
+        // std::cout << "Found ID = " << src_gids[i] << " and area = " << src_areas[i] << std::endl;
         assert(i < srcID_size);
         assert(src_gids[i] < nDofA);
         if (src_areas[i] > src_glob_areas[src_gids[i]])
@@ -338,17 +338,15 @@ int main(int argc, char* argv[])
       rval = get_vartag_data(mbCore, srcCenterLat, sets, srccenter_size, src_centerlat);MB_CHK_SET_ERR(rval, "Getting source mesh areas failed");
       rval = get_vartag_data(mbCore, srcCenterLon, sets, srccenter_size, src_centerlon);MB_CHK_SET_ERR(rval, "Getting target mesh areas failed");
       std::vector<double> src_glob_centerlat(nDofA, 0.0), src_glob_centerlon(nDofA, 0.0);
+
       std::vector<int> src_elem_ordering;
       for (int i=0; i < srccenter_size; ++i) {
           assert(i < srcID_size);
           assert(src_gids[i] < nDofA);
 
           src_elem_ordering.push_back(src_gids[i]);
-          if (src_centerlat[i] > src_glob_centerlat[src_gids[i]] || src_centerlon[i] > src_glob_centerlon[src_gids[i]])
-          {
-            src_glob_centerlat[src_gids[i]] = src_centerlat[i];
-            src_glob_centerlon[src_gids[i]] = src_centerlon[i];
-          }
+          src_glob_centerlat[src_gids[i]] = src_centerlat[i];
+          src_glob_centerlon[src_gids[i]] = src_centerlon[i];
       }
 
       std::vector<double> tgt_centerlat, tgt_centerlon;
@@ -362,11 +360,8 @@ int main(int argc, char* argv[])
           assert(tgt_gids[i] < nDofB);
 
           tgt_elem_ordering.push_back(tgt_gids[i]);
-          if (tgt_centerlat[i] > tgt_glob_centerlat[tgt_gids[i]] || tgt_centerlon[i] > tgt_glob_centerlon[tgt_gids[i]])
-          {
-            tgt_glob_centerlat[tgt_gids[i]] = tgt_centerlat[i];
-            tgt_glob_centerlon[tgt_gids[i]] = tgt_centerlon[i];
-          }
+          tgt_glob_centerlat[tgt_gids[i]] = tgt_centerlat[i];
+          tgt_glob_centerlon[tgt_gids[i]] = tgt_centerlon[i];
       }
 
       varYCA->put(&(src_glob_centerlat[0]), nDofA);
@@ -378,7 +373,6 @@ int main(int argc, char* argv[])
       src_centerlon.clear();
       tgt_centerlat.clear();
       tgt_centerlon.clear();
-      // std::cout << "Source mesh = " << source_mesh << " and target_mesh = " << target_mesh << " and overlap_mesh = " << overlap_mesh << std::endl;
 
       std::vector<double> src_glob_vertexlat(nDofA*nva, 0.0), src_glob_vertexlon(nDofA*nva, 0.0);
       if (nva > 1)
@@ -447,7 +441,6 @@ int main(int argc, char* argv[])
     assert(val_sizes == NNZ);
 
     // Let us form the matrix in-memory and consolidate shared DoF rows from shared-process contributions
-    // SparseMatrix<double> mapMatrix(nDofB, nDofA);
     SparseMatrix<double> mapMatrix;
 
     for (int innz = 0; innz < NNZ; ++innz)

@@ -1041,9 +1041,7 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
                         dataGLLJacobianSrc );
                 }
             }
-            else { /* Source is a point cloud dataset */
-
-            }
+            // else { /* Source is a point cloud dataset */ }
 
             if (!m_bPointCloudTarget)
             {
@@ -1066,9 +1064,7 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
                         dataGLLJacobian );
                 }
             }
-            else { /* Target is a point cloud dataset */
-
-            }
+            // else { /* Target is a point cloud dataset */ }
 
             // Finite volume input / Finite element output
             rval = this->SetDOFmapAssociation(eInputType, (eInputType == DiscretizationType_CGLL), 
@@ -1132,8 +1128,6 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
             // Initialize coordinates for map
             this->InitializeSourceCoordinatesFromMeshFE (
                 *m_meshInputCov, nPin, dataGLLNodesSrcCov );
-            this->InitializeSourceCoordinatesFromMeshFE (
-                *m_meshInput, nPin, dataGLLNodesSrc );
             this->InitializeTargetCoordinatesFromMeshFV ( *m_meshOutput );
 
             // Generate the continuous Jacobian for input mesh
@@ -1239,8 +1233,6 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
             // Initialize coordinates for map
             this->InitializeSourceCoordinatesFromMeshFE (
                 *m_meshInputCov, nPin, dataGLLNodesSrcCov );
-            this->InitializeSourceCoordinatesFromMeshFE (
-                *m_meshInput, nPin, dataGLLNodesSrc );
             this->InitializeTargetCoordinatesFromMeshFE (
                 *m_meshOutput, nPout, dataGLLNodesDest );
 
@@ -1308,13 +1300,6 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights ( std::string s
 #ifdef MOAB_HAVE_EIGEN
         copy_tempest_sparsemat_to_eigen3();
 #endif
-
-        // // Let us alos write out the TempestRemap equivalent so that we can do some verification checks
-        // if ( is_root && size == 1)
-        // {
-        //     dbgprint.printf ( 0, "NOTE: Writing out moab_intersection mesh in TempestRemap format\n" );
-        //     m_meshOverlap->Write ( "moab_intersection_tempest.g");
-        // }
 
 #ifdef MOAB_HAVE_MPI
         {
@@ -1620,17 +1605,115 @@ int moab::TempestOnlineMap::IsMonotone (double dTolerance)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-moab::ErrorCode moab::TempestOnlineMap::WriteParallelMap (std::string strOutputFile)  const
+moab::ErrorCode moab::TempestOnlineMap::WriteParallelMap (std::string strOutputFile)
 {
     moab::ErrorCode rval;
+
+    /* Let us compute all relevant data for the current original source mesh on the process */
+    DataArray1D<double> vecSourceFaceArea, vecTargetFaceArea;
+    DataArray1D<double> dSourceCenterLon, dSourceCenterLat;
+    DataArray2D<double> dSourceVertexLon, dSourceVertexLat;
+    DataArray3D<double> dataGLLJacobianSrc, dataGLLJacobianDest;
+    if (m_srcDiscType == DiscretizationType_FV || m_srcDiscType == DiscretizationType_PCLOUD)
+    {
+        // printf("Source FV discretization with order - %d, \n", m_nDofsPEl_Src);
+        this->InitializeCoordinatesFromMeshFV(*m_meshInput, dSourceCenterLon, dSourceCenterLat, dSourceVertexLon, dSourceVertexLat, false /* fLatLon = false */);
+
+        vecSourceFaceArea.Allocate(m_meshInput->vecFaceArea.GetRows());
+        for (unsigned i = 0; i < m_meshInput->vecFaceArea.GetRows(); ++i)
+            vecSourceFaceArea[i] = m_meshInput->vecFaceArea[i];
+    }
+    else
+    {
+        // printf("Source FE discretization with order - %d, \n", m_nDofsPEl_Src);
+        this->InitializeCoordinatesFromMeshFE(*m_meshInput, m_nDofsPEl_Src, dataGLLNodesSrc, dSourceCenterLon, dSourceCenterLat, dSourceVertexLon, dSourceVertexLat);
+        
+        // Generate the continuous Jacobian for input mesh
+        GenerateMetaData (
+            *m_meshInput,
+            m_nDofsPEl_Src,
+            false /* fBubble */,
+            dataGLLNodesSrc,
+            dataGLLJacobianSrc );
+
+        if ( m_srcDiscType == DiscretizationType_CGLL )
+        {
+            GenerateUniqueJacobian (
+                dataGLLNodesSrc,
+                dataGLLJacobianSrc,
+                m_meshInput->vecFaceArea );
+        }
+        else
+        {
+            GenerateDiscontinuousJacobian (
+                dataGLLJacobianSrc,
+                m_meshInput->vecFaceArea );
+        }
+
+        vecSourceFaceArea.Allocate( m_meshInput->faces.size() * m_nDofsPEl_Src * m_nDofsPEl_Src );
+        int offset = 0;
+        for (size_t e = 0; e < m_meshInput->faces.size(); e++) {
+            for (int s = 0; s < m_nDofsPEl_Src; s++) {
+                for (int t = 0; t < m_nDofsPEl_Src; t++) {
+                    // vecSourceFaceArea[offset + s * m_nDofsPEl_Src + t] = dataGLLJacobianSrc[s][t][e];
+                    vecSourceFaceArea[ srccol_dtoc_dofmap [ offset + s * m_nDofsPEl_Src + t ] ] = dataGLLJacobianSrc[s][t][e];
+                }
+            }
+            offset += m_nDofsPEl_Src * m_nDofsPEl_Src;
+        }
+    }
+
+    if (m_destDiscType == DiscretizationType_FV || m_destDiscType == DiscretizationType_PCLOUD)
+    {
+        vecTargetFaceArea.Allocate(m_meshOutput->vecFaceArea.GetRows());
+        for (unsigned i = 0; i < m_meshOutput->vecFaceArea.GetRows(); ++i)
+            vecTargetFaceArea[i] = m_meshOutput->vecFaceArea[i];
+    }
+    else
+    {
+        // printf("Source FE discretization with order - %d, \n", m_nDofsPEl_Dest);
+        // Generate the continuous Jacobian for input mesh
+        GenerateMetaData (
+            *m_meshOutput,
+            m_nDofsPEl_Dest,
+            false /* fBubble */,
+            dataGLLNodesDest,
+            dataGLLJacobianDest );
+        
+        if ( m_destDiscType == DiscretizationType_CGLL )
+        {
+            GenerateUniqueJacobian (
+                dataGLLNodesDest,
+                dataGLLJacobianDest,
+                m_meshOutput->vecFaceArea );
+        }
+        else
+        {
+            GenerateDiscontinuousJacobian (
+                dataGLLJacobianDest,
+                m_meshOutput->vecFaceArea );
+        }
+
+        vecTargetFaceArea.Allocate( m_meshOutput->faces.size() * m_nDofsPEl_Dest * m_nDofsPEl_Dest );
+        int offset = 0;
+        for (size_t e = 0; e < m_meshOutput->faces.size(); e++) {
+            for (int s = 0; s < m_nDofsPEl_Dest; s++) {
+                for (int t = 0; t < m_nDofsPEl_Dest; t++) {
+                    // vecTargetFaceArea[offset + s * m_nDofsPEl_Dest + t] = dataGLLJacobianDest[s][t][e];
+                    vecTargetFaceArea[ row_dtoc_dofmap [ offset + s * m_nDofsPEl_Dest + t ] ] = dataGLLJacobianDest[s][t][e];
+                }
+            }
+            offset += m_nDofsPEl_Dest * m_nDofsPEl_Dest;
+        }
+    }
 
     moab::EntityHandle& m_meshOverlapSet = m_remapper->m_overlap_set;
     int tot_src_ents = m_remapper->m_source_entities.size();
     int tot_tgt_ents = m_remapper->m_target_entities.size();
-    int tot_src_size = this->m_dSourceAreas.GetRows();
-    int tot_tgt_size = this->m_dTargetAreas.GetRows();
-    int tot_vsrc_size = this->m_dSourceVertexLon.GetRows()*this->m_dSourceVertexLon.GetColumns();
-    int tot_vtgt_size = this->m_dTargetVertexLon.GetRows()*this->m_dTargetVertexLon.GetColumns();
+    int tot_src_size = dSourceCenterLon.GetRows();
+    int tot_tgt_size = m_dTargetCenterLon.GetRows();
+    int tot_vsrc_size = dSourceVertexLon.GetRows()*dSourceVertexLon.GetColumns();
+    int tot_vtgt_size = m_dTargetVertexLon.GetRows()*m_dTargetVertexLon.GetColumns();
 
     const int weightMatNNZ = m_weightMatrix.nonZeros();
     moab::Tag tagMapMetaData, tagMapIndexRow, tagMapIndexCol, tagMapValues, srcEleIDs, tgtEleIDs;
@@ -1701,8 +1784,8 @@ moab::ErrorCode moab::TempestOnlineMap::WriteParallelMap (std::string strOutputF
     int map_disc_details[6];
     map_disc_details[0] = m_nDofsPEl_Src;
     map_disc_details[1] = m_nDofsPEl_Dest;
-    map_disc_details[2] = (m_srcDiscType == DiscretizationType_FV ? 0 : (m_srcDiscType == DiscretizationType_CGLL ? 1 : 2));
-    map_disc_details[3] = (m_destDiscType == DiscretizationType_FV ? 0 : (m_destDiscType == DiscretizationType_CGLL ? 1 : 2));
+    map_disc_details[2] = (m_srcDiscType == DiscretizationType_FV || m_srcDiscType == DiscretizationType_PCLOUD ? 0 : (m_srcDiscType == DiscretizationType_CGLL ? 1 : 2));
+    map_disc_details[3] = (m_destDiscType == DiscretizationType_FV || m_destDiscType == DiscretizationType_PCLOUD ? 0 : (m_destDiscType == DiscretizationType_CGLL ? 1 : 2));
     map_disc_details[4] = (m_bConserved ? 1 : 0);
     map_disc_details[5] = m_iMonotonicity;
 
@@ -1753,11 +1836,11 @@ moab::ErrorCode moab::TempestOnlineMap::WriteParallelMap (std::string strOutputF
     // col_gdofmap [ col_ldofmap [ 0 : local_ndofs ] ] = GDOF
     // row_gdofmap [ row_ldofmap [ 0 : local_ndofs ] ] = GDOF
     ////
-    std::vector<int> src_global_dofs(m_dSourceAreas.GetRows()), tgt_global_dofs(m_dTargetAreas.GetRows());
-    for (unsigned i=0; i < m_dSourceAreas.GetRows(); ++i)
-        src_global_dofs[i] = this->GetColGlobalDoF ( i ); // col_gdofmap [ col_ldofmap [ i ] ];
-    for (unsigned i=0; i < m_dTargetAreas.GetRows(); ++i)
-        tgt_global_dofs[i] = this->GetRowGlobalDoF ( i ); // row_gdofmap [ row_ldofmap [ i ] ];
+    std::vector<int> src_global_dofs(tot_src_size), tgt_global_dofs(tot_tgt_size);
+    for (int i=0; i < tot_src_size; ++i)
+        src_global_dofs[i] = srccol_gdofmap [ i ]; // this->GetColGlobalDoF ( i ); //     col_gdofmap [ localColID ];
+    for (int i=0; i < tot_tgt_size; ++i)
+        tgt_global_dofs[i] = row_gdofmap [ i ]; // this->GetRowGlobalDoF ( i ); // row_gdofmap [ row_ldofmap [ i ] ];
     const void* srceleidvals_d = src_global_dofs.data(); //this->col_gdofmap.data();
     const void* tgteleidvals_d = tgt_global_dofs.data(); //this->row_gdofmap.data();
     dsize = src_global_dofs.size();
@@ -1766,29 +1849,29 @@ moab::ErrorCode moab::TempestOnlineMap::WriteParallelMap (std::string strOutputF
     rval = m_interface->tag_set_by_ptr(tgtEleIDs, &m_meshOverlapSet, 1, &tgteleidvals_d, &dsize);MB_CHK_SET_ERR(rval, "Setting local tag data failed");
 
     /* Set the source and target areas */
-    const void* srcareavals_d = /*m_remapper->m_source->vecFaceArea*/ m_dSourceAreas;
-    const void* tgtareavals_d = /*m_remapper->m_target->vecFaceArea*/ m_dTargetAreas;
-    dsize = /*m_remapper->m_source->vecFaceArea.GetRows()*/m_dSourceAreas.GetRows();
+    const void* srcareavals_d = vecSourceFaceArea;
+    const void* tgtareavals_d = vecTargetFaceArea;
+    dsize = tot_src_size;
     rval = m_interface->tag_set_by_ptr(srcAreaValues, &m_meshOverlapSet, 1, &srcareavals_d, &dsize);MB_CHK_SET_ERR(rval, "Setting local tag data failed");
-    dsize = /*m_remapper->m_target->vecFaceArea.GetRows()*/m_dTargetAreas.GetRows();
+    dsize = tot_tgt_size;
     rval = m_interface->tag_set_by_ptr(tgtAreaValues, &m_meshOverlapSet, 1, &tgtareavals_d, &dsize);MB_CHK_SET_ERR(rval, "Setting local tag data failed");
 
     /* Set the coordinates for source and target center vertices */
-    const void* srccoordsclonvals_d = &m_dSourceCenterLon[0];
-    const void* srccoordsclatvals_d = &m_dSourceCenterLat[0];
-    dsize = m_dSourceAreas.GetRows();
+    const void* srccoordsclonvals_d = &dSourceCenterLon[0];
+    const void* srccoordsclatvals_d = &dSourceCenterLat[0];
+    dsize = dSourceCenterLon.GetRows();
     rval = m_interface->tag_set_by_ptr(tagSrcCoordsCLon, &m_meshOverlapSet, 1, &srccoordsclonvals_d, &dsize);MB_CHK_SET_ERR(rval, "Setting local tag data failed");
     rval = m_interface->tag_set_by_ptr(tagSrcCoordsCLat, &m_meshOverlapSet, 1, &srccoordsclatvals_d, &dsize);MB_CHK_SET_ERR(rval, "Setting local tag data failed");
     const void* tgtcoordsclonvals_d = &m_dTargetCenterLon[0];
     const void* tgtcoordsclatvals_d = &m_dTargetCenterLat[0];
-    dsize = m_dTargetAreas.GetRows();
+    dsize = vecTargetFaceArea.GetRows();
     rval = m_interface->tag_set_by_ptr(tagTgtCoordsCLon, &m_meshOverlapSet, 1, &tgtcoordsclonvals_d, &dsize);MB_CHK_SET_ERR(rval, "Setting local tag data failed");
     rval = m_interface->tag_set_by_ptr(tagTgtCoordsCLat, &m_meshOverlapSet, 1, &tgtcoordsclatvals_d, &dsize);MB_CHK_SET_ERR(rval, "Setting local tag data failed");
 
     /* Set the coordinates for source and target element vertices */
-    const void* srccoordsvlonvals_d = &(m_dSourceVertexLon[0][0]);
-    const void* srccoordsvlatvals_d = &(m_dSourceVertexLat[0][0]);
-    dsize = m_dSourceVertexLon.GetRows()*m_dSourceVertexLon.GetColumns();
+    const void* srccoordsvlonvals_d = &(dSourceVertexLon[0][0]);
+    const void* srccoordsvlatvals_d = &(dSourceVertexLat[0][0]);
+    dsize = dSourceVertexLon.GetRows()*dSourceVertexLon.GetColumns();
     rval = m_interface->tag_set_by_ptr(tagSrcCoordsVLon, &m_meshOverlapSet, 1, &srccoordsvlonvals_d, &dsize);MB_CHK_SET_ERR(rval, "Setting local tag data failed");
     rval = m_interface->tag_set_by_ptr(tagSrcCoordsVLat, &m_meshOverlapSet, 1, &srccoordsvlatvals_d, &dsize);MB_CHK_SET_ERR(rval, "Setting local tag data failed");
     const void* tgtcoordsvlonvals_d = &(m_dTargetVertexLon[0][0]);
@@ -1819,7 +1902,6 @@ moab::ErrorCode moab::TempestOnlineMap::WriteParallelMap (std::string strOutputF
     // EntityHandle sets[3] = {m_remapper->m_source_set, m_remapper->m_target_set, m_remapper->m_overlap_set};
     EntityHandle sets[1] = {m_remapper->m_overlap_set};
     rval = m_interface->write_file ( strOutputFile.c_str(), NULL, writeOptions, sets, 1 ); MB_CHK_ERR ( rval );
-    // rval = m_interface->write_file ( strOutputFile.c_str(), NULL, writeOptions ); MB_CHK_ERR ( rval );
 
 #ifdef WRITE_SCRIP_FILE
     sstr.str("");
