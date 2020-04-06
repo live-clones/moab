@@ -110,11 +110,6 @@ int main(int argc, char* argv[])
   int power = -1;
   opts.addOpt<int>("power,M", "Generate multiple partitions, in powers of 2, up to 2^(pow)", &power);
 
-  bool moab_partition_slave = false, rescale_spherical_radius = false;
-  std::string slave_file_name = "";
-  opts.addOpt<std::string>("inferred", "(Zoltan) Specify inferred mesh file name to impose partition.", &slave_file_name);
-  opts.addOpt<void>( "scale_sphere",  "(Zoltan) The meshes are defined on a sphere and so rescale radius if needed", &rescale_spherical_radius);
-
   bool reorder = false;
   opts.addOpt<void>("reorder,R", "Reorder mesh to group entities by partition", &reorder);
 
@@ -127,13 +122,20 @@ int main(int argc, char* argv[])
 #endif // MOAB_HAVE_CGM
 
   bool ghost = false;
-  opts.addOpt<void>("ghost,H", "Specify if partition ghost geometry body.");
+  opts.addOpt<void>("ghost,H", "(Zoltan) Specify if partition ghost geometry body.");
 
   int obj_weight = 0;
-  opts.addOpt<int>("vertex_w,v", "Number of weights associated with a graph vertex.");
+  opts.addOpt<int>("vertex_w,v", "(Zoltan) Number of weights associated with a graph vertex.");
 
   int edge_weight = 0;
-  opts.addOpt<int>("edge_w,e", "Number of weights associated with an edge.");
+  opts.addOpt<int>("edge_w,e", "(Zoltan) Number of weights associated with an edge.");
+
+  bool moab_partition_slave = false;
+  std::string slave_file_name = "";
+  opts.addOpt<std::string>("inferred", "(Zoltan) Specify inferred slave mesh file name to impose partition based on cuts computed for original master mesh.", &slave_file_name);
+
+  bool rescale_spherical_radius = false;
+  opts.addOpt<void>( "scale_sphere",  "(Zoltan) If the meshes are defined on a sphere, rescale radius as needed (in combination with --inferred)", &rescale_spherical_radius);
 
 #endif // MOAB_HAVE_ZOLTAN
 
