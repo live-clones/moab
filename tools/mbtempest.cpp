@@ -568,7 +568,7 @@ int main ( int argc, char* argv[] )
                                                              moab::Remapper::SourceMesh, 
                                                              testFunction);MB_CHK_ERR ( rval );
                 runCtx->timer_pop();
-                // rval = mbCore->write_file ( "srcWithSolnTag.h5m", NULL, writeOptions, &ctx.meshsets[0], 1 ); MB_CHK_ERR ( rval );
+                // rval = mbCore->write_file ( "srcWithSolnTag.h5m", NULL, writeOptions, &runCtx->meshsets[0], 1 ); MB_CHK_ERR ( rval );
 
                 runCtx->timer_push ( "describe a solution on target grid" );
                 moab::Tag tgtAnalyticalFunction;
@@ -578,14 +578,14 @@ int main ( int argc, char* argv[] )
                                                              testFunction,
                                                              &tgtProjectedFunction,
                                                              "ProjectedSolnTgt");MB_CHK_ERR ( rval );
-                // rval = mbCore->write_file ( "tgtWithSolnTag.h5m", NULL, writeOptions, &ctx.meshsets[1], 1 ); MB_CHK_ERR ( rval );
+                // rval = mbCore->write_file ( "tgtWithSolnTag.h5m", NULL, writeOptions, &runCtx->meshsets[1], 1 ); MB_CHK_ERR ( rval );
                 runCtx->timer_pop();
 
                 runCtx->timer_push ( "compute solution projection on target grid" );
                 rval = weightMap->ApplyWeights(srcAnalyticalFunction, tgtProjectedFunction);MB_CHK_ERR ( rval );
                 runCtx->timer_pop();
-                // rval = mbCore->write_file ( "tgtWithSolnTag2.h5m", NULL, writeOptions, &ctx.meshsets[1], 1 ); MB_CHK_ERR ( rval );
-                
+                rval = mbCore->write_file ( "tgtWithSolnTag2.h5m", NULL, writeOptions, &runCtx->meshsets[1], 1 ); MB_CHK_ERR ( rval );
+
                 runCtx->timer_push ( "compute error metrics against analytical solution on target grid" );
                 std::map<std::string, double> errMetrics;
                 rval = weightMap->ComputeMetrics(moab::Remapper::TargetMesh, tgtAnalyticalFunction, tgtProjectedFunction, errMetrics, true);MB_CHK_ERR ( rval );
@@ -791,3 +791,4 @@ double sample_stationary_vortex ( double dLon, double dLat )
 }
 
 ///////////////////////////////////////////////
+

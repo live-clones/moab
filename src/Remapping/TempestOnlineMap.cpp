@@ -2225,7 +2225,7 @@ moab::ErrorCode moab::TempestOnlineMap::DefineAnalyticalSolution ( moab::Tag& so
                 for ( int q = 0; q < discOrder; q++ )
                 {
                     const int offsetDOF = j * discOrder * discOrder + p * discOrder + q;
-                    dVarMB [ offsetDOF ] = dVar[ offsetDOF ];
+                    dVarMB [ offsetDOF ] = dVar[ col_dtoc_dofmap[ offsetDOF ] ];
                 }
     }
     else
@@ -2235,7 +2235,7 @@ moab::ErrorCode moab::TempestOnlineMap::DefineAnalyticalSolution ( moab::Tag& so
                 for ( int q = 0; q < discOrder; q++ )
                 {
                     const int offsetDOF = j * discOrder * discOrder + p * discOrder + q;
-                    dVarMB [ offsetDOF ] = dVar[ offsetDOF ];
+                    dVarMB [ offsetDOF ] = dVar[ row_dtoc_dofmap[ offsetDOF ] ];
                 }
     }
     
