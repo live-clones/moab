@@ -73,4 +73,5 @@ EXTRA_DIST = 125hex.g \
              wholeATM_T.h5m \
              wholeLnd.h5m \
              recMeshOcn.h5m \
-	     AtmPhys.h5m
+	     AtmPhys.h5m \
+	     AtmPhys_01.h5m

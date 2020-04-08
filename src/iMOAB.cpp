@@ -2102,6 +2102,16 @@ ErrCode iMOAB_ReceiveElementTag(iMOAB_AppID pid, const iMOAB_String tag_storage_
   {
     owned = data.local_verts;
   }
+  // another possibility is for par comm graph to be computed from iMOAB_ComputeCommGraph, for after atm ocn intx, from phys
+  // (case from imoab_phatm_ocn_coupler.cpp) get then the cover set from ints remapper
+#ifdef MOAB_HAVE_TEMPESTREMAP
+  if (data.tempestData.remapper != NULL) // this is the case this is part of intx;;
+  {
+    cover_set = data.tempestData.remapper->GetMeshSet(Remapper::CoveringMesh);
+    rval = context.MBI->get_entities_by_dimension ( cover_set, 2, owned); CHKERRVAL ( rval );
+    // should still have only quads ?
+  }
+#endif
   /*
    * data_intx.remapper exists though only on the intersection application
    *  how do we get from here ( we know the pid that receives, and the commgraph used by migrate mesh )
@@ -2199,7 +2209,16 @@ ErrCode iMOAB_ComputeCommGraph(iMOAB_AppID  pid1, iMOAB_AppID  pid2,  MPI_Comm* 
   // populate first tuple
   if (*pid1>=0)
   {
-    EntityHandle fset1 = context.appDatas[*pid1].file_set;
+    appData& data1 = context.appDatas[*pid1];
+    EntityHandle fset1 = data1.file_set;
+        //in case of tempest remap, get the coverage set
+#ifdef MOAB_HAVE_TEMPESTREMAP
+    if (data1.tempestData.remapper != NULL) // this is the case this is part of intx;;
+    {
+      fset1 = data1.tempestData.remapper->GetMeshSet(Remapper::CoveringMesh);
+      // should still have only quads ?
+    }
+#endif
     Range ents_of_interest;
     if (*type1==1)
     {
@@ -2258,7 +2277,17 @@ ErrCode iMOAB_ComputeCommGraph(iMOAB_AppID  pid1, iMOAB_AppID  pid2,  MPI_Comm* 
   std::vector<int> valuesComp2;
   if (*pid2>=0)
   {
-    EntityHandle fset2 = context.appDatas[*pid2].file_set;
+    appData& data2 = context.appDatas[*pid2];
+    EntityHandle fset2 = data2.file_set;
+    //in case of tempest remap, get the coverage set
+#ifdef MOAB_HAVE_TEMPESTREMAP
+    if (data2.tempestData.remapper != NULL) // this is the case this is part of intx;;
+    {
+      fset2 = data2.tempestData.remapper->GetMeshSet(Remapper::CoveringMesh);
+      // should still have only quads ?
+    }
+#endif
+
     Range ents_of_interest;
     if (*type2==1)
     {
