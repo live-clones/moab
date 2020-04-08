@@ -25,13 +25,16 @@ typedef int PartType;
 
 #include <iostream>
 #include <sstream>
+#include <cmath>
 #include <stdlib.h>
 #include <list>
 #include <time.h>
 
+#include "moab/IntxMesh/IntxUtils.hpp"
+
 using namespace moab;
 
-const char DEFAULT_TAGGEDSETS_TAG[] = "PARALLEL_PARTITION";
+std::string DEFAULT_TAGGEDSETS_TAG = "PARALLEL_PARTITION";
 
 const char DEFAULT_ZOLTAN_METHOD[] = "RCB";
 #ifdef MOAB_HAVE_ZOLTAN
@@ -119,13 +122,20 @@ int main(int argc, char* argv[])
 #endif // MOAB_HAVE_CGM
 
   bool ghost = false;
-  opts.addOpt<void>("ghost,H", "Specify if partition ghost geometry body.");
+  opts.addOpt<void>("ghost,H", "(Zoltan) Specify if partition ghost geometry body.");
 
   int obj_weight = 0;
-  opts.addOpt<int>("vertex_w,v", "Number of weights associated with a graph vertex.");
+  opts.addOpt<int>("vertex_w,v", "(Zoltan) Number of weights associated with a graph vertex.");
 
   int edge_weight = 0;
-  opts.addOpt<int>("edge_w,e", "Number of weights associated with an edge.");
+  opts.addOpt<int>("edge_w,e", "(Zoltan) Number of weights associated with an edge.");
+
+  bool moab_partition_slave = false;
+  std::string slave_file_name = "";
+  opts.addOpt<std::string>("inferred", "(Zoltan) Specify inferred slave mesh file name to impose partition based on cuts computed for original master mesh.", &slave_file_name);
+
+  bool rescale_spherical_radius = false;
+  opts.addOpt<void>( "scale_sphere",  "(Zoltan) If the meshes are defined on a sphere, rescale radius as needed (in combination with --inferred)", &rescale_spherical_radius);
 
 #endif // MOAB_HAVE_ZOLTAN
 
@@ -189,6 +199,8 @@ int main(int argc, char* argv[])
     opts.printHelp();
     return EXIT_FAILURE;
   }
+
+  if (slave_file_name.size()) moab_partition_slave = true;
 
   if (moab_use_zoltan) {
     if (part_geom_mesh_size < 0.)
@@ -322,34 +334,11 @@ int main(int argc, char* argv[])
   std::cout << "Loading file " << input_file << "..." << std::endl;
   if (load_msets == false)
   {
-    rval = mb.load_file(input_file.c_str(), 0, options);
-    if (MB_SUCCESS != rval)
-    {
-      std::cerr << input_file << " : failed to read file." << std::endl;
-      std::cerr << "  Error code: " << mb.get_error_string(rval) << " (" << rval
-                << ")" << std::endl;
-      std::string errstr;
-      mb.get_last_error(errstr);
-      if (!errstr.empty())
-        std::cerr << "  Error message: " << errstr << std::endl;
-      return 2;
-    }
+    rval = mb.load_file(input_file.c_str(), 0, options);MB_CHK_SET_ERR ( rval, "Failed to load input file: " + input_file );
   }
-  // load the material set(s)
-  else
+  else // load the material set(s)
   {
-    rval = mb.load_mesh(input_file.c_str(), &set_l[0], (int) set_l.size());
-    if (MB_SUCCESS != rval)
-    {
-      std::cerr << input_file << " : failed to read file." << std::endl;
-      std::cerr << "  Error code: " << mb.get_error_string(rval) << " (" << rval
-                << ")" << std::endl;
-      std::string errstr;
-      mb.get_last_error(errstr);
-      if (!errstr.empty())
-        std::cerr << "  Error message: " << errstr << std::endl;
-      return 2;
-    }
+    rval = mb.load_mesh(input_file.c_str(), &set_l[0], (int) set_l.size());MB_CHK_SET_ERR ( rval, "Failed to load input mesh: " + input_file );
   }
   if (print_time)
     std::cout << "Read input file in "
@@ -382,7 +371,7 @@ int main(int argc, char* argv[])
              zoltan_method.c_str(),
              (!parm_method.empty() ? parm_method.c_str() : oct_method.c_str()),
              imbal_tol, part_dim, write_sets, write_tags, obj_weight,
-             edge_weight, part_surf, ghost, spherical_coords, print_time);
+             edge_weight, part_surf, ghost, spherical_coords, print_time);MB_CHK_SET_ERR ( rval, "Zoltan partitioner failed." );
     }
 #endif
 #ifdef MOAB_HAVE_METIS
@@ -390,20 +379,10 @@ int main(int argc, char* argv[])
       rval = metis_tool->partition_mesh( num_parts, metis_method.c_str(), part_dim,
                                    write_sets, write_tags,
                                    partition_tagged_sets, partition_tagged_ents,
-                                   aggregating_tag.c_str(), print_time);
+                                   aggregating_tag.c_str(), print_time);MB_CHK_SET_ERR ( rval, "Metis partitioner failed." );
     }
 #endif
-    if (MB_SUCCESS != rval)
-    {
-      std::cerr << "Partitioner failed!" << std::endl;
-      std::cerr << "  Error code: " << mb.get_error_string(rval) << " (" << rval
-                << ")" << std::endl;
-      std::string errstr;
-      mb.get_last_error(errstr);
-      if (!errstr.empty())
-        std::cerr << "  Error message: " << errstr << std::endl;
-      return 3;
-    }
+
     if (print_time)
       std::cout << "Generated " << num_parts << " part partitioning in "
                 << (clock() - t) / (double) CLOCKS_PER_SEC << " seconds" << std::endl;
@@ -413,38 +392,23 @@ int main(int argc, char* argv[])
       std::cout << "Reordering mesh for partition..." << std::endl;
 
       Tag tag, order;
-      rval = mb.tag_get_handle(DEFAULT_TAGGEDSETS_TAG, 1, MB_TYPE_INTEGER, tag);
-      if (MB_SUCCESS != rval)
-      {
-        std::cerr << "Partitioner did not create " << DEFAULT_TAGGEDSETS_TAG << " tag" << std::endl;
-        return 2;
-      }
+      rval = mb.tag_get_handle(DEFAULT_TAGGEDSETS_TAG.c_str(), 1, MB_TYPE_INTEGER, tag);MB_CHK_SET_ERR ( rval, "Partitioner did not create " + DEFAULT_TAGGEDSETS_TAG + " tag" );
 
       t = clock();
       if (write_sets)
       {
         Range sets;
         mb.get_entities_by_type_and_tag(0, MBENTITYSET, &tag, 0, 1, sets);
-        rval = reorder_tool.handle_order_from_sets_and_adj(sets, order);
+        rval = reorder_tool.handle_order_from_sets_and_adj(sets, order);MB_CHK_SET_ERR ( rval, "Failed to calculate reordering." );
       }
       else
       {
-        rval = reorder_tool.handle_order_from_int_tag(tag, -1, order);
-      }
-      if (MB_SUCCESS != rval)
-      {
-        std::cerr << "Failed to calculate reordering!" << std::endl;
-        return 2;
+        rval = reorder_tool.handle_order_from_int_tag(tag, -1, order);MB_CHK_SET_ERR ( rval, "Failed to calculate reordering." );
       }
 
-      rval = reorder_tool.reorder_entities(order);
-      if (MB_SUCCESS != rval)
-      {
-        std::cerr << "Failed to perform reordering!" << std::endl;
-        return 2;
-      }
+      rval = reorder_tool.reorder_entities(order);MB_CHK_SET_ERR ( rval, "Failed to perform reordering." );
 
-      mb.tag_delete(order);
+      rval = mb.tag_delete(order);MB_CHK_SET_ERR ( rval, "Failed to delete tag." );
       if (print_time)
         std::cout << "Reordered mesh in "
                   << (clock() - t) / (double) CLOCKS_PER_SEC << " seconds"
@@ -454,12 +418,7 @@ int main(int argc, char* argv[])
 #ifdef MOAB_HAVE_ZOLTAN
     if (incl_closure)
     {
-      rval = zoltan_tool->include_closure();
-      if (MB_SUCCESS != rval)
-      {
-        std::cerr << "Closure inclusion failed." << std::endl;
-        return 1;
-      }
+      rval = zoltan_tool->include_closure();MB_CHK_SET_ERR ( rval, "Closure inclusion failed." );
     }
 #endif
 
@@ -541,6 +500,71 @@ int main(int argc, char* argv[])
     if (print_time)
       std::cout << "Wrote \"" << tmp_output_file.str() << "\" in "
                 << (clock() - t) / (double) CLOCKS_PER_SEC << " seconds" << std::endl;
+
+#ifdef MOAB_HAVE_ZOLTAN
+
+    if (moab_use_zoltan && moab_partition_slave && p == 0) {
+      t = clock();
+      spherical_coords = true;
+      double master_radius, slave_radius;
+      if (rescale_spherical_radius) {
+        EntityHandle rootset = 0;
+        Range masterverts;
+        rval = mb.get_entities_by_dimension(rootset, 0, masterverts); MB_CHK_SET_ERR ( rval, "Can't create vertices on master set" );
+        double points[6];
+        EntityHandle mfrontback[2] = {masterverts[0], masterverts[masterverts.size()-1]};
+        rval = mb.get_coords(&mfrontback[0], 2, points);MB_CHK_ERR(rval);
+        const double mr1 = std::sqrt(points[0]*points[0]+points[1]*points[1]+points[2]*points[2]);
+        const double mr2 = std::sqrt(points[3]*points[3]+points[4]*points[4]+points[5]*points[5]);
+        master_radius = 0.5*(mr1+mr2);
+      }
+      EntityHandle slaveset;
+      rval = mb.create_meshset ( moab::MESHSET_SET, slaveset ); MB_CHK_SET_ERR ( rval, "Can't create new set" );
+      rval = mb.load_file(slave_file_name.c_str(), &slaveset, options);
+      if (rescale_spherical_radius) {
+        double points[6];
+        Range slaveverts;
+        rval = mb.get_entities_by_dimension(slaveset, 0, slaveverts); MB_CHK_SET_ERR ( rval, "Can't create vertices on master set" );
+        EntityHandle sfrontback[2] = {slaveverts[0], slaveverts[slaveverts.size()-1]};
+        rval = mb.get_coords(&sfrontback[0], 2, points);MB_CHK_ERR(rval);
+        const double sr1 = std::sqrt(points[0]*points[0]+points[1]*points[1]+points[2]*points[2]);
+        const double sr2 = std::sqrt(points[3]*points[3]+points[4]*points[4]+points[5]*points[5]);
+        slave_radius = 0.5*(sr1+sr2);
+        // Let us rescale both master and slave meshes to a unit sphere
+        rval = ScaleToRadius(&mb, slaveset, master_radius);MB_CHK_ERR(rval);
+      }
+
+      rval = zoltan_tool->partition_inferred_mesh(slaveset, num_parts, part_dim);
+
+      if (rescale_spherical_radius) {
+        // rescale the slave mesh back to its original radius
+        rval = ScaleToRadius(&mb, slaveset, slave_radius);MB_CHK_ERR(rval);
+      }
+
+      if (print_time) {
+        std::cout << "Time taken to infer slave mesh partitions = " 
+                  << (clock() - t) / (double) CLOCKS_PER_SEC << " seconds" << std::endl;
+      }
+
+      size_t lastindex = slave_file_name.find_last_of("."); 
+      std::string inferred_output_file = slave_file_name.substr(0, lastindex) + "_inferred" + slave_file_name.substr(lastindex, slave_file_name.size());
+      
+      // Save the resulting mesh
+      std::cout << "Saving inferred file to " << inferred_output_file << "..." << std::endl;
+      rval = mb.write_file(inferred_output_file.c_str(), 0, 0, &slaveset, 1);
+      if (MB_SUCCESS != rval)
+      {
+        std::cerr << tmp_output_file.str() << " : failed to write file." << std::endl;
+        std::cerr << "  Error code: " << mb.get_error_string(rval) << " ("
+                  << rval << ")" << std::endl;
+        std::string errstr;
+        mb.get_last_error(errstr);
+        if (!errstr.empty())
+          std::cerr << "  Error message: " << errstr << std::endl;
+        return 2;
+      }
+    }
+#endif
 
     num_parts *= 2;
   }
