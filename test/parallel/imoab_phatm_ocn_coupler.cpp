@@ -373,7 +373,7 @@ int main( int argc, char* argv[] )
   MPI_Barrier(MPI_COMM_WORLD);
 
   if (couComm != MPI_COMM_NULL) {
-    char outputFileTgt3[] = "recvOcn.h5m";
+    char outputFileTgt3[] = "recvOcn2.h5m";
     PUSH_TIMER("Write migrated OCN mesh on coupler PEs")
     ierr = iMOAB_WriteMesh(cplOcnPID, outputFileTgt3, fileWriteOptions,
       strlen(outputFileTgt3), strlen(fileWriteOptions) );
@@ -657,7 +657,7 @@ int main( int argc, char* argv[] )
     CHECKIERR(ierr, "failed to compute projection weight application");
     POP_TIMER(couComm, rankInCouComm)
 
-    char outputFileTgt[] = "fOcnOnCpl.h5m";
+    char outputFileTgt[] = "fOcnOnCpl2.h5m";
     ierr = iMOAB_WriteMesh(cplOcnPID, outputFileTgt, fileWriteOptions,
       strlen(outputFileTgt), strlen(fileWriteOptions) );
   }
@@ -696,7 +696,7 @@ int main( int argc, char* argv[] )
   }
   if (ocnComm != MPI_COMM_NULL)
   {
-    char outputFileOcn[] = "OcnWithProj.h5m";
+    char outputFileOcn[] = "OcnWithProj2.h5m";
     ierr = iMOAB_WriteMesh(cmpOcnPID, outputFileOcn, fileWriteOptions,
         strlen(outputFileOcn), strlen(fileWriteOptions) );
   }
