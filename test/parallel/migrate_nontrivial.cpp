@@ -26,7 +26,7 @@
 #define RUN_TEST_ARG2(A, B) run_test( &A, #A, B)
 
 using namespace moab;
-
+//#define VERBOSE
 #define CHECKRC(rc, message)  if (0!=rc) { printf ("%s\n", message); return MB_FAILURE;}
 
 int is_any_proc_error( int is_my_error )
@@ -132,7 +132,8 @@ ErrorCode migrate_smart(const char*filename, const char * outfile, int partMetho
       CHECKRC(ierr, "cannot send elements" )
 #ifdef VERBOSE
       int is_sender = 1;
-      iMOAB_DumpCommGraph(pid1,  &compid1,  &compid2, &is_sender, "MigrateS", strlen("MigrateS"));
+      int context = -1;
+      iMOAB_DumpCommGraph(pid1,  &context, &is_sender, "MigrateS", strlen("MigrateS"));
 #endif
   }
 
@@ -145,7 +146,8 @@ ErrorCode migrate_smart(const char*filename, const char * outfile, int partMetho
      CHECKRC(ierr, "cannot write received mesh" )
 #ifdef VERBOSE
      int is_sender = 0;
-     iMOAB_DumpCommGraph(pid2,  &compid1,  &compid2, &is_sender, "MigrateR", strlen("MigrateR"));
+     int context = -1;
+     iMOAB_DumpCommGraph(pid2,  &context, &is_sender, "MigrateR", strlen("MigrateR"));
 #endif
   }
 

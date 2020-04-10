@@ -138,6 +138,9 @@ int main( int argc, char* argv[] )
 
   opts.addOpt<int>("partitioning,p", "partitioning option for migration", &repartitioner_scheme);
 
+  int n=1; // number of send/receive / project / send back cycles
+  opts.addOpt<int>("iterations,n", "number of iterations for coupler", &n);
+
   opts.parseCommandLine(argc, argv);
 
   char fileWriteOptions[] ="PARALLEL=WRITE_PART";
@@ -365,7 +368,7 @@ int main( int argc, char* argv[] )
 
   MPI_Barrier(MPI_COMM_WORLD);
 
-  if (couComm != MPI_COMM_NULL) {
+  if (couComm != MPI_COMM_NULL && 1==n) { // write only for n==1 case
     char outputFileTgt3[] = "recvOcn.h5m";
     PUSH_TIMER("Write migrated OCN mesh on coupler PEs")
     ierr = iMOAB_WriteMesh(cplOcnPID, outputFileTgt3, fileWriteOptions,
@@ -413,7 +416,7 @@ int main( int argc, char* argv[] )
 
   MPI_Barrier(MPI_COMM_WORLD);
 
-  if (couComm != MPI_COMM_NULL) {
+  if (couComm != MPI_COMM_NULL && 1==n) { // write only for n==1 case
     char outputFileLnd[] = "recvLnd.h5m";
     PUSH_TIMER("Write migrated LND mesh on coupler PEs")
     ierr = iMOAB_WriteMesh(cplLndPID, outputFileLnd, fileWriteOptions,
@@ -496,7 +499,7 @@ int main( int argc, char* argv[] )
 
 #ifdef ENABLE_ATMOCN_COUPLING
 #ifdef VERBOSE
-  if (couComm != MPI_COMM_NULL) {
+  if (couComm != MPI_COMM_NULL && 1==n) {  // write only for n==1 case
     char serialWriteOptions[] =""; // for writing in serial
     std::stringstream outf;
     outf<<"intxAtmOcn_" << rankInCouComm<<".h5m";
@@ -619,6 +622,9 @@ int main( int argc, char* argv[] )
   const char * concat_fieldname = "a2oTbot;a2oUbot;a2oVbot;";
   const char * concat_fieldnameT = "a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;";
 
+  // start a virtual loop for number of iterations
+for (int iters=0; iters<n; iters++)
+{
 #ifdef ENABLE_ATMOCN_COUPLING
   PUSH_TIMER("Send/receive data from atm component to coupler in ocn context")
   if (atmComm != MPI_COMM_NULL ){
@@ -640,7 +646,7 @@ int main( int argc, char* argv[] )
     CHECKIERR(ierr, "cannot free buffers used to resend atm tag towards the coverage mesh")
   }
 #ifdef VERBOSE
-  if (couComm != MPI_COMM_NULL) {
+  if (couComm != MPI_COMM_NULL && 1==n) { // write only for n==1 case
     char outputFileRecvd[] = "recvAtmCoupOcn.h5m";
     ierr = iMOAB_WriteMesh(cplAtmPID, outputFileRecvd, fileWriteOptions,
         strlen(outputFileRecvd), strlen(fileWriteOptions) );
@@ -660,10 +666,12 @@ int main( int argc, char* argv[] )
                                               );
     CHECKIERR(ierr, "failed to compute projection weight application");
     POP_TIMER(couComm, rankInCouComm)
-
-    char outputFileTgt[] = "fOcnOnCpl.h5m";
-    ierr = iMOAB_WriteMesh(cplOcnPID, outputFileTgt, fileWriteOptions,
-      strlen(outputFileTgt), strlen(fileWriteOptions) );
+    if (1==n) // write only for n==1 case
+    {
+      char outputFileTgt[] = "fOcnOnCpl.h5m";
+      ierr = iMOAB_WriteMesh(cplOcnPID, outputFileTgt, fileWriteOptions,
+        strlen(outputFileTgt), strlen(fileWriteOptions) );
+    }
   }
 
   // send the projected tag back to ocean pes, with send/receive tag
@@ -699,7 +707,7 @@ int main( int argc, char* argv[] )
   if (couComm != MPI_COMM_NULL){
     ierr = iMOAB_FreeSenderBuffers(cplOcnPID, &context_id);
   }
-  if (ocnComm != MPI_COMM_NULL)
+  if (ocnComm != MPI_COMM_NULL && 1 == n) // write only for n==1 case
   {
     char outputFileOcn[] = "OcnWithProj.h5m";
     ierr = iMOAB_WriteMesh(cmpOcnPID, outputFileOcn, fileWriteOptions,
@@ -730,7 +738,7 @@ int main( int argc, char* argv[] )
     CHECKIERR(ierr, "cannot free buffers used to resend atm tag towards the coverage mesh for land context")
   }
 #ifdef VERBOSE
-  if (couComm != MPI_COMM_NULL){
+  if (couComm != MPI_COMM_NULL && 1==n){  // write only for n==1 case
     char outputFileRecvd[] = "recvAtmCoupLnd.h5m";
     ierr = iMOAB_WriteMesh(cplAtmPID, outputFileRecvd, fileWriteOptions,
         strlen(outputFileRecvd), strlen(fileWriteOptions) );
@@ -753,7 +761,7 @@ int main( int argc, char* argv[] )
   }
 
 #ifdef VERBOSE
-  if (couComm != MPI_COMM_NULL){
+  if (couComm != MPI_COMM_NULL && 1==n){ // write only for n==1 case
     char outputFileTgtLnd[] = "fLndOnCpl.h5m";
     ierr = iMOAB_WriteMesh(cplLndPID, outputFileTgtLnd, fileWriteOptions,
       strlen(outputFileTgtLnd), strlen(fileWriteOptions) );
@@ -794,13 +802,16 @@ int main( int argc, char* argv[] )
   if (couComm != MPI_COMM_NULL){
     ierr = iMOAB_FreeSenderBuffers(cplLndPID, &context_id);
   }
-  if (lndComm != MPI_COMM_NULL)
+  if (lndComm != MPI_COMM_NULL && 1==n) // write only for n==1 case
   {
     char outputFileLnd[] = "LndWithProj.h5m";
     ierr = iMOAB_WriteMesh(cmpLndPID, outputFileLnd, fileWriteOptions,
         strlen(outputFileLnd), strlen(fileWriteOptions) );
   }
+#endif // ENABLE_ATMLND_COUPLING
 
+} // end loop iterations n
+#ifdef ENABLE_ATMLND_COUPLING
   if (lndComm != MPI_COMM_NULL) {
     ierr = iMOAB_DeregisterApplication(cmpLndPID);
     CHECKIERR(ierr, "cannot deregister app LND1" )
