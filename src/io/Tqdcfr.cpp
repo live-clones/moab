@@ -475,7 +475,7 @@ ErrorCode Tqdcfr::load_file(const char *file_name,
   // **************************
   // Restore geometric topology
   // **************************
-  GeomTopoTool gtt(mdbImpl, true);
+  GeomTopoTool gtt(mdbImpl, true, 0, true, false);
   result = gtt.restore_topology_from_adjacency();
   if (MB_SUCCESS != result) {
     std::cout << "Failed to restore topology " << std::endl;
