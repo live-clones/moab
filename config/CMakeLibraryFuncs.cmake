@@ -16,7 +16,6 @@ macro(SciFixupLibrary Proj LibName DeclName)
           VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}
       )
     endif ()
-    message(STATUS "LibName = ${LibName}.")
     target_compile_definitions(${LibName}
       PRIVATE ${DeclName}_EXPORTS
       # ${Proj}_DLL # Added at the top
