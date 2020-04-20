@@ -610,8 +610,6 @@ int main( int argc, char* argv[] )
     }
   }
 
-  const char * concat_fieldname = "T16_ph;u16_ph;v16_ph;";
-  const char * concat_fieldnameT = "T_proj;u_proj;v_proj;";
 
 #ifdef ENABLE_ATMOCN_COUPLING
   PUSH_TIMER("Send/receive data from atm component to coupler in ocn context")
@@ -642,6 +640,9 @@ int main( int argc, char* argv[] )
   }
 #endif
 */
+
+  const char * concat_fieldname = "T16_ph;u16_ph;v16_ph;";
+  const char * concat_fieldnameT = "T_proj;u_proj;v_proj;";
 
   if (couComm != MPI_COMM_NULL) {
     /* We have the remapping weights now. Let us apply the weights onto the tag we defined
@@ -676,16 +677,16 @@ int main( int argc, char* argv[] )
       // as always, use nonblocking sends
   // original graph (context is -1_
   if (couComm != MPI_COMM_NULL){
-    ierr = iMOAB_SendElementTag(cplOcnPID, "a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;", &ocnCouComm, &context_id,
-        strlen("a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;"));
+    ierr = iMOAB_SendElementTag(cplOcnPID, "T_proj;u_proj;v_proj;", &ocnCouComm, &context_id,
+        strlen("T_proj;u_proj;v_proj;"));
     CHECKIERR(ierr, "cannot send tag values back to ocean pes")
   }
 
   // receive on component 2, ocean
   if (ocnComm != MPI_COMM_NULL)
   {
-    ierr = iMOAB_ReceiveElementTag(cmpOcnPID, "a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;",
-        &ocnCouComm, &context_id, strlen("a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;"));
+    ierr = iMOAB_ReceiveElementTag(cmpOcnPID, "T_proj;u_proj;v_proj;",
+        &ocnCouComm, &context_id, strlen("T_proj;u_proj;v_proj;"));
     CHECKIERR(ierr, "cannot receive tag values from ocean mesh on coupler pes")
   }
 
@@ -702,6 +703,7 @@ int main( int argc, char* argv[] )
   }
 #endif
 
+  MPI_Barrier(MPI_COMM_WORLD);
 
 #ifdef ENABLE_ATMLND_COUPLING
   // start land proj:
