@@ -216,7 +216,7 @@ ErrorCode Intx2MeshOnSphere::computeIntersectionBetweenTgtAndSrc(EntityHandle tg
       double orientedArea = area2D(&P[2*k], &P[2 * k1], &P[2 * k2]);
       if (orientedArea<0)
       {
-        std::cout <<" oriented area is negative: " << orientedArea << " k:"<< k << " target, src:" << target << " " << source << " \n";
+        std::cout <<" oriented area is negative: " << orientedArea << " k:"<< k << " target, src:" << tgt << " " << src << " \n";
       }
     }
 #endif
@@ -466,7 +466,8 @@ ErrorCode Intx2MeshOnSphere::findNodes(EntityHandle tgt, int nsTgt, EntityHandle
         std::cout << " old verts: " << oldNodes << " other intx:" << otherIntx << "\n";
 
 
-        std::cout <<"rank:" << my_rank << " oriented area in 3d is negative: " << orientedArea << " k:"<< k << " target, src:" << target << " " << source << " \n";
+        std::cout <<"rank:" << my_rank << " oriented area in 3d is negative: " << orientedArea
+            << " k:"<< k << " target, src:" << tgt << " " << src << " \n";
       }
     }
 #endif

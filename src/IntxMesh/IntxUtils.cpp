@@ -1257,13 +1257,27 @@ ErrorCode positive_orientation(Interface * mb, EntityHandle set, double R) {
     else
       area = area2D(coords, coords + 3, coords + 6);
     if (area < 0) {
-      std::vector<EntityHandle> newconn(num_nodes);
-      for (int i = 0; i < num_nodes; i++) {
-        newconn[num_nodes - 1 - i] = conn[i];
-      }
-      rval = mb->set_connectivity(cell, &newconn[0], num_nodes);
+      // compute all area, do not revert if total area is positive
+      std::vector<double> coords2(3 * num_nodes);
+      // get coordinates
+      rval = mb->get_coords(conn, num_nodes, &coords2[0]);
       if (MB_SUCCESS != rval)
-        return rval;
+        return MB_FAILURE;
+      double totArea = area_spherical_polygon_lHuiller(&coords2[0], num_nodes, R);
+      if (totArea<0)
+      {
+        std::vector<EntityHandle> newconn(num_nodes);
+        for (int i = 0; i < num_nodes; i++) {
+          newconn[num_nodes - 1 - i] = conn[i];
+        }
+        rval = mb->set_connectivity(cell, &newconn[0], num_nodes);
+        if (MB_SUCCESS != rval)
+          return rval;
+      }
+      else
+      {
+        std::cout << " nonconvex problem first area:" << area << " total area: " << totArea << std::endl;
+      }
     }
   }
   return MB_SUCCESS;
