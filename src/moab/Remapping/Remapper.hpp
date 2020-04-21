@@ -57,7 +57,7 @@ public:
 		DEFAULT = -1,
 		SourceMesh = 0,
 		TargetMesh = 1,
-		IntersectedMesh = 2,
+		OverlapMesh = 2,
 		CoveringMesh = 3
 	};
 

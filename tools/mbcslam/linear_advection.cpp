@@ -751,12 +751,12 @@ moab::ErrorCode update_density(moab::Interface * mb, moab::EntityHandle euler_se
   std::vector<double> newValues(rs2.size(), 0.);// initialize with 0 all of them
 
   // For each polygon get red/blue parent
-  moab::Tag redParentTag;
-  moab::Tag blueParentTag;
-  rval = mb->tag_get_handle("RedParent", 1, MB_TYPE_INTEGER, redParentTag, MB_TAG_DENSE);
+  moab::Tag tgtParentTag;
+  moab::Tag srcParentTag;
+  rval = mb->tag_get_handle("TargetParent", 1, MB_TYPE_INTEGER, tgtParentTag, MB_TAG_DENSE);
     if (MB_SUCCESS != rval)
       return rval;
-  rval = mb->tag_get_handle("BlueParent", 1, MB_TYPE_INTEGER, blueParentTag, MB_TAG_DENSE);
+  rval = mb->tag_get_handle("SourceParent", 1, MB_TYPE_INTEGER, srcParentTag, MB_TAG_DENSE);
     if (MB_SUCCESS != rval)
       return rval;
 
@@ -769,12 +769,12 @@ moab::ErrorCode update_density(moab::Interface * mb, moab::EntityHandle euler_se
 
     moab::EntityHandle poly=*it;
     int blueIndex, redIndex;
-    rval =  mb->tag_get_data(blueParentTag, &poly, 1, &blueIndex);
+    rval =  mb->tag_get_data(srcParentTag, &poly, 1, &blueIndex);
     if (MB_SUCCESS != rval)
       return rval;
     moab::EntityHandle blue = rs1[blueIndex];
 
-    rval = mb->tag_get_data(redParentTag, &poly, 1, &redIndex);
+    rval = mb->tag_get_data(tgtParentTag, &poly, 1, &redIndex);
     if (MB_SUCCESS != rval)
       return rval;
 
@@ -926,14 +926,14 @@ void get_intersection_weights(moab::Interface * mb, moab::EntityHandle euler_set
     return;
 
   // get tag for Eulerian parent cell of intersection polygon
-  moab::Tag redParentTag;
-  rval = mb->tag_get_handle("RedParent", 1, MB_TYPE_INTEGER, redParentTag, MB_TAG_DENSE);
+  moab::Tag tgtParentTag;
+  rval = mb->tag_get_handle("TargetParent", 1, MB_TYPE_INTEGER, tgtParentTag, MB_TAG_DENSE);
   if (MB_SUCCESS != rval)
     return;
 
   // get tag for Lagrangian parent cell of intersection polygon
-  moab::Tag blueParentTag;
-  rval = mb->tag_get_handle("BlueParent", 1, MB_TYPE_INTEGER, blueParentTag, MB_TAG_DENSE);
+  moab::Tag srcParentTag;
+  rval = mb->tag_get_handle("SourceParent", 1, MB_TYPE_INTEGER, srcParentTag, MB_TAG_DENSE);
   if (MB_SUCCESS != rval)
     return;
 
@@ -963,13 +963,13 @@ void get_intersection_weights(moab::Interface * mb, moab::EntityHandle euler_set
 
     // get index of Eulerian parent cell for polygon
     int redIndex;
-    rval = mb->tag_get_data(redParentTag, &poly, 1, &redIndex);
+    rval = mb->tag_get_data(tgtParentTag, &poly, 1, &redIndex);
     if (MB_SUCCESS != rval)
       return;
 
     // get index of Lagrangian parent cell for polygon
     int blueIndex;
-    rval = mb->tag_get_data(blueParentTag, &poly, 1, &blueIndex);
+    rval = mb->tag_get_data(srcParentTag, &poly, 1, &blueIndex);
     if (MB_SUCCESS != rval)
       return;
 

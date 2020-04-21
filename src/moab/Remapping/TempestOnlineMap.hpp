@@ -129,16 +129,7 @@ public:
 	///	</summary>
 	const DataArray1D<double>& GetGlobalTargetAreas() const;
 
-#ifdef MOAB_HAVE_EIGEN
-	void InitVectors();
-#endif
-
 private:
-
-	///	<summary>
-	///		Remove all the ghosted overlap entities that were accumulated to enable conservation in parallel
-	///	</summary>
-	moab::ErrorCode remove_ghosted_overlap_entities (moab::Range& sharedGhostEntities);
 
 	///	<summary>
 	///		Compute the remapping weights as a permutation matrix that relates DoFs on the source mesh
@@ -339,7 +330,7 @@ public:
 	///	<summary>
 	///		Parallel I/O with HDF5 to write out the remapping weights from multiple processors.
 	///	</summary>
-	moab::ErrorCode WriteParallelMap (std::string strOutputFile) const;
+	moab::ErrorCode WriteParallelMap (std::string strOutputFile);
 
     typedef double (*sample_function)(double, double);
 
@@ -390,9 +381,8 @@ public:
 	///		The original tag data and local to global DoF mapping to associate matrix values to solution
 	///	<summary>
 	moab::Tag m_dofTagSrc, m_dofTagDest;
-	std::vector<unsigned> row_dofmap, col_dofmap, srccol_dofmap;
 	std::vector<unsigned> row_gdofmap, col_gdofmap, srccol_gdofmap;
-	std::vector<unsigned> row_ldofmap, col_ldofmap, srccol_ldofmap;
+	std::vector<unsigned> row_dtoc_dofmap, col_dtoc_dofmap, srccol_dtoc_dofmap;
 
 	DataArray3D<int> dataGLLNodesSrc, dataGLLNodesSrcCov, dataGLLNodesDest;
 	DiscretizationType m_srcDiscType, m_destDiscType;
@@ -419,7 +409,7 @@ public:
 inline
 int moab::TempestOnlineMap::GetRowGlobalDoF(int localRowID) const
 {
-    return row_gdofmap [ row_ldofmap [ localRowID ] ];
+    return row_gdofmap [ localRowID ];
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -427,7 +417,7 @@ int moab::TempestOnlineMap::GetRowGlobalDoF(int localRowID) const
 inline
 int moab::TempestOnlineMap::GetColGlobalDoF(int localColID) const
 {
-    return col_gdofmap [ col_ldofmap [ localColID ] ];
+    return col_gdofmap [ localColID ];
 }
 
 

@@ -151,7 +151,8 @@ ErrorCode MetisPartitioner::partition_mesh(const idx_t nparts,
     // assign global node ids, starting from one! TODO
   if (assign_global_ids)
   {
-    result = mbpc->assign_global_ids(0, 0, 1);MB_CHK_ERR(result);
+    EntityHandle rootset = 0;
+    result = mbpc->assign_global_ids(rootset, part_dim, 1, true, false);MB_CHK_ERR(result);
   }
 #endif
 

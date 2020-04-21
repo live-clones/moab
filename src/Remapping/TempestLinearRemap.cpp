@@ -107,7 +107,7 @@ moab::ErrorCode moab::TempestOnlineMap::LinearRemapNN_MOAB (bool use_GID_matchin
     {
         std::map<unsigned, unsigned> src_gl;
         for (unsigned it=0; it < col_gdofmap.size(); ++it)
-            src_gl[ col_gdofmap[it] ] = col_dofmap[it];
+            src_gl[ col_gdofmap[it] ] = it;
 
         std::map<unsigned,unsigned>::iterator iter;
         for (unsigned it=0; it < row_gdofmap.size(); ++it) {
@@ -125,7 +125,7 @@ moab::ErrorCode moab::TempestOnlineMap::LinearRemapNN_MOAB (bool use_GID_matchin
             else
             {
                 unsigned icol = src_gl[ row ];
-                unsigned irow = row_dofmap[it];
+                unsigned irow = it;
 
                 // Set the permutation matrix in local space
                 m_mapRemap(irow, icol) = 1.0;
@@ -153,7 +153,7 @@ void moab::TempestOnlineMap::LinearRemapFVtoFV_Tempest_MOAB (
     const int TriQuadRuleOrder = 4;
 
     // Verify ReverseNodeArray has been calculated
-    if ( m_meshInputCov->revnodearray.size() == 0 )
+    if ( m_meshInputCov->faces.size() > 0 && m_meshInputCov->revnodearray.size() == 0 )
     {
         _EXCEPTIONT ( "ReverseNodeArray has not been calculated for m_meshInput" );
     }
@@ -189,7 +189,7 @@ void moab::TempestOnlineMap::LinearRemapFVtoFV_Tempest_MOAB (
 
     // Current overlap face
     int ixOverlap = 0;
-    const unsigned outputFrequency = (m_meshInputCov->faces.size()/10);
+    const unsigned outputFrequency = (m_meshInputCov->faces.size()/10)+1;
 
     // Loop through all faces on m_meshInput
     for ( size_t ixFirst = 0; ixFirst < m_meshInputCov->faces.size(); ixFirst++ )
@@ -330,9 +330,16 @@ void moab::TempestOnlineMap::copy_tempest_sparsemat_to_eigen3()
 #define VERBOSE_ACTIVATED
 // #define VERBOSE
 #endif
+    if (m_nTotDofs_Dest <= 0 || m_nTotDofs_SrcCov <= 0)
+    {
+      // std::cout << rank << ": rowsize = " <<  m_nTotDofs_Dest << ", colsize = " << m_nTotDofs_SrcCov << "\n";
+      return; // No need to allocate if either rows or cols size are zero
+    }
+
     /* Should the columns be the global size of the matrix ? */
     m_weightMatrix.resize(m_nTotDofs_Dest, m_nTotDofs_SrcCov);
-    InitVectors();
+    m_rowVector.resize( m_weightMatrix.rows() );
+    m_colVector.resize( m_weightMatrix.cols() );
 
 #ifdef VERBOSE
     int locrows = std::max(m_mapRemap.GetRows(), m_nTotDofs_Dest);
@@ -693,26 +700,25 @@ moab::ErrorCode moab::TempestOnlineMap::ApplyWeights (std::vector<double>& srcVa
     if (transpose) {
         // Permute the source data first
         for (unsigned i=0; i < srcVals.size(); ++i) {
-            m_rowVector(row_dofmap[i]) = srcVals[i]; // permute and set the row (source) vector properly
+            m_rowVector(row_dtoc_dofmap[i]) = srcVals[i]; // permute and set the row (source) vector properly
         }
 
         m_colVector = m_weightMatrix.adjoint() * m_rowVector;
 
         // Permute the resulting target data back
         for (unsigned i=0; i < tgtVals.size(); ++i) {
-            tgtVals[i] = m_colVector(col_dofmap[i]); // permute and set the row (source) vector properly
+            tgtVals[i] = m_colVector(col_dtoc_dofmap[i]); // permute and set the row (source) vector properly
         }
     }
     else {
         // Permute the source data first
 #ifdef VERBOSE
-        output_file << "ColVector: " << m_colVector.size() << ", SrcVals: " << srcVals.size() << ", Sizes: " << m_nTotDofs_SrcCov << ", " << col_dofmap.size() << "\n";
+        output_file << "ColVector: " << m_colVector.size() << ", SrcVals: " << srcVals.size() << ", Sizes: " << m_nTotDofs_SrcCov << ", " << col_gdofmap.size() << "\n";
 #endif
         for (unsigned i=0; i < srcVals.size(); ++i) {
-            assert(m_colVector.size()-col_dofmap[i]>0);
-            m_colVector(col_dofmap[i]) = srcVals[i]; // permute and set the row (source) vector properly
+            m_colVector(col_dtoc_dofmap[i]) = srcVals[i]; // permute and set the row (source) vector properly
 #ifdef VERBOSE
-            output_file << "Col: " << i << ", " << col_dofmap[i] << ", GID: " << col_gdofmap[i] << ", Data = " << srcVals[i]  << ", " << m_colVector(col_dofmap[i]) << "\n";
+            output_file << "Col: " << i << ", GID: " << col_gdofmap[i] << ", Data = " << srcVals[i]  << ", " << m_colVector(i) << "\n";
 #endif
         }
 
@@ -720,12 +726,12 @@ moab::ErrorCode moab::TempestOnlineMap::ApplyWeights (std::vector<double>& srcVa
 
         // Permute the resulting target data back
 #ifdef VERBOSE
-        output_file << "RowVector: " << m_rowVector.size() << ", TgtVals:" << tgtVals.size() << ", Sizes: " << m_nTotDofs_Dest << ", " << row_dofmap.size() << "\n";
+        output_file << "RowVector: " << m_rowVector.size() << ", TgtVals:" << tgtVals.size() << ", Sizes: " << m_nTotDofs_Dest << ", " << row_gdofmap.size() << "\n";
 #endif
         for (unsigned i=0; i < tgtVals.size(); ++i) {
-            tgtVals[i] = m_rowVector(row_dofmap[i]); // permute and set the row (source) vector properly
+            tgtVals[i] = m_rowVector(row_dtoc_dofmap[i]); // permute and set the row (source) vector properly
 #ifdef VERBOSE
-            output_file << "Row: " << i << ", " << row_dofmap[i] << ", GID: " << row_gdofmap[i] << ", Data = " << m_rowVector(row_dofmap[i]) << "\n";
+            output_file << "Row: " << i << ", GID: " << row_gdofmap[i] << ", Data = " << m_rowVector(i) << "\n";
 #endif
         }
     }
@@ -824,7 +830,7 @@ void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB (
 
     // Current Overlap Face
     int ixOverlap = 0;
-    const unsigned outputFrequency = (m_meshInputCov->faces.size()/10);
+    const unsigned outputFrequency = (m_meshInputCov->faces.size()/10)+1;
 
     // Loop over all input Faces
     for ( size_t ixFirst = 0; ixFirst < m_meshInputCov->faces.size(); ixFirst++ )
@@ -970,8 +976,8 @@ void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB (
                             ( dBeta  < -1.0e-13 ) || ( dBeta  > 1.0 + 1.0e-13 )
                        )
                     {
-                        _EXCEPTION2 ( "Inverse Map out of range (%1.5e %1.5e)",
-                                      dAlpha, dBeta );
+                        _EXCEPTION4 ( "Inverse Map for element %d and subtriangle %d out of range (%1.5e %1.5e)",
+                                      j, l, dAlpha, dBeta );
                     }
 
                     // Sample the finite element at this point
@@ -1283,7 +1289,7 @@ void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_MOAB (
 
     // Loop through all faces on m_meshInput
     ixOverlap = 0;
-    const unsigned outputFrequency = (m_meshInputCov->faces.size()/10);
+    const unsigned outputFrequency = (m_meshInputCov->faces.size()/10)+1;
 
     if ( is_root ) dbgprint.printf ( 0, "Building conservative distribution maps\n" );
     for ( size_t ixFirst = 0; ixFirst < m_meshInputCov->faces.size(); ixFirst++ )
@@ -1861,7 +1867,7 @@ void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_Pointwise_MOAB (
     DataArray1D<bool> fSecondNodeFound ( dataNodalAreaOut.GetRows() );
 
     ixOverlap = 0;
-    const unsigned outputFrequency = (m_meshInputCov->faces.size()/10);
+    const unsigned outputFrequency = (m_meshInputCov->faces.size()/10)+1;
 
     // Loop through all faces on m_meshInputCov
     for ( size_t ixFirst = 0; ixFirst < m_meshInputCov->faces.size(); ixFirst++ )

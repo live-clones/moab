@@ -2493,7 +2493,7 @@ ErrCode iMOAB_CoverageGraph ( MPI_Comm * join, iMOAB_AppID pid_src,
         appData& dataIntx = context.appDatas[*pid_intx];
         Tag parentTag, orgSendProcTag ;
 
-        rval = context.MBI->tag_get_handle ( "BlueParent", parentTag ); CHKERRVAL ( rval ); // global id of the blue, source element
+        rval = context.MBI->tag_get_handle ( "SourceParent", parentTag ); CHKERRVAL ( rval ); // global id of the blue, source element
         if ( !parentTag )
             return 1; // fatal error, abort
 
@@ -2768,7 +2768,7 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere ( iMOAB_AppID pid_src, iMOAB_AppID
     tdata.remapper->initialize(false);
     tdata.remapper->GetMeshSet ( moab::Remapper::SourceMesh ) = data_src.file_set;
     tdata.remapper->GetMeshSet ( moab::Remapper::TargetMesh ) = data_tgt.file_set;
-    tdata.remapper->GetMeshSet ( moab::Remapper::IntersectedMesh ) = data_intx.file_set;
+    tdata.remapper->GetMeshSet ( moab::Remapper::OverlapMesh ) = data_intx.file_set;
 
     rval = tdata.remapper->ConvertMeshToTempest ( moab::Remapper::SourceMesh );CHKERRVAL(rval);
     rval = tdata.remapper->ConvertMeshToTempest ( moab::Remapper::TargetMesh );CHKERRVAL(rval);
@@ -2778,7 +2778,7 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere ( iMOAB_AppID pid_src, iMOAB_AppID
 
     // Next, compute intersections with MOAB.
     rval = tdata.remapper->ComputeOverlapMesh ( use_kdtree_search, false );CHKERRVAL(rval);
-    // rval = data_intx.remapper->ConvertMeshToTempest ( moab::Remapper::IntersectedMesh );CHKERRVAL(rval);
+    // rval = data_intx.remapper->ConvertMeshToTempest ( moab::Remapper::OverlapMesh );CHKERRVAL(rval);
 
     // Mapping computation done
     if (validate)
@@ -2892,7 +2892,7 @@ ErrCode iMOAB_ComputePointDoFIntersection ( iMOAB_AppID pid_src, iMOAB_AppID pid
     tdata.remapper->initialize(false);
     tdata.remapper->GetMeshSet ( moab::Remapper::SourceMesh ) = data_src.file_set;
     tdata.remapper->GetMeshSet ( moab::Remapper::TargetMesh ) = data_tgt.file_set;
-    tdata.remapper->GetMeshSet ( moab::Remapper::IntersectedMesh ) = data_intx.file_set;
+    tdata.remapper->GetMeshSet ( moab::Remapper::OverlapMesh ) = data_intx.file_set;
 
     /* Let make sure that the radius match for source and target meshes. If not, rescale now and unscale later. */
     bool radii_scaled = false;

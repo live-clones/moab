@@ -234,7 +234,7 @@ int main(int argc, char * argv[])
                                               strlen(disc_methods[2]), strlen(disc_methods[0]),
                                               strlen(dof_tag_names[2]), strlen(dof_tag_names[0])
                                             );
-  CHECKIERR(ierr, "failed to compute remapping projection weights for ATM-LND scalar non-conservative field");
+  CHECKIERR(ierr, "failed to compute remapping projection weights for LND-ATM scalar non-conservative field");
 
   /* We have the mesh intersection now. Let us compute the remapping weights */
   fNoConserve=0;
@@ -260,7 +260,7 @@ int main(int argc, char * argv[])
                                             strlen(bottomTempField),
                                             strlen(bottomTempProjectedNCField)
                                             );
-  CHECKIERR(ierr, "failed to compute projection weight application for scalar non-conservative field");
+  CHECKIERR(ierr, "failed to apply projection weights for scalar non-conservative field");
 
   /* We have the remapping weights now. Let us apply the weights onto the tag we defined
      on the srouce mesh and get the projection on the target mesh */
@@ -272,7 +272,7 @@ int main(int argc, char * argv[])
                                             strlen(bottomTempField),
                                             strlen(bottomTempProjectedField)
                                             );
-  CHECKIERR(ierr, "failed to compute projection weight application for scalar conservative field");
+  CHECKIERR(ierr, "failed to apply projection weights for scalar conservative field");
 
   /* We have the remapping weights now. Let us apply the weights onto the tag we defined
      on the srouce mesh and get the projection on the target mesh */
@@ -284,7 +284,7 @@ int main(int argc, char * argv[])
                                             strlen(bottomTempField),
                                             strlen(bottomTempProjectedField)
                                             );
-  CHECKIERR(ierr, "failed to compute projection weight application for ATM-LND scalar field");
+  CHECKIERR(ierr, "failed to apply projection weights for ATM-LND scalar field");
 
   /* We have the remapping weights now. Let us apply the weights onto the tag we defined
      on the srouce mesh and get the projection on the target mesh */
@@ -296,7 +296,7 @@ int main(int argc, char * argv[])
                                             strlen(bottomTempField),
                                             strlen(bottomTempProjectedField)
                                             );
-  CHECKIERR(ierr, "failed to compute projection weight application for LND-ATM scalar field");
+  CHECKIERR(ierr, "failed to apply projection weights for LND-ATM scalar field");
 
   /*
    * the file can be written in parallel, and it will contain additional tags defined by the user

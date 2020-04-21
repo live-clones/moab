@@ -16,13 +16,13 @@ public:
   Intx2MeshInPlane(Interface * mbimpl);
   virtual ~Intx2MeshInPlane();
 
-  double setup_red_cell(EntityHandle red, int & nsRed);
+  double setup_tgt_cell(EntityHandle tgt, int & nsTgt);
 
-  ErrorCode computeIntersectionBetweenRedAndBlue(EntityHandle red, EntityHandle blue,
+  ErrorCode computeIntersectionBetweenTgtAndSrc(EntityHandle tgt, EntityHandle src,
       double * P, int & nP, double & area, int markb[MAXEDGES], int markr[MAXEDGES],
-      int & nsBlue, int & nsRed, bool check_boxes_first=false);
+      int & nsSrc, int & nsTgt, bool check_boxes_first=false);
 
-  ErrorCode findNodes(EntityHandle red, int nsRed, EntityHandle blue, int nsBlue, double * iP, int nP);
+  ErrorCode findNodes(EntityHandle tgt, int nsTgt, EntityHandle src, int nsSrc, double * iP, int nP);
 
 };
 } // end namespace moab

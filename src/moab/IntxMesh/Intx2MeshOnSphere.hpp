@@ -21,15 +21,15 @@ public:
   void set_radius_source_mesh(double radius) { Rsrc=radius ;}
   void set_radius_destination_mesh(double radius) { Rdest=radius ;}
 
-  double setup_red_cell(EntityHandle red, int & nsRed);
+  double setup_tgt_cell(EntityHandle tgt, int & nsTgt);
 
   // main method to intersect meshes on a sphere
 
-  ErrorCode computeIntersectionBetweenRedAndBlue(EntityHandle red, EntityHandle blue,
+  ErrorCode computeIntersectionBetweenTgtAndSrc(EntityHandle tgt, EntityHandle src,
           double * P, int & nP, double & area, int markb[MAXEDGES], int markr[MAXEDGES],
-          int & nsBlue, int & nsRed, bool check_boxes_first=false);
+          int & nsSrc, int & nsTgt, bool check_boxes_first=false);
 
-  ErrorCode findNodes(EntityHandle red, int nsRed, EntityHandle blue, int nsBlue,
+  ErrorCode findNodes(EntityHandle tgt, int nsTgt, EntityHandle src, int nsSrc,
       double * iP, int nP);
 
   ErrorCode update_tracer_data(EntityHandle out_set, Tag & tagElem, Tag & tagArea);
