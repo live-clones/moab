@@ -26,6 +26,8 @@ int main(int argc, char **argv)
 
   // vertex 25 in filt out  (-0.784768, 0.594952, -0.173698)
   double x=-0.784768, y=0.594952, z=-0.173698;
+  double lat=28.6551, lon=61.0204; // from Charlie Zender's page
+  // https://acme-climate.atlassian.net/wiki/spaces/ED/pages/1347092547/Assessing+and+Addressing+Regridding+Weights+in+Map-Files
 
   string inputFile = test_file_name;
   opts.addOpt<string>("inFile,i", "Specify the input file name string ", &inputFile);
@@ -36,6 +38,12 @@ int main(int argc, char **argv)
   opts.addOpt<double>(string("xpos,x"), string("x position"), &x);
   opts.addOpt<double>(string("ypos,y"), string("y position"), &y);
   opts.addOpt<double>(string("zpos,z"), string("z position"), &z);
+
+  opts.addOpt<double>(string("latitude,t"), string("north latitude in degrees"), &lat);
+  opts.addOpt<double>(string("longitude,w"), string("east longitude in degrees"), &lon);
+
+  bool spherical= false;
+  opts.addOpt<void>("spherical,s", "use spherical coords input", &spherical);
 
   double distance =0.01;
   opts.addOpt<double>(string("distance,d"), string("distance "), &distance);
@@ -58,7 +66,18 @@ int main(int argc, char **argv)
       // create meshset
   rval = mb.create_meshset(MESHSET_SET, outSet);MB_CHK_ERR(rval);
 
+  // double sphere radius is 1
   CartVect point(x,y,z);
+  const double MY_PI=3.1415926535;
+  if (spherical)
+  {
+    lat = lat*MY_PI/180;
+    lon = lon*MY_PI/180;
+    point[0] =  cos(lat) * cos(lon);
+    point[1] =  cos(lat) * sin(lon);
+    point[2] =  sin(lat);
+  }
+
   Range closeByCells;
   for (Range::iterator it=elems.begin(); it!=elems.end(); it++)
   {
