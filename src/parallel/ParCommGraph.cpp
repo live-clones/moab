@@ -1010,6 +1010,7 @@ void ParCommGraph::settle_comm_by_ids(int comp, TupleList & TLBackToComp, std::v
   // Vector to store element
   // with respective present index
   std::vector<std::pair<int, int> > vp;
+  vp.reserve(valuesComp.size());
 
   // Inserting element in pair vector
   // to keep track of previous indexes in valuesComp
@@ -1037,7 +1038,7 @@ void ParCommGraph::settle_comm_by_ids(int comp, TupleList & TLBackToComp, std::v
       int val = *sst;
       involved_IDs_map[procId].push_back(val);
       indx[indexVal+1] = indx[indexVal];
-      while ( vp[indexInVp].first <= val) // should be equal !
+      while ( (indexInVp<(int)valuesComp.size()) && (vp[indexInVp].first <= val)) // should be equal !
       {
         if (vp[indexInVp].first == val)
         {
