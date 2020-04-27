@@ -879,6 +879,9 @@ ErrorCode ParCommGraph::receive_tag_values (MPI_Comm jcomm, ParallelComm *pco, R
           buffer->buff_ptr+=vect_bytes_per_tag[i];
         }
       }
+
+      // delete receive buffer
+      delete buffer ;
 #ifdef VERBOSE
       dbfile.close();
 #endif
@@ -903,7 +906,7 @@ ErrorCode ParCommGraph::receive_tag_values (MPI_Comm jcomm, ParallelComm *pco, R
       // we will fill this array, using data from received buffer
       //rval = mb->tag_get_data(owned, (void*)( &(valuesTags[i][0])) );MB_CHK_ERR ( rval );
     }
-    // now, pack the data and send it
+    // now, unpack the data and set the tags
     sendReqs.resize(involved_IDs_map.size());
     for (std::map<int ,std::vector<int> >::iterator mit =involved_IDs_map.begin(); mit!=involved_IDs_map.end(); mit++)
     {
@@ -931,6 +934,8 @@ ErrorCode ParCommGraph::receive_tag_values (MPI_Comm jcomm, ParallelComm *pco, R
             valuesTags[i][ index_in_values[k] ]= val;
         }
       }
+      // we are done with the buffer in which we received tags, release / delete it
+      delete buffer;
     }
     // now we populated the values for all tags; set now the tags!
     for (size_t i=0; i<tag_handles.size(); i++)

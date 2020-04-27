@@ -329,6 +329,7 @@ ErrCode iMOAB_DeregisterApplication ( iMOAB_AppID pid )
     {
       ParCommGraph* pgr = mt->second;
       delete pgr;
+      pgr = NULL;
     }
     if (pco) delete pco;
 #endif
@@ -2181,8 +2182,10 @@ ErrCode iMOAB_ComputeCommGraph(iMOAB_AppID  pid1, iMOAB_AppID  pid2,  MPI_Comm* 
   MPI_Comm_size( *join, &numProcs );
   // instantiate the par comm graph
   // ParCommGraph::ParCommGraph(MPI_Comm joincomm, MPI_Group group1, MPI_Group group2, int coid1, int coid2)
-  ParCommGraph* cgraph = new ParCommGraph ( *join, *group1, *group2, *comp1, *comp2 );
-  ParCommGraph* cgraph_rev = new ParCommGraph ( *join, *group2, *group1, *comp2, *comp1 );
+  ParCommGraph* cgraph = NULL;
+  if (*pid1>=0) cgraph = new ParCommGraph ( *join, *group1, *group2, *comp1, *comp2 );
+  ParCommGraph* cgraph_rev = NULL;
+  if (*pid2>=0) cgraph_rev = new ParCommGraph ( *join, *group2, *group1, *comp2, *comp1 );
   // we should search if we have another pcomm with the same comp ids in the list already
   // sort of check existing comm graphs in the map context.appDatas[*pid].pgraph
   if (*pid1>=0) context.appDatas[*pid1].pgraph[*comp2] = cgraph ; // the context will be the other comp
