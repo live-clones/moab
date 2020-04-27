@@ -699,8 +699,12 @@ double area_spherical_triangle_lHuiller(double * ptA, double * ptB,
     std::cout << " c: " << c << "\n";
   }
 #endif
+
+#ifdef MOAB_HAVE_TEMPESTREMAP
   if (fabs(gq_areas-area) > 1e-14)
     printf("Areas from quadrature = %12.16f, lHuiller = %12.16f, Error = %12.16e\n", gq_areas, area, fabs(gq_areas-area));
+#endif
+
   return area;
 }
 #undef CHECKNEGATIVEAREA
