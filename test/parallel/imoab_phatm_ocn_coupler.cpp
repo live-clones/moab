@@ -811,6 +811,12 @@ int main( int argc, char* argv[] )
     ierr = iMOAB_DeregisterApplication(cplAtmOcnPID);
     CHECKIERR(ierr, "cannot deregister app intx AO" )
   }
+#endif
+  if (atmComm != MPI_COMM_NULL) {
+    ierr = iMOAB_DeregisterApplication(cmpPhAtmPID);
+    CHECKIERR(ierr, "cannot deregister app PhysAtm " )
+  }
+#ifdef ENABLE_ATMOCN_COUPLING
   if (ocnComm != MPI_COMM_NULL) {
     ierr = iMOAB_DeregisterApplication(cmpOcnPID);
     CHECKIERR(ierr, "cannot deregister app OCN1" )
@@ -820,8 +826,6 @@ int main( int argc, char* argv[] )
   if (atmComm != MPI_COMM_NULL) {
     ierr = iMOAB_DeregisterApplication(cmpAtmPID);
     CHECKIERR(ierr, "cannot deregister app ATM1" )
-    ierr = iMOAB_DeregisterApplication(cmpPhAtmPID);
-    CHECKIERR(ierr, "cannot deregister app PhysAtm " )
   }
 
 #ifdef ENABLE_ATMLND_COUPLING

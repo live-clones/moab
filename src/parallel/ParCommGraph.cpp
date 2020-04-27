@@ -1208,6 +1208,8 @@ ErrorCode ParCommGraph::compute_partition (ParallelComm *pco, Range & owned, int
       split_ranges[receiverTasks[part_index]] = mit->second;
     }
   }
+  // delete now the partitioner
+  delete mbZTool;
 #endif
   t3 = MPI_Wtime();
   if (rootSender)
