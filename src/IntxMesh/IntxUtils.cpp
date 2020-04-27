@@ -23,6 +23,10 @@
 #endif
 #include <queue>
 
+#ifdef MOAB_HAVE_TEMPESTREMAP
+#include "GridElements.h"
+#endif
+
 namespace moab {
 
 #define CORRTAGNAME "__correspondent"
@@ -613,6 +617,22 @@ double area_spherical_polygon(double * A, int N, double Radius) {
   return Radius * Radius * correction;
 
 }
+
+#ifdef MOAB_HAVE_TEMPESTREMAP
+double gauss_quadrature_area_integral(double * ptA, double * ptB,
+    double * ptC, double Radius) {
+  Face face(3);
+  NodeVector nodes(3);
+  nodes[0] = Node(ptA[0], ptA[1], ptA[2]);
+  nodes[1] = Node(ptB[0], ptB[1], ptB[2]);
+  nodes[2] = Node(ptC[0], ptC[1], ptC[2]);
+  face.SetNode(0, 0);
+  face.SetNode(1, 1);
+  face.SetNode(2, 2);
+  return CalculateFaceArea(face, nodes);
+}
+#endif
+
 /*
  *  l'Huiller's formula for spherical triangle
  *  http://williams.best.vwh.net/avform.htm
@@ -642,6 +662,11 @@ double area_spherical_polygon(double * A, int N, double Radius) {
 
 double area_spherical_triangle_lHuiller(double * ptA, double * ptB,
     double * ptC, double Radius) {
+
+#ifdef MOAB_HAVE_TEMPESTREMAP
+  double gq_areas = gauss_quadrature_area_integral(ptA, ptB, ptC, Radius);
+#endif
+
   // now, a is angle BOC, O is origin
   CartVect vA(ptA), vB(ptB), vC(ptC);
   double a = angle(vB, vC);
@@ -674,6 +699,8 @@ double area_spherical_triangle_lHuiller(double * ptA, double * ptB,
     std::cout << " c: " << c << "\n";
   }
 #endif
+  if (fabs(gq_areas-area) > 1e-14)
+    printf("Areas from quadrature = %12.16f, lHuiller = %12.16f, Error = %12.16e\n", gq_areas, area, fabs(gq_areas-area));
   return area;
 }
 #undef CHECKNEGATIVEAREA
