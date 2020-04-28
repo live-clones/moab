@@ -210,14 +210,6 @@ int main( int argc, char* argv[] )
   CHECKIERR(ierr, "Cannot create ocnComm")
 #endif
 
-//#ifdef ENABLE_ATMLND_COUPLING
-  int PHYS_COMM_TAG = 3;
-  MPI_Comm physComm;
-  // physComm is for phys atm app (can we use atm comm?)
-  ierr = MPI_Comm_create_group(MPI_COMM_WORLD, atmPEGroup, PHYS_COMM_TAG, &physComm);
-  CHECKIERR(ierr, "Cannot create physComm")  // can we use atm comm ?
-//#endif
-
   int COU_COMM_TAG = 4;
   MPI_Comm couComm;
   // lndComm is for land app
