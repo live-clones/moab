@@ -69,6 +69,7 @@ struct appData
 {
     EntityHandle file_set;
     int   global_id;  // external component id, unique for application
+    std::string name;
     Range all_verts;
     Range local_verts; // it could include shared, but not owned at the interface
     // these vertices would be all_verts if no ghosting was required
@@ -251,6 +252,7 @@ ErrCode iMOAB_RegisterApplication ( const iMOAB_String app_name,
     appData app_data;
     app_data.file_set = file_set;
     app_data.global_id = * compid; // will be used mostly for par comm graph
+    app_data.name = name; // save the name of application
 
 #ifdef MOAB_HAVE_TEMPESTREMAP
     app_data.tempestData.remapper = NULL; // Only allocate as needed
@@ -301,8 +303,15 @@ ErrCode iMOAB_DeregisterApplication ( iMOAB_AppID pid )
     // the file set , parallel comm are all in vectors indexed by *pid
     // assume we did not delete anything yet
     // *pid will not be reused if we register another application
+    appData& data = context.appDatas[*pid];
+    int rankHere=0;
+#ifdef MOAB_HAVE_MPI
+    ParallelComm* pco = context.pcomms[*pid];
+    rankHere  = pco->rank();
+#endif
+    if (!rankHere) std::cout << " application with ID: " << *pid << " global id: " << data.global_id << " name: " << data.name <<  " is de-registered now \n";
 
-    EntityHandle fileSet = context.appDatas[*pid].file_set;
+    EntityHandle fileSet = data.file_set;
     // get all entities part of the file set
     Range fileents;
     ErrorCode rval = context.MBI->get_entities_by_handle ( fileSet, fileents, /*recursive */true );CHKERRVAL(rval);
@@ -312,17 +321,16 @@ ErrCode iMOAB_DeregisterApplication ( iMOAB_AppID pid )
     rval = context.MBI->get_entities_by_type ( fileSet, MBENTITYSET, fileents );CHKERRVAL(rval); // append all mesh sets
 
 #ifdef MOAB_HAVE_TEMPESTREMAP
-  if (context.appDatas[*pid].tempestData.remapper) delete context.appDatas[*pid].tempestData.remapper;
-  if (context.appDatas[*pid].tempestData.weightMaps.size()) context.appDatas[*pid].tempestData.weightMaps.clear();
+  if (data.tempestData.remapper) delete data.tempestData.remapper;
+  if (data.tempestData.weightMaps.size()) data.tempestData.weightMaps.clear();
 #endif
 
 #ifdef MOAB_HAVE_MPI
-    ParallelComm* pco = context.pcomms[*pid];
 
     // we could get the pco also with
     // ParallelComm * pcomm = ParallelComm::get_pcomm(context.MBI, *pid);
 
-    std::map<int, ParCommGraph*>& pargs = context.appDatas[*pid].pgraph;
+    std::map<int, ParCommGraph*>& pargs = data.pgraph;
 
     // free the parallel comm graphs associated with this app
     for ( std::map<int, ParCommGraph*>::iterator mt = pargs.begin(); mt!= pargs.end(); mt++ )
@@ -381,7 +389,7 @@ ErrCode iMOAB_DeregisterApplication ( iMOAB_AppID pid )
 
     context.appIdCompMap.erase ( mit1 );
 
-    context.unused_pid--;
+    context.unused_pid--; // we have to go backwards always TODO
     context.appDatas.pop_back();
 #ifdef MOAB_HAVE_MPI
     context.pcomms.pop_back();
