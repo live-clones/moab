@@ -56,6 +56,7 @@ int run_test( ErrorCode (*func)(const char*),
 
 ErrorCode migrate_graph( const char* filename );
 ErrorCode migrate_geom( const char* filename );
+ErrorCode migrate_trivial( const char* filename );
 
 // some global variables, used by all tests
 int rank, size, ierr;
@@ -190,6 +191,12 @@ ErrorCode migrate_geom( const char* filename )
   return migrate_smart(filename, "migrate_geom.h5m", 2);
 }
 
+ErrorCode migrate_trivial( const char* filename )
+{
+  return migrate_smart(filename, "migrate_trivial.h5m", 0);
+}
+
+
 int main( int argc, char* argv[] )
 {
   MPI_Init(&argc, &argv);
@@ -201,7 +208,7 @@ int main( int argc, char* argv[] )
   MPI_Comm_group(jcomm, &jgroup);
 
   ProgOptions opts;
-  int typeTest = 0;
+  int typeTest = 3;
   //std::string inputfile, outfile("out.h5m"), netcdfFile, variable_name, sefile_name;
   std::string filename;
   filename = TestDir + "/field1.h5m";
@@ -217,7 +224,7 @@ int main( int argc, char* argv[] )
   opts.addOpt<int>("startRecv,c", "start task for receiver layout", &startG2);
   opts.addOpt<int>("endRecv,d", "end task for receiver layout", &endG2);
 
-  opts.addOpt<int>("typeTest,t", "test types (both=0 default, 1 graph only, 2 geom only", &typeTest);
+  opts.addOpt<int>("typeTest,t", "test types (0 - trivial, 1 graph, 2 geom, 3 both  graph and geometry", &typeTest);
 
   opts.parseCommandLine(argc, argv);
 
@@ -226,13 +233,15 @@ int main( int argc, char* argv[] )
     std::cout << " input file : " << filename << "\n";
     std::cout << " sender   on tasks: " << startG1 << ":" << endG1 <<  "\n";
     std::cout << " receiver on tasks: " << startG2 << ":" << endG2 <<  "\n";
+    std::cout << " type migrate: " << typeTest << " (0 - trivial, 1 graph , 2 geom, 3 both graph and geom  ) \n";
   }
 
   int num_errors = 0;
 
 
-  if (0==typeTest || 1==typeTest) num_errors += RUN_TEST_ARG2( migrate_graph, filename.c_str() );
-  if (0==typeTest || 2==typeTest) num_errors += RUN_TEST_ARG2( migrate_geom, filename.c_str() );
+  if (0==typeTest) num_errors += RUN_TEST_ARG2( migrate_trivial, filename.c_str() );
+  if (3==typeTest || 1==typeTest) num_errors += RUN_TEST_ARG2( migrate_graph, filename.c_str() );
+  if (3==typeTest || 2==typeTest) num_errors += RUN_TEST_ARG2( migrate_geom, filename.c_str() );
 
   if (rank == 0) {
     if (!num_errors)
