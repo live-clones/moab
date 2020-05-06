@@ -36,15 +36,15 @@ namespace moab {
 
 
 // vec utilities that could be common between quads on a plane or sphere
-double dist2(double * a, double * b) {
+double IntxUtils::dist2(double * a, double * b) {
   double abx = b[0] - a[0], aby = b[1] - a[1];
   return sqrt(abx * abx + aby * aby);
 }
-double area2D(double *a, double *b, double *c) {
+double IntxUtils::area2D(double *a, double *b, double *c) {
   // (b-a)x(c-a) / 2
   return ((b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0])) / 2;
 }
-int borderPointsOfXinY2(double * X, int nX, double * Y, int nY, double * P,
+int IntxUtils::borderPointsOfXinY2(double * X, int nX, double * Y, int nY, double * P,
     int * side, double epsilon_area) {
   // 2 triangles, 3 corners, is the corner of X in Y?
   // Y must have a positive area
@@ -93,7 +93,7 @@ bool angleCompare(angleAndIndex lhs, angleAndIndex rhs)
 { return lhs.angle < rhs.angle; }
 
 // nP might be modified too, we will remove duplicates if found
-int SortAndRemoveDoubles2(double * P, int & nP, double epsilon_1) {
+int IntxUtils::SortAndRemoveDoubles2(double * P, int & nP, double epsilon_1) {
   if (nP < 2)
     return 0; // nothing to do
   // center of gravity for the points
@@ -165,7 +165,7 @@ int SortAndRemoveDoubles2(double * P, int & nP, double epsilon_1) {
 
 // the marks will show what edges of blue intersect the red
 
-ErrorCode EdgeIntersections2(double * blue, int nsBlue, double * red, int nsRed,
+ErrorCode IntxUtils::EdgeIntersections2(double * blue, int nsBlue, double * red, int nsRed,
     int * markb, int * markr, double * points, int & nPoints) {
   /* EDGEINTERSECTIONS computes edge intersections of two elements
    [P,n]=EdgeIntersections(X,Y) computes for the two given elements  * red
@@ -220,7 +220,7 @@ ErrorCode EdgeIntersections2(double * blue, int nsBlue, double * red, int nsRed,
 }
 
 // special one, for intersection between rll (constant latitude)  and cs quads
-ErrorCode EdgeIntxRllCs(double * blue, CartVect * bluec, int * blueEdgeType,
+ErrorCode IntxUtils::EdgeIntxRllCs(double * blue, CartVect * bluec, int * blueEdgeType,
     int nsBlue, double * red, CartVect * redc, int nsRed, int * markb,
     int * markr, int plane, double R, double * points, int & nPoints) {
   // if blue edge type is 1, intersect in 3d then project to 2d by gnomonic projection
@@ -307,7 +307,7 @@ ErrorCode EdgeIntxRllCs(double * blue, CartVect * bluec, int * blueEdgeType,
  * projection on the plane will preserve the orientation, such that a triangle, quad pointing
  * outside the sphere will have a positive orientation in the projection plane
  */
-void decide_gnomonic_plane(const CartVect & pos, int & plane) {
+void IntxUtils::decide_gnomonic_plane(const CartVect & pos, int & plane) {
   // decide plane, based on max x, y, z
   if (fabs(pos[0]) < fabs(pos[1])) {
     if (fabs(pos[2]) < fabs(pos[1])) {
@@ -340,8 +340,9 @@ void decide_gnomonic_plane(const CartVect & pos, int & plane) {
   }
   return;
 }
+
 // point on a sphere is projected on one of six planes, decided earlier
-ErrorCode gnomonic_projection(const CartVect & pos, double R, int plane, double & c1,
+ErrorCode IntxUtils::gnomonic_projection(const CartVect & pos, double R, int plane, double & c1,
     double & c2) {
   double alfa = 1.; // the new point will be on line alfa*pos
 
@@ -396,7 +397,7 @@ ErrorCode gnomonic_projection(const CartVect & pos, double R, int plane, double 
 }
 
 // given the position on plane (one out of 6), find out the position on sphere
-ErrorCode reverse_gnomonic_projection(const double & c1, const double & c2, double R,
+ErrorCode IntxUtils::reverse_gnomonic_projection(const double & c1, const double & c2, double R,
     int plane, CartVect & pos) {
 
   // the new point will be on line beta*pos
@@ -484,7 +485,7 @@ ErrorCode reverse_gnomonic_projection(const double & c1, const double & c2, doub
 
  end function cart_to_spherical
  */
-SphereCoords cart_to_spherical(CartVect & cart3d) {
+IntxUtils::SphereCoords IntxUtils::cart_to_spherical(CartVect & cart3d) {
   SphereCoords res;
   res.R = cart3d.length();
   if (res.R < 0) {
@@ -500,6 +501,7 @@ SphereCoords cart_to_spherical(CartVect & cart3d) {
 
   return res;
 }
+
 /*
  * ! ===================================================================
  ! spherical_to_cart:
@@ -518,7 +520,7 @@ SphereCoords cart_to_spherical(CartVect & cart3d) {
 
  end function spherical_to_cart
  */
-CartVect spherical_to_cart(SphereCoords & sc) {
+CartVect IntxUtils::spherical_to_cart(IntxUtils::SphereCoords & sc) {
   CartVect res;
   res[0] = sc.R * cos(sc.lat) * cos(sc.lon); // x coordinate
   res[1] = sc.R * cos(sc.lat) * sin(sc.lon); // y
@@ -526,7 +528,7 @@ CartVect spherical_to_cart(SphereCoords & sc) {
   return res;
 }
 
-ErrorCode ScaleToRadius(Interface * mb, EntityHandle set, double R) {
+ErrorCode IntxUtils::ScaleToRadius(Interface * mb, EntityHandle set, double R) {
   Range nodes;
   ErrorCode rval = mb->get_entities_by_type(set, MBVERTEX, nodes, true); // recursive
   if (rval != moab::MB_SUCCESS)
@@ -552,7 +554,7 @@ ErrorCode ScaleToRadius(Interface * mb, EntityHandle set, double R) {
 }
 
 // assume they are one the same sphere
-double spherical_angle(double * A, double * B, double * C, double Radius) {
+double IntxAreaUtils::spherical_angle(double * A, double * B, double * C, double Radius) {
   // the angle by definition is between the planes OAB and OBC
   CartVect a(A);
   CartVect b(B);
@@ -566,9 +568,10 @@ double spherical_angle(double * A, double * B, double * C, double Radius) {
   CartVect normalOCB = c * b;
   return angle(normalOAB, normalOCB);
 }
+
 // could be bigger than M_PI;
 // angle at B could be bigger than M_PI, if the orientation is such that ABC points toward the interior
-double oriented_spherical_angle(double * A, double * B, double * C) {
+double IntxUtils::oriented_spherical_angle(double * A, double * B, double * C) {
   // assume the same radius, sphere at origin
   CartVect a(A), b(B), c(C);
   CartVect normalOAB = a * b;
@@ -586,7 +589,8 @@ double oriented_spherical_angle(double * A, double * B, double * C) {
   return ang;
 
 }
-double area_spherical_triangle(double *A, double *B, double *C, double Radius) {
+
+double IntxAreaUtils::area_spherical_triangle(double *A, double *B, double *C, double Radius) {
   double correction = spherical_angle(A, B, C, Radius)
       + spherical_angle(B, C, A, Radius)
       + spherical_angle(C, A, B, Radius)-M_PI;
@@ -601,7 +605,7 @@ double area_spherical_triangle(double *A, double *B, double *C, double Radius) {
 
 }
 
-double area_spherical_polygon(double * A, int N, double Radius) {
+double IntxAreaUtils::area_spherical_polygon(double * A, int N, double Radius) {
   // this should work for non-convex polygons too
   // assume that the A, A+3, ..., A+3*(N-1) are the coordinates
   //
@@ -611,7 +615,7 @@ double area_spherical_polygon(double * A, int N, double Radius) {
   for (int i = 0; i < N; i++) {
     int i1 = (i + 1) % N;
     int i2 = (i + 2) % N;
-    sum_angles += oriented_spherical_angle(A + 3 * i, A + 3 * i1, A + 3 * i2);
+    sum_angles += IntxUtils::oriented_spherical_angle(A + 3 * i, A + 3 * i1, A + 3 * i2);
   }
   double correction = sum_angles - (N - 2) * M_PI;
   return Radius * Radius * correction;
@@ -619,7 +623,7 @@ double area_spherical_polygon(double * A, int N, double Radius) {
 }
 
 #ifdef MOAB_HAVE_TEMPESTREMAP
-double gauss_quadrature_area_integral(double * ptA, double * ptB,
+double IntxAreaUtils::area_spherical_triangle_GQ(double * ptA, double * ptB,
     double * ptC, double Radius) {
   Face face(3);
   NodeVector nodes(3);
@@ -660,12 +664,8 @@ double gauss_quadrature_area_integral(double * ptA, double * ptB,
  *  E = 4*atan(sqrt(tan(s/2)*tan((s-a)/2)*tan((s-b)/2)*tan((s-c)/2)))
  */
 
-double area_spherical_triangle_lHuiller(double * ptA, double * ptB,
+double IntxAreaUtils::area_spherical_triangle_lHuiller(double * ptA, double * ptB,
     double * ptC, double Radius) {
-
-#ifdef MOAB_HAVE_TEMPESTREMAP
-  double gq_areas = gauss_quadrature_area_integral(ptA, ptB, ptC, Radius);
-#endif
 
   // now, a is angle BOC, O is origin
   CartVect vA(ptA), vB(ptB), vC(ptC);
@@ -700,16 +700,31 @@ double area_spherical_triangle_lHuiller(double * ptA, double * ptB,
   }
 #endif
 
-#ifdef MOAB_HAVE_TEMPESTREMAP
-  if (fabs(gq_areas-area) > 1e-14)
-    printf("Areas from quadrature = %12.16f, lHuiller = %12.16f, Error = %12.16e\n", gq_areas, area, fabs(gq_areas-area));
-#endif
-
   return area;
 }
 #undef CHECKNEGATIVEAREA
 
-double area_spherical_polygon_lHuiller(double * A, int N, double Radius) {
+double IntxAreaUtils::compute_area_spherical_triangle(double * ptA, double * ptB,
+    double * ptC, double Radius)
+{
+#ifdef MOAB_HAVE_TEMPESTREMAP
+  if (this->use_lHuiller)
+  {
+    return area_spherical_triangle_lHuiller(ptA, ptB, ptC, Radius);
+  }
+  else
+  {
+    /* compute the area by using Gauss-Quadratures; use TR interfaces directly */
+    return area_spherical_triangle_GQ(ptA, ptB, ptC, Radius);
+  }
+#else
+  /* Use lHuiller method by default */
+  return area_spherical_triangle_lHuiller(ptA, ptB, ptC, Radius);
+#endif
+}
+
+
+double IntxAreaUtils::area_spherical_polygon_lHuiller(double * A, int N, double Radius) {
   // this should work for non-convex polygons too
   // assume that the A, A+3, ..., A+3*(N-1) are the coordinates
   //
@@ -725,7 +740,7 @@ double area_spherical_polygon_lHuiller(double * A, int N, double Radius) {
   return area;
 }
 
-double area_spherical_polygon_lHuiller_check_sign(double * A, int N, double Radius, int * sign) {
+double IntxAreaUtils::area_spherical_polygon_lHuiller_check_sign(double * A, int N, double Radius, int * sign) {
   // this should work for non-convex polygons too
   // assume that the A, A+3, ..., A+3*(N-1) are the coordinates
   //
@@ -746,7 +761,7 @@ double area_spherical_polygon_lHuiller_check_sign(double * A, int N, double Radi
 }
 
 
-double area_on_sphere(Interface * mb, EntityHandle set, double R) {
+double IntxAreaUtils::area_on_sphere(Interface * mb, EntityHandle set, double R) {
   // get all entities of dimension 2
   // then get the connectivity, etc
   Range inputRange;
@@ -792,7 +807,7 @@ double area_on_sphere(Interface * mb, EntityHandle set, double R) {
   return total_area;
 }
 
-double area_on_sphere_lHuiller(Interface * mb, EntityHandle set, double R) {
+double IntxAreaUtils::area_on_sphere_lHuiller(Interface * mb, EntityHandle set, double R) {
   // get all entities of dimension 2
   // then get the connectivity, etc
   Range inputRange;
@@ -831,7 +846,7 @@ double area_on_sphere_lHuiller(Interface * mb, EntityHandle set, double R) {
   return total_area;
 }
 
-double area_spherical_element(Interface * mb, EntityHandle elem, double R) {
+double IntxAreaUtils::area_spherical_element(Interface * mb, EntityHandle elem, double R) {
   const EntityHandle * verts;
   int num_nodes;
   ErrorCode rval = mb->get_connectivity(elem, verts, num_nodes);
@@ -843,12 +858,10 @@ double area_spherical_element(Interface * mb, EntityHandle elem, double R) {
   if (MB_SUCCESS != rval)
     return -1;
   return area_spherical_polygon_lHuiller(&coords[0], num_nodes, R);
-
 }
-/*
- *
- */
-double distance_on_great_circle(CartVect & p1, CartVect & p2) {
+
+
+double IntxUtils::distance_on_great_circle(CartVect & p1, CartVect & p2) {
   SphereCoords sph1 = cart_to_spherical(p1);
   SphereCoords sph2 = cart_to_spherical(p2);
   // radius should be the same
@@ -857,6 +870,7 @@ double distance_on_great_circle(CartVect & p1, CartVect & p2) {
           sin(sph1.lon) * sin(sph2.lon)
               + cos(sph1.lat) * cos(sph2.lat) * cos(sph2.lon - sph2.lon));
 }
+
 /*
  * based on paper A class of deformational flow test cases for linear transport problems on the sphere
  *  longitude lambda [0.. 2*pi) and latitude theta (-pi/2, pi/2)
@@ -866,7 +880,7 @@ double distance_on_great_circle(CartVect & p1, CartVect & p2) {
  *
  *  cosine bell: center lambda0, theta0:
  */
-void departure_point_case1(CartVect & arrival_point, double t, double delta_t,
+void IntxUtils::departure_point_case1(CartVect & arrival_point, double t, double delta_t,
     CartVect & departure_point) {
   // always assume radius is 1 here?
   SphereCoords sph = cart_to_spherical(arrival_point);
@@ -905,7 +919,7 @@ void departure_point_case1(CartVect & arrival_point, double t, double delta_t,
   return;
 }
 
-void velocity_case1(CartVect & arrival_point, double t, CartVect & velo) {
+void IntxUtils::velocity_case1(CartVect & arrival_point, double t, CartVect & velo) {
   // always assume radius is 1 here?
   SphereCoords sph = cart_to_spherical(arrival_point);
   double T = 5; // duration of integration (5 units)
@@ -928,7 +942,7 @@ void velocity_case1(CartVect & arrival_point, double t, CartVect & velo) {
 // break the nonconvex quads into triangles; remove the quad from the set? yes.
 // maybe radius is not needed;
 //
-ErrorCode enforce_convexity(Interface * mb, EntityHandle lset, int my_rank) {
+ErrorCode IntxUtils::enforce_convexity(Interface * mb, EntityHandle lset, int my_rank) {
   // look at each polygon; compute all angles; if one is reflex, break that angle with
   // the next triangle; put the 2 new polys in the set;
   // still look at the next poly
@@ -1006,7 +1020,7 @@ ErrorCode enforce_convexity(Interface * mb, EntityHandle lset, int my_rank) {
       double * A = &coords[3 * i];
       double * B = &coords[3 * ((i + 1) % nsides)];
       double * C = &coords[3 * ((i + 2) % nsides)];
-      double angle = oriented_spherical_angle(A, B, C);
+      double angle = IntxUtils::oriented_spherical_angle(A, B, C);
       if (angle - M_PI > 0.) // even almost reflex is bad; break it!
           {
         if (alreadyBroken) {
@@ -1014,9 +1028,9 @@ ErrorCode enforce_convexity(Interface * mb, EntityHandle lset, int my_rank) {
           mb->list_entities(verts, nsides);
           double * D = &coords[3 * ((i + 3) % nsides)];
           std::cout << "ABC: " << angle << " \n";
-          std::cout << "BCD: " << oriented_spherical_angle(B, C, D) << " \n";
-          std::cout << "CDA: " << oriented_spherical_angle(C, D, A) << " \n";
-          std::cout << "DAB: " << oriented_spherical_angle(D, A, B) << " \n";
+          std::cout << "BCD: " << IntxUtils::oriented_spherical_angle(B, C, D) << " \n";
+          std::cout << "CDA: " << IntxUtils::oriented_spherical_angle(C, D, A) << " \n";
+          std::cout << "DAB: " << IntxUtils::oriented_spherical_angle(D, A, B) << " \n";
           std::cout
               << " this cell has at least 2 angles > 180, it has serious issues\n";
 
@@ -1094,7 +1108,8 @@ ErrorCode enforce_convexity(Interface * mb, EntityHandle lset, int my_rank) {
       << " concave polygons were decomposed in convex ones \n";
   return MB_SUCCESS;
 }
-ErrorCode create_span_quads(Interface * mb, EntityHandle euler_set, int rank) {
+
+ErrorCode IntxUtils::create_span_quads(Interface * mb, EntityHandle euler_set, int rank) {
   // first get all edges adjacent to polygons
   Tag dpTag = 0;
   std::string tag_name("DP");
@@ -1224,12 +1239,11 @@ ErrorCode create_span_quads(Interface * mb, EntityHandle euler_set, int rank) {
   mb->delete_entities(new_verts);
 
   return MB_SUCCESS;
-
 }
 
 // looking at quad connectivity, collapse to triangle if 2 nodes equal
 // then delete the old quad
-ErrorCode fix_degenerate_quads(Interface * mb, EntityHandle set) {
+ErrorCode IntxUtils::fix_degenerate_quads(Interface * mb, EntityHandle set) {
   Range quads;
   ErrorCode rval = mb->get_entities_by_type(set, MBQUAD, quads); MB_CHK_ERR(rval);
   Tag gid;
@@ -1261,7 +1275,7 @@ ErrorCode fix_degenerate_quads(Interface * mb, EntityHandle set) {
   return MB_SUCCESS;
 }
 
-ErrorCode positive_orientation(Interface * mb, EntityHandle set, double R) {
+ErrorCode IntxAreaUtils::positive_orientation(Interface * mb, EntityHandle set, double R) {
   Range cells2d;
   ErrorCode rval = mb->get_entities_by_dimension(set, 2, cells2d);
   if (MB_SUCCESS != rval)
@@ -1286,7 +1300,7 @@ ErrorCode positive_orientation(Interface * mb, EntityHandle set, double R) {
       area = area_spherical_triangle_lHuiller(coords, coords + 3,
         coords + 6, R);
     else
-      area = area2D(coords, coords + 3, coords + 6);
+      area = IntxUtils::area2D(coords, coords + 3, coords + 6);
     if (area < 0) {
       // compute all area, do not revert if total area is positive
       std::vector<double> coords2(3 * num_nodes);
@@ -1313,14 +1327,16 @@ ErrorCode positive_orientation(Interface * mb, EntityHandle set, double R) {
   }
   return MB_SUCCESS;
 }
+
 // distance along a great circle on a sphere of radius 1
 // page 4
-double distance_on_sphere(double la1, double te1, double la2, double te2) {
+double IntxUtils::distance_on_sphere(double la1, double te1, double la2, double te2) {
   return acos(sin(te1) * sin(te2) + cos(te1) * cos(te2) * cos(la1 - la2));
 }
+
 // page 4 Nair Lauritzen paper
 // param will be: (la1, te1), (la2, te2), b, c; hmax=1, r=1/2
-double quasi_smooth_field(double lam, double tet, double * params) {
+double IntxUtils::quasi_smooth_field(double lam, double tet, double * params) {
   double la1 = params[0];
   double te1 = params[1];
   double la2 = params[2];
@@ -1340,10 +1356,11 @@ double quasi_smooth_field(double lam, double tet, double * params) {
   }
   return value;
 }
+
 // page 4
 // params are now x1, y1, ..., y2, z2 (6 params)
 // plus h max and b0 (total of 8 params); radius is 1
-double smooth_field(double lam, double tet, double * params) {
+double IntxUtils::smooth_field(double lam, double tet, double * params) {
   SphereCoords sc;
   sc.R = 1.;
   sc.lat = tet;
@@ -1357,8 +1374,9 @@ double smooth_field(double lam, double tet, double * params) {
   double expo2 = -b0 * (xyz - c2).length_squared();
   return hmax * (exp(expo1) + exp(expo2));
 }
+
 // page 5
-double slotted_cylinder_field(double lam, double tet, double * params) {
+double IntxUtils::slotted_cylinder_field(double lam, double tet, double * params) {
   double la1 = params[0];
   double te1 = params[1];
   double la2 = params[2];
@@ -1391,7 +1409,7 @@ double slotted_cylinder_field(double lam, double tet, double * params) {
  * given 2 great circle arcs, AB and CD, compute the unique intersection point, if it exists
  *  in between
  */
-ErrorCode intersect_great_circle_arcs(double * A, double * B, double * C,
+ErrorCode IntxUtils::intersect_great_circle_arcs(double * A, double * B, double * C,
     double * D, double R, double * E) {
   // first verify A, B, C, D are on the same sphere
   double R2 = R * R;
@@ -1447,10 +1465,11 @@ ErrorCode intersect_great_circle_arcs(double * A, double * B, double * C,
 
   return MB_SUCCESS;
 }
+
 // verify that result is in between a and b on a great circle arc, and between c and d on a constant
 // latitude arc
-bool verify(CartVect a, CartVect b, CartVect c, CartVect d, double x, double y,
-    double z) {
+static bool verify(CartVect a, CartVect b, CartVect c, CartVect d, double x, double y, double z)
+{
   // to check, the point has to be between a and b on a great arc, and between c and d on a const lat circle
   CartVect s(x, y, z);
   CartVect n1 = a * b;
@@ -1470,7 +1489,8 @@ bool verify(CartVect a, CartVect b, CartVect c, CartVect d, double x, double y,
 
   return true;
 }
-ErrorCode intersect_great_circle_arc_with_clat_arc(double * A, double * B,
+
+ErrorCode IntxUtils::intersect_great_circle_arc_with_clat_arc(double * A, double * B,
     double * C, double * D, double R, double * E, int & np) {
   const double distTol = R * 1.e-6;
   const double Tolerance = R * R * 1.e-12; // radius should be 1, usually
@@ -1702,6 +1722,7 @@ ErrorCode intersect_great_circle_arc_with_clat_arc(double * A, double * B,
     return MB_FAILURE;
   return MB_SUCCESS;
 }
+
 #if 0
 ErrorCode set_edge_type_flag(Interface * mb, EntityHandle sf1)
 {
@@ -1746,9 +1767,10 @@ ErrorCode set_edge_type_flag(Interface * mb, EntityHandle sf1)
   return MB_SUCCESS;
 }
 #endif
+
 // decide in a different metric if the corners of CS quad are
 // in the interior of an RLL quad
-int borderPointsOfCSinRLL(CartVect * redc, double * red2dc, int nsRed,
+int IntxUtils::borderPointsOfCSinRLL(CartVect * redc, double * red2dc, int nsRed,
     CartVect *bluec, int nsBlue, int * blueEdgeType, double * P, int * side,
     double epsil) {
   int extraPoints = 0;
@@ -1790,9 +1812,10 @@ int borderPointsOfCSinRLL(CartVect * redc, double * red2dc, int nsRed,
   }
   return extraPoints;
 }
+
 // this simply copies the one mesh set into another, and sets some correlation tags
 // for easy mapping back and forth
-ErrorCode deep_copy_set(Interface * mb, EntityHandle source_set,
+ErrorCode IntxUtils::deep_copy_set(Interface * mb, EntityHandle source_set,
     EntityHandle dest_set) {
   // create the handle tag for the corresponding element / vertex
 
@@ -1874,7 +1897,8 @@ ErrorCode deep_copy_set(Interface * mb, EntityHandle source_set,
 
   return MB_SUCCESS;
 }
-ErrorCode deep_copy_set_with_quads(Interface * mb, EntityHandle source_set,
+
+ErrorCode IntxUtils::deep_copy_set_with_quads(Interface * mb, EntityHandle source_set,
     EntityHandle dest_set) {
   ReadUtilIface *read_iface;
   ErrorCode rval = mb->query_interface(read_iface);
@@ -1978,4 +2002,5 @@ ErrorCode deep_copy_set_with_quads(Interface * mb, EntityHandle source_set,
 
   return MB_SUCCESS;
 }
+
 } //namespace moab
