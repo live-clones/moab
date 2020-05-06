@@ -2762,10 +2762,11 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere ( iMOAB_AppID pid_src, iMOAB_AppID
     bool defaultradius = 1.0;
     if (fabs(radius_source - radius_target) > 1e-10) { /* the radii are different */
         radii_scaled = true;
-        rval = ScaleToRadius(context.MBI, data_src.file_set, defaultradius);CHKERRVAL(rval);
-        rval = ScaleToRadius(context.MBI, data_tgt.file_set, defaultradius);CHKERRVAL(rval);
+        rval = IntxUtils::ScaleToRadius(context.MBI, data_src.file_set, defaultradius);CHKERRVAL(rval);
+        rval = IntxUtils::ScaleToRadius(context.MBI, data_tgt.file_set, defaultradius);CHKERRVAL(rval);
     }
 
+    IntxAreaUtils areaAdaptor(true); // use_lHuiller = true
     // print verbosely about the problem setting
     bool use_kdtree_search = false;
     double srctgt_areas[2], srctgt_areas_glb[2];
@@ -2773,9 +2774,9 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere ( iMOAB_AppID pid_src, iMOAB_AppID
         moab::Range rintxverts, rintxelems;
         rval = context.MBI->get_entities_by_dimension ( data_src.file_set, 0, rintxverts );CHKERRVAL(rval);
         rval = context.MBI->get_entities_by_dimension ( data_src.file_set, data_src.dimension, rintxelems );CHKERRVAL(rval);
-        rval = fix_degenerate_quads ( context.MBI, data_src.file_set );CHKERRVAL(rval);
-        rval = positive_orientation ( context.MBI, data_src.file_set, defaultradius /*radius_source*/ );CHKERRVAL(rval);
-        srctgt_areas[0] = area_on_sphere_lHuiller ( context.MBI, data_src.file_set, defaultradius /*radius_source*/ );
+        rval = IntxUtils::fix_degenerate_quads ( context.MBI, data_src.file_set );CHKERRVAL(rval);
+        rval = areaAdaptor.positive_orientation ( context.MBI, data_src.file_set, defaultradius /*radius_source*/ );CHKERRVAL(rval);
+        srctgt_areas[0] = areaAdaptor.area_on_sphere_lHuiller ( context.MBI, data_src.file_set, defaultradius /*radius_source*/ );
 #ifdef VERBOSE
         std::cout << "The red set contains " << rintxverts.size() << " vertices and " << rintxelems.size() << " elements \n";
 #endif
@@ -2783,9 +2784,9 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere ( iMOAB_AppID pid_src, iMOAB_AppID
         moab::Range bintxverts, bintxelems;
         rval = context.MBI->get_entities_by_dimension ( data_tgt.file_set, 0, bintxverts );CHKERRVAL(rval);
         rval = context.MBI->get_entities_by_dimension ( data_tgt.file_set, data_tgt.dimension, bintxelems );CHKERRVAL(rval);
-        rval = fix_degenerate_quads ( context.MBI, data_tgt.file_set );CHKERRVAL(rval);
-        rval = positive_orientation ( context.MBI, data_tgt.file_set, defaultradius /*radius_target*/ );CHKERRVAL(rval);
-        srctgt_areas[1] = area_on_sphere_lHuiller ( context.MBI, data_tgt.file_set, defaultradius /*radius_target*/ );
+        rval = IntxUtils::fix_degenerate_quads ( context.MBI, data_tgt.file_set );CHKERRVAL(rval);
+        rval = areaAdaptor.positive_orientation ( context.MBI, data_tgt.file_set, defaultradius /*radius_target*/ );CHKERRVAL(rval);
+        srctgt_areas[1] = areaAdaptor.area_on_sphere_lHuiller ( context.MBI, data_tgt.file_set, defaultradius /*radius_target*/ );
 #ifdef VERBOSE
         std::cout << "The blue set contains " << bintxverts.size() << " vertices and " << bintxelems.size() << " elements \n";
 #endif
@@ -2832,8 +2833,8 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere ( iMOAB_AppID pid_src, iMOAB_AppID
     if (validate)
     {
         double local_areas[2], global_areas[4]; // Array for Initial area, and through Method 1 and Method 2
-        local_areas[0] = area_on_sphere_lHuiller ( context.MBI, data_intx.file_set, radius_source );
-        local_areas[1] = area_on_sphere ( context.MBI, data_intx.file_set, radius_source );
+        local_areas[0] = areaAdaptor.area_on_sphere_lHuiller ( context.MBI, data_intx.file_set, radius_source );
+        local_areas[1] = areaAdaptor.area_on_sphere ( context.MBI, data_intx.file_set, radius_source );
 
         global_areas[0] = srctgt_areas_glb[0];
         global_areas[1] = srctgt_areas_glb[1];
@@ -2898,13 +2899,14 @@ ErrCode iMOAB_ComputePointDoFIntersection ( iMOAB_AppID pid_src, iMOAB_AppID pid
     ComputeSphereRadius(pid_src, &radius_source);
     ComputeSphereRadius(pid_tgt, &radius_target);
 
+    IntxAreaUtils areaAdaptor(true); // use_lHuiller = true
     // print verbosely about the problem setting
     {
         moab::Range rintxverts, rintxelems;
         rval = context.MBI->get_entities_by_dimension ( data_src.file_set, 0, rintxverts );CHKERRVAL(rval);
         rval = context.MBI->get_entities_by_dimension ( data_src.file_set, 2, rintxelems );CHKERRVAL(rval);
-        rval = fix_degenerate_quads ( context.MBI, data_src.file_set );CHKERRVAL(rval);
-        rval = positive_orientation ( context.MBI, data_src.file_set, radius_source );CHKERRVAL(rval);
+        rval = IntxUtils::fix_degenerate_quads ( context.MBI, data_src.file_set );CHKERRVAL(rval);
+        rval = areaAdaptor.positive_orientation ( context.MBI, data_src.file_set, radius_source );CHKERRVAL(rval);
 #ifdef VERBOSE
         std::cout << "The red set contains " << rintxverts.size() << " vertices and " << rintxelems.size() << " elements \n";
 #endif
@@ -2912,8 +2914,8 @@ ErrCode iMOAB_ComputePointDoFIntersection ( iMOAB_AppID pid_src, iMOAB_AppID pid
         moab::Range bintxverts, bintxelems;
         rval = context.MBI->get_entities_by_dimension ( data_tgt.file_set, 0, bintxverts );CHKERRVAL(rval);
         rval = context.MBI->get_entities_by_dimension ( data_tgt.file_set, 2, bintxelems );CHKERRVAL(rval);
-        rval = fix_degenerate_quads ( context.MBI, data_tgt.file_set );CHKERRVAL(rval);
-        rval = positive_orientation ( context.MBI, data_tgt.file_set, radius_target );CHKERRVAL(rval);
+        rval = IntxUtils::fix_degenerate_quads ( context.MBI, data_tgt.file_set );CHKERRVAL(rval);
+        rval = areaAdaptor.positive_orientation ( context.MBI, data_tgt.file_set, radius_target );CHKERRVAL(rval);
 #ifdef VERBOSE
         std::cout << "The blue set contains " << bintxverts.size() << " vertices and " << bintxelems.size() << " elements \n";
 #endif
@@ -2946,8 +2948,8 @@ ErrCode iMOAB_ComputePointDoFIntersection ( iMOAB_AppID pid_src, iMOAB_AppID pid
     bool radii_scaled = false;
     if (fabs(radius_source - radius_target) > 1e-10) { /* the radii are different */
         radii_scaled = true;
-        rval = ScaleToRadius(context.MBI, data_src.file_set, 1.0);CHKERRVAL(rval);
-        rval = ScaleToRadius(context.MBI, data_tgt.file_set, 1.0);CHKERRVAL(rval);
+        rval = IntxUtils::ScaleToRadius(context.MBI, data_src.file_set, 1.0);CHKERRVAL(rval);
+        rval = IntxUtils::ScaleToRadius(context.MBI, data_tgt.file_set, 1.0);CHKERRVAL(rval);
     }
 
     rval = tdata.remapper->ConvertMeshToTempest ( moab::Remapper::SourceMesh );CHKERRVAL(rval);

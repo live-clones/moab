@@ -62,10 +62,11 @@ int main(int argc, char* argv[])
   rval = mb->create_meshset(MESHSET_SET, outputSet);
   if (MB_SUCCESS != rval)
     return 1;
+  
   Intx2MeshInPlane worker(mb);
-
-  rval = positive_orientation(mb, sf1, -1);MB_CHK_ERR(rval);
-  rval = positive_orientation(mb, sf2, -1);MB_CHK_ERR(rval);
+  IntxAreaUtils areaAdaptor;
+  rval = areaAdaptor.positive_orientation(mb, sf1, -1);MB_CHK_ERR(rval);
+  rval = areaAdaptor.positive_orientation(mb, sf2, -1);MB_CHK_ERR(rval);
 
   worker.set_error_tolerance( 1.e-5);
   rval = worker.FindMaxEdges(sf1, sf2);MB_CHK_ERR(rval);
@@ -97,6 +98,5 @@ int main(int argc, char* argv[])
   if (MB_SUCCESS != rval)
     return 1;
   return 0;
-
-
 }
+

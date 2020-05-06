@@ -285,6 +285,8 @@ int main ( int argc, char* argv[] )
     remapper.constructEdgeMap = false;
     remapper.initialize();
 
+    moab::IntxAreaUtils areaAdaptor(true); // use_lHuiller = true
+
     Mesh* tempest_mesh = new Mesh();
     runCtx->timer_push ( "create Tempest mesh" );
     rval = CreateTempestMesh ( *runCtx, remapper, tempest_mesh ); MB_CHK_ERR ( rval );
@@ -371,10 +373,10 @@ int main ( int argc, char* argv[] )
             rval = mbCore->get_entities_by_dimension ( intxset, 0, intxverts, true ); MB_CHK_ERR ( rval );
             outputFormatter.printf ( 0,  "The intersection set contains %lu elements and %lu vertices \n", intxelems.size(), intxverts.size() );
 
-            double initial_sarea = area_on_sphere_lHuiller ( mbCore, runCtx->meshsets[0], radius_src ); // use the target to compute the initial area
-            double initial_tarea = area_on_sphere_lHuiller ( mbCore, runCtx->meshsets[1], radius_dest ); // use the target to compute the initial area
-            double area_method1 = area_on_sphere_lHuiller ( mbCore, intxset, radius_src );
-            double area_method2 = area_on_sphere ( mbCore, intxset, radius_src );
+            double initial_sarea = areaAdaptor.area_on_sphere_lHuiller ( mbCore, runCtx->meshsets[0], radius_src ); // use the target to compute the initial area
+            double initial_tarea = areaAdaptor.area_on_sphere_lHuiller ( mbCore, runCtx->meshsets[1], radius_dest ); // use the target to compute the initial area
+            double area_method1 = areaAdaptor.area_on_sphere_lHuiller ( mbCore, intxset, radius_src );
+            double area_method2 = areaAdaptor.area_on_sphere ( mbCore, intxset, radius_src );
 
             outputFormatter.printf ( 0,  "initial areas: source = %12.10f, target = %12.10f \n", initial_sarea, initial_tarea );
             outputFormatter.printf ( 0,  " area with l'Huiller: %12.10f with Girard: %12.10f\n", area_method1, area_method2 );
@@ -414,15 +416,15 @@ int main ( int argc, char* argv[] )
             moab::Range rintxverts, rintxelems;
             rval = mbCore->get_entities_by_dimension ( runCtx->meshsets[0], 0, rintxverts ); MB_CHK_ERR ( rval );
             rval = mbCore->get_entities_by_dimension ( runCtx->meshsets[0], 2, rintxelems ); MB_CHK_ERR ( rval );
-            rval = fix_degenerate_quads ( mbCore, runCtx->meshsets[0] ); MB_CHK_ERR ( rval );
-            rval = positive_orientation ( mbCore, runCtx->meshsets[0], radius_src ); MB_CHK_ERR ( rval );
+            rval = moab::IntxUtils::fix_degenerate_quads ( mbCore, runCtx->meshsets[0] ); MB_CHK_ERR ( rval );
+            rval = areaAdaptor.positive_orientation ( mbCore, runCtx->meshsets[0], radius_src ); MB_CHK_ERR ( rval );
             if ( !proc_id ) outputFormatter.printf ( 0,  "The source set contains %lu vertices and %lu elements \n", rintxverts.size(), rintxelems.size() );
 
             moab::Range bintxverts, bintxelems;
             rval = mbCore->get_entities_by_dimension ( runCtx->meshsets[1], 0, bintxverts ); MB_CHK_ERR ( rval );
             rval = mbCore->get_entities_by_dimension ( runCtx->meshsets[1], 2, bintxelems ); MB_CHK_ERR ( rval );
-            rval = fix_degenerate_quads ( mbCore, runCtx->meshsets[1] ); MB_CHK_ERR ( rval );
-            rval = positive_orientation ( mbCore, runCtx->meshsets[1], radius_dest ); MB_CHK_ERR ( rval );
+            rval = moab::IntxUtils::fix_degenerate_quads ( mbCore, runCtx->meshsets[1] ); MB_CHK_ERR ( rval );
+            rval = areaAdaptor.positive_orientation ( mbCore, runCtx->meshsets[1], radius_dest ); MB_CHK_ERR ( rval );
             if ( !proc_id ) outputFormatter.printf ( 0,  "The target set contains %lu vertices and %lu elements \n", bintxverts.size(), bintxelems.size() );
         }
 
@@ -440,10 +442,10 @@ int main ( int argc, char* argv[] )
         {
             double local_areas[4], global_areas[4]; // Array for Initial area, and through Method 1 and Method 2
             // local_areas[0] = area_on_sphere_lHuiller ( mbCore, runCtx->meshsets[1], radius_src );
-            local_areas[0] = area_on_sphere_lHuiller ( mbCore, runCtx->meshsets[0], radius_src );
-            local_areas[1] = area_on_sphere_lHuiller ( mbCore, runCtx->meshsets[1], radius_dest );
-            local_areas[2] = area_on_sphere_lHuiller ( mbCore, runCtx->meshsets[2], radius_src );
-            local_areas[3] = area_on_sphere ( mbCore, runCtx->meshsets[2], radius_src );
+            local_areas[0] = areaAdaptor.area_on_sphere_lHuiller ( mbCore, runCtx->meshsets[0], radius_src );
+            local_areas[1] = areaAdaptor.area_on_sphere_lHuiller ( mbCore, runCtx->meshsets[1], radius_dest );
+            local_areas[2] = areaAdaptor.area_on_sphere_lHuiller ( mbCore, runCtx->meshsets[2], radius_src );
+            local_areas[3] = areaAdaptor.area_on_sphere ( mbCore, runCtx->meshsets[2], radius_src );
 
 #ifdef MOAB_HAVE_MPI
             MPI_Allreduce ( &local_areas[0], &global_areas[0], 4, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
@@ -671,13 +673,13 @@ static moab::ErrorCode CreateTempestMesh ( ToolContext& ctx, moab::TempestRemapp
         // Load the source mesh and validate
         rval = remapper.LoadNativeMesh ( ctx.inFilenames[0], ctx.meshsets[0], additional_read_opts ); MB_CHK_ERR ( rval );
         // Rescale the radius of both to compute the intersection
-        rval = ScaleToRadius(ctx.mbcore, ctx.meshsets[0], radius_src);MB_CHK_ERR ( rval );
+        rval = moab::IntxUtils::ScaleToRadius(ctx.mbcore, ctx.meshsets[0], radius_src);MB_CHK_ERR ( rval );
         rval = remapper.ConvertMeshToTempest ( moab::Remapper::SourceMesh ); MB_CHK_ERR ( rval );
         ctx.meshes[0] = remapper.GetMesh ( moab::Remapper::SourceMesh );
 
         // Load the target mesh and validate
         rval = remapper.LoadNativeMesh ( ctx.inFilenames[1], ctx.meshsets[1], additional_read_opts ); MB_CHK_ERR ( rval );
-        rval = ScaleToRadius(ctx.mbcore, ctx.meshsets[1], radius_dest);MB_CHK_ERR ( rval );
+        rval = moab::IntxUtils::ScaleToRadius(ctx.mbcore, ctx.meshsets[1], radius_dest);MB_CHK_ERR ( rval );
         rval = remapper.ConvertMeshToTempest ( moab::Remapper::TargetMesh ); MB_CHK_ERR ( rval );
         ctx.meshes[1] = remapper.GetMesh ( moab::Remapper::TargetMesh );
     }

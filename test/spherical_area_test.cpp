@@ -29,15 +29,16 @@ int main(int/* argc*/, char** /* argv[]*/)
     return 1;
 
 
+  moab::IntxAreaUtils areaAdaptor(true); // use_lHuiller = true
   double R = 6.; // should be input
   // compare total area with 4*M_PI * R^2
 
-  double total_area = area_on_sphere(mb, sf, R) ;
+  double total_area = areaAdaptor.area_on_sphere(mb, sf, R) ;
   double  area_sphere = R*R*M_PI*4.;
   std::cout<<"total area with Girard:  " << total_area << " area_sphere:" << area_sphere << " rel error:"
       << fabs((total_area-area_sphere)/area_sphere) << "\n";
 
-  double area2 = area_on_sphere_lHuiller(mb, sf, R) ;
+  double area2 = areaAdaptor.area_on_sphere_lHuiller(mb, sf, R) ;
   std::cout<<"total area with l'Huiller: " << area2 << " area_sphere:" << area_sphere << " rel error:"
         << fabs((total_area-area_sphere)/area_sphere) << "\n";
 

@@ -163,8 +163,8 @@ int main(int argc, char* argv[])
     error = mbCore->get_coords(&sfrontback[0], 2, points);MB_CHK_ERR(error);
     slave_radius = 0.5*(std::sqrt(points[0]*points[0]+points[1]*points[1]+points[2]*points[2]) + std::sqrt(points[3]*points[3]+points[4]*points[4]+points[5]*points[5]));
     // Let us rescale both master and slave meshes to a unit sphere
-    error = ScaleToRadius(mbCore, masterfileset, 1.0);MB_CHK_ERR(error);
-    error = ScaleToRadius(mbCore, slavefileset, 1.0);MB_CHK_ERR(error);
+    error = moab::IntxUtils::ScaleToRadius(mbCore, masterfileset, 1.0);MB_CHK_ERR(error);
+    error = moab::IntxUtils::ScaleToRadius(mbCore, slavefileset, 1.0);MB_CHK_ERR(error);
   }
 
   try {
@@ -262,7 +262,7 @@ int main(int argc, char* argv[])
 
     if (use_spherical)
     {
-      error = ScaleToRadius(mbCore, slavefileset, slave_radius);MB_CHK_ERR(error);
+      error = moab::IntxUtils::ScaleToRadius(mbCore, slavefileset, slave_radius);MB_CHK_ERR(error);
     }
 
     error = mbCore->delete_entities(&masterfileset, 1);MB_CHK_ERR(error);

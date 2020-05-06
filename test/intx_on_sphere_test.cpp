@@ -94,8 +94,8 @@ int main(int argc, char* argv[])
   rval = mb->create_meshset(MESHSET_SET, outputSet);MB_CHK_ERR(rval);
 
   // fix radius of both meshes, to be consistent with input R
-  rval = ScaleToRadius(mb, sf1, R); MB_CHK_ERR(rval);
-  rval = ScaleToRadius(mb, sf2, R); MB_CHK_ERR(rval);
+  rval = moab::IntxUtils::ScaleToRadius(mb, sf1, R); MB_CHK_ERR(rval);
+  rval = moab::IntxUtils::ScaleToRadius(mb, sf2, R); MB_CHK_ERR(rval);
 
 #if 0
   // std::cout << "Fix orientation etc ..\n";
@@ -111,6 +111,7 @@ int main(int argc, char* argv[])
   ParallelComm* pcomm = ParallelComm::get_pcomm(mb, 0);
 #endif
   Intx2MeshOnSphere  worker(mb);
+  IntxAreaUtils areaAdaptor;
 
   worker.set_error_tolerance(R*epsrel);
   worker.set_box_error(boxeps);
@@ -156,9 +157,9 @@ int main(int argc, char* argv[])
       // subtract
       rval = mb->subtract_meshset(comm_set, sf1); MB_CHK_ERR(rval);
       // compute fractions
-      double area_cov_set = area_on_sphere(mb, covering_set, R);
+      double area_cov_set = areaAdaptor.area_on_sphere(mb, covering_set, R);
       assert(area_cov_set>0);
-      double comm_area = area_on_sphere(mb, comm_set, R);
+      double comm_area = areaAdaptor.area_on_sphere(mb, comm_set, R);
       // more important is actually the number of elements communicated
       int num_cov_cells, num_comm_cells;
       rval = mb->get_number_entities_by_dimension(covering_set, 2, num_cov_cells); MB_CHK_ERR(rval);
@@ -216,9 +217,9 @@ int main(int argc, char* argv[])
   // we write this file just for checking it looks OK
 
   //compute total area with 2 methods
-  //double initial_area = area_on_sphere_lHuiller(mb, sf1, R);
-  //double area_method1 = area_on_sphere_lHuiller(mb, outputSet, R);
-  //double area_method2 = area_on_sphere(mb, outputSet, R);
+  //double initial_area = areaAdaptor.area_on_sphere_lHuiller(mb, sf1, R);
+  //double area_method1 = areaAdaptor.area_on_sphere_lHuiller(mb, outputSet, R);
+  //double area_method2 = areaAdaptor.area_on_sphere(mb, outputSet, R);
 
   //std::cout << "initial area: " << initial_area << "\n";
   //std::cout<< " area with l'Huiller: " << area_method1 << " with Girard: " << area_method2<< "\n";
@@ -231,8 +232,8 @@ int main(int argc, char* argv[])
     outf<<"intersect" << rank<<".h5m";
     rval = mb->write_file(outf.str().c_str(), 0, 0, &outputSet, 1);
   }
-  double intx_area = area_on_sphere(mb, outputSet, R);
-  double arrival_area = area_on_sphere(mb, sf2, R) ;
+  double intx_area = areaAdaptor.area_on_sphere(mb, outputSet, R);
+  double arrival_area = areaAdaptor.area_on_sphere(mb, sf2, R) ;
   std::cout<< "On rank : " << rank << " arrival area: " << arrival_area<<
       "  intersection area:" << intx_area << " rel error: " << fabs((intx_area-arrival_area)/arrival_area) << "\n";
 

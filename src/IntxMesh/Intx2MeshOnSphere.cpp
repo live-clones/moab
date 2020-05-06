@@ -52,17 +52,17 @@ double Intx2MeshOnSphere::setup_tgt_cell(EntityHandle tgt, int & nsTgt) {
     middle += tgtCoords[i];
   middle = 1./nsTgt * middle;
 
-  decide_gnomonic_plane(middle, plane);// output the plane
+  IntxUtils::decide_gnomonic_plane(middle, plane);// output the plane
   for (int j = 0; j < nsTgt; j++)
   {
     // populate coords in the plane for intersection
     // they should be oriented correctly, positively
-    rval = gnomonic_projection(tgtCoords[j],  Rdest, plane, tgtCoords2D[2 * j],
+    rval = IntxUtils::gnomonic_projection(tgtCoords[j],  Rdest, plane, tgtCoords2D[2 * j],
         tgtCoords2D[2 * j + 1]);MB_CHK_ERR_RET_VAL(rval,cellArea);
   }
 
   for (int j=1; j<nsTgt-1; j++)
-    cellArea += area2D(&tgtCoords2D[0], &tgtCoords2D[2*j], &tgtCoords2D[2*j+2]);
+    cellArea += IntxUtils::area2D(&tgtCoords2D[0], &tgtCoords2D[2*j], &tgtCoords2D[2*j+2]);
 
   // take target coords in order and compute area in plane
   return cellArea;
@@ -99,7 +99,7 @@ ErrorCode Intx2MeshOnSphere::computeIntersectionBetweenTgtAndSrc(EntityHandle tg
     bool overlap3d = GeomUtil::bounding_boxes_overlap(tgtCoords, nsTgt, srcCoords, nsBlue, box_error);
     int planeb;
     CartVect mid3 = (srcCoords[0]+srcCoords[1]+srcCoords[2])/3;
-    decide_gnomonic_plane(mid3, planeb);
+    IntxUtils::decide_gnomonic_plane(mid3, planeb);
     if (!overlap3d && (plane!=planeb)) // plane was set at setup_tgt_cell
       return MB_SUCCESS; // no error, but no intersection, decide early to get out
     // if same plane, still check for gnomonic plane in 2d
@@ -108,7 +108,7 @@ ErrorCode Intx2MeshOnSphere::computeIntersectionBetweenTgtAndSrc(EntityHandle tg
     {
       for (int j=0; j<nsBlue; j++)
       {
-        rval = gnomonic_projection(srcCoords[j], Rsrc, plane, srcCoords2D[2 * j],
+        rval = IntxUtils::gnomonic_projection(srcCoords[j], Rsrc, plane, srcCoords2D[2 * j],
             srcCoords2D[2 * j + 1]);MB_CHK_ERR(rval);
       }
       bool overlap2d = GeomUtil::bounding_boxes_overlap_2d (srcCoords2D, nsBlue, tgtCoords2D, nsTgt, box_error);
@@ -137,7 +137,7 @@ ErrorCode Intx2MeshOnSphere::computeIntersectionBetweenTgtAndSrc(EntityHandle tg
 
   for (int j=0; j<nsBlue; j++)
   {
-    rval = gnomonic_projection(srcCoords[j], Rsrc, plane, srcCoords2D[2 * j],
+    rval = IntxUtils::gnomonic_projection(srcCoords[j], Rsrc, plane, srcCoords2D[2 * j],
         srcCoords2D[2 * j + 1]);MB_CHK_ERR(rval);
   }
 
@@ -157,10 +157,10 @@ ErrorCode Intx2MeshOnSphere::computeIntersectionBetweenTgtAndSrc(EntityHandle tg
   }
 #endif
 
-  rval = EdgeIntersections2(srcCoords2D, nsBlue, tgtCoords2D, nsTgt, markb, markr, P, nP);MB_CHK_ERR(rval);
+  rval = IntxUtils::EdgeIntersections2(srcCoords2D, nsBlue, tgtCoords2D, nsTgt, markb, markr, P, nP);MB_CHK_ERR(rval);
 
   int side[MAXEDGES] = { 0 };// this refers to what side? source or tgt?
-  int extraPoints = borderPointsOfXinY2(srcCoords2D, nsBlue, tgtCoords2D, nsTgt, &(P[2 * nP]), side, epsilon_area);
+  int extraPoints = IntxUtils::borderPointsOfXinY2(srcCoords2D, nsBlue, tgtCoords2D, nsTgt, &(P[2 * nP]), side, epsilon_area);
   if (extraPoints >= 1)
   {
     for (int k = 0; k < nsBlue; k++)
@@ -180,7 +180,7 @@ ErrorCode Intx2MeshOnSphere::computeIntersectionBetweenTgtAndSrc(EntityHandle tg
   }
   nP += extraPoints;
 
-  extraPoints = borderPointsOfXinY2(tgtCoords2D, nsTgt, srcCoords2D, nsBlue, &(P[2 * nP]), side, epsilon_area);
+  extraPoints = IntxUtils::borderPointsOfXinY2(tgtCoords2D, nsTgt, srcCoords2D, nsBlue, &(P[2 * nP]), side, epsilon_area);
   if (extraPoints >= 1)
   {
     for (int k = 0; k < nsTgt; k++)
@@ -200,20 +200,20 @@ ErrorCode Intx2MeshOnSphere::computeIntersectionBetweenTgtAndSrc(EntityHandle tg
   // now sort and orient the points in P, such that they are forming a convex polygon
   // this will be the foundation of our new mesh
   // this works if the polygons are convex
-  SortAndRemoveDoubles2(P, nP, epsilon_1); // nP should be at most 8 in the end ?
+  IntxUtils::SortAndRemoveDoubles2(P, nP, epsilon_1); // nP should be at most 8 in the end ?
   // if there are more than 3 points, some area will be positive
 
   if (nP >= 3)
   {
     for (int k = 1; k < nP - 1; k++)
-      area += area2D(P, &P[2 * k], &P[2 * k + 2]);
+      area += IntxUtils::area2D(P, &P[2 * k], &P[2 * k + 2]);
 #ifdef  CHECK_CONVEXITY
     // each edge should be large enough that we can compute angles between edges
     for (int k=0; k<nP; k++)
     {
       int k1 = (k+1)%nP;
       int k2 = (k1+1)%nP;
-      double orientedArea = area2D(&P[2*k], &P[2 * k1], &P[2 * k2]);
+      double orientedArea = IntxUtils::area2D(&P[2*k], &P[2 * k1], &P[2 * k2]);
       if (orientedArea<0)
       {
         std::cout <<" oriented area is negative: " << orientedArea << " k:"<< k << " target, src:" << tgt << " " << src << " \n";
@@ -269,7 +269,7 @@ ErrorCode Intx2MeshOnSphere::findNodes(EntityHandle tgt, int nsTgt, EntityHandle
     double * pp = &iP[2 * i]; // iP+2*i
     // project the point back on the sphere
     CartVect pos;
-    reverse_gnomonic_projection(pp[0], pp[1], Rdest, plane, pos);
+    IntxUtils::reverse_gnomonic_projection(pp[0], pp[1], Rdest, plane, pos);
     int found = 0;
     // first, are they on vertices from target or src?
     // priority is the target mesh (mb2?)
@@ -278,7 +278,7 @@ ErrorCode Intx2MeshOnSphere::findNodes(EntityHandle tgt, int nsTgt, EntityHandle
     for (j = 0; j < nsTgt && !found; j++)
     {
       //int node = tgtTri.v[j];
-      double d2 = dist2(pp, &tgtCoords2D[2 * j]);
+      double d2 = IntxUtils::dist2(pp, &tgtCoords2D[2 * j]);
       if (d2 < epsilon_1)
       {
 
@@ -299,7 +299,7 @@ ErrorCode Intx2MeshOnSphere::findNodes(EntityHandle tgt, int nsTgt, EntityHandle
     for (j = 0; j < nsBlue && !found; j++)
     {
       //int node = srcTri.v[j];
-      double d2 = dist2(pp, &srcCoords2D[2 * j]);
+      double d2 = IntxUtils::dist2(pp, &srcCoords2D[2 * j]);
       if (d2 < epsilon_1)
       {
         // suspect is srcConn[j] corresponding in mbOut
@@ -327,10 +327,10 @@ ErrorCode Intx2MeshOnSphere::findNodes(EntityHandle tgt, int nsTgt, EntityHandle
       for (j = 0; j < nsTgt; j++)
       {
         int j1 = (j + 1) % nsTgt;
-        double area = fabs(area2D(&tgtCoords2D[2 * j], &tgtCoords2D[2 * j1], pp));
+        double area = fabs(IntxUtils::area2D(&tgtCoords2D[2 * j], &tgtCoords2D[2 * j1], pp));
         // how to check if pp is between redCoords2D[j] and redCoords2D[j1] ?
         // they should form a straight line; the sign should be -1
-        double checkx = dist2(&tgtCoords2D[2*j],pp)+dist2(&tgtCoords2D[2*j1],pp)-dist2(&tgtCoords2D[2*j],&tgtCoords2D[2*j1]);
+        double checkx = IntxUtils::dist2(&tgtCoords2D[2*j],pp)+IntxUtils::dist2(&tgtCoords2D[2*j1],pp)-IntxUtils::dist2(&tgtCoords2D[2*j],&tgtCoords2D[2*j1]);
         if (area<minArea && checkx<2*epsilon_1) // round off error or not?
         {
           index_min = j;
@@ -559,6 +559,7 @@ ErrorCode Intx2MeshOnSphere::update_tracer_data(EntityHandle out_set, Tag & tagE
   // area of the polygon * conc on target (old) current quantity
   // finally, divide by the area of the tgt
   double check_intx_area=0.;
+  moab::IntxAreaUtils intxAreas(true); // use_lHuiller = true
   for (Range::iterator it= polys.begin(); it!=polys.end(); ++it)
   {
     EntityHandle poly=*it;
@@ -573,7 +574,7 @@ ErrorCode Intx2MeshOnSphere::update_tracer_data(EntityHandle out_set, Tag & tagE
     // source to target (so a deformed source corresponds to an arrival tgt)
     /// TODO: VSM: Its unclear whether we need the source or destination radius here.
     double radius = Rsrc;
-    double areap = area_spherical_element(mb, poly, radius);
+    double areap = intxAreas.area_spherical_element(mb, poly, radius);
     check_intx_area+=areap;
     // so the departure cell at time t (srcIndex) covers a portion of a tgtCell
     // that quantity will be transported to the tgtCell at time t+dt
@@ -721,7 +722,7 @@ ErrorCode Intx2MeshOnSphere::build_processor_euler_boxes(EntityHandle euler_set,
   {
     CartVect pos(&coords[3*i]);
     int pl;
-    decide_gnomonic_plane(pos, pl);
+    IntxUtils::decide_gnomonic_plane(pos, pl);
     gnplane[i] = pl;
   }
 
@@ -763,7 +764,7 @@ ErrorCode Intx2MeshOnSphere::build_processor_euler_boxes(EntityHandle euler_set,
       {
         CartVect pos(&elco[3*i]);
         double c2[2];
-        gnomonic_projection(pos, Rdest, pl, c2[0], c2[1]);  // 2 coordinates
+        IntxUtils::gnomonic_projection(pos, Rdest, pl, c2[0], c2[1]);  // 2 coordinates
         //
         for (int k=0; k<2; k++)
         {
@@ -931,7 +932,7 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set(EntityHandle & initial_distr
   {
     CartVect pos(&coords_mesh[3*i]);
     int pl;
-    decide_gnomonic_plane(pos, pl);
+    IntxUtils::decide_gnomonic_plane(pos, pl);
     gnplane[i] = pl;
   }
 
@@ -974,7 +975,7 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set(EntityHandle & initial_distr
         CartVect dp(&elco[3 * i]); // uses constructor for CartVect that takes a pointer to double
         // gnomonic projection
         double c2[2];
-        gnomonic_projection(dp, Rsrc, pl, c2[0], c2[1]);  // 2 coordinates
+        IntxUtils::gnomonic_projection(dp, Rsrc, pl, c2[0], c2[1]);  // 2 coordinates
         for (int j = 0; j < 2; j++)
         {
           if (qmin[j] > c2[j])
