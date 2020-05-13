@@ -227,7 +227,7 @@ MOSTLYCLEANFILES = mhdf_ll.h5m \
                    migrate_graph.h5m migrate_geom.h5m \
                    recvLnd.h5m LndWithProj.h5m fOcnOnCpl.h5m recvOcn.h5m outPhys.h5m wholeATM_new.h5m \
                    outLnd.h5m wholeATM_lnd.h5m physAtm_lnd.h5m physBack_lnd.h5m \
-                   fOcnOnCpl2.h5m recvOcn2.h5m  OcnWithProj2.h5m
+                   fOcnOnCpl2.h5m recvOcn2.h5m  OcnWithProj2.h5m recvLnd2.h5m LndWithProj2.h5m
 
 FORTDEFS = $(FCDEFS)
 PPFCCOMPILE = $(FC) $(FORTDEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \

@@ -456,7 +456,7 @@ int main( int argc, char* argv[] )
   MPI_Barrier(MPI_COMM_WORLD);
 
   if (couComm != MPI_COMM_NULL) {
-    char outputFileLnd[] = "recvLnd.h5m";
+    char outputFileLnd[] = "recvLnd2.h5m";
     PUSH_TIMER("Write migrated LND mesh on coupler PEs")
     ierr = iMOAB_WriteMesh(cplLndPID, outputFileLnd, fileWriteOptions,
       strlen(outputFileLnd), strlen(fileWriteOptions) );
@@ -866,7 +866,7 @@ int main( int argc, char* argv[] )
   }
   if (lndComm != MPI_COMM_NULL)
   {
-    char outputFileLnd[] = "LndWithProj.h5m";
+    char outputFileLnd[] = "LndWithProj2.h5m";
     ierr = iMOAB_WriteMesh(cmpLndPID, outputFileLnd, fileWriteOptions,
         strlen(outputFileLnd), strlen(fileWriteOptions) );
   }
