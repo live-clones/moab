@@ -26,7 +26,7 @@
 #define RUN_TEST_ARG2(A, B) run_test( &A, #A, B)
 
 using namespace moab;
-#define VERBOSE
+//#define VERBOSE
 #define CHECKRC(rc, message)  if (0!=rc) { printf ("%s\n", message); return MB_FAILURE;}
 
 int is_any_proc_error( int is_my_error )

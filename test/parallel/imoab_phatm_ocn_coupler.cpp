@@ -41,7 +41,7 @@
 
 using namespace moab;
 
-#define VERBOSE
+//#define VERBOSE
 
 #ifndef MOAB_HAVE_TEMPESTREMAP
 #error The climate coupler test example requires MOAB configuration with TempestRemap
