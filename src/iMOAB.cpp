@@ -69,6 +69,7 @@ struct appData
 {
     EntityHandle file_set;
     int   global_id;  // external component id, unique for application
+    std::string name;
     Range all_verts;
     Range local_verts; // it could include shared, but not owned at the interface
     // these vertices would be all_verts if no ghosting was required
@@ -251,6 +252,7 @@ ErrCode iMOAB_RegisterApplication ( const iMOAB_String app_name,
     appData app_data;
     app_data.file_set = file_set;
     app_data.global_id = * compid; // will be used mostly for par comm graph
+    app_data.name = name; // save the name of application
 
 #ifdef MOAB_HAVE_TEMPESTREMAP
     app_data.tempestData.remapper = NULL; // Only allocate as needed
@@ -301,8 +303,15 @@ ErrCode iMOAB_DeregisterApplication ( iMOAB_AppID pid )
     // the file set , parallel comm are all in vectors indexed by *pid
     // assume we did not delete anything yet
     // *pid will not be reused if we register another application
+    appData& data = context.appDatas[*pid];
+    int rankHere=0;
+#ifdef MOAB_HAVE_MPI
+    ParallelComm* pco = context.pcomms[*pid];
+    rankHere  = pco->rank();
+#endif
+    if (!rankHere) std::cout << " application with ID: " << *pid << " global id: " << data.global_id << " name: " << data.name <<  " is de-registered now \n";
 
-    EntityHandle fileSet = context.appDatas[*pid].file_set;
+    EntityHandle fileSet = data.file_set;
     // get all entities part of the file set
     Range fileents;
     ErrorCode rval = context.MBI->get_entities_by_handle ( fileSet, fileents, /*recursive */true );CHKERRVAL(rval);
@@ -312,22 +321,25 @@ ErrCode iMOAB_DeregisterApplication ( iMOAB_AppID pid )
     rval = context.MBI->get_entities_by_type ( fileSet, MBENTITYSET, fileents );CHKERRVAL(rval); // append all mesh sets
 
 #ifdef MOAB_HAVE_TEMPESTREMAP
-  if (context.appDatas[*pid].tempestData.remapper) delete context.appDatas[*pid].tempestData.remapper;
-  if (context.appDatas[*pid].tempestData.weightMaps.size()) context.appDatas[*pid].tempestData.weightMaps.clear();
+  if (data.tempestData.remapper) delete data.tempestData.remapper;
+  if (data.tempestData.weightMaps.size()) data.tempestData.weightMaps.clear();
 #endif
 
 #ifdef MOAB_HAVE_MPI
-    ParallelComm* pco = context.pcomms[*pid];
 
     // we could get the pco also with
     // ParallelComm * pcomm = ParallelComm::get_pcomm(context.MBI, *pid);
-    if (pco) delete pco;
-    std::map<int, ParCommGraph*>& pargs = context.appDatas[*pid].pgraph;
+
+    std::map<int, ParCommGraph*>& pargs = data.pgraph;
 
     // free the parallel comm graphs associated with this app
     for ( std::map<int, ParCommGraph*>::iterator mt = pargs.begin(); mt!= pargs.end(); mt++ )
-    { delete mt->second; }
-
+    {
+      ParCommGraph* pgr = mt->second;
+      delete pgr;
+      pgr = NULL;
+    }
+    if (pco) delete pco;
 #endif
 
     // delete first all except vertices
@@ -377,7 +389,7 @@ ErrCode iMOAB_DeregisterApplication ( iMOAB_AppID pid )
 
     context.appIdCompMap.erase ( mit1 );
 
-    context.unused_pid--;
+    context.unused_pid--; // we have to go backwards always TODO
     context.appDatas.pop_back();
 #ifdef MOAB_HAVE_MPI
     context.pcomms.pop_back();
@@ -2102,6 +2114,16 @@ ErrCode iMOAB_ReceiveElementTag(iMOAB_AppID pid, const iMOAB_String tag_storage_
   {
     owned = data.local_verts;
   }
+  // another possibility is for par comm graph to be computed from iMOAB_ComputeCommGraph, for after atm ocn intx, from phys
+  // (case from imoab_phatm_ocn_coupler.cpp) get then the cover set from ints remapper
+#ifdef MOAB_HAVE_TEMPESTREMAP
+  if (data.tempestData.remapper != NULL) // this is the case this is part of intx;;
+  {
+    cover_set = data.tempestData.remapper->GetMeshSet(Remapper::CoveringMesh);
+    rval = context.MBI->get_entities_by_dimension ( cover_set, 2, owned); CHKERRVAL ( rval );
+    // should still have only quads ?
+  }
+#endif
   /*
    * data_intx.remapper exists though only on the intersection application
    *  how do we get from here ( we know the pid that receives, and the commgraph used by migrate mesh )
@@ -2168,8 +2190,10 @@ ErrCode iMOAB_ComputeCommGraph(iMOAB_AppID  pid1, iMOAB_AppID  pid2,  MPI_Comm* 
   MPI_Comm_size( *join, &numProcs );
   // instantiate the par comm graph
   // ParCommGraph::ParCommGraph(MPI_Comm joincomm, MPI_Group group1, MPI_Group group2, int coid1, int coid2)
-  ParCommGraph* cgraph = new ParCommGraph ( *join, *group1, *group2, *comp1, *comp2 );
-  ParCommGraph* cgraph_rev = new ParCommGraph ( *join, *group2, *group1, *comp2, *comp1 );
+  ParCommGraph* cgraph = NULL;
+  if (*pid1>=0) cgraph = new ParCommGraph ( *join, *group1, *group2, *comp1, *comp2 );
+  ParCommGraph* cgraph_rev = NULL;
+  if (*pid2>=0) cgraph_rev = new ParCommGraph ( *join, *group2, *group1, *comp2, *comp1 );
   // we should search if we have another pcomm with the same comp ids in the list already
   // sort of check existing comm graphs in the map context.appDatas[*pid].pgraph
   if (*pid1>=0) context.appDatas[*pid1].pgraph[*comp2] = cgraph ; // the context will be the other comp
@@ -2199,7 +2223,16 @@ ErrCode iMOAB_ComputeCommGraph(iMOAB_AppID  pid1, iMOAB_AppID  pid2,  MPI_Comm* 
   // populate first tuple
   if (*pid1>=0)
   {
-    EntityHandle fset1 = context.appDatas[*pid1].file_set;
+    appData& data1 = context.appDatas[*pid1];
+    EntityHandle fset1 = data1.file_set;
+        //in case of tempest remap, get the coverage set
+#ifdef MOAB_HAVE_TEMPESTREMAP
+    if (data1.tempestData.remapper != NULL) // this is the case this is part of intx;;
+    {
+      fset1 = data1.tempestData.remapper->GetMeshSet(Remapper::CoveringMesh);
+      // should still have only quads ?
+    }
+#endif
     Range ents_of_interest;
     if (*type1==1)
     {
@@ -2258,7 +2291,17 @@ ErrCode iMOAB_ComputeCommGraph(iMOAB_AppID  pid1, iMOAB_AppID  pid2,  MPI_Comm* 
   std::vector<int> valuesComp2;
   if (*pid2>=0)
   {
-    EntityHandle fset2 = context.appDatas[*pid2].file_set;
+    appData& data2 = context.appDatas[*pid2];
+    EntityHandle fset2 = data2.file_set;
+    //in case of tempest remap, get the coverage set
+#ifdef MOAB_HAVE_TEMPESTREMAP
+    if (data2.tempestData.remapper != NULL) // this is the case this is part of intx;;
+    {
+      fset2 = data2.tempestData.remapper->GetMeshSet(Remapper::CoveringMesh);
+      // should still have only quads ?
+    }
+#endif
+
     Range ents_of_interest;
     if (*type2==1)
     {

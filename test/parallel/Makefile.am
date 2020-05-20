@@ -62,8 +62,9 @@ commgraph_test_LDADD = $(LDADD) $(FCLIBS)
 endif
 
 if HAVE_TEMPESTREMAP
-  HDF5_TESTS += imoab_coupler
+  HDF5_TESTS += imoab_coupler imoab_phatm_ocn_coupler
   imoab_coupler_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
+  imoab_phatm_ocn_coupler_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
 endif
 
 else
@@ -164,6 +165,7 @@ hireconst_test_parallel_SOURCES = hireconst_test_parallel.cpp
 uref_hirec_test_parallel_SOURCES = uref_hirec_test_parallel.cpp ../geomObject.cpp
 migrate_test_SOURCES = migrate_test.cpp
 imoab_coupler_SOURCES = imoab_coupler.cpp
+imoab_phatm_ocn_coupler_SOURCES = imoab_phatm_ocn_coupler.cpp
 migrate_nontrivial_SOURCES = migrate_nontrivial.cpp
 ghost_thin_layers_SOURCES = ghost_thin_layers.cpp
 commgraph_test_SOURCES = commgraph_test.cpp
@@ -224,7 +226,8 @@ MOSTLYCLEANFILES = mhdf_ll.h5m \
                    intx_00.h5m intx_01.h5m fIntxTarget.h5m recvTarget.h5m OcnWithProj.h5m \
                    migrate_graph.h5m migrate_geom.h5m \
                    recvLnd.h5m LndWithProj.h5m fOcnOnCpl.h5m recvOcn.h5m outPhys.h5m wholeATM_new.h5m \
-                   outLnd.h5m wholeATM_lnd.h5m physAtm_lnd.h5m physBack_lnd.h5m 
+                   outLnd.h5m wholeATM_lnd.h5m physAtm_lnd.h5m physBack_lnd.h5m \
+                   fOcnOnCpl2.h5m recvOcn2.h5m  OcnWithProj2.h5m
 
 FORTDEFS = $(FCDEFS)
 PPFCCOMPILE = $(FC) $(FORTDEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \

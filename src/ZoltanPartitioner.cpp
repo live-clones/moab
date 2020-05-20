@@ -2315,7 +2315,7 @@ ErrorCode ZoltanPartitioner::partition_owned_cells(Range & primary, ParallelComm
   Zoltan::LB_Free_Part( &export_global_ids, &export_local_ids,
       &assign_procs, &assign_parts);
 
-  delete myZZ;
+  delete myZZ; myZZ = NULL;
 
   // clear arrays that were resized locally, to free up local memory
 

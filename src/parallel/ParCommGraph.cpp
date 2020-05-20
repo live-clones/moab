@@ -879,6 +879,9 @@ ErrorCode ParCommGraph::receive_tag_values (MPI_Comm jcomm, ParallelComm *pco, R
           buffer->buff_ptr+=vect_bytes_per_tag[i];
         }
       }
+
+      // delete receive buffer
+      delete buffer ;
 #ifdef VERBOSE
       dbfile.close();
 #endif
@@ -903,7 +906,7 @@ ErrorCode ParCommGraph::receive_tag_values (MPI_Comm jcomm, ParallelComm *pco, R
       // we will fill this array, using data from received buffer
       //rval = mb->tag_get_data(owned, (void*)( &(valuesTags[i][0])) );MB_CHK_ERR ( rval );
     }
-    // now, pack the data and send it
+    // now, unpack the data and set the tags
     sendReqs.resize(involved_IDs_map.size());
     for (std::map<int ,std::vector<int> >::iterator mit =involved_IDs_map.begin(); mit!=involved_IDs_map.end(); mit++)
     {
@@ -931,6 +934,8 @@ ErrorCode ParCommGraph::receive_tag_values (MPI_Comm jcomm, ParallelComm *pco, R
             valuesTags[i][ index_in_values[k] ]= val;
         }
       }
+      // we are done with the buffer in which we received tags, release / delete it
+      delete buffer;
     }
     // now we populated the values for all tags; set now the tags!
     for (size_t i=0; i<tag_handles.size(); i++)
@@ -1010,6 +1015,7 @@ void ParCommGraph::settle_comm_by_ids(int comp, TupleList & TLBackToComp, std::v
   // Vector to store element
   // with respective present index
   std::vector<std::pair<int, int> > vp;
+  vp.reserve(valuesComp.size());
 
   // Inserting element in pair vector
   // to keep track of previous indexes in valuesComp
@@ -1037,7 +1043,7 @@ void ParCommGraph::settle_comm_by_ids(int comp, TupleList & TLBackToComp, std::v
       int val = *sst;
       involved_IDs_map[procId].push_back(val);
       indx[indexVal+1] = indx[indexVal];
-      while ( vp[indexInVp].first <= val) // should be equal !
+      while ( (indexInVp<(int)valuesComp.size()) && (vp[indexInVp].first <= val)) // should be equal !
       {
         if (vp[indexInVp].first == val)
         {
@@ -1202,6 +1208,8 @@ ErrorCode ParCommGraph::compute_partition (ParallelComm *pco, Range & owned, int
       split_ranges[receiverTasks[part_index]] = mit->second;
     }
   }
+  // delete now the partitioner
+  delete mbZTool;
 #endif
   t3 = MPI_Wtime();
   if (rootSender)
