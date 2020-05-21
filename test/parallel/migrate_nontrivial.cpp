@@ -26,7 +26,7 @@
 #define RUN_TEST_ARG2(A, B) run_test( &A, #A, B)
 
 using namespace moab;
-//#define VERBOSE
+//#define GRAPH_INFO
 #define CHECKRC(rc, message)  if (0!=rc) { printf ("%s\n", message); return MB_FAILURE;}
 
 int is_any_proc_error( int is_my_error )
@@ -131,7 +131,7 @@ ErrorCode migrate_smart(const char*filename, const char * outfile, int partMetho
       CHECKRC(ierr, "can't load mesh ")
       ierr = iMOAB_SendMesh(pid1, &jcomm, &group2, &compid2, &partMethod); // send to component 2
       CHECKRC(ierr, "cannot send elements" )
-#ifdef VERBOSE
+#ifdef GRAPH_INFO
       int is_sender = 1;
       int context = -1;
       iMOAB_DumpCommGraph(pid1,  &context, &is_sender, "MigrateS", strlen("MigrateS"));
@@ -145,7 +145,7 @@ ErrorCode migrate_smart(const char*filename, const char * outfile, int partMetho
      wopts   = "PARALLEL=WRITE_PART;";
      ierr = iMOAB_WriteMesh(pid2, (char*)outfile , (char*)wopts.c_str(), strlen(outfile), strlen(wopts.c_str()) );
      CHECKRC(ierr, "cannot write received mesh" )
-#ifdef VERBOSE
+#ifdef GRAPH_INFO
      int is_sender = 0;
      int context = -1;
      iMOAB_DumpCommGraph(pid2,  &context, &is_sender, "MigrateR", strlen("MigrateR"));

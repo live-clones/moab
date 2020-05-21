@@ -40,7 +40,7 @@
 
 using namespace moab;
 
-//#define VERBOSE
+//#define GRAPH_INFO
 
 #ifndef MOAB_HAVE_TEMPESTREMAP
 #error The climate coupler test example requires MOAB configuration with TempestRemap
@@ -318,7 +318,7 @@ int main( int argc, char* argv[] )
     ierr = iMOAB_SendMesh(cmpAtmPID, &atmCouComm, &couPEGroup, &cplatm, &repartitioner_scheme); // send to component 3, on coupler pes
     CHECKIERR(ierr, "cannot send elements" )
     POP_TIMER(atmComm, rankInAtmComm)
-#ifdef VERBOSE
+#ifdef GRAPH_INFO
     int is_sender = 1;
     int context = -1;
     iMOAB_DumpCommGraph(cmpAtmPID,  &context, &is_sender, "AtmMigS", strlen("AtmMigS"));
@@ -330,7 +330,7 @@ int main( int argc, char* argv[] )
     ierr = iMOAB_ReceiveMesh(cplAtmPID, &atmCouComm, &atmPEGroup, &cmpatm); // receive from component 1
     CHECKIERR(ierr, "cannot receive elements on ATMX app")
     POP_TIMER(couComm, rankInCouComm)
-#ifdef VERBOSE
+#ifdef GRAPH_INFO
     int is_sender = 0;
     int context = -1;
     iMOAB_DumpCommGraph(cplAtmPID,  &context, &is_sender, "AtmMigR", strlen("AtmMigR"));
@@ -642,7 +642,7 @@ for (int iters=0; iters<n; iters++)
     // this is for projection to ocean:
     ierr = iMOAB_SendElementTag(cmpAtmPID, "a2oTbot;a2oUbot;a2oVbot;", &atmCouComm, &cplocn, strlen("a2oTbot;a2oUbot;a2oVbot;"));
     CHECKIERR(ierr, "cannot send tag values")
-#ifdef VERBOSE
+#ifdef GRAPH_INFO
     int is_sender = 1;
     int context = cplocn;
     iMOAB_DumpCommGraph(cmpAtmPID,  &context, &is_sender, "AtmCovOcnS", strlen("AtmMigOcnS"));
@@ -652,7 +652,7 @@ for (int iters=0; iters<n; iters++)
     // receive on atm on coupler pes, that was redistributed according to coverage
     ierr = iMOAB_ReceiveElementTag(cplAtmPID, "a2oTbot;a2oUbot;a2oVbot;", &atmCouComm, &cplocn, strlen("a2oTbot;a2oUbot;a2oVbot;"));
     CHECKIERR(ierr, "cannot receive tag values")
-#ifdef VERBOSE
+#ifdef GRAPH_INFO
     int is_sender = 0;
     int context = cplocn; // the same context, cplocn
     iMOAB_DumpCommGraph(cmpAtmPID,  &context, &is_sender, "AtmCovOcnR", strlen("AtmMigOcnR"));

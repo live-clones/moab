@@ -13,6 +13,7 @@
 #endif
 
 // #define VERBOSE
+// #define GRAPH_INFO
 
 namespace moab {
 ParCommGraph::ParCommGraph(MPI_Comm joincomm, MPI_Group group1, MPI_Group group2, int coid1, int coid2) :
