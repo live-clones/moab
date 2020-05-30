@@ -5,6 +5,7 @@ using namespace moab;
 
 std::string example_eul = TestDir + "/io/eul3x48x96.t.3.nc";
 std::string example_fv = TestDir + "/io/fv3x46x72.t.3.nc";
+std::string example_domain = TestDir + "/io/domain.ocn.ne4np4_oQU240.160614.nc";
 
 #ifdef MOAB_HAVE_MPI
 #include "moab_mpi.h"
@@ -28,6 +29,9 @@ void test_read_fv_novars();
 void test_read_fv_ghosting();
 #endif
 
+// Domain file
+void test_read_domain();
+
 ErrorCode get_options(std::string& opts);
 
 const int levels = 3;
@@ -44,12 +48,12 @@ int main(int argc, char* argv[])
   argv[0] = argv[argc - argc]; // To remove the warnings in serial mode about unused variables
 #endif
 
-  result += RUN_TEST(test_read_eul_all);
+  /*result += RUN_TEST(test_read_eul_all);
   result += RUN_TEST(test_read_eul_onevar);
   result += RUN_TEST(test_read_eul_onetimestep);
   result += RUN_TEST(test_read_eul_nomesh);
-  result += RUN_TEST(test_read_eul_novars);
-
+  result += RUN_TEST(test_read_eul_novars);*/
+  result += RUN_TEST(test_read_domain);
   // Exclude test_read_fv_all() since reading edge data is not implemented in MOAB yet
   //result += RUN_TEST(test_read_fv_all);
   result += RUN_TEST(test_read_fv_onevar);
@@ -530,11 +534,29 @@ void test_read_fv_ghosting()
 }
 #endif
 
+void test_read_domain()
+{
+  Core moab;
+  Interface& mb = moab;
+
+  // Need a set for nomesh to work right
+  EntityHandle set;
+  ErrorCode rval = mb.create_meshset(MESHSET_SET, set);
+  CHECK_ERR(rval);
+
+  std::string orig, opts;
+  rval = get_options(orig);
+  CHECK_ERR(rval);
+
+  opts = orig + std::string(";VARIABLE=");
+  rval = mb.load_file(example_domain.c_str(), &set, opts.c_str());
+  CHECK_ERR(rval);
+}
 ErrorCode get_options(std::string& opts)
 {
 #ifdef MOAB_HAVE_MPI
   // Use parallel options
-  opts = std::string(";;PARALLEL=READ_PART;PARTITION_METHOD=SQIJ");
+  opts = std::string(";;PARALLEL=READ_PART;PARTITION_METHOD=SQIJ;DEBUG_IO=2;");
   return MB_SUCCESS;
 #else
   opts = std::string(";;");
