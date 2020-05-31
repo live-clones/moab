@@ -15,6 +15,7 @@
 #ifndef MB_TEMPESTREMAPPER_HPP
 #define MB_TEMPESTREMAPPER_HPP
 
+#include "moab/CpuTimer.hpp"
 #include "moab/Remapping/Remapper.hpp"
 #include "moab/IntxMesh/Intx2MeshOnSphere.hpp"
 #include "moab/IntxMesh/IntxUtils.hpp"
@@ -45,6 +46,7 @@ class TempestRemapper : public Remapper
 #endif
           meshValidate( false ), constructEdgeMap( false ), m_source_type( DEFAULT ), m_target_type( DEFAULT )
     {
+        timer = new moab::CpuTimer();
     }
 
     virtual ~TempestRemapper();
@@ -230,6 +232,7 @@ class TempestRemapper : public Remapper
     moab::ErrorCode GetOverlapAugmentedEntities( moab::Range& sharedGhostEntities );
 
   public:               // public members
+  public:               // public members
     bool meshValidate;  // Validate the mesh after loading from file
 
     bool constructEdgeMap;  //  Construct the edge map within the TempestRemap datastructures
@@ -237,6 +240,10 @@ class TempestRemapper : public Remapper
     static const bool verbose = true;
 
   private:
+    void timer_push( std::string operation );
+
+    void timer_pop();
+
     moab::ErrorCode convert_overlap_mesh_sorted_by_source();
 
     // private methods
@@ -289,6 +296,10 @@ class TempestRemapper : public Remapper
     std::map< int, int > lid_to_gid_src, lid_to_gid_covsrc, lid_to_gid_tgt;
 
     IntxAreaUtils::AreaMethod m_area_method;
+
+    moab::CpuTimer* timer;
+    double timer_ops;
+    std::string opName;
 
     bool rrmgrids;
     bool is_parallel, is_root;
@@ -525,6 +536,33 @@ inline int TempestRemapper::GetLocalID( Remapper::IntersectionContext ctx, int g
         default:
             return -1;
     }
+}
+
+inline void TempestRemapper::timer_push( std::string operation )
+{
+    timer_ops = timer->time_since_birth();
+    opName    = operation;
+}
+
+inline void TempestRemapper::timer_pop()
+{
+    double locElapsed = timer->time_since_birth() - timer_ops, avgElapsed = 0, maxElapsed = 0;
+#ifdef MOAB_HAVE_MPI
+    MPI_Reduce( &locElapsed, &maxElapsed, 1, MPI_DOUBLE, MPI_MAX, 0, m_pcomm->comm() );
+    MPI_Reduce( &locElapsed, &avgElapsed, 1, MPI_DOUBLE, MPI_SUM, 0, m_pcomm->comm() );
+#else
+    maxElapsed = locElapsed;
+    avgElapsed = locElapsed;
+#endif
+    if( !rank )
+    {
+        avgElapsed /= size;
+        std::cout << "[LOG] Time taken to " << opName.c_str() << ": max = " << maxElapsed << ", avg = " << avgElapsed
+                  << "\n";
+    }
+    // std::cout << "\n[LOG" << rank << "] Time taken to " << opName << " = " << timer->time_since_birth() - timer_ops
+    // << std::endl;
+    opName.clear();
 }
 
 }  // namespace moab

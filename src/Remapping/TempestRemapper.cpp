@@ -701,8 +701,11 @@ ErrorCode TempestRemapper::ComputeGlobalLocalMaps()
         m_covering_source = new Mesh();
         rval = convert_mesh_to_tempest_private( m_covering_source, m_covering_source_set, m_covering_source_entities,
                                                 &m_covering_source_vertices );MB_CHK_SET_ERR( rval, "Can't convert source Tempest mesh" );
-        // std::cout << "ComputeGlobalLocalMaps: " << rank << ", " << " covering entities = [" <<
-        // m_covering_source_vertices.size() << ", " << m_covering_source_entities.size() << "]\n";
+
+        moab::DebugOutput dbgprint( std::cout, this->rank, 0 );
+        dbgprint.set_prefix( "[ConstructCoveringSet]: " );
+        dbgprint.printf( 0, "Source coverage (vertices, entities) = (%zu, %zu)\n", m_covering_source_vertices.size(),
+                         m_covering_source_entities.size() );
     }
     gid_to_lid_src.clear();
     lid_to_gid_src.clear();
@@ -1174,6 +1177,9 @@ ErrorCode TempestRemapper::ComputeOverlapMesh( bool kdtree_search, bool use_temp
     }
     else
     {
+        MPI_Barrier( m_pcomm->comm() );
+        this->timer_push( "Overlap mesh pre-process checks" );
+
         Tag gidtag = m_interface->globalId_tag();
         moab::EntityHandle subrange[2];
         int gid[2];
@@ -1213,7 +1219,10 @@ ErrorCode TempestRemapper::ComputeOverlapMesh( bool kdtree_search, bool use_temp
 #endif
             }
         }
+        this->timer_pop();
 
+        MPI_Barrier( m_pcomm->comm() );
+        this->timer_push( "compute actual intersection mesh" );
         // Now perform the actual parallel intersection between the source and the target meshes
         if( kdtree_search )
         {
@@ -1226,6 +1235,7 @@ ErrorCode TempestRemapper::ComputeOverlapMesh( bool kdtree_search, bool use_temp
                 dbgprint.printf( 0, "Computing intersection mesh with the advancing-front propagation algorithm" );
             rval = mbintx->intersect_meshes( m_covering_source_set, m_target_set, m_overlap_set );MB_CHK_SET_ERR( rval, "Can't compute the intersection of meshes on the sphere" );
         }
+        this->timer_pop();
 
 #ifdef MOAB_HAVE_MPI
         if( is_parallel || rrmgrids )
@@ -1239,11 +1249,14 @@ ErrorCode TempestRemapper::ComputeOverlapMesh( bool kdtree_search, bool use_temp
             rval = m_interface->write_mesh( fft.str().c_str(), &m_target_set, 1 );MB_CHK_ERR( rval );
             rval = m_interface->write_mesh( ffo.str().c_str(), &m_overlap_set, 1 );MB_CHK_ERR( rval );
 #endif
-            // because we do not want to work with elements in coverage set that do not participate
-            // in intersection, remove them from the coverage set we will not delete them yet, just
-            // remove from the set !
-            if( !point_cloud_target )
+            // because we do not want to work with elements in coverage set that do not participate in intersection,
+            // remove them from the coverage set
+            // we will not delete them yet, just remove from the set !
+            if( !point_cloud_target && size > 1 )
             {
+                MPI_Barrier( m_pcomm->comm() );
+                this->timer_push( "Augment overlap set" );
+
                 Range covEnts;
                 rval = m_interface->get_entities_by_dimension( m_covering_source_set, 2, covEnts );MB_CHK_ERR( rval );
                 Tag gidtag = m_interface->globalId_tag();
@@ -1272,9 +1285,9 @@ ErrorCode TempestRemapper::ComputeOverlapMesh( bool kdtree_search, bool use_temp
                     intxCov.insert( covEnts[loc_gid_to_lid_covsrc[blueParent]] );
                 }
 
-                if( size > 1 )
                 {
                     Range notNeededCovCells = moab::subtract( covEnts, intxCov );
+
                     // remove now from coverage set the cells that are not needed
                     rval = m_interface->remove_entities( m_covering_source_set, notNeededCovCells );MB_CHK_ERR( rval );
                     covEnts = moab::subtract( covEnts, notNeededCovCells );
@@ -1297,6 +1310,7 @@ ErrorCode TempestRemapper::ComputeOverlapMesh( bool kdtree_search, bool use_temp
 
                     rval = augment_overlap_set();MB_CHK_ERR( rval );
                 }
+                this->timer_pop();
             }
 
             // m_covering_source = new Mesh();
@@ -1305,6 +1319,11 @@ ErrorCode TempestRemapper::ComputeOverlapMesh( bool kdtree_search, bool use_temp
             // "Can't convert source Tempest mesh" );
         }
 #endif
+
+        // Measure time for post-processing after intersection mesh is computed
+        MPI_Barrier( m_pcomm->comm() );
+        // This includes the sorting and conversion to TempestRemap format in-memory
+        this->timer_push( "Overlap mesh post-process" );
 
         // Fix any inconsistencies in the overlap mesh
         {
@@ -1317,6 +1336,8 @@ ErrorCode TempestRemapper::ComputeOverlapMesh( bool kdtree_search, bool use_temp
         rval = this->ComputeGlobalLocalMaps();MB_CHK_ERR( rval );
 
         rval = this->convert_overlap_mesh_sorted_by_source();MB_CHK_ERR( rval );
+
+        this->timer_pop();
 
         // free the memory
         delete mbintx;

@@ -42,7 +42,7 @@ class ParallelMergeMesh;
 class DebugOutput;
 class SharedSetData;
 
-#define MAX_SHARING_PROCS 64
+#define MAX_SHARING_PROCS 256
 
 /**
  * \brief Parallel communications in MOAB
