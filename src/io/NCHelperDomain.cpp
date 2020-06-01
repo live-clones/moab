@@ -1,5 +1,6 @@
 #include "NCHelperDomain.hpp"
 #include "moab/FileOptions.hpp"
+#include "moab/ReadUtilIface.hpp"
 
 #include <cmath>
 #include <sstream>
@@ -58,7 +59,7 @@ ErrorCode NCHelperDomain::init_mesh_vals()
   }
   iDim = idx;
   gDims[0] = 0;
-  gDims[3] = dimLens[idx] - 1;
+  gDims[3] = dimLens[idx] ;
 
   // Then j
   if ((vit = std::find(dimNames.begin(), dimNames.end(), "nj")) != dimNames.end())
@@ -68,7 +69,7 @@ ErrorCode NCHelperDomain::init_mesh_vals()
   }
   jDim = idx;
   gDims[1] = 0;
-  gDims[4] = dimLens[idx] - 1 ; // Add 2 for the pole points ? not needed
+  gDims[4] = dimLens[idx]  ; // Add 2 for the pole points ? not needed
 
 
 
@@ -108,10 +109,10 @@ ErrorCode NCHelperDomain::init_mesh_vals()
       parData.pDims[i] = pdims[i];
 
     dbgOut.tprintf(1, "Partition: %dx%d (out of %dx%d)\n",
-        lDims[3] - lDims[0] + 1, lDims[4] - lDims[1] + 1,
-        gDims[3] - gDims[0] + 1, gDims[4] - gDims[1] + 1);
+        lDims[3] - lDims[0] , lDims[4] - lDims[1] ,
+        gDims[3] - gDims[0] , gDims[4] - gDims[1] );
     if (0 == rank)
-      dbgOut.tprintf(1, "Contiguous chunks of size %d bytes.\n", 8 * (lDims[3] - lDims[0] + 1) * (lDims[4] - lDims[1] + 1));
+      dbgOut.tprintf(1, "Contiguous chunks of size %d bytes.\n", 8 * (lDims[3] - lDims[0] ) * (lDims[4] - lDims[1] ));
   }
   else {
     for (int i = 0; i < 6; i++)
@@ -128,7 +129,7 @@ ErrorCode NCHelperDomain::init_mesh_vals()
 
   // For FV models, will always be non-periodic in j
   lCDims[1] = lDims[1];
-  lCDims[4] = lDims[4] - 1;
+  lCDims[4] = lDims[4] ;
 
 #if 0
   // Resize vectors to store values later
@@ -254,29 +255,68 @@ ErrorCode NCHelperDomain::create_mesh(Range& faces)
   if (procs >= 2 && trivialPartitionShift > 0)
     shifted_rank = (rank + trivialPartitionShift) % procs;
 
-#if 0
 
-  int local_elems =
-  // num_coarse_quads is the number of elems instantiated in MOAB; if !spectralMesh, num_coarse_quads = num_fine_quads
-  num_elems = int(std::floor(1.0 * num_quads / (spectral_unit * procs)));
-  // start_idx is the starting index in the HommeMapping connectivity list for this proc, before converting to coarse quad representation
-  start_idx = 4 * shifted_rank * num_coarse_quads * spectral_unit;
-  // iextra = # coarse quads extra after equal split over procs
-  int iextra = num_quads % (procs * spectral_unit);
-  if (shifted_rank < iextra)
-    num_coarse_quads++;
-  start_idx += 4 * spectral_unit * std::min(shifted_rank, iextra);
-  // num_fine_quads is the number of quads in the connectivity list in HommeMapping file assigned to this proc
-  num_fine_quads = spectral_unit * num_coarse_quads;
 
-  // Now create num_coarse_quads
+  // how many will have mask 0 or 1
+  // how many will have a fraction  ? we will not instantiate all elements; only those with mask 1 ?
+  // also, not all vertices, only those that belong to mask 1 elements ?
+  // we will not care about duplicate vertices; maybe another time ?
+  // we will start reading masks, vertices
+  int local_elems = (lDims[4]-lDims[1])*(lDims[3]-lDims[0]);
+  dbgOut.tprintf(1, "local cells: %d \n",local_elems);
+
+  // count how many will be with mask 1 here
+  // basically, read the mask variable on the local elements;
+  std::string maskstr("mask");
+  ReadNC::VarData & vmask = _readNC->varInfo[maskstr];
+  int count = vmask.entLoc;
+  // mask is (nj, ni)
+  vmask.readStarts.push_back(lDims[1]);
+  vmask.readStarts.push_back(lDims[0]);
+  vmask.readCounts.push_back(lDims[4]-lDims[1]);
+  vmask.readCounts.push_back(lDims[3]-lDims[0]);
+  std::vector<int> mask(local_elems);
+  success = NCFUNCAG(_vara_int)(_fileId, vmask.varId, &vmask.readStarts[0], &vmask.readCounts[0], &mask[0]);
+  if (success)
+    MB_SET_ERR(MB_FAILURE, "Failed to read int data for mask variable ");
+
+  int nb_with_mask1 = 0;
+  for (int i=0; i<local_elems; i++)
+    if (1==mask[i])
+      nb_with_mask1++;
+
+  std::vector<NCDF_SIZE> startsv(3);
+  startsv[0] = vmask.readStarts[0];
+  startsv[1] = vmask.readStarts[1];
+  startsv[2] = 0;
+  std::vector<NCDF_SIZE> countsv(3);
+  countsv[0] = vmask.readCounts[0];
+  countsv[1] = vmask.readCounts[1];
+  countsv[2] = nv; // number of vertices per element
+
+  std::string xvstr("xv");
+  ReadNC::VarData & var_xv = _readNC->varInfo[xvstr];
+  std::vector<double> xv(local_elems*nv);
+  success = NCFUNCAG(_vara_double)(_fileId, var_xv.varId, &startsv[0], &countsv[0], &xv[0]);
+  if (success)
+      MB_SET_ERR(MB_FAILURE, "Failed to read double data for xv variable ");
+
+  std::string yvstr("yv");
+  ReadNC::VarData & var_yv = _readNC->varInfo[yvstr];
+  std::vector<double> yv(local_elems*nv);
+  success = NCFUNCAG(_vara_double)(_fileId, var_yv.varId, &startsv[0], &countsv[0], &yv[0]);
+  if (success)
+      MB_SET_ERR(MB_FAILURE, "Failed to read double data for yv variable ");
+  // read xv and yv coords for vertices, and create elements;
+
+  // Now create
   EntityHandle* conn_arr;
   EntityHandle start_vertex;
   Range tmp_range;
 
-  // Read connectivity into that space
+  // set connectivity into that space
   EntityHandle* sv_ptr = NULL;
-  EntityHandle start_quad;
+  EntityHandle start_cell;
   EntityType mdb_type = MBTRI;
   if (nv==3)
     mdb_type = MBTRI;
@@ -285,177 +325,55 @@ ErrorCode NCHelperDomain::create_mesh(Range& faces)
   else // (nv > 4)
     mdb_type = MBPOLYGON;
 
-  if (!spectralMesh) {
-    rval = _readNC->readMeshIface->get_element_connect(num_coarse_quads, 4,
-                                                      MBQUAD, 0, start_quad, conn_arr,
-                                                      // Might have to create gather mesh later
-                                                      (create_gathers ? num_coarse_quads + num_quads : num_coarse_quads));MB_CHK_SET_ERR(rval, "Failed to create local quads");
-    tmp_range.insert(start_quad, start_quad + num_coarse_quads - 1);
-    int* tmp_conn_end = (&tmp_conn[start_idx + 4 * num_fine_quads-1])+1;
-    std::copy(&tmp_conn[start_idx], tmp_conn_end, conn_arr);
-    std::copy(conn_arr, conn_arr + 4 * num_fine_quads, range_inserter(localGidVerts));
-  }
-  else {
-    rval = smt.create_spectral_elems(&tmp_conn[0], num_fine_quads, 2, tmp_range, start_idx, &localGidVerts);MB_CHK_SET_ERR(rval, "Failed to create spectral elements");
-    int count, v_per_e;
-    rval = mbImpl->connect_iterate(tmp_range.begin(), tmp_range.end(), conn_arr, v_per_e, count);MB_CHK_SET_ERR(rval, "Failed to get connectivity of spectral elements");
-    rval = mbImpl->tag_iterate(smt.spectral_vertices_tag(true), tmp_range.begin(), tmp_range.end(),
-                               count, (void*&)sv_ptr);MB_CHK_SET_ERR(rval, "Failed to get fine connectivity of spectral elements");
-  }
+
+  rval = _readNC->readMeshIface->get_element_connect(nb_with_mask1, nv,
+      mdb_type, 0, start_cell, conn_arr);MB_CHK_SET_ERR(rval, "Failed to create local cells");
+
+  tmp_range.insert(start_cell, start_cell+nb_with_mask1-1);
+  // create also nv*nb_with_mask1 vertices, and compute their coordinates
 
   // Create vertices
-  nLocalVertices = localGidVerts.size();
+  int nLocalVertices = nb_with_mask1* nv;
   std::vector<double*> arrays;
-  rval = _readNC->readMeshIface->get_node_coords(3, nLocalVertices, 0, start_vertex, arrays,
-                                                // Might have to create gather mesh later
-                                                (create_gathers ? nLocalVertices + nVertices : nLocalVertices));MB_CHK_SET_ERR(rval, "Failed to create local vertices");
+  rval = _readNC->readMeshIface->get_node_coords(3, nLocalVertices, 0, start_vertex, arrays);MB_CHK_SET_ERR(rval, "Failed to create local vertices");
 
   // Set vertex coordinates
+  // will read all xv, yv, but use only those with correct mask on
   Range::iterator rit;
   double* xptr = arrays[0];
   double* yptr = arrays[1];
   double* zptr = arrays[2];
-  int i;
-  for (i = 0, rit = localGidVerts.begin(); i < nLocalVertices; i++, ++rit) {
-    assert(*rit < xVertVals.size() + 1);
-    xptr[i] = xVertVals[(*rit) - 1]; // lon
-    yptr[i] = yVertVals[(*rit) - 1]; // lat
-  }
-
-  // Convert lon/lat/rad to x/y/z
+  int index=0; // consider the mask for advancing in moab arrays;
+  int elem_index = 0; // total index in netcdf arrays
   const double pideg = acos(-1.0) / 180.0;
-  double rad = (isConnFile) ? 8000.0 : 8000.0 + levVals[0];
-  for (i = 0; i < nLocalVertices; i++) {
-    double cosphi = cos(pideg * yptr[i]);
-    double zmult = sin(pideg * yptr[i]);
-    double xmult = cosphi * cos(xptr[i] * pideg);
-    double ymult = cosphi * sin(xptr[i] * pideg);
-    xptr[i] = rad * xmult;
-    yptr[i] = rad * ymult;
-    zptr[i] = rad * zmult;
-  }
+  double radius = 1;
 
-  // Get ptr to gid memory for vertices
-  Range vert_range(start_vertex, start_vertex + nLocalVertices - 1);
-  void* data;
-  int count;
-  rval = mbImpl->tag_iterate(mGlobalIdTag, vert_range.begin(), vert_range.end(),
-                             count, data);MB_CHK_SET_ERR(rval, "Failed to iterate global id tag on local vertices");
-  assert(count == nLocalVertices);
-  int* gid_data = (int*) data;
-  std::copy(localGidVerts.begin(), localGidVerts.end(), gid_data);
-
-  // Duplicate global id data, which will be used to resolve sharing
-  if (mpFileIdTag) {
-    rval = mbImpl->tag_iterate(*mpFileIdTag, vert_range.begin(), vert_range.end(),
-                               count, data);MB_CHK_SET_ERR(rval, "Failed to iterate file id tag on local vertices");
-    assert(count == nLocalVertices);
-    int bytes_per_tag = 4;
-    rval = mbImpl->tag_get_bytes(*mpFileIdTag, bytes_per_tag);MB_CHK_SET_ERR(rval, "Can't get number of bytes for file id tag");
-    if (4 == bytes_per_tag) {
-      gid_data = (int*) data;
-      std::copy(localGidVerts.begin(), localGidVerts.end(), gid_data);
+  for ( ; elem_index < local_elems; elem_index++) {
+    if (0==mask[elem_index])
+      continue; // nothing to do, do not advance elem_index in actual moab arrays
+    // set area and fraction on those elements too
+    for (int j=0; j<nv; j++)
+    {
+      EntityHandle vertex = start_vertex + nv*index+j;
+      conn_arr[nv*index+j] = vertex;
+      int index_v_arr = nv*elem_index+j;
+      double cosphi = cos(pideg * yv[index_v_arr]);
+      double zmult = sin(pideg * yv[index_v_arr]);
+      double xmult = cosphi * cos(xv[index_v_arr] * pideg);
+      double ymult = cosphi * sin(xv[index_v_arr] * pideg);
+      xptr[nv*index+j] = radius * xmult;
+      yptr[nv*index+j] = radius * ymult;
+      zptr[nv*index+j] = radius * zmult;
     }
-    else if (8 == bytes_per_tag) { // Should be a handle tag on 64 bit machine?
-      long* handle_tag_data = (long*)data;
-      std::copy(localGidVerts.begin(), localGidVerts.end(), handle_tag_data);
-    }
-  }
-
-  // Create map from file ids to vertex handles, used later to set connectivity
-  std::map<EntityHandle, EntityHandle> vert_handles;
-  for (rit = localGidVerts.begin(), i = 0; rit != localGidVerts.end(); ++rit, i++)
-    vert_handles[*rit] = start_vertex + i;
-
-  // Compute proper handles in connectivity using offset
-  for (int q = 0; q < 4 * num_coarse_quads; q++) {
-    conn_arr[q] = vert_handles[conn_arr[q]];
-    assert(conn_arr[q]);
-  }
-  if (spectralMesh) {
-    int verts_per_quad = (_spectralOrder + 1) * (_spectralOrder + 1);
-    for (int q = 0; q < verts_per_quad * num_coarse_quads; q++) {
-      sv_ptr[q] = vert_handles[sv_ptr[q]];
-      assert(sv_ptr[q]);
-    }
+    index++;
   }
 
   // Add new vertices and quads to current file set
   faces.merge(tmp_range);
   tmp_range.insert(start_vertex, start_vertex + nLocalVertices - 1);
-  rval = mbImpl->add_entities(_fileSet, tmp_range);MB_CHK_SET_ERR(rval, "Failed to add new vertices and quads to current file set");
+  rval = mbImpl->add_entities(_fileSet, tmp_range);MB_CHK_SET_ERR(rval, "Failed to add new cells to current file set");
 
-  // Mark the set with the spectral order
-  Tag sporder;
-  rval = mbImpl->tag_get_handle("SPECTRAL_ORDER", 1, MB_TYPE_INTEGER, sporder,
-                                MB_TAG_SPARSE | MB_TAG_CREAT);MB_CHK_SET_ERR(rval, "Trouble creating SPECTRAL_ORDER tag");
-  rval = mbImpl->tag_set_data(sporder, &_fileSet, 1, &_spectralOrder);MB_CHK_SET_ERR(rval, "Trouble setting data to SPECTRAL_ORDER tag");
 
-  if (create_gathers) {
-    EntityHandle gather_set;
-    rval = _readNC->readMeshIface->create_gather_set(gather_set);MB_CHK_SET_ERR(rval, "Failed to create gather set");
-
-    // Create vertices
-    arrays.clear();
-    // Don't need to specify allocation number here, because we know enough verts were created before
-    rval = _readNC->readMeshIface->get_node_coords(3, nVertices, 0, start_vertex, arrays);MB_CHK_SET_ERR(rval, "Failed to create gather set vertices");
-
-    xptr = arrays[0];
-    yptr = arrays[1];
-    zptr = arrays[2];
-    for (i = 0; i < nVertices; i++) {
-      double cosphi = cos(pideg * yVertVals[i]);
-      double zmult = sin(pideg * yVertVals[i]);
-      double xmult = cosphi * cos(xVertVals[i] * pideg);
-      double ymult = cosphi * sin(xVertVals[i] * pideg);
-      xptr[i] = rad * xmult;
-      yptr[i] = rad * ymult;
-      zptr[i] = rad * zmult;
-    }
-
-    // Get ptr to gid memory for vertices
-    Range gather_set_verts_range(start_vertex, start_vertex + nVertices - 1);
-    rval = mbImpl->tag_iterate(mGlobalIdTag, gather_set_verts_range.begin(), gather_set_verts_range.end(),
-                               count, data);MB_CHK_SET_ERR(rval, "Failed to iterate global id tag on gather set vertices");
-    assert(count == nVertices);
-    gid_data = (int*) data;
-    for (int j = 1; j <= nVertices; j++)
-      gid_data[j - 1] = j;
-    // Set the file id tag too, it should be bigger something not interfering with global id
-    if (mpFileIdTag) {
-      rval = mbImpl->tag_iterate(*mpFileIdTag, gather_set_verts_range.begin(), gather_set_verts_range.end(),
-                                 count, data);MB_CHK_SET_ERR(rval, "Failed to iterate file id tag on gather set vertices");
-      assert(count == nVertices);
-      int bytes_per_tag = 4;
-      rval = mbImpl->tag_get_bytes(*mpFileIdTag, bytes_per_tag);MB_CHK_SET_ERR(rval, "Can't get number of bytes for file id tag");
-      if (4 == bytes_per_tag) {
-        gid_data = (int*)data;
-        for (int j = 1; j <= nVertices; j++)
-          gid_data[j - 1] = nVertices + j; // Bigger than global id tag
-      }
-      else if (8 == bytes_per_tag) { // Should be a handle tag on 64 bit machine?
-        long* handle_tag_data = (long*)data;
-        for (int j = 1; j <= nVertices; j++)
-          handle_tag_data[j - 1] = nVertices + j; // Bigger than global id tag
-      }
-    }
-
-    rval = mbImpl->add_entities(gather_set, gather_set_verts_range);MB_CHK_SET_ERR(rval, "Failed to add vertices to the gather set");
-
-    // Create quads
-    Range gather_set_quads_range;
-    // Don't need to specify allocation number here, because we know enough quads were created before
-    rval = _readNC->readMeshIface->get_element_connect(num_quads, 4, MBQUAD, 0,
-                                                       start_quad, conn_arr);MB_CHK_SET_ERR(rval, "Failed to create gather set quads");
-    gather_set_quads_range.insert(start_quad, start_quad + num_quads - 1);
-    int* tmp_conn_end = (&tmp_conn[4 * num_quads-1]) + 1;
-    std::copy(&tmp_conn[0], tmp_conn_end, conn_arr);
-    for (i = 0; i != 4 * num_quads; i++)
-      conn_arr[i] += start_vertex - 1; // Connectivity array is shifted by where the gather verts start
-    rval = mbImpl->add_entities(gather_set, gather_set_quads_range);MB_CHK_SET_ERR(rval, "Failed to add quads to the gather set");
-  }
-
-#endif
   return MB_SUCCESS;
 
 }

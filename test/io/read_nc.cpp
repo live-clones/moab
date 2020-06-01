@@ -48,11 +48,11 @@ int main(int argc, char* argv[])
   argv[0] = argv[argc - argc]; // To remove the warnings in serial mode about unused variables
 #endif
 
-  /*result += RUN_TEST(test_read_eul_all);
+  result += RUN_TEST(test_read_eul_all);
   result += RUN_TEST(test_read_eul_onevar);
   result += RUN_TEST(test_read_eul_onetimestep);
   result += RUN_TEST(test_read_eul_nomesh);
-  result += RUN_TEST(test_read_eul_novars);*/
+  result += RUN_TEST(test_read_eul_novars);
   result += RUN_TEST(test_read_domain);
   // Exclude test_read_fv_all() since reading edge data is not implemented in MOAB yet
   //result += RUN_TEST(test_read_fv_all);
