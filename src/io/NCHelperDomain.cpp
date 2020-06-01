@@ -362,20 +362,24 @@ ErrorCode NCHelperDomain::create_mesh(Range& faces)
   // set connectivity into that space
 
   EntityHandle start_cell;
-  EntityType mdb_type = MBTRI;
+  EntityType mdb_type = MBVERTEX;
   if (nv==3)
     mdb_type = MBTRI;
   else if (nv==4)
     mdb_type = MBQUAD;
-  else // (nv > 4)
+  else  if (nv > 4)// (nv > 4)
     mdb_type = MBPOLYGON;
+  // for nv = 1 , type is vertex
 
 
-  rval = _readNC->readMeshIface->get_element_connect(nb_with_mask1, nv,
-      mdb_type, 0, start_cell, conn_arr);MB_CHK_SET_ERR(rval, "Failed to create local cells");
+  if (nv> 1)
+  {
+    rval = _readNC->readMeshIface->get_element_connect(nb_with_mask1, nv,
+        mdb_type, 0, start_cell, conn_arr);MB_CHK_SET_ERR(rval, "Failed to create local cells");
 
-  tmp_range.insert(start_cell, start_cell+nb_with_mask1-1);
-  // create also nv*nb_with_mask1 vertices, and compute their coordinates
+    tmp_range.insert(start_cell, start_cell+nb_with_mask1-1);
+    // create also nv*nb_with_mask1 vertices, and compute their coordinates
+  }
 
   // Create vertices
   int nLocalVertices = nb_with_mask1* nv;
@@ -404,17 +408,35 @@ ErrorCode NCHelperDomain::create_mesh(Range& faces)
     for (int j=0; j<nv; j++)
     {
       EntityHandle vertex = start_vertex + nv*index+j;
-      conn_arr[nv*index+j] = vertex;
+
       int index_v_arr = nv*elem_index+j;
-      double cosphi = cos(pideg * yv[index_v_arr]);
-      double zmult = sin(pideg * yv[index_v_arr]);
-      double xmult = cosphi * cos(xv[index_v_arr] * pideg);
-      double ymult = cosphi * sin(xv[index_v_arr] * pideg);
-      xptr[nv*index+j] = radius * xmult;
-      yptr[nv*index+j] = radius * ymult;
-      zptr[nv*index+j] = radius * zmult;
+      double x, y;
+      if (nv>1)
+      {
+        conn_arr[nv*index+j] = vertex;
+        x = xv[index_v_arr];
+        y = yv[index_v_arr];
+        double cosphi = cos(pideg * y);
+        double zmult = sin(pideg * y);
+        double xmult = cosphi * cos(x * pideg);
+        double ymult = cosphi * sin(x * pideg);
+        xptr[nv*index+j] = radius * xmult;
+        yptr[nv*index+j] = radius * ymult;
+        zptr[nv*index+j] = radius * zmult;
+      }
+      else // nv ==1 , tempest remap case, only xc make sense
+      {
+        x = xc[elem_index];
+        y = yc[elem_index];
+        xptr[nv*index+j] = x;
+        yptr[nv*index+j] = y;
+        zptr[nv*index+j] = 0;
+      }
+
     }
-    EntityHandle cell = start_cell+index;
+    EntityHandle cell = start_vertex + index;
+    if (nv > 1)
+      cell = start_cell + index;
     // set other tags, like xc, yc, frac, area
     rval = mbImpl->tag_set_data (xcTag , &cell, 1, &xc[elem_index] );MB_CHK_SET_ERR(rval, "Failed to set xc tag");
     rval = mbImpl->tag_set_data (ycTag , &cell, 1, &yc[elem_index] );MB_CHK_SET_ERR(rval, "Failed to set yc tag");
