@@ -224,12 +224,13 @@ ErrorCode NCHelperDomain::init_mesh_vals()
 ErrorCode NCHelperDomain::create_mesh(Range& faces)
 {
   Interface*& mbImpl = _readNC->mbImpl;
-  std::string& fileName = _readNC->fileName;
+  //std::string& fileName = _readNC->fileName;
   Tag& mGlobalIdTag = _readNC->mGlobalIdTag;
-  const Tag*& mpFileIdTag = _readNC->mpFileIdTag;
+  //const Tag*& mpFileIdTag = _readNC->mpFileIdTag;
   DebugOutput& dbgOut = _readNC->dbgOut;
-  int& gatherSetRank = _readNC->gatherSetRank;
-  int& trivialPartitionShift = _readNC->trivialPartitionShift;
+  /*int& gatherSetRank = _readNC->gatherSetRank;
+  int& trivialPartitionShift = _readNC->trivialPartitionShift;*/
+/*
 
   int rank = 0;
   int procs = 1;
@@ -241,11 +242,12 @@ ErrorCode NCHelperDomain::create_mesh(Range& faces)
     procs = myPcomm->proc_config().proc_size();
   }
 #endif
+*/
 
   ErrorCode rval;
   int success = 0;
 
-
+/*
   bool create_gathers = false;
   if (rank == gatherSetRank)
     create_gathers = true;
@@ -253,7 +255,7 @@ ErrorCode NCHelperDomain::create_mesh(Range& faces)
   // Shift rank to obtain a rotated trivial partition
   int shifted_rank = rank;
   if (procs >= 2 && trivialPartitionShift > 0)
-    shifted_rank = (rank + trivialPartitionShift) % procs;
+    shifted_rank = (rank + trivialPartitionShift) % procs;*/
 
 
 
@@ -269,7 +271,7 @@ ErrorCode NCHelperDomain::create_mesh(Range& faces)
   // basically, read the mask variable on the local elements;
   std::string maskstr("mask");
   ReadNC::VarData & vmask = _readNC->varInfo[maskstr];
-  int count = vmask.entLoc;
+
   // mask is (nj, ni)
   vmask.readStarts.push_back(lDims[1]);
   vmask.readStarts.push_back(lDims[0]);
@@ -294,28 +296,71 @@ ErrorCode NCHelperDomain::create_mesh(Range& faces)
   countsv[1] = vmask.readCounts[1];
   countsv[2] = nv; // number of vertices per element
 
+  // read xv and yv coords for vertices, and create elements;
   std::string xvstr("xv");
   ReadNC::VarData & var_xv = _readNC->varInfo[xvstr];
   std::vector<double> xv(local_elems*nv);
   success = NCFUNCAG(_vara_double)(_fileId, var_xv.varId, &startsv[0], &countsv[0], &xv[0]);
   if (success)
-      MB_SET_ERR(MB_FAILURE, "Failed to read double data for xv variable ");
+    MB_SET_ERR(MB_FAILURE, "Failed to read double data for xv variable ");
 
   std::string yvstr("yv");
   ReadNC::VarData & var_yv = _readNC->varInfo[yvstr];
   std::vector<double> yv(local_elems*nv);
   success = NCFUNCAG(_vara_double)(_fileId, var_yv.varId, &startsv[0], &countsv[0], &yv[0]);
   if (success)
-      MB_SET_ERR(MB_FAILURE, "Failed to read double data for yv variable ");
-  // read xv and yv coords for vertices, and create elements;
+    MB_SET_ERR(MB_FAILURE, "Failed to read double data for yv variable ");
 
-  // Now create
+
+  // read other variables, like xc, yc, frac, area
+  std::string xcstr("xc");
+  ReadNC::VarData & var_xc = _readNC->varInfo[xcstr];
+  std::vector<double> xc(local_elems);
+  success = NCFUNCAG(_vara_double)(_fileId, var_xc.varId, &vmask.readStarts[0],
+      &vmask.readCounts[0], &xc[0]);
+  if (success)
+    MB_SET_ERR(MB_FAILURE, "Failed to read double data for xc variable ");
+
+  std::string ycstr("yc");
+  ReadNC::VarData &var_yc = _readNC->varInfo[ycstr];
+  std::vector<double> yc(local_elems);
+  success = NCFUNCAG(_vara_double)(_fileId, var_yc.varId, &vmask.readStarts[0],
+      &vmask.readCounts[0], &yc[0]);
+  if (success)
+    MB_SET_ERR(MB_FAILURE, "Failed to read double data for yc variable ");
+
+  std::string fracstr("frac");
+  ReadNC::VarData &var_frac = _readNC->varInfo[fracstr];
+  std::vector<double> frac(local_elems);
+  success = NCFUNCAG(_vara_double)(_fileId, var_frac.varId,
+      &vmask.readStarts[0], &vmask.readCounts[0], &frac[0]);
+  if (success)
+    MB_SET_ERR(MB_FAILURE, "Failed to read double data for frac variable ");
+  std::string areastr("area");
+  ReadNC::VarData &var_area = _readNC->varInfo[areastr];
+  std::vector<double> area(local_elems);
+  success = NCFUNCAG(_vara_double)(_fileId, var_area.varId,
+      &vmask.readStarts[0], &vmask.readCounts[0], &area[0]);
+  if (success)
+    MB_SET_ERR(MB_FAILURE, "Failed to read double data for area variable ");
+  // create tags for them
+  Tag areaTag, fracTag, xcTag, ycTag;
+  rval = mbImpl->tag_get_handle("area", 1, MB_TYPE_DOUBLE, areaTag,
+                                  MB_TAG_DENSE | MB_TAG_CREAT);MB_CHK_SET_ERR(rval, "Trouble creating area tag");
+  rval = mbImpl->tag_get_handle("frac", 1, MB_TYPE_DOUBLE, fracTag,
+                                  MB_TAG_DENSE | MB_TAG_CREAT);MB_CHK_SET_ERR(rval, "Trouble creating frac tag");
+  rval = mbImpl->tag_get_handle("xc", 1, MB_TYPE_DOUBLE, xcTag,
+                                    MB_TAG_DENSE | MB_TAG_CREAT);MB_CHK_SET_ERR(rval, "Trouble creating xc tag");
+  rval = mbImpl->tag_get_handle("yc", 1, MB_TYPE_DOUBLE, ycTag,
+                                    MB_TAG_DENSE | MB_TAG_CREAT);MB_CHK_SET_ERR(rval, "Trouble creating yc tag");
+
+  //
   EntityHandle* conn_arr;
   EntityHandle start_vertex;
   Range tmp_range;
 
   // set connectivity into that space
-  EntityHandle* sv_ptr = NULL;
+
   EntityHandle start_cell;
   EntityType mdb_type = MBTRI;
   if (nv==3)
@@ -348,6 +393,10 @@ ErrorCode NCHelperDomain::create_mesh(Range& faces)
   const double pideg = acos(-1.0) / 180.0;
   double radius = 1;
 
+  //int nj = gDims[4]-gDims[1]; // is it about 1 in irregular cases
+  int j = lDims[1];
+  int i = lDims[0]; // if elem_index is getting to next row, increase j
+  int local_row_size = lDims[3]-lDims[0];
   for ( ; elem_index < local_elems; elem_index++) {
     if (0==mask[elem_index])
       continue; // nothing to do, do not advance elem_index in actual moab arrays
@@ -365,6 +414,22 @@ ErrorCode NCHelperDomain::create_mesh(Range& faces)
       yptr[nv*index+j] = radius * ymult;
       zptr[nv*index+j] = radius * zmult;
     }
+    EntityHandle cell = start_cell+index;
+    // set other tags, like xc, yc, frac, area
+    rval = mbImpl->tag_set_data (xcTag , &cell, 1, &xc[elem_index] );MB_CHK_SET_ERR(rval, "Failed to set xc tag");
+    rval = mbImpl->tag_set_data (ycTag , &cell, 1, &yc[elem_index] );MB_CHK_SET_ERR(rval, "Failed to set yc tag");
+    rval = mbImpl->tag_set_data (areaTag , &cell, 1, &area[elem_index] );MB_CHK_SET_ERR(rval, "Failed to set area tag");
+    rval = mbImpl->tag_set_data (fracTag , &cell, 1, &frac[elem_index] );MB_CHK_SET_ERR(rval, "Failed to set frac tag");
+
+    // set the global id too:
+    int globalId = j*local_row_size + i +1;
+    i++;
+    if ((i-lDims[0])%local_row_size==0)
+    {
+      j++;
+      i = lDims[0]; // start over next row
+    }
+    rval = mbImpl->tag_set_data (mGlobalIdTag , &cell, 1, &globalId );MB_CHK_SET_ERR(rval, "Failed to set global id tag");
     index++;
   }
 
