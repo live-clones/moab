@@ -529,8 +529,9 @@ int main ( int argc, char* argv[] )
                 size_t lastindex = runCtx->outFilename.find_last_of(".");
                 sstr.str("");
                 sstr << runCtx->outFilename.substr(0, lastindex) << ".h5m";
+                std::string map_file_name = sstr.str();
                 // Write the map file to disk in parallel
-                rval = weightMap->WriteParallelMap(sstr.str().c_str());MB_CHK_ERR ( rval );
+                rval = weightMap->WriteParallelMap(map_file_name.c_str());MB_CHK_ERR ( rval );
 
                 // Write out the metadata information for the map file
                 if (proc_id == 0) {
@@ -541,17 +542,16 @@ int main ( int argc, char* argv[] )
                     metafile << "Generator = MOAB-TempestRemap (mbtempest) Offline Regridding Weight Generator" << std::endl;
                     metafile << "domain_a = " << runCtx->inFilenames[0] << std::endl;
                     metafile << "domain_b = " << runCtx->inFilenames[1] << std::endl;
-                    metafile << "grid_file_src = " << runCtx->inFilenames[0] << std::endl;
-                    metafile << "grid_file_dst = " << runCtx->inFilenames[1] << std::endl;
-                    metafile << "grid_file_ovr = " << (runCtx->intxFilename.size() ? runCtx->intxFilename : "outOverlap.h5m") << std::endl;
-                    metafile << "mono_type = " << runCtx->ensureMonotonicity << std::endl;
-                    metafile << "np_src = " << runCtx->disc_orders[0] << std::endl;
-                    metafile << "np_dst = " << runCtx->disc_orders[1] << std::endl;
+                    metafile << "domain_aNb = " << (runCtx->intxFilename.size() ? runCtx->intxFilename : "outOverlap.h5m") << std::endl;
+                    metafile << "map_aPb = " << map_file_name << std::endl;
                     metafile << "type_src = " << runCtx->disc_methods[0] << std::endl;
-                    metafile << "type_dst = " << runCtx->disc_methods[1] << std::endl;
-                    metafile << "bubble = " << (runCtx->fNoBubble ? "false" : "true") << std::endl;
+                    metafile << "np_src = " << runCtx->disc_orders[0] << std::endl;
                     metafile << "concave_src = " << (runCtx->fInputConcave ? "true" : "false") << std::endl;
+                    metafile << "type_dst = " << runCtx->disc_methods[1] << std::endl;
+                    metafile << "np_dst = " << runCtx->disc_orders[1] << std::endl;
                     metafile << "concave_dst = " << (runCtx->fOutputConcave ? "true" : "false") << std::endl;
+                    metafile << "mono_type = " << runCtx->ensureMonotonicity << std::endl;
+                    metafile << "bubble = " << (runCtx->fNoBubble ? "false" : "true") << std::endl;
                     metafile << "version = " << "MOAB v5.1.0+" << std::endl;
                     metafile.close();
                 }
