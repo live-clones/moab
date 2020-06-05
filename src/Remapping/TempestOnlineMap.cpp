@@ -1609,15 +1609,21 @@ moab::ErrorCode moab::TempestOnlineMap::WriteParallelMap (std::string strOutputF
 {
     moab::ErrorCode rval;
 
+    /**
+     * Need to get the global maximum of number of vertices per element
+     * Key issue is that when calling InitializeCoordinatesFromMeshFV, the allocation for dVertexLon/dVertexLat 
+     * are made based on the maximum vertices in the current process. However, when writing this out, other processes
+     * may have a different size for the same array. This is hence a mess to consolidate in h5mtoscrip eventually.
+    **/
+
     /* Let us compute all relevant data for the current original source mesh on the process */
     DataArray1D<double> vecSourceFaceArea, vecTargetFaceArea;
-    DataArray1D<double> dSourceCenterLon, dSourceCenterLat;
-    DataArray2D<double> dSourceVertexLon, dSourceVertexLat;
-    DataArray3D<double> dataGLLJacobianSrc, dataGLLJacobianDest;
+    DataArray1D<double> dSourceCenterLon, dSourceCenterLat, dTargetCenterLon, dTargetCenterLat;
+    DataArray2D<double> dSourceVertexLon, dSourceVertexLat, dTargetVertexLon, dTargetVertexLat;
     if (m_srcDiscType == DiscretizationType_FV || m_srcDiscType == DiscretizationType_PCLOUD)
     {
         // printf("Source FV discretization with order - %d, \n", m_nDofsPEl_Src);
-        this->InitializeCoordinatesFromMeshFV(*m_meshInput, dSourceCenterLon, dSourceCenterLat, dSourceVertexLon, dSourceVertexLat, false /* fLatLon = false */);
+        this->InitializeCoordinatesFromMeshFV(*m_meshInput, dSourceCenterLon, dSourceCenterLat, dSourceVertexLon, dSourceVertexLat, false /* fLatLon = false */, m_remapper->max_source_edges);
 
         vecSourceFaceArea.Allocate(m_meshInput->vecFaceArea.GetRows());
         for (unsigned i = 0; i < m_meshInput->vecFaceArea.GetRows(); ++i)
@@ -1625,6 +1631,7 @@ moab::ErrorCode moab::TempestOnlineMap::WriteParallelMap (std::string strOutputF
     }
     else
     {
+        DataArray3D<double> dataGLLJacobianSrc;
         // printf("Source FE discretization with order - %d, \n", m_nDofsPEl_Src);
         this->InitializeCoordinatesFromMeshFE(*m_meshInput, m_nDofsPEl_Src, dataGLLNodesSrc, dSourceCenterLon, dSourceCenterLat, dSourceVertexLon, dSourceVertexLat);
         
@@ -1665,13 +1672,19 @@ moab::ErrorCode moab::TempestOnlineMap::WriteParallelMap (std::string strOutputF
 
     if (m_destDiscType == DiscretizationType_FV || m_destDiscType == DiscretizationType_PCLOUD)
     {
+        // printf("Target FV discretization with order - %d, \n", m_nDofsPEl_Dest);
+        this->InitializeCoordinatesFromMeshFV(*m_meshOutput, dTargetCenterLon, dTargetCenterLat, dTargetVertexLon, dTargetVertexLat, false /* fLatLon = false */, m_remapper->max_target_edges);
+
         vecTargetFaceArea.Allocate(m_meshOutput->vecFaceArea.GetRows());
         for (unsigned i = 0; i < m_meshOutput->vecFaceArea.GetRows(); ++i)
             vecTargetFaceArea[i] = m_meshOutput->vecFaceArea[i];
     }
     else
     {
-        // printf("Source FE discretization with order - %d, \n", m_nDofsPEl_Dest);
+        DataArray3D<double> dataGLLJacobianDest;
+        // printf("Target FE discretization with order - %d, \n", m_nDofsPEl_Dest);
+        this->InitializeCoordinatesFromMeshFE(*m_meshOutput, m_nDofsPEl_Dest, dataGLLNodesDest, dTargetCenterLon, dTargetCenterLat, dTargetVertexLon, dTargetVertexLat);
+
         // Generate the continuous Jacobian for input mesh
         GenerateMetaData (
             *m_meshOutput,
