@@ -1731,11 +1731,9 @@ moab::ErrorCode moab::TempestOnlineMap::WriteParallelMap (std::string strOutputF
     rval = m_interface->tag_get_handle("SourceCoordCenterLat", tot_src_size, moab::MB_TYPE_DOUBLE, tagSrcCoordsCLat, moab::MB_TAG_CREAT|moab::MB_TAG_SPARSE|moab::MB_TAG_VARLEN);MB_CHK_SET_ERR(rval, "Retrieving tag handles failed");
     rval = m_interface->tag_get_handle("TargetCoordCenterLon", tot_tgt_size, moab::MB_TYPE_DOUBLE, tagTgtCoordsCLon, moab::MB_TAG_CREAT|moab::MB_TAG_SPARSE|moab::MB_TAG_VARLEN);MB_CHK_SET_ERR(rval, "Retrieving tag handles failed");
     rval = m_interface->tag_get_handle("TargetCoordCenterLat", tot_tgt_size, moab::MB_TYPE_DOUBLE, tagTgtCoordsCLat, moab::MB_TAG_CREAT|moab::MB_TAG_SPARSE|moab::MB_TAG_VARLEN);MB_CHK_SET_ERR(rval, "Retrieving tag handles failed");
-    moab::Tag tagSrcVertexNVE, tagTgtVertexNVE, tagSrcCoordsVLon, tagSrcCoordsVLat, tagTgtCoordsVLon, tagTgtCoordsVLat;
-    rval = m_interface->tag_get_handle("SourceVertexNVE", tot_src_size, moab::MB_TYPE_INTEGER, tagSrcVertexNVE, moab::MB_TAG_CREAT|moab::MB_TAG_SPARSE|moab::MB_TAG_VARLEN);MB_CHK_SET_ERR(rval, "Retrieving tag handles failed");
+    moab::Tag tagSrcCoordsVLon, tagSrcCoordsVLat, tagTgtCoordsVLon, tagTgtCoordsVLat;
     rval = m_interface->tag_get_handle("SourceCoordVertexLon", tot_vsrc_size, moab::MB_TYPE_DOUBLE, tagSrcCoordsVLon, moab::MB_TAG_CREAT|moab::MB_TAG_SPARSE|moab::MB_TAG_VARLEN);MB_CHK_SET_ERR(rval, "Retrieving tag handles failed");
     rval = m_interface->tag_get_handle("SourceCoordVertexLat", tot_vsrc_size, moab::MB_TYPE_DOUBLE, tagSrcCoordsVLat, moab::MB_TAG_CREAT|moab::MB_TAG_SPARSE|moab::MB_TAG_VARLEN);MB_CHK_SET_ERR(rval, "Retrieving tag handles failed");
-    rval = m_interface->tag_get_handle("TargetVertexNVE", tot_tgt_size, moab::MB_TYPE_INTEGER, tagTgtVertexNVE, moab::MB_TAG_CREAT|moab::MB_TAG_SPARSE|moab::MB_TAG_VARLEN);MB_CHK_SET_ERR(rval, "Retrieving tag handles failed");
     rval = m_interface->tag_get_handle("TargetCoordVertexLon", tot_vtgt_size, moab::MB_TYPE_DOUBLE, tagTgtCoordsVLon, moab::MB_TAG_CREAT|moab::MB_TAG_SPARSE|moab::MB_TAG_VARLEN);MB_CHK_SET_ERR(rval, "Retrieving tag handles failed");
     rval = m_interface->tag_get_handle("TargetCoordVertexLat", tot_vtgt_size, moab::MB_TYPE_DOUBLE, tagTgtCoordsVLat, moab::MB_TAG_CREAT|moab::MB_TAG_SPARSE|moab::MB_TAG_VARLEN);MB_CHK_SET_ERR(rval, "Retrieving tag handles failed");
     moab::Tag srcMaskValues, tgtMaskValues;
@@ -1872,23 +1870,6 @@ moab::ErrorCode moab::TempestOnlineMap::WriteParallelMap (std::string strOutputF
     dsize = vecTargetFaceArea.GetRows();
     rval = m_interface->tag_set_by_ptr(tagTgtCoordsCLon, &m_meshOverlapSet, 1, &tgtcoordsclonvals_d, &dsize);MB_CHK_SET_ERR(rval, "Setting local tag data failed");
     rval = m_interface->tag_set_by_ptr(tagTgtCoordsCLat, &m_meshOverlapSet, 1, &tgtcoordsclatvals_d, &dsize);MB_CHK_SET_ERR(rval, "Setting local tag data failed");
-
-    /* Set the NVE for source and target elements */
-    std::vector<int> srcNVE(m_remapper->m_source->faces.size()), tgtNVE(m_remapper->m_target->faces.size());
-    for (int i=0; i < m_remapper->m_source->faces.size(); ++i) {
-        srcNVE[i] = m_remapper->m_source->faces[i].edges.size();
-    }
-
-    for (int i=0; i < m_remapper->m_target->faces.size(); ++i) {
-        tgtNVE[i] = m_remapper->m_target->faces[i].edges.size();
-    }
-
-    const void* srcnve_d = srcNVE.data();
-    const void* tgtnve_d = tgtNVE.data();
-    dsize = srcNVE.size();
-    rval = m_interface->tag_set_by_ptr(tagSrcVertexNVE, &m_meshOverlapSet, 1, &srcnve_d, &dsize);MB_CHK_SET_ERR(rval, "Setting local tag data failed");
-    dsize = tgtNVE.size();
-    rval = m_interface->tag_set_by_ptr(tagTgtVertexNVE, &m_meshOverlapSet, 1, &tgtnve_d, &dsize);MB_CHK_SET_ERR(rval, "Setting local tag data failed");
 
     /* Set the coordinates for source and target element vertices */
     const void* srccoordsvlonvals_d = &(dSourceVertexLon[0][0]);

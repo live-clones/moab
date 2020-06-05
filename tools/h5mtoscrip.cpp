@@ -1,5 +1,5 @@
 // Usage:
-// tools/mbslavepart -d 2 -m mpas/x1.2562.grid.h5m -s mpas/x1.10242.grid.h5m -o mpas_slave.h5m -e 1e-8 -b 1e-6 -O
+// tools/h5mtoscrip -w map_atm_to_ocn.h5m -s map_atm_to_ocn.nc --coords
 // 
 #include <iostream>
 #include <exception>
@@ -16,12 +16,15 @@
 #include "moab_mpi.h"
 #endif
 
-#ifdef MOAB_HAVE_TEMPESTREMAP
+#ifndef MOAB_HAVE_TEMPESTREMAP
+#error Tool requires compilation with TempestRemap dependency
+#endif
+
+// TempestRemap includes
 #include "OfflineMap.h"
-#include "FiniteElementTools.h"
 #include "netcdfcpp.h"
 #include "NetCDFUtilities.h"
-#endif
+#include "DataArray2D.h"
 
 using namespace moab;
 
@@ -224,11 +227,9 @@ int main(int argc, char* argv[])
     rval = mbCore->tag_get_handle( "SourceCoordCenterLat" , srcCenterLat);MB_CHK_ERR(rval);
     rval = mbCore->tag_get_handle( "TargetCoordCenterLon" , tgtCenterLon);MB_CHK_ERR(rval);
     rval = mbCore->tag_get_handle( "TargetCoordCenterLat" , tgtCenterLat);MB_CHK_ERR(rval);
-    Tag srcVertexLon, srcVertexLat, tgtVertexLon, tgtVertexLat, srcVertexNVE, tgtVertexNVE;
-    rval = mbCore->tag_get_handle( "SourceVertexNVE" , srcVertexNVE);MB_CHK_ERR(rval);
+    Tag srcVertexLon, srcVertexLat, tgtVertexLon, tgtVertexLat;
     rval = mbCore->tag_get_handle( "SourceCoordVertexLon" , srcVertexLon);MB_CHK_ERR(rval);
     rval = mbCore->tag_get_handle( "SourceCoordVertexLat" , srcVertexLat);MB_CHK_ERR(rval);
-    rval = mbCore->tag_get_handle( "TargetVertexNVE" , tgtVertexNVE);MB_CHK_ERR(rval);
     rval = mbCore->tag_get_handle( "TargetCoordVertexLon" , tgtVertexLon);MB_CHK_ERR(rval);
     rval = mbCore->tag_get_handle( "TargetCoordVertexLat" , tgtVertexLat);MB_CHK_ERR(rval);
     
@@ -376,36 +377,30 @@ int main(int argc, char* argv[])
       tgt_centerlat.clear();
       tgt_centerlon.clear();
 
-      std::vector<double> src_glob_vertexlat(nDofA*nva, 0.0), src_glob_vertexlon(nDofA*nva, 0.0);
+      DataArray2D<double> src_glob_vertexlat(nDofA,nva), src_glob_vertexlon(nDofA,nva);
       if (nva > 1)
       {
-        int srcnve_size;
-        std::vector<int> src_NVE;
-        rval = get_vartag_data(mbCore, srcVertexNVE, sets, srcnve_size, src_NVE);MB_CHK_SET_ERR(rval, "Getting source mesh areas failed");
         std::vector<double> src_vertexlat, src_vertexlon;
         int srcvertex_size;
         rval = get_vartag_data(mbCore, srcVertexLat, sets, srcvertex_size, src_vertexlat);MB_CHK_SET_ERR(rval, "Getting source mesh areas failed");
         rval = get_vartag_data(mbCore, srcVertexLon, sets, srcvertex_size, src_vertexlon);MB_CHK_SET_ERR(rval, "Getting target mesh areas failed");
         int offset = 0;
-        printf("Source: %d, %d, %d, %d, %d, %d, %d\n", nva, nDofA, srcvertex_size, src_elem_ordering.size()*nva, nDofA*nva, src_elem_ordering.size(), src_vertexlat.size());
+        // printf("Source: %d, %d, %d, %d, %d, %d, %d\n", nva, nDofA, srcvertex_size, src_elem_ordering.size()*nva, nDofA*nva, src_elem_ordering.size(), src_vertexlat.size());
         for (unsigned vIndex = 0; vIndex < src_elem_ordering.size(); ++vIndex)
         {
-            const int boffset = src_elem_ordering[vIndex]*src_NVE[vIndex];
-            for (int vNV = 0; vNV < src_NVE[vIndex]; ++vNV, ++offset)
+            for (int vNV = 0; vNV < nva; ++vNV)
             {
               assert(offset < srcvertex_size);
-              src_glob_vertexlat[boffset+vNV] = src_vertexlat[offset];
-              src_glob_vertexlon[boffset+vNV] = src_vertexlon[offset];
+              src_glob_vertexlat[src_elem_ordering[vIndex]][vNV] = src_vertexlat[offset];
+              src_glob_vertexlon[src_elem_ordering[vIndex]][vNV] = src_vertexlon[offset];
+              offset++;
             }
         }
       }
 
-      std::vector<double> tgt_glob_vertexlat(nDofB*nvb, 0.0), tgt_glob_vertexlon(nDofB*nvb, 0.0);
+      DataArray2D<double> tgt_glob_vertexlat(nDofB,nvb), tgt_glob_vertexlon(nDofB,nvb);
       if (nvb > 1)
       {
-        int tgtnve_size;
-        std::vector<int> tgt_NVE;
-        rval = get_vartag_data(mbCore, tgtVertexNVE, sets, tgtnve_size, tgt_NVE);MB_CHK_SET_ERR(rval, "Getting source mesh areas failed");
         std::vector<double> tgt_vertexlat, tgt_vertexlon;
         int tgtvertex_size;
         rval = get_vartag_data(mbCore, tgtVertexLat, sets, tgtvertex_size, tgt_vertexlat);MB_CHK_SET_ERR(rval, "Getting source mesh areas failed");
@@ -413,21 +408,21 @@ int main(int argc, char* argv[])
         int offset = 0;
         for (unsigned vIndex = 0; vIndex < tgt_elem_ordering.size(); ++vIndex)
         {
-          const int boffset = tgt_elem_ordering[vIndex]*tgt_NVE[vIndex];
-          for (int vNV = 0; vNV < tgt_NVE[vIndex]; ++vNV, ++offset)
+          for (int vNV = 0; vNV < nvb; ++vNV)
           {
             assert(offset < tgtvertex_size);
-            tgt_glob_vertexlat[boffset+vNV] = tgt_vertexlat[offset];
-            tgt_glob_vertexlon[boffset+vNV] = tgt_vertexlon[offset];
+            tgt_glob_vertexlat[tgt_elem_ordering[vIndex]][vNV] = tgt_vertexlat[offset];
+            tgt_glob_vertexlon[tgt_elem_ordering[vIndex]][vNV] = tgt_vertexlon[offset];
+            offset++;
           }
         }
       }
 
-      varYVA->put(&(src_glob_vertexlat[0]), nDofA, nva);
-      varYVB->put(&(tgt_glob_vertexlat[0]), nDofB, nvb);
+      varYVA->put(&(src_glob_vertexlat[0][0]), nDofA, nva);
+      varYVB->put(&(tgt_glob_vertexlat[0][0]), nDofB, nvb);
 
-      varXVA->put(&(src_glob_vertexlon[0]), nDofA, nva);
-      varXVB->put(&(tgt_glob_vertexlon[0]), nDofB, nvb);
+      varXVA->put(&(src_glob_vertexlon[0][0]), nDofA, nva);
+      varXVB->put(&(tgt_glob_vertexlon[0][0]), nDofB, nvb);
     }
 
     // Write areas
