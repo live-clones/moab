@@ -4,6 +4,7 @@
 #include <iostream>
 #include <exception>
 #include <cmath>
+#include <cassert>
 #include <vector>
 #include <string>
 #include <fstream>
