@@ -343,12 +343,10 @@ int main(int argc, char* argv[])
       rval = get_vartag_data(mbCore, srcCenterLon, sets, srccenter_size, src_centerlon);MB_CHK_SET_ERR(rval, "Getting target mesh areas failed");
       std::vector<double> src_glob_centerlat(nDofA, 0.0), src_glob_centerlon(nDofA, 0.0);
 
-      std::vector<int> src_elem_ordering;
       for (int i=0; i < srccenter_size; ++i) {
           assert(i < srcID_size);
           assert(src_gids[i] < nDofA);
 
-          src_elem_ordering.push_back(src_gids[i]);
           src_glob_centerlat[src_gids[i]] = src_centerlat[i];
           src_glob_centerlon[src_gids[i]] = src_centerlon[i];
       }
@@ -358,12 +356,10 @@ int main(int argc, char* argv[])
       rval = get_vartag_data(mbCore, tgtCenterLat, sets, tgtcenter_size, tgt_centerlat);MB_CHK_SET_ERR(rval, "Getting source mesh areas failed");
       rval = get_vartag_data(mbCore, tgtCenterLon, sets, tgtcenter_size, tgt_centerlon);MB_CHK_SET_ERR(rval, "Getting target mesh areas failed");
       std::vector<double> tgt_glob_centerlat(nDofB, 0.0), tgt_glob_centerlon(nDofB, 0.0);
-      std::vector<int> tgt_elem_ordering;
       for (int i=0; i < tgtcenter_size; ++i) {
           assert(i < tgtID_size);
           assert(tgt_gids[i] < nDofB);
 
-          tgt_elem_ordering.push_back(tgt_gids[i]);
           tgt_glob_centerlat[tgt_gids[i]] = tgt_centerlat[i];
           tgt_glob_centerlon[tgt_gids[i]] = tgt_centerlon[i];
       }
@@ -382,18 +378,21 @@ int main(int argc, char* argv[])
       if (nva > 1)
       {
         std::vector<double> src_vertexlat, src_vertexlon;
-        int srcvertex_size;
-        rval = get_vartag_data(mbCore, srcVertexLat, sets, srcvertex_size, src_vertexlat);MB_CHK_SET_ERR(rval, "Getting source mesh areas failed");
-        rval = get_vartag_data(mbCore, srcVertexLon, sets, srcvertex_size, src_vertexlon);MB_CHK_SET_ERR(rval, "Getting target mesh areas failed");
+        int srcvertex_size1, srcvertex_size2;
+        rval = get_vartag_data(mbCore, srcVertexLat, sets, srcvertex_size1, src_vertexlat);MB_CHK_SET_ERR(rval, "Getting source mesh areas failed");
+        rval = get_vartag_data(mbCore, srcVertexLon, sets, srcvertex_size2, src_vertexlon);MB_CHK_SET_ERR(rval, "Getting target mesh areas failed");
         int offset = 0;
-        // printf("Source: %d, %d, %d, %d, %d, %d, %d\n", nva, nDofA, srcvertex_size, src_elem_ordering.size()*nva, nDofA*nva, src_elem_ordering.size(), src_vertexlat.size());
-        for (unsigned vIndex = 0; vIndex < src_elem_ordering.size(); ++vIndex)
+        printf("Source: %d, %d, %d, %d, %d, %d, %d, %d\n", nva, nDofA, srcvertex_size1, srcvertex_size2, src_gids.size()*nva, nDofA*nva, src_gids.size(), src_vertexlat.size());
+        for (unsigned vIndex = 0; vIndex < src_gids.size(); ++vIndex)
         {
             for (int vNV = 0; vNV < nva; ++vNV)
             {
-              assert(offset < srcvertex_size);
-              src_glob_vertexlat[src_elem_ordering[vIndex]][vNV] = src_vertexlat[offset];
-              src_glob_vertexlon[src_elem_ordering[vIndex]][vNV] = src_vertexlon[offset];
+              // assert(offset < srcvertex_size1);
+              if (offset < srcvertex_size1) src_glob_vertexlat[src_gids[vIndex]][vNV] = src_vertexlat[offset];
+              else { printf("Offset = %d, and srcvertex_size1 = %d\n", offset, srcvertex_size1); }
+              // assert(offset < srcvertex_size2);
+              if (offset < srcvertex_size2) src_glob_vertexlon[src_gids[vIndex]][vNV] = src_vertexlon[offset];
+              else { printf("Offset = %d, and srcvertex_size2 = %d\n", offset, srcvertex_size2); }
               offset++;
             }
         }
@@ -407,13 +406,13 @@ int main(int argc, char* argv[])
         rval = get_vartag_data(mbCore, tgtVertexLat, sets, tgtvertex_size, tgt_vertexlat);MB_CHK_SET_ERR(rval, "Getting source mesh areas failed");
         rval = get_vartag_data(mbCore, tgtVertexLon, sets, tgtvertex_size, tgt_vertexlon);MB_CHK_SET_ERR(rval, "Getting target mesh areas failed");
         int offset = 0;
-        for (unsigned vIndex = 0; vIndex < tgt_elem_ordering.size(); ++vIndex)
+        for (unsigned vIndex = 0; vIndex < tgt_gids.size(); ++vIndex)
         {
           for (int vNV = 0; vNV < nvb; ++vNV)
           {
             assert(offset < tgtvertex_size);
-            tgt_glob_vertexlat[tgt_elem_ordering[vIndex]][vNV] = tgt_vertexlat[offset];
-            tgt_glob_vertexlon[tgt_elem_ordering[vIndex]][vNV] = tgt_vertexlon[offset];
+            tgt_glob_vertexlat[tgt_gids[vIndex]][vNV] = tgt_vertexlat[offset];
+            tgt_glob_vertexlon[tgt_gids[vIndex]][vNV] = tgt_vertexlon[offset];
             offset++;
           }
         }
