@@ -346,6 +346,7 @@ endif (ENABLE_ZOLTAN )
 
 if ( EIGEN3_FOUND )
   find_package( TempestRemap )
+  set(MOAB_HAVE_TEMPESTREMAP ${TEMPESTREMAP_FOUND})
 endif( EIGEN3_FOUND )
 
 set (MOAB_HAVE_CGM OFF CACHE INTERNAL "Found necessary CGM components. Configure MOAB with it." )

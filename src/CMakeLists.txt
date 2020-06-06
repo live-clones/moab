@@ -275,6 +275,22 @@ if (MOAB_HAVE_METIS)
   list(APPEND MOAB_DEP_LIBRARIES ${METIS_LIBRARIES})
 endif()
 
+if (MOAB_HAVE_TEMPESTREMAP)
+  set( MOAB_LIB_SOURCES ${MOAB_LIB_SOURCES} 
+                        Remapping/TempestRemapper.cpp 
+                        Remapping/TempestOnlineMap.cpp 
+                        Remapping/TempestLinearRemap.cpp
+                        )
+  set( MOAB_INSTALL_HEADERS ${MOAB_INSTALL_HEADERS} 
+        moab/Remapping/Remapper.hpp
+        moab/Remapping/TempestRemapper.hpp
+        moab/Remapping/TempestOnlineMap.hpp )
+
+  include_directories( ${TEMPESTREMAP_INCLUDES} )
+  list(APPEND MOAB_DEP_LIBRARIES ${TEMPESTREMAP_LIBRARIES})
+
+endif (MOAB_HAVE_TEMPESTREMAP)
+
 add_library(
   MOAB
   ${MOAB_LIB_SOURCES} ${MOAB_INSTALL_HEADERS} ${MOAB_GENERATED_INSTALL_HEADERS}
