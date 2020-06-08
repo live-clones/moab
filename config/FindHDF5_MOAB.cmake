@@ -114,6 +114,13 @@ else (HDF5_FOUND)
           mark_as_advanced( HDF5_IS_PARALLEL )
         endforeach()
         SET( HDF5_FOUND YES )
+
+        # print some HDF5 configuration details
+        message (STATUS "---   HDF5 Configuration ::")
+        message (STATUS "        Directory    : ${HDF5_ROOT}")
+        message (STATUS "        IS_PARALLEL  : ${HDF5_IS_PARALLEL}")
+        message (STATUS "        INCLUDES     : ${HDF5_INCLUDES}")
+        message (STATUS "        LIBRARIES    : ${HDF5_LIBRARIES}")
       ELSE (HDF5_INCLUDE_DIR AND HDF5_BASE_LIBRARY)
         set( HDF5_FOUND NO )
         message("finding HDF5 failed, please try to set the var HDF5_ROOT")
@@ -125,11 +132,6 @@ else (HDF5_FOUND)
 
   endif ()
 endif (HDF5_FOUND)
-
-message (STATUS "---   HDF5 Configuration ::")
-message (STATUS "        IS_PARALLEL  : ${HDF5_IS_PARALLEL}")
-message (STATUS "        INCLUDES     : ${HDF5_INCLUDES}")
-message (STATUS "        LIBRARIES    : ${HDF5_LIBRARIES}")
 
 include (FindPackageHandleStandardArgs)
 find_package_handle_standard_args (
