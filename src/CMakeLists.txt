@@ -16,7 +16,7 @@ if(MOAB_HAVE_MPI AND MPI_FOUND)
   if (MPI_EXTRA_LIBRARY)
     list(APPEND MPI_LIBRARIES ${MPI_EXTRA_LIBRARY})
   endif ()
-  message(STATUS "MPI_LIBRARIES = ${MPI_LIBRARIES}.")
+  # message(STATUS "MPI_LIBRARIES = ${MPI_LIBRARIES}.")
 endif()
 
 #Create the moab/EntityHandle.hpp file
