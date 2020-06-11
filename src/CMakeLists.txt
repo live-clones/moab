@@ -16,7 +16,7 @@ if(MOAB_HAVE_MPI AND MPI_FOUND)
   if (MPI_EXTRA_LIBRARY)
     list(APPEND MPI_LIBRARIES ${MPI_EXTRA_LIBRARY})
   endif ()
-  message(STATUS "MPI_LIBRARIES = ${MPI_LIBRARIES}.")
+  # message(STATUS "MPI_LIBRARIES = ${MPI_LIBRARIES}.")
 endif()
 
 #Create the moab/EntityHandle.hpp file
@@ -274,6 +274,22 @@ if (MOAB_HAVE_METIS)
   include_directories( ${METIS_INCLUDES} )
   list(APPEND MOAB_DEP_LIBRARIES ${METIS_LIBRARIES})
 endif()
+
+if (MOAB_HAVE_TEMPESTREMAP)
+  set( MOAB_LIB_SOURCES ${MOAB_LIB_SOURCES} 
+                        Remapping/TempestRemapper.cpp 
+                        Remapping/TempestOnlineMap.cpp 
+                        Remapping/TempestLinearRemap.cpp
+                        )
+  set( MOAB_INSTALL_HEADERS ${MOAB_INSTALL_HEADERS} 
+        moab/Remapping/Remapper.hpp
+        moab/Remapping/TempestRemapper.hpp
+        moab/Remapping/TempestOnlineMap.hpp )
+
+  include_directories( ${TEMPESTREMAP_INCLUDES} )
+  list(APPEND MOAB_DEP_LIBRARIES ${TEMPESTREMAP_LIBRARIES})
+
+endif (MOAB_HAVE_TEMPESTREMAP)
 
 add_library(
   MOAB

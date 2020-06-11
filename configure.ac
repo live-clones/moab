@@ -947,9 +947,9 @@ AC_ARG_WITH( [vtk-lib-suffix],
                esac],[VTK_LIB_SUFFIX=] )
 
 # Provide downloadable option for TempestRemap library
-# Supported TempestRemap versions: 2.0.3
+# Supported TempestRemap versions: 2.0.4, 2.0.3, 2.0.2
 # Arguments: 1) Default Version Number, 2) Download by default ?
-AUSCM_CONFIGURE_DOWNLOAD_TEMPESTREMAP([2.0.3],[no])
+AUSCM_CONFIGURE_DOWNLOAD_TEMPESTREMAP([2.0.4],[no])
 
 # Configuration for TempestRemap library
 AC_ARG_WITH([tempestremap],
@@ -995,10 +995,15 @@ if (test "x$WITH_TEMPEST" != "xno" && test "x$WITH_TEMPEST" != "x"); then
     AC_DEFINE([HAVE_TEMPESTREMAP],[1],[Enable use of TempestRemap library API for computing intersection and remapping for Climate problems])
     HAVE_TEMPEST=yes
 
+    TEMPESTREMAP_DIR=$WITH_TEMPEST
+    AC_SUBST(TEMPESTREMAP_DIR)
+
   fi
 fi
-AM_CONDITIONAL( HAVE_TEMPESTREMAP, [test "x$HAVE_TEMPEST" = "xyes"] )
 
+enabletempestremap=$HAVE_TEMPEST
+AM_CONDITIONAL( HAVE_TEMPESTREMAP, [test "x$HAVE_TEMPEST" = "xyes"] )
+AC_SUBST(enabletempestremap)
 ################################################################################
 #                           Zoltan - Part 2 of 2
 ################################################################################

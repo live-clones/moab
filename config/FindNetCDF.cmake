@@ -53,16 +53,16 @@ find_library( NETCDF_FORTRAN_LIBRARY
       if ( NETCDF_FORTRAN_LIBRARY )
         set(NETCDF_LIBRARIES ${NETCDF_LIBRARIES} ${NETCDF_FORTRAN_LIBRARY})
       endif ( NETCDF_FORTRAN_LIBRARY )
+      # print some details about NetCDF configuration
+      message (STATUS "---   NetCDF Configuration ::")
+      message (STATUS "        Directory : ${NETCDF_ROOT}")
+      message (STATUS "        INCLUDES  : ${NETCDF_INCLUDES}")
+      message (STATUS "        LIBRARIES : ${NETCDF_LIBRARIES}")
     else ( NETCDF_INCLUDE_DIR AND NETCDF_C_LIBRARY )
       set( NETCDF_FOUND NO )
       message("finding NetCDF failed, please try to set the var NETCDF_ROOT")
     endif ( NETCDF_INCLUDE_DIR AND NETCDF_C_LIBRARY )
   ENDIF (NOT NETCDF_FOUND)
-
-message (STATUS "---   NetCDF Configuration ::")
-message (STATUS "        Found  : ${NETCDF_FOUND}")
-message (STATUS "        INCLUDES  : ${NETCDF_INCLUDES}")
-message (STATUS "        LIBRARIES : ${NETCDF_LIBRARIES}")
 
 mark_as_advanced(
   NETCDF_ROOT
@@ -93,7 +93,7 @@ find_library( PNETCDF_LIBRARIES
     if ( PNETCDF_INCLUDES AND PNETCDF_LIBRARIES )
       set( PNETCDF_FOUND YES )
       message (STATUS "---   PNetCDF Configuration ::")
-      message (STATUS "        Found  : ${PNETCDF_FOUND}")
+      message (STATUS "        Directory : ${PNETCDF_ROOT}")
       message (STATUS "        INCLUDES  : ${PNETCDF_INCLUDES}")
       message (STATUS "        LIBRARIES : ${PNETCDF_LIBRARIES}")
     else ( PNETCDF_INCLUDES AND PNETCDF_LIBRARIES )

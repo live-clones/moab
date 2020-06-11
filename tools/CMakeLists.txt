@@ -237,7 +237,8 @@ endif( )
 if ( MOAB_BUILD_MBTEMPEST AND MOAB_HAVE_TEMPEST )
   add_executable( mbtempest mbtempest.cpp)
   set_source_files_properties( mbtempest.cpp COMPILE_FLAGS "${MOAB_DEFINES}" )
-  target_link_libraries( mbtempest ${TOOLS_LINK_LIBS} )
+  include_directories( ${TEMPESTREMAP_INCLUDES} ${EIGEN3_DIR} )
+  target_link_libraries( mbtempest ${TOOLS_LINK_LIBS} ${TEMPESTREMAP_LIBRARIES} )
   set( MOAB_HAVE_MBTEMPEST 1 )
   install(
     TARGETS mbtempest
