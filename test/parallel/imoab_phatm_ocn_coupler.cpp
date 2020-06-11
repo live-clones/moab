@@ -41,7 +41,7 @@
 
 using namespace moab;
 
-// #define VERBOSE
+//#define VERBOSE
 
 #ifndef MOAB_HAVE_TEMPESTREMAP
 #error The climate coupler test example requires MOAB configuration with TempestRemap
@@ -456,7 +456,7 @@ int main( int argc, char* argv[] )
   MPI_Barrier(MPI_COMM_WORLD);
 
   if (couComm != MPI_COMM_NULL) {
-    char outputFileLnd[] = "recvLnd.h5m";
+    char outputFileLnd[] = "recvLnd2.h5m";
     PUSH_TIMER("Write migrated LND mesh on coupler PEs")
     ierr = iMOAB_WriteMesh(cplLndPID, outputFileLnd, fileWriteOptions,
       strlen(outputFileLnd), strlen(fileWriteOptions) );
@@ -705,11 +705,21 @@ int main( int argc, char* argv[] )
      // this is for projection to ocean:
      ierr = iMOAB_SendElementTag(cmpPhAtmPID, "T_ph;u_ph;v_ph;", &atmCouComm, &atmocnid, strlen("T_ph;u_ph;v_ph;"));
      CHECKIERR(ierr, "cannot send tag values")
+#ifdef VERBOSE
+    int is_sender = 1;
+    int context = atmocnid; // used to identity the parcommgraph in charge
+    iMOAB_DumpCommGraph(cmpPhAtmPID,  &context, &is_sender, "PhysAtmA2OS", strlen("PhysAtmA2OS"));
+#endif
   }
   if (couComm != MPI_COMM_NULL) {
     // receive on atm on coupler pes, that was redistributed according to coverage
     ierr = iMOAB_ReceiveElementTag(cplAtmOcnPID, "T16_ph;u16_ph;v16_ph;", &atmCouComm, &cmpatm, strlen("T16_ph;u16_ph;v16_ph;"));
     CHECKIERR(ierr, "cannot receive tag values")
+#ifdef VERBOSE
+    int is_sender = 0;
+    int context = cmpatm; // used to identity the parcommgraph in charge
+    iMOAB_DumpCommGraph(cplAtmOcnPID,  &context, &is_sender, "PhysAtmA2OR", strlen("PhysAtmA2OR"));
+#endif
   }
   POP_TIMER(MPI_COMM_WORLD, rankInGlobalComm)
 
@@ -866,7 +876,7 @@ int main( int argc, char* argv[] )
   }
   if (lndComm != MPI_COMM_NULL)
   {
-    char outputFileLnd[] = "LndWithProj.h5m";
+    char outputFileLnd[] = "LndWithProj2.h5m";
     ierr = iMOAB_WriteMesh(cmpLndPID, outputFileLnd, fileWriteOptions,
         strlen(outputFileLnd), strlen(fileWriteOptions) );
   }

@@ -13,6 +13,7 @@
 #endif
 
 // #define VERBOSE
+// #define GRAPH_INFO
 
 namespace moab {
 ParCommGraph::ParCommGraph(MPI_Comm joincomm, MPI_Group group1, MPI_Group group2, int coid1, int coid2) :
@@ -1324,7 +1325,7 @@ ErrorCode ParCommGraph::dump_comm_information(std::string prefix, int is_send)
   {
     std::ofstream dbfile;
     std::stringstream outf;
-    outf << prefix << "_sender_" << rankInGroup1 << "_joint"<< rankInJoin << ".txt";
+    outf << prefix << "_sender_" << rankInGroup1 << "_joint"<< rankInJoin  <<"_type_"<< (int)graph_type << ".txt";
     dbfile.open (outf.str().c_str());
 
     if (graph_type == COVERAGE)
@@ -1345,9 +1346,13 @@ ErrorCode ParCommGraph::dump_comm_information(std::string prefix, int is_send)
         dbfile << "receiver: "  << receiver_proc << " size:" << eids.size() << "\n";
       }
     }
-    else if (graph_type == DOF_BASED)// just after migration
+    else if (graph_type == DOF_BASED)// just after migration, or from computeGraph
     {
-      // TODO
+      for ( std::map<int ,std::vector<int> >::iterator mit=involved_IDs_map.begin(); mit!=involved_IDs_map.end();mit++)
+      {
+        int receiver_proc = mit->first;
+        dbfile << "receiver: "  << receiver_proc << " size:" << mit->second.size() << "\n";
+      }
     }
     dbfile.close();
   }
@@ -1355,7 +1360,7 @@ ErrorCode ParCommGraph::dump_comm_information(std::string prefix, int is_send)
   {
     std::ofstream dbfile;
     std::stringstream outf;
-    outf << prefix << "_receiver_" << rankInGroup2 << "_joint"<< rankInJoin << ".txt";
+    outf << prefix << "_receiver_" << rankInGroup2 << "_joint"<< rankInJoin << "_type_"<< (int)graph_type << ".txt";
     dbfile.open (outf.str().c_str());
 
     if (graph_type == COVERAGE)
@@ -1378,7 +1383,11 @@ ErrorCode ParCommGraph::dump_comm_information(std::string prefix, int is_send)
     }
     else if (graph_type == DOF_BASED)// just after migration
     {
-      // TODO
+      for ( std::map<int ,std::vector<int> >::iterator mit=involved_IDs_map.begin(); mit!=involved_IDs_map.end();mit++)
+      {
+        int sender_proc = mit->first;
+        dbfile << "receiver: "  << sender_proc << " size:" << mit->second.size() << "\n";
+      }
     }
     dbfile.close();
   }

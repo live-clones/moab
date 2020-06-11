@@ -2679,7 +2679,12 @@ ErrCode iMOAB_DumpCommGraph                 (  iMOAB_AppID pid,
     {
       prefix_str = prefix_str.substr ( 0, length_prefix );
     }
-    cgraph->dump_comm_information(prefix_str, *is_sender);
+    if (NULL!=cgraph)
+      cgraph->dump_comm_information(prefix_str, *is_sender);
+    else
+    {
+      std::cout << " cannot find ParCommGraph on app with pid " << *pid << " name: " << context.appDatas[*pid].name << " context: " << *context_id << "\n";
+    }
     return 0;
 }
 
