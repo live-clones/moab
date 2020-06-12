@@ -1609,15 +1609,21 @@ moab::ErrorCode moab::TempestOnlineMap::WriteParallelMap (std::string strOutputF
 {
     moab::ErrorCode rval;
 
+    /**
+     * Need to get the global maximum of number of vertices per element
+     * Key issue is that when calling InitializeCoordinatesFromMeshFV, the allocation for dVertexLon/dVertexLat 
+     * are made based on the maximum vertices in the current process. However, when writing this out, other processes
+     * may have a different size for the same array. This is hence a mess to consolidate in h5mtoscrip eventually.
+    **/
+
     /* Let us compute all relevant data for the current original source mesh on the process */
     DataArray1D<double> vecSourceFaceArea, vecTargetFaceArea;
-    DataArray1D<double> dSourceCenterLon, dSourceCenterLat;
-    DataArray2D<double> dSourceVertexLon, dSourceVertexLat;
-    DataArray3D<double> dataGLLJacobianSrc, dataGLLJacobianDest;
+    DataArray1D<double> dSourceCenterLon, dSourceCenterLat, dTargetCenterLon, dTargetCenterLat;
+    DataArray2D<double> dSourceVertexLon, dSourceVertexLat, dTargetVertexLon, dTargetVertexLat;
     if (m_srcDiscType == DiscretizationType_FV || m_srcDiscType == DiscretizationType_PCLOUD)
     {
         // printf("Source FV discretization with order - %d, \n", m_nDofsPEl_Src);
-        this->InitializeCoordinatesFromMeshFV(*m_meshInput, dSourceCenterLon, dSourceCenterLat, dSourceVertexLon, dSourceVertexLat, false /* fLatLon = false */);
+        this->InitializeCoordinatesFromMeshFV(*m_meshInput, dSourceCenterLon, dSourceCenterLat, dSourceVertexLon, dSourceVertexLat, false /* fLatLon = false */, m_remapper->max_source_edges);
 
         vecSourceFaceArea.Allocate(m_meshInput->vecFaceArea.GetRows());
         for (unsigned i = 0; i < m_meshInput->vecFaceArea.GetRows(); ++i)
@@ -1625,6 +1631,7 @@ moab::ErrorCode moab::TempestOnlineMap::WriteParallelMap (std::string strOutputF
     }
     else
     {
+        DataArray3D<double> dataGLLJacobianSrc;
         // printf("Source FE discretization with order - %d, \n", m_nDofsPEl_Src);
         this->InitializeCoordinatesFromMeshFE(*m_meshInput, m_nDofsPEl_Src, dataGLLNodesSrc, dSourceCenterLon, dSourceCenterLat, dSourceVertexLon, dSourceVertexLat);
         
@@ -1665,13 +1672,19 @@ moab::ErrorCode moab::TempestOnlineMap::WriteParallelMap (std::string strOutputF
 
     if (m_destDiscType == DiscretizationType_FV || m_destDiscType == DiscretizationType_PCLOUD)
     {
+        // printf("Target FV discretization with order - %d, \n", m_nDofsPEl_Dest);
+        this->InitializeCoordinatesFromMeshFV(*m_meshOutput, dTargetCenterLon, dTargetCenterLat, dTargetVertexLon, dTargetVertexLat, false /* fLatLon = false */, m_remapper->max_target_edges);
+
         vecTargetFaceArea.Allocate(m_meshOutput->vecFaceArea.GetRows());
         for (unsigned i = 0; i < m_meshOutput->vecFaceArea.GetRows(); ++i)
             vecTargetFaceArea[i] = m_meshOutput->vecFaceArea[i];
     }
     else
     {
-        // printf("Source FE discretization with order - %d, \n", m_nDofsPEl_Dest);
+        DataArray3D<double> dataGLLJacobianDest;
+        // printf("Target FE discretization with order - %d, \n", m_nDofsPEl_Dest);
+        this->InitializeCoordinatesFromMeshFE(*m_meshOutput, m_nDofsPEl_Dest, dataGLLNodesDest, dTargetCenterLon, dTargetCenterLat, dTargetVertexLon, dTargetVertexLat);
+
         // Generate the continuous Jacobian for input mesh
         GenerateMetaData (
             *m_meshOutput,
@@ -1747,20 +1760,32 @@ moab::ErrorCode moab::TempestOnlineMap::WriteParallelMap (std::string strOutputF
     std::vector<int> smatrowvals(weightMatNNZ), smatcolvals(weightMatNNZ);
     std::vector<double> smatvals(weightMatNNZ);
     // const double* smatvals = m_weightMatrix.valuePtr();
-    int maxrow=0, maxcol=0, offset=0;
-
     // Loop over the matrix entries and find the max global ID for rows and columns
-    for (int k=0; k < m_weightMatrix.outerSize(); ++k)
+    for (int k=0, offset=0; k < m_weightMatrix.outerSize(); ++k)
     {
-        for (moab::TempestOnlineMap::WeightMatrix::InnerIterator it(m_weightMatrix,k); it; ++it)
+        for (moab::TempestOnlineMap::WeightMatrix::InnerIterator it(m_weightMatrix,k); it; ++it, ++offset)
         {
             smatrowvals[offset] = this->GetRowGlobalDoF ( it.row() );
             smatcolvals[offset] = this->GetColGlobalDoF ( it.col() );
             smatvals[offset] = it.value();
-            maxrow = (smatrowvals[offset] > maxrow) ? smatrowvals[offset] : maxrow;
-            maxcol = (smatcolvals[offset] > maxcol) ? smatcolvals[offset] : maxcol;
-            ++offset;
         }
+    }
+
+    /* Set the global IDs for the DoFs */
+    ////
+    // col_gdofmap [ col_ldofmap [ 0 : local_ndofs ] ] = GDOF
+    // row_gdofmap [ row_ldofmap [ 0 : local_ndofs ] ] = GDOF
+    ////
+    int maxrow=0, maxcol=0;
+    std::vector<int> src_global_dofs(tot_src_size), tgt_global_dofs(tot_tgt_size);
+    for (int i=0; i < tot_src_size; ++i) {
+        src_global_dofs[i] = srccol_gdofmap [ i ];
+        maxcol = (src_global_dofs[i] > maxcol) ? src_global_dofs[i] : maxcol;
+    }
+        
+    for (int i=0; i < tot_tgt_size; ++i) {
+        tgt_global_dofs[i] = row_gdofmap [ i ];
+        maxrow = (tgt_global_dofs[i] > maxrow) ? tgt_global_dofs[i] : maxrow;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1832,17 +1857,8 @@ moab::ErrorCode moab::TempestOnlineMap::WriteParallelMap (std::string strOutputF
     rval = m_interface->tag_set_by_ptr(tagMapValues, &m_meshOverlapSet, 1, &smatvals_d, &numval);MB_CHK_SET_ERR(rval, "Setting local tag data failed");
 
     /* Set the global IDs for the DoFs */
-    ////
-    // col_gdofmap [ col_ldofmap [ 0 : local_ndofs ] ] = GDOF
-    // row_gdofmap [ row_ldofmap [ 0 : local_ndofs ] ] = GDOF
-    ////
-    std::vector<int> src_global_dofs(tot_src_size), tgt_global_dofs(tot_tgt_size);
-    for (int i=0; i < tot_src_size; ++i)
-        src_global_dofs[i] = srccol_gdofmap [ i ]; // this->GetColGlobalDoF ( i ); //     col_gdofmap [ localColID ];
-    for (int i=0; i < tot_tgt_size; ++i)
-        tgt_global_dofs[i] = row_gdofmap [ i ]; // this->GetRowGlobalDoF ( i ); // row_gdofmap [ row_ldofmap [ i ] ];
-    const void* srceleidvals_d = src_global_dofs.data(); //this->col_gdofmap.data();
-    const void* tgteleidvals_d = tgt_global_dofs.data(); //this->row_gdofmap.data();
+    const void* srceleidvals_d = src_global_dofs.data();
+    const void* tgteleidvals_d = tgt_global_dofs.data();
     dsize = src_global_dofs.size();
     rval = m_interface->tag_set_by_ptr(srcEleIDs, &m_meshOverlapSet, 1, &srceleidvals_d, &dsize);MB_CHK_SET_ERR(rval, "Setting local tag data failed");
     dsize = tgt_global_dofs.size();
