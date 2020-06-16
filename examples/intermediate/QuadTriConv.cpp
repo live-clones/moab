@@ -14,8 +14,6 @@
 #include "moab/Core.hpp"
 #include "MBTagConventions.hpp"
 
-#define NTAGVALS 3
-
 using namespace moab;
 using namespace std;
 
@@ -104,6 +102,8 @@ int main(int argc, char **argv)
 
   mb->delete_entities(modifiedCells);
   rval = mb->write_file(outfile.c_str()); MB_CHK_SET_ERR(rval, "Failed to write new file");
+
+  cout << " wrote file " << outfile << " with " << modifiedCells.size() << " modified cells\n";
 
   delete mb;
   return 0;
