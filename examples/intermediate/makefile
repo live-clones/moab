@@ -3,7 +3,7 @@ include ../makefile.config
 
 default: all
 
-EXAMPLES = LoadPartial DirectAccessWithHoles DirectAccessNoHoles PointInElementSearch ExtractClose
+EXAMPLES = LoadPartial DirectAccessWithHoles DirectAccessNoHoles PointInElementSearch ExtractClose QuadTriConv
 PAREXAMPLES = ReduceExchangeTags
 ALLEXAMPLES = ${EXAMPLES}
 
@@ -17,6 +17,7 @@ endif
 all: $(ALLEXAMPLES)
 
 LoadPartial: LoadPartial.o ${MOAB_LIBDIR}/libMOAB.la
+QuadTriConv: QuadTriConv.o ${MOAB_LIBDIR}/libMOAB.la
 DirectAccessWithHoles: DirectAccessWithHoles.o ${MOAB_LIBDIR}/libMOAB.la
 DirectAccessNoHoles: DirectAccessNoHoles.o ${MOAB_LIBDIR}/libMOAB.la
 ReduceExchangeTags: ReduceExchangeTags.o ${MOAB_LIBDIR}/libMOAB.la
