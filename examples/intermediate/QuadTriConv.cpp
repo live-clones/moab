@@ -101,6 +101,22 @@ int main(int argc, char **argv)
 
 
   mb->delete_entities(modifiedCells);
+  // in case global ids are not set for vertices, set them, in order;
+  // they are needed for migrating later on
+  // 
+  Range verts;
+  rval = mb->get_entities_by_dimension(0, 0, verts);MB_CHK_SET_ERR(rval, "Failed to get vertices");
+
+  vector<int> gids;
+  gids.resize(verts.size());
+  rval = mb->tag_get_data(gid, verts, &gids[0]);  MB_CHK_SET_ERR(rval, "Failed to get gids on vertices");
+  if (gids[0]<=0)
+  {
+    // gids were never set, assign them
+    for (size_t i=1; i<=verts.size(); i++)
+      gids[i-1] = (int)i;
+    rval = mb->tag_set_data(gid, verts, &gids[0]);  MB_CHK_SET_ERR(rval, "Failed to set gids on vertices");
+  }
   rval = mb->write_file(outfile.c_str()); MB_CHK_SET_ERR(rval, "Failed to write new file");
 
   cout << " wrote file " << outfile << " with " << modifiedCells.size() << " modified cells\n";
