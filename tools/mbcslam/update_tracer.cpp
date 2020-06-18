@@ -4,6 +4,7 @@
 #include "moab/Range.hpp"
 #include "moab/IntxMesh/Intx2MeshOnSphere.hpp"
 #include "moab/IntxMesh/IntxUtils.hpp"
+#include "IntxUtilsCSLAM.hpp"
 
 extern "C" void update_tracer(iMesh_Instance instance,
     iBase_EntitySetHandle imesh_euler_set, int * ierr)

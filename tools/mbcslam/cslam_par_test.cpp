@@ -31,6 +31,7 @@
 #include "MBTagConventions.hpp"
 
 #include "moab/IntxMesh/IntxUtils.hpp"
+#include "IntxUtilsCSLAM.hpp"
 
 // for M_PI
 #include <math.h>
