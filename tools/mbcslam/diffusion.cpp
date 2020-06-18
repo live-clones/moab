@@ -98,9 +98,9 @@ ErrorCode add_field_value(Interface * mb, EntityHandle euler_set, int rank, Tag 
       rval = mb->get_coords(&oldV, 1, &(posi[0]) );
       CHECK_ERR(rval);
 
-      SphereCoords sphCoord = cart_to_spherical(posi);
+      moab::IntxUtils::SphereCoords sphCoord = moab::IntxUtils::cart_to_spherical(posi);
 
-      ptr_DP[0]=quasi_smooth_field(sphCoord.lon, sphCoord.lat, params);;
+      ptr_DP[0]=moab::IntxUtils::quasi_smooth_field(sphCoord.lon, sphCoord.lat, params);;
 
       ptr_DP++; // increment to the next node
     }
@@ -108,13 +108,13 @@ ErrorCode add_field_value(Interface * mb, EntityHandle euler_set, int rank, Tag 
   else if (2 == field_type) // smooth
   {
     CartVect p1, p2;
-    SphereCoords spr;
+    moab::IntxUtils::SphereCoords spr;
     spr.R = 1;
     spr.lat = M_PI/3;
     spr.lon= M_PI;
-    p1 = spherical_to_cart(spr);
+    p1 = moab::IntxUtils::spherical_to_cart(spr);
     spr.lat = -M_PI/3;
-    p2 = spherical_to_cart(spr);
+    p2 = moab::IntxUtils::spherical_to_cart(spr);
     //                  x1,    y1,     z1,    x2,   y2,    z2,   h_max, b0
     double params[] = { p1[0], p1[1], p1[2], p2[0], p2[1], p2[2], 1,    5.};
     for (Range::iterator vit=connecVerts.begin();vit!=connecVerts.end(); ++vit)
@@ -124,9 +124,9 @@ ErrorCode add_field_value(Interface * mb, EntityHandle euler_set, int rank, Tag 
       rval = mb->get_coords(&oldV, 1, &(posi[0]) );
       CHECK_ERR(rval);
 
-      SphereCoords sphCoord = cart_to_spherical(posi);
+      moab::IntxUtils::SphereCoords sphCoord = moab::IntxUtils::cart_to_spherical(posi);
 
-      ptr_DP[0]=smooth_field(sphCoord.lon, sphCoord.lat, params);;
+      ptr_DP[0]=moab::IntxUtils::smooth_field(sphCoord.lon, sphCoord.lat, params);;
 
       ptr_DP++; // increment to the next node
     }
@@ -142,9 +142,9 @@ ErrorCode add_field_value(Interface * mb, EntityHandle euler_set, int rank, Tag 
       rval = mb->get_coords(&oldV, 1, &(posi[0]) );
       CHECK_ERR(rval);
 
-      SphereCoords sphCoord = cart_to_spherical(posi);
+      moab::IntxUtils::SphereCoords sphCoord = moab::IntxUtils::cart_to_spherical(posi);
 
-      ptr_DP[0]=slotted_cylinder_field(sphCoord.lon, sphCoord.lat, params);;
+      ptr_DP[0]=moab::IntxUtils::slotted_cylinder_field(sphCoord.lon, sphCoord.lat, params);;
 
       ptr_DP++; // increment to the next node
     }
@@ -185,9 +185,10 @@ ErrorCode add_field_value(Interface * mb, EntityHandle euler_set, int rank, Tag 
       // now get area
       std::vector<double> coords;
       coords.resize(3*num_nodes);
-      rval = mb->get_coords(conn, num_nodes, &coords[0]);
-      CHECK_ERR(rval);
-      *ptrArea =  area_spherical_polygon_lHuiller (&coords[0], num_nodes, radius);
+      rval = mb->get_coords(conn, num_nodes, &coords[0]);CHECK_ERR(rval);
+
+      moab::IntxAreaUtils sphAreaUtils(true);
+      *ptrArea =  sphAreaUtils.area_spherical_polygon_lHuiller (&coords[0], num_nodes, radius);
 
       // we should have used some
       // total mass:
@@ -236,7 +237,7 @@ ErrorCode compute_velocity_case1(Interface * mb, EntityHandle euler_set, Tag & t
     CHECK_ERR(rval);
     CartVect velo ;
     double t = T * tStep/numSteps; //
-    velocity_case1(posi, t, velo);
+    moab::IntxUtils::velocity_case1(posi, t, velo);
 
     ptr_velo[0]= velo[0];
     ptr_velo[1]= velo[1];
@@ -280,7 +281,7 @@ ErrorCode compute_tracer_case1(Interface * mb, Intx2MeshOnSphere & worker, Entit
     CHECK_ERR(rval);
     // Intx utils, case 1
     CartVect newPos;
-    departure_point_case1(posi, t, delta_t, newPos);
+    moab::IntxUtils::departure_point_case1(posi, t, delta_t, newPos);
     newPos = radius * newPos; // do we need this? the radius should be 1
     EntityHandle new_vert;
     rval = mb->tag_get_data(corrTag, &oldV, 1, &new_vert);
@@ -509,7 +510,7 @@ int main(int argc, char **argv)
   // copy the initial mesh in the lagrangian set
   // initial vertices will be at the same position as euler;
 
-  rval = deep_copy_set(&mb, euler_set, lagr_set);
+  rval = moab::IntxUtils::deep_copy_set(&mb, euler_set, lagr_set);
   CHECK_ERR(rval);
 
   Intx2MeshOnSphere worker(&mb);

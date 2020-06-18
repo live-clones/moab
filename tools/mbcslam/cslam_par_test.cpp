@@ -214,8 +214,10 @@ void test_intx_in_parallel_elem_based()
   std::stringstream outf;
   outf<<"intersect" << rank<<".h5m";
   rval = mb.write_file(outf.str().c_str(), 0, 0, &outputSet, 1);
-  double intx_area = area_on_sphere(&mb, outputSet, Radius);
-  double arrival_area = area_on_sphere(&mb, euler_set, Radius) ;
+
+  moab::IntxAreaUtils sphAreaUtils(true);
+  double intx_area = sphAreaUtils.area_on_sphere(&mb, outputSet, Radius);
+  double arrival_area = sphAreaUtils.area_on_sphere(&mb, euler_set, Radius) ;
   std::cout<< "On rank : " << rank << " arrival area: " << arrival_area<<
       "  intersection area:" << intx_area << " rel error: " << fabs((intx_area-arrival_area)/arrival_area) << "\n";
   CHECK_ERR(rval);

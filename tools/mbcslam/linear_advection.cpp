@@ -136,7 +136,7 @@ int main(int argc, char *argv[]) {
     rval = mb.create_meshset(MESHSET_SET, covering_set);
     CHECK_ERR(rval);
     //rval = create_lagr_mesh(&mb, euler_set, lagrange_set);
-    rval = deep_copy_set(&mb, euler_set, lagrange_set);
+    rval = moab::IntxUtils::deep_copy_set(&mb, euler_set, lagrange_set);
     CHECK_ERR(rval);
     moab::EntityHandle dum = 0;
     moab::Tag corrTag;
@@ -334,7 +334,7 @@ void get_gnomonic_plane(moab::Interface * mb, moab::EntityHandle set, moab::Tag 
 
     // define gnomonic plane based on cell center coordinates
      int plane = 0;
-     decide_gnomonic_plane(center,plane);
+     moab::IntxUtils::decide_gnomonic_plane(center,plane);
 
      rval = mb->tag_set_data(planeTag, &icell, 1, &plane);
      if (MB_SUCCESS != rval)
@@ -389,7 +389,7 @@ void get_barycenters(moab::Interface * mb, moab::EntityHandle set, moab::Tag &pl
      for (int inode = 0; inode < num_nodes; inode++){
          double rad = sqrt(coords[inode*3]*coords[inode*3] + coords[inode*3+1]*coords[inode*3+1] + coords[inode*3+2]*coords[inode*3+2]);
          CartVect xyzcoord(coords[inode*3]/rad,coords[inode*3+1]/rad,coords[inode*3+2]/rad);
-         gnomonic_projection(xyzcoord, R, plane, x[inode],y[inode]);
+         moab::IntxUtils::gnomonic_projection(xyzcoord, R, plane, x[inode],y[inode]);
 
      }
 
@@ -419,7 +419,7 @@ void get_barycenters(moab::Interface * mb, moab::EntityHandle set, moab::Tag &pl
 
     // barycenter in Cartesian X,Y,Z coordinates
      moab::CartVect barycent;
-     reverse_gnomonic_projection(bary_x, bary_y, R, plane, barycent);
+     moab::IntxUtils::reverse_gnomonic_projection(bary_x, bary_y, R, plane, barycent);
 
     // set barycenter
      std::vector<double> barycenter(3);
@@ -462,14 +462,14 @@ void set_density(moab::Interface * mb, moab::EntityHandle euler_set, moab::Tag &
 
      // convert barycenter from 3-D Cartesian to lat/lon
       moab::CartVect bary_xyz(cell_barys[cell_ind*3],cell_barys[cell_ind*3+1],cell_barys[cell_ind*3+2]);
-      moab::SphereCoords sphCoord = cart_to_spherical(bary_xyz);
+      moab::IntxUtils::SphereCoords sphCoord = moab::IntxUtils::cart_to_spherical(bary_xyz);
 
       if (field_type == 1)  // cosine bells
       {
         //                 lon1,        lat1  lon2    lat2   b    c  hmax  r
         double params[] = { 5*M_PI/6.0, 0.0, 7*M_PI/6, 0.0, 0.1, 0.9, 1., 0.5};
 
-        double rho_barycent = quasi_smooth_field(sphCoord.lon, sphCoord.lat, params);
+        double rho_barycent = moab::IntxUtils::quasi_smooth_field(sphCoord.lon, sphCoord.lat, params);
         rval = mb->tag_set_data(rhoTag, &icell, 1, &rho_barycent);
         if (MB_SUCCESS != rval)
           return;
@@ -478,17 +478,17 @@ void set_density(moab::Interface * mb, moab::EntityHandle euler_set, moab::Tag &
       if (field_type == 2)  // Gaussian hills
       {
         moab::CartVect p1, p2;
-        moab::SphereCoords spr;
+        moab::IntxUtils::SphereCoords spr;
         spr.R = 1;
         spr.lat = M_PI/3;
         spr.lon= M_PI;
-        p1 = spherical_to_cart(spr);
+        p1 = moab::IntxUtils::spherical_to_cart(spr);
         spr.lat = -M_PI/3;
-        p2 = spherical_to_cart(spr);
+        p2 = moab::IntxUtils::spherical_to_cart(spr);
         // X1, Y1, Z1, X2, Y2, Z2, ?, ?
         double params[] = { p1[0], p1[1], p1[2], p2[0], p2[1], p2[2], 1,    5.};
 
-        double rho_barycent = smooth_field(sphCoord.lon, sphCoord.lat, params);
+        double rho_barycent = moab::IntxUtils::smooth_field(sphCoord.lon, sphCoord.lat, params);
         rval = mb->tag_set_data(rhoTag, &icell, 1, &rho_barycent);
         if (MB_SUCCESS != rval)
           return;
@@ -499,7 +499,7 @@ void set_density(moab::Interface * mb, moab::EntityHandle euler_set, moab::Tag &
         //                   lon1,      lat1,    lon2,   lat2, b,   c,   r
         double params[] = { 5*M_PI/6.0, 0.0, 7*M_PI/6.0, 0.0, 0.1, 0.9, 0.5};
 
-        double rho_barycent = slotted_cylinder_field(sphCoord.lon, sphCoord.lat, params);
+        double rho_barycent = moab::IntxUtils::slotted_cylinder_field(sphCoord.lon, sphCoord.lat, params);
         rval = mb->tag_set_data(rhoTag, &icell, 1, &rho_barycent);
         if (MB_SUCCESS != rval)
           return;
@@ -571,7 +571,7 @@ void get_linear_reconstruction(moab::Interface * mb, moab::EntityHandle set, moa
      CartVect barycenter(barycent[0],barycent[1],barycent[2]);
      double cellbaryx = 0;
      double cellbaryy = 0;
-     gnomonic_projection(barycenter, rad, plane, cellbaryx, cellbaryy);
+     moab::IntxUtils::gnomonic_projection(barycenter, rad, plane, cellbaryx, cellbaryy);
 
     // get density value
      double rhocell = 0;
@@ -597,7 +597,7 @@ void get_linear_reconstruction(moab::Interface * mb, moab::EntityHandle set, moa
          if (adjacentCells[i] != icell) {
 
             CartVect bary_xyz(cell_barys[i*3],cell_barys[i*3+1],cell_barys[i*3+2]);
-            gnomonic_projection(bary_xyz, rad, plane, bary_x, bary_y);
+            moab::IntxUtils::gnomonic_projection(bary_xyz, rad, plane, bary_x, bary_y);
 
             dx[jind] = bary_x - cellbaryx;
             dy[jind] = bary_y - cellbaryy;
@@ -699,17 +699,13 @@ moab::ErrorCode update_density(moab::Interface * mb, moab::EntityHandle euler_se
     moab::Tag & areaTag, moab::Tag & rhoCoefsTag, moab::Tag & weightsTag,
     moab::Tag & planeTag)
 {
-
 //  moab::ParallelComm * parcomm = ParallelComm::get_pcomm(mb, 0);
-
   double R = 1.0;
 
   moab::EntityHandle dum=0;
   Tag corrTag;
   mb->tag_get_handle(CORRTAGNAME, 1, MB_TYPE_HANDLE, corrTag,
                                              MB_TAG_DENSE, &dum);
-
-  moab::Tag gid = mb->globalId_tag();
 
   // get all polygons out of out_set; then see where are they coming from
   moab::Range polys;
@@ -833,7 +829,7 @@ void departure_point_swirl(moab::CartVect & arrival_point, double t, double delt
 {
 
   // always assume radius is 1 here?
-  moab::SphereCoords sph = cart_to_spherical(arrival_point);
+  moab::IntxUtils::SphereCoords sph = moab::IntxUtils::cart_to_spherical(arrival_point);
   double k = 2.4; //flow parameter
   /*     radius needs to be within some range   */
   double  sl2 = sin(sph.lon/2);
@@ -857,12 +853,12 @@ void departure_point_swirl(moab::CartVect & arrival_point, double t, double delt
       ( sin(sph.lon)* cos(sph.lat) * sin(pit) * omega
           - u_tilda * cos(sph.lon) * cos(sph.lat) * cos(pit)
           + v * sin(sph.lon) * sin(sph.lat) * cos(pit)  );
-  moab::SphereCoords sph_dep;
+  moab::IntxUtils::SphereCoords sph_dep;
   sph_dep.R = 1.; // radius
   sph_dep.lat = lat_dep;
   sph_dep.lon = lon_dep;
 
-  departure_point = spherical_to_cart(sph_dep);
+  departure_point = moab::IntxUtils::spherical_to_cart(sph_dep);
   return;
 }
 
@@ -872,7 +868,7 @@ void departure_point_swirl(moab::CartVect & arrival_point, double t, double delt
 void departure_point_swirl_rot(moab::CartVect & arrival_point, double t, double delta_t, moab::CartVect & departure_point)
 {
 
-  moab::SphereCoords sph = cart_to_spherical(arrival_point);
+  moab::IntxUtils::SphereCoords sph = moab::IntxUtils::cart_to_spherical(arrival_point);
   double omega = M_PI/T;
   double gt = cos(M_PI*t/T);
 
@@ -891,12 +887,12 @@ void departure_point_swirl_rot(moab::CartVect & arrival_point, double t, double 
                     + u_tilda*cos(sph.lat)*cos(omega*t)
                     + v*sin(sph.lat)*cos(omega*t)*sin(lambda)*cos(lambda));
 
-  moab::SphereCoords sph_dep;
+  moab::IntxUtils::SphereCoords sph_dep;
   sph_dep.R = 1.; // radius
   sph_dep.lat = lat_dep;
   sph_dep.lon = lon_dep;
 
-  departure_point = spherical_to_cart(sph_dep);
+  departure_point = moab::IntxUtils::spherical_to_cart(sph_dep);
   return;
 }
 
@@ -982,7 +978,7 @@ void get_intersection_weights(moab::Interface * mb, moab::EntityHandle euler_set
     for (int inode = 0; inode < num_nodes; inode++){
          double rad = sqrt(coords[inode*3]*coords[inode*3] + coords[inode*3+1]*coords[inode*3+1] + coords[inode*3+2]*coords[inode*3+2]);
          moab::CartVect xyzcoord(coords[inode*3]/rad,coords[inode*3+1]/rad,coords[inode*3+2]/rad);
-         gnomonic_projection(xyzcoord, R, plane[redIndex], x[inode],y[inode]);
+         moab::IntxUtils::gnomonic_projection(xyzcoord, R, plane[redIndex], x[inode],y[inode]);
     }
 
     std::vector<double> weights(3);

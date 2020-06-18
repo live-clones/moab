@@ -39,7 +39,7 @@ extern "C" void update_tracer(iMesh_Instance instance,
   }
 
   //
-  rval = enforce_convexity(mb, covering_lagr_set);
+  rval = moab::IntxUtils::enforce_convexity(mb, covering_lagr_set);
   MB_CHK_SET_ERR_RET(rval, "can't write covering set ");
 
   EntityHandle outputSet;
