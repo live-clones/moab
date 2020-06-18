@@ -101,10 +101,6 @@ public:
 
     static double distance_on_great_circle(CartVect & p1, CartVect & p2);
 
-    static void departure_point_case1(CartVect & arrival_point, double t, double delta_t, CartVect & departure_point);
-
-    static void velocity_case1(CartVect & arrival_point, double t, CartVect & velo);
-
     // break the nonconvex quads into triangles; remove the quad from the set? yes.
     // maybe radius is not needed;
     //
@@ -113,28 +109,12 @@ public:
     // this could be larger than PI, because of orientation; useful for non-convex polygons
     static double oriented_spherical_angle(double * A, double * B, double * C);
 
-    // looking at DP tag, create the spanning quads, write a file (with rank) and
-    // then delete the new entities (vertices) and the set of quads
-    static ErrorCode create_span_quads(Interface * mb, EntityHandle euler_set, int rank);
-
     // looking at quad connectivity, collapse to triangle if 2 nodes equal
     // then delete the old quad
     static ErrorCode fix_degenerate_quads(Interface * mb, EntityHandle set);
 
     // distance along a great circle on a sphere of radius 1
     static double distance_on_sphere(double la1, double te1, double la2, double te2);
-
-    /* Analytical functions */
-
-    // page 4 Nair Lauritzen paper
-    // param will be: (la1, te1), (la2, te2), b, c; hmax=1, r=1/2
-    static double quasi_smooth_field(double lam, double tet, double * params);
-
-    // page 4
-    static double smooth_field(double lam, double tet, double * params);
-
-    // page 5
-    static double slotted_cylinder_field(double lam, double tet, double * params);
 
     /* End Analytical functions */
 
@@ -156,12 +136,6 @@ public:
 
     static int  borderPointsOfCSinRLL(CartVect * redc, double * red2dc, int nsRed, CartVect *bluec, int nsBlue, int * blueEdgeType,
         double * P, int * side, double epsil);
-
-    // copy the euler mesh into a new set, lagr_set (or lagr set into a new euler set)
-    // it will be used in 3rd method, when the positions of nodes are modified, no new nodes are
-    //  created
-    // it will also be used to
-    static ErrorCode  deep_copy_set(Interface * mb, EntityHandle source, EntityHandle dest);
 
     // used only by homme
     static ErrorCode  deep_copy_set_with_quads(Interface * mb, EntityHandle source_set, EntityHandle dest_set);
