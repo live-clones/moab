@@ -32,6 +32,9 @@ DEFS += -DBUILDING_MB \
         -DSRCDIR=$(srcdir) \
         -DMESHDIR=$(MESHDIR)
 
+EXTRA_DIST = IntxUtilsCSLAM.cpp \
+             IntxUtilsCSLAM.hpp
+
 noinst_DATA = IntxUtilsCSLAM.o
 case1_test_SOURCES = case1_test.cpp
 proj1_SOURCES = proj1.cpp
