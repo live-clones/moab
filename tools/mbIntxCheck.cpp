@@ -194,7 +194,7 @@ int main ( int argc, char* argv[] )
       if (MB_SUCCESS != rval)
         return -1;
       int check_sign = 1;
-      double intx_area = areaAdaptor.area_spherical_polygon_lHuiller_check_sign(&coords[0], num_nodes, R, &check_sign);
+      double intx_area = areaAdaptor.area_spherical_polygon_lHuiller(&coords[0], num_nodes, R, &check_sign);
 
       rval = mb->tag_set_data(areaTag, &cell, 1, &intx_area); ;MB_CHK_ERR(rval);
       int sourceID, targetID;

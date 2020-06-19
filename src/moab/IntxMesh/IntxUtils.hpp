@@ -173,9 +173,7 @@ public:
 
     double compute_area_spherical_triangle(double * A, double * B, double * C, double Radius = 1.0);
 
-    double area_spherical_polygon_lHuiller (double * A, int N, double Radius);
-
-    double area_spherical_polygon_lHuiller_check_sign(double * A, int N, double Radius, int * sign);
+    double area_spherical_polygon_lHuiller (double * A, int N, double Radius, int *sign = NULL);
 
     double area_on_sphere(Interface * mb, EntityHandle set, double R);
 

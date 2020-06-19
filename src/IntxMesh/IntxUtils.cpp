@@ -724,7 +724,7 @@ double IntxAreaUtils::compute_area_spherical_triangle(double * ptA, double * ptB
 }
 
 
-double IntxAreaUtils::area_spherical_polygon_lHuiller(double * A, int N, double Radius) {
+double IntxAreaUtils::area_spherical_polygon_lHuiller(double * A, int N, double Radius, int * sign) {
   // this should work for non-convex polygons too
   // assume that the A, A+3, ..., A+3*(N-1) are the coordinates
   //
@@ -732,31 +732,18 @@ double IntxAreaUtils::area_spherical_polygon_lHuiller(double * A, int N, double 
   // if negative orientation, the area will be negative
   if (N <= 2)
     return 0.;
-  double area = 0.;
-  for (int i = 1; i < N - 1; i++) {
-    int i1 = i + 1;
-    area += area_spherical_triangle_lHuiller(A, A + 3 * i, A + 3 * i1, Radius);
-  }
-  return area;
-}
-
-double IntxAreaUtils::area_spherical_polygon_lHuiller_check_sign(double * A, int N, double Radius, int * sign) {
-  // this should work for non-convex polygons too
-  // assume that the A, A+3, ..., A+3*(N-1) are the coordinates
-  //
-  // assume that the orientation is positive;
-  // if negative orientation, the area will be negative
-  if (N <= 2)
-    return 0.;
-  *sign = 1; // assume positive orientain
+  
+  int lsign = 1; // assume positive orientain
   double area = 0.;
   for (int i = 1; i < N - 1; i++) {
     int i1 = i + 1;
     double areaTriangle = area_spherical_triangle_lHuiller(A, A + 3 * i, A + 3 * i1, Radius);
     if (areaTriangle<0)
-      *sign = -1; // signal that we have at least one triangle with negative orientation ; possible nonconvex polygon
+      lsign = -1; // signal that we have at least one triangle with negative orientation ; possible nonconvex polygon
     area += areaTriangle;
   }
+  if (sign) *sign = lsign;
+
   return area;
 }
 
@@ -846,7 +833,8 @@ double IntxAreaUtils::area_on_sphere_lHuiller(Interface * mb, EntityHandle set, 
   return total_area;
 }
 
-double IntxAreaUtils::area_spherical_element(Interface * mb, EntityHandle elem, double R) {
+double IntxAreaUtils::area_spherical_element(Interface * mb, EntityHandle elem, double R)
+{
   const EntityHandle * verts;
   int num_nodes;
   ErrorCode rval = mb->get_connectivity(elem, verts, num_nodes);
