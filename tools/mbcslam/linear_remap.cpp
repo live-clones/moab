@@ -1,20 +1,19 @@
 #include <iostream>
-#include <sstream>
-#include <time.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+#include <cmath>
+
 #include "moab/Core.hpp"
 #include "moab/Interface.hpp"
 #include "moab/IntxMesh/Intx2MeshOnSphere.hpp"
-#include <math.h>
 #include "moab/ParallelComm.hpp"
 #include "moab/ProgOptions.hpp"
 #include "MBParallelConventions.h"
 #include "moab/ReadUtilIface.hpp"
 #include "MBTagConventions.hpp"
-#include "TestUtil.hpp"
+
 #include "moab/IntxMesh/IntxUtils.hpp"
+#include "IntxUtilsCSLAM.hpp"
+
+#include "TestUtil.hpp"
 
 //std::string file_name("./uniform_15.g");
 //std::string file_name("./eulerHomme.vtk");
@@ -168,7 +167,7 @@ void get_gnomonic_plane(moab::Interface * mb, moab::EntityHandle set,
     R = 1.0;
 
     int plane = 0;
-    decide_gnomonic_plane(center, plane);
+    moab::IntxUtils::decide_gnomonic_plane(center, plane);
     //decide_gnomonic_plane_test(center,plane);
 
     rval = mb->tag_set_data(planeTag, &icell, 1, &plane);
@@ -222,7 +221,7 @@ void get_barycenters(moab::Interface * mb, moab::EntityHandle set,
               + coords[inode * 3 + 2] * coords[inode * 3 + 2]);
       CartVect xyzcoord(coords[inode * 3] / rad, coords[inode * 3 + 1] / rad,
           coords[inode * 3 + 2] / rad);
-      gnomonic_projection(xyzcoord, R, plane, x[inode], y[inode]);
+      moab::IntxUtils::gnomonic_projection(xyzcoord, R, plane, x[inode], y[inode]);
       // int dum = gnomonic_projection_test(xyzcoord, R, plane, x[inode],y[inode]);
 
     }
@@ -256,7 +255,7 @@ void get_barycenters(moab::Interface * mb, moab::EntityHandle set,
     bary_y = bary_y / area;
 
     moab::CartVect barycent;
-    reverse_gnomonic_projection(bary_x, bary_y, R, plane, barycent);
+    moab::IntxUtils::reverse_gnomonic_projection(bary_x, bary_y, R, plane, barycent);
     // reverse_gnomonic_projection_test(bary_x, bary_y, R, plane, barycent);
     std::vector<double> barycenter(3);
     barycenter[0] = barycent[0];
@@ -322,7 +321,7 @@ void get_linear_reconstruction(moab::Interface * mb, moab::EntityHandle set,
     CartVect barycenter(barycent[0], barycent[1], barycent[2]);
     double cellbaryx = 0;
     double cellbaryy = 0;
-    gnomonic_projection(barycenter, R, plane, cellbaryx, cellbaryy);
+    moab::IntxUtils::gnomonic_projection(barycenter, R, plane, cellbaryx, cellbaryy);
     // int rc = gnomonic_projection_test(barycenter, R, plane, cellbaryx, cellbaryy);
 
     // get density value
@@ -346,7 +345,7 @@ void get_linear_reconstruction(moab::Interface * mb, moab::EntityHandle set,
       if (adjacentCells[i] != icell) {
         CartVect bary_xyz(cell_barys[i * 3], cell_barys[i * 3 + 1],
             cell_barys[i * 3 + 2]);
-        gnomonic_projection(bary_xyz, R, plane, bary_x, bary_y);
+        moab::IntxUtils::gnomonic_projection(bary_xyz, R, plane, bary_x, bary_y);
         // rc = gnomonic_projection_test(bary_xyz, R, plane, bary_x, bary_y);
 
         dx[jind] = bary_x - cellbaryx;
@@ -439,7 +438,7 @@ void test_linear_reconstruction(moab::Interface * mb, moab::EntityHandle set,
               + coords[inode * 3 + 2] * coords[inode * 3 + 2]);
       CartVect xyzcoord(coords[inode * 3] / rad, coords[inode * 3 + 1] / rad,
           coords[inode * 3 + 2] / rad);
-      gnomonic_projection(xyzcoord, R, plane, x[inode], y[inode]);
+      moab::IntxUtils::gnomonic_projection(xyzcoord, R, plane, x[inode], y[inode]);
       // int dum = gnomonic_projection_test(xyzcoord, R, plane, x[inode],y[inode]);
 
     }
@@ -484,7 +483,7 @@ void test_linear_reconstruction(moab::Interface * mb, moab::EntityHandle set,
     double bary_x;
     double bary_y;
     CartVect bary_xyz(bary[0], bary[1], bary[2]);
-    gnomonic_projection(bary_xyz, R, plane, bary_x, bary_y);
+    moab::IntxUtils::gnomonic_projection(bary_xyz, R, plane, bary_x, bary_y);
     //int rc = gnomonic_projection_test(bary_xyz, R, plane, bary_x, bary_y);
 
     // get cell average density
@@ -669,22 +668,22 @@ moab::ErrorCode add_field_value(moab::Interface * mb,
       rval = mb->get_coords(&oldV, 1, &(posi[0]));
       CHECK_ERR(rval);
 
-      moab::SphereCoords sphCoord = cart_to_spherical(posi);
+      moab::IntxUtils::SphereCoords sphCoord = moab::IntxUtils::cart_to_spherical(posi);
 
-      ptr_DP[0] = quasi_smooth_field(sphCoord.lon, sphCoord.lat, params);
+      ptr_DP[0] = IntxUtilsCSLAM::quasi_smooth_field(sphCoord.lon, sphCoord.lat, params);
 
       ptr_DP++; // increment to the next node
     }
   } else if (2 == field_type) // smooth
       {
     moab::CartVect p1, p2;
-    moab::SphereCoords spr;
+    moab::IntxUtils::SphereCoords spr;
     spr.R = 1;
     spr.lat = M_PI / 3;
     spr.lon = M_PI;
-    p1 = spherical_to_cart(spr);
+    p1 = moab::IntxUtils::spherical_to_cart(spr);
     spr.lat = -M_PI / 3;
-    p2 = spherical_to_cart(spr);
+    p2 = moab::IntxUtils::spherical_to_cart(spr);
     //                  x1,    y1,     z1,    x2,   y2,    z2,   h_max, b0
     double params[] = { p1[0], p1[1], p1[2], p2[0], p2[1], p2[2], 1, 5. };
     for (Range::iterator vit = connecVerts.begin(); vit != connecVerts.end();
@@ -694,9 +693,9 @@ moab::ErrorCode add_field_value(moab::Interface * mb,
       rval = mb->get_coords(&oldV, 1, &(posi[0]));
       CHECK_ERR(rval);
 
-      moab::SphereCoords sphCoord = cart_to_spherical(posi);
+      moab::IntxUtils::SphereCoords sphCoord = moab::IntxUtils::cart_to_spherical(posi);
 
-      ptr_DP[0] = smooth_field(sphCoord.lon, sphCoord.lat, params);
+      ptr_DP[0] = IntxUtilsCSLAM::smooth_field(sphCoord.lon, sphCoord.lat, params);
 
       ptr_DP++; // increment to the next node
     }
@@ -711,9 +710,9 @@ moab::ErrorCode add_field_value(moab::Interface * mb,
       rval = mb->get_coords(&oldV, 1, &(posi[0]));
       CHECK_ERR(rval);
 
-      moab::SphereCoords sphCoord = cart_to_spherical(posi);
+      moab::IntxUtils::SphereCoords sphCoord = moab::IntxUtils::cart_to_spherical(posi);
 
-      ptr_DP[0] = slotted_cylinder_field(sphCoord.lon, sphCoord.lat, params);
+      ptr_DP[0] = IntxUtilsCSLAM::slotted_cylinder_field(sphCoord.lon, sphCoord.lat, params);
       ;
 
       ptr_DP++; // increment to the next node
@@ -726,7 +725,7 @@ moab::ErrorCode add_field_value(moab::Interface * mb,
       moab::CartVect posi;
       rval = mb->get_coords(&oldV, 1, &(posi[0]));
 
-      moab::SphereCoords sphCoord = cart_to_spherical(posi);*/
+      moab::IntxUtils::SphereCoords sphCoord = moab::IntxUtils::cart_to_spherical(posi);*/
 
       ptr_DP[0] = 1.0;
 

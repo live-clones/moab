@@ -7,22 +7,18 @@
 // copy from par_sph_intx
 // will save the LOC tag on the euler nodes? maybe
 #include <iostream>
-#include <sstream>
-#include <time.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+#include <cmath> // for M_PI
+
 #include "moab/Core.hpp"
 #include "moab/Interface.hpp"
 #include "moab/IntxMesh/Intx2MeshOnSphere.hpp"
-#include <math.h>
 #include "moab/ProgOptions.hpp"
 #include "MBTagConventions.hpp"
-#include "TestUtil.hpp"
-#include "moab/IntxMesh/IntxUtils.hpp"
 
-// for M_PI
-#include <math.h>
+#include "moab/IntxMesh/IntxUtils.hpp"
+#include "IntxUtilsCSLAM.hpp"
+
+#include "TestUtil.hpp"
 
 using namespace moab;
 // some input data
@@ -75,7 +71,7 @@ ErrorCode manufacture_lagrange_mesh_on_sphere(Interface * mb,
       return rval;
     // Intx utils, case 1
     CartVect newPos;
-    departure_point_case1(posi, t, delta_t, newPos);
+    IntxUtilsCSLAM::departure_point_case1(posi, t, delta_t, newPos);
     newPos = radius * newPos;
     EntityHandle new_vert;
     rval = mb->create_vertex(&(newPos[0]), new_vert);
@@ -164,7 +160,7 @@ int main(int argc, char **argv)
  if (MB_SUCCESS != rval)
    std::cout << "can't write lagr set\n";
 
-  rval = enforce_convexity(&mb, lagrange_set);
+  rval = moab::IntxUtils::enforce_convexity(&mb, lagrange_set);
   if (MB_SUCCESS != rval)
     return 1;
 
@@ -201,8 +197,10 @@ int main(int argc, char **argv)
   rval = mb.write_file(outf.str().c_str(), 0, 0, &outputSet, 1);
   if (MB_SUCCESS != rval)
     std::cout << "can't write output\n";
-  double intx_area = area_on_sphere_lHuiller(&mb, outputSet, radius);
-  double arrival_area = area_on_sphere_lHuiller(&mb, euler_set, radius);
+  
+  moab::IntxAreaUtils sphAreaUtils(true);
+  double intx_area = sphAreaUtils.area_on_sphere_lHuiller(&mb, outputSet, radius);
+  double arrival_area = sphAreaUtils.area_on_sphere_lHuiller(&mb, euler_set, radius);
   std::cout << " Arrival area: " << arrival_area
       << "  intersection area:" << intx_area << " rel error: "
       << fabs((intx_area - arrival_area) / arrival_area) << "\n";

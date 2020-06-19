@@ -32,6 +32,7 @@ DEFS += -DBUILDING_MB \
         -DSRCDIR=$(srcdir) \
         -DMESHDIR=$(MESHDIR)
 
+noinst_DATA = IntxUtilsCSLAM.o
 case1_test_SOURCES = case1_test.cpp
 proj1_SOURCES = proj1.cpp
 create_dp_SOURCES = create_dp.cpp
