@@ -126,7 +126,7 @@ int main( int argc, char* argv[] )
   opts.addOpt<std::string>("land,l", "land mesh filename (target)", &lndFilename);
 #endif
 
-  opts.addOpt<std::string>("physgrid,p", "physics grid file", &atmPhysMesh);
+  opts.addOpt<std::string>("physgrid,q", "physics grid file", &atmPhysMesh);
 
   opts.addOpt<int>("startAtm,a", "start task for atmosphere layout", &startG1);
   opts.addOpt<int>("endAtm,b", "end task for atmosphere layout", &endG1);
