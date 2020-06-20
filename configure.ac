@@ -1540,6 +1540,23 @@ if  (test "x$WITH_VTK" != "xno" && test "x$WITH_VTK" != "x"); then
   AC_SUBST(VTK_INC_DIR)
 fi
 
+###############################################################################
+#                       Download Auxilliary Files locally
+###############################################################################
+AC_ARG_DOWNLOAD(extmeshfiles,
+                [AS_HELP_STRING([--download-extmeshfiles],[Download and locally store the external mesh files (URL:http://ftp.mcs.anl.gov/pub/fathom/MeshFiles)])],
+  [case "x${downloadval}" in
+    xno)   download_ext_meshfiles=no ;;
+    *)     download_ext_meshfiles=yes  ;;
+  esac],
+  [download_ext_meshfiles=no])
+
+if (test "x$download_ext_meshfiles" != "xno"); then
+  DOWNLOAD_EXTERNAL_DATA([ne4pg2], [e3sm/ne4pg2_o240], 
+                        [[AtmPhys_pg2.h5m], [land_p8.h5m], [ne4pg2_p8.h5m]])
+  DOWNLOAD_EXTERNAL_DATA([ne30pg2], [e3sm/ne30pg2_r05_oECv3_ICG], 
+                        [[AtmPhys_01.h5m], [domain_clean_p16.h5m], [outCS30_pg2_p8.h5m], [wholeMPAS.h5m]])
+fi
 ################################################################################
 #                           Output Files
 ################################################################################
