@@ -63,8 +63,8 @@ int main( int argc, char* argv[] )
   std::string readopts("PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_SHARED_ENTS");
   std::string readoptsPhysAtm("PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION");
 
-  if (argc < 2)
-    return 0; // no test; we will force naming the land domain file
+  /*if (argc < 2)
+    return 0; // no test; we will force naming the land domain file*/
   // Timer data
   moab::CpuTimer timer;
   double timer_ops;
@@ -81,8 +81,8 @@ int main( int argc, char* argv[] )
 
   MPI_Comm_group(MPI_COMM_WORLD, &jgroup);// all processes in jgroup
 
-  std::string atmFilename = TestDir + "/wholeATM_T.h5m"; // we should use only mesh from here
-  std::string atmPhysMesh = TestDir + "/AtmPhys_01.h5m"; // it has some data associated to vertices, T_ph, u_ph, v_ph
+  std::string atmFilename = TestDir + "/ne4pg2_p8.h5m"; // we should use only mesh from here
+  std::string atmPhysMesh = TestDir + "/AtmPhys_pg2.h5m"; // it has some data associated to vertices, T_ph, u_ph, v_ph
   // we will eventually project that data to ocean mesh, after intx atm/ocn
 
   // on a regular case,  5 ATM, 6 CPLATM (ATMX), 17 OCN     , 18 CPLOCN (OCNX)  ;
@@ -105,7 +105,7 @@ int main( int argc, char* argv[] )
   int cmpocn=17, cplocn=18, atmocnid=618;  // component ids are unique over all pes, and established in advance;
 #endif
 #ifdef ENABLE_ATMLND_COUPLING
-  std::string lndFilename = TestDir + "/wholeLnd.h5m";
+  std::string lndFilename = TestDir + "/land_p8.h5m";
   int rankInLndComm = -1;
   int cpllnd=10, cmplnd=9, atmlndid=610;  // component ids are unique over all pes, and established in advance;
 #endif
@@ -393,7 +393,7 @@ int main( int argc, char* argv[] )
   MPI_Barrier(MPI_COMM_WORLD);
 
   if (couComm != MPI_COMM_NULL) {
-    char outputFileTgt3[] = "recvOcn2.h5m";
+    char outputFileTgt3[] = "recvOcn3.h5m";
     PUSH_TIMER("Write migrated OCN mesh on coupler PEs")
     ierr = iMOAB_WriteMesh(cplOcnPID, outputFileTgt3, fileWriteOptions,
       strlen(outputFileTgt3), strlen(fileWriteOptions) );
@@ -461,7 +461,7 @@ int main( int argc, char* argv[] )
   MPI_Barrier(MPI_COMM_WORLD);
 
   if (couComm != MPI_COMM_NULL) {
-    char outputFileLnd[] = "recvLnd.h5m";
+    char outputFileLnd[] = "recvLnd3.h5m";
     PUSH_TIMER("Write migrated LND mesh on coupler PEs")
     ierr = iMOAB_WriteMesh(cplLndPID, outputFileLnd, fileWriteOptions,
       strlen(outputFileLnd), strlen(fileWriteOptions) );
@@ -566,7 +566,7 @@ int main( int argc, char* argv[] )
   int fMonotoneTypeID=0, fVolumetric=0, fValidate=1, fNoConserve=0;
 
 #ifdef ENABLE_ATMOCN_COUPLING
-//#ifdef VERBOSE
+#ifdef VERBOSE
   if (couComm != MPI_COMM_NULL) {
     char serialWriteOptions[] =""; // for writing in serial
     std::stringstream outf;
@@ -575,7 +575,7 @@ int main( int argc, char* argv[] )
     ierr = iMOAB_WriteMesh(cplAtmOcnPID, (char*)intxfile.c_str(), serialWriteOptions, (int)intxfile.length(), strlen(serialWriteOptions));
     CHECKIERR(ierr, "cannot write intx file result" )
   }
-//#endif
+#endif
 
   if (couComm != MPI_COMM_NULL) {
     PUSH_TIMER("Compute the projection weights with TempestRemap")
@@ -751,7 +751,7 @@ int main( int argc, char* argv[] )
     CHECKIERR(ierr, "failed to compute projection weight application");
     POP_TIMER(couComm, rankInCouComm)
 
-    char outputFileTgt[] = "fOcnOnCpl2.h5m";
+    char outputFileTgt[] = "fOcnOnCpl3.h5m";
     ierr = iMOAB_WriteMesh(cplOcnPID, outputFileTgt, fileWriteOptions,
       strlen(outputFileTgt), strlen(fileWriteOptions) );
   }
@@ -790,7 +790,7 @@ int main( int argc, char* argv[] )
   }
   if (ocnComm != MPI_COMM_NULL)
   {
-    char outputFileOcn[] = "OcnWithProj2.h5m";
+    char outputFileOcn[] = "OcnWithProj3.h5m";
     ierr = iMOAB_WriteMesh(cmpOcnPID, outputFileOcn, fileWriteOptions,
         strlen(outputFileOcn), strlen(fileWriteOptions) );
   }
@@ -844,7 +844,7 @@ int main( int argc, char* argv[] )
     CHECKIERR(ierr, "failed to compute projection weight application");
     POP_TIMER(couComm, rankInCouComm)
 
-    char outputFileTgt[] = "fLndOnCpl2.h5m";
+    char outputFileTgt[] = "fLndOnCpl3.h5m";
     ierr = iMOAB_WriteMesh(cplLndPID, outputFileTgt, fileWriteOptions,
       strlen(outputFileTgt), strlen(fileWriteOptions) );
   }
@@ -893,7 +893,7 @@ int main( int argc, char* argv[] )
   }
   if (lndComm != MPI_COMM_NULL)
   {
-    char outputFileLnd[] = "LndWithProj.h5m";
+    char outputFileLnd[] = "LndWithProj3.h5m";
     ierr = iMOAB_WriteMesh(cmpLndPID, outputFileLnd, fileWriteOptions,
         strlen(outputFileLnd), strlen(fileWriteOptions) );
   }
