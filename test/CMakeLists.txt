@@ -97,9 +97,8 @@ set_target_properties( Test_MBMeshSet PROPERTIES COMPILE_FLAGS "${TEST_COMP_FLAG
 target_link_libraries( Test_MBMeshSet MOAB ${CGM_LIBRARIES} ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES} )
 add_test( Test_MBMeshSet ${EXECUTABLE_OUTPUT_PATH}/Test_MBMeshSet )
 
-find_program( ZCAT_EXE NAMES zcap ZCAT PATHS /bin /usr/bin )
-
-if(ZCAT_EXE)
+if(ZCAT_EXE AND NOT WIN32)
+  find_program( ZCAT_EXE NAMES zcap ZCAT PATHS /bin /usr/bin )
   add_custom_command( OUTPUT mb_big_test.g
                       COMMAND ${ZCAT_EXE} < ${MOAB_SOURCE_DIR}/MeshFiles/unittest/mb_big_test.g.gz > mb_big_test.g
                       DEPENDS ${MOAB_SOURCE_DIR}/MeshFiles/unittest/mb_big_test.g.gz )
@@ -133,13 +132,11 @@ set_target_properties( mbcn_test PROPERTIES
 target_link_libraries( mbcn_test MOAB ${CGM_LIBRARIES} ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES} )
 add_test( mbcn_test ${EXECUTABLE_OUTPUT_PATH}/mbcn_test )
 
-
 add_executable( file_options_test ${CMAKE_SOURCE_DIR}/src/FileOptions.cpp )
 set_source_files_properties( ${CMAKE_SOURCE_DIR}/src/FileOptions.cpp
                              COMPILE_FLAGS "-DTEST ${MOAB_DEFINES} ${TEST_COMP_FLAGS}" )
 target_link_libraries( file_options_test MOAB ${CGM_LIBRARIES} ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES} )
 add_test( file_options_test ${EXECUTABLE_OUTPUT_PATH}/file_options_test )
-
 
 add_executable( homxform_test homxform_test.cpp )
 set_source_files_properties( homxform_test.cpp
