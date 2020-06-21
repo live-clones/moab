@@ -1557,6 +1557,8 @@ if (test "x$download_ext_meshfiles" != "xno"); then
   DOWNLOAD_EXTERNAL_DATA([ne30pg2], [e3sm/ne30pg2_r05_oECv3_ICG], 
                         [[AtmPhys_01.h5m], [domain_clean_p16.h5m], [outCS30_pg2_p8.h5m], [wholeMPAS.h5m]])
 fi
+AM_CONDITIONAL([HAVE_EXTMESHES],[test "$download_ext_meshfiles" = "yes"])
+
 ################################################################################
 #                           Output Files
 ################################################################################
