@@ -62,10 +62,13 @@ commgraph_test_LDADD = $(LDADD) $(FCLIBS)
 endif
 
 if HAVE_TEMPESTREMAP
-  HDF5_TESTS += imoab_coupler imoab_phatm_ocn_coupler imoab_apg2_ol_coupler
+  HDF5_TESTS += imoab_coupler imoab_phatm_ocn_coupler
   imoab_coupler_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
   imoab_phatm_ocn_coupler_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
+if HAVE_EXTMESHES
+  HDF5_TESTS +=  imoab_apg2_ol_coupler
   imoab_apg2_ol_coupler_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
+endif
 endif
 
 else

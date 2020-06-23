@@ -17,7 +17,7 @@
 
 #include "moab/Core.hpp"
 #ifndef MOAB_HAVE_MPI
-    #error mbtempest tool requires MPI configuration
+    #error imoab coupler test requires MPI configuration
 #endif
 
 // MPI includes
@@ -81,8 +81,8 @@ int main( int argc, char* argv[] )
 
   MPI_Comm_group(MPI_COMM_WORLD, &jgroup);// all processes in jgroup
 
-  std::string atmFilename = TestDir + "/ne4pg2_p8.h5m"; // we should use only mesh from here
-  std::string atmPhysMesh = TestDir + "/AtmPhys_pg2.h5m"; // it has some data associated to vertices, T_ph, u_ph, v_ph
+  std::string atmFilename = "../../sandbox/MeshFiles/e3sm/ne4pg2_o240/ne4pg2_p8.h5m"; // we should use only mesh from here
+  std::string atmPhysMesh = "../../sandbox/MeshFiles/e3sm/ne4pg2_o240/AtmPhys_pg2.h5m"; // it has some data associated to vertices, T_ph, u_ph, v_ph
   // we will eventually project that data to ocean mesh, after intx atm/ocn
 
   // on a regular case,  5 ATM, 6 CPLATM (ATMX), 17 OCN     , 18 CPLOCN (OCNX)  ;
@@ -105,7 +105,7 @@ int main( int argc, char* argv[] )
   int cmpocn=17, cplocn=18, atmocnid=618;  // component ids are unique over all pes, and established in advance;
 #endif
 #ifdef ENABLE_ATMLND_COUPLING
-  std::string lndFilename = TestDir + "/land_p8.h5m";
+  std::string lndFilename = "../../sandbox/MeshFiles/e3sm/ne4pg2_o240/land_p8.h5m";
   int rankInLndComm = -1;
   int cpllnd=10, cmplnd=9, atmlndid=610;  // component ids are unique over all pes, and established in advance;
 #endif
