@@ -15,6 +15,11 @@
 #include "moab/CartVect.hpp"
 #include "moab/IntxMesh/IntxUtils.hpp"
 
+#ifdef MOAB_HAVE_MPI
+#include "moab_mpi.h"
+#include "moab/ParallelComm.hpp"
+#endif
+
 using namespace moab;
 using namespace std;
 
@@ -51,15 +56,38 @@ int main(int argc, char **argv)
 
   opts.parseCommandLine(argc, argv);
 
+  int rank = 0;
+  int numProcesses = 1;
+  std::string readopts;
+
+
+#ifdef MOAB_HAVE_MPI
+  int fail = MPI_Init(&argc, &argv);
+  if (fail)
+    return 1;
+  MPI_Comm_rank( MPI_COMM_WORLD, &rank );
+  MPI_Comm_size( MPI_COMM_WORLD, &numProcesses );
+
+  readopts = string("PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION");// we do not have to resolve shared ents
+#endif
   // Instantiate
   Core mb;
 
-  // Load the file
-  ErrorCode rval = mb.load_file(inputFile.c_str());MB_CHK_SET_ERR(rval, "Error loading file");
+  // Load the file into a new file set
+  EntityHandle fileSet;
+  ErrorCode rval=mb.create_meshset(MESHSET_SET, fileSet);MB_CHK_SET_ERR(rval, "Error creating file set");
+  rval = mb.load_file(inputFile.c_str(), &fileSet, readopts.c_str());MB_CHK_SET_ERR(rval, "Error loading file");
 
-  // Get all 2d elements in the file
+  if (!rank)
+  {
+    cout << " reading file " << inputFile << " on " << numProcesses << " task";
+    if (numProcesses > 1)
+      cout << "s";
+    cout <<"\n";
+  }
+  // Get all 2d elements in the file set
   Range elems;
-  rval = mb.get_entities_by_dimension(0, 2, elems);MB_CHK_SET_ERR(rval, "Error getting 2d elements");
+  rval = mb.get_entities_by_dimension(fileSet, 2, elems);MB_CHK_SET_ERR(rval, "Error getting 2d elements");
 
   // create a meshset with close elements
   EntityHandle outSet;
@@ -94,14 +122,27 @@ int main(int argc, char **argv)
 
   rval = mb.add_entities(outSet, closeByCells); MB_CHK_SET_ERR(rval, "Can't add to entity set");
 
-  if (closeByCells.empty())
+  int numCells = (int)closeByCells.size();
+#ifdef MOAB_HAVE_MPI
+  // Reduce all of the local sums into the global sum
+  int globalCells;
+  MPI_Reduce(&numCells, &globalCells, 1, MPI_INT, MPI_SUM, 0,
+             MPI_COMM_WORLD);
+  numCells = globalCells;
+#endif
+  if (numCells==0)
   {
-    std::cout << " no close cells to the point "  << point << " at distance less than " << distance << "\n";
+    if (!rank)
+      std::cout << " no close cells to the point "  << point << " at distance less than " << distance << "\n";
   }
   else
   {
-    std::cout <<" write file " << outFile << " with cells closer than " << distance << " from " << point << "\n";
-    rval = mb.write_file(outFile.c_str(), 0, 0, &outSet, 1); MB_CHK_SET_ERR(rval, "Can't write file");
+    if (!rank)
+      std::cout <<" write file " << outFile << " with cells closer than " << distance << " from " << point << "\n";
+    string writeOpts;
+    if (numProcesses>1)
+      writeOpts = string("PARALLEL=WRITE_PART;");
+    rval = mb.write_file(outFile.c_str(), 0, writeOpts.c_str(), &outSet, 1); MB_CHK_SET_ERR(rval, "Can't write file");
   }
   return 0;
 }
