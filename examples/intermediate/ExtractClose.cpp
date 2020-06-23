@@ -13,6 +13,7 @@
 #include "moab/Range.hpp"
 #include "moab/ProgOptions.hpp"
 #include "moab/CartVect.hpp"
+#include "moab/IntxMesh/IntxUtils.hpp"
 
 using namespace moab;
 using namespace std;
@@ -43,7 +44,7 @@ int main(int argc, char **argv)
   opts.addOpt<double>(string("longitude,w"), string("east longitude in degrees"), &lon);
 
   bool spherical= false;
-  opts.addOpt<void>("spherical,s", "use spherical coords input", &spherical);
+  opts.addOpt<void>("spherical,s", "use spherical coords input (default false) ", &spherical);
 
   double distance =0.01;
   opts.addOpt<double>(string("distance,d"), string("distance "), &distance);
@@ -68,14 +69,14 @@ int main(int argc, char **argv)
 
   // double sphere radius is 1
   CartVect point(x,y,z);
-  const double MY_PI=3.1415926535;
   if (spherical)
   {
-    lat = lat*MY_PI/180;
-    lon = lon*MY_PI/180;
-    point[0] =  cos(lat) * cos(lon);
-    point[1] =  cos(lat) * sin(lon);
-    point[2] =  sin(lat);
+    std::cout << " use spherical coordinates on the sphere of radius 1.\n";
+    SphereCoords pos;
+    pos.R = 1; // always on the
+    pos.lat = lat*M_PI/180; // defined in math.h
+    pos.lon = lon*M_PI/180;
+    point = spherical_to_cart(pos);
   }
 
   Range closeByCells;
@@ -95,10 +96,11 @@ int main(int argc, char **argv)
 
   if (closeByCells.empty())
   {
-    std::cout << " no close cells to the point [" << x << ", " << y << ", " << z <<"] at distance less than " << distance << "\n";
+    std::cout << " no close cells to the point "  << point << " at distance less than " << distance << "\n";
   }
   else
   {
+    std::cout <<" write file " << outFile << " with cells closer than " << distance << " from " << point << "\n";
     rval = mb.write_file(outFile.c_str(), 0, 0, &outSet, 1); MB_CHK_SET_ERR(rval, "Can't write file");
   }
   return 0;
