@@ -15,7 +15,7 @@ namespace moab {
 class Intx2MeshOnSphere: public moab::Intx2Mesh
 {
 public:
-  Intx2MeshOnSphere(Interface * mbimpl);
+  Intx2MeshOnSphere(Interface * mbimpl, IntxAreaUtils::AreaMethod amethod=IntxAreaUtils::lHuiller);
   virtual ~Intx2MeshOnSphere();
 
   void set_radius_source_mesh(double radius) { Rsrc=radius ;}

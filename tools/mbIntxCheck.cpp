@@ -34,6 +34,8 @@ using namespace moab;
 int main ( int argc, char* argv[] )
 {
     std::stringstream sstr;
+    // Default area_method = lHuiller; Options: Girard, GaussQuadrature (if TR is available)
+    const IntxAreaUtils::AreaMethod areaMethod = IntxAreaUtils::lHuiller;
 
     int rank = 0, size = 1;
 #ifdef MOAB_HAVE_MPI
@@ -137,7 +139,7 @@ int main ( int argc, char* argv[] )
     Tag areaTag;
     rval = mb->tag_get_handle("OrigArea", 1, MB_TYPE_DOUBLE, areaTag, MB_TAG_DENSE | MB_TAG_CREAT);MB_CHK_ERR(rval);
 
-    moab::IntxAreaUtils areaAdaptor(true); // use_lHuiller = true
+    moab::IntxAreaUtils areaAdaptor(areaMethod);
     Range non_convex_intx_cells;
     for (Range::iterator eit = sourceCells.begin(); eit != sourceCells.end(); ++eit)
     {
@@ -152,7 +154,7 @@ int main ( int argc, char* argv[] )
       rval = mb->get_coords(verts, num_nodes, &coords[0]);
       if (MB_SUCCESS != rval)
         return -1;
-      double area = areaAdaptor.area_spherical_polygon_lHuiller(&coords[0], num_nodes, R);
+      double area = areaAdaptor.area_spherical_polygon(&coords[0], num_nodes, R);
       int sourceID;
       rval = mb->tag_get_data(gidTag, &cell, 1, &sourceID);MB_CHK_ERR(rval);
       sourceAreas[sourceID] = area;
@@ -172,7 +174,7 @@ int main ( int argc, char* argv[] )
       rval = mb->get_coords(verts, num_nodes, &coords[0]);
       if (MB_SUCCESS != rval)
         return -1;
-      double area = areaAdaptor.area_spherical_polygon_lHuiller(&coords[0], num_nodes, R);
+      double area = areaAdaptor.area_spherical_polygon(&coords[0], num_nodes, R);
       int targetID;
       rval = mb->tag_get_data(gidTag, &cell, 1, &targetID);MB_CHK_ERR(rval);
       targetAreas[targetID] = area;
@@ -194,7 +196,7 @@ int main ( int argc, char* argv[] )
       if (MB_SUCCESS != rval)
         return -1;
       int check_sign = 1;
-      double intx_area = areaAdaptor.area_spherical_polygon_lHuiller(&coords[0], num_nodes, R, &check_sign);
+      double intx_area = areaAdaptor.area_spherical_polygon(&coords[0], num_nodes, R, &check_sign);
 
       rval = mb->tag_set_data(areaTag, &cell, 1, &intx_area); ;MB_CHK_ERR(rval);
       int sourceID, targetID;

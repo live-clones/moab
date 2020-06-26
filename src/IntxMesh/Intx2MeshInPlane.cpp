@@ -10,13 +10,11 @@
 #include "moab/IntxMesh/IntxUtils.hpp"
 
 namespace moab {
-Intx2MeshInPlane::Intx2MeshInPlane(Interface * mbimpl):Intx2Mesh(mbimpl){
+Intx2MeshInPlane::Intx2MeshInPlane(Interface * mbimpl, IntxAreaUtils::AreaMethod amethod):Intx2Mesh(mbimpl, amethod)
+{ }
 
-}
-
-Intx2MeshInPlane::~Intx2MeshInPlane() {
-  // TODO Auto-generated destructor stub
-}
+Intx2MeshInPlane::~Intx2MeshInPlane() 
+{ }
 
 double Intx2MeshInPlane::setup_tgt_cell(EntityHandle tgt, int & nsTgt)
 {

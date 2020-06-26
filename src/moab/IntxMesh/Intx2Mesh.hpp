@@ -20,6 +20,7 @@
 #include "moab/Interface.hpp"
 #include "moab/Range.hpp"
 #include "moab/CartVect.hpp"
+#include "moab/IntxMesh/IntxUtils.hpp"
 
 // #define ENABLE_DEBUG
 
@@ -47,7 +48,9 @@ class TupleList;
 class Intx2Mesh
 {
 public:
-  Intx2Mesh(Interface * mbimpl);
+
+  Intx2Mesh(Interface * mbimpl, IntxAreaUtils::AreaMethod amethod=IntxAreaUtils::lHuiller);
+
   virtual ~Intx2Mesh();
 
   /*
@@ -164,6 +167,7 @@ public:
 
 protected: // so it can be accessed in derived classes, InPlane and OnSphere
   Interface * mb;
+  IntxAreaUtils::AreaMethod areaMethod;
 
   EntityHandle mbs1;
   EntityHandle mbs2;

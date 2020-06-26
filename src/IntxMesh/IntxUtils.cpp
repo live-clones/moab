@@ -32,18 +32,17 @@ namespace moab {
 #define CORRTAGNAME "__correspondent"
 #define MAXEDGES 10
 
-// #define MB_CHK_ERR( A )   if (MB_SUCCESS!=A) { std::cout << "error:" <<  __LINE__ <<" " << __FILE__ "\n"; return rval;}
-
-
 // vec utilities that could be common between quads on a plane or sphere
 double IntxUtils::dist2(double * a, double * b) {
   double abx = b[0] - a[0], aby = b[1] - a[1];
   return sqrt(abx * abx + aby * aby);
 }
+
 double IntxUtils::area2D(double *a, double *b, double *c) {
   // (b-a)x(c-a) / 2
   return ((b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0])) / 2;
 }
+
 int IntxUtils::borderPointsOfXinY2(double * X, int nX, double * Y, int nY, double * P,
     int * side, double epsilon_area) {
   // 2 triangles, 3 corners, is the corner of X in Y?
@@ -60,7 +59,6 @@ int IntxUtils::borderPointsOfXinY2(double * X, int nX, double * Y, int nY, doubl
     int inside = 1;
     for (int j = 0; j < nY; j++) {
       double * B = Y + 2 * j;
-
       int j1 = (j + 1) % nY;
       double * C = Y + 2 * j1; // no copy of data
 
@@ -96,6 +94,7 @@ bool angleCompare(angleAndIndex lhs, angleAndIndex rhs)
 int IntxUtils::SortAndRemoveDoubles2(double * P, int & nP, double epsilon_1) {
   if (nP < 2)
     return 0; // nothing to do
+
   // center of gravity for the points
   double c[2] = { 0., 0. };
   int k = 0;
@@ -587,10 +586,39 @@ double IntxUtils::oriented_spherical_angle(double * A, double * B, double * C) {
     return (2 * M_PI - ang); // the other angle, supplement
 
   return ang;
-
 }
 
 double IntxAreaUtils::area_spherical_triangle(double *A, double *B, double *C, double Radius) {
+  switch(m_eAreaMethod)
+  {
+    case Girard:
+      return area_spherical_triangle_girard(A, B, C, Radius);
+#ifdef MOAB_HAVE_TEMPESTREMAP
+    case GaussQuadrature:
+      return area_spherical_triangle_GQ(A, B, C, Radius);
+#endif
+    case lHuiller:
+    default:
+      return area_spherical_triangle_lHuiller(A, B, C, Radius);
+  }
+}
+
+double IntxAreaUtils::area_spherical_polygon(double * A, int N, double Radius, int *sign) {
+  switch(m_eAreaMethod)
+  {
+    case Girard:
+      return area_spherical_polygon_girard(A, N, Radius);
+#ifdef MOAB_HAVE_TEMPESTREMAP
+    case GaussQuadrature:
+      return area_spherical_polygon_GQ(A, N, Radius);
+#endif
+    case lHuiller:
+    default:
+      return area_spherical_polygon_lHuiller(A, N, Radius, sign);
+  }
+}
+
+double IntxAreaUtils::area_spherical_triangle_girard(double *A, double *B, double *C, double Radius) {
   double correction = spherical_angle(A, B, C, Radius)
       + spherical_angle(B, C, A, Radius)
       + spherical_angle(C, A, B, Radius)-M_PI;
@@ -602,10 +630,9 @@ double IntxAreaUtils::area_spherical_triangle(double *A, double *B, double *C, d
     return area;
   else
     return -area;
-
 }
 
-double IntxAreaUtils::area_spherical_polygon(double * A, int N, double Radius) {
+double IntxAreaUtils::area_spherical_polygon_girard(double * A, int N, double Radius) {
   // this should work for non-convex polygons too
   // assume that the A, A+3, ..., A+3*(N-1) are the coordinates
   //
@@ -619,12 +646,50 @@ double IntxAreaUtils::area_spherical_polygon(double * A, int N, double Radius) {
   }
   double correction = sum_angles - (N - 2) * M_PI;
   return Radius * Radius * correction;
+}
 
+double IntxAreaUtils::area_spherical_polygon_lHuiller(double * A, int N, double Radius, int * sign) {
+  // This should work for non-convex polygons too
+  // In the input vector A, assume that the A, A+3, ..., A+3*(N-1) are the coordinates
+  // We also assume that the orientation is positive;
+  // If negative orientation, the area will be negative
+  if (N <= 2)
+    return 0.;
+  
+  int lsign = 1; // assume positive orientain
+  double area = 0.;
+  for (int i = 1; i < N - 1; i++) {
+    int i1 = i + 1;
+    double areaTriangle = area_spherical_triangle_lHuiller(A, A + 3 * i, A + 3 * i1, Radius);
+    if (areaTriangle<0)
+      lsign = -1; // signal that we have at least one triangle with negative orientation ; possible nonconvex polygon
+    area += areaTriangle;
+  }
+  if (sign) *sign = lsign;
+
+  return area;
 }
 
 #ifdef MOAB_HAVE_TEMPESTREMAP
-double IntxAreaUtils::area_spherical_triangle_GQ(double * ptA, double * ptB,
-    double * ptC, double Radius) {
+double IntxAreaUtils::area_spherical_polygon_GQ(double * A, int N, double Radius) {
+  // this should work for non-convex polygons too
+  // In the input vector A, assume that the A, A+3, ..., A+3*(N-1) are the coordinates
+  // We also assume that the orientation is positive;
+  // If negative orientation, the area can be negative
+  if (N <= 2)
+    return 0.;
+  
+  // assume positive orientain
+  double area = 0.;
+  for (int i = 1; i < N - 1; i++) {
+    int i1 = i + 1;
+    area += area_spherical_triangle_GQ(A, A + 3 * i, A + 3 * i1, Radius);
+  }
+  return area;
+}
+
+/* compute the area by using Gauss-Quadratures; use TR interfaces directly */
+double IntxAreaUtils::area_spherical_triangle_GQ(double * ptA, double * ptB, double * ptC, double ) {
   Face face(3);
   NodeVector nodes(3);
   nodes[0] = Node(ptA[0], ptA[1], ptA[2]);
@@ -663,7 +728,6 @@ double IntxAreaUtils::area_spherical_triangle_GQ(double * ptA, double * ptB,
  *
  *  E = 4*atan(sqrt(tan(s/2)*tan((s-a)/2)*tan((s-b)/2)*tan((s-c)/2)))
  */
-
 double IntxAreaUtils::area_spherical_triangle_lHuiller(double * ptA, double * ptB,
     double * ptC, double Radius) {
 
@@ -676,13 +740,13 @@ double IntxAreaUtils::area_spherical_triangle_lHuiller(double * ptA, double * pt
   if ((vA * vB) % vC < 0)
     sign = -1;
   double s = (a + b + c) / 2;
-  double tmp = tan(s / 2) * tan((s - a) / 2) * tan((s - b) / 2)
-      * tan((s - c) / 2);
-  if (tmp < 0.)
-    tmp = 0.;
+  double tmp = tan(s / 2) * tan((s - a) / 2) * tan((s - b) / 2) * tan((s - c) / 2);
+  if (tmp < 0.) tmp = 0.;
+
   double E = 4 * atan(sqrt(tmp));
   if (E != E)
     std::cout << " NaN at spherical triangle area \n";
+
   double area=sign * E * Radius * Radius;
 
 #ifdef CHECKNEGATIVEAREA
@@ -704,148 +768,59 @@ double IntxAreaUtils::area_spherical_triangle_lHuiller(double * ptA, double * pt
 }
 #undef CHECKNEGATIVEAREA
 
-double IntxAreaUtils::compute_area_spherical_triangle(double * ptA, double * ptB,
-    double * ptC, double Radius)
-{
-#ifdef MOAB_HAVE_TEMPESTREMAP
-  if (this->use_lHuiller)
-  {
-    return area_spherical_triangle_lHuiller(ptA, ptB, ptC, Radius);
-  }
-  else
-  {
-    /* compute the area by using Gauss-Quadratures; use TR interfaces directly */
-    return area_spherical_triangle_GQ(ptA, ptB, ptC, Radius);
-  }
-#else
-  /* Use lHuiller method by default */
-  return area_spherical_triangle_lHuiller(ptA, ptB, ptC, Radius);
-#endif
-}
-
-
-double IntxAreaUtils::area_spherical_polygon_lHuiller(double * A, int N, double Radius, int * sign) {
-  // this should work for non-convex polygons too
-  // assume that the A, A+3, ..., A+3*(N-1) are the coordinates
-  //
-  // assume that the orientation is positive;
-  // if negative orientation, the area will be negative
-  if (N <= 2)
-    return 0.;
-  
-  int lsign = 1; // assume positive orientain
-  double area = 0.;
-  for (int i = 1; i < N - 1; i++) {
-    int i1 = i + 1;
-    double areaTriangle = area_spherical_triangle_lHuiller(A, A + 3 * i, A + 3 * i1, Radius);
-    if (areaTriangle<0)
-      lsign = -1; // signal that we have at least one triangle with negative orientation ; possible nonconvex polygon
-    area += areaTriangle;
-  }
-  if (sign) *sign = lsign;
-
-  return area;
-}
-
-
 double IntxAreaUtils::area_on_sphere(Interface * mb, EntityHandle set, double R) {
-  // get all entities of dimension 2
-  // then get the connectivity, etc
+  // Get all entities of dimension 2
   Range inputRange;
-  ErrorCode rval = mb->get_entities_by_dimension(set, 2, inputRange);
-  if (MB_SUCCESS != rval)
-    return -1;
+  ErrorCode rval = mb->get_entities_by_dimension(set, 2, inputRange);MB_CHK_ERR_RET_VAL(rval, -1.0);
 
+  // Filter by elements that are owned by current process
   std::vector<int> ownerinfo(inputRange.size(), -1);
   Tag intxOwnerTag;
   rval = mb->tag_get_handle ( "ORIG_PROC", intxOwnerTag );
   if (MB_SUCCESS == rval) {
-    rval = mb->tag_get_data(intxOwnerTag, inputRange, &ownerinfo[0]);
-    if (MB_SUCCESS != rval)
-      return -1;
+    rval = mb->tag_get_data(intxOwnerTag, inputRange, &ownerinfo[0]);MB_CHK_ERR_RET_VAL(rval, -1.0);
   }
 
   // compare total area with 4*M_PI * R^2
   int ie = 0;
   double total_area = 0.;
-  for (Range::iterator eit = inputRange.begin(); eit != inputRange.end();
-      ++eit) {
-    if (ownerinfo[ie++] >= 0) continue; // All zero/positive owner data represents ghosted elems
+  for (Range::iterator eit = inputRange.begin(); eit != inputRange.end(); ++eit) {
+
+    // All zero/positive owner data represents ghosted elems
+    if (ownerinfo[ie++] >= 0) continue; 
 
     EntityHandle eh = *eit;
-    // get the nodes, then the coordinates
-    const EntityHandle * verts;
-    int num_nodes;
-    rval = mb->get_connectivity(eh, verts, num_nodes);
-    if (MB_SUCCESS != rval)
-      return -1;
-    int nsides = num_nodes;
-    // account for possible padded polygons
-    while (verts[nsides - 2] == verts[nsides - 1] && nsides > 3)
-      nsides--;
+    const double elem_area = this->area_spherical_element(mb, eh, R);
 
-    std::vector<double> coords(3 * nsides);
-    // get coordinates
-    rval = mb->get_coords(verts, nsides, &coords[0]);
-    if (MB_SUCCESS != rval)
-      return -1;
-    total_area += area_spherical_polygon(&coords[0], nsides, R);
+    // check whether the area of the spherical element is positive.
+    assert(elem_area > 0);
+
+    // sum up the contribution
+    total_area += elem_area;
   }
+
+  // return total mesh area
   return total_area;
 }
 
-double IntxAreaUtils::area_on_sphere_lHuiller(Interface * mb, EntityHandle set, double R) {
-  // get all entities of dimension 2
-  // then get the connectivity, etc
-  Range inputRange;
-  ErrorCode rval = mb->get_entities_by_dimension(set, 2, inputRange);
-  if (MB_SUCCESS != rval)
-    return -1;
-
-  std::vector<int> ownerinfo(inputRange.size(), -1);
-  Tag intxOwnerTag;
-  rval = mb->tag_get_handle ( "ORIG_PROC", intxOwnerTag );
-  if (MB_SUCCESS == rval) {
-    rval = mb->tag_get_data(intxOwnerTag, inputRange, &ownerinfo[0]);
-    if (MB_SUCCESS != rval)
-      return -1;
-  }
-
-  int ie = 0;
-  double total_area = 0.;
-  for (Range::iterator eit = inputRange.begin(); eit != inputRange.end();
-      ++eit) {
-    if (ownerinfo[ie++] >= 0) continue; // All zero/positive owner data represents ghosted elems
-    EntityHandle eh = *eit;
-    // get the nodes, then the coordinates
-    const EntityHandle * verts;
-    int num_nodes;
-    rval = mb->get_connectivity(eh, verts, num_nodes);
-    if (MB_SUCCESS != rval)
-      return -1;
-    std::vector<double> coords(3 * num_nodes);
-    // get coordinates
-    rval = mb->get_coords(verts, num_nodes, &coords[0]);
-    if (MB_SUCCESS != rval)
-      return -1;
-    total_area += area_spherical_polygon_lHuiller(&coords[0], num_nodes, R);
-  }
-  return total_area;
-}
 
 double IntxAreaUtils::area_spherical_element(Interface * mb, EntityHandle elem, double R)
 {
+  // get the nodes, then the coordinates
   const EntityHandle * verts;
-  int num_nodes;
-  ErrorCode rval = mb->get_connectivity(elem, verts, num_nodes);
-  if (MB_SUCCESS != rval)
-    return -1;
-  std::vector<double> coords(3 * num_nodes);
+  int nsides;
+  ErrorCode rval = mb->get_connectivity(elem, verts, nsides);MB_CHK_ERR_RET_VAL(rval, -1.0);
+
+  // account for possible padded polygons
+  while (verts[nsides - 2] == verts[nsides - 1] && nsides > 3)
+    nsides--;
+
   // get coordinates
-  rval = mb->get_coords(verts, num_nodes, &coords[0]);
-  if (MB_SUCCESS != rval)
-    return -1;
-  return area_spherical_polygon_lHuiller(&coords[0], num_nodes, R);
+  std::vector<double> coords(3 * nsides);
+  rval = mb->get_coords(verts, nsides, &coords[0]);MB_CHK_ERR_RET_VAL(rval, -1.0);
+
+  // compute and return the area of the polygonal element
+  return area_spherical_polygon(&coords[0], nsides, R);
 }
 
 

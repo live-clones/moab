@@ -17,16 +17,12 @@
 namespace moab {
 
 
-Intx2MeshOnSphere::Intx2MeshOnSphere(Interface * mbimpl):Intx2Mesh(mbimpl), plane(0), Rsrc(0.0), Rdest(0.0)
-{
-  // TODO Auto-generated constructor stub
-
-}
+Intx2MeshOnSphere::Intx2MeshOnSphere(Interface * mbimpl, IntxAreaUtils::AreaMethod amethod) : 
+  Intx2Mesh(mbimpl, amethod), plane(0), Rsrc(0.0), Rdest(0.0)
+{ }
 
 Intx2MeshOnSphere::~Intx2MeshOnSphere()
-{
-  // TODO Auto-generated destructor stub
-}
+{ }
 
 /*
  * return also the area for robustness verification
@@ -559,7 +555,7 @@ ErrorCode Intx2MeshOnSphere::update_tracer_data(EntityHandle out_set, Tag & tagE
   // area of the polygon * conc on target (old) current quantity
   // finally, divide by the area of the tgt
   double check_intx_area=0.;
-  moab::IntxAreaUtils intxAreas(true); // use_lHuiller = true
+  moab::IntxAreaUtils intxAreas(this->areaMethod); // use_lHuiller = true
   for (Range::iterator it= polys.begin(); it!=polys.end(); ++it)
   {
     EntityHandle poly=*it;

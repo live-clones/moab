@@ -144,13 +144,11 @@ public:
 
 class IntxAreaUtils
 {
-private:
-    /* data */
-    bool use_lHuiller;
-
 public:
 
-    IntxAreaUtils(bool p_bUselHuiller = true) : use_lHuiller(p_bUselHuiller)
+    enum AreaMethod {lHuiller=0, Girard=1, GaussQuadrature=2};
+
+    IntxAreaUtils(AreaMethod p_eAreaMethod = lHuiller) : m_eAreaMethod(p_eAreaMethod)
     {}
 
     ~IntxAreaUtils()
@@ -169,27 +167,39 @@ public:
 
     double area_spherical_triangle(double *A, double *B, double *C, double Radius);
 
-    double area_spherical_polygon (double * A, int N, double Radius);
-
-    double compute_area_spherical_triangle(double * A, double * B, double * C, double Radius = 1.0);
-
-    double area_spherical_polygon_lHuiller (double * A, int N, double Radius, int *sign = NULL);
-
-    double area_on_sphere(Interface * mb, EntityHandle set, double R);
-
-    double area_on_sphere_lHuiller(Interface * mb, EntityHandle set, double R);
+    double area_spherical_polygon (double * A, int N, double Radius, int *sign = NULL);
 
     double area_spherical_element(Interface * mb, EntityHandle  elem, double R);
 
+    double area_on_sphere(Interface * mb, EntityHandle set, double R);
+
     ErrorCode positive_orientation(Interface * mb, EntityHandle set, double R);
 
-private:
+    private:
+
+    /* lHuiller method for computing area on a spherical triangle */
+    double area_spherical_triangle_lHuiller(double * ptA, double * ptB, double * ptC, double Radius);
+
+    /* lHuiller method for computing area on a spherical polygon */
+    double area_spherical_polygon_lHuiller (double * A, int N, double Radius, int *sign = NULL);
+
+    /* Girard method for computing area on a spherical triangle with spherical excess */
+    double area_spherical_triangle_girard(double *A, double *B, double *C, double Radius);
+
+    /* Girard method for computing area on a spherical polygon with spherical excess */
+    double area_spherical_polygon_girard (double * A, int N, double Radius);
 
 #ifdef MOAB_HAVE_TEMPESTREMAP
+    /* Gauss-quadrature based integration method for computing area on a spherical triangle */
     double area_spherical_triangle_GQ(double * ptA, double * ptB, double * ptC, double Radius);
+
+    /* Gauss-quadrature based integration method for computing area on a spherical polygon element */
+    double area_spherical_polygon_GQ(double * A, int N, double Radius);
 #endif
 
-    double area_spherical_triangle_lHuiller(double * ptA, double * ptB, double * ptC, double Radius);
+private:
+    /* data */
+    AreaMethod m_eAreaMethod;
 
 };
 

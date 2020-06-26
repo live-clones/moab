@@ -13,7 +13,7 @@ namespace moab {
 
 class Intx2MeshInPlane: public moab::Intx2Mesh {
 public:
-  Intx2MeshInPlane(Interface * mbimpl);
+  Intx2MeshInPlane(Interface * mbimpl, IntxAreaUtils::AreaMethod amethod=IntxAreaUtils::lHuiller);
   virtual ~Intx2MeshInPlane();
 
   double setup_tgt_cell(EntityHandle tgt, int & nsTgt);

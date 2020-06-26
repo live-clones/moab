@@ -366,13 +366,14 @@ int main(int argc, char* argv[])
   TempestRemapper *remapper = new moab::TempestRemapper(gMB);
 #endif
 
+  bool use_overlap_context = false;
+  Tag srcParentTag, tgtParentTag;
+
 #endif
   for (j = in.begin(); j != in.end(); ++j) {
     reset_times();
 
 #ifdef MOAB_HAVE_TEMPESTREMAP
-    bool use_overlap_context = false;
-    Tag srcParentTag, tgtParentTag;
 
     remapper->meshValidate = false;
     //remapper->constructEdgeMap = true;

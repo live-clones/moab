@@ -11,20 +11,16 @@
 
 namespace moab {
 
-IntxRllCssphere::IntxRllCssphere(Interface * mbimpl):Intx2Mesh(mbimpl), R(0.0), plane(0) {
-  // TODO Auto-generated constructor stub
+IntxRllCssphere::IntxRllCssphere(Interface * mbimpl, IntxAreaUtils::AreaMethod amethod):Intx2Mesh(mbimpl, amethod), R(0.0), plane(0)
+{ }
 
-}
+IntxRllCssphere::~IntxRllCssphere()
+{ }
 
-IntxRllCssphere::~IntxRllCssphere() {
-  // TODO Auto-generated destructor stub
-}
 /*
  * return also the area for robustness verification
  */
 double IntxRllCssphere::setup_tgt_cell(EntityHandle tgt, int & nsTgt){
-
-
   // get coordinates of the tgt quad, to decide the gnomonic plane
   double cellArea =0;
 

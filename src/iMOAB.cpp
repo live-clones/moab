@@ -4,20 +4,15 @@
 #include "moab/MOABConfig.h"
 #include "moab/Core.hpp"
 
-using namespace moab;
-
 #ifdef MOAB_HAVE_MPI
     #include "moab_mpi.h"
     #include "moab/ParallelComm.hpp"
     #include "moab/ParCommGraph.hpp"
 #endif
-
-#include <assert.h>
+#include "DebugOutput.hpp"
 #include "moab/iMOAB.h"
 
-/*
- this is needed so far because of direct access to hdf5/mhdf
-  */
+/* this is needed because of direct access to hdf5/mhdf */
 #ifdef MOAB_HAVE_HDF5
     #include "mhdf.h"
     #include <H5Tpublic.h>
@@ -38,9 +33,11 @@ using namespace moab;
 #endif
 
 // C++ includes
-#include <stdio.h>
+#include <cassert>
 #include <sstream>
 #include <iostream>
+
+using namespace moab;
 
 // #define VERBOSE
 
@@ -2747,6 +2744,9 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere ( iMOAB_AppID pid_src, iMOAB_AppID
     }
 #endif
 
+    moab::DebugOutput outputFormatter ( std::cout, rank, 0 );
+    outputFormatter.set_prefix("[iMOAB_ComputeMeshIntersectionOnSphere]: ");
+
     ierr = iMOAB_UpdateMeshInfo(pid_src); CHKIERRVAL(ierr);
     ierr = iMOAB_UpdateMeshInfo(pid_tgt); CHKIERRVAL(ierr);
 
@@ -2754,7 +2754,7 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere ( iMOAB_AppID pid_src, iMOAB_AppID
     ComputeSphereRadius(pid_src, &radius_source);
     ComputeSphereRadius(pid_tgt, &radius_target);
 #ifdef VERBOSE
-    std::cout << "Radius of spheres: source = " << radius_source << " and target = " << radius_target << "\n";
+    if ( is_root ) outputFormatter.printf(0, "Radius of spheres: source = %12.14f, and target = %12.14f\n", radius_source, radius_target);
 #endif
 
     /* Let make sure that the radius match for source and target meshes. If not, rescale now and unscale later. */
@@ -2766,7 +2766,13 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere ( iMOAB_AppID pid_src, iMOAB_AppID
         rval = IntxUtils::ScaleToRadius(context.MBI, data_tgt.file_set, defaultradius);CHKERRVAL(rval);
     }
 
-    IntxAreaUtils areaAdaptor(true); // use_lHuiller = true
+    // Default area_method = lHuiller; Options: Girard, GaussQuadrature (if TR is available)
+#ifdef MOAB_HAVE_TEMPESTREMAP
+        IntxAreaUtils areaAdaptor(IntxAreaUtils::GaussQuadrature);
+#else
+        IntxAreaUtils areaAdaptor(IntxAreaUtils::lHuiller);
+#endif
+
     // print verbosely about the problem setting
     bool use_kdtree_search = false;
     double srctgt_areas[2], srctgt_areas_glb[2];
@@ -2776,9 +2782,9 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere ( iMOAB_AppID pid_src, iMOAB_AppID
         rval = context.MBI->get_entities_by_dimension ( data_src.file_set, data_src.dimension, rintxelems );CHKERRVAL(rval);
         rval = IntxUtils::fix_degenerate_quads ( context.MBI, data_src.file_set );CHKERRVAL(rval);
         rval = areaAdaptor.positive_orientation ( context.MBI, data_src.file_set, defaultradius /*radius_source*/ );CHKERRVAL(rval);
-        srctgt_areas[0] = areaAdaptor.area_on_sphere_lHuiller ( context.MBI, data_src.file_set, defaultradius /*radius_source*/ );
+        srctgt_areas[0] = areaAdaptor.area_on_sphere ( context.MBI, data_src.file_set, defaultradius /*radius_source*/ );
 #ifdef VERBOSE
-        std::cout << "The red set contains " << rintxverts.size() << " vertices and " << rintxelems.size() << " elements \n";
+        if ( is_root ) outputFormatter.printf(0, "The red set contains %d vertices and %d elements \n", rintxverts.size(), rintxelems.size());
 #endif
 
         moab::Range bintxverts, bintxelems;
@@ -2786,9 +2792,9 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere ( iMOAB_AppID pid_src, iMOAB_AppID
         rval = context.MBI->get_entities_by_dimension ( data_tgt.file_set, data_tgt.dimension, bintxelems );CHKERRVAL(rval);
         rval = IntxUtils::fix_degenerate_quads ( context.MBI, data_tgt.file_set );CHKERRVAL(rval);
         rval = areaAdaptor.positive_orientation ( context.MBI, data_tgt.file_set, defaultradius /*radius_target*/ );CHKERRVAL(rval);
-        srctgt_areas[1] = areaAdaptor.area_on_sphere_lHuiller ( context.MBI, data_tgt.file_set, defaultradius /*radius_target*/ );
+        srctgt_areas[1] = areaAdaptor.area_on_sphere ( context.MBI, data_tgt.file_set, defaultradius /*radius_target*/ );
 #ifdef VERBOSE
-        std::cout << "The blue set contains " << bintxverts.size() << " vertices and " << bintxelems.size() << " elements \n";
+        if ( is_root ) outputFormatter.printf(0, "The blue set contains %d vertices and %d elements \n", bintxverts.size(), bintxelems.size());
 #endif
 #ifdef MOAB_HAVE_MPI
         MPI_Allreduce ( &srctgt_areas[0], &srctgt_areas_glb[0], 2, MPI_DOUBLE, MPI_SUM, pco_intx->comm() );
@@ -2827,37 +2833,31 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere ( iMOAB_AppID pid_src, iMOAB_AppID
 
     // Next, compute intersections with MOAB.
     rval = tdata.remapper->ComputeOverlapMesh ( use_kdtree_search, false );CHKERRVAL(rval);
-    // rval = data_intx.remapper->ConvertMeshToTempest ( moab::Remapper::OverlapMesh );CHKERRVAL(rval);
 
     // Mapping computation done
     if (validate)
     {
-        double local_areas[2], global_areas[4]; // Array for Initial area, and through Method 1 and Method 2
-        local_areas[0] = areaAdaptor.area_on_sphere_lHuiller ( context.MBI, data_intx.file_set, radius_source );
-        local_areas[1] = areaAdaptor.area_on_sphere ( context.MBI, data_intx.file_set, radius_source );
+        double local_area, global_areas[3]; // Array for Initial area, and through Method 1 and Method 2
+        local_area = areaAdaptor.area_on_sphere ( context.MBI, data_intx.file_set, radius_source );
 
         global_areas[0] = srctgt_areas_glb[0];
         global_areas[1] = srctgt_areas_glb[1];
 
 #ifdef MOAB_HAVE_MPI
         if (is_parallel) {
-            MPI_Allreduce ( &local_areas[0], &global_areas[2], 2, MPI_DOUBLE, MPI_SUM, pco_intx->comm() );
+            MPI_Reduce ( &local_area, &global_areas[2], 1, MPI_DOUBLE, MPI_SUM, pco_intx->comm(), 0 );
         }
         else
         {
-            global_areas[2] = local_areas[0];
-            global_areas[3] = local_areas[1];
+            global_areas[2] = local_area;
         }
 #else
-        global_areas[2] = local_areas[0];
-        global_areas[3] = local_areas[1];
+        global_areas[2] = local_area;
 #endif
         if ( is_root )
         {
-            printf ( "initial area: source = %12.14f, target = %12.14f\n", global_areas[0], global_areas[1] );
-            printf ( " area with l'Huiller: %12.14f with Girard: %12.14f\n", global_areas[2], global_areas[3] );
-            printf ( " relative difference areas = %12.10e\n", fabs ( global_areas[2] - global_areas[3] ) / global_areas[2] );
-            printf ( " relative error w.r.t source = %12.14e, and target = %12.14e\n", fabs ( global_areas[2] - global_areas[0] ) / global_areas[2], fabs ( global_areas[2] - global_areas[1] ) / global_areas[2] );
+            outputFormatter.printf ( 0, "initial area: source mesh = %12.14f, target mesh = %12.14f, overlap mesh = %12.14f\n", global_areas[0], global_areas[1], global_areas[2] );
+            outputFormatter.printf ( 0, " relative error w.r.t source = %12.14e, and target = %12.14e\n", fabs ( global_areas[0] - global_areas[2] ) / global_areas[0], fabs ( global_areas[1] - global_areas[2] ) / global_areas[1] );
         }
     }
 
@@ -2899,7 +2899,7 @@ ErrCode iMOAB_ComputePointDoFIntersection ( iMOAB_AppID pid_src, iMOAB_AppID pid
     ComputeSphereRadius(pid_src, &radius_source);
     ComputeSphereRadius(pid_tgt, &radius_target);
 
-    IntxAreaUtils areaAdaptor(true); // use_lHuiller = true
+    IntxAreaUtils areaAdaptor;
     // print verbosely about the problem setting
     {
         moab::Range rintxverts, rintxelems;
