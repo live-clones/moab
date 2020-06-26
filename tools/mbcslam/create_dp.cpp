@@ -168,8 +168,8 @@ ErrorCode add_field_value(Interface & mb)
       coords.resize(3*num_nodes);
       rval = mb.get_coords(conn, num_nodes, &coords[0]);
       CHECK_ERR(rval);
-      IntxAreaUtils sphAreaUtils(true);
-      *ptrArea =  sphAreaUtils.area_spherical_polygon_lHuiller (&coords[0], num_nodes, radius);
+      IntxAreaUtils sphAreaUtils;
+      *ptrArea =  sphAreaUtils.area_spherical_polygon (&coords[0], num_nodes, radius);
 
       // we should have used some
       // total mass:

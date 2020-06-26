@@ -198,9 +198,9 @@ int main(int argc, char **argv)
   if (MB_SUCCESS != rval)
     std::cout << "can't write output\n";
   
-  moab::IntxAreaUtils sphAreaUtils(true);
-  double intx_area = sphAreaUtils.area_on_sphere_lHuiller(&mb, outputSet, radius);
-  double arrival_area = sphAreaUtils.area_on_sphere_lHuiller(&mb, euler_set, radius);
+  moab::IntxAreaUtils sphAreaUtils;
+  double intx_area = sphAreaUtils.area_on_sphere(&mb, outputSet, radius);
+  double arrival_area = sphAreaUtils.area_on_sphere(&mb, euler_set, radius);
   std::cout << " Arrival area: " << arrival_area
       << "  intersection area:" << intx_area << " rel error: "
       << fabs((intx_area - arrival_area) / arrival_area) << "\n";

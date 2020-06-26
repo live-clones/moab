@@ -181,8 +181,8 @@ ErrorCode add_field_value(Interface * mb, EntityHandle euler_set, int rank, Tag 
       coords.resize(3*num_nodes);
       rval = mb->get_coords(conn, num_nodes, &coords[0]);MB_CHK_ERR(rval);
 
-      moab::IntxAreaUtils sphAreaUtils(true);
-      *ptrArea =  sphAreaUtils.area_spherical_polygon_lHuiller (&coords[0], num_nodes, radius);
+      moab::IntxAreaUtils sphAreaUtils;
+      *ptrArea =  sphAreaUtils.area_spherical_polygon (&coords[0], num_nodes, radius);
 
       // we should have used some
       // total mass:
