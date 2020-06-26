@@ -153,6 +153,7 @@ AC_DEFUN([INITIALIZE_EXTERNAL_PACKAGES],
     MOAB_ARCH_DIR="$MOAB_SANDBOX/$MOAB_ARCH"
   fi
   MOAB_PACKAGES_DIR="$MOAB_SANDBOX/archives"
+  MOAB_EXTERNAL_MESHDIR="$MOAB_SANDBOX/MeshFiles"
 ])
 
 # AC_PROG_MKDIR_P
@@ -169,10 +170,12 @@ dnl Fetches an external package into MOAB_ARCH using:
 dnl $1 = Package Name
 dnl $2 = URL
 dnl $3 = Storage location (Archive name)
+dnl $4 = If directory, download recursively ? Default: no.
+dnl $5 = If present, do not print verbose messages
 dnl -------------------------------------------------------------
 AC_DEFUN([DOWNLOAD_EXTERNAL_PACKAGE],
 [
-  PREFIX_PRINT(Downloading sources from URL: $2 )
+  PREFIX_PRINT(Downloading from URL: $2 )
   cdir=`dirname $3`
   if (test "x$cdir" != "x."); then
     op_dirname="$cdir"
@@ -183,21 +186,35 @@ AC_DEFUN([DOWNLOAD_EXTERNAL_PACKAGE],
   if (test -f "$3"); then
     hashtarfile1="`$HASHPRGM $3 | cut -d ' ' -f1`"
   fi
+  recursivedownload=no
+  if (test "x$4" != "x"); then
+    recursivedownload=yes
+  fi
   filedownloaded=no
   remoteprotocol=yes
-  
+  verbosemessages=yes
+  if (test "x$5" != "x"); then
+    verbosemessages=no
+  fi
+ 
   # decipher protocol needed to download
   case $2 in
     @*) remoteprotocol=no ;;
     *)  remoteprotocol=yes ;;
   esac
   currdir="$PWD"
-  if (test -f "$3" ); then
+  if (test -f "$3" || test -d "$3"); then
     filedownloaded=yes # Perhaps from a previous run
   else
     if (test $remoteprotocol != no); then
+      ADDLN_OPTS=""
       if (test "$HAVE_WGET" != "no" ); then
-        PREFIX_PRINT([   WGET: $1 package downloading to $3 ])
+        if (test "$verbosemessages" != "no" ); then
+          PREFIX_PRINT([   WGET: $1 package downloading to $3 ])
+        fi
+        if (test "$recursivedownload" != "no"); then
+          ADDLN_OPTS="--recursive --no-parent"
+        fi
         if (test -f "$3"); then
           # Check if the file requested exists in the remote directory -- inform user if there is a network error 
           op_checkifexists="`wget --spider -O/dev/null -q $2 && echo yes || echo no`"
@@ -205,25 +222,35 @@ AC_DEFUN([DOWNLOAD_EXTERNAL_PACKAGE],
             AC_ERROR([ --  Requested URL does not exist in remote host. Try again later. ($2)  -- ])
           fi
           #op_needdownload="`wget --spider -N -q $2 && echo yes || echo no; cd $currdir`"
-          op_downloadlog$1="`wget -q -c -N --progress=bar $2 -O $3`"
+          op_downloadlog$1="`wget $ADDLN_OPTS -q -c -N --progress=bar $2 -O $3`"
         else
           # No need to check for time-stamping
-          op_downloadlog$1="`wget -q --progress=bar $2 -O $3`"
+          op_downloadlog$1="`wget $ADDLN_OPTS -q --progress=bar $2 -O $3`"
         fi
         filedownloaded=yes
       fi
 
       if (test "$HAVE_CURL" != "no" && test "$filedownloaded" != "yes"); then
-        PREFIX_PRINT([   CURL: $1 package downloading to $3 ])
-        op_downloadlog$1="`curl -R -L -s $2 -z $3 -o $3`"
+        if (test "$verbosemessages" != "no" ); then
+          PREFIX_PRINT([   CURL: $1 package downloading to $3 ])
+        fi
+        if (test "$recursivedownload" != "no"); then
+          ADDLN_OPTS="-r"
+        fi
+        op_downloadlog$1="`curl $ADDLN_OPTS -R -L -s $2 -z $3 -o $3`"
         filedownloaded=yes
       fi
     else
       if (test "$HAVE_SCP" != "no" && test "$filedownloaded" != "yes"); then
         bnamerem="`echo $2 | cut -c 2-`"
         # op_downloadlog$1="`scp -q $bnamerem $3`"
-        PREFIX_PRINT([   SCP: $1 package downloading to $3 ])
-        op_downloadlog$1="`scp -q $2 $3`"
+        if (test "$verbosemessages" != "no" ); then
+          PREFIX_PRINT([   SCP: $1 package downloading to $3 ])
+        fi
+        if (test "$recursivedownload" != "no"); then
+          ADDLN_OPTS="-r"
+        fi
+        op_downloadlog$1="`scp $ADDLN_OPTS -q $2 $3`"
         filedownloaded=yes
       fi
     fi
@@ -232,7 +259,9 @@ AC_DEFUN([DOWNLOAD_EXTERNAL_PACKAGE],
   if (test "$filedownloaded" != "yes"); then
     AC_ERROR([ --  The archive URL ($2) specified cannot be handled by wget, curl or scp  -- ])
   else
-    MSG_ECHO_LOG(${op_downloadlog$1})
+    if (test "$verbosemessages" != "no" ); then
+      MSG_ECHO_LOG(${op_downloadlog$1})
+    fi
   fi
 
   hashtarfile2="`$HASHPRGM $3 | cut -d ' ' -f1`"
@@ -244,6 +273,20 @@ AC_DEFUN([DOWNLOAD_EXTERNAL_PACKAGE],
 
 ])
 
+dnl --------------------------------------------------------------------
+dnl Fetches an external data artifact into MOAB_SANDBOX directory using:
+dnl $1 = Base name identifier
+dnl $2 = Base directory and path hierarchy
+dnl $3 = List of filenames to download
+dnl --------------------------------------------------------------------
+AC_DEFUN([DOWNLOAD_EXTERNAL_DATA],
+[
+  PPREFIX="MOAB Data"
+  PREFIX_PRINT(Downloading data from MOAB FTP website: $1 )
+  AS_MKDIR_P("$MOAB_EXTERNAL_MESHDIR/$2")
+  m4_foreach([fnamevar], [$3], [DOWNLOAD_EXTERNAL_PACKAGE([$1], [http://ftp.mcs.anl.gov/pub/fathom/MeshFiles/$2/fnamevar], [$MOAB_EXTERNAL_MESHDIR/$2/fnamevar], [], [yes])])
+  #DOWNLOAD_EXTERNAL_PACKAGE([$1-$fname], [http://ftp.mcs.anl.gov/pub/fathom/MeshFiles/$2/$fname], [$MOAB_EXTERNAL_MESHDIR/$2/$fname], [], [yes])
+])
 
 dnl -------------------------------------------------------------
 dnl Fetches an external source package:
