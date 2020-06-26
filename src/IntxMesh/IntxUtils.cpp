@@ -4,7 +4,8 @@
  *  Created on: Oct 3, 2012
  */
 
-#include <math.h>
+#include <cmath>
+#include <cassert>
 #include "moab/IntxMesh/IntxUtils.hpp"
 // this is from mbcoupler; maybe it should be moved somewhere in moab src
 // right now, add a dependency to mbcoupler
