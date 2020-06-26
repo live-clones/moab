@@ -24,7 +24,7 @@
 #include "MBTagConventions.hpp"
 #include "moab/ParallelComm.hpp"
 #include "moab/IntxMesh/IntxUtils.hpp"
-
+#include "IntxUtilsCSLAM.hpp"
 #include "TestUtil.hpp"
 
 using namespace moab;
@@ -48,15 +48,10 @@ ErrorCode manufacture_lagrange_mesh_on_sphere(Interface * mb,
    *
    */
   Range polygons;
-  rval = mb->get_entities_by_dimension(euler_set, 2, polygons);
-  if (MB_SUCCESS != rval)
-    return rval;
+  rval = mb->get_entities_by_dimension(euler_set, 2, polygons);CHECK_ERR(rval);
 
   Range connecVerts;
-  rval = mb->get_connectivity(polygons, connecVerts);
-  if (MB_SUCCESS != rval)
-    return rval;
-
+  rval = mb->get_connectivity(polygons, connecVerts);CHECK_ERR(rval);
 
   Tag tagh = 0;
   std::string tag_name("DP");
@@ -65,8 +60,7 @@ ErrorCode manufacture_lagrange_mesh_on_sphere(Interface * mb,
   void *data; // pointer to the LOC in memory, for each vertex
   int count;
 
-  rval = mb->tag_iterate(tagh, connecVerts.begin(), connecVerts.end(), count, data);
-  CHECK_ERR(rval);
+  rval = mb->tag_iterate(tagh, connecVerts.begin(), connecVerts.end(), count, data);CHECK_ERR(rval);
   // here we are checking contiguity
   assert(count == (int) connecVerts.size());
   double * ptr_DP=(double*)data;
@@ -77,7 +71,6 @@ ErrorCode manufacture_lagrange_mesh_on_sphere(Interface * mb,
   //int vix=0; // vertex index in new array
   double T=5;// check the script
 
-
   for (Range::iterator vit=connecVerts.begin();vit!=connecVerts.end(); ++vit)
   {
     EntityHandle oldV=*vit;
@@ -85,7 +78,7 @@ ErrorCode manufacture_lagrange_mesh_on_sphere(Interface * mb,
     rval = mb->get_coords(&oldV, 1, &(posi[0]) );
     CHECK_ERR(rval);
     // do some mumbo jumbo, as in python script
-    SphereCoords sphCoord = cart_to_spherical(posi);
+    IntxUtils::SphereCoords sphCoord = IntxUtils::cart_to_spherical(posi);
     double lat1 = sphCoord.lat-2*M_PI*t/T; // 0.1/5
     double uu = 3*radius/ T * pow(sin(lat1), 2)*sin(2*sphCoord.lon)*cos(M_PI*t/T);
     uu+=2*radius*M_PI*cos(sphCoord.lon)/T;
@@ -174,16 +167,13 @@ int main(int argc, char **argv)
   Interface & mb = moab;
   EntityHandle euler_set;
   ErrorCode rval;
-  rval = mb.create_meshset(MESHSET_SET, euler_set);
-  CHECK_ERR(rval);
+  rval = mb.create_meshset(MESHSET_SET, euler_set);CHECK_ERR(rval);
 
   clock_t tt = clock();
 
-  rval = mb.load_file(filename_mesh1, &euler_set, opts.c_str());
-  CHECK_ERR(rval);
+  rval = mb.load_file(filename_mesh1, &euler_set, opts.c_str());CHECK_ERR(rval);
 
-  ParallelComm* pcomm = ParallelComm::get_pcomm(&mb, 0);
-  CHECK_ERR(rval);
+  ParallelComm* pcomm = ParallelComm::get_pcomm(&mb, 0);CHECK_ERR(rval);
 
   /*rval = pcomm->check_all_shared_handles();
   CHECK_ERR(rval);*/
@@ -202,25 +192,19 @@ int main(int argc, char **argv)
       tt = clock();
   }
 
-  rval = manufacture_lagrange_mesh_on_sphere(&mb, euler_set);
-  if (MB_SUCCESS != rval)
-    return 1;
-  // create a set with quads corresponding to each initial edge spanned with the displacement field
+  rval = manufacture_lagrange_mesh_on_sphere(&mb, euler_set);CHECK_ERR(rval);
 
+  // create a set with quads corresponding to each initial edge spanned with the displacement field
   if (flux_form)
   {
-    rval = create_span_quads(&mb, euler_set, rank);
-    if (MB_SUCCESS != rval)
-      return 1;
+    rval = IntxUtilsCSLAM::create_span_quads(&mb, euler_set, rank);CHECK_ERR(rval);
   }
 
   EntityHandle covering_lagr_set;
-  rval = mb.create_meshset(MESHSET_SET, covering_lagr_set);
-  CHECK_ERR(rval);
+  rval = mb.create_meshset(MESHSET_SET, covering_lagr_set);CHECK_ERR(rval);
+
   Intx2MeshOnSphere worker(&mb);
-
   //double radius = 1.; // input
-
   worker.set_radius_source_mesh(radius);
   worker.set_radius_destination_mesh(radius);
   worker.set_parallel_comm(pcomm);
@@ -230,11 +214,10 @@ int main(int argc, char **argv)
               << (clock() - tt) / (double) CLOCKS_PER_SEC << " seconds" << std::endl;
      tt = clock();
   }
-  rval = worker.FindMaxEdges(euler_set, euler_set);
-  CHECK_ERR(rval);
+  rval = worker.FindMaxEdges(euler_set, euler_set);CHECK_ERR(rval);
   worker.set_error_tolerance(gtol);
-  rval = worker.create_departure_mesh_2nd_alg(euler_set, covering_lagr_set);
-  CHECK_ERR(rval);
+
+  rval = worker.create_departure_mesh_2nd_alg(euler_set, covering_lagr_set);CHECK_ERR(rval);
 
   if (0==rank)
   {
@@ -250,9 +233,7 @@ int main(int argc, char **argv)
     rval = mb.write_file(lagrIni.str().c_str(), 0, 0, &covering_lagr_set, 1);
   }
 
-  rval = enforce_convexity(&mb, covering_lagr_set, rank);
-  if (MB_SUCCESS != rval)
-    return 1;
+  rval = IntxUtils::enforce_convexity(&mb, covering_lagr_set, rank);CHECK_ERR(rval);
   if (Verbose)
   {
     std::stringstream ste;
@@ -264,12 +245,9 @@ int main(int argc, char **argv)
     std::cout << "can't write lagr set\n";
 
   EntityHandle outputSet;
-  rval = mb.create_meshset(MESHSET_SET, outputSet);
-  if (MB_SUCCESS != rval)
-    return 1;
-  rval = worker.intersect_meshes(covering_lagr_set, euler_set, outputSet);
-  if (MB_SUCCESS != rval)
-    return 1;
+  rval = mb.create_meshset(MESHSET_SET, outputSet);CHECK_ERR(rval);
+  rval = worker.intersect_meshes(covering_lagr_set, euler_set, outputSet);CHECK_ERR(rval);
+
   if (0==rank)
   {
      std::cout << "intersect meshes in " << procs << " processors in "
@@ -288,8 +266,9 @@ int main(int argc, char **argv)
 
   if (rank <= 4)
   {
-    double intx_area = area_on_sphere_lHuiller(&mb, outputSet, radius);
-    double arrival_area = area_on_sphere_lHuiller(&mb, euler_set, radius);
+    moab::IntxAreaUtils areaAdaptor;
+    double intx_area = areaAdaptor.area_on_sphere(&mb, outputSet, radius);
+    double arrival_area = areaAdaptor.area_on_sphere(&mb, euler_set, radius);
     std::cout << "On proc " << rank << "  arrival area: " << arrival_area
         << "  intersection area:" << intx_area << " rel error: "
         << fabs((intx_area - arrival_area) / arrival_area) << "\n";
