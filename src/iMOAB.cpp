@@ -2845,7 +2845,7 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere ( iMOAB_AppID pid_src, iMOAB_AppID
 
 #ifdef MOAB_HAVE_MPI
         if (is_parallel) {
-            MPI_Reduce ( &local_area, &global_areas[2], 1, MPI_DOUBLE, MPI_SUM, pco_intx->comm(), 0 );
+            MPI_Reduce ( &local_area, &global_areas[2], 1, MPI_DOUBLE, MPI_SUM, 0, pco_intx->comm() );
         }
         else
         {
