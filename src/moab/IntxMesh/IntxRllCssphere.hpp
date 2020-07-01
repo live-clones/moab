@@ -12,7 +12,9 @@ namespace moab {
 
 class IntxRllCssphere: public moab::Intx2Mesh {
 public:
-  IntxRllCssphere(Interface * mbimpl, IntxAreaUtils::AreaMethod amethod=IntxAreaUtils::lHuiller);
+
+  IntxRllCssphere(Interface * mbimpl);
+
   virtual ~IntxRllCssphere();
 
   void set_radius(double radius) { R=radius ;}

@@ -33,17 +33,6 @@ namespace moab {
 #define CORRTAGNAME "__correspondent"
 #define MAXEDGES 10
 
-// vec utilities that could be common between quads on a plane or sphere
-double IntxUtils::dist2(double * a, double * b) {
-  double abx = b[0] - a[0], aby = b[1] - a[1];
-  return sqrt(abx * abx + aby * aby);
-}
-
-double IntxUtils::area2D(double *a, double *b, double *c) {
-  // (b-a)x(c-a) / 2
-  return ((b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0])) / 2;
-}
-
 int IntxUtils::borderPointsOfXinY2(double * X, int nX, double * Y, int nY, double * P,
     int * side, double epsilon_area) {
   // 2 triangles, 3 corners, is the corner of X in Y?

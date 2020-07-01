@@ -11,7 +11,7 @@
 
 namespace moab {
 
-IntxRllCssphere::IntxRllCssphere(Interface * mbimpl, IntxAreaUtils::AreaMethod amethod):Intx2Mesh(mbimpl, amethod), R(0.0), plane(0)
+IntxRllCssphere::IntxRllCssphere(Interface * mbimpl) : Intx2Mesh(mbimpl), R(0.0), plane(0)
 { }
 
 IntxRllCssphere::~IntxRllCssphere()

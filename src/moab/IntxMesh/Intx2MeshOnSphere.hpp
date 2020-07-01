@@ -15,7 +15,9 @@ namespace moab {
 class Intx2MeshOnSphere: public moab::Intx2Mesh
 {
 public:
+
   Intx2MeshOnSphere(Interface * mbimpl, IntxAreaUtils::AreaMethod amethod=IntxAreaUtils::lHuiller);
+
   virtual ~Intx2MeshOnSphere();
 
   void set_radius_source_mesh(double radius) { Rsrc=radius ;}
@@ -38,6 +40,8 @@ public:
 
   virtual ErrorCode build_processor_euler_boxes(EntityHandle euler_set, Range & local_verts);
 #endif
+
+  const IntxAreaUtils::AreaMethod areaMethod;
 
 private:
   int plane; // current gnomonic plane

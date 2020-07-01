@@ -16,9 +16,9 @@
 //#define CHECK_CONVEXITY
 namespace moab {
 
-
-Intx2MeshOnSphere::Intx2MeshOnSphere(Interface * mbimpl, IntxAreaUtils::AreaMethod amethod) : 
-  Intx2Mesh(mbimpl, amethod), plane(0), Rsrc(0.0), Rdest(0.0)
+Intx2MeshOnSphere::Intx2MeshOnSphere(Interface* mbimpl, IntxAreaUtils::AreaMethod amethod) : 
+    Intx2Mesh(mbimpl), 
+    areaMethod(amethod), plane(0), Rsrc(0.0), Rdest(0.0)
 { }
 
 Intx2MeshOnSphere::~Intx2MeshOnSphere()

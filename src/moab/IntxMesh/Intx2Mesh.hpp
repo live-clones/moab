@@ -49,7 +49,7 @@ class Intx2Mesh
 {
 public:
 
-  Intx2Mesh(Interface * mbimpl, IntxAreaUtils::AreaMethod amethod=IntxAreaUtils::lHuiller);
+  Intx2Mesh(Interface * mbimpl);
 
   virtual ~Intx2Mesh();
 
@@ -167,7 +167,6 @@ public:
 
 protected: // so it can be accessed in derived classes, InPlane and OnSphere
   Interface * mb;
-  IntxAreaUtils::AreaMethod areaMethod;
 
   EntityHandle mbs1;
   EntityHandle mbs2;

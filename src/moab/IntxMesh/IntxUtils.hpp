@@ -17,9 +17,21 @@ class IntxUtils
 {
 public:
 
-    static double dist2(double * a, double * b);
-    static double area2D(double *a, double *b, double *c);
+    // vec utilities that could be common between quads on a plane or sphere
+    static inline double dist2(double* a, double* b)
+    {
+        double abx = b[0] - a[0], aby = b[1] - a[1];
+        return sqrt(abx * abx + aby * aby);
+    }
+
+    static inline double area2D(double* a, double* b, double* c)
+    {
+        // (b-a)x(c-a) / 2
+        return ((b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0])) / 2;
+    }
+
     static int borderPointsOfXinY2(double * X, int nX, double * Y, int nY, double * P, int * side, double epsilon_area);
+
     static int SortAndRemoveDoubles2(double * P, int & nP, double epsilon);
     // the marks will show what edges of blue intersect the red
 
