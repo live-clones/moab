@@ -8,11 +8,14 @@
 #include "moab/Core.hpp"
 #include "moab/Interface.hpp"
 #include <iostream>
-#include <math.h>
-#include <TestUtil.hpp>
+#include <cmath>
+#include <cassert>
 
 #include "moab/IntxMesh/IntxUtils.hpp"
-#include <assert.h>
+#include "IntxUtilsCSLAM.hpp"
+
+#include <TestUtil.hpp>
+
 using namespace moab;
 
 double radius = 1.;// in m:  6371220.
@@ -76,9 +79,9 @@ ErrorCode add_field_value(Interface & mb)
       rval = mb.get_coords(&oldV, 1, &(posi[0]) );
       CHECK_ERR(rval);
 
-      SphereCoords sphCoord = cart_to_spherical(posi);
+      moab::IntxUtils::SphereCoords sphCoord = moab::IntxUtils::cart_to_spherical(posi);
 
-      ptr_DP[0]=quasi_smooth_field(sphCoord.lon, sphCoord.lat, params);;
+      ptr_DP[0]=IntxUtilsCSLAM::quasi_smooth_field(sphCoord.lon, sphCoord.lat, params);;
 
       ptr_DP++; // increment to the next node
     }
@@ -86,13 +89,13 @@ ErrorCode add_field_value(Interface & mb)
   else if (2 == field_type) // smooth
   {
     CartVect p1, p2;
-    SphereCoords spr;
+    moab::IntxUtils::SphereCoords spr;
     spr.R = 1;
     spr.lat = M_PI/3;
     spr.lon= M_PI;
-    p1 = spherical_to_cart(spr);
+    p1 = moab::IntxUtils::spherical_to_cart(spr);
     spr.lat = -M_PI/3;
-    p2 = spherical_to_cart(spr);
+    p2 = moab::IntxUtils::spherical_to_cart(spr);
     //                  x1,    y1,     z1,    x2,   y2,    z2,   h_max, b0
     double params[] = { p1[0], p1[1], p1[2], p2[0], p2[1], p2[2], 1,    5.};
     for (Range::iterator vit=connecVerts.begin();vit!=connecVerts.end(); ++vit)
@@ -102,9 +105,9 @@ ErrorCode add_field_value(Interface & mb)
       rval = mb.get_coords(&oldV, 1, &(posi[0]) );
       CHECK_ERR(rval);
 
-      SphereCoords sphCoord = cart_to_spherical(posi);
+      moab::IntxUtils::SphereCoords sphCoord = moab::IntxUtils::cart_to_spherical(posi);
 
-      ptr_DP[0]=smooth_field(sphCoord.lon, sphCoord.lat, params);;
+      ptr_DP[0]=IntxUtilsCSLAM::smooth_field(sphCoord.lon, sphCoord.lat, params);;
 
       ptr_DP++; // increment to the next node
     }
@@ -120,9 +123,9 @@ ErrorCode add_field_value(Interface & mb)
       rval = mb.get_coords(&oldV, 1, &(posi[0]) );
       CHECK_ERR(rval);
 
-      SphereCoords sphCoord = cart_to_spherical(posi);
+      moab::IntxUtils::SphereCoords sphCoord = moab::IntxUtils::cart_to_spherical(posi);
 
-      ptr_DP[0]=slotted_cylinder_field(sphCoord.lon, sphCoord.lat, params);;
+      ptr_DP[0]=IntxUtilsCSLAM::slotted_cylinder_field(sphCoord.lon, sphCoord.lat, params);;
 
       ptr_DP++; // increment to the next node
     }
@@ -165,7 +168,8 @@ ErrorCode add_field_value(Interface & mb)
       coords.resize(3*num_nodes);
       rval = mb.get_coords(conn, num_nodes, &coords[0]);
       CHECK_ERR(rval);
-      *ptrArea =  area_spherical_polygon_lHuiller (&coords[0], num_nodes, radius);
+      IntxAreaUtils sphAreaUtils;
+      *ptrArea =  sphAreaUtils.area_spherical_polygon (&coords[0], num_nodes, radius);
 
       // we should have used some
       // total mass:
@@ -268,7 +272,7 @@ int main(int argc, char **argv)
        //EntityHandle v = verts[v];
        CartVect pos( x_ptr[v], y_ptr[v] , z_ptr[v]);
        CartVect newPos;
-       departure_point_case1(pos, t, dt, newPos);
+       IntxUtilsCSLAM::departure_point_case1(pos, t, dt, newPos);
        ptr_DP[0]=newPos[0];
        ptr_DP[1]=newPos[1];
        ptr_DP[2]=newPos[2];

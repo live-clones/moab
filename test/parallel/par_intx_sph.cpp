@@ -125,7 +125,7 @@ ErrorCode  manufacture_lagrange_mesh_on_sphere(Interface * mb, EntityHandle eule
     rval = mb->get_coords(&oldV, 1, &(posi[0]) );
     CHECK_ERR(rval);
     // do some mumbo jumbo, as in python script
-    SphereCoords sphCoord = cart_to_spherical(posi);
+    moab::IntxUtils::SphereCoords sphCoord = moab::IntxUtils::cart_to_spherical(posi);
     double lat1 = sphCoord.lat-2*M_PI*t/T; // 0.1/5
     double uu = 3*radius/ T * pow(sin(lat1), 2)*sin(2*sphCoord.lon)*cos(M_PI*t/T);
     uu+=2*M_PI*cos(sphCoord.lon)/T;
@@ -212,14 +212,15 @@ void test_intx_in_parallel_elem_based()
   rval = worker.intersect_meshes(covering_lagr_set, euler_set, outputSet);
   CHECK_ERR(rval);
 
+  IntxAreaUtils areaAdaptor;
   //std::string opts_write("PARALLEL=WRITE_PART");
   //rval = mb.write_file("manuf.h5m", 0, opts_write.c_str(), &outputSet, 1);
   //std::string opts_write("");
   std::stringstream outf;
   outf<<"intersect" << rank<<".h5m";
   rval = mb.write_file(outf.str().c_str(), 0, 0, &outputSet, 1);
-  double intx_area = area_on_sphere(&mb, outputSet, radius);
-  double arrival_area = area_on_sphere(&mb, euler_set, radius) ;
+  double intx_area = areaAdaptor.area_on_sphere(&mb, outputSet, radius);
+  double arrival_area = areaAdaptor.area_on_sphere(&mb, euler_set, radius) ;
   std::cout<< "On rank : " << rank << " arrival area: " << arrival_area<<
       "  intersection area:" << intx_area << " rel error: " << fabs((intx_area-arrival_area)/arrival_area) << "\n";
   CHECK_ERR(rval);
@@ -280,7 +281,7 @@ void test_intx_mpas()
   std::stringstream ss;
   ss<<"partial" << rank<<".vtk";
   mb.write_file(ss.str().c_str(), 0, 0, &covering_lagr_set, 1);
-  rval = enforce_convexity(&mb, covering_lagr_set, rank);
+  rval = moab::IntxUtils::enforce_convexity(&mb, covering_lagr_set, rank);
   CHECK_ERR(rval);
   std::stringstream ss2;
   ss2<<"partialConvex" << rank<<".vtk";
@@ -297,9 +298,12 @@ void test_intx_mpas()
   std::stringstream outf;
   outf<<"intersect" << rank<<".h5m";
   rval = mb.write_file(outf.str().c_str(), 0, 0, &outputSet, 1);
-  double intx_area = area_on_sphere(&mb, outputSet, radius);
-  double arrival_area = area_on_sphere(&mb, euler_set, radius) ;
+
+  IntxAreaUtils areaAdaptor;
+  double intx_area = areaAdaptor.area_on_sphere(&mb, outputSet, radius);
+  double arrival_area = areaAdaptor.area_on_sphere(&mb, euler_set, radius) ;
   std::cout<< "On rank : " << rank << " arrival area: " << arrival_area<<
       "  intersection area:" << intx_area << " rel error: " << fabs((intx_area-arrival_area)/arrival_area) << "\n";
   CHECK_ERR(rval);
 }
+

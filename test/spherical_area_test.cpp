@@ -32,14 +32,31 @@ int main(int/* argc*/, char** /* argv[]*/)
   double R = 6.; // should be input
   // compare total area with 4*M_PI * R^2
 
-  double total_area = area_on_sphere(mb, sf, R) ;
-  double  area_sphere = R*R*M_PI*4.;
-  std::cout<<"total area with Girard:  " << total_area << " area_sphere:" << area_sphere << " rel error:"
-      << fabs((total_area-area_sphere)/area_sphere) << "\n";
+  const double area_sphere = R*R*M_PI*4.;
+  std::cout << "total area of the sphere        :  " << area_sphere << "\n";
 
-  double area2 = area_on_sphere_lHuiller(mb, sf, R) ;
-  std::cout<<"total area with l'Huiller: " << area2 << " area_sphere:" << area_sphere << " rel error:"
-        << fabs((total_area-area_sphere)/area_sphere) << "\n";
+  {
+    moab::IntxAreaUtils areaAdaptor(moab::IntxAreaUtils::Girard); // use_lHuiller = true
+    double area1 = areaAdaptor.area_on_sphere(mb, sf, R) ;
+    std::cout << "total area with Girard          :  " << area1 << " rel error:"
+        << fabs((area1-area_sphere)/area_sphere) << "\n";
+  }
+
+  {
+    moab::IntxAreaUtils areaAdaptor(moab::IntxAreaUtils::lHuiller); 
+    double area2 = areaAdaptor.area_on_sphere(mb, sf, R) ;
+    std::cout << "total area with l'Huiller       : " << area2 << " rel error:"
+          << fabs((area2-area_sphere)/area_sphere) << "\n";
+  }
+
+#ifdef MOAB_HAVE_TEMPESTREMAP
+  {
+    moab::IntxAreaUtils areaAdaptor(moab::IntxAreaUtils::GaussQuadrature);
+    double area3 = areaAdaptor.area_on_sphere(mb, sf, R) ;
+    std::cout << "total area with GaussQuadrature : " << area3 << " rel error:"
+          << fabs((area3-area_sphere)/area_sphere) << "\n";
+  }
+#endif
 
   return 0;
 }

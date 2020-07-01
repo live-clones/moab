@@ -305,7 +305,7 @@ AM_CPPFLAGS += -I$(srcdir)/Remapping
 
 if HAVE_TEMPESTREMAP
   AM_CPPFLAGS += $(TEMPESTREMAP_INCLUDE)
-  AM_LDFLAGS += $(TEMPESTREMAP_LIBS)
+  libMOAB_la_LIBADD += $(TEMPESTREMAP_LIBS)
 
   MOAB_REMAPPING_SRCS += \
      Remapping/TempestRemapper.cpp  \

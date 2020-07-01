@@ -20,6 +20,7 @@
 #include "moab/Interface.hpp"
 #include "moab/Range.hpp"
 #include "moab/CartVect.hpp"
+#include "moab/IntxMesh/IntxUtils.hpp"
 
 // #define ENABLE_DEBUG
 
@@ -47,7 +48,9 @@ class TupleList;
 class Intx2Mesh
 {
 public:
+
   Intx2Mesh(Interface * mbimpl);
+
   virtual ~Intx2Mesh();
 
   /*

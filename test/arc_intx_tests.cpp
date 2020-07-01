@@ -22,10 +22,10 @@ void test_great_arc_intx()
 
   double E[3];
   double R=1.0;
-  ErrorCode rval = intersect_great_circle_arcs(A, B, C, D, R, E);
+  ErrorCode rval = moab::IntxUtils::intersect_great_circle_arcs(A, B, C, D, R, E);
   CHECK_ERR(rval);
   std::cout << "E: " << E[0] << " " << E[1] << " " << E[2] << "\n";
-  rval = intersect_great_circle_arcs(A, C, B, D, R, E);
+  rval = moab::IntxUtils::intersect_great_circle_arcs(A, C, B, D, R, E);
   CHECK(rval == MB_FAILURE);
 
 }
@@ -40,11 +40,11 @@ void test_great_arc_clat_intx()
   double E[9];
   double R=1.0;
   int np=0;
-  ErrorCode rval = intersect_great_circle_arc_with_clat_arc(A, B, C, D, R, E, np);
+  ErrorCode rval = moab::IntxUtils::intersect_great_circle_arc_with_clat_arc(A, B, C, D, R, E, np);
   CHECK_ERR(rval);
   std::cout << "E: " << E[0] << " " << E[1] << " " << E[2] << "\n";
   double F[3]={-d3, d3, d3};
-  rval = intersect_great_circle_arc_with_clat_arc(A, B, C, F, R, E, np);
+  rval = moab::IntxUtils::intersect_great_circle_arc_with_clat_arc(A, B, C, F, R, E, np);
   CHECK(rval == MB_FAILURE);
 }
 int main()
@@ -54,3 +54,4 @@ int main()
   failures += RUN_TEST(test_great_arc_clat_intx);
   return failures;
 }
+

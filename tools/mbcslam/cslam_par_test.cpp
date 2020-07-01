@@ -31,6 +31,7 @@
 #include "MBTagConventions.hpp"
 
 #include "moab/IntxMesh/IntxUtils.hpp"
+#include "IntxUtilsCSLAM.hpp"
 
 // for M_PI
 #include <math.h>
@@ -90,23 +91,19 @@ ErrorCode  compute_lagrange_mesh_on_sphere(Interface * mb, EntityHandle euler_se
    *  pos (t-dt) = pos(t) -Velo(t)*dt; this will be lagrange mesh, on each processor
    */
   Range quads;
-  ErrorCode rval = mb->get_entities_by_type(euler_set, MBQUAD, quads);
-  CHECK_ERR(rval);
+  ErrorCode rval = mb->get_entities_by_type(euler_set, MBQUAD, quads);MB_CHK_ERR(rval);
 
   Range connecVerts;
-  rval = mb->get_connectivity(quads, connecVerts);
-  CHECK_ERR(rval);
+  rval = mb->get_connectivity(quads, connecVerts);MB_CHK_ERR(rval);
 
   // the LOC tag, should be provided by the user?
   Tag tagh = 0;
   std::string tag_name("DP");
-  rval = mb->tag_get_handle(tag_name.c_str(), 3, MB_TYPE_DOUBLE, tagh, MB_TAG_DENSE | MB_TAG_CREAT);
-  CHECK_ERR(rval);
+  rval = mb->tag_get_handle(tag_name.c_str(), 3, MB_TYPE_DOUBLE, tagh, MB_TAG_DENSE | MB_TAG_CREAT);MB_CHK_ERR(rval);
   void *data; // pointer to the DP in memory, for each vertex
   int count;
 
-  rval = mb->tag_iterate(tagh, connecVerts.begin(), connecVerts.end(), count, data);
-  CHECK_ERR(rval);
+  rval = mb->tag_iterate(tagh, connecVerts.begin(), connecVerts.end(), count, data);MB_CHK_ERR(rval);
   // here we are checking contiguity
   assert(count == (int) connecVerts.size());
   double * ptr_DP=(double*)data;
@@ -114,13 +111,12 @@ ErrorCode  compute_lagrange_mesh_on_sphere(Interface * mb, EntityHandle euler_se
 
   Tag tagv = 0;
   std::string velo_tag_name("VELO");
-  rval = mb->tag_get_handle(velo_tag_name.c_str(), 3, MB_TYPE_DOUBLE, tagv, MB_TAG_DENSE);
-  CHECK_ERR(rval);
+  rval = mb->tag_get_handle(velo_tag_name.c_str(), 3, MB_TYPE_DOUBLE, tagv, MB_TAG_DENSE);MB_CHK_ERR(rval);
 
   /*void *datavelo; // pointer to the VELO in memory, for each vertex
 
   rval = mb->tag_iterate(tagv, connecVerts.begin(), connecVerts.end(), count, datavelo);
-  CHECK_ERR(rval);*/
+  MB_CHK_ERR(rval);*/
   // here we are checking contiguity
   assert(count == (int) connecVerts.size());
 // now put the vertices in the right place....
@@ -131,10 +127,10 @@ ErrorCode  compute_lagrange_mesh_on_sphere(Interface * mb, EntityHandle euler_se
     EntityHandle oldV=*vit;
     CartVect posi;
     rval = mb->get_coords(&oldV, 1, &(posi[0]) );
-    CHECK_ERR(rval);
+    MB_CHK_ERR(rval);
     CartVect velo;
     rval = mb->tag_get_data(tagv, &oldV, 1, (void *) &(velo[0]) );
-    CHECK_ERR(rval);
+    MB_CHK_ERR(rval);
     // do some mumbo jumbo, as in python script
     CartVect newPos = posi - deltaT*velo;
     double len1= newPos.length();
@@ -157,21 +153,17 @@ void test_intx_in_parallel_elem_based()
   Interface & mb = moab;
   EntityHandle euler_set;
   ErrorCode rval;
-  rval = mb.create_meshset(MESHSET_SET, euler_set);
-  CHECK_ERR(rval);
+  rval = mb.create_meshset(MESHSET_SET, euler_set);MB_CHK_ERR_RET(rval);
   std::string example(TestDir + "/" +  input_mesh_file);
 
   rval = mb.load_file(example.c_str(), &euler_set, opts.c_str());
 
-  ParallelComm* pcomm = ParallelComm::get_pcomm(&mb, 0);
-  CHECK_ERR(rval);
+  ParallelComm* pcomm = ParallelComm::get_pcomm(&mb, 0);MB_CHK_ERR_RET(rval);
 
-  rval = pcomm->check_all_shared_handles();
-  CHECK_ERR(rval);
+  rval = pcomm->check_all_shared_handles();MB_CHK_ERR_RET(rval);
 
   // everybody will get a DP tag, including the non owned entities; so exchange tags is not required for LOC (here)
-  rval = compute_lagrange_mesh_on_sphere(&mb, euler_set);
-  CHECK_ERR(rval);
+  rval = compute_lagrange_mesh_on_sphere(&mb, euler_set);MB_CHK_ERR_RET(rval);
 
   int rank = pcomm->proc_config().proc_rank();
 
@@ -193,30 +185,27 @@ void test_intx_in_parallel_elem_based()
   rval = worker.FindMaxEdges(euler_set, euler_set); // departure will be the same max_edges
   // we need to make sure the covering set is bigger than the euler mesh
   EntityHandle covering_lagr_set;
-  rval = mb.create_meshset(MESHSET_SET, covering_lagr_set);
-  CHECK_ERR(rval);
+  rval = mb.create_meshset(MESHSET_SET, covering_lagr_set);MB_CHK_ERR_RET(rval);
 
-  rval = worker.create_departure_mesh_2nd_alg(euler_set, covering_lagr_set);
-  CHECK_ERR(rval);
+  rval = worker.create_departure_mesh_2nd_alg(euler_set, covering_lagr_set);MB_CHK_ERR_RET(rval);
 
   std::stringstream ss;
   ss<<"partial" << rank<<".vtk";
   mb.write_file(ss.str().c_str(), 0, 0, &covering_lagr_set, 1);
   EntityHandle outputSet;
-  rval = mb.create_meshset(MESHSET_SET, outputSet);
-  CHECK_ERR(rval);
-  rval = worker.intersect_meshes(covering_lagr_set, euler_set, outputSet);
-  CHECK_ERR(rval);
+  rval = mb.create_meshset(MESHSET_SET, outputSet);MB_CHK_ERR_RET(rval);
+  rval = worker.intersect_meshes(covering_lagr_set, euler_set, outputSet);MB_CHK_ERR_RET(rval);
 
   //std::string opts_write("PARALLEL=WRITE_PART");
   //rval = mb.write_file("manuf.h5m", 0, opts_write.c_str(), &outputSet, 1);
   //std::string opts_write("");
   std::stringstream outf;
   outf<<"intersect" << rank<<".h5m";
-  rval = mb.write_file(outf.str().c_str(), 0, 0, &outputSet, 1);
-  double intx_area = area_on_sphere(&mb, outputSet, Radius);
-  double arrival_area = area_on_sphere(&mb, euler_set, Radius) ;
+  rval = mb.write_file(outf.str().c_str(), 0, 0, &outputSet, 1);MB_CHK_ERR_RET(rval);
+
+  moab::IntxAreaUtils sphAreaUtils;
+  double intx_area = sphAreaUtils.area_on_sphere(&mb, outputSet, Radius);
+  double arrival_area = sphAreaUtils.area_on_sphere(&mb, euler_set, Radius) ;
   std::cout<< "On rank : " << rank << " arrival area: " << arrival_area<<
       "  intersection area:" << intx_area << " rel error: " << fabs((intx_area-arrival_area)/arrival_area) << "\n";
-  CHECK_ERR(rval);
 }

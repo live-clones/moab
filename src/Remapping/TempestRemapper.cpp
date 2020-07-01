@@ -1242,8 +1242,11 @@ ErrorCode TempestRemapper::ComputeOverlapMesh ( bool kdtree_search, bool use_tem
 #endif
 
         // Fix any inconsistencies in the overlap mesh
-        rval = fix_degenerate_quads(m_interface, m_overlap_set);MB_CHK_ERR(rval);
-        rval = positive_orientation(m_interface, m_overlap_set, 1.0 /*radius*/);MB_CHK_ERR(rval);
+        {
+          IntxAreaUtils areaAdaptor;
+          rval = IntxUtils::fix_degenerate_quads(m_interface, m_overlap_set);MB_CHK_ERR(rval);
+          rval = areaAdaptor.positive_orientation(m_interface, m_overlap_set, 1.0 /*radius*/);MB_CHK_ERR(rval);
+        }
 
         // Now let us re-convert the MOAB mesh back to Tempest representation
         rval = this->ComputeGlobalLocalMaps();MB_CHK_ERR(rval);

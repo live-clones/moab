@@ -11,9 +11,12 @@
 #include "Intx2Mesh.hpp"
 namespace moab {
 
-class Intx2MeshInPlane: public moab::Intx2Mesh {
+class Intx2MeshInPlane: public moab::Intx2Mesh
+{
 public:
+
   Intx2MeshInPlane(Interface * mbimpl);
+
   virtual ~Intx2MeshInPlane();
 
   double setup_tgt_cell(EntityHandle tgt, int & nsTgt);
@@ -25,5 +28,6 @@ public:
   ErrorCode findNodes(EntityHandle tgt, int nsTgt, EntityHandle src, int nsSrc, double * iP, int nP);
 
 };
+
 } // end namespace moab
 #endif /* INTX2MESHINPLANE_HPP_ */

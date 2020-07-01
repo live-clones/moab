@@ -4,7 +4,8 @@
  *  Created on: Oct 3, 2012
  */
 
-#include <math.h>
+#include <cmath>
+#include <cassert>
 #include "moab/IntxMesh/IntxUtils.hpp"
 // this is from mbcoupler; maybe it should be moved somewhere in moab src
 // right now, add a dependency to mbcoupler
@@ -23,24 +24,16 @@
 #endif
 #include <queue>
 
+#ifdef MOAB_HAVE_TEMPESTREMAP
+#include "GridElements.h"
+#endif
+
 namespace moab {
 
 #define CORRTAGNAME "__correspondent"
 #define MAXEDGES 10
 
-#define CHECK_ERR( A )   if (MB_SUCCESS!=A) { std::cout << "error:" <<  __LINE__ <<" " << __FILE__ "\n"; return rval;}
-
-
-// vec utilities that could be common between quads on a plane or sphere
-double dist2(double * a, double * b) {
-  double abx = b[0] - a[0], aby = b[1] - a[1];
-  return sqrt(abx * abx + aby * aby);
-}
-double area2D(double *a, double *b, double *c) {
-  // (b-a)x(c-a) / 2
-  return ((b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0])) / 2;
-}
-int borderPointsOfXinY2(double * X, int nX, double * Y, int nY, double * P,
+int IntxUtils::borderPointsOfXinY2(double * X, int nX, double * Y, int nY, double * P,
     int * side, double epsilon_area) {
   // 2 triangles, 3 corners, is the corner of X in Y?
   // Y must have a positive area
@@ -56,7 +49,6 @@ int borderPointsOfXinY2(double * X, int nX, double * Y, int nY, double * P,
     int inside = 1;
     for (int j = 0; j < nY; j++) {
       double * B = Y + 2 * j;
-
       int j1 = (j + 1) % nY;
       double * C = Y + 2 * j1; // no copy of data
 
@@ -89,9 +81,10 @@ bool angleCompare(angleAndIndex lhs, angleAndIndex rhs)
 { return lhs.angle < rhs.angle; }
 
 // nP might be modified too, we will remove duplicates if found
-int SortAndRemoveDoubles2(double * P, int & nP, double epsilon_1) {
+int IntxUtils::SortAndRemoveDoubles2(double * P, int & nP, double epsilon_1) {
   if (nP < 2)
     return 0; // nothing to do
+
   // center of gravity for the points
   double c[2] = { 0., 0. };
   int k = 0;
@@ -161,7 +154,7 @@ int SortAndRemoveDoubles2(double * P, int & nP, double epsilon_1) {
 
 // the marks will show what edges of blue intersect the red
 
-ErrorCode EdgeIntersections2(double * blue, int nsBlue, double * red, int nsRed,
+ErrorCode IntxUtils::EdgeIntersections2(double * blue, int nsBlue, double * red, int nsRed,
     int * markb, int * markr, double * points, int & nPoints) {
   /* EDGEINTERSECTIONS computes edge intersections of two elements
    [P,n]=EdgeIntersections(X,Y) computes for the two given elements  * red
@@ -216,7 +209,7 @@ ErrorCode EdgeIntersections2(double * blue, int nsBlue, double * red, int nsRed,
 }
 
 // special one, for intersection between rll (constant latitude)  and cs quads
-ErrorCode EdgeIntxRllCs(double * blue, CartVect * bluec, int * blueEdgeType,
+ErrorCode IntxUtils::EdgeIntxRllCs(double * blue, CartVect * bluec, int * blueEdgeType,
     int nsBlue, double * red, CartVect * redc, int nsRed, int * markb,
     int * markr, int plane, double R, double * points, int & nPoints) {
   // if blue edge type is 1, intersect in 3d then project to 2d by gnomonic projection
@@ -303,7 +296,7 @@ ErrorCode EdgeIntxRllCs(double * blue, CartVect * bluec, int * blueEdgeType,
  * projection on the plane will preserve the orientation, such that a triangle, quad pointing
  * outside the sphere will have a positive orientation in the projection plane
  */
-void decide_gnomonic_plane(const CartVect & pos, int & plane) {
+void IntxUtils::decide_gnomonic_plane(const CartVect & pos, int & plane) {
   // decide plane, based on max x, y, z
   if (fabs(pos[0]) < fabs(pos[1])) {
     if (fabs(pos[2]) < fabs(pos[1])) {
@@ -336,8 +329,9 @@ void decide_gnomonic_plane(const CartVect & pos, int & plane) {
   }
   return;
 }
+
 // point on a sphere is projected on one of six planes, decided earlier
-ErrorCode gnomonic_projection(const CartVect & pos, double R, int plane, double & c1,
+ErrorCode IntxUtils::gnomonic_projection(const CartVect & pos, double R, int plane, double & c1,
     double & c2) {
   double alfa = 1.; // the new point will be on line alfa*pos
 
@@ -392,7 +386,7 @@ ErrorCode gnomonic_projection(const CartVect & pos, double R, int plane, double 
 }
 
 // given the position on plane (one out of 6), find out the position on sphere
-ErrorCode reverse_gnomonic_projection(const double & c1, const double & c2, double R,
+ErrorCode IntxUtils::reverse_gnomonic_projection(const double & c1, const double & c2, double R,
     int plane, CartVect & pos) {
 
   // the new point will be on line beta*pos
@@ -480,7 +474,7 @@ ErrorCode reverse_gnomonic_projection(const double & c1, const double & c2, doub
 
  end function cart_to_spherical
  */
-SphereCoords cart_to_spherical(CartVect & cart3d) {
+IntxUtils::SphereCoords IntxUtils::cart_to_spherical(CartVect & cart3d) {
   SphereCoords res;
   res.R = cart3d.length();
   if (res.R < 0) {
@@ -496,6 +490,7 @@ SphereCoords cart_to_spherical(CartVect & cart3d) {
 
   return res;
 }
+
 /*
  * ! ===================================================================
  ! spherical_to_cart:
@@ -514,7 +509,7 @@ SphereCoords cart_to_spherical(CartVect & cart3d) {
 
  end function spherical_to_cart
  */
-CartVect spherical_to_cart(SphereCoords & sc) {
+CartVect IntxUtils::spherical_to_cart(IntxUtils::SphereCoords & sc) {
   CartVect res;
   res[0] = sc.R * cos(sc.lat) * cos(sc.lon); // x coordinate
   res[1] = sc.R * cos(sc.lat) * sin(sc.lon); // y
@@ -522,7 +517,7 @@ CartVect spherical_to_cart(SphereCoords & sc) {
   return res;
 }
 
-ErrorCode ScaleToRadius(Interface * mb, EntityHandle set, double R) {
+ErrorCode IntxUtils::ScaleToRadius(Interface * mb, EntityHandle set, double R) {
   Range nodes;
   ErrorCode rval = mb->get_entities_by_type(set, MBVERTEX, nodes, true); // recursive
   if (rval != moab::MB_SUCCESS)
@@ -548,7 +543,7 @@ ErrorCode ScaleToRadius(Interface * mb, EntityHandle set, double R) {
 }
 
 // assume they are one the same sphere
-double spherical_angle(double * A, double * B, double * C, double Radius) {
+double IntxAreaUtils::spherical_angle(double * A, double * B, double * C, double Radius) {
   // the angle by definition is between the planes OAB and OBC
   CartVect a(A);
   CartVect b(B);
@@ -562,9 +557,10 @@ double spherical_angle(double * A, double * B, double * C, double Radius) {
   CartVect normalOCB = c * b;
   return angle(normalOAB, normalOCB);
 }
+
 // could be bigger than M_PI;
 // angle at B could be bigger than M_PI, if the orientation is such that ABC points toward the interior
-double oriented_spherical_angle(double * A, double * B, double * C) {
+double IntxUtils::oriented_spherical_angle(double * A, double * B, double * C) {
   // assume the same radius, sphere at origin
   CartVect a(A), b(B), c(C);
   CartVect normalOAB = a * b;
@@ -580,9 +576,39 @@ double oriented_spherical_angle(double * A, double * B, double * C) {
     return (2 * M_PI - ang); // the other angle, supplement
 
   return ang;
-
 }
-double area_spherical_triangle(double *A, double *B, double *C, double Radius) {
+
+double IntxAreaUtils::area_spherical_triangle(double *A, double *B, double *C, double Radius) {
+  switch(m_eAreaMethod)
+  {
+    case Girard:
+      return area_spherical_triangle_girard(A, B, C, Radius);
+#ifdef MOAB_HAVE_TEMPESTREMAP
+    case GaussQuadrature:
+      return area_spherical_triangle_GQ(A, B, C, Radius);
+#endif
+    case lHuiller:
+    default:
+      return area_spherical_triangle_lHuiller(A, B, C, Radius);
+  }
+}
+
+double IntxAreaUtils::area_spherical_polygon(double * A, int N, double Radius, int *sign) {
+  switch(m_eAreaMethod)
+  {
+    case Girard:
+      return area_spherical_polygon_girard(A, N, Radius);
+#ifdef MOAB_HAVE_TEMPESTREMAP
+    case GaussQuadrature:
+      return area_spherical_polygon_GQ(A, N, Radius);
+#endif
+    case lHuiller:
+    default:
+      return area_spherical_polygon_lHuiller(A, N, Radius, sign);
+  }
+}
+
+double IntxAreaUtils::area_spherical_triangle_girard(double *A, double *B, double *C, double Radius) {
   double correction = spherical_angle(A, B, C, Radius)
       + spherical_angle(B, C, A, Radius)
       + spherical_angle(C, A, B, Radius)-M_PI;
@@ -594,10 +620,9 @@ double area_spherical_triangle(double *A, double *B, double *C, double Radius) {
     return area;
   else
     return -area;
-
 }
 
-double area_spherical_polygon(double * A, int N, double Radius) {
+double IntxAreaUtils::area_spherical_polygon_girard(double * A, int N, double Radius) {
   // this should work for non-convex polygons too
   // assume that the A, A+3, ..., A+3*(N-1) are the coordinates
   //
@@ -607,12 +632,66 @@ double area_spherical_polygon(double * A, int N, double Radius) {
   for (int i = 0; i < N; i++) {
     int i1 = (i + 1) % N;
     int i2 = (i + 2) % N;
-    sum_angles += oriented_spherical_angle(A + 3 * i, A + 3 * i1, A + 3 * i2);
+    sum_angles += IntxUtils::oriented_spherical_angle(A + 3 * i, A + 3 * i1, A + 3 * i2);
   }
   double correction = sum_angles - (N - 2) * M_PI;
   return Radius * Radius * correction;
-
 }
+
+double IntxAreaUtils::area_spherical_polygon_lHuiller(double * A, int N, double Radius, int * sign) {
+  // This should work for non-convex polygons too
+  // In the input vector A, assume that the A, A+3, ..., A+3*(N-1) are the coordinates
+  // We also assume that the orientation is positive;
+  // If negative orientation, the area will be negative
+  if (N <= 2)
+    return 0.;
+  
+  int lsign = 1; // assume positive orientain
+  double area = 0.;
+  for (int i = 1; i < N - 1; i++) {
+    int i1 = i + 1;
+    double areaTriangle = area_spherical_triangle_lHuiller(A, A + 3 * i, A + 3 * i1, Radius);
+    if (areaTriangle<0)
+      lsign = -1; // signal that we have at least one triangle with negative orientation ; possible nonconvex polygon
+    area += areaTriangle;
+  }
+  if (sign) *sign = lsign;
+
+  return area;
+}
+
+#ifdef MOAB_HAVE_TEMPESTREMAP
+double IntxAreaUtils::area_spherical_polygon_GQ(double * A, int N, double Radius) {
+  // this should work for non-convex polygons too
+  // In the input vector A, assume that the A, A+3, ..., A+3*(N-1) are the coordinates
+  // We also assume that the orientation is positive;
+  // If negative orientation, the area can be negative
+  if (N <= 2)
+    return 0.;
+  
+  // assume positive orientain
+  double area = 0.;
+  for (int i = 1; i < N - 1; i++) {
+    int i1 = i + 1;
+    area += area_spherical_triangle_GQ(A, A + 3 * i, A + 3 * i1, Radius);
+  }
+  return area;
+}
+
+/* compute the area by using Gauss-Quadratures; use TR interfaces directly */
+double IntxAreaUtils::area_spherical_triangle_GQ(double * ptA, double * ptB, double * ptC, double ) {
+  Face face(3);
+  NodeVector nodes(3);
+  nodes[0] = Node(ptA[0], ptA[1], ptA[2]);
+  nodes[1] = Node(ptB[0], ptB[1], ptB[2]);
+  nodes[2] = Node(ptC[0], ptC[1], ptC[2]);
+  face.SetNode(0, 0);
+  face.SetNode(1, 1);
+  face.SetNode(2, 2);
+  return CalculateFaceArea(face, nodes);
+}
+#endif
+
 /*
  *  l'Huiller's formula for spherical triangle
  *  http://williams.best.vwh.net/avform.htm
@@ -639,9 +718,9 @@ double area_spherical_polygon(double * A, int N, double Radius) {
  *
  *  E = 4*atan(sqrt(tan(s/2)*tan((s-a)/2)*tan((s-b)/2)*tan((s-c)/2)))
  */
-
-double area_spherical_triangle_lHuiller(double * ptA, double * ptB,
+double IntxAreaUtils::area_spherical_triangle_lHuiller(double * ptA, double * ptB,
     double * ptC, double Radius) {
+
   // now, a is angle BOC, O is origin
   CartVect vA(ptA), vB(ptB), vC(ptC);
   double a = angle(vB, vC);
@@ -651,13 +730,13 @@ double area_spherical_triangle_lHuiller(double * ptA, double * ptB,
   if ((vA * vB) % vC < 0)
     sign = -1;
   double s = (a + b + c) / 2;
-  double tmp = tan(s / 2) * tan((s - a) / 2) * tan((s - b) / 2)
-      * tan((s - c) / 2);
-  if (tmp < 0.)
-    tmp = 0.;
+  double tmp = tan(s / 2) * tan((s - a) / 2) * tan((s - b) / 2) * tan((s - c) / 2);
+  if (tmp < 0.) tmp = 0.;
+
   double E = 4 * atan(sqrt(tmp));
   if (E != E)
     std::cout << " NaN at spherical triangle area \n";
+
   double area=sign * E * Radius * Radius;
 
 #ifdef CHECKNEGATIVEAREA
@@ -674,150 +753,68 @@ double area_spherical_triangle_lHuiller(double * ptA, double * ptB,
     std::cout << " c: " << c << "\n";
   }
 #endif
+
   return area;
 }
 #undef CHECKNEGATIVEAREA
 
-double area_spherical_polygon_lHuiller(double * A, int N, double Radius) {
-  // this should work for non-convex polygons too
-  // assume that the A, A+3, ..., A+3*(N-1) are the coordinates
-  //
-  // assume that the orientation is positive;
-  // if negative orientation, the area will be negative
-  if (N <= 2)
-    return 0.;
-  double area = 0.;
-  for (int i = 1; i < N - 1; i++) {
-    int i1 = i + 1;
-    area += area_spherical_triangle_lHuiller(A, A + 3 * i, A + 3 * i1, Radius);
-  }
-  return area;
-}
-
-double area_spherical_polygon_lHuiller_check_sign(double * A, int N, double Radius, int * sign) {
-  // this should work for non-convex polygons too
-  // assume that the A, A+3, ..., A+3*(N-1) are the coordinates
-  //
-  // assume that the orientation is positive;
-  // if negative orientation, the area will be negative
-  if (N <= 2)
-    return 0.;
-  *sign = 1; // assume positive orientain
-  double area = 0.;
-  for (int i = 1; i < N - 1; i++) {
-    int i1 = i + 1;
-    double areaTriangle = area_spherical_triangle_lHuiller(A, A + 3 * i, A + 3 * i1, Radius);
-    if (areaTriangle<0)
-      *sign = -1; // signal that we have at least one triangle with negative orientation ; possible nonconvex polygon
-    area += areaTriangle;
-  }
-  return area;
-}
-
-
-double area_on_sphere(Interface * mb, EntityHandle set, double R) {
-  // get all entities of dimension 2
-  // then get the connectivity, etc
+double IntxAreaUtils::area_on_sphere(Interface * mb, EntityHandle set, double R) {
+  // Get all entities of dimension 2
   Range inputRange;
-  ErrorCode rval = mb->get_entities_by_dimension(set, 2, inputRange);
-  if (MB_SUCCESS != rval)
-    return -1;
+  ErrorCode rval = mb->get_entities_by_dimension(set, 2, inputRange);MB_CHK_ERR_RET_VAL(rval, -1.0);
 
+  // Filter by elements that are owned by current process
   std::vector<int> ownerinfo(inputRange.size(), -1);
   Tag intxOwnerTag;
   rval = mb->tag_get_handle ( "ORIG_PROC", intxOwnerTag );
   if (MB_SUCCESS == rval) {
-    rval = mb->tag_get_data(intxOwnerTag, inputRange, &ownerinfo[0]);
-    if (MB_SUCCESS != rval)
-      return -1;
+    rval = mb->tag_get_data(intxOwnerTag, inputRange, &ownerinfo[0]);MB_CHK_ERR_RET_VAL(rval, -1.0);
   }
 
   // compare total area with 4*M_PI * R^2
   int ie = 0;
   double total_area = 0.;
-  for (Range::iterator eit = inputRange.begin(); eit != inputRange.end();
-      ++eit) {
-    if (ownerinfo[ie++] >= 0) continue; // All zero/positive owner data represents ghosted elems
+  for (Range::iterator eit = inputRange.begin(); eit != inputRange.end(); ++eit) {
+
+    // All zero/positive owner data represents ghosted elems
+    if (ownerinfo[ie++] >= 0) continue; 
 
     EntityHandle eh = *eit;
-    // get the nodes, then the coordinates
-    const EntityHandle * verts;
-    int num_nodes;
-    rval = mb->get_connectivity(eh, verts, num_nodes);
-    if (MB_SUCCESS != rval)
-      return -1;
-    int nsides = num_nodes;
-    // account for possible padded polygons
-    while (verts[nsides - 2] == verts[nsides - 1] && nsides > 3)
-      nsides--;
+    const double elem_area = this->area_spherical_element(mb, eh, R);
 
-    std::vector<double> coords(3 * nsides);
-    // get coordinates
-    rval = mb->get_coords(verts, nsides, &coords[0]);
-    if (MB_SUCCESS != rval)
-      return -1;
-    total_area += area_spherical_polygon(&coords[0], nsides, R);
+    // check whether the area of the spherical element is positive.
+    assert(elem_area > 0);
+
+    // sum up the contribution
+    total_area += elem_area;
   }
+
+  // return total mesh area
   return total_area;
 }
 
-double area_on_sphere_lHuiller(Interface * mb, EntityHandle set, double R) {
-  // get all entities of dimension 2
-  // then get the connectivity, etc
-  Range inputRange;
-  ErrorCode rval = mb->get_entities_by_dimension(set, 2, inputRange);
-  if (MB_SUCCESS != rval)
-    return -1;
 
-  std::vector<int> ownerinfo(inputRange.size(), -1);
-  Tag intxOwnerTag;
-  rval = mb->tag_get_handle ( "ORIG_PROC", intxOwnerTag );
-  if (MB_SUCCESS == rval) {
-    rval = mb->tag_get_data(intxOwnerTag, inputRange, &ownerinfo[0]);
-    if (MB_SUCCESS != rval)
-      return -1;
-  }
-
-  int ie = 0;
-  double total_area = 0.;
-  for (Range::iterator eit = inputRange.begin(); eit != inputRange.end();
-      ++eit) {
-    if (ownerinfo[ie++] >= 0) continue; // All zero/positive owner data represents ghosted elems
-    EntityHandle eh = *eit;
-    // get the nodes, then the coordinates
-    const EntityHandle * verts;
-    int num_nodes;
-    rval = mb->get_connectivity(eh, verts, num_nodes);
-    if (MB_SUCCESS != rval)
-      return -1;
-    std::vector<double> coords(3 * num_nodes);
-    // get coordinates
-    rval = mb->get_coords(verts, num_nodes, &coords[0]);
-    if (MB_SUCCESS != rval)
-      return -1;
-    total_area += area_spherical_polygon_lHuiller(&coords[0], num_nodes, R);
-  }
-  return total_area;
-}
-
-double area_spherical_element(Interface * mb, EntityHandle elem, double R) {
+double IntxAreaUtils::area_spherical_element(Interface * mb, EntityHandle elem, double R)
+{
+  // get the nodes, then the coordinates
   const EntityHandle * verts;
-  int num_nodes;
-  ErrorCode rval = mb->get_connectivity(elem, verts, num_nodes);
-  if (MB_SUCCESS != rval)
-    return -1;
-  std::vector<double> coords(3 * num_nodes);
-  // get coordinates
-  rval = mb->get_coords(verts, num_nodes, &coords[0]);
-  if (MB_SUCCESS != rval)
-    return -1;
-  return area_spherical_polygon_lHuiller(&coords[0], num_nodes, R);
+  int nsides;
+  ErrorCode rval = mb->get_connectivity(elem, verts, nsides);MB_CHK_ERR_RET_VAL(rval, -1.0);
 
+  // account for possible padded polygons
+  while (verts[nsides - 2] == verts[nsides - 1] && nsides > 3)
+    nsides--;
+
+  // get coordinates
+  std::vector<double> coords(3 * nsides);
+  rval = mb->get_coords(verts, nsides, &coords[0]);MB_CHK_ERR_RET_VAL(rval, -1.0);
+
+  // compute and return the area of the polygonal element
+  return area_spherical_polygon(&coords[0], nsides, R);
 }
-/*
- *
- */
-double distance_on_great_circle(CartVect & p1, CartVect & p2) {
+
+
+double IntxUtils::distance_on_great_circle(CartVect & p1, CartVect & p2) {
   SphereCoords sph1 = cart_to_spherical(p1);
   SphereCoords sph2 = cart_to_spherical(p2);
   // radius should be the same
@@ -826,78 +823,11 @@ double distance_on_great_circle(CartVect & p1, CartVect & p2) {
           sin(sph1.lon) * sin(sph2.lon)
               + cos(sph1.lat) * cos(sph2.lat) * cos(sph2.lon - sph2.lon));
 }
-/*
- * based on paper A class of deformational flow test cases for linear transport problems on the sphere
- *  longitude lambda [0.. 2*pi) and latitude theta (-pi/2, pi/2)
- *  lambda: -> lon (0, 2*pi)
- *  theta : -> lat (-pi/2, po/2)
- *  Radius of the sphere is 1 (if not, everything gets multiplied by 1)
- *
- *  cosine bell: center lambda0, theta0:
- */
-void departure_point_case1(CartVect & arrival_point, double t, double delta_t,
-    CartVect & departure_point) {
-  // always assume radius is 1 here?
-  SphereCoords sph = cart_to_spherical(arrival_point);
-  double T = 5; // duration of integration (5 units)
-  double k = 2.4; //flow parameter
-  /*     radius needs to be within some range   */
-  double sl2 = sin(sph.lon / 2);
-  double pit = M_PI * t / T;
-  double omega = M_PI / T;
-  double costetha = cos(sph.lat);
-  //double u = k * sl2*sl2 * sin(2*sph.lat) * cos(pit);
-  double v = k * sin(sph.lon) * costetha * cos(pit);
-  //double psi = k * sl2 * sl2 *costetha * costetha * cos(pit);
-  double u_tilda = 2 * k * sl2 * sl2 * sin(sph.lat) * cos(pit);
 
-  // formula 35, page 8
-  // this will approximate dep point using a Taylor series with up to second derivative
-  // this will be O(delta_t^3) exact.
-  double lon_dep = sph.lon - delta_t * u_tilda
-      - delta_t * delta_t * k * sl2
-          * (sl2 * sin(sph.lat) * sin(pit) * omega
-              - u_tilda * sin(sph.lat) * cos(pit) * cos(sph.lon / 2)
-              - v * sl2 * costetha * cos(pit));
-  // formula 36, page 8 again
-  double lat_dep = sph.lat - delta_t * v
-      - delta_t * delta_t / 4 * k
-          * (sin(sph.lon) * cos(sph.lat) * sin(pit) * omega
-              - u_tilda * cos(sph.lon) * cos(sph.lat) * cos(pit)
-              + v * sin(sph.lon) * sin(sph.lat) * cos(pit));
-  SphereCoords sph_dep;
-  sph_dep.R = 1.; // radius
-  sph_dep.lat = lat_dep;
-  sph_dep.lon = lon_dep;
-
-  departure_point = spherical_to_cart(sph_dep);
-  return;
-}
-
-void velocity_case1(CartVect & arrival_point, double t, CartVect & velo) {
-  // always assume radius is 1 here?
-  SphereCoords sph = cart_to_spherical(arrival_point);
-  double T = 5; // duration of integration (5 units)
-  double k = 2.4; //flow parameter
-  /*     radius needs to be within some range   */
-  double sl2 = sin(sph.lon / 2);
-  double pit = M_PI * t / T;
-  //double omega = M_PI/T;
-  double coslat = cos(sph.lat);
-  double sinlat = sin(sph.lat);
-  double sinlon = sin(sph.lon);
-  double coslon = cos(sph.lon);
-  double u = k * sl2 * sl2 * sin(2 * sph.lat) * cos(pit);
-  double v = k / 2 * sinlon * coslat * cos(pit);
-  velo[0] = -u * sinlon - v * sinlat * coslon;
-  velo[1] = u * coslon - v * sinlat * sinlon;
-  velo[2] = v * coslat;
-
-}
 // break the nonconvex quads into triangles; remove the quad from the set? yes.
 // maybe radius is not needed;
 //
-ErrorCode enforce_convexity(Interface * mb, EntityHandle lset, int my_rank) {
+ErrorCode IntxUtils::enforce_convexity(Interface * mb, EntityHandle lset, int my_rank) {
   // look at each polygon; compute all angles; if one is reflex, break that angle with
   // the next triangle; put the 2 new polys in the set;
   // still look at the next poly
@@ -975,7 +905,7 @@ ErrorCode enforce_convexity(Interface * mb, EntityHandle lset, int my_rank) {
       double * A = &coords[3 * i];
       double * B = &coords[3 * ((i + 1) % nsides)];
       double * C = &coords[3 * ((i + 2) % nsides)];
-      double angle = oriented_spherical_angle(A, B, C);
+      double angle = IntxUtils::oriented_spherical_angle(A, B, C);
       if (angle - M_PI > 0.) // even almost reflex is bad; break it!
           {
         if (alreadyBroken) {
@@ -983,9 +913,9 @@ ErrorCode enforce_convexity(Interface * mb, EntityHandle lset, int my_rank) {
           mb->list_entities(verts, nsides);
           double * D = &coords[3 * ((i + 3) % nsides)];
           std::cout << "ABC: " << angle << " \n";
-          std::cout << "BCD: " << oriented_spherical_angle(B, C, D) << " \n";
-          std::cout << "CDA: " << oriented_spherical_angle(C, D, A) << " \n";
-          std::cout << "DAB: " << oriented_spherical_angle(D, A, B) << " \n";
+          std::cout << "BCD: " << IntxUtils::oriented_spherical_angle(B, C, D) << " \n";
+          std::cout << "CDA: " << IntxUtils::oriented_spherical_angle(C, D, A) << " \n";
+          std::cout << "DAB: " << IntxUtils::oriented_spherical_angle(D, A, B) << " \n";
           std::cout
               << " this cell has at least 2 angles > 180, it has serious issues\n";
 
@@ -1063,142 +993,10 @@ ErrorCode enforce_convexity(Interface * mb, EntityHandle lset, int my_rank) {
       << " concave polygons were decomposed in convex ones \n";
   return MB_SUCCESS;
 }
-ErrorCode create_span_quads(Interface * mb, EntityHandle euler_set, int rank) {
-  // first get all edges adjacent to polygons
-  Tag dpTag = 0;
-  std::string tag_name("DP");
-  ErrorCode rval = mb->tag_get_handle(tag_name.c_str(), 3, MB_TYPE_DOUBLE,
-      dpTag, MB_TAG_DENSE);
-  // if the tag does not exist, get out early
-  if (rval != MB_SUCCESS)
-    return rval;
-  Range polygons;
-  rval = mb->get_entities_by_dimension(euler_set, 2, polygons);
-  if (MB_SUCCESS != rval)
-    return rval;
-  Range iniEdges;
-  rval = mb->get_adjacencies(polygons, 1, false, iniEdges, Interface::UNION);
-  if (MB_SUCCESS != rval)
-    return rval;
-  // now create some if missing
-  Range allEdges;
-  rval = mb->get_adjacencies(polygons, 1, true, allEdges, Interface::UNION);
-  if (MB_SUCCESS != rval)
-    return rval;
-  // create the vertices at the DP points, and the quads after that
-  Range verts;
-  rval = mb->get_connectivity(polygons, verts);
-  if (MB_SUCCESS != rval)
-    return rval;
-  int num_verts = (int) verts.size();
-  // now see the departure points; to what boxes should we send them?
-  std::vector<double> dep_points(3 * num_verts);
-  rval = mb->tag_get_data(dpTag, verts, (void*) &dep_points[0]);
-  if (MB_SUCCESS != rval)
-    return rval;
-
-  // create vertices corresponding to dp locations
-  ReadUtilIface *read_iface;
-  rval = mb->query_interface(read_iface);
-  if (MB_SUCCESS != rval)
-    return rval;
-  std::vector<double *> coords;
-  EntityHandle start_vert, start_elem, *connect;
-  // create verts, num is 2(nquads+1) because they're in a 1d row; will initialize coords in loop over quads later
-  rval = read_iface->get_node_coords(3, num_verts, 0, start_vert, coords);
-  if (MB_SUCCESS != rval)
-    return rval;
-  // fill it up
-  // Cppcheck warning (false positive): variable coords is assigned a value that is never used
-  for (int i = 0; i < num_verts; i++) {
-    // block from interleaved
-    coords[0][i] = dep_points[3 * i];
-    coords[1][i] = dep_points[3 * i + 1];
-    coords[2][i] = dep_points[3 * i + 2];
-  }
-  // create quads; one quad for each edge
-  rval = read_iface->get_element_connect(allEdges.size(), 4, MBQUAD, 0,
-      start_elem, connect);
-  if (MB_SUCCESS != rval)
-    return rval;
-
-  const EntityHandle * edge_conn = NULL;
-  int quad_index = 0;
-  EntityHandle firstVertHandle = verts[0]; // assume vertices are contiguous...
-  for (Range::iterator eit = allEdges.begin(); eit != allEdges.end();
-      ++eit, quad_index++) {
-    EntityHandle edge = *eit;
-    int num_nodes;
-    rval = mb->get_connectivity(edge, edge_conn, num_nodes);
-    if (MB_SUCCESS != rval)
-      return rval;
-    connect[quad_index * 4] = edge_conn[0];
-    connect[quad_index * 4 + 1] = edge_conn[1];
-
-    // maybe some indexing in range?
-    connect[quad_index * 4 + 2] = start_vert + edge_conn[1] - firstVertHandle;
-    connect[quad_index * 4 + 3] = start_vert + edge_conn[0] - firstVertHandle;
-  }
-
-  Range quads(start_elem, start_elem + allEdges.size() - 1);
-  EntityHandle outSet;
-  rval = mb->create_meshset(MESHSET_SET, outSet);
-  if (MB_SUCCESS != rval)
-    return rval;
-  mb->add_entities(outSet, quads);
-
-  Tag colTag;
-  rval = mb->tag_get_handle("COLOR_ID", 1, MB_TYPE_INTEGER, colTag,
-      MB_TAG_DENSE | MB_TAG_CREAT);
-  if (MB_SUCCESS != rval)
-    return rval;
-  int j = 1;
-  for (Range::iterator itq = quads.begin(); itq != quads.end(); ++itq, j++) {
-    EntityHandle q = *itq;
-    rval = mb->tag_set_data(colTag, &q, 1, &j);
-    if (MB_SUCCESS != rval)
-      return rval;
-  }
-  std::stringstream outf;
-  outf << "SpanQuads" << rank << ".h5m";
-  rval = mb->write_file(outf.str().c_str(), 0, 0, &outSet, 1);
-  if (MB_SUCCESS != rval)
-    return rval;
-  EntityHandle outSet2;
-  rval = mb->create_meshset(MESHSET_SET, outSet2);
-  if (MB_SUCCESS != rval)
-    return rval;
-
-  Range quadEdges;
-  rval = mb->get_adjacencies(quads, 1, true, quadEdges, Interface::UNION);
-  if (MB_SUCCESS != rval)
-    return rval;
-  mb->add_entities(outSet2, quadEdges);
-
-  std::stringstream outf2;
-  outf2 << "SpanEdges" << rank << ".h5m";
-  rval = mb->write_file(outf2.str().c_str(), 0, 0, &outSet2, 1);
-  if (MB_SUCCESS != rval)
-    return rval;
-
-// maybe some clean up
-  mb->delete_entities(&outSet, 1);
-  mb->delete_entities(&outSet2, 1);
-  mb->delete_entities(quads);
-  Range new_edges = subtract(allEdges, iniEdges);
-  mb->delete_entities(new_edges);
-  new_edges = subtract(quadEdges, iniEdges);
-  mb->delete_entities(new_edges);
-  Range new_verts(start_vert, start_vert + num_verts);
-  mb->delete_entities(new_verts);
-
-  return MB_SUCCESS;
-
-}
 
 // looking at quad connectivity, collapse to triangle if 2 nodes equal
 // then delete the old quad
-ErrorCode fix_degenerate_quads(Interface * mb, EntityHandle set) {
+ErrorCode IntxUtils::fix_degenerate_quads(Interface * mb, EntityHandle set) {
   Range quads;
   ErrorCode rval = mb->get_entities_by_type(set, MBQUAD, quads); MB_CHK_ERR(rval);
   Tag gid;
@@ -1230,7 +1028,7 @@ ErrorCode fix_degenerate_quads(Interface * mb, EntityHandle set) {
   return MB_SUCCESS;
 }
 
-ErrorCode positive_orientation(Interface * mb, EntityHandle set, double R) {
+ErrorCode IntxAreaUtils::positive_orientation(Interface * mb, EntityHandle set, double R) {
   Range cells2d;
   ErrorCode rval = mb->get_entities_by_dimension(set, 2, cells2d);
   if (MB_SUCCESS != rval)
@@ -1255,7 +1053,7 @@ ErrorCode positive_orientation(Interface * mb, EntityHandle set, double R) {
       area = area_spherical_triangle_lHuiller(coords, coords + 3,
         coords + 6, R);
     else
-      area = area2D(coords, coords + 3, coords + 6);
+      area = IntxUtils::area2D(coords, coords + 3, coords + 6);
     if (area < 0) {
       // compute all area, do not revert if total area is positive
       std::vector<double> coords2(3 * num_nodes);
@@ -1282,85 +1080,18 @@ ErrorCode positive_orientation(Interface * mb, EntityHandle set, double R) {
   }
   return MB_SUCCESS;
 }
+
 // distance along a great circle on a sphere of radius 1
 // page 4
-double distance_on_sphere(double la1, double te1, double la2, double te2) {
+double IntxUtils::distance_on_sphere(double la1, double te1, double la2, double te2) {
   return acos(sin(te1) * sin(te2) + cos(te1) * cos(te2) * cos(la1 - la2));
-}
-// page 4 Nair Lauritzen paper
-// param will be: (la1, te1), (la2, te2), b, c; hmax=1, r=1/2
-double quasi_smooth_field(double lam, double tet, double * params) {
-  double la1 = params[0];
-  double te1 = params[1];
-  double la2 = params[2];
-  double te2 = params[3];
-  double b = params[4];
-  double c = params[5];
-  double hmax = params[6]; // 1;
-  double r = params[7]; // 0.5;
-  double r1 = distance_on_sphere(lam, tet, la1, te1);
-  double r2 = distance_on_sphere(lam, tet, la2, te2);
-  double value = b;
-  if (r1 < r) {
-    value += c * hmax / 2 * (1 + cos(M_PI * r1 / r));
-  }
-  if (r2 < r) {
-    value += c * hmax / 2 * (1 + cos(M_PI * r2 / r));
-  }
-  return value;
-}
-// page 4
-// params are now x1, y1, ..., y2, z2 (6 params)
-// plus h max and b0 (total of 8 params); radius is 1
-double smooth_field(double lam, double tet, double * params) {
-  SphereCoords sc;
-  sc.R = 1.;
-  sc.lat = tet;
-  sc.lon = lam;
-  double hmax = params[6];
-  double b0 = params[7];
-  CartVect xyz = spherical_to_cart(sc);
-  CartVect c1(params);
-  CartVect c2(params + 3);
-  double expo1 = -b0 * (xyz - c1).length_squared();
-  double expo2 = -b0 * (xyz - c2).length_squared();
-  return hmax * (exp(expo1) + exp(expo2));
-}
-// page 5
-double slotted_cylinder_field(double lam, double tet, double * params) {
-  double la1 = params[0];
-  double te1 = params[1];
-  double la2 = params[2];
-  double te2 = params[3];
-  double b = params[4];
-  double c = params[5];
-  //double hmax = params[6]; // 1;
-  double r = params[6]; // 0.5;
-  double r1 = distance_on_sphere(lam, tet, la1, te1);
-  double r2 = distance_on_sphere(lam, tet, la2, te2);
-  double value = b;
-  double d1 = fabs(lam - la1);
-  double d2 = fabs(lam - la2);
-  double rp6 = r / 6;
-  double rt5p12 = r * 5 / 12;
-
-  if (r1 <= r && d1 >= rp6)
-    value = c;
-  if (r2 <= r && d2 >= rp6)
-    value = c;
-  if (r1 <= r && d1 < rp6 && tet - te1 < -rt5p12)
-    value = c;
-  if (r2 <= r && d2 < rp6 && tet - te2 > rt5p12)
-    value = c;
-
-  return value;
 }
 
 /*
  * given 2 great circle arcs, AB and CD, compute the unique intersection point, if it exists
  *  in between
  */
-ErrorCode intersect_great_circle_arcs(double * A, double * B, double * C,
+ErrorCode IntxUtils::intersect_great_circle_arcs(double * A, double * B, double * C,
     double * D, double R, double * E) {
   // first verify A, B, C, D are on the same sphere
   double R2 = R * R;
@@ -1416,10 +1147,11 @@ ErrorCode intersect_great_circle_arcs(double * A, double * B, double * C,
 
   return MB_SUCCESS;
 }
+
 // verify that result is in between a and b on a great circle arc, and between c and d on a constant
 // latitude arc
-bool verify(CartVect a, CartVect b, CartVect c, CartVect d, double x, double y,
-    double z) {
+static bool verify(CartVect a, CartVect b, CartVect c, CartVect d, double x, double y, double z)
+{
   // to check, the point has to be between a and b on a great arc, and between c and d on a const lat circle
   CartVect s(x, y, z);
   CartVect n1 = a * b;
@@ -1439,7 +1171,8 @@ bool verify(CartVect a, CartVect b, CartVect c, CartVect d, double x, double y,
 
   return true;
 }
-ErrorCode intersect_great_circle_arc_with_clat_arc(double * A, double * B,
+
+ErrorCode IntxUtils::intersect_great_circle_arc_with_clat_arc(double * A, double * B,
     double * C, double * D, double R, double * E, int & np) {
   const double distTol = R * 1.e-6;
   const double Tolerance = R * R * 1.e-12; // radius should be 1, usually
@@ -1671,6 +1404,7 @@ ErrorCode intersect_great_circle_arc_with_clat_arc(double * A, double * B,
     return MB_FAILURE;
   return MB_SUCCESS;
 }
+
 #if 0
 ErrorCode set_edge_type_flag(Interface * mb, EntityHandle sf1)
 {
@@ -1715,9 +1449,10 @@ ErrorCode set_edge_type_flag(Interface * mb, EntityHandle sf1)
   return MB_SUCCESS;
 }
 #endif
+
 // decide in a different metric if the corners of CS quad are
 // in the interior of an RLL quad
-int borderPointsOfCSinRLL(CartVect * redc, double * red2dc, int nsRed,
+int IntxUtils::borderPointsOfCSinRLL(CartVect * redc, double * red2dc, int nsRed,
     CartVect *bluec, int nsBlue, int * blueEdgeType, double * P, int * side,
     double epsil) {
   int extraPoints = 0;
@@ -1759,113 +1494,26 @@ int borderPointsOfCSinRLL(CartVect * redc, double * red2dc, int nsRed,
   }
   return extraPoints;
 }
-// this simply copies the one mesh set into another, and sets some correlation tags
-// for easy mapping back and forth
-ErrorCode deep_copy_set(Interface * mb, EntityHandle source_set,
-    EntityHandle dest_set) {
-  // create the handle tag for the corresponding element / vertex
 
-  EntityHandle dum = 0;
-  Tag corrTag = 0; // it will be created here
-  ErrorCode rval = mb->tag_get_handle(CORRTAGNAME, 1, MB_TYPE_HANDLE, corrTag,
-      MB_TAG_DENSE | MB_TAG_CREAT, &dum);
-  CHECK_ERR(rval);
-
-  // give the same global id to new verts and cells created in the lagr(departure) mesh
-  Tag gid =  mb->globalId_tag();
-
-  Range polys;
-  rval = mb->get_entities_by_dimension(source_set, 2, polys);
-  CHECK_ERR(rval);
-
-  Range connecVerts;
-  rval = mb->get_connectivity(polys, connecVerts);
-  CHECK_ERR(rval);
-
-  std::map<EntityHandle, EntityHandle> newNodes;
-  for (Range::iterator vit = connecVerts.begin(); vit != connecVerts.end();
-      ++vit) {
-    EntityHandle oldV = *vit;
-    CartVect posi;
-    rval = mb->get_coords(&oldV, 1, &(posi[0]));
-    CHECK_ERR(rval);
-    int global_id;
-    rval = mb->tag_get_data(gid, &oldV, 1, &global_id);
-    CHECK_ERR(rval);
-    EntityHandle new_vert;
-    rval = mb->create_vertex(&(posi[0]), new_vert); // duplicate the position
-    CHECK_ERR(rval);
-    newNodes[oldV] = new_vert;
-    // set also the correspondent tag :)
-    rval = mb->tag_set_data(corrTag, &oldV, 1, &new_vert);
-    CHECK_ERR(rval);
-    // also the other side
-    // need to check if we really need this; the new vertex will never need the old vertex
-    // we have the global id which is the same
-    rval = mb->tag_set_data(corrTag, &new_vert, 1, &oldV);
-    CHECK_ERR(rval);
-    // set the global id on the corresponding vertex the same as the initial vertex
-    rval = mb->tag_set_data(gid, &new_vert, 1, &global_id);
-    CHECK_ERR(rval);
-
-  }
-
-  for (Range::iterator it = polys.begin(); it != polys.end(); ++it) {
-    EntityHandle q = *it;
-    int nnodes;
-    const EntityHandle * conn;
-    rval = mb->get_connectivity(q, conn, nnodes);
-    CHECK_ERR(rval);
-    int global_id;
-    rval = mb->tag_get_data(gid, &q, 1, &global_id);
-    CHECK_ERR(rval);
-    EntityType typeElem = mb->type_from_handle(q);
-    std::vector<EntityHandle> new_conn(nnodes);
-    for (int i = 0; i < nnodes; i++) {
-      EntityHandle v1 = conn[i];
-      new_conn[i] = newNodes[v1];
-    }
-    EntityHandle newElement;
-    rval = mb->create_element(typeElem, &new_conn[0], nnodes, newElement);
-    CHECK_ERR(rval);
-    //set the corresponding tag; not sure we need this one, from old to new
-    rval = mb->tag_set_data(corrTag, &q, 1, &newElement);
-    CHECK_ERR(rval);
-    rval = mb->tag_set_data(corrTag, &newElement, 1, &q);
-    CHECK_ERR(rval);
-    // set the global id
-    rval = mb->tag_set_data(gid, &newElement, 1, &global_id);
-    CHECK_ERR(rval);
-
-    rval = mb->add_entities(dest_set, &newElement, 1);
-    CHECK_ERR(rval);
-  }
-
-  return MB_SUCCESS;
-}
-ErrorCode deep_copy_set_with_quads(Interface * mb, EntityHandle source_set,
+ErrorCode IntxUtils::deep_copy_set_with_quads(Interface * mb, EntityHandle source_set,
     EntityHandle dest_set) {
   ReadUtilIface *read_iface;
-  ErrorCode rval = mb->query_interface(read_iface);
-  CHECK_ERR(rval);
+  ErrorCode rval = mb->query_interface(read_iface);MB_CHK_ERR(rval);
   // create the handle tag for the corresponding element / vertex
 
   EntityHandle dum = 0;
   Tag corrTag = 0; // it will be created here
   rval = mb->tag_get_handle(CORRTAGNAME, 1, MB_TYPE_HANDLE, corrTag,
-      MB_TAG_DENSE | MB_TAG_CREAT, &dum);
-  CHECK_ERR(rval);
+      MB_TAG_DENSE | MB_TAG_CREAT, &dum);MB_CHK_ERR(rval);
 
   // give the same global id to new verts and cells created in the lagr(departure) mesh
   Tag gid = mb->globalId_tag();
 
   Range quads;
-  rval = mb->get_entities_by_type(source_set, MBQUAD, quads);
-  CHECK_ERR(rval);
+  rval = mb->get_entities_by_type(source_set, MBQUAD, quads);MB_CHK_ERR(rval);
 
   Range connecVerts;
-  rval = mb->get_connectivity(quads, connecVerts);
-  CHECK_ERR(rval);
+  rval = mb->get_connectivity(quads, connecVerts);MB_CHK_ERR(rval);
 
   std::map<EntityHandle, EntityHandle> newNodes;
 
@@ -1881,11 +1529,10 @@ ErrorCode deep_copy_set_with_quads(Interface * mb, EntityHandle source_set,
       ++vit, i++) {
     EntityHandle oldV = *vit;
     CartVect posi;
-    rval = mb->get_coords(&oldV, 1, &(posi[0]));
-    CHECK_ERR(rval);
+    rval = mb->get_coords(&oldV, 1, &(posi[0]));MB_CHK_ERR(rval);
+    
     int global_id;
-    rval = mb->tag_get_data(gid, &oldV, 1, &global_id);
-    CHECK_ERR(rval);
+    rval = mb->tag_get_data(gid, &oldV, 1, &global_id);MB_CHK_ERR(rval);
     EntityHandle new_vert = start_vert + i;
     // Cppcheck warning (false positive): variable coords is assigned a value that is never used
     coords[0][i] = posi[0];
@@ -1894,17 +1541,14 @@ ErrorCode deep_copy_set_with_quads(Interface * mb, EntityHandle source_set,
 
     newNodes[oldV] = new_vert;
     // set also the correspondent tag :)
-    rval = mb->tag_set_data(corrTag, &oldV, 1, &new_vert);
-    CHECK_ERR(rval);
+    rval = mb->tag_set_data(corrTag, &oldV, 1, &new_vert);MB_CHK_ERR(rval);
+
     // also the other side
     // need to check if we really need this; the new vertex will never need the old vertex
     // we have the global id which is the same
-    rval = mb->tag_set_data(corrTag, &new_vert, 1, &oldV);
-    CHECK_ERR(rval);
+    rval = mb->tag_set_data(corrTag, &new_vert, 1, &oldV);MB_CHK_ERR(rval);
     // set the global id on the corresponding vertex the same as the initial vertex
-    rval = mb->tag_set_data(gid, &new_vert, 1, &global_id);
-    CHECK_ERR(rval);
-
+    rval = mb->tag_set_data(gid, &new_vert, 1, &global_id);MB_CHK_ERR(rval);
   }
   // now create new quads in order (in a sequence)
 
@@ -1917,11 +1561,9 @@ ErrorCode deep_copy_set_with_quads(Interface * mb, EntityHandle source_set,
     EntityHandle q = *it;
     int nnodes;
     const EntityHandle * conn;
-    rval = mb->get_connectivity(q, conn, nnodes);
-    CHECK_ERR(rval);
+    rval = mb->get_connectivity(q, conn, nnodes);MB_CHK_ERR(rval);
     int global_id;
-    rval = mb->tag_get_data(gid, &q, 1, &global_id);
-    CHECK_ERR(rval);
+    rval = mb->tag_get_data(gid, &q, 1, &global_id);MB_CHK_ERR(rval);
 
     for (int ii = 0; ii < nnodes; ii++) {
       EntityHandle v1 = conn[ii];
@@ -1930,21 +1572,18 @@ ErrorCode deep_copy_set_with_quads(Interface * mb, EntityHandle source_set,
     EntityHandle newElement = start_elem + ie;
 
     //set the corresponding tag; not sure we need this one, from old to new
-    rval = mb->tag_set_data(corrTag, &q, 1, &newElement);
-    CHECK_ERR(rval);
-    rval = mb->tag_set_data(corrTag, &newElement, 1, &q);
-    CHECK_ERR(rval);
-    // set the global id
-    rval = mb->tag_set_data(gid, &newElement, 1, &global_id);
-    CHECK_ERR(rval);
+    rval = mb->tag_set_data(corrTag, &q, 1, &newElement);MB_CHK_ERR(rval);
+    rval = mb->tag_set_data(corrTag, &newElement, 1, &q);MB_CHK_ERR(rval);
 
-    rval = mb->add_entities(dest_set, &newElement, 1);
-    CHECK_ERR(rval);
+    // set the global id
+    rval = mb->tag_set_data(gid, &newElement, 1, &global_id);MB_CHK_ERR(rval);
+
+    rval = mb->add_entities(dest_set, &newElement, 1);MB_CHK_ERR(rval);
   }
 
-  rval = read_iface->update_adjacencies(start_elem, quads.size(), 4, connect);
-  CHECK_ERR(rval);
+  rval = read_iface->update_adjacencies(start_elem, quads.size(), 4, connect);MB_CHK_ERR(rval);
 
   return MB_SUCCESS;
 }
+
 } //namespace moab

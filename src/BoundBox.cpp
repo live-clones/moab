@@ -90,10 +90,10 @@ namespace moab
       // decide first the gnomonic plane, based on first coordinate
       int plane=-1;
       CartVect pos;
-      decide_gnomonic_plane(verts[0], plane);
+      IntxUtils::decide_gnomonic_plane(verts[0], plane);
       double in_plane_positions[20]; // at most polygons with 10 edges; do we need to revise this?
       for (int i=0; i<len && i<10; i++ )
-        gnomonic_projection(verts[i], R, plane, in_plane_positions[2*i], in_plane_positions[2*i+1]);
+        IntxUtils::gnomonic_projection(verts[i], R, plane, in_plane_positions[2*i], in_plane_positions[2*i+1]);
       // look for points on the intersection between edges in gnomonic plane and coordinate axes
       // if yes, reverse projection of intx point, and update box
       double oriented_area2=0;
@@ -109,7 +109,7 @@ namespace moab
         {
           double alfa = ay/(ay-by);
           double xintx = ax+alfa*(bx-ax);
-          reverse_gnomonic_projection(xintx, 0, R, plane, pos);
+          IntxUtils::reverse_gnomonic_projection(xintx, 0, R, plane, pos);
           update_min(pos.array());
           update_max(pos.array());
         }
@@ -117,7 +117,7 @@ namespace moab
         {
           double alfa = ax/(ax-bx);
           double yintx = ay+alfa*(by-ay);
-          reverse_gnomonic_projection(0, yintx, R, plane, pos);
+          IntxUtils::reverse_gnomonic_projection(0, yintx, R, plane, pos);
           update_min(pos.array());
           update_max(pos.array());
         }
@@ -125,7 +125,7 @@ namespace moab
       }
       if (fabs(oriented_area2) > R*R * 1.e-6) // origin is in the interior, add the center
       {
-        reverse_gnomonic_projection(0, 0, R, plane, pos);
+        IntxUtils::reverse_gnomonic_projection(0, 0, R, plane, pos);
         update_min(pos.array());
         update_max(pos.array());
       }

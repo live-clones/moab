@@ -10,13 +10,12 @@
 #include "moab/IntxMesh/IntxUtils.hpp"
 
 namespace moab {
-Intx2MeshInPlane::Intx2MeshInPlane(Interface * mbimpl):Intx2Mesh(mbimpl){
 
-}
+Intx2MeshInPlane::Intx2MeshInPlane(Interface * mbimpl) : Intx2Mesh(mbimpl)
+{ }
 
-Intx2MeshInPlane::~Intx2MeshInPlane() {
-  // TODO Auto-generated destructor stub
-}
+Intx2MeshInPlane::~Intx2MeshInPlane() 
+{ }
 
 double Intx2MeshInPlane::setup_tgt_cell(EntityHandle tgt, int & nsTgt)
 {
@@ -43,7 +42,7 @@ double Intx2MeshInPlane::setup_tgt_cell(EntityHandle tgt, int & nsTgt)
     tgtCoords2D[2 * j + 1] = tgtCoords[j][1]; // y coordinate
   }
   for (int j=1; j<nsTgt-1; j++)
-    cellArea += area2D(&tgtCoords2D[0], &tgtCoords2D[2*j], &tgtCoords2D[2*j+2]);
+    cellArea += IntxUtils::area2D(&tgtCoords2D[0], &tgtCoords2D[2*j], &tgtCoords2D[2*j+2]);
 
   return cellArea;
 }
@@ -101,7 +100,7 @@ ErrorCode Intx2MeshInPlane::computeIntersectionBetweenTgtAndSrc(EntityHandle tgt
   }
 #endif
 
-  rval = EdgeIntersections2(srcCoords2D, nsSrc, tgtCoords2D, nsTgt, markb,
+  rval = IntxUtils::EdgeIntersections2(srcCoords2D, nsSrc, tgtCoords2D, nsTgt, markb,
       markr, P, nP);MB_CHK_ERR(rval);
 #ifdef ENABLE_DEBUG
   if (dbg_1) {
@@ -113,7 +112,7 @@ ErrorCode Intx2MeshInPlane::computeIntersectionBetweenTgtAndSrc(EntityHandle tgt
 #endif
 
   int side[MAXEDGES] = { 0 }; // this refers to what side? src or tgt?
-  int extraPoints = borderPointsOfXinY2(srcCoords2D, nsSrc, tgtCoords2D,
+  int extraPoints = IntxUtils::borderPointsOfXinY2(srcCoords2D, nsSrc, tgtCoords2D,
       nsTgt, &(P[2 * nP]), side, epsilon_area);
   if (extraPoints >= 1) {
     for (int k = 0; k < nsSrc; k++) {
@@ -139,7 +138,7 @@ ErrorCode Intx2MeshInPlane::computeIntersectionBetweenTgtAndSrc(EntityHandle tgt
 #endif
   nP += extraPoints;
 
-  extraPoints = borderPointsOfXinY2(tgtCoords2D, nsTgt, srcCoords2D, nsSrc,
+  extraPoints = IntxUtils::borderPointsOfXinY2(tgtCoords2D, nsTgt, srcCoords2D, nsSrc,
       &(P[2 * nP]), side, epsilon_area);
   if (extraPoints >= 1) {
     for (int k = 0; k < nsTgt; k++) {
@@ -165,12 +164,12 @@ ErrorCode Intx2MeshInPlane::computeIntersectionBetweenTgtAndSrc(EntityHandle tgt
   // now sort and orient the points in P, such that they are forming a convex polygon
   // this will be the foundation of our new mesh
   // this works if the polygons are convex
-  SortAndRemoveDoubles2(P, nP, epsilon_1); // nP should be at most 8 in the end ?
+  IntxUtils::SortAndRemoveDoubles2(P, nP, epsilon_1); // nP should be at most 8 in the end ?
   // if there are more than 3 points, some area will be positive
 
   if (nP >= 3) {
     for (int k = 1; k < nP - 1; k++)
-      area += area2D(P, &P[2 * k], &P[2 * k + 2]);
+      area += IntxUtils::area2D(P, &P[2 * k], &P[2 * k + 2]);
   }
 
   return MB_SUCCESS; // no error
@@ -225,7 +224,7 @@ ErrorCode Intx2MeshInPlane::findNodes(EntityHandle tgt, int nsTgt, EntityHandle 
     for (j = 0; j < nsTgt && !found; j++)
     {
       //int node = tgtTri.v[j];
-      double d2 = dist2(pp, &tgtCoords2D[2 * j]);
+      double d2 = IntxUtils::dist2(pp, &tgtCoords2D[2 * j]);
       if (d2 < epsilon_1)
       {
 
@@ -243,7 +242,7 @@ ErrorCode Intx2MeshInPlane::findNodes(EntityHandle tgt, int nsTgt, EntityHandle 
     for (j = 0; j < nsSrc && !found; j++)
     {
       //int node = srcTri.v[j];
-      double d2 = dist2(pp, &srcCoords2D[2 * j]);
+      double d2 = IntxUtils::dist2(pp, &srcCoords2D[2 * j]);
       if (d2 < epsilon_1)
       {
         // suspect is srcConn[j] corresponding in mbOut
@@ -265,7 +264,7 @@ ErrorCode Intx2MeshInPlane::findNodes(EntityHandle tgt, int nsTgt, EntityHandle 
       for (j = 0; j < nsTgt; j++)
       {
         int j1 = (j + 1) % nsTgt;
-        double area = area2D(&tgtCoords2D[2 * j], &tgtCoords2D[2 * j1], pp);
+        double area = IntxUtils::area2D(&tgtCoords2D[2 * j], &tgtCoords2D[2 * j1], pp);
 #ifdef ENABLE_DEBUG
         if (dbg_1)
           std::cout << "   edge " << j << ": "

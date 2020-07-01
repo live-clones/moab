@@ -168,7 +168,7 @@ int main(int argc, char* argv[])
   ErrorCode result;
   Range range;
 
-#ifdef MOAB_HAVE_MPI
+#if (defined(MOAB_HAVE_MPI) && defined(MOAB_HAVE_TEMPESTREMAP))
     moab::ParallelComm* pcomm = new moab::ParallelComm ( gMB, MPI_COMM_WORLD, 0 );
 #endif
 
@@ -361,18 +361,20 @@ int main(int argc, char* argv[])
   }
 
 #ifdef MOAB_HAVE_MPI
-      TempestRemapper *remapper = new moab::TempestRemapper(gMB, pcomm);
+  TempestRemapper *remapper = new moab::TempestRemapper(gMB, pcomm);
 #else
-      TempestRemapper *remapper = new moab::TempestRemapper(gMB);
+  TempestRemapper *remapper = new moab::TempestRemapper(gMB);
 #endif
 
-#endif
   bool use_overlap_context = false;
   Tag srcParentTag, tgtParentTag;
+
+#endif
   for (j = in.begin(); j != in.end(); ++j) {
     reset_times();
 
 #ifdef MOAB_HAVE_TEMPESTREMAP
+
     remapper->meshValidate = false;
     //remapper->constructEdgeMap = true;
     remapper->initialize();

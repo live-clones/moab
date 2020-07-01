@@ -531,14 +531,14 @@ int main(int argc, char* argv[])
         const double sr2 = std::sqrt(points[3]*points[3]+points[4]*points[4]+points[5]*points[5]);
         slave_radius = 0.5*(sr1+sr2);
         // Let us rescale both master and slave meshes to a unit sphere
-        rval = ScaleToRadius(&mb, slaveset, master_radius);MB_CHK_ERR(rval);
+        rval = moab::IntxUtils::ScaleToRadius(&mb, slaveset, master_radius);MB_CHK_ERR(rval);
       }
 
       rval = zoltan_tool->partition_inferred_mesh(slaveset, num_parts, part_dim);
 
       if (rescale_spherical_radius) {
         // rescale the slave mesh back to its original radius
-        rval = ScaleToRadius(&mb, slaveset, slave_radius);MB_CHK_ERR(rval);
+        rval = moab::IntxUtils::ScaleToRadius(&mb, slaveset, slave_radius);MB_CHK_ERR(rval);
       }
 
       if (print_time) {

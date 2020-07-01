@@ -11,20 +11,16 @@
 
 namespace moab {
 
-IntxRllCssphere::IntxRllCssphere(Interface * mbimpl):Intx2Mesh(mbimpl), R(0.0), plane(0) {
-  // TODO Auto-generated constructor stub
+IntxRllCssphere::IntxRllCssphere(Interface * mbimpl) : Intx2Mesh(mbimpl), R(0.0), plane(0)
+{ }
 
-}
+IntxRllCssphere::~IntxRllCssphere()
+{ }
 
-IntxRllCssphere::~IntxRllCssphere() {
-  // TODO Auto-generated destructor stub
-}
 /*
  * return also the area for robustness verification
  */
 double IntxRllCssphere::setup_tgt_cell(EntityHandle tgt, int & nsTgt){
-
-
   // get coordinates of the tgt quad, to decide the gnomonic plane
   double cellArea =0;
 
@@ -45,19 +41,19 @@ double IntxRllCssphere::setup_tgt_cell(EntityHandle tgt, int & nsTgt){
     middle += tgtCoords[i];
   middle = 1./nsTgt * middle;
 
-  decide_gnomonic_plane(middle, plane);// output the plane
+  IntxUtils::decide_gnomonic_plane(middle, plane);// output the plane
   for (int j = 0; j < nsTgt; j++)
   {
     // populate coords in the plane for intersection
     // they should be oriented correctly, positively
-    int rc = gnomonic_projection(tgtCoords[j],  R, plane, tgtCoords2D[2 * j],
+    int rc = IntxUtils::gnomonic_projection(tgtCoords[j],  R, plane, tgtCoords2D[2 * j],
         tgtCoords2D[2 * j + 1]);
     if (rc != 0)
       return 1;
   }
 
   for (int j=1; j<nsTgt-1; j++)
-    cellArea += area2D(&tgtCoords2D[0], &tgtCoords2D[2*j], &tgtCoords2D[2*j+2]);
+    cellArea += IntxUtils::area2D(&tgtCoords2D[0], &tgtCoords2D[2*j], &tgtCoords2D[2*j+2]);
 
   // take tgt coords in order and compute area in plane
   return cellArea;
@@ -120,7 +116,7 @@ ErrorCode IntxRllCssphere::computeIntersectionBetweenTgtAndSrc(EntityHandle tgt,
 #endif
   for (int j=0; j<nsSrc; j++)
   {
-    rval = gnomonic_projection(srcCoords[j], R, plane, srcCoords2D[2 * j],
+    rval = IntxUtils::gnomonic_projection(srcCoords[j], R, plane, srcCoords2D[2 * j],
         srcCoords2D[2 * j + 1]);MB_CHK_ERR(rval);
   }
 #ifdef ENABLE_DEBUG
@@ -138,11 +134,11 @@ ErrorCode IntxRllCssphere::computeIntersectionBetweenTgtAndSrc(EntityHandle tgt,
     }
   }
 #endif
-  rval = EdgeIntxRllCs(srcCoords2D, srcCoords, srcEdgeType, nsSrc, tgtCoords2D, tgtCoords, nsTgt, markb, markr,
+  rval = IntxUtils::EdgeIntxRllCs(srcCoords2D, srcCoords, srcEdgeType, nsSrc, tgtCoords2D, tgtCoords, nsTgt, markb, markr,
       plane, R, P, nP);MB_CHK_ERR(rval);
 
   int side[MAXEDGES] = { 0 };// this refers to what side? src or tgt?// more tolerant here with epsilon_area
-  int extraPoints = borderPointsOfXinY2(srcCoords2D, nsSrc, tgtCoords2D, nsTgt, &(P[2 * nP]), side, 2*epsilon_area);
+  int extraPoints = IntxUtils::borderPointsOfXinY2(srcCoords2D, nsSrc, tgtCoords2D, nsTgt, &(P[2 * nP]), side, 2*epsilon_area);
   if (extraPoints >= 1)
   {
     for (int k = 0; k < nsSrc; k++)
@@ -162,7 +158,7 @@ ErrorCode IntxRllCssphere::computeIntersectionBetweenTgtAndSrc(EntityHandle tgt,
   }
   nP += extraPoints;
 
-  extraPoints = borderPointsOfCSinRLL(tgtCoords, tgtCoords2D, nsTgt, srcCoords, nsSrc, srcEdgeType, &(P[2 * nP]), side,
+  extraPoints = IntxUtils::borderPointsOfCSinRLL(tgtCoords, tgtCoords2D, nsTgt, srcCoords, nsSrc, srcEdgeType, &(P[2 * nP]), side,
       100*epsilon_area); // we need to compare with 0 a volume from 3 vector product; // lots of round off errors at stake
   if (extraPoints >= 1)
   {
@@ -183,13 +179,13 @@ ErrorCode IntxRllCssphere::computeIntersectionBetweenTgtAndSrc(EntityHandle tgt,
   // now sort and orient the points in P, such that they are forming a convex polygon
   // this will be the foundation of our new mesh
   // this works if the polygons are convex
-  SortAndRemoveDoubles2(P, nP, epsilon_1); // nP should be at most 8 in the end ?
+  IntxUtils::SortAndRemoveDoubles2(P, nP, epsilon_1); // nP should be at most 8 in the end ?
   // if there are more than 3 points, some area will be positive
 
   if (nP >= 3)
   {
     for (int k = 1; k < nP - 1; k++)
-      area += area2D(P, &P[2 * k], &P[2 * k + 2]);
+      area += IntxUtils::area2D(P, &P[2 * k], &P[2 * k + 2]);
   }
 
   return MB_SUCCESS; // no error
@@ -235,7 +231,7 @@ ErrorCode IntxRllCssphere::findNodes(EntityHandle tgt, int nsTgt, EntityHandle s
     double * pp = &iP[2 * i]; // iP+2*i
     // project the point back on the sphere
     CartVect pos;
-    reverse_gnomonic_projection(pp[0], pp[1], R, plane, pos);
+    IntxUtils::reverse_gnomonic_projection(pp[0], pp[1], R, plane, pos);
     int found = 0;
     // first, are they on vertices from tgt or src?
     // priority is the tgt mesh (mb2?)
@@ -244,7 +240,7 @@ ErrorCode IntxRllCssphere::findNodes(EntityHandle tgt, int nsTgt, EntityHandle s
     for (j = 0; j < nsTgt && !found; j++)
     {
       //int node = tgtTri.v[j];
-      double d2 = dist2(pp, &tgtCoords2D[2 * j]);
+      double d2 = IntxUtils::dist2(pp, &tgtCoords2D[2 * j]);
       if (d2 < epsilon_1)
       {
 
@@ -262,7 +258,7 @@ ErrorCode IntxRllCssphere::findNodes(EntityHandle tgt, int nsTgt, EntityHandle s
     for (j = 0; j < nsSrc && !found; j++)
     {
       //int node = srcTri.v[j];
-      double d2 = dist2(pp, &srcCoords2D[2 * j]);
+      double d2 = IntxUtils::dist2(pp, &srcCoords2D[2 * j]);
       if (d2 < epsilon_1)
       {
         // suspect is srcConn[j] corresponding in mbOut
@@ -284,7 +280,7 @@ ErrorCode IntxRllCssphere::findNodes(EntityHandle tgt, int nsTgt, EntityHandle s
       for (j = 0; j < nsTgt; j++)
       {
         int j1 = (j + 1) % nsTgt;
-        double area = area2D(&tgtCoords2D[2 * j], &tgtCoords2D[2 * j1], pp);
+        double area = IntxUtils::area2D(&tgtCoords2D[2 * j], &tgtCoords2D[2 * j1], pp);
 #ifdef ENABLE_DEBUG
         if (dbg_1)
           std::cout << "   edge " << j << ": "

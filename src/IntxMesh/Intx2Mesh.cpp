@@ -24,7 +24,8 @@ namespace moab {
 int Intx2Mesh::dbg_1=0;
 #endif
 
-Intx2Mesh::Intx2Mesh(Interface * mbimpl): mb(mbimpl),
+Intx2Mesh::Intx2Mesh(Interface * mbimpl): 
+  mb(mbimpl), 
   mbs1(0), mbs2(0), outSet(0),
   gid(0), TgtFlagTag(0), tgtParentTag(0), srcParentTag(0), countTag(0), srcNeighTag(0), tgtNeighTag(0), neighTgtEdgeTag(0),
   orgSendProcTag(0),

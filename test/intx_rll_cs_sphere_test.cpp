@@ -58,15 +58,16 @@ int main(int argc, char* argv[])
     return 1;
 
   // IntxUtils
-  rval = fix_degenerate_quads(mb, sf1);
+  rval = IntxUtils::fix_degenerate_quads(mb, sf1);
   if (MB_SUCCESS != rval)
     return 1;
 
-  rval =positive_orientation(mb, sf1, R);
+  IntxAreaUtils areaAdaptor;
+  rval = areaAdaptor.positive_orientation(mb, sf1, R);
   if (MB_SUCCESS != rval)
     return 1;
 
-  rval =positive_orientation(mb, sf2, R);
+  rval = areaAdaptor.positive_orientation(mb, sf2, R);
   if (MB_SUCCESS != rval)
     return 1;
 
