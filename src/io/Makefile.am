@@ -23,6 +23,7 @@ if HAVE_NETCDF
                      NCHelper.cpp NCHelper.hpp \
                      NCHelperEuler.cpp NCHelperEuler.hpp \
                      NCHelperFV.cpp NCHelperFV.hpp \
+                     NCHelperDomain.cpp NCHelperDomain.hpp \
                      NCHelperHOMME.cpp NCHelperHOMME.hpp \
                      NCHelperMPAS.cpp NCHelperMPAS.hpp \
                      NCHelperGCRM.cpp NCHelperGCRM.hpp \
@@ -31,7 +32,7 @@ if HAVE_NETCDF
                      NCWriteFV.cpp NCWriteFV.hpp \
                      NCWriteHOMME.cpp NCWriteHOMME.hpp \
                      NCWriteMPAS.cpp NCWriteMPAS.hpp \
-                     NCWriteGCRM.cpp NCWriteGCRM.hpp
+                     NCWriteGCRM.cpp NCWriteGCRM.hpp 
 else
   MOAB_NETCDF_SRCS =
 endif
@@ -43,6 +44,7 @@ if !HAVE_NETCDF
                      NCHelper.cpp NCHelper.hpp \
                      NCHelperEuler.cpp NCHelperEuler.hpp \
                      NCHelperFV.cpp NCHelperFV.hpp \
+                     NCHelperDomain.cpp NCHelperDomain.hpp \
                      NCHelperHOMME.cpp NCHelperHOMME.hpp \
                      NCHelperMPAS.cpp NCHelperMPAS.hpp \
                      NCHelperGCRM.cpp NCHelperGCRM.hpp \

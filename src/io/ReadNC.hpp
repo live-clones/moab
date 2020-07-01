@@ -65,6 +65,7 @@ class ReadNC : public ReaderIface
   friend class UcdNCHelper;
   friend class NCHelperEuler;
   friend class NCHelperFV;
+  friend class NCHelperDomain;
   friend class NCHelperHOMME;
   friend class NCHelperMPAS;
   friend class NCHelperGCRM;

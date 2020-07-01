@@ -1,6 +1,7 @@
 #include "NCHelper.hpp"
 #include "NCHelperEuler.hpp"
 #include "NCHelperFV.hpp"
+#include "NCHelperDomain.hpp"
 #include "NCHelperHOMME.hpp"
 #include "NCHelperMPAS.hpp"
 #include "NCHelperGCRM.hpp"
@@ -44,6 +45,8 @@ NCHelper* NCHelper::get_nc_helper(ReadNC* readNC, int fileId, const FileOptions&
       return new (std::nothrow) NCHelperFV(readNC, fileId, opts, fileSet);
     else if (NCHelperHOMME::can_read_file(readNC, fileId))
       return new (std::nothrow) NCHelperHOMME(readNC, fileId, opts, fileSet);
+    else if (NCHelperDomain::can_read_file(readNC, fileId))
+      return new (std::nothrow) NCHelperDomain(readNC, fileId, opts, fileSet);
   }
   else {
     if (NCHelperMPAS::can_read_file(readNC))
