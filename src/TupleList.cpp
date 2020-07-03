@@ -585,7 +585,7 @@ ErrorCode TupleList::sort(uint key, TupleList::buffer *buf)
       umax_2(Ulong_size,real_size));
   unsigned data_size =
       key >= mi ? sizeof(SortData<long> ) : sizeof(SortData<uint> );
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32)
+#if defined(WIN32) || defined(_WIN32) 
   if (key>=mi+ml)
     data_size = sizeof(SortData<Ulong> );
 #endif

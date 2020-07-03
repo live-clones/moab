@@ -5,6 +5,9 @@
 /// \version Mar 08, 2017
 ///
 
+#ifdef WIN32  /* windows */
+#  define _USE_MATH_DEFINES //For M_PI
+#endif
 #include "Announce.h"
 #include "DataArray3D.h"
 #include "FiniteElementTools.h"

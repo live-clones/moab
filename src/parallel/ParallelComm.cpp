@@ -27,6 +27,7 @@
 #include <numeric>
 
 #include <math.h>
+#include <cstdlib>
 #include <assert.h>
 
 #ifdef MOAB_HAVE_MPI
@@ -4324,7 +4325,8 @@ ErrorCode ParallelComm::get_remote_handles(EntityHandle *local_vec, EntityHandle
     unsigned val = 0;
     for (size_t i = 0; i < proc_list.size(); i++)
       val ^= proc_list[i];
-    return rand_r(&val) % proc_list.size();
+    srand((int)(val));
+    return rand() % proc_list.size();
   }
 
   struct set_tuple

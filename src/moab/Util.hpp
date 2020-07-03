@@ -63,7 +63,7 @@ template <typename T>
 inline
 bool Util::is_finite(T value)
 {
-  return moab_isfinite(value);
+  return moab_isfinite((double)value);
 }
 
 } // namespace moab

@@ -6,7 +6,7 @@
  */
 
 // Different platforms follow different conventions for usage
-#ifndef NT
+#ifndef _WIN32
 #include <sys/resource.h>
 #endif
 #ifdef SOLARIS
@@ -405,9 +405,12 @@ void query_vert_to_elem(iMesh_Instance mesh)
   free(all_verts);
 }
 
-void print_time(const bool print_em, double &tot_time, double &utime, double &stime,
-                long &imem, long &rmem)
+void print_time(const bool print_em, double &tot_time, double &utime,
+    double &stime, long &imem, long &rmem)
 {
+  // Disabling this for windows
+  // Different platforms follow different conventions for usage
+#ifndef _WIN32 // Windows does not have rusage
   struct rusage r_usage;
   getrusage(RUSAGE_SELF, &r_usage);
   utime = (double)r_usage.ru_utime.tv_sec +
@@ -429,7 +432,9 @@ void print_time(const bool print_em, double &tot_time, double &utime, double &st
   system("ps o args,drs,rss | grep perf | grep -v grep");  // RedHat 9.0 doesnt fill in actual memory data
 #endif
     //delete [] hex_array;
+#endif // if not on windows
 }
+
 
 void compute_edge(double *start, const int nelem,  const double xint,
                   const int stride)

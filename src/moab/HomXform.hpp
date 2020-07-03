@@ -33,6 +33,8 @@
 #include <math.h>
 #include <ostream>
 
+#include "moab/win32_config.h"
+
 namespace moab {
 
 class HomXform;
@@ -55,8 +57,8 @@ private:
 public:
   friend class HomXform;
 
-  static HomCoord unitv[3];
-  static HomCoord IDENTITY;
+  static MOAB_EXPORT HomCoord unitv[3];
+  static MOAB_EXPORT HomCoord IDENTITY;
 
     //! constructors
   HomCoord();
@@ -74,6 +76,9 @@ public:
 
     //! get function
   const int *hom_coord() const {return homCoord;}
+
+  // Getters needed for share windows
+  static HomCoord& getUnitv(int c);
 
     //! parameter-based access functions
   int i() const {return homCoord[0];}
@@ -139,7 +144,7 @@ public:
 
   friend class HomCoord;
 
-  static HomXform IDENTITY;
+  static MOAB_EXPORT HomXform IDENTITY;
 
     //! constructor from matrix
   HomXform(const int matrix[16]);

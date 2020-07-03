@@ -6,7 +6,7 @@
 #  include "moab_mpi.h"
 #endif
 
-#include <time.h>
+#include <ctime>
 
 namespace moab
 {

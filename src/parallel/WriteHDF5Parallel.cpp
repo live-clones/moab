@@ -53,11 +53,13 @@ namespace {
 
 namespace moab {
 
-// Need an MPI type that we can put handles in
-STATIC_ASSERT(sizeof(unsigned long) >= sizeof(EntityHandle));
+#ifndef _WIN32 // problematic for windows
+  // Need an MPI type that we can put handles in
+  STATIC_ASSERT(sizeof(unsigned long) >= sizeof(EntityHandle));
 
-// Need an MPI type that we can put file IDs in
-STATIC_ASSERT(sizeof(unsigned long) >= sizeof(WriteHDF5::wid_t));
+  // Need an MPI type that we can put file IDs in
+  STATIC_ASSERT(sizeof(unsigned long) >= sizeof(WriteHDF5::wid_t));
+#endif
 
 // This function doesn't do anything useful. It's just a nice
 // place to set a break point to determine why the reader fails.

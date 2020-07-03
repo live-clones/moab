@@ -74,7 +74,7 @@ public:
    *  location in the patch at which a sample-based metric is to be
    *  evaluated.
    */
-#ifndef _MSC_VER
+#ifndef _WIN32
   enum {
     /** the number of bits in a handle that are used to store element index */
     ELEM_INDEX_BITS = sizeof(size_t)*8 - Sample::NUMBER_PACKED_BITS,

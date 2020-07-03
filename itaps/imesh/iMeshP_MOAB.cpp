@@ -1635,7 +1635,8 @@ void iMeshP_pushTags( iMesh_Instance instance,
   if (entity_topo != iMesh_ALL_TOPOLOGIES)
     types.first = types.second = mb_topology_table[entity_topo];
   else if (entity_type != iBase_ALL_TYPES)
-    types = CN::TypeDimensionMap[entity_type];
+    // types = CN::TypeDimensionMap[entity_type];
+    types = CN::getDimPair(entity_type);
   else {
     types.first = MBVERTEX;
     types.second = MBENTITYSET;

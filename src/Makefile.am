@@ -246,10 +246,11 @@ nobase_libMOAB_la_include_HEADERS = \
   moab/WriteUtilIface.hpp \
   moab/WriterIface.hpp \
   moab/ElemEvaluator.hpp \
+  moab/win32_config.h \
   MBEntityType.h \
   MBCN.h \
   MBCN_protos.h \
-  MBTagConventions.hpp
+  MBTagConventions.hpp 
 
 verdictincludedir = $(includedir)/moab/verdict
 verdictinclude_HEADERS = \

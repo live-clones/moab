@@ -1,3 +1,5 @@
+SET(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}
                     ${CMAKE_CURRENT_BINARY_DIR}
                     parallel
@@ -241,6 +243,7 @@ set( MOAB_INSTALL_HEADERS
         moab/WriterIface.hpp
         moab/verdict.h
         moab/verdict/VerdictWrapper.hpp
+        moab/win32_config.h
         MBEntityType.h
         MBCN.h
         MBCN_protos.h
@@ -299,10 +302,14 @@ add_library(
   ${MOABPAR_OBJECTS}
   ${MDHF_OBJ}
   )
+SciFixupLibrary(MOAB MOAB MOAB)
 
 target_include_directories(MOAB
   PUBLIC
   "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
+
+include(GenerateExportHeader)
+generate_export_header(MOAB)
 
 set_target_properties(
   MOAB
@@ -314,10 +321,10 @@ set_target_properties(
   )
 
 message(STATUS "MOAB_LIBS = ${MOAB_LIBS}.")
-target_link_libraries(
-  MOAB
-  ${CMAKE_EXE_LINKER_FLAGS} ${MOAB_DEP_LIBRARIES} ${MOAB_LIBS} ${MOAB_CGM_LIBS} ${MPI_LIBRARIES} ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES}
-  )
+set(MOAB_ALL_LIBS ${MOAB_DEP_LIBRARIES} ${MOAB_LIBS} ${MOAB_CGM_LIBS})
+list(APPEND MOAB_ALL_LIBS "${MPI_LIBRARY}")
+list(APPEND MOAB_ALL_LIBS ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES})
+target_link_libraries(MOAB "${MOAB_ALL_LIBS}")
 
 install(
   TARGETS MOAB

@@ -190,12 +190,20 @@ CHECK_FUNCTION_EXISTS(finite MOAB_HAVE_FINITE)
 # Find packages
 ################################################################################
 
-if ( BUILD_SHARED_LIBS EQUAL OFF )
-#Static start
-set_target_properties(MOAB PROPERTIES LINK_SEARCH_START_STATIC 1)
-set_target_properties(MOAB PROPERTIES LINK_SEARCH_END_STATIC 1)
-set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
-endif ( BUILD_SHARED_LIBS EQUAL OFF )
+include(config/CMakeLibraryFuncs.cmake)
+include(GenerateExportHeader)
+if (BUILD_SHARED_LIBS)
+  if (WIN32)
+    add_definitions(/DMOAB_DLL)
+    if (NOT DEFINED CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS)
+# https://cmake.org/cmake/help/v3.4/prop_tgt/WINDOWS_EXPORT_ALL_SYMBOLS.html
+# Export all symbols
+      set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
+    endif ()
+  else ()
+    # add_definitions(-DMOAB_DLL) # Not needed?
+  endif ()
+endif ()
 
 set (MOAB_HAVE_BLAS OFF CACHE INTERNAL "Configured MOAB with BLAS library support." )
 set (MOAB_HAVE_LAPACK OFF CACHE INTERNAL "Configured MOAB with LAPACK library support." )
@@ -376,8 +384,9 @@ message(STATUS "Adding src subdirectory.")
 add_subdirectory( src )
 message(STATUS "Adding itaps subdirectory.")
 add_subdirectory( itaps )
-message(STATUS "Adding tools subdirectory.")
-add_subdirectory( tools )
+if (NOT WIN32) # Need further work to prepare for windows
+  add_subdirectory( tools )
+endif ()
 if (ENABLE_PYMOAB)
   add_subdirectory( pymoab )
 endif()

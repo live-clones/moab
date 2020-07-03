@@ -49,7 +49,7 @@ using MBMesquite::arrptr;
 #include <iostream>
 #include <algorithm>
 
-#ifndef _MSC_VER
+#ifndef _WIN32
 #  include <unistd.h>
 #endif
 

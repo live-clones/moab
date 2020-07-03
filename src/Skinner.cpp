@@ -17,6 +17,9 @@
 #pragma warning(disable:4786)
 #endif
 
+#ifdef WIN32  /* windows */
+#  define _USE_MATH_DEFINES //For M_PI
+#endif
 #include "moab/Skinner.hpp"
 #include "moab/Range.hpp"
 #include "moab/CN.hpp"

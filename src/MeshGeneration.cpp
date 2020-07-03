@@ -6,7 +6,11 @@
 #include "moab/MeshGeneration.hpp"
 #include "moab/MergeMesh.hpp"
 #include <iostream>
+#include <ctime>
 #include <vector>
+#ifdef WIN32  /* windows */
+#include <time.h>
+#endif
 
 #ifdef MOAB_HAVE_MPI
 #include "moab_mpi.h"

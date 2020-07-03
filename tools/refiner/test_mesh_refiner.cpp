@@ -16,7 +16,7 @@
 #include <sstream>
 #include <map>
 
-#include "sys/time.h"
+#include <ctime>
 
 using namespace moab;
 
@@ -106,11 +106,13 @@ int TestMeshRefiner( int argc, char* argv[] )
   Range ents_to_refine;
   imesh->get_entities_by_type( set_handle, MBTET, ents_to_refine ); // refine just the tets
   //ents_to_refine.insert( set_handle ); // refine everything multiple times (because subsets are not disjoint)
+#ifdef _WIN32
   struct timeval tic, toc;
   gettimeofday( &tic, 0 );
   mref->refine( ents_to_refine );
   gettimeofday( &toc, 0 );
   std::cout << "\nTime: " << ( (toc.tv_sec - tic.tv_sec) * 1000 + (toc.tv_usec - tic.tv_usec) / 1000. ) << " ms\n\n";
+#endif
 
   if (do_output) {
     parallel_options.clear();

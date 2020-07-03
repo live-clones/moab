@@ -14,11 +14,9 @@
  */
 
 // If Microsoft compiler, then WIN32
-#if defined(_MSC_VER) || defined(__MINGW32__)
 #  ifndef WIN32
 #    define WIN32
 #  endif
-#endif
 
 #include "moab/Core.hpp"
 #include "moab/Range.hpp"

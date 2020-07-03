@@ -5,6 +5,7 @@
 #include <list>
 #include <limits>
 #include <set>
+#include <algorithm>
 
 #include <assert.h>
 #include <string.h>

@@ -226,7 +226,7 @@ int check_valid_file_ids( struct mhdf_FileDesc* desc )
 
 int check_file_contains_holes( const char* filename )
 {
-#ifndef _MSC_VER
+#ifndef _WIN32
   const int blocksize = 512;
 #endif
   int errorcode;
@@ -238,7 +238,7 @@ int check_file_contains_holes( const char* filename )
     return 1;
   }
 
-#ifndef _MSC_VER  /*Does not have st_blocks*/
+#ifndef _WIN32  /*Does not have st_blocks*/
   if (buf.st_size/blocksize > buf.st_blocks+1) {
     printf("File \"%s\" contains holes.  This indicates that portions of the file were never written.\n",
       filename);

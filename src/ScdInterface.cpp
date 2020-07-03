@@ -1358,4 +1358,16 @@ ErrorCode ScdInterface::get_shared_vertices(ParallelComm *pcomm, ScdBox *box,
 #endif
 }
 
+std::ostream &operator<<(std::ostream &str, const ScdParData &pd) {
+  str << "Partition method = "
+      << ScdParData::PartitionMethodNames[pd.partMethod] << ", gDims = ("
+      << pd.gDims[0] << "," << pd.gDims[1] << "," << pd.gDims[2] << ")-("
+      << pd.gDims[3] << "," << pd.gDims[4] << "," << pd.gDims[5]
+      << "), gPeriodic = ("
+      << pd.gPeriodic[0] << "," << pd.gPeriodic[1] << "," << pd.gPeriodic[2]
+      << "), pDims = (" << pd.pDims[0] << "," << pd.pDims[1] << ","
+      << pd.pDims[2] << ")" << std::endl;
+  return str;
+}
+
 } // namespace moab

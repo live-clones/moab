@@ -29,7 +29,7 @@
 
 #include "moab/MOABConfig.h"
 
-#ifdef _MSC_VER  //if vc
+#ifdef _WIN32  //if vc
   #ifdef MESQUITE_DLL_EXPORTS //if we are exporting as dll
     #define MESQUITE_EXPORT  __declspec(dllexport)
   #else                      //else we aren't exporting as dll
@@ -45,6 +45,10 @@
   #define MESQUITE_EXPORT __attribute__ ((visibility("default")))
 #else                    //else not vc
   #define MESQUITE_EXPORT
+#endif
+
+#ifdef WIN32  /* windows */
+#  define _USE_MATH_DEFINES //For M_PI
 #endif
 
 #include <cmath>
@@ -72,10 +76,6 @@
 */
 namespace MBMesquite
 {
-  // Windows has issues
-#ifndef M_PI
-  const double M_PI = 3.14159265358979323846;
-#endif
 
   typedef int StatusCode;
 

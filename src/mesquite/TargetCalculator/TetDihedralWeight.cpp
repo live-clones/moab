@@ -29,7 +29,9 @@
  *  \brief
  *  \author Jason Kraftcheck
  */
-
+#ifdef WIN32  /* windows */
+#  define _USE_MATH_DEFINES //For M_PI
+#endif
 #include "Mesquite.hpp"
 #include "TetDihedralWeight.hpp"
 #include "PatchData.hpp"

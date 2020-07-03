@@ -34,7 +34,7 @@
 #include <stdio.h>
 #define MIN(a,b) (a < b ? a : b)
 
-#ifdef _MSC_VER
+#ifdef _WIN32
 # define snprintf(A,B,C,D) _snprintf((A),(B),(C),(D))
 #endif
 
@@ -2852,8 +2852,8 @@ extern "C" {
     }
     else if (entity_type != iBase_ALL_TYPES) {
         // need to loop over all types of this dimension
-      for (EntityType tp = CN::TypeDimensionMap[entity_type].first;
-           tp <= CN::TypeDimensionMap[entity_type].second; tp++) {
+      DimensionPair dimpair = CN::getDimPair(entity_type);
+      for (EntityType tp = dimpair.first; tp <= dimpair.second; tp++) {
         Range tmp_range;
         ErrorCode tmp_result = MOABI->get_entities_by_type_and_tag(handle, type, (Tag*)tag_handles,
                                                                    (const void* const *)tag_vals,

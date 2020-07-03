@@ -21,6 +21,10 @@ namespace moab {
 HomCoord HomCoord::unitv[3] = {HomCoord(1,0,0), HomCoord(0,1,0), HomCoord(0,0,1)};
 HomCoord HomCoord::IDENTITY(1, 1, 1);
 
+HomCoord& HomCoord::getUnitv(int c) {
+  return unitv[c];
+}
+
 int dum[] = {1, 0, 0, 0,
              0, 1, 0, 0,
              0, 0, 1, 0,

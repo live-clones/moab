@@ -20,7 +20,7 @@
  * \date August, 2006
  */
 
-#ifdef _MSC_VER  /* windows */
+#ifdef WIN32  /* windows */
 #  define _USE_MATH_DEFINES //For M_PI
 #endif
 

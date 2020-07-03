@@ -9,7 +9,7 @@
 #include <cstdio>
 #include <cstdlib>
 
-#ifndef _MSC_VER
+#ifndef _WIN32
 #include <sys/times.h>
 #include <sys/resource.h>
 #include <unistd.h>
@@ -298,18 +298,18 @@ void print_memory_stats( moab::Interface& mb,
                   "%llu " // vsize
                   "%ld", // rss
                   &vsize, &rss )) {
-  #ifndef _MSC_VER
+  #ifndef _WIN32
       long long tmprss = rss * getpagesize();
   #endif
       std::cout << std::endl << "SYSTEM:"
                 << std::endl << "Virtual memory:    " << memstr(vsize)
-  #ifndef _MSC_VER
+  #ifndef _WIN32
                 << std::endl << "Resident set size: " << memstr(tmprss)
   #endif
                 << std::endl;
     }
     else {
-  #ifndef _MSC_VER
+  #ifndef _WIN32
       struct rusage sysdata;
       if (getrusage( RUSAGE_SELF, &sysdata )) {
         std::cerr << "getrusage failed" << std::endl;
