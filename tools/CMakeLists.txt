@@ -234,7 +234,7 @@ if ( MOAB_BUILD_MBSLAVEPART )
 endif( )
 
 # MBTEMPEST
-if ( MOAB_BUILD_MBTEMPEST AND MOAB_HAVE_TEMPEST )
+if ( MOAB_BUILD_MBTEMPEST )
   add_executable( mbtempest mbtempest.cpp)
   set_source_files_properties( mbtempest.cpp COMPILE_FLAGS "${MOAB_DEFINES}" )
   include_directories( ${TEMPESTREMAP_INCLUDES} ${EIGEN3_DIR} )
