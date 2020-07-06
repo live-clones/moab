@@ -477,6 +477,38 @@ if (ENABLE_FORTRAN)
   set(MOAB_FC_FUNC_  "${FortranCInterface_GLOBAL__PREFIX} ${FC_CASE} ${FortranCInterface_GLOBAL__SUFFIX}")
 endif (ENABLE_FORTRAN)
 
+find_program( CLANG_FORMAT_EXE NAMES "clang-format" DOC "Path to clang-format executable" )
+if(NOT CLANG_FORMAT_EXE)
+	message(STATUS "clang-format not found.")
+else()
+	message(STATUS "clang-format found: ${CLANG_FORMAT_EXE}")
+	set(DO_CLANG_FORMAT "${CLANG_FORMAT_EXE}" "-i -style=file")
+endif()
+
+# get all project files
+file(GLOB_RECURSE MOAB_PROJECT_SOURCE_FILES 
+			RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
+			LIST_DIRECTORIES false 
+			src/*.cpp src/*.c src/*.hpp 
+			tools/*.cpp tools/*.hpp 
+			test/*.cpp 
+			itaps/*.cpp itaps/*.h itaps/*.hpp 
+			examples/*.cpp
+		)
+
+function(prepend var prefix)
+  set(listVar "")
+  foreach(f ${ARGN})
+    list(APPEND listVar "${prefix}/${f}")
+  endforeach()
+  set(${var} "${listVar}" PARENT_SCOPE)
+endfunction()
+
+if(CLANG_FORMAT_EXE)
+	prepend(FILES_TO_FORMAT ${CMAKE_CURRENT_SOURCE_DIR} ${MOAB_PROJECT_SOURCE_FILES})
+	add_custom_target( clang-format-project-files COMMAND ${CLANG_FORMAT_EXE} -i -style=file ${FILES_TO_FORMAT} )
+endif()
+
 # Generate the CMake input header file and then pass it through configuration
 ## execute_process( COMMAND cat MOABConfig.h.in COMMAND sed -e "s/#undef /#cmakedefine MOAB_/g"
 #execute_process( COMMAND cat MOABConfig.h.in COMMAND sed -r "s/#undef ([A-Z].*)/#cmakedefine MOAB_\\1 @MOAB_\\1@/"
