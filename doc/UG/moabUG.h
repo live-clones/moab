@@ -826,7 +826,7 @@ Before discussing how to access parallel aspects of a mesh, several terms need t
 </tr>
 </table>
 
-Parallel functionality is described in the following sections.  First, methods to load a mesh into a parallel representation are described; next, functions for accessing parallel aspects of a mesh are described; functions for communicating mesh and tag data are described.
+Parallel functionality is described in the following sections and in [26].  First, methods to load a mesh into a parallel representation are described; next, functions for accessing parallel aspects of a mesh are described; functions for communicating mesh and tag data are described.
 
   \ref contents
 
@@ -1245,7 +1245,7 @@ Initial results have demonstrated that the data abstraction provided by MOAB is 
 
 [25] Deville, Michel O., Paul F. Fischer, Paul F. Fischer, and E. H. Mund. High-order methods for incompressible fluid flow. Vol. 9. Cambridge university press, 2002.
 
-
+[26] T. J. Tautges, J. A. Kraftcheck, N. Bertram, V. Sachdeva and J. Magerlein, "Mesh Interface Resolution and Ghost Exchange in a Parallel Mesh Representation," 2012 IEEE 26th International Parallel and Distributed Processing Symposium Workshops & PhD Forum, Shanghai, 2012, pp. 1670-1679, doi: 10.1109/IPDPSW.2012.208.
   \ref contents
 
   \page differences Differences Between iMesh and MOAB
