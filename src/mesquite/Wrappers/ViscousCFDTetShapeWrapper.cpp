@@ -56,9 +56,8 @@
 namespace MBMesquite
 {
 
-void ViscousCFDTetShapeWrapper::run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh,
-                                             Settings* settings, QualityAssessor* qa,
-                                             MsqError& err )
+void ViscousCFDTetShapeWrapper::run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh, Settings* settings,
+                                             QualityAssessor* qa, MsqError& err )
 {
     InstructionQueue q;
 

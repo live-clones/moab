@@ -39,8 +39,8 @@
 
 using namespace MBMesquite;
 
-static inline void untangle_function_2d( double beta, const Vector3D temp_vec[], size_t e_ind,
-                                         PatchData& pd, double& fval, MsqError& err )
+static inline void untangle_function_2d( double beta, const Vector3D temp_vec[], size_t e_ind, PatchData& pd,
+                                         double& fval, MsqError& err )
 {
     Vector3D surface_normal;
     pd.get_domain_normal_at_element( e_ind, surface_normal, err );MSQ_ERRRTN( err );
@@ -68,10 +68,7 @@ static inline void untangle_function_3d( double beta, const Vector3D temp_vec[],
   \brief For untangle beta, the constructor defaults to the SUM
   averaging method, and to the ELEMENT_VERTICES evaluation mode.
 */
-UntangleBetaQualityMetric::UntangleBetaQualityMetric( double bet )
-    : AveragingQM( RMS ), mBeta( bet )
-{
-}
+UntangleBetaQualityMetric::UntangleBetaQualityMetric( double bet ) : AveragingQM( RMS ), mBeta( bet ) {}
 
 std::string UntangleBetaQualityMetric::get_name( ) const
 {
@@ -134,8 +131,8 @@ bool UntangleBetaQualityMetric::evaluate( PatchData& pd, size_t e_ind, double& f
             temp_vec[ 4 ] = vertices[ v_i[ 3 ] ] - vertices[ v_i[ 0 ] ];
             // transform to equilateral tet
             temp_vec[ 1 ] = ( ( 2 * temp_vec[ 3 ] ) - temp_vec[ 0 ] ) / MSQ_SQRT_THREE;
-            temp_vec[ 2 ] = ( ( 3 * temp_vec[ 4 ] ) - temp_vec[ 0 ] - temp_vec[ 3 ] ) /
-                            ( MSQ_SQRT_THREE * MSQ_SQRT_TWO );
+            temp_vec[ 2 ] =
+                ( ( 3 * temp_vec[ 4 ] ) - temp_vec[ 0 ] - temp_vec[ 3 ] ) / ( MSQ_SQRT_THREE * MSQ_SQRT_TWO );
             untangle_function_3d( mBeta, temp_vec, fval );
             break;
         case HEXAHEDRON:
@@ -188,8 +185,7 @@ bool UntangleBetaQualityMetric::evaluate( PatchData& pd, size_t e_ind, double& f
                 temp_vec[ 0 ] = vertices[ v_i[ ( i + 1 ) % 4 ] ] - vertices[ v_i[ i ] ];
                 temp_vec[ 1 ] = vertices[ v_i[ ( i + 3 ) % 4 ] ] - vertices[ v_i[ i ] ];
                 temp_vec[ 3 ] = vertices[ v_i[ 4 ] ] - vertices[ v_i[ i ] ];
-                temp_vec[ 2 ] =
-                    ( 4 * temp_vec[ 3 ] - temp_vec[ 0 ] - temp_vec[ 1 ] ) / ( 2.0 - MSQ_SQRT_TWO );
+                temp_vec[ 2 ] = ( 4 * temp_vec[ 3 ] - temp_vec[ 0 ] - temp_vec[ 1 ] ) / ( 2.0 - MSQ_SQRT_TWO );
                 untangle_function_3d( mBeta, temp_vec, met_vals[ i ] );
             }
             fval = average_metrics( met_vals, 4, err );
@@ -237,8 +233,7 @@ bool UntangleBetaQualityMetric::evaluate( PatchData& pd, size_t e_ind, double& f
             break;
         default:
             MSQ_SETERR( err )
-            ( MsqError::UNSUPPORTED_ELEMENT,
-              "Unsupported cell type (%d) for Untangle quality metric.", type );
+            ( MsqError::UNSUPPORTED_ELEMENT, "Unsupported cell type (%d) for Untangle quality metric.", type );
 
             fval = MSQ_MAX_CAP;
             return false;

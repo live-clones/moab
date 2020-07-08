@@ -64,8 +64,7 @@ ErrorCode NCWriteHOMME::collect_mesh_info( )
             // Assume that PARALLEL_RESOLVE_SHARED_ENTS option is set
             // Verify that not all local vertices are owned by the last processor
             if( procs - 1 == rank )
-                assert( "PARALLEL_RESOLVE_SHARED_ENTS option is set" &&
-                        localVertsOwned.size( ) < num_local_verts );
+                assert( "PARALLEL_RESOLVE_SHARED_ENTS option is set" && localVertsOwned.size( ) < num_local_verts );
         }
     }
 #endif
@@ -79,8 +78,7 @@ ErrorCode NCWriteHOMME::collect_mesh_info( )
     return MB_SUCCESS;
 }
 
-ErrorCode NCWriteHOMME::collect_variable_data( std::vector< std::string >& var_names,
-                                               std::vector< int >&         tstep_nums )
+ErrorCode NCWriteHOMME::collect_variable_data( std::vector< std::string >& var_names, std::vector< int >& tstep_nums )
 {
     NCWriteHelper::collect_variable_data( var_names, tstep_nums );
 
@@ -118,8 +116,7 @@ ErrorCode NCWriteHOMME::collect_variable_data( std::vector< std::string >& var_n
             // Time should be the first dimension
             assert( tDim == varDims[ 0 ] );
 
-            currentVarData.writeStarts[ dim_idx ] =
-                0;  // This value is timestep dependent, will be set later
+            currentVarData.writeStarts[ dim_idx ] = 0;  // This value is timestep dependent, will be set later
             currentVarData.writeCounts[ dim_idx ] = 1;
             dim_idx++;
         }
@@ -162,8 +159,7 @@ ErrorCode NCWriteHOMME::collect_variable_data( std::vector< std::string >& var_n
                 currentVarData.writeCounts[ dim_idx ] = localGidVertsOwned.size( );
                 break;
             default:
-                MB_SET_ERR( MB_FAILURE,
-                            "Unexpected entity location type for variable " << varname );
+                MB_SET_ERR( MB_FAILURE, "Unexpected entity location type for variable " << varname );
         }
         dim_idx++;
 
@@ -196,8 +192,7 @@ ErrorCode NCWriteHOMME::write_nonset_variables( std::vector< WriteNC::VarData >&
                 // Vertices
                 break;
             default:
-                MB_SET_ERR( MB_FAILURE, "Unexpected entity location type for variable "
-                                            << variableData.varName );
+                MB_SET_ERR( MB_FAILURE, "Unexpected entity location type for variable " << variableData.varName );
         }
 
         unsigned int num_timesteps;
@@ -243,11 +238,9 @@ ErrorCode NCWriteHOMME::write_nonset_variables( std::vector< WriteNC::VarData >&
             // Use tag_get_data instead of tag_iterate to copy tag data, as localVertsOwned
             // might not be contiguous. We should also transpose for level so that means
             // deep copy for transpose
-            if( tDim == variableData.varDims[ 0 ] )
-                variableData.writeStarts[ 0 ] = t;  // This is start for time
+            if( tDim == variableData.varDims[ 0 ] ) variableData.writeStarts[ 0 ] = t;  // This is start for time
             std::vector< double > tag_data( num_local_verts_owned * num_lev );
-            ErrorCode             rval =
-                mbImpl->tag_get_data( variableData.varTags[ t ], localVertsOwned, &tag_data[ 0 ] );MB_CHK_SET_ERR( rval, "Trouble getting tag data on owned vertices" );
+            ErrorCode rval = mbImpl->tag_get_data( variableData.varTags[ t ], localVertsOwned, &tag_data[ 0 ] );MB_CHK_SET_ERR( rval, "Trouble getting tag data on owned vertices" );
 
 #ifdef MOAB_HAVE_PNETCDF
             size_t             nb_writes = localGidVertsOwned.psize( );
@@ -265,8 +258,8 @@ ErrorCode NCWriteHOMME::write_nonset_variables( std::vector< WriteNC::VarData >&
                     {
                         // Transpose (ncol, lev) back to (lev, ncol)
                         // Note, num_local_verts_owned is not used by jik_to_kji_stride()
-                        jik_to_kji_stride( num_local_verts_owned, 1, num_lev, &tmpdoubledata[ 0 ],
-                                           &tag_data[ 0 ], localGidVertsOwned );
+                        jik_to_kji_stride( num_local_verts_owned, 1, num_lev, &tmpdoubledata[ 0 ], &tag_data[ 0 ],
+                                           localGidVertsOwned );
                     }
 
                     size_t indexInDoubleArray = 0;
@@ -284,33 +277,29 @@ ErrorCode NCWriteHOMME::write_nonset_variables( std::vector< WriteNC::VarData >&
                         // Wait outside this loop
                         success = NCFUNCREQP( _vara_double )(
                             _fileId, variableData.varId, &( variableData.writeStarts[ 0 ] ),
-                            &( variableData.writeCounts[ 0 ] ),
-                            &( tmpdoubledata[ indexInDoubleArray ] ), &requests[ idxReq++ ] );
+                            &( variableData.writeCounts[ 0 ] ), &( tmpdoubledata[ indexInDoubleArray ] ),
+                            &requests[ idxReq++ ] );
 #else
                         success = NCFUNCAP( _vara_double )(
                             _fileId, variableData.varId, &( variableData.writeStarts[ 0 ] ),
-                            &( variableData.writeCounts[ 0 ] ),
-                            &( tmpdoubledata[ indexInDoubleArray ] ) );
+                            &( variableData.writeCounts[ 0 ] ), &( tmpdoubledata[ indexInDoubleArray ] ) );
 #endif
                         if( success )
                             MB_SET_ERR( MB_FAILURE,
-                                        "Failed to write double data in a loop for variable "
-                                            << variableData.varName );
+                                        "Failed to write double data in a loop for variable " << variableData.varName );
                         // We need to increment the index in double array for the
                         // next subrange
                         indexInDoubleArray += ( endh - starth + 1 ) * num_lev;
                     }
                     assert( ic == localGidVertsOwned.psize( ) );
 #ifdef MOAB_HAVE_PNETCDF
-                    success =
-                        ncmpi_wait_all( _fileId, requests.size( ), &requests[ 0 ], &statuss[ 0 ] );
+                    success = ncmpi_wait_all( _fileId, requests.size( ), &requests[ 0 ], &statuss[ 0 ] );
                     if( success ) MB_SET_ERR( MB_FAILURE, "Failed on wait_all" );
 #endif
                     break;
                 }
                 default:
-                    MB_SET_ERR( MB_NOT_IMPLEMENTED,
-                                "Writing non-double data is not implemented yet" );
+                    MB_SET_ERR( MB_NOT_IMPLEMENTED, "Writing non-double data is not implemented yet" );
             }
         }
     }

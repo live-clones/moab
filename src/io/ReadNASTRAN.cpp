@@ -59,8 +59,7 @@ ReadNASTRAN::~ReadNASTRAN( )
 }
 
 ErrorCode ReadNASTRAN::read_tag_values( const char* /*file_name*/, const char* /*tag_name*/,
-                                        const FileOptions& /*opts*/,
-                                        std::vector< int >& /*tag_values_out*/,
+                                        const FileOptions& /*opts*/, std::vector< int >& /*tag_values_out*/,
                                         const SubsetList* /*subset_list*/ )
 {
     return MB_NOT_IMPLEMENTED;
@@ -68,15 +67,11 @@ ErrorCode ReadNASTRAN::read_tag_values( const char* /*file_name*/, const char* /
 
 // Load the file as called by the Interface function
 ErrorCode ReadNASTRAN::load_file( const char* filename, const EntityHandle* /* file_set */,
-                                  const FileOptions& /* opts */,
-                                  const ReaderIface::SubsetList* subset_list,
-                                  const Tag*                     file_id_tag )
+                                  const FileOptions& /* opts */, const ReaderIface::SubsetList* subset_list,
+                                  const Tag* file_id_tag )
 {
     // At this time there is no support for reading a subset of the file
-    if( subset_list )
-    {
-        MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "Reading subset of files not supported for NASTRAN" );
-    }
+    if( subset_list ) { MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "Reading subset of files not supported for NASTRAN" ); }
 
     nodeIdMap.clear( );
     elemIdMap.clear( );
@@ -133,8 +128,7 @@ ErrorCode ReadNASTRAN::load_file( const char* filename, const EntityHandle* /* f
     // Now that the number of vertices is known, create the vertices.
     EntityHandle           start_vert = 0;
     std::vector< double* > coord_arrays( 3 );
-    result = readMeshIface->get_node_coords( 3, entity_count[ 0 ], MB_START_ID, start_vert,
-                                             coord_arrays );
+    result = readMeshIface->get_node_coords( 3, entity_count[ 0 ], MB_START_ID, start_vert, coord_arrays );
     if( MB_SUCCESS != result ) return result;
     if( 0 == start_vert ) return MB_FAILURE;  // check for NULL
     int id, vert_index = 0;
@@ -167,8 +161,7 @@ ErrorCode ReadNASTRAN::load_file( const char* filename, const EntityHandle* /* f
                                     coord_arrays[ 2 ] + vert_index };
             result = read_node( tokens, debug, coords, id );
             if( MB_SUCCESS != result ) return result;
-            if( !nodeIdMap.insert( id, start_vert + vert_index, 1 ).second )
-                return MB_FAILURE;  // Duplicate IDs!
+            if( !nodeIdMap.insert( id, start_vert + vert_index, 1 ).second ) return MB_FAILURE;  // Duplicate IDs!
             ++vert_index;
         }
         else
@@ -340,8 +333,8 @@ ErrorCode ReadNASTRAN::get_real( const std::string& token, double& real )
 
 /* It has been determined that this line is a vertex. Read the rest of
    the line and create the vertex. */
-ErrorCode ReadNASTRAN::read_node( const std::vector< std::string >& tokens, const bool debug,
-                                  double* coords[ 3 ], int& id )
+ErrorCode ReadNASTRAN::read_node( const std::vector< std::string >& tokens, const bool debug, double* coords[ 3 ],
+                                  int& id )
 {
     // Read the node's id (unique)
     ErrorCode result;
@@ -370,9 +363,8 @@ ErrorCode ReadNASTRAN::read_node( const std::vector< std::string >& tokens, cons
 /* The type of element has already been identified. Read the rest of the
    line and create the element. Assume that all of the nodes have already
    been created. */
-ErrorCode ReadNASTRAN::read_element( const std::vector< std::string >& tokens,
-                                     std::vector< Range >& materials, const EntityType element_type,
-                                     const bool /*debug*/ )
+ErrorCode ReadNASTRAN::read_element( const std::vector< std::string >& tokens, std::vector< Range >& materials,
+                                     const EntityType element_type, const bool /*debug*/ )
 {
     // Read the element's id (unique) and material set
     ErrorCode result;
@@ -423,8 +415,8 @@ ErrorCode ReadNASTRAN::create_materials( const std::vector< Range >& materials )
     ErrorCode result;
     Tag       material_tag;
     int       negone = -1;
-    result = MBI->tag_get_handle( MATERIAL_SET_TAG_NAME, 1, MB_TYPE_INTEGER, material_tag,
-                                  MB_TAG_SPARSE | MB_TAG_CREAT, &negone );
+    result = MBI->tag_get_handle( MATERIAL_SET_TAG_NAME, 1, MB_TYPE_INTEGER, material_tag, MB_TAG_SPARSE | MB_TAG_CREAT,
+                                  &negone );
     if( MB_SUCCESS != result ) return result;
 
     for( size_t i = 0; i < materials.size( ); ++i )

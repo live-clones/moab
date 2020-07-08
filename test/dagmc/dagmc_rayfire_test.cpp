@@ -16,15 +16,14 @@ using moab::DagMC;
 
 DagMC* DAG;
 
-#define CHKERR( A )                                                                          \
-    do                                                                                       \
-    {                                                                                        \
-        if( MB_SUCCESS != ( A ) )                                                            \
-        {                                                                                    \
-            std::cerr << "Failure (error code " << ( A ) << ") at " __FILE__ ":" << __LINE__ \
-                      << std::endl;                                                          \
-            return A;                                                                        \
-        }                                                                                    \
+#define CHKERR( A )                                                                                        \
+    do                                                                                                     \
+    {                                                                                                      \
+        if( MB_SUCCESS != ( A ) )                                                                          \
+        {                                                                                                  \
+            std::cerr << "Failure (error code " << ( A ) << ") at " __FILE__ ":" << __LINE__ << std::endl; \
+            return A;                                                                                      \
+        }                                                                                                  \
     } while( false )
 
 std::string input_file = TestDir + "/test_geom.h5m";
@@ -174,12 +173,10 @@ int main( int /* argc */, char** /* argv */ )
     // rays fired along cardinal directions
     result += RUN_TEST( dagmc_origin_face_rayfire );  // point in centre
     result += RUN_TEST( dagmc_outside_face_rayfire );
-    result +=
-        RUN_TEST( dagmc_outside_face_rayfire_orient_exit );  // fire ray from point outside volume
-                                                             // looking for exit intersections
-    result += RUN_TEST(
-        dagmc_outside_face_rayfire_orient_entrance );  // fire ray from point outside volume looking
-                                                       // for entrance intersection
+    result += RUN_TEST( dagmc_outside_face_rayfire_orient_exit );  // fire ray from point outside volume
+                                                                   // looking for exit intersections
+    result += RUN_TEST( dagmc_outside_face_rayfire_orient_entrance );  // fire ray from point outside volume looking
+                                                                       // for entrance intersection
     result += RUN_TEST( dagmc_outside_face_rayfire_history_fail );  // fire ray from point outside
                                                                     // geometry using ray history
     result += RUN_TEST( dagmc_outside_face_rayfire_history );  // fire ray from point outside

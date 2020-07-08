@@ -65,10 +65,9 @@ int main( int argc, char* argv[] )
 
     opts.parseCommandLine( argc, argv );
     // load meshes in parallel if needed
-    std::string opts_read =
-        ( size == 1 ? ""
-                    : std::string( "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION" ) +
-                          std::string( ";PARALLEL_RESOLVE_SHARED_ENTS" ) );
+    std::string opts_read = ( size == 1 ? ""
+                                        : std::string( "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION" ) +
+                                              std::string( ";PARALLEL_RESOLVE_SHARED_ENTS" ) );
 
     // read meshes in 3 file sets
     ErrorCode    rval;
@@ -137,8 +136,7 @@ int main( int argc, char* argv[] )
     Tag gidTag = mb->globalId_tag( );
 
     Tag areaTag;
-    rval =
-        mb->tag_get_handle( "OrigArea", 1, MB_TYPE_DOUBLE, areaTag, MB_TAG_DENSE | MB_TAG_CREAT );MB_CHK_ERR( rval );
+    rval = mb->tag_get_handle( "OrigArea", 1, MB_TYPE_DOUBLE, areaTag, MB_TAG_DENSE | MB_TAG_CREAT );MB_CHK_ERR( rval );
 
     moab::IntxAreaUtils areaAdaptor( areaMethod );
     Range               non_convex_intx_cells;
@@ -191,8 +189,7 @@ int main( int argc, char* argv[] )
         rval = mb->get_coords( verts, num_nodes, &coords[ 0 ] );
         if( MB_SUCCESS != rval ) return -1;
         int    check_sign = 1;
-        double intx_area =
-            areaAdaptor.area_spherical_polygon( &coords[ 0 ], num_nodes, R, &check_sign );
+        double intx_area = areaAdaptor.area_spherical_polygon( &coords[ 0 ], num_nodes, R, &check_sign );
 
         rval = mb->tag_set_data( areaTag, &cell, 1, &intx_area );
         ;MB_CHK_ERR( rval );
@@ -225,23 +222,21 @@ int main( int argc, char* argv[] )
         }
         if( intx_area < 0 )
         {
-            std::cout << "negative intx area: " << intx_area << " n:" << num_nodes
-                      << " parents: " << sourceID << " " << targetID << "\n";
+            std::cout << "negative intx area: " << intx_area << " n:" << num_nodes << " parents: " << sourceID << " "
+                      << targetID << "\n";
         }
         if( check_sign < 0 )
         {
             non_convex_intx_cells.insert( cell );
-            std::cout << " non-convex polygon: " << intx_area << " n:" << num_nodes
-                      << " parents: " << sourceID << " " << targetID << "\n";
+            std::cout << " non-convex polygon: " << intx_area << " n:" << num_nodes << " parents: " << sourceID << " "
+                      << targetID << "\n";
         }
     }
     Tag diffTag;
-    rval =
-        mb->tag_get_handle( "AreaDiff", 1, MB_TYPE_DOUBLE, diffTag, MB_TAG_DENSE | MB_TAG_CREAT );MB_CHK_ERR( rval );
+    rval = mb->tag_get_handle( "AreaDiff", 1, MB_TYPE_DOUBLE, diffTag, MB_TAG_DENSE | MB_TAG_CREAT );MB_CHK_ERR( rval );
 
     Tag countIntxCellsTag;
-    rval = mb->tag_get_handle( "CountIntx", 1, MB_TYPE_INTEGER, countIntxCellsTag,
-                               MB_TAG_DENSE | MB_TAG_CREAT );MB_CHK_ERR( rval );
+    rval = mb->tag_get_handle( "CountIntx", 1, MB_TYPE_INTEGER, countIntxCellsTag, MB_TAG_DENSE | MB_TAG_CREAT );MB_CHK_ERR( rval );
 
     for( Range::iterator eit = sourceCells.begin( ); eit != sourceCells.end( ); ++eit )
     {
@@ -285,8 +280,7 @@ int main( int argc, char* argv[] )
                 EntityHandle cell = *eit;
                 int          sourceID;
                 rval = mb->tag_get_data( sourceParentTag, &cell, 1, &sourceID );MB_CHK_ERR( rval );
-                std::vector< int >::iterator j =
-                    std::lower_bound( sourceIDs.begin( ), sourceIDs.end( ), sourceID );
+                std::vector< int >::iterator j = std::lower_bound( sourceIDs.begin( ), sourceIDs.end( ), sourceID );
                 if( ( j != sourceIDs.end( ) ) && ( *j == sourceID ) )
                 {
                     rval = mb->add_entities( errorSourceIntxSet, &cell, 1 );
@@ -343,8 +337,7 @@ int main( int argc, char* argv[] )
                 EntityHandle cell = *eit;
                 int          targetID;
                 rval = mb->tag_get_data( targetParentTag, &cell, 1, &targetID );MB_CHK_ERR( rval );
-                std::vector< int >::iterator j =
-                    std::lower_bound( targetIDs.begin( ), targetIDs.end( ), targetID );
+                std::vector< int >::iterator j = std::lower_bound( targetIDs.begin( ), targetIDs.end( ), targetID );
                 if( ( j != targetIDs.end( ) ) && ( *j == targetID ) )
                 {
                     rval = mb->add_entities( errorTargetIntxSet, &cell, 1 );
@@ -363,8 +356,7 @@ int main( int argc, char* argv[] )
 
         Range sourceCells;
         Range targetCells;
-        for( Range::iterator it = non_convex_intx_cells.begin( );
-             it != non_convex_intx_cells.end( ); it++ )
+        for( Range::iterator it = non_convex_intx_cells.begin( ); it != non_convex_intx_cells.end( ); it++ )
         {
             EntityHandle cellIntx = *it;
             int          sourceID, targetID;

@@ -24,223 +24,202 @@ const CN::ConnMap CN::mConnectivityMap[ MBMAXTYPE ][ 3 ] = {
     { { 0,
         0,
         { 0 },
-        { MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
-          MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE },
+        { MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
+          MBMAXTYPE, MBMAXTYPE },
         { { 0 } } },
       // vertex-face
       { 0,
         0,
         { 0 },
-        { MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
-          MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE },
+        { MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
+          MBMAXTYPE, MBMAXTYPE },
         { { 0 } } },
       // vertex-region
       { 0,
         0,
         { 0 },
-        { MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
-          MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE },
+        { MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
+          MBMAXTYPE, MBMAXTYPE },
         { { 0 } } } },
 
     // edge-edge
     { { 1,
         1,
         { 2 },
-        { MBEDGE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
-          MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE },
+        { MBEDGE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
+          MBMAXTYPE, MBMAXTYPE },
         { { 0, 1 } } },
       // edge-face
       { 1,
         0,
         { 0 },
-        { MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
-          MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE },
+        { MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
+          MBMAXTYPE, MBMAXTYPE },
         { { 0 } } },
       // edge-region
       { 1,
         0,
         { 0 },
-        { MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
-          MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE },
+        { MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
+          MBMAXTYPE, MBMAXTYPE },
         { { 0 } } } },
 
     // tri-edge
     { { 2,
         3,
         { 2, 2, 2 },
-        { MBEDGE, MBEDGE, MBEDGE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
-          MBMAXTYPE, MBMAXTYPE, MBMAXTYPE },
+        { MBEDGE, MBEDGE, MBEDGE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
+          MBMAXTYPE, MBMAXTYPE },
         { { 0, 1 }, { 1, 2 }, { 2, 0 } } },
       // tri-face
       { 2,
         1,
         { 3 },
-        { MBTRI, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
-          MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE },
+        { MBTRI, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
+          MBMAXTYPE, MBMAXTYPE },
         { { 0, 1, 2 } } },
       // tri-region
       { 2,
         0,
         { 0 },
-        { MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
-          MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE },
+        { MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
+          MBMAXTYPE, MBMAXTYPE },
         { { 0 } } } },
 
     // quad-edge
     { { 2,
         4,
         { 2, 2, 2, 2 },
-        { MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
-          MBMAXTYPE, MBMAXTYPE, MBMAXTYPE },
+        { MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
+          MBMAXTYPE },
         { { 0, 1 }, { 1, 2 }, { 2, 3 }, { 3, 0 } } },
       // quad-face
       { 2,
         1,
         { 4 },
-        { MBQUAD, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
-          MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE },
+        { MBQUAD, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
+          MBMAXTYPE, MBMAXTYPE },
         { { 0, 1, 2, 3 } } },
       // quad-region
       { 2,
         0,
         { 0 },
-        { MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
-          MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE },
+        { MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
+          MBMAXTYPE, MBMAXTYPE },
         { { 0 } } } },
 
     // polygon-edge
     { { 2,
         0,
         { 0 },
-        { MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
-          MBMAXTYPE, MBMAXTYPE },
+        { MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
+          MBMAXTYPE },
         { { 0 } } },
       // polygon-face
       { 2,
         1,
         { 0 },
-        { MBPOLYGON, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
-          MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE },
+        { MBPOLYGON, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
+          MBMAXTYPE, MBMAXTYPE },
         { { 0 } } },
       // polygon-region
       { 2,
         0,
         { 0 },
-        { MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
-          MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE },
+        { MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
+          MBMAXTYPE, MBMAXTYPE },
         { { 0 } } } },
 
     // tet-edge
     { { 3,
         6,
         { 2, 2, 2, 2, 2, 2 },
-        { MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
-          MBMAXTYPE, MBMAXTYPE, MBMAXTYPE },
+        { MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
+          MBMAXTYPE },
         { { 0, 1 }, { 1, 2 }, { 2, 0 }, { 0, 3 }, { 1, 3 }, { 2, 3 } } },
       // tet-face
       { 3,
         4,
         { 3, 3, 3, 3 },
-        { MBTRI, MBTRI, MBTRI, MBTRI, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
-          MBMAXTYPE, MBMAXTYPE, MBMAXTYPE },
+        { MBTRI, MBTRI, MBTRI, MBTRI, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
+          MBMAXTYPE },
         { { 0, 1, 3 }, { 1, 2, 3 }, { 0, 3, 2 }, { 0, 2, 1 } } },
       // tet-tet
       { 3,
         1,
         { 4 },
-        { MBTET, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
-          MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE },
+        { MBTET, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
+          MBMAXTYPE, MBMAXTYPE },
         { { 0, 1, 2, 3 } } } },
 
     // pyramid-edge
     { { 3,
         8,
         { 2, 2, 2, 2, 2, 2, 2, 2 },
-        { MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBMAXTYPE, MBMAXTYPE,
-          MBMAXTYPE, MBMAXTYPE },
+        { MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE },
         { { 0, 1 }, { 1, 2 }, { 2, 3 }, { 3, 0 }, { 0, 4 }, { 1, 4 }, { 2, 4 }, { 3, 4 } } },
       // pyramid-face
       { 3,
         5,
         { 3, 3, 3, 3, 4 },
-        { MBTRI, MBTRI, MBTRI, MBTRI, MBQUAD, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
-          MBMAXTYPE, MBMAXTYPE },
+        { MBTRI, MBTRI, MBTRI, MBTRI, MBQUAD, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
+          MBMAXTYPE },
         { { 0, 1, 4 }, { 1, 2, 4 }, { 2, 3, 4 }, { 3, 0, 4 }, { 0, 3, 2, 1 } } },
       // pyramid-pyramid
       { 3,
         1,
         { 5 },
-        { MBPYRAMID, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
-          MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE },
+        { MBPYRAMID, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
+          MBMAXTYPE, MBMAXTYPE },
         { { 0, 1, 2, 3, 4 } } } },
 
     // wedge-edge
     { { 3,
         9,
         { 2, 2, 2, 2, 2, 2, 2, 2, 2 },
-        { MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBMAXTYPE,
-          MBMAXTYPE, MBMAXTYPE },
-        { { 0, 1 },
-          { 1, 2 },
-          { 2, 0 },
-          { 0, 3 },
-          { 1, 4 },
-          { 2, 5 },
-          { 3, 4 },
-          { 4, 5 },
-          { 5, 3 } } },
+        { MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE },
+        { { 0, 1 }, { 1, 2 }, { 2, 0 }, { 0, 3 }, { 1, 4 }, { 2, 5 }, { 3, 4 }, { 4, 5 }, { 5, 3 } } },
       // wedge-face
       { 3,
         5,
         { 4, 4, 4, 3, 3 },
-        { MBQUAD, MBQUAD, MBQUAD, MBTRI, MBTRI, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
-          MBMAXTYPE, MBMAXTYPE, MBMAXTYPE },
+        { MBQUAD, MBQUAD, MBQUAD, MBTRI, MBTRI, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
+          MBMAXTYPE },
         { { 0, 1, 4, 3 }, { 1, 2, 5, 4 }, { 0, 3, 5, 2 }, { 0, 2, 1 }, { 3, 4, 5 } } },
       // wedge-wedge
       { 3,
         1,
         { 6 },
-        { MBPRISM, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
-          MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE },
+        { MBPRISM, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
+          MBMAXTYPE, MBMAXTYPE },
         { { 0, 1, 2, 3, 4, 5 } } } },
 
     // knife-edge
     { { 3,
         10,
         { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 },
-        { MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBMAXTYPE,
-          MBMAXTYPE },
-        { { 0, 1 },
-          { 1, 2 },
-          { 2, 3 },
-          { 3, 0 },
-          { 0, 4 },
-          { 1, 5 },
-          { 2, 6 },
-          { 3, 5 },
-          { 4, 5 },
-          { 5, 6 } } },
+        { MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBMAXTYPE, MBMAXTYPE },
+        { { 0, 1 }, { 1, 2 }, { 2, 3 }, { 3, 0 }, { 0, 4 }, { 1, 5 }, { 2, 6 }, { 3, 5 }, { 4, 5 }, { 5, 6 } } },
       // knife-face
       { 3,
         5,
         { 4, 4, 4, 4, 4 },
-        { MBQUAD, MBQUAD, MBQUAD, MBQUAD, MBQUAD, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
-          MBMAXTYPE, MBMAXTYPE, MBMAXTYPE },
+        { MBQUAD, MBQUAD, MBQUAD, MBQUAD, MBQUAD, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
+          MBMAXTYPE },
         { { 0, 1, 5, 4 }, { 1, 2, 6, 5 }, { 2, 3, 5, 6 }, { 3, 0, 4, 5 }, { 0, 3, 2, 1 } } },
       // knife-knife
       { 3,
         1,
         { 7 },
-        { MBKNIFE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
-          MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE },
+        { MBKNIFE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
+          MBMAXTYPE, MBMAXTYPE },
         { { 0, 1, 2, 3, 4, 5, 6 } } } },
 
     // hex-edge
     { { 3,
         12,
         { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 },
-        { MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE,
-          MBEDGE },
+        { MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE, MBEDGE },
         { { 0, 1 },
           { 1, 2 },
           { 2, 3 },
@@ -257,64 +236,59 @@ const CN::ConnMap CN::mConnectivityMap[ MBMAXTYPE ][ 3 ] = {
       { 3,
         6,
         { 4, 4, 4, 4, 4, 4 },
-        { MBQUAD, MBQUAD, MBQUAD, MBQUAD, MBQUAD, MBQUAD, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
-          MBMAXTYPE, MBMAXTYPE, MBMAXTYPE },
-        { { 0, 1, 5, 4 },
-          { 1, 2, 6, 5 },
-          { 2, 3, 7, 6 },
-          { 3, 0, 4, 7 },
-          { 0, 3, 2, 1 },
-          { 4, 5, 6, 7 } } },
+        { MBQUAD, MBQUAD, MBQUAD, MBQUAD, MBQUAD, MBQUAD, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
+          MBMAXTYPE },
+        { { 0, 1, 5, 4 }, { 1, 2, 6, 5 }, { 2, 3, 7, 6 }, { 3, 0, 4, 7 }, { 0, 3, 2, 1 }, { 4, 5, 6, 7 } } },
       // hex-hex
       { 3,
         1,
         { 8 },
-        { MBHEX, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
-          MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE },
+        { MBHEX, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
+          MBMAXTYPE, MBMAXTYPE },
         { { 0, 1, 2, 3, 4, 5, 6, 7 } } } },
 
     // polyhedron-edge
     { { 3,
         0,
         { 0 },
-        { MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
-          MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE },
+        { MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
+          MBMAXTYPE, MBMAXTYPE },
         { { 0 } } },
       // polyhedron-face
       { 3,
         0,
         { 0 },
-        { MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
-          MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE },
+        { MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
+          MBMAXTYPE, MBMAXTYPE },
         { { 0 } } },
       // polyhedron-polyhedron
       { 3,
         1,
         { 0 },
-        { MBPOLYHEDRON, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
-          MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE },
+        { MBPOLYHEDRON, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
+          MBMAXTYPE, MBMAXTYPE, MBMAXTYPE },
         { { 0 } } } },
 
     // meshset-edge
     { { 4,
         0,
         { 0 },
-        { MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
-          MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE },
+        { MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
+          MBMAXTYPE, MBMAXTYPE },
         { { 0 } } },  // not handled yet?
-                      // meshset-face
+      // meshset-face
       { 4,
         0,
         { 0 },
-        { MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
-          MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE },
+        { MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
+          MBMAXTYPE, MBMAXTYPE },
         { { 0 } } },  // not handled yet?
-                      // meshset-region
+      // meshset-region
       { 4,
         0,
         { 0 },
-        { MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
-          MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE },
+        { MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE, MBMAXTYPE,
+          MBMAXTYPE, MBMAXTYPE },
         { { 0 } } } }  // not handled yet?
 
     // maxtype
@@ -323,22 +297,10 @@ const CN::ConnMap CN::mConnectivityMap[ MBMAXTYPE ][ 3 ] = {
 const CN::UpConnMap CN::mUpConnMap[ MBMAXTYPE ][ 4 ][ 4 ] = {
     {
         // type MBVERTEX
-        { { { 1 }, { { 0 } } },
-          { { 0 }, { { 0 } } },
-          { { 0 }, { { 0 } } },
-          { { 0 }, { { 0 } } } },  // source dim 0
-        { { { 0 }, { { 0 } } },
-          { { 0 }, { { 0 } } },
-          { { 0 }, { { 0 } } },
-          { { 0 }, { { 0 } } } },  // source dim 1
-        { { { 0 }, { { 0 } } },
-          { { 0 }, { { 0 } } },
-          { { 0 }, { { 0 } } },
-          { { 0 }, { { 0 } } } },  // source dim 2
-        { { { 0 }, { { 0 } } },
-          { { 0 }, { { 0 } } },
-          { { 0 }, { { 0 } } },
-          { { 0 }, { { 0 } } } },  // source dim 3
+        { { { 1 }, { { 0 } } }, { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } } },  // source dim 0
+        { { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } } },  // source dim 1
+        { { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } } },  // source dim 2
+        { { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } } },  // source dim 3
     },
 
     {
@@ -375,14 +337,8 @@ const CN::UpConnMap CN::mUpConnMap[ MBMAXTYPE ][ 4 ][ 4 ] = {
               { { 0 } } }  // end target dimension 3
         },  // end source dim 1
 
-        { { { 0 }, { { 0 } } },
-          { { 0 }, { { 0 } } },
-          { { 0 }, { { 0 } } },
-          { { 0 }, { { 0 } } } },  // source dim 2
-        { { { 0 }, { { 0 } } },
-          { { 0 }, { { 0 } } },
-          { { 0 }, { { 0 } } },
-          { { 0 }, { { 0 } } } },  // source dim 3
+        { { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } } },  // source dim 2
+        { { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } } },  // source dim 3
     },  // end type MBEDGE
 
     {
@@ -628,25 +584,13 @@ const CN::UpConnMap CN::mUpConnMap[ MBMAXTYPE ][ 4 ][ 4 ] = {
             // source dim 0
             { // target dim 0
               { 3, 3, 3, 3, 4 },  // 3 connected vertices for most vertices
-              { { 1, 3, 4 },
-                { 0, 2, 4 },
-                { 1, 3, 4 },
-                { 0, 2, 4 },
-                { 0, 1, 2, 3 } } },  // end target dimension 0
+              { { 1, 3, 4 }, { 0, 2, 4 }, { 1, 3, 4 }, { 0, 2, 4 }, { 0, 1, 2, 3 } } },  // end target dimension 0
             { // target dimension 1
               { 3, 3, 3, 3, 4 },  // 3 connected edges for most vertices
-              { { 0, 3, 4 },
-                { 0, 1, 5 },
-                { 1, 2, 6 },
-                { 2, 3, 7 },
-                { 4, 5, 6, 7 } } },  // end target dimension 1
+              { { 0, 3, 4 }, { 0, 1, 5 }, { 1, 2, 6 }, { 2, 3, 7 }, { 4, 5, 6, 7 } } },  // end target dimension 1
             { // target dimension 2
               { 3, 3, 3, 3, 4 },  // 3 connected faces for most vertices
-              { { 0, 3, 4 },
-                { 0, 1, 4 },
-                { 1, 2, 4 },
-                { 2, 3, 4 },
-                { 0, 1, 2, 3 } } },  // end target dimension 2
+              { { 0, 3, 4 }, { 0, 1, 4 }, { 1, 2, 4 }, { 2, 3, 4 }, { 0, 1, 2, 3 } } },  // end target dimension 2
             { // target dimension 3
               { 1, 1, 1, 1, 1 },  // 0 connected elements for all vertices
               { { 0 }, { 0 }, { 0 }, { 0 }, { 0 } } }  // end target dimension 3
@@ -656,14 +600,7 @@ const CN::UpConnMap CN::mUpConnMap[ MBMAXTYPE ][ 4 ][ 4 ] = {
             // source dim 1
             { // target dim 0
               { 2, 2, 2, 2, 2, 2, 2, 2 },  // 2 vertices for all edges
-              { { 0, 1 },
-                { 1, 2 },
-                { 2, 3 },
-                { 0, 3 },
-                { 0, 4 },
-                { 1, 4 },
-                { 2, 4 },
-                { 3, 4 } } },  // end target dim 0
+              { { 0, 1 }, { 1, 2 }, { 2, 3 }, { 0, 3 }, { 0, 4 }, { 1, 4 }, { 2, 4 }, { 3, 4 } } },  // end target dim 0
             { // target dim 1
               { 4, 4, 4, 4, 5, 5, 5, 5 },  // 4 edges for some edges, 5 for others
               { { 1, 3, 4, 5 },
@@ -676,14 +613,7 @@ const CN::UpConnMap CN::mUpConnMap[ MBMAXTYPE ][ 4 ][ 4 ] = {
                 { 2, 3, 4, 5, 6 } } },  // end target dim 1
             { // target dim 2
               { 2, 2, 2, 2, 2, 2, 2, 2 },  // 2 faces for all edges
-              { { 0, 4 },
-                { 1, 4 },
-                { 2, 4 },
-                { 3, 4 },
-                { 0, 3 },
-                { 0, 1 },
-                { 1, 2 },
-                { 2, 3 } } },  // end target dim 2
+              { { 0, 4 }, { 1, 4 }, { 2, 4 }, { 3, 4 }, { 0, 3 }, { 0, 1 }, { 1, 2 }, { 2, 3 } } },  // end target dim 2
             { // target dimension 3
               { 1, 1, 1, 1, 1, 1, 1, 1 },  // 0 connected elements for all vertices
               { { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 } } }  // end target dimension
@@ -694,25 +624,13 @@ const CN::UpConnMap CN::mUpConnMap[ MBMAXTYPE ][ 4 ][ 4 ] = {
             // source dim 2
             { // target dim 0
               { 3, 3, 3, 3, 4 },  // 3 vertices for most edges
-              { { 0, 1, 4 },
-                { 1, 2, 4 },
-                { 2, 3, 4 },
-                { 0, 3, 4 },
-                { 0, 1, 2, 3 } } },  // end target dim 0
+              { { 0, 1, 4 }, { 1, 2, 4 }, { 2, 3, 4 }, { 0, 3, 4 }, { 0, 1, 2, 3 } } },  // end target dim 0
             { // target dim 1
               { 3, 3, 3, 3, 4 },  // 3 edges for most faces
-              { { 0, 5, 4 },
-                { 1, 6, 5 },
-                { 6, 2, 7 },
-                { 3, 4, 7 },
-                { 0, 3, 2, 1 } } },  // end target dim 1
+              { { 0, 5, 4 }, { 1, 6, 5 }, { 6, 2, 7 }, { 3, 4, 7 }, { 0, 3, 2, 1 } } },  // end target dim 1
             { // target dim 2
               { 3, 3, 3, 3, 4 },  // 4 faces for most faces
-              { { 4, 1, 3 },
-                { 4, 2, 0 },
-                { 4, 3, 1 },
-                { 4, 0, 2 },
-                { 0, 1, 2, 3 } } },  // end target dim 2
+              { { 4, 1, 3 }, { 4, 2, 0 }, { 4, 3, 1 }, { 4, 0, 2 }, { 0, 1, 2, 3 } } },  // end target dim 2
             { // target dimension 3
               { 1, 1, 1, 1, 1 },  // 0 connected elements for all vertices
               { { 0 }, { 0 }, { 0 }, { 0 }, { 0 } } }  // end target dimension 3
@@ -741,28 +659,16 @@ const CN::UpConnMap CN::mUpConnMap[ MBMAXTYPE ][ 4 ][ 4 ] = {
             // source dim 0
             { // target dim 0
               { 3, 3, 3, 3, 3, 3 },  // 3 connected vertices for all vertices
-              { { 1, 2, 3 },
-                { 0, 2, 4 },
-                { 0, 1, 5 },
-                { 0, 4, 5 },
-                { 1, 3, 5 },
-                { 2, 3, 4 } } },  // end target dimension 0
+              { { 1, 2, 3 }, { 0, 2, 4 }, { 0, 1, 5 }, { 0, 4, 5 }, { 1, 3, 5 }, { 2, 3, 4 } } },  // end target
+                                                                                                   // dimension 0
             { // target dimension 1
               { 3, 3, 3, 3, 3, 3 },  // 3 connected edges for all vertices
-              { { 0, 2, 3 },
-                { 0, 1, 4 },
-                { 1, 2, 5 },
-                { 3, 6, 8 },
-                { 4, 6, 7 },
-                { 5, 7, 8 } } },  // end target dimension 1
+              { { 0, 2, 3 }, { 0, 1, 4 }, { 1, 2, 5 }, { 3, 6, 8 }, { 4, 6, 7 }, { 5, 7, 8 } } },  // end target
+                                                                                                   // dimension 1
             { // target dimension 2
               { 3, 3, 3, 3, 3, 3 },  // 3 connected faces for all vertices
-              { { 0, 2, 3 },
-                { 0, 1, 3 },
-                { 1, 2, 3 },
-                { 0, 2, 4 },
-                { 0, 1, 4 },
-                { 1, 2, 4 } } },  // end target dimension 2
+              { { 0, 2, 3 }, { 0, 1, 3 }, { 1, 2, 3 }, { 0, 2, 4 }, { 0, 1, 4 }, { 1, 2, 4 } } },  // end target
+                                                                                                   // dimension 2
             { // target dimension 3
               { 1, 1, 1, 1, 1, 1 },  // 0 connected elements for all vertices
               { { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 } } }  // end target dimension 3
@@ -772,15 +678,9 @@ const CN::UpConnMap CN::mUpConnMap[ MBMAXTYPE ][ 4 ][ 4 ] = {
             // source dim 1
             { // target dim 0
               { 2, 2, 2, 2, 2, 2, 2, 2, 2 },  // 2 vertices for all edges
-              { { 0, 1 },
-                { 1, 2 },
-                { 0, 2 },
-                { 0, 3 },
-                { 1, 4 },
-                { 2, 5 },
-                { 3, 4 },
-                { 4, 5 },
-                { 3, 5 } } },  // end target dim 0
+              { { 0, 1 }, { 1, 2 }, { 0, 2 }, { 0, 3 }, { 1, 4 }, { 2, 5 }, { 3, 4 }, { 4, 5 }, { 3, 5 } } },  // end
+                                                                                                               // target
+                                                                                                               // dim 0
             { // target dim 1
               { 4, 4, 4, 4, 4, 4, 4, 4, 4 },  // 4 edges for all edges
               { { 1, 2, 3, 4 },
@@ -794,15 +694,9 @@ const CN::UpConnMap CN::mUpConnMap[ MBMAXTYPE ][ 4 ][ 4 ] = {
                 { 3, 5, 6, 7 } } },  // end target dim 1
             { // target dim 2
               { 2, 2, 2, 2, 2, 2, 2, 2, 2 },  // 2 faces for all edges
-              { { 0, 3 },
-                { 1, 3 },
-                { 2, 3 },
-                { 0, 2 },
-                { 0, 1 },
-                { 1, 2 },
-                { 0, 4 },
-                { 1, 4 },
-                { 2, 4 } } },  // end target dim 2
+              { { 0, 3 }, { 1, 3 }, { 2, 3 }, { 0, 2 }, { 0, 1 }, { 1, 2 }, { 0, 4 }, { 1, 4 }, { 2, 4 } } },  // end
+                                                                                                               // target
+                                                                                                               // dim 2
             { // target dimension 3
               { 1, 1, 1, 1, 1, 1, 1, 1, 1 },  // 0 connected elements for all vertices
               { { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 } } }  // end target
@@ -813,25 +707,13 @@ const CN::UpConnMap CN::mUpConnMap[ MBMAXTYPE ][ 4 ][ 4 ] = {
             // source dim 2
             { // target dim 0
               { 4, 4, 4, 3, 3 },  // 4 vertices for some faces, 3 for others
-              { { 0, 1, 3, 4 },
-                { 1, 2, 4, 5 },
-                { 0, 2, 3, 5 },
-                { 0, 1, 2 },
-                { 3, 4, 5 } } },  // end target dim 0
+              { { 0, 1, 3, 4 }, { 1, 2, 4, 5 }, { 0, 2, 3, 5 }, { 0, 1, 2 }, { 3, 4, 5 } } },  // end target dim 0
             { // target dim 1
               { 4, 4, 4, 3, 3 },  // 4 edges for some faces, 3 for others
-              { { 0, 4, 6, 3 },
-                { 1, 5, 7, 4 },
-                { 2, 3, 8, 5 },
-                { 0, 2, 1 },
-                { 6, 7, 8 } } },  // end target dim 1
+              { { 0, 4, 6, 3 }, { 1, 5, 7, 4 }, { 2, 3, 8, 5 }, { 0, 2, 1 }, { 6, 7, 8 } } },  // end target dim 1
             { // target dim 2
               { 4, 4, 4, 3, 3 },  // 4 faces for some faces, 3 for others
-              { { 3, 1, 4, 2 },
-                { 3, 2, 4, 0 },
-                { 3, 0, 4, 1 },
-                { 0, 2, 1 },
-                { 0, 1, 2 } } },  // end target dim 2
+              { { 3, 1, 4, 2 }, { 3, 2, 4, 0 }, { 3, 0, 4, 1 }, { 0, 2, 1 }, { 0, 1, 2 } } },  // end target dim 2
             { // target dimension 3
               { 1, 1, 1, 1, 1 },  // 0 connected elements for all vertices
               { { 0 }, { 0 }, { 0 }, { 0 }, { 0 } } }  // end target dimension 3
@@ -948,18 +830,8 @@ const CN::UpConnMap CN::mUpConnMap[ MBMAXTYPE ][ 4 ][ 4 ] = {
                 { 3, 5 } } },  // end target dim 2
             { // target dimension 3
               { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },  // 0 connected elements for all vertices
-              { { 0 },
-                { 0 },
-                { 0 },
-                { 0 },
-                { 0 },
-                { 0 },
-                { 0 },
-                { 0 },
-                { 0 },
-                { 0 },
-                { 0 },
-                { 0 } } }  // end target dimension 3
+              { { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 } } }  // end target
+                                                                                                        // dimension 3
         },  // end source dim 1
 
         {
@@ -1092,20 +964,15 @@ const unsigned char CN::midNodesPerType[ MBMAXTYPE ][ MAX_NODES_PER_ELEMENT + 1 
     // polygon
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
     // tet 1, 2, 3, 4, 5, 6, 7, 8, 9,  10, 11, 12,13, 14,  15
-    { 0,     0,         0, 0, 0, R, 0, 0, F, F | R, E, E | R, 0, 0,
-      E | F, E | F | R, 0, 0, 0, 0, 0, 0, 0, 0,     0, 0,     0, 0 },
+    { 0, 0, 0, 0, 0, R, 0, 0, F, F | R, E, E | R, 0, 0, E | F, E | F | R, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
     // pyramid   3, 4, 5, 6, 7, 8, 9,10, 11, 12,13, 14, 15,16,17, 18,  19
-    { 0,     0, 0, 0, 0,     0,         R, 0, 0, 0, F, F | R, 0, E,
-      E | R, 0, 0, 0, E | F, E | F | R, 0, 0, 0, 0, 0, 0,     0, 0 },
+    { 0, 0, 0, 0, 0, 0, R, 0, 0, 0, F, F | R, 0, E, E | R, 0, 0, 0, E | F, E | F | R, 0, 0, 0, 0, 0, 0, 0, 0 },
     // prism  2, 3, 4, 5, 6, 7, 8, 9,10,11, 12, 13,14,15, 16, 17,18,19, 20,  21
-    { 0, 0, 0,     0, 0, 0, 0,     R,         0, 0, 0, F, F | R, 0,
-      0, E, E | R, 0, 0, 0, E | F, E | F | R, 0, 0, 0, 0, 0,     0 },
+    { 0, 0, 0, 0, 0, 0, 0, R, 0, 0, 0, F, F | R, 0, 0, E, E | R, 0, 0, 0, E | F, E | F | R, 0, 0, 0, 0, 0, 0 },
     // knife  2, 3, 4, 5, 6, 7, 8, 9,10,11, 12,13, 14,15,16,17, 18, 19,20,21, 22,  23
-    { 0, 0, 0, 0, 0,     0, 0, 0, R,     0,         0, 0, F, F | R,
-      0, 0, 0, E, E | R, 0, 0, 0, E | F, E | F | R, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0, R, 0, 0, 0, F, F | R, 0, 0, 0, E, E | R, 0, 0, 0, E | F, E | F | R, 0, 0, 0, 0 },
     // hex 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,11,12,13,14,15, 16,17,18,19,20, 21, 22,23,24,25, 26,  27
-    { 0, 0,     0, 0, 0, 0, 0, 0,     0, R, 0, 0, 0,     0,
-      F, F | R, 0, 0, 0, 0, E, E | R, 0, 0, 0, 0, E | F, E | F | R },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, R, 0, 0, 0, 0, F, F | R, 0, 0, 0, 0, E, E | R, 0, 0, 0, 0, E | F, E | F | R },
     // polyhedron
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
     // set

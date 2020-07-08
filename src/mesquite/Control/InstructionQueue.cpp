@@ -77,8 +77,7 @@ void InstructionQueue::add_vertex_slaver( VertexSlaver* vs, MsqError& )
 void InstructionQueue::remove_vertex_slaver( VertexSlaver* vs, MsqError& err )
 {
     size_t idx = 0;
-    for( std::list< Instruction* >::iterator i = instructions.begin( ); i != instructions.end( );
-         ++i, ++idx )
+    for( std::list< Instruction* >::iterator i = instructions.begin( ); i != instructions.end( ); ++i, ++idx )
     {
         if( *i == vs )
         {
@@ -101,8 +100,7 @@ void InstructionQueue::add_tag_vertex_mesh( TagVertexMesh* vs, MsqError& )
 void InstructionQueue::remove_tag_vertex_mesh( TagVertexMesh* vs, MsqError& err )
 {
     size_t idx = 0;
-    for( std::list< Instruction* >::iterator i = instructions.begin( ); i != instructions.end( );
-         ++i, ++idx )
+    for( std::list< Instruction* >::iterator i = instructions.begin( ); i != instructions.end( ); ++i, ++idx )
     {
         if( *i == vs )
         {
@@ -255,8 +253,7 @@ void InstructionQueue::remove_quality_assessor( size_t index, MsqError& err )
 
     \param index is 0-based. An error is set if the index is past the end of the queue.
 */
-void InstructionQueue::insert_quality_assessor( QualityAssessor* instr, size_t index,
-                                                MsqError& err )
+void InstructionQueue::insert_quality_assessor( QualityAssessor* instr, size_t index, MsqError& err )
 {
     // checks index is valid
     if( index > instructions.size( ) )
@@ -295,8 +292,8 @@ void InstructionQueue::set_master_quality_improver( QualityImprover* instr, MsqE
     }
 }
 
-void InstructionQueue::run_common( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh,
-                                   Settings* settings, MsqError& err )
+void InstructionQueue::run_common( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh, Settings* settings,
+                                   MsqError& err )
 {
     MSQ_DBGOUT( 1 ) << version_string( false ) << "\n";
 

@@ -61,14 +61,13 @@ ReadGmsh::~ReadGmsh( )
 }
 
 ErrorCode ReadGmsh::read_tag_values( const char* /* file_name */, const char* /* tag_name */,
-                                     const FileOptions& /* opts */,
-                                     std::vector< int >& /* tag_values_out */,
+                                     const FileOptions& /* opts */, std::vector< int >& /* tag_values_out */,
                                      const SubsetList* /* subset_list */ )
 {
     return MB_NOT_IMPLEMENTED;
 }
 
-ErrorCode ReadGmsh::load_file( const char* filename, const EntityHandle*, const FileOptions&,
+ErrorCode ReadGmsh::load_file( const char*                    filename, const EntityHandle*, const FileOptions&,
                                const ReaderIface::SubsetList* subset_list, const Tag* file_id_tag )
 {
     int        num_material_sets = 0;
@@ -76,11 +75,8 @@ ErrorCode ReadGmsh::load_file( const char* filename, const EntityHandle*, const 
 
     if( subset_list )
     {
-        if( subset_list->tag_list_length > 1 &&
-            !strcmp( subset_list->tag_list[ 0 ].tag_name, MATERIAL_SET_TAG_NAME ) )
-        {
-            MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "GMsh supports subset read only by material ID" );
-        }
+        if( subset_list->tag_list_length > 1 && !strcmp( subset_list->tag_list[ 0 ].tag_name, MATERIAL_SET_TAG_NAME ) )
+        { MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "GMsh supports subset read only by material ID" ); }
         material_set_list = subset_list->tag_list[ 0 ].tag_values;
         num_material_sets = subset_list->tag_list[ 0 ].num_tag_values;
     }
@@ -90,8 +86,8 @@ ErrorCode ReadGmsh::load_file( const char* filename, const EntityHandle*, const 
 
     // Create set for more convenient check for material set ids
     std::set< int > blocks;
-    for( const int* mat_set_end = material_set_list + num_material_sets;
-         material_set_list != mat_set_end; ++material_set_list )
+    for( const int* mat_set_end = material_set_list + num_material_sets; material_set_list != mat_set_end;
+         ++material_set_list )
         blocks.insert( *material_set_list );
 
     // Map of ID->handle for nodes
@@ -116,8 +112,7 @@ ErrorCode ReadGmsh::load_file( const char* filename, const EntityHandle*, const 
 
         if( version != 2.0 && version != 2.1 && version != 2.2 )
         {
-            MB_SET_ERR( MB_FILE_DOES_NOT_EXIST,
-                        filename << ": unknown format version: " << version );
+            MB_SET_ERR( MB_FILE_DOES_NOT_EXIST, filename << ": unknown format version: " << version );
             return MB_FILE_DOES_NOT_EXIST;
         }
 
@@ -159,8 +154,7 @@ ErrorCode ReadGmsh::load_file( const char* filename, const EntityHandle*, const 
     // Allocate nodes
     std::vector< double* > coord_arrays;
     EntityHandle           handle = 0;
-    ErrorCode              result =
-        readMeshIface->get_node_coords( 3, num_nodes, MB_START_ID, handle, coord_arrays );
+    ErrorCode              result = readMeshIface->get_node_coords( 3, num_nodes, MB_START_ID, handle, coord_arrays );
     if( MB_SUCCESS != result ) return result;
 
     // Read nodes
@@ -168,15 +162,12 @@ ErrorCode ReadGmsh::load_file( const char* filename, const EntityHandle*, const 
     for( long i = 0; i < num_nodes; ++i, ++handle )
     {
         long id;
-        if( !tokens.get_long_ints( 1, &id ) || !tokens.get_doubles( 1, x++ ) ||
-            !tokens.get_doubles( 1, y++ ) || !tokens.get_doubles( 1, z++ ) )
+        if( !tokens.get_long_ints( 1, &id ) || !tokens.get_doubles( 1, x++ ) || !tokens.get_doubles( 1, y++ ) ||
+            !tokens.get_doubles( 1, z++ ) )
             return MB_FILE_WRITE_ERROR;
 
         if( !node_id_map.insert( std::pair< long, EntityHandle >( id, handle ) ).second )
-        {
-            MB_SET_ERR( MB_FILE_WRITE_ERROR,
-                        "Duplicate node ID at line " << tokens.line_number( ) );
-        }
+        { MB_SET_ERR( MB_FILE_WRITE_ERROR, "Duplicate node ID at line " << tokens.line_number( ) ); }
     }
 
     // Create reverse map from handle to id
@@ -229,8 +220,8 @@ ErrorCode ReadGmsh::load_file( const char* filename, const EntityHandle*, const 
             if( (unsigned)tag_data[ 1 ] < GmshUtil::numGmshElemType &&
                 GmshUtil::gmshElemTypes[ tag_data[ 1 ] ].num_nodes != (unsigned)int_data[ 4 ] )
             {
-                MB_SET_ERR( MB_FILE_WRITE_ERROR, "Invalid node count for element type at line "
-                                                     << tokens.line_number( ) );
+                MB_SET_ERR( MB_FILE_WRITE_ERROR,
+                            "Invalid node count for element type at line " << tokens.line_number( ) );
             }
         }
         // File format 2.0
@@ -238,17 +229,14 @@ ErrorCode ReadGmsh::load_file( const char* filename, const EntityHandle*, const 
         {
             if( !tokens.get_integers( 3, &int_data[ 0 ] ) ) return MB_FILE_WRITE_ERROR;
             tag_data.resize( int_data[ 2 ] );
-            if( !tokens.get_integers( tag_data.size( ), &tag_data[ 0 ] ) )
-                return MB_FILE_WRITE_ERROR;
+            if( !tokens.get_integers( tag_data.size( ), &tag_data[ 0 ] ) ) return MB_FILE_WRITE_ERROR;
         }
 
         // If a list of material sets was specified in the
         // argument list, skip any elements for which the
         // material set is not specified or is not in the
         // passed list.
-        if( !blocks.empty( ) &&
-            ( tag_data.empty( ) || blocks.find( tag_data[ 0 ] ) != blocks.end( ) ) )
-            continue;
+        if( !blocks.empty( ) && ( tag_data.empty( ) || blocks.find( tag_data[ 0 ] ) != blocks.end( ) ) ) continue;
 
         // If the next element is not the same type as the last one,
         // create a sequence for the block of elements we've read
@@ -258,9 +246,8 @@ ErrorCode ReadGmsh::load_file( const char* filename, const EntityHandle*, const 
         {
             if( !id_list.empty( ) )
             {  // First iteration
-                result = create_elements( GmshUtil::gmshElemTypes[ curr_elem_type ], id_list,
-                                          mat_set_list, geom_set_list, part_set_list, connectivity,
-                                          file_id_tag );
+                result = create_elements( GmshUtil::gmshElemTypes[ curr_elem_type ], id_list, mat_set_list,
+                                          geom_set_list, part_set_list, connectivity, file_id_tag );
                 if( MB_SUCCESS != result ) return result;
             }
 
@@ -273,9 +260,8 @@ ErrorCode ReadGmsh::load_file( const char* filename, const EntityHandle*, const 
             if( (unsigned)curr_elem_type >= GmshUtil::numGmshElemType ||
                 GmshUtil::gmshElemTypes[ curr_elem_type ].mb_type == MBMAXTYPE )
             {
-                MB_SET_ERR( MB_FILE_WRITE_ERROR, "Unsupported element type "
-                                                     << curr_elem_type << " at line "
-                                                     << tokens.line_number( ) );
+                MB_SET_ERR( MB_FILE_WRITE_ERROR,
+                            "Unsupported element type " << curr_elem_type << " at line " << tokens.line_number( ) );
             }
             tmp_conn.resize( GmshUtil::gmshElemTypes[ curr_elem_type ].num_nodes );
         }
@@ -283,12 +269,10 @@ ErrorCode ReadGmsh::load_file( const char* filename, const EntityHandle*, const 
         // Store data from element description
         id_list.push_back( int_data[ 0 ] );
         if( tag_data.size( ) > 3 )
-            part_set_list.push_back(
-                tag_data[ 3 ] );  // it must be new format for gmsh, >= 2.5
-                                  // it could have negative partition ids, for ghost elements
+            part_set_list.push_back( tag_data[ 3 ] );  // it must be new format for gmsh, >= 2.5
+                                                       // it could have negative partition ids, for ghost elements
         else if( tag_data.size( ) > 2 )
-            part_set_list.push_back(
-                tag_data[ 2 ] );  // old format, partition id saved in 3rd tag field
+            part_set_list.push_back( tag_data[ 2 ] );  // old format, partition id saved in 3rd tag field
         else
             part_set_list.push_back( 0 );
         geom_set_list.push_back( tag_data.size( ) > 1 ? tag_data[ 1 ] : 0 );
@@ -302,10 +286,7 @@ ErrorCode ReadGmsh::load_file( const char* filename, const EntityHandle*, const 
         {
             std::map< long, EntityHandle >::iterator k = node_id_map.find( tmp_conn[ j ] );
             if( k == node_id_map.end( ) )
-            {
-                MB_SET_ERR( MB_FILE_WRITE_ERROR,
-                            "Invalid node ID at line " << tokens.line_number( ) );
-            }
+            { MB_SET_ERR( MB_FILE_WRITE_ERROR, "Invalid node ID at line " << tokens.line_number( ) ); }
             connectivity.push_back( k->second );
         }
     }  // for (num_nodes)
@@ -313,8 +294,8 @@ ErrorCode ReadGmsh::load_file( const char* filename, const EntityHandle*, const 
     // Create entity sequence for last element(s).
     if( !id_list.empty( ) )
     {
-        result = create_elements( GmshUtil::gmshElemTypes[ curr_elem_type ], id_list, mat_set_list,
-                                  geom_set_list, part_set_list, connectivity, file_id_tag );
+        result = create_elements( GmshUtil::gmshElemTypes[ curr_elem_type ], id_list, mat_set_list, geom_set_list,
+                                  part_set_list, connectivity, file_id_tag );
         if( MB_SUCCESS != result ) return result;
     }
 
@@ -328,19 +309,17 @@ ErrorCode ReadGmsh::load_file( const char* filename, const EntityHandle*, const 
 
 //! Create an element sequence
 ErrorCode ReadGmsh::create_elements( const GmshElemType& type, const std::vector< int >& elem_ids,
-                                     const std::vector< int >&          matl_ids,
-                                     const std::vector< int >&          geom_ids,
+                                     const std::vector< int >& matl_ids, const std::vector< int >& geom_ids,
                                      const std::vector< int >&          prtn_ids,
-                                     const std::vector< EntityHandle >& connectivity,
-                                     const Tag*                         file_id_tag )
+                                     const std::vector< EntityHandle >& connectivity, const Tag* file_id_tag )
 {
     ErrorCode result;
 
     // Make sure input is consistent
     const unsigned long num_elem = elem_ids.size( );
     const int           node_per_elem = type.num_nodes;
-    if( matl_ids.size( ) != num_elem || geom_ids.size( ) != num_elem ||
-        prtn_ids.size( ) != num_elem || connectivity.size( ) != num_elem * node_per_elem )
+    if( matl_ids.size( ) != num_elem || geom_ids.size( ) != num_elem || prtn_ids.size( ) != num_elem ||
+        connectivity.size( ) != num_elem * node_per_elem )
         return MB_FAILURE;
 
     // Create the element sequence
@@ -348,8 +327,7 @@ ErrorCode ReadGmsh::create_elements( const GmshElemType& type, const std::vector
     if( type.mb_type == MBVERTEX )
     {
         Range elements;
-        elements.insert< std::vector< EntityHandle > >( connectivity.begin( ),
-                                                        connectivity.end( ) );
+        elements.insert< std::vector< EntityHandle > >( connectivity.begin( ), connectivity.end( ) );
         result = create_sets( type.mb_type, elements, matl_ids, 0 );
         if( MB_SUCCESS != result ) return result;
 
@@ -357,8 +335,8 @@ ErrorCode ReadGmsh::create_elements( const GmshElemType& type, const std::vector
     }
     EntityHandle  handle = 0;
     EntityHandle* conn_array;
-    result = readMeshIface->get_element_connect( num_elem, node_per_elem, type.mb_type, MB_START_ID,
-                                                 handle, conn_array );
+    result =
+        readMeshIface->get_element_connect( num_elem, node_per_elem, type.mb_type, MB_START_ID, handle, conn_array );
     if( MB_SUCCESS != result ) return result;
 
     // Copy passed element connectivity into entity sequence data.
@@ -366,8 +344,7 @@ ErrorCode ReadGmsh::create_elements( const GmshElemType& type, const std::vector
     {
         for( unsigned long i = 0; i < num_elem; ++i )
             for( int j = 0; j < node_per_elem; ++j )
-                conn_array[ i * node_per_elem + type.node_order[ j ] ] =
-                    connectivity[ i * node_per_elem + j ];
+                conn_array[ i * node_per_elem + type.node_order[ j ] ] = connectivity[ i * node_per_elem + j ];
     }
     else
     {
@@ -402,8 +379,8 @@ ErrorCode ReadGmsh::create_elements( const GmshElemType& type, const std::vector
 }
 
 //! Add elements to sets as dictated by grouping ID in file.
-ErrorCode ReadGmsh::create_sets( EntityType type, const Range& elements,
-                                 const std::vector< int >& set_ids, int set_type )
+ErrorCode ReadGmsh::create_sets( EntityType type, const Range& elements, const std::vector< int >& set_ids,
+                                 int set_type )
 {
     ErrorCode result;
 
@@ -413,8 +390,7 @@ ErrorCode ReadGmsh::create_sets( EntityType type, const Range& elements,
         ids.insert( *i );
 
     // No Sets?
-    if( ids.empty( ) || ( ids.size( ) == 1 && *ids.begin( ) == 0 ) )
-        return MB_SUCCESS;  // no sets (all ids are zero)
+    if( ids.empty( ) || ( ids.size( ) == 1 && *ids.begin( ) == 0 ) ) return MB_SUCCESS;  // no sets (all ids are zero)
 
     // Get/create tag handles
     int         num_tags;
@@ -429,15 +405,15 @@ ErrorCode ReadGmsh::create_sets( EntityType type, const Range& elements,
         case 0:
         case 2: {
             const char* name = set_type ? PARALLEL_PARTITION_TAG_NAME : MATERIAL_SET_TAG_NAME;
-            result = mdbImpl->tag_get_handle( name, 1, MB_TYPE_INTEGER, tag_handles[ 0 ],
-                                              MB_TAG_SPARSE | MB_TAG_CREAT );
+            result =
+                mdbImpl->tag_get_handle( name, 1, MB_TYPE_INTEGER, tag_handles[ 0 ], MB_TAG_SPARSE | MB_TAG_CREAT );
             if( MB_SUCCESS != result ) return result;
             num_tags = 1;
             break;
         }
         case 1: {
-            result = mdbImpl->tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER,
-                                              tag_handles[ 1 ], MB_TAG_SPARSE | MB_TAG_CREAT );
+            result = mdbImpl->tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, tag_handles[ 1 ],
+                                              MB_TAG_SPARSE | MB_TAG_CREAT );
             if( MB_SUCCESS != result ) return result;
             tag_values[ 1 ] = NULL;
             tag_handles[ 0 ] = globalId;
@@ -462,8 +438,7 @@ ErrorCode ReadGmsh::create_sets( EntityType type, const Range& elements,
         // Cppcheck warning (false positive): variable tag_val is assigned a value that is never
         // used
         tag_val = *i;
-        result = mdbImpl->get_entities_by_type_and_tag( 0, MBENTITYSET, tag_handles, tag_values,
-                                                        num_tags, sets );
+        result = mdbImpl->get_entities_by_type_and_tag( 0, MBENTITYSET, tag_handles, tag_values, num_tags, sets );
         if( MB_SUCCESS != result && MB_ENTITY_NOT_FOUND != result ) return result;
 
         // Don't use existing geometry sets (from some other file)

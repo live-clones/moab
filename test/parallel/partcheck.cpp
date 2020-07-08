@@ -22,8 +22,7 @@ const char USAGE[] = " [-v <n>] [-R] [-p <parttag>[=val]] [-D|-B|-P] <input_file
 
 static void usage( const char* argv0 )
 {
-    std::cerr << "Usage: " << argv0 << USAGE << std::endl
-              << "       " << argv0 << " -h" << std::endl;
+    std::cerr << "Usage: " << argv0 << USAGE << std::endl << "       " << argv0 << " -h" << std::endl;
     exit( 1 );
 }
 
@@ -41,12 +40,9 @@ static void help( const char* argv0 )
               << "  -R  : do not resolve shared entities" << std::endl
               << "  -p  : partition tag, with optional '=' value" << std::endl
               << "          (default = \"" << PARTTAG << "\")" << std::endl
-              << "  -D  : read mode as \"" << READ_DEL_OPT << "\"" << defstr( READ_DEL_OPT )
-              << std::endl
-              << "  -B  : read mode as \"" << BCAST_DEL_OPT << "\"" << defstr( READ_DEL_OPT )
-              << std::endl
-              << "  -P  : read mode as \"" << READ_PART_OPT << "\"" << defstr( READ_PART_OPT )
-              << std::endl;
+              << "  -D  : read mode as \"" << READ_DEL_OPT << "\"" << defstr( READ_DEL_OPT ) << std::endl
+              << "  -B  : read mode as \"" << BCAST_DEL_OPT << "\"" << defstr( READ_DEL_OPT ) << std::endl
+              << "  -P  : read mode as \"" << READ_PART_OPT << "\"" << defstr( READ_PART_OPT ) << std::endl;
     exit( 0 );
 }
 
@@ -164,16 +160,14 @@ int main( int argc, char* argv[] )
     Interface&    mb = moab;
     ParallelComm* pcomm = new ParallelComm( &mb, MPI_COMM_WORLD );
     if( pcomm->rank( ) == 0 )
-        std::cout << "Loading file: \"" << input_file << "\" with options \"" << opts.str( ) << '"'
-                  << std::endl;
+        std::cout << "Loading file: \"" << input_file << "\" with options \"" << opts.str( ) << '"' << std::endl;
     opts << ";PARALLEL_COMM=" << pcomm->get_id( );
 
     clock_t   init_time = clock( );
     ErrorCode rval = mb.load_file( input_file, 0, opts.str( ).c_str( ) );
     if( MB_SUCCESS != rval )
     {
-        std::cerr << input_file << " : file read failed (" << mb.get_error_string( rval ) << ")"
-                  << std::endl;
+        std::cerr << input_file << " : file read failed (" << mb.get_error_string( rval ) << ")" << std::endl;
         return 1;
     }
 
@@ -186,8 +180,7 @@ int main( int argc, char* argv[] )
         sec = ( t - init_time ) / (double)CLOCKS_PER_SEC;
     double allsec;
     MPI_Reduce( &sec, &allsec, 1, MPI_DOUBLE, MPI_MAX, 0, pcomm->comm( ) );
-    if( pcomm->rank( ) == 0 )
-    { std::cout << "Read completed in " << allsec << " seconds" << std::endl; }
+    if( pcomm->rank( ) == 0 ) { std::cout << "Read completed in " << allsec << " seconds" << std::endl; }
 
     int result = check_parallel_read( mb, pcomm, resolve_shared );
 
@@ -216,8 +209,7 @@ int check_parallel_read( Interface& mb, ParallelComm* pcomm, bool /*shared_ents*
     {
         dim = CN::Dimension( mb.type_from_handle( part_ents.back( ) ) );
         if( !part_ents.all_of_dimension( dim ) )
-            std::cout << "Partitioned ents of mixed dimension for process " << pcomm->rank( )
-                      << std::endl;
+            std::cout << "Partitioned ents of mixed dimension for process " << pcomm->rank( ) << std::endl;
     }
 
     Range all_ents;

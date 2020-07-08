@@ -41,18 +41,15 @@
 namespace MBMesquite
 {
 
-SlaveBoundaryVertices::SlaveBoundaryVertices( unsigned depth, unsigned dim )
-    : elemDepth( depth ), domainDoF( dim )
-{
-}
+SlaveBoundaryVertices::SlaveBoundaryVertices( unsigned depth, unsigned dim ) : elemDepth( depth ), domainDoF( dim ) {}
 
 std::string SlaveBoundaryVertices::get_name( ) const
 {
     return "SlaveBoundaryVertices";
 }
 
-double SlaveBoundaryVertices::loop_over_mesh( MeshDomainAssoc* mesh_and_domain,
-                                              const Settings* settings, MsqError& err )
+double SlaveBoundaryVertices::loop_over_mesh( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
+                                              MsqError& err )
 {
     Mesh*       mesh = mesh_and_domain->get_mesh( );
     MeshDomain* domain = mesh_and_domain->get_domain( );
@@ -136,13 +133,11 @@ double SlaveBoundaryVertices::loop_over_mesh( MeshDomainAssoc* mesh_and_domain,
             unsigned short elem_depth = elemDepth + 1;
             for( k = conn.begin( ); k != conn.end( ); ++k )
             {
-                size_t i =
-                    std::lower_bound( vertices.begin( ), vertices.end( ), *k ) - vertices.begin( );
+                size_t i = std::lower_bound( vertices.begin( ), vertices.end( ), *k ) - vertices.begin( );
                 if( i == vertices.size( ) )
                 {
                     MSQ_SETERR( err )
-                    ( "Invalid vertex handle in element connectivity list.",
-                      MsqError::INVALID_MESH );
+                    ( "Invalid vertex handle in element connectivity list.", MsqError::INVALID_MESH );
                     return 0.0;
                 }
                 if( depth[ i ] < elem_depth ) elem_depth = depth[ i ];
@@ -152,8 +147,7 @@ double SlaveBoundaryVertices::loop_over_mesh( MeshDomainAssoc* mesh_and_domain,
             ++elem_depth;
             for( k = conn.begin( ); k != conn.end( ); ++k )
             {
-                size_t i =
-                    std::lower_bound( vertices.begin( ), vertices.end( ), *k ) - vertices.begin( );
+                size_t i = std::lower_bound( vertices.begin( ), vertices.end( ), *k ) - vertices.begin( );
                 if( depth[ i ] > elem_depth )
                 {
                     depth[ i ] = elem_depth;

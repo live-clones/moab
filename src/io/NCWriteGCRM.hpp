@@ -29,12 +29,10 @@ class NCWriteGCRM : public UcdNCWriteHelper
     virtual ErrorCode collect_mesh_info( );
 
     //! Collect data for specified variables
-    virtual ErrorCode collect_variable_data( std::vector< std::string >& var_names,
-                                             std::vector< int >&         tstep_nums );
+    virtual ErrorCode collect_variable_data( std::vector< std::string >& var_names, std::vector< int >& tstep_nums );
 
     //! Implementation of NCWriteHelper::write_nonset_variables()
-    virtual ErrorCode write_nonset_variables( std::vector< WriteNC::VarData >& vdatas,
-                                              std::vector< int >&              tstep_nums );
+    virtual ErrorCode write_nonset_variables( std::vector< WriteNC::VarData >& vdatas, std::vector< int >& tstep_nums );
 };
 
 }  // namespace moab

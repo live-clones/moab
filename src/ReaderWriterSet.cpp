@@ -92,11 +92,9 @@ ReaderWriterSet::ReaderWriterSet( Core* mdb ) : mbCore( mdb )
 #ifdef MOAB_HAVE_HDF5
     const char* hdf5_sufxs[] = { "h5m", "mhdf", NULL };
 #ifdef MOAB_HAVE_HDF5_PARALLEL
-    register_factory( ReadHDF5::factory, WriteHDF5Parallel::factory, "MOAB native (HDF5)",
-                      hdf5_sufxs, "MOAB" );
+    register_factory( ReadHDF5::factory, WriteHDF5Parallel::factory, "MOAB native (HDF5)", hdf5_sufxs, "MOAB" );
 #else
-    register_factory( ReadHDF5::factory, WriteHDF5::factory, "MOAB native (HDF5)", hdf5_sufxs,
-                      "MOAB" );
+    register_factory( ReadHDF5::factory, WriteHDF5::factory, "MOAB native (HDF5)", hdf5_sufxs, "MOAB" );
 #endif
 #endif
 
@@ -150,14 +148,12 @@ ReaderWriterSet::ReaderWriterSet( Core* mdb ) : mbCore( mdb )
 
 #ifdef MOAB_HAVE_CCMIO
     const char* ccmio_sufxs[] = { "ccm", "ccmg", NULL };
-    register_factory( ReadCCMIO::factory, WriteCCMIO::factory, "CCMIO files", ccmio_sufxs,
-                      "CCMIO" );
+    register_factory( ReadCCMIO::factory, WriteCCMIO::factory, "CCMIO files", ccmio_sufxs, "CCMIO" );
 #endif
 
 #ifdef MOAB_HAVE_DAMSEL
     const char* damsel_sufxs[] = { "h5", NULL };
-    register_factory( ReadDamsel::factory, WriteDamsel::factory, "Damsel files", damsel_sufxs,
-                      "DAMSEL" );
+    register_factory( ReadDamsel::factory, WriteDamsel::factory, "Damsel files", damsel_sufxs, "DAMSEL" );
 #endif
 
     register_factory( NULL, WriteGMV::factory, "GMV", "gmv", "GMV" );
@@ -167,29 +163,26 @@ ReaderWriterSet::ReaderWriterSet( Core* mdb ) : mbCore( mdb )
     const char* gmsh_sufxs[] = { "msh", "gmsh", NULL };
     register_factory( ReadGmsh::factory, WriteGmsh::factory, "Gmsh mesh file", gmsh_sufxs, "GMSH" );
 
-    register_factory( ReadSTL::factory, WriteSTL::factory, "Stereo Lithography File (STL)", "stl",
-                      "STL" );
+    register_factory( ReadSTL::factory, WriteSTL::factory, "Stereo Lithography File (STL)", "stl", "STL" );
 
     const char* tetgen_sufxs[] = { "node", "ele", "face", "edge", NULL };
     register_factory( ReadTetGen::factory, 0, "TetGen output files", tetgen_sufxs, "TETGEN" );
 
     const char* template_sufxs[] = { NULL };
-    register_factory( ReadTemplate::factory, WriteTemplate::factory, "Template input files",
-                      template_sufxs, "TEMPLATE" );
+    register_factory( ReadTemplate::factory, WriteTemplate::factory, "Template input files", template_sufxs,
+                      "TEMPLATE" );
 }
 
 ReaderWriterSet::~ReaderWriterSet( ) {}
 
-ErrorCode ReaderWriterSet::register_factory( reader_factory_t reader, writer_factory_t writer,
-                                             const char* description, const char* const* extensions,
-                                             const char* name )
+ErrorCode ReaderWriterSet::register_factory( reader_factory_t reader, writer_factory_t writer, const char* description,
+                                             const char* const* extensions, const char* name )
 {
     if( !reader && !writer ) return MB_FAILURE;
 
     // check for duplicate names
     iterator h = handler_by_name( name );
-    if( h != end( ) )
-    { MB_SET_ERR( MB_FAILURE, "Conflicting string name for file formats: \"" << name << "\"" ); }
+    if( h != end( ) ) { MB_SET_ERR( MB_FAILURE, "Conflicting string name for file formats: \"" << name << "\"" ); }
 
     // count extensions and check for duplicates
     const char* const* iter;
@@ -200,22 +193,20 @@ ErrorCode ReaderWriterSet::register_factory( reader_factory_t reader, writer_fac
         {
             if( NULL != reader && h->have_reader( ) )
                 MB_SET_ERR( MB_FAILURE, "Conflicting readers for file extension \""
-                                            << *iter << "\": \"" << h->description( ) << "\" and \""
-                                            << description << "\"." );
+                                            << *iter << "\": \"" << h->description( ) << "\" and \"" << description
+                                            << "\"." );
             else if( NULL != writer && h->have_writer( ) )
                 MB_SET_ERR( MB_FAILURE, "Conflicting writers for file extension \""
-                                            << *iter << "\": \"" << h->description( ) << "\" and \""
-                                            << description << "\"." );
+                                            << *iter << "\": \"" << h->description( ) << "\" and \"" << description
+                                            << "\"." );
         }
     }
-    handlerList.push_back(
-        Handler( reader, writer, name, description, extensions, iter - extensions ) );
+    handlerList.push_back( Handler( reader, writer, name, description, extensions, iter - extensions ) );
     return MB_SUCCESS;
 }
 
-ErrorCode ReaderWriterSet::register_factory( reader_factory_t reader, writer_factory_t writer,
-                                             const char* description, const char* extension,
-                                             const char* name )
+ErrorCode ReaderWriterSet::register_factory( reader_factory_t reader, writer_factory_t writer, const char* description,
+                                             const char* extension, const char* name )
 {
     const char* extensions[ 2 ] = { extension, NULL };
     return register_factory( reader, writer, description, extensions, name );
@@ -245,11 +236,9 @@ std::string ReaderWriterSet::extension_from_filename( const std::string& filenam
     return filename.substr( idx + 1 );
 }
 
-ReaderWriterSet::Handler::Handler( reader_factory_t read_f, writer_factory_t write_f,
-                                   const char* nm, const char* desc, const char* const* ext,
-                                   int num_ext )
-    : mReader( read_f ), mWriter( write_f ), mName( nm ), mDescription( desc ),
-      mExtensions( num_ext )
+ReaderWriterSet::Handler::Handler( reader_factory_t read_f, writer_factory_t write_f, const char* nm, const char* desc,
+                                   const char* const* ext, int num_ext )
+    : mReader( read_f ), mWriter( write_f ), mName( nm ), mDescription( desc ), mExtensions( num_ext )
 {
     for( int i = 0; i < num_ext; ++i )
         mExtensions[ i ] = ext[ i ];
@@ -259,8 +248,7 @@ ReaderWriterSet::Handler::Handler( reader_factory_t read_f, writer_factory_t wri
 #define strcasecmp( A, B ) _stricmp( A, B )
 #endif
 
-ReaderWriterSet::iterator ReaderWriterSet::handler_from_extension( const std::string& ext,
-                                                                   bool               with_reader,
+ReaderWriterSet::iterator ReaderWriterSet::handler_from_extension( const std::string& ext, bool with_reader,
                                                                    bool with_writer ) const
 {
     iterator                                   iter;
@@ -269,8 +257,7 @@ ReaderWriterSet::iterator ReaderWriterSet::handler_from_extension( const std::st
     // try case-sensitive compare
     for( iter = begin( ); iter != end( ); ++iter )
     {
-        if( ( with_reader && !iter->have_reader( ) ) || ( with_writer && !iter->have_writer( ) ) )
-            continue;
+        if( ( with_reader && !iter->have_reader( ) ) || ( with_writer && !iter->have_writer( ) ) ) continue;
 
         for( siter = iter->mExtensions.begin( ); siter != iter->mExtensions.end( ); ++siter )
             if( *siter == ext ) return iter;
@@ -279,8 +266,7 @@ ReaderWriterSet::iterator ReaderWriterSet::handler_from_extension( const std::st
     // try case-insensitive compare
     for( iter = begin( ); iter != end( ); ++iter )
     {
-        if( ( with_reader && !iter->have_reader( ) ) || ( with_writer && !iter->have_writer( ) ) )
-            continue;
+        if( ( with_reader && !iter->have_reader( ) ) || ( with_writer && !iter->have_writer( ) ) ) continue;
 
         for( siter = iter->mExtensions.begin( ); siter != iter->mExtensions.end( ); ++siter )
             if( 0 == strcasecmp( siter->c_str( ), ext.c_str( ) ) ) return iter;

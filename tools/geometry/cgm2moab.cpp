@@ -52,8 +52,8 @@ void chkerr( GeomTopoTool& gtt, ErrorCode code, int line, const char* file )
  *
  * @param offset Offset to apply to surface to avoid a zero result.
  */
-static ErrorCode get_signed_volume( Interface* MBI, const EntityHandle surf_set,
-                                    const CartVect& offset, double& signed_volume )
+static ErrorCode get_signed_volume( Interface* MBI, const EntityHandle surf_set, const CartVect& offset,
+                                    double& signed_volume )
 {
     ErrorCode rval;
     Range     tris;
@@ -176,8 +176,7 @@ static ErrorCode replace_surface( Interface* mbi, EntityHandle old_surf, EntityH
     rval = mbi->add_entities( old_surf, new_tris );
     if( MB_SUCCESS != rval ) return rval;
 
-    if( verbose )
-    { std::cout << num_old_tris << " tris -> " << num_new_tris << " tris" << std::endl; }
+    if( verbose ) { std::cout << num_old_tris << " tris -> " << num_new_tris << " tris" << std::endl; }
 
     return MB_SUCCESS;
 }
@@ -186,9 +185,8 @@ static ErrorCode replace_surface( Interface* mbi, EntityHandle old_surf, EntityH
  * Given an "old" file and a "new" file, replace the facets in any surface of the old
  * file with facets from the new file.
  */
-static ErrorCode merge_input_surfs( Interface* mbi, const EntityHandle old_file_set,
-                                    const EntityHandle new_file_set, const Tag& idTag,
-                                    const Tag& dimTag, const Tag& senseTag )
+static ErrorCode merge_input_surfs( Interface* mbi, const EntityHandle old_file_set, const EntityHandle new_file_set,
+                                    const Tag& idTag, const Tag& dimTag, const Tag& senseTag )
 {
     ErrorCode rval;
 
@@ -197,8 +195,7 @@ static ErrorCode merge_input_surfs( Interface* mbi, const EntityHandle old_file_
     const void* tag_vals[ 2 ] = { &two, NULL };
 
     Range old_surfs;
-    rval = mbi->get_entities_by_type_and_tag( old_file_set, MBENTITYSET, &dimTag, tag_vals, 1,
-                                              old_surfs );
+    rval = mbi->get_entities_by_type_and_tag( old_file_set, MBENTITYSET, &dimTag, tag_vals, 1, old_surfs );
     if( MB_SUCCESS != rval ) return rval;
 
     int count = 0;
@@ -213,16 +210,15 @@ static ErrorCode merge_input_surfs( Interface* mbi, const EntityHandle old_file_
 
         Range new_surf_range;
         tag_vals[ 1 ] = &surf_id;
-        rval = mbi->get_entities_by_type_and_tag( new_file_set, MBENTITYSET, tags, tag_vals, 2,
-                                                  new_surf_range );
+        rval = mbi->get_entities_by_type_and_tag( new_file_set, MBENTITYSET, tags, tag_vals, 2, new_surf_range );
         if( MB_SUCCESS != rval ) return rval;
 
         if( new_surf_range.size( ) != 1 )
         {
             if( new_surf_range.size( ) > 1 )
             {
-                std::cerr << "Warning: surface " << surf_id
-                          << " has more than one representation in new file" << std::endl;
+                std::cerr << "Warning: surface " << surf_id << " has more than one representation in new file"
+                          << std::endl;
             }
             continue;
         }
@@ -253,16 +249,14 @@ int main( int argc, char* argv[] )
     int         grid = 50;
 
     po.addOpt< void >( ",v", "Verbose output", &verbose );
-    po.addOpt< std::string >( "outmesh,o", "Specify output file name (default " + output_file + ")",
-                              &output_file );
+    po.addOpt< std::string >( "outmesh,o", "Specify output file name (default " + output_file + ")", &output_file );
     po.addOpt< void >( "no-outmesh,", "Do not write an output mesh" );
-    po.addOpt< std::string >( ",m",
-                              "Specify alternate input mesh to override surfaces in input_file" );
+    po.addOpt< std::string >( ",m", "Specify alternate input mesh to override surfaces in input_file" );
     po.addOpt< std::string >( "obb-vis,O", "Specify obb visualization output file (default none)" );
     po.addOpt< int >( "obb-vis-divs", "Resolution of obb visualization grid (default 50)", &grid );
     po.addOpt< void >( "obb-stats,S", "Print obb statistics.  With -v, print verbose statistics." );
-    po.addOpt< std::vector< int > >(
-        "vols,V", "Specify a set of volumes (applies to --obb_vis and --obb_stats, default all)" );
+    po.addOpt< std::vector< int > >( "vols,V",
+                                     "Specify a set of volumes (applies to --obb_vis and --obb_stats, default all)" );
     po.addOptionHelpHeading( "Options for loading CAD files" );
     po.addOpt< double >( "ftol,f", "Faceting distance tolerance", po.add_cancel_opt );
     po.addOpt< double >( "ltol,l", "Faceting edge length tolerance", po.add_cancel_opt );
@@ -271,8 +265,7 @@ int main( int argc, char* argv[] )
     po.addOpt< void >( "no-attribs", "Do not actuate CGM attributes" );
     po.addOpt< void >( "fatal_curves", "Fatal Error when curves cannot be faceted" );
 
-    po.addRequiredArg< std::string >( "input_file", "Path to input file for preprocessing",
-                                      &input_file );
+    po.addRequiredArg< std::string >( "input_file", "Path to input file for preprocessing", &input_file );
 
     po.parseCommandLine( argc, argv );
 
@@ -280,9 +273,7 @@ int main( int argc, char* argv[] )
     bool obb_task = po.numOptSet( "obb-vis" ) || po.numOptSet( "obb-stats" );
 
     if( po.numOptSet( "no-outmesh" ) && !obb_task )
-    {
-        po.error( "Nothing to do.  Please specify an OBB-related option, or remove --no_outmesh." );
-    }
+    { po.error( "Nothing to do.  Please specify an OBB-related option, or remove --no_outmesh." ); }
 
     /* Load input file, with CAD processing options, if specified */
     std::string options;
@@ -342,10 +333,7 @@ int main( int argc, char* argv[] )
 
     ret = mbi.load_file( input_file.c_str( ), &input_file_set, options.c_str( ) );
     if( ret == MB_UNHANDLED_OPTION )
-    {
-        std::cerr << "Warning: unhandled option while loading input_file, will proceed anyway"
-                  << std::endl;
-    }
+    { std::cerr << "Warning: unhandled option while loading input_file, will proceed anyway" << std::endl; }
     else
     {
         CHECKERR( mbi, ret );
@@ -360,22 +348,16 @@ int main( int argc, char* argv[] )
     {
 
         if( obb_task )
-        {
-            std::cerr
-                << "Warning: using obb features in conjunction with -m may not work correctly!"
-                << std::endl;
-        }
+        { std::cerr << "Warning: using obb features in conjunction with -m may not work correctly!" << std::endl; }
 
         // Create tags
         Tag dimTag, idTag, senseTag;
-        ret = mbi.tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, dimTag,
-                                  MB_TAG_SPARSE | MB_TAG_CREAT );
+        ret = mbi.tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, dimTag, MB_TAG_SPARSE | MB_TAG_CREAT );
         CHECKERR( mbi, ret );
 
         idTag = mbi.globalId_tag( );
 
-        ret = mbi.tag_get_handle( "GEOM_SENSE_2", 2, MB_TYPE_HANDLE, senseTag,
-                                  MB_TAG_SPARSE | MB_TAG_CREAT );
+        ret = mbi.tag_get_handle( "GEOM_SENSE_2", 2, MB_TYPE_HANDLE, senseTag, MB_TAG_SPARSE | MB_TAG_CREAT );
         CHECKERR( mbi, ret );
 
         for( std::vector< std::string >::iterator i = m_list.begin( ); i != m_list.end( ); ++i )

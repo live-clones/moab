@@ -173,8 +173,7 @@ class VarLenTag
     inline unsigned char* data( )
 #ifdef VAR_LEN_TAG_ELIDE_DATA
     {
-        return size( ) <= VarLenTagData::INLINE_COUNT ? mData.mData.mInline.array
-                                                      : mData.mData.mPointer.array;
+        return size( ) <= VarLenTagData::INLINE_COUNT ? mData.mData.mInline.array : mData.mData.mPointer.array;
     }
 #else
     {

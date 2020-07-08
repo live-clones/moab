@@ -38,9 +38,8 @@
 namespace MBMesquite
 {
 
-void JacobianCalculator::get_Jacobian_2D( const MappingFunction2D* mf, NodeSet ho_bits,
-                                          Sample location, const Vector3D* verts,
-                                          size_t num_type_vert, MsqMatrix< 3, 2 >& J_out,
+void JacobianCalculator::get_Jacobian_2D( const MappingFunction2D* mf, NodeSet ho_bits, Sample location,
+                                          const Vector3D* verts, size_t num_type_vert, MsqMatrix< 3, 2 >& J_out,
                                           MsqError& err )
 {
     size_t num_vtx = 0;
@@ -58,9 +57,8 @@ void JacobianCalculator::get_Jacobian_2D( const MappingFunction2D* mf, NodeSet h
     J_out.set_column( 1, MsqMatrix< 3, 1 >( c[ 1 ].to_array( ) ) );
 }
 
-void JacobianCalculator::get_Jacobian_3D( const MappingFunction3D* mf, NodeSet ho_bits,
-                                          Sample location, const Vector3D* verts,
-                                          size_t num_type_vert, MsqMatrix< 3, 3 >& J_out,
+void JacobianCalculator::get_Jacobian_3D( const MappingFunction3D* mf, NodeSet ho_bits, Sample location,
+                                          const Vector3D* verts, size_t num_type_vert, MsqMatrix< 3, 3 >& J_out,
                                           MsqError& err )
 {
     size_t num_vtx = 0;
@@ -68,7 +66,7 @@ void JacobianCalculator::get_Jacobian_3D( const MappingFunction3D* mf, NodeSet h
     mf->convert_connectivity_indices( num_type_vert, mIndices, num_vtx, err );MSQ_ERRRTN( err );
     const MsqVector< 3 >* d = mDerivs3D;
     const size_t* const   e = mIndices + num_vtx;
-    Vector3D c[ 3 ] = { Vector3D( 0, 0, 0 ), Vector3D( 0, 0, 0 ), Vector3D( 0, 0, 0 ) };
+    Vector3D              c[ 3 ] = { Vector3D( 0, 0, 0 ), Vector3D( 0, 0, 0 ), Vector3D( 0, 0, 0 ) };
     for( const size_t* i = mIndices; i != e; ++i, ++d )
     {
         c[ 0 ] += ( *d )[ 0 ] * verts[ *i ];

@@ -64,8 +64,7 @@ using namespace std;
     } while( false )
 
 // Function to parse input parameters
-ErrorCode get_file_options( int argc, char** argv, string& filename, string& tagName,
-                            double& tagValues )
+ErrorCode get_file_options( int argc, char** argv, string& filename, string& tagName, double& tagValues )
 {
     // Get mesh filename
     if( argc > 1 )
@@ -167,14 +166,14 @@ int main( int argc, char** argv )
         stringstream sstr;
         // Create the exchange tag: default name = USERTAG_EXC
         sstr << tagName << "_EXC";
-        err = mbi->tag_get_handle( sstr.str( ).c_str( ), 1, MB_TYPE_INTEGER, tagExchange,
-                                   MB_TAG_CREAT | MB_TAG_DENSE, &tagValue );MB_CHK_SET_ERR( err, "Retrieving tag handles failed" );
+        err = mbi->tag_get_handle( sstr.str( ).c_str( ), 1, MB_TYPE_INTEGER, tagExchange, MB_TAG_CREAT | MB_TAG_DENSE,
+                                   &tagValue );MB_CHK_SET_ERR( err, "Retrieving tag handles failed" );
 
         // Create the exchange tag: default name = USERTAG_RED
         sstr.str( "" );
         sstr << tagName << "_RED";
-        err = mbi->tag_get_handle( sstr.str( ).c_str( ), 1, MB_TYPE_DOUBLE, tagReduce,
-                                   MB_TAG_CREAT | MB_TAG_DENSE, &tagValue );MB_CHK_SET_ERR( err, "Retrieving tag handles failed" );
+        err = mbi->tag_get_handle( sstr.str( ).c_str( ), 1, MB_TYPE_DOUBLE, tagReduce, MB_TAG_CREAT | MB_TAG_DENSE,
+                                   &tagValue );MB_CHK_SET_ERR( err, "Retrieving tag handles failed" );
     }
 
     // Perform exchange tag data
@@ -186,8 +185,7 @@ int main( int argc, char** argv )
             // Get all entities of dimension = dim
             err = mbi->get_entities_by_dimension( rootset, dim, dimEnts, false );MB_CHK_ERR( err );
 
-            vector< int > tagValues( dimEnts.size( ),
-                                     static_cast< int >( tagValue ) * ( rank + 1 ) * ( dim + 1 ) );
+            vector< int > tagValues( dimEnts.size( ), static_cast< int >( tagValue ) * ( rank + 1 ) * ( dim + 1 ) );
             // Set local tag data for exchange
             err = mbi->tag_set_data( tagExchange, dimEnts, &tagValues[ 0 ] );MB_CHK_SET_ERR( err, "Setting local tag data failed during exchange phase" );
             // Merge entities into parent set

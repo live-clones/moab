@@ -46,14 +46,12 @@ class RefSizeTargetCalculator : public TargetCalculator
     RefSizeTargetCalculator( ReferenceMesh* reference_mesh, TargetCalculator* tc );
     RefSizeTargetCalculator( ReferenceMesh* reference_mesh );
 
-    virtual bool get_3D_target( PatchData& pd, size_t element, Sample sample,
-                                MsqMatrix< 3, 3 >& W_out, MsqError& err );
+    virtual bool get_3D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 3, 3 >& W_out, MsqError& err );
 
-    virtual bool get_2D_target( PatchData& pd, size_t element, Sample sample,
-                                MsqMatrix< 2, 2 >& W_out, MsqError& err );
+    virtual bool get_2D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 2, 2 >& W_out, MsqError& err );
 
-    virtual bool get_surface_target( PatchData& pd, size_t element, Sample sample,
-                                     MsqMatrix< 3, 2 >& W_out, MsqError& err );
+    virtual bool get_surface_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 3, 2 >& W_out,
+                                     MsqError& err );
 
     virtual bool have_surface_orient( ) const
     {

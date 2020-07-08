@@ -39,9 +39,7 @@
 
 using namespace MBMesquite;
 
-ConditionNumberQualityMetric::ConditionNumberQualityMetric( ) : AveragingQM( QualityMetric::LINEAR )
-{
-}
+ConditionNumberQualityMetric::ConditionNumberQualityMetric( ) : AveragingQM( QualityMetric::LINEAR ) {}
 
 std::string ConditionNumberQualityMetric::get_name( ) const
 {
@@ -53,8 +51,7 @@ int ConditionNumberQualityMetric::get_negate_flag( ) const
     return 1;
 }
 
-bool ConditionNumberQualityMetric::evaluate( PatchData& pd, size_t handle, double& fval,
-                                             MsqError& err )
+bool ConditionNumberQualityMetric::evaluate( PatchData& pd, size_t handle, double& fval, MsqError& err )
 {
     const MsqMeshEntity* const element = &pd.element_by_index( handle );
     bool                       return_flag;
@@ -104,8 +101,8 @@ bool ConditionNumberQualityMetric::evaluate( PatchData& pd, size_t handle, doubl
             temp_vec[ 4 ] = vertices[ v_i[ 3 ] ] - vertices[ v_i[ 0 ] ];
             // transform to equilateral tet
             temp_vec[ 1 ] = ( ( 2 * temp_vec[ 3 ] ) - temp_vec[ 0 ] ) / MSQ_SQRT_THREE;
-            temp_vec[ 2 ] = ( ( 3 * temp_vec[ 4 ] ) - temp_vec[ 0 ] - temp_vec[ 3 ] ) /
-                            ( MSQ_SQRT_THREE * MSQ_SQRT_TWO );
+            temp_vec[ 2 ] =
+                ( ( 3 * temp_vec[ 4 ] ) - temp_vec[ 0 ] - temp_vec[ 3 ] ) / ( MSQ_SQRT_THREE * MSQ_SQRT_TWO );
             return_flag = condition_number_3d( temp_vec, pd, fval, err );
             MSQ_ERRZERO( err );
             return return_flag;
@@ -179,8 +176,7 @@ bool ConditionNumberQualityMetric::evaluate( PatchData& pd, size_t handle, doubl
                 temp_vec[ 4 ] = vertices[ v_i[ adj_idx[ 2 ] ] ] - vertices[ v_i[ adj_idx[ 1 ] ] ];
                 temp_vec[ 2 ] = 0.5 * ( temp_vec[ 3 ] + temp_vec[ 4 ] );
 
-                return_flag =
-                    return_flag && condition_number_3d( temp_vec, pd, met_vals[ j ], err );
+                return_flag = return_flag && condition_number_3d( temp_vec, pd, met_vals[ j ], err );
             }
             fval = average_metrics( met_vals, 4, err );
             MSQ_ERRZERO( err );
@@ -204,8 +200,7 @@ bool ConditionNumberQualityMetric::evaluate( PatchData& pd, size_t handle, doubl
                 temp_vec[ 1 ] -= vertices[ v_i[ adj_idx[ 0 ] ] ];
                 temp_vec[ 1 ] *= MSQ_SQRT_THREE_INV;
 
-                return_flag =
-                    return_flag && condition_number_3d( temp_vec, pd, met_vals[ j ], err );
+                return_flag = return_flag && condition_number_3d( temp_vec, pd, met_vals[ j ], err );
             }
             fval = average_metrics( met_vals, 6, err );
             MSQ_ERRZERO( err );
@@ -214,8 +209,7 @@ bool ConditionNumberQualityMetric::evaluate( PatchData& pd, size_t handle, doubl
 
         default:
             MSQ_SETERR( err )
-            ( MsqError::UNSUPPORTED_ELEMENT,
-              "Unsupported cell type (%d) for Condition Number quality metric.", type );
+            ( MsqError::UNSUPPORTED_ELEMENT, "Unsupported cell type (%d) for Condition Number quality metric.", type );
 
             fval = MSQ_MAX_CAP;
             return false;

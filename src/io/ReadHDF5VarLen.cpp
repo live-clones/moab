@@ -23,18 +23,15 @@ bool ReadHDF5VarLen::is_ranged( EntityHandle file_id, Range::const_iterator& ran
     return true;
 }
 
-ErrorCode ReadHDF5VarLen::read_data( ReadHDF5Dataset& data_set, const Range& offsets,
-                                     EntityHandle start_offset, hid_t data_type,
-                                     const Range&                   file_ids,
-                                     const std::vector< unsigned >& vals_per_ent,
-                                     const Range&                   ranged_file_ids )
+ErrorCode ReadHDF5VarLen::read_data( ReadHDF5Dataset& data_set, const Range& offsets, EntityHandle start_offset,
+                                     hid_t data_type, const Range& file_ids,
+                                     const std::vector< unsigned >& vals_per_ent, const Range& ranged_file_ids )
 {
-    ErrorCode            rval;
-    const size_t         value_size = H5Tget_size( data_type );
-    const size_t         buffer_size = bufferSize / value_size;
-    unsigned char* const data_buffer = reinterpret_cast< unsigned char* >( dataBuffer );
-    std::vector< unsigned char >
-                                            partial;  // for when we read only part of the contents of a set/entity
+    ErrorCode                               rval;
+    const size_t                            value_size = H5Tget_size( data_type );
+    const size_t                            buffer_size = bufferSize / value_size;
+    unsigned char* const                    data_buffer = reinterpret_cast< unsigned char* >( dataBuffer );
+    std::vector< unsigned char >            partial;  // for when we read only part of the contents of a set/entity
     Range::const_iterator                   fileid_iter = file_ids.begin( );
     Range::const_iterator                   ranged_iter = ranged_file_ids.begin( );
     std::vector< unsigned >::const_iterator count_iter = vals_per_ent.begin( );
@@ -53,8 +50,7 @@ ErrorCode ReadHDF5VarLen::read_data( ReadHDF5Dataset& data_set, const Range& off
         return MB_FAILURE;
     }
 
-    dbgOut.printf( 3, "Reading %s in %lu chunks\n", data_set.get_debug_desc( ),
-                   data_set.get_read_count( ) );
+    dbgOut.printf( 3, "Reading %s in %lu chunks\n", data_set.get_debug_desc( ), data_set.get_read_count( ) );
 
     while( !data_set.done( ) )
     {
@@ -103,8 +99,7 @@ ErrorCode ReadHDF5VarLen::read_data( ReadHDF5Dataset& data_set, const Range& off
         {
             assert( fileid_iter != file_ids.end( ) );
             ranged = is_ranged( *fileid_iter, ranged_iter, ranged_file_ids.end( ) );
-            rval =
-                store_data( *fileid_iter, data_buffer + offset * value_size, *count_iter, ranged );
+            rval = store_data( *fileid_iter, data_buffer + offset * value_size, *count_iter, ranged );
             if( MB_SUCCESS != rval ) return rval;
 
             offset += *count_iter;
@@ -118,8 +113,7 @@ ErrorCode ReadHDF5VarLen::read_data( ReadHDF5Dataset& data_set, const Range& off
         if( offset < count )
         {
             assert( partial.empty( ) );
-            partial.insert( partial.end( ), data_buffer + offset * value_size,
-                            data_buffer + count * value_size );
+            partial.insert( partial.end( ), data_buffer + offset * value_size, data_buffer + count * value_size );
         }
     }
     // NOTE: If the last set is empty, we will not process it here
@@ -289,9 +283,8 @@ ErrorCode ReadHDF5VarLen::read_offsets( ReadHDF5Dataset& data_set,
   return MB_SUCCESS;
 }
 */
-ErrorCode ReadHDF5VarLen::read_offsets( ReadHDF5Dataset& data_set, const Range& file_ids,
-                                        EntityHandle start_file_id, EntityHandle nudge,
-                                        Range& offsets_out, std::vector< unsigned >& counts_out )
+ErrorCode ReadHDF5VarLen::read_offsets( ReadHDF5Dataset& data_set, const Range& file_ids, EntityHandle start_file_id,
+                                        EntityHandle nudge, Range& offsets_out, std::vector< unsigned >& counts_out )
 {
 
     // Use hints to make sure insertion into ranges is O(1)
@@ -313,8 +306,7 @@ ErrorCode ReadHDF5VarLen::read_offsets( ReadHDF5Dataset& data_set, const Range& 
     }
     while( pair != file_ids.const_pair_end( ) )
     {
-        hint = rows.insert( hint, pair->first - start_file_id + nudge - 1,
-                            pair->second - start_file_id + nudge );
+        hint = rows.insert( hint, pair->first - start_file_id + nudge - 1, pair->second - start_file_id + nudge );
         ++pair;
     }
 
@@ -332,8 +324,7 @@ ErrorCode ReadHDF5VarLen::read_offsets( ReadHDF5Dataset& data_set, const Range& 
         have_prev_end = true;
     }
 
-    dbgOut.printf( 3, "Reading %s in %lu chunks\n", data_set.get_debug_desc( ),
-                   data_set.get_read_count( ) );
+    dbgOut.printf( 3, "Reading %s in %lu chunks\n", data_set.get_debug_desc( ), data_set.get_read_count( ) );
 
     // read offset table
     size_t                count, offset;

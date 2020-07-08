@@ -397,8 +397,7 @@ void test_1d_sub_entity_indices( EntityType type, int num_edges, const int ( *ed
         int indices[ 3 ] = { 0, 0, -99 };
         // check correct results
         CN::SubEntityVertexIndices( type, 1, i, indices );
-        if( edge_indices[ i ][ 0 ] == indices[ 0 ] )
-        { CHECK_EQUAL( edge_indices[ i ][ 1 ], indices[ 1 ] ); }
+        if( edge_indices[ i ][ 0 ] == indices[ 0 ] ) { CHECK_EQUAL( edge_indices[ i ][ 1 ], indices[ 1 ] ); }
         else
         {
             CHECK_EQUAL( edge_indices[ i ][ 0 ], indices[ 1 ] );
@@ -488,8 +487,7 @@ void test_sub_entity_indices_tet( )
     const EntityType type = MBTET;
     const int        num_vtx = 4;
     const int        edges[][ 2 ] = { { 0, 1 }, { 1, 2 }, { 2, 0 }, { 0, 3 }, { 1, 3 }, { 2, 3 } };
-    const int        faces[][ 5 ] = {
-        { 3, 0, 1, 3, 0 }, { 3, 1, 2, 3, 0 }, { 3, 2, 0, 3, 0 }, { 3, 2, 1, 0, 0 } };
+    const int        faces[][ 5 ] = { { 3, 0, 1, 3, 0 }, { 3, 1, 2, 3, 0 }, { 3, 2, 0, 3, 0 }, { 3, 2, 1, 0, 0 } };
     test_0d_sub_entity_indices( type, num_vtx );
     test_1d_sub_entity_indices( type, sizeof( edges ) / sizeof( edges[ 0 ] ), edges );
     test_2d_sub_entity_indices( type, sizeof( faces ) / sizeof( faces[ 0 ] ), faces );
@@ -500,13 +498,9 @@ void test_sub_entity_indices_pyr( )
 {
     const EntityType type = MBPYRAMID;
     const int        num_vtx = 5;
-    const int        edges[][ 2 ] = { { 0, 1 }, { 1, 2 }, { 2, 3 }, { 3, 0 },
-                               { 0, 4 }, { 1, 4 }, { 2, 4 }, { 3, 4 } };
-    const int        faces[][ 5 ] = { { 3, 0, 1, 4, 0 },
-                               { 3, 1, 2, 4, 0 },
-                               { 3, 2, 3, 4, 0 },
-                               { 3, 3, 0, 4, 0 },
-                               { 4, 3, 2, 1, 0 } };
+    const int        edges[][ 2 ] = { { 0, 1 }, { 1, 2 }, { 2, 3 }, { 3, 0 }, { 0, 4 }, { 1, 4 }, { 2, 4 }, { 3, 4 } };
+    const int        faces[][ 5 ] = {
+        { 3, 0, 1, 4, 0 }, { 3, 1, 2, 4, 0 }, { 3, 2, 3, 4, 0 }, { 3, 3, 0, 4, 0 }, { 4, 3, 2, 1, 0 } };
     test_0d_sub_entity_indices( type, num_vtx );
     test_1d_sub_entity_indices( type, sizeof( edges ) / sizeof( edges[ 0 ] ), edges );
     test_2d_sub_entity_indices( type, sizeof( faces ) / sizeof( faces[ 0 ] ), faces );
@@ -519,11 +513,8 @@ void test_sub_entity_indices_pri( )
     const int        num_vtx = 6;
     const int        edges[][ 2 ] = { { 0, 1 }, { 1, 2 }, { 2, 0 }, { 0, 3 }, { 1, 4 },
                                { 2, 5 }, { 3, 4 }, { 4, 5 }, { 5, 3 } };
-    const int        faces[][ 5 ] = { { 4, 0, 1, 4, 3 },
-                               { 4, 1, 2, 5, 4 },
-                               { 4, 2, 0, 3, 5 },
-                               { 3, 2, 1, 0, 0 },
-                               { 3, 3, 4, 5, 0 } };
+    const int        faces[][ 5 ] = {
+        { 4, 0, 1, 4, 3 }, { 4, 1, 2, 5, 4 }, { 4, 2, 0, 3, 5 }, { 3, 2, 1, 0, 0 }, { 3, 3, 4, 5, 0 } };
     test_0d_sub_entity_indices( type, num_vtx );
     test_1d_sub_entity_indices( type, sizeof( edges ) / sizeof( edges[ 0 ] ), edges );
     test_2d_sub_entity_indices( type, sizeof( faces ) / sizeof( faces[ 0 ] ), faces );
@@ -556,14 +547,12 @@ static void do_test_side_number_1d( EntityType type, int idx )
     int side_conn[ 2 ] = { elem_verts[ side_idx[ 0 ] ], elem_verts[ side_idx[ 1 ] ] };
     int rev_conn[ 2 ] = { elem_verts[ side_idx[ 1 ] ], elem_verts[ side_idx[ 0 ] ] };
     int result_side = -100, result_sense = -100, result_offset = -100;
-    int err = CN::SideNumber( type, elem_verts, side_conn, 2, 1, result_side, result_sense,
-                              result_offset );
+    int err = CN::SideNumber( type, elem_verts, side_conn, 2, 1, result_side, result_sense, result_offset );
     CHECK_EQUAL( 0, err );
     CHECK_EQUAL( idx, result_side );
     CHECK_EQUAL( 1, result_sense );
     CHECK_EQUAL( 0, result_offset );
-    err = CN::SideNumber( type, elem_verts, rev_conn, 2, 1, result_side, result_sense,
-                          result_offset );
+    err = CN::SideNumber( type, elem_verts, rev_conn, 2, 1, result_side, result_sense, result_offset );
     CHECK_EQUAL( 0, err );
     CHECK_EQUAL( idx, result_side );
     CHECK( result_offset == 1 || result_sense == -1 );
@@ -586,12 +575,11 @@ static void do_test_side_number_2d( EntityType type, int idx )
             int side_conn[ 4 ];
             side_conn[ 3 ] = 0;
             for( int i = 0; i < side_size; ++i )
-                side_conn[ ( side_size + rev * i ) % side_size ] =
-                    elem_verts[ side_idx[ ( i + off ) % side_size ] ];
+                side_conn[ ( side_size + rev * i ) % side_size ] = elem_verts[ side_idx[ ( i + off ) % side_size ] ];
 
             int result_side = -100, result_sense = -100, result_offset = -100;
-            int err = CN::SideNumber( type, elem_verts, side_conn, side_size, 2, result_side,
-                                      result_sense, result_offset );
+            int err =
+                CN::SideNumber( type, elem_verts, side_conn, side_size, 2, result_side, result_sense, result_offset );
             CHECK_EQUAL( 0, err );
             CHECK_EQUAL( idx, result_side );
             CHECK_EQUAL( rev, result_sense );
@@ -889,9 +877,8 @@ void test_opposite_side_hex( )
 
 void test_has_mid_nodes( EntityType type )
 {
-    const int combinations[][ 4 ] = { { 0, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 1, 0 },
-                                      { 0, 1, 1, 0 }, { 0, 0, 0, 1 }, { 0, 1, 0, 1 },
-                                      { 0, 0, 1, 1 }, { 0, 1, 1, 1 } };
+    const int combinations[][ 4 ] = { { 0, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 1, 0 }, { 0, 1, 1, 0 },
+                                      { 0, 0, 0, 1 }, { 0, 1, 0, 1 }, { 0, 0, 1, 1 }, { 0, 1, 1, 1 } };
 
     const int dim = CN::Dimension( type );
     // calculate number of valid combinations of ho node flags
@@ -928,9 +915,8 @@ void test_has_mid_nodes( EntityType type )
 
 void test_ho_node_parent( )
 {
-    const int combinations[][ 4 ] = { { 0, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 1, 0 },
-                                      { 0, 1, 1, 0 }, { 0, 0, 0, 1 }, { 0, 1, 0, 1 },
-                                      { 0, 0, 1, 1 }, { 0, 1, 1, 1 } };
+    const int combinations[][ 4 ] = { { 0, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 1, 0 }, { 0, 1, 1, 0 },
+                                      { 0, 0, 0, 1 }, { 0, 1, 0, 1 }, { 0, 0, 1, 1 }, { 0, 1, 1, 1 } };
 
     for( const EntityType* t = elem_types; *t != MBMAXTYPE; ++t )
     {
@@ -996,9 +982,8 @@ void test_ho_node_parent( )
 
 void test_ho_node_index( )
 {
-    const int combinations[][ 4 ] = { { 0, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 1, 0 },
-                                      { 0, 1, 1, 0 }, { 0, 0, 0, 1 }, { 0, 1, 0, 1 },
-                                      { 0, 0, 1, 1 }, { 0, 1, 1, 1 } };
+    const int combinations[][ 4 ] = { { 0, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 1, 0 }, { 0, 1, 1, 0 },
+                                      { 0, 0, 0, 1 }, { 0, 1, 0, 1 }, { 0, 0, 1, 1 }, { 0, 1, 1, 1 } };
 
     for( const EntityType* t = elem_types; *t != MBMAXTYPE; ++t )
     {
@@ -1111,7 +1096,7 @@ void test_sub_entity_nodes( EntityType parent, int num_nodes, int sub_dimension 
     // now test the actual indices
     for( int i = 0; i < num_sub; ++i )
     {
-        int num, conn[ moab::MAX_SUB_ENTITY_VERTICES ], corners[ moab::MAX_SUB_ENTITY_VERTICES ];
+        int        num, conn[ moab::MAX_SUB_ENTITY_VERTICES ], corners[ moab::MAX_SUB_ENTITY_VERTICES ];
         EntityType type;
         CN::SubEntityNodeIndices( parent, num_nodes, sub_dimension, i, type, num, conn );
 

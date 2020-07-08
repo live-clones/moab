@@ -58,20 +58,18 @@ int TMPQualityMetric::get_negate_flag( ) const
     return 1;
 }
 
-void TMPQualityMetric::get_evaluations( PatchData& pd, std::vector< size_t >& handles, bool free,
-                                        MsqError& err )
+void TMPQualityMetric::get_evaluations( PatchData& pd, std::vector< size_t >& handles, bool free, MsqError& err )
 {
     get_sample_pt_evaluations( pd, handles, free, err );
 }
 
-void TMPQualityMetric::get_patch_evaluations( PatchData& pd, std::vector< size_t >& handles,
-                                              bool free, MsqError& err )
+void TMPQualityMetric::get_patch_evaluations( PatchData& pd, std::vector< size_t >& handles, bool free, MsqError& err )
 {
     get_sample_pt_evaluations( pd, handles, free, err );
 }
 
-void TMPQualityMetric::get_element_evaluations( PatchData& pd, size_t p_elem,
-                                                std::vector< size_t >& handles, MsqError& err )
+void TMPQualityMetric::get_element_evaluations( PatchData& pd, size_t p_elem, std::vector< size_t >& handles,
+                                                MsqError& err )
 {
     get_elem_sample_points( pd, p_elem, handles, err );
 }
@@ -138,9 +136,8 @@ static void get_u_perp( const MsqVector< 3 >& u, MsqVector< 3 >& u_perp )
  * where the plane into which we are projecting is orthogonal
  * to the passed u vector.
  */
-static inline bool project_to_perp_plane( MsqMatrix< 3, 2 > J, const MsqVector< 3 >& u,
-                                          const MsqVector< 3 >& u_perp, MsqMatrix< 2, 2 >& A,
-                                          MsqMatrix< 3, 2 >& S_a_transpose_Theta )
+static inline bool project_to_perp_plane( MsqMatrix< 3, 2 > J, const MsqVector< 3 >& u, const MsqVector< 3 >& u_perp,
+                                          MsqMatrix< 2, 2 >& A, MsqMatrix< 3, 2 >& S_a_transpose_Theta )
 {
     MsqVector< 3 > n_a = J.column( 0 ) * J.column( 1 );
     double         sc, len = length( n_a );
@@ -160,13 +157,12 @@ static inline bool project_to_perp_plane( MsqMatrix< 3, 2 > J, const MsqVector< 
     // rotate J such that they are.
     if( sinphi > 1e-12 )
     {
-        MsqVector< 3 > m = sigma * cross;
-        MsqVector< 3 > n = ( 1 / sinphi ) * m;
-        MsqVector< 3 > p = ( 1 - cosphi ) * n;
-        double         s_a[] = {
-            p[ 0 ] * n[ 0 ] + cosphi, p[ 0 ] * n[ 1 ] - m[ 2 ], p[ 0 ] * n[ 2 ] + m[ 1 ],
-            p[ 1 ] * n[ 0 ] + m[ 2 ], p[ 1 ] * n[ 1 ] + cosphi, p[ 1 ] * n[ 2 ] - m[ 0 ],
-            p[ 2 ] * n[ 0 ] - m[ 1 ], p[ 2 ] * n[ 1 ] + m[ 0 ], p[ 2 ] * n[ 2 ] + cosphi };
+        MsqVector< 3 >    m = sigma * cross;
+        MsqVector< 3 >    n = ( 1 / sinphi ) * m;
+        MsqVector< 3 >    p = ( 1 - cosphi ) * n;
+        double            s_a[] = { p[ 0 ] * n[ 0 ] + cosphi, p[ 0 ] * n[ 1 ] - m[ 2 ], p[ 0 ] * n[ 2 ] + m[ 1 ],
+                         p[ 1 ] * n[ 0 ] + m[ 2 ], p[ 1 ] * n[ 1 ] + cosphi, p[ 1 ] * n[ 2 ] - m[ 0 ],
+                         p[ 2 ] * n[ 0 ] - m[ 1 ], p[ 2 ] * n[ 1 ] + m[ 0 ], p[ 2 ] * n[ 2 ] + cosphi };
         MsqMatrix< 3, 3 > S_a( s_a );
         J = S_a * J;
         S_a_transpose_Theta = transpose( S_a ) * Theta;
@@ -190,8 +186,8 @@ static inline bool project_to_perp_plane( MsqMatrix< 3, 2 > J, const MsqVector< 
  * Also pass back the cross product of the columns of M as u,
  * and the first column of M as u_perp, both normalized.
  */
-static inline void project_to_matrix_plane( const MsqMatrix< 3, 2 >& M_in, MsqMatrix< 2, 2 >& M_out,
-                                            MsqVector< 3 >& u, MsqVector< 3 >& u_perp )
+static inline void project_to_matrix_plane( const MsqMatrix< 3, 2 >& M_in, MsqMatrix< 2, 2 >& M_out, MsqVector< 3 >& u,
+                                            MsqVector< 3 >& u_perp )
 {
     u = M_in.column( 0 ) * M_in.column( 1 );
     u_perp = M_in.column( 0 );
@@ -240,12 +236,10 @@ static inline void project_to_matrix_plane( const MsqMatrix< 3, 2 >& M_in, MsqMa
     }
 }
 
-bool TMPQualityMetric::evaluate_surface_common( PatchData& pd, Sample s, size_t e,
-                                                const NodeSet& bits, size_t* indices,
-                                                size_t& num_indices, MsqVector< 2 >* derivs,
-                                                MsqMatrix< 2, 2 >& W, MsqMatrix< 2, 2 >& A,
-                                                MsqMatrix< 3, 2 >& S_a_transpose_Theta,
-                                                MsqError&          err )
+bool TMPQualityMetric::evaluate_surface_common( PatchData& pd, Sample s, size_t e, const NodeSet& bits, size_t* indices,
+                                                size_t& num_indices, MsqVector< 2 >* derivs, MsqMatrix< 2, 2 >& W,
+                                                MsqMatrix< 2, 2 >& A, MsqMatrix< 3, 2 >& S_a_transpose_Theta,
+                                                MsqError& err )
 {
     EntityTopology type = pd.element_by_index( e ).get_element_type( );
 
@@ -312,9 +306,8 @@ bool TMPQualityMetric::evaluate_surface_common( PatchData& pd, Sample s, size_t 
     return true;
 }
 
-void TMPQualityMetric::weight( PatchData& pd, Sample p_sample, size_t p_elem, int num_idx,
-                               double& value, Vector3D* grad, SymMatrix3D* diag, Matrix3D* hess,
-                               MsqError& err )
+void TMPQualityMetric::weight( PatchData& pd, Sample p_sample, size_t p_elem, int num_idx, double& value,
+                               Vector3D* grad, SymMatrix3D* diag, Matrix3D* hess, MsqError& err )
 {
     if( !weightCalc ) return;
 
@@ -338,8 +331,7 @@ void TMPQualityMetric::weight( PatchData& pd, Sample p_sample, size_t p_elem, in
     }
 }
 
-void TMPQualityMetric::initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
-                                         MsqError& err )
+void TMPQualityMetric::initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings, MsqError& err )
 {
     targetCalc->initialize_queue( mesh_and_domain, settings, err );MSQ_ERRRTN( err );
     if( weightCalc )

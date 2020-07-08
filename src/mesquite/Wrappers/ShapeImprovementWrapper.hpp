@@ -68,13 +68,12 @@ class ShapeImprovementWrapper : public Wrapper
                              int parallel_iterations = 10 );
     // Constructor sets the instructions in the queue.
     MESQUITE_EXPORT
-    ShapeImprovementWrapper( double cpu_time = 0.0, double grad_norm = 1.e-6,
-                             int parallel_iterations = 10 );
+    ShapeImprovementWrapper( double cpu_time = 0.0, double grad_norm = 1.e-6, int parallel_iterations = 10 );
 
   protected:
     MESQUITE_EXPORT
-    void run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh, Settings* settings,
-                      QualityAssessor* qa, MsqError& err );
+    void run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh, Settings* settings, QualityAssessor* qa,
+                      MsqError& err );
 
   private:
     double maxTime, gradNorm;

@@ -35,8 +35,7 @@ int main( int argc, char** argv )
 #ifdef MOAB_HAVE_NETCDF
         input_file = string( MESH_DIR ) + string( "/io/fv3x46x72.t.3.nc" );
         output_file = "ReadWriteTestOut.h5m";
-        read_opts =
-            "PARALLEL=READ_PART;PARTITION_METHOD=SQIJ;PARALLEL_RESOLVE_SHARED_ENTS;VARIABLE=T,U";
+        read_opts = "PARALLEL=READ_PART;PARTITION_METHOD=SQIJ;PARALLEL_RESOLVE_SHARED_ENTS;VARIABLE=T,U";
         write_opts = "PARALLEL=WRITE_PART";
 #else
         cout << "Usage: mpiexec -n $NP ReadWriteTest [input] [output] -O <read_opts> -o "
@@ -77,8 +76,8 @@ int main( int argc, char** argv )
     clock_t tt = clock( );
 
     if( 0 == rank )
-        cout << "Reading file " << input_file << "\n with options: " << read_opts << "\n on "
-             << nprocs << " processors\n";
+        cout << "Reading file " << input_file << "\n with options: " << read_opts << "\n on " << nprocs
+             << " processors\n";
 
     // Read the file with the specified options
     rval = mb->load_file( input_file.c_str( ), &set, read_opts.c_str( ) );MB_CHK_ERR( rval );

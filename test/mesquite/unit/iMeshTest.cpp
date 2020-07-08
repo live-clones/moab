@@ -186,14 +186,13 @@ bool iMeshTest::writeVtkFile( const char* filename )
     const int num_pts = sizeof( vertexCoords ) / ( 3 * sizeof( double ) );
     fprintf( file, "POINTS %d float\n", num_pts );
     for( i = 0; i < num_pts; ++i )
-        fprintf( file, "%f %f %f\n", vertexCoords[ 3 * i ], vertexCoords[ 3 * i + 1 ],
-                 vertexCoords[ 3 * i + 2 ] );
+        fprintf( file, "%f %f %f\n", vertexCoords[ 3 * i ], vertexCoords[ 3 * i + 1 ], vertexCoords[ 3 * i + 2 ] );
 
     int num_tris = sizeof( triangleConnectivity ) / ( 3 * sizeof( int ) );
     fprintf( file, "CELLS %d %d\n", num_tris, 4 * num_tris );
     for( i = 0; i < num_tris; ++i )
-        fprintf( file, "3 %d %d %d\n", triangleConnectivity[ 3 * i ],
-                 triangleConnectivity[ 3 * i + 1 ], triangleConnectivity[ 3 * i + 2 ] );
+        fprintf( file, "3 %d %d %d\n", triangleConnectivity[ 3 * i ], triangleConnectivity[ 3 * i + 1 ],
+                 triangleConnectivity[ 3 * i + 2 ] );
 
     fprintf( file, "CELL_TYPES %d\n", num_tris );
     for( i = 0; i < num_tris; ++i )
@@ -267,8 +266,7 @@ void iMeshTest::matchVertexCoordinates( )
     // match vertex coordiantes
     for( size_t i = 0; i < num_pts; ++i )
     {
-        MBMesquite::Vector3D coord( vertexCoords[ 3 * i ], vertexCoords[ 3 * i + 1 ],
-                                    vertexCoords[ 3 * i + 2 ] );
+        MBMesquite::Vector3D coord( vertexCoords[ 3 * i ], vertexCoords[ 3 * i + 1 ], vertexCoords[ 3 * i + 2 ] );
         size_t               j;
         for( j = 0; j < vertices.size( ); ++j )
         {
@@ -313,8 +311,7 @@ void iMeshTest::matchElementConnectivity( )
     myMesh->get_all_elements( elements, err );
     CPPUNIT_ASSERT( !err );
     CPPUNIT_ASSERT_EQUAL( num_tri, elements.size( ) );
-    myMesh->elements_get_attached_vertices( arrptr( elements ), elements.size( ), vertices, offsets,
-                                            err );
+    myMesh->elements_get_attached_vertices( arrptr( elements ), elements.size( ), vertices, offsets, err );
     CPPUNIT_ASSERT( !err );
 
     // Make sure all are triangles
@@ -328,8 +325,7 @@ void iMeshTest::matchElementConnectivity( )
         size_t j;
         for( j = 0; j < elements.size( ); ++j )
         {
-            Mesh::VertexHandle verts[ 3 ] = { vertices[ offsets[ j ] ],
-                                              vertices[ offsets[ j ] + 1 ],
+            Mesh::VertexHandle verts[ 3 ] = { vertices[ offsets[ j ] ], vertices[ offsets[ j ] + 1 ],
                                               vertices[ offsets[ j ] + 2 ] };
 
             if( match_triangles( triangleConnectivity + 3 * i, verts ) )
@@ -486,8 +482,7 @@ void iMeshTest::testVertexFlag( bool fixed, iBase_TagValueType type )
             values[ i ] = fixed;
 
         // set flag on vertices
-        iMesh_setIntArrData( myIMesh, ihandles, handles.size( ), tag, arrptr( values ),
-                             values.size( ), &ierr );
+        iMesh_setIntArrData( myIMesh, ihandles, handles.size( ), tag, arrptr( values ), values.size( ), &ierr );
         CPPUNIT_ASSERT_EQUAL( (int)iBase_SUCCESS, ierr );
     }
     else if( type == iBase_BYTES )
@@ -498,8 +493,7 @@ void iMeshTest::testVertexFlag( bool fixed, iBase_TagValueType type )
             values[ i ] = fixed;
 
         // set flag on vertices
-        iMesh_setArrData( myIMesh, ihandles, handles.size( ), tag, arrptr( values ), values.size( ),
-                          &ierr );
+        iMesh_setArrData( myIMesh, ihandles, handles.size( ), tag, arrptr( values ), values.size( ), &ierr );
         CPPUNIT_ASSERT_EQUAL( (int)iBase_SUCCESS, ierr );
     }
     else

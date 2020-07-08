@@ -297,7 +297,7 @@ Mesh* get_imesh_mesh( const char* file_name )
     }
 
     MsqError err;
-    Mesh* result = new MBMesquite::MsqIMesh( imesh_mesh, root_set, iBase_REGION, err, &fixed_tag );
+    Mesh*    result = new MBMesquite::MsqIMesh( imesh_mesh, root_set, iBase_REGION, err, &fixed_tag );
     if( MSQ_CHKERR( err ) )
     {
         delete result;
@@ -319,7 +319,7 @@ Mesh* get_imesh_mesh( const char* file_name )
 
     moab::EntityHandle root_set = 0;
     MsqError           err;
-    Mesh* result = new MBMesquite::MsqMOAB( mb, root_set, moab::MBHEX, err, &fixed_tag );
+    Mesh*              result = new MBMesquite::MsqMOAB( mb, root_set, moab::MBHEX, err, &fixed_tag );
     if( MSQ_CHKERR( err ) )
     {
         delete result;

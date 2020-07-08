@@ -59,11 +59,9 @@ namespace MeshWriter
     class Transform2D
     {
       public:
-        Transform2D( PatchData* pd, Projection& proj, unsigned width, unsigned height,
-                     bool flip_about_horizontal );
+        Transform2D( PatchData* pd, Projection& proj, unsigned width, unsigned height, bool flip_about_horizontal );
 
-        Transform2D( const Vector3D* verts, size_t num_vert, Projection& projection, unsigned width,
-                     unsigned height );
+        Transform2D( const Vector3D* verts, size_t num_vert, Projection& projection, unsigned width, unsigned height );
 
         void transform( const Vector3D& coords, int& horizontal, int& vertical ) const;
 
@@ -110,8 +108,7 @@ namespace MeshWriter
         write_vtk( pd, out_filename, err );MSQ_CHKERR( err );
     }
 
-    void write_vtk( PatchData& pd, const char* out_filename, MsqError& err,
-                    const Vector3D* OF_gradient )
+    void write_vtk( PatchData& pd, const char* out_filename, MsqError& err, const Vector3D* OF_gradient )
     {
         // Open the file
         std::ofstream file( out_filename );
@@ -148,8 +145,8 @@ namespace MeshWriter
             pd.element_by_index( i ).get_node_indices( vtx_indices );
 
             // Convert native to VTK node order, if not the same
-            const VtkTypeInfo* info = VtkTypeInfo::find_type(
-                pd.element_by_index( i ).get_element_type( ), vtx_indices.size( ), err );MSQ_ERRRTN( err );
+            const VtkTypeInfo* info =
+                VtkTypeInfo::find_type( pd.element_by_index( i ).get_element_type( ), vtx_indices.size( ), err );MSQ_ERRRTN( err );
             info->mesquiteToVtkOrder( vtx_indices );
 
             file << vtx_indices.size( );
@@ -164,9 +161,8 @@ namespace MeshWriter
         file << "CELL_TYPES " << pd.num_elements( ) << '\n';
         for( i = 0; i < pd.num_elements( ); i++ )
         {
-            const VtkTypeInfo* info =
-                VtkTypeInfo::find_type( pd.element_by_index( i ).get_element_type( ),
-                                        pd.element_by_index( i ).node_count( ), err );MSQ_ERRRTN( err );
+            const VtkTypeInfo* info = VtkTypeInfo::find_type( pd.element_by_index( i ).get_element_type( ),
+                                                              pd.element_by_index( i ).node_count( ), err );MSQ_ERRRTN( err );
             file << info->vtkType << '\n';
         }
 
@@ -192,8 +188,7 @@ namespace MeshWriter
         {
             file << "VECTORS gradient double\n";
             for( i = 0; i < pd.num_free_vertices( ); ++i )
-                file << OF_gradient[ i ].x( ) << " " << OF_gradient[ i ].y( ) << " "
-                     << OF_gradient[ i ].z( ) << "\n";
+                file << OF_gradient[ i ].x( ) << " " << OF_gradient[ i ].y( ) << " " << OF_gradient[ i ].z( ) << "\n";
             for( i = pd.num_free_vertices( ); i < pd.num_nodes( ); ++i )
                 file << "0.0 0.0 0.0\n";
         }
@@ -211,8 +206,7 @@ namespace MeshWriter
         write_gnuplot( pd, out_filebase, err );
     }
 
-    void write_gnuplot( Mesh* mesh, std::vector< Mesh::ElementHandle >& elems,
-                        const char* out_filebase, MsqError& err )
+    void write_gnuplot( Mesh* mesh, std::vector< Mesh::ElementHandle >& elems, const char* out_filebase, MsqError& err )
     {
         // loads a global patch
         PatchData pd;
@@ -276,8 +270,8 @@ namespace MeshWriter
      * Read a set of input files to determine the bounding box
      * of the combined data.
      */
-    static void find_gnuplot_agregate_range( int count, const char* basename, Vector3D& min,
-                                             Vector3D& max, MsqError& err )
+    static void find_gnuplot_agregate_range( int count, const char* basename, Vector3D& min, Vector3D& max,
+                                             MsqError& err )
     {
         // read all input files to determine extents
         min = Vector3D( HUGE_VAL, HUGE_VAL, HUGE_VAL );
@@ -344,17 +338,15 @@ namespace MeshWriter
         // write header
         file << "#!gnuplot" << endl;
         file << "#" << endl;
-        file << "# Mesquite Animation of " << basename << ".0 to " << basename << '.' << count
-             << endl;
+        file << "# Mesquite Animation of " << basename << ".0 to " << basename << '.' << count << endl;
         file << "#" << endl;
 
         // write plot settings
-        file << "set term gif animate transparent opt delay " << DELAY << " size " << WIDTH << ","
-             << HEIGHT << endl;
-        file << "set xrange [" << min[ haxis ] - 0.05 * range[ haxis ] << ":"
-             << max[ haxis ] + 0.05 * range[ haxis ] << "]" << endl;
-        file << "set yrange [" << min[ vaxis ] - 0.05 * range[ vaxis ] << ":"
-             << max[ vaxis ] + 0.05 * range[ vaxis ] << "]" << endl;
+        file << "set term gif animate transparent opt delay " << DELAY << " size " << WIDTH << "," << HEIGHT << endl;
+        file << "set xrange [" << min[ haxis ] - 0.05 * range[ haxis ] << ":" << max[ haxis ] + 0.05 * range[ haxis ]
+             << "]" << endl;
+        file << "set yrange [" << min[ vaxis ] - 0.05 * range[ vaxis ] << ":" << max[ vaxis ] + 0.05 * range[ vaxis ]
+             << "]" << endl;
         file << "set title '" << basename << "'" << endl;
         file << "set output '" << basename << ".gif'" << endl;
 
@@ -446,15 +438,12 @@ namespace MeshWriter
         fprintf( file, "set output '%s.gif'\n", basename );
 
         // plot data
-        fprintf( file, "plot '%s.0.gpt' using %d:%d w l lc rgb '#%02x%02x%02x' title 't0'",
-                 basename, haxis + 1, vaxis + 1, red( 0, count ), green( 0, count ),
-                 blue( 0, count ) );
+        fprintf( file, "plot '%s.0.gpt' using %d:%d w l lc rgb '#%02x%02x%02x' title 't0'", basename, haxis + 1,
+                 vaxis + 1, red( 0, count ), green( 0, count ), blue( 0, count ) );
         for( int i = 1; i <= count; ++i )
         {
-            fprintf( file,
-                     ", \\\n     '%s.%d.gpt' using %d:%d w l lc rgb '#%02x%02x%02x' title 't%d'",
-                     basename, i, haxis + 1, vaxis + 1, red( i, count ), green( i, count ),
-                     blue( i, count ), i );
+            fprintf( file, ", \\\n     '%s.%d.gpt' using %d:%d w l lc rgb '#%02x%02x%02x' title 't%d'", basename, i,
+                     haxis + 1, vaxis + 1, red( i, count ), green( i, count ), blue( i, count ), i );
         }
         fprintf( file, "\n" );
 
@@ -506,8 +495,7 @@ namespace MeshWriter
             file << "facet normal " << n.x( ) << " " << n.y( ) << " " << n.z( ) << endl;
             file << "outer loop" << endl;
             for( unsigned i = 0; i < 3; ++i )
-                file << "vertex " << coords[ i ].x( ) << " " << coords[ i ].y( ) << " "
-                     << coords[ i ].z( ) << endl;
+                file << "vertex " << coords[ i ].x( ) << " " << coords[ i ].y( ) << " " << coords[ i ].z( ) << endl;
             file << "endloop" << endl;
             file << "endfacet" << endl;
         }
@@ -597,10 +585,9 @@ namespace MeshWriter
         const double y = axis.y( );
         const double z = axis.z( );
 
-        const double xform[ 9 ] = {
-            c + x * x * ( 1 - c ),      -z * s + x * y * ( 1 - c ), y * s + x * z * ( 1 - c ),
-            z * s + x * y * ( 1 - c ),  c + y * y * ( 1 - c ),      -x * s + y * z * ( 1 - c ),
-            -y * s + x * z * ( 1 - c ), x * s + y * z * ( 1 - c ),  c + z * z * ( 1 - c ) };
+        const double xform[ 9 ] = { c + x * x * ( 1 - c ),      -z * s + x * y * ( 1 - c ), y * s + x * z * ( 1 - c ),
+                                    z * s + x * y * ( 1 - c ),  c + y * y * ( 1 - c ),      -x * s + y * z * ( 1 - c ),
+                                    -y * s + x * z * ( 1 - c ), x * s + y * z * ( 1 - c ),  c + z * z * ( 1 - c ) };
         return Matrix3D( xform );
     }
 
@@ -611,8 +598,7 @@ namespace MeshWriter
         v = (float)pr.y( );
     }
 
-    Transform2D::Transform2D( PatchData* pd, Projection& projection, unsigned width,
-                              unsigned height, bool flip )
+    Transform2D::Transform2D( PatchData* pd, Projection& projection, unsigned width, unsigned height, bool flip )
         : myProj( projection ), vertSign( flip ? -1 : 1 )
     {
         // Get the bounding box of the projected points
@@ -646,8 +632,8 @@ namespace MeshWriter
         vertMax = (int)( ( flip ? -h_min : h_max ) * myScale ) + vertOffset;
     }
 
-    Transform2D::Transform2D( const Vector3D* verts, size_t num_vert, Projection& projection,
-                              unsigned width, unsigned height )
+    Transform2D::Transform2D( const Vector3D* verts, size_t num_vert, Projection& projection, unsigned width,
+                              unsigned height )
         : myProj( projection ), vertSign( 1 )
     {
         // Get the bounding box of the projected points
@@ -698,8 +684,7 @@ namespace MeshWriter
      * to verify this, don't forget to adjust for the different
      * parameter ranges: \f$ \xi = 2 t - 1 \f$).
      */
-    static void write_eps_quadratic_edge( ostream& s, Transform2D& xform, Vector3D start,
-                                          Vector3D mid, Vector3D end )
+    static void write_eps_quadratic_edge( ostream& s, Transform2D& xform, Vector3D start, Vector3D mid, Vector3D end )
     {
         Vector3D P1 = 1. / 3 * ( 4 * mid - end );
         Vector3D P2 = 1. / 3 * ( 4 * mid - start );
@@ -715,8 +700,7 @@ namespace MeshWriter
         s << x << ' ' << y << " curveto" << endl;
     }
 
-    void write_eps( Mesh* mesh, const char* filename, Projection proj, MsqError& err, int width,
-                    int height )
+    void write_eps( Mesh* mesh, const char* filename, Projection proj, MsqError& err, int width, int height )
     {
         // Get a global patch
         PatchData pd;
@@ -739,8 +723,7 @@ namespace MeshWriter
         s << "%%Title: Mesquite " << endl;
         s << "%%DocumentData: Clean7Bit" << endl;
         s << "%%Origin: 0 0" << endl;
-        s << "%%BoundingBox: 0 0 " << transf.max_horizontal( ) << ' ' << transf.max_vertical( )
-          << endl;
+        s << "%%BoundingBox: 0 0 " << transf.max_horizontal( ) << ' ' << transf.max_vertical( ) << endl;
         s << "%%Pages: 1" << endl;
 
         s << "%%BeginProlog" << endl;
@@ -830,9 +813,8 @@ namespace MeshWriter
         return result;
     }
 
-    void write_eps_triangle( Mesh* mesh, Mesh::ElementHandle elem, const char* filename,
-                             bool draw_iso_lines, bool draw_nodes, MsqError& err, int width,
-                             int height )
+    void write_eps_triangle( Mesh* mesh, Mesh::ElementHandle elem, const char* filename, bool draw_iso_lines,
+                             bool draw_nodes, MsqError& err, int width, int height )
     {
         // Get triangle vertices
         MsqVertex      coords[ 6 ];
@@ -861,13 +843,11 @@ namespace MeshWriter
         {
             mesh->vertices_get_fixed_flag( arrptr( verts ), fixed, verts.size( ), err );MSQ_ERRRTN( err );
         }
-        write_eps_triangle( coords2, verts.size( ), filename, draw_iso_lines, draw_nodes, err,
-                            fixed, width, height );
+        write_eps_triangle( coords2, verts.size( ), filename, draw_iso_lines, draw_nodes, err, fixed, width, height );
     }
 
-    void write_eps_triangle( const Vector3D* coords, size_t num_vtx, const char* filename,
-                             bool draw_iso_lines, bool draw_nodes, MsqError& err,
-                             const std::vector< bool >& fixed, int width, int height )
+    void write_eps_triangle( const Vector3D* coords, size_t num_vtx, const char* filename, bool draw_iso_lines,
+                             bool draw_nodes, MsqError& err, const std::vector< bool >& fixed, int width, int height )
     {
         const int    PT_RAD = 3;  // radius of circles for drawing nodes, in points
         const int    PAD = PT_RAD + 2;  // margin in points
@@ -894,8 +874,8 @@ namespace MeshWriter
         str << "%%Title: Mesquite " << endl;
         str << "%%DocumentData: Clean7Bit" << endl;
         str << "%%Origin: 0 0" << endl;
-        str << "%%BoundingBox: " << -PAD << ' ' << -PAD << ' ' << transf.max_horizontal( ) + PAD
-            << ' ' << transf.max_vertical( ) + PAD << endl;
+        str << "%%BoundingBox: " << -PAD << ' ' << -PAD << ' ' << transf.max_horizontal( ) + PAD << ' '
+            << transf.max_vertical( ) + PAD << endl;
         str << "%%Pages: 1" << endl;
 
         str << "%%BeginProlog" << endl;
@@ -953,9 +933,8 @@ namespace MeshWriter
                     double   R[ 2 ] = { iso_params[ i ][ 0 ][ 0 ], iso_params[ i ][ 1 ][ 0 ] };
                     double   S[ 2 ] = { iso_params[ i ][ 0 ][ 1 ], iso_params[ i ][ 1 ][ 1 ] };
                     double   T[ 2 ] = { 1 - R[ 0 ] - S[ 0 ], 1 - R[ 1 ] - S[ 1 ] };
-                    Vector3D p[ 2 ] = {
-                        T[ 0 ] * coords[ 0 ] + R[ 0 ] * coords[ 1 ] + S[ 0 ] * coords[ 2 ],
-                        T[ 1 ] * coords[ 0 ] + R[ 1 ] * coords[ 1 ] + S[ 1 ] * coords[ 2 ] };
+                    Vector3D p[ 2 ] = { T[ 0 ] * coords[ 0 ] + R[ 0 ] * coords[ 1 ] + S[ 0 ] * coords[ 2 ],
+                                        T[ 1 ] * coords[ 0 ] + R[ 1 ] * coords[ 1 ] + S[ 1 ] * coords[ 2 ] };
                     transf.transform( p[ 0 ], x[ 0 ], y[ 0 ] );
                     transf.transform( p[ 1 ], x[ 1 ], y[ 1 ] );
                     str << x[ 0 ] << ' ' << y[ 0 ] << " moveto" << endl;
@@ -982,8 +961,7 @@ namespace MeshWriter
                     double S[ 3 ] = { iso_params[ i ][ 0 ][ 1 ], 0, iso_params[ i ][ 1 ][ 1 ] };
                     R[ 1 ] = 0.5 * ( R[ 0 ] + R[ 2 ] );
                     S[ 1 ] = 0.5 * ( S[ 0 ] + S[ 2 ] );
-                    Vector3D p[ 3 ] = { quad_tri_pt( R[ 0 ], S[ 0 ], coords ),
-                                        quad_tri_pt( R[ 1 ], S[ 1 ], coords ),
+                    Vector3D p[ 3 ] = { quad_tri_pt( R[ 0 ], S[ 0 ], coords ), quad_tri_pt( R[ 1 ], S[ 1 ], coords ),
                                         quad_tri_pt( R[ 2 ], S[ 2 ], coords ) };
                     write_eps_quadratic_edge( str, transf, p[ 0 ], p[ 1 ], p[ 2 ] );
                 }
@@ -1044,9 +1022,8 @@ namespace MeshWriter
         file << "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" "
              << "\"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">" << endl;
         file << endl;
-        file << "<svg width=\"" << transf.max_horizontal( ) << "\" height=\""
-             << transf.max_vertical( ) << "\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\">"
-             << endl;
+        file << "<svg width=\"" << transf.max_horizontal( ) << "\" height=\"" << transf.max_vertical( )
+             << "\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\">" << endl;
 
         // Write mesh edges
         EdgeIterator iter( &pd, err );MSQ_ERRRTN( err );

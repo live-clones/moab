@@ -109,8 +109,8 @@ class MESQUITE_EXPORT TopologyInfo
      * determine which mid-nodes are present given the topology
      * and total number of nodes.
      */
-    static void higher_order( EntityTopology topo, unsigned num_nodes, bool& midedge, bool& midface,
-                              bool& midvol, MsqError& err );
+    static void higher_order( EntityTopology topo, unsigned num_nodes, bool& midedge, bool& midface, bool& midvol,
+                              MsqError& err );
 
     /** \brief Check which mid-nodes a higher-order element has.
      *
@@ -162,26 +162,23 @@ class MESQUITE_EXPORT TopologyInfo
      *         ordering of element connectivity, or -1 of element type contains
      *         no such node.
      */
-    static int higher_order_from_side( EntityTopology topo, unsigned num_nodes,
-                                       unsigned side_dimension, unsigned side_number,
-                                       MsqError& err );
+    static int higher_order_from_side( EntityTopology topo, unsigned num_nodes, unsigned side_dimension,
+                                       unsigned side_number, MsqError& err );
 
     /**\brief Get side given a higher-order node */
-    static void side_from_higher_order( EntityTopology topo, unsigned num_nodes,
-                                        unsigned node_number, unsigned& side_dim_out,
-                                        unsigned& side_num_out, MsqError& err );
+    static void side_from_higher_order( EntityTopology topo, unsigned num_nodes, unsigned node_number,
+                                        unsigned& side_dim_out, unsigned& side_num_out, MsqError& err );
 
     /** Get logical position given an element type node node index*/
-    static inline Sample sample_from_node( EntityTopology topo, unsigned num_nodes,
-                                           unsigned node_number, MsqError& err )
+    static inline Sample sample_from_node( EntityTopology topo, unsigned num_nodes, unsigned node_number,
+                                           MsqError& err )
     {
         unsigned dim, num;
         side_from_higher_order( topo, num_nodes, node_number, dim, num, err );
         return Sample( dim, num );
     }
     /** Get node index from logical position */
-    static inline int node_from_sample( EntityTopology topo, unsigned num_nodes, Sample sample,
-                                        MsqError& err )
+    static inline int node_from_sample( EntityTopology topo, unsigned num_nodes, Sample sample, MsqError& err )
     {
         return higher_order_from_side( topo, num_nodes, sample.dimension, sample.number, err );
     }
@@ -191,8 +188,7 @@ class MESQUITE_EXPORT TopologyInfo
      * in the connectivity list for the element type correspond to the
      * end vertices of that edge.
      */
-    static const unsigned* edge_vertices( EntityTopology topo, unsigned edge_number,
-                                          MsqError& err );
+    static const unsigned* edge_vertices( EntityTopology topo, unsigned edge_number, MsqError& err );
     static const unsigned* edge_vertices( EntityTopology topo, unsigned edge_number );
 
     /**\brief Get face corner indices in element connectivity array
@@ -202,10 +198,9 @@ class MESQUITE_EXPORT TopologyInfo
      * vertices of that face, ordered in a counter-clockwise cycle
      * around a vector pointing out of the element for an ideal element.
      */
-    static const unsigned* face_vertices( EntityTopology topo, unsigned face_number,
-                                          unsigned& num_vertices_out, MsqError& err );
-    static const unsigned* face_vertices( EntityTopology topo, unsigned face_number,
-                                          unsigned& num_vertices_out );
+    static const unsigned* face_vertices( EntityTopology topo, unsigned face_number, unsigned& num_vertices_out,
+                                          MsqError& err );
+    static const unsigned* face_vertices( EntityTopology topo, unsigned face_number, unsigned& num_vertices_out );
 
     /**\brief Get corner indices of side
      *
@@ -219,11 +214,10 @@ class MESQUITE_EXPORT TopologyInfo
      * element are returned.  Fails if side dimension
      * greater than the dimension of the specified topology type.
      */
-    static const unsigned* side_vertices( EntityTopology topo, unsigned side_dimension,
-                                          unsigned side_number, unsigned& num_verts_out,
-                                          MsqError& err );
-    static const unsigned* side_vertices( EntityTopology topo, unsigned side_dimension,
-                                          unsigned side_number, unsigned& num_verts_out );
+    static const unsigned* side_vertices( EntityTopology topo, unsigned side_dimension, unsigned side_number,
+                                          unsigned& num_verts_out, MsqError& err );
+    static const unsigned* side_vertices( EntityTopology topo, unsigned side_dimension, unsigned side_number,
+                                          unsigned& num_verts_out );
 
     /**\brief Return which side the specified mid-node lies on
      *
@@ -241,8 +235,7 @@ class MESQUITE_EXPORT TopologyInfo
      *\param side_number_out The canonical number of the side
      */
     static void side_number( EntityTopology topo, unsigned connectivity_length, unsigned node_index,
-                             unsigned& side_dimension_out, unsigned& side_number_out,
-                             MsqError& err );
+                             unsigned& side_dimension_out, unsigned& side_number_out, MsqError& err );
 
     /**\brief  Get adjacent corner vertices
      *
@@ -267,8 +260,7 @@ class MESQUITE_EXPORT TopologyInfo
      *\param num_adj_out The number of adjacent vertices (output)
      *\return The array of vertex indices
      */
-    static const unsigned* adjacent_vertices( EntityTopology topo, unsigned index,
-                                              unsigned& num_adj_out );
+    static const unsigned* adjacent_vertices( EntityTopology topo, unsigned index, unsigned& num_adj_out );
 
     /**\brief  Get reverse adjacency offsets
      *
@@ -304,8 +296,7 @@ class MESQUITE_EXPORT TopologyInfo
      *\param reversed_out    True if edge is reversed wrt edge_vertices
      *\return                The edge number.
      */
-    static unsigned find_edge( EntityTopology topo, const unsigned* edge_vertices,
-                               bool& reversed_out, MsqError& err );
+    static unsigned find_edge( EntityTopology topo, const unsigned* edge_vertices, bool& reversed_out, MsqError& err );
 
     /**\brief Find which face of an element has the passed vertex indices
      *
@@ -317,8 +308,8 @@ class MESQUITE_EXPORT TopologyInfo
      *\param reversed_out   True if face is reversed wrt face_vertices
      *\return               The face number.
      */
-    static unsigned find_face( EntityTopology topo, const unsigned* face_vertices,
-                               unsigned num_face_vertices, bool& reversed_out, MsqError& err );
+    static unsigned find_face( EntityTopology topo, const unsigned* face_vertices, unsigned num_face_vertices,
+                               bool& reversed_out, MsqError& err );
 
     /**\brief Find which side of an element has the passed vertex indices
      *
@@ -331,9 +322,8 @@ class MESQUITE_EXPORT TopologyInfo
      *\param number_out     The enumerated index for the side
      *\param reversed_out   True if side is reversed wrt side_vertices
      */
-    static void find_side( EntityTopology topo, const unsigned* side_vertices,
-                           unsigned num_vertices, unsigned& dimension_out, unsigned& number_out,
-                           bool& reversed_out, MsqError& err );
+    static void find_side( EntityTopology topo, const unsigned* side_vertices, unsigned num_vertices,
+                           unsigned& dimension_out, unsigned& number_out, bool& reversed_out, MsqError& err );
 
     /**\brief Test if two elements share lower-order topology
      *
@@ -373,8 +363,7 @@ class MESQUITE_EXPORT TopologyInfo
     };
 
     unsigned char dimMap[ MIXED ]; /**< Get dimension of entity given topology */
-    unsigned char adjMap[ MIXED ]
-                        [ 4 ]; /**< Get number of adj entities of dimension 0, 1 and dimension 2 */
+    unsigned char adjMap[ MIXED ][ 4 ]; /**< Get number of adj entities of dimension 0, 1 and dimension 2 */
     /** Vertex indices for element edges */
     unsigned edgeMap[ LAST_VOL - FIRST_FACE + 1 ][ MAX_EDGES ][ 2 ];
     /** Vertex indices for element faces */

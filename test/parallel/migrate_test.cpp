@@ -133,8 +133,7 @@ ErrorCode migrate( const char* filename, const char* outfile )
     ierr = MPI_Comm_create_group( jcomm, group2, tagcomm2, &comm2 );
     CHECKRC( ierr, "can't create comm2" )
 
-    ierr = iMOAB_Initialize(
-        0, 0 );  // not really needed anything from argc, argv, yet; maybe we should
+    ierr = iMOAB_Initialize( 0, 0 );  // not really needed anything from argc, argv, yet; maybe we should
     CHECKRC( ierr, "can't initialize iMOAB" )
 
     // give some dummy values to component ids, just to differentiate between them
@@ -163,8 +162,7 @@ ErrorCode migrate( const char* filename, const char* outfile )
     if( comm1 != MPI_COMM_NULL )
     {
 
-        std::string readopts(
-            "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_SHARED_ENTS" );
+        std::string readopts( "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_SHARED_ENTS" );
 
         nghlay = 0;
 
@@ -181,8 +179,8 @@ ErrorCode migrate( const char* filename, const char* outfile )
         CHECKRC( ierr, "cannot receive elements" )
         std::string wopts;
         wopts = "PARALLEL=WRITE_PART;";
-        ierr = iMOAB_WriteMesh( pid2, (char*)outfile, (char*)wopts.c_str( ), strlen( outfile ),
-                                strlen( wopts.c_str( ) ) );
+        ierr =
+            iMOAB_WriteMesh( pid2, (char*)outfile, (char*)wopts.c_str( ), strlen( outfile ), strlen( wopts.c_str( ) ) );
         CHECKRC( ierr, "cannot write received mesh" )
     }
 
@@ -206,26 +204,24 @@ ErrorCode migrate( const char* filename, const char* outfile )
     // now send a tag from component 2, towards component 1
     if( comm2 != MPI_COMM_NULL )
     {
-        ierr = iMOAB_DefineTagStorage( pid2, "element_field", &tagType, &size_tag, &tagIndex2,
-                                       strlen( "element_field" ) );
+        ierr =
+            iMOAB_DefineTagStorage( pid2, "element_field", &tagType, &size_tag, &tagIndex2, strlen( "element_field" ) );
         CHECKRC( ierr, "failed to get tag element_field " );
         // this tag is already existing in the file
 
         // first, send from compid2 to compid1, from comm2, using common joint comm
         // as always, use nonblocking sends
-        ierr = iMOAB_SendElementTag( pid2, "element_field", &jcomm, &context_id,
-                                     strlen( "element_field" ) );
+        ierr = iMOAB_SendElementTag( pid2, "element_field", &jcomm, &context_id, strlen( "element_field" ) );
         CHECKRC( ierr, "cannot send tag values" )
     }
     // receive on component 1
     if( comm1 != MPI_COMM_NULL )
     {
-        ierr = iMOAB_DefineTagStorage( pid1, "element_field", &tagType, &size_tag, &tagIndex1,
-                                       strlen( "element_field" ) );
+        ierr =
+            iMOAB_DefineTagStorage( pid1, "element_field", &tagType, &size_tag, &tagIndex1, strlen( "element_field" ) );
         CHECKRC( ierr, "failed to get tag DFIELD " );
 
-        ierr = iMOAB_ReceiveElementTag( pid1, "element_field", &jcomm, &context_id,
-                                        strlen( "element_field" ) );
+        ierr = iMOAB_ReceiveElementTag( pid1, "element_field", &jcomm, &context_id, strlen( "element_field" ) );
         CHECKRC( ierr, "cannot send tag values" )
         std::string wopts;
         wopts = "PARALLEL=WRITE_PART;";

@@ -61,14 +61,11 @@ class MESQUITE_EXPORT VertexMover : public QualityImprover
     // virtual destructor ensures use of polymorphism during destruction
     virtual ~VertexMover( );
 
-    virtual void initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
-                                   MsqError& err );
+    virtual void initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings, MsqError& err );
 
-    virtual double loop_over_mesh( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
-                                   MsqError& err );
+    virtual double loop_over_mesh( MeshDomainAssoc* mesh_and_domain, const Settings* settings, MsqError& err );
 
-    virtual double loop_over_mesh( ParallelMesh* mesh, MeshDomain* domain, const Settings* settings,
-                                   MsqError& err );
+    virtual double loop_over_mesh( ParallelMesh* mesh, MeshDomain* domain, const Settings* settings, MsqError& err );
 
     /**\brief Do Nash-game type optimization
      *

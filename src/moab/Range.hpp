@@ -263,8 +263,7 @@ class Range
 
     template< typename T > iterator insert_list( T begin_iter, T end_iter );
 
-    template< class T >
-    iterator insert( typename T::const_iterator begin_iter, typename T::const_iterator end_iter )
+    template< class T > iterator insert( typename T::const_iterator begin_iter, typename T::const_iterator end_iter )
     {
         return insert_list( begin_iter, end_iter );
     }
@@ -296,10 +295,8 @@ class Range
     const_iterator find( EntityHandle val ) const;
 
     //! return an iterator to the first value >= val
-    static const_iterator lower_bound( const_iterator first, const_iterator last,
-                                       EntityHandle val );
-    static const_iterator upper_bound( const_iterator first, const_iterator last,
-                                       EntityHandle val );
+    static const_iterator lower_bound( const_iterator first, const_iterator last, EntityHandle val );
+    static const_iterator upper_bound( const_iterator first, const_iterator last, EntityHandle val );
 
     const_iterator lower_bound( EntityHandle val ) const
     {
@@ -312,8 +309,8 @@ class Range
     const_iterator                              lower_bound( EntityType type ) const;
     const_iterator                              upper_bound( EntityType type ) const;
     std::pair< const_iterator, const_iterator > equal_range( EntityType type ) const;
-    const_iterator lower_bound( EntityType type, const_iterator first ) const;
-    const_iterator upper_bound( EntityType type, const_iterator first ) const;
+    const_iterator                              lower_bound( EntityType type, const_iterator first ) const;
+    const_iterator                              upper_bound( EntityType type, const_iterator first ) const;
 
     //! True if all entities in range are of passed type
     //! (also true if range is empty)
@@ -370,12 +367,9 @@ class Range
     struct PairNode : public std::pair< EntityHandle, EntityHandle >
     {
 
-        PairNode( ) : std::pair< EntityHandle, EntityHandle >( 0, 0 ), mNext( NULL ), mPrev( NULL )
-        {
-        }
+        PairNode( ) : std::pair< EntityHandle, EntityHandle >( 0, 0 ), mNext( NULL ), mPrev( NULL ) {}
         PairNode( PairNode* next, PairNode* prev, EntityHandle _first, EntityHandle _second )
-            : std::pair< EntityHandle, EntityHandle >( _first, _second ), mNext( next ),
-              mPrev( prev )
+            : std::pair< EntityHandle, EntityHandle >( _first, _second ), mNext( next ), mPrev( prev )
         {
         }
 
@@ -609,9 +603,7 @@ class Range
         const_reverse_iterator( const_iterator fwd_iter ) : myIter( fwd_iter ) {}
 
         //! constructor used by Range
-        const_reverse_iterator( const PairNode* iter, const EntityHandle val ) : myIter( iter, val )
-        {
-        }
+        const_reverse_iterator( const PairNode* iter, const EntityHandle val ) : myIter( iter, val ) {}
 
         //! dereference that value this iterator points to
         //! returns a const reference
@@ -955,13 +947,10 @@ inline int Range::index( EntityHandle handle ) const
 inline double Range::compactness( ) const
 {
     unsigned int num_ents = size( );
-    return ( num_ents
-                 ? ( (double)get_memory_use( ) / (double)( num_ents * sizeof( EntityHandle ) ) )
-                 : -1 );
+    return ( num_ents ? ( (double)get_memory_use( ) / (double)( num_ents * sizeof( EntityHandle ) ) ) : -1 );
 }
 
-template< typename Iterator >
-Range::iterator Range::insert_list( Iterator begin_iter, Iterator end_iter )
+template< typename Iterator > Range::iterator Range::insert_list( Iterator begin_iter, Iterator end_iter )
 {
     size_t        n = std::distance( begin_iter, end_iter );
     EntityHandle* sorted = new EntityHandle[ n ];

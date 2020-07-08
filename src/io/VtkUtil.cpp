@@ -51,8 +51,7 @@ const unsigned wedge[] = { 0,  2,  1,  // bottom corners
                            17, 16, 15 };  // quadrilateral faces
 const unsigned qhex[] = { 0,  1,  2,  3,  // corners (same)
                           4,  5,  6,  7,  8,  9,  10, 11,  // mid-edge (top before lateral)
-                          16, 17, 18, 19, 12, 13, 14, 15,
-                          23, 21, 20, 22,  // mid-face (mixed up) & mid-region (same)
+                          16, 17, 18, 19, 12, 13, 14, 15, 23, 21, 20, 22,  // mid-face (mixed up) & mid-region (same)
                           24, 25, 26 };
 
 // List of VtkElemType structs, indexed by the VTK type number.
@@ -102,8 +101,7 @@ const VtkElemType VtkUtil::vtkElemTypes[] = {
     { "polyhedron", 42, MBPOLYHEDRON, 0, 0 }  //
 };
 
-const unsigned VtkUtil::numVtkElemType =
-    sizeof( VtkUtil::vtkElemTypes ) / sizeof( VtkUtil::vtkElemTypes[ 0 ] );
+const unsigned VtkUtil::numVtkElemType = sizeof( VtkUtil::vtkElemTypes ) / sizeof( VtkUtil::vtkElemTypes[ 0 ] );
 
 // Define an array, indexed by EntityType containing the corresponding
 // VTK element type numbers for the linear, quadratic (mid-edge),

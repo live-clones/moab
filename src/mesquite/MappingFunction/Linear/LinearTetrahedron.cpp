@@ -31,8 +31,7 @@
 namespace MBMesquite
 {
 
-static const char* nonlinear_error =
-    "Attempt to use LinearTetrahedron mapping function for a nonlinear element\n";
+static const char* nonlinear_error = "Attempt to use LinearTetrahedron mapping function for a nonlinear element\n";
 
 EntityTopology LinearTetrahedron::element_topology( ) const
 {
@@ -53,8 +52,8 @@ NodeSet LinearTetrahedron::sample_points( NodeSet ) const
 
 static const unsigned faces[][ 3 ] = { { 1, 0, 3 }, { 3, 2, 1 }, { 0, 2, 3 }, { 0, 1, 2 } };
 
-void LinearTetrahedron::coefficients( Sample location, NodeSet nodeset, double* coeff_out,
-                                      size_t* indices_out, size_t& num_coeff, MsqError& err ) const
+void LinearTetrahedron::coefficients( Sample location, NodeSet nodeset, double* coeff_out, size_t* indices_out,
+                                      size_t& num_coeff, MsqError& err ) const
 {
     if( nodeset.have_any_mid_node( ) )
     {
@@ -104,9 +103,8 @@ void LinearTetrahedron::coefficients( Sample location, NodeSet nodeset, double* 
     }
 }
 
-void LinearTetrahedron::derivatives( Sample, NodeSet nodeset, size_t* vertices,
-                                     MsqVector< 3 >* coeff_derivs, size_t& num_vtx,
-                                     MsqError& err ) const
+void LinearTetrahedron::derivatives( Sample, NodeSet nodeset, size_t* vertices, MsqVector< 3 >* coeff_derivs,
+                                     size_t& num_vtx, MsqError& err ) const
 {
     if( nodeset.have_any_mid_node( ) )
     {

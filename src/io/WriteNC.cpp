@@ -34,8 +34,7 @@ WriteNC::WriteNC( Interface* impl )
 #ifdef MOAB_HAVE_MPI
       myPcomm( NULL ),
 #endif
-      noMesh( false ), noVars( false ), append( false ), mGlobalIdTag( 0 ), isParallel( false ),
-      myHelper( NULL )
+      noMesh( false ), noVars( false ), append( false ), mGlobalIdTag( 0 ), isParallel( false ), myHelper( NULL )
 {
     assert( impl != NULL );
     impl->query_interface( mWriteIface );
@@ -48,10 +47,9 @@ WriteNC::~WriteNC( )
 }
 
 //! Writes out a file
-ErrorCode WriteNC::write_file( const char* file_name, const bool overwrite,
-                               const FileOptions& options, const EntityHandle* file_set,
-                               const int num_set, const std::vector< std::string >&, const Tag*,
-                               int, int )
+ErrorCode WriteNC::write_file( const char* file_name, const bool overwrite, const FileOptions& options,
+                               const EntityHandle* file_set, const int num_set, const std::vector< std::string >&,
+                               const Tag*, int, int )
 {
     ErrorCode rval;
     // See if opts has variable(s) specified
@@ -64,9 +62,7 @@ ErrorCode WriteNC::write_file( const char* file_name, const bool overwrite,
     mGlobalIdTag = mbImpl->globalId_tag( );
 
     // num set has to be 1, we will write only one set, the original file set used to load
-    if( num_set != 1 )
-        MB_SET_ERR( MB_FAILURE,
-                    "We should write only one set (the file set used to read data into)" );
+    if( num_set != 1 ) MB_SET_ERR( MB_FAILURE, "We should write only one set (the file set used to read data into)" );
 
     rval = parse_options( options, var_names, desired_names, tstep_nums, tstep_vals );MB_CHK_SET_ERR( rval, "Trouble parsing option string" );
 
@@ -88,40 +84,36 @@ ErrorCode WriteNC::write_file( const char* file_name, const bool overwrite,
         int omode = NC_WRITE;
 #ifdef MOAB_HAVE_PNETCDF
         if( isParallel )
-            success = NCFUNC( open )( myPcomm->proc_config( ).proc_comm( ), file_name, omode,
-                                      MPI_INFO_NULL, &fileId );
+            success = NCFUNC( open )( myPcomm->proc_config( ).proc_comm( ), file_name, omode, MPI_INFO_NULL, &fileId );
         else
             success = NCFUNC( open )( MPI_COMM_SELF, file_name, omode, MPI_INFO_NULL, &fileId );
 #else
         // This is a regular netcdf file, open in write mode
         success = NCFUNC( open )( file_name, omode, &fileId );
 #endif
-        if( success )
-            MB_SET_ERR( MB_FAILURE, "Trouble opening file " << file_name << " for appending" );
+        if( success ) MB_SET_ERR( MB_FAILURE, "Trouble opening file " << file_name << " for appending" );
     }
     else
     {  // Case when the file is new, will be overwritten, most likely
         int cmode = overwrite ? NC_CLOBBER : NC_NOCLOBBER;
 #ifdef MOAB_HAVE_PNETCDF
         if( isParallel )
-            success = NCFUNC( create )( myPcomm->proc_config( ).proc_comm( ), file_name, cmode,
-                                        MPI_INFO_NULL, &fileId );
+            success =
+                NCFUNC( create )( myPcomm->proc_config( ).proc_comm( ), file_name, cmode, MPI_INFO_NULL, &fileId );
         else
             success = NCFUNC( create )( MPI_COMM_SELF, file_name, cmode, MPI_INFO_NULL, &fileId );
 #else
         // This is a regular netcdf file
         success = NCFUNC( create )( file_name, cmode, &fileId );
 #endif
-        if( success )
-            MB_SET_ERR( MB_FAILURE, "Trouble creating file " << file_name << " for writing" );
+        if( success ) MB_SET_ERR( MB_FAILURE, "Trouble creating file " << file_name << " for writing" );
     }
 
     if( NULL != myHelper ) delete myHelper;
 
     // Get appropriate helper instance for WriteNC class based on some info in the file set
     myHelper = NCWriteHelper::get_nc_helper( this, fileId, options, *file_set );
-    if( NULL == myHelper )
-    { MB_SET_ERR( MB_FAILURE, "Failed to get NCWriteHelper class instance" ); }
+    if( NULL == myHelper ) { MB_SET_ERR( MB_FAILURE, "Failed to get NCWriteHelper class instance" ); }
 
     rval = myHelper->collect_mesh_info( );MB_CHK_SET_ERR( rval, "Trouble collecting mesh information" );
 
@@ -138,9 +130,8 @@ ErrorCode WriteNC::write_file( const char* file_name, const bool overwrite,
 }
 
 ErrorCode WriteNC::parse_options( const FileOptions& opts, std::vector< std::string >& var_names,
-                                  std::vector< std::string >& desired_names,
-                                  std::vector< int >&         tstep_nums,
-                                  std::vector< double >&      tstep_vals )
+                                  std::vector< std::string >& desired_names, std::vector< int >& tstep_nums,
+                                  std::vector< double >& tstep_vals )
 {
     int tmpval;
     if( MB_SUCCESS == opts.get_int_option( "DEBUG_IO", 1, tmpval ) )
@@ -212,8 +203,7 @@ ErrorCode WriteNC::parse_options( const FileOptions& opts, std::vector< std::str
 
     int pcomm_no = 0;
     rval = opts.get_int_option( "PARALLEL_COMM", pcomm_no );
-    if( MB_TYPE_OUT_OF_RANGE == rval )
-    { MB_SET_ERR( rval, "Invalid value for PARALLEL_COMM option" ); }
+    if( MB_TYPE_OUT_OF_RANGE == rval ) { MB_SET_ERR( rval, "Invalid value for PARALLEL_COMM option" ); }
 
     myPcomm = ParallelComm::get_pcomm( mbImpl, pcomm_no );
     if( 0 == myPcomm ) { myPcomm = new ParallelComm( mbImpl, MPI_COMM_WORLD ); }
@@ -221,10 +211,7 @@ ErrorCode WriteNC::parse_options( const FileOptions& opts, std::vector< std::str
 #ifndef MOAB_HAVE_PNETCDF
     const int procs = myPcomm->proc_config( ).proc_size( );
     if( procs > 1 )
-    {
-        MB_SET_ERR( MB_UNSUPPORTED_OPERATION,
-                    "Attempt to launch NC writer in parallel without pnetcdf support" );
-    }
+    { MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "Attempt to launch NC writer in parallel without pnetcdf support" ); }
 #endif
 
     const int rank = myPcomm->proc_config( ).proc_rank( );
@@ -298,8 +285,7 @@ ErrorCode WriteNC::process_conventional_tags( EntityHandle fileSet )
     tag_name = "__VAR_NAMES_LOCATIONS";
     data = NULL;
     int varNamesLocsSz = 0;
-    rval = mbImpl->tag_get_handle( tag_name.c_str( ), 0, MB_TYPE_INTEGER, varNamesLocsTag,
-                                   MB_TAG_ANY );MB_CHK_SET_ERR( rval, "Trouble getting conventional tag " << tag_name );
+    rval = mbImpl->tag_get_handle( tag_name.c_str( ), 0, MB_TYPE_INTEGER, varNamesLocsTag, MB_TAG_ANY );MB_CHK_SET_ERR( rval, "Trouble getting conventional tag " << tag_name );
     rval = mbImpl->tag_get_by_ptr( varNamesLocsTag, &fileSet, 1, &data, &varNamesLocsSz );MB_CHK_SET_ERR( rval, "Trouble getting data of conventional tag " << tag_name );
     int_p = static_cast< const int* >( data );
     std::vector< int > varNamesLocs( varNamesLocsSz );
@@ -333,14 +319,12 @@ ErrorCode WriteNC::process_conventional_tags( EntityHandle fileSet )
             variableDataStruct.varName = var_name;
             variableDataStruct.entLoc = varNamesLocs[ idxVar ];
 
-            dbgOut.tprintf( 2, "at var name %s varInfo size %d \n", var_name.c_str( ),
-                            (int)varInfo.size( ) );
+            dbgOut.tprintf( 2, "at var name %s varInfo size %d \n", var_name.c_str( ), (int)varInfo.size( ) );
 
             sz = 0;
             Tag         dims_tag = 0;
             std::string dim_names = "__" + var_name + "_DIMS";
-            rval = mbImpl->tag_get_handle( dim_names.c_str( ), 0, MB_TYPE_OPAQUE, dims_tag,
-                                           MB_TAG_ANY );
+            rval = mbImpl->tag_get_handle( dim_names.c_str( ), 0, MB_TYPE_OPAQUE, dims_tag, MB_TAG_ANY );
             if( MB_SUCCESS != rval )
             {
                 if( MB_TAG_NOT_FOUND == rval )
@@ -367,15 +351,11 @@ ErrorCode WriteNC::process_conventional_tags( EntityHandle fileSet )
             {
                 std::string dim_name;
                 rval = mbImpl->tag_get_name( ptags[ j ], dim_name );MB_CHK_SET_ERR( rval, "Trouble getting dimension of variable " << var_name );
-                dbgOut.tprintf( 2, "var name: %s has %s as dimension \n", var_name.c_str( ),
-                                dim_name.c_str( ) );
-                std::vector< std::string >::iterator vit =
-                    std::find( dimNames.begin( ), dimNames.end( ), dim_name );
+                dbgOut.tprintf( 2, "var name: %s has %s as dimension \n", var_name.c_str( ), dim_name.c_str( ) );
+                std::vector< std::string >::iterator vit = std::find( dimNames.begin( ), dimNames.end( ), dim_name );
                 if( vit == dimNames.end( ) )
-                    MB_SET_ERR( MB_FAILURE, "Dimension " << dim_name << " not found for variable "
-                                                         << var_name );
-                variableDataStruct.varDims[ j ] =
-                    (int)( vit - dimNames.begin( ) );  // Will be used for writing
+                    MB_SET_ERR( MB_FAILURE, "Dimension " << dim_name << " not found for variable " << var_name );
+                variableDataStruct.varDims[ j ] = (int)( vit - dimNames.begin( ) );  // Will be used for writing
                 // This will have to change to actual file dimension, for writing
             }
 
@@ -389,8 +369,7 @@ ErrorCode WriteNC::process_conventional_tags( EntityHandle fileSet )
             const void* varAttPtr = NULL;
             int         varAttSz = 0;
             rval = mbImpl->tag_get_by_ptr( varAttTag, &fileSet, 1, &varAttPtr, &varAttSz );MB_CHK_SET_ERR( rval, "Trouble getting data of conventional tag " << tag_name );
-            if( MB_SUCCESS == rval )
-                dbgOut.tprintf( 2, "Tag retrieved for variable %s\n", tag_name.c_str( ) );
+            if( MB_SUCCESS == rval ) dbgOut.tprintf( 2, "Tag retrieved for variable %s\n", tag_name.c_str( ) );
 
             std::string attribString( (char*)varAttPtr, (char*)varAttPtr + varAttSz );
             if( attribString == "NO_ATTRIBS" )
@@ -409,18 +388,15 @@ ErrorCode WriteNC::process_conventional_tags( EntityHandle fileSet )
                 ssTagName << "_LEN";
                 tag_name = ssTagName.str( );
                 Tag varAttLenTag = 0;
-                rval = mbImpl->tag_get_handle( tag_name.c_str( ), 0, MB_TYPE_INTEGER, varAttLenTag,
-                                               MB_TAG_ANY );MB_CHK_SET_ERR( rval, "Trouble getting conventional tag " << tag_name );
+                rval = mbImpl->tag_get_handle( tag_name.c_str( ), 0, MB_TYPE_INTEGER, varAttLenTag, MB_TAG_ANY );MB_CHK_SET_ERR( rval, "Trouble getting conventional tag " << tag_name );
                 int varAttLenSz = 0;
                 rval = mbImpl->tag_get_length( varAttLenTag, varAttLenSz );MB_CHK_SET_ERR( rval, "Trouble getting length of conventional tag " << tag_name );
                 std::vector< int > varAttLen( varAttLenSz );
                 rval = mbImpl->tag_get_data( varAttLenTag, &fileSet, 1, &varAttLen[ 0 ] );MB_CHK_SET_ERR( rval, "Trouble getting data of conventional tag " << tag_name );
 
-                rval = process_concatenated_attribute( varAttPtr, varAttSz, varAttLen,
-                                                       variableDataStruct.varAtts );MB_CHK_SET_ERR( rval, "Trouble processing attributes of variable " << var_name );
+                rval = process_concatenated_attribute( varAttPtr, varAttSz, varAttLen, variableDataStruct.varAtts );MB_CHK_SET_ERR( rval, "Trouble processing attributes of variable " << var_name );
 
-                if( MB_SUCCESS == rval )
-                    dbgOut.tprintf( 2, "Tag metadata for variable %s\n", tag_name.c_str( ) );
+                if( MB_SUCCESS == rval ) dbgOut.tprintf( 2, "Tag metadata for variable %s\n", tag_name.c_str( ) );
             }
             // End attribute
 
@@ -432,8 +408,7 @@ ErrorCode WriteNC::process_conventional_tags( EntityHandle fileSet )
     // Global attributes
     tag_name = "__GLOBAL_ATTRIBS";
     Tag globalAttTag = 0;
-    rval = mbImpl->tag_get_handle( tag_name.c_str( ), 0, MB_TYPE_OPAQUE, globalAttTag,
-                                   MB_TAG_SPARSE | MB_TAG_VARLEN );MB_CHK_SET_ERR( rval, "Trouble getting conventional tag " << tag_name );
+    rval = mbImpl->tag_get_handle( tag_name.c_str( ), 0, MB_TYPE_OPAQUE, globalAttTag, MB_TAG_SPARSE | MB_TAG_VARLEN );MB_CHK_SET_ERR( rval, "Trouble getting conventional tag " << tag_name );
     std::vector< int > gattLen;
 
     const void* gattptr = NULL;
@@ -447,14 +422,12 @@ ErrorCode WriteNC::process_conventional_tags( EntityHandle fileSet )
     tag_name = "__GLOBAL_ATTRIBS_LEN";
     Tag globalAttLenTag = 0;
 
-    rval = mbImpl->tag_get_handle( tag_name.c_str( ), 0, MB_TYPE_INTEGER, globalAttLenTag,
-                                   MB_TAG_ANY );MB_CHK_SET_ERR( rval, "Trouble getting conventional tag " << tag_name );
+    rval = mbImpl->tag_get_handle( tag_name.c_str( ), 0, MB_TYPE_INTEGER, globalAttLenTag, MB_TAG_ANY );MB_CHK_SET_ERR( rval, "Trouble getting conventional tag " << tag_name );
     int sizeGAtt = 0;
     rval = mbImpl->tag_get_length( globalAttLenTag, sizeGAtt );MB_CHK_SET_ERR( rval, "Trouble getting length of conventional tag " << tag_name );
     gattLen.resize( sizeGAtt );
     rval = mbImpl->tag_get_data( globalAttLenTag, &fileSet, 1, &gattLen[ 0 ] );MB_CHK_SET_ERR( rval, "Trouble getting data of conventional tag " << tag_name );
-    if( MB_SUCCESS == rval )
-        dbgOut.tprintf( 2, "Tag retrieved for variable %s\n", tag_name.c_str( ) );
+    if( MB_SUCCESS == rval ) dbgOut.tprintf( 2, "Tag retrieved for variable %s\n", tag_name.c_str( ) );
 
     rval = process_concatenated_attribute( gattptr, globalAttSz, gattLen, globalAtts );MB_CHK_SET_ERR( rval, "Trouble processing global attributes" );
 
@@ -462,8 +435,7 @@ ErrorCode WriteNC::process_conventional_tags( EntityHandle fileSet )
 }
 
 // Reverse process from create_attrib_string
-ErrorCode WriteNC::process_concatenated_attribute( const void* attPtr, int attSz,
-                                                   std::vector< int >&               attLen,
+ErrorCode WriteNC::process_concatenated_attribute( const void* attPtr, int attSz, std::vector< int >& attLen,
                                                    std::map< std::string, AttData >& attributes )
 {
     std::size_t start = 0;
@@ -503,8 +475,7 @@ ErrorCode WriteNC::process_concatenated_attribute( const void* attPtr, int attSz
                 attrib.attDataType = NC_SHORT;
 
             ++att_counter;
-            dbgOut.tprintf( 2, "       Process attribute %s with value %s \n", att_name.c_str( ),
-                            data_val.c_str( ) );
+            dbgOut.tprintf( 2, "       Process attribute %s with value %s \n", att_name.c_str( ), data_val.c_str( ) );
         }
     }
 

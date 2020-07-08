@@ -153,9 +153,8 @@ class QualityAssessor : public Instruction
      *                are in use at the same time.
      */
     MESQUITE_EXPORT
-    QualityAssessor( std::ostream& output_stream, QualityMetric* metric,
-                     int histogram_intervals = 0, double power_mean = 0.0,
-                     bool free_elements_only = true, const char* metric_value_tag_name = 0,
+    QualityAssessor( std::ostream& output_stream, QualityMetric* metric, int histogram_intervals = 0,
+                     double power_mean = 0.0, bool free_elements_only = true, const char* metric_value_tag_name = 0,
                      const char* inverted_element_tag_name = 0, std::string name = std::string( ) );
 
     /**\brief Construct and register a QualityMetric
@@ -190,8 +189,8 @@ class QualityAssessor : public Instruction
     MESQUITE_EXPORT
     QualityAssessor( QualityMetric* metric, int histogram_intervals = 0, double power_mean = 0.0,
                      bool free_elements_only = true, const char* metric_value_tag_name = 0,
-                     bool        print_summary_to_std_out = true,
-                     const char* inverted_element_tag_name = 0, std::string name = std::string( ) );
+                     bool print_summary_to_std_out = true, const char* inverted_element_tag_name = 0,
+                     std::string name = std::string( ) );
 
     MESQUITE_EXPORT virtual ~QualityAssessor( );
 
@@ -264,18 +263,16 @@ class QualityAssessor : public Instruction
      *                inverted elements.
      */
     MESQUITE_EXPORT
-    void add_quality_assessment( QualityMetric* metric, int histogram_intervals = 0,
-                                 double power_mean = 0.0, const char* metric_value_tag_name = 0,
-                                 const char* metric_label = 0 );
+    void add_quality_assessment( QualityMetric* metric, int histogram_intervals = 0, double power_mean = 0.0,
+                                 const char* metric_value_tag_name = 0, const char* metric_label = 0 );
 
     /**\brief Same as add_quality_assessment, except that the average
      *        metric value is also used as the return value from loop_over_mesh.
      *        Specify a power_mean value to control which average is used.
      */
     MESQUITE_EXPORT
-    void set_stopping_assessment( QualityMetric* metric, int histogram_intervals = 0,
-                                  double power_mean = 0.0, const char* metric_value_tag_name = 0,
-                                  const char* metric_label = 0 );
+    void set_stopping_assessment( QualityMetric* metric, int histogram_intervals = 0, double power_mean = 0.0,
+                                  const char* metric_value_tag_name = 0, const char* metric_label = 0 );
 
     /**\brief Register a QualityMetric for use in quality assessment.
      *
@@ -304,20 +301,19 @@ class QualityAssessor : public Instruction
      *                inverted elements.
      */
     MESQUITE_EXPORT
-    void add_histogram_assessment( QualityMetric* qm, double min, double max, int intervals,
-                                   double power_mean = 0.0, const char* metric_value_tag_name = 0,
-                                   const char* metric_label = 0 );
+    void add_histogram_assessment( QualityMetric* qm, double min, double max, int intervals, double power_mean = 0.0,
+                                   const char* metric_value_tag_name = 0, const char* metric_label = 0 );
 
-    virtual MESQUITE_EXPORT void initialize_queue( MeshDomainAssoc* mesh_and_domain,
-                                                   const Settings* settings, MsqError& err );
-
-    //! Does one sweep over the mesh and assess the quality with the metrics previously added.
-    virtual MESQUITE_EXPORT double loop_over_mesh( MeshDomainAssoc* mesh_and_domain,
-                                                   const Settings* settings, MsqError& err );
+    virtual MESQUITE_EXPORT void initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
+                                                   MsqError& err );
 
     //! Does one sweep over the mesh and assess the quality with the metrics previously added.
-    virtual MESQUITE_EXPORT double loop_over_mesh( ParallelMesh* mesh, MeshDomain* domain,
-                                                   const Settings* settings, MsqError& err );
+    virtual MESQUITE_EXPORT double loop_over_mesh( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
+                                                   MsqError& err );
+
+    //! Does one sweep over the mesh and assess the quality with the metrics previously added.
+    virtual MESQUITE_EXPORT double loop_over_mesh( ParallelMesh* mesh, MeshDomain* domain, const Settings* settings,
+                                                   MsqError& err );
 
     //! Do not print results of assessment.
     MESQUITE_EXPORT void disable_printing_results( )
@@ -337,8 +333,7 @@ class QualityAssessor : public Instruction
     //!  determined, undefined_elems.
     //! Returns false if this information is not yet available.
     //! Returns true, otherwise.
-    MESQUITE_EXPORT bool get_inverted_element_count( int& inverted_elems, int& inverted_samples,
-                                                     MsqError& err );
+    MESQUITE_EXPORT bool get_inverted_element_count( int& inverted_elems, int& inverted_samples, MsqError& err );
 
     //! Reset calculated data
     MESQUITE_EXPORT void reset_data( );
@@ -438,8 +433,8 @@ class QualityAssessor : public Instruction
          *              upper bounds.
          */
         MESQUITE_EXPORT
-        void get_histogram( double& lower_bound_out, double& upper_bound_out,
-                            std::vector< int >& counts_out, MsqError& err ) const;
+        void get_histogram( double& lower_bound_out, double& upper_bound_out, std::vector< int >& counts_out,
+                            MsqError& err ) const;
 
         /** Reset all calculated data */
         MESQUITE_EXPORT void reset_data( );
@@ -603,8 +598,8 @@ class QualityAssessor : public Instruction
     Data* myData;
 
     //! Common code for serial and parallel loop_over_mesh
-    double loop_over_mesh_internal( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
-                                    ParallelHelper* helper, MsqError& err );
+    double loop_over_mesh_internal( MeshDomainAssoc* mesh_and_domain, const Settings* settings, ParallelHelper* helper,
+                                    MsqError& err );
 
     /** Find an Assessor corresponding to the passed
      *  QualityMetric, or create it if is not found in
@@ -619,8 +614,7 @@ class QualityAssessor : public Instruction
     list_type::iterator find_stopping_assessment( );
 
     /** Find or create tag */
-    TagHandle get_tag( Mesh* mesh, std::string name, Mesh::TagType type, unsigned size,
-                       MsqError& err );
+    TagHandle get_tag( Mesh* mesh, std::string name, Mesh::TagType type, unsigned size, MsqError& err );
 
     /** Try to determine if output stream is a terminal and if so,
         the width of that terminal.  Returns zero if width cannot

@@ -53,13 +53,11 @@ class VertexQM : public QualityMetric
     MESQUITE_EXPORT virtual void get_evaluations( PatchData& pd, std::vector< size_t >& handles,
                                                   bool free_vertices_only, MsqError& err );
 
-    MESQUITE_EXPORT static void get_vertex_evaluations( PatchData&             pd,
-                                                        std::vector< size_t >& handles,
+    MESQUITE_EXPORT static void get_vertex_evaluations( PatchData& pd, std::vector< size_t >& handles,
                                                         bool free_vertices_only, MsqError& err );
 
     MESQUITE_EXPORT static void get_vertex_corner_handles( PatchData& pd, size_t vertex_index,
-                                                           std::vector< size_t >& handles_out,
-                                                           MsqError&              err );
+                                                           std::vector< size_t >& handles_out, MsqError& err );
 };
 
 }  // namespace MBMesquite

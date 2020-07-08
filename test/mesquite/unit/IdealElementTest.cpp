@@ -262,8 +262,7 @@ void IdealElementTest::test_unit_height_pyr( )
     CPPUNIT_ASSERT_DOUBLES_EQUAL( height, ( coords[ 0 ] - coords[ 1 ] ).length( ), 1e-6 );
 }
 
-static void get_edge_lengths( EntityTopology type, const Vector3D* coords, double& min,
-                              double& max )
+static void get_edge_lengths( EntityTopology type, const Vector3D* coords, double& min, double& max )
 {
     MsqError err;
     unsigned n = TopologyInfo::edges( type );

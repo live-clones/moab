@@ -26,8 +26,7 @@ double gtol = 0.0001;  // this is for geometry tolerance
 double CubeSide = 6.;  // the above file starts with cube side 6; radius depends on cube side
 double t = 0.1, delta_t = 0.43;  // check the script
 
-ErrorCode manufacture_lagrange_mesh_on_sphere( Interface* mb, EntityHandle euler_set,
-                                               EntityHandle& lagr_set )
+ErrorCode manufacture_lagrange_mesh_on_sphere( Interface* mb, EntityHandle euler_set, EntityHandle& lagr_set )
 {
     /*
      * get all quads first, then vertices, then move them on the surface of the sphere
@@ -112,8 +111,8 @@ int main( int argc, char** argv )
             index++;
         }
     }
-    std::cout << " case 1: use -gtol " << gtol << " -dt " << delta_t << " -cube " << CubeSide
-              << " -input " << filename_mesh1 << "\n";
+    std::cout << " case 1: use -gtol " << gtol << " -dt " << delta_t << " -cube " << CubeSide << " -input "
+              << filename_mesh1 << "\n";
 
     Core         moab;
     Interface&   mb = moab;

@@ -59,8 +59,7 @@ class SpatialLocatorTimes
      times are computed.
 
      */
-    ErrorCode accumulate_times( MPI_Comm comm, double* max_times, double* min_times,
-                                double* avg_times = NULL );
+    ErrorCode accumulate_times( MPI_Comm comm, double* max_times, double* min_times, double* avg_times = NULL );
 #endif
 
     /* \brief Enumeration to identify fields in performance data
@@ -87,8 +86,8 @@ inline void SpatialLocatorTimes::reset( )
 }
 
 #ifdef MOAB_HAVE_MPI
-inline ErrorCode SpatialLocatorTimes::accumulate_times( MPI_Comm comm, double* min_times,
-                                                        double* max_times, double* avg_times )
+inline ErrorCode SpatialLocatorTimes::accumulate_times( MPI_Comm comm, double* min_times, double* max_times,
+                                                        double* avg_times )
 {
     ErrorCode rval = MB_SUCCESS;
     int       success = MPI_Reduce( slTimes, min_times, NUM_STATS, MPI_DOUBLE, MPI_MIN, 0, comm );
@@ -104,8 +103,8 @@ inline ErrorCode SpatialLocatorTimes::accumulate_times( MPI_Comm comm, double* m
         MPI_Comm_rank( comm, &rank );
         std::vector< double > all_times;
         if( !rank ) all_times.resize( NUM_STATS * sz + NUM_STATS );
-        success = MPI_Gather( slTimes, NUM_STATS, MPI_DOUBLE, ( rank ? NULL : &all_times[ 0 ] ),
-                              NUM_STATS, MPI_DOUBLE, 0, comm );
+        success = MPI_Gather( slTimes, NUM_STATS, MPI_DOUBLE, ( rank ? NULL : &all_times[ 0 ] ), NUM_STATS, MPI_DOUBLE,
+                              0, comm );
         if( !success ) rval = MB_FAILURE;
         if( !rank )
         {

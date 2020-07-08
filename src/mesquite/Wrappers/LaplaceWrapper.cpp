@@ -45,15 +45,15 @@ const bool   CULLING_DEFAULT = true;
 const int    DEFAULT_ITERATION_LIMIT = 100;
 
 LaplaceWrapper::LaplaceWrapper( )
-    : maxTime( -1.0 ), movementFactor( DEFAULT_MOVEMENT_FACTOR ),
-      iterationLimit( DEFAULT_ITERATION_LIMIT ), doCulling( CULLING_DEFAULT )
+    : maxTime( -1.0 ), movementFactor( DEFAULT_MOVEMENT_FACTOR ), iterationLimit( DEFAULT_ITERATION_LIMIT ),
+      doCulling( CULLING_DEFAULT )
 {
 }
 
 LaplaceWrapper::~LaplaceWrapper( ) {}
 
-void LaplaceWrapper::run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh,
-                                  Settings* settings, QualityAssessor* qa, MsqError& err )
+void LaplaceWrapper::run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh, Settings* settings,
+                                  QualityAssessor* qa, MsqError& err )
 {
     if( maxTime <= 0.0 && movementFactor <= 0.0 && iterationLimit <= 0 )
     {

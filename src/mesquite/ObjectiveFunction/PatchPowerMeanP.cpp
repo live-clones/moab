@@ -45,8 +45,7 @@ ObjectiveFunction* PatchPowerMeanP::clone( ) const
     return new PatchPowerMeanP( *this );
 }
 
-bool PatchPowerMeanP::initialize_block_coordinate_descent( Mesh* mesh, MeshDomain* domain,
-                                                           const Settings* settings,
+bool PatchPowerMeanP::initialize_block_coordinate_descent( Mesh* mesh, MeshDomain* domain, const Settings* settings,
                                                            PatchSet* patch_set, MsqError& err )
 {
     clear( );
@@ -68,8 +67,7 @@ bool PatchPowerMeanP::initialize_block_coordinate_descent( Mesh* mesh, MeshDomai
     return result;
 }
 
-bool PatchPowerMeanP::evaluate( EvalType type, PatchData& pd, double& value_out, bool free,
-                                MsqError& err )
+bool PatchPowerMeanP::evaluate( EvalType type, PatchData& pd, double& value_out, bool free, MsqError& err )
 {
     QualityMetric* qm = get_quality_metric( );
     if( type == ObjectiveFunction::ACCUMULATE )
@@ -110,7 +108,7 @@ bool PatchPowerMeanP::evaluate_with_gradient( EvalType type, PatchData& pd, doub
     // calculate OF value and gradient for just the patch
     std::vector< size_t >::const_iterator i;
     double                                value, working_sum = 0.0;
-    const double f = qm->get_negate_flag( ) * mPower.value( ) / qmHandles.size( );
+    const double                          f = qm->get_negate_flag( ) * mPower.value( ) / qmHandles.size( );
     for( i = qmHandles.begin( ); i != qmHandles.end( ); ++i )
     {
         bool result = qm->evaluate_with_gradient( pd, *i, value, mIndices, mGradient, err );
@@ -139,8 +137,7 @@ bool PatchPowerMeanP::evaluate_with_gradient( EvalType type, PatchData& pd, doub
 }
 
 bool PatchPowerMeanP::evaluate_with_Hessian( EvalType type, PatchData& pd, double& value_out,
-                                             std::vector< Vector3D >& grad_out,
-                                             MsqHessian& Hessian_out, MsqError& err )
+                                             std::vector< Vector3D >& grad_out, MsqHessian& Hessian_out, MsqError& err )
 {
     QualityMetric* qm = get_quality_metric( );
     qm->get_evaluations( pd, qmHandles, OF_FREE_EVALS_ONLY, err );
@@ -155,13 +152,12 @@ bool PatchPowerMeanP::evaluate_with_Hessian( EvalType type, PatchData& pd, doubl
     std::vector< size_t >::const_iterator i;
     size_t                                j, k, n;
     double                                value, working_sum = 0.0;
-    const double f1 = qm->get_negate_flag( ) * mPower.value( ) / qmHandles.size( );
-    const double f2 = f1 * ( mPower.value( ) - 1 );
-    Matrix3D     m;
+    const double                          f1 = qm->get_negate_flag( ) * mPower.value( ) / qmHandles.size( );
+    const double                          f2 = f1 * ( mPower.value( ) - 1 );
+    Matrix3D                              m;
     for( i = qmHandles.begin( ); i != qmHandles.end( ); ++i )
     {
-        bool result =
-            qm->evaluate_with_Hessian( pd, *i, value, mIndices, mGradient, mHessian, err );
+        bool result = qm->evaluate_with_Hessian( pd, *i, value, mIndices, mGradient, mHessian, err );
         if( MSQ_CHKERR( err ) || !result ) return false;
         if( fabs( value ) < DBL_EPSILON ) continue;
 

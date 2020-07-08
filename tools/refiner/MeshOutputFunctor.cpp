@@ -52,8 +52,8 @@ MeshOutputFunctor::~MeshOutputFunctor( )
         delete this->new_entities[ i ];
 }
 
-void MeshOutputFunctor::print_vert_crud( EntityHandle vout, int nvhash, EntityHandle* vhash,
-                                         const double* vcoords, const void* /*vtags*/ )
+void MeshOutputFunctor::print_vert_crud( EntityHandle vout, int nvhash, EntityHandle* vhash, const double* vcoords,
+                                         const void* /*vtags*/ )
 {
     std::cout << "+ {";
     for( int i = 0; i < nvhash; ++i )
@@ -94,8 +94,7 @@ void MeshOutputFunctor::assign_global_ids( ParallelComm* comm )
 #endif  // MB_DEBUG
     int                                   i = 0;
     std::map< ProcessSet, int >::iterator it;
-    for( it = this->proc_partition_counts.begin( ); it != this->proc_partition_counts.end( );
-         ++it, ++i )
+    for( it = this->proc_partition_counts.begin( ); it != this->proc_partition_counts.end( ); ++it, ++i )
     {
         for( int j = 0; j < ProcessSet::SHARED_PROC_BYTES; ++j )
             lpdefns[ ProcessSet::SHARED_PROC_BYTES * i + j ] = it->first.data( )[ j ];
@@ -113,31 +112,28 @@ void MeshOutputFunctor::assign_global_ids( ParallelComm* comm )
     unsigned long psize = comm->proc_config( ).proc_size( );
     nparts.resize( psize );
     dparts.resize( psize + 1 );
-    MPI_Allgather( &lnparts, 1, MPI_INT, &nparts[ 0 ], 1, MPI_INT,
-                   comm->proc_config( ).proc_comm( ) );
+    MPI_Allgather( &lnparts, 1, MPI_INT, &nparts[ 0 ], 1, MPI_INT, comm->proc_config( ).proc_comm( ) );
     // unsigned long ndefs = 0;
     for( unsigned long rank = 1; rank <= psize; ++rank )
     {
         dparts[ rank ] = nparts[ rank - 1 ] + dparts[ rank - 1 ];
 #ifdef MB_DEBUG
-        std::cout << "Proc " << rank << ": " << nparts[ rank - 1 ]
-                  << " partitions, offset: " << dparts[ rank ] << "\n";
+        std::cout << "Proc " << rank << ": " << nparts[ rank - 1 ] << " partitions, offset: " << dparts[ rank ] << "\n";
 #endif  // MB_DEBUG
     }
     std::vector< unsigned char > part_defns;
     std::vector< int >           part_sizes;
     part_defns.resize( ProcessSet::SHARED_PROC_BYTES * dparts[ psize ] );
     part_sizes.resize( dparts[ psize ] );
-    MPI_Allgatherv( &lpsizes[ 0 ], lnparts, MPI_INT, &part_sizes[ 0 ], &nparts[ 0 ], &dparts[ 0 ],
-                    MPI_INT, comm->proc_config( ).proc_comm( ) );
+    MPI_Allgatherv( &lpsizes[ 0 ], lnparts, MPI_INT, &part_sizes[ 0 ], &nparts[ 0 ], &dparts[ 0 ], MPI_INT,
+                    comm->proc_config( ).proc_comm( ) );
     for( unsigned long rank = 0; rank < psize; ++rank )
     {
         nparts[ rank ] *= ProcessSet::SHARED_PROC_BYTES;
         dparts[ rank ] *= ProcessSet::SHARED_PROC_BYTES;
     }
-    MPI_Allgatherv( &lpdefns[ 0 ], ProcessSet::SHARED_PROC_BYTES * lnparts, MPI_UNSIGNED_CHAR,
-                    &part_defns[ 0 ], &nparts[ 0 ], &dparts[ 0 ], MPI_UNSIGNED_CHAR,
-                    comm->proc_config( ).proc_comm( ) );
+    MPI_Allgatherv( &lpdefns[ 0 ], ProcessSet::SHARED_PROC_BYTES * lnparts, MPI_UNSIGNED_CHAR, &part_defns[ 0 ],
+                    &nparts[ 0 ], &dparts[ 0 ], MPI_UNSIGNED_CHAR, comm->proc_config( ).proc_comm( ) );
 
     // Now that we have the number of new entities in every partition, we
     // can deterministically assign the same GID to the same entity even
@@ -145,13 +141,12 @@ void MeshOutputFunctor::assign_global_ids( ParallelComm* comm )
     // identical on all processes -- the vertex splits.
     for( int j = 0; j < dparts[ psize ]; ++j )
     {
-        ProcessSet pset( &part_defns[ ProcessSet::SHARED_PROC_BYTES * j ] );
+        ProcessSet                            pset( &part_defns[ ProcessSet::SHARED_PROC_BYTES * j ] );
         std::map< ProcessSet, int >::iterator mit = this->proc_partition_counts.find( pset );
         if( mit != this->proc_partition_counts.end( ) )
         {
 #ifdef MB_DEBUG
-            std::cout << "Partition " << pset
-                      << ( mit->second == part_sizes[ j ] ? " matches" : " broken" ) << ".\n";
+            std::cout << "Partition " << pset << ( mit->second == part_sizes[ j ] ? " matches" : " broken" ) << ".\n";
 #endif  // MB_DEBUG
         }
         else
@@ -163,14 +158,12 @@ void MeshOutputFunctor::assign_global_ids( ParallelComm* comm )
     std::map< ProcessSet, int >           gids;
     std::map< ProcessSet, int >::iterator pcit;
     EntityHandle start_gid = 100;  // FIXME: Get actual maximum GID across all processes and add 1
-    for( pcit = this->proc_partition_counts.begin( ); pcit != this->proc_partition_counts.end( );
-         ++pcit )
+    for( pcit = this->proc_partition_counts.begin( ); pcit != this->proc_partition_counts.end( ); ++pcit )
     {
         gids[ pcit->first ] = start_gid;
         start_gid += pcit->second;
 #ifdef MB_DEBUG
-        std::cout << "Partition " << pcit->first << ": " << pcit->second << " # ["
-                  << gids[ pcit->first ] << "]\n";
+        std::cout << "Partition " << pcit->first << ": " << pcit->second << " # [" << gids[ pcit->first ] << "]\n";
 #endif  // MB_DEBUG
     }
     std::vector< SplitVerticesBase* >::iterator vit;
@@ -205,8 +198,7 @@ void MeshOutputFunctor::assign_tags( EntityHandle vhandle, const void* vtags )
     }
 }
 
-EntityHandle MeshOutputFunctor::map_vertex( EntityHandle vhash, const double* vcoords,
-                                            const void* vtags )
+EntityHandle MeshOutputFunctor::map_vertex( EntityHandle vhash, const double* vcoords, const void* vtags )
 {
     if( this->input_is_output )
     {  // Don't copy the original vertex!
@@ -216,8 +208,8 @@ EntityHandle MeshOutputFunctor::map_vertex( EntityHandle vhash, const double* vc
         return vhash;
     }
     EntityHandle vertex_handle;
-    bool         newly_created = this->vertex_map->find_or_create( &vhash, vcoords, vertex_handle,
-                                                           this->proc_partition_counts, false );
+    bool         newly_created =
+        this->vertex_map->find_or_create( &vhash, vcoords, vertex_handle, this->proc_partition_counts, false );
     if( newly_created )
     {
         std::vector< int > gid;
@@ -233,14 +225,13 @@ EntityHandle MeshOutputFunctor::map_vertex( EntityHandle vhash, const double* vc
     return vertex_handle;
 }
 
-EntityHandle MeshOutputFunctor::operator( )( int nvhash, EntityHandle* vhash, const double* vcoords,
-                                             const void* vtags )
+EntityHandle MeshOutputFunctor::operator( )( int nvhash, EntityHandle* vhash, const double* vcoords, const void* vtags )
 {
     EntityHandle vertex_handle;
     if( nvhash < 4 )
     {
-        bool newly_created = this->split_vertices[ nvhash ]->find_or_create(
-            vhash, vcoords, vertex_handle, this->proc_partition_counts, true );
+        bool newly_created = this->split_vertices[ nvhash ]->find_or_create( vhash, vcoords, vertex_handle,
+                                                                             this->proc_partition_counts, true );
         if( newly_created ) { this->assign_tags( vertex_handle, vtags ); }
         if( !vertex_handle ) { std::cerr << "Could not insert mid-edge vertex!\n"; }
 #ifdef MB_DEBUG
@@ -272,8 +263,8 @@ void MeshOutputFunctor::operator( )( EntityType etyp )
 {
     EntityHandle elem_handle;
     int          nconn = this->elem_vert.size( );
-    bool         newly_created = this->new_entities[ nconn ]->create_element(
-        etyp, nconn, &this->elem_vert[ 0 ], elem_handle, this->proc_partition_counts );
+    bool newly_created = this->new_entities[ nconn ]->create_element( etyp, nconn, &this->elem_vert[ 0 ], elem_handle,
+                                                                      this->proc_partition_counts );
     if( newly_created )
     {
 #ifdef MB_DEBUG

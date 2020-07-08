@@ -111,16 +111,14 @@ class ProgOptions
      *        class
      */
     template< typename T >
-    void addOpt( const std::string& namestring, const std::string& helpstring, T* value,
-                 int flags = 0 );
+    void addOpt( const std::string& namestring, const std::string& helpstring, T* value, int flags = 0 );
 
     /** Specify a new command-line option
      *
      * This funtion is identical to the 4-arg version, but omits the value parameter, which
      * is assumed to be NULL
      */
-    template< typename T >
-    void addOpt( const std::string& namestring, const std::string& helpstring, int flags = 0 )
+    template< typename T > void addOpt( const std::string& namestring, const std::string& helpstring, int flags = 0 )
     {
         addOpt< T >( namestring, helpstring, NULL, flags );
     }
@@ -144,8 +142,7 @@ class ProgOptions
      *        If NULL, the value must be queried using getReqArg()
      */
     template< typename T >
-    void addRequiredArg( const std::string& helpname, const std::string& helpstring,
-                         T* value = NULL, int flags = 0 );
+    void addRequiredArg( const std::string& helpname, const std::string& helpstring, T* value = NULL, int flags = 0 );
 
     /** Add optional positional arguments
      *
@@ -158,8 +155,8 @@ class ProgOptions
      * @param helpstring The help text for the arguments
      */
     template< typename T >
-    void addOptionalArgs( unsigned max_count, const std::string& helpname,
-                          const std::string& helpstring, int flags = 0 );
+    void addOptionalArgs( unsigned max_count, const std::string& helpname, const std::string& helpstring,
+                          int flags = 0 );
 
     /**
      * Print the full help to the given stream
@@ -204,8 +201,7 @@ class ProgOptions
      * @param values Reference to list to store values into.  Will have as many entries
      *        as there were instances of this option on the command line
      */
-    template< typename T >
-    void getOptAllArgs( const std::string& namestring, std::vector< T >& values );
+    template< typename T > void getOptAllArgs( const std::string& namestring, std::vector< T >& values );
 
     /**
      * @param namestring See similar argument to getOpt()
@@ -249,8 +245,7 @@ class ProgOptions
     ProgOpt* lookup( const std::map< std::string, ProgOpt* >&, const std::string& );
     ProgOpt* lookup_option( const std::string& );
 
-    bool evaluate( const ProgOpt& opt, void* target, const std::string& option,
-                   unsigned* arg_idx = NULL );
+    bool evaluate( const ProgOpt& opt, void* target, const std::string& option, unsigned* arg_idx = NULL );
     bool process_option( ProgOpt* opt, std::string arg, const char* value = 0 );
 
     std::map< std::string, ProgOpt* > long_names;

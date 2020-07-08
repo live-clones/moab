@@ -67,8 +67,7 @@ ReaderIface* ReadCGM::factory( Interface* iface )
 }
 
 ReadCGM::ReadCGM( Interface* impl )
-    : geom_tag( 0 ), id_tag( 0 ), name_tag( 0 ), category_tag( 0 ), faceting_tol_tag( 0 ),
-      geometry_resabs_tag( 0 )
+    : geom_tag( 0 ), id_tag( 0 ), name_tag( 0 ), category_tag( 0 ), faceting_tol_tag( 0 ), geometry_resabs_tag( 0 )
 {
     assert( NULL != impl );
     mdbImpl = impl;
@@ -84,20 +83,19 @@ ReadCGM::ReadCGM( Interface* impl )
 
     // get some tag handles
     int negone = -1, zero = 0 /*, negonearr[] = {-1, -1, -1, -1}*/;
-    rval = mdbImpl->tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, geom_tag,
-                                    MB_TAG_SPARSE | MB_TAG_CREAT, &negone );
+    rval = mdbImpl->tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, geom_tag, MB_TAG_SPARSE | MB_TAG_CREAT,
+                                    &negone );
     assert( !rval );
     id_tag = mdbImpl->globalId_tag( );
 
-    rval = mdbImpl->tag_get_handle( NAME_TAG_NAME, NAME_TAG_SIZE, MB_TYPE_OPAQUE, name_tag,
-                                    MB_TAG_SPARSE | MB_TAG_CREAT );
+    rval =
+        mdbImpl->tag_get_handle( NAME_TAG_NAME, NAME_TAG_SIZE, MB_TYPE_OPAQUE, name_tag, MB_TAG_SPARSE | MB_TAG_CREAT );
     assert( !rval );
 
-    rval = mdbImpl->tag_get_handle( CATEGORY_TAG_NAME, CATEGORY_TAG_SIZE, MB_TYPE_OPAQUE,
-                                    category_tag, MB_TAG_SPARSE | MB_TAG_CREAT );
-    assert( !rval );
-    rval = mdbImpl->tag_get_handle( "FACETING_TOL", 1, MB_TYPE_DOUBLE, faceting_tol_tag,
+    rval = mdbImpl->tag_get_handle( CATEGORY_TAG_NAME, CATEGORY_TAG_SIZE, MB_TYPE_OPAQUE, category_tag,
                                     MB_TAG_SPARSE | MB_TAG_CREAT );
+    assert( !rval );
+    rval = mdbImpl->tag_get_handle( "FACETING_TOL", 1, MB_TYPE_DOUBLE, faceting_tol_tag, MB_TAG_SPARSE | MB_TAG_CREAT );
     assert( !rval );
     rval = mdbImpl->tag_get_handle( "GEOMETRY_RESABS", 1, MB_TYPE_DOUBLE, geometry_resabs_tag,
                                     MB_TAG_SPARSE | MB_TAG_CREAT );
@@ -114,17 +112,15 @@ ReadCGM::~ReadCGM( )
 }
 
 ErrorCode ReadCGM::read_tag_values( const char* /* file_name */, const char* /* tag_name */,
-                                    const FileOptions& /* opts */,
-                                    std::vector< int >& /* tag_values_out */,
+                                    const FileOptions& /* opts */, std::vector< int >& /* tag_values_out */,
                                     const SubsetList* /* subset_list */ )
 {
     return MB_NOT_IMPLEMENTED;
 }
 
 // Sets options passed into ReadCGM::load_file
-ErrorCode ReadCGM::set_options( const FileOptions& opts, int& norm_tol, double& faceting_tol,
-                                double& len_tol, bool& act_att, bool& verbose_warnings,
-                                bool& fatal_on_curves )
+ErrorCode ReadCGM::set_options( const FileOptions& opts, int& norm_tol, double& faceting_tol, double& len_tol,
+                                bool& act_att, bool& verbose_warnings, bool& fatal_on_curves )
 {
     ErrorCode rval;
 
@@ -135,14 +131,12 @@ ErrorCode ReadCGM::set_options( const FileOptions& opts, int& norm_tol, double& 
     act_att = true;
 
     // Check for the options.
-    if( MB_SUCCESS != opts.get_int_option( "FACET_NORMAL_TOLERANCE", norm_tol ) )
-        norm_tol = DEFAULT_NORM;
+    if( MB_SUCCESS != opts.get_int_option( "FACET_NORMAL_TOLERANCE", norm_tol ) ) norm_tol = DEFAULT_NORM;
 
     if( MB_SUCCESS != opts.get_real_option( "FACET_DISTANCE_TOLERANCE", faceting_tol ) )
         faceting_tol = DEFAULT_FACET_TOL;
 
-    if( MB_SUCCESS != opts.get_real_option( "MAX_FACET_EDGE_LENGTH", len_tol ) )
-        len_tol = DEFAULT_LEN_TOL;
+    if( MB_SUCCESS != opts.get_real_option( "MAX_FACET_EDGE_LENGTH", len_tol ) ) len_tol = DEFAULT_LEN_TOL;
 
     if( MB_SUCCESS == opts.get_null_option( "VERBOSE_CGM_WARNINGS" ) ) verbose_warnings = true;
 
@@ -158,10 +152,9 @@ ErrorCode ReadCGM::set_options( const FileOptions& opts, int& norm_tol, double& 
 
 ErrorCode ReadCGM::create_entity_sets( std::map< RefEntity*, EntityHandle > ( &entmap )[ 5 ] )
 {
-    ErrorCode         rval;
-    const char        geom_categories[][ CATEGORY_TAG_SIZE ] = { "Vertex\0", "Curve\0", "Surface\0",
-                                                          "Volume\0", "Group\0" };
-    const char* const names[] = { "Vertex", "Curve", "Surface", "Volume" };
+    ErrorCode  rval;
+    const char geom_categories[][ CATEGORY_TAG_SIZE ] = { "Vertex\0", "Curve\0", "Surface\0", "Volume\0", "Group\0" };
+    const char* const     names[] = { "Vertex", "Curve", "Surface", "Volume" };
     DLIList< RefEntity* > entlist;
 
     for( int dim = 0; dim < 4; dim++ )
@@ -238,8 +231,7 @@ ErrorCode ReadCGM::store_surface_senses( std::map< RefEntity*, EntityHandle >& s
         {
             BasicTopologyEntity* vol = cf->get_parent_basic_topology_entity_ptr( );
             // Allocate vol to the proper topology entity (forward or reverse)
-            if( cf->get_sense( ) == CUBIT_UNKNOWN ||
-                cf->get_sense( ) != face->get_surface_ptr( )->bridge_sense( ) )
+            if( cf->get_sense( ) == CUBIT_UNKNOWN || cf->get_sense( ) != face->get_surface_ptr( )->bridge_sense( ) )
             {
                 // Check that each surface has a sense for only one volume
                 if( reverse )
@@ -251,8 +243,7 @@ ErrorCode ReadCGM::store_surface_senses( std::map< RefEntity*, EntityHandle >& s
                 }
                 reverse = vol;
             }
-            if( cf->get_sense( ) == CUBIT_UNKNOWN ||
-                cf->get_sense( ) == face->get_surface_ptr( )->bridge_sense( ) )
+            if( cf->get_sense( ) == CUBIT_UNKNOWN || cf->get_sense( ) == face->get_surface_ptr( )->bridge_sense( ) )
             {
                 // Check that each surface has a sense for only one volume
                 if( forward )
@@ -297,14 +288,12 @@ ErrorCode ReadCGM::store_curve_senses( std::map< RefEntity*, EntityHandle >& cur
         {
             BasicTopologyEntity* fac = ce->get_parent_basic_topology_entity_ptr( );
             EntityHandle         face = surface_map[ fac ];
-            if( ce->get_sense( ) == CUBIT_UNKNOWN ||
-                ce->get_sense( ) != edge->get_curve_ptr( )->bridge_sense( ) )
+            if( ce->get_sense( ) == CUBIT_UNKNOWN || ce->get_sense( ) != edge->get_curve_ptr( )->bridge_sense( ) )
             {
                 ents.push_back( face );
                 senses.push_back( SENSE_REVERSE );
             }
-            if( ce->get_sense( ) == CUBIT_UNKNOWN ||
-                ce->get_sense( ) == edge->get_curve_ptr( )->bridge_sense( ) )
+            if( ce->get_sense( ) == CUBIT_UNKNOWN || ce->get_sense( ) == edge->get_curve_ptr( )->bridge_sense( ) )
             {
                 ents.push_back( face );
                 senses.push_back( SENSE_FORWARD );
@@ -335,8 +324,7 @@ ErrorCode ReadCGM::store_groups( std::map< RefEntity*, EntityHandle > ( &entitym
 ErrorCode ReadCGM::create_group_entsets( std::map< RefEntity*, EntityHandle >& group_map )
 {
     ErrorCode  rval;
-    const char geom_categories[][ CATEGORY_TAG_SIZE ] = { "Vertex\0", "Curve\0", "Surface\0",
-                                                          "Volume\0", "Group\0" };
+    const char geom_categories[][ CATEGORY_TAG_SIZE ] = { "Vertex\0", "Curve\0", "Surface\0", "Volume\0", "Group\0" };
     DLIList< RefEntity* > entitylist;
     // Create entity sets for all ref groups
     std::vector< Tag > extra_name_tags;
@@ -380,8 +368,7 @@ ErrorCode ReadCGM::create_group_entsets( std::map< RefEntity*, EntityHandle >& g
         memset( namebuf, '\0', NAME_TAG_SIZE );
         strncpy( namebuf, name1.c_str( ), NAME_TAG_SIZE - 1 );
         if( name1.length( ) >= (unsigned)NAME_TAG_SIZE )
-            std::cout << "WARNING: group name '" << name1.c_str( ) << "' truncated to '" << namebuf
-                      << "'" << std::endl;
+            std::cout << "WARNING: group name '" << name1.c_str( ) << "' truncated to '" << namebuf << "'" << std::endl;
         rval = mdbImpl->tag_set_data( name_tag, &h, 1, namebuf );
         if( MB_SUCCESS != rval ) return MB_FAILURE;
 
@@ -398,8 +385,8 @@ ErrorCode ReadCGM::create_group_entsets( std::map< RefEntity*, EntityHandle >& g
             {
                 sprintf( namebuf, "EXTRA_%s%d", NAME_TAG_NAME, j );
                 Tag t;
-                rval = mdbImpl->tag_get_handle( namebuf, NAME_TAG_SIZE, MB_TYPE_OPAQUE, t,
-                                                MB_TAG_SPARSE | MB_TAG_CREAT );
+                rval =
+                    mdbImpl->tag_get_handle( namebuf, NAME_TAG_SIZE, MB_TYPE_OPAQUE, t, MB_TAG_SPARSE | MB_TAG_CREAT );
                 assert( !rval );
                 extra_name_tags.push_back( t );
             }
@@ -414,8 +401,8 @@ ErrorCode ReadCGM::create_group_entsets( std::map< RefEntity*, EntityHandle >& g
                 memset( namebuf, '\0', NAME_TAG_SIZE );
                 strncpy( namebuf, name1.c_str( ), NAME_TAG_SIZE - 1 );
                 if( name1.length( ) >= (unsigned)NAME_TAG_SIZE )
-                    std::cout << "WARNING: group name '" << name1.c_str( ) << "' truncated to '"
-                              << namebuf << "'" << std::endl;
+                    std::cout << "WARNING: group name '" << name1.c_str( ) << "' truncated to '" << namebuf << "'"
+                              << std::endl;
                 rval = mdbImpl->tag_set_data( extra_name_tags[ j ], &h, 1, namebuf );
                 if( MB_SUCCESS != rval ) return MB_FAILURE;
             }
@@ -474,8 +461,7 @@ ErrorCode ReadCGM::store_group_content( std::map< RefEntity*, EntityHandle > ( &
                 else
                 {
                     // Otherwise, warn user.
-                    std::cerr << "Warning: A dim<0 entity is being ignored by ReadCGM."
-                              << std::endl;
+                    std::cerr << "Warning: A dim<0 entity is being ignored by ReadCGM." << std::endl;
                 }
             }
             else if( dim < 4 )
@@ -537,8 +523,7 @@ ErrorCode ReadCGM::create_curve_facets( std::map< RefEntity*, EntityHandle >& cu
 #else
                                         int /* norm_tol */,
 #endif
-                                        double faceting_tol, bool verbose_warn,
-                                        bool fatal_on_curves )
+                                        double faceting_tol, bool verbose_warn, bool fatal_on_curves )
 {
     ErrorCode   rval;
     CubitStatus s;
@@ -587,12 +572,11 @@ ErrorCode ReadCGM::create_curve_facets( std::map< RefEntity*, EntityHandle >& cu
         std::vector< CubitVector > points;
         for( int i = 0; i < data.pointListCount; ++i )
             // Add Cubit vertext points to a list
-            points.push_back( CubitVector( data.point_list( )[ i ].x, data.point_list( )[ i ].y,
-                                           data.point_list( )[ i ].z ) );
+            points.push_back(
+                CubitVector( data.point_list( )[ i ].x, data.point_list( )[ i ].y, data.point_list( )[ i ].z ) );
 
         // Need to reverse data?
-        if( curve->bridge_sense( ) == CUBIT_REVERSED )
-            std::reverse( points.begin( ), points.end( ) );
+        if( curve->bridge_sense( ) == CUBIT_REVERSED ) std::reverse( points.begin( ), points.end( ) );
 
         // Check for closed curve
         RefVertex *start_vtx, *end_vtx;
@@ -617,8 +601,8 @@ ErrorCode ReadCGM::create_curve_facets( std::map< RefEntity*, EntityHandle >& cu
         const bool closed = ( points.front( ) - points.back( ) ).length( ) < GEOMETRY_RESABS;
         if( closed != ( start_vtx == end_vtx ) )
         {
-            std::cerr << "Warning: topology and geometry inconsistant for possibly closed curve "
-                      << edge->id( ) << std::endl;
+            std::cerr << "Warning: topology and geometry inconsistant for possibly closed curve " << edge->id( )
+                      << std::endl;
         }
 
         // Check proximity of vertices to end coordinates
@@ -631,10 +615,7 @@ ErrorCode ReadCGM::create_curve_facets( std::map< RefEntity*, EntityHandle >& cu
             {
                 std::cerr << "Warning: vertices not at ends of curve " << edge->id( ) << std::endl;
                 if( curve_warnings == 0 && !verbose_warn )
-                {
-                    std::cerr << "         further instances of this warning will be suppressed..."
-                              << std::endl;
-                }
+                { std::cerr << "         further instances of this warning will be suppressed..." << std::endl; }
             }
         }
         // Create interior points
@@ -671,8 +652,7 @@ ErrorCode ReadCGM::create_curve_facets( std::map< RefEntity*, EntityHandle >& cu
 
     if( !verbose_warn && curve_warnings < 0 )
     {
-        std::cerr << "Suppressed " << -curve_warnings
-                  << " 'vertices not at ends of curve' warnings." << std::endl;
+        std::cerr << "Suppressed " << -curve_warnings << " 'vertices not at ends of curve' warnings." << std::endl;
         std::cerr << "To see all warnings, use reader param VERBOSE_CGM_WARNINGS." << std::endl;
     }
 
@@ -680,8 +660,8 @@ ErrorCode ReadCGM::create_curve_facets( std::map< RefEntity*, EntityHandle >& cu
 }
 
 ErrorCode ReadCGM::create_surface_facets( std::map< RefEntity*, EntityHandle >& surface_map,
-                                          std::map< RefEntity*, EntityHandle >& vertex_map,
-                                          int norm_tol, double facet_tol, double length_tol )
+                                          std::map< RefEntity*, EntityHandle >& vertex_map, int norm_tol,
+                                          double facet_tol, double length_tol )
 {
     ErrorCode                                      rval;
     std::map< RefEntity*, EntityHandle >::iterator ci;
@@ -721,15 +701,13 @@ ErrorCode ReadCGM::create_surface_facets( std::map< RefEntity*, EntityHandle >& 
             for( int j = 0; j < data.pointListCount; ++j )
             {
                 // Assign facet vertex
-                CubitVector vpos( data.point_list( )[ j ].x, data.point_list( )[ j ].y,
-                                  data.point_list( )[ j ].z );
+                CubitVector vpos( data.point_list( )[ j ].x, data.point_list( )[ j ].y, data.point_list( )[ j ].z );
                 // Check to see if they are considered coincident
                 if( ( pos - vpos ).length_squared( ) < GEOMETRY_RESABS * GEOMETRY_RESABS )
                 {
                     // If this facet vertex has already been found coincident, print warning
                     if( verts[ j ] )
-                        std::cerr << "Warning: Coincident vertices in surface " << face->id( )
-                                  << std::endl;
+                        std::cerr << "Warning: Coincident vertices in surface " << face->id( ) << std::endl;
                     // If a coincidence is found, keep track of it in the verts vector
                     verts[ j ] = vertex_map[ vtx ];
                     break;
@@ -742,8 +720,7 @@ ErrorCode ReadCGM::create_surface_facets( std::map< RefEntity*, EntityHandle >& 
         {
             if( verts[ i ] )  // If a geometric vertex
                 continue;
-            double coords[] = { data.point_list( )[ i ].x, data.point_list( )[ i ].y,
-                                data.point_list( )[ i ].z };
+            double coords[] = { data.point_list( )[ i ].x, data.point_list( )[ i ].y, data.point_list( )[ i ].z };
             // Return vertex handle to verts to fill in all remaining facet
             // vertices
             rval = mdbImpl->create_vertex( coords, verts[ i ] );
@@ -769,8 +746,7 @@ ErrorCode ReadCGM::create_surface_facets( std::map< RefEntity*, EntityHandle >& 
             {
                 if( facet[ j ] >= (int)verts.size( ) )
                 {
-                    std::cerr << "ERROR: Invalid facet data for surface " << face->id( )
-                              << std::endl;
+                    std::cerr << "ERROR: Invalid facet data for surface " << face->id( ) << std::endl;
                     return MB_FAILURE;
                 }
                 corners[ j - 1 ] = verts[ facet[ j ] ];
@@ -809,18 +785,13 @@ ErrorCode ReadCGM::create_surface_facets( std::map< RefEntity*, EntityHandle >& 
 }
 
 // Copy geometry into mesh database
-ErrorCode ReadCGM::load_file( const char* cgm_file_name, const EntityHandle* file_set,
-                              const FileOptions& opts, const ReaderIface::SubsetList* subset_list,
-                              const Tag* /*file_id_tag*/ )
+ErrorCode ReadCGM::load_file( const char* cgm_file_name, const EntityHandle* file_set, const FileOptions& opts,
+                              const ReaderIface::SubsetList* subset_list, const Tag* /*file_id_tag*/ )
 {
     // Blocks_to_load and num_blocks are ignored.
     ErrorCode rval;
 
-    if( subset_list )
-    {
-        MB_SET_ERR( MB_UNSUPPORTED_OPERATION,
-                    "Reading subset of files not supported for CGM data" );
-    }
+    if( subset_list ) { MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "Reading subset of files not supported for CGM data" ); }
 
     int    norm_tol;
     double faceting_tol;
@@ -829,8 +800,7 @@ ErrorCode ReadCGM::load_file( const char* cgm_file_name, const EntityHandle* fil
     bool   verbose_warnings = false;
     bool   fatal_on_curves = false;
 
-    rval = set_options( opts, norm_tol, faceting_tol, len_tol, act_att, verbose_warnings,
-                        fatal_on_curves );
+    rval = set_options( opts, norm_tol, faceting_tol, len_tol, act_att, verbose_warnings, fatal_on_curves );
     if( MB_SUCCESS != rval ) return rval;
 
     // Always tag with the faceting_tol and geometry absolute resolution
@@ -857,10 +827,7 @@ ErrorCode ReadCGM::load_file( const char* cgm_file_name, const EntityHandle* fil
 
     s = CubitCompat_import_solid_model( cgm_file_name, file_type );
     if( CUBIT_SUCCESS != s )
-    {
-        MB_SET_ERR( MB_FAILURE,
-                    cgm_file_name << ": Failed to read file of type \"" << file_type << "\"" );
-    }
+    { MB_SET_ERR( MB_FAILURE, cgm_file_name << ": Failed to read file of type \"" << file_type << "\"" ); }
 
     // Create entity sets for all geometric entities
     std::map< RefEntity*, EntityHandle > entmap[ 5 ];  // One for each dim, and one for groups
@@ -893,8 +860,7 @@ ErrorCode ReadCGM::load_file( const char* cgm_file_name, const EntityHandle* fil
     if( rval != MB_SUCCESS ) return rval;
 
     // Create facets for all curves
-    rval = create_curve_facets( entmap[ 1 ], entmap[ 0 ], norm_tol, faceting_tol, verbose_warnings,
-                                fatal_on_curves );
+    rval = create_curve_facets( entmap[ 1 ], entmap[ 0 ], norm_tol, faceting_tol, verbose_warnings, fatal_on_curves );
     if( rval != MB_SUCCESS ) return rval;
 
     // Create facets for surfaces
@@ -923,8 +889,7 @@ void ReadCGM::dump_fail_counts( )
 {
     std::cout << "***** Faceting Summary Information *****" << std::endl;
     std::cout << "----- Curve Fail Information -----" << std::endl;
-    std::cout << "There were " << failed_curve_count << " curves that could not be faceted."
-              << std::endl;
+    std::cout << "There were " << failed_curve_count << " curves that could not be faceted." << std::endl;
 
     if( failed_curve_count > 0 )
     {
@@ -937,8 +902,7 @@ void ReadCGM::dump_fail_counts( )
     }
     std::cout << std::endl;
     std::cout << "----- Facet Fail Information -----" << std::endl;
-    std::cout << "There were " << failed_surface_count << " surfaces that could not be faceted."
-              << std::endl;
+    std::cout << "There were " << failed_surface_count << " surfaces that could not be faceted." << std::endl;
     if( failed_surface_count > 0 )
     {
         std::cout << "The surfaces were ";
@@ -993,39 +957,33 @@ const char* ReadCGM::get_geom_fptr_type( FILE* file )
 int ReadCGM::is_cubit_file( FILE* file )
 {
     unsigned char buffer[ 4 ];
-    return !fseek( file, 0, SEEK_SET ) && fread( buffer, 4, 1, file ) &&
-           !memcmp( buffer, "CUBE", 4 );
+    return !fseek( file, 0, SEEK_SET ) && fread( buffer, 4, 1, file ) && !memcmp( buffer, "CUBE", 4 );
 }
 
 int ReadCGM::is_step_file( FILE* file )
 {
     unsigned char buffer[ 9 ];
-    return !fseek( file, 0, SEEK_SET ) && fread( buffer, 9, 1, file ) &&
-           !memcmp( buffer, "ISO-10303", 9 );
+    return !fseek( file, 0, SEEK_SET ) && fread( buffer, 9, 1, file ) && !memcmp( buffer, "ISO-10303", 9 );
 }
 
 int ReadCGM::is_iges_file( FILE* file )
 {
     unsigned char buffer[ 10 ];
-    return !fseek( file, 72, SEEK_SET ) && fread( buffer, 10, 1, file ) &&
-           !memcmp( buffer, "S      1", 8 );
+    return !fseek( file, 72, SEEK_SET ) && fread( buffer, 10, 1, file ) && !memcmp( buffer, "S      1", 8 );
 }
 
 int ReadCGM::is_occ_brep_file( FILE* file )
 {
     unsigned char buffer[ 6 ];
-    return !fseek( file, 0, SEEK_SET ) && fread( buffer, 6, 1, file ) &&
-           !memcmp( buffer, "DBRep_", 6 );
+    return !fseek( file, 0, SEEK_SET ) && fread( buffer, 6, 1, file ) && !memcmp( buffer, "DBRep_", 6 );
 }
 int ReadCGM::is_facet_file( FILE* file )
 {
     unsigned char buffer[ 10 ];
-    return !fseek( file, 0, SEEK_SET ) && fread( buffer, 10, 1, file ) &&
-           !memcmp( buffer, "MESH_BASED", 10 );
+    return !fseek( file, 0, SEEK_SET ) && fread( buffer, 10, 1, file ) && !memcmp( buffer, "MESH_BASED", 10 );
 }
 
-void ReadCGM::tokenize( const std::string& str, std::vector< std::string >& tokens,
-                        const char* delimiters )
+void ReadCGM::tokenize( const std::string& str, std::vector< std::string >& tokens, const char* delimiters )
 {
     std::string::size_type last = str.find_first_not_of( delimiters, 0 );
     std::string::size_type pos = str.find_first_of( delimiters, last );

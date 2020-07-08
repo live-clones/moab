@@ -58,15 +58,15 @@ double QuadraticHex::DSH( const int i, const double params )
     }
 }
 
-ErrorCode QuadraticHex::evalFcn( const double* params, const double* field, const int /*ndim*/,
-                                 const int num_tuples, double* /*work*/, double* result )
+ErrorCode QuadraticHex::evalFcn( const double* params, const double* field, const int /*ndim*/, const int num_tuples,
+                                 double* /*work*/, double* result )
 {
     assert( params && field && num_tuples > 0 );
     std::fill( result, result + num_tuples, 0.0 );
     for( int i = 0; i < 27; i++ )
     {
-        const double sh = SH( corner[ i ][ 0 ], params[ 0 ] ) *
-                          SH( corner[ i ][ 1 ], params[ 1 ] ) * SH( corner[ i ][ 2 ], params[ 2 ] );
+        const double sh = SH( corner[ i ][ 0 ], params[ 0 ] ) * SH( corner[ i ][ 1 ], params[ 1 ] ) *
+                          SH( corner[ i ][ 2 ], params[ 2 ] );
         for( int j = 0; j < num_tuples; j++ )
             result[ j ] += sh * field[ num_tuples * i + j ];
     }
@@ -74,25 +74,22 @@ ErrorCode QuadraticHex::evalFcn( const double* params, const double* field, cons
     return MB_SUCCESS;
 }
 
-ErrorCode QuadraticHex::jacobianFcn( const double* params, const double* verts, const int nverts,
-                                     const int ndim, double* /*work*/, double* result )
+ErrorCode QuadraticHex::jacobianFcn( const double* params, const double* verts, const int nverts, const int ndim,
+                                     double* /*work*/, double* result )
 {
     assert( 27 == nverts && params && verts );
     if( 27 != nverts ) return MB_FAILURE;
     Matrix3* J = reinterpret_cast< Matrix3* >( result );
     for( int i = 0; i < 27; i++ )
     {
-        const double sh[ 3 ] = { SH( corner[ i ][ 0 ], params[ 0 ] ),
-                                 SH( corner[ i ][ 1 ], params[ 1 ] ),
+        const double sh[ 3 ] = { SH( corner[ i ][ 0 ], params[ 0 ] ), SH( corner[ i ][ 1 ], params[ 1 ] ),
                                  SH( corner[ i ][ 2 ], params[ 2 ] ) };
-        const double dsh[ 3 ] = { DSH( corner[ i ][ 0 ], params[ 0 ] ),
-                                  DSH( corner[ i ][ 1 ], params[ 1 ] ),
+        const double dsh[ 3 ] = { DSH( corner[ i ][ 0 ], params[ 0 ] ), DSH( corner[ i ][ 1 ], params[ 1 ] ),
                                   DSH( corner[ i ][ 2 ], params[ 2 ] ) };
 
         for( int j = 0; j < 3; j++ )
         {
-            ( *J )( j, 0 ) +=
-                dsh[ 0 ] * sh[ 1 ] * sh[ 2 ] * verts[ ndim * i + j ];  // dxj/dr first column
+            ( *J )( j, 0 ) += dsh[ 0 ] * sh[ 1 ] * sh[ 2 ] * verts[ ndim * i + j ];  // dxj/dr first column
             ( *J )( j, 1 ) += sh[ 0 ] * dsh[ 1 ] * sh[ 2 ] * verts[ ndim * i + j ];  // dxj/ds
             ( *J )( j, 2 ) += sh[ 0 ] * sh[ 1 ] * dsh[ 2 ] * verts[ ndim * i + j ];  // dxj/dt
         }
@@ -101,23 +98,20 @@ ErrorCode QuadraticHex::jacobianFcn( const double* params, const double* verts, 
     return MB_SUCCESS;
 }
 
-ErrorCode QuadraticHex::integrateFcn( const double* /*field*/, const double* /*verts*/,
-                                      const int /*nverts*/, const int /*ndim*/,
-                                      const int /*num_tuples*/, double* /*work*/,
+ErrorCode QuadraticHex::integrateFcn( const double* /*field*/, const double* /*verts*/, const int /*nverts*/,
+                                      const int /*ndim*/, const int /*num_tuples*/, double* /*work*/,
                                       double* /*result*/ )
 {
     return MB_NOT_IMPLEMENTED;
 }
 
-ErrorCode QuadraticHex::reverseEvalFcn( EvalFcn eval, JacobianFcn jacob, InsideFcn ins,
-                                        const double* posn, const double* verts, const int nverts,
-                                        const int ndim, const double iter_tol,
-                                        const double inside_tol, double* work, double* params,
-                                        int* is_inside )
+ErrorCode QuadraticHex::reverseEvalFcn( EvalFcn eval, JacobianFcn jacob, InsideFcn ins, const double* posn,
+                                        const double* verts, const int nverts, const int ndim, const double iter_tol,
+                                        const double inside_tol, double* work, double* params, int* is_inside )
 {
     assert( posn && verts );
-    return EvalSet::evaluate_reverse( eval, jacob, ins, posn, verts, nverts, ndim, iter_tol,
-                                      inside_tol, work, params, is_inside );
+    return EvalSet::evaluate_reverse( eval, jacob, ins, posn, verts, nverts, ndim, iter_tol, inside_tol, work, params,
+                                      is_inside );
 }
 
 int QuadraticHex::insideFcn( const double* params, const int ndim, const double tol )

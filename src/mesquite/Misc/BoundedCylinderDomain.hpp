@@ -49,8 +49,8 @@ class BoundedCylinderDomain : public CylinderDomain
     {
     }
 
-    virtual void domain_DoF( const Mesh::VertexHandle* handle_array, unsigned short* dof_array,
-                             size_t count, MsqError& err ) const;
+    virtual void domain_DoF( const Mesh::VertexHandle* handle_array, unsigned short* dof_array, size_t count,
+                             MsqError& err ) const;
 
     /**\brief define a circular curve bounding the cylinder
      *\param distance Location on cylinder at which to create

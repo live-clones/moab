@@ -128,14 +128,13 @@ int main( int argc, char** argv )
     if( numCells == 0 )
     {
         if( !rank )
-            std::cout << " no close cells to the point " << point << " at distance less than "
-                      << distance << "\n";
+            std::cout << " no close cells to the point " << point << " at distance less than " << distance << "\n";
     }
     else
     {
         if( !rank )
-            std::cout << " write file " << outFile << " with cells closer than " << distance
-                      << " from " << point << "\n";
+            std::cout << " write file " << outFile << " with cells closer than " << distance << " from " << point
+                      << "\n";
         string writeOpts;
         if( numProcesses > 1 ) writeOpts = string( "PARALLEL=WRITE_PART;" );
         rval = mb.write_file( outFile.c_str( ), 0, writeOpts.c_str( ), &outSet, 1 );MB_CHK_SET_ERR( rval, "Can't write file" );

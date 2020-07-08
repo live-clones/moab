@@ -17,8 +17,8 @@ class BitTag : public TagInfo
 {
   private:
     BitTag( const char* name, int size, const void* default_value )
-        : TagInfo( name, size, MB_TYPE_BIT, default_value, default_value ? 1 : 0 ),
-          requestedBitsPerEntity( 0 ), storedBitsPerEntity( 0 ), pageShift( 0 )
+        : TagInfo( name, size, MB_TYPE_BIT, default_value, default_value ? 1 : 0 ), requestedBitsPerEntity( 0 ),
+          storedBitsPerEntity( 0 ), pageShift( 0 )
     {
     }
 
@@ -42,8 +42,7 @@ class BitTag : public TagInfo
      *
      *\param seqman    Pointer to mesh entity database
      */
-    virtual ErrorCode release_all_data( SequenceManager* seqman, Error* error_handler,
-                                        bool delete_pending );
+    virtual ErrorCode release_all_data( SequenceManager* seqman, Error* error_handler, bool delete_pending );
 
     /**\brief Get tag value for passed entities
      *
@@ -56,27 +55,26 @@ class BitTag : public TagInfo
      *\param data Pointer to memory in which to store consecutive tag values,
      *            one for each passed entity.
      */
-    virtual ErrorCode get_data( const SequenceManager* seqman, Error* error_handler,
-                                const EntityHandle* entities, size_t num_entities,
+    virtual ErrorCode get_data( const SequenceManager* seqman, Error* error_handler, const EntityHandle* entities,
+                                size_t num_entities, void* data ) const;
+
+    /**\brief Get tag value for passed entities
+     *
+     * Get tag values for specified entities.
+     *
+     *\Note Will fail for variable-length data.
+     *\param seqman Pointer to mesh entity database
+     *\param entities Entity handles for which to retrieve tag data
+     *\param data Pointer to memory in which to store consecutive tag values,
+     *            one for each passed entity.
+     */
+    virtual ErrorCode get_data( const SequenceManager* seqman, Error* error_handler, const Range& entities,
                                 void* data ) const;
 
     /**\brief Get tag value for passed entities
      *
      * Get tag values for specified entities.
      *
-     *\Note Will fail for variable-length data.
-     *\param seqman Pointer to mesh entity database
-     *\param entities Entity handles for which to retrieve tag data
-     *\param data Pointer to memory in which to store consecutive tag values,
-     *            one for each passed entity.
-     */
-    virtual ErrorCode get_data( const SequenceManager* seqman, Error* error_handler,
-                                const Range& entities, void* data ) const;
-
-    /**\brief Get tag value for passed entities
-     *
-     * Get tag values for specified entities.
-     *
      *\param seqman    Pointer to mesh entity database
      *\param entities  Entity handles for which to retrieve tag data
      *\param num_entities Length of \c entities array
@@ -86,9 +84,8 @@ class BitTag : public TagInfo
      *                length of the tag value for the corresponding
      *                entity.
      */
-    virtual ErrorCode get_data( const SequenceManager* seqman, Error* error_handler,
-                                const EntityHandle* entities, size_t num_entities,
-                                const void** data_ptrs, int* data_lengths ) const;
+    virtual ErrorCode get_data( const SequenceManager* seqman, Error* error_handler, const EntityHandle* entities,
+                                size_t num_entities, const void** data_ptrs, int* data_lengths ) const;
 
     /**\brief Get tag value for passed entities
      *
@@ -102,9 +99,8 @@ class BitTag : public TagInfo
      *                length of the tag value for the corresponding
      *                entity.
      */
-    virtual ErrorCode get_data( const SequenceManager* seqman, Error* error_handler,
-                                const Range& entities, const void** data_ptrs,
-                                int* data_lengths ) const;
+    virtual ErrorCode get_data( const SequenceManager* seqman, Error* error_handler, const Range& entities,
+                                const void** data_ptrs, int* data_lengths ) const;
 
     /**\brief Set tag value for passed entities
      *
@@ -116,25 +112,24 @@ class BitTag : public TagInfo
      *\param data Pointer to memory holding consecutive tag values,
      *            one for each passed entity.
      */
-    virtual ErrorCode set_data( SequenceManager* seqman, Error* error_handler,
-                                const EntityHandle* entities, size_t num_entities,
+    virtual ErrorCode set_data( SequenceManager* seqman, Error* error_handler, const EntityHandle* entities,
+                                size_t num_entities, const void* data );
+
+    /**\brief Set tag value for passed entities
+     *
+     * Store tag data or update stored tag values
+     *\Note Will fail for variable-length data.
+     *\param seqman Pointer to mesh entity database
+     *\param entities Entity handles for which to store tag data
+     *\param data Pointer to memory holding consecutive tag values,
+     *            one for each passed entity.
+     */
+    virtual ErrorCode set_data( SequenceManager* seqman, Error* error_handler, const Range& entities,
                                 const void* data );
 
     /**\brief Set tag value for passed entities
      *
      * Store tag data or update stored tag values
-     *\Note Will fail for variable-length data.
-     *\param seqman Pointer to mesh entity database
-     *\param entities Entity handles for which to store tag data
-     *\param data Pointer to memory holding consecutive tag values,
-     *            one for each passed entity.
-     */
-    virtual ErrorCode set_data( SequenceManager* seqman, Error* error_handler,
-                                const Range& entities, const void* data );
-
-    /**\brief Set tag value for passed entities
-     *
-     * Store tag data or update stored tag values
      *
      *\param seqman    Pointer to mesh entity database
      *\param entities  Entity handles for which to store tag data
@@ -146,29 +141,27 @@ class BitTag : public TagInfo
      *                entity.  Array is required for variable-length
      *                tags and is ignored for fixed-length tags.
      */
-    virtual ErrorCode set_data( SequenceManager* seqman, Error* error_handler,
-                                const EntityHandle* entities, size_t num_entities,
+    virtual ErrorCode set_data( SequenceManager* seqman, Error* error_handler, const EntityHandle* entities,
+                                size_t num_entities, void const* const* data_ptrs, const int* data_lengths );
+
+    /**\brief Set tag value for passed entities
+     *
+     * Store tag data or update stored tag values
+     *
+     *\param seqman    Pointer to mesh entity database
+     *\param entities  Entity handles for which to store tag data
+     *\param data_ptrs Array of pointers to tag values, one pointer
+     *                 for each passed entity.
+     *\param data_lengths One value for each entity specifying the
+     *                length of the tag value for the corresponding
+     *                entity.  Array is required for variable-length
+     *                tags and is ignored for fixed-length tags.
+     */
+    virtual ErrorCode set_data( SequenceManager* seqman, Error* error_handler, const Range& entities,
                                 void const* const* data_ptrs, const int* data_lengths );
 
     /**\brief Set tag value for passed entities
      *
-     * Store tag data or update stored tag values
-     *
-     *\param seqman    Pointer to mesh entity database
-     *\param entities  Entity handles for which to store tag data
-     *\param data_ptrs Array of pointers to tag values, one pointer
-     *                 for each passed entity.
-     *\param data_lengths One value for each entity specifying the
-     *                length of the tag value for the corresponding
-     *                entity.  Array is required for variable-length
-     *                tags and is ignored for fixed-length tags.
-     */
-    virtual ErrorCode set_data( SequenceManager* seqman, Error* error_handler,
-                                const Range& entities, void const* const* data_ptrs,
-                                const int* data_lengths );
-
-    /**\brief Set tag value for passed entities
-     *
      * Store tag data or update stored tag values.
      *
      *\param seqman    Pointer to mesh entity database
@@ -180,25 +173,24 @@ class BitTag : public TagInfo
      *                 fixed-length tags.  Required for variable-
      *                 length tags.
      */
-    virtual ErrorCode clear_data( SequenceManager* seqman, Error* error_handler,
-                                  const EntityHandle* entities, size_t num_entities,
+    virtual ErrorCode clear_data( SequenceManager* seqman, Error* error_handler, const EntityHandle* entities,
+                                  size_t num_entities, const void* value_ptr, int value_len = 0 );
+
+    /**\brief Set tag value for passed entities
+     *
+     * Store tag data or update stored tag values.
+     *
+     *\param seqman    Pointer to mesh entity database
+     *\param entities  Entity handles for which to store tag data
+     *\param value_ptr Pointer to a single tag value which is to be
+     *                 stored for each of the passed entities.
+     *\param value_len Length of tag value in bytes.  Ignored for
+     *                 fixed-length tags.  Required for variable-
+     *                 length tags.
+     */
+    virtual ErrorCode clear_data( SequenceManager* seqman, Error* error_handler, const Range& entities,
                                   const void* value_ptr, int value_len = 0 );
 
-    /**\brief Set tag value for passed entities
-     *
-     * Store tag data or update stored tag values.
-     *
-     *\param seqman    Pointer to mesh entity database
-     *\param entities  Entity handles for which to store tag data
-     *\param value_ptr Pointer to a single tag value which is to be
-     *                 stored for each of the passed entities.
-     *\param value_len Length of tag value in bytes.  Ignored for
-     *                 fixed-length tags.  Required for variable-
-     *                 length tags.
-     */
-    virtual ErrorCode clear_data( SequenceManager* seqman, Error* error_handler,
-                                  const Range& entities, const void* value_ptr, int value_len = 0 );
-
     /**\brief Remove/clear tag data for entities
      *
      * Remove tag values from entities.
@@ -207,8 +199,8 @@ class BitTag : public TagInfo
      *\param entities  Entity handles for which to store tag data
      *\param num_entities Length of \c entities array
      */
-    virtual ErrorCode remove_data( SequenceManager* seqman, Error* error_handler,
-                                   const EntityHandle* entities, size_t num_entities );
+    virtual ErrorCode remove_data( SequenceManager* seqman, Error* error_handler, const EntityHandle* entities,
+                                   size_t num_entities );
 
     /**\brief Remove/clear tag data for entities
      *
@@ -217,8 +209,7 @@ class BitTag : public TagInfo
      *\param seqman    Pointer to mesh entity database
      *\param entities  Entity handles for which to store tag data
      */
-    virtual ErrorCode remove_data( SequenceManager* seqman, Error* error_handler,
-                                   const Range& entities );
+    virtual ErrorCode remove_data( SequenceManager* seqman, Error* error_handler, const Range& entities );
 
     /**\brief Access tag data via direct pointer into contiguous blocks
      *
@@ -242,9 +233,8 @@ class BitTag : public TagInfo
      *      even though MOAB would normally not explicitly store tag values
      *      for such entities.
      */
-    virtual ErrorCode tag_iterate( SequenceManager* seqman, Error* error_handler,
-                                   Range::iterator& iter, const Range::iterator& end,
-                                   void*& data_ptr, bool allocate = true );
+    virtual ErrorCode tag_iterate( SequenceManager* seqman, Error* error_handler, Range::iterator& iter,
+                                   const Range::iterator& end, void*& data_ptr, bool allocate = true );
 
     /**\brief Get all tagged entities
      *
@@ -260,8 +250,7 @@ class BitTag : public TagInfo
      *                search is restricted to entities in this list.
      */
     virtual ErrorCode get_tagged_entities( const SequenceManager* seqman, Range& output_entities,
-                                           EntityType   type = MBMAXTYPE,
-                                           const Range* intersect = 0 ) const;
+                                           EntityType type = MBMAXTYPE, const Range* intersect = 0 ) const;
 
     /**\brief Count all tagged entities
      *
@@ -277,8 +266,7 @@ class BitTag : public TagInfo
      *                search is restricted to entities in this list.
      */
     virtual ErrorCode num_tagged_entities( const SequenceManager* seqman, size_t& output_count,
-                                           EntityType   type = MBMAXTYPE,
-                                           const Range* intersect = 0 ) const;
+                                           EntityType type = MBMAXTYPE, const Range* intersect = 0 ) const;
 
     /**\brief Get all tagged entities with tag value
      *
@@ -294,8 +282,8 @@ class BitTag : public TagInfo
      *                search is restricted to entities in this list.
      */
     virtual ErrorCode find_entities_with_value( const SequenceManager* seqman, Error* error_handler,
-                                                Range& output_entities, const void* value,
-                                                int value_bytes = 0, EntityType type = MBMAXTYPE,
+                                                Range& output_entities, const void* value, int value_bytes = 0,
+                                                EntityType   type = MBMAXTYPE,
                                                 const Range* intersect_entities = 0 ) const;
 
     /**\brief Check if entity is tagged */
@@ -304,15 +292,13 @@ class BitTag : public TagInfo
     /**\brief Get memory use for tag data.
      *
      */
-    ErrorCode get_memory_use( const SequenceManager* seqman, unsigned long& total,
-                              unsigned long& per_entity ) const;
+    ErrorCode get_memory_use( const SequenceManager* seqman, unsigned long& total, unsigned long& per_entity ) const;
 
     /**\brief Get entities for which an explicit tag of the specified value is stored */
     ErrorCode get_entities_with_bits( EntityType type, Range& entities, unsigned char bits ) const;
 
     /**\brief Get entities for which an explicit tag of the specified value is stored */
-    ErrorCode get_entities_with_bits( const Range& range, EntityType type, Range& entities,
-                                      unsigned char bits ) const;
+    ErrorCode get_entities_with_bits( const Range& range, EntityType type, Range& entities, unsigned char bits ) const;
 
     enum
     {
@@ -333,11 +319,10 @@ class BitTag : public TagInfo
             return 0;
     }
 
-    std::vector< BitPage* >
-                 pageList[ MBMAXTYPE ];  //!< Array of BitPage instances storing actual data.
-    unsigned int requestedBitsPerEntity;  //!< user-requested bits per entity
-    unsigned int storedBitsPerEntity;  //!< allocated bits per entity (power of 2)
-    unsigned int pageShift;  //!< log2( ents_per_page() )
+    std::vector< BitPage* > pageList[ MBMAXTYPE ];  //!< Array of BitPage instances storing actual data.
+    unsigned int            requestedBitsPerEntity;  //!< user-requested bits per entity
+    unsigned int            storedBitsPerEntity;  //!< allocated bits per entity (power of 2)
+    unsigned int            pageShift;  //!< log2( ents_per_page() )
 
     /**\brief Get indices from handle
      *
@@ -359,11 +344,9 @@ class BitTag : public TagInfo
         return 8 * PageSize / storedBitsPerEntity;
     }
 
+    template< class Container > inline void get_tagged( EntityType type, Container& entities ) const;
     template< class Container >
-    inline void get_tagged( EntityType type, Container& entities ) const;
-    template< class Container >
-    inline void get_tagged( Range::const_iterator begin, Range::const_iterator end,
-                            Container& entities ) const;
+    inline void get_tagged( Range::const_iterator begin, Range::const_iterator end, Container& entities ) const;
     template< class Container >
     inline void get_tagged( Container& entities, EntityType type, const Range* intersect ) const;
 };

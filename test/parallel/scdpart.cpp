@@ -63,10 +63,8 @@ void test_read_parallel( int num_verts )
     ErrorCode    rval;
     rval = mb.create_meshset( MESHSET_SET, file_set );CHECK_ERR( rval );
 
-    std::string opt =
-        std::string(
-            "PARALLEL=READ_PART;PARTITION=;PARTITION_DISTRIBUTE;PARALLEL_RESOLVE_SHARED_ENTS" ) +
-        partition_method;
+    std::string opt = std::string( "PARALLEL=READ_PART;PARTITION=;PARTITION_DISTRIBUTE;PARALLEL_RESOLVE_SHARED_ENTS" ) +
+                      partition_method;
     rval = mb.load_file( example.c_str( ), &file_set, opt.c_str( ) );CHECK_ERR( rval );
 
     ParallelComm* pcomm = ParallelComm::get_pcomm( &mb, 0 );

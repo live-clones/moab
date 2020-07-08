@@ -88,8 +88,7 @@ int main( int argc, char* argv[] )
     {
         const char*  flag;
         const char** name_ptr;
-    } flags[] = {
-        { "-d", &deformed_file }, { "-t", &tag_file }, { "-f", &smoothed_file }, { 0, 0 } };
+    } flags[] = { { "-d", &deformed_file }, { "-t", &tag_file }, { "-f", &smoothed_file }, { 0, 0 } };
 
     for( int i = 1; i < argc; ++i )
     {
@@ -122,8 +121,7 @@ int main( int argc, char* argv[] )
     if( MSQ_CHKERR( err ) ) return 1;
 
     // new, "deformed" domain will be an 2HDx2HD planar square
-    const double corner_coords[][ 3 ] = {
-        { -HD, -HD, Z }, { HD, -HD, Z }, { HD, HD, Z }, { -HD, HD, Z } };
+    const double corner_coords[][ 3 ] = { { -HD, -HD, Z }, { HD, -HD, Z }, { HD, HD, Z }, { -HD, HD, Z } };
     LineDomain   lines[ 4 ] = { LineDomain( Vector3D( corner_coords[ 0 ] ), Vector3D( 1, 0, 0 ) ),
                               LineDomain( Vector3D( corner_coords[ 1 ] ), Vector3D( 0, 1, 0 ) ),
                               LineDomain( Vector3D( corner_coords[ 2 ] ), Vector3D( -1, 0, 0 ) ),
@@ -134,8 +132,7 @@ int main( int argc, char* argv[] )
     DeformingCurveSmoother curve_tool;
     for( int i = 0; i < 4; ++i )
     {
-        curve_tool.store_initial_mesh( &mesh, &curves[ i ][ 0 ], curves[ i ].size( ), &lines[ i ],
-                                       err );
+        curve_tool.store_initial_mesh( &mesh, &curves[ i ][ 0 ], curves[ i ].size( ), &lines[ i ], err );
         if( MSQ_CHKERR( err ) ) return 1;
     }
     DeformingDomainWrapper wrapper;

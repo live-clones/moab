@@ -73,8 +73,7 @@ void help( const char* argv0 )
 
 /* For each tet, calculate ratio of min/max dihedral angle.
  * Return stats for all tets */
-void tet_dihedral_angle_ratios( Mesh& mesh, double& ratio_min, double& ratio_avg, double& ratio_max,
-                                MsqError& err );
+void tet_dihedral_angle_ratios( Mesh& mesh, double& ratio_min, double& ratio_avg, double& ratio_max, MsqError& err );
 
 int main( int argc, char* argv[] )
 {
@@ -146,8 +145,7 @@ static inline double da( double dot )
     return 180 - ( 180 / M_PI ) * acos( dot );
 }
 
-void tet_dihedral_angle_ratios( Mesh& mesh, double& ratio_min, double& ratio_avg, double& ratio_max,
-                                MsqError& err )
+void tet_dihedral_angle_ratios( Mesh& mesh, double& ratio_min, double& ratio_avg, double& ratio_max, MsqError& err )
 {
     std::vector< Mesh::VertexHandle >  verts;
     std::vector< Mesh::ElementHandle > tets;

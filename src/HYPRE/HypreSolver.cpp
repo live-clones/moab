@@ -55,8 +55,7 @@ HYPRE_Int HypreSolver::Solve( const HypreParVector& b, HypreParVector& x ) const
 {
     HYPRE_Int err;
 
-    if( A == NULL )
-    { MB_SET_ERR_RET_VAL( "HypreSolver::Solve (...) : HypreParMatrix A is missing", 1 ); }
+    if( A == NULL ) { MB_SET_ERR_RET_VAL( "HypreSolver::Solve (...) : HypreParMatrix A is missing", 1 ); }
 
     if( !setup_called )
     {

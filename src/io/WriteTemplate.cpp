@@ -60,14 +60,14 @@ WriteTemplate::WriteTemplate( Interface* impl ) : mbImpl( impl )
     // Initialize in case tag_get_handle fails below
     //! Get and cache predefined tag handles
     int negone = -1;
-    impl->tag_get_handle( MATERIAL_SET_TAG_NAME, 1, MB_TYPE_INTEGER, mMaterialSetTag,
-                          MB_TAG_SPARSE | MB_TAG_CREAT, &negone );
+    impl->tag_get_handle( MATERIAL_SET_TAG_NAME, 1, MB_TYPE_INTEGER, mMaterialSetTag, MB_TAG_SPARSE | MB_TAG_CREAT,
+                          &negone );
 
-    impl->tag_get_handle( DIRICHLET_SET_TAG_NAME, 1, MB_TYPE_INTEGER, mDirichletSetTag,
-                          MB_TAG_SPARSE | MB_TAG_CREAT, &negone );
+    impl->tag_get_handle( DIRICHLET_SET_TAG_NAME, 1, MB_TYPE_INTEGER, mDirichletSetTag, MB_TAG_SPARSE | MB_TAG_CREAT,
+                          &negone );
 
-    impl->tag_get_handle( NEUMANN_SET_TAG_NAME, 1, MB_TYPE_INTEGER, mNeumannSetTag,
-                          MB_TAG_SPARSE | MB_TAG_CREAT, &negone );
+    impl->tag_get_handle( NEUMANN_SET_TAG_NAME, 1, MB_TYPE_INTEGER, mNeumannSetTag, MB_TAG_SPARSE | MB_TAG_CREAT,
+                          &negone );
 
     mGlobalIdTag = impl->globalId_tag( );
 
@@ -90,11 +90,9 @@ void WriteTemplate::reset_matset( std::vector< WriteTemplate::MaterialSetData >&
 
 ErrorCode WriteTemplate::write_file( const char* file_name,
                                      const bool /* overwrite (commented out to remove warning) */,
-                                     const FileOptions& /*opts*/, const EntityHandle* ent_handles,
-                                     const int num_sets,
-                                     const std::vector< std::string >& /* qa_list */,
-                                     const Tag* /* tag_list */, int /* num_tags */,
-                                     int /* export_dimension */ )
+                                     const FileOptions& /*opts*/, const EntityHandle* ent_handles, const int num_sets,
+                                     const std::vector< std::string >& /* qa_list */, const Tag* /* tag_list */,
+                                     int /* num_tags */, int /* export_dimension */ )
 {
     assert( 0 != mMaterialSetTag && 0 != mNeumannSetTag && 0 != mDirichletSetTag );
 
@@ -111,16 +109,13 @@ ErrorCode WriteTemplate::write_file( const char* file_name,
     {
         // Default to all defined sets
         Range this_range;
-        mbImpl->get_entities_by_type_and_tag( 0, MBENTITYSET, &mMaterialSetTag, NULL, 1,
-                                              this_range );
+        mbImpl->get_entities_by_type_and_tag( 0, MBENTITYSET, &mMaterialSetTag, NULL, 1, this_range );
         std::copy( this_range.begin( ), this_range.end( ), std::back_inserter( matsets ) );
         this_range.clear( );
-        mbImpl->get_entities_by_type_and_tag( 0, MBENTITYSET, &mDirichletSetTag, NULL, 1,
-                                              this_range );
+        mbImpl->get_entities_by_type_and_tag( 0, MBENTITYSET, &mDirichletSetTag, NULL, 1, this_range );
         std::copy( this_range.begin( ), this_range.end( ), std::back_inserter( dirsets ) );
         this_range.clear( );
-        mbImpl->get_entities_by_type_and_tag( 0, MBENTITYSET, &mNeumannSetTag, NULL, 1,
-                                              this_range );
+        mbImpl->get_entities_by_type_and_tag( 0, MBENTITYSET, &mNeumannSetTag, NULL, 1, this_range );
         std::copy( this_range.begin( ), this_range.end( ), std::back_inserter( neusets ) );
     }
     else
@@ -147,8 +142,8 @@ ErrorCode WriteTemplate::write_file( const char* file_name,
     MeshInfo mesh_info;
 
     matset_info.clear( );
-    if( gather_mesh_information( mesh_info, matset_info, neuset_info, dirset_info, matsets, neusets,
-                                 dirsets ) != MB_SUCCESS )
+    if( gather_mesh_information( mesh_info, matset_info, neuset_info, dirset_info, matsets, neusets, dirsets ) !=
+        MB_SUCCESS )
     {
         reset_matset( matset_info );
         return MB_FAILURE;
@@ -182,12 +177,13 @@ ErrorCode WriteTemplate::write_file( const char* file_name,
     return MB_SUCCESS;
 }
 
-ErrorCode WriteTemplate::gather_mesh_information(
-    MeshInfo& mesh_info, std::vector< WriteTemplate::MaterialSetData >& matset_info,
-    std::vector< WriteTemplate::NeumannSetData >&   neuset_info,
-    std::vector< WriteTemplate::DirichletSetData >& dirset_info,
-    std::vector< EntityHandle >& matsets, std::vector< EntityHandle >& neusets,
-    std::vector< EntityHandle >& dirsets )
+ErrorCode WriteTemplate::gather_mesh_information( MeshInfo&                                       mesh_info,
+                                                  std::vector< WriteTemplate::MaterialSetData >&  matset_info,
+                                                  std::vector< WriteTemplate::NeumannSetData >&   neuset_info,
+                                                  std::vector< WriteTemplate::DirichletSetData >& dirset_info,
+                                                  std::vector< EntityHandle >&                    matsets,
+                                                  std::vector< EntityHandle >&                    neusets,
+                                                  std::vector< EntityHandle >&                    dirsets )
 {
     std::vector< EntityHandle >::iterator vector_iter, end_vector_iter;
 
@@ -206,8 +202,7 @@ ErrorCode WriteTemplate::gather_mesh_information(
 
     // Clean out the bits for the element mark
     mbImpl->tag_delete( mEntityMark );
-    mbImpl->tag_get_handle( "WriteTemplate element mark", 1, MB_TYPE_BIT, mEntityMark,
-                            MB_TAG_CREAT );
+    mbImpl->tag_get_handle( "WriteTemplate element mark", 1, MB_TYPE_BIT, mEntityMark, MB_TAG_CREAT );
 
     int highest_dimension_of_element_matsets = 0;
 
@@ -217,8 +212,7 @@ ErrorCode WriteTemplate::gather_mesh_information(
         matset_data.elements = new Range;
 
         // For the purpose of qa records, get the parents of these matsets
-        if( mbImpl->get_parent_meshsets( *vector_iter, parent_meshsets ) != MB_SUCCESS )
-            return MB_FAILURE;
+        if( mbImpl->get_parent_meshsets( *vector_iter, parent_meshsets ) != MB_SUCCESS ) return MB_FAILURE;
 
         // Get all Entity Handles in the mesh set
         Range dummy_range;
@@ -229,17 +223,14 @@ ErrorCode WriteTemplate::gather_mesh_information(
         --entity_iter;
         int this_dim = CN::Dimension( TYPE_FROM_HANDLE( *entity_iter ) );
         entity_iter = dummy_range.begin( );
-        while( entity_iter != dummy_range.end( ) &&
-               CN::Dimension( TYPE_FROM_HANDLE( *entity_iter ) ) != this_dim )
+        while( entity_iter != dummy_range.end( ) && CN::Dimension( TYPE_FROM_HANDLE( *entity_iter ) ) != this_dim )
             ++entity_iter;
 
         if( entity_iter != dummy_range.end( ) )
-            std::copy( entity_iter, dummy_range.end( ),
-                       range_inserter( *( matset_data.elements ) ) );
+            std::copy( entity_iter, dummy_range.end( ), range_inserter( *( matset_data.elements ) ) );
 
         assert( matset_data.elements->begin( ) == matset_data.elements->end( ) ||
-                CN::Dimension( TYPE_FROM_HANDLE( *( matset_data.elements->begin( ) ) ) ) ==
-                    this_dim );
+                CN::Dimension( TYPE_FROM_HANDLE( *( matset_data.elements->begin( ) ) ) ) == this_dim );
 
         // Get the matset's id
         if( mbImpl->tag_get_data( mMaterialSetTag, &( *vector_iter ), 1, &id ) != MB_SUCCESS )
@@ -262,8 +253,7 @@ ErrorCode WriteTemplate::gather_mesh_information(
 
         int dimension = CN::Dimension( entity_type );
 
-        if( dimension > highest_dimension_of_element_matsets )
-            highest_dimension_of_element_matsets = dimension;
+        if( dimension > highest_dimension_of_element_matsets ) highest_dimension_of_element_matsets = dimension;
 
         matset_data.moab_type = mbImpl->type_from_handle( *( matset_data.elements->begin( ) ) );
         if( MBMAXTYPE == matset_data.moab_type ) return MB_FAILURE;
@@ -274,13 +264,9 @@ ErrorCode WriteTemplate::gather_mesh_information(
             ExoIIUtil::get_element_type_from_num_verts( tmp_conn.size( ), entity_type, dimension );
 
         if( matset_data.element_type == EXOII_MAX_ELEM_TYPE )
-        {
-            MB_SET_ERR( MB_FAILURE,
-                        "Element type in matset " << id << " didn't get set correctly" );
-        }
+        { MB_SET_ERR( MB_FAILURE, "Element type in matset " << id << " didn't get set correctly" ); }
 
-        matset_data.number_nodes_per_element =
-            ExoIIUtil::VerticesPerElement[ matset_data.element_type ];
+        matset_data.number_nodes_per_element = ExoIIUtil::VerticesPerElement[ matset_data.element_type ];
 
         // Number of nodes for this matset
         matset_data.number_elements = matset_data.elements->size( );
@@ -289,14 +275,12 @@ ErrorCode WriteTemplate::gather_mesh_information(
         mesh_info.num_elements += matset_data.number_elements;
 
         // Get the nodes for the elements
-        mWriteIface->gather_nodes_from_elements( *matset_data.elements, mEntityMark,
-                                                 mesh_info.nodes );
+        mWriteIface->gather_nodes_from_elements( *matset_data.elements, mEntityMark, mesh_info.nodes );
 
         if( !neusets.empty( ) )
         {
             // If there are neusets, keep track of which elements are being written out
-            for( Range::iterator iter = matset_data.elements->begin( );
-                 iter != matset_data.elements->end( ); ++iter )
+            for( Range::iterator iter = matset_data.elements->begin( ); iter != matset_data.elements->end( ); ++iter )
             {
                 unsigned char bit = 0x1;
                 mbImpl->tag_set_data( mEntityMark, &( *iter ), 1, &bit );
@@ -373,8 +357,7 @@ ErrorCode WriteTemplate::gather_mesh_information(
         WriteTemplate::NeumannSetData neuset_data;
 
         // Get the neuset's id
-        if( mbImpl->tag_get_data( mNeumannSetTag, &( *vector_iter ), 1, &id ) != MB_SUCCESS )
-            return MB_FAILURE;
+        if( mbImpl->tag_get_data( mNeumannSetTag, &( *vector_iter ), 1, &id ) != MB_SUCCESS ) return MB_FAILURE;
 
         neuset_data.id = id;
         neuset_data.mesh_set_handle = *vector_iter;
@@ -382,8 +365,7 @@ ErrorCode WriteTemplate::gather_mesh_information(
         // Get the sides in two lists, one forward the other reverse; starts with forward sense
         // by convention
         Range forward_elems, reverse_elems;
-        if( get_neuset_elems( *vector_iter, 0, forward_elems, reverse_elems ) == MB_FAILURE )
-            return MB_FAILURE;
+        if( get_neuset_elems( *vector_iter, 0, forward_elems, reverse_elems ) == MB_FAILURE ) return MB_FAILURE;
 
         ErrorCode result = get_valid_sides( forward_elems, 1, neuset_data );MB_CHK_SET_ERR( result, "Couldn't get valid sides data" );
         result = get_valid_sides( reverse_elems, -1, neuset_data );MB_CHK_SET_ERR( result, "Couldn't get valid sides data" );
@@ -395,8 +377,7 @@ ErrorCode WriteTemplate::gather_mesh_information(
     return MB_SUCCESS;
 }
 
-ErrorCode WriteTemplate::get_valid_sides( Range& elems, const int sense,
-                                          WriteTemplate::NeumannSetData& neuset_data )
+ErrorCode WriteTemplate::get_valid_sides( Range& elems, const int sense, WriteTemplate::NeumannSetData& neuset_data )
 {
     // This is where we see if underlying element of side set element is included in output
 
@@ -420,8 +401,7 @@ ErrorCode WriteTemplate::get_valid_sides( Range& elems, const int sense,
             int                         dimension = CN::Dimension( TYPE_FROM_HANDLE( *iter ) );
 
             // Get the adjacent parent element of "side"
-            if( mbImpl->get_adjacencies( &( *iter ), 1, dimension + 1, false, parents ) !=
-                MB_SUCCESS )
+            if( mbImpl->get_adjacencies( &( *iter ), 1, dimension + 1, false, parents ) != MB_SUCCESS )
             { MB_SET_ERR( MB_FAILURE, "Couldn't get adjacencies for neuset" ); }
 
             if( !parents.empty( ) )
@@ -429,13 +409,11 @@ ErrorCode WriteTemplate::get_valid_sides( Range& elems, const int sense,
                 // Make sure the adjacent parent element will be output
                 for( unsigned int k = 0; k < parents.size( ); k++ )
                 {
-                    result =
-                        mbImpl->tag_get_data( mEntityMark, &( parents[ k ] ), 1, &element_marked );MB_CHK_SET_ERR( result, "Couldn't get mark data" );
+                    result = mbImpl->tag_get_data( mEntityMark, &( parents[ k ] ), 1, &element_marked );MB_CHK_SET_ERR( result, "Couldn't get mark data" );
 
                     int side_no, this_sense, this_offset;
                     if( 0x1 == element_marked &&
-                        mbImpl->side_number( parents[ k ], *iter, side_no, this_sense,
-                                             this_offset ) == MB_SUCCESS &&
+                        mbImpl->side_number( parents[ k ], *iter, side_no, this_sense, this_offset ) == MB_SUCCESS &&
                         this_sense == sense )
                     {
                         neuset_data.elements.push_back( parents[ k ] );
@@ -446,8 +424,7 @@ ErrorCode WriteTemplate::get_valid_sides( Range& elems, const int sense,
             }
             else
             {
-                MB_SET_ERR( MB_FAILURE,
-                            "No parent element exists for element in neuset " << neuset_data.id );
+                MB_SET_ERR( MB_FAILURE, "No parent element exists for element in neuset " << neuset_data.id );
             }
         }
     }
@@ -473,8 +450,7 @@ ErrorCode WriteTemplate::write_nodes( const int num_nodes, const Range& nodes, c
 
     if( num_coords_to_fill == 3 ) coord_arrays[ 2 ] = new double[ num_nodes ];
 
-    result =
-        mWriteIface->get_node_coords( dimension, num_nodes, nodes, mGlobalIdTag, 0, coord_arrays );
+    result = mWriteIface->get_node_coords( dimension, num_nodes, nodes, mGlobalIdTag, 0, coord_arrays );
     if( result != MB_SUCCESS )
     {
         delete[] coord_arrays[ 0 ];
@@ -526,8 +502,7 @@ ErrorCode WriteTemplate::write_nodes( const int num_nodes, const Range& nodes, c
 ErrorCode WriteTemplate::write_matsets(
     MeshInfo& /* mesh_info (commented out to remove warning) */,
     std::vector< WriteTemplate::MaterialSetData >& matset_data,
-    std::vector<
-        WriteTemplate::NeumannSetData >& /* neuset_data (commented out to remove warning) */ )
+    std::vector< WriteTemplate::NeumannSetData >& /* neuset_data (commented out to remove warning) */ )
 {
     unsigned int        i;
     std::vector< int >  connect;
@@ -590,8 +565,7 @@ ErrorCode WriteTemplate::initialize_file( MeshInfo& mesh_info )
 ErrorCode WriteTemplate::open_file( const char* filename )
 {
     // Not a valid filename
-    if( strlen( (const char*)filename ) == 0 )
-    { MB_SET_ERR( MB_FAILURE, "Output filename not specified" ); }
+    if( strlen( (const char*)filename ) == 0 ) { MB_SET_ERR( MB_FAILURE, "Output filename not specified" ); }
 
     /* Template - open file & store somewhere */
 
@@ -602,8 +576,8 @@ ErrorCode WriteTemplate::open_file( const char* filename )
     return MB_SUCCESS;
 }
 
-ErrorCode WriteTemplate::get_neuset_elems( EntityHandle neuset, int current_sense,
-                                           Range& forward_elems, Range& reverse_elems )
+ErrorCode WriteTemplate::get_neuset_elems( EntityHandle neuset, int current_sense, Range& forward_elems,
+                                           Range& reverse_elems )
 {
     Range neuset_elems, neuset_meshsets;
 
@@ -636,8 +610,7 @@ ErrorCode WriteTemplate::get_neuset_elems( EntityHandle neuset, int current_sens
     --dum_it;
     int target_dim = CN::Dimension( TYPE_FROM_HANDLE( *dum_it ) );
     dum_it = neuset_elems.begin( );
-    while( target_dim != CN::Dimension( TYPE_FROM_HANDLE( *dum_it ) ) &&
-           dum_it != neuset_elems.end( ) )
+    while( target_dim != CN::Dimension( TYPE_FROM_HANDLE( *dum_it ) ) && dum_it != neuset_elems.end( ) )
         ++dum_it;
 
     if( current_sense == 1 || current_sense == 0 )
@@ -651,8 +624,7 @@ ErrorCode WriteTemplate::get_neuset_elems( EntityHandle neuset, int current_sens
     {
         // First get the sense; if it's not there, by convention it's forward
         int this_sense;
-        if( 0 == sense_tag ||
-            MB_FAILURE == mbImpl->tag_get_data( sense_tag, &( *range_iter ), 1, &this_sense ) )
+        if( 0 == sense_tag || MB_FAILURE == mbImpl->tag_get_data( sense_tag, &( *range_iter ), 1, &this_sense ) )
             this_sense = 1;
 
         // Now get all the entities on this meshset, with the proper (possibly reversed) sense

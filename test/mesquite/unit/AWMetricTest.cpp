@@ -71,8 +71,7 @@ class GradTestMetricAbs : public AWMetric
         return 3 * r + c + 1;
     }
 
-    bool evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result,
-                   MsqError& )
+    bool evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result, MsqError& )
     {
         result = 0;
         for( int r = 0; r < 2; ++r )
@@ -81,8 +80,7 @@ class GradTestMetricAbs : public AWMetric
         return true;
     }
 
-    bool evaluate( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >& W, double& result,
-                   MsqError& )
+    bool evaluate( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >& W, double& result, MsqError& )
     {
         result = 0;
         for( int r = 0; r < 3; ++r )
@@ -117,8 +115,7 @@ class HessTestMetricAbs : public AWMetric
         return "HessTest";
     }
 
-    bool evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result,
-                   MsqError& )
+    bool evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result, MsqError& )
     {
         result = sqr_Frobenius( 2 * A - transpose( A ) - W );
         return true;
@@ -131,8 +128,7 @@ class HessTestMetricAbs : public AWMetric
         return true;
     }
 
-    bool evaluate( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >& W, double& result,
-                   MsqError& )
+    bool evaluate( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >& W, double& result, MsqError& )
     {
         result = sqr_Frobenius( 2 * A - transpose( A ) - W );
         return true;
@@ -168,23 +164,22 @@ class HessTestMetricAbs_2 : public AWMetric
         return "HessTest2";
     }
 
-    bool evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >&, double& result,
-                   MsqError& err )
+    bool evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >&, double& result, MsqError& err )
     {
         result = Frobenius( A );
         return true;
     }
 
-    bool evaluate_with_grad( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >&, double& result,
-                             MsqMatrix< 2, 2 >& d, MsqError& err )
+    bool evaluate_with_grad( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >&, double& result, MsqMatrix< 2, 2 >& d,
+                             MsqError& err )
     {
         result = Frobenius( A );
         d = A / result;
         return true;
     }
 
-    bool evaluate_with_hess( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >&, double& result,
-                             MsqMatrix< 2, 2 >& d, MsqMatrix< 2, 2 > d2[ 3 ], MsqError& err )
+    bool evaluate_with_hess( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >&, double& result, MsqMatrix< 2, 2 >& d,
+                             MsqMatrix< 2, 2 > d2[ 3 ], MsqError& err )
     {
         result = Frobenius( A );
         d = A / result;
@@ -199,23 +194,22 @@ class HessTestMetricAbs_2 : public AWMetric
         return true;
     }
 
-    bool evaluate( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >&, double& result,
-                   MsqError& err )
+    bool evaluate( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >&, double& result, MsqError& err )
     {
         result = Frobenius( A );
         return true;
     }
 
-    bool evaluate_with_grad( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >&, double& result,
-                             MsqMatrix< 3, 3 >& d, MsqError& err )
+    bool evaluate_with_grad( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >&, double& result, MsqMatrix< 3, 3 >& d,
+                             MsqError& err )
     {
         result = Frobenius( A );
         d = A / result;
         return true;
     }
 
-    bool evaluate_with_hess( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >&, double& result,
-                             MsqMatrix< 3, 3 >& d, MsqMatrix< 3, 3 > d2[ 6 ], MsqError& err )
+    bool evaluate_with_hess( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >&, double& result, MsqMatrix< 3, 3 >& d,
+                             MsqMatrix< 3, 3 > d2[ 6 ], MsqError& err )
     {
         result = Frobenius( A );
         d = A / result;

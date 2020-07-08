@@ -76,8 +76,8 @@ class AWMetricBarrier2D : public AWMetricBarrier
      *
      * This method always returns an error for 2D-only metrics
      */
-    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >& W,
-                                           double& result, MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >& W, double& result,
+                                           MsqError& err );
 };
 
 class AWMetricBarrier3D : public AWMetricBarrier
@@ -89,8 +89,8 @@ class AWMetricBarrier3D : public AWMetricBarrier
      *
      * This method always returns an error for 3D-only metrics
      */
-    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W,
-                                           double& result, MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result,
+                                           MsqError& err );
 };
 
 }  // namespace MBMesquite

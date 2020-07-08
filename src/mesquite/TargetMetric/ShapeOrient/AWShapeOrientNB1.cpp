@@ -46,8 +46,7 @@ std::string AWShapeOrientNB1::get_name( ) const
 AWShapeOrientNB1::~AWShapeOrientNB1( ) {}
 
 template< unsigned DIM >
-static inline bool eval( const MsqMatrix< DIM, DIM >& A, const MsqMatrix< DIM, DIM >& W,
-                         double& result )
+static inline bool eval( const MsqMatrix< DIM, DIM >& A, const MsqMatrix< DIM, DIM >& W, double& result )
 {
     result = std::sqrt( sqr_Frobenius( A ) * sqr_Frobenius( W ) );
     result -= A % W;
@@ -56,8 +55,8 @@ static inline bool eval( const MsqMatrix< DIM, DIM >& A, const MsqMatrix< DIM, D
 }
 
 template< unsigned DIM >
-static inline bool grad( const MsqMatrix< DIM, DIM >& A, const MsqMatrix< DIM, DIM >& W,
-                         double& result, MsqMatrix< DIM, DIM >& deriv )
+static inline bool grad( const MsqMatrix< DIM, DIM >& A, const MsqMatrix< DIM, DIM >& W, double& result,
+                         MsqMatrix< DIM, DIM >& deriv )
 {
     const double nsW = sqr_Frobenius( W );
     const double nsA = sqr_Frobenius( A );

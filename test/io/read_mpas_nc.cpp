@@ -33,8 +33,7 @@ int main( int argc, char* argv[] )
     int fail = MPI_Init( &argc, &argv );
     if( fail ) return 1;
 #else
-    argv[ 0 ] =
-        argv[ argc - argc ];  // To remove the warnings in serial mode about unused variables
+    argv[ 0 ] = argv[ argc - argc ];  // To remove the warnings in serial mode about unused variables
 #endif
 
     result += RUN_TEST( test_read_all );
@@ -451,8 +450,8 @@ void test_gather_onevar( )
         // Check ke0 tag values on 4 gather set cells: first pentagon, last pentagon,
         // first hexagon, and last hexagon
         double       ke0_val[ 4 ];
-        EntityHandle cell_ents[] = { gather_set_cells[ 0 ], gather_set_cells[ 11 ],
-                                     gather_set_cells[ 12 ], gather_set_cells[ 641 ] };
+        EntityHandle cell_ents[] = { gather_set_cells[ 0 ], gather_set_cells[ 11 ], gather_set_cells[ 12 ],
+                                     gather_set_cells[ 641 ] };
         rval = mb.tag_get_data( ke_tag0, cell_ents, 4, ke0_val );CHECK_ERR( rval );
         CHECK_REAL_EQUAL( 15.001, ke0_val[ 0 ], eps );
         CHECK_REAL_EQUAL( 15.012, ke0_val[ 1 ], eps );

@@ -76,12 +76,11 @@ void XYRectangle::setup( Mesh* mesh, MsqError& err )
         for( int d = 0; d < 3; ++d )
         {
             if( d == normalDir ) continue;
-            if( minCoords[ d ] - coords[ i ][ d ] > epsilon ||
-                coords[ i ][ d ] - maxCoords[ d ] > epsilon )
+            if( minCoords[ d ] - coords[ i ][ d ] > epsilon || coords[ i ][ d ] - maxCoords[ d ] > epsilon )
             {
                 MSQ_SETERR( err )
-                ( MsqError::INVALID_MESH, "Invalid vertex coordinate: (%f,%f,%f)\n",
-                  coords[ i ][ 0 ], coords[ i ][ 1 ], coords[ i ][ 2 ] );
+                ( MsqError::INVALID_MESH, "Invalid vertex coordinate: (%f,%f,%f)\n", coords[ i ][ 0 ], coords[ i ][ 1 ],
+                  coords[ i ][ 2 ] );
                 return;
             }
             else if( coords[ i ][ d ] - minCoords[ d ] < epsilon )
@@ -120,16 +119,16 @@ void XYRectangle::element_normal_at( Mesh::ElementHandle /*handle*/, Vector3D& n
     norm[ normalDir ] = 1.0;
 }
 
-void XYRectangle::vertex_normal_at( const Mesh::VertexHandle* /*vertices*/, Vector3D normals[],
-                                    unsigned count, MsqError& ) const
+void XYRectangle::vertex_normal_at( const Mesh::VertexHandle* /*vertices*/, Vector3D normals[], unsigned count,
+                                    MsqError& ) const
 {
     Vector3D norm( 0, 0, 0 );
     norm[ normalDir ] = 1.0;
     std::fill( normals, normals + count, norm );
 }
 
-void XYRectangle::closest_point( Mesh::VertexHandle vertex, const Vector3D& position,
-                                 Vector3D& closest, Vector3D& normal, MsqError& ) const
+void XYRectangle::closest_point( Mesh::VertexHandle vertex, const Vector3D& position, Vector3D& closest,
+                                 Vector3D& normal, MsqError& ) const
 {
     normal = position;
     vertex_normal_at( vertex, normal );
@@ -137,8 +136,8 @@ void XYRectangle::closest_point( Mesh::VertexHandle vertex, const Vector3D& posi
     closest[ 2 ] = 0;
 }
 
-void XYRectangle::domain_DoF( const Mesh::VertexHandle* vertices, unsigned short* dof_array,
-                              size_t num_handles, MsqError& ) const
+void XYRectangle::domain_DoF( const Mesh::VertexHandle* vertices, unsigned short* dof_array, size_t num_handles,
+                              MsqError& ) const
 {
     for( unsigned i = 0; i < num_handles; ++i )
     {

@@ -72,28 +72,22 @@ C_FUNC_DEF double v_tet_edge_ratio( int /*num_nodes*/, double coordinates[][ 3 ]
 {
     VerdictVector a, b, c, d, e, f;
 
-    a.set( coordinates[ 1 ][ 0 ] - coordinates[ 0 ][ 0 ],
-           coordinates[ 1 ][ 1 ] - coordinates[ 0 ][ 1 ],
+    a.set( coordinates[ 1 ][ 0 ] - coordinates[ 0 ][ 0 ], coordinates[ 1 ][ 1 ] - coordinates[ 0 ][ 1 ],
            coordinates[ 1 ][ 2 ] - coordinates[ 0 ][ 2 ] );
 
-    b.set( coordinates[ 2 ][ 0 ] - coordinates[ 1 ][ 0 ],
-           coordinates[ 2 ][ 1 ] - coordinates[ 1 ][ 1 ],
+    b.set( coordinates[ 2 ][ 0 ] - coordinates[ 1 ][ 0 ], coordinates[ 2 ][ 1 ] - coordinates[ 1 ][ 1 ],
            coordinates[ 2 ][ 2 ] - coordinates[ 1 ][ 2 ] );
 
-    c.set( coordinates[ 0 ][ 0 ] - coordinates[ 2 ][ 0 ],
-           coordinates[ 0 ][ 1 ] - coordinates[ 2 ][ 1 ],
+    c.set( coordinates[ 0 ][ 0 ] - coordinates[ 2 ][ 0 ], coordinates[ 0 ][ 1 ] - coordinates[ 2 ][ 1 ],
            coordinates[ 0 ][ 2 ] - coordinates[ 2 ][ 2 ] );
 
-    d.set( coordinates[ 3 ][ 0 ] - coordinates[ 0 ][ 0 ],
-           coordinates[ 3 ][ 1 ] - coordinates[ 0 ][ 1 ],
+    d.set( coordinates[ 3 ][ 0 ] - coordinates[ 0 ][ 0 ], coordinates[ 3 ][ 1 ] - coordinates[ 0 ][ 1 ],
            coordinates[ 3 ][ 2 ] - coordinates[ 0 ][ 2 ] );
 
-    e.set( coordinates[ 3 ][ 0 ] - coordinates[ 1 ][ 0 ],
-           coordinates[ 3 ][ 1 ] - coordinates[ 1 ][ 1 ],
+    e.set( coordinates[ 3 ][ 0 ] - coordinates[ 1 ][ 0 ], coordinates[ 3 ][ 1 ] - coordinates[ 1 ][ 1 ],
            coordinates[ 3 ][ 2 ] - coordinates[ 1 ][ 2 ] );
 
-    f.set( coordinates[ 3 ][ 0 ] - coordinates[ 2 ][ 0 ],
-           coordinates[ 3 ][ 1 ] - coordinates[ 2 ][ 1 ],
+    f.set( coordinates[ 3 ][ 0 ] - coordinates[ 2 ][ 0 ], coordinates[ 3 ][ 1 ] - coordinates[ 2 ][ 1 ],
            coordinates[ 3 ][ 2 ] - coordinates[ 2 ][ 2 ] );
 
     double a2 = a.length_squared( );
@@ -161,28 +155,22 @@ C_FUNC_DEF double v_tet_scaled_jacobian( int /*num_nodes*/, double coordinates[]
 
     VerdictVector side0, side1, side2, side3, side4, side5;
 
-    side0.set( coordinates[ 1 ][ 0 ] - coordinates[ 0 ][ 0 ],
-               coordinates[ 1 ][ 1 ] - coordinates[ 0 ][ 1 ],
+    side0.set( coordinates[ 1 ][ 0 ] - coordinates[ 0 ][ 0 ], coordinates[ 1 ][ 1 ] - coordinates[ 0 ][ 1 ],
                coordinates[ 1 ][ 2 ] - coordinates[ 0 ][ 2 ] );
 
-    side1.set( coordinates[ 2 ][ 0 ] - coordinates[ 1 ][ 0 ],
-               coordinates[ 2 ][ 1 ] - coordinates[ 1 ][ 1 ],
+    side1.set( coordinates[ 2 ][ 0 ] - coordinates[ 1 ][ 0 ], coordinates[ 2 ][ 1 ] - coordinates[ 1 ][ 1 ],
                coordinates[ 2 ][ 2 ] - coordinates[ 1 ][ 2 ] );
 
-    side2.set( coordinates[ 0 ][ 0 ] - coordinates[ 2 ][ 0 ],
-               coordinates[ 0 ][ 1 ] - coordinates[ 2 ][ 1 ],
+    side2.set( coordinates[ 0 ][ 0 ] - coordinates[ 2 ][ 0 ], coordinates[ 0 ][ 1 ] - coordinates[ 2 ][ 1 ],
                coordinates[ 0 ][ 2 ] - coordinates[ 2 ][ 2 ] );
 
-    side3.set( coordinates[ 3 ][ 0 ] - coordinates[ 0 ][ 0 ],
-               coordinates[ 3 ][ 1 ] - coordinates[ 0 ][ 1 ],
+    side3.set( coordinates[ 3 ][ 0 ] - coordinates[ 0 ][ 0 ], coordinates[ 3 ][ 1 ] - coordinates[ 0 ][ 1 ],
                coordinates[ 3 ][ 2 ] - coordinates[ 0 ][ 2 ] );
 
-    side4.set( coordinates[ 3 ][ 0 ] - coordinates[ 1 ][ 0 ],
-               coordinates[ 3 ][ 1 ] - coordinates[ 1 ][ 1 ],
+    side4.set( coordinates[ 3 ][ 0 ] - coordinates[ 1 ][ 0 ], coordinates[ 3 ][ 1 ] - coordinates[ 1 ][ 1 ],
                coordinates[ 3 ][ 2 ] - coordinates[ 1 ][ 2 ] );
 
-    side5.set( coordinates[ 3 ][ 0 ] - coordinates[ 2 ][ 0 ],
-               coordinates[ 3 ][ 1 ] - coordinates[ 2 ][ 1 ],
+    side5.set( coordinates[ 3 ][ 0 ] - coordinates[ 2 ][ 0 ], coordinates[ 3 ][ 1 ] - coordinates[ 2 ][ 1 ],
                coordinates[ 3 ][ 2 ] - coordinates[ 2 ][ 2 ] );
 
     double jacobi;
@@ -190,12 +178,11 @@ C_FUNC_DEF double v_tet_scaled_jacobian( int /*num_nodes*/, double coordinates[]
     jacobi = side3 % ( side2 * side0 );
 
     // products of lengths squared of each edge attached to a node.
-    double length_squared[ 4 ] = {
-        side0.length_squared( ) * side2.length_squared( ) * side3.length_squared( ),
-        side0.length_squared( ) * side1.length_squared( ) * side4.length_squared( ),
-        side1.length_squared( ) * side2.length_squared( ) * side5.length_squared( ),
-        side3.length_squared( ) * side4.length_squared( ) * side5.length_squared( ) };
-    int which_node = 0;
+    double length_squared[ 4 ] = { side0.length_squared( ) * side2.length_squared( ) * side3.length_squared( ),
+                                   side0.length_squared( ) * side1.length_squared( ) * side4.length_squared( ),
+                                   side1.length_squared( ) * side2.length_squared( ) * side5.length_squared( ),
+                                   side3.length_squared( ) * side4.length_squared( ) * side5.length_squared( ) };
+    int    which_node = 0;
     if( length_squared[ 1 ] > length_squared[ which_node ] ) which_node = 1;
     if( length_squared[ 2 ] > length_squared[ which_node ] ) which_node = 2;
     if( length_squared[ 3 ] > length_squared[ which_node ] ) which_node = 3;
@@ -225,28 +212,22 @@ C_FUNC_DEF double v_tet_radius_ratio( int /*num_nodes*/, double coordinates[][ 3
     // Determine side vectors
     VerdictVector side[ 6 ];
 
-    side[ 0 ].set( coordinates[ 1 ][ 0 ] - coordinates[ 0 ][ 0 ],
-                   coordinates[ 1 ][ 1 ] - coordinates[ 0 ][ 1 ],
+    side[ 0 ].set( coordinates[ 1 ][ 0 ] - coordinates[ 0 ][ 0 ], coordinates[ 1 ][ 1 ] - coordinates[ 0 ][ 1 ],
                    coordinates[ 1 ][ 2 ] - coordinates[ 0 ][ 2 ] );
 
-    side[ 1 ].set( coordinates[ 2 ][ 0 ] - coordinates[ 1 ][ 0 ],
-                   coordinates[ 2 ][ 1 ] - coordinates[ 1 ][ 1 ],
+    side[ 1 ].set( coordinates[ 2 ][ 0 ] - coordinates[ 1 ][ 0 ], coordinates[ 2 ][ 1 ] - coordinates[ 1 ][ 1 ],
                    coordinates[ 2 ][ 2 ] - coordinates[ 1 ][ 2 ] );
 
-    side[ 2 ].set( coordinates[ 0 ][ 0 ] - coordinates[ 2 ][ 0 ],
-                   coordinates[ 0 ][ 1 ] - coordinates[ 2 ][ 1 ],
+    side[ 2 ].set( coordinates[ 0 ][ 0 ] - coordinates[ 2 ][ 0 ], coordinates[ 0 ][ 1 ] - coordinates[ 2 ][ 1 ],
                    coordinates[ 0 ][ 2 ] - coordinates[ 2 ][ 2 ] );
 
-    side[ 3 ].set( coordinates[ 3 ][ 0 ] - coordinates[ 0 ][ 0 ],
-                   coordinates[ 3 ][ 1 ] - coordinates[ 0 ][ 1 ],
+    side[ 3 ].set( coordinates[ 3 ][ 0 ] - coordinates[ 0 ][ 0 ], coordinates[ 3 ][ 1 ] - coordinates[ 0 ][ 1 ],
                    coordinates[ 3 ][ 2 ] - coordinates[ 0 ][ 2 ] );
 
-    side[ 4 ].set( coordinates[ 3 ][ 0 ] - coordinates[ 1 ][ 0 ],
-                   coordinates[ 3 ][ 1 ] - coordinates[ 1 ][ 1 ],
+    side[ 4 ].set( coordinates[ 3 ][ 0 ] - coordinates[ 1 ][ 0 ], coordinates[ 3 ][ 1 ] - coordinates[ 1 ][ 1 ],
                    coordinates[ 3 ][ 2 ] - coordinates[ 1 ][ 2 ] );
 
-    side[ 5 ].set( coordinates[ 3 ][ 0 ] - coordinates[ 2 ][ 0 ],
-                   coordinates[ 3 ][ 1 ] - coordinates[ 2 ][ 1 ],
+    side[ 5 ].set( coordinates[ 3 ][ 0 ] - coordinates[ 2 ][ 0 ], coordinates[ 3 ][ 1 ] - coordinates[ 2 ][ 1 ],
                    coordinates[ 3 ][ 2 ] - coordinates[ 2 ][ 2 ] );
 
     VerdictVector numerator = side[ 3 ].length_squared( ) * ( side[ 2 ] * side[ 0 ] ) +
@@ -287,28 +268,22 @@ C_FUNC_DEF double v_tet_aspect_beta( int /*num_nodes*/, double coordinates[][ 3 
     // Determine side vectors
     VerdictVector side[ 6 ];
 
-    side[ 0 ].set( coordinates[ 1 ][ 0 ] - coordinates[ 0 ][ 0 ],
-                   coordinates[ 1 ][ 1 ] - coordinates[ 0 ][ 1 ],
+    side[ 0 ].set( coordinates[ 1 ][ 0 ] - coordinates[ 0 ][ 0 ], coordinates[ 1 ][ 1 ] - coordinates[ 0 ][ 1 ],
                    coordinates[ 1 ][ 2 ] - coordinates[ 0 ][ 2 ] );
 
-    side[ 1 ].set( coordinates[ 2 ][ 0 ] - coordinates[ 1 ][ 0 ],
-                   coordinates[ 2 ][ 1 ] - coordinates[ 1 ][ 1 ],
+    side[ 1 ].set( coordinates[ 2 ][ 0 ] - coordinates[ 1 ][ 0 ], coordinates[ 2 ][ 1 ] - coordinates[ 1 ][ 1 ],
                    coordinates[ 2 ][ 2 ] - coordinates[ 1 ][ 2 ] );
 
-    side[ 2 ].set( coordinates[ 0 ][ 0 ] - coordinates[ 2 ][ 0 ],
-                   coordinates[ 0 ][ 1 ] - coordinates[ 2 ][ 1 ],
+    side[ 2 ].set( coordinates[ 0 ][ 0 ] - coordinates[ 2 ][ 0 ], coordinates[ 0 ][ 1 ] - coordinates[ 2 ][ 1 ],
                    coordinates[ 0 ][ 2 ] - coordinates[ 2 ][ 2 ] );
 
-    side[ 3 ].set( coordinates[ 3 ][ 0 ] - coordinates[ 0 ][ 0 ],
-                   coordinates[ 3 ][ 1 ] - coordinates[ 0 ][ 1 ],
+    side[ 3 ].set( coordinates[ 3 ][ 0 ] - coordinates[ 0 ][ 0 ], coordinates[ 3 ][ 1 ] - coordinates[ 0 ][ 1 ],
                    coordinates[ 3 ][ 2 ] - coordinates[ 0 ][ 2 ] );
 
-    side[ 4 ].set( coordinates[ 3 ][ 0 ] - coordinates[ 1 ][ 0 ],
-                   coordinates[ 3 ][ 1 ] - coordinates[ 1 ][ 1 ],
+    side[ 4 ].set( coordinates[ 3 ][ 0 ] - coordinates[ 1 ][ 0 ], coordinates[ 3 ][ 1 ] - coordinates[ 1 ][ 1 ],
                    coordinates[ 3 ][ 2 ] - coordinates[ 1 ][ 2 ] );
 
-    side[ 5 ].set( coordinates[ 3 ][ 0 ] - coordinates[ 2 ][ 0 ],
-                   coordinates[ 3 ][ 1 ] - coordinates[ 2 ][ 1 ],
+    side[ 5 ].set( coordinates[ 3 ][ 0 ] - coordinates[ 2 ][ 0 ], coordinates[ 3 ][ 1 ] - coordinates[ 2 ][ 1 ],
                    coordinates[ 3 ][ 2 ] - coordinates[ 2 ][ 2 ] );
 
     VerdictVector numerator = side[ 3 ].length_squared( ) * ( side[ 2 ] * side[ 0 ] ) +
@@ -347,32 +322,26 @@ C_FUNC_DEF double v_tet_aspect_ratio( int /*num_nodes*/, double coordinates[][ 3
     // Determine side vectors
     VerdictVector ab, bc, ac, ad, bd, cd;
 
-    ab.set( coordinates[ 1 ][ 0 ] - coordinates[ 0 ][ 0 ],
-            coordinates[ 1 ][ 1 ] - coordinates[ 0 ][ 1 ],
+    ab.set( coordinates[ 1 ][ 0 ] - coordinates[ 0 ][ 0 ], coordinates[ 1 ][ 1 ] - coordinates[ 0 ][ 1 ],
             coordinates[ 1 ][ 2 ] - coordinates[ 0 ][ 2 ] );
 
-    ac.set( coordinates[ 2 ][ 0 ] - coordinates[ 0 ][ 0 ],
-            coordinates[ 2 ][ 1 ] - coordinates[ 0 ][ 1 ],
+    ac.set( coordinates[ 2 ][ 0 ] - coordinates[ 0 ][ 0 ], coordinates[ 2 ][ 1 ] - coordinates[ 0 ][ 1 ],
             coordinates[ 2 ][ 2 ] - coordinates[ 0 ][ 2 ] );
 
-    ad.set( coordinates[ 3 ][ 0 ] - coordinates[ 0 ][ 0 ],
-            coordinates[ 3 ][ 1 ] - coordinates[ 0 ][ 1 ],
+    ad.set( coordinates[ 3 ][ 0 ] - coordinates[ 0 ][ 0 ], coordinates[ 3 ][ 1 ] - coordinates[ 0 ][ 1 ],
             coordinates[ 3 ][ 2 ] - coordinates[ 0 ][ 2 ] );
 
     double detTet = ab % ( ac * ad );
 
     if( detTet < VERDICT_DBL_MIN ) return (double)VERDICT_DBL_MAX;
 
-    bc.set( coordinates[ 2 ][ 0 ] - coordinates[ 1 ][ 0 ],
-            coordinates[ 2 ][ 1 ] - coordinates[ 1 ][ 1 ],
+    bc.set( coordinates[ 2 ][ 0 ] - coordinates[ 1 ][ 0 ], coordinates[ 2 ][ 1 ] - coordinates[ 1 ][ 1 ],
             coordinates[ 2 ][ 2 ] - coordinates[ 1 ][ 2 ] );
 
-    bd.set( coordinates[ 3 ][ 0 ] - coordinates[ 1 ][ 0 ],
-            coordinates[ 3 ][ 1 ] - coordinates[ 1 ][ 1 ],
+    bd.set( coordinates[ 3 ][ 0 ] - coordinates[ 1 ][ 0 ], coordinates[ 3 ][ 1 ] - coordinates[ 1 ][ 1 ],
             coordinates[ 3 ][ 2 ] - coordinates[ 1 ][ 2 ] );
 
-    cd.set( coordinates[ 3 ][ 0 ] - coordinates[ 2 ][ 0 ],
-            coordinates[ 3 ][ 1 ] - coordinates[ 2 ][ 1 ],
+    cd.set( coordinates[ 3 ][ 0 ] - coordinates[ 2 ][ 0 ], coordinates[ 3 ][ 1 ] - coordinates[ 2 ][ 1 ],
             coordinates[ 3 ][ 2 ] - coordinates[ 2 ][ 2 ] );
 
     double ab2 = ab.length_squared( );
@@ -415,28 +384,22 @@ C_FUNC_DEF double v_tet_aspect_gamma( int /*num_nodes*/, double coordinates[][ 3
     // Determine side vectors
     VerdictVector side0, side1, side2, side3, side4, side5;
 
-    side0.set( coordinates[ 1 ][ 0 ] - coordinates[ 0 ][ 0 ],
-               coordinates[ 1 ][ 1 ] - coordinates[ 0 ][ 1 ],
+    side0.set( coordinates[ 1 ][ 0 ] - coordinates[ 0 ][ 0 ], coordinates[ 1 ][ 1 ] - coordinates[ 0 ][ 1 ],
                coordinates[ 1 ][ 2 ] - coordinates[ 0 ][ 2 ] );
 
-    side1.set( coordinates[ 2 ][ 0 ] - coordinates[ 1 ][ 0 ],
-               coordinates[ 2 ][ 1 ] - coordinates[ 1 ][ 1 ],
+    side1.set( coordinates[ 2 ][ 0 ] - coordinates[ 1 ][ 0 ], coordinates[ 2 ][ 1 ] - coordinates[ 1 ][ 1 ],
                coordinates[ 2 ][ 2 ] - coordinates[ 1 ][ 2 ] );
 
-    side2.set( coordinates[ 0 ][ 0 ] - coordinates[ 2 ][ 0 ],
-               coordinates[ 0 ][ 1 ] - coordinates[ 2 ][ 1 ],
+    side2.set( coordinates[ 0 ][ 0 ] - coordinates[ 2 ][ 0 ], coordinates[ 0 ][ 1 ] - coordinates[ 2 ][ 1 ],
                coordinates[ 0 ][ 2 ] - coordinates[ 2 ][ 2 ] );
 
-    side3.set( coordinates[ 3 ][ 0 ] - coordinates[ 0 ][ 0 ],
-               coordinates[ 3 ][ 1 ] - coordinates[ 0 ][ 1 ],
+    side3.set( coordinates[ 3 ][ 0 ] - coordinates[ 0 ][ 0 ], coordinates[ 3 ][ 1 ] - coordinates[ 0 ][ 1 ],
                coordinates[ 3 ][ 2 ] - coordinates[ 0 ][ 2 ] );
 
-    side4.set( coordinates[ 3 ][ 0 ] - coordinates[ 1 ][ 0 ],
-               coordinates[ 3 ][ 1 ] - coordinates[ 1 ][ 1 ],
+    side4.set( coordinates[ 3 ][ 0 ] - coordinates[ 1 ][ 0 ], coordinates[ 3 ][ 1 ] - coordinates[ 1 ][ 1 ],
                coordinates[ 3 ][ 2 ] - coordinates[ 1 ][ 2 ] );
 
-    side5.set( coordinates[ 3 ][ 0 ] - coordinates[ 2 ][ 0 ],
-               coordinates[ 3 ][ 1 ] - coordinates[ 2 ][ 1 ],
+    side5.set( coordinates[ 3 ][ 0 ] - coordinates[ 2 ][ 0 ], coordinates[ 3 ][ 1 ] - coordinates[ 2 ][ 1 ],
                coordinates[ 3 ][ 2 ] - coordinates[ 2 ][ 2 ] );
 
     double volume = fabs( v_tet_volume( 4, coordinates ) );
@@ -445,10 +408,9 @@ C_FUNC_DEF double v_tet_aspect_gamma( int /*num_nodes*/, double coordinates[][ 3
         return (double)VERDICT_DBL_MAX;
     else
     {
-        double srms =
-            sqrt( ( side0.length_squared( ) + side1.length_squared( ) + side2.length_squared( ) +
-                    side3.length_squared( ) + side4.length_squared( ) + side5.length_squared( ) ) /
-                  6.0 );
+        double srms = sqrt( ( side0.length_squared( ) + side1.length_squared( ) + side2.length_squared( ) +
+                              side3.length_squared( ) + side4.length_squared( ) + side5.length_squared( ) ) /
+                            6.0 );
 
         double aspect_ratio_gamma = pow( srms, 3 ) / ( 8.48528137423857 * volume );
         return (double)aspect_ratio_gamma;
@@ -467,16 +429,13 @@ C_FUNC_DEF double v_tet_aspect_frobenius( int /*num_nodes*/, double coordinates[
 
     VerdictVector ab, ac, ad;
 
-    ab.set( coordinates[ 1 ][ 0 ] - coordinates[ 0 ][ 0 ],
-            coordinates[ 1 ][ 1 ] - coordinates[ 0 ][ 1 ],
+    ab.set( coordinates[ 1 ][ 0 ] - coordinates[ 0 ][ 0 ], coordinates[ 1 ][ 1 ] - coordinates[ 0 ][ 1 ],
             coordinates[ 1 ][ 2 ] - coordinates[ 0 ][ 2 ] );
 
-    ac.set( coordinates[ 2 ][ 0 ] - coordinates[ 0 ][ 0 ],
-            coordinates[ 2 ][ 1 ] - coordinates[ 0 ][ 1 ],
+    ac.set( coordinates[ 2 ][ 0 ] - coordinates[ 0 ][ 0 ], coordinates[ 2 ][ 1 ] - coordinates[ 0 ][ 1 ],
             coordinates[ 2 ][ 2 ] - coordinates[ 0 ][ 2 ] );
 
-    ad.set( coordinates[ 3 ][ 0 ] - coordinates[ 0 ][ 0 ],
-            coordinates[ 3 ][ 1 ] - coordinates[ 0 ][ 1 ],
+    ad.set( coordinates[ 3 ][ 0 ] - coordinates[ 0 ][ 0 ], coordinates[ 3 ][ 1 ] - coordinates[ 0 ][ 1 ],
             coordinates[ 3 ][ 2 ] - coordinates[ 0 ][ 2 ] );
 
     double denominator = ab % ( ac * ad );
@@ -520,20 +479,16 @@ C_FUNC_DEF double v_tet_minimum_angle( int /*num_nodes*/, double coordinates[][ 
     // Determine side vectors
     VerdictVector ab, bc, ad, cd;
 
-    ab.set( coordinates[ 1 ][ 0 ] - coordinates[ 0 ][ 0 ],
-            coordinates[ 1 ][ 1 ] - coordinates[ 0 ][ 1 ],
+    ab.set( coordinates[ 1 ][ 0 ] - coordinates[ 0 ][ 0 ], coordinates[ 1 ][ 1 ] - coordinates[ 0 ][ 1 ],
             coordinates[ 1 ][ 2 ] - coordinates[ 0 ][ 2 ] );
 
-    ad.set( coordinates[ 3 ][ 0 ] - coordinates[ 0 ][ 0 ],
-            coordinates[ 3 ][ 1 ] - coordinates[ 0 ][ 1 ],
+    ad.set( coordinates[ 3 ][ 0 ] - coordinates[ 0 ][ 0 ], coordinates[ 3 ][ 1 ] - coordinates[ 0 ][ 1 ],
             coordinates[ 3 ][ 2 ] - coordinates[ 0 ][ 2 ] );
 
-    bc.set( coordinates[ 2 ][ 0 ] - coordinates[ 1 ][ 0 ],
-            coordinates[ 2 ][ 1 ] - coordinates[ 1 ][ 1 ],
+    bc.set( coordinates[ 2 ][ 0 ] - coordinates[ 1 ][ 0 ], coordinates[ 2 ][ 1 ] - coordinates[ 1 ][ 1 ],
             coordinates[ 2 ][ 2 ] - coordinates[ 1 ][ 2 ] );
 
-    cd.set( coordinates[ 3 ][ 0 ] - coordinates[ 2 ][ 0 ],
-            coordinates[ 3 ][ 1 ] - coordinates[ 2 ][ 1 ],
+    cd.set( coordinates[ 3 ][ 0 ] - coordinates[ 2 ][ 0 ], coordinates[ 3 ][ 1 ] - coordinates[ 2 ][ 1 ],
             coordinates[ 3 ][ 2 ] - coordinates[ 2 ][ 2 ] );
 
     VerdictVector abc = ab * bc;
@@ -573,28 +528,22 @@ C_FUNC_DEF double v_tet_collapse_ratio( int /*num_nodes*/, double coordinates[][
     // Determine side vectors
     VerdictVector e01, e02, e03, e12, e13, e23;
 
-    e01.set( coordinates[ 1 ][ 0 ] - coordinates[ 0 ][ 0 ],
-             coordinates[ 1 ][ 1 ] - coordinates[ 0 ][ 1 ],
+    e01.set( coordinates[ 1 ][ 0 ] - coordinates[ 0 ][ 0 ], coordinates[ 1 ][ 1 ] - coordinates[ 0 ][ 1 ],
              coordinates[ 1 ][ 2 ] - coordinates[ 0 ][ 2 ] );
 
-    e02.set( coordinates[ 2 ][ 0 ] - coordinates[ 0 ][ 0 ],
-             coordinates[ 2 ][ 1 ] - coordinates[ 0 ][ 1 ],
+    e02.set( coordinates[ 2 ][ 0 ] - coordinates[ 0 ][ 0 ], coordinates[ 2 ][ 1 ] - coordinates[ 0 ][ 1 ],
              coordinates[ 2 ][ 2 ] - coordinates[ 0 ][ 2 ] );
 
-    e03.set( coordinates[ 3 ][ 0 ] - coordinates[ 0 ][ 0 ],
-             coordinates[ 3 ][ 1 ] - coordinates[ 0 ][ 1 ],
+    e03.set( coordinates[ 3 ][ 0 ] - coordinates[ 0 ][ 0 ], coordinates[ 3 ][ 1 ] - coordinates[ 0 ][ 1 ],
              coordinates[ 3 ][ 2 ] - coordinates[ 0 ][ 2 ] );
 
-    e12.set( coordinates[ 2 ][ 0 ] - coordinates[ 1 ][ 0 ],
-             coordinates[ 2 ][ 1 ] - coordinates[ 1 ][ 1 ],
+    e12.set( coordinates[ 2 ][ 0 ] - coordinates[ 1 ][ 0 ], coordinates[ 2 ][ 1 ] - coordinates[ 1 ][ 1 ],
              coordinates[ 2 ][ 2 ] - coordinates[ 1 ][ 2 ] );
 
-    e13.set( coordinates[ 3 ][ 0 ] - coordinates[ 1 ][ 0 ],
-             coordinates[ 3 ][ 1 ] - coordinates[ 1 ][ 1 ],
+    e13.set( coordinates[ 3 ][ 0 ] - coordinates[ 1 ][ 0 ], coordinates[ 3 ][ 1 ] - coordinates[ 1 ][ 1 ],
              coordinates[ 3 ][ 2 ] - coordinates[ 1 ][ 2 ] );
 
-    e23.set( coordinates[ 3 ][ 0 ] - coordinates[ 2 ][ 0 ],
-             coordinates[ 3 ][ 1 ] - coordinates[ 2 ][ 1 ],
+    e23.set( coordinates[ 3 ][ 0 ] - coordinates[ 2 ][ 0 ], coordinates[ 3 ][ 1 ] - coordinates[ 2 ][ 1 ],
              coordinates[ 3 ][ 2 ] - coordinates[ 2 ][ 2 ] );
 
     double l[ 6 ];
@@ -660,16 +609,13 @@ C_FUNC_DEF double v_tet_volume( int /*num_nodes*/, double coordinates[][ 3 ] )
     // Determine side vectors
     VerdictVector side0, side2, side3;
 
-    side0.set( coordinates[ 1 ][ 0 ] - coordinates[ 0 ][ 0 ],
-               coordinates[ 1 ][ 1 ] - coordinates[ 0 ][ 1 ],
+    side0.set( coordinates[ 1 ][ 0 ] - coordinates[ 0 ][ 0 ], coordinates[ 1 ][ 1 ] - coordinates[ 0 ][ 1 ],
                coordinates[ 1 ][ 2 ] - coordinates[ 0 ][ 2 ] );
 
-    side2.set( coordinates[ 0 ][ 0 ] - coordinates[ 2 ][ 0 ],
-               coordinates[ 0 ][ 1 ] - coordinates[ 2 ][ 1 ],
+    side2.set( coordinates[ 0 ][ 0 ] - coordinates[ 2 ][ 0 ], coordinates[ 0 ][ 1 ] - coordinates[ 2 ][ 1 ],
                coordinates[ 0 ][ 2 ] - coordinates[ 2 ][ 2 ] );
 
-    side3.set( coordinates[ 3 ][ 0 ] - coordinates[ 0 ][ 0 ],
-               coordinates[ 3 ][ 1 ] - coordinates[ 0 ][ 1 ],
+    side3.set( coordinates[ 3 ][ 0 ] - coordinates[ 0 ][ 0 ], coordinates[ 3 ][ 1 ] - coordinates[ 0 ][ 1 ],
                coordinates[ 3 ][ 2 ] - coordinates[ 0 ][ 2 ] );
 
     return (double)( ( side3 % ( side2 * side0 ) ) / 6.0 );
@@ -689,16 +635,13 @@ C_FUNC_DEF double v_tet_condition( int /*num_nodes*/, double coordinates[][ 3 ] 
 
     VerdictVector side0, side2, side3;
 
-    side0.set( coordinates[ 1 ][ 0 ] - coordinates[ 0 ][ 0 ],
-               coordinates[ 1 ][ 1 ] - coordinates[ 0 ][ 1 ],
+    side0.set( coordinates[ 1 ][ 0 ] - coordinates[ 0 ][ 0 ], coordinates[ 1 ][ 1 ] - coordinates[ 0 ][ 1 ],
                coordinates[ 1 ][ 2 ] - coordinates[ 0 ][ 2 ] );
 
-    side2.set( coordinates[ 0 ][ 0 ] - coordinates[ 2 ][ 0 ],
-               coordinates[ 0 ][ 1 ] - coordinates[ 2 ][ 1 ],
+    side2.set( coordinates[ 0 ][ 0 ] - coordinates[ 2 ][ 0 ], coordinates[ 0 ][ 1 ] - coordinates[ 2 ][ 1 ],
                coordinates[ 0 ][ 2 ] - coordinates[ 2 ][ 2 ] );
 
-    side3.set( coordinates[ 3 ][ 0 ] - coordinates[ 0 ][ 0 ],
-               coordinates[ 3 ][ 1 ] - coordinates[ 0 ][ 1 ],
+    side3.set( coordinates[ 3 ][ 0 ] - coordinates[ 0 ][ 0 ], coordinates[ 3 ][ 1 ] - coordinates[ 0 ][ 1 ],
                coordinates[ 3 ][ 2 ] - coordinates[ 0 ][ 2 ] );
 
     VerdictVector c_1, c_2, c_3;
@@ -708,8 +651,7 @@ C_FUNC_DEF double v_tet_condition( int /*num_nodes*/, double coordinates[][ 3 ] 
     c_3 = ( 3 * side3 + side2 - side0 ) / rt6;
 
     term1 = c_1 % c_1 + c_2 % c_2 + c_3 % c_3;
-    term2 = ( c_1 * c_2 ) % ( c_1 * c_2 ) + ( c_2 * c_3 ) % ( c_2 * c_3 ) +
-            ( c_1 * c_3 ) % ( c_1 * c_3 );
+    term2 = ( c_1 * c_2 ) % ( c_1 * c_2 ) + ( c_2 * c_3 ) % ( c_2 * c_3 ) + ( c_1 * c_3 ) % ( c_1 * c_3 );
     det = c_1 % ( c_2 * c_3 );
 
     if( det <= VERDICT_DBL_MIN )
@@ -729,16 +671,13 @@ C_FUNC_DEF double v_tet_jacobian( int /*num_nodes*/, double coordinates[][ 3 ] )
 {
     VerdictVector side0, side2, side3;
 
-    side0.set( coordinates[ 1 ][ 0 ] - coordinates[ 0 ][ 0 ],
-               coordinates[ 1 ][ 1 ] - coordinates[ 0 ][ 1 ],
+    side0.set( coordinates[ 1 ][ 0 ] - coordinates[ 0 ][ 0 ], coordinates[ 1 ][ 1 ] - coordinates[ 0 ][ 1 ],
                coordinates[ 1 ][ 2 ] - coordinates[ 0 ][ 2 ] );
 
-    side2.set( coordinates[ 0 ][ 0 ] - coordinates[ 2 ][ 0 ],
-               coordinates[ 0 ][ 1 ] - coordinates[ 2 ][ 1 ],
+    side2.set( coordinates[ 0 ][ 0 ] - coordinates[ 2 ][ 0 ], coordinates[ 0 ][ 1 ] - coordinates[ 2 ][ 1 ],
                coordinates[ 0 ][ 2 ] - coordinates[ 2 ][ 2 ] );
 
-    side3.set( coordinates[ 3 ][ 0 ] - coordinates[ 0 ][ 0 ],
-               coordinates[ 3 ][ 1 ] - coordinates[ 0 ][ 1 ],
+    side3.set( coordinates[ 3 ][ 0 ] - coordinates[ 0 ][ 0 ], coordinates[ 3 ][ 1 ] - coordinates[ 0 ][ 1 ],
                coordinates[ 3 ][ 2 ] - coordinates[ 0 ][ 2 ] );
 
     return (double)( side3 % ( side2 * side0 ) );
@@ -757,23 +696,20 @@ C_FUNC_DEF double v_tet_shape( int /*num_nodes*/, double coordinates[][ 3 ] )
 
     VerdictVector edge0, edge2, edge3;
 
-    edge0.set( coordinates[ 1 ][ 0 ] - coordinates[ 0 ][ 0 ],
-               coordinates[ 1 ][ 1 ] - coordinates[ 0 ][ 1 ],
+    edge0.set( coordinates[ 1 ][ 0 ] - coordinates[ 0 ][ 0 ], coordinates[ 1 ][ 1 ] - coordinates[ 0 ][ 1 ],
                coordinates[ 1 ][ 2 ] - coordinates[ 0 ][ 2 ] );
 
-    edge2.set( coordinates[ 0 ][ 0 ] - coordinates[ 2 ][ 0 ],
-               coordinates[ 0 ][ 1 ] - coordinates[ 2 ][ 1 ],
+    edge2.set( coordinates[ 0 ][ 0 ] - coordinates[ 2 ][ 0 ], coordinates[ 0 ][ 1 ] - coordinates[ 2 ][ 1 ],
                coordinates[ 0 ][ 2 ] - coordinates[ 2 ][ 2 ] );
 
-    edge3.set( coordinates[ 3 ][ 0 ] - coordinates[ 0 ][ 0 ],
-               coordinates[ 3 ][ 1 ] - coordinates[ 0 ][ 1 ],
+    edge3.set( coordinates[ 3 ][ 0 ] - coordinates[ 0 ][ 0 ], coordinates[ 3 ][ 1 ] - coordinates[ 0 ][ 1 ],
                coordinates[ 3 ][ 2 ] - coordinates[ 0 ][ 2 ] );
 
     double jacobian = edge3 % ( edge2 * edge0 );
     if( jacobian < VERDICT_DBL_MIN ) { return (double)0.0; }
     double num = 3 * pow( root_of_2 * jacobian, two_thirds );
-    double den = 1.5 * ( edge0 % edge0 + edge2 % edge2 + edge3 % edge3 ) -
-                 ( edge0 % -edge2 + -edge2 % edge3 + edge3 % edge0 );
+    double den =
+        1.5 * ( edge0 % edge0 + edge2 % edge2 + edge3 % edge3 ) - ( edge0 % -edge2 + -edge2 % edge3 + edge3 % edge0 );
 
     if( den < VERDICT_DBL_MIN ) return (double)0.0;
 
@@ -851,8 +787,7 @@ C_FUNC_DEF double v_tet_distortion( int num_nodes, double coordinates[][ 3 ] )
     // create an object of GaussIntegration for tet
     GaussIntegration::initialize( number_of_gauss_points, num_nodes, number_dims, is_tri );
     GaussIntegration::calculate_shape_function_3d_tet( );
-    GaussIntegration::get_shape_func( shape_function[ 0 ], dndy1[ 0 ], dndy2[ 0 ], dndy3[ 0 ],
-                                      weight );
+    GaussIntegration::get_shape_func( shape_function[ 0 ], dndy1[ 0 ], dndy2[ 0 ], dndy3[ 0 ], weight );
 
     // vector xxi is the derivative vector of coordinates w.r.t local xi coordinate in the
     // computation space
@@ -894,8 +829,7 @@ C_FUNC_DEF double v_tet_distortion( int num_nodes, double coordinates[][ 3 ] )
     double dndy2_at_node[ maxNumberNodes ][ maxNumberNodes ];
     double dndy3_at_node[ maxNumberNodes ][ maxNumberNodes ];
 
-    GaussIntegration::calculate_derivative_at_nodes_3d_tet( dndy1_at_node, dndy2_at_node,
-                                                            dndy3_at_node );
+    GaussIntegration::calculate_derivative_at_nodes_3d_tet( dndy1_at_node, dndy2_at_node, dndy3_at_node );
     int node_id;
     for( node_id = 0; node_id < num_nodes; node_id++ )
     {
@@ -922,8 +856,8 @@ C_FUNC_DEF double v_tet_distortion( int num_nodes, double coordinates[][ 3 ] )
 /*!
   the quality metrics of a tet
 */
-C_FUNC_DEF void v_tet_quality( int num_nodes, double coordinates[][ 3 ],
-                               unsigned int metrics_request_flag, TetMetricVals* metric_vals )
+C_FUNC_DEF void v_tet_quality( int num_nodes, double coordinates[][ 3 ], unsigned int metrics_request_flag,
+                               TetMetricVals* metric_vals )
 {
 
     memset( metric_vals, 0, sizeof( TetMetricVals ) );
@@ -950,51 +884,43 @@ C_FUNC_DEF void v_tet_quality( int num_nodes, double coordinates[][ 3 ],
 
     // lets start with making the vectors
     VerdictVector edges[ 6 ];
-    edges[ 0 ].set( coordinates[ 1 ][ 0 ] - coordinates[ 0 ][ 0 ],
-                    coordinates[ 1 ][ 1 ] - coordinates[ 0 ][ 1 ],
+    edges[ 0 ].set( coordinates[ 1 ][ 0 ] - coordinates[ 0 ][ 0 ], coordinates[ 1 ][ 1 ] - coordinates[ 0 ][ 1 ],
                     coordinates[ 1 ][ 2 ] - coordinates[ 0 ][ 2 ] );
 
-    edges[ 1 ].set( coordinates[ 2 ][ 0 ] - coordinates[ 1 ][ 0 ],
-                    coordinates[ 2 ][ 1 ] - coordinates[ 1 ][ 1 ],
+    edges[ 1 ].set( coordinates[ 2 ][ 0 ] - coordinates[ 1 ][ 0 ], coordinates[ 2 ][ 1 ] - coordinates[ 1 ][ 1 ],
                     coordinates[ 2 ][ 2 ] - coordinates[ 1 ][ 2 ] );
 
-    edges[ 2 ].set( coordinates[ 0 ][ 0 ] - coordinates[ 2 ][ 0 ],
-                    coordinates[ 0 ][ 1 ] - coordinates[ 2 ][ 1 ],
+    edges[ 2 ].set( coordinates[ 0 ][ 0 ] - coordinates[ 2 ][ 0 ], coordinates[ 0 ][ 1 ] - coordinates[ 2 ][ 1 ],
                     coordinates[ 0 ][ 2 ] - coordinates[ 2 ][ 2 ] );
 
-    edges[ 3 ].set( coordinates[ 3 ][ 0 ] - coordinates[ 0 ][ 0 ],
-                    coordinates[ 3 ][ 1 ] - coordinates[ 0 ][ 1 ],
+    edges[ 3 ].set( coordinates[ 3 ][ 0 ] - coordinates[ 0 ][ 0 ], coordinates[ 3 ][ 1 ] - coordinates[ 0 ][ 1 ],
                     coordinates[ 3 ][ 2 ] - coordinates[ 0 ][ 2 ] );
 
-    edges[ 4 ].set( coordinates[ 3 ][ 0 ] - coordinates[ 1 ][ 0 ],
-                    coordinates[ 3 ][ 1 ] - coordinates[ 1 ][ 1 ],
+    edges[ 4 ].set( coordinates[ 3 ][ 0 ] - coordinates[ 1 ][ 0 ], coordinates[ 3 ][ 1 ] - coordinates[ 1 ][ 1 ],
                     coordinates[ 3 ][ 2 ] - coordinates[ 1 ][ 2 ] );
 
-    edges[ 5 ].set( coordinates[ 3 ][ 0 ] - coordinates[ 2 ][ 0 ],
-                    coordinates[ 3 ][ 1 ] - coordinates[ 2 ][ 1 ],
+    edges[ 5 ].set( coordinates[ 3 ][ 0 ] - coordinates[ 2 ][ 0 ], coordinates[ 3 ][ 1 ] - coordinates[ 2 ][ 1 ],
                     coordinates[ 3 ][ 2 ] - coordinates[ 2 ][ 2 ] );
 
     // common numbers
     static const double root_of_2 = sqrt( 2.0 );
 
     // calculate the jacobian
-    static const int do_jacobian = V_TET_JACOBIAN | V_TET_VOLUME | V_TET_ASPECT_BETA |
-                                   V_TET_ASPECT_GAMMA | V_TET_SHAPE | V_TET_RELATIVE_SIZE_SQUARED |
-                                   V_TET_SHAPE_AND_SIZE | V_TET_SCALED_JACOBIAN | V_TET_CONDITION;
+    static const int do_jacobian = V_TET_JACOBIAN | V_TET_VOLUME | V_TET_ASPECT_BETA | V_TET_ASPECT_GAMMA |
+                                   V_TET_SHAPE | V_TET_RELATIVE_SIZE_SQUARED | V_TET_SHAPE_AND_SIZE |
+                                   V_TET_SCALED_JACOBIAN | V_TET_CONDITION;
     if( metrics_request_flag & do_jacobian )
     { metric_vals->jacobian = (double)( edges[ 3 ] % ( edges[ 2 ] * edges[ 0 ] ) ); }
 
     // calculate the volume
-    if( metrics_request_flag & V_TET_VOLUME )
-    { metric_vals->volume = (double)( metric_vals->jacobian / 6.0 ); }
+    if( metrics_request_flag & V_TET_VOLUME ) { metric_vals->volume = (double)( metric_vals->jacobian / 6.0 ); }
 
     // calculate aspect ratio
     if( metrics_request_flag & V_TET_ASPECT_BETA )
     {
-        double surface_area =
-            ( ( edges[ 2 ] * edges[ 0 ] ).length( ) + ( edges[ 3 ] * edges[ 0 ] ).length( ) +
-              ( edges[ 4 ] * edges[ 1 ] ).length( ) + ( edges[ 3 ] * edges[ 2 ] ).length( ) ) *
-            0.5;
+        double surface_area = ( ( edges[ 2 ] * edges[ 0 ] ).length( ) + ( edges[ 3 ] * edges[ 0 ] ).length( ) +
+                                ( edges[ 4 ] * edges[ 1 ] ).length( ) + ( edges[ 3 ] * edges[ 2 ] ).length( ) ) *
+                              0.5;
 
         VerdictVector numerator = edges[ 3 ].length_squared( ) * ( edges[ 2 ] * edges[ 0 ] ) +
                                   edges[ 2 ].length_squared( ) * ( edges[ 3 ] * edges[ 0 ] ) +
@@ -1005,8 +931,7 @@ C_FUNC_DEF void v_tet_quality( int num_nodes, double coordinates[][ 3 ],
         if( volume < VERDICT_DBL_MIN )
             metric_vals->aspect_beta = (double)( VERDICT_DBL_MAX );
         else
-            metric_vals->aspect_beta =
-                (double)( numerator.length( ) * surface_area / ( 108 * volume * volume ) );
+            metric_vals->aspect_beta = (double)( numerator.length( ) * surface_area / ( 108 * volume * volume ) );
     }
 
     // calculate the aspect gamma
@@ -1017,10 +942,10 @@ C_FUNC_DEF void v_tet_quality( int num_nodes, double coordinates[][ 3 ],
             metric_vals->aspect_gamma = VERDICT_DBL_MAX;
         else
         {
-            double srms = sqrt( ( edges[ 0 ].length_squared( ) + edges[ 1 ].length_squared( ) +
-                                  edges[ 2 ].length_squared( ) + edges[ 3 ].length_squared( ) +
-                                  edges[ 4 ].length_squared( ) + edges[ 5 ].length_squared( ) ) /
-                                6.0 );
+            double srms =
+                sqrt( ( edges[ 0 ].length_squared( ) + edges[ 1 ].length_squared( ) + edges[ 2 ].length_squared( ) +
+                        edges[ 3 ].length_squared( ) + edges[ 4 ].length_squared( ) + edges[ 5 ].length_squared( ) ) /
+                      6.0 );
 
             // cube the srms
             srms *= ( srms * srms );
@@ -1037,10 +962,8 @@ C_FUNC_DEF void v_tet_quality( int num_nodes, double coordinates[][ 3 ],
         {
             static const double two_thirds = 2.0 / 3.0;
             double              num = 3.0 * pow( root_of_2 * metric_vals->jacobian, two_thirds );
-            double              den =
-                1.5 * ( edges[ 0 ] % edges[ 0 ] + edges[ 2 ] % edges[ 2 ] +
-                        edges[ 3 ] % edges[ 3 ] ) -
-                ( edges[ 0 ] % -edges[ 2 ] + -edges[ 2 ] % edges[ 3 ] + edges[ 3 ] % edges[ 0 ] );
+            double den = 1.5 * ( edges[ 0 ] % edges[ 0 ] + edges[ 2 ] % edges[ 2 ] + edges[ 3 ] % edges[ 3 ] ) -
+                         ( edges[ 0 ] % -edges[ 2 ] + -edges[ 2 ] % edges[ 3 ] + edges[ 3 ] % edges[ 0 ] );
 
             if( den < VERDICT_DBL_MIN )
                 metric_vals->shape = (double)0.0;
@@ -1073,24 +996,18 @@ C_FUNC_DEF void v_tet_quality( int num_nodes, double coordinates[][ 3 ],
 
     // calculate the shape and size
     if( metrics_request_flag & V_TET_SHAPE_AND_SIZE )
-    {
-        metric_vals->shape_and_size =
-            (double)( metric_vals->shape * metric_vals->relative_size_squared );
-    }
+    { metric_vals->shape_and_size = (double)( metric_vals->shape * metric_vals->relative_size_squared ); }
 
     // calculate the scaled jacobian
     if( metrics_request_flag & V_TET_SCALED_JACOBIAN )
     {
         // find out which node the normalized jacobian can be calculated at
         // and it will be the smaller than at other nodes
-        double length_squared[ 4 ] = { edges[ 0 ].length_squared( ) * edges[ 2 ].length_squared( ) *
-                                           edges[ 3 ].length_squared( ),
-                                       edges[ 0 ].length_squared( ) * edges[ 1 ].length_squared( ) *
-                                           edges[ 4 ].length_squared( ),
-                                       edges[ 1 ].length_squared( ) * edges[ 2 ].length_squared( ) *
-                                           edges[ 5 ].length_squared( ),
-                                       edges[ 3 ].length_squared( ) * edges[ 4 ].length_squared( ) *
-                                           edges[ 5 ].length_squared( ) };
+        double length_squared[ 4 ] = {
+            edges[ 0 ].length_squared( ) * edges[ 2 ].length_squared( ) * edges[ 3 ].length_squared( ),
+            edges[ 0 ].length_squared( ) * edges[ 1 ].length_squared( ) * edges[ 4 ].length_squared( ),
+            edges[ 1 ].length_squared( ) * edges[ 2 ].length_squared( ) * edges[ 5 ].length_squared( ),
+            edges[ 3 ].length_squared( ) * edges[ 4 ].length_squared( ) * edges[ 5 ].length_squared( ) };
 
         int which_node = 0;
         if( length_squared[ 1 ] > length_squared[ which_node ] ) which_node = 1;
@@ -1099,14 +1016,12 @@ C_FUNC_DEF void v_tet_quality( int num_nodes, double coordinates[][ 3 ],
 
         // find the scaled jacobian at this node
         double length_product = sqrt( length_squared[ which_node ] );
-        if( length_product < fabs( metric_vals->jacobian ) )
-            length_product = fabs( metric_vals->jacobian );
+        if( length_product < fabs( metric_vals->jacobian ) ) length_product = fabs( metric_vals->jacobian );
 
         if( length_product < VERDICT_DBL_MIN )
             metric_vals->scaled_jacobian = (double)VERDICT_DBL_MAX;
         else
-            metric_vals->scaled_jacobian =
-                (double)( root_of_2 * metric_vals->jacobian / length_product );
+            metric_vals->scaled_jacobian = (double)( root_of_2 * metric_vals->jacobian / length_product );
     }
 
     // calculate the condition number
@@ -1121,8 +1036,7 @@ C_FUNC_DEF void v_tet_quality( int num_nodes, double coordinates[][ 3 ],
         c_3 = ( 3 * edges[ 3 ] + edges[ 2 ] - edges[ 0 ] ) / root_of_6;
 
         double term1 = c_1 % c_1 + c_2 % c_2 + c_3 % c_3;
-        double term2 = ( c_1 * c_2 ) % ( c_1 * c_2 ) + ( c_2 * c_3 ) % ( c_2 * c_3 ) +
-                       ( c_3 * c_1 ) % ( c_3 * c_1 );
+        double term2 = ( c_1 * c_2 ) % ( c_1 * c_2 ) + ( c_2 * c_3 ) % ( c_2 * c_3 ) + ( c_3 * c_1 ) % ( c_3 * c_1 );
 
         double det = c_1 % ( c_2 * c_3 );
 
@@ -1140,25 +1054,20 @@ C_FUNC_DEF void v_tet_quality( int num_nodes, double coordinates[][ 3 ],
     if( metrics_request_flag & V_TET_ASPECT_BETA )
     {
         if( metric_vals->aspect_beta > 0 )
-            metric_vals->aspect_beta =
-                (double)VERDICT_MIN( metric_vals->aspect_beta, VERDICT_DBL_MAX );
-        metric_vals->aspect_beta =
-            (double)VERDICT_MAX( metric_vals->aspect_beta, -VERDICT_DBL_MAX );
+            metric_vals->aspect_beta = (double)VERDICT_MIN( metric_vals->aspect_beta, VERDICT_DBL_MAX );
+        metric_vals->aspect_beta = (double)VERDICT_MAX( metric_vals->aspect_beta, -VERDICT_DBL_MAX );
     }
 
     if( metrics_request_flag & V_TET_ASPECT_GAMMA )
     {
         if( metric_vals->aspect_gamma > 0 )
-            metric_vals->aspect_gamma =
-                (double)VERDICT_MIN( metric_vals->aspect_gamma, VERDICT_DBL_MAX );
-        metric_vals->aspect_gamma =
-            (double)VERDICT_MAX( metric_vals->aspect_gamma, -VERDICT_DBL_MAX );
+            metric_vals->aspect_gamma = (double)VERDICT_MIN( metric_vals->aspect_gamma, VERDICT_DBL_MAX );
+        metric_vals->aspect_gamma = (double)VERDICT_MAX( metric_vals->aspect_gamma, -VERDICT_DBL_MAX );
     }
 
     if( metrics_request_flag & V_TET_VOLUME )
     {
-        if( metric_vals->volume > 0 )
-            metric_vals->volume = (double)VERDICT_MIN( metric_vals->volume, VERDICT_DBL_MAX );
+        if( metric_vals->volume > 0 ) metric_vals->volume = (double)VERDICT_MIN( metric_vals->volume, VERDICT_DBL_MAX );
         metric_vals->volume = (double)VERDICT_MAX( metric_vals->volume, -VERDICT_DBL_MAX );
     }
 
@@ -1179,16 +1088,13 @@ C_FUNC_DEF void v_tet_quality( int num_nodes, double coordinates[][ 3 ],
     if( metrics_request_flag & V_TET_SCALED_JACOBIAN )
     {
         if( metric_vals->scaled_jacobian > 0 )
-            metric_vals->scaled_jacobian =
-                (double)VERDICT_MIN( metric_vals->scaled_jacobian, VERDICT_DBL_MAX );
-        metric_vals->scaled_jacobian =
-            (double)VERDICT_MAX( metric_vals->scaled_jacobian, -VERDICT_DBL_MAX );
+            metric_vals->scaled_jacobian = (double)VERDICT_MIN( metric_vals->scaled_jacobian, VERDICT_DBL_MAX );
+        metric_vals->scaled_jacobian = (double)VERDICT_MAX( metric_vals->scaled_jacobian, -VERDICT_DBL_MAX );
     }
 
     if( metrics_request_flag & V_TET_SHAPE )
     {
-        if( metric_vals->shape > 0 )
-            metric_vals->shape = (double)VERDICT_MIN( metric_vals->shape, VERDICT_DBL_MAX );
+        if( metric_vals->shape > 0 ) metric_vals->shape = (double)VERDICT_MIN( metric_vals->shape, VERDICT_DBL_MAX );
         metric_vals->shape = (double)VERDICT_MAX( metric_vals->shape, -VERDICT_DBL_MAX );
     }
 
@@ -1204,32 +1110,26 @@ C_FUNC_DEF void v_tet_quality( int num_nodes, double coordinates[][ 3 ],
     if( metrics_request_flag & V_TET_SHAPE_AND_SIZE )
     {
         if( metric_vals->shape_and_size > 0 )
-            metric_vals->shape_and_size =
-                (double)VERDICT_MIN( metric_vals->shape_and_size, VERDICT_DBL_MAX );
-        metric_vals->shape_and_size =
-            (double)VERDICT_MAX( metric_vals->shape_and_size, -VERDICT_DBL_MAX );
+            metric_vals->shape_and_size = (double)VERDICT_MIN( metric_vals->shape_and_size, VERDICT_DBL_MAX );
+        metric_vals->shape_and_size = (double)VERDICT_MAX( metric_vals->shape_and_size, -VERDICT_DBL_MAX );
     }
 
     if( metrics_request_flag & V_TET_DISTORTION )
     {
         if( metric_vals->distortion > 0 )
-            metric_vals->distortion =
-                (double)VERDICT_MIN( metric_vals->distortion, VERDICT_DBL_MAX );
+            metric_vals->distortion = (double)VERDICT_MIN( metric_vals->distortion, VERDICT_DBL_MAX );
         metric_vals->distortion = (double)VERDICT_MAX( metric_vals->distortion, -VERDICT_DBL_MAX );
     }
 
-    if( metrics_request_flag & V_TET_ASPECT_RATIO )
-        metric_vals->aspect_ratio = v_tet_aspect_ratio( 4, coordinates );
+    if( metrics_request_flag & V_TET_ASPECT_RATIO ) metric_vals->aspect_ratio = v_tet_aspect_ratio( 4, coordinates );
 
     if( metrics_request_flag & V_TET_ASPECT_FROBENIUS )
         metric_vals->aspect_frobenius = v_tet_aspect_frobenius( 4, coordinates );
 
-    if( metrics_request_flag & V_TET_MINIMUM_ANGLE )
-        metric_vals->minimum_angle = v_tet_minimum_angle( 4, coordinates );
+    if( metrics_request_flag & V_TET_MINIMUM_ANGLE ) metric_vals->minimum_angle = v_tet_minimum_angle( 4, coordinates );
 
     if( metrics_request_flag & V_TET_COLLAPSE_RATIO )
         metric_vals->collapse_ratio = v_tet_collapse_ratio( 4, coordinates );
 
-    if( metrics_request_flag & V_TET_RADIUS_RATIO )
-        metric_vals->radius_ratio = v_tet_radius_ratio( 4, coordinates );
+    if( metrics_request_flag & V_TET_RADIUS_RATIO ) metric_vals->radius_ratio = v_tet_radius_ratio( 4, coordinates );
 }

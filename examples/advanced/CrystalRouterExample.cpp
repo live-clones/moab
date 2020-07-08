@@ -83,13 +83,11 @@ int main( int argc, char** argv )
 
     // How many procs communicate to current proc, on average (we will vary that too)
     int num_comms = 2;
-    opts.addOpt< int >(
-        "num_comms,n", "each task will send to about num_comms other tasks some tuples (default 2)",
-        &num_comms );
+    opts.addOpt< int >( "num_comms,n", "each task will send to about num_comms other tasks some tuples (default 2)",
+                        &num_comms );
 
     int num_tuples = 4;
-    opts.addOpt< int >( "num_tuples,t",
-                        "each task will send to some task about num_tuples tuples (default 4)",
+    opts.addOpt< int >( "num_tuples,t", "each task will send to some task about num_tuples tuples (default 4)",
                         &num_tuples );
 
     int reportrank = size + 1;
@@ -176,14 +174,13 @@ int main( int argc, char** argv )
         long valrec = tl.vl_rd[ i ];
         int  remainder = valrec - 100000 * rank - 1000 * from;
         if( remainder < 0 || remainder >= num_tuples * 4 )
-            cout << " error: tuple " << i << " received at proc rank " << rank << " from proc "
-                 << from << " has value " << valrec << " remainder " << remainder << "\n";
+            cout << " error: tuple " << i << " received at proc rank " << rank << " from proc " << from << " has value "
+                 << valrec << " remainder " << remainder << "\n";
     }
 
     if( rank == reportrank || ( reportrank >= size && 0 == rank ) )
     {
-        cout << "communication of about " << total_n_tuples << " tuples/per proc took " << secs
-             << " seconds"
+        cout << "communication of about " << total_n_tuples << " tuples/per proc took " << secs << " seconds"
              << "\n";
         tt = clock( );
     }

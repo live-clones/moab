@@ -41,8 +41,8 @@ int main( int argc, char** argv )
 
     if( argc > 4 ) layer_thick = atof( argv[ 4 ] );
 
-    std::cout << "Run: " << argv[ 0 ] << " " << test_file_name << " " << output << " " << layers
-              << " " << layer_thick << "\n";
+    std::cout << "Run: " << argv[ 0 ] << " " << test_file_name << " " << output << " " << layers << " " << layer_thick
+              << "\n";
     // Load the mesh from vtk file
     ErrorCode rval = mb->load_mesh( test_file_name.c_str( ) );MB_CHK_ERR( rval );
 
@@ -147,8 +147,7 @@ int main( int argc, char** argv )
             for( int i = 0; i < num_nodes; i++ )
                 newConn[ i ] = newVerts[ ii + 1 ][ indexVerts[ i ] ];  // vertices in layer ii+1
 
-            rval = mb->create_element( MBPOLYGON, newConn, num_nodes,
-                                       allPolygons[ nfaces * ( ii + 1 ) + j ] );MB_CHK_ERR( rval );
+            rval = mb->create_element( MBPOLYGON, newConn, num_nodes, allPolygons[ nfaces * ( ii + 1 ) + j ] );MB_CHK_ERR( rval );
 
             // now create a polyhedra with top, bottom and lateral swept faces
             // first face is the bottom

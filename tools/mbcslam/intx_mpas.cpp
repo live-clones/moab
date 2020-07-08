@@ -54,8 +54,7 @@ ErrorCode manufacture_lagrange_mesh_on_sphere( Interface* mb, EntityHandle euler
 
     Tag         tagh = 0;
     std::string tag_name( "DP" );
-    rval = mb->tag_get_handle( tag_name.c_str( ), 3, MB_TYPE_DOUBLE, tagh,
-                               MB_TAG_DENSE | MB_TAG_CREAT );CHECK_ERR( rval );
+    rval = mb->tag_get_handle( tag_name.c_str( ), 3, MB_TYPE_DOUBLE, tagh, MB_TAG_DENSE | MB_TAG_CREAT );CHECK_ERR( rval );
     void* data;  // pointer to the LOC in memory, for each vertex
     int   count;
 
@@ -78,11 +77,9 @@ ErrorCode manufacture_lagrange_mesh_on_sphere( Interface* mb, EntityHandle euler
         // do some mumbo jumbo, as in python script
         IntxUtils::SphereCoords sphCoord = IntxUtils::cart_to_spherical( posi );
         double                  lat1 = sphCoord.lat - 2 * M_PI * t / T;  // 0.1/5
-        double                  uu =
-            3 * radius / T * pow( sin( lat1 ), 2 ) * sin( 2 * sphCoord.lon ) * cos( M_PI * t / T );
+        double uu = 3 * radius / T * pow( sin( lat1 ), 2 ) * sin( 2 * sphCoord.lon ) * cos( M_PI * t / T );
         uu += 2 * radius * M_PI * cos( sphCoord.lon ) / T;
-        double vv =
-            3 * radius / T * ( sin( 2 * lat1 ) ) * cos( sphCoord.lon ) * cos( M_PI * t / T );
+        double vv = 3 * radius / T * ( sin( 2 * lat1 ) ) * cos( sphCoord.lon ) * cos( M_PI * t / T );
         double vx = -uu * sin( sphCoord.lon ) - vv * sin( sphCoord.lat ) * cos( sphCoord.lon );
         double vy = -uu * cos( sphCoord.lon ) - vv * sin( sphCoord.lat ) * sin( sphCoord.lon );
         double vz = vv * cos( sphCoord.lat );
@@ -120,8 +117,7 @@ int main( int argc, char** argv )
             if( !strcmp( argv[ index ], "-dt" ) ) { delta_t = atof( argv[ ++index ] ); }
             if( !strcmp( argv[ index ], "-input" ) ) { filename_mesh1 = argv[ ++index ]; }
             if( !strcmp( argv[ index ], "-R" ) ) { radius = atof( argv[ ++index ] ); }
-            if( !strcmp( argv[ index ], "-O" ) )
-            { extra_read_opts = std::string( argv[ ++index ] ); }
+            if( !strcmp( argv[ index ], "-O" ) ) { extra_read_opts = std::string( argv[ ++index ] ); }
             if( !strcmp( argv[ index ], "-FF" ) ) { flux_form = true; }
             if( !strcmp( argv[ index ], "-v" ) ) { Verbose = true; }
             if( !strcmp( argv[ index ], "-t" ) ) { t = atof( argv[ ++index ] ); }
@@ -137,8 +133,7 @@ int main( int argc, char** argv )
     }
     // start copy
     std::string opts = std::string( "PARALLEL=READ_PART;PARTITION_METHOD=RCBZOLTAN" ) +
-                       std::string( ";PARALLEL_RESOLVE_SHARED_ENTS;VARIABLE=;NO_EDGES;" ) +
-                       extra_read_opts;
+                       std::string( ";PARALLEL_RESOLVE_SHARED_ENTS;VARIABLE=;NO_EDGES;" ) + extra_read_opts;
     Core         moab;
     Interface&   mb = moab;
     EntityHandle euler_set;
@@ -157,8 +152,8 @@ int main( int argc, char** argv )
     int procs = pcomm->proc_config( ).proc_size( );
 
     if( 0 == rank )
-        std::cout << " case 1: use -gtol " << gtol << " -dt " << delta_t << " -R " << radius
-                  << " -input " << filename_mesh1 << " -t " << t << " -rot " << rot << "\n";
+        std::cout << " case 1: use -gtol " << gtol << " -dt " << delta_t << " -R " << radius << " -input "
+                  << filename_mesh1 << " -t " << t << " -rot " << rot << "\n";
 
     if( 0 == rank )
     {
@@ -186,9 +181,8 @@ int main( int argc, char** argv )
     worker.set_parallel_comm( pcomm );
     if( 0 == rank )
     {
-        std::cout << "manufacture departure mesh " << filename_mesh1 << "\n  on " << procs
-                  << " processors in " << ( clock( ) - tt ) / (double)CLOCKS_PER_SEC << " seconds"
-                  << std::endl;
+        std::cout << "manufacture departure mesh " << filename_mesh1 << "\n  on " << procs << " processors in "
+                  << ( clock( ) - tt ) / (double)CLOCKS_PER_SEC << " seconds" << std::endl;
         tt = clock( );
     }
     rval = worker.FindMaxEdges( euler_set, euler_set );CHECK_ERR( rval );
@@ -226,8 +220,8 @@ int main( int argc, char** argv )
 
     if( 0 == rank )
     {
-        std::cout << "intersect meshes in " << procs << " processors in "
-                  << ( clock( ) - tt ) / (double)CLOCKS_PER_SEC << " seconds" << std::endl;
+        std::cout << "intersect meshes in " << procs << " processors in " << ( clock( ) - tt ) / (double)CLOCKS_PER_SEC
+                  << " seconds" << std::endl;
         tt = clock( );
     }
     if( Verbose && rank <= 4 )
@@ -244,8 +238,7 @@ int main( int argc, char** argv )
         moab::IntxAreaUtils areaAdaptor;
         double              intx_area = areaAdaptor.area_on_sphere( &mb, outputSet, radius );
         double              arrival_area = areaAdaptor.area_on_sphere( &mb, euler_set, radius );
-        std::cout << "On proc " << rank << "  arrival area: " << arrival_area
-                  << "  intersection area:" << intx_area
+        std::cout << "On proc " << rank << "  arrival area: " << arrival_area << "  intersection area:" << intx_area
                   << " rel error: " << fabs( ( intx_area - arrival_area ) / arrival_area ) << "\n";
     }
 

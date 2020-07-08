@@ -50,18 +50,15 @@ class MESQUITE_EXPORT Instruction
     //! Called for all instructions in queue before loop_over_mesh
     //! is called for any insetruction in queue.  Default behavior
     //! is to do nothing.
-    virtual void initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
-                                   MsqError& err ) = 0;
+    virtual void initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings, MsqError& err ) = 0;
 
     //! Virtual fuction implementing primary functionaliy of
     //! instruction instance.
-    virtual double loop_over_mesh( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
-                                   MsqError& err ) = 0;
+    virtual double loop_over_mesh( MeshDomainAssoc* mesh_and_domain, const Settings* settings, MsqError& err ) = 0;
 
     //! Virtual fuction implementing primary functionaliy of
     //! instruction instance for parallel mesh.
-    virtual double loop_over_mesh( ParallelMesh* mesh, MeshDomain* domain, const Settings* settings,
-                                   MsqError& err );
+    virtual double loop_over_mesh( ParallelMesh* mesh, MeshDomain* domain, const Settings* settings, MsqError& err );
 
     //! Get string name for use in diagnostic and status output
     virtual std::string get_name( ) const = 0;
@@ -72,8 +69,7 @@ class MESQUITE_EXPORT Instruction
     //! MSQ_CULLED flag on all vertices.
     //! \NOTE SLAVE_ALL setting is handled in PatchData rather than here
     //! for efficiency.
-    static void initialize_vertex_byte( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
-                                        MsqError& err );
+    static void initialize_vertex_byte( MeshDomainAssoc* mesh_and_domain, const Settings* settings, MsqError& err );
 };
 
 }  // namespace MBMesquite

@@ -36,17 +36,14 @@ ReadTemplate::~ReadTemplate( )
 }
 
 ErrorCode ReadTemplate::read_tag_values( const char* /* file_name */, const char* /* tag_name */,
-                                         const FileOptions& /* opts */,
-                                         std::vector< int >& /* tag_values_out */,
+                                         const FileOptions& /* opts */, std::vector< int >& /* tag_values_out */,
                                          const SubsetList* /* subset_list */ )
 {
     return MB_NOT_IMPLEMENTED;
 }
 
-ErrorCode ReadTemplate::load_file( const char* filename, const EntityHandle* file_set,
-                                   const FileOptions&             opts,
-                                   const ReaderIface::SubsetList* subset_list,
-                                   const Tag* /*file_id_tag*/ )
+ErrorCode ReadTemplate::load_file( const char* filename, const EntityHandle* file_set, const FileOptions& opts,
+                                   const ReaderIface::SubsetList* subset_list, const Tag* /*file_id_tag*/ )
 {
     if( subset_list )
     {
@@ -131,8 +128,7 @@ ErrorCode ReadTemplate::read_vertices( int num_verts, EntityHandle& start_vertex
     // start_handle, and the reader is passed back double*'s pointing to MOAB's native storage for
     // vertex coordinates for those verts
     std::vector< double* > coord_arrays;
-    ErrorCode              result =
-        readMeshIface->get_node_coords( 3, num_verts, 1, start_vertex, coord_arrays );MB_CHK_SET_ERR( result, fileName << ": Trouble reading vertices" );
+    ErrorCode              result = readMeshIface->get_node_coords( 3, num_verts, 1, start_vertex, coord_arrays );MB_CHK_SET_ERR( result, fileName << ": Trouble reading vertices" );
 
     // Fill in vertex coordinate arrays
     double *x = coord_arrays[ 0 ], *y = coord_arrays[ 1 ], *z = coord_arrays[ 2 ];
@@ -148,8 +144,8 @@ ErrorCode ReadTemplate::read_vertices( int num_verts, EntityHandle& start_vertex
 }
 
 //! Read/create elements
-ErrorCode ReadTemplate::read_elements( int num_elems, EntityHandle start_vertex,
-                                       EntityHandle& start_elem, Range& read_ents )
+ErrorCode ReadTemplate::read_elements( int num_elems, EntityHandle start_vertex, EntityHandle& start_elem,
+                                       Range& read_ents )
 {
     // Get the entity type being read
     EntityType ent_type = MBHEX;
@@ -160,8 +156,8 @@ ErrorCode ReadTemplate::read_elements( int num_elems, EntityHandle start_vertex,
     // Create the element sequence; passes back a pointer to the internal storage for connectivity
     // and the starting entity handle
     EntityHandle* conn_array;
-    ErrorCode result = readMeshIface->get_element_connect( num_elems, verts_per_elem, ent_type, 1,
-                                                           start_elem, conn_array );MB_CHK_SET_ERR( result, fileName << ": Trouble reading elements" );
+    ErrorCode     result =
+        readMeshIface->get_element_connect( num_elems, verts_per_elem, ent_type, 1, start_elem, conn_array );MB_CHK_SET_ERR( result, fileName << ": Trouble reading elements" );
 
     // Read connectivity into conn_array directly
     for( long i = 0; i < num_elems; i++ )
@@ -198,8 +194,7 @@ ErrorCode ReadTemplate::read_elements( int num_elems, EntityHandle start_vertex,
 
 //! Read/create sets
 ErrorCode ReadTemplate::create_sets( int num_sets, EntityHandle /*start_vertex*/, int /*num_verts*/,
-                                     EntityHandle /*start_elem*/, int /*num_elems*/,
-                                     Range& read_ents )
+                                     EntityHandle /*start_elem*/, int /*num_elems*/, Range& read_ents )
 {
     ErrorCode    result = MB_SUCCESS;
     EntityHandle this_set;

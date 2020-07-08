@@ -38,7 +38,7 @@ void test_tet( )
 
 void test_hex( )
 {
-    double   positions[] = { 236.80706050970281, -139.55422526228017, 193.27999999999997,
+    double                  positions[] = { 236.80706050970281, -139.55422526228017, 193.27999999999997,
                            236.47511729348639, -141.33020962638582, 193.27999999999997,
                            237.8457938295229,  -142.57076074835663, 193.27999999999997,
                            239.12702305519684, -139.96608933577852, 193.27999999999997,
@@ -46,7 +46,7 @@ void test_hex( )
                            236.47655014713746, -141.32980272396816, 202.654,
                            237.8477913707564,  -142.57047282187165, 202.654,
                            239.12865103844533, -139.96531051891105, 202.654 };
-    CartVect x( 235.96518686964933, -142.43503000077749, 188.19999999999987 );
+    CartVect                x( 235.96518686964933, -142.43503000077749, 188.19999999999987 );
     std::vector< CartVect > vertices;
     for( int i = 0; i < 8; i++ )
         vertices.push_back( CartVect( positions + 3 * i ) );
@@ -112,8 +112,7 @@ void test_spectral_hex( )
         delete mb;
         return;
     }
-    rval =
-        mb->get_entities_by_type_and_tag( 0, moab::MBENTITYSET, &sem_tag, NULL, 1, spectral_sets );
+    rval = mb->get_entities_by_type_and_tag( 0, moab::MBENTITYSET, &sem_tag, NULL, 1, spectral_sets );
     if( moab::MB_SUCCESS != rval || spectral_sets.empty( ) )
     {
         std::cout << "can't get sem set\n";
@@ -326,10 +325,9 @@ void test_spherical_quad( )
     // example from one coupler test, run like this
     // ./mbcoupler_test -meshes sphere_16p.h5m mpas_p8.h5m -itag vertex_field -meth 4 -outfile
     // dd.h5m method 4 is spherical
-    double   positions[] = { -0.88882388032987436, -0.069951956448441419, 0.45287838714646161,
-                           -0.88226455385461389, -0.13973697758043971,  0.4495362433757738,
-                           -0.84497006020160348, -0.13383011007602069,  0.51779831884618843,
-                           -0.85072691325794214, -0.066953660115039074, 0.52132612293631853 };
+    double   positions[] = { -0.88882388032987436, -0.069951956448441419, 0.45287838714646161,   -0.88226455385461389,
+                           -0.13973697758043971, 0.4495362433757738,    -0.84497006020160348,  -0.13383011007602069,
+                           0.51779831884618843,  -0.85072691325794214,  -0.066953660115039074, 0.52132612293631853 };
     CartVect x( -0.85408569769999998, -0.12391301439999999, 0.50515659540000002 );
     std::vector< CartVect > vertices;
     for( int i = 0; i < 4; i++ )
@@ -375,8 +373,7 @@ void test_linear_tri( )
         std::cout << x << " :" << nat_par << "\n";
     }
 
-    double positions2[] = { -0.866026, -0.500001, 0.,         0.866026, -0.500001,
-                            0.,        0.000000,  100.000000, 0. };
+    double positions2[] = { -0.866026, -0.500001, 0., 0.866026, -0.500001, 0., 0.000000, 100.000000, 0. };
     x = CartVect( 0, 0, 0 );
     std::vector< CartVect > vertices2;
     for( int i = 0; i < 3; i++ )
@@ -390,8 +387,7 @@ void test_linear_tri( )
         std::cout << x << " :" << nat_par << "\n";
     }
 
-    std::cout << "vertices2 " << vertices2[ 0 ] << " " << vertices2[ 1 ] << " " << vertices2[ 2 ]
-              << "\n";
+    std::cout << "vertices2 " << vertices2[ 0 ] << " " << vertices2[ 1 ] << " " << vertices2[ 2 ] << "\n";
 
     x = CartVect( -0.866026, -0.500001, 0. );
     std::cout << x << " :" << tri2.ievaluate( x ) << "\n";
@@ -409,10 +405,10 @@ void test_spherical_tri( )
     // example from one coupler test, run like this
     // ./mbcoupler_test -meshes  tri_fl_8p.h5m mpas_p8.h5m -itag vertex_field -meth 4  -outfile
     // oo.h5m -eps 1.e-9 method 4 is spherical
-    double   positions[] = { -0.86339258282987197, -0.17004443185241255,  0.47501383044112816,
+    double                  positions[] = { -0.86339258282987197, -0.17004443185241255,  0.47501383044112816,
                            -0.80777478326268271, -0.15172299908552511,  0.5696314870803928,
                            -0.8655618847392077,  -0.061613422011313854, 0.49699739427361828 };
-    CartVect x( -0.85408569769999998, -0.12391301439999999, 0.50515659540000002 );
+    CartVect                x( -0.85408569769999998, -0.12391301439999999, 0.50515659540000002 );
     std::vector< CartVect > vertices;
     for( int i = 0; i < 3; i++ )
         vertices.push_back( CartVect( positions + 3 * i ) );

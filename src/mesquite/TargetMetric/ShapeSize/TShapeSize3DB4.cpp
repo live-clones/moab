@@ -60,8 +60,8 @@ bool TShapeSize3DB4::evaluate( const MsqMatrix< 3, 3 >& T, double& result, MsqEr
     return true;
 }
 
-bool TShapeSize3DB4::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& result,
-                                         MsqMatrix< 3, 3 >& deriv, MsqError& err )
+bool TShapeSize3DB4::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& result, MsqMatrix< 3, 3 >& deriv,
+                                         MsqError& err )
 {
     const double tau = det( T );
     if( invalid_determinant( tau ) )
@@ -82,9 +82,8 @@ bool TShapeSize3DB4::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& res
     return true;
 }
 
-bool TShapeSize3DB4::evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result,
-                                         MsqMatrix< 3, 3 >& deriv, MsqMatrix< 3, 3 > second[ 6 ],
-                                         MsqError& err )
+bool TShapeSize3DB4::evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result, MsqMatrix< 3, 3 >& deriv,
+                                         MsqMatrix< 3, 3 > second[ 6 ], MsqError& err )
 {
     const double tau = det( T );
     if( invalid_determinant( tau ) )
@@ -111,14 +110,12 @@ bool TShapeSize3DB4::evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& res
         set_scaled_outer_product( second, h * inv_norm, T );
         pluseq_scaled_I( second, norm * h );
         pluseq_scaled_2nd_deriv_of_det( second, g1 - f * g * inv_tau, T );
-        pluseq_scaled_outer_product( second, ( f * g + mGamma * inv_tau ) * 2 * inv_tau * inv_tau,
-                                     adjt );
+        pluseq_scaled_outer_product( second, ( f * g + mGamma * inv_tau ) * 2 * inv_tau * inv_tau, adjt );
         pluseq_scaled_sum_outer_product( second, -g * inv_tau, T, adjt );
     }
     else
     {
-        std::cout << "Warning: Division by zero avoided in TShapeSize3DB4::evaluate_with_hess()"
-                  << std::endl;
+        std::cout << "Warning: Division by zero avoided in TShapeSize3DB4::evaluate_with_hess()" << std::endl;
     }
 
     return true;

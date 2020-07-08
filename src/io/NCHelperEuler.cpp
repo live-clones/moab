@@ -24,29 +24,24 @@ bool NCHelperEuler::can_read_file( ReadNC* readNC, int fileId )
 
     // If dimension names "lon" AND "lat' exist then it could be either the Eulerian Spectral grid
     // or the FV grid
-    if( ( std::find( dimNames.begin( ), dimNames.end( ), std::string( "lon" ) ) !=
-          dimNames.end( ) ) &&
-        ( std::find( dimNames.begin( ), dimNames.end( ), std::string( "lat" ) ) !=
-          dimNames.end( ) ) )
+    if( ( std::find( dimNames.begin( ), dimNames.end( ), std::string( "lon" ) ) != dimNames.end( ) ) &&
+        ( std::find( dimNames.begin( ), dimNames.end( ), std::string( "lat" ) ) != dimNames.end( ) ) )
     {
         // If dimension names "lon" AND "lat" AND "slon" AND "slat" exist then it should be the FV
         // grid
-        if( ( std::find( dimNames.begin( ), dimNames.end( ), std::string( "slon" ) ) !=
-              dimNames.end( ) ) &&
-            ( std::find( dimNames.begin( ), dimNames.end( ), std::string( "slat" ) ) !=
-              dimNames.end( ) ) )
+        if( ( std::find( dimNames.begin( ), dimNames.end( ), std::string( "slon" ) ) != dimNames.end( ) ) &&
+            ( std::find( dimNames.begin( ), dimNames.end( ), std::string( "slat" ) ) != dimNames.end( ) ) )
             return false;
 
         // Make sure it is CAM grid
-        std::map< std::string, ReadNC::AttData >::iterator attIt =
-            readNC->globalAtts.find( "source" );
+        std::map< std::string, ReadNC::AttData >::iterator attIt = readNC->globalAtts.find( "source" );
         if( attIt == readNC->globalAtts.end( ) ) return false;
         unsigned int sz = attIt->second.attLen;
         std::string  att_data;
         att_data.resize( sz + 1 );
         att_data[ sz ] = '\000';
-        int success = NCFUNC( get_att_text )( fileId, attIt->second.attVarId,
-                                              attIt->second.attName.c_str( ), &att_data[ 0 ] );
+        int success =
+            NCFUNC( get_att_text )( fileId, attIt->second.attVarId, attIt->second.attName.c_str( ), &att_data[ 0 ] );
         if( success ) return false;
         if( att_data.find( "CAM" ) == std::string::npos ) return false;
 
@@ -89,9 +84,7 @@ ErrorCode NCHelperEuler::init_mesh_vals( )
     // Now we can set gDims for i
     gDims[ 0 ] = 0;
     gDims[ 3 ] =
-        gCDims[ 3 ] + ( globallyPeriodic[ 0 ]
-                            ? 0
-                            : 1 );  // Only if not periodic is vertex param max > elem param max
+        gCDims[ 3 ] + ( globallyPeriodic[ 0 ] ? 0 : 1 );  // Only if not periodic is vertex param max > elem param max
 
     // Then j
     if( ( vit = std::find( dimNames.begin( ), dimNames.end( ), "lat" ) ) != dimNames.end( ) )
@@ -155,14 +148,12 @@ ErrorCode NCHelperEuler::init_mesh_vals( )
         parData.partMethod = partMethod;
         int pdims[ 3 ];
 
-        rval =
-            ScdInterface::compute_partition( procs, rank, parData, lDims, locallyPeriodic, pdims );MB_CHK_ERR( rval );
+        rval = ScdInterface::compute_partition( procs, rank, parData, lDims, locallyPeriodic, pdims );MB_CHK_ERR( rval );
         for( int i = 0; i < 3; i++ )
             parData.pDims[ i ] = pdims[ i ];
 
         dbgOut.tprintf( 1, "Partition: %dx%d (out of %dx%d)\n", lDims[ 3 ] - lDims[ 0 ] + 1,
-                        lDims[ 4 ] - lDims[ 1 ] + 1, gDims[ 3 ] - gDims[ 0 ] + 1,
-                        gDims[ 4 ] - gDims[ 1 ] + 1 );
+                        lDims[ 4 ] - lDims[ 1 ] + 1, gDims[ 3 ] - gDims[ 0 ] + 1, gDims[ 4 ] - gDims[ 1 ] + 1 );
         if( 0 == rank )
             dbgOut.tprintf( 1, "Contiguous chunks of size %d bytes.\n",
                             8 * ( lDims[ 3 ] - lDims[ 0 ] + 1 ) * ( lDims[ 4 ] - lDims[ 1 ] + 1 ) );
@@ -203,8 +194,7 @@ ErrorCode NCHelperEuler::init_mesh_vals( )
     std::map< std::string, ReadNC::VarData >::iterator vmit;
     if( -1 != lCDims[ 0 ] )
     {
-        if( ( vmit = varInfo.find( "lon" ) ) != varInfo.end( ) &&
-            ( *vmit ).second.varDims.size( ) == 1 )
+        if( ( vmit = varInfo.find( "lon" ) ) != varInfo.end( ) && ( *vmit ).second.varDims.size( ) == 1 )
         {
             rval = read_coordinate( "lon", lCDims[ 0 ], lCDims[ 3 ], ilCVals );MB_CHK_SET_ERR( rval, "Trouble reading 'lon' variable" );
         }
@@ -216,8 +206,7 @@ ErrorCode NCHelperEuler::init_mesh_vals( )
 
     if( -1 != lCDims[ 1 ] )
     {
-        if( ( vmit = varInfo.find( "lat" ) ) != varInfo.end( ) &&
-            ( *vmit ).second.varDims.size( ) == 1 )
+        if( ( vmit = varInfo.find( "lat" ) ) != varInfo.end( ) && ( *vmit ).second.varDims.size( ) == 1 )
         {
             rval = read_coordinate( "lat", lCDims[ 1 ], lCDims[ 4 ], jlCVals );MB_CHK_SET_ERR( rval, "Trouble reading 'lat' variable" );
         }
@@ -229,8 +218,7 @@ ErrorCode NCHelperEuler::init_mesh_vals( )
 
     if( -1 != lDims[ 0 ] )
     {
-        if( ( vmit = varInfo.find( "lon" ) ) != varInfo.end( ) &&
-            ( *vmit ).second.varDims.size( ) == 1 )
+        if( ( vmit = varInfo.find( "lon" ) ) != varInfo.end( ) && ( *vmit ).second.varDims.size( ) == 1 )
         {
             double      dif = ( ilCVals[ 1 ] - ilCVals[ 0 ] ) / 2;
             std::size_t i;
@@ -247,8 +235,7 @@ ErrorCode NCHelperEuler::init_mesh_vals( )
 
     if( -1 != lDims[ 1 ] )
     {
-        if( ( vmit = varInfo.find( "lat" ) ) != varInfo.end( ) &&
-            ( *vmit ).second.varDims.size( ) == 1 )
+        if( ( vmit = varInfo.find( "lat" ) ) != varInfo.end( ) && ( *vmit ).second.varDims.size( ) == 1 )
         {
             if( !isParallel || ( ( gDims[ 4 ] - gDims[ 1 ] ) == ( lDims[ 4 ] - lDims[ 1 ] ) ) )
             {
@@ -330,13 +317,11 @@ ErrorCode NCHelperEuler::init_mesh_vals( )
     // Store time coordinate values in tVals
     if( nTimeSteps > 0 )
     {
-        if( ( vmit = varInfo.find( "time" ) ) != varInfo.end( ) &&
-            ( *vmit ).second.varDims.size( ) == 1 )
+        if( ( vmit = varInfo.find( "time" ) ) != varInfo.end( ) && ( *vmit ).second.varDims.size( ) == 1 )
         {
             rval = read_coordinate( "time", 0, nTimeSteps - 1, tVals );MB_CHK_SET_ERR( rval, "Trouble reading 'time' variable" );
         }
-        else if( ( vmit = varInfo.find( "t" ) ) != varInfo.end( ) &&
-                 ( *vmit ).second.varDims.size( ) == 1 )
+        else if( ( vmit = varInfo.find( "t" ) ) != varInfo.end( ) && ( *vmit ).second.varDims.size( ) == 1 )
         {
             rval = read_coordinate( "t", 0, nTimeSteps - 1, tVals );MB_CHK_SET_ERR( rval, "Trouble reading 't' variable" );
         }
@@ -349,8 +334,7 @@ ErrorCode NCHelperEuler::init_mesh_vals( )
     }
 
     dbgOut.tprintf( 1, "I=%d-%d, J=%d-%d\n", lDims[ 0 ], lDims[ 3 ], lDims[ 1 ], lDims[ 4 ] );
-    dbgOut.tprintf( 1, "%d elements, %d vertices\n",
-                    ( lDims[ 3 ] - lDims[ 0 ] ) * ( lDims[ 4 ] - lDims[ 1 ] ),
+    dbgOut.tprintf( 1, "%d elements, %d vertices\n", ( lDims[ 3 ] - lDims[ 0 ] ) * ( lDims[ 4 ] - lDims[ 1 ] ),
                     ( lDims[ 3 ] - lDims[ 0 ] + 1 ) * ( lDims[ 4 ] - lDims[ 1 ] + 1 ) );
 
     // For each variable, determine the entity location type and number of levels
@@ -362,16 +346,13 @@ ErrorCode NCHelperEuler::init_mesh_vals( )
         // Default entLoc is ENTLOCSET
         if( std::find( vd.varDims.begin( ), vd.varDims.end( ), tDim ) != vd.varDims.end( ) )
         {
-            if( ( std::find( vd.varDims.begin( ), vd.varDims.end( ), iCDim ) !=
-                  vd.varDims.end( ) ) &&
-                ( std::find( vd.varDims.begin( ), vd.varDims.end( ), jCDim ) !=
-                  vd.varDims.end( ) ) )
+            if( ( std::find( vd.varDims.begin( ), vd.varDims.end( ), iCDim ) != vd.varDims.end( ) ) &&
+                ( std::find( vd.varDims.begin( ), vd.varDims.end( ), jCDim ) != vd.varDims.end( ) ) )
                 vd.entLoc = ReadNC::ENTLOCFACE;
         }
 
         // Default numLev is 0
-        if( std::find( vd.varDims.begin( ), vd.varDims.end( ), levDim ) != vd.varDims.end( ) )
-            vd.numLev = nLevels;
+        if( std::find( vd.varDims.begin( ), vd.varDims.end( ), levDim ) != vd.varDims.end( ) ) vd.numLev = nLevels;
     }
 
     // For Eul models, slon and slat are "virtual" dimensions (not defined in the file header)
@@ -411,11 +392,9 @@ ErrorCode NCHelperEuler::init_mesh_vals( )
         std::stringstream ss_tag_name;
         ss_tag_name << ijdimNames[ i ] << "_LOC_MINMAX";
         tag_name = ss_tag_name.str( );
-        rval = mbImpl->tag_get_handle( tag_name.c_str( ), 2, MB_TYPE_INTEGER, tagh,
-                                       MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_SET_ERR( rval, "Trouble creating conventional tag " << tag_name );
+        rval = mbImpl->tag_get_handle( tag_name.c_str( ), 2, MB_TYPE_INTEGER, tagh, MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_SET_ERR( rval, "Trouble creating conventional tag " << tag_name );
         rval = mbImpl->tag_set_data( tagh, &_fileSet, 1, &val[ 0 ] );MB_CHK_SET_ERR( rval, "Trouble setting data to conventional tag " << tag_name );
-        if( MB_SUCCESS == rval )
-            dbgOut.tprintf( 2, "Conventional tag %s is created.\n", tag_name.c_str( ) );
+        if( MB_SUCCESS == rval ) dbgOut.tprintf( 2, "Conventional tag %s is created.\n", tag_name.c_str( ) );
     }
 
     // __<dim_name>_LOC_VALS (for virtual slon, virtual slat, lon and lat)
@@ -460,8 +439,7 @@ ErrorCode NCHelperEuler::init_mesh_vals( )
         rval = mbImpl->tag_get_handle( tag_name.c_str( ), 0, MB_TYPE_DOUBLE, tagh,
                                        MB_TAG_CREAT | MB_TAG_SPARSE | MB_TAG_VARLEN );MB_CHK_SET_ERR( rval, "Trouble creating conventional tag " << tag_name );
         rval = mbImpl->tag_set_by_ptr( tagh, &_fileSet, 1, &val, &val_len );MB_CHK_SET_ERR( rval, "Trouble setting data to conventional tag " << tag_name );
-        if( MB_SUCCESS == rval )
-            dbgOut.tprintf( 2, "Conventional tag %s is created.\n", tag_name.c_str( ) );
+        if( MB_SUCCESS == rval ) dbgOut.tprintf( 2, "Conventional tag %s is created.\n", tag_name.c_str( ) );
     }
 
     // __<dim_name>_GLOBAL_MINMAX (for virtual slon, virtual slat, lon and lat)
@@ -491,11 +469,9 @@ ErrorCode NCHelperEuler::init_mesh_vals( )
         std::stringstream ss_tag_name;
         ss_tag_name << ijdimNames[ i ] << "_GLOBAL_MINMAX";
         tag_name = ss_tag_name.str( );
-        rval = mbImpl->tag_get_handle( tag_name.c_str( ), 2, MB_TYPE_INTEGER, tagh,
-                                       MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_SET_ERR( rval, "Trouble creating conventional tag " << tag_name );
+        rval = mbImpl->tag_get_handle( tag_name.c_str( ), 2, MB_TYPE_INTEGER, tagh, MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_SET_ERR( rval, "Trouble creating conventional tag " << tag_name );
         rval = mbImpl->tag_set_data( tagh, &_fileSet, 1, &val[ 0 ] );MB_CHK_SET_ERR( rval, "Trouble setting data to conventional tag " << tag_name );
-        if( MB_SUCCESS == rval )
-            dbgOut.tprintf( 2, "Conventional tag %s is created.\n", tag_name.c_str( ) );
+        if( MB_SUCCESS == rval ) dbgOut.tprintf( 2, "Conventional tag %s is created.\n", tag_name.c_str( ) );
     }
 
     // Hack: create dummy variables, if needed, for dimensions with no corresponding coordinate

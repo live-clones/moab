@@ -897,24 +897,23 @@ void iMesh_initEntArrIter( iMesh_Instance instance,
                                                                                *value.
                                                                                ******************************************************************************/
 
-void iMesh_getNextEntArrIter(
-    iMesh_Instance instance,
-    /**< [in] iMesh instance handle */
-    iBase_EntityArrIterator entArr_iterator,
-    /**< [in] Iterator being queried */
-    iBase_EntityHandle** entity_handles,
-    /**< [in,out] Pointer to array of entity handles contained in current
-       value of iterator \ref trio) */
-    int* entity_handles_allocated,
-    /**< [in,out] Pointer to allocated size of entity_handles */
-    int* entity_handles_size,
-    /**< [out] Pointer to occupied size of entity_handles  */
-    int* has_data,
-    /**< [out] Pointer to a flag indicating if the value(s) returned
-       in entity_handles are valid. A non-zero value indicates the value(s)
-       are valid. A zero value indicates the value(s) are NOT valid. */
-    int* err
-    /**< [out] Returned Error status (see iBase_ErrorType) */
+void iMesh_getNextEntArrIter( iMesh_Instance instance,
+                              /**< [in] iMesh instance handle */
+                              iBase_EntityArrIterator entArr_iterator,
+                              /**< [in] Iterator being queried */
+                              iBase_EntityHandle** entity_handles,
+                              /**< [in,out] Pointer to array of entity handles contained in current
+                                 value of iterator \ref trio) */
+                              int* entity_handles_allocated,
+                              /**< [in,out] Pointer to allocated size of entity_handles */
+                              int* entity_handles_size,
+                              /**< [out] Pointer to occupied size of entity_handles  */
+                              int* has_data,
+                              /**< [out] Pointer to a flag indicating if the value(s) returned
+                                 in entity_handles are valid. A non-zero value indicates the value(s)
+                                 are valid. A zero value indicates the value(s) are NOT valid. */
+                              int* err
+                              /**< [out] Returned Error status (see iBase_ErrorType) */
 );
 
 /***************************************************************************/ /**

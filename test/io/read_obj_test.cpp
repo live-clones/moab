@@ -9,15 +9,14 @@
 
 using namespace moab;
 
-#define CHKERR( A )                                                                          \
-    do                                                                                       \
-    {                                                                                        \
-        if( MB_SUCCESS != ( A ) )                                                            \
-        {                                                                                    \
-            std::cerr << "Failure (error code " << ( A ) << ") at " __FILE__ ":" << __LINE__ \
-                      << std::endl;                                                          \
-            return A;                                                                        \
-        }                                                                                    \
+#define CHKERR( A )                                                                                        \
+    do                                                                                                     \
+    {                                                                                                      \
+        if( MB_SUCCESS != ( A ) )                                                                          \
+        {                                                                                                  \
+            std::cerr << "Failure (error code " << ( A ) << ") at " __FILE__ ":" << __LINE__ << std::endl; \
+            return A;                                                                                      \
+        }                                                                                                  \
     } while( false )
 
 std::string test = TestDir + "/io/test.obj";

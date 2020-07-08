@@ -19,14 +19,12 @@ class EntitySequence
     EntitySequence( EntityHandle h ) : startHandle( h ), endHandle( h ), sequenceData( NULL ) {}
 
     EntitySequence( EntitySequence& split_from, EntityHandle here )
-        : startHandle( here ), endHandle( split_from.endHandle ),
-          sequenceData( split_from.sequenceData )
+        : startHandle( here ), endHandle( split_from.endHandle ), sequenceData( split_from.sequenceData )
     {
         split_from.endHandle = here - 1;
     }
 
-    SequenceData* create_data_subset( EntityHandle start_handle, EntityHandle end_handle,
-                                      int             num_sequence_arrays,
+    SequenceData* create_data_subset( EntityHandle start_handle, EntityHandle end_handle, int num_sequence_arrays,
                                       unsigned const* bytes_per_element ) const;
 
     ErrorCode prepend_entities( EntityID count );
@@ -112,8 +110,7 @@ class EntitySequence
      * SequenceData referenced by this EntitySequence.  Do not make any
      * changes to this EntitySequence or the current SequenceData.
      */
-    virtual SequenceData* create_data_subset( EntityHandle start_handle,
-                                              EntityHandle end_handle ) const = 0;
+    virtual SequenceData* create_data_subset( EntityHandle start_handle, EntityHandle end_handle ) const = 0;
 
     /**\brief Get memory characteristcs that are the same for all entities
      *
@@ -124,8 +121,7 @@ class EntitySequence
      *                        for unused portions of the SequenceData.
      *\param size_of_sequence The size of the leaf subclass of this class
      */
-    virtual void get_const_memory_use( unsigned long& bytes_per_entity,
-                                       unsigned long& size_of_sequence ) const = 0;
+    virtual void get_const_memory_use( unsigned long& bytes_per_entity, unsigned long& size_of_sequence ) const = 0;
     /**\brief Get portion of memory use that varies per entity
      *
      *\return Any per-entity memory use not accounted for in the results

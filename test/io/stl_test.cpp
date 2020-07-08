@@ -215,12 +215,9 @@ void check_mesh_is_tet( Interface& moab )
         CHECK_EQUAL( 3, len );
 
         int conn_idx[ 3 ] = {
-            static_cast< int >( std::find( vert_handles, vert_handles + 4, conn[ 0 ] ) -
-                                vert_handles ),
-            static_cast< int >( std::find( vert_handles, vert_handles + 4, conn[ 1 ] ) -
-                                vert_handles ),
-            static_cast< int >( std::find( vert_handles, vert_handles + 4, conn[ 2 ] ) -
-                                vert_handles ) };
+            static_cast< int >( std::find( vert_handles, vert_handles + 4, conn[ 0 ] ) - vert_handles ),
+            static_cast< int >( std::find( vert_handles, vert_handles + 4, conn[ 1 ] ) - vert_handles ),
+            static_cast< int >( std::find( vert_handles, vert_handles + 4, conn[ 2 ] ) - vert_handles ) };
         CHECK( conn_idx[ 0 ] != 4 );
         CHECK( conn_idx[ 1 ] != 4 );
         CHECK( conn_idx[ 2 ] != 4 );
@@ -231,8 +228,7 @@ void check_mesh_is_tet( Interface& moab )
             int k = std::find( expt_conn[ j ], expt_conn[ j ] + 3, conn_idx[ 0 ] ) - expt_conn[ j ];
             if( k == 3 ) continue;
 
-            if( expt_conn[ j ][ ( k + 1 ) % 3 ] == conn_idx[ 1 ] &&
-                expt_conn[ j ][ ( k + 2 ) % 3 ] == conn_idx[ 2 ] )
+            if( expt_conn[ j ][ ( k + 1 ) % 3 ] == conn_idx[ 1 ] && expt_conn[ j ][ ( k + 2 ) % 3 ] == conn_idx[ 2 ] )
             {
                 CHECK_EQUAL( (EntityHandle)0, tri_handles[ j ] );
                 tri_handles[ j ] = *i;

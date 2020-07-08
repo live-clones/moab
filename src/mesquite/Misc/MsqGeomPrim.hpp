@@ -46,8 +46,7 @@ class MESQUITE_EXPORT MsqLine
     Vector3D mDirection;  // unit direction
 
   public:
-    MsqLine( const Vector3D& p_point, const Vector3D& p_dir )
-        : mPoint( p_point ), mDirection( p_dir / p_dir.length( ) )
+    MsqLine( const Vector3D& p_point, const Vector3D& p_dir ) : mPoint( p_point ), mDirection( p_dir / p_dir.length( ) )
     {
     }
 
@@ -110,13 +109,11 @@ class MESQUITE_EXPORT MsqCircle
 
     //! Find circle passing through three points
     //!\return false if points are colinear, true otherwise.
-    static bool three_point( const Vector3D& p1, const Vector3D& p2, const Vector3D& p3,
-                             MsqCircle& result );
+    static bool three_point( const Vector3D& p1, const Vector3D& p2, const Vector3D& p3, MsqCircle& result );
 
     //! Find circle with center and two points
     //!\return false if points are colinear or not equidistant from center, true otherwise.
-    static bool two_point( const Vector3D& center, const Vector3D& p1, const Vector3D& p2,
-                           MsqCircle& result );
+    static bool two_point( const Vector3D& center, const Vector3D& p1, const Vector3D& p2, MsqCircle& result );
 
     const Vector3D& center( ) const
     {
@@ -141,8 +138,7 @@ class MESQUITE_EXPORT MsqCircle
     //! Find closest point on circle to input position, and tangent
     //! at that point.  Fails and returns false if point is at center
     //! of circle.
-    bool closest( const Vector3D& point, Vector3D& point_on_circle,
-                  Vector3D& tangent_at_point ) const;
+    bool closest( const Vector3D& point, Vector3D& point_on_circle, Vector3D& tangent_at_point ) const;
 };
 
 /**\brief Plane */
@@ -205,10 +201,7 @@ class MESQUITE_EXPORT MsqSphere
     double   mRadius;
 
   public:
-    MsqSphere( const Vector3D& p_center, double p_radius )
-        : mCenter( p_center ), mRadius( p_radius )
-    {
-    }
+    MsqSphere( const Vector3D& p_center, double p_radius ) : mCenter( p_center ), mRadius( p_radius ) {}
 
     const Vector3D& center( ) const
     {
@@ -226,8 +219,7 @@ class MESQUITE_EXPORT MsqSphere
     //! Get location on sphere closest to input location, and
     //! normal at closest point.
     //!\return false if input point is at center, true otherwise.
-    bool closest( const Vector3D& point, Vector3D& point_on_sphere,
-                  Vector3D& normal_at_point ) const;
+    bool closest( const Vector3D& point, Vector3D& point_on_sphere, Vector3D& normal_at_point ) const;
 
     double distance( const Vector3D& point ) const
     {

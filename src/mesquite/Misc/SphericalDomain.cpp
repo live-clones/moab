@@ -42,8 +42,7 @@
 
 MBMesquite::SphericalDomain::~SphericalDomain( ) {}
 
-void MBMesquite::SphericalDomain::snap_to( Mesh::VertexHandle /*entity_handle*/,
-                                           Vector3D& coordinate ) const
+void MBMesquite::SphericalDomain::snap_to( Mesh::VertexHandle /*entity_handle*/, Vector3D& coordinate ) const
 {
     // Get vector center to coordinate, store in coordinate.
     coordinate -= mCenter;
@@ -58,8 +57,7 @@ void MBMesquite::SphericalDomain::snap_to( Mesh::VertexHandle /*entity_handle*/,
     coordinate += mCenter;
 }
 
-void MBMesquite::SphericalDomain::vertex_normal_at( Mesh::VertexHandle /*entity_handle*/,
-                                                    Vector3D& coordinate ) const
+void MBMesquite::SphericalDomain::vertex_normal_at( Mesh::VertexHandle /*entity_handle*/, Vector3D& coordinate ) const
 {
     // normal is vector from center to input position
     coordinate -= mCenter;
@@ -70,8 +68,7 @@ void MBMesquite::SphericalDomain::vertex_normal_at( Mesh::VertexHandle /*entity_
     // on sphere as snap_to.
     if( !moab::Util::is_finite( coordinate.x( ) ) ) coordinate.set( 1.0, 0.0, 0.0 );
 }
-void MBMesquite::SphericalDomain::element_normal_at( Mesh::ElementHandle h,
-                                                     Vector3D&           coordinate ) const
+void MBMesquite::SphericalDomain::element_normal_at( Mesh::ElementHandle h, Vector3D& coordinate ) const
 {
     SphericalDomain::vertex_normal_at( h, coordinate );
 }
@@ -84,10 +81,8 @@ void MBMesquite::SphericalDomain::vertex_normal_at( const MBMesquite::Mesh::Vert
         vertex_normal_at( handle[ i ], coords[ i ] );
 }
 
-void MBMesquite::SphericalDomain::closest_point( MBMesquite::Mesh::VertexHandle,
-                                                 const MBMesquite::Vector3D& position,
-                                                 MBMesquite::Vector3D&       closest,
-                                                 MBMesquite::Vector3D&       normal,
+void MBMesquite::SphericalDomain::closest_point( MBMesquite::Mesh::VertexHandle, const MBMesquite::Vector3D& position,
+                                                 MBMesquite::Vector3D& closest, MBMesquite::Vector3D& normal,
                                                  MBMesquite::MsqError& ) const
 {
     normal = position - mCenter;
@@ -96,8 +91,8 @@ void MBMesquite::SphericalDomain::closest_point( MBMesquite::Mesh::VertexHandle,
     closest = mCenter + mRadius * normal;
 }
 
-void MBMesquite::SphericalDomain::domain_DoF( const Mesh::VertexHandle*, unsigned short* dof_array,
-                                              size_t num_vertices, MsqError& ) const
+void MBMesquite::SphericalDomain::domain_DoF( const Mesh::VertexHandle*, unsigned short* dof_array, size_t num_vertices,
+                                              MsqError& ) const
 {
     std::fill( dof_array, dof_array + num_vertices, 2 );
 }
@@ -109,8 +104,8 @@ void MBMesquite::SphericalDomain::fit_vertices( Mesh* mesh, MsqError& err, doubl
     if( !MSQ_CHKERR( err ) ) fit_vertices( mesh, arrptr( verts ), verts.size( ), err, epsilon );
 }
 
-void MBMesquite::SphericalDomain::fit_vertices( Mesh* mesh, const Mesh::VertexHandle* verts,
-                                                size_t num_verts, MsqError& err, double epsilon )
+void MBMesquite::SphericalDomain::fit_vertices( Mesh* mesh, const Mesh::VertexHandle* verts, size_t num_verts,
+                                                MsqError& err, double epsilon )
 {
     std::vector< MsqVertex > coords( num_verts );
     mesh->vertices_get_coordinates( verts, arrptr( coords ), num_verts, err );MSQ_ERRRTN( err );

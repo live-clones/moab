@@ -68,8 +68,7 @@ int main( int argc, char** argv )
             // Get the entities in the set, recursively
             rval = mb->get_entities_by_handle( *set_it, set_ents, true );MB_CHK_ERR( rval );
 
-            cout << tag_nms[ i ] << " " << set_id << " has " << set_ents.size( )
-                 << " entities:" << endl;
+            cout << tag_nms[ i ] << " " << set_id << " has " << set_ents.size( ) << " entities:" << endl;
             set_ents.print( "   " );
             set_ents.clear( );
         }

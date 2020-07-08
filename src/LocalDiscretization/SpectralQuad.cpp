@@ -75,8 +75,8 @@ void SpectralQuad::set_gl_points( double* x, double* y, double* z )
     _xyz[ 1 ] = y;
     _xyz[ 2 ] = z;
 }
-CartVect SpectralQuad::evalFcn( const double* params, const double* field, const int ndim,
-                                const int num_tuples, double* work, double* result )
+CartVect SpectralQuad::evalFcn( const double* params, const double* field, const int ndim, const int num_tuples,
+                                double* work, double* result )
 {
     // piece that we shouldn't want to cache
     int d = 0;
@@ -87,15 +87,14 @@ CartVect SpectralQuad::evalFcn( const double* params, const double* field, const
     CartVect result;
     for( d = 0; d < 3; d++ )
     {
-        result[ d ] =
-            tensor_i2( _ld[ 0 ].J, _ld[ 0 ].n, _ld[ 1 ].J, _ld[ 1 ].n, _xyz[ d ], _odwork );
+        result[ d ] = tensor_i2( _ld[ 0 ].J, _ld[ 0 ].n, _ld[ 1 ].J, _ld[ 1 ].n, _xyz[ d ], _odwork );
     }
     return result;
 }
 // replicate the functionality of hex_findpt
-bool SpectralQuad::reverseEvalFcn( const double* posn, const double* verts, const int nverts,
-                                   const int ndim, const double iter_tol, const double inside_tol,
-                                   double* work, double* params, int* is_inside )
+bool SpectralQuad::reverseEvalFcn( const double* posn, const double* verts, const int nverts, const int ndim,
+                                   const double iter_tol, const double inside_tol, double* work, double* params,
+                                   int* is_inside )
 {
     params = init;
 
@@ -120,16 +119,15 @@ bool SpectralQuad::reverseEvalFcn( const double* posn, const double* verts, cons
     return insideFcn( params, 2, inside_tol );
 }
 
-Matrix3 SpectralQuad::jacobian( const double* params, const double* verts, const int nverts,
-                                const int ndim, double* work, double* result )
+Matrix3 SpectralQuad::jacobian( const double* params, const double* verts, const int nverts, const int ndim,
+                                double* work, double* result )
 {
     // not implemented
     Matrix3 J( 0. );
     return J;
 }
 
-void SpectralQuad::evaluate_vector( const CartVect& params, const double* field, int num_tuples,
-                                    double* eval ) const
+void SpectralQuad::evaluate_vector( const CartVect& params, const double* field, int num_tuples, double* eval ) const
 {
     // piece that we shouldn't want to cache
     int d;
@@ -140,9 +138,8 @@ void SpectralQuad::evaluate_vector( const CartVect& params, const double* field,
 
     *eval = tensor_i2( _ld[ 0 ].J, _ld[ 0 ].n, _ld[ 1 ].J, _ld[ 1 ].n, field, _odwork );
 }
-void SpectralQuad::integrate_vector( const double* field, const double* verts, const int nverts,
-                                     const int ndim, const int num_tuples, double* work,
-                                     double* result )
+void SpectralQuad::integrate_vector( const double* field, const double* verts, const int nverts, const int ndim,
+                                     const int num_tuples, double* work, double* result )
 {
     // not implemented
 }
@@ -169,12 +166,11 @@ void SpectralQuad::compute_gl_positions( )
         double csi = _z[ 0 ][ i ];
         for( int j = 0; j < _n; j++ )
         {
-            double eta = _z[ 1 ][ j ];  // we could really use the same _z[0] array of lobatto nodes
+            double   eta = _z[ 1 ][ j ];  // we could really use the same _z[0] array of lobatto nodes
             CartVect pos( 0.0 );
             for( int k = 0; k < 4; k++ )
             {
-                const double N_k =
-                    ( 1 + csi * corner_params[ k ][ 0 ] ) * ( 1 + eta * corner_params[ k ][ 1 ] );
+                const double N_k = ( 1 + csi * corner_params[ k ][ 0 ] ) * ( 1 + eta * corner_params[ k ][ 1 ] );
                 pos += N_k * vertex[ k ];
             }
             pos *= 0.25;  // these are x, y, z of gl points; reorder them

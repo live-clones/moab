@@ -18,11 +18,9 @@ SphereDecomp::SphereDecomp( Interface* impl )
     mbImpl = impl;
 }
 
-ErrorCode SphereDecomp::build_sphere_mesh( const char*   sphere_radii_tag_name,
-                                           EntityHandle* hex_set )
+ErrorCode SphereDecomp::build_sphere_mesh( const char* sphere_radii_tag_name, EntityHandle* hex_set )
 {
-    ErrorCode result =
-        mbImpl->tag_get_handle( sphere_radii_tag_name, 1, MB_TYPE_DOUBLE, sphereRadiiTag );RR;
+    ErrorCode result = mbImpl->tag_get_handle( sphere_radii_tag_name, 1, MB_TYPE_DOUBLE, sphereRadiiTag );RR;
 
     // need to make sure all interior edges and faces are created
     Range all_verts;
@@ -104,8 +102,7 @@ ErrorCode SphereDecomp::compute_nodes( const int dim )
         {
             for( int j = 0; j < 3; j++ )
                 unitv[ j ] = avg_pos[ j ] - vert_pos[ 3 * i + j ];
-            double vlength =
-                sqrt( unitv[ 0 ] * unitv[ 0 ] + unitv[ 1 ] * unitv[ 1 ] + unitv[ 2 ] * unitv[ 2 ] );
+            double vlength = sqrt( unitv[ 0 ] * unitv[ 0 ] + unitv[ 1 ] * unitv[ 1 ] + unitv[ 2 ] * unitv[ 2 ] );
             if( vlength < radii[ i ] )
             {
                 std::cout << "Radius too large at vertex " << i << std::endl;
@@ -120,8 +117,7 @@ ErrorCode SphereDecomp::compute_nodes( const int dim )
                 new_vert_pos[ 3 * i + j ] = vert_pos[ 3 * i + j ] + radii[ i ] * unitv[ j ];
 
             // create vertex at this position
-            ErrorCode tmp_result =
-                mbImpl->create_vertex( &new_vert_pos[ 3 * i ], subdiv_vertices[ i ] );
+            ErrorCode tmp_result = mbImpl->create_vertex( &new_vert_pos[ 3 * i ], subdiv_vertices[ i ] );
             if( MB_SUCCESS != tmp_result ) result = tmp_result;
         }
 
@@ -134,8 +130,7 @@ ErrorCode SphereDecomp::compute_nodes( const int dim )
             for( int j = 0; j < 3; j++ )
                 new_new_vert_pos[ j ] = .5 * ( vert_pos[ 3 * i + j ] + new_vert_pos[ 3 * i + j ] );
 
-            result =
-                mbImpl->create_vertex( new_new_vert_pos, subdiv_vertices[ num_verts + 1 + i ] );
+            result = mbImpl->create_vertex( new_new_vert_pos, subdiv_vertices[ num_verts + 1 + i ] );
         }
 
         // set the tag
@@ -592,9 +587,8 @@ ErrorCode SphereDecomp::subdivide_tet( EntityHandle tet, std::vector< EntityHand
     return result;
 }
 
-ErrorCode SphereDecomp::retrieve_subdiv_verts( EntityHandle tet, EntityHandle this_ent,
-                                               const EntityHandle* tet_conn, const int dim,
-                                               EntityHandle* subdiv_verts )
+ErrorCode SphereDecomp::retrieve_subdiv_verts( EntityHandle tet, EntityHandle this_ent, const EntityHandle* tet_conn,
+                                               const int dim, EntityHandle* subdiv_verts )
 {
     // get the subdiv verts for this entity
     ErrorCode result;
@@ -616,8 +610,7 @@ ErrorCode SphereDecomp::retrieve_subdiv_verts( EntityHandle tet, EntityHandle th
     for( size_t i = 0; i < this_conn.size( ); ++i )
         conn_tet_indices[ i ] = std::find( tet_conn, tet_conn + 4, this_conn[ i ] ) - tet_conn;
     int sense, side_no, offset;
-    int success = CN::SideNumber( MBTET, &conn_tet_indices[ 0 ], this_conn.size( ), dim, side_no,
-                                  sense, offset );
+    int success = CN::SideNumber( MBTET, &conn_tet_indices[ 0 ], this_conn.size( ), dim, side_no, sense, offset );
     if( -1 == success ) return MB_FAILURE;
 
     // start of this entity's subdiv_verts; edges go first, then preceding sides, then this one;

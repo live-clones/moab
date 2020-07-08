@@ -65,16 +65,14 @@ namespace MBMesquite
 {
 
 UntangleWrapper::UntangleWrapper( )
-    : qualityMetric( SIZE ), maxTime( -1 ), movementFactor( DEFAULT_MOVEMENT_FACTOR ),
-      metricConstant( -1 ), maxIterations( -1 ), doCulling( CULLING_DEFAULT ),
-      doJacobi( JACOBI_DEFAULT )
+    : qualityMetric( SIZE ), maxTime( -1 ), movementFactor( DEFAULT_MOVEMENT_FACTOR ), metricConstant( -1 ),
+      maxIterations( -1 ), doCulling( CULLING_DEFAULT ), doJacobi( JACOBI_DEFAULT )
 {
 }
 
 UntangleWrapper::UntangleWrapper( UntangleMetric m )
-    : qualityMetric( m ), maxTime( -1 ), movementFactor( DEFAULT_MOVEMENT_FACTOR ),
-      metricConstant( -1 ), maxIterations( -1 ), doCulling( CULLING_DEFAULT ),
-      doJacobi( JACOBI_DEFAULT )
+    : qualityMetric( m ), maxTime( -1 ), movementFactor( DEFAULT_MOVEMENT_FACTOR ), metricConstant( -1 ),
+      maxIterations( -1 ), doCulling( CULLING_DEFAULT ), doJacobi( JACOBI_DEFAULT )
 {
 }
 
@@ -105,8 +103,8 @@ void UntangleWrapper::set_vertex_movement_limit_factor( double f )
     movementFactor = f;
 }
 
-void UntangleWrapper::run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh,
-                                   Settings* settings, QualityAssessor* qa, MsqError& err )
+void UntangleWrapper::run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh, Settings* settings,
+                                   QualityAssessor* qa, MsqError& err )
 {
     Instruction::initialize_vertex_byte( mesh_and_domain, settings, err );MSQ_ERRRTN( err );
 
@@ -153,7 +151,7 @@ void UntangleWrapper::run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMes
     PMeanPTemplate   objfunc( 1.0, &metric );
 
     // define termination criterion
-    double eps = movementFactor * ( edge_len.average( ) - edge_len.standard_deviation( ) );
+    double               eps = movementFactor * ( edge_len.average( ) - edge_len.standard_deviation( ) );
     TerminationCriterion inner( "<type:untangle_inner>", TerminationCriterion::TYPE_INNER ),
         outer( "<type:untangle_outer>", TerminationCriterion::TYPE_OUTER );
     outer.add_untangled_mesh( );

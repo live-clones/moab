@@ -178,8 +178,7 @@ void lagrange_weights( const real* z, unsigned n, const real* x, unsigned m, rea
    inner index of outputs J,D is the basis function index (row-major format)
    provide work array with space for 6*n doubles
  */
-void lagrange_weights_deriv( const real* z, unsigned n, const real* x, unsigned m, real* J, real* D,
-                             real* work );
+void lagrange_weights_deriv( const real* z, unsigned n, const real* x, unsigned m, real* J, real* D, real* work );
 
 /*--------------------------------------------------------------------------
    Speedy Lagrangian Interpolation
@@ -244,19 +243,17 @@ void tensor_c1( const real* R, unsigned mr, unsigned nr, const real* u, real* v 
 void tensor_r1( const real* R, unsigned mr, unsigned nr, const real* u, real* v );
 
 /* work holds mr*ns reals */
-void tensor_c2( const real* R, unsigned mr, unsigned nr, const real* S, unsigned ms, unsigned ns,
-                const real* u, real* v, real* work );
-void tensor_r2( const real* R, unsigned mr, unsigned nr, const real* S, unsigned ms, unsigned ns,
-                const real* u, real* v, real* work );
+void tensor_c2( const real* R, unsigned mr, unsigned nr, const real* S, unsigned ms, unsigned ns, const real* u,
+                real* v, real* work );
+void tensor_r2( const real* R, unsigned mr, unsigned nr, const real* S, unsigned ms, unsigned ns, const real* u,
+                real* v, real* work );
 
 /* work1 holds mr*ns*nt reals,
    work2 holds mr*ms*nt reals */
-void tensor_c3( const real* R, unsigned mr, unsigned nr, const real* S, unsigned ms, unsigned ns,
-                const real* T, unsigned mt, unsigned nt, const real* u, real* v, real* work1,
-                real* work2 );
-void tensor_r3( const real* R, unsigned mr, unsigned nr, const real* S, unsigned ms, unsigned ns,
-                const real* T, unsigned mt, unsigned nt, const real* u, real* v, real* work1,
-                real* work2 );
+void tensor_c3( const real* R, unsigned mr, unsigned nr, const real* S, unsigned ms, unsigned ns, const real* T,
+                unsigned mt, unsigned nt, const real* u, real* v, real* work1, real* work2 );
+void tensor_r3( const real* R, unsigned mr, unsigned nr, const real* S, unsigned ms, unsigned ns, const real* T,
+                unsigned mt, unsigned nt, const real* u, real* v, real* work1, real* work2 );
 
 /*--------------------------------------------------------------------------
    1-,2-,3-d Tensor Application of Row Vectors (for Interpolation)
@@ -273,12 +270,11 @@ void tensor_r3( const real* R, unsigned mr, unsigned nr, const real* S, unsigned
 real tensor_i1( const real* Jr, unsigned nr, const real* u );
 
 /* work holds ns reals */
-real tensor_i2( const real* Jr, unsigned nr, const real* Js, unsigned ns, const real* u,
-                real* work );
+real tensor_i2( const real* Jr, unsigned nr, const real* Js, unsigned ns, const real* u, real* work );
 
 /* work holds ns*nt + nt reals */
-real tensor_i3( const real* Jr, unsigned nr, const real* Js, unsigned ns, const real* Jt,
-                unsigned nt, const real* u, real* work );
+real tensor_i3( const real* Jr, unsigned nr, const real* Js, unsigned ns, const real* Jt, unsigned nt, const real* u,
+                real* work );
 
 /*--------------------------------------------------------------------------
    1-,2-,3-d Tensor Application of Row Vectors
@@ -299,13 +295,12 @@ real tensor_i3( const real* Jr, unsigned nr, const real* Js, unsigned ns, const 
 real tensor_ig1( const real* Jr, const real* Dr, unsigned nr, const real* u, real* g );
 
 /* work holds 2*ns reals */
-real tensor_ig2( const real* Jr, const real* Dr, unsigned nr, const real* Js, const real* Ds,
-                 unsigned ns, const real* u, real* g, real* work );
+real tensor_ig2( const real* Jr, const real* Dr, unsigned nr, const real* Js, const real* Ds, unsigned ns,
+                 const real* u, real* g, real* work );
 
 /* work holds 2*ns*nt + 3*ns reals */
-real tensor_ig3( const real* Jr, const real* Dr, unsigned nr, const real* Js, const real* Ds,
-                 unsigned ns, const real* Jt, const real* Dt, unsigned nt, const real* u, real* g,
-                 real* work );
+real tensor_ig3( const real* Jr, const real* Dr, unsigned nr, const real* Js, const real* Ds, unsigned ns,
+                 const real* Jt, const real* Dt, unsigned nt, const real* u, real* g, real* work );
 
 //======================================================
 // from findpt.h
@@ -343,10 +338,10 @@ typedef struct
     real*                     od_work;
 } findpt_data_3;
 
-findpt_data_2* findpt_setup_2( const real* const xw[ 2 ], const unsigned n[ 2 ], uint nel,
-                               uint max_hash_size, real bbox_tol );
-findpt_data_3* findpt_setup_3( const real* const xw[ 3 ], const unsigned n[ 3 ], uint nel,
-                               uint max_hash_size, real bbox_tol );
+findpt_data_2* findpt_setup_2( const real* const xw[ 2 ], const unsigned n[ 2 ], uint nel, uint max_hash_size,
+                               real bbox_tol );
+findpt_data_3* findpt_setup_3( const real* const xw[ 3 ], const unsigned n[ 3 ], uint nel, uint max_hash_size,
+                               real bbox_tol );
 
 void findpt_free_2( findpt_data_2* p );
 void findpt_free_3( findpt_data_3* p );
@@ -378,8 +373,8 @@ inline double findpt_eval_2( findpt_data_2* p, const real* u )
 
 inline double findpt_eval_3( findpt_data_3* p, const real* u )
 {
-    return tensor_i3( p->ld[ 0 ].J, p->ld[ 0 ].n, p->ld[ 1 ].J, p->ld[ 1 ].n, p->ld[ 2 ].J,
-                      p->ld[ 2 ].n, u, p->od_work );
+    return tensor_i3( p->ld[ 0 ].J, p->ld[ 0 ].n, p->ld[ 1 ].J, p->ld[ 1 ].n, p->ld[ 2 ].J, p->ld[ 2 ].n, u,
+                      p->od_work );
 }
 
 //======================================================
@@ -420,8 +415,7 @@ typedef struct
 
 void   opt_alloc_3( opt_data_3* p, lagrange_data* ld );
 void   opt_free_3( opt_data_3* p );
-double opt_findpt_3( opt_data_3* p, const real* const elx[ 3 ], const real xstar[ 3 ], real r[ 3 ],
-                     unsigned* constr );
+double opt_findpt_3( opt_data_3* p, const real* const elx[ 3 ], const real xstar[ 3 ], real r[ 3 ], unsigned* constr );
 void   opt_vol_set_intp_3( opt_data_3* p, const real r[ 3 ] );
 
 const unsigned opt_no_constraints_2 = 3 + 1;
@@ -459,7 +453,6 @@ typedef struct
 } opt_data_2;
 void   opt_alloc_2( opt_data_2* p, lagrange_data* ld );
 void   opt_free_2( opt_data_2* p );
-double opt_findpt_2( opt_data_2* p, const real* const elx[ 2 ], const real xstar[ 2 ], real r[ 2 ],
-                     unsigned* constr );
+double opt_findpt_2( opt_data_2* p, const real* const elx[ 2 ], const real xstar[ 2 ], real r[ 2 ], unsigned* constr );
 
 #endif

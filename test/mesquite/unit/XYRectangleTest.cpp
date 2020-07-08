@@ -122,7 +122,7 @@ double              TEST_MESH_COORDS[] = { XMIN,
 const int           NUM_TEST_MESH_VERTS = sizeof( TEST_MESH_COORDS ) / sizeof( double ) / 3;
 const unsigned long TEST_MESH_CONN[] = { 0, 1, 4, 1, 2, 5, 0, 4, 3, 1, 5, 4, 2, 6, 5,
                                          3, 4, 7, 4, 5, 8, 5, 6, 9, 4, 8, 7, 5, 9, 8 };
-const int NUM_TEST_MESH_TRIS = sizeof( TEST_MESH_CONN ) / sizeof( TEST_MESH_CONN[ 0 ] ) / 3;
+const int           NUM_TEST_MESH_TRIS = sizeof( TEST_MESH_CONN ) / sizeof( TEST_MESH_CONN[ 0 ] ) / 3;
 
 void XYRectangleTest::setUp( )
 {
@@ -131,8 +131,8 @@ void XYRectangleTest::setUp( )
     std::copy( TEST_MESH_COORDS, TEST_MESH_COORDS + 3 * NUM_TEST_MESH_VERTS, mCoords.begin( ) );
     mFlags.clear( );
     mFlags.resize( NUM_TEST_MESH_VERTS, 0 );
-    myMesh.set_mesh( 3, NUM_TEST_MESH_VERTS, arrptr( mCoords ), arrptr( mFlags ),
-                     NUM_TEST_MESH_TRIS, TRIANGLE, TEST_MESH_CONN );
+    myMesh.set_mesh( 3, NUM_TEST_MESH_VERTS, arrptr( mCoords ), arrptr( mFlags ), NUM_TEST_MESH_TRIS, TRIANGLE,
+                     TEST_MESH_CONN );
     myDomain.setup( &myMesh, err );
     ASSERT_NO_ERROR( err );
 }
@@ -265,10 +265,8 @@ void XYRectangleTest::test_closest_point( )
 unsigned short dof( const Vector3D& point )
 {
     unsigned short result = 2;
-    if( ( fabs( point[ 0 ] - XMIN ) < 1e-6 ) || ( fabs( point[ 0 ] - XMIN - WIDTH ) < 1e-6 ) )
-        --result;
-    if( ( fabs( point[ 1 ] - YMIN ) < 1e-6 ) || ( fabs( point[ 1 ] - YMIN - HEIGHT ) < 1e-6 ) )
-        --result;
+    if( ( fabs( point[ 0 ] - XMIN ) < 1e-6 ) || ( fabs( point[ 0 ] - XMIN - WIDTH ) < 1e-6 ) ) --result;
+    if( ( fabs( point[ 1 ] - YMIN ) < 1e-6 ) || ( fabs( point[ 1 ] - YMIN - HEIGHT ) < 1e-6 ) ) --result;
     return result;
 }
 

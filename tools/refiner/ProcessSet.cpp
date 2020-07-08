@@ -59,8 +59,7 @@ void ProcessSet::set_process_member( int proc )
  */
 void ProcessSet::set_process_members( const std::vector< int >& procs )
 {
-    for( std::vector< int >::const_iterator it = procs.begin( ); it != procs.end( ) && *it != -1;
-         ++it )
+    for( std::vector< int >::const_iterator it = procs.begin( ); it != procs.end( ) && *it != -1; ++it )
     {
         this->set_process_member( *it );
     }

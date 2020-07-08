@@ -6,8 +6,7 @@
 #include "moab/IntxMesh/IntxUtils.hpp"
 #include "IntxUtilsCSLAM.hpp"
 
-extern "C" void update_tracer( iMesh_Instance instance, iBase_EntitySetHandle imesh_euler_set,
-                               int* ierr )
+extern "C" void update_tracer( iMesh_Instance instance, iBase_EntitySetHandle imesh_euler_set, int* ierr )
 {
     using namespace moab;
     const double radius = 1.;
@@ -53,15 +52,13 @@ extern "C" void update_tracer( iMesh_Instance instance, iBase_EntitySetHandle im
     // tagElem is the average computed at each element, from nodal values
     Tag         tagElem = 0;
     std::string tag_name2( "TracerAverage" );
-    rval = mb->tag_get_handle( tag_name2.c_str( ), 1, MB_TYPE_DOUBLE, tagElem,
-                               MB_TAG_DENSE | MB_TAG_CREAT );MB_CHK_SET_ERR_RET( rval, "can't get tracer tag " );
+    rval = mb->tag_get_handle( tag_name2.c_str( ), 1, MB_TYPE_DOUBLE, tagElem, MB_TAG_DENSE | MB_TAG_CREAT );MB_CHK_SET_ERR_RET( rval, "can't get tracer tag " );
 
     // area of the euler element is fixed, store it; it is used to recompute the averages at each
     // time step
     Tag         tagArea = 0;
     std::string tag_name4( "Area" );
-    rval = mb->tag_get_handle( tag_name4.c_str( ), 1, MB_TYPE_DOUBLE, tagArea,
-                               MB_TAG_DENSE | MB_TAG_CREAT );MB_CHK_SET_ERR_RET( rval, "can't get area tag" );
+    rval = mb->tag_get_handle( tag_name4.c_str( ), 1, MB_TYPE_DOUBLE, tagArea, MB_TAG_DENSE | MB_TAG_CREAT );MB_CHK_SET_ERR_RET( rval, "can't get area tag" );
 
     rval = worker.update_tracer_data( outputSet, tagElem, tagArea );MB_CHK_SET_ERR_RET( rval, "can't update tracer " );
 

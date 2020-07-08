@@ -9,8 +9,7 @@
 
 namespace moab
 {
-const short int SpectralMeshTool::permute_array[] = { 0, 1, 13, 25, 3,  2,  14, 26,
-                                                      7, 6, 18, 30, 11, 10, 22, 34 };
+const short int SpectralMeshTool::permute_array[] = { 0, 1, 13, 25, 3, 2, 14, 26, 7, 6, 18, 30, 11, 10, 22, 34 };
 
 // lin_permute_array does the same to get the linear vertices of the coarse quad
 const short int SpectralMeshTool::lin_permute_array[] = { 0, 25, 34, 11 };
@@ -23,15 +22,13 @@ Tag SpectralMeshTool::spectral_vertices_tag( const bool create_if_missing )
         if( !spectralOrder )
         {
             // should already be a spectral order tag...
-            MB_SET_ERR_RET_VAL( "Spectral order must be set before creating spectral vertices tag",
-                                0 );
+            MB_SET_ERR_RET_VAL( "Spectral order must be set before creating spectral vertices tag", 0 );
         }
 
         // create it
         std::vector< EntityHandle > dum_val( spectralOrderp1 * spectralOrderp1, 0 );
-        rval = mbImpl->tag_get_handle( "SPECTRAL_VERTICES", spectralOrderp1 * spectralOrderp1,
-                                       MB_TYPE_HANDLE, svTag, MB_TAG_DENSE | MB_TAG_CREAT,
-                                       &dum_val[ 0 ] );
+        rval = mbImpl->tag_get_handle( "SPECTRAL_VERTICES", spectralOrderp1 * spectralOrderp1, MB_TYPE_HANDLE, svTag,
+                                       MB_TAG_DENSE | MB_TAG_CREAT, &dum_val[ 0 ] );
     }
 
     return ( rval == MB_SUCCESS ? svTag : 0 );
@@ -48,8 +45,7 @@ Tag SpectralMeshTool::spectral_order_tag( const bool create_if_missing )
 
         // create it
         int dum = 0;
-        rval = mbImpl->tag_get_handle( "SPECTRAL_ORDER", 1, MB_TYPE_INTEGER, soTag,
-                                       MB_TAG_DENSE | MB_TAG_CREAT, &dum );
+        rval = mbImpl->tag_get_handle( "SPECTRAL_ORDER", 1, MB_TYPE_INTEGER, soTag, MB_TAG_DENSE | MB_TAG_CREAT, &dum );
     }
 
     return ( rval == MB_SUCCESS ? soTag : 0 );
@@ -77,10 +73,7 @@ ErrorCode SpectralMeshTool::convert_to_coarse( int order, EntityHandle spectral_
 {
     if( order ) spectralOrder = order;
     if( !spectralOrder )
-    {
-        MB_SET_ERR( MB_FAILURE,
-                    "Spectral order must be set or input before converting to spectral mesh" );
-    }
+    { MB_SET_ERR( MB_FAILURE, "Spectral order must be set or input before converting to spectral mesh" ); }
 
     Range     tmp_ents, ents;
     ErrorCode rval = mbImpl->get_entities_by_handle( spectral_set, tmp_ents );
@@ -93,22 +86,19 @@ ErrorCode SpectralMeshTool::convert_to_coarse( int order, EntityHandle spectral_
     if( ents.empty( ) ) { MB_SET_ERR( MB_FAILURE, "Can't find any entities for conversion" ); }
 
     // get a ptr to connectivity
-    if( ents.psize( ) != 1 )
-    { MB_SET_ERR( MB_FAILURE, "Entities must be in one chunk for conversion" ); }
+    if( ents.psize( ) != 1 ) { MB_SET_ERR( MB_FAILURE, "Entities must be in one chunk for conversion" ); }
     EntityHandle* conn;
     int           count, verts_per_e;
     rval = mbImpl->connect_iterate( ents.begin( ), ents.end( ), conn, verts_per_e, count );
     if( MB_SUCCESS != rval || count != (int)ents.size( ) ) return rval;
 
     Range tmp_range;
-    return create_spectral_elems( conn, ents.size( ),
-                                  CN::Dimension( TYPE_FROM_HANDLE( *ents.begin( ) ) ), tmp_range );
+    return create_spectral_elems( conn, ents.size( ), CN::Dimension( TYPE_FROM_HANDLE( *ents.begin( ) ) ), tmp_range );
 }
 
 template< class T >
-ErrorCode SpectralMeshTool::create_spectral_elems( const T* conn, int num_fine_elems, int dim,
-                                                   Range& output_range, int start_idx,
-                                                   Range* local_gids )
+ErrorCode SpectralMeshTool::create_spectral_elems( const T* conn, int num_fine_elems, int dim, Range& output_range,
+                                                   int start_idx, Range* local_gids )
 {
     assert( spectralOrder && num_fine_elems );
 
@@ -124,11 +114,10 @@ ErrorCode SpectralMeshTool::create_spectral_elems( const T* conn, int num_fine_e
     ErrorCode      rval = mbImpl->query_interface( rmi );
     if( MB_SUCCESS != rval ) return rval;
 
-    int verts_per_felem = spectralOrderp1 * spectralOrderp1,
-        verts_per_celem = std::pow( (double)2.0, dim );
+    int verts_per_felem = spectralOrderp1 * spectralOrderp1, verts_per_celem = std::pow( (double)2.0, dim );
 
-    rval = rmi->get_element_connect( num_coarse_elems, verts_per_celem,
-                                     ( 2 == dim ? MBQUAD : MBHEX ), 0, start_elem, new_conn );MB_CHK_SET_ERR( rval, "Failed to create elems" );
+    rval = rmi->get_element_connect( num_coarse_elems, verts_per_celem, ( 2 == dim ? MBQUAD : MBHEX ), 0, start_elem,
+                                     new_conn );MB_CHK_SET_ERR( rval, "Failed to create elems" );
 
     output_range.insert( start_elem, start_elem + num_coarse_elems - 1 );
 
@@ -142,8 +131,8 @@ ErrorCode SpectralMeshTool::create_spectral_elems( const T* conn, int num_fine_e
     // we're assuming here that elems was empty on input
     int           count;
     EntityHandle* sv_ptr = NULL;
-    rval = mbImpl->tag_iterate( spectral_vertices_tag( true ), output_range.begin( ),
-                                output_range.end( ), count, (void*&)sv_ptr );MB_CHK_SET_ERR( rval, "Failed to get SPECTRAL_VERTICES ptr" );
+    rval = mbImpl->tag_iterate( spectral_vertices_tag( true ), output_range.begin( ), output_range.end( ), count,
+                                (void*&)sv_ptr );MB_CHK_SET_ERR( rval, "Failed to get SPECTRAL_VERTICES ptr" );
     assert( count == num_coarse_elems );
     int f = start_idx, fs = 0, fl = 0;
     for( int c = 0; c < num_coarse_elems; c++ )
@@ -156,20 +145,17 @@ ErrorCode SpectralMeshTool::create_spectral_elems( const T* conn, int num_fine_e
         f += verts_per_celem * spectral_unit;
         fs += verts_per_felem;
     }
-    if( local_gids )
-        std::copy( sv_ptr, sv_ptr + verts_per_felem * num_coarse_elems,
-                   range_inserter( *local_gids ) );
+    if( local_gids ) std::copy( sv_ptr, sv_ptr + verts_per_felem * num_coarse_elems, range_inserter( *local_gids ) );
 
     return MB_SUCCESS;
 }
 
 // force instantiation of a few specific types
-template ErrorCode SpectralMeshTool::create_spectral_elems< int >( const int* conn,
-                                                                   int num_fine_elems, int dim,
-                                                                   Range& output_range,
-                                                                   int    start_idx,
+template ErrorCode SpectralMeshTool::create_spectral_elems< int >( const int* conn, int num_fine_elems, int dim,
+                                                                   Range& output_range, int start_idx,
                                                                    Range* local_gids );
-template ErrorCode SpectralMeshTool::create_spectral_elems< EntityHandle >(
-    const EntityHandle* conn, int num_fine_elems, int dim, Range& output_range, int start_idx,
-    Range* local_gids );
+template ErrorCode SpectralMeshTool::create_spectral_elems< EntityHandle >( const EntityHandle* conn,
+                                                                            int num_fine_elems, int dim,
+                                                                            Range& output_range, int start_idx,
+                                                                            Range* local_gids );
 }  // namespace moab

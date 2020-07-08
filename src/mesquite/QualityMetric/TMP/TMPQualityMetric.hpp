@@ -59,30 +59,23 @@ class TMPQualityMetric : public ElemSampleQM
      *\param tc   The target calculator
      *\param wc   The weight calculator
      */
-    TMPQualityMetric( TargetCalculator* tc, WeightCalculator* wc )
-        : targetCalc( tc ), weightCalc( wc )
-    {
-    }
+    TMPQualityMetric( TargetCalculator* tc, WeightCalculator* wc ) : targetCalc( tc ), weightCalc( wc ) {}
 
     MESQUITE_EXPORT virtual int get_negate_flag( ) const;
 
     MESQUITE_EXPORT virtual void get_evaluations( PatchData& pd, std::vector< size_t >& handles,
                                                   bool free_vertices_only, MsqError& err );
 
-    MESQUITE_EXPORT static void get_patch_evaluations( PatchData&             pd,
-                                                       std::vector< size_t >& handles,
+    MESQUITE_EXPORT static void get_patch_evaluations( PatchData& pd, std::vector< size_t >& handles,
                                                        bool free_vertices_only, MsqError& err );
 
     MESQUITE_EXPORT virtual void get_element_evaluations( PatchData& pd, size_t elem_index,
-                                                          std::vector< size_t >& handles,
-                                                          MsqError&              err );
+                                                          std::vector< size_t >& handles, MsqError& err );
 
-    MESQUITE_EXPORT virtual bool evaluate( PatchData& pd, size_t handle, double& value,
-                                           MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate( PatchData& pd, size_t handle, double& value, MsqError& err );
 
     MESQUITE_EXPORT virtual bool evaluate_with_indices( PatchData& pd, size_t handle, double& value,
-                                                        std::vector< size_t >& indices,
-                                                        MsqError&              err );
+                                                        std::vector< size_t >& indices, MsqError& err );
 
     MESQUITE_EXPORT
     void set_target_calculator( TargetCalculator* tc )
@@ -106,24 +99,22 @@ class TMPQualityMetric : public ElemSampleQM
     }
 
     MESQUITE_EXPORT
-    virtual void initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
-                                   MsqError& err );
+    virtual void initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings, MsqError& err );
 
   protected:
-    MESQUITE_EXPORT virtual bool evaluate_internal( PatchData& pd, size_t handle, double& value,
-                                                    size_t* indices, size_t& num_indices,
-                                                    MsqError& err ) = 0;
+    MESQUITE_EXPORT virtual bool evaluate_internal( PatchData& pd, size_t handle, double& value, size_t* indices,
+                                                    size_t& num_indices, MsqError& err ) = 0;
 
     MESQUITE_EXPORT
     bool evaluate_surface_common(  // input:
         PatchData& pd, Sample sample, size_t element_index, const NodeSet& bits,
         // output:
-        size_t* indices, size_t& num_indices, MsqVector< 2 >* derivs, MsqMatrix< 2, 2 >& W,
-        MsqMatrix< 2, 2 >& A, MsqMatrix< 3, 2 >& S_a_transpose_Theta, MsqError& err );
+        size_t* indices, size_t& num_indices, MsqVector< 2 >* derivs, MsqMatrix< 2, 2 >& W, MsqMatrix< 2, 2 >& A,
+        MsqMatrix< 3, 2 >& S_a_transpose_Theta, MsqError& err );
 
     MESQUITE_EXPORT
-    void weight( PatchData& pd, Sample sample, size_t elem, int num_points, double& value,
-                 Vector3D* grad, SymMatrix3D* diag, Matrix3D* hess, MsqError& err );
+    void weight( PatchData& pd, Sample sample, size_t elem, int num_points, double& value, Vector3D* grad,
+                 SymMatrix3D* diag, Matrix3D* hess, MsqError& err );
 
     enum
     {

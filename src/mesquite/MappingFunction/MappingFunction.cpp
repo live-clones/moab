@@ -45,9 +45,8 @@ NodeSet MappingFunction::sample_points( NodeSet higher_order ) const
     return higher_order;
 }
 
-void MappingFunction::convert_connectivity_indices_impl( EntityTopology topo, int input_type,
-                                                         int output_type, size_t* index_list,
-                                                         unsigned num_indices, MsqError& err )
+void MappingFunction::convert_connectivity_indices_impl( EntityTopology topo, int input_type, int output_type,
+                                                         size_t* index_list, unsigned num_indices, MsqError& err )
 {
     bool in_edges, in_faces, in_region, out_edges, out_faces, out_region;
     TopologyInfo::higher_order( topo, input_type, in_edges, in_faces, in_region, err );MSQ_ERRRTN( err );
@@ -60,8 +59,7 @@ void MappingFunction::convert_connectivity_indices_impl( EntityTopology topo, in
 
     // If both have mid-region nodes and they don't have the same stuff
     // preceeding the mid-region node, then we need to change that index.
-    bool region_diff =
-        in_region && out_region && ( in_faces != out_faces || in_edges != out_edges );
+    bool region_diff = in_region && out_region && ( in_faces != out_faces || in_edges != out_edges );
     // If both have mid-face nodes and one has mid-edge nodes and the other
     // does not, then we need to change the face indices.
     bool face_diff = in_faces && out_faces && in_edges != out_edges;
@@ -102,8 +100,7 @@ void MappingFunction::convert_connectivity_indices_impl( EntityTopology topo, in
         }
         else if( index_list[ i ] < in_regn_offset )
         {  // mid-face node
-            assert( TopologyInfo::dimension( topo ) == 3 ||
-                    index_list[ i ] == (unsigned)input_type - 1 );
+            assert( TopologyInfo::dimension( topo ) == 3 || index_list[ i ] == (unsigned)input_type - 1 );
             if( !out_faces )
             {
                 MSQ_SETERR( err )( "Incompatible nodes present.", MsqError::UNSUPPORTED_ELEMENT );
@@ -116,8 +113,7 @@ void MappingFunction::convert_connectivity_indices_impl( EntityTopology topo, in
         else
         {  // region
             assert( in_region );
-            assert( TopologyInfo::dimension( topo ) == 3 &&
-                    index_list[ i ] == (unsigned)input_type - 1 );
+            assert( TopologyInfo::dimension( topo ) == 3 && index_list[ i ] == (unsigned)input_type - 1 );
             if( !out_region )
             {
                 MSQ_SETERR( err )( "Incompatible nodes present.", MsqError::UNSUPPORTED_ELEMENT );
@@ -130,10 +126,9 @@ void MappingFunction::convert_connectivity_indices_impl( EntityTopology topo, in
     }
 }
 
-void MappingFunction2D::jacobian( const PatchData& pd, size_t element_number, NodeSet nodeset,
-                                  Sample location, size_t* vertex_patch_indices_out,
-                                  MsqVector< 2 >* d_coeff_d_xi_out, size_t& num_vtx_out,
-                                  MsqMatrix< 3, 2 >& jacobian_out, MsqError& err ) const
+void MappingFunction2D::jacobian( const PatchData& pd, size_t element_number, NodeSet nodeset, Sample location,
+                                  size_t* vertex_patch_indices_out, MsqVector< 2 >* d_coeff_d_xi_out,
+                                  size_t& num_vtx_out, MsqMatrix< 3, 2 >& jacobian_out, MsqError& err ) const
 {
     const MsqMeshEntity& elem = pd.element_by_index( element_number );
     const size_t*        conn = elem.get_vertex_index_array( );
@@ -187,10 +182,9 @@ void MappingFunction2D::ideal( Sample location, MsqMatrix< 3, 2 >& J, MsqError& 
     J *= size;
 }
 
-void MappingFunction3D::jacobian( const PatchData& pd, size_t element_number, NodeSet nodeset,
-                                  Sample location, size_t* vertex_patch_indices_out,
-                                  MsqVector< 3 >* d_coeff_d_xi_out, size_t& num_vtx_out,
-                                  MsqMatrix< 3, 3 >& jacobian_out, MsqError& err ) const
+void MappingFunction3D::jacobian( const PatchData& pd, size_t element_number, NodeSet nodeset, Sample location,
+                                  size_t* vertex_patch_indices_out, MsqVector< 3 >* d_coeff_d_xi_out,
+                                  size_t& num_vtx_out, MsqMatrix< 3, 3 >& jacobian_out, MsqError& err ) const
 {
     const MsqMeshEntity& elem = pd.element_by_index( element_number );
     const size_t*        conn = elem.get_vertex_index_array( );

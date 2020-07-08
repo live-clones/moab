@@ -125,7 +125,7 @@ double MBMesquite::StopWatch::total_time( ) const
 }
 
 MBMesquite::StopWatchCollection::Key MBMesquite::StopWatchCollection::add( const std::string& name,
-                                                                           bool fail_if_exists )
+                                                                           bool               fail_if_exists )
 {
     // Don't allow empty name
     if( name == "" ) return 0;
@@ -147,8 +147,7 @@ MBMesquite::StopWatchCollection::Key MBMesquite::StopWatchCollection::add( const
             }
         }
         // If not, create a new one
-        if( i == mEntries.size( ) )
-        { mEntries.push_back( std::pair< std::string, StopWatch >( name, StopWatch( ) ) ); }
+        if( i == mEntries.size( ) ) { mEntries.push_back( std::pair< std::string, StopWatch >( name, StopWatch( ) ) ); }
         key = i + 1;
     }
     // If it already existed...
@@ -158,8 +157,7 @@ MBMesquite::StopWatchCollection::Key MBMesquite::StopWatchCollection::add( const
     return key;
 }
 
-MBMesquite::StopWatchCollection::Key
-    MBMesquite::StopWatchCollection::get_key( const std::string& name ) const
+MBMesquite::StopWatchCollection::Key MBMesquite::StopWatchCollection::get_key( const std::string& name ) const
 {
     Key key = 0;
 
@@ -196,14 +194,12 @@ void MBMesquite::StopWatchCollection::remove( const MBMesquite::StopWatchCollect
 
 void MBMesquite::StopWatchCollection::start( const MBMesquite::StopWatchCollection::Key key )
 {
-    if( key > 0 && key <= mEntries.size( ) && mEntries[ key - 1 ].first != "" )
-        mEntries[ key - 1 ].second.start( );
+    if( key > 0 && key <= mEntries.size( ) && mEntries[ key - 1 ].first != "" ) mEntries[ key - 1 ].second.start( );
 }
 
 void MBMesquite::StopWatchCollection::stop( const MBMesquite::StopWatchCollection::Key key )
 {
-    if( key > 0 && key <= mEntries.size( ) && mEntries[ key - 1 ].first != "" )
-        mEntries[ key - 1 ].second.stop( );
+    if( key > 0 && key <= mEntries.size( ) && mEntries[ key - 1 ].first != "" ) mEntries[ key - 1 ].second.stop( );
 }
 
 void MBMesquite::StopWatchCollection::reset( const MBMesquite::StopWatchCollection::Key key )
@@ -211,8 +207,7 @@ void MBMesquite::StopWatchCollection::reset( const MBMesquite::StopWatchCollecti
     if( key > 0 && key <= mEntries.size( ) ) mEntries[ key - 1 ].second.reset( );
 }
 
-double MBMesquite::StopWatchCollection::total_time(
-    const MBMesquite::StopWatchCollection::Key key ) const
+double MBMesquite::StopWatchCollection::total_time( const MBMesquite::StopWatchCollection::Key key ) const
 {
     if( key > 0 && key <= mEntries.size( ) && mEntries[ key - 1 ].first != "" )
         return mEntries[ key - 1 ].second.total_time( );
@@ -220,8 +215,7 @@ double MBMesquite::StopWatchCollection::total_time(
         return 0.0;
 }
 
-int MBMesquite::StopWatchCollection::number_of_starts(
-    const MBMesquite::StopWatchCollection::Key key ) const
+int MBMesquite::StopWatchCollection::number_of_starts( const MBMesquite::StopWatchCollection::Key key ) const
 {
     if( key > 0 && key <= mEntries.size( ) && mEntries[ key - 1 ].first != "" )
         return mEntries[ key - 1 ].second.number_of_starts( );
@@ -289,9 +283,9 @@ std::ostream& MBMesquite::operator<<( std::ostream& str, MBMesquite::StopWatchCo
     for( i = 0; i < number_of_keys; ++i )
     {
         str << std::setiosflags( std::ios::left ) << std::setw( 13 )
-            << MBMesquite::GlobalStopWatches.total_time( sorted_keys[ i ] ) << " "
-            << std::setw( 13 ) << MBMesquite::GlobalStopWatches.number_of_starts( sorted_keys[ i ] )
-            << " " << MBMesquite::GlobalStopWatches.get_string( sorted_keys[ i ] ) << std::endl;
+            << MBMesquite::GlobalStopWatches.total_time( sorted_keys[ i ] ) << " " << std::setw( 13 )
+            << MBMesquite::GlobalStopWatches.number_of_starts( sorted_keys[ i ] ) << " "
+            << MBMesquite::GlobalStopWatches.get_string( sorted_keys[ i ] ) << std::endl;
     }
     return str;
 }

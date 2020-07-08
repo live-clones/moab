@@ -54,14 +54,12 @@ namespace common_tree
     {
         for( std::size_t i = 0; i < box.min.size( ); ++i )
         {
-            if( p[ i ] < ( box.min[ i ] - tol ) || p[ i ] > ( box.max[ i ] ) + tol )
-            { return false; }
+            if( p[ i ] < ( box.min[ i ] - tol ) || p[ i ] > ( box.max[ i ] ) + tol ) { return false; }
         }
         return true;
     }
 
-    template< typename _Box >
-    bool box_contains_box( const _Box& a, const _Box& b, const double tol )
+    template< typename _Box > bool box_contains_box( const _Box& a, const _Box& b, const double tol )
     {
         for( std::size_t i = 0; i < a.min.size( ); ++i )
         {
@@ -82,17 +80,14 @@ namespace common_tree
         };  // Compute_center
     }  // namespace
 
-    template< typename Vector >
-    inline void compute_box_center( Vector& max, Vector& min, Vector& center )
+    template< typename Vector > inline void compute_box_center( Vector& max, Vector& min, Vector& center )
     {
         typedef typename Vector::value_type Unit;
         center = min;
-        std::transform( max.begin( ), max.end( ), center.begin( ), center.begin( ),
-                        Compute_center< Unit >( ) );
+        std::transform( max.begin( ), max.end( ), center.begin( ), center.begin( ), Compute_center< Unit >( ) );
     }
 
-    template< typename Box >
-    inline typename Box::value_type compute_box_center( const Box& box, const int dim )
+    template< typename Box > inline typename Box::value_type compute_box_center( const Box& box, const int dim )
     {
         return ( box.max[ dim ] + box.min[ dim ] ) / 2.0;
     }
@@ -198,8 +193,8 @@ namespace common_tree
     // Requirements: Data contains at least a bounding box.
     // And a non-default constructor which takes only a Box&
     template< typename Entity_handles, typename Element_map, typename Bounding_box, typename Moab >
-    void construct_element_map( const Entity_handles& elements, Element_map& map,
-                                Bounding_box& bounding_box, Moab& moab )
+    void construct_element_map( const Entity_handles& elements, Element_map& map, Bounding_box& bounding_box,
+                                Moab& moab )
     {
         typedef typename Element_map::mapped_type         Box_data;
         typedef typename Entity_handles::value_type       Entity_handle;
@@ -220,8 +215,7 @@ namespace common_tree
             moab.get_coords( vertex_handle, num_vertices, &coordinate[ 0 ] );
             Bounding_box box( coordinate.begin( ), coordinate.begin( ) + 3 );
             if( i == elements.begin( ) ) { bounding_box = box; }
-            for( Coordinate_iterator j = coordinate.begin( ) + DIM; j != coordinate.end( );
-                 j += DIM )
+            for( Coordinate_iterator j = coordinate.begin( ) + DIM; j != coordinate.end( ); j += DIM )
             {
                 update_bounding_max( box.max, j );
                 update_bounding_min( box.min, j );

@@ -60,11 +60,10 @@ class WriteDamsel : public WriterIface
     //! \param tag_list If non-NULL, only these tags should be written
     //! \param num_tags The number of tag handles in tag_list, used only if tag_list is non-NULL
     //! \param requested_output_dimension Dimension used for coordinates
-    ErrorCode write_file( const char*        file_name, const bool /* overwrite */,
-                          const FileOptions& opts, const EntityHandle* meshset_list,
-                          const int num_sets, const std::vector< std::string >& /* qa_records */,
-                          const Tag* /* tag_list */ = NULL, int /* num_tags */ = 0,
-                          int /* requested_output_dimension */ = 3 );
+    ErrorCode write_file( const char* file_name, const bool /* overwrite */, const FileOptions& opts,
+                          const EntityHandle* meshset_list, const int num_sets,
+                          const std::vector< std::string >& /* qa_records */, const Tag* /* tag_list */ = NULL,
+                          int /* num_tags */ = 0, int /* requested_output_dimension */ = 3 );
 
     enum
     {

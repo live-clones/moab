@@ -61,8 +61,8 @@ std::string AWQualityMetric::get_name( ) const
     return targetMetric->get_name( );
 }
 
-bool AWQualityMetric::evaluate_internal( PatchData& pd, size_t p_handle, double& value,
-                                         size_t* indices, size_t& num_indices, MsqError& err )
+bool AWQualityMetric::evaluate_internal( PatchData& pd, size_t p_handle, double& value, size_t* indices,
+                                         size_t& num_indices, MsqError& err )
 {
     const Sample   s = ElemSampleQM::sample( p_handle );
     const size_t   e = ElemSampleQM::elem( p_handle );
@@ -97,8 +97,8 @@ bool AWQualityMetric::evaluate_internal( PatchData& pd, size_t p_handle, double&
     {
         MsqMatrix< 2, 2 > W, A;
         MsqMatrix< 3, 2 > S_a_transpose_Theta;
-        rval = evaluate_surface_common( pd, s, e, bits, indices, num_indices, mDerivs2D, W, A,
-                                        S_a_transpose_Theta, err );
+        rval =
+            evaluate_surface_common( pd, s, e, bits, indices, num_indices, mDerivs2D, W, A, S_a_transpose_Theta, err );
         if( MSQ_CHKERR( err ) || !rval ) return false;
         rval = targetMetric->evaluate( A, W, value, err );
         MSQ_ERRZERO( err );
@@ -116,8 +116,8 @@ bool AWQualityMetric::evaluate_internal( PatchData& pd, size_t p_handle, double&
 }
 
 bool AWQualityMetric::evaluate_with_gradient( PatchData& pd, size_t p_handle, double& value,
-                                              std::vector< size_t >&   indices,
-                                              std::vector< Vector3D >& grad, MsqError& err )
+                                              std::vector< size_t >& indices, std::vector< Vector3D >& grad,
+                                              MsqError& err )
 {
     const Sample   s = ElemSampleQM::sample( p_handle );
     const size_t   e = ElemSampleQM::elem( p_handle );
@@ -154,8 +154,7 @@ bool AWQualityMetric::evaluate_with_gradient( PatchData& pd, size_t p_handle, do
     {
         MsqMatrix< 2, 2 > W, A, dmdA;
         MsqMatrix< 3, 2 > S_a_transpose_Theta;
-        rval = evaluate_surface_common( pd, s, e, bits, mIndices, num_idx, mDerivs2D, W, A,
-                                        S_a_transpose_Theta, err );
+        rval = evaluate_surface_common( pd, s, e, bits, mIndices, num_idx, mDerivs2D, W, A, S_a_transpose_Theta, err );
         if( MSQ_CHKERR( err ) || !rval ) return false;
         rval = targetMetric->evaluate_with_grad( A, W, value, dmdA, err );
         MSQ_ERRZERO( err );
@@ -181,8 +180,7 @@ bool AWQualityMetric::evaluate_with_gradient( PatchData& pd, size_t p_handle, do
 }
 
 bool AWQualityMetric::evaluate_with_Hessian( PatchData& pd, size_t p_handle, double& value,
-                                             std::vector< size_t >&   indices,
-                                             std::vector< Vector3D >& grad,
+                                             std::vector< size_t >& indices, std::vector< Vector3D >& grad,
                                              std::vector< Matrix3D >& Hessian, MsqError& err )
 {
     const Sample   s = ElemSampleQM::sample( p_handle );
@@ -224,13 +222,11 @@ bool AWQualityMetric::evaluate_with_Hessian( PatchData& pd, size_t p_handle, dou
 #ifdef NUMERICAL_2D_HESSIAN
         // return finite difference approximation for now
 
-        return QualityMetric::evaluate_with_Hessian( pd, p_handle, value, indices, grad, Hessian,
-                                                     err );
+        return QualityMetric::evaluate_with_Hessian( pd, p_handle, value, indices, grad, Hessian, err );
 #else
         MsqMatrix< 2, 2 > W, A, dmdA, d2mdA2[ 3 ];
         MsqMatrix< 3, 2 > M;
-        rval =
-            evaluate_surface_common( pd, s, e, bits, mIndices, num_idx, mDerivs2D, W, A, M, err );
+        rval = evaluate_surface_common( pd, s, e, bits, mIndices, num_idx, mDerivs2D, W, A, M, err );
         if( MSQ_CHKERR( err ) || !rval ) return false;
         rval = targetMetric->evaluate_with_hess( A, W, value, dmdA, d2mdA2, err );
         MSQ_ERRZERO( err );
@@ -268,10 +264,8 @@ bool AWQualityMetric::evaluate_with_Hessian( PatchData& pd, size_t p_handle, dou
 }
 
 bool AWQualityMetric::evaluate_with_Hessian_diagonal( PatchData& pd, size_t p_handle, double& value,
-                                                      std::vector< size_t >&      indices,
-                                                      std::vector< Vector3D >&    grad,
-                                                      std::vector< SymMatrix3D >& diagonal,
-                                                      MsqError&                   err )
+                                                      std::vector< size_t >& indices, std::vector< Vector3D >& grad,
+                                                      std::vector< SymMatrix3D >& diagonal, MsqError& err )
 {
     const Sample   s = ElemSampleQM::sample( p_handle );
     const size_t   e = ElemSampleQM::elem( p_handle );
@@ -311,13 +305,11 @@ bool AWQualityMetric::evaluate_with_Hessian_diagonal( PatchData& pd, size_t p_ha
     {
 #ifdef NUMERICAL_2D_HESSIAN
         // use finite diference approximation for now
-        return QualityMetric::evaluate_with_Hessian_diagonal( pd, p_handle, value, indices, grad,
-                                                              diagonal, err );
+        return QualityMetric::evaluate_with_Hessian_diagonal( pd, p_handle, value, indices, grad, diagonal, err );
 #else
         MsqMatrix< 2, 2 > W, A, dmdA, d2mdA2[ 3 ];
         MsqMatrix< 3, 2 > M;
-        rval =
-            evaluate_surface_common( pd, s, e, bits, mIndices, num_idx, mDerivs2D, W, A, M, err );
+        rval = evaluate_surface_common( pd, s, e, bits, mIndices, num_idx, mDerivs2D, W, A, M, err );
         if( MSQ_CHKERR( err ) || !rval ) return false;
         rval = targetMetric->evaluate_with_hess( A, W, value, dmdA, d2mdA2, err );
         MSQ_ERRZERO( err );

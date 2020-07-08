@@ -214,9 +214,8 @@ class gs_data
 
     /**Sets up the moab_gs_data; see constructor for parameter documentation
      */
-    ErrorCode initialize( uint n, const long* label, const Ulong* ulabel, uint maxv,
-                          const unsigned int nlabels, const unsigned int nulabels,
-                          crystal_data* crystal );
+    ErrorCode initialize( uint n, const long* label, const Ulong* ulabel, uint maxv, const unsigned int nlabels,
+                          const unsigned int nulabels, crystal_data* crystal );
 
     void reset( );
 

@@ -268,15 +268,13 @@ bool CLArgs::long_flag( char fl, const char* name, const char* desc, CLArgs::Lon
     return impl->add_flag( new CLArgLong( fl, name, desc, callback ) );
 }
 
-bool CLArgs::double_flag( char fl, const char* name, const char* desc,
-                          CLArgs::DoubleArgI* callback )
+bool CLArgs::double_flag( char fl, const char* name, const char* desc, CLArgs::DoubleArgI* callback )
 {
     if( !is_flag_available( fl ) ) return false;
     return impl->add_flag( new CLArgDouble( fl, name, desc, callback ) );
 }
 
-bool CLArgs::toggle_flag( char on_flag, char off_flag, const char* desc,
-                          CLArgs::ToggleArgI* callback )
+bool CLArgs::toggle_flag( char on_flag, char off_flag, const char* desc, CLArgs::ToggleArgI* callback )
 {
     if( !( is_flag_available( on_flag ) && is_flag_available( off_flag ) ) ) return false;
 
@@ -326,8 +324,7 @@ void CLArgs::add_optional_arg( const char* name )
     impl->add_opt_arg( name );
 }
 
-bool CLArgs::parse_options( int argc, char** argv, std::vector< std::string >& args_out,
-                            std::ostream& error_stream )
+bool CLArgs::parse_options( int argc, char** argv, std::vector< std::string >& args_out, std::ostream& error_stream )
 {
     std::vector< CLArgFlag* > pending;
     bool                      no_more_flags = false;
@@ -339,8 +336,8 @@ bool CLArgs::parse_options( int argc, char** argv, std::vector< std::string >& a
             pending.erase( pending.begin( ) );
             if( !flag->parse( argv[ i ] ) )
             {
-                error_stream << argv[ 0 ] << ": invalid value for flag: -" << flag->flag( ) << " \""
-                             << argv[ i ] << '"' << std::endl;
+                error_stream << argv[ 0 ] << ": invalid value for flag: -" << flag->flag( ) << " \"" << argv[ i ] << '"'
+                             << std::endl;
                 return false;
             }
         }
@@ -371,16 +368,14 @@ bool CLArgs::parse_options( int argc, char** argv, std::vector< std::string >& a
                 }
                 else if( !flag->parse( NULL ) )
                 {
-                    error_stream << argv[ 0 ] << ": conflicting flag: -" << argv[ i ][ j ]
-                                 << std::endl;
+                    error_stream << argv[ 0 ] << ": conflicting flag: -" << argv[ i ][ j ] << std::endl;
                     return false;
                 }
             }
         }
         else if( !impl->add_parsed_arg( argv[ i ] ) )
         {
-            error_stream << argv[ 0 ] << ": unexpected argument: \"" << argv[ i ] << '"'
-                         << std::endl;
+            error_stream << argv[ 0 ] << ": unexpected argument: \"" << argv[ i ] << '"' << std::endl;
             return false;
         }
     }
@@ -389,8 +384,7 @@ bool CLArgs::parse_options( int argc, char** argv, std::vector< std::string >& a
 
     if( !pending.empty( ) )
     {
-        error_stream << argv[ 0 ] << ": expected argument following flag: -"
-                     << pending.front( )->flag( ) << std::endl;
+        error_stream << argv[ 0 ] << ": expected argument following flag: -" << pending.front( )->flag( ) << std::endl;
         return false;
     }
     if( !impl->have_required_args( ) )
@@ -467,8 +461,7 @@ bool CLArgs::KeyWordArg::compare_no_case( const char* s1, const char* s2 )
 }
 
 CLArgs::IntRange::IntRange( const int* min, const int* max )
-    : mMin( min ? *min : std::numeric_limits< int >::min( ) ),
-      mMax( max ? *max : std::numeric_limits< int >::max( ) )
+    : mMin( min ? *min : std::numeric_limits< int >::min( ) ), mMax( max ? *max : std::numeric_limits< int >::max( ) )
 {
 }
 

@@ -67,8 +67,7 @@ ErrorCode TestErrorHandling_4( )
 
     // Create a variable-length dense tag
     Tag tag;
-    rval = mb.tag_get_handle( "var_len_den", 1, MB_TYPE_INTEGER, tag,
-                              MB_TAG_VARLEN | MB_TAG_DENSE | MB_TAG_CREAT );MB_CHK_SET_ERR( rval, "Failed to create a tag" );
+    rval = mb.tag_get_handle( "var_len_den", 1, MB_TYPE_INTEGER, tag, MB_TAG_VARLEN | MB_TAG_DENSE | MB_TAG_CREAT );MB_CHK_SET_ERR( rval, "Failed to create a tag" );
 
     // Attempt to iterate over a variable-length tag, which will never be possible
     void* ptr = NULL;

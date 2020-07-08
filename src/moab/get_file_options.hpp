@@ -17,12 +17,10 @@ bool check_for_flag( const char* str )
 }
 
 // New get_file_options() function with added possibilities for mbcoupler_test.
-ErrorCode get_file_options( int argc, char** argv, std::vector< std::string >& meshFiles,
-                            std::string& interpTag, std::string& gNormTag, std::string& ssNormTag,
-                            std::vector< const char* >& ssTagNames,
-                            std::vector< const char* >& ssTagValues, std::string& readOpts,
-                            std::string& outFile, std::string& writeOpts, std::string& dbgFile,
-                            bool& help )
+ErrorCode get_file_options( int argc, char** argv, std::vector< std::string >& meshFiles, std::string& interpTag,
+                            std::string& gNormTag, std::string& ssNormTag, std::vector< const char* >& ssTagNames,
+                            std::vector< const char* >& ssTagValues, std::string& readOpts, std::string& outFile,
+                            std::string& writeOpts, std::string& dbgFile, bool& help )
 {
     // Initialize some of the outputs to null values indicating not present
     // in the argument list.
@@ -33,8 +31,7 @@ ErrorCode get_file_options( int argc, char** argv, std::vector< std::string >& m
     outFile = "";
     writeOpts = "PARALLEL=WRITE_PART;CPUTIME";
     dbgFile = "";
-    std::string defaultDbgFile =
-        argv[ 0 ];  // The executable name will be the default debug output file.
+    std::string defaultDbgFile = argv[ 0 ];  // The executable name will be the default debug output file.
 
     // These will indicate if we've gotten our required parameters at the end of parsing.
     bool haveMeshes = false;
@@ -63,8 +60,7 @@ ErrorCode get_file_options( int argc, char** argv, std::vector< std::string >& m
                     meshFiles[ i ] = argv[ npos++ ];
                 else
                 {
-                    std::cerr << "    ERROR - missing correct number of mesh filenames"
-                              << std::endl;
+                    std::cerr << "    ERROR - missing correct number of mesh filenames" << std::endl;
                     return MB_FAILURE;
                 }
             }
@@ -219,15 +215,14 @@ ErrorCode get_file_options( int argc, char** argv, std::vector< std::string >& m
         meshFiles.resize( 2 );
         meshFiles[ 0 ] = std::string( TestDir + "/64bricks_1khex.h5m" );
         meshFiles[ 1 ] = std::string( TestDir + "/64bricks_12ktet.h5m" );
-        std::cout << "Mesh files not entered; using default files " << meshFiles[ 0 ] << " and "
-                  << meshFiles[ 1 ] << std::endl;
+        std::cout << "Mesh files not entered; using default files " << meshFiles[ 0 ] << " and " << meshFiles[ 1 ]
+                  << std::endl;
     }
 
     if( !haveInterpTag )
     {
         interpTag = "vertex_field";
-        std::cout << "Interpolation field name not given, using default of " << interpTag
-                  << std::endl;
+        std::cout << "Interpolation field name not given, using default of " << interpTag << std::endl;
     }
 
 #ifdef MOAB_HAVE_HDF5

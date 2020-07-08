@@ -57,13 +57,12 @@ const char* face_start_token = "f";
 const char* const geom_name[] = { "Vertex\0", "Curve\0", "Surface\0", "Volume\0" };
 
 // Geometric Categories
-const char geom_category[][ CATEGORY_TAG_SIZE ] = { "Vertex\0", "Curve\0", "Surface\0", "Volume\0",
-                                                    "Group\0" };
+const char geom_category[][ CATEGORY_TAG_SIZE ] = { "Vertex\0", "Curve\0", "Surface\0", "Volume\0", "Group\0" };
 
 // Constructor
 ReadOBJ::ReadOBJ( Interface* impl )
-    : MBI( impl ), geom_tag( 0 ), id_tag( 0 ), name_tag( 0 ), category_tag( 0 ),
-      faceting_tol_tag( 0 ), geometry_resabs_tag( 0 ), obj_name_tag( 0 )
+    : MBI( impl ), geom_tag( 0 ), id_tag( 0 ), name_tag( 0 ), category_tag( 0 ), faceting_tol_tag( 0 ),
+      geometry_resabs_tag( 0 ), obj_name_tag( 0 )
 {
     assert( NULL != impl );
     MBI->query_interface( readMeshIface );
@@ -73,25 +72,22 @@ ReadOBJ::ReadOBJ( Interface* impl )
     // Get all handles
     int       negone = -1;
     ErrorCode rval;
-    rval = MBI->tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, geom_tag,
-                                MB_TAG_SPARSE | MB_TAG_CREAT, &negone );MB_CHK_ERR_RET( rval );
+    rval = MBI->tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, geom_tag, MB_TAG_SPARSE | MB_TAG_CREAT,
+                                &negone );MB_CHK_ERR_RET( rval );
 
     id_tag = MBI->globalId_tag( );
 
-    rval = MBI->tag_get_handle( NAME_TAG_NAME, NAME_TAG_SIZE, MB_TYPE_OPAQUE, name_tag,
-                                MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_ERR_RET( rval );
+    rval = MBI->tag_get_handle( NAME_TAG_NAME, NAME_TAG_SIZE, MB_TYPE_OPAQUE, name_tag, MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_ERR_RET( rval );
 
     rval = MBI->tag_get_handle( CATEGORY_TAG_NAME, CATEGORY_TAG_SIZE, MB_TYPE_OPAQUE, category_tag,
                                 MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_ERR_RET( rval );
 
-    rval = MBI->tag_get_handle( "OBJECT_NAME", 32, MB_TYPE_OPAQUE, obj_name_tag,
-                                MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_ERR_RET( rval );
+    rval = MBI->tag_get_handle( "OBJECT_NAME", 32, MB_TYPE_OPAQUE, obj_name_tag, MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_ERR_RET( rval );
 
-    rval = MBI->tag_get_handle( "FACETING_TOL", 1, MB_TYPE_DOUBLE, faceting_tol_tag,
-                                MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_ERR_RET( rval );
+    rval = MBI->tag_get_handle( "FACETING_TOL", 1, MB_TYPE_DOUBLE, faceting_tol_tag, MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_ERR_RET( rval );
 
-    rval = MBI->tag_get_handle( "GEOMETRY_RESABS", 1, MB_TYPE_DOUBLE, geometry_resabs_tag,
-                                MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_ERR_RET( rval );
+    rval =
+        MBI->tag_get_handle( "GEOMETRY_RESABS", 1, MB_TYPE_DOUBLE, geometry_resabs_tag, MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_ERR_RET( rval );
 }
 
 // Destructor
@@ -106,18 +102,15 @@ ReadOBJ::~ReadOBJ( )
     delete myGeomTool;
 }
 
-ErrorCode ReadOBJ::read_tag_values( const char* /*file_name*/, const char* /*tag_name*/,
-                                    const FileOptions& /*opts*/,
-                                    std::vector< int >& /*tag_values_out*/,
-                                    const SubsetList* /*subset_list*/ )
+ErrorCode ReadOBJ::read_tag_values( const char* /*file_name*/, const char* /*tag_name*/, const FileOptions& /*opts*/,
+                                    std::vector< int >& /*tag_values_out*/, const SubsetList* /*subset_list*/ )
 {
     return MB_NOT_IMPLEMENTED;
 }
 
 // Load the file as called by the Interface function
-ErrorCode ReadOBJ::load_file( const char* filename, const EntityHandle*, const FileOptions&,
-                              const ReaderIface::SubsetList* subset_list,
-                              const Tag* /*file_id_tag*/ )
+ErrorCode ReadOBJ::load_file( const char*                    filename, const EntityHandle*, const FileOptions&,
+                              const ReaderIface::SubsetList* subset_list, const Tag* /*file_id_tag*/ )
 {
     ErrorCode                   rval;
     int                         ignored = 0;  // Number of lines not beginning with o, v, or f
@@ -130,8 +123,7 @@ ErrorCode ReadOBJ::load_file( const char* filename, const EntityHandle*, const F
     int                         num_groups;
 
     // At this time, there is no support for reading a subset of the file
-    if( subset_list )
-    { MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "Reading subset of files not supported for OBJ." ); }
+    if( subset_list ) { MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "Reading subset of files not supported for OBJ." ); }
 
     std::ifstream input_file( filename );  // Filestream for OBJ file
 
@@ -228,8 +220,7 @@ ErrorCode ReadOBJ::load_file( const char* filename, const EntityHandle*, const F
                         rval = split_quad( tokens, vertex_list, new_faces_eh );MB_CHK_ERR( rval );
 
                         // Add new faces created by split quad to meshset
-                        if( rval == MB_SUCCESS )
-                        { MBI->add_entities( curr_meshset, new_faces_eh ); }
+                        if( rval == MB_SUCCESS ) { MBI->add_entities( curr_meshset, new_faces_eh ); }
                     }
 
                     else
@@ -266,13 +257,11 @@ ErrorCode ReadOBJ::load_file( const char* filename, const EntityHandle*, const F
 /* The tokenize function will split an input line
  * into a vector of strings based upon the delimiter
  */
-void ReadOBJ::tokenize( const std::string& str, std::vector< std::string >& tokens,
-                        const char* delimiters2 )
+void ReadOBJ::tokenize( const std::string& str, std::vector< std::string >& tokens, const char* delimiters2 )
 {
     tokens.clear( );
 
-    std::string::size_type next_token_end,
-        next_token_start = str.find_first_not_of( delimiters2, 0 );
+    std::string::size_type next_token_end, next_token_start = str.find_first_not_of( delimiters2, 0 );
 
     while( std::string::npos != next_token_start )
     {
@@ -336,15 +325,14 @@ keyword_type ReadOBJ::get_keyword( std::vector< std::string > tokens )
     return keywords[ match( tokens[ 0 ], keywords ) ];
 }
 
-template< typename T >
-std::string ReadOBJ::match( const std::string& token, std::map< std::string, T >& tokenList )
+template< typename T > std::string ReadOBJ::match( const std::string& token, std::map< std::string, T >& tokenList )
 {
     // Initialize with no match and obj_undefined as return string
     std::string best_match = OBJ_UNDEFINED;
 
     // Search the map
-    for( typename std::map< std::string, T >::iterator thisToken = tokenList.begin( );
-         thisToken != tokenList.end( ); ++thisToken )
+    for( typename std::map< std::string, T >::iterator thisToken = tokenList.begin( ); thisToken != tokenList.end( );
+         ++thisToken )
     {
         // If a perfect match break the loop (assume keyword list is unambiguous)
         if( token == ( *thisToken ).first )
@@ -362,8 +350,7 @@ std::string ReadOBJ::match( const std::string& token, std::map< std::string, T >
  * The create_new_object function starts a new meshset for each object
  * that will contain all faces that make up the object.
  */
-ErrorCode ReadOBJ::create_new_object( std::string object_name, int curr_object,
-                                      EntityHandle& object_meshset )
+ErrorCode ReadOBJ::create_new_object( std::string object_name, int curr_object, EntityHandle& object_meshset )
 {
     ErrorCode rval;
 
@@ -414,8 +401,7 @@ ErrorCode ReadOBJ::create_new_object( std::string object_name, int curr_object,
  * The create_new_group function starts a new meshset for each group
  * that will contain all faces that make up the group
  */
-ErrorCode ReadOBJ::create_new_group( std::string group_name, int curr_group,
-                                     EntityHandle& group_meshset )
+ErrorCode ReadOBJ::create_new_group( std::string group_name, int curr_group, EntityHandle& group_meshset )
 {
     ErrorCode rval;
 
@@ -453,9 +439,8 @@ ErrorCode ReadOBJ::create_new_vertex( std::vector< std::string > v_tokens, Entit
    a structure that has the three
    connectivity points as members.
  */
-ErrorCode ReadOBJ::create_new_face( std::vector< std::string >         f_tokens,
-                                    const std::vector< EntityHandle >& vertex_list,
-                                    EntityHandle&                      face_eh )
+ErrorCode ReadOBJ::create_new_face( std::vector< std::string > f_tokens, const std::vector< EntityHandle >& vertex_list,
+                                    EntityHandle& face_eh )
 {
     face      next_face;
     ErrorCode rval;
@@ -482,8 +467,8 @@ ErrorCode ReadOBJ::create_new_face( std::vector< std::string >         f_tokens,
 }
 
 // The split_quad function divides a quad face into 4 tri faces.
-ErrorCode ReadOBJ::split_quad( std::vector< std::string >   f_tokens,
-                               std::vector< EntityHandle >& vertex_list, Range& face_eh )
+ErrorCode ReadOBJ::split_quad( std::vector< std::string > f_tokens, std::vector< EntityHandle >& vertex_list,
+                               Range& face_eh )
 {
     ErrorCode                   rval;
     std::vector< EntityHandle > quad_vert_eh;

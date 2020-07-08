@@ -31,10 +31,8 @@ class BoundBox
     void      compute_center( CartVect& center );
     void      update( const BoundBox& other_box );
     void      update( const double* coords );
-    ErrorCode update( Interface& iface, const Range& elems, bool spherical = false,
-                      double radius = 1. );
-    ErrorCode update( Interface& iface, const EntityHandle ent, bool spherical = false,
-                      double radius = 1. );
+    ErrorCode update( Interface& iface, const Range& elems, bool spherical = false, double radius = 1. );
+    ErrorCode update( Interface& iface, const EntityHandle ent, bool spherical = false, double radius = 1. );
     void      update_min( const BoundBox& other_box );
     void      update_min( const double* coords );
     void      update_max( const BoundBox& other_box );
@@ -86,9 +84,8 @@ inline BoundBox::BoundBox( const double* corners )
 
 inline bool BoundBox::contains_point( const double* point, const double tol ) const
 {
-    if( point[ 0 ] < bMin[ 0 ] - tol || point[ 0 ] > bMax[ 0 ] + tol ||
-        point[ 1 ] < bMin[ 1 ] - tol || point[ 1 ] > bMax[ 1 ] + tol ||
-        point[ 2 ] < bMin[ 2 ] - tol || point[ 2 ] > bMax[ 2 ] + tol )
+    if( point[ 0 ] < bMin[ 0 ] - tol || point[ 0 ] > bMax[ 0 ] + tol || point[ 1 ] < bMin[ 1 ] - tol ||
+        point[ 1 ] > bMax[ 1 ] + tol || point[ 2 ] < bMin[ 2 ] - tol || point[ 2 ] > bMax[ 2 ] + tol )
         return false;
     else
         return true;
@@ -96,9 +93,8 @@ inline bool BoundBox::contains_point( const double* point, const double tol ) co
 
 inline bool BoundBox::intersects_box( const BoundBox& b, const double tol ) const
 {
-    if( b.bMax[ 0 ] < bMin[ 0 ] - tol || b.bMin[ 0 ] > bMax[ 0 ] + tol ||
-        b.bMax[ 1 ] < bMin[ 1 ] - tol || b.bMin[ 1 ] > bMax[ 1 ] + tol ||
-        b.bMax[ 2 ] < bMin[ 2 ] - tol || b.bMin[ 2 ] > bMax[ 2 ] + tol )
+    if( b.bMax[ 0 ] < bMin[ 0 ] - tol || b.bMin[ 0 ] > bMax[ 0 ] + tol || b.bMax[ 1 ] < bMin[ 1 ] - tol ||
+        b.bMin[ 1 ] > bMax[ 1 ] + tol || b.bMax[ 2 ] < bMin[ 2 ] - tol || b.bMin[ 2 ] > bMax[ 2 ] + tol )
         return false;
 
     else
@@ -166,8 +162,7 @@ inline std::ostream& operator<<( std::ostream& out, const BoundBox& box )
     return out;
 }
 
-inline ErrorCode BoundBox::update( Interface& iface, const EntityHandle ent, bool spherical,
-                                   double radius )
+inline ErrorCode BoundBox::update( Interface& iface, const EntityHandle ent, bool spherical, double radius )
 {
     Range tmp_range( ent, ent );
     return update( iface, tmp_range, spherical, radius );
@@ -194,16 +189,16 @@ inline double BoundBox::distance( const double* from_point ) const
 
 inline double BoundBox::diagonal_length( ) const
 {
-    if( DBL_MAX == bMax[ 0 ] || DBL_MAX == bMax[ 1 ] || DBL_MAX == bMax[ 2 ] ||
-        DBL_MAX == bMin[ 0 ] || DBL_MAX == bMin[ 1 ] || DBL_MAX == bMin[ 2 ] )
+    if( DBL_MAX == bMax[ 0 ] || DBL_MAX == bMax[ 1 ] || DBL_MAX == bMax[ 2 ] || DBL_MAX == bMin[ 0 ] ||
+        DBL_MAX == bMin[ 1 ] || DBL_MAX == bMin[ 2 ] )
         return DBL_MAX;
     return ( bMax - bMin ).length( );
 }
 
 inline double BoundBox::diagonal_squared( ) const
 {
-    if( DBL_MAX == bMax[ 0 ] || DBL_MAX == bMax[ 1 ] || DBL_MAX == bMax[ 2 ] ||
-        DBL_MAX == bMin[ 0 ] || DBL_MAX == bMin[ 1 ] || DBL_MAX == bMin[ 2 ] )
+    if( DBL_MAX == bMax[ 0 ] || DBL_MAX == bMax[ 1 ] || DBL_MAX == bMax[ 2 ] || DBL_MAX == bMin[ 0 ] ||
+        DBL_MAX == bMin[ 1 ] || DBL_MAX == bMin[ 2 ] )
         return DBL_MAX;
     return ( bMax - bMin ).length_squared( );
 }

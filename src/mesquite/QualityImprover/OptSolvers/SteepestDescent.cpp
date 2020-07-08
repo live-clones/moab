@@ -112,8 +112,7 @@ void SteepestDescent::optimize_vertex_positions( PatchData& pd, MsqError& err )
     //  return;
     //  if (norm_squared < DBL_EPSILON)
     //    return;
-    if( norm_squared >= DBL_EPSILON )
-        step_size = max_edge_len / std::sqrt( norm_squared ) * pd.num_free_vertices( );
+    if( norm_squared >= DBL_EPSILON ) step_size = max_edge_len / std::sqrt( norm_squared ) * pd.num_free_vertices( );
 
     // The steepest descent loop...
     // We loop until the user-specified termination criteria are met.
@@ -140,8 +139,7 @@ void SteepestDescent::optimize_vertex_positions( PatchData& pd, MsqError& err )
             // Move vertices to new positions.
             // Note: step direction is -gradient so we pass +gradient and
             //       -step_size to achieve the same thing.
-            pd.move_free_vertices_constrained( arrptr( gradient ), gradient.size( ), -step_size,
-                                               err );MSQ_ERRRTN( err );
+            pd.move_free_vertices_constrained( arrptr( gradient ), gradient.size( ), -step_size, err );MSQ_ERRRTN( err );
             // Evaluate objective function for new vertices.  We call the
             // 'evaluate' form here because we aren't sure yet if we want to
             // keep these vertices.  Until we call 'update', we have the option

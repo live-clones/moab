@@ -81,14 +81,12 @@ class CachingTargetCalculator : public TargetCalculator, private ExtraDataUser< 
         return cachedCalculator;
     }
 
-    virtual bool get_3D_target( PatchData& pd, size_t element, Sample sample,
-                                MsqMatrix< 3, 3 >& W_out, MsqError& err );
+    virtual bool get_3D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 3, 3 >& W_out, MsqError& err );
 
-    virtual bool get_surface_target( PatchData& pd, size_t element, Sample sample,
-                                     MsqMatrix< 3, 2 >& W_out, MsqError& err );
+    virtual bool get_surface_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 3, 2 >& W_out,
+                                     MsqError& err );
 
-    virtual bool get_2D_target( PatchData& pd, size_t element, Sample sample,
-                                MsqMatrix< 2, 2 >& W_out, MsqError& err );
+    virtual bool get_2D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 2, 2 >& W_out, MsqError& err );
 
     virtual bool have_surface_orient( ) const
     {
@@ -99,8 +97,7 @@ class CachingTargetCalculator : public TargetCalculator, private ExtraDataUser< 
     void notify_patch_destroyed( CachedTargetData& d );
 
     void notify_sub_patch( PatchData& orig_patch, CachedTargetData& data, PatchData& sub_patch,
-                           const size_t* vertex_index_map, const size_t* element_index_map,
-                           MsqError& err );
+                           const size_t* vertex_index_map, const size_t* element_index_map, MsqError& err );
 
     void notify_new_patch( PatchData& patch, CachedTargetData& data );
 

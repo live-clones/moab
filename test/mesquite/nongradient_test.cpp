@@ -207,9 +207,7 @@ int main( )
     queue4.run_instructions( &mesh_and_domain2, err );
     if( err.error_code( ) == err.BARRIER_VIOLATED )
     {
-        std::cerr << std::endl
-                  << "PMeanPTemplate OF with inverted mesh test passed" << std::endl
-                  << std::endl;
+        std::cerr << std::endl << "PMeanPTemplate OF with inverted mesh test passed" << std::endl << std::endl;
         err.clear( );
     }
     else

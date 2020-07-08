@@ -137,9 +137,7 @@ bool points_are_coincident( const double* first, const double* second )
 }
 
 // dumb n^2 coincident node algorithm
-ErrorCode
-    find_coincident_nodes( Range                                                   vertices,
-                           std::vector< std::pair< EntityHandle, EntityHandle > >& coin_nodes )
+ErrorCode find_coincident_nodes( Range vertices, std::vector< std::pair< EntityHandle, EntityHandle > >& coin_nodes )
 {
     double                                  first_coords[ 3 ], second_coords[ 3 ];
     Range::iterator                         iter, jter;
@@ -170,9 +168,7 @@ ErrorCode
     return MB_SUCCESS;
 }
 
-ErrorCode
-    find_coincident_edges( Range                                                   entities,
-                           std::vector< std::pair< EntityHandle, EntityHandle > >& coin_edges )
+ErrorCode find_coincident_edges( Range entities, std::vector< std::pair< EntityHandle, EntityHandle > >& coin_edges )
 {
     double                                  coords1[ 3 ], coords2[ 3 ], coords3[ 3 ];
     Range::iterator                         iter, jter;
@@ -240,8 +236,7 @@ ErrorCode find_coincident_elements( Range entities, int num_nodes,
                 // Elements should be the same sense to merge.
                 if( gMB->get_connectivity( &*jter, 1, conn ) != MB_SUCCESS ) return MB_FAILURE;
 
-                if( gMB->get_coords( &conn[ 0 ], 1, coords2[ 0 ] ) != MB_SUCCESS )
-                    return MB_FAILURE;
+                if( gMB->get_coords( &conn[ 0 ], 1, coords2[ 0 ] ) != MB_SUCCESS ) return MB_FAILURE;
 
                 // Find if first node is coincident before testing the rest.
                 for( i = 0; i < num_nodes; i++ )
@@ -253,15 +248,12 @@ ErrorCode find_coincident_elements( Range entities, int num_nodes,
                 {
                     for( ii = 1; ii < num_nodes; ii++ )
                     {
-                        if( gMB->get_coords( &conn[ ii ], 1, coords2[ ii ] ) != MB_SUCCESS )
-                            return MB_FAILURE;
+                        if( gMB->get_coords( &conn[ ii ], 1, coords2[ ii ] ) != MB_SUCCESS ) return MB_FAILURE;
                     }
 
                     for( j = 1; j < num_nodes; j++ )
                     {
-                        if( !points_are_coincident( coords1[ j ],
-                                                    coords2[ ( j + i ) % num_nodes ] ) )
-                            break;
+                        if( !points_are_coincident( coords1[ j ], coords2[ ( j + i ) % num_nodes ] ) ) break;
                     }
 
                     if( j == num_nodes )
@@ -382,8 +374,8 @@ ErrorCode merge_top_down( EntityCount& init_count, EntityCount& curr_count )
 
     // Make sure we didn't merge anything.
     if( init_count.node != curr_count.node || init_count.edge != curr_count.edge ||
-        init_count.quad != curr_count.quad || init_count.tri != curr_count.tri ||
-        init_count.hex != curr_count.hex || init_count.tet != curr_count.tet )
+        init_count.quad != curr_count.quad || init_count.tri != curr_count.tri || init_count.hex != curr_count.hex ||
+        init_count.tet != curr_count.tet )
     {
         cout << "***ERROR: Merged top down when not using auto merge.***" << endl;
         return MB_FAILURE;
@@ -427,9 +419,8 @@ ErrorCode merge_nodes( EntityCount& init_count, EntityCount& curr_count )
     init_count.node = curr_count.node;
 
     // Make sure we didn't merge anything else.
-    if( init_count.edge != curr_count.edge || init_count.quad != curr_count.quad ||
-        init_count.tri != curr_count.tri || init_count.hex != curr_count.hex ||
-        init_count.tet != curr_count.tet )
+    if( init_count.edge != curr_count.edge || init_count.quad != curr_count.quad || init_count.tri != curr_count.tri ||
+        init_count.hex != curr_count.hex || init_count.tet != curr_count.tet )
     {
         cout << "***ERROR: Merged other objects when merging nodes.***" << endl;
         return MB_FAILURE;
@@ -476,9 +467,8 @@ ErrorCode merge_edges( EntityCount& init_count, EntityCount& curr_count )
     init_count.edge = curr_count.edge;
 
     // Make sure we didn't merge anything else.
-    if( init_count.node != curr_count.node || init_count.quad != curr_count.quad ||
-        init_count.tri != curr_count.tri || init_count.hex != curr_count.hex ||
-        init_count.tet != curr_count.tet )
+    if( init_count.node != curr_count.node || init_count.quad != curr_count.quad || init_count.tri != curr_count.tri ||
+        init_count.hex != curr_count.hex || init_count.tet != curr_count.tet )
     {
         cout << "***ERROR: Merged other objects when merging edges.***" << endl;
         return MB_FAILURE;
@@ -553,8 +543,8 @@ ErrorCode merge_2D_elem( EntityCount& init_count, EntityCount& curr_count )
     init_count.quad = curr_count.quad;
 
     // Make sure we didn't merge anything else.
-    if( init_count.node != curr_count.node || init_count.edge != curr_count.edge ||
-        init_count.hex != curr_count.hex || init_count.tet != curr_count.tet )
+    if( init_count.node != curr_count.node || init_count.edge != curr_count.edge || init_count.hex != curr_count.hex ||
+        init_count.tet != curr_count.tet )
     {
         cout << "***ERROR: Merged other objects when merging faces.***" << endl;
         return MB_FAILURE;
@@ -770,12 +760,9 @@ ErrorCode process_td_auto_merge( std::string& file_name )
     }
 
     // Make sure we merged everything.
-    if( init_count.node - curr_count.node != diff_count.node ||
-        init_count.edge - curr_count.edge != diff_count.edge ||
-        init_count.quad - curr_count.quad != diff_count.quad ||
-        init_count.tri - curr_count.tri != diff_count.tri ||
-        init_count.hex - curr_count.hex != diff_count.hex ||
-        init_count.tet - curr_count.tet != diff_count.tet )
+    if( init_count.node - curr_count.node != diff_count.node || init_count.edge - curr_count.edge != diff_count.edge ||
+        init_count.quad - curr_count.quad != diff_count.quad || init_count.tri - curr_count.tri != diff_count.tri ||
+        init_count.hex - curr_count.hex != diff_count.hex || init_count.tet - curr_count.tet != diff_count.tet )
     {
         cout << "***ERROR: Not all coincident objects merged automatically.***" << endl;
         curr_count.print( );
@@ -838,12 +825,9 @@ ErrorCode process_mo_auto_merge( std::string& file_name )
     }
 
     // Make sure we merged everything.
-    if( init_count.node - curr_count.node != diff_count.node ||
-        init_count.edge - curr_count.edge != diff_count.edge ||
-        init_count.quad - curr_count.quad != diff_count.quad ||
-        init_count.tri - curr_count.tri != diff_count.tri ||
-        init_count.hex - curr_count.hex != diff_count.hex ||
-        init_count.tet - curr_count.tet != diff_count.tet )
+    if( init_count.node - curr_count.node != diff_count.node || init_count.edge - curr_count.edge != diff_count.edge ||
+        init_count.quad - curr_count.quad != diff_count.quad || init_count.tri - curr_count.tri != diff_count.tri ||
+        init_count.hex - curr_count.hex != diff_count.hex || init_count.tet - curr_count.tet != diff_count.tet )
     {
         cout << "***ERROR: Not all coincident objects merged automatically.***" << endl;
         curr_count.print( );
@@ -897,12 +881,9 @@ ErrorCode process_bu_auto_merge( std::string& file_name )
     }
 
     // Make sure we merged everything.
-    if( init_count.node - curr_count.node != diff_count.node ||
-        init_count.edge - curr_count.edge != diff_count.edge ||
-        init_count.quad - curr_count.quad != diff_count.quad ||
-        init_count.tri - curr_count.tri != diff_count.tri ||
-        init_count.hex - curr_count.hex != diff_count.hex ||
-        init_count.tet - curr_count.tet != diff_count.tet )
+    if( init_count.node - curr_count.node != diff_count.node || init_count.edge - curr_count.edge != diff_count.edge ||
+        init_count.quad - curr_count.quad != diff_count.quad || init_count.tri - curr_count.tri != diff_count.tri ||
+        init_count.hex - curr_count.hex != diff_count.hex || init_count.tet - curr_count.tet != diff_count.tet )
     {
         cout << "***ERROR: Not all coincident objects merged automatically.***" << endl;
         curr_count.print( );
@@ -964,15 +945,12 @@ int main( )
 {
     ErrorCode   result;
     std::string test_files[] = {
-        std::string( "test/2barcase1.g" ),  std::string( "test/2barcase2.g" ),
-        std::string( "test/2hexcase1.g" ),  std::string( "test/2hexcase2.g" ),
-        std::string( "test/2hexcase3.g" ),  std::string( "test/2hexcase4.g" ),
-        std::string( "test/2hexcase5.g" ),  std::string( "test/2quadcase1.g" ),
-        std::string( "test/2quadcase2.g" ), std::string( "test/2quadcase3.g" ),
-        std::string( "test/2quadcase4.g" ), std::string( "test/2tetcase1.g" ),
-        std::string( "test/2tetcase2.g" ),  std::string( "test/2tetcase3.g" ),
-        std::string( "test/2tetcase4.g" ),  std::string( "test/2tricase1.g" ),
-        std::string( "test/2tricase2.g" ),  std::string( "test/2tricase3.g" ) };
+        std::string( "test/2barcase1.g" ),  std::string( "test/2barcase2.g" ),  std::string( "test/2hexcase1.g" ),
+        std::string( "test/2hexcase2.g" ),  std::string( "test/2hexcase3.g" ),  std::string( "test/2hexcase4.g" ),
+        std::string( "test/2hexcase5.g" ),  std::string( "test/2quadcase1.g" ), std::string( "test/2quadcase2.g" ),
+        std::string( "test/2quadcase3.g" ), std::string( "test/2quadcase4.g" ), std::string( "test/2tetcase1.g" ),
+        std::string( "test/2tetcase2.g" ),  std::string( "test/2tetcase3.g" ),  std::string( "test/2tetcase4.g" ),
+        std::string( "test/2tricase1.g" ),  std::string( "test/2tricase2.g" ),  std::string( "test/2tricase3.g" ) };
 
     // Create the MB database instance.
     gMB = new Core( );

@@ -20,9 +20,8 @@ namespace element_utility
         Linear_tet_map( const Self& f ) : Tinv( f.Tinv ), eh( f.eh ) {}
         // Natural coordinates
         template< typename Moab, typename Points, typename Point >
-        std::pair< bool, Point > operator( )( const Moab& moab, const Entity_handle _eh,
-                                              const Points& v, const Point& p,
-                                              const double tol = 1e-6 )
+        std::pair< bool, Point > operator( )( const Moab& moab, const Entity_handle _eh, const Points& v,
+                                              const Point& p, const double tol = 1e-6 )
         {
             // Remove the warning about unused parameter
             if( NULL != &moab ) {}
@@ -63,11 +62,9 @@ namespace element_utility
             {
                 I += field_values[ i ];
             }
-            double det = Matrix( v[ 1 ][ 0 ] - v[ 0 ][ 0 ], v[ 2 ][ 0 ] - v[ 0 ][ 0 ],
-                                 v[ 3 ][ 0 ] - v[ 0 ][ 0 ], v[ 1 ][ 1 ] - v[ 0 ][ 1 ],
-                                 v[ 2 ][ 1 ] - v[ 0 ][ 1 ], v[ 3 ][ 1 ] - v[ 0 ][ 1 ],
-                                 v[ 1 ][ 2 ] - v[ 0 ][ 2 ], v[ 2 ][ 2 ] - v[ 0 ][ 2 ],
-                                 v[ 3 ][ 2 ] - v[ 0 ][ 2 ] )
+            double det = Matrix( v[ 1 ][ 0 ] - v[ 0 ][ 0 ], v[ 2 ][ 0 ] - v[ 0 ][ 0 ], v[ 3 ][ 0 ] - v[ 0 ][ 0 ],
+                                 v[ 1 ][ 1 ] - v[ 0 ][ 1 ], v[ 2 ][ 1 ] - v[ 0 ][ 1 ], v[ 3 ][ 1 ] - v[ 0 ][ 1 ],
+                                 v[ 1 ][ 2 ] - v[ 0 ][ 2 ], v[ 2 ][ 2 ] - v[ 0 ][ 2 ], v[ 3 ][ 2 ] - v[ 0 ][ 2 ] )
                              .determinant( );
             I *= det / 24.0;
             return I;
@@ -78,11 +75,10 @@ namespace element_utility
             if( eh != _eh )
             {
                 eh = _eh;
-                Tinv = moab::Matrix::inverse( Matrix(
-                    v[ 1 ][ 0 ] - v[ 0 ][ 0 ], v[ 2 ][ 0 ] - v[ 0 ][ 0 ], v[ 3 ][ 0 ] - v[ 0 ][ 0 ],
-                    v[ 1 ][ 1 ] - v[ 0 ][ 1 ], v[ 2 ][ 1 ] - v[ 0 ][ 1 ], v[ 3 ][ 1 ] - v[ 0 ][ 1 ],
-                    v[ 1 ][ 2 ] - v[ 0 ][ 2 ], v[ 2 ][ 2 ] - v[ 0 ][ 2 ],
-                    v[ 3 ][ 2 ] - v[ 0 ][ 2 ] ) );
+                Tinv = moab::Matrix::inverse(
+                    Matrix( v[ 1 ][ 0 ] - v[ 0 ][ 0 ], v[ 2 ][ 0 ] - v[ 0 ][ 0 ], v[ 3 ][ 0 ] - v[ 0 ][ 0 ],
+                            v[ 1 ][ 1 ] - v[ 0 ][ 1 ], v[ 2 ][ 1 ] - v[ 0 ][ 1 ], v[ 3 ][ 1 ] - v[ 0 ][ 1 ],
+                            v[ 1 ][ 2 ] - v[ 0 ][ 2 ], v[ 2 ][ 2 ] - v[ 0 ][ 2 ], v[ 3 ][ 2 ] - v[ 0 ][ 2 ] ) );
             }
         }
 

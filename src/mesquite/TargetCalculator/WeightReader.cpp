@@ -39,8 +39,7 @@
 namespace MBMesquite
 {
 
-static TagHandle get_tag( Mesh* mesh, unsigned num_doubles, const std::string& base_name,
-                          MsqError& err )
+static TagHandle get_tag( Mesh* mesh, unsigned num_doubles, const std::string& base_name, MsqError& err )
 {
     std::ostringstream str;
     str << base_name << num_doubles;
@@ -58,8 +57,7 @@ static TagHandle get_tag( Mesh* mesh, unsigned num_doubles, const std::string& b
     if( temp_type != Mesh::DOUBLE || temp_length != num_doubles )
     {
         MSQ_SETERR( err )
-        ( MsqError::TAG_ALREADY_EXISTS, "Mismatched type or length for existing tag \"%s\"",
-          str.str( ).c_str( ) );
+        ( MsqError::TAG_ALREADY_EXISTS, "Mismatched type or length for existing tag \"%s\"", str.str( ).c_str( ) );
     }
 
     return handle;
@@ -98,8 +96,8 @@ double WeightReader::get_weight( PatchData& pd, size_t element, Sample sample, M
 
     // get the tag data
     data.weights.resize( num_samples );
-    pd.get_mesh( )->tag_get_element_data( tag_handle, 1, pd.get_element_handles_array( ) + element,
-                                          &data.weights[ 0 ], err );
+    pd.get_mesh( )->tag_get_element_data( tag_handle, 1, pd.get_element_handles_array( ) + element, &data.weights[ 0 ],
+                                          err );
     if( MSQ_CHKERR( err ) )
     {
         data.weights.clear( );
@@ -123,8 +121,8 @@ void WeightReader::notify_new_patch( PatchData&, WeightReaderData& data )
     data.weights.clear( );
 }
 
-void WeightReader::notify_sub_patch( PatchData& /*pd*/, WeightReaderData& data, PatchData& subpatch,
-                                     const size_t*, const size_t*, MsqError& /*err*/ )
+void WeightReader::notify_sub_patch( PatchData& /*pd*/, WeightReaderData& data, PatchData& subpatch, const size_t*,
+                                     const size_t*, MsqError& /*err*/ )
 {
     WeightReaderData& other = get_data( subpatch );
     if( other.handles.empty( ) ) other.handles = data.handles;

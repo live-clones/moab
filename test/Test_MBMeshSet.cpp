@@ -30,8 +30,7 @@ void test_clear( unsigned flags );
 //! Create 10x10x10 hex mesh
 void make_mesh( Interface& iface );
 //! Create 10x10x10 hex mesh, return ranges of handles
-void make_mesh( Interface& iface, EntityHandle& vstart, EntityHandle& vend, EntityHandle& hstart,
-                EntityHandle& hend );
+void make_mesh( Interface& iface, EntityHandle& vstart, EntityHandle& vend, EntityHandle& hstart, EntityHandle& hend );
 //! Print std::vector<EntityHandle>
 void print_handle_vect( const char* prefix, const std::vector< EntityHandle >& vect );
 //! Print Range
@@ -53,8 +52,7 @@ enum BoolOp
 //! Perform boolean op on two entity sets and verify result
 bool test_boolean( Core& mb, BoolOp op, unsigned flags1, const Range& set1_ents, unsigned flags2,
                    const Range& set2_ents );
-void test_iterator( Interface& moab, SetIterator* iter, EntityHandle set, EntityType etype,
-                    int dim );
+void test_iterator( Interface& moab, SetIterator* iter, EntityHandle set, EntityType etype, int dim );
 void test_iterators( unsigned int flags, bool type, bool dim );
 void test_all_iterators( );
 
@@ -338,19 +336,18 @@ void make_mesh( Interface& iface )
             for( int x = 0; x < dim; ++x )
             {
                 const EntityHandle off = 1 + x + dim1 * y + dimq * z;
-                const EntityHandle conn[] = {
-                    off,        off + 1,        off + 1 + dim1,        off + dim1,
-                    off + dimq, off + 1 + dimq, off + 1 + dim1 + dimq, off + dim1 + dimq };
-                EntityHandle new_handle = 0;
-                ErrorCode    rval = iface.create_element( MBHEX, conn, 8, new_handle );CHECK_ERR( rval );
+                const EntityHandle conn[] = { off,        off + 1,        off + 1 + dim1,        off + dim1,
+                                              off + dimq, off + 1 + dimq, off + 1 + dim1 + dimq, off + dim1 + dimq };
+                EntityHandle       new_handle = 0;
+                ErrorCode          rval = iface.create_element( MBHEX, conn, 8, new_handle );CHECK_ERR( rval );
                 CHECK_EQUAL( prev_handle++, new_handle );
             }
         }
     }
 }
 
-void make_mesh( Interface& mb, EntityHandle& first_vert, EntityHandle& last_vert,
-                EntityHandle& first_hex, EntityHandle& last_hex )
+void make_mesh( Interface& mb, EntityHandle& first_vert, EntityHandle& last_vert, EntityHandle& first_hex,
+                EntityHandle& last_hex )
 {
     make_mesh( mb );
 
@@ -415,8 +412,8 @@ void print_mbrange( const char* prefix, const Range& range )
     print_handles( std::cout, prefix, range.begin( ), range.end( ) );
 }
 
-bool compare_set_contents( unsigned flags, const std::vector< EntityHandle >& expected,
-                           int set_count, std::vector< EntityHandle >& vect, const Range& range )
+bool compare_set_contents( unsigned flags, const std::vector< EntityHandle >& expected, int set_count,
+                           std::vector< EntityHandle >& vect, const Range& range )
 {
 
     std::vector< EntityHandle > sorted( expected );
@@ -1200,20 +1197,17 @@ void regression_insert_set_1( )
     EntityHandle       e = CREATE_HANDLE( MBEDGE, 0 );
     EntityHandle       q = CREATE_HANDLE( MBQUAD, 0 );
     const EntityHandle initial_ranges[] = {
-        0x7fe,      0x7fe,      0x802,      0x80b,      0xb3a,      0xb3c,      0xb6b,
-        0xb6b,      0xbed,      0xbee,      0x19ff,     0x19ff,     0x1a0b,     0x1a0b,
-        0x1a16,     0x1a17,     0x1a56,     0x1a57,     0x2554,     0x255c,     e + 0x0099,
-        e + 0x009b, e + 0x00c0, e + 0x00c2, e + 0x0729, e + 0x0732, e + 0x0a3b, e + 0x0a3d,
-        e + 0x0ba9, e + 0x0bab, e + 0x2322, e + 0x232b, q + 0x00c,  q + 0x017,  q + 0x0e9,
-        q + 0x112,  q + 0x2f2,  q + 0x303,  q + 0x67e,  q + 0x6a5,  q + 0x866,  q + 0x871,
-        q + 0x8f5,  q + 0x900,  q + 0xc06,  q + 0xc17,  q + 0xc7e,  q + 0xc9b,  q + 0xce0,
-        q + 0xd07 };
+        0x7fe,      0x7fe,      0x802,      0x80b,      0xb3a,      0xb3c,      0xb6b,      0xb6b,      0xbed,
+        0xbee,      0x19ff,     0x19ff,     0x1a0b,     0x1a0b,     0x1a16,     0x1a17,     0x1a56,     0x1a57,
+        0x2554,     0x255c,     e + 0x0099, e + 0x009b, e + 0x00c0, e + 0x00c2, e + 0x0729, e + 0x0732, e + 0x0a3b,
+        e + 0x0a3d, e + 0x0ba9, e + 0x0bab, e + 0x2322, e + 0x232b, q + 0x00c,  q + 0x017,  q + 0x0e9,  q + 0x112,
+        q + 0x2f2,  q + 0x303,  q + 0x67e,  q + 0x6a5,  q + 0x866,  q + 0x871,  q + 0x8f5,  q + 0x900,  q + 0xc06,
+        q + 0xc17,  q + 0xc7e,  q + 0xc9b,  q + 0xce0,  q + 0xd07 };
 
-    const EntityHandle new_ranges[] = { 0x7e1,  0x829,  0xb37,  0xb63,  0xb6b,  0xb6b,  0xb73,
-                                        0xb75,  0xbed,  0xbee,  0xc0b,  0xc10,  0x19fd, 0x19fd,
-                                        0x19ff, 0x19ff, 0x1a02, 0x1a04, 0x1a0b, 0x1a0b, 0x1a11,
-                                        0x1a17, 0x1a1b, 0x1a23, 0x1a56, 0x1a57, 0x1a7c, 0x1a96,
-                                        0x1bb5, 0x1bba, 0x254b, 0x2565, 0x25a5, 0x25bf };
+    const EntityHandle new_ranges[] = { 0x7e1,  0x829,  0xb37,  0xb63,  0xb6b,  0xb6b,  0xb73,  0xb75,  0xbed,
+                                        0xbee,  0xc0b,  0xc10,  0x19fd, 0x19fd, 0x19ff, 0x19ff, 0x1a02, 0x1a04,
+                                        0x1a0b, 0x1a0b, 0x1a11, 0x1a17, 0x1a1b, 0x1a23, 0x1a56, 0x1a57, 0x1a7c,
+                                        0x1a96, 0x1bb5, 0x1bba, 0x254b, 0x2565, 0x25a5, 0x25bf };
 
     Core       moab;
     Interface& mb = moab;
@@ -1438,8 +1432,7 @@ void test_iterators( unsigned int flags, bool test_type, bool test_dim )
     }
 }
 
-void test_iterator( Interface& moab, SetIterator* iter, EntityHandle set, EntityType etype,
-                    int dim )
+void test_iterator( Interface& moab, SetIterator* iter, EntityHandle set, EntityType etype, int dim )
 {
     // iterate over the set, adding to contents
     std::vector< EntityHandle > entities, entities2;

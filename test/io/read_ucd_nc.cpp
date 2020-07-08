@@ -35,8 +35,7 @@ int main( int argc, char* argv[] )
     int fail = MPI_Init( &argc, &argv );
     if( fail ) return 1;
 #else
-    argv[ 0 ] =
-        argv[ argc - argc ];  // To remove the warnings in serial mode about unused variables
+    argv[ 0 ] = argv[ argc - argc ];  // To remove the warnings in serial mode about unused variables
 #endif
 
     result += RUN_TEST( test_read_all );
@@ -232,8 +231,7 @@ void test_read_coord_vars( )
     // Check tag for regular coordinate variable lev
     tag_name = "lev";
     var_len = 0;
-    rval = mb.tag_get_handle( tag_name.c_str( ), var_len, MB_TYPE_OPAQUE, var_tag,
-                              MB_TAG_SPARSE | MB_TAG_VARLEN );CHECK_ERR( rval );
+    rval = mb.tag_get_handle( tag_name.c_str( ), var_len, MB_TYPE_OPAQUE, var_tag, MB_TAG_SPARSE | MB_TAG_VARLEN );CHECK_ERR( rval );
     CHECK_EQUAL( true, var_tag->variable_length( ) );
     CHECK_EQUAL( MB_TYPE_DOUBLE, var_tag->get_data_type( ) );
 
@@ -248,8 +246,7 @@ void test_read_coord_vars( )
     // Check tag for dummy coordinate variable ncol
     tag_name = "ncol";
     var_len = 0;
-    rval = mb.tag_get_handle( tag_name.c_str( ), var_len, MB_TYPE_OPAQUE, var_tag,
-                              MB_TAG_SPARSE | MB_TAG_VARLEN );CHECK_ERR( rval );
+    rval = mb.tag_get_handle( tag_name.c_str( ), var_len, MB_TYPE_OPAQUE, var_tag, MB_TAG_SPARSE | MB_TAG_VARLEN );CHECK_ERR( rval );
     CHECK_EQUAL( true, var_tag->variable_length( ) );
     CHECK_EQUAL( MB_TYPE_INTEGER, var_tag->get_data_type( ) );
 
@@ -269,8 +266,7 @@ void test_read_coord_vars( )
     // Check tag for regular coordinate lev
     tag_name = "lev";
     var_len = 0;
-    rval = mb.tag_get_handle( tag_name.c_str( ), var_len, MB_TYPE_OPAQUE, var_tag,
-                              MB_TAG_SPARSE | MB_TAG_VARLEN );CHECK_ERR( rval );
+    rval = mb.tag_get_handle( tag_name.c_str( ), var_len, MB_TYPE_OPAQUE, var_tag, MB_TAG_SPARSE | MB_TAG_VARLEN );CHECK_ERR( rval );
     CHECK_EQUAL( true, var_tag->variable_length( ) );
     CHECK_EQUAL( MB_TYPE_DOUBLE, var_tag->get_data_type( ) );
 
@@ -284,8 +280,7 @@ void test_read_coord_vars( )
     // Check tag for dummy coordinate variable ncol
     tag_name = "ncol";
     var_len = 0;
-    rval = mb.tag_get_handle( tag_name.c_str( ), var_len, MB_TYPE_OPAQUE, var_tag,
-                              MB_TAG_SPARSE | MB_TAG_VARLEN );CHECK_ERR( rval );
+    rval = mb.tag_get_handle( tag_name.c_str( ), var_len, MB_TYPE_OPAQUE, var_tag, MB_TAG_SPARSE | MB_TAG_VARLEN );CHECK_ERR( rval );
     CHECK_EQUAL( true, var_tag->variable_length( ) );
     CHECK_EQUAL( MB_TYPE_INTEGER, var_tag->get_data_type( ) );
 
@@ -350,8 +345,8 @@ void test_gather_onevar( )
 
         // Get T0 tag values on 4 strategically selected gather set vertices
         double       T0_val[ 4 * levels ];
-        EntityHandle vert_ents[] = { gather_set_verts[ 0 ], gather_set_verts[ 1728 ],
-                                     gather_set_verts[ 1729 ], gather_set_verts[ 3457 ] };
+        EntityHandle vert_ents[] = { gather_set_verts[ 0 ], gather_set_verts[ 1728 ], gather_set_verts[ 1729 ],
+                                     gather_set_verts[ 3457 ] };
         rval = mb.tag_get_data( Ttag0, vert_ents, 4, T0_val );CHECK_ERR( rval );
 
         const double eps = 0.001;

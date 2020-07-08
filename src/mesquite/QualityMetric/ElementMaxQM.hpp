@@ -56,8 +56,7 @@ class ElementMaxQM : public ElementQM
 
     MESQUITE_EXPORT virtual int get_negate_flag( ) const;
 
-    MESQUITE_EXPORT virtual bool evaluate( PatchData& pd, size_t handle, double& value,
-                                           MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate( PatchData& pd, size_t handle, double& value, MsqError& err );
 
   private:
     ElemSampleQM*                 mMetric;

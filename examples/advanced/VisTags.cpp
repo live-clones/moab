@@ -149,8 +149,7 @@ int main( int argc, char** argv )
             ostringstream newTagName;
             newTagName << tagName << "_" << level;
             Tag newTagh;
-            rval = mb->tag_get_handle( newTagName.str( ).c_str( ), 1, type, newTagh,
-                                       MB_TAG_DENSE | MB_TAG_CREAT );
+            rval = mb->tag_get_handle( newTagName.str( ).c_str( ), 1, type, newTagh, MB_TAG_DENSE | MB_TAG_CREAT );
             if( MB_SUCCESS != rval )
             {
                 cout << "not getting new tag " << newTagName.str( ) << "\n";

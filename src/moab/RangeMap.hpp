@@ -75,8 +75,7 @@ template< typename KeyType, typename ValType, ValType NullVal = 0 > class RangeM
      * an existing range, the second value of the pair will be returned as false
      * and the iterator will point to (one of) the overlapping ranges.
      */
-    inline std::pair< iterator, bool > insert( KeyType first_key, ValType first_val,
-                                               KeyType count );
+    inline std::pair< iterator, bool > insert( KeyType first_key, ValType first_val, KeyType count );
 
     /**\brief Insert mapping between range of keys and range of values
      *
@@ -153,8 +152,7 @@ template< typename KeyType, typename ValType, ValType NullVal = 0 > class RangeM
 
 template< typename KeyType, typename ValType, ValType NullVal >
 inline std::pair< typename RangeMap< KeyType, ValType, NullVal >::iterator, bool >
-    RangeMap< KeyType, ValType, NullVal >::insert( KeyType first_key, ValType first_val,
-                                                   KeyType count )
+    RangeMap< KeyType, ValType, NullVal >::insert( KeyType first_key, ValType first_val, KeyType count )
 {
     Range                        block = { first_key, count, first_val };
     typename RangeList::iterator i = std::lower_bound( data.begin( ), data.end( ), block );
@@ -211,8 +209,7 @@ inline std::pair< typename RangeMap< KeyType, ValType, NullVal >::iterator, bool
 }
 
 template< typename KeyType, typename ValType, ValType NullVal >
-inline bool RangeMap< KeyType, ValType, NullVal >::merge(
-    const RangeMap< KeyType, ValType, NullVal >& other )
+inline bool RangeMap< KeyType, ValType, NullVal >::merge( const RangeMap< KeyType, ValType, NullVal >& other )
 {
     // grow map sufficiently to hold new ranges
     RangeList new_data;

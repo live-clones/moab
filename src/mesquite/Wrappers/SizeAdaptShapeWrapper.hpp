@@ -45,8 +45,8 @@ class MESQUITE_EXPORT SizeAdaptShapeWrapper : public Wrapper
     int    parallelIterations;
     double maxVtxMovement;
 
-    void run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh, Settings* settings,
-                      QualityAssessor* qa, MsqError& err );
+    void run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh, Settings* settings, QualityAssessor* qa,
+                      MsqError& err );
 
   public:
     /**
@@ -56,8 +56,7 @@ class MESQUITE_EXPORT SizeAdaptShapeWrapper : public Wrapper
      *\param max_iterations       Termination optimizaiton after this many solver
      *                            steps.
      */
-    SizeAdaptShapeWrapper( double max_vertex_movement, int max_iterations = 50,
-                           int parallel_iterations = 10 )
+    SizeAdaptShapeWrapper( double max_vertex_movement, int max_iterations = 50, int parallel_iterations = 10 )
         : iterationLimit( max_iterations ), parallelIterations( parallel_iterations ),
           maxVtxMovement( max_vertex_movement )
     {

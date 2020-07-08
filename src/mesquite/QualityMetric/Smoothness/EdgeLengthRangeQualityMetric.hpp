@@ -70,12 +70,11 @@ class EdgeLengthRangeQualityMetric : public VertexQM, public AveragingQM
 
     virtual bool evaluate( PatchData& pd, size_t vertex, double& value, MsqError& err );
 
-    virtual bool evaluate_with_indices( PatchData& pd, size_t vertex, double& value,
-                                        std::vector< size_t >& indices, MsqError& err );
+    virtual bool evaluate_with_indices( PatchData& pd, size_t vertex, double& value, std::vector< size_t >& indices,
+                                        MsqError& err );
 
   private:
-    bool evaluate_common( PatchData& pd, size_t vertex, double& value,
-                          std::vector< size_t >& vertices, MsqError& err );
+    bool evaluate_common( PatchData& pd, size_t vertex, double& value, std::vector< size_t >& vertices, MsqError& err );
 
     double highVal;
     double lowVal;

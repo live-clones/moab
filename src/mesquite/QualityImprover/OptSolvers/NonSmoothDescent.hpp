@@ -200,8 +200,7 @@ class NonSmoothDescent : public VertexMover
 
     /* optimize */
     void minmax_opt( PatchData& pd, MsqError& err );
-    void step_acceptance( PatchData& pd, int iter_count, const Vector3D& search_dir,
-                          MsqError& err );
+    void step_acceptance( PatchData& pd, int iter_count, const Vector3D& search_dir, MsqError& err );
     void get_min_estimate( double* final_est, MsqError& err );
     void get_gradient_projections( const Vector3D& mSearch, MsqError& err );
     void compute_alpha( MsqError& err );
@@ -219,34 +218,29 @@ class NonSmoothDescent : public VertexMover
     /* checking equilibrium routines */
     bool check_equilibrium( OptStatus& opt_status, MsqError& err );
     bool convex_hull_test( const std::vector< Vector3D >& vec, MsqError& err );
-    bool check_vector_dots( const std::vector< Vector3D >& vec, const Vector3D& normal,
-                            MsqError& err );
-    void find_plane_normal( const Vector3D& pt1, const Vector3D& pt2, const Vector3D& pt3,
-                            Vector3D& cross, MsqError& /*err*/ );
-    void find_plane_points( Direction dir1, Direction dir2, const std::vector< Vector3D >& vec,
-                            Vector3D& pt1, Vector3D& pt2, Vector3D& pt3, Status& status,
-                            MsqError& );
+    bool check_vector_dots( const std::vector< Vector3D >& vec, const Vector3D& normal, MsqError& err );
+    void find_plane_normal( const Vector3D& pt1, const Vector3D& pt2, const Vector3D& pt3, Vector3D& cross,
+                            MsqError& /*err*/ );
+    void find_plane_points( Direction dir1, Direction dir2, const std::vector< Vector3D >& vec, Vector3D& pt1,
+                            Vector3D& pt2, Vector3D& pt3, Status& status, MsqError& );
 
     /* from the matrix file */
     void form_grammian( const std::vector< Vector3D >& vec, MsqError& err );
     void form_PD_grammian( MsqError& err );
     void singular_test( int n, const Matrix3D& A, bool& singular, MsqError& err );
-    bool solve2x2( double a11, double a12, double a21, double a22, double b1, double b2,
-                   double x[ 2 ], MsqError& err );
+    bool solve2x2( double a11, double a12, double a21, double a22, double b1, double b2, double x[ 2 ], MsqError& err );
     void form_reduced_matrix( SymmetricMatrix& P );
 
     /* search direction */
     void search_direction( PatchData& pd, Vector3D& search_dir_out, MsqError& err );
     void search_edges_faces( const Vector3D* dir, Vector3D& search, MsqError& err );
-    void get_active_directions( const std::vector< Vector3D >& gradient,
-                                std::vector< Vector3D >& dir, MsqError& err );
+    void get_active_directions( const std::vector< Vector3D >& gradient, std::vector< Vector3D >& dir, MsqError& err );
     NonSmoothDescent( const NonSmoothDescent& pd );  // disable copying
     NonSmoothDescent& operator=( const NonSmoothDescent& pd );  // disable assignment
 };
 
-inline void NonSmoothDescent::find_plane_normal( const Vector3D& pt1, const Vector3D& pt2,
-                                                 const Vector3D& pt3, Vector3D& cross,
-                                                 MsqError& /*err*/ )
+inline void NonSmoothDescent::find_plane_normal( const Vector3D& pt1, const Vector3D& pt2, const Vector3D& pt3,
+                                                 Vector3D& cross, MsqError& /*err*/ )
 {
     Vector3D vecA = pt2 - pt1;
     Vector3D vecB = pt3 - pt1;
@@ -260,8 +254,7 @@ inline bool NonSmoothDescent::improvement_check( MsqError& /*err*/ )
     if( originalValue < mActive.true_active_value )
     {
         MSQ_PRINT( 2 )
-        ( "The local mesh got worse; initial value %f; final value %f\n", originalValue,
-          mActive.true_active_value );
+        ( "The local mesh got worse; initial value %f; final value %f\n", originalValue, mActive.true_active_value );
         return false;
     }
 

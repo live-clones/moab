@@ -39,10 +39,8 @@ using namespace moab;
 #include <fcntl.h>
 */
 
-int  create_3dtri_3_sequences( Core* gMB, const int intervals, EntityHandle* vstart,
-                               EntityHandle* estart );
-int  create_3dtri_ucd_sequences( Core* gMB, const int intervals, EntityHandle* vstart,
-                                 EntityHandle* estart );
+int  create_3dtri_3_sequences( Core* gMB, const int intervals, EntityHandle* vstart, EntityHandle* estart );
+int  create_3dtri_ucd_sequences( Core* gMB, const int intervals, EntityHandle* vstart, EntityHandle* estart );
 void print_time( );
 
 int main( int argc, char** argv )
@@ -56,8 +54,7 @@ int main( int argc, char** argv )
     if( argc < 2 )
     {
         std::cout << "Usage: <scdseq_timing> <#intervals> " << std::endl
-                  << " where #intervals is the number of intervals on each side of each cube."
-                  << std::endl;
+                  << " where #intervals is the number of intervals on each side of each cube." << std::endl;
         return 0;
     }
 
@@ -120,8 +117,8 @@ int main( int argc, char** argv )
         stop = clock( );
         time = static_cast< float >( stop - start ) / CLOCKS_PER_SEC;
 
-        std::cout << "Time to get connectivity for scd mesh of " << 3 * total_elements
-                  << " elements: " << time << " seconds." << std::endl;
+        std::cout << "Time to get connectivity for scd mesh of " << 3 * total_elements << " elements: " << time
+                  << " seconds." << std::endl;
 
         print_time( );
         // wait for input to get memory reading
@@ -162,8 +159,8 @@ int main( int argc, char** argv )
         stop = clock( );
         time = static_cast< float >( stop - start ) / CLOCKS_PER_SEC;
 
-        std::cout << "Time to get connectivity for ucd mesh of " << 3 * total_elements
-                  << " elements: " << time << " seconds." << std::endl;
+        std::cout << "Time to get connectivity for ucd mesh of " << 3 * total_elements << " elements: " << time
+                  << " seconds." << std::endl;
 
         print_time( );
         // wait for input to get memory reading
@@ -176,8 +173,7 @@ int main( int argc, char** argv )
     }
 }
 
-int create_3dtri_3_sequences( Core* gMB, const int intervals, EntityHandle* vstart,
-                              EntityHandle* estart )
+int create_3dtri_3_sequences( Core* gMB, const int intervals, EntityHandle* vstart, EntityHandle* estart )
 {
     // create 3 brick esequences arranged such that the all share a common (tri-valent) edge;
     // orient each region similarly to the 2dtri_3_esequences test problem, swept into 3d in the
@@ -195,12 +191,9 @@ int create_3dtri_3_sequences( Core* gMB, const int intervals, EntityHandle* vsta
     // set vseq parametric spaces directly from intervals-4
     // use 0-based parameterization on vseq's just for fun, which means we'll have to transform into
     // eseq system
-    HomCoord vseq0_minmax[ 2 ] = { HomCoord( 0, 0, 0 ),
-                                   HomCoord( intervals, intervals, intervals ) };
-    HomCoord vseq1_minmax[ 2 ] = { HomCoord( 0, 0, 0 ),
-                                   HomCoord( intervals - 1, intervals, intervals ) };
-    HomCoord vseq2_minmax[ 2 ] = { HomCoord( 0, 0, 0 ),
-                                   HomCoord( intervals - 1, intervals - 1, intervals ) };
+    HomCoord vseq0_minmax[ 2 ] = { HomCoord( 0, 0, 0 ), HomCoord( intervals, intervals, intervals ) };
+    HomCoord vseq1_minmax[ 2 ] = { HomCoord( 0, 0, 0 ), HomCoord( intervals - 1, intervals, intervals ) };
+    HomCoord vseq2_minmax[ 2 ] = { HomCoord( 0, 0, 0 ), HomCoord( intervals - 1, intervals - 1, intervals ) };
 
     // get the seq manager from gMB
     EntitySequenceManager* seq_mgr = gMB->sequence_manager( );
@@ -210,20 +203,18 @@ int create_3dtri_3_sequences( Core* gMB, const int intervals, EntityHandle* vsta
     vseq[ 0 ] = vseq[ 1 ] = vseq[ 2 ] = NULL;
 
     // first vertex sequence
-    ErrorCode result = seq_mgr->create_scd_sequence( vseq0_minmax[ 0 ], vseq0_minmax[ 1 ], MBVERTEX,
-                                                     1, vstart[ 0 ], dum_seq );
+    ErrorCode result =
+        seq_mgr->create_scd_sequence( vseq0_minmax[ 0 ], vseq0_minmax[ 1 ], MBVERTEX, 1, vstart[ 0 ], dum_seq );
     if( NULL != dum_seq ) vseq[ 0 ] = dynamic_cast< ScdVertexSeq* >( dum_seq );
     assert( MB_FAILURE != result && vstart[ 0 ] != 0 && dum_seq != NULL && vseq[ 0 ] != NULL );
 
     // second vertex sequence
-    result = seq_mgr->create_scd_sequence( vseq1_minmax[ 0 ], vseq1_minmax[ 1 ], MBVERTEX, 1,
-                                           vstart[ 1 ], dum_seq );
+    result = seq_mgr->create_scd_sequence( vseq1_minmax[ 0 ], vseq1_minmax[ 1 ], MBVERTEX, 1, vstart[ 1 ], dum_seq );
     if( NULL != dum_seq ) vseq[ 1 ] = dynamic_cast< ScdVertexSeq* >( dum_seq );
     assert( MB_FAILURE != result && vstart[ 1 ] != 0 && dum_seq != NULL && vseq[ 1 ] != NULL );
 
     // third vertex sequence
-    result = seq_mgr->create_scd_sequence( vseq2_minmax[ 0 ], vseq2_minmax[ 1 ], MBVERTEX, 1,
-                                           vstart[ 2 ], dum_seq );
+    result = seq_mgr->create_scd_sequence( vseq2_minmax[ 0 ], vseq2_minmax[ 1 ], MBVERTEX, 1, vstart[ 2 ], dum_seq );
     if( NULL != dum_seq ) vseq[ 2 ] = dynamic_cast< ScdVertexSeq* >( dum_seq );
     assert( MB_FAILURE != result && vstart[ 2 ] != 0 && dum_seq != NULL && vseq[ 2 ] != NULL );
 
@@ -232,18 +223,14 @@ int create_3dtri_3_sequences( Core* gMB, const int intervals, EntityHandle* vsta
     // set eseq parametric spaces directly from intervals-4
     // use 0-based parameterization on eseq's just for fun, which means we'll have to transform into
     // eseq system
-    HomCoord eseq0_minmax[ 2 ] = { HomCoord( 0, 0, 0 ),
-                                   HomCoord( intervals, intervals, intervals ) };
-    HomCoord eseq1_minmax[ 2 ] = { HomCoord( 0, 0, 0 ),
-                                   HomCoord( intervals, intervals, intervals ) };
-    HomCoord eseq2_minmax[ 2 ] = { HomCoord( 0, 0, 0 ),
-                                   HomCoord( intervals, intervals, intervals ) };
+    HomCoord eseq0_minmax[ 2 ] = { HomCoord( 0, 0, 0 ), HomCoord( intervals, intervals, intervals ) };
+    HomCoord eseq1_minmax[ 2 ] = { HomCoord( 0, 0, 0 ), HomCoord( intervals, intervals, intervals ) };
+    HomCoord eseq2_minmax[ 2 ] = { HomCoord( 0, 0, 0 ), HomCoord( intervals, intervals, intervals ) };
 
     eseq[ 0 ] = eseq[ 1 ] = eseq[ 2 ] = NULL;
 
     // create the first element sequence
-    result = seq_mgr->create_scd_sequence( eseq0_minmax[ 0 ], eseq0_minmax[ 1 ], MBHEX, 1,
-                                           estart[ 0 ], dum_seq );
+    result = seq_mgr->create_scd_sequence( eseq0_minmax[ 0 ], eseq0_minmax[ 1 ], MBHEX, 1, estart[ 0 ], dum_seq );
     if( NULL != dum_seq ) eseq[ 0 ] = dynamic_cast< ScdElementSeq* >( dum_seq );
     assert( MB_FAILURE != result && estart[ 0 ] != 0 && dum_seq != NULL && eseq[ 0 ] != NULL );
 
@@ -251,20 +238,17 @@ int create_3dtri_3_sequences( Core* gMB, const int intervals, EntityHandle* vsta
     result = eseq[ 0 ]->add_vsequence( vseq[ 0 ],
                                        // trick: if I know it's going to be unity, just input
                                        // 3 sets of equivalent points
-                                       vseq0_minmax[ 0 ], vseq0_minmax[ 0 ], vseq0_minmax[ 0 ],
-                                       vseq0_minmax[ 0 ], vseq0_minmax[ 0 ], vseq0_minmax[ 0 ] );
+                                       vseq0_minmax[ 0 ], vseq0_minmax[ 0 ], vseq0_minmax[ 0 ], vseq0_minmax[ 0 ],
+                                       vseq0_minmax[ 0 ], vseq0_minmax[ 0 ] );
 
     if( MB_SUCCESS != result )
     {
-        std::cout
-            << "Couldn't add first vsequence to first element sequence in tri-composite 3d eseq."
-            << std::endl;
+        std::cout << "Couldn't add first vsequence to first element sequence in tri-composite 3d eseq." << std::endl;
         errors++;
     }
 
     // create the second element sequence
-    result = seq_mgr->create_scd_sequence( eseq1_minmax[ 0 ], eseq1_minmax[ 1 ], MBHEX, 1,
-                                           estart[ 1 ], dum_seq );
+    result = seq_mgr->create_scd_sequence( eseq1_minmax[ 0 ], eseq1_minmax[ 1 ], MBHEX, 1, estart[ 1 ], dum_seq );
     if( NULL != dum_seq ) eseq[ 1 ] = dynamic_cast< ScdElementSeq* >( dum_seq );
     assert( MB_FAILURE != result && estart[ 1 ] != 0 && dum_seq != NULL && eseq[ 1 ] != NULL );
 
@@ -279,37 +263,30 @@ int create_3dtri_3_sequences( Core* gMB, const int intervals, EntityHandle* vsta
         vseq0_minmax[ 0 ], eseq0_minmax[ 0 ],
         // set bb such that it's the jmin side of vseq
         true, eseq[ 1 ]->min_params( ),
-        HomCoord( eseq[ 1 ]->min_params( ).i( ), eseq[ 1 ]->max_params( ).j( ),
-                  eseq[ 1 ]->max_params( ).k( ) ) );
+        HomCoord( eseq[ 1 ]->min_params( ).i( ), eseq[ 1 ]->max_params( ).j( ), eseq[ 1 ]->max_params( ).k( ) ) );
     if( MB_SUCCESS != result )
     {
-        std::cout
-            << "Couldn't add shared vsequence to second element sequence in tri-composite 3d eseq."
-            << std::endl;
+        std::cout << "Couldn't add shared vsequence to second element sequence in tri-composite 3d eseq." << std::endl;
         errors++;
     }
 
     // add second vseq to this eseq, with different orientation but all of it (no bb input)
-    result =
-        eseq[ 1 ]->add_vsequence( vseq[ 1 ],
-                                  // p1: origin/i+1 (vseq/eseq)
-                                  vseq1_minmax[ 0 ], eseq1_minmax[ 0 ] + HomCoord::unitv[ 0 ],
-                                  // p2: j+1 from p1
-                                  vseq1_minmax[ 0 ] + HomCoord::unitv[ 1 ],
-                                  eseq1_minmax[ 0 ] + HomCoord::unitv[ 0 ] + HomCoord::unitv[ 1 ],
-                                  // p3: i+1 from p1
-                                  vseq1_minmax[ 0 ] + HomCoord::unitv[ 0 ],
-                                  eseq[ 1 ]->min_params( ) + HomCoord::unitv[ 0 ] * 2 );
+    result = eseq[ 1 ]->add_vsequence(
+        vseq[ 1 ],
+        // p1: origin/i+1 (vseq/eseq)
+        vseq1_minmax[ 0 ], eseq1_minmax[ 0 ] + HomCoord::unitv[ 0 ],
+        // p2: j+1 from p1
+        vseq1_minmax[ 0 ] + HomCoord::unitv[ 1 ], eseq1_minmax[ 0 ] + HomCoord::unitv[ 0 ] + HomCoord::unitv[ 1 ],
+        // p3: i+1 from p1
+        vseq1_minmax[ 0 ] + HomCoord::unitv[ 0 ], eseq[ 1 ]->min_params( ) + HomCoord::unitv[ 0 ] * 2 );
     if( MB_SUCCESS != result )
     {
-        std::cout << "Couldn't add second vseq to second element sequence in tri-composite 3d eseq."
-                  << std::endl;
+        std::cout << "Couldn't add second vseq to second element sequence in tri-composite 3d eseq." << std::endl;
         errors++;
     }
 
     // create the third element sequence
-    result = seq_mgr->create_scd_sequence( eseq2_minmax[ 0 ], eseq2_minmax[ 1 ], MBHEX, 1,
-                                           estart[ 2 ], dum_seq );
+    result = seq_mgr->create_scd_sequence( eseq2_minmax[ 0 ], eseq2_minmax[ 1 ], MBHEX, 1, estart[ 2 ], dum_seq );
     if( NULL != dum_seq ) eseq[ 2 ] = dynamic_cast< ScdElementSeq* >( dum_seq );
     assert( MB_FAILURE != result && estart[ 2 ] != 0 && dum_seq != NULL && eseq[ 2 ] != NULL );
 
@@ -319,19 +296,15 @@ int create_3dtri_3_sequences( Core* gMB, const int intervals, EntityHandle* vsta
         // p1: origin/j+1 (vseq/eseq)
         vseq1_minmax[ 0 ], eseq[ 2 ]->min_params( ) + HomCoord::unitv[ 1 ],
         // p2: i+1/j+2 (vseq/eseq)
-        vseq1_minmax[ 0 ] + HomCoord::unitv[ 0 ],
-        eseq[ 2 ]->min_params( ) + HomCoord::unitv[ 1 ] * 2,
+        vseq1_minmax[ 0 ] + HomCoord::unitv[ 0 ], eseq[ 2 ]->min_params( ) + HomCoord::unitv[ 1 ] * 2,
         // p3: arbitrary
         vseq1_minmax[ 0 ], eseq[ 2 ]->min_params( ) + HomCoord::unitv[ 1 ],
         // bb input such that we only get one side of eseq parameter space
         true, eseq[ 2 ]->min_params( ) + HomCoord::unitv[ 1 ],
-        HomCoord( eseq[ 2 ]->min_params( ).i( ), eseq[ 2 ]->max_params( ).j( ),
-                  eseq[ 2 ]->max_params( ).k( ) ) );
+        HomCoord( eseq[ 2 ]->min_params( ).i( ), eseq[ 2 ]->max_params( ).j( ), eseq[ 2 ]->max_params( ).k( ) ) );
     if( MB_SUCCESS != result )
     {
-        std::cout
-            << "Couldn't add shared vsequence to third element sequence in tri-composite 3d eseq."
-            << std::endl;
+        std::cout << "Couldn't add shared vsequence to third element sequence in tri-composite 3d eseq." << std::endl;
         errors++;
     }
 
@@ -345,8 +318,7 @@ int create_3dtri_3_sequences( Core* gMB, const int intervals, EntityHandle* vsta
         // p3: arbitrary
         vseq1_minmax[ 0 ], eseq2_minmax[ 0 ],
         // bb input such that we only get one side of eseq parameter space
-        true, eseq2_minmax[ 0 ],
-        HomCoord( eseq2_minmax[ 1 ].i( ), eseq2_minmax[ 0 ].j( ), eseq2_minmax[ 1 ].k( ) ) );
+        true, eseq2_minmax[ 0 ], HomCoord( eseq2_minmax[ 1 ].i( ), eseq2_minmax[ 0 ].j( ), eseq2_minmax[ 1 ].k( ) ) );
     if( MB_SUCCESS != result )
     {
         std::cout << "Couldn't add left shared vsequence to third element sequence in "
@@ -356,28 +328,26 @@ int create_3dtri_3_sequences( Core* gMB, const int intervals, EntityHandle* vsta
     }
 
     // add third vseq to this eseq
-    result = eseq[ 2 ]->add_vsequence(
-        vseq[ 2 ],
-        // p1: origin/i+1,j+1
-        vseq2_minmax[ 0 ], eseq[ 2 ]->min_params( ) + HomCoord::unitv[ 0 ] + HomCoord::unitv[ 1 ],
-        // p2: i+1 from p1
-        vseq2_minmax[ 0 ] + HomCoord::unitv[ 0 ],
-        eseq[ 2 ]->min_params( ) + HomCoord::unitv[ 0 ] * 2 + HomCoord::unitv[ 1 ],
-        // p3: j+1 from p1
-        vseq2_minmax[ 0 ] + HomCoord::unitv[ 1 ],
-        eseq[ 2 ]->min_params( ) + HomCoord::unitv[ 0 ] + HomCoord::unitv[ 1 ] * 2 );
+    result = eseq[ 2 ]->add_vsequence( vseq[ 2 ],
+                                       // p1: origin/i+1,j+1
+                                       vseq2_minmax[ 0 ],
+                                       eseq[ 2 ]->min_params( ) + HomCoord::unitv[ 0 ] + HomCoord::unitv[ 1 ],
+                                       // p2: i+1 from p1
+                                       vseq2_minmax[ 0 ] + HomCoord::unitv[ 0 ],
+                                       eseq[ 2 ]->min_params( ) + HomCoord::unitv[ 0 ] * 2 + HomCoord::unitv[ 1 ],
+                                       // p3: j+1 from p1
+                                       vseq2_minmax[ 0 ] + HomCoord::unitv[ 1 ],
+                                       eseq[ 2 ]->min_params( ) + HomCoord::unitv[ 0 ] + HomCoord::unitv[ 1 ] * 2 );
     if( MB_SUCCESS != result )
     {
-        std::cout << "Couldn't add third vseq to third element sequence in tri-composite 3d eseq."
-                  << std::endl;
+        std::cout << "Couldn't add third vseq to third element sequence in tri-composite 3d eseq." << std::endl;
         errors++;
     }
 
     return errors;
 }
 
-int create_3dtri_ucd_sequences( Core* gMB, const int intervals, EntityHandle* vstart,
-                                EntityHandle* estart )
+int create_3dtri_ucd_sequences( Core* gMB, const int intervals, EntityHandle* vstart, EntityHandle* estart )
 {
 
     ReadUtilIface* readMeshIface;

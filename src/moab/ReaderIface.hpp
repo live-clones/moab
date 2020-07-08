@@ -73,9 +73,8 @@ class ReaderIface
      *                      it reads, a unique integer ID for this tag.
      *\author Jason Kraftcheck
      */
-    virtual ErrorCode load_file( const char* file_name, const EntityHandle* file_set,
-                                 const FileOptions& opts, const SubsetList* subset_list = 0,
-                                 const Tag* file_id_tag = 0 ) = 0;
+    virtual ErrorCode load_file( const char* file_name, const EntityHandle* file_set, const FileOptions& opts,
+                                 const SubsetList* subset_list = 0, const Tag* file_id_tag = 0 ) = 0;
 
     /**
      *\brief Read tag values from a file.
@@ -92,9 +91,8 @@ class ReaderIface
      *                      tags (intersection) should be read.
      *\param subset_list_length The length of the 'subset_list' array.
      */
-    virtual ErrorCode read_tag_values( const char* file_name, const char* tag_name,
-                                       const FileOptions& opts, std::vector< int >& tag_values_out,
-                                       const SubsetList* subset_list = 0 ) = 0;
+    virtual ErrorCode read_tag_values( const char* file_name, const char* tag_name, const FileOptions& opts,
+                                       std::vector< int >& tag_values_out, const SubsetList* subset_list = 0 ) = 0;
 };
 
 }  // namespace moab

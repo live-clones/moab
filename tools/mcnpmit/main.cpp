@@ -65,8 +65,7 @@ int main( int argc, char** argv )
     moab::AdaptiveKDTree kdtree( MBI );
     moab::EntityHandle   root;
 
-    MBI->tag_get_handle( "CoordTag", 1, moab::MB_TYPE_INTEGER, coord_tag,
-                         moab::MB_TAG_DENSE | moab::MB_TAG_CREAT );
+    MBI->tag_get_handle( "CoordTag", 1, moab::MB_TYPE_INTEGER, coord_tag, moab::MB_TAG_DENSE | moab::MB_TAG_CREAT );
     MBI->tag_get_handle( "RotationTag", 16, moab::MB_TYPE_DOUBLE, rotation_tag,
                          moab::MB_TAG_DENSE | moab::MB_TAG_CREAT );
 
@@ -82,8 +81,7 @@ int main( int argc, char** argv )
         else
         {
             std::cout << "Failure reading h5m file!" << std::endl;
-            std::cerr << "Error code: " << MBI->get_error_string( MBresult ) << " (" << MBresult
-                      << ")" << std::endl;
+            std::cerr << "Error code: " << MBI->get_error_string( MBresult ) << " (" << MBresult << ")" << std::endl;
             std::string message;
             if( moab::MB_SUCCESS == MBI->get_last_error( message ) && !message.empty( ) )
                 std::cerr << "Error message: " << message << std::endl;
@@ -113,8 +111,7 @@ int main( int argc, char** argv )
         else
         {
             std::cout << "Error building KD-Tree!" << std::endl << std::endl;
-            std::cerr << "Error code: " << MBI->get_error_string( MBresult ) << " (" << MBresult
-                      << ")" << std::endl;
+            std::cerr << "Error code: " << MBI->get_error_string( MBresult ) << " (" << MBresult << ")" << std::endl;
             std::string message;
             if( moab::MB_SUCCESS == MBI->get_last_error( message ) && !message.empty( ) )
                 std::cerr << "Error message: " << message << std::endl;
@@ -255,8 +252,7 @@ int main( int argc, char** argv )
             {
                 std::cout << "MOAB WARNING: Unhandled error code during point search in KdTree, "
                              "ErrorCode = "
-                          << MBresult << " and Coord xyz=" << x << " " << y << " " << z
-                          << std::endl;
+                          << MBresult << " and Coord xyz=" << x << " " << y << " " << z << std::endl;
             }
             std::cout << "No leaf found, MCNP coord xyz=" << x << " " << y << " " << z << std::endl;
             ++cfd_iter;
@@ -292,8 +288,8 @@ int main( int argc, char** argv )
                 MBresult = MBI->tag_get_data( MCNP->tally_tag, &( *rit ), 1, &taldata );MB_CHK_ERR( MBresult );
                 MBresult = MBI->tag_get_data( MCNP->relerr_tag, &( *rit ), 1, &errdata );MB_CHK_ERR( MBresult );
 
-                outfile << n << "," << testpt[ 0 ] << "," << testpt[ 1 ] << "," << testpt[ 2 ]
-                        << "," << taldata << "," << errdata << std::endl;
+                outfile << n << "," << testpt[ 0 ] << "," << testpt[ 1 ] << "," << testpt[ 2 ] << "," << taldata << ","
+                        << errdata << std::endl;
 
                 if( !read_qnv )
                 {
@@ -323,21 +319,14 @@ int main( int argc, char** argv )
     outfile.close( );
 
     if( result == MCNP_SUCCESS )
-    {
-        std::cout << "Success! " << elems_read << " elements interpolated." << std::endl
-                  << std::endl;
-    }
+    { std::cout << "Success! " << elems_read << " elements interpolated." << std::endl << std::endl; }
     else
     {
-        std::cout << "Failure during query! " << elems_read << " elements interpolated."
-                  << std::endl
-                  << std::endl;
+        std::cout << "Failure during query! " << elems_read << " elements interpolated." << std::endl << std::endl;
     }
 
-    double tal_std_dev =
-        sqrt( ( 1.0 / elems_read ) * ( tal_sum_sqr - ( 1.0 / elems_read ) * tal_sum * tal_sum ) );
-    double err_std_dev =
-        sqrt( ( 1.0 / elems_read ) * ( err_sum_sqr - ( 1.0 / elems_read ) * err_sum * err_sum ) );
+    double tal_std_dev = sqrt( ( 1.0 / elems_read ) * ( tal_sum_sqr - ( 1.0 / elems_read ) * tal_sum * tal_sum ) );
+    double err_std_dev = sqrt( ( 1.0 / elems_read ) * ( err_sum_sqr - ( 1.0 / elems_read ) * err_sum * err_sum ) );
 
     std::cout << "Tally Mean:               " << tal_sum / elems_read << std::endl;
     std::cout << "Tally Standard Deviation: " << tal_std_dev << std::endl;

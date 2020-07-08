@@ -59,9 +59,8 @@ namespace ElemUtil
         static const double corner_xi[ 8 ][ 3 ];
     };
 
-    const double LinearHexMap::corner_xi[ 8 ][ 3 ] = { { -1, -1, -1 }, { 1, -1, -1 }, { 1, 1, -1 },
-                                                       { -1, 1, -1 },  { -1, -1, 1 }, { 1, -1, 1 },
-                                                       { 1, 1, 1 },    { -1, 1, 1 } };
+    const double LinearHexMap::corner_xi[ 8 ][ 3 ] = { { -1, -1, -1 }, { 1, -1, -1 }, { 1, 1, -1 }, { -1, 1, -1 },
+                                                       { -1, -1, 1 },  { 1, -1, 1 },  { 1, 1, 1 },  { -1, 1, 1 } };
     CartVect     LinearHexMap::center_xi( ) const
     {
         return CartVect( 0.0 );
@@ -72,8 +71,7 @@ namespace ElemUtil
         CartVect x( 0.0 );
         for( unsigned i = 0; i < 8; ++i )
         {
-            const double N_i = ( 1 + xi[ 0 ] * corner_xi[ i ][ 0 ] ) *
-                               ( 1 + xi[ 1 ] * corner_xi[ i ][ 1 ] ) *
+            const double N_i = ( 1 + xi[ 0 ] * corner_xi[ i ][ 0 ] ) * ( 1 + xi[ 1 ] * corner_xi[ i ][ 1 ] ) *
                                ( 1 + xi[ 2 ] * corner_xi[ i ][ 2 ] );
             x += N_i * corners[ i ];
         }
@@ -86,8 +84,7 @@ namespace ElemUtil
         double f( 0.0 );
         for( unsigned i = 0; i < 8; ++i )
         {
-            const double N_i = ( 1 + xi[ 0 ] * corner_xi[ i ][ 0 ] ) *
-                               ( 1 + xi[ 1 ] * corner_xi[ i ][ 1 ] ) *
+            const double N_i = ( 1 + xi[ 0 ] * corner_xi[ i ][ 0 ] ) * ( 1 + xi[ 1 ] * corner_xi[ i ][ 1 ] ) *
                                ( 1 + xi[ 2 ] * corner_xi[ i ][ 2 ] );
             f += N_i * f_vals[ i ];
         }
@@ -119,8 +116,7 @@ namespace ElemUtil
         return J *= 0.125;
     }
 
-    bool nat_coords_trilinear_hex( const CartVect* corner_coords, const CartVect& x, CartVect& xi,
-                                   double tol )
+    bool nat_coords_trilinear_hex( const CartVect* corner_coords, const CartVect& x, CartVect& xi, double tol )
     {
         return LinearHexMap( corner_coords ).solve_inverse( x, xi, tol );
     }
@@ -128,8 +124,7 @@ namespace ElemUtil
     // nat_coords_trilinear_hex2
     //  Duplicate functionality of nat_coords_trilinear_hex using hex_findpt
     //
-    void nat_coords_trilinear_hex2( const CartVect hex[ 8 ], const CartVect& xyz, CartVect& ncoords,
-                                    double etol )
+    void nat_coords_trilinear_hex2( const CartVect hex[ 8 ], const CartVect& xyz, CartVect& ncoords, double etol )
 
     {
         const int ndim = 3;
@@ -160,8 +155,7 @@ namespace ElemUtil
             // outside element, set extremal values to something outside range
             for( int j = 0; j < 3; j++ )
             {
-                if( ncoords[ j ] < ( -1.0 - etol ) || ncoords[ j ] > ( 1.0 + etol ) )
-                    ncoords[ j ] *= 10;
+                if( ncoords[ j ] < ( -1.0 - etol ) || ncoords[ j ] > ( 1.0 + etol ) ) ncoords[ j ] *= 10;
             }
         }
     }
@@ -272,8 +266,7 @@ namespace ElemUtil
             lagrange_0( &ld[ d ], rst[ d ] );
         }
 
-        value = tensor_i3( ld[ 0 ].J, ld[ 0 ].n, ld[ 1 ].J, ld[ 1 ].n, ld[ 2 ].J, ld[ 2 ].n, field,
-                           od_work );
+        value = tensor_i3( ld[ 0 ].J, ld[ 0 ].n, ld[ 1 ].J, ld[ 1 ].n, ld[ 2 ].J, ld[ 2 ].n, field, od_work );
 
         // all this could be cached
         for( d = 0; d < 3; d++ )
@@ -313,8 +306,7 @@ namespace ElemUtil
     // Function to integrate the field defined by field_fn function
     // over the volume of the trilinear hex defined by the hex_corners
 
-    bool integrate_trilinear_hex( const CartVect* hex_corners, double* corner_fields,
-                                  double& field_val, int num_pts )
+    bool integrate_trilinear_hex( const CartVect* hex_corners, double* corner_fields, double& field_val, int num_pts )
     {
         // Create the LinearHexMap object using the hex_corners array of CartVects
         LinearHexMap hex( hex_corners );
@@ -439,8 +431,7 @@ namespace Element
 
             J = jacobian( xi );
             det = J.determinant( );
-            if( det < std::numeric_limits< double >::epsilon( ) )
-                throw Map::EvaluationError( x, vertex );
+            if( det < std::numeric_limits< double >::epsilon( ) ) throw Map::EvaluationError( x, vertex );
             xi -= J.inverse( ) * delta;
             delta = evaluate( xi ) - x;
         }
@@ -477,8 +468,7 @@ namespace Element
         vx = vx / vx.length( );
 
         CartVect vy = vz * vx;
-        transf = Matrix3( vx[ 0 ], vx[ 1 ], vx[ 2 ], vy[ 0 ], vy[ 1 ], vy[ 2 ], vz[ 0 ], vz[ 1 ],
-                          vz[ 2 ] );
+        transf = Matrix3( vx[ 0 ], vx[ 1 ], vx[ 2 ], vy[ 0 ], vy[ 1 ], vy[ 2 ], vz[ 0 ], vz[ 1 ], vz[ 2 ] );
         vertex[ 0 ] = CartVect( 0. );
         for( int j = 1; j < 4; j++ )
             vertex[ j ] = transf * ( vertex[ j ] - v1 );
@@ -506,37 +496,33 @@ namespace Element
 
     const double LinearTri::corner[ 3 ][ 3 ] = { { 0, 0, 0 }, { 1, 0, 0 }, { 0, 1, 0 } };
 
-    LinearTri::LinearTri( )
-        : Map( 0 ), det_T( 0.0 ), det_T_inverse( 0.0 ) {}  // LinearTri::LinearTri()
+    LinearTri::LinearTri( ) : Map( 0 ), det_T( 0.0 ), det_T_inverse( 0.0 ) {}  // LinearTri::LinearTri()
 
     LinearTri::~LinearTri( ) {}
 
     void LinearTri::set_vertices( const std::vector< CartVect >& v )
     {
         this->Map::set_vertices( v );
-        this->T = Matrix3( v[ 1 ][ 0 ] - v[ 0 ][ 0 ], v[ 2 ][ 0 ] - v[ 0 ][ 0 ], 0,
-                           v[ 1 ][ 1 ] - v[ 0 ][ 1 ], v[ 2 ][ 1 ] - v[ 0 ][ 1 ], 0,
-                           v[ 1 ][ 2 ] - v[ 0 ][ 2 ], v[ 2 ][ 2 ] - v[ 0 ][ 2 ], 1 );
+        this->T = Matrix3( v[ 1 ][ 0 ] - v[ 0 ][ 0 ], v[ 2 ][ 0 ] - v[ 0 ][ 0 ], 0, v[ 1 ][ 1 ] - v[ 0 ][ 1 ],
+                           v[ 2 ][ 1 ] - v[ 0 ][ 1 ], 0, v[ 1 ][ 2 ] - v[ 0 ][ 2 ], v[ 2 ][ 2 ] - v[ 0 ][ 2 ], 1 );
         this->T_inverse = this->T.inverse( );
         this->det_T = this->T.determinant( );
-        this->det_T_inverse =
-            ( this->det_T < 1e-12 ? std::numeric_limits< double >::max( ) : 1.0 / this->det_T );
+        this->det_T_inverse = ( this->det_T < 1e-12 ? std::numeric_limits< double >::max( ) : 1.0 / this->det_T );
     }  // LinearTri::set_vertices()
 
     bool LinearTri::inside_nat_space( const CartVect& xi, double& tol ) const
     {
         // linear tri space is a triangle with vertices (0,0,0), (1,0,0), (0,1,0)
         // first check if outside bigger box, then below the line x+y=1
-        return ( xi[ 0 ] >= -tol ) && ( xi[ 1 ] >= -tol ) && ( xi[ 2 ] >= -tol ) &&
-               ( xi[ 2 ] <= tol ) && ( xi[ 0 ] + xi[ 1 ] < 1.0 + tol );
+        return ( xi[ 0 ] >= -tol ) && ( xi[ 1 ] >= -tol ) && ( xi[ 2 ] >= -tol ) && ( xi[ 2 ] <= tol ) &&
+               ( xi[ 0 ] + xi[ 1 ] < 1.0 + tol );
     }
     CartVect LinearTri::ievaluate( const CartVect& x, double /*tol*/, const CartVect& /*x0*/ ) const
     {
         return this->T_inverse * ( x - this->vertex[ 0 ] );
     }  // LinearTri::ievaluate
 
-    double LinearTri::evaluate_scalar_field( const CartVect& xi,
-                                             const double*   field_vertex_value ) const
+    double LinearTri::evaluate_scalar_field( const CartVect& xi, const double* field_vertex_value ) const
     {
         double f0 = field_vertex_value[ 0 ];
         double f = f0;
@@ -590,8 +576,7 @@ namespace Element
         vx = vx / vx.length( );
 
         CartVect vy = vz * vx;
-        transf = Matrix3( vx[ 0 ], vx[ 1 ], vx[ 2 ], vy[ 0 ], vy[ 1 ], vy[ 2 ], vz[ 0 ], vz[ 1 ],
-                          vz[ 2 ] );
+        transf = Matrix3( vx[ 0 ], vx[ 1 ], vx[ 2 ], vy[ 0 ], vy[ 1 ], vy[ 2 ], vz[ 0 ], vz[ 1 ], vz[ 2 ] );
         vertex[ 0 ] = CartVect( 0. );
         for( int j = 1; j < 3; j++ )
             vertex[ j ] = transf * ( vertex[ j ] - v1 );
@@ -599,8 +584,7 @@ namespace Element
         LinearTri::set_vertices( vertex );
     }
 
-    CartVect SphericalTri::ievaluate( const CartVect& x, double /*tol*/,
-                                      const CartVect& /*x0*/ ) const
+    CartVect SphericalTri::ievaluate( const CartVect& x, double /*tol*/, const CartVect& /*x0*/ ) const
     {
         // project to the plane tangent at first vertex (gnomonic projection)
         double   v1v1 = v1 % v1;
@@ -658,14 +642,12 @@ namespace Element
         return J;
     }  // LinearEdge::jacobian()
 
-    double LinearEdge::evaluate_scalar_field( const CartVect& xi,
-                                              const double*   field_vertex_value ) const
+    double LinearEdge::evaluate_scalar_field( const CartVect& xi, const double* field_vertex_value ) const
     {
         double f( 0.0 );
         for( unsigned i = 0; i < LinearEdge::corner_count; ++i )
         {
-            const double N_i =
-                ( 1 + xi[ 0 ] * corner[ i ][ 0 ] ) * ( 1.0 + xi[ 1 ] * corner[ i ][ 1 ] );
+            const double N_i = ( 1 + xi[ 0 ] * corner[ i ][ 0 ] ) * ( 1.0 + xi[ 1 ] * corner[ i ][ 1 ] );
             f += N_i * field_vertex_value[ i ];
         }
         f /= LinearEdge::corner_count;
@@ -680,8 +662,7 @@ namespace Element
             double   x1 = this->gauss[ j1 ][ 1 ];
             double   w1 = this->gauss[ j1 ][ 0 ];
             CartVect x( x1, 0.0, 0.0 );
-            I += this->evaluate_scalar_field( x, field_vertex_values ) * w1 *
-                 this->det_jacobian( x );
+            I += this->evaluate_scalar_field( x, field_vertex_values ) * w1 * this->det_jacobian( x );
         }
         return I;
     }  // LinearEdge::integrate_scalar_field()
@@ -692,9 +673,8 @@ namespace Element
         return ( xi[ 0 ] >= -1. - tol ) && ( xi[ 0 ] <= 1. + tol );
     }
 
-    const double LinearHex::corner[ 8 ][ 3 ] = { { -1, -1, -1 }, { 1, -1, -1 }, { 1, 1, -1 },
-                                                 { -1, 1, -1 },  { -1, -1, 1 }, { 1, -1, 1 },
-                                                 { 1, 1, 1 },    { -1, 1, 1 } };
+    const double LinearHex::corner[ 8 ][ 3 ] = { { -1, -1, -1 }, { 1, -1, -1 }, { 1, 1, -1 }, { -1, 1, -1 },
+                                                 { -1, -1, 1 },  { 1, -1, 1 },  { 1, 1, 1 },  { -1, 1, 1 } };
 
     LinearHex::LinearHex( ) : Map( 0 ) {}  // LinearHex::LinearHex()
 
@@ -715,8 +695,7 @@ namespace Element
         CartVect x( 0.0 );
         for( unsigned i = 0; i < 8; ++i )
         {
-            const double N_i = ( 1 + xi[ 0 ] * corner[ i ][ 0 ] ) *
-                               ( 1 + xi[ 1 ] * corner[ i ][ 1 ] ) *
+            const double N_i = ( 1 + xi[ 0 ] * corner[ i ][ 0 ] ) * ( 1 + xi[ 1 ] * corner[ i ][ 1 ] ) *
                                ( 1 + xi[ 2 ] * corner[ i ][ 2 ] );
             x += N_i * this->vertex[ i ];
         }
@@ -748,14 +727,12 @@ namespace Element
         return J *= 0.125;
     }  // LinearHex::jacobian()
 
-    double LinearHex::evaluate_scalar_field( const CartVect& xi,
-                                             const double*   field_vertex_value ) const
+    double LinearHex::evaluate_scalar_field( const CartVect& xi, const double* field_vertex_value ) const
     {
         double f( 0.0 );
         for( unsigned i = 0; i < 8; ++i )
         {
-            const double N_i = ( 1 + xi[ 0 ] * corner[ i ][ 0 ] ) *
-                               ( 1 + xi[ 1 ] * corner[ i ][ 1 ] ) *
+            const double N_i = ( 1 + xi[ 0 ] * corner[ i ][ 0 ] ) * ( 1 + xi[ 1 ] * corner[ i ][ 1 ] ) *
                                ( 1 + xi[ 2 ] * corner[ i ][ 2 ] );
             f += N_i * field_vertex_value[ i ];
         }
@@ -779,8 +756,7 @@ namespace Element
                     double   x3 = this->gauss[ j3 ][ 1 ];
                     double   w3 = this->gauss[ j3 ][ 0 ];
                     CartVect x( x1, x2, x3 );
-                    I += this->evaluate_scalar_field( x, field_vertex_values ) * w1 * w2 * w3 *
-                         this->det_jacobian( x );
+                    I += this->evaluate_scalar_field( x, field_vertex_values ) * w1 * w2 * w3 * this->det_jacobian( x );
                 }
             }
         }
@@ -857,8 +833,8 @@ namespace Element
         CartVect x( 0.0 );
         for( int i = 0; i < 27; i++ )
         {
-            const double sh = SH( corner[ i ][ 0 ], xi[ 0 ] ) * SH( corner[ i ][ 1 ], xi[ 1 ] ) *
-                              SH( corner[ i ][ 2 ], xi[ 2 ] );
+            const double sh =
+                SH( corner[ i ][ 0 ], xi[ 0 ] ) * SH( corner[ i ][ 1 ], xi[ 1 ] ) * SH( corner[ i ][ 2 ], xi[ 2 ] );
             x += sh * vertex[ i ];
         }
 
@@ -876,17 +852,14 @@ namespace Element
         Matrix3 J( 0.0 );
         for( int i = 0; i < 27; i++ )
         {
-            const double sh[ 3 ] = { SH( corner[ i ][ 0 ], xi[ 0 ] ),
-                                     SH( corner[ i ][ 1 ], xi[ 1 ] ),
+            const double sh[ 3 ] = { SH( corner[ i ][ 0 ], xi[ 0 ] ), SH( corner[ i ][ 1 ], xi[ 1 ] ),
                                      SH( corner[ i ][ 2 ], xi[ 2 ] ) };
-            const double dsh[ 3 ] = { DSH( corner[ i ][ 0 ], xi[ 0 ] ),
-                                      DSH( corner[ i ][ 1 ], xi[ 1 ] ),
+            const double dsh[ 3 ] = { DSH( corner[ i ][ 0 ], xi[ 0 ] ), DSH( corner[ i ][ 1 ], xi[ 1 ] ),
                                       DSH( corner[ i ][ 2 ], xi[ 2 ] ) };
 
             for( int j = 0; j < 3; j++ )
             {
-                J( j, 0 ) +=
-                    dsh[ 0 ] * sh[ 1 ] * sh[ 2 ] * vertex[ i ][ j ];  // dxj/dr first column
+                J( j, 0 ) += dsh[ 0 ] * sh[ 1 ] * sh[ 2 ] * vertex[ i ][ j ];  // dxj/dr first column
                 J( j, 1 ) += sh[ 0 ] * dsh[ 1 ] * sh[ 2 ] * vertex[ i ][ j ];  // dxj/ds
                 J( j, 2 ) += sh[ 0 ] * sh[ 1 ] * dsh[ 2 ] * vertex[ i ][ j ];  // dxj/dt
             }
@@ -894,14 +867,13 @@ namespace Element
 
         return J;
     }
-    double QuadraticHex::evaluate_scalar_field( const CartVect& xi,
-                                                const double*   field_vertex_values ) const
+    double QuadraticHex::evaluate_scalar_field( const CartVect& xi, const double* field_vertex_values ) const
     {
         double x = 0.0;
         for( int i = 0; i < 27; i++ )
         {
-            const double sh = SH( corner[ i ][ 0 ], xi[ 0 ] ) * SH( corner[ i ][ 1 ], xi[ 1 ] ) *
-                              SH( corner[ i ][ 2 ], xi[ 2 ] );
+            const double sh =
+                SH( corner[ i ][ 0 ], xi[ 0 ] ) * SH( corner[ i ][ 1 ], xi[ 1 ] ) * SH( corner[ i ][ 2 ], xi[ 2 ] );
             x += sh * field_vertex_values[ i ];
         }
 
@@ -912,31 +884,24 @@ namespace Element
         return 0.;  // TODO: gaussian integration , probably 2x2x2
     }
 
-    const double LinearTet::corner[ 4 ][ 3 ] = { { 0, 0, 0 },
-                                                 { 1, 0, 0 },
-                                                 { 0, 1, 0 },
-                                                 { 0, 0, 1 } };
+    const double LinearTet::corner[ 4 ][ 3 ] = { { 0, 0, 0 }, { 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 } };
 
-    LinearTet::LinearTet( )
-        : Map( 0 ), det_T( 0.0 ), det_T_inverse( 0.0 ) {}  // LinearTet::LinearTet()
+    LinearTet::LinearTet( ) : Map( 0 ), det_T( 0.0 ), det_T_inverse( 0.0 ) {}  // LinearTet::LinearTet()
 
     LinearTet::~LinearTet( ) {}
 
     void LinearTet::set_vertices( const std::vector< CartVect >& v )
     {
         this->Map::set_vertices( v );
-        this->T = Matrix3(
-            v[ 1 ][ 0 ] - v[ 0 ][ 0 ], v[ 2 ][ 0 ] - v[ 0 ][ 0 ], v[ 3 ][ 0 ] - v[ 0 ][ 0 ],
-            v[ 1 ][ 1 ] - v[ 0 ][ 1 ], v[ 2 ][ 1 ] - v[ 0 ][ 1 ], v[ 3 ][ 1 ] - v[ 0 ][ 1 ],
-            v[ 1 ][ 2 ] - v[ 0 ][ 2 ], v[ 2 ][ 2 ] - v[ 0 ][ 2 ], v[ 3 ][ 2 ] - v[ 0 ][ 2 ] );
+        this->T = Matrix3( v[ 1 ][ 0 ] - v[ 0 ][ 0 ], v[ 2 ][ 0 ] - v[ 0 ][ 0 ], v[ 3 ][ 0 ] - v[ 0 ][ 0 ],
+                           v[ 1 ][ 1 ] - v[ 0 ][ 1 ], v[ 2 ][ 1 ] - v[ 0 ][ 1 ], v[ 3 ][ 1 ] - v[ 0 ][ 1 ],
+                           v[ 1 ][ 2 ] - v[ 0 ][ 2 ], v[ 2 ][ 2 ] - v[ 0 ][ 2 ], v[ 3 ][ 2 ] - v[ 0 ][ 2 ] );
         this->T_inverse = this->T.inverse( );
         this->det_T = this->T.determinant( );
-        this->det_T_inverse =
-            ( this->det_T < 1e-12 ? std::numeric_limits< double >::max( ) : 1.0 / this->det_T );
+        this->det_T_inverse = ( this->det_T < 1e-12 ? std::numeric_limits< double >::max( ) : 1.0 / this->det_T );
     }  // LinearTet::set_vertices()
 
-    double LinearTet::evaluate_scalar_field( const CartVect& xi,
-                                             const double*   field_vertex_value ) const
+    double LinearTet::evaluate_scalar_field( const CartVect& xi, const double* field_vertex_value ) const
     {
         double f0 = field_vertex_value[ 0 ];
         double f = f0;
@@ -1053,10 +1018,9 @@ namespace Element
         CartVect result;
         for( d = 0; d < 3; d++ )
         {
-            result[ d ] =
-                tensor_i3( _ld[ 0 ].J, _ld[ 0 ].n, _ld[ 1 ].J, _ld[ 1 ].n, _ld[ 2 ].J, _ld[ 2 ].n,
-                           _xyz[ d ],  // this is the "field"
-                           _odwork );
+            result[ d ] = tensor_i3( _ld[ 0 ].J, _ld[ 0 ].n, _ld[ 1 ].J, _ld[ 1 ].n, _ld[ 2 ].J, _ld[ 2 ].n,
+                                     _xyz[ d ],  // this is the "field"
+                                     _odwork );
         }
         return result;
     }
@@ -1113,8 +1077,8 @@ namespace Element
             lagrange_0( &_ld[ d ], xi[ d ] );
         }
 
-        double value = tensor_i3( _ld[ 0 ].J, _ld[ 0 ].n, _ld[ 1 ].J, _ld[ 1 ].n, _ld[ 2 ].J,
-                                  _ld[ 2 ].n, field, _odwork );
+        double value =
+            tensor_i3( _ld[ 0 ].J, _ld[ 0 ].n, _ld[ 1 ].J, _ld[ 1 ].n, _ld[ 2 ].J, _ld[ 2 ].n, field, _odwork );
         return value;
     }
     double SpectralHex::integrate_scalar_field( const double* field_vertex_values ) const
@@ -1176,10 +1140,7 @@ namespace Element
     // SpectralHex
 
     // filescope for static member data that is cached
-    const double LinearQuad::corner[ 4 ][ 3 ] = { { -1, -1, 0 },
-                                                  { 1, -1, 0 },
-                                                  { 1, 1, 0 },
-                                                  { -1, 1, 0 } };
+    const double LinearQuad::corner[ 4 ][ 3 ] = { { -1, -1, 0 }, { 1, -1, 0 }, { 1, 1, 0 }, { -1, 1, 0 } };
 
     LinearQuad::LinearQuad( ) : Map( 0 ) {}  // LinearQuad::LinearQuad()
 
@@ -1196,8 +1157,7 @@ namespace Element
         CartVect x( 0.0 );
         for( unsigned i = 0; i < LinearQuad::corner_count; ++i )
         {
-            const double N_i =
-                ( 1 + xi[ 0 ] * corner[ i ][ 0 ] ) * ( 1 + xi[ 1 ] * corner[ i ][ 1 ] );
+            const double N_i = ( 1 + xi[ 0 ] * corner[ i ][ 0 ] ) * ( 1 + xi[ 1 ] * corner[ i ][ 1 ] );
             x += N_i * this->vertex[ i ];
         }
         x /= LinearQuad::corner_count;
@@ -1224,14 +1184,12 @@ namespace Element
         return J;
     }  // LinearQuad::jacobian()
 
-    double LinearQuad::evaluate_scalar_field( const CartVect& xi,
-                                              const double*   field_vertex_value ) const
+    double LinearQuad::evaluate_scalar_field( const CartVect& xi, const double* field_vertex_value ) const
     {
         double f( 0.0 );
         for( unsigned i = 0; i < LinearQuad::corner_count; ++i )
         {
-            const double N_i =
-                ( 1 + xi[ 0 ] * corner[ i ][ 0 ] ) * ( 1 + xi[ 1 ] * corner[ i ][ 1 ] );
+            const double N_i = ( 1 + xi[ 0 ] * corner[ i ][ 0 ] ) * ( 1 + xi[ 1 ] * corner[ i ][ 1 ] );
             f += N_i * field_vertex_value[ i ];
         }
         f /= LinearQuad::corner_count;
@@ -1250,8 +1208,7 @@ namespace Element
                 double   x2 = this->gauss[ j2 ][ 1 ];
                 double   w2 = this->gauss[ j2 ][ 0 ];
                 CartVect x( x1, x2, 0.0 );
-                I += this->evaluate_scalar_field( x, field_vertex_values ) * w1 * w2 *
-                     this->det_jacobian( x );
+                I += this->evaluate_scalar_field( x, field_vertex_values ) * w1 * w2 * this->det_jacobian( x );
             }
         }
         return I;
@@ -1349,14 +1306,12 @@ namespace Element
         CartVect result;
         for( d = 0; d < 3; d++ )
         {
-            result[ d ] =
-                tensor_i2( _ld[ 0 ].J, _ld[ 0 ].n, _ld[ 1 ].J, _ld[ 1 ].n, _xyz[ d ], _odwork );
+            result[ d ] = tensor_i2( _ld[ 0 ].J, _ld[ 0 ].n, _ld[ 1 ].J, _ld[ 1 ].n, _xyz[ d ], _odwork );
         }
         return result;
     }
     // replicate the functionality of hex_findpt
-    CartVect SpectralQuad::ievaluate( CartVect const& xyz, double /*tol*/,
-                                      const CartVect& /*x0*/ ) const
+    CartVect SpectralQuad::ievaluate( CartVect const& xyz, double /*tol*/, const CartVect& /*x0*/ ) const
     {
         // find nearest point
         realType x_star[ 3 ];
@@ -1426,13 +1381,11 @@ namespace Element
             double eta = _z[ 0 ][ i ];
             for( int j = 0; j < _n; j++ )
             {
-                double csi =
-                    _z[ 1 ][ j ];  // we could really use the same _z[0] array of lobatto nodes
+                double   csi = _z[ 1 ][ j ];  // we could really use the same _z[0] array of lobatto nodes
                 CartVect pos( 0.0 );
                 for( int k = 0; k < 4; k++ )
                 {
-                    const double N_k =
-                        ( 1 + csi * corner_xi[ k ][ 0 ] ) * ( 1 + eta * corner_xi[ k ][ 1 ] );
+                    const double N_k = ( 1 + csi * corner_xi[ k ][ 0 ] ) * ( 1 + eta * corner_xi[ k ][ 1 ] );
                     pos += N_k * vertex[ k ];
                 }
                 pos *= 0.25;  // these are x, y, z of gl points; reorder them

@@ -65,8 +65,7 @@ class MESQUITE_EXPORT OFEvaluator
      */
     OFEvaluator( ObjectiveFunction* of );
 
-    void initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
-                           MsqError& err );
+    void initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings, MsqError& err );
 
     /**\brief Initialize OFEvaluator
      *
@@ -77,8 +76,7 @@ class MESQUITE_EXPORT OFEvaluator
      *
      *\param mesh The active mesh
      */
-    bool initialize( MeshDomainAssoc* mesh_and_domain, const Settings* settings, PatchSet* patches,
-                     MsqError& err );
+    bool initialize( MeshDomainAssoc* mesh_and_domain, const Settings* settings, PatchSet* patches, MsqError& err );
 
     /**\brief Update accumulated values for changes to vertex positions
      *        in a patch.
@@ -168,8 +166,7 @@ class MESQUITE_EXPORT OFEvaluator
      *             with respect to each FREE vertex in the patch.
      *\param Hessian Output, the Hessian of the objective function.
      */
-    bool update( PatchData& pd, double& value, std::vector< Vector3D >& grad, MsqHessian& Hessian,
-                 MsqError& err );
+    bool update( PatchData& pd, double& value, std::vector< Vector3D >& grad, MsqHessian& Hessian, MsqError& err );
 
     /**\brief Check if doing Nash game algorithm.*/
     bool is_nash_game( ) const
@@ -225,8 +222,7 @@ class MESQUITE_EXPORT OFEvaluator
      *\param grad Output, the gradient of the objective function
      *             with respect to each FREE vertex in the patch.
      */
-    bool evaluate( PatchData& pd, double& value, std::vector< Vector3D >& grad,
-                   MsqError& err ) const;
+    bool evaluate( PatchData& pd, double& value, std::vector< Vector3D >& grad, MsqError& err ) const;
 
     /**\brief Evaluate the objective function without changing any
      *        accumulated values.

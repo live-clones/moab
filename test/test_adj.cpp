@@ -61,9 +61,8 @@ int main( )
     {
         conn.clear( );
         err = iface->get_connectivity( &*it, 1, conn );CHECK_ERR( err );
-        std::cout << "quads[" << ( *it - *quads.begin( ) ) << "] = " << *it << " :: conn = ["
-                  << conn[ 0 ] << ", " << conn[ 1 ] << ", " << conn[ 2 ] << ", " << conn[ 3 ] << "]"
-                  << std::endl;
+        std::cout << "quads[" << ( *it - *quads.begin( ) ) << "] = " << *it << " :: conn = [" << conn[ 0 ] << ", "
+                  << conn[ 1 ] << ", " << conn[ 2 ] << ", " << conn[ 3 ] << "]" << std::endl;
     }
 
     std::vector< EntityHandle > nodes;

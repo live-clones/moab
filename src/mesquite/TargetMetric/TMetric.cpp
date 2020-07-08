@@ -40,8 +40,8 @@ namespace MBMesquite
 {
 
 template< unsigned Dim >
-static inline double do_finite_difference( int r, int c, TMetric* metric, MsqMatrix< Dim, Dim > A,
-                                           double value, MsqError& err )
+static inline double do_finite_difference( int r, int c, TMetric* metric, MsqMatrix< Dim, Dim > A, double value,
+                                           MsqError& err )
 {
     const double INITIAL_STEP = std::max( 1e-6, fabs( 1e-14 * value ) );
     const double init = A( r, c );
@@ -111,8 +111,7 @@ static inline bool do_numerical_gradient( TMetric* mu, MsqMatrix< Dim, Dim > A, 
 
 template< unsigned Dim >
 static inline bool do_numerical_hessian( TMetric* metric, MsqMatrix< Dim, Dim > A, double& value,
-                                         MsqMatrix< Dim, Dim >& grad, MsqMatrix< Dim, Dim >* Hess,
-                                         MsqError& err )
+                                         MsqMatrix< Dim, Dim >& grad, MsqMatrix< Dim, Dim >* Hess, MsqError& err )
 {
     // zero hessian data
     const int num_block = Dim * ( Dim + 1 ) / 2;
@@ -145,8 +144,7 @@ static inline bool do_numerical_hessian( TMetric* metric, MsqMatrix< Dim, Dim > 
             // if no valid step size, try step in other direction
             if( !valid )
             {
-                for( step = -INITAL_STEP; step < -std::numeric_limits< double >::epsilon( );
-                     step *= 0.1 )
+                for( step = -INITAL_STEP; step < -std::numeric_limits< double >::epsilon( ); step *= 0.1 )
                 {
                     A( r, c ) = in_val + step;
                     valid = metric->evaluate_with_grad( A, value2, grad2, err );
@@ -158,8 +156,7 @@ static inline bool do_numerical_hessian( TMetric* metric, MsqMatrix< Dim, Dim > 
                 if( !valid )
                 {
                     MSQ_SETERR( err )
-                    ( "No valid step size for finite difference of 2D target metric.",
-                      MsqError::INTERNAL_ERROR );
+                    ( "No valid step size for finite difference of 2D target metric.", MsqError::INTERNAL_ERROR );
                     return false;
                 }
             }
@@ -204,28 +201,24 @@ bool TMetric::evaluate( const MsqMatrix< 3, 3 >& /*T*/, double& /*result*/, MsqE
     return false;
 }
 
-bool TMetric::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& result,
-                                  MsqMatrix< 2, 2 >& wrt_T, MsqError& err )
+bool TMetric::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& result, MsqMatrix< 2, 2 >& wrt_T, MsqError& err )
 {
     return do_numerical_gradient( this, T, result, wrt_T, err );
 }
 
-bool TMetric::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& result,
-                                  MsqMatrix< 3, 3 >& wrt_T, MsqError& err )
+bool TMetric::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& result, MsqMatrix< 3, 3 >& wrt_T, MsqError& err )
 {
     return do_numerical_gradient( this, T, result, wrt_T, err );
 }
 
-bool TMetric::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& result,
-                                  MsqMatrix< 2, 2 >& deriv_wrt_T, MsqMatrix< 2, 2 > hess_wrt_T[ 3 ],
-                                  MsqError& err )
+bool TMetric::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& result, MsqMatrix< 2, 2 >& deriv_wrt_T,
+                                  MsqMatrix< 2, 2 > hess_wrt_T[ 3 ], MsqError& err )
 {
     return do_numerical_hessian( this, T, result, deriv_wrt_T, hess_wrt_T, err );
 }
 
-bool TMetric::evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result,
-                                  MsqMatrix< 3, 3 >& deriv_wrt_T, MsqMatrix< 3, 3 > hess_wrt_T[ 6 ],
-                                  MsqError& err )
+bool TMetric::evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result, MsqMatrix< 3, 3 >& deriv_wrt_T,
+                                  MsqMatrix< 3, 3 > hess_wrt_T[ 6 ], MsqError& err )
 {
     return do_numerical_hessian( this, T, result, deriv_wrt_T, hess_wrt_T, err );
 }

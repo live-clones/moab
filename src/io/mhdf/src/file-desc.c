@@ -9,8 +9,8 @@
 #include <H5Ppublic.h>
 
 static struct mhdf_FileDesc* alloc_file_desc( mhdf_Status* status );
-static void* realloc_data( struct mhdf_FileDesc** data, size_t append_bytes, mhdf_Status* status );
-static char  buffer[ 512 ];
+static void*                 realloc_data( struct mhdf_FileDesc** data, size_t append_bytes, mhdf_Status* status );
+static char                  buffer[ 512 ];
 
 static struct mhdf_FileDesc* alloc_file_desc( mhdf_Status* status )
 {
@@ -65,8 +65,7 @@ static void* realloc_data( struct mhdf_FileDesc** data, size_t append_bytes, mhd
 
 #define FIX_OFFSET( TYPE, FIELD ) \
     if( copy_ptr->FIELD != NULL ) \
-    copy_ptr->FIELD =             \
-        ( TYPE )( ( (char*)( copy_ptr->FIELD ) - (char*)orig_addr ) + (char*)copy_ptr )
+    copy_ptr->FIELD = ( TYPE )( ( (char*)( copy_ptr->FIELD ) - (char*)orig_addr ) + (char*)copy_ptr )
 
 void mhdf_fixFileDesc( struct mhdf_FileDesc* copy_ptr, const struct mhdf_FileDesc* orig_addr )
 {
@@ -111,9 +110,8 @@ void mhdf_fixFileDesc( struct mhdf_FileDesc* copy_ptr, const struct mhdf_FileDes
     API_END;
 }
 
-static struct mhdf_FileDesc* get_elem_desc( mhdf_FileHandle       file_handle,
-                                            struct mhdf_FileDesc* result, const char* elem_handle,
-                                            int idx, mhdf_Status* status )
+static struct mhdf_FileDesc* get_elem_desc( mhdf_FileHandle file_handle, struct mhdf_FileDesc* result,
+                                            const char* elem_handle, int idx, mhdf_Status* status )
 {
     hid_t id_pair[ 2 ];
     int   poly;
@@ -146,9 +144,9 @@ static struct mhdf_FileDesc* get_elem_desc( mhdf_FileHandle       file_handle,
 
     if( !poly )
     {
-        id_pair[ 0 ] = mhdf_openConnectivity(
-            file_handle, elem_handle, &result->elems[ idx ].desc.vals_per_ent,
-            &result->elems[ idx ].desc.count, &result->elems[ idx ].desc.start_id, status );
+        id_pair[ 0 ] =
+            mhdf_openConnectivity( file_handle, elem_handle, &result->elems[ idx ].desc.vals_per_ent,
+                                   &result->elems[ idx ].desc.count, &result->elems[ idx ].desc.start_id, status );
         if( id_pair[ 0 ] < 0 )
         {
             free( result );
@@ -159,8 +157,8 @@ static struct mhdf_FileDesc* get_elem_desc( mhdf_FileHandle       file_handle,
     else
     {
         result->elems[ idx ].desc.vals_per_ent = -1;
-        mhdf_openPolyConnectivity( file_handle, elem_handle, &result->elems[ idx ].desc.count,
-                                   &junk, &result->elems[ idx ].desc.start_id, id_pair, status );
+        mhdf_openPolyConnectivity( file_handle, elem_handle, &result->elems[ idx ].desc.count, &junk,
+                                   &result->elems[ idx ].desc.start_id, id_pair, status );
         if( id_pair[ 0 ] < 0 )
         {
             free( result );
@@ -172,8 +170,7 @@ static struct mhdf_FileDesc* get_elem_desc( mhdf_FileHandle       file_handle,
 
     result->elems[ idx ].desc.dense_tag_indices = NULL;
     result->elems[ idx ].desc.num_dense_tags = 0;
-    result->elems[ idx ].have_adj =
-        mhdf_haveAdjacency( file_handle, result->elems[ idx ].handle, status );
+    result->elems[ idx ].have_adj = mhdf_haveAdjacency( file_handle, result->elems[ idx ].handle, status );
     if( mhdf_isError( status ) )
     {
         free( result );
@@ -194,9 +191,8 @@ static unsigned get_file_id_size( hid_t file_id_type, mhdf_Status* status )
     return H5Tget_size( file_id_type );
 }
 
-static struct mhdf_FileDesc* get_tag_desc( mhdf_FileHandle       file_handle,
-                                           struct mhdf_FileDesc* result, const char* name, int idx,
-                                           hid_t type, mhdf_Status* status )
+static struct mhdf_FileDesc* get_tag_desc( mhdf_FileHandle file_handle, struct mhdf_FileDesc* result, const char* name,
+                                           int idx, hid_t type, mhdf_Status* status )
 {
     void*   ptr;
     int     have_default, have_global;
@@ -209,8 +205,8 @@ static struct mhdf_FileDesc* get_tag_desc( mhdf_FileHandle       file_handle,
     result->tags[ idx ].name = ptr;
 
     mhdf_getTagInfo( file_handle, name, &result->tags[ idx ].type, &result->tags[ idx ].size,
-                     &result->tags[ idx ].storage, &have_default, &have_global,
-                     &result->tags[ idx ].have_sparse, status );
+                     &result->tags[ idx ].storage, &have_default, &have_global, &result->tags[ idx ].have_sparse,
+                     status );
     if( mhdf_isError( status ) )
     {
         free( result );
@@ -281,10 +277,8 @@ static struct mhdf_FileDesc* get_tag_desc( mhdf_FileHandle       file_handle,
                     break;
                 default:
                     free( result );
-                    mhdf_setFail(
-                        status,
-                        "Cannot create a bit tag larger than 64-bits.  %d bits requested.\n",
-                        (int)valsize );
+                    mhdf_setFail( status, "Cannot create a bit tag larger than 64-bits.  %d bits requested.\n",
+                                  (int)valsize );
                     return NULL;
             }
             close_type = 1;
@@ -302,8 +296,8 @@ static struct mhdf_FileDesc* get_tag_desc( mhdf_FileHandle       file_handle,
             valsize *= size;
             break;
         default:
-            mhdf_setFail( status, "Unknown mhdf_TagDataType value (%d) for tag (\"%s\")",
-                          (int)result->tags[ idx ].type, name );
+            mhdf_setFail( status, "Unknown mhdf_TagDataType value (%d) for tag (\"%s\")", (int)result->tags[ idx ].type,
+                          name );
             free( result );
             return NULL;
     }
@@ -349,8 +343,8 @@ static struct mhdf_FileDesc* get_tag_desc( mhdf_FileHandle       file_handle,
             }
             result->tags[ idx ].global_value = ptr;
         }
-        mhdf_getTagValues( file_handle, name, type, result->tags[ idx ].default_value,
-                           result->tags[ idx ].global_value, status );
+        mhdf_getTagValues( file_handle, name, type, result->tags[ idx ].default_value, result->tags[ idx ].global_value,
+                           status );
         if( close_type ) { H5Tclose( type ); }
         if( mhdf_isError( status ) )
         {
@@ -370,8 +364,8 @@ static void free_string_list( char** list, int count )
     free( list );
 }
 
-struct mhdf_FileDesc* mhdf_getFileSummary( mhdf_FileHandle file_handle, hid_t file_id_type,
-                                           mhdf_Status* status, int extraSetInfo )
+struct mhdf_FileDesc* mhdf_getFileSummary( mhdf_FileHandle file_handle, hid_t file_id_type, mhdf_Status* status,
+                                           int extraSetInfo )
 {
     struct mhdf_FileDesc* result;
     hid_t                 table_id;
@@ -380,8 +374,7 @@ struct mhdf_FileDesc* mhdf_getFileSummary( mhdf_FileHandle file_handle, hid_t fi
     void*                 ptr;
     char **               elem_handles = 0, **tag_names = 0;
     unsigned char *       array, *matrix;
-    const char* pname[ 5 ] = { "PARALLEL_PARTITION", "MATERIAL_SET", "NEUMANN_SET", "DIRICHLET_SET",
-                               "GEOM_DIMENSION" };
+    const char* pname[ 5 ] = { "PARALLEL_PARTITION", "MATERIAL_SET", "NEUMANN_SET", "DIRICHLET_SET", "GEOM_DIMENSION" };
 
     long*                id_list;
     struct mhdf_TagDesc* tag_desc;
@@ -404,9 +397,8 @@ struct mhdf_FileDesc* mhdf_getFileSummary( mhdf_FileHandle file_handle, hid_t fi
     }
     if( have )
     {
-        table_id =
-            mhdf_openNodeCoords( file_handle, &result->nodes.count, &result->nodes.vals_per_ent,
-                                 &result->nodes.start_id, status );
+        table_id = mhdf_openNodeCoords( file_handle, &result->nodes.count, &result->nodes.vals_per_ent,
+                                        &result->nodes.start_id, status );
         if( table_id < 0 )
         {
             free( result );
@@ -432,8 +424,7 @@ struct mhdf_FileDesc* mhdf_getFileSummary( mhdf_FileHandle file_handle, hid_t fi
     }
     if( have )
     {
-        table_id =
-            mhdf_openSetMeta( file_handle, &result->sets.count, &result->sets.start_id, status );
+        table_id = mhdf_openSetMeta( file_handle, &result->sets.count, &result->sets.start_id, status );
         if( table_id < 0 )
         {
             free( result );
@@ -648,8 +639,7 @@ struct mhdf_FileDesc* mhdf_getFileSummary( mhdf_FileHandle file_handle, hid_t fi
                 {
                     if( tag_desc->have_sparse )
                     {
-                        mhdf_openSparseTagData( file_handle, pname[ k ], &nval, &junk, table,
-                                                status );
+                        mhdf_openSparseTagData( file_handle, pname[ k ], &nval, &junk, table, status );
                         if( mhdf_isError( status ) )
                         {
                             free( array );
@@ -690,8 +680,7 @@ struct mhdf_FileDesc* mhdf_getFileSummary( mhdf_FileHandle file_handle, hid_t fi
 
                         data_type = H5Dget_type( table[ 0 ] );
 
-                        mhdf_read_data( table[ 0 ], 0, nval, data_type, id_list, H5P_DEFAULT,
-                                        status );
+                        mhdf_read_data( table[ 0 ], 0, nval, data_type, id_list, H5P_DEFAULT, status );
                         if( mhdf_isError( status ) )
                         {
                             free( array );
@@ -700,12 +689,10 @@ struct mhdf_FileDesc* mhdf_getFileSummary( mhdf_FileHandle file_handle, hid_t fi
                         H5Tclose( data_type );
 
                         for( i1 = 0; i1 < nval; i1++ )
-                            result->defTagsEntSets[ k ][ i1 ] =
-                                (int)( id_list[ i1 ] - result->sets.start_id + 1 );
+                            result->defTagsEntSets[ k ][ i1 ] = (int)( id_list[ i1 ] - result->sets.start_id + 1 );
                         /* now read values, integer type */
                         data_type = H5Dget_type( table[ 1 ] );
-                        mhdf_read_data( table[ 1 ], 0, nval, data_type, result->defTagsVals[ k ],
-                                        H5P_DEFAULT, status );
+                        mhdf_read_data( table[ 1 ], 0, nval, data_type, result->defTagsVals[ k ], H5P_DEFAULT, status );
                         if( mhdf_isError( status ) )
                         {
                             free( array );
@@ -729,13 +716,10 @@ struct mhdf_FileDesc* mhdf_getFileSummary( mhdf_FileHandle file_handle, hid_t fi
                     else if( 0 == k || 1 == k )
                     { /* parallel partition or material sets should still work if dense
  could be dense tags on sets */
-                        if( !mhdf_haveDenseTag( file_handle, pname[ k ], mhdf_set_type_handle( ),
-                                                status ) )
-                            continue;
-                        table[ 0 ] = mhdf_openDenseTagData(
-                            file_handle, pname[ k ], mhdf_set_type_handle( ), &nval, status );
-                        if( mhdf_isError( status ) )
-                        { continue; /* do not error out if not a dense tag either */ }
+                        if( !mhdf_haveDenseTag( file_handle, pname[ k ], mhdf_set_type_handle( ), status ) ) continue;
+                        table[ 0 ] =
+                            mhdf_openDenseTagData( file_handle, pname[ k ], mhdf_set_type_handle( ), &nval, status );
+                        if( mhdf_isError( status ) ) { continue; /* do not error out if not a dense tag either */ }
                         result->numEntSets[ k ] = nval;
                         if( nval <= 0 ) continue; /* do not do anything */
 
@@ -776,8 +760,7 @@ struct mhdf_FileDesc* mhdf_getFileSummary( mhdf_FileHandle file_handle, hid_t fi
                           because dense, sets will be in order
 
                           we know it has to be integer */
-                        mhdf_readTagValues( table[ 0 ], 0, nval, H5T_NATIVE_INT,
-                                            result->defTagsVals[ k ], status );
+                        mhdf_readTagValues( table[ 0 ], 0, nval, H5T_NATIVE_INT, result->defTagsVals[ k ], status );
                         if( mhdf_isError( status ) )
                         {
                             free( array );

@@ -63,8 +63,8 @@ class IdealWeightMeanRatio : public ElementQM, public AveragingQM
 {
   public:
     MESQUITE_EXPORT IdealWeightMeanRatio( )
-        : AveragingQM( QualityMetric::LINEAR ), a2Con( 2.0 ), b2Con( -1.0 ), c2Con( 1.0 ),
-          a3Con( 3.0 ), b3Con( -1.0 ), c3Con( 2.0 / 3.0 )
+        : AveragingQM( QualityMetric::LINEAR ), a2Con( 2.0 ), b2Con( -1.0 ), c2Con( 1.0 ), a3Con( 3.0 ), b3Con( -1.0 ),
+          c3Con( 2.0 / 3.0 )
     {
     }
 
@@ -78,20 +78,16 @@ class IdealWeightMeanRatio : public ElementQM, public AveragingQM
 
     virtual bool evaluate( PatchData& pd, size_t handle, double& value, MsqError& err );
 
-    virtual bool evaluate_with_gradient( PatchData& pd, size_t handle, double& value,
-                                         std::vector< size_t >&   indices,
+    virtual bool evaluate_with_gradient( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
                                          std::vector< Vector3D >& gradient, MsqError& err );
 
     virtual bool evaluate_with_Hessian_diagonal( PatchData& pd, size_t handle, double& value,
-                                                 std::vector< size_t >&      indices,
-                                                 std::vector< Vector3D >&    gradient,
-                                                 std::vector< SymMatrix3D >& Hessian,
-                                                 MsqError&                   err );
+                                                 std::vector< size_t >& indices, std::vector< Vector3D >& gradient,
+                                                 std::vector< SymMatrix3D >& Hessian, MsqError& err );
 
-    virtual bool evaluate_with_Hessian( PatchData& pd, size_t handle, double& value,
-                                        std::vector< size_t >&   indices,
-                                        std::vector< Vector3D >& gradient,
-                                        std::vector< Matrix3D >& Hessian, MsqError& err );
+    virtual bool evaluate_with_Hessian( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
+                                        std::vector< Vector3D >& gradient, std::vector< Matrix3D >& Hessian,
+                                        MsqError& err );
 
   private:
     // arrays used in Hessian computations

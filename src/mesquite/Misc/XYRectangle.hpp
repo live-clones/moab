@@ -83,30 +83,25 @@ class XYRectangle : public MBMesquite::MeshDomain
     void setup( MBMesquite::Mesh* mesh, MBMesquite::MsqError& err );
 
     MESQUITE_EXPORT
-    void snap_to( MBMesquite::Mesh::VertexHandle entity_handle,
-                  MBMesquite::Vector3D&          coordinate ) const;
+    void snap_to( MBMesquite::Mesh::VertexHandle entity_handle, MBMesquite::Vector3D& coordinate ) const;
 
     MESQUITE_EXPORT
-    void vertex_normal_at( MBMesquite::Mesh::VertexHandle entity_handle,
-                           MBMesquite::Vector3D&          coordinate ) const;
+    void vertex_normal_at( MBMesquite::Mesh::VertexHandle entity_handle, MBMesquite::Vector3D& coordinate ) const;
 
     MESQUITE_EXPORT
-    void element_normal_at( MBMesquite::Mesh::ElementHandle entity_handle,
-                            MBMesquite::Vector3D&           coordinate ) const;
+    void element_normal_at( MBMesquite::Mesh::ElementHandle entity_handle, MBMesquite::Vector3D& coordinate ) const;
 
     MESQUITE_EXPORT
-    void vertex_normal_at( const MBMesquite::Mesh::VertexHandle* handles,
-                           MBMesquite::Vector3D coordinates[], unsigned count,
-                           MBMesquite::MsqError& err ) const;
+    void vertex_normal_at( const MBMesquite::Mesh::VertexHandle* handles, MBMesquite::Vector3D coordinates[],
+                           unsigned count, MBMesquite::MsqError& err ) const;
 
     MESQUITE_EXPORT
     void closest_point( MBMesquite::Mesh::VertexHandle handle, const MBMesquite::Vector3D& position,
-                        MBMesquite::Vector3D& closest, MBMesquite::Vector3D& normal,
-                        MBMesquite::MsqError& err ) const;
+                        MBMesquite::Vector3D& closest, MBMesquite::Vector3D& normal, MBMesquite::MsqError& err ) const;
 
     MESQUITE_EXPORT
-    void domain_DoF( const MBMesquite::Mesh::VertexHandle* handle_array, unsigned short* dof_array,
-                     size_t num_handles, MBMesquite::MsqError& err ) const;
+    void domain_DoF( const MBMesquite::Mesh::VertexHandle* handle_array, unsigned short* dof_array, size_t num_handles,
+                     MBMesquite::MsqError& err ) const;
 
   private:
     double    minCoords[ 3 ], maxCoords[ 3 ];  //!< corner coords

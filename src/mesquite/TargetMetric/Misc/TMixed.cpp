@@ -63,24 +63,23 @@ bool TMixed::evaluate( const MsqMatrix< 3, 3 >& T, double& result, MsqError& err
     return rval;
 }
 
-bool TMixed::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& result,
-                                 MsqMatrix< 2, 2 >& deriv_wrt_T, MsqError& err )
+bool TMixed::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& result, MsqMatrix< 2, 2 >& deriv_wrt_T,
+                                 MsqError& err )
 {
     bool rval = mu2D->evaluate_with_grad( T, result, deriv_wrt_T, err );
     MSQ_ERRZERO( err );
     return rval;
 }
 
-bool TMixed::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& result,
-                                 MsqMatrix< 3, 3 >& deriv_wrt_T, MsqError& err )
+bool TMixed::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& result, MsqMatrix< 3, 3 >& deriv_wrt_T,
+                                 MsqError& err )
 {
     bool rval = mu3D->evaluate_with_grad( T, result, deriv_wrt_T, err );
     MSQ_ERRZERO( err );
     return rval;
 }
 
-bool TMixed::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& result,
-                                 MsqMatrix< 2, 2 >& deriv_wrt_T,
+bool TMixed::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& result, MsqMatrix< 2, 2 >& deriv_wrt_T,
                                  MsqMatrix< 2, 2 > second_wrt_T[ 3 ], MsqError& err )
 {
     bool rval = mu2D->evaluate_with_hess( T, result, deriv_wrt_T, second_wrt_T, err );
@@ -88,8 +87,7 @@ bool TMixed::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& result,
     return rval;
 }
 
-bool TMixed::evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result,
-                                 MsqMatrix< 3, 3 >& deriv_wrt_T,
+bool TMixed::evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result, MsqMatrix< 3, 3 >& deriv_wrt_T,
                                  MsqMatrix< 3, 3 > second_wrt_T[ 3 ], MsqError& err )
 {
     bool rval = mu3D->evaluate_with_hess( T, result, deriv_wrt_T, second_wrt_T, err );

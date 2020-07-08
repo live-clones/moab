@@ -39,8 +39,7 @@
 namespace moab
 {
 
-static void corners_from_box( const double box_min[ 3 ], const double box_max[ 3 ],
-                              double corners[ 8 ][ 3 ] )
+static void corners_from_box( const double box_min[ 3 ], const double box_max[ 3 ], double corners[ 8 ][ 3 ] )
 {
     const double* ranges[] = { box_min, box_max };
     for( int z = 0; z < 2; ++z )
@@ -87,8 +86,7 @@ void BSPTree::Plane::set( const double pt1[ 3 ], const double pt2[ 3 ], const do
 {
     const double v1[] = { pt2[ 0 ] - pt1[ 0 ], pt2[ 1 ] - pt1[ 1 ], pt2[ 2 ] - pt1[ 2 ] };
     const double v2[] = { pt3[ 0 ] - pt1[ 0 ], pt3[ 1 ] - pt1[ 1 ], pt3[ 2 ] - pt1[ 2 ] };
-    const double nrm[] = { v1[ 1 ] * v2[ 2 ] - v1[ 2 ] * v2[ 1 ],
-                           v1[ 2 ] * v2[ 0 ] - v1[ 0 ] * v2[ 2 ],
+    const double nrm[] = { v1[ 1 ] * v2[ 2 ] - v1[ 2 ] * v2[ 1 ], v1[ 2 ] * v2[ 0 ] - v1[ 0 ] * v2[ 2 ],
                            v1[ 0 ] * v2[ 1 ] - v1[ 1 ] * v2[ 0 ] };
     set( nrm, pt1 );
 }
@@ -100,13 +98,11 @@ ErrorCode BSPTree::init_tags( const char* tagname )
     std::string rootname( tagname );
     rootname += "_box";
 
-    ErrorCode rval = moab( )->tag_get_handle( tagname, 4, MB_TYPE_DOUBLE, planeTag,
-                                              MB_TAG_CREAT | MB_TAG_DENSE );
+    ErrorCode rval = moab( )->tag_get_handle( tagname, 4, MB_TYPE_DOUBLE, planeTag, MB_TAG_CREAT | MB_TAG_DENSE );
     if( MB_SUCCESS != rval )
         planeTag = 0;
     else
-        rval = moab( )->tag_get_handle( rootname.c_str( ), 24, MB_TYPE_DOUBLE, rootTag,
-                                        MB_TAG_CREAT | MB_TAG_SPARSE );
+        rval = moab( )->tag_get_handle( rootname.c_str( ), 24, MB_TYPE_DOUBLE, rootTag, MB_TAG_CREAT | MB_TAG_SPARSE );
     if( MB_SUCCESS != rval ) rootTag = 0;
     return rval;
 }
@@ -117,8 +113,7 @@ BSPTree::BSPTree( Interface* mb, const char* tagname, unsigned set_flags )
     init_tags( tagname );
 }
 
-BSPTree::BSPTree( Interface* mb, bool destroy_created_trees, const char* tagname,
-                  unsigned set_flags )
+BSPTree::BSPTree( Interface* mb, bool destroy_created_trees, const char* tagname, unsigned set_flags )
     : mbInstance( mb ), meshSetFlags( set_flags ), cleanUpTrees( destroy_created_trees )
 {
     init_tags( tagname );
@@ -142,8 +137,7 @@ BSPTree::~BSPTree( )
 ErrorCode BSPTree::set_split_plane( EntityHandle node, const Plane& p )
 {
     // check for unit-length normal
-    const double lensqr =
-        p.norm[ 0 ] * p.norm[ 0 ] + p.norm[ 1 ] * p.norm[ 1 ] + p.norm[ 2 ] * p.norm[ 2 ];
+    const double lensqr = p.norm[ 0 ] * p.norm[ 0 ] + p.norm[ 1 ] * p.norm[ 1 ] + p.norm[ 2 ] * p.norm[ 2 ];
     if( fabs( lensqr - 1.0 ) < std::numeric_limits< double >::epsilon( ) )
         return moab( )->tag_set_data( planeTag, &node, 1, &p );
 
@@ -155,15 +149,13 @@ ErrorCode BSPTree::set_split_plane( EntityHandle node, const Plane& p )
     p2.coeff *= inv_len;
 
     // check for zero-length normal
-    if( !Util::is_finite( p2.norm[ 0 ] + p2.norm[ 1 ] + p2.norm[ 2 ] + p2.coeff ) )
-        return MB_FAILURE;
+    if( !Util::is_finite( p2.norm[ 0 ] + p2.norm[ 1 ] + p2.norm[ 2 ] + p2.coeff ) ) return MB_FAILURE;
 
     // store plane
     return moab( )->tag_set_data( planeTag, &node, 1, &p2 );
 }
 
-ErrorCode BSPTree::set_tree_box( EntityHandle root_handle, const double box_min[ 3 ],
-                                 const double box_max[ 3 ] )
+ErrorCode BSPTree::set_tree_box( EntityHandle root_handle, const double box_min[ 3 ], const double box_max[ 3 ] )
 {
     double corners[ 8 ][ 3 ];
     corners_from_box( box_min, box_max, corners );
@@ -209,8 +201,7 @@ ErrorCode BSPTree::create_tree( const double corners[ 8 ][ 3 ], EntityHandle& ro
     return MB_SUCCESS;
 }
 
-ErrorCode BSPTree::create_tree( const double box_min[ 3 ], const double box_max[ 3 ],
-                                EntityHandle& root_handle )
+ErrorCode BSPTree::create_tree( const double box_min[ 3 ], const double box_max[ 3 ], EntityHandle& root_handle )
 {
     double corners[ 8 ][ 3 ];
     corners_from_box( box_min, box_max, corners );
@@ -237,8 +228,7 @@ ErrorCode BSPTree::delete_tree( EntityHandle root_handle )
     rval = moab( )->tag_delete_data( rootTag, &root_handle, 1 );
     if( MB_SUCCESS != rval ) return rval;
 
-    createdTrees.erase( std::remove( createdTrees.begin( ), createdTrees.end( ), root_handle ),
-                        createdTrees.end( ) );
+    createdTrees.erase( std::remove( createdTrees.begin( ), createdTrees.end( ), root_handle ), createdTrees.end( ) );
     return moab( )->delete_entities( &dead_sets[ 0 ], dead_sets.size( ) );
 }
 
@@ -261,8 +251,7 @@ ErrorCode BSPTree::get_tree_end_iterator( EntityHandle root, BSPTreeIter& iter )
     return iter.step_to_first_leaf( BSPTreeIter::RIGHT );
 }
 
-ErrorCode BSPTree::split_leaf( BSPTreeIter& leaf, Plane plane, EntityHandle& left,
-                               EntityHandle& right )
+ErrorCode BSPTree::split_leaf( BSPTreeIter& leaf, Plane plane, EntityHandle& left, EntityHandle& right )
 {
     ErrorCode rval;
 
@@ -295,8 +284,7 @@ ErrorCode BSPTree::split_leaf( BSPTreeIter& leaf, Plane plane )
     return split_leaf( leaf, plane, left, right );
 }
 
-ErrorCode BSPTree::split_leaf( BSPTreeIter& leaf, Plane plane, const Range& left_entities,
-                               const Range& right_entities )
+ErrorCode BSPTree::split_leaf( BSPTreeIter& leaf, Plane plane, const Range& left_entities, const Range& right_entities )
 {
     EntityHandle left, right, parent = leaf.handle( );
     ErrorCode    rval = split_leaf( leaf, plane, left, right );
@@ -314,8 +302,7 @@ ErrorCode BSPTree::split_leaf( BSPTreeIter& leaf, Plane plane, const Range& left
     return MB_FAILURE;
 }
 
-ErrorCode BSPTree::split_leaf( BSPTreeIter& leaf, Plane plane,
-                               const std::vector< EntityHandle >& left_entities,
+ErrorCode BSPTree::split_leaf( BSPTreeIter& leaf, Plane plane, const std::vector< EntityHandle >& left_entities,
                                const std::vector< EntityHandle >& right_entities )
 {
     EntityHandle left, right, parent = leaf.handle( );
@@ -323,8 +310,7 @@ ErrorCode BSPTree::split_leaf( BSPTreeIter& leaf, Plane plane,
     if( MB_SUCCESS != rval ) return rval;
 
     if( MB_SUCCESS == moab( )->add_entities( left, &left_entities[ 0 ], left_entities.size( ) ) &&
-        MB_SUCCESS ==
-            moab( )->add_entities( right, &right_entities[ 0 ], right_entities.size( ) ) &&
+        MB_SUCCESS == moab( )->add_entities( right, &right_entities[ 0 ], right_entities.size( ) ) &&
         MB_SUCCESS == moab( )->clear_meshset( &parent, 1 ) )
         return MB_SUCCESS;
 
@@ -489,8 +475,8 @@ double BSPTreeIter::volume( ) const
 bool BSPTreeIter::is_sibling( const BSPTreeIter& other_leaf ) const
 {
     const size_t s = mStack.size( );
-    return ( s > 1 ) && ( s == other_leaf.mStack.size( ) ) &&
-           ( other_leaf.mStack[ s - 2 ] == mStack[ s - 2 ] ) && other_leaf.handle( ) != handle( );
+    return ( s > 1 ) && ( s == other_leaf.mStack.size( ) ) && ( other_leaf.mStack[ s - 2 ] == mStack[ s - 2 ] ) &&
+           other_leaf.handle( ) != handle( );
 }
 
 bool BSPTreeIter::is_sibling( EntityHandle other_leaf ) const
@@ -571,7 +557,7 @@ ErrorCode BSPTreeBoxIter::initialize( BSPTree* tool_ptr, EntityHandle root, cons
     return MB_SUCCESS;
 }
 
-BSPTreeBoxIter::SideBits BSPTreeBoxIter::side_above_plane( const double hex_coords[ 8 ][ 3 ],
+BSPTreeBoxIter::SideBits BSPTreeBoxIter::side_above_plane( const double          hex_coords[ 8 ][ 3 ],
                                                            const BSPTree::Plane& plane )
 {
     unsigned result = 0;
@@ -580,8 +566,7 @@ BSPTreeBoxIter::SideBits BSPTreeBoxIter::side_above_plane( const double hex_coor
     return (BSPTreeBoxIter::SideBits)result;
 }
 
-BSPTreeBoxIter::SideBits BSPTreeBoxIter::side_on_plane( const double          hex_coords[ 8 ][ 3 ],
-                                                        const BSPTree::Plane& plane )
+BSPTreeBoxIter::SideBits BSPTreeBoxIter::side_on_plane( const double hex_coords[ 8 ][ 3 ], const BSPTree::Plane& plane )
 {
     unsigned result = 0;
     for( unsigned i = 0; i < 8u; ++i )
@@ -734,8 +719,7 @@ static inline void copy_coords( double dest[ 3 ], const double source[ 3 ] )
 }
 
 /** reverse of plane_cut_box */
-static inline ErrorCode plane_uncut_box( const double          cut_face_in[ 4 ][ 3 ],
-                                         double                corners_inout[ 8 ][ 3 ],
+static inline ErrorCode plane_uncut_box( const double cut_face_in[ 4 ][ 3 ], double corners_inout[ 8 ][ 3 ],
                                          const BSPTree::Plane& plane )
 {
     switch( BSPTreeBoxIter::side_on_plane( corners_inout, plane ) )
@@ -1037,8 +1021,7 @@ ErrorCode BSPTreeBoxIter::sibling_side( SideBits& side_out ) const
     return MB_SUCCESS;
 }
 
-ErrorCode BSPTreeBoxIter::get_neighbors( SideBits side, std::vector< BSPTreeBoxIter >& results,
-                                         double epsilon ) const
+ErrorCode BSPTreeBoxIter::get_neighbors( SideBits side, std::vector< BSPTreeBoxIter >& results, double epsilon ) const
 {
     EntityHandle   tmp_handle;
     BSPTree::Plane plane;
@@ -1149,8 +1132,7 @@ ErrorCode BSPTreeBoxIter::calculate_polyhedron( BSPTreePoly& poly_out ) const
     return poly_out.set( ptr );
 }
 
-ErrorCode BSPTree::leaf_containing_point( EntityHandle tree_root, const double point[ 3 ],
-                                          EntityHandle& leaf_out )
+ErrorCode BSPTree::leaf_containing_point( EntityHandle tree_root, const double point[ 3 ], EntityHandle& leaf_out )
 {
     std::vector< EntityHandle > children;
     Plane                       plane;
@@ -1171,8 +1153,7 @@ ErrorCode BSPTree::leaf_containing_point( EntityHandle tree_root, const double p
     return MB_SUCCESS;
 }
 
-ErrorCode BSPTree::leaf_containing_point( EntityHandle root, const double point[ 3 ],
-                                          BSPTreeIter& iter )
+ErrorCode BSPTree::leaf_containing_point( EntityHandle root, const double point[ 3 ], BSPTreeIter& iter )
 {
     ErrorCode rval;
 
@@ -1195,9 +1176,8 @@ ErrorCode BSPTree::leaf_containing_point( EntityHandle root, const double point[
 }
 
 template< typename PlaneIter >
-static inline bool ray_intersect_halfspaces( const CartVect& ray_pt, const CartVect& ray_dir,
-                                             const PlaneIter& begin, const PlaneIter& end,
-                                             double& t_enter, double& t_exit )
+static inline bool ray_intersect_halfspaces( const CartVect& ray_pt, const CartVect& ray_dir, const PlaneIter& begin,
+                                             const PlaneIter& end, double& t_enter, double& t_exit )
 {
     const double epsilon = 1e-12;
 
@@ -1280,12 +1260,11 @@ BoxPlaneIter::BoxPlaneIter( const double coords[ 8 ][ 3 ] ) : faceNum( 0 )
     }
 }
 
-bool BSPTreeBoxIter::intersect_ray( const double ray_point[ 3 ], const double ray_vect[ 3 ],
-                                    double& t_enter, double& t_exit ) const
+bool BSPTreeBoxIter::intersect_ray( const double ray_point[ 3 ], const double ray_vect[ 3 ], double& t_enter,
+                                    double& t_exit ) const
 {
     BoxPlaneIter iter( this->leafCoords ), end;
-    return ray_intersect_halfspaces( CartVect( ray_point ), CartVect( ray_vect ), iter, end,
-                                     t_enter, t_exit );
+    return ray_intersect_halfspaces( CartVect( ray_point ), CartVect( ray_vect ), iter, end, t_enter, t_exit );
 }
 
 class BSPTreePlaneIter
@@ -1350,13 +1329,12 @@ BSPTreePlaneIter& BSPTreePlaneIter::operator++( )
     return *this;
 }
 
-bool BSPTreeIter::intersect_ray( const double ray_point[ 3 ], const double ray_vect[ 3 ],
-                                 double& t_enter, double& t_exit ) const
+bool BSPTreeIter::intersect_ray( const double ray_point[ 3 ], const double ray_vect[ 3 ], double& t_enter,
+                                 double& t_exit ) const
 {
     // intersect with half-spaces defining tree
     BSPTreePlaneIter iter1( tool( ), &mStack[ 0 ], mStack.size( ) ), end1;
-    if( !ray_intersect_halfspaces( CartVect( ray_point ), CartVect( ray_vect ), iter1, end1,
-                                   t_enter, t_exit ) )
+    if( !ray_intersect_halfspaces( CartVect( ray_point ), CartVect( ray_vect ), iter1, end1, t_enter, t_exit ) )
         return false;
 
     // itersect with box bounding entire tree
@@ -1370,8 +1348,7 @@ bool BSPTreeIter::intersect_ray( const double ray_point[ 3 ], const double ray_v
 
     BoxPlaneIter iter2( corners ), end2;
     double       t2_enter, t2_exit;
-    if( !ray_intersect_halfspaces( CartVect( ray_point ), CartVect( ray_vect ), iter2, end2,
-                                   t2_enter, t2_exit ) )
+    if( !ray_intersect_halfspaces( CartVect( ray_point ), CartVect( ray_vect ), iter2, end2, t2_enter, t2_exit ) )
         return false;
 
     // if intersect both box and halfspaces, check that

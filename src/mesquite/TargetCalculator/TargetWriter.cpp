@@ -45,10 +45,9 @@
 namespace MBMesquite
 {
 
-TargetWriter::TargetWriter( TargetCalculator* tc, WeightCalculator* wc,
-                            std::string target_base_name, std::string weight_base_name )
-    : targetCalc( tc ), weightCalc( wc ), targetName( target_base_name ),
-      weightName( weight_base_name )
+TargetWriter::TargetWriter( TargetCalculator* tc, WeightCalculator* wc, std::string target_base_name,
+                            std::string weight_base_name )
+    : targetCalc( tc ), weightCalc( wc ), targetName( target_base_name ), weightName( weight_base_name )
 {
 }
 
@@ -59,8 +58,7 @@ std::string TargetWriter::get_name( ) const
     return "TargetWriter";
 }
 
-double TargetWriter::loop_over_mesh( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
-                                     MsqError& err )
+double TargetWriter::loop_over_mesh( MeshDomainAssoc* mesh_and_domain, const Settings* settings, MsqError& err )
 {
     Mesh*       mesh = mesh_and_domain->get_mesh( );
     MeshDomain* domain = mesh_and_domain->get_domain( );
@@ -121,8 +119,7 @@ double TargetWriter::loop_over_mesh( MeshDomainAssoc* mesh_and_domain, const Set
 
                 TagHandle tag = get_target_tag( 3, samples.size( ), mesh, err );
                 MSQ_ERRZERO( err );
-                mesh->tag_set_element_data( tag, 1, patch.get_element_handles_array( ),
-                                            arrptr( targets3d ), err );
+                mesh->tag_set_element_data( tag, 1, patch.get_element_handles_array( ), arrptr( targets3d ), err );
                 MSQ_ERRZERO( err );
             }
             else if( targetCalc->have_surface_orient( ) )
@@ -130,12 +127,10 @@ double TargetWriter::loop_over_mesh( MeshDomainAssoc* mesh_and_domain, const Set
                 targets2dorient.resize( samples.size( ) );
                 for( unsigned i = 0; i < samples.size( ); ++i )
                 {
-                    targetCalc->get_surface_target( patch, 0, samples[ i ], targets2dorient[ i ],
-                                                    err );
+                    targetCalc->get_surface_target( patch, 0, samples[ i ], targets2dorient[ i ], err );
                     MSQ_ERRZERO( err );
 
-                    MsqMatrix< 3, 1 > cross =
-                        targets2dorient[ i ].column( 0 ) * targets2dorient[ i ].column( 1 );
+                    MsqMatrix< 3, 1 > cross = targets2dorient[ i ].column( 0 ) * targets2dorient[ i ].column( 1 );
                     if( DBL_EPSILON > ( cross % cross ) )
                     {
                         MSQ_SETERR( err )( "Degenerate 2D target", MsqError::INVALID_ARG );
@@ -145,8 +140,8 @@ double TargetWriter::loop_over_mesh( MeshDomainAssoc* mesh_and_domain, const Set
 
                 TagHandle tag = get_target_tag( 2, samples.size( ), mesh, err );
                 MSQ_ERRZERO( err );
-                mesh->tag_set_element_data( tag, 1, patch.get_element_handles_array( ),
-                                            arrptr( targets2dorient ), err );
+                mesh->tag_set_element_data( tag, 1, patch.get_element_handles_array( ), arrptr( targets2dorient ),
+                                            err );
                 MSQ_ERRZERO( err );
             }
             else
@@ -166,8 +161,7 @@ double TargetWriter::loop_over_mesh( MeshDomainAssoc* mesh_and_domain, const Set
 
                 TagHandle tag = get_target_tag( 2, samples.size( ), mesh, err );
                 MSQ_ERRZERO( err );
-                mesh->tag_set_element_data( tag, 1, patch.get_element_handles_array( ),
-                                            arrptr( targets2d ), err );
+                mesh->tag_set_element_data( tag, 1, patch.get_element_handles_array( ), arrptr( targets2d ), err );
                 MSQ_ERRZERO( err );
             }
         }
@@ -182,8 +176,7 @@ double TargetWriter::loop_over_mesh( MeshDomainAssoc* mesh_and_domain, const Set
             }
             TagHandle tag = get_weight_tag( samples.size( ), mesh, err );
             MSQ_ERRZERO( err );
-            mesh->tag_set_element_data( tag, 1, patch.get_element_handles_array( ),
-                                        arrptr( weights ), err );
+            mesh->tag_set_element_data( tag, 1, patch.get_element_handles_array( ), arrptr( weights ), err );
             MSQ_ERRZERO( err );
         }
     }
@@ -225,8 +218,7 @@ TagHandle TargetWriter::get_weight_tag( unsigned count, Mesh* mesh, MsqError& er
     return weightTags[ count ];
 }
 
-TagHandle TargetWriter::get_tag_handle( const std::string& base_name, unsigned num_dbl, Mesh* mesh,
-                                        MsqError& err )
+TagHandle TargetWriter::get_tag_handle( const std::string& base_name, unsigned num_dbl, Mesh* mesh, MsqError& err )
 {
     std::ostringstream sstr;
     sstr << base_name << num_dbl;
@@ -243,8 +235,7 @@ TagHandle TargetWriter::get_tag_handle( const std::string& base_name, unsigned n
         if( temp_type != Mesh::DOUBLE || temp_length != num_dbl )
         {
             MSQ_SETERR( err )
-            ( MsqError::TAG_ALREADY_EXISTS, "Mismatched type or length for existing tag \"%s\"",
-              sstr.str( ).c_str( ) );
+            ( MsqError::TAG_ALREADY_EXISTS, "Mismatched type or length for existing tag \"%s\"", sstr.str( ).c_str( ) );
         }
     }
     else if( err.error_code( ) == MsqError::TAG_NOT_FOUND )

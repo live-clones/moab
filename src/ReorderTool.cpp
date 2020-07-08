@@ -28,18 +28,17 @@ static inline ErrorCode error( ErrorCode val )
 #define CHKERR \
     if( MB_SUCCESS != rval ) return error( rval )
 
-#define UNRECOVERABLE( ERRCODE )                                                               \
-    do                                                                                         \
-    {                                                                                          \
-        if( MB_SUCCESS != ( ERRCODE ) )                                                        \
-        {                                                                                      \
-            error( ( ERRCODE ) );                                                              \
-            std::cerr << "Unreconverable error during mesh reorder." << std::endl              \
-                      << "Error Code " << ( ERRCODE ) << " at " << __FILE__ << ":" << __LINE__ \
-                      << std::endl;                                                            \
-            std::cerr.flush( );                                                                \
-            abort( );                                                                          \
-        }                                                                                      \
+#define UNRECOVERABLE( ERRCODE )                                                                             \
+    do                                                                                                       \
+    {                                                                                                        \
+        if( MB_SUCCESS != ( ERRCODE ) )                                                                      \
+        {                                                                                                    \
+            error( ( ERRCODE ) );                                                                            \
+            std::cerr << "Unreconverable error during mesh reorder." << std::endl                            \
+                      << "Error Code " << ( ERRCODE ) << " at " << __FILE__ << ":" << __LINE__ << std::endl; \
+            std::cerr.flush( );                                                                              \
+            abort( );                                                                                        \
+        }                                                                                                    \
     } while( false )
 
 static ErrorCode check_tag_type( Interface* moab, Tag tag, DataType exp_type, int exp_size )
@@ -64,8 +63,7 @@ ErrorCode ReorderTool::handle_order_from_int_tag( Tag tag, int skip_value, Tag& 
     // check that input tag handles are what we expect
     rval = check_tag_type( mMB, tag, MB_TYPE_INTEGER, sizeof( int ) );CHKERR;
     EntityHandle zero = 0;
-    rval = mMB->tag_get_handle( 0, 1, MB_TYPE_HANDLE, new_handles,
-                                MB_TAG_DENSE | MB_TAG_CREAT | MB_TAG_EXCL, &zero );CHKERR;
+    rval = mMB->tag_get_handle( 0, 1, MB_TYPE_HANDLE, new_handles, MB_TAG_DENSE | MB_TAG_CREAT | MB_TAG_EXCL, &zero );CHKERR;
 
     // Can only reorder within same type/connectivity (or vertex/num_coords)
     // groupings.  Call helper function for each such grouping.
@@ -81,8 +79,7 @@ ErrorCode ReorderTool::handle_order_from_int_tag( Tag tag, int skip_value, Tag& 
             EntitySequence* seq = *i;
             // 0 values per entity implies structured data, which
             // we cannot reorder.  Skip those.
-            if( t == MBVERTEX || 0 < seq->values_per_entity( ) )
-                values.insert( seq->values_per_entity( ) );
+            if( t == MBVERTEX || 0 < seq->values_per_entity( ) ) values.insert( seq->values_per_entity( ) );
         }
 
         // Call helper function for each (type,size) tuple.
@@ -115,8 +112,8 @@ void ReorderTool::get_entities( EntityType t, int vals_per_ent, Range& entities 
     }
 }
 
-ErrorCode ReorderTool::handle_order_from_int_tag( EntityType t, int vals_per_ent, Tag tag,
-                                                  int skip_value, Tag new_handles )
+ErrorCode ReorderTool::handle_order_from_int_tag( EntityType t, int vals_per_ent, Tag tag, int skip_value,
+                                                  Tag new_handles )
 {
     ErrorCode rval;
 
@@ -195,8 +192,7 @@ ErrorCode ReorderTool::handle_order_from_sets_and_adj( const Range& sets, Tag& h
 
     Tag       order_tag;
     const int negone = -1;
-    rval = mMB->tag_get_handle( 0, 1, MB_TYPE_INTEGER, order_tag,
-                                MB_TAG_DENSE | MB_TAG_CREAT | MB_TAG_EXCL, &negone );
+    rval = mMB->tag_get_handle( 0, 1, MB_TYPE_INTEGER, order_tag, MB_TAG_DENSE | MB_TAG_CREAT | MB_TAG_EXCL, &negone );
     if( MB_SUCCESS != rval )
     {
         mMB->tag_delete( handle_tag );
@@ -230,8 +226,7 @@ ErrorCode ReorderTool::handle_order_from_sets_and_adj( const Range& sets, Tag& h
 // Compare function to use for a map keyed on pointers to sorted vectors
 struct CompSortedVect
 {
-    bool operator( )( const std::vector< EntityHandle >* v1,
-                      const std::vector< EntityHandle >* v2 ) const
+    bool operator( )( const std::vector< EntityHandle >* v1, const std::vector< EntityHandle >* v2 ) const
     {
         std::vector< EntityHandle >::const_iterator i1, i2;
         for( i1 = v1->begin( ), i2 = v2->begin( ); i1 != v1->end( ); ++i1, ++i2 )
@@ -245,9 +240,8 @@ struct CompSortedVect
     }
 };
 
-ErrorCode
-    ReorderTool::int_order_from_sets_and_adj( const Range& sets, Tag order_tag, int skip_val,
-                                              std::vector< std::vector< EntityHandle >* >& revMap )
+ErrorCode ReorderTool::int_order_from_sets_and_adj( const Range& sets, Tag order_tag, int skip_val,
+                                                    std::vector< std::vector< EntityHandle >* >& revMap )
 {
     ErrorCode rval;
 
@@ -260,7 +254,7 @@ ErrorCode
     // Map from sorted list of handles to index
     std::map< std::vector< EntityHandle >*, int, CompSortedVect >           forMap;
     std::map< std::vector< EntityHandle >*, int, CompSortedVect >::iterator fiter, fiter2;
-    std::vector< EntityHandle > sharing;  // tmp storage for entity
+    std::vector< EntityHandle >                                             sharing;  // tmp storage for entity
 
     // for each set
     for( Range::iterator s = sets.begin( ); s != sets.end( ); ++s )
@@ -303,8 +297,7 @@ ErrorCode
             if( val != skip_val )
             {
                 sharing = *revMap[ val ];
-                assert( std::lower_bound( sharing.begin( ), sharing.end( ), *s ) ==
-                        sharing.end( ) );
+                assert( std::lower_bound( sharing.begin( ), sharing.end( ), *s ) == sharing.end( ) );
             }
             sharing.push_back( *s );
 
@@ -316,8 +309,8 @@ ErrorCode
                 std::vector< EntityHandle >* newvec = new std::vector< EntityHandle >;
                 newvec->swap( sharing );
                 if( (int)revMap.size( ) == skip_val ) revMap.push_back( 0 );
-                fiter2 = forMap.insert( fiter, std::pair< std::vector< EntityHandle >*, int >(
-                                                   newvec, revMap.size( ) ) );
+                fiter2 =
+                    forMap.insert( fiter, std::pair< std::vector< EntityHandle >*, int >( newvec, revMap.size( ) ) );
                 assert( fiter2 != fiter );
                 fiter = fiter2;
                 revMap.push_back( newvec );
@@ -336,8 +329,7 @@ ErrorCode ReorderTool::get_reordered_handles( Tag tag, const Range& old_handles,
                                               std::vector< EntityHandle >& new_handles )
 {
     new_handles.resize( old_handles.size( ) );
-    ErrorCode rval =
-        mMB->tag_get_data( tag, old_handles, ( new_handles.empty( ) ) ? NULL : &new_handles[ 0 ] );CHKERR;
+    ErrorCode rval = mMB->tag_get_data( tag, old_handles, ( new_handles.empty( ) ) ? NULL : &new_handles[ 0 ] );CHKERR;
 
     Range::const_iterator                 it1 = old_handles.begin( );
     std::vector< EntityHandle >::iterator it2 = new_handles.begin( );
@@ -347,16 +339,15 @@ ErrorCode ReorderTool::get_reordered_handles( Tag tag, const Range& old_handles,
     return MB_SUCCESS;
 }
 
-ErrorCode ReorderTool::get_reordered_handles( Tag                                tag,
-                                              const std::vector< EntityHandle >& old_handles,
-                                              std::vector< EntityHandle >&       new_handles )
+ErrorCode ReorderTool::get_reordered_handles( Tag tag, const std::vector< EntityHandle >& old_handles,
+                                              std::vector< EntityHandle >& new_handles )
 {
     new_handles.resize( old_handles.size( ) );
     return get_reordered_handles( tag, &old_handles[ 0 ], &new_handles[ 0 ], old_handles.size( ) );
 }
 
-ErrorCode ReorderTool::get_reordered_handles( Tag tag, const EntityHandle* old_handles,
-                                              EntityHandle* new_handles, size_t num_handles )
+ErrorCode ReorderTool::get_reordered_handles( Tag tag, const EntityHandle* old_handles, EntityHandle* new_handles,
+                                              size_t num_handles )
 {
     ErrorCode rval = mMB->tag_get_data( tag, old_handles, num_handles, new_handles );CHKERR;
 
@@ -366,13 +357,11 @@ ErrorCode ReorderTool::get_reordered_handles( Tag tag, const EntityHandle* old_h
     return MB_SUCCESS;
 }
 
-ErrorCode ReorderTool::get_new_handles( Tag tag, Range& old_handles,
-                                        std::vector< EntityHandle >& newhandles )
+ErrorCode ReorderTool::get_new_handles( Tag tag, Range& old_handles, std::vector< EntityHandle >& newhandles )
 {
     // get new handles for tagged entities
     newhandles.resize( old_handles.size( ) );
-    ErrorCode rval =
-        mMB->tag_get_data( tag, old_handles, ( newhandles.empty( ) ) ? NULL : &newhandles[ 0 ] );CHKERR;
+    ErrorCode rval = mMB->tag_get_data( tag, old_handles, ( newhandles.empty( ) ) ? NULL : &newhandles[ 0 ] );CHKERR;
 
     // remove entities that were not reordered
     Range::iterator i = old_handles.begin( );
@@ -418,8 +407,7 @@ ErrorCode ReorderTool::reorder_entities( Tag new_handles )
             EntitySequence* seq = *i;
             // 0 values per entity implies structured data, which
             // we cannot reorder.  Skip those.
-            if( t == MBVERTEX || 0 < seq->values_per_entity( ) )
-                values.insert( seq->values_per_entity( ) );
+            if( t == MBVERTEX || 0 < seq->values_per_entity( ) ) values.insert( seq->values_per_entity( ) );
         }
 
         // reorder primary data for each (type,size) tuple.
@@ -578,8 +566,7 @@ ErrorCode ReorderTool::reorder_tag_data( EntityType etype, Tag new_handles, Tag 
     {
         assert( !( buffer.size( ) % sizeof( EntityHandle ) ) );
         std::vector< unsigned char > buffer2( buffer.size( ) );
-        rval = get_reordered_handles( new_handles,
-                                      reinterpret_cast< const EntityHandle* >( &buffer[ 0 ] ),
+        rval = get_reordered_handles( new_handles, reinterpret_cast< const EntityHandle* >( &buffer[ 0 ] ),
                                       reinterpret_cast< EntityHandle* >( &buffer2[ 0 ] ),
                                       buffer.size( ) / sizeof( EntityHandle ) );CHKERR;
         // if var-length tag then do not do swap because pointers[] contains pointers
@@ -593,8 +580,7 @@ ErrorCode ReorderTool::reorder_tag_data( EntityType etype, Tag new_handles, Tag 
     // store re-ordered tag data
     if( -1 == tagsize )
     {
-        rval = mMB->tag_set_by_ptr( tag, &newhandles[ 0 ], newhandles.size( ), &pointers[ 0 ],
-                                    &sizes[ 0 ] );
+        rval = mMB->tag_set_by_ptr( tag, &newhandles[ 0 ], newhandles.size( ), &pointers[ 0 ], &sizes[ 0 ] );
         pointers.clear( );
         sizes.clear( );
         buffer.clear( );

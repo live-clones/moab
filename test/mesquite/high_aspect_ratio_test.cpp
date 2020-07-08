@@ -112,12 +112,11 @@ void usage( const char* argv0, bool brief = true )
     std::exit( NO_ERROR );
 }
 
-#define CHECKERR                                                               \
-    if( err )                                                                  \
-    {                                                                          \
-        std::cerr << "Internal error at line " << __LINE__ << ":" << std::endl \
-                  << ( err ) << std::endl;                                     \
-        std::exit( LAST_EXIT_CODE + ( err ).error_code( ) );                   \
+#define CHECKERR                                                                                        \
+    if( err )                                                                                           \
+    {                                                                                                   \
+        std::cerr << "Internal error at line " << __LINE__ << ":" << std::endl << ( err ) << std::endl; \
+        std::exit( LAST_EXIT_CODE + ( err ).error_code( ) );                                            \
     }
 
 /*    |<----- x ----->|
@@ -140,9 +139,8 @@ void usage( const char* argv0, bool brief = true )
  */
 void create_input_mesh( const MeshParams& params, bool all_fixed, MeshImpl& mesh, MsqError& err );
 
-void parse_options( char* argv[], int argc, MeshParams& mesh, MeshParams& ref,
-                    std::string& output_file, bool& fixed_boundary,
-                    TerminationCriterion::TimeStepFileType& write_timesteps, bool& use_feas_newt,
+void parse_options( char* argv[], int argc, MeshParams& mesh, MeshParams& ref, std::string& output_file,
+                    bool& fixed_boundary, TerminationCriterion::TimeStepFileType& write_timesteps, bool& use_feas_newt,
                     int& num_iterations );
 
 std::string base_name( std::string filename );
@@ -155,9 +153,8 @@ int main( int argc, char* argv[] )
     std::string                            output_file_name;
     int                                    num_iterations;
 
-    parse_options( argv, argc, input_params, reference_params, output_file_name,
-                   fixed_boundary_vertices, write_timestep_files, feas_newt_solver,
-                   num_iterations );
+    parse_options( argv, argc, input_params, reference_params, output_file_name, fixed_boundary_vertices,
+                   write_timestep_files, feas_newt_solver, num_iterations );
 
     MsqError    err;
     MeshImpl    mesh, refmesh;
@@ -255,10 +252,8 @@ int main( int argc, char* argv[] )
     if( fract < MIN_FRACT )
     {
         std::cerr << "Vertex far from optimimal location" << std::endl
-                  << "  Expected: (" << expect[ 0 ] << ", " << expect[ 1 ] << ", " << expect[ 2 ]
-                  << ")" << std::endl
-                  << "  Actual:   (" << coords[ 0 ] << ", " << coords[ 1 ] << ", " << coords[ 2 ]
-                  << ")" << std::endl;
+                  << "  Expected: (" << expect[ 0 ] << ", " << expect[ 1 ] << ", " << expect[ 2 ] << ")" << std::endl
+                  << "  Actual:   (" << coords[ 0 ] << ", " << coords[ 1 ] << ", " << coords[ 2 ] << ")" << std::endl;
         return FAR_FROM_TARGET;
     }
 
@@ -268,10 +263,8 @@ int main( int argc, char* argv[] )
         fabs( coords[ 1 ] - expect[ 1 ] ) > EPS * input_params.h || fabs( expect[ 2 ] ) > EPS )
     {
         std::cerr << "Vertex not at optimimal location" << std::endl
-                  << "  Expected: (" << expect[ 0 ] << ", " << expect[ 1 ] << ", " << expect[ 2 ]
-                  << ")" << std::endl
-                  << "  Actual:   (" << coords[ 0 ] << ", " << coords[ 1 ] << ", " << coords[ 2 ]
-                  << ")" << std::endl;
+                  << "  Expected: (" << expect[ 0 ] << ", " << expect[ 1 ] << ", " << expect[ 2 ] << ")" << std::endl
+                  << "  Actual:   (" << coords[ 0 ] << ", " << coords[ 1 ] << ", " << coords[ 2 ] << ")" << std::endl;
         return NOT_AT_TARGET;
     }
 
@@ -296,10 +289,9 @@ enum ParseState
     EXPECTING_O,
     EXPECTING_I
 };
-void parse_options( char* argv[], int argc, MeshParams& mesh, MeshParams& ref,
-                    std::string& output_file, bool& fixed_boundary,
-                    TerminationCriterion::TimeStepFileType& write_timesteps, bool& feas_newt_solver,
-                    int& num_iterations )
+void parse_options( char* argv[], int argc, MeshParams& mesh, MeshParams& ref, std::string& output_file,
+                    bool& fixed_boundary, TerminationCriterion::TimeStepFileType& write_timesteps,
+                    bool& feas_newt_solver, int& num_iterations )
 {
     // begin with defaults
     mesh = default_mesh;

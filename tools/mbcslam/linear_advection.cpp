@@ -22,35 +22,29 @@
 
 using namespace moab;
 
-moab::ErrorCode update_density( moab::Interface* mb, moab::EntityHandle euler_set,
-                                moab::EntityHandle lagr_set, moab::EntityHandle out_set,
-                                moab::Tag& rhoTag, moab::Tag& areaTag, moab::Tag& rhoCoefsTag,
-                                moab::Tag& weightsTag, moab::Tag& planeTag );
+moab::ErrorCode update_density( moab::Interface* mb, moab::EntityHandle euler_set, moab::EntityHandle lagr_set,
+                                moab::EntityHandle out_set, moab::Tag& rhoTag, moab::Tag& areaTag,
+                                moab::Tag& rhoCoefsTag, moab::Tag& weightsTag, moab::Tag& planeTag );
 
-moab::ErrorCode get_departure_grid( moab::Interface* mb, moab::EntityHandle euler_set,
-                                    moab::EntityHandle lagr_set, moab::EntityHandle covering_set,
-                                    int tStep, moab::Range& connecVerts );
+moab::ErrorCode get_departure_grid( moab::Interface* mb, moab::EntityHandle euler_set, moab::EntityHandle lagr_set,
+                                    moab::EntityHandle covering_set, int tStep, moab::Range& connecVerts );
 
 moab::ErrorCode get_barycenters( moab::Interface* mb, moab::EntityHandle set, moab::Tag& planeTag,
                                  moab::Tag& barycenterTag, moab::Tag& areaTag );
-moab::ErrorCode get_gnomonic_plane( moab::Interface* mb, moab::EntityHandle set,
-                                    moab::Tag& planeTag );
-moab::ErrorCode get_linear_reconstruction( moab::Interface* mb, moab::EntityHandle set,
-                                           moab::Tag& rhoTag, moab::Tag& planeTag,
-                                           moab::Tag& barycenterTag, moab::Tag& linearCoefTag );
+moab::ErrorCode get_gnomonic_plane( moab::Interface* mb, moab::EntityHandle set, moab::Tag& planeTag );
+moab::ErrorCode get_linear_reconstruction( moab::Interface* mb, moab::EntityHandle set, moab::Tag& rhoTag,
+                                           moab::Tag& planeTag, moab::Tag& barycenterTag, moab::Tag& linearCoefTag );
 moab::ErrorCode get_intersection_weights( moab::Interface* mb, moab::EntityHandle euler_set,
-                                          moab::EntityHandle lagr_set, moab::EntityHandle intx_set,
-                                          moab::Tag& planeTag, moab::Tag& weightsTag );
+                                          moab::EntityHandle lagr_set, moab::EntityHandle intx_set, moab::Tag& planeTag,
+                                          moab::Tag& weightsTag );
 
-moab::ErrorCode set_density( moab::Interface* mb, moab::EntityHandle euler_set,
-                             moab::Tag& barycenterTag, moab::Tag& rhoTag, int field_type );
+moab::ErrorCode set_density( moab::Interface* mb, moab::EntityHandle euler_set, moab::Tag& barycenterTag,
+                             moab::Tag& rhoTag, int field_type );
 
-moab::ErrorCode create_lagr_mesh( moab::Interface* mb, moab::EntityHandle euler_set,
-                                  moab::EntityHandle lagr_set );
+moab::ErrorCode create_lagr_mesh( moab::Interface* mb, moab::EntityHandle euler_set, moab::EntityHandle lagr_set );
 
 // functions to compute departure point locations
-void departure_point_swirl( moab::CartVect& arrival_point, double t, double delta_t,
-                            moab::CartVect& departure_point );
+void departure_point_swirl( moab::CartVect& arrival_point, double t, double delta_t, moab::CartVect& departure_point );
 void departure_point_swirl_rot( moab::CartVect& arrival_point, double t, double delta_t,
                                 moab::CartVect& departure_point );
 
@@ -95,13 +89,11 @@ int main( int argc, char* argv[] )
 
     // Create tag for cell density
     moab::Tag rhoTag = 0;
-    rval = mb.tag_get_handle( "Density", 1, moab::MB_TYPE_DOUBLE, rhoTag,
-                              moab::MB_TAG_CREAT | moab::MB_TAG_DENSE );MB_CHK_ERR( rval );
+    rval = mb.tag_get_handle( "Density", 1, moab::MB_TYPE_DOUBLE, rhoTag, moab::MB_TAG_CREAT | moab::MB_TAG_DENSE );MB_CHK_ERR( rval );
 
     // Create tag for cell area
     moab::Tag areaTag = 0;
-    rval = mb.tag_get_handle( "Area", 1, moab::MB_TYPE_DOUBLE, areaTag,
-                              moab::MB_TAG_CREAT | moab::MB_TAG_DENSE );MB_CHK_ERR( rval );
+    rval = mb.tag_get_handle( "Area", 1, moab::MB_TYPE_DOUBLE, areaTag, moab::MB_TAG_CREAT | moab::MB_TAG_DENSE );MB_CHK_ERR( rval );
     // Create tag for cell barycenters in 3D Cartesian space
     moab::Tag barycenterTag = 0;
     rval = mb.tag_get_handle( "CellBarycenter", 3, moab::MB_TYPE_DOUBLE, barycenterTag,
@@ -116,8 +108,7 @@ int main( int argc, char* argv[] )
                               moab::MB_TAG_CREAT | moab::MB_TAG_DENSE );MB_CHK_ERR( rval );
     // Create tag for intersection weights
     moab::Tag weightsTag = 0;
-    rval = mb.tag_get_handle( "Weights", 3, moab::MB_TYPE_DOUBLE, weightsTag,
-                              moab::MB_TAG_CREAT | moab::MB_TAG_DENSE );MB_CHK_ERR( rval );
+    rval = mb.tag_get_handle( "Weights", 3, moab::MB_TYPE_DOUBLE, weightsTag, moab::MB_TAG_CREAT | moab::MB_TAG_DENSE );MB_CHK_ERR( rval );
 
     // get cell plane
     rval = get_gnomonic_plane( &mb, euler_set, planeTag );MB_CHK_ERR( rval );
@@ -143,8 +134,7 @@ int main( int argc, char* argv[] )
     rval = IntxUtilsCSLAM::deep_copy_set( &mb, euler_set, lagrange_set );MB_CHK_ERR( rval );
     moab::EntityHandle dum = 0;
     moab::Tag          corrTag;
-    rval = mb.tag_get_handle( CORRTAGNAME, 1, MB_TYPE_HANDLE, corrTag, MB_TAG_DENSE | MB_TAG_CREAT,
-                              &dum );MB_CHK_ERR( rval );
+    rval = mb.tag_get_handle( CORRTAGNAME, 1, MB_TYPE_HANDLE, corrTag, MB_TAG_DENSE | MB_TAG_CREAT, &dum );MB_CHK_ERR( rval );
     // Set up intersection of two meshes
 
     /*
@@ -193,8 +183,8 @@ int main( int argc, char* argv[] )
         get_intersection_weights( &mb, euler_set, lagrange_set, out_set, planeTag, weightsTag );
 
         // update the density
-        rval = update_density( &mb, euler_set, lagrange_set, out_set, rhoTag, areaTag, rhoCoefTag,
-                               weightsTag, planeTag );MB_CHK_ERR( rval );
+        rval =
+            update_density( &mb, euler_set, lagrange_set, out_set, rhoTag, areaTag, rhoCoefTag, weightsTag, planeTag );MB_CHK_ERR( rval );
 
         if( writeFiles && ( ts % 5 == 0 ) )  // so if write
         {
@@ -213,8 +203,8 @@ int main( int argc, char* argv[] )
         // get Eulerian and lagrangian cells
         moab::Range polys;
         rval = mb.get_entities_by_dimension( euler_set, 2, polys );MB_CHK_ERR( rval );
-        rval = mb.get_entities_by_dimension(
-            lagrange_set, 2, polys );  // do not delete lagr set either, with its vertices
+        rval =
+            mb.get_entities_by_dimension( lagrange_set, 2, polys );  // do not delete lagr set either, with its vertices
         MB_CHK_ERR( rval );
 
         // add to the connecVerts range all verts, from all initial polys
@@ -252,8 +242,7 @@ int main( int argc, char* argv[] )
         {
             // double area = *ptrArea;
             norm1 += fabs( *ptrTracer - iniValsRho[ j ] ) * ( *ptrArea );
-            norm2 +=
-                ( *ptrTracer - iniValsRho[ j ] ) * ( *ptrTracer - iniValsRho[ j ] ) * ( *ptrArea );
+            norm2 += ( *ptrTracer - iniValsRho[ j ] ) * ( *ptrTracer - iniValsRho[ j ] ) * ( *ptrArea );
             exact1 += ( iniValsRho[ j ] ) * ( *ptrArea );
             exact2 += ( iniValsRho[ j ] ) * ( iniValsRho[ j ] ) * ( *ptrArea );
         }
@@ -279,8 +268,7 @@ int main( int argc, char* argv[] )
     return 0;
 }
 
-moab::ErrorCode get_gnomonic_plane( moab::Interface* mb, moab::EntityHandle set,
-                                    moab::Tag& planeTag )
+moab::ErrorCode get_gnomonic_plane( moab::Interface* mb, moab::EntityHandle set, moab::Tag& planeTag )
 {
     // get all entities of dimension 2
     moab::Range cells;
@@ -325,8 +313,8 @@ moab::ErrorCode get_gnomonic_plane( moab::Interface* mb, moab::EntityHandle set,
     return moab::MB_SUCCESS;
 }
 
-moab::ErrorCode get_barycenters( moab::Interface* mb, moab::EntityHandle set, moab::Tag& planeTag,
-                                 moab::Tag& areaTag, moab::Tag& barycenterTag )
+moab::ErrorCode get_barycenters( moab::Interface* mb, moab::EntityHandle set, moab::Tag& planeTag, moab::Tag& areaTag,
+                                 moab::Tag& barycenterTag )
 {
 
     // get all entities of dimension 2
@@ -361,9 +349,9 @@ moab::ErrorCode get_barycenters( moab::Interface* mb, moab::EntityHandle set, mo
         double                bary_y = 0;
         for( int inode = 0; inode < num_nodes; inode++ )
         {
-            double   rad = sqrt( coords[ inode * 3 ] * coords[ inode * 3 ] +
-                               coords[ inode * 3 + 1 ] * coords[ inode * 3 + 1 ] +
-                               coords[ inode * 3 + 2 ] * coords[ inode * 3 + 2 ] );
+            double rad =
+                sqrt( coords[ inode * 3 ] * coords[ inode * 3 ] + coords[ inode * 3 + 1 ] * coords[ inode * 3 + 1 ] +
+                      coords[ inode * 3 + 2 ] * coords[ inode * 3 + 2 ] );
             CartVect xyzcoord( coords[ inode * 3 ] / rad, coords[ inode * 3 + 1 ] / rad,
                                coords[ inode * 3 + 2 ] / rad );
             moab::IntxUtils::gnomonic_projection( xyzcoord, R, plane, x[ inode ], y[ inode ] );
@@ -381,11 +369,11 @@ moab::ErrorCode get_barycenters( moab::Interface* mb, moab::EntityHandle set, mo
             double r2 = sqrt( 1 + x[ inode2 ] * x[ inode2 ] + y[ inode2 ] * y[ inode2 ] );
             double hx = x[ inode2 ] - x[ inode ];
 
-            area += -hx *
-                    ( y[ inode ] / ( r1 * ( 1 + x[ inode ] * x[ inode ] ) ) +
-                      4.0 * ymid / ( rm * ( 1 + xmid * xmid ) ) +
-                      y[ inode2 ] / ( r2 * ( 1 + x[ inode2 ] * x[ inode2 ] ) ) ) /
-                    6.0;
+            area +=
+                -hx *
+                ( y[ inode ] / ( r1 * ( 1 + x[ inode ] * x[ inode ] ) ) + 4.0 * ymid / ( rm * ( 1 + xmid * xmid ) ) +
+                  y[ inode2 ] / ( r2 * ( 1 + x[ inode2 ] * x[ inode2 ] ) ) ) /
+                6.0;
 
             bary_x += -hx *
                       ( x[ inode ] * y[ inode ] / ( r1 * ( 1 + x[ inode ] * x[ inode ] ) ) +
@@ -416,8 +404,8 @@ moab::ErrorCode get_barycenters( moab::Interface* mb, moab::EntityHandle set, mo
     return moab::MB_SUCCESS;
 }
 
-moab::ErrorCode set_density( moab::Interface* mb, moab::EntityHandle euler_set,
-                             moab::Tag& barycenterTag, moab::Tag& rhoTag, int field_type )
+moab::ErrorCode set_density( moab::Interface* mb, moab::EntityHandle euler_set, moab::Tag& barycenterTag,
+                             moab::Tag& rhoTag, int field_type )
 {
     // get cells
     moab::Range     cells;
@@ -434,7 +422,7 @@ moab::ErrorCode set_density( moab::Interface* mb, moab::EntityHandle euler_set,
         moab::EntityHandle icell = *it;
 
         // convert barycenter from 3-D Cartesian to lat/lon
-        moab::CartVect bary_xyz( cell_barys[ cell_ind * 3 ], cell_barys[ cell_ind * 3 + 1 ],
+        moab::CartVect                bary_xyz( cell_barys[ cell_ind * 3 ], cell_barys[ cell_ind * 3 + 1 ],
                                  cell_barys[ cell_ind * 3 + 2 ] );
         moab::IntxUtils::SphereCoords sphCoord = moab::IntxUtils::cart_to_spherical( bary_xyz );
 
@@ -443,8 +431,7 @@ moab::ErrorCode set_density( moab::Interface* mb, moab::EntityHandle euler_set,
             //                 lon1,        lat1  lon2    lat2   b    c  hmax  r
             double params[] = { 5 * M_PI / 6.0, 0.0, 7 * M_PI / 6, 0.0, 0.1, 0.9, 1., 0.5 };
 
-            double rho_barycent =
-                IntxUtilsCSLAM::quasi_smooth_field( sphCoord.lon, sphCoord.lat, params );
+            double rho_barycent = IntxUtilsCSLAM::quasi_smooth_field( sphCoord.lon, sphCoord.lat, params );
             rval = mb->tag_set_data( rhoTag, &icell, 1, &rho_barycent );MB_CHK_ERR( rval );
         }
 
@@ -461,8 +448,7 @@ moab::ErrorCode set_density( moab::Interface* mb, moab::EntityHandle euler_set,
             // X1, Y1, Z1, X2, Y2, Z2, ?, ?
             double params[] = { p1[ 0 ], p1[ 1 ], p1[ 2 ], p2[ 0 ], p2[ 1 ], p2[ 2 ], 1, 5. };
 
-            double rho_barycent =
-                IntxUtilsCSLAM::smooth_field( sphCoord.lon, sphCoord.lat, params );
+            double rho_barycent = IntxUtilsCSLAM::smooth_field( sphCoord.lon, sphCoord.lat, params );
             rval = mb->tag_set_data( rhoTag, &icell, 1, &rho_barycent );MB_CHK_ERR( rval );
         }
 
@@ -471,8 +457,7 @@ moab::ErrorCode set_density( moab::Interface* mb, moab::EntityHandle euler_set,
             //                   lon1,      lat1,    lon2,   lat2, b,   c,   r
             double params[] = { 5 * M_PI / 6.0, 0.0, 7 * M_PI / 6.0, 0.0, 0.1, 0.9, 0.5 };
 
-            double rho_barycent =
-                IntxUtilsCSLAM::slotted_cylinder_field( sphCoord.lon, sphCoord.lat, params );
+            double rho_barycent = IntxUtilsCSLAM::slotted_cylinder_field( sphCoord.lon, sphCoord.lat, params );
             rval = mb->tag_set_data( rhoTag, &icell, 1, &rho_barycent );MB_CHK_ERR( rval );
         }
 
@@ -488,9 +473,8 @@ moab::ErrorCode set_density( moab::Interface* mb, moab::EntityHandle euler_set,
     return moab::MB_SUCCESS;
 }
 
-moab::ErrorCode get_linear_reconstruction( moab::Interface* mb, moab::EntityHandle set,
-                                           moab::Tag& rhoTag, moab::Tag& planeTag,
-                                           moab::Tag& barycenterTag, moab::Tag& linearCoefTag )
+moab::ErrorCode get_linear_reconstruction( moab::Interface* mb, moab::EntityHandle set, moab::Tag& rhoTag,
+                                           moab::Tag& planeTag, moab::Tag& barycenterTag, moab::Tag& linearCoefTag )
 {
     // get all entities of dimension 2
     Range     cells;
@@ -551,8 +535,7 @@ moab::ErrorCode get_linear_reconstruction( moab::Interface* mb, moab::EntityHand
             if( adjacentCells[ i ] != icell )
             {
 
-                CartVect bary_xyz( cell_barys[ i * 3 ], cell_barys[ i * 3 + 1 ],
-                                   cell_barys[ i * 3 + 2 ] );
+                CartVect bary_xyz( cell_barys[ i * 3 ], cell_barys[ i * 3 + 1 ], cell_barys[ i * 3 + 2 ] );
                 moab::IntxUtils::gnomonic_projection( bary_xyz, rad, plane, bary_x, bary_y );
 
                 dx[ jind ] = bary_x - cellbaryx;
@@ -568,18 +551,13 @@ moab::ErrorCode get_linear_reconstruction( moab::Interface* mb, moab::EntityHand
         {
 
             // compute normal equations matrix
-            double N11 =
-                dx[ 0 ] * dx[ 0 ] + dx[ 1 ] * dx[ 1 ] + dx[ 2 ] * dx[ 2 ] + dx[ 3 ] * dx[ 3 ];
-            double N22 =
-                dy[ 0 ] * dy[ 0 ] + dy[ 1 ] * dy[ 1 ] + dy[ 2 ] * dy[ 2 ] + dy[ 3 ] * dy[ 3 ];
-            double N12 =
-                dx[ 0 ] * dy[ 0 ] + dx[ 1 ] * dy[ 1 ] + dx[ 2 ] * dy[ 2 ] + dx[ 3 ] * dy[ 3 ];
+            double N11 = dx[ 0 ] * dx[ 0 ] + dx[ 1 ] * dx[ 1 ] + dx[ 2 ] * dx[ 2 ] + dx[ 3 ] * dx[ 3 ];
+            double N22 = dy[ 0 ] * dy[ 0 ] + dy[ 1 ] * dy[ 1 ] + dy[ 2 ] * dy[ 2 ] + dy[ 3 ] * dy[ 3 ];
+            double N12 = dx[ 0 ] * dy[ 0 ] + dx[ 1 ] * dy[ 1 ] + dx[ 2 ] * dy[ 2 ] + dx[ 3 ] * dy[ 3 ];
 
             // rhs
-            double Rx =
-                dx[ 0 ] * dr[ 0 ] + dx[ 1 ] * dr[ 1 ] + dx[ 2 ] * dr[ 2 ] + dx[ 3 ] * dr[ 3 ];
-            double Ry =
-                dy[ 0 ] * dr[ 0 ] + dy[ 1 ] * dr[ 1 ] + dy[ 2 ] * dr[ 2 ] + dy[ 3 ] * dr[ 3 ];
+            double Rx = dx[ 0 ] * dr[ 0 ] + dx[ 1 ] * dr[ 1 ] + dx[ 2 ] * dr[ 2 ] + dx[ 3 ] * dr[ 3 ];
+            double Ry = dy[ 0 ] * dr[ 0 ] + dy[ 1 ] * dr[ 1 ] + dy[ 2 ] * dr[ 2 ] + dy[ 3 ] * dr[ 3 ];
 
             // determinant
             double Det = N11 * N22 - N12 * N12;
@@ -604,9 +582,8 @@ moab::ErrorCode get_linear_reconstruction( moab::Interface* mb, moab::EntityHand
     return moab::MB_SUCCESS;
 }
 
-moab::ErrorCode get_departure_grid( moab::Interface* mb, moab::EntityHandle euler_set,
-                                    moab::EntityHandle lagr_set, moab::EntityHandle covering_set,
-                                    int tStep, Range& connecVerts )
+moab::ErrorCode get_departure_grid( moab::Interface* mb, moab::EntityHandle euler_set, moab::EntityHandle lagr_set,
+                                    moab::EntityHandle covering_set, int tStep, Range& connecVerts )
 {
     EntityHandle dum = 0;
     Tag          corrTag;
@@ -646,10 +623,9 @@ moab::ErrorCode get_departure_grid( moab::Interface* mb, moab::EntityHandle eule
 }
 
 // !!! For now serial !!!
-moab::ErrorCode update_density( moab::Interface* mb, moab::EntityHandle euler_set,
-                                moab::EntityHandle lagr_set, moab::EntityHandle out_set,
-                                moab::Tag& rhoTag, moab::Tag& areaTag, moab::Tag& rhoCoefsTag,
-                                moab::Tag& weightsTag, moab::Tag& planeTag )
+moab::ErrorCode update_density( moab::Interface* mb, moab::EntityHandle euler_set, moab::EntityHandle lagr_set,
+                                moab::EntityHandle out_set, moab::Tag& rhoTag, moab::Tag& areaTag,
+                                moab::Tag& rhoCoefsTag, moab::Tag& weightsTag, moab::Tag& planeTag )
 {
     //  moab::ParallelComm * parcomm = ParallelComm::get_pcomm(mb, 0);
     ErrorCode          rval;
@@ -740,8 +716,8 @@ moab::ErrorCode update_density( moab::Interface* mb, moab::EntityHandle euler_se
     rval = mb->tag_set_data( rhoTag, rs2, &newValues[ 0 ] );MB_CHK_ERR( rval );
 
     std::cout << "total mass now:" << total_mass_local << "\n";
-    std::cout << "check: total intersection area: (4 * M_PI * R^2): " << 4 * M_PI * R * R << " "
-              << check_intx_area << "\n";
+    std::cout << "check: total intersection area: (4 * M_PI * R^2): " << 4 * M_PI * R * R << " " << check_intx_area
+              << "\n";
 
     return MB_SUCCESS;
 }
@@ -749,8 +725,7 @@ moab::ErrorCode update_density( moab::Interface* mb, moab::EntityHandle euler_se
 /*
  *  Deformational flow
  */
-void departure_point_swirl( moab::CartVect& arrival_point, double t, double delta_t,
-                            moab::CartVect& departure_point )
+void departure_point_swirl( moab::CartVect& arrival_point, double t, double delta_t, moab::CartVect& departure_point )
 {
 
     // always assume radius is 1 here?
@@ -769,11 +744,11 @@ void departure_point_swirl( moab::CartVect& arrival_point, double t, double delt
     // formula 35, page 8
     // this will approximate dep point using a Taylor series with up to second derivative
     // this will be O(delta_t^3) exact.
-    double lon_dep = sph.lon - delta_t * u_tilda -
-                     delta_t * delta_t * k * sl2 *
-                         ( sl2 * sin( sph.lat ) * sin( pit ) * omega -
-                           u_tilda * sin( sph.lat ) * cos( pit ) * cos( sph.lon / 2 ) -
-                           v * sl2 * costheta * cos( pit ) );
+    double lon_dep =
+        sph.lon - delta_t * u_tilda -
+        delta_t * delta_t * k * sl2 *
+            ( sl2 * sin( sph.lat ) * sin( pit ) * omega - u_tilda * sin( sph.lat ) * cos( pit ) * cos( sph.lon / 2 ) -
+              v * sl2 * costheta * cos( pit ) );
     // formula 36, page 8 again
     double lat_dep = sph.lat - delta_t * v -
                      delta_t * delta_t / 4 * k *
@@ -810,13 +785,12 @@ void departure_point_swirl_rot( moab::CartVect& arrival_point, double t, double 
                            sin( lambda ) * cos( sph.lat ) * cos( omega * t ) * v -
                            2.0 * cos( lambda ) * sin( sph.lat ) * cos( omega * t ) * u_tilda );
 
-    double lat_dep =
-        sph.lat - delta_t * v -
-        delta_t * delta_t * 2.0 *
-            ( cos( sph.lat ) * sin( omega * t ) * omega * sin( lambda ) * cos( lambda ) -
-              2.0 * u_tilda * cos( sph.lat ) * cos( omega * t ) * cos( lambda ) * cos( lambda ) +
-              u_tilda * cos( sph.lat ) * cos( omega * t ) +
-              v * sin( sph.lat ) * cos( omega * t ) * sin( lambda ) * cos( lambda ) );
+    double lat_dep = sph.lat - delta_t * v -
+                     delta_t * delta_t * 2.0 *
+                         ( cos( sph.lat ) * sin( omega * t ) * omega * sin( lambda ) * cos( lambda ) -
+                           2.0 * u_tilda * cos( sph.lat ) * cos( omega * t ) * cos( lambda ) * cos( lambda ) +
+                           u_tilda * cos( sph.lat ) * cos( omega * t ) +
+                           v * sin( sph.lat ) * cos( omega * t ) * sin( lambda ) * cos( lambda ) );
 
     moab::IntxUtils::SphereCoords sph_dep;
     sph_dep.R = 1.;  // radius
@@ -831,8 +805,8 @@ void departure_point_swirl_rot( moab::CartVect& arrival_point, double t, double 
  *  Zonal flow
  */
 moab::ErrorCode get_intersection_weights( moab::Interface* mb, moab::EntityHandle euler_set,
-                                          moab::EntityHandle lagr_set, moab::EntityHandle intx_set,
-                                          moab::Tag& planeTag, moab::Tag& weightsTag )
+                                          moab::EntityHandle lagr_set, moab::EntityHandle intx_set, moab::Tag& planeTag,
+                                          moab::Tag& weightsTag )
 {
     // get all intersection polygons
     moab::Range polys;
@@ -888,13 +862,12 @@ moab::ErrorCode get_intersection_weights( moab::Interface* mb, moab::EntityHandl
         double                R = 1.0;
         for( int inode = 0; inode < num_nodes; inode++ )
         {
-            double         rad = sqrt( coords[ inode * 3 ] * coords[ inode * 3 ] +
-                               coords[ inode * 3 + 1 ] * coords[ inode * 3 + 1 ] +
-                               coords[ inode * 3 + 2 ] * coords[ inode * 3 + 2 ] );
+            double rad =
+                sqrt( coords[ inode * 3 ] * coords[ inode * 3 ] + coords[ inode * 3 + 1 ] * coords[ inode * 3 + 1 ] +
+                      coords[ inode * 3 + 2 ] * coords[ inode * 3 + 2 ] );
             moab::CartVect xyzcoord( coords[ inode * 3 ] / rad, coords[ inode * 3 + 1 ] / rad,
                                      coords[ inode * 3 + 2 ] / rad );
-            moab::IntxUtils::gnomonic_projection( xyzcoord, R, plane[ redIndex ], x[ inode ],
-                                                  y[ inode ] );
+            moab::IntxUtils::gnomonic_projection( xyzcoord, R, plane[ redIndex ], x[ inode ], y[ inode ] );
         }
 
         std::vector< double > weights( 3 );
@@ -909,18 +882,17 @@ moab::ErrorCode get_intersection_weights( moab::Interface* mb, moab::EntityHandl
             double r2 = sqrt( 1 + x[ inode2 ] * x[ inode2 ] + y[ inode2 ] * y[ inode2 ] );
             double hx = x[ inode2 ] - x[ inode ];
 
-            poly_area += -hx *
-                         ( y[ inode ] / ( r1 * ( 1 + x[ inode ] * x[ inode ] ) ) +
-                           4.0 * ymid / ( rm * ( 1 + xmid * xmid ) ) +
-                           y[ inode2 ] / ( r2 * ( 1 + x[ inode2 ] * x[ inode2 ] ) ) ) /
-                         6.0;
-
-            poly_intx +=
+            poly_area +=
                 -hx *
-                ( x[ inode ] * y[ inode ] / ( r1 * ( 1 + x[ inode ] * x[ inode ] ) ) +
-                  4.0 * xmid * ymid / ( rm * ( 1 + xmid * xmid ) ) +
-                  x[ inode2 ] * y[ inode2 ] / ( r2 * ( 1 + x[ inode2 ] * x[ inode2 ] ) ) ) /
+                ( y[ inode ] / ( r1 * ( 1 + x[ inode ] * x[ inode ] ) ) + 4.0 * ymid / ( rm * ( 1 + xmid * xmid ) ) +
+                  y[ inode2 ] / ( r2 * ( 1 + x[ inode2 ] * x[ inode2 ] ) ) ) /
                 6.0;
+
+            poly_intx += -hx *
+                         ( x[ inode ] * y[ inode ] / ( r1 * ( 1 + x[ inode ] * x[ inode ] ) ) +
+                           4.0 * xmid * ymid / ( rm * ( 1 + xmid * xmid ) ) +
+                           x[ inode2 ] * y[ inode2 ] / ( r2 * ( 1 + x[ inode2 ] * x[ inode2 ] ) ) ) /
+                         6.0;
 
             poly_inty += hx * ( 1.0 / r1 + 4.0 / rm + 1.0 / r2 ) / 6.0;
         }
@@ -938,16 +910,14 @@ moab::ErrorCode get_intersection_weights( moab::Interface* mb, moab::EntityHandl
     return moab::MB_SUCCESS;
 }
 
-ErrorCode create_lagr_mesh( moab::Interface* mb, moab::EntityHandle euler_set,
-                            moab::EntityHandle lagr_set )
+ErrorCode create_lagr_mesh( moab::Interface* mb, moab::EntityHandle euler_set, moab::EntityHandle lagr_set )
 {
     // create the handle tag for the corresponding element / vertex
 
     moab::EntityHandle dum = 0;
 
     moab::Tag corrTag;
-    ErrorCode rval = mb->tag_get_handle( CORRTAGNAME, 1, MB_TYPE_HANDLE, corrTag,
-                                         MB_TAG_DENSE | MB_TAG_CREAT, &dum );
+    ErrorCode rval = mb->tag_get_handle( CORRTAGNAME, 1, MB_TYPE_HANDLE, corrTag, MB_TAG_DENSE | MB_TAG_CREAT, &dum );
 
     MB_CHK_ERR( rval );
     // give the same global id to new verts and cells created in the lagr(departure) mesh

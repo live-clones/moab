@@ -49,10 +49,7 @@ class Exponent
 
     Exponent( ) : funcPointer( 0 ) {}
 
-    explicit Exponent( double exponent )
-        : mExponent( exponent ), funcPointer( get_func_ptr( exponent ) )
-    {
-    }
+    explicit Exponent( double exponent ) : mExponent( exponent ), funcPointer( get_func_ptr( exponent ) ) {}
 
     inline double raise( double p_value ) const
     {

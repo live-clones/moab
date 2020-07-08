@@ -37,8 +37,8 @@
 namespace MBMesquite
 {
 
-void BoundedCylinderDomain::domain_DoF( const Mesh::VertexHandle* handle_array,
-                                        unsigned short* dof_array, size_t count, MsqError& ) const
+void BoundedCylinderDomain::domain_DoF( const Mesh::VertexHandle* handle_array, unsigned short* dof_array, size_t count,
+                                        MsqError& ) const
 {
     double t;
     for( size_t i = 0; i < count; ++i )
@@ -48,8 +48,7 @@ void BoundedCylinderDomain::domain_DoF( const Mesh::VertexHandle* handle_array,
             dof_array[ i ] = 2;
 }
 
-void BoundedCylinderDomain::create_curve( double                                   distance,
-                                          const std::vector< Mesh::VertexHandle >& handles )
+void BoundedCylinderDomain::create_curve( double distance, const std::vector< Mesh::VertexHandle >& handles )
 {
     Curve c;
     c.t = distance;
@@ -58,8 +57,7 @@ void BoundedCylinderDomain::create_curve( double                                
     curveList.push_back( c );
 }
 
-void BoundedCylinderDomain::create_curve( double distance, Mesh* mesh, double tolerance,
-                                          MsqError& err )
+void BoundedCylinderDomain::create_curve( double distance, Mesh* mesh, double tolerance, MsqError& err )
 {
     std::vector< Mesh::VertexHandle > handles;
     mesh->get_all_vertices( handles, err );MSQ_ERRRTN( err );
@@ -89,8 +87,7 @@ void BoundedCylinderDomain::create_curve( double distance, Mesh* mesh, double to
     create_curve( distance, list );
 }
 
-void BoundedCylinderDomain::evaluate( double t, const Vector3D& point, Vector3D& closest,
-                                      Vector3D& normal ) const
+void BoundedCylinderDomain::evaluate( double t, const Vector3D& point, Vector3D& closest, Vector3D& normal ) const
 {
     const double   EPSILON = std::numeric_limits< double >::epsilon( );
     double         t2 = axis( ) % ( point - center( ) );
@@ -107,8 +104,8 @@ void BoundedCylinderDomain::evaluate( double t, const Vector3D& point, Vector3D&
     }
 }
 
-void BoundedCylinderDomain::evaluate( Mesh::VertexHandle handle, const Vector3D& point,
-                                      Vector3D& closest, Vector3D& normal ) const
+void BoundedCylinderDomain::evaluate( Mesh::VertexHandle handle, const Vector3D& point, Vector3D& closest,
+                                      Vector3D& normal ) const
 {
     double t;
     if( find_curve( handle, t ) )

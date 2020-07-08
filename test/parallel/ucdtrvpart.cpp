@@ -39,8 +39,7 @@ void test_read_parallel_ucd_trivial( )
 
 void test_read_parallel_ucd_trivial_spectral( )
 {
-    partition_method =
-        std::string( ";PARTITION_METHOD=TRIVIAL;SPECTRAL_MESH;PARALLEL_RESOLVE_SHARED_ENTS" );
+    partition_method = std::string( ";PARTITION_METHOD=TRIVIAL;SPECTRAL_MESH;PARALLEL_RESOLVE_SHARED_ENTS" );
     test_read_parallel( 3458, false );
 }
 

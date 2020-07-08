@@ -85,13 +85,12 @@ ZoltanPartitioner::~ZoltanPartitioner( )
     if( NULL != myZZ ) delete myZZ;
 }
 
-ErrorCode ZoltanPartitioner::balance_mesh( const char* zmethod, const char* other_method,
-                                           const bool write_as_sets, const bool write_as_tags )
+ErrorCode ZoltanPartitioner::balance_mesh( const char* zmethod, const char* other_method, const bool write_as_sets,
+                                           const bool write_as_tags )
 {
     if( !strcmp( zmethod, "RR" ) && !strcmp( zmethod, "RCB" ) && !strcmp( zmethod, "RIB" ) &&
-        !strcmp( zmethod, "HSFC" ) && !strcmp( zmethod, "Hypergraph" ) &&
-        !strcmp( zmethod, "PHG" ) && !strcmp( zmethod, "PARMETIS" ) &&
-        !strcmp( zmethod, "OCTPART" ) )
+        !strcmp( zmethod, "HSFC" ) && !strcmp( zmethod, "Hypergraph" ) && !strcmp( zmethod, "PHG" ) &&
+        !strcmp( zmethod, "PARMETIS" ) && !strcmp( zmethod, "OCTPART" ) )
     {
         std::cout << "ERROR node " << mbpc->proc_config( ).proc_rank( ) << ": Method must be "
                   << "RR, RCB, RIB, HSFC, Hypergraph (PHG), PARMETIS, or OCTPART" << std::endl;
@@ -112,8 +111,7 @@ ErrorCode ZoltanPartitioner::balance_mesh( const char* zmethod, const char* othe
         result = assemble_graph( 3, pts, ids, adjs, length, elems );RR;
     }
 
-    myNumPts =
-        mbInitializePoints( (int)ids.size( ), &pts[ 0 ], &ids[ 0 ], &adjs[ 0 ], &length[ 0 ] );
+    myNumPts = mbInitializePoints( (int)ids.size( ), &pts[ 0 ], &ids[ 0 ], &adjs[ 0 ], &length[ 0 ] );
 
     // Initialize Zoltan.  This is a C call.  The simple C++ code
     // that creates Zoltan objects does not keep track of whether
@@ -177,17 +175,13 @@ ErrorCode ZoltanPartitioner::balance_mesh( const char* zmethod, const char* othe
     int*          exportProcs;
     int*          exportToPart;
 
-    int rc = myZZ->LB_Partition( changes, numGidEntries, numLidEntries, numImport, importGlobalIds,
-                                 importLocalIds, importProcs, importToPart, numExport,
-                                 exportGlobalIds, exportLocalIds, exportProcs, exportToPart );
+    int rc = myZZ->LB_Partition( changes, numGidEntries, numLidEntries, numImport, importGlobalIds, importLocalIds,
+                                 importProcs, importToPart, numExport, exportGlobalIds, exportLocalIds, exportProcs,
+                                 exportToPart );
 
     rc = mbGlobalSuccess( rc );
 
-    if( !rc )
-    {
-        mbPrintGlobalResult( "==============Result==============", myNumPts, numImport, numExport,
-                             changes );
-    }
+    if( !rc ) { mbPrintGlobalResult( "==============Result==============", myNumPts, numImport, numExport, changes ); }
     else
     {
         return MB_FAILURE;
@@ -201,8 +195,7 @@ ErrorCode ZoltanPartitioner::balance_mesh( const char* zmethod, const char* othe
 
     if( mbpc->proc_config( ).proc_rank( ) == 0 )
     {
-        result = write_partition( mbpc->proc_config( ).proc_size( ), elems, assignment,
-                                  write_as_sets, write_as_tags );
+        result = write_partition( mbpc->proc_config( ).proc_size( ), elems, assignment, write_as_sets, write_as_tags );
 
         if( MB_SUCCESS != result ) return result;
 
@@ -226,9 +219,8 @@ ErrorCode ZoltanPartitioner::balance_mesh( const char* zmethod, const char* othe
     return MB_SUCCESS;
 }
 
-ErrorCode ZoltanPartitioner::repartition( std::vector< double >& x, std::vector< double >& y,
-                                          std::vector< double >& z, int StartID,
-                                          const char* zmethod, Range& localGIDs )
+ErrorCode ZoltanPartitioner::repartition( std::vector< double >& x, std::vector< double >& y, std::vector< double >& z,
+                                          int StartID, const char* zmethod, Range& localGIDs )
 {
     //
     int     nprocs = mbpc->proc_config( ).proc_size( );
@@ -304,19 +296,17 @@ ErrorCode ZoltanPartitioner::repartition( std::vector< double >& x, std::vector<
     int *         assign_procs, *assign_parts;
 
     if( rank == 0 )
-        std::cout << "Computing partition using " << ( zmethod ? zmethod : "RCB" ) << " method for "
-                  << nprocs << " processors..." << std::endl;
+        std::cout << "Computing partition using " << ( zmethod ? zmethod : "RCB" ) << " method for " << nprocs
+                  << " processors..." << std::endl;
 
-    retval =
-        myZZ->LB_Partition( changes, numGidEntries, numLidEntries, num_import, import_global_ids,
-                            import_local_ids, import_procs, import_to_part, num_export,
-                            export_global_ids, export_local_ids, assign_procs, assign_parts );
+    retval = myZZ->LB_Partition( changes, numGidEntries, numLidEntries, num_import, import_global_ids, import_local_ids,
+                                 import_procs, import_to_part, num_export, export_global_ids, export_local_ids,
+                                 assign_procs, assign_parts );
     if( ZOLTAN_OK != retval ) return MB_FAILURE;
 
     if( rank == 0 )
     {
-        std::cout << " time to LB_partition " << ( clock( ) - t ) / (double)CLOCKS_PER_SEC
-                  << "s. \n";
+        std::cout << " time to LB_partition " << ( clock( ) - t ) / (double)CLOCKS_PER_SEC << "s. \n";
         t = clock( );
     }
 
@@ -330,18 +320,16 @@ ErrorCode ZoltanPartitioner::repartition( std::vector< double >& x, std::vector<
     localGIDs = subtract( iniGids, exported );
     localGIDs = unite( localGIDs, imported );
     // Free data structures allocated by Zoltan::LB_Partition
-    retval =
-        myZZ->LB_Free_Part( &import_global_ids, &import_local_ids, &import_procs, &import_to_part );
+    retval = myZZ->LB_Free_Part( &import_global_ids, &import_local_ids, &import_procs, &import_to_part );
     if( ZOLTAN_OK != retval ) return MB_FAILURE;
-    retval =
-        myZZ->LB_Free_Part( &export_global_ids, &export_local_ids, &assign_procs, &assign_parts );
+    retval = myZZ->LB_Free_Part( &export_global_ids, &export_local_ids, &assign_procs, &assign_parts );
     if( ZOLTAN_OK != retval ) return MB_FAILURE;
 
     return MB_SUCCESS;
 }
 
-ErrorCode ZoltanPartitioner::partition_inferred_mesh( EntityHandle sfileset, size_t num_parts,
-                                                      int part_dim, const bool write_as_sets )
+ErrorCode ZoltanPartitioner::partition_inferred_mesh( EntityHandle sfileset, size_t num_parts, int part_dim,
+                                                      const bool write_as_sets )
 {
     ErrorCode result;
 
@@ -376,8 +364,8 @@ ErrorCode ZoltanPartitioner::partition_inferred_mesh( EntityHandle sfileset, siz
     if( write_as_sets )
     {
         moab::Range oldpsets;
-        result = mbImpl->get_entities_by_type_and_tag( sfileset, MBENTITYSET, &part_set_tag, NULL,
-                                                       1, oldpsets, Interface::UNION );RR;
+        result = mbImpl->get_entities_by_type_and_tag( sfileset, MBENTITYSET, &part_set_tag, NULL, 1, oldpsets,
+                                                       Interface::UNION );RR;
         result = mbImpl->remove_entities( sfileset, oldpsets );RR;
     }
 
@@ -403,43 +391,41 @@ ErrorCode ZoltanPartitioner::partition_inferred_mesh( EntityHandle sfileset, siz
                allocate integer-size partitions */
             std::vector< int > assignment( partvec.size( ),
                                            partnum );  // initialize all values to partnum
-            result = mbImpl->tag_set_data( part_set_tag, &partvec[ 0 ], partvec.size( ),
-                                           &assignment[ 0 ] );RR;
+            result = mbImpl->tag_set_data( part_set_tag, &partvec[ 0 ], partvec.size( ), &assignment[ 0 ] );RR;
         }
     }
 
     if( part_assignments.size( ) != num_parts )
     {
-        std::cout << "ERROR: The inference yielded lesser number of parts ("
-                  << part_assignments.size( ) << ") than requested by user (" << num_parts
-                  << ").\n";
+        std::cout << "ERROR: The inference yielded lesser number of parts (" << part_assignments.size( )
+                  << ") than requested by user (" << num_parts << ").\n";
     }
 
     return MB_SUCCESS;
 }
 
-ErrorCode ZoltanPartitioner::partition_mesh_and_geometry(
-    const double part_geom_mesh_size, const int nparts, const char* zmethod,
-    const char* other_method, double imbal_tol, const int part_dim, const bool write_as_sets,
-    const bool write_as_tags, const int obj_weight, const int edge_weight,
+ErrorCode ZoltanPartitioner::partition_mesh_and_geometry( const double part_geom_mesh_size, const int nparts,
+                                                          const char* zmethod, const char* other_method,
+                                                          double imbal_tol, const int part_dim,
+                                                          const bool write_as_sets, const bool write_as_tags,
+                                                          const int obj_weight, const int edge_weight,
 #ifdef MOAB_HAVE_CGM
-    const bool part_surf, const bool ghost,
+                                                          const bool part_surf, const bool ghost,
 #else
-    const bool, const bool,
+                                                          const bool, const bool,
 #endif
-    const bool spherical_coords, const bool print_time )
+                                                          const bool spherical_coords, const bool print_time )
 {
     // should only be called in serial
     if( mbpc->proc_config( ).proc_size( ) != 1 )
     {
-        std::cout << "ZoltanPartitioner::partition_mesh_and_geometry must be called in serial."
-                  << std::endl;
+        std::cout << "ZoltanPartitioner::partition_mesh_and_geometry must be called in serial." << std::endl;
         return MB_FAILURE;
     }
     clock_t t = clock( );
-    if( NULL != zmethod && strcmp( zmethod, "RR" ) && strcmp( zmethod, "RCB" ) &&
-        strcmp( zmethod, "RIB" ) && strcmp( zmethod, "HSFC" ) && strcmp( zmethod, "Hypergraph" ) &&
-        strcmp( zmethod, "PHG" ) && strcmp( zmethod, "PARMETIS" ) && strcmp( zmethod, "OCTPART" ) )
+    if( NULL != zmethod && strcmp( zmethod, "RR" ) && strcmp( zmethod, "RCB" ) && strcmp( zmethod, "RIB" ) &&
+        strcmp( zmethod, "HSFC" ) && strcmp( zmethod, "Hypergraph" ) && strcmp( zmethod, "PHG" ) &&
+        strcmp( zmethod, "PARMETIS" ) && strcmp( zmethod, "OCTPART" ) )
     {
         std::cout << "ERROR node " << mbpc->proc_config( ).proc_rank( ) << ": Method must be "
                   << "RCB, RIB, HSFC, Hypergraph (PHG), PARMETIS, or OCTPART" << std::endl;
@@ -447,8 +433,8 @@ ErrorCode ZoltanPartitioner::partition_mesh_and_geometry(
     }
 
     bool part_geom = false;
-    if( 0 == strcmp( zmethod, "RR" ) || 0 == strcmp( zmethod, "RCB" ) ||
-        0 == strcmp( zmethod, "RIB" ) || 0 == strcmp( zmethod, "HSFC" ) )
+    if( 0 == strcmp( zmethod, "RR" ) || 0 == strcmp( zmethod, "RCB" ) || 0 == strcmp( zmethod, "RIB" ) ||
+        0 == strcmp( zmethod, "HSFC" ) )
         part_geom = true;  // so no adjacency / edges needed
     std::vector< double > pts;  // x[0], y[0], z[0], ... from MOAB
     std::vector< int >    ids;  // point ids from MOAB
@@ -484,8 +470,7 @@ ErrorCode ZoltanPartitioner::partition_mesh_and_geometry(
                 nstart += num_per;
             }
 
-            result =
-                write_partition( nparts, elems, &assign_vec[ 0 ], write_as_sets, write_as_tags );RR;
+            result = write_partition( nparts, elems, &assign_vec[ 0 ], write_as_sets, write_as_tags );RR;
         }
         else
         {
@@ -502,14 +487,13 @@ ErrorCode ZoltanPartitioner::partition_mesh_and_geometry(
     if( part_geom_mesh_size < 0. )
     {
         // if (!part_geom) {
-        result =
-            assemble_graph( part_dim, pts, ids, adjs, length, elems, part_geom, spherical_coords );RR;
+        result = assemble_graph( part_dim, pts, ids, adjs, length, elems, part_geom, spherical_coords );RR;
     }
     else
     {
 #ifdef MOAB_HAVE_CGM
-        result = assemble_graph( part_dim, pts, ids, adjs, length, obj_weights, edge_weights, parts,
-                                 entities, part_geom_mesh_size, nparts );RR;
+        result = assemble_graph( part_dim, pts, ids, adjs, length, obj_weights, edge_weights, parts, entities,
+                                 part_geom_mesh_size, nparts );RR;
 
         if( debug )
         {
@@ -518,14 +502,12 @@ ErrorCode ZoltanPartitioner::partition_mesh_and_geometry(
             int i_leng = 0;
             for( int i = 0; i < n_ids; i++ )
             {
-                std::cout << "graph_input_ids[" << i << "]=" << ids[ i ]
-                          << ",obj_weights=" << obj_weights[ i ]
-                          << ",entity_id=" << entities.get_and_step( )->id( )
-                          << ",part=" << parts[ i ] << std::endl;
+                std::cout << "graph_input_ids[" << i << "]=" << ids[ i ] << ",obj_weights=" << obj_weights[ i ]
+                          << ",entity_id=" << entities.get_and_step( )->id( ) << ",part=" << parts[ i ] << std::endl;
                 for( int j = 0; j < length[ i ]; j++ )
                 {
-                    std::cout << "adjs[" << j << "]=" << adjs[ i_leng ]
-                              << ",edge_weights=" << edge_weights[ i_leng ] << std::endl;
+                    std::cout << "adjs[" << j << "]=" << adjs[ i_leng ] << ",edge_weights=" << edge_weights[ i_leng ]
+                              << std::endl;
                     i_leng++;
                 }
             }
@@ -534,8 +516,7 @@ ErrorCode ZoltanPartitioner::partition_mesh_and_geometry(
     }
     if( print_time )
     {
-        std::cout << " time to assemble graph: " << ( clock( ) - t ) / (double)CLOCKS_PER_SEC
-                  << "s. \n";
+        std::cout << " time to assemble graph: " << ( clock( ) - t ) / (double)CLOCKS_PER_SEC << "s. \n";
         t = clock( );
     }
     double* o_wgt = NULL;
@@ -543,8 +524,8 @@ ErrorCode ZoltanPartitioner::partition_mesh_and_geometry(
     if( obj_weights.size( ) > 0 ) o_wgt = &obj_weights[ 0 ];
     if( edge_weights.size( ) > 0 ) e_wgt = &edge_weights[ 0 ];
 
-    myNumPts = mbInitializePoints( (int)ids.size( ), &pts[ 0 ], &ids[ 0 ], &adjs[ 0 ], &length[ 0 ],
-                                   o_wgt, e_wgt, &parts[ 0 ], part_geom );
+    myNumPts = mbInitializePoints( (int)ids.size( ), &pts[ 0 ], &ids[ 0 ], &adjs[ 0 ], &length[ 0 ], o_wgt, e_wgt,
+                                   &parts[ 0 ], part_geom );
 
     // Initialize Zoltan.  This is a C call.  The simple C++ code
     // that creates Zoltan objects does not keep track of whether
@@ -552,8 +533,7 @@ ErrorCode ZoltanPartitioner::partition_mesh_and_geometry(
 
     if( print_time )
     {
-        std::cout << " time to initialize points: " << ( clock( ) - t ) / (double)CLOCKS_PER_SEC
-                  << "s. \n";
+        std::cout << " time to initialize points: " << ( clock( ) - t ) / (double)CLOCKS_PER_SEC << "s. \n";
         t = clock( );
     }
     float version;
@@ -648,8 +628,8 @@ ErrorCode ZoltanPartitioner::partition_mesh_and_geometry(
     ZOLTAN_ID_PTR assign_gid, assign_lid;
     int *         assign_procs, *assign_parts;
 
-    std::cout << "Computing partition using " << ( zmethod ? zmethod : "RCB" ) << " method for "
-              << nparts << " processors..." << std::endl;
+    std::cout << "Computing partition using " << ( zmethod ? zmethod : "RCB" ) << " method for " << nparts
+              << " processors..." << std::endl;
 #ifndef NDEBUG
 #if 0
   if (NULL == zmethod || !strcmp(zmethod, "RCB"))
@@ -659,15 +639,13 @@ ErrorCode ZoltanPartitioner::partition_mesh_and_geometry(
       Zoltan_Generate_Files(myZZ->Get_C_Handle(), (char*)zmethod, 1, 0, 1, 1);
 #endif
 #endif
-    retval = myZZ->LB_Partition( changes, numGidEntries, numLidEntries, dumnum1, dum_global,
-                                 dum_local, dum1, dum2, num_assign, assign_gid, assign_lid,
-                                 assign_procs, assign_parts );
+    retval = myZZ->LB_Partition( changes, numGidEntries, numLidEntries, dumnum1, dum_global, dum_local, dum1, dum2,
+                                 num_assign, assign_gid, assign_lid, assign_procs, assign_parts );
     if( ZOLTAN_OK != retval ) return MB_FAILURE;
 
     if( print_time )
     {
-        std::cout << " time to LB_partition " << ( clock( ) - t ) / (double)CLOCKS_PER_SEC
-                  << "s. \n";
+        std::cout << " time to LB_partition " << ( clock( ) - t ) / (double)CLOCKS_PER_SEC << "s. \n";
         t = clock( );
     }
     // take results & write onto MOAB partition sets
@@ -687,8 +665,7 @@ ErrorCode ZoltanPartitioner::partition_mesh_and_geometry(
 
     if( print_time )
     {
-        std::cout << " time to write partition in memory "
-                  << ( clock( ) - t ) / (double)CLOCKS_PER_SEC << "s. \n";
+        std::cout << " time to write partition in memory " << ( clock( ) - t ) / (double)CLOCKS_PER_SEC << "s. \n";
         t = clock( );
     }
 
@@ -759,8 +736,8 @@ ErrorCode ZoltanPartitioner::include_closure( )
 
     // finally, mark all the part sets as having the closure
     Tag closure_tag;
-    result = mbImpl->tag_get_handle( "INCLUDES_CLOSURE", 1, MB_TYPE_INTEGER, closure_tag,
-                                     MB_TAG_SPARSE | MB_TAG_CREAT );RR;
+    result =
+        mbImpl->tag_get_handle( "INCLUDES_CLOSURE", 1, MB_TYPE_INTEGER, closure_tag, MB_TAG_SPARSE | MB_TAG_CREAT );RR;
 
     std::vector< int > closure_vals( partSets.size( ), 1 );
     result = mbImpl->tag_set_data( closure_tag, partSets, &closure_vals[ 0 ] );RR;
@@ -769,10 +746,9 @@ ErrorCode ZoltanPartitioner::include_closure( )
 }
 
 ErrorCode ZoltanPartitioner::assemble_graph( const int dimension, std::vector< double >& coords,
-                                             std::vector< int >& moab_ids,
-                                             std::vector< int >& adjacencies,
-                                             std::vector< int >& length, Range& elems,
-                                             bool part_geom, bool spherical_coords )
+                                             std::vector< int >& moab_ids, std::vector< int >& adjacencies,
+                                             std::vector< int >& length, Range& elems, bool part_geom,
+                                             bool spherical_coords )
 {
     // assemble a graph with vertices equal to elements of specified dimension, edges
     // signified by list of other elements to which an element is connected
@@ -808,8 +784,7 @@ ErrorCode ZoltanPartitioner::assemble_graph( const int dimension, std::vector< d
         {
             // get bridge adjacencies
             adjs.clear( );
-            result = mtu.get_bridge_adjacencies( *rit, ( dimension > 0 ? dimension - 1 : 3 ),
-                                                 dimension, adjs );RR;
+            result = mtu.get_bridge_adjacencies( *rit, ( dimension > 0 ? dimension - 1 : 3 ), dimension, adjs );RR;
 
             // get the graph vertex ids of those
             if( !adjs.empty( ) )
@@ -834,8 +809,7 @@ ErrorCode ZoltanPartitioner::assemble_graph( const int dimension, std::vector< d
         // transform coordinates to spherical coordinates, if requested
         if( spherical_coords )
         {
-            double R = avg_position[ 0 ] * avg_position[ 0 ] +
-                       avg_position[ 1 ] * avg_position[ 1 ] +
+            double R = avg_position[ 0 ] * avg_position[ 0 ] + avg_position[ 1 ] * avg_position[ 1 ] +
                        avg_position[ 2 ] * avg_position[ 2 ];
             R = sqrt( R );
             double lat = asin( avg_position[ 2 ] / R );
@@ -851,20 +825,16 @@ ErrorCode ZoltanPartitioner::assemble_graph( const int dimension, std::vector< d
     if( debug )
     {
         std::cout << "Length vector: " << std::endl;
-        std::copy( length.begin( ), length.end( ),
-                   std::ostream_iterator< int >( std::cout, ", " ) );
+        std::copy( length.begin( ), length.end( ), std::ostream_iterator< int >( std::cout, ", " ) );
         std::cout << std::endl;
         std::cout << "Adjacencies vector: " << std::endl;
-        std::copy( adjacencies.begin( ), adjacencies.end( ),
-                   std::ostream_iterator< int >( std::cout, ", " ) );
+        std::copy( adjacencies.begin( ), adjacencies.end( ), std::ostream_iterator< int >( std::cout, ", " ) );
         std::cout << std::endl;
         std::cout << "Moab_ids vector: " << std::endl;
-        std::copy( moab_ids.begin( ), moab_ids.end( ),
-                   std::ostream_iterator< int >( std::cout, ", " ) );
+        std::copy( moab_ids.begin( ), moab_ids.end( ), std::ostream_iterator< int >( std::cout, ", " ) );
         std::cout << std::endl;
         std::cout << "Coords vector: " << std::endl;
-        std::copy( coords.begin( ), coords.end( ),
-                   std::ostream_iterator< double >( std::cout, ", " ) );
+        std::copy( coords.begin( ), coords.end( ), std::ostream_iterator< double >( std::cout, ", " ) );
         std::cout << std::endl;
     }
 
@@ -872,11 +842,12 @@ ErrorCode ZoltanPartitioner::assemble_graph( const int dimension, std::vector< d
 }
 
 #ifdef MOAB_HAVE_CGM
-ErrorCode ZoltanPartitioner::assemble_graph(
-    const int /* dimension */, std::vector< double >& /* coords */, std::vector< int >& moab_ids,
-    std::vector< int >& adjacencies, std::vector< int >& length, std::vector< double >& obj_weights,
-    std::vector< double >& edge_weights, std::vector< int >& parts, DLIList< RefEntity* >& entities,
-    const double part_geom_mesh_size, const int n_part )
+ErrorCode ZoltanPartitioner::assemble_graph( const int /* dimension */, std::vector< double >& /* coords */,
+                                             std::vector< int >& moab_ids, std::vector< int >& adjacencies,
+                                             std::vector< int >& length, std::vector< double >& obj_weights,
+                                             std::vector< double >& edge_weights, std::vector< int >& parts,
+                                             DLIList< RefEntity* >& entities, const double part_geom_mesh_size,
+                                             const int n_part )
 {
     // get body vertex weights
     DLIList< RefEntity* > body_list;
@@ -939,8 +910,8 @@ ErrorCode ZoltanPartitioner::assemble_graph(
 
         if( debug )
         {
-            std::cout << "body=" << body->id( ) << ",graph_id=" << temp_index
-                      << ",weight=" << vertex_w << ",part=" << proc << std::endl;
+            std::cout << "body=" << body->id( ) << ",graph_id=" << temp_index << ",weight=" << vertex_w
+                      << ",part=" << proc << std::endl;
         }
 
         // treat shared surfaces connected to this body
@@ -961,8 +932,7 @@ ErrorCode ZoltanPartitioner::assemble_graph(
             double tmp_sw = estimate_face_comm_load( face, part_geom_mesh_size );
             edge_weights.push_back( tmp_sw );
 
-            if( debug )
-            { std::cout << "adjac=" << temp_index << ",weight=" << tmp_sw << std::endl; }
+            if( debug ) { std::cout << "adjac=" << temp_index << ",weight=" << tmp_sw << std::endl; }
         }
         length.push_back( n_shared );
     }
@@ -1005,8 +975,7 @@ ErrorCode ZoltanPartitioner::assemble_graph(
 
         if( debug )
         {
-            std::cout << "shared_surf=" << face->id( )
-                      << ",graph_id=" << surf_vertex_map[ face->id( ) ]
+            std::cout << "shared_surf=" << face->id( ) << ",graph_id=" << surf_vertex_map[ face->id( ) ]
                       << ",weight=" << face_mesh_load << ",part=" << parts[ min_ind ] << std::endl;
         }
     }
@@ -1030,8 +999,7 @@ double ZoltanPartitioner::estimate_face_mesh_load( RefEntity* face, const double
     {
         return 5.910511018383144e-4 * n_logn;
     }
-    else if( type == CONE_SURFACE_TYPE || type == SPHERE_SURFACE_TYPE ||
-             type == TORUS_SURFACE_TYPE )
+    else if( type == CONE_SURFACE_TYPE || type == SPHERE_SURFACE_TYPE || type == TORUS_SURFACE_TYPE )
     {
         return 2.352511671418708e-4 * n_logn;
     }
@@ -1076,17 +1044,16 @@ double ZoltanPartitioner::estimate_face_comm_load( RefEntity* face, const double
     return ( 104 * face->measure( ) / sqrt( 3 ) / h / h + 56 / 3 * peri / h ) / 700000.;
 }
 
-ErrorCode ZoltanPartitioner::write_partition( const int nparts, DLIList< RefEntity* > entities,
-                                              const int*             assignment,
-                                              std::vector< double >& obj_weights,
-                                              const bool part_surf, const bool ghost )
+ErrorCode ZoltanPartitioner::write_partition( const int nparts, DLIList< RefEntity* > entities, const int* assignment,
+                                              std::vector< double >& obj_weights, const bool part_surf,
+                                              const bool ghost )
 {
     ErrorCode result;
 
     // actuate CA_BODIES and turn on auto flag for other attributes
-    CGMApp::instance( )->attrib_manager( )->register_attrib_type(
-        CA_BODIES, "bodies", "BODIES", CABodies_creator, CUBIT_TRUE, CUBIT_TRUE, CUBIT_TRUE,
-        CUBIT_TRUE, CUBIT_TRUE, CUBIT_FALSE );
+    CGMApp::instance( )->attrib_manager( )->register_attrib_type( CA_BODIES, "bodies", "BODIES", CABodies_creator,
+                                                                  CUBIT_TRUE, CUBIT_TRUE, CUBIT_TRUE, CUBIT_TRUE,
+                                                                  CUBIT_TRUE, CUBIT_FALSE );
     CGMApp::instance( )->attrib_manager( )->auto_flag( CUBIT_TRUE );
 
     // set partition info to Body at first
@@ -1104,10 +1071,7 @@ ErrorCode ZoltanPartitioner::write_partition( const int nparts, DLIList< RefEnti
             TDParallel* td_par = (TDParallel*)entity->get_TD( &TDParallel::is_parallel );
             if( td_par == NULL ) td_par = new TDParallel( entity, NULL, &shared_procs );
 
-            if( debug )
-            {
-                std::cout << "body" << entity->id( ) << "_is_partitioned_to_p" << proc << std::endl;
-            }
+            if( debug ) { std::cout << "body" << entity->id( ) << "_is_partitioned_to_p" << proc << std::endl; }
 
             // assign to volumes, it should be removed in future
             DLIList< RefVolume* > volumes;
@@ -1161,8 +1125,7 @@ ErrorCode ZoltanPartitioner::write_partition( const int nparts, DLIList< RefEnti
             {  // if it is shared by 2 processors
                 int         merge_id = TDUniqueId::get_unique_id( entity );
                 TDParallel* td_par = (TDParallel*)entity->get_TD( &TDParallel::is_parallel );
-                if( td_par == NULL )
-                    td_par = new TDParallel( entity, NULL, &shared_procs, NULL, merge_id, 1 );
+                if( td_par == NULL ) td_par = new TDParallel( entity, NULL, &shared_procs, NULL, merge_id, 1 );
 
                 if( debug )
                 {
@@ -1202,16 +1165,14 @@ ErrorCode ZoltanPartitioner::write_partition( const int nparts, DLIList< RefEnti
                 sp->reset( );
                 for( int j = 0; j < n_sp; j++ )
                 {
-                    std::cout << "partitioned_" << st.c_str( ) << ",proc=" << sp->get_and_step( )
-                              << std::endl;
+                    std::cout << "partitioned_" << st.c_str( ) << ",proc=" << sp->get_and_step( ) << std::endl;
                 }
                 DLIList< int >* gp = td_par->get_ghost_proc_list( );
                 int             n_gp = gp->size( );
                 sp->reset( );
                 for( int j = 0; j < n_gp; j++ )
                 {
-                    std::cout << "partitioned_" << st.c_str( ) << ",ghost=" << gp->get_and_step( )
-                              << std::endl;
+                    std::cout << "partitioned_" << st.c_str( ) << ",ghost=" << gp->get_and_step( ) << std::endl;
                 }
             }
         }
@@ -1220,8 +1181,7 @@ ErrorCode ZoltanPartitioner::write_partition( const int nparts, DLIList< RefEnti
     return MB_SUCCESS;
 }
 
-ErrorCode ZoltanPartitioner::partition_surface( const int nparts, DLIList< RefEntity* > entities,
-                                                const int*             assignment,
+ErrorCode ZoltanPartitioner::partition_surface( const int nparts, DLIList< RefEntity* > entities, const int* assignment,
                                                 std::vector< double >& obj_weights )
 {
     int     i;
@@ -1290,8 +1250,7 @@ ErrorCode ZoltanPartitioner::partition_surface( const int nparts, DLIList< RefEn
                         TopologyEntity* te = CAST_TO( face, TopologyEntity );
                         if( te->bridge_manager( )->number_of_bridges( ) < 2 )
                         {  // non-shared
-                            TDParallel* td_par =
-                                (TDParallel*)face->get_TD( &TDParallel::is_parallel );
+                            TDParallel* td_par = (TDParallel*)face->get_TD( &TDParallel::is_parallel );
                             if( td_par == NULL )
                             {  // only consider unpartitioned surfaces
                                 double face_load = face->measure( );
@@ -1303,14 +1262,12 @@ ErrorCode ZoltanPartitioner::partition_surface( const int nparts, DLIList< RefEn
                                     DLIList< int > shared_procs;
                                     shared_procs.append( min_proc );
                                     shared_procs.append( max_proc );
-                                    td_par = new TDParallel( face, NULL, &shared_procs, NULL,
-                                                             merge_id, 1 );
+                                    td_par = new TDParallel( face, NULL, &shared_procs, NULL, merge_id, 1 );
 
                                     if( debug )
                                     {
-                                        std::cout << "non-shared surface " << face->id( )
-                                                  << " is moved from p" << max_proc << " to p"
-                                                  << min_proc << std::endl;
+                                        std::cout << "non-shared surface " << face->id( ) << " is moved from p"
+                                                  << max_proc << " to p" << min_proc << std::endl;
                                     }
                                     b_moved = true;
                                     break;
@@ -1402,8 +1359,7 @@ ErrorCode ZoltanPartitioner::partition_round_robin( const int n_part )
         {
             RefFace*        face = faces.get_and_step( );
             TopologyEntity* te = CAST_TO( face, TopologyEntity );
-            if( te->bridge_manager( )->number_of_bridges( ) < 2 )
-                loads[ proc ] = loads[ proc ] + face->measure( );
+            if( te->bridge_manager( )->number_of_bridges( ) < 2 ) loads[ proc ] = loads[ proc ] + face->measure( );
         }
 
         // Get all child entities
@@ -1428,8 +1384,7 @@ ErrorCode ZoltanPartitioner::partition_round_robin( const int n_part )
                 for( k = 0; k < n_parent; k++ )
                 {
                     RefEntity*  parent_vol = CAST_TO( parent_bodies.get_and_step( ), RefEntity );
-                    TDParallel* parent_td =
-                        (TDParallel*)parent_vol->get_TD( &TDParallel::is_parallel );
+                    TDParallel* parent_td = (TDParallel*)parent_vol->get_TD( &TDParallel::is_parallel );
 
                     if( parent_td == NULL )
                     {
@@ -1459,14 +1414,11 @@ ErrorCode ZoltanPartitioner::partition_round_robin( const int n_part )
                             }
 
                             // balance interface surface loads
-                            if( loads[ child_shared_procs[ 0 ] ] >
-                                loads[ child_shared_procs[ 1 ] ] )
+                            if( loads[ child_shared_procs[ 0 ] ] > loads[ child_shared_procs[ 1 ] ] )
                                 child_shared_procs.reverse( );
 
-                            loads[ child_shared_procs[ 0 ] ] =
-                                loads[ child_shared_procs[ 0 ] ] + entity->measure( );
-                            td_par = new TDParallel( entity, NULL, &child_shared_procs, NULL,
-                                                     merge_id, 1 );
+                            loads[ child_shared_procs[ 0 ] ] = loads[ child_shared_procs[ 0 ] ] + entity->measure( );
+                            td_par = new TDParallel( entity, NULL, &child_shared_procs, NULL, merge_id, 1 );
                         }  // face
                         else if( entity->entity_type_info( ) == typeid( RefEdge ) ||
                                  entity->entity_type_info( ) == typeid( RefVertex ) )
@@ -1482,8 +1434,7 @@ ErrorCode ZoltanPartitioner::partition_round_robin( const int n_part )
                             ve_loads[ min_p ] = ve_loads[ min_p ] + entity->measure( );
                             child_shared_procs.remove( min_p );
                             child_shared_procs.insert_first( min_p );
-                            td_par = new TDParallel( entity, NULL, &child_shared_procs, NULL,
-                                                     merge_id, 1 );
+                            td_par = new TDParallel( entity, NULL, &child_shared_procs, NULL, merge_id, 1 );
                         }  // edge or vertex
                     }  // if (td_par == NULL)
                 }  // if it is interface
@@ -1498,8 +1449,8 @@ ErrorCode ZoltanPartitioner::partition_round_robin( const int n_part )
 }
 
 // partition child entities to one of parent entity shared processors
-ErrorCode ZoltanPartitioner::partition_child_entities( const int dim, const int n_part,
-                                                       const bool part_surf, const bool ghost )
+ErrorCode ZoltanPartitioner::partition_child_entities( const int dim, const int n_part, const bool part_surf,
+                                                       const bool ghost )
 {
     DLIList< RefEntity* > entity_list;
     if( dim == 0 )
@@ -1616,9 +1567,8 @@ ErrorCode ZoltanPartitioner::partition_child_entities( const int dim, const int 
                 for( j = 0; j < n_parents; j++ )
                 {  // for all parent bodies
                     RefEntity*  parent_vol = CAST_TO( parents.get_and_step( ), RefEntity );
-                    TDParallel* parent_td =
-                        (TDParallel*)parent_vol->get_TD( &TDParallel::is_parallel );
-                    int n_shared_proc = shared_procs.size( );
+                    TDParallel* parent_td = (TDParallel*)parent_vol->get_TD( &TDParallel::is_parallel );
+                    int         n_shared_proc = shared_procs.size( );
 
                     for( k = 0; k < n_shared_proc; k++ )
                     {
@@ -1630,8 +1580,7 @@ ErrorCode ZoltanPartitioner::partition_child_entities( const int dim, const int 
             // initialize tool data
             int         merge_id = TDUniqueId::get_unique_id( entity );
             TDParallel* td_par = (TDParallel*)entity->get_TD( &TDParallel::is_parallel );
-            if( td_par == NULL )
-                td_par = new TDParallel( entity, NULL, &shared_procs, NULL, merge_id, 1 );
+            if( td_par == NULL ) td_par = new TDParallel( entity, NULL, &shared_procs, NULL, merge_id, 1 );
         }
     }
 
@@ -1653,8 +1602,8 @@ ErrorCode ZoltanPartitioner::write_partition( const int nparts, Range& elems, co
 
     // get any sets already with this tag, and clear them
     Range tagged_sets;
-    result = mbImpl->get_entities_by_type_and_tag( 0, MBENTITYSET, &part_set_tag, NULL, 1,
-                                                   tagged_sets, Interface::UNION );RR;
+    result =
+        mbImpl->get_entities_by_type_and_tag( 0, MBENTITYSET, &part_set_tag, NULL, 1, tagged_sets, Interface::UNION );RR;
     if( !tagged_sets.empty( ) )
     {
         result = mbImpl->clear_meshset( tagged_sets );RR;
@@ -1753,8 +1702,7 @@ ErrorCode ZoltanPartitioner::write_partition( const int nparts, Range& elems, co
 
 void ZoltanPartitioner::SetRCB_Parameters( )
 {
-    if( mbpc->proc_config( ).proc_rank( ) == 0 )
-        std::cout << "\nRecursive Coordinate Bisection" << std::endl;
+    if( mbpc->proc_config( ).proc_rank( ) == 0 ) std::cout << "\nRecursive Coordinate Bisection" << std::endl;
     // General parameters:
 
     myZZ->Set_Param( "DEBUG_LEVEL", "0" );  // no debug messages
@@ -1769,8 +1717,7 @@ void ZoltanPartitioner::SetRCB_Parameters( )
 
 void ZoltanPartitioner::SetRIB_Parameters( )
 {
-    if( mbpc->proc_config( ).proc_rank( ) == 0 )
-        std::cout << "\nRecursive Inertial Bisection" << std::endl;
+    if( mbpc->proc_config( ).proc_rank( ) == 0 ) std::cout << "\nRecursive Inertial Bisection" << std::endl;
     // General parameters:
 
     myZZ->Set_Param( "DEBUG_LEVEL", "0" );  // no debug messages
@@ -1784,8 +1731,7 @@ void ZoltanPartitioner::SetRIB_Parameters( )
 
 void ZoltanPartitioner::SetHSFC_Parameters( )
 {
-    if( mbpc->proc_config( ).proc_rank( ) == 0 )
-        std::cout << "\nHilbert Space Filling Curve" << std::endl;
+    if( mbpc->proc_config( ).proc_rank( ) == 0 ) std::cout << "\nHilbert Space Filling Curve" << std::endl;
     // General parameters:
 
     myZZ->Set_Param( "DEBUG_LEVEL", "0" );  // no debug messages
@@ -1798,8 +1744,7 @@ void ZoltanPartitioner::SetHSFC_Parameters( )
 
 void ZoltanPartitioner::SetHypergraph_Parameters( const char* phg_method )
 {
-    if( mbpc->proc_config( ).proc_rank( ) == 0 )
-        std::cout << "\nHypergraph (or PHG): " << std::endl;
+    if( mbpc->proc_config( ).proc_rank( ) == 0 ) std::cout << "\nHypergraph (or PHG): " << std::endl;
     // General parameters:
 
     myZZ->Set_Param( "DEBUG_LEVEL", "0" );  // no debug messages
@@ -1811,8 +1756,7 @@ void ZoltanPartitioner::SetHypergraph_Parameters( const char* phg_method )
 
 void ZoltanPartitioner::SetPARMETIS_Parameters( const char* parmetis_method )
 {
-    if( mbpc->proc_config( ).proc_rank( ) == 0 )
-        std::cout << "\nPARMETIS: " << parmetis_method << std::endl;
+    if( mbpc->proc_config( ).proc_rank( ) == 0 ) std::cout << "\nPARMETIS: " << parmetis_method << std::endl;
     // General parameters:
 
     myZZ->Set_Param( "DEBUG_LEVEL", "0" );  // no debug messages
@@ -1825,8 +1769,7 @@ void ZoltanPartitioner::SetPARMETIS_Parameters( const char* parmetis_method )
 
 void ZoltanPartitioner::SetOCTPART_Parameters( const char* oct_method )
 {
-    if( mbpc->proc_config( ).proc_rank( ) == 0 )
-        std::cout << "\nOctree Partitioning: " << oct_method << std::endl;
+    if( mbpc->proc_config( ).proc_rank( ) == 0 ) std::cout << "\nOctree Partitioning: " << oct_method << std::endl;
     // General parameters:
 
     myZZ->Set_Param( "DEBUG_LEVEL", "0" );  // no debug messages
@@ -1838,9 +1781,8 @@ void ZoltanPartitioner::SetOCTPART_Parameters( const char* oct_method )
     myZZ->Set_Param( "OCT_OUTPUT_LEVEL", "3" );
 }
 
-int ZoltanPartitioner::mbInitializePoints( int npts, double* pts, int* ids, int* adjs, int* length,
-                                           double* obj_weights, double* edge_weights, int* parts,
-                                           bool part_geom )
+int ZoltanPartitioner::mbInitializePoints( int npts, double* pts, int* ids, int* adjs, int* length, double* obj_weights,
+                                           double* edge_weights, int* parts, bool part_geom )
 {
     unsigned int i;
     int          j;
@@ -1952,8 +1894,8 @@ int ZoltanPartitioner::mbInitializePoints( int npts, double* pts, int* ids, int*
     return mySize;
 }
 
-void ZoltanPartitioner::mbFinalizePoints( int npts, int numExport, ZOLTAN_ID_PTR exportLocalIDs,
-                                          int* exportProcs, int** assignment )
+void ZoltanPartitioner::mbFinalizePoints( int npts, int numExport, ZOLTAN_ID_PTR exportLocalIDs, int* exportProcs,
+                                          int** assignment )
 {
     int*       MyAssignment;
     int        i;
@@ -2008,8 +1950,7 @@ int ZoltanPartitioner::mbGlobalSuccess( int rc )
     {
         if( vals[ i ] != ZOLTAN_OK )
         {
-            if( 0 == mbpc->proc_config( ).proc_rank( ) )
-            { mbShowError( vals[ i ], "Result on process " ); }
+            if( 0 == mbpc->proc_config( ).proc_rank( ) ) { mbShowError( vals[ i ], "Result on process " ); }
             fail = 1;
         }
     }
@@ -2018,8 +1959,7 @@ int ZoltanPartitioner::mbGlobalSuccess( int rc )
     return fail;
 }
 
-void ZoltanPartitioner::mbPrintGlobalResult( const char* s, int begin, int import, int exp,
-                                             int change )
+void ZoltanPartitioner::mbPrintGlobalResult( const char* s, int begin, int import, int exp, int change )
 {
     unsigned int i;
     int*         v1 = (int*)malloc( 4 * sizeof( int ) );
@@ -2041,8 +1981,8 @@ void ZoltanPartitioner::mbPrintGlobalResult( const char* s, int begin, int impor
         fprintf( stdout, "======%s======\n", s );
         for( i = 0, v = v2; i < mbpc->proc_config( ).proc_size( ); i++, v += 4 )
         {
-            fprintf( stdout, "%u: originally had %d, import %d, exp %d, %s\n", i, v[ 0 ], v[ 1 ],
-                     v[ 2 ], v[ 3 ] ? "a change of partitioning" : "no change" );
+            fprintf( stdout, "%u: originally had %d, import %d, exp %d, %s\n", i, v[ 0 ], v[ 1 ], v[ 2 ],
+                     v[ 3 ] ? "a change of partitioning" : "no change" );
         }
         fprintf( stdout, "==========================================\n" );
         fflush( stdout );
@@ -2087,9 +2027,8 @@ int mbGetNumberOfAssignedObjects( void* /* userDefinedData */, int* err )
     return NumPoints;
 }
 
-void mbGetObjectList( void* /* userDefinedData */, int /* numGlobalIds */, int /* numLids */,
-                      ZOLTAN_ID_PTR gids, ZOLTAN_ID_PTR lids, int wgt_dim, float* obj_wgts,
-                      int* err )
+void mbGetObjectList( void* /* userDefinedData */, int /* numGlobalIds */, int /* numLids */, ZOLTAN_ID_PTR gids,
+                      ZOLTAN_ID_PTR lids, int wgt_dim, float* obj_wgts, int* err )
 {
     for( int i = 0; i < NumPoints; i++ )
     {
@@ -2107,9 +2046,8 @@ int mbGetObjectSize( void* /* userDefinedData */, int* err )
     return 3;
 }
 
-void mbGetObject( void* /* userDefinedData */, int /* numGlobalIds */, int /* numLids */,
-                  int numObjs, ZOLTAN_ID_PTR /* gids */, ZOLTAN_ID_PTR lids, int numDim,
-                  double* pts, int* err )
+void mbGetObject( void* /* userDefinedData */, int /* numGlobalIds */, int /* numLids */, int numObjs,
+                  ZOLTAN_ID_PTR /* gids */, ZOLTAN_ID_PTR lids, int numDim, double* pts, int* err )
 {
     int i, id, id3;
     int next = 0;
@@ -2138,9 +2076,8 @@ void mbGetObject( void* /* userDefinedData */, int /* numGlobalIds */, int /* nu
     }
 }
 
-void mbGetNumberOfEdges( void* /* userDefinedData */, int /* numGlobalIds */, int /* numLids */,
-                         int numObjs, ZOLTAN_ID_PTR /* gids */, ZOLTAN_ID_PTR lids, int* numEdges,
-                         int* err )
+void mbGetNumberOfEdges( void* /* userDefinedData */, int /* numGlobalIds */, int /* numLids */, int numObjs,
+                         ZOLTAN_ID_PTR /* gids */, ZOLTAN_ID_PTR lids, int* numEdges, int* err )
 {
     int i, id;
     int next = 0;
@@ -2159,10 +2096,9 @@ void mbGetNumberOfEdges( void* /* userDefinedData */, int /* numGlobalIds */, in
     }
 }
 
-void mbGetEdgeList( void* /* userDefinedData */, int /* numGlobalIds */, int /* numLids */,
-                    int numObjs, ZOLTAN_ID_PTR /* gids */, ZOLTAN_ID_PTR lids, int* /* numEdges */,
-                    ZOLTAN_ID_PTR nborGlobalIds, int* nborProcs, int wgt_dim, float* edge_wgts,
-                    int* err )
+void mbGetEdgeList( void* /* userDefinedData */, int /* numGlobalIds */, int /* numLids */, int numObjs,
+                    ZOLTAN_ID_PTR /* gids */, ZOLTAN_ID_PTR lids, int* /* numEdges */, ZOLTAN_ID_PTR nborGlobalIds,
+                    int* nborProcs, int wgt_dim, float* edge_wgts, int* err )
 {
     int i, id, idSum, j;
     int next = 0;
@@ -2216,8 +2152,7 @@ void mbGetPart( void* /* userDefinedData */, int /* numGlobalIds */, int /* numL
 // new methods for partition in parallel, used by migrate in iMOAB
 ErrorCode ZoltanPartitioner::partition_owned_cells( Range& primary, ParallelComm* pco,
                                                     std::multimap< int, int >& extraGraphEdges,
-                                                    std::map< int, int >       procs,
-                                                    int&                       numNewPartitions,
+                                                    std::map< int, int > procs, int& numNewPartitions,
                                                     std::map< int, Range >& distribution, int met )
 {
     // start copy
@@ -2251,8 +2186,7 @@ ErrorCode ZoltanPartitioner::partition_owned_cells( Range& primary, ParallelComm
         if( 1 == met )
         {
             adjs.clear( );
-            rval = mtu.get_bridge_adjacencies( cell, ( primaryDim > 0 ? primaryDim - 1 : 3 ),
-                                               primaryDim, adjs );MB_CHK_ERR( rval );
+            rval = mtu.get_bridge_adjacencies( cell, ( primaryDim > 0 ? primaryDim - 1 : 3 ), primaryDim, adjs );MB_CHK_ERR( rval );
 
             // get the graph vertex ids of those
             if( !adjs.empty( ) )
@@ -2269,17 +2203,14 @@ ErrorCode ZoltanPartitioner::partition_owned_cells( Range& primary, ParallelComm
             {
                 // it means that the current cell is adjacent to a cell in another partition ; maybe
                 // a few
-                std::pair< std::multimap< int, int >::iterator,
-                           std::multimap< int, int >::iterator >
-                    ret;
+                std::pair< std::multimap< int, int >::iterator, std::multimap< int, int >::iterator > ret;
                 ret = extraGraphEdges.equal_range( moab_id );
                 for( std::multimap< int, int >::iterator it = ret.first; it != ret.second; ++it )
                 {
                     int otherID = it->second;
                     neighbors[ size_adjs ] = otherID;  // the id of the other cell, across partition
-                    neib_proc[ size_adjs ] =
-                        procs[ otherID ];  // this is how we built this map, the cell id maps to
-                                           // what proc it came from
+                    neib_proc[ size_adjs ] = procs[ otherID ];  // this is how we built this map, the cell id maps to
+                                                                // what proc it came from
                     size_adjs++;
                 }
             }
@@ -2311,8 +2242,7 @@ ErrorCode ZoltanPartitioner::partition_owned_cells( Range& primary, ParallelComm
     std::copy( length.begin( ), length.end( ), std::ostream_iterator< int >( ofs, ", " ) );
     ofs << std::endl;
     ofs << "Adjacencies vector: " << std::endl;
-    std::copy( adjacencies.begin( ), adjacencies.end( ),
-               std::ostream_iterator< int >( ofs, ", " ) );
+    std::copy( adjacencies.begin( ), adjacencies.end( ), std::ostream_iterator< int >( ofs, ", " ) );
     ofs << std::endl;
     ofs << "Moab_ids vector: " << std::endl;
     std::copy( ids.begin( ), ids.end( ), std::ostream_iterator< int >( ofs, ", " ) );
@@ -2383,8 +2313,8 @@ ErrorCode ZoltanPartitioner::partition_owned_cells( Range& primary, ParallelComm
     int *         assign_procs, *assign_parts;
 
     if( pco->rank( ) == 0 )
-        std::cout << "Computing partition using method (1-graph, 2-geom):" << met << " for "
-                  << numNewPartitions << " parts..." << std::endl;
+        std::cout << "Computing partition using method (1-graph, 2-geom):" << met << " for " << numNewPartitions
+                  << " parts..." << std::endl;
 
 #ifndef NDEBUG
 #if 0
@@ -2404,10 +2334,9 @@ ErrorCode ZoltanPartitioner::partition_owned_cells( Range& primary, ParallelComm
   }
 #endif
 #endif
-    retval =
-        myZZ->LB_Partition( changes, numGidEntries, numLidEntries, num_import, import_global_ids,
-                            import_local_ids, import_procs, import_to_part, num_export,
-                            export_global_ids, export_local_ids, assign_procs, assign_parts );
+    retval = myZZ->LB_Partition( changes, numGidEntries, numLidEntries, num_import, import_global_ids, import_local_ids,
+                                 import_procs, import_to_part, num_export, export_global_ids, export_local_ids,
+                                 assign_procs, assign_parts );
     if( ZOLTAN_OK != retval ) return MB_FAILURE;
 
 #ifdef VERBOSE

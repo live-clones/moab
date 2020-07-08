@@ -21,8 +21,8 @@ double find_angle( const moab::CartVect& A, const moab::CartVect& B )
 
 #define CHECK_EIGVECREAL_EQUAL( EXP, ACT, EPS ) \
     check_equal_eigvect( ( EXP ), ( ACT ), ( EPS ), #EXP, #ACT, __LINE__, __FILE__ )
-void check_equal_eigvect( const moab::CartVect& A, const moab::CartVect& B, double eps,
-                          const char* sA, const char* sB, int line, const char* file )
+void check_equal_eigvect( const moab::CartVect& A, const moab::CartVect& B, double eps, const char* sA, const char* sB,
+                          int line, const char* file )
 {
     check_equal( A.length( ), B.length( ), eps, sA, sB, line, file );
 
@@ -124,8 +124,7 @@ void test_EigenDecomp( )
     // another check to ensure the result is valid (AM-kM = 0)
     for( unsigned i = 0; i < 3; ++i )
     {
-        moab::CartVect v =
-            moab::Matrix::matrix_vector( mat, vectors.col( i ) ) - lamda[ i ] * vectors.col( i );
+        moab::CartVect v = moab::Matrix::matrix_vector( mat, vectors.col( i ) ) - lamda[ i ] * vectors.col( i );
         CHECK_REAL_EQUAL( v.length( ), 0, tol );
     }
 

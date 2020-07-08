@@ -11,8 +11,7 @@ namespace moab
 class ElementSequence : public EntitySequence
 {
   public:
-    ElementSequence( EntityHandle start, EntityID count, unsigned int nodes_per_elem,
-                     SequenceData* dat )
+    ElementSequence( EntityHandle start, EntityID count, unsigned int nodes_per_elem, SequenceData* dat )
         : EntitySequence( start, count, dat ), nodesPerElement( nodes_per_elem )
     {
     }
@@ -27,12 +26,10 @@ class ElementSequence : public EntitySequence
     virtual ErrorCode get_connectivity( EntityHandle handle, std::vector< EntityHandle >& connect,
                                         bool topological = false ) const = 0;
 
-    virtual ErrorCode get_connectivity( EntityHandle handle, EntityHandle const*& connect,
-                                        int& connect_length, bool topological = false,
-                                        std::vector< EntityHandle >* storage = 0 ) const = 0;
+    virtual ErrorCode get_connectivity( EntityHandle handle, EntityHandle const*& connect, int& connect_length,
+                                        bool topological = false, std::vector< EntityHandle >* storage = 0 ) const = 0;
 
-    virtual ErrorCode set_connectivity( EntityHandle handle, EntityHandle const* connect,
-                                        int connect_length ) = 0;
+    virtual ErrorCode set_connectivity( EntityHandle handle, EntityHandle const* connect, int connect_length ) = 0;
 
     inline EntityHandle const* get_connectivity_array( ) const;
 

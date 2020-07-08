@@ -16,8 +16,8 @@ namespace moab
 static bool debug = false;
 
 SpatialLocator::SpatialLocator( Interface* impl, Range& elems, Tree* tree, ElemEvaluator* eval )
-    : mbImpl( impl ), myElems( elems ), myDim( -1 ), myTree( tree ), elemEval( eval ),
-      iCreatedTree( false ), timerInitialized( false )
+    : mbImpl( impl ), myElems( elems ), myDim( -1 ), myTree( tree ), elemEval( eval ), iCreatedTree( false ),
+      timerInitialized( false )
 {
     create_tree( );
 
@@ -50,8 +50,8 @@ void SpatialLocator::create_tree( )
 
 ErrorCode SpatialLocator::add_elems( Range& elems )
 {
-    if( elems.empty( ) || mbImpl->dimension_from_handle( *elems.begin( ) ) !=
-                              mbImpl->dimension_from_handle( *elems.rbegin( ) ) )
+    if( elems.empty( ) ||
+        mbImpl->dimension_from_handle( *elems.begin( ) ) != mbImpl->dimension_from_handle( *elems.rbegin( ) ) )
         return MB_FAILURE;
 
     myDim = mbImpl->dimension_from_handle( *elems.begin( ) );
@@ -73,8 +73,7 @@ ErrorCode SpatialLocator::initialize_intermediate_partition( ParallelComm* pc )
     double sendbuffer[ 6 ];
     double rcvbuffer[ 6 ];
 
-    localBox.get(
-        sendbuffer );  // fill sendbuffer with local box, max values in [0:2] min values in [3:5]
+    localBox.get( sendbuffer );  // fill sendbuffer with local box, max values in [0:2] min values in [3:5]
     sendbuffer[ 0 ] *= -1;
     sendbuffer[ 1 ] *= -1;  // negate Xmin,Ymin,Zmin to get their minimum using MPI_MAX
     sendbuffer[ 2 ] *= -1;  // to avoid calling MPI_Allreduce again with MPI_MIN
@@ -100,30 +99,27 @@ ErrorCode SpatialLocator::initialize_intermediate_partition( ParallelComm* pc )
     localBox.get( dgijk );
     for( int i = 0; i < 6; i++ )
         spd.gDims[ i ] = dgijk[ i ] * mfactor;
-    ErrorCode rval =
-        ScdInterface::compute_partition( pc->size( ), pc->rank( ), spd, ldims, lper, regNums );
+    ErrorCode rval = ScdInterface::compute_partition( pc->size( ), pc->rank( ), spd, ldims, lper, regNums );
     if( MB_SUCCESS != rval ) return rval;
     // all we're really interested in is regNums[i], #procs in each direction
 
     for( int i = 0; i < 3; i++ )
-        regDeltaXYZ[ i ] = ( globalBox.bMax[ i ] - globalBox.bMin[ i ] ) /
-                           double( regNums[ i ] );  // size of each region
+        regDeltaXYZ[ i ] =
+            ( globalBox.bMax[ i ] - globalBox.bMin[ i ] ) / double( regNums[ i ] );  // size of each region
 
     return MB_SUCCESS;
 }
 
 // this function sets up the TupleList TLreg_o containing the registration messages
 // and sends it
-ErrorCode SpatialLocator::register_src_with_intermediate_procs( ParallelComm* pc,
-                                                                double        abs_iter_tol,
-                                                                TupleList&    TLreg_o )
+ErrorCode SpatialLocator::register_src_with_intermediate_procs( ParallelComm* pc, double abs_iter_tol,
+                                                                TupleList& TLreg_o )
 {
     int corner_ijk[ 6 ];
 
     // step 3: compute ijks of local box corners in intermediate partition
     // get corner ijk values for my box
-    ErrorCode rval =
-        get_point_ijk( localBox.bMin - CartVect( abs_iter_tol ), abs_iter_tol, corner_ijk );
+    ErrorCode rval = get_point_ijk( localBox.bMin - CartVect( abs_iter_tol ), abs_iter_tol, corner_ijk );
     if( MB_SUCCESS != rval ) return rval;
     rval = get_point_ijk( localBox.bMax + CartVect( abs_iter_tol ), abs_iter_tol, corner_ijk + 3 );
     if( MB_SUCCESS != rval ) return rval;
@@ -168,10 +164,8 @@ ErrorCode SpatialLocator::register_src_with_intermediate_procs( ParallelComm* pc
     return MB_SUCCESS;
 }
 
-ErrorCode SpatialLocator::par_locate_points( ParallelComm* /*pc*/, Range& /*vertices*/,
-                                             const double /*rel_iter_tol*/,
-                                             const double /*abs_iter_tol*/,
-                                             const double /*inside_tol*/ )
+ErrorCode SpatialLocator::par_locate_points( ParallelComm* /*pc*/, Range& /*vertices*/, const double /*rel_iter_tol*/,
+                                             const double /*abs_iter_tol*/, const double /*inside_tol*/ )
 {
     return MB_UNSUPPORTED_OPERATION;
 }
@@ -228,8 +222,8 @@ ErrorCode SpatialLocator::par_locate_points( ParallelComm* pc, const double* pos
 
     for( int pnt = 0; pnt < 3 * num_points; pnt += 3 )
     {
-        int forw_id = proc_from_point(
-            pos + pnt, abs_iter_tol );  // get ID of proc resonsible of the region the proc is in
+        int forw_id =
+            proc_from_point( pos + pnt, abs_iter_tol );  // get ID of proc resonsible of the region the proc is in
 
         iargs[ 0 ] = forw_id;  // toProc
         iargs[ 1 ] = my_rank;  // originalSourceProc
@@ -260,8 +254,7 @@ ErrorCode SpatialLocator::par_locate_points( ParallelComm* pc, const double* pos
         CartVect tmp_pnt( TLquery_o.vr_rd + 3 * i );
 
         // compare coordinates to list of bounding boxes
-        for( std::map< int, BoundBox >::iterator mit = srcProcBoxes.begin( );
-             mit != srcProcBoxes.end( ); ++mit )
+        for( std::map< int, BoundBox >::iterator mit = srcProcBoxes.begin( ); mit != srcProcBoxes.end( ); ++mit )
         {
             if( ( *mit ).second.contains_point( tmp_pnt.array( ), abs_iter_tol ) )
             {
@@ -298,8 +291,8 @@ ErrorCode SpatialLocator::par_locate_points( ParallelComm* pc, const double* pos
     std::vector< int >          is_inside( NN, 0 );
     std::vector< EntityHandle > ents( NN, 0 );
 
-    rval = locate_points( TLforward_o.vr_rd, TLforward_o.get_n( ), &ents[ 0 ], &params[ 0 ],
-                          &is_inside[ 0 ], rel_iter_tol, abs_iter_tol, inside_tol );
+    rval = locate_points( TLforward_o.vr_rd, TLforward_o.get_n( ), &ents[ 0 ], &params[ 0 ], &is_inside[ 0 ],
+                          rel_iter_tol, abs_iter_tol, inside_tol );
     if( MB_SUCCESS != rval ) return rval;
 
     locTable.initialize( 1, 0, 1, 3, 0 );
@@ -342,8 +335,7 @@ ErrorCode SpatialLocator::par_locate_points( ParallelComm* pc, const double* pos
     if( debug )
     {
         int num_found =
-            num_points -
-            0.5 * std::count_if( parLocTable.vi_wr, parLocTable.vi_wr + 2 * num_points, is_neg );
+            num_points - 0.5 * std::count_if( parLocTable.vi_wr, parLocTable.vi_wr + 2 * num_points, is_neg );
         std::cout << "Points found = " << num_found << "/" << num_points << " ("
                   << 100.0 * ( (double)num_found / num_points ) << "%)" << std::endl;
     }
@@ -355,8 +347,8 @@ ErrorCode SpatialLocator::par_locate_points( ParallelComm* pc, const double* pos
 
 #endif
 
-ErrorCode SpatialLocator::locate_points( Range& verts, const double rel_iter_tol,
-                                         const double abs_iter_tol, const double inside_tol )
+ErrorCode SpatialLocator::locate_points( Range& verts, const double rel_iter_tol, const double abs_iter_tol,
+                                         const double inside_tol )
 {
     bool i_initialized = false;
     if( !timerInitialized )
@@ -374,15 +366,13 @@ ErrorCode SpatialLocator::locate_points( Range& verts, const double rel_iter_tol
     if( MB_SUCCESS != rval ) return rval;
 
     // only call this if I'm the top-level function, since it resets the last time called
-    if( i_initialized )
-        myTimes.slTimes[ SpatialLocatorTimes::SRC_SEARCH ] = myTimer.time_elapsed( );
+    if( i_initialized ) myTimes.slTimes[ SpatialLocatorTimes::SRC_SEARCH ] = myTimer.time_elapsed( );
 
     return MB_SUCCESS;
 }
 
-ErrorCode SpatialLocator::locate_points( const double* pos, int num_points,
-                                         const double rel_iter_tol, const double abs_iter_tol,
-                                         const double inside_tol )
+ErrorCode SpatialLocator::locate_points( const double* pos, int num_points, const double rel_iter_tol,
+                                         const double abs_iter_tol, const double inside_tol )
 {
     bool i_initialized = false;
     if( !timerInitialized )
@@ -396,22 +386,20 @@ ErrorCode SpatialLocator::locate_points( const double* pos, int num_points,
     locTable.enableWriteAccess( );
 
     // pass storage directly into locate_points, since we know those arrays are contiguous
-    ErrorCode rval = locate_points( pos, num_points, (EntityHandle*)locTable.vul_wr, locTable.vr_wr,
-                                    NULL, rel_iter_tol, abs_iter_tol, inside_tol );
+    ErrorCode rval = locate_points( pos, num_points, (EntityHandle*)locTable.vul_wr, locTable.vr_wr, NULL, rel_iter_tol,
+                                    abs_iter_tol, inside_tol );
     std::fill( locTable.vi_wr, locTable.vi_wr + num_points, 0 );
     locTable.set_n( num_points );
     if( MB_SUCCESS != rval ) return rval;
 
     // only call this if I'm the top-level function, since it resets the last time called
-    if( i_initialized )
-        myTimes.slTimes[ SpatialLocatorTimes::SRC_SEARCH ] = myTimer.time_elapsed( );
+    if( i_initialized ) myTimes.slTimes[ SpatialLocatorTimes::SRC_SEARCH ] = myTimer.time_elapsed( );
 
     return MB_SUCCESS;
 }
 
-ErrorCode SpatialLocator::locate_points( Range& verts, EntityHandle* ents, double* params,
-                                         int* is_inside, const double rel_iter_tol,
-                                         const double abs_iter_tol, const double inside_tol )
+ErrorCode SpatialLocator::locate_points( Range& verts, EntityHandle* ents, double* params, int* is_inside,
+                                         const double rel_iter_tol, const double abs_iter_tol, const double inside_tol )
 {
     bool i_initialized = false;
     if( !timerInitialized )
@@ -425,19 +413,16 @@ ErrorCode SpatialLocator::locate_points( Range& verts, EntityHandle* ents, doubl
     std::vector< double > pos( 3 * verts.size( ) );
     ErrorCode             rval = mbImpl->get_coords( verts, &pos[ 0 ] );
     if( MB_SUCCESS != rval ) return rval;
-    rval = locate_points( &pos[ 0 ], verts.size( ), ents, params, is_inside, rel_iter_tol,
-                          abs_iter_tol, inside_tol );
+    rval = locate_points( &pos[ 0 ], verts.size( ), ents, params, is_inside, rel_iter_tol, abs_iter_tol, inside_tol );
 
     // only call this if I'm the top-level function, since it resets the last time called
-    if( i_initialized )
-        myTimes.slTimes[ SpatialLocatorTimes::SRC_SEARCH ] = myTimer.time_elapsed( );
+    if( i_initialized ) myTimes.slTimes[ SpatialLocatorTimes::SRC_SEARCH ] = myTimer.time_elapsed( );
 
     return rval;
 }
 
-ErrorCode SpatialLocator::locate_points( const double* pos, int num_points, EntityHandle* ents,
-                                         double* params, int*                          is_inside,
-                                         const double /* rel_iter_tol */, const double abs_iter_tol,
+ErrorCode SpatialLocator::locate_points( const double* pos, int num_points, EntityHandle* ents, double* params,
+                                         int* is_inside, const double /* rel_iter_tol */, const double abs_iter_tol,
                                          const double inside_tol )
 {
     bool i_initialized = false;
@@ -462,8 +447,8 @@ ErrorCode SpatialLocator::locate_points( const double* pos, int num_points, Enti
     for( int i = 0; i < num_points; i++ )
     {
         int       i3 = 3 * i;
-        ErrorCode tmp_rval = myTree->point_search( pos + i3, ents[ i ], abs_iter_tol, inside_tol,
-                                                   NULL, NULL, (CartVect*)( params + i3 ) );
+        ErrorCode tmp_rval = myTree->point_search( pos + i3, ents[ i ], abs_iter_tol, inside_tol, NULL, NULL,
+                                                   (CartVect*)( params + i3 ) );
         if( MB_SUCCESS != tmp_rval )
         {
             rval = tmp_rval;
@@ -472,16 +457,15 @@ ErrorCode SpatialLocator::locate_points( const double* pos, int num_points, Enti
 
         if( debug && !ents[ i ] )
         {
-            std::cout << "Point " << i << " not found; point: (" << pos[ i3 ] << ","
-                      << pos[ i3 + 1 ] << "," << pos[ i3 + 2 ] << ")" << std::endl;
+            std::cout << "Point " << i << " not found; point: (" << pos[ i3 ] << "," << pos[ i3 + 1 ] << ","
+                      << pos[ i3 + 2 ] << ")" << std::endl;
         }
 
         if( is_inside ) is_inside[ i ] = ( ents[ i ] ? true : false );
     }
 
     // only call this if I'm the top-level function, since it resets the last time called
-    if( i_initialized )
-        myTimes.slTimes[ SpatialLocatorTimes::SRC_SEARCH ] = myTimer.time_elapsed( );
+    if( i_initialized ) myTimes.slTimes[ SpatialLocatorTimes::SRC_SEARCH ] = myTimer.time_elapsed( );
 
     return rval;
 }
@@ -493,8 +477,7 @@ ErrorCode SpatialLocator::locate_points( const double* pos, int num_points, Enti
  */
 int SpatialLocator::local_num_located( )
 {
-    int num_located =
-        locTable.get_n( ) - std::count( locTable.vul_rd, locTable.vul_rd + locTable.get_n( ), 0 );
+    int num_located = locTable.get_n( ) - std::count( locTable.vul_rd, locTable.vul_rd + locTable.get_n( ), 0 );
     if( num_located != (int)locTable.get_n( ) )
     {
         Ulong* nl = std::find( locTable.vul_rd, locTable.vul_rd + locTable.get_n( ), 0 );

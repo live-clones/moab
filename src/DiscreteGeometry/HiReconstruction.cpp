@@ -15,8 +15,7 @@
 
 namespace moab
 {
-HiReconstruction::HiReconstruction( Core* impl, ParallelComm* comm, EntityHandle meshIn,
-                                    int minpnts, bool recwhole )
+HiReconstruction::HiReconstruction( Core* impl, ParallelComm* comm, EntityHandle meshIn, int minpnts, bool recwhole )
     : mbImpl( impl ), pcomm( comm ), _mesh2rec( meshIn ), _MINPNTS( minpnts )
 {
     assert( NULL != impl );
@@ -115,8 +114,7 @@ ErrorCode HiReconstruction::initialize( bool recwhole )
  *  User Interface for Reconstruction of Geometry  *
  ***************************************************/
 
-ErrorCode HiReconstruction::reconstruct3D_surf_geom( int degree, bool interp, bool safeguard,
-                                                     bool reset )
+ErrorCode HiReconstruction::reconstruct3D_surf_geom( int degree, bool interp, bool safeguard, bool reset )
 {
     assert( 2 == _dim );
     if( _hasfittings && !reset )
@@ -153,8 +151,8 @@ ErrorCode HiReconstruction::reconstruct3D_surf_geom( int degree, bool interp, bo
         coeffs = &( _local_fit_coeffs[ istr ] );
         degree_out = &( _degrees_out[ index ] );
         _interps[ index ] = interp;
-        error = polyfit3d_walf_surf_vertex( *ivert, interp, degree, _MINPNTS, safeguard, 9, coords,
-                                            degree_out, ncoeffs, coeffs );MB_CHK_ERR( error );
+        error = polyfit3d_walf_surf_vertex( *ivert, interp, degree, _MINPNTS, safeguard, 9, coords, degree_out, ncoeffs,
+                                            coeffs );MB_CHK_ERR( error );
 
         // DBG
         if( degree_out[ 0 ] < degree ) dcount += 1;
@@ -168,12 +166,11 @@ ErrorCode HiReconstruction::reconstruct3D_surf_geom( int degree, bool interp, bo
     return error;
 }
 
-ErrorCode HiReconstruction::reconstruct3D_surf_geom( size_t npts, int* degrees, bool* interps,
-                                                     bool safeguard, bool reset )
+ErrorCode HiReconstruction::reconstruct3D_surf_geom( size_t npts, int* degrees, bool* interps, bool safeguard,
+                                                     bool reset )
 {
     assert( _dim == 2 );
-    if( npts != _nv2rec )
-    { MB_SET_ERR( MB_FAILURE, "Input number of degrees doesn't match number of vertices" ); }
+    if( npts != _nv2rec ) { MB_SET_ERR( MB_FAILURE, "Input number of degrees doesn't match number of vertices" ); }
     if( _hasfittings && !reset ) { return MB_SUCCESS; }
     else
     {
@@ -195,16 +192,15 @@ ErrorCode HiReconstruction::reconstruct3D_surf_geom( size_t npts, int* degrees, 
         degree_out = &( _degrees_out[ index ] );
         _interps[ index ] = interps[ i ];
         int ncoeffs = ( degrees[ i ] + 2 ) * ( degrees[ i ] + 1 ) / 2;
-        error = polyfit3d_walf_surf_vertex( *ivert, interps[ i ], degrees[ i ], _MINPNTS, safeguard,
-                                            9, coords, degree_out, ncoeffs, coeffs );MB_CHK_ERR( error );
+        error = polyfit3d_walf_surf_vertex( *ivert, interps[ i ], degrees[ i ], _MINPNTS, safeguard, 9, coords,
+                                            degree_out, ncoeffs, coeffs );MB_CHK_ERR( error );
     }
     _geom = HISURFACE;
     _hasfittings = true;
     return error;
 }
 
-ErrorCode HiReconstruction::reconstruct3D_curve_geom( int degree, bool interp, bool safeguard,
-                                                      bool reset )
+ErrorCode HiReconstruction::reconstruct3D_curve_geom( int degree, bool interp, bool safeguard, bool reset )
 {
     assert( _dim == 1 );
     if( _hasfittings && !reset ) { return MB_SUCCESS; }
@@ -225,21 +221,20 @@ ErrorCode HiReconstruction::reconstruct3D_curve_geom( int degree, bool interp, b
         coeffs = &( _local_fit_coeffs[ istr ] );
         degree_out = &( _degrees_out[ index ] );
         _interps[ index ] = interp;
-        error = polyfit3d_walf_curve_vertex( *ivert, interp, degree, _MINPNTS, safeguard, 0, coords,
-                                             degree_out, ncoeffs, coeffs );MB_CHK_ERR( error );
+        error = polyfit3d_walf_curve_vertex( *ivert, interp, degree, _MINPNTS, safeguard, 0, coords, degree_out,
+                                             ncoeffs, coeffs );MB_CHK_ERR( error );
     }
     _geom = HI3DCURVE;
     _hasfittings = true;
     return error;
 }
 
-ErrorCode HiReconstruction::reconstruct3D_curve_geom( size_t npts, int* degrees, bool* interps,
-                                                      bool safeguard, bool reset )
+ErrorCode HiReconstruction::reconstruct3D_curve_geom( size_t npts, int* degrees, bool* interps, bool safeguard,
+                                                      bool reset )
 {
     assert( _dim == 1 );
     ErrorCode error;
-    if( npts != _nv2rec )
-    { MB_SET_ERR( MB_FAILURE, "Input number of degrees doesn't match the number of vertices" ); }
+    if( npts != _nv2rec ) { MB_SET_ERR( MB_FAILURE, "Input number of degrees doesn't match the number of vertices" ); }
     if( _hasfittings && !reset ) { return MB_SUCCESS; }
     else
     {
@@ -258,19 +253,18 @@ ErrorCode HiReconstruction::reconstruct3D_curve_geom( size_t npts, int* degrees,
         degree_out = &( _degrees_out[ index ] );
         _interps[ index ] = interps[ i ];
         int ncoeffs = 3 * ( degrees[ i ] + 1 );
-        error = polyfit3d_walf_curve_vertex( *ivert, interps[ i ], degrees[ i ], _MINPNTS,
-                                             safeguard, 0, coords, degree_out, ncoeffs, coeffs );MB_CHK_ERR( error );
+        error = polyfit3d_walf_curve_vertex( *ivert, interps[ i ], degrees[ i ], _MINPNTS, safeguard, 0, coords,
+                                             degree_out, ncoeffs, coeffs );MB_CHK_ERR( error );
     }
     _geom = HI3DCURVE;
     _hasfittings = true;
     return error;
 }
 
-ErrorCode HiReconstruction::polyfit3d_walf_surf_vertex( const EntityHandle vid, const bool interp,
-                                                        int degree, int minpnts,
-                                                        const bool safeguard, const int ncoords,
-                                                        double* coords, int* degree_out,
-                                                        const int ncoeffs, double* coeffs )
+ErrorCode HiReconstruction::polyfit3d_walf_surf_vertex( const EntityHandle vid, const bool interp, int degree,
+                                                        int minpnts, const bool safeguard, const int ncoords,
+                                                        double* coords, int* degree_out, const int ncoeffs,
+                                                        double* coeffs )
 {
     assert( _dim == 2 );
     ErrorCode error;
@@ -304,18 +298,17 @@ ErrorCode HiReconstruction::polyfit3d_walf_surf_vertex( const EntityHandle vid, 
     std::swap( ngbnrms[ 2 ], ngbnrms[ 3 * index + 2 ] );
     // local WLS fitting
     int degree_pnt, degree_qr;
-    polyfit3d_surf_get_coeff( nverts, ngbcoords, ngbnrms, degree, interp, safeguard, ncoords,
-                              coords, ncoeffs, coeffs, degree_out, &degree_pnt, &degree_qr );
+    polyfit3d_surf_get_coeff( nverts, ngbcoords, ngbnrms, degree, interp, safeguard, ncoords, coords, ncoeffs, coeffs,
+                              degree_out, &degree_pnt, &degree_qr );
     delete[] ngbcoords;
     delete[] ngbnrms;
     return error;
 }
 
-ErrorCode HiReconstruction::polyfit3d_walf_curve_vertex( const EntityHandle vid, const bool interp,
-                                                         int degree, int minpnts,
-                                                         const bool safeguard, const int ncoords,
-                                                         double* coords, int* degree_out,
-                                                         const int ncoeffs, double* coeffs )
+ErrorCode HiReconstruction::polyfit3d_walf_curve_vertex( const EntityHandle vid, const bool interp, int degree,
+                                                         int minpnts, const bool safeguard, const int ncoords,
+                                                         double* coords, int* degree_out, const int ncoeffs,
+                                                         double* coeffs )
 {
     ErrorCode error;
     int       ring = estimate_num_rings( degree, interp );
@@ -340,8 +333,8 @@ ErrorCode HiReconstruction::polyfit3d_walf_curve_vertex( const EntityHandle vid,
     std::swap( ngbtangs[ 1 ], ngbtangs[ 3 * index + 1 ] );
     std::swap( ngbtangs[ 2 ], ngbtangs[ 3 * index + 2 ] );
     // local WLS fittings
-    polyfit3d_curve_get_coeff( nverts, ngbcoords, ngbtangs, degree, interp, safeguard, ncoords,
-                               coords, ncoeffs, coeffs, degree_out );
+    polyfit3d_curve_get_coeff( nverts, ngbcoords, ngbtangs, degree, interp, safeguard, ncoords, coords, ncoeffs, coeffs,
+                               degree_out );
     delete[] ngbcoords;
     delete[] ngbtangs;
     return error;
@@ -351,10 +344,8 @@ ErrorCode HiReconstruction::polyfit3d_walf_curve_vertex( const EntityHandle vid,
  *  User Interface for Evaluation via Reconstructed Geometry  *
  **************************************************************/
 
-ErrorCode HiReconstruction::hiproj_walf_in_element( EntityHandle elem, const int nvpe,
-                                                    const int     npts2fit,
-                                                    const double* naturalcoords2fit,
-                                                    double*       newcoords )
+ErrorCode HiReconstruction::hiproj_walf_in_element( EntityHandle elem, const int nvpe, const int npts2fit,
+                                                    const double* naturalcoords2fit, double* newcoords )
 {
     assert( newcoords );
     ErrorCode error;
@@ -373,9 +364,7 @@ ErrorCode HiReconstruction::hiproj_walf_in_element( EntityHandle elem, const int
         for( int i = 0; i < nvpe; ++i )
         {
             if( -1 == _verts2rec.index( elemconn[ i ] ) )
-            {
-                MB_SET_ERR( MB_FAILURE, "There is no existing fitting results for element " + ID );
-            }
+            { MB_SET_ERR( MB_FAILURE, "There is no existing fitting results for element " + ID ); }
         }
     }
     // check correctness of input
@@ -422,9 +411,8 @@ ErrorCode HiReconstruction::hiproj_walf_in_element( EntityHandle elem, const int
     return error;
 }
 
-ErrorCode HiReconstruction::hiproj_walf_around_vertex( EntityHandle vid, const int npts2fit,
-                                                       const double* coords2fit,
-                                                       double*       hiproj_new )
+ErrorCode HiReconstruction::hiproj_walf_around_vertex( EntityHandle vid, const int npts2fit, const double* coords2fit,
+                                                       double* hiproj_new )
 {
     if( !_hasfittings ) { MB_SET_ERR( MB_FAILURE, "There is no existing fitting results" ); }
     else if( -1 == _verts2rec.index( vid ) )
@@ -449,25 +437,23 @@ ErrorCode HiReconstruction::hiproj_walf_around_vertex( EntityHandle vid, const i
         // int ncoeffs = (local_deg+2)*(local_deg+1)>>1;
         size_t istr = _vertID2coeffID[ index ];
         local_coeffs = &( _local_fit_coeffs[ istr ] );
-        walf3d_surf_vertex_eval( local_origin, uvw_coords, local_deg, local_coeffs, interp,
-                                 npts2fit, coords2fit, hiproj_new );
+        walf3d_surf_vertex_eval( local_origin, uvw_coords, local_deg, local_coeffs, interp, npts2fit, coords2fit,
+                                 hiproj_new );
     }
     else if( _geom == HI3DCURVE )
     {
         uvw_coords = &( _local_coords[ 3 * index ] );
         size_t istr = _vertID2coeffID[ index ];
         local_coeffs = &( _local_fit_coeffs[ istr ] );
-        walf3d_curve_vertex_eval( local_origin, uvw_coords, local_deg, local_coeffs, interp,
-                                  npts2fit, coords2fit, hiproj_new );
+        walf3d_curve_vertex_eval( local_origin, uvw_coords, local_deg, local_coeffs, interp, npts2fit, coords2fit,
+                                  hiproj_new );
     }
     return error;
 }
 
-void HiReconstruction::walf3d_surf_vertex_eval( const double* local_origin,
-                                                const double* local_coords, const int local_deg,
-                                                const double* local_coeffs, const bool interp,
-                                                const int npts2fit, const double* coords2fit,
-                                                double* hiproj_new )
+void HiReconstruction::walf3d_surf_vertex_eval( const double* local_origin, const double* local_coords,
+                                                const int local_deg, const double* local_coeffs, const bool interp,
+                                                const int npts2fit, const double* coords2fit, double* hiproj_new )
 {
     double xaxis[ 3 ], yaxis[ 3 ], zaxis[ 3 ];
     for( int i = 0; i < 3; ++i )
@@ -506,21 +492,16 @@ void HiReconstruction::walf3d_surf_vertex_eval( const double* local_origin,
         {
             height += local_coeffs[ p + 1 ] * basis[ p ];
         }
-        hiproj_new[ 3 * i ] =
-            local_origin[ 0 ] + u * xaxis[ 0 ] + v * yaxis[ 0 ] + height * zaxis[ 0 ];
-        hiproj_new[ 3 * i + 1 ] =
-            local_origin[ 1 ] + u * xaxis[ 1 ] + v * yaxis[ 1 ] + height * zaxis[ 1 ];
-        hiproj_new[ 3 * i + 2 ] =
-            local_origin[ 2 ] + u * xaxis[ 2 ] + v * yaxis[ 2 ] + height * zaxis[ 2 ];
+        hiproj_new[ 3 * i ] = local_origin[ 0 ] + u * xaxis[ 0 ] + v * yaxis[ 0 ] + height * zaxis[ 0 ];
+        hiproj_new[ 3 * i + 1 ] = local_origin[ 1 ] + u * xaxis[ 1 ] + v * yaxis[ 1 ] + height * zaxis[ 1 ];
+        hiproj_new[ 3 * i + 2 ] = local_origin[ 2 ] + u * xaxis[ 2 ] + v * yaxis[ 2 ] + height * zaxis[ 2 ];
     }
     // delete [] basis;
 }
 
-void HiReconstruction::walf3d_curve_vertex_eval( const double* local_origin,
-                                                 const double* local_coords, const int local_deg,
-                                                 const double* local_coeffs, const bool interp,
-                                                 const int npts2fit, const double* coords2fit,
-                                                 double* hiproj_new )
+void HiReconstruction::walf3d_curve_vertex_eval( const double* local_origin, const double* local_coords,
+                                                 const int local_deg, const double* local_coeffs, const bool interp,
+                                                 const int npts2fit, const double* coords2fit, double* hiproj_new )
 {
     assert( local_origin && local_coords && local_coeffs );
     int ncoeffspvpd = local_deg + 1;
@@ -551,9 +532,8 @@ void HiReconstruction::walf3d_curve_vertex_eval( const double* local_origin,
     }
 }
 
-bool HiReconstruction::get_fittings_data( EntityHandle vid, GEOMTYPE& geomtype,
-                                          std::vector< double >& coords, int& degree_out,
-                                          std::vector< double >& coeffs, bool& interp )
+bool HiReconstruction::get_fittings_data( EntityHandle vid, GEOMTYPE& geomtype, std::vector< double >& coords,
+                                          int& degree_out, std::vector< double >& coeffs, bool& interp )
 {
     if( !_hasfittings ) { return false; }
     else
@@ -567,8 +547,7 @@ bool HiReconstruction::get_fittings_data( EntityHandle vid, GEOMTYPE& geomtype,
         geomtype = _geom;
         if( HISURFACE == _geom )
         {
-            coords.insert( coords.end( ), _local_coords.begin( ) + 9 * index,
-                           _local_coords.begin( ) + 9 * index + 9 );
+            coords.insert( coords.end( ), _local_coords.begin( ) + 9 * index, _local_coords.begin( ) + 9 * index + 9 );
             degree_out = _degrees_out[ index ];
             interp = _interps[ index ];
             int    ncoeffs = ( degree_out + 2 ) * ( degree_out + 1 ) >> 1;
@@ -578,8 +557,7 @@ bool HiReconstruction::get_fittings_data( EntityHandle vid, GEOMTYPE& geomtype,
         }
         else if( HI3DCURVE == _geom )
         {
-            coords.insert( coords.end( ), _local_coords.begin( ) + 3 * index,
-                           _local_coords.begin( ) + 3 * index + 3 );
+            coords.insert( coords.end( ), _local_coords.begin( ) + 3 * index, _local_coords.begin( ) + 3 * index + 3 );
             degree_out = _degrees_out[ index ];
             interp = _interps[ index ];
             int    ncoeffs = 3 * ( degree_out + 1 );
@@ -597,12 +575,10 @@ bool HiReconstruction::get_fittings_data( EntityHandle vid, GEOMTYPE& geomtype,
 
 int HiReconstruction::estimate_num_rings( int degree, bool interp )
 {
-    return interp ? ( ( degree + 1 ) >> 1 ) + ( ( degree + 1 ) & 1 )
-                  : ( ( degree + 2 ) >> 1 ) + ( ( degree + 2 ) & 1 );
+    return interp ? ( ( degree + 1 ) >> 1 ) + ( ( degree + 1 ) & 1 ) : ( ( degree + 2 ) >> 1 ) + ( ( degree + 2 ) & 1 );
 }
 
-ErrorCode HiReconstruction::vertex_get_incident_elements( const EntityHandle&          vid,
-                                                          const int                    elemdim,
+ErrorCode HiReconstruction::vertex_get_incident_elements( const EntityHandle& vid, const int elemdim,
                                                           std::vector< EntityHandle >& adjents )
 {
     ErrorCode error;
@@ -615,8 +591,7 @@ ErrorCode HiReconstruction::vertex_get_incident_elements( const EntityHandle&   
     return error;
 }
 
-ErrorCode HiReconstruction::obtain_nring_ngbvs( const EntityHandle vid, int ring, const int minpnts,
-                                                Range& ngbvs )
+ErrorCode HiReconstruction::obtain_nring_ngbvs( const EntityHandle vid, int ring, const int minpnts, Range& ngbvs )
 {
     ErrorCode                  error;
     std::deque< EntityHandle > todo;
@@ -965,11 +940,9 @@ ErrorCode HiReconstruction::get_tangents_curve( const Range& vertsh, double* tan
  *	Internal Routines for local WLS fittings	*
  *************************************************/
 
-void HiReconstruction::polyfit3d_surf_get_coeff( const int nverts, const double* ngbcoords,
-                                                 const double* ngbnrms, int degree,
-                                                 const bool interp, const bool safeguard,
-                                                 const int ncoords, double* coords,
-                                                 const int ncoeffs, double* coeffs, int* degree_out,
+void HiReconstruction::polyfit3d_surf_get_coeff( const int nverts, const double* ngbcoords, const double* ngbnrms,
+                                                 int degree, const bool interp, const bool safeguard, const int ncoords,
+                                                 double* coords, const int ncoeffs, double* coeffs, int* degree_out,
                                                  int* degree_pnt, int* degree_qr )
 {
     if( nverts <= 0 ) { return; }
@@ -979,10 +952,8 @@ void HiReconstruction::polyfit3d_surf_get_coeff( const int nverts, const double*
     // ")" << std::endl;
 
     // step 1. copmute local coordinate system
-    double nrm[ 3 ] = { ngbnrms[ 0 ], ngbnrms[ 1 ], ngbnrms[ 2 ] }, tang1[ 3 ] = { 0, 0, 0 },
-                  tang2[ 3 ] = { 0, 0, 0 };
-    if( fabs( nrm[ 0 ] ) > fabs( nrm[ 1 ] ) && fabs( nrm[ 0 ] ) > fabs( nrm[ 2 ] ) )
-    { tang1[ 1 ] = 1.0; }
+    double nrm[ 3 ] = { ngbnrms[ 0 ], ngbnrms[ 1 ], ngbnrms[ 2 ] }, tang1[ 3 ] = { 0, 0, 0 }, tang2[ 3 ] = { 0, 0, 0 };
+    if( fabs( nrm[ 0 ] ) > fabs( nrm[ 1 ] ) && fabs( nrm[ 0 ] ) > fabs( nrm[ 2 ] ) ) { tang1[ 1 ] = 1.0; }
     else
     {
         tang1[ 0 ] = 1.0;
@@ -1037,8 +1008,7 @@ void HiReconstruction::polyfit3d_surf_get_coeff( const int nverts, const double*
 
     // step 3. compute weights
     std::vector< double > ws( npts2fit );  // double *ws = new double[npts2fit];
-    int nzeros = compute_weights( npts2fit, 2, &( us[ 0 ] ), nverts, ngbnrms, degree, _MINEPS,
-                                  &( ws[ 0 ] ) );
+    int nzeros = compute_weights( npts2fit, 2, &( us[ 0 ] ), nverts, ngbnrms, degree, _MINEPS, &( ws[ 0 ] ) );
 
     // step 4. adjust according to zero-weights
     if( nzeros )
@@ -1081,8 +1051,8 @@ void HiReconstruction::polyfit3d_surf_get_coeff( const int nverts, const double*
     // std::cout<<"npnts after weighting = "<<npts2fit<<std::endl;
 
     // step 5. fitting
-    eval_vander_bivar_cmf( npts2fit, &( us[ 0 ] ), 1, &( bs[ 0 ] ), degree, &( ws[ 0 ] ), interp,
-                           safeguard, degree_out, degree_pnt, degree_qr );
+    eval_vander_bivar_cmf( npts2fit, &( us[ 0 ] ), 1, &( bs[ 0 ] ), degree, &( ws[ 0 ] ), interp, safeguard, degree_out,
+                           degree_pnt, degree_qr );
 
     // step 6. organize output
     int ncoeffs_out = ( *degree_out + 2 ) * ( *degree_out + 1 ) / 2;
@@ -1095,9 +1065,8 @@ void HiReconstruction::polyfit3d_surf_get_coeff( const int nverts, const double*
     // delete [] us; delete [] bs; delete [] ws;
 }
 
-void HiReconstruction::eval_vander_bivar_cmf( const int npts2fit, const double* us, const int ndim,
-                                              double* bs, int degree, const double* ws,
-                                              const bool interp, const bool safeguard,
+void HiReconstruction::eval_vander_bivar_cmf( const int npts2fit, const double* us, const int ndim, double* bs,
+                                              int degree, const double* ws, const bool interp, const bool safeguard,
                                               int* degree_out, int* degree_pnt, int* degree_qr )
 {
     // step 1. adjust the degree according to number of points to fit
@@ -1112,8 +1081,7 @@ void HiReconstruction::eval_vander_bivar_cmf( const int npts2fit, const double* 
     // std::cout << "degree_pnt: " << *degree_pnt << std::endl;
 
     // step 2. construct Vandermonde matrix, stored in columnwise
-    std::vector< double >
-        V;  // V(npts2fit*(ncols+interp)); //double *V_init = new double[npts2fit*(ncols+interp)];
+    std::vector< double > V;  // V(npts2fit*(ncols+interp)); //double *V_init = new double[npts2fit*(ncols+interp)];
     DGMSolver::gen_vander_multivar( npts2fit, 2, us, degree, V );
     // remove the first column of 1s if interpolation
     if( interp ) { V.erase( V.begin( ), V.begin( ) + npts2fit ); }
@@ -1213,8 +1181,8 @@ void HiReconstruction::eval_vander_bivar_cmf( const int npts2fit, const double* 
     {
         // for debug
         // std::cout << "ts size " << ts.size() << std::endl;
-        DGMSolver::backsolve_polyfit_safeguarded( 2, degree, interp, npts2fit, ncols_sub,
-                                                  &( V[ 0 ] ), ndim, bs, &( ts[ 0 ] ), degree_out );
+        DGMSolver::backsolve_polyfit_safeguarded( 2, degree, interp, npts2fit, ncols_sub, &( V[ 0 ] ), ndim, bs,
+                                                  &( ts[ 0 ] ), degree_out );
     }
     else
     {
@@ -1228,11 +1196,9 @@ void HiReconstruction::eval_vander_bivar_cmf( const int npts2fit, const double* 
     }*/
 }
 
-void HiReconstruction::polyfit3d_curve_get_coeff( const int nverts, const double* ngbcors,
-                                                  const double* ngbtangs, int degree,
-                                                  const bool interp, const bool safeguard,
-                                                  const int ncoords, double* coords,
-                                                  const int ncoeffs, double* coeffs,
+void HiReconstruction::polyfit3d_curve_get_coeff( const int nverts, const double* ngbcors, const double* ngbtangs,
+                                                  int degree, const bool interp, const bool safeguard,
+                                                  const int ncoords, double* coords, const int ncoeffs, double* coeffs,
                                                   int* degree_out )
 {
     if( !nverts ) { return; }
@@ -1262,7 +1228,7 @@ void HiReconstruction::polyfit3d_curve_get_coeff( const int nverts, const double
     }
     std::vector< double > us( npts2fit );  // double *us = new double[npts2fit];
     std::vector< double > bs( npts2fit * 3 );  // double *bs = new double[npts2fit*3];
-    double uu[ 3 ];
+    double                uu[ 3 ];
     for( int i = interp; i < nverts; ++i )
     {
         int k = i - interp;
@@ -1275,8 +1241,7 @@ void HiReconstruction::polyfit3d_curve_get_coeff( const int nverts, const double
 
     // step 3. copmute weights
     std::vector< double > ws( npts2fit );
-    int nzeros = compute_weights( npts2fit, 1, &( us[ 0 ] ), nverts, ngbtangs, degree, _MINEPS,
-                                  &( ws[ 0 ] ) );
+    int nzeros = compute_weights( npts2fit, 1, &( us[ 0 ] ), nverts, ngbtangs, degree, _MINEPS, &( ws[ 0 ] ) );
     assert( nzeros <= npts2fit );
 
     // step 4. adjust according to number of zero-weights
@@ -1320,8 +1285,8 @@ void HiReconstruction::polyfit3d_curve_get_coeff( const int nverts, const double
     }
 
     // step 5. fitting
-    eval_vander_univar_cmf( npts2fit, &( us[ 0 ] ), 3, &( bs[ 0 ] ), degree, &( ws[ 0 ] ), interp,
-                            safeguard, degree_out );
+    eval_vander_univar_cmf( npts2fit, &( us[ 0 ] ), 3, &( bs[ 0 ] ), degree, &( ws[ 0 ] ), interp, safeguard,
+                            degree_out );
     // step 6. write results to output pointers
     int ncoeffs_out_pvpd = *degree_out + 1;
     assert( ncoeffs >= 3 * ncoeffs_out_pvpd );
@@ -1335,9 +1300,8 @@ void HiReconstruction::polyfit3d_curve_get_coeff( const int nverts, const double
     }
 }
 
-void HiReconstruction::eval_vander_univar_cmf( const int npts2fit, const double* us, const int ndim,
-                                               double* bs, int degree, const double* ws,
-                                               const bool interp, const bool safeguard,
+void HiReconstruction::eval_vander_univar_cmf( const int npts2fit, const double* us, const int ndim, double* bs,
+                                               int degree, const double* ws, const bool interp, const bool safeguard,
                                                int* degree_out )
 {
     // step 1. determine degree of polynomials to fit according to number of points
@@ -1427,8 +1391,8 @@ void HiReconstruction::eval_vander_univar_cmf( const int npts2fit, const double*
     // backsolve
     if( safeguard )
     {
-        DGMSolver::backsolve_polyfit_safeguarded( 1, degree, interp, npts2fit, ncols, &( V[ 0 ] ),
-                                                  ndim, bs, ws, degree_out );
+        DGMSolver::backsolve_polyfit_safeguarded( 1, degree, interp, npts2fit, ncols, &( V[ 0 ] ), ndim, bs, ws,
+                                                  degree_out );
     }
     else
     {
@@ -1437,9 +1401,8 @@ void HiReconstruction::eval_vander_univar_cmf( const int npts2fit, const double*
     }
 }
 
-int HiReconstruction::compute_weights( const int nrows, const int ncols, const double* us,
-                                       const int nngbs, const double* ngbnrms, const int degree,
-                                       const double toler, double* ws )
+int HiReconstruction::compute_weights( const int nrows, const int ncols, const double* us, const int nngbs,
+                                       const double* ngbnrms, const int degree, const double toler, double* ws )
 {
     assert( nrows <= _MAXPNTS && ws );
     bool interp = false;
@@ -1469,8 +1432,7 @@ int HiReconstruction::compute_weights( const int nrows, const int ncols, const d
     for( int i = 0; i < nrows; ++i )
     {
         double costheta = DGMSolver::vec_innerprod( 3, ngbnrms, ngbnrms + 3 * ( i + interp ) );
-        if( costheta > toler )
-        { ws[ i ] = costheta * pow( ws[ i ] / h + epsilon, -1 * (double)degree / 2.0 ); }
+        if( costheta > toler ) { ws[ i ] = costheta * pow( ws[ i ] / h + epsilon, -1 * (double)degree / 2.0 ); }
         else
         {
             ws[ i ] = 0;

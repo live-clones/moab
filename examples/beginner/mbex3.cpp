@@ -67,8 +67,7 @@ int main( )
     // example, we want to create a single, 2x2x2 box. The construct_box
     // method will do this for us.
     moab::ScdBox* scdbox = NULL;
-    rval = scdint->construct_box( moab::HomCoord( 0, 0, 0 ), moab::HomCoord( 2, 2, 2 ),
-                                  vertex_coords, NUMVTX, scdbox );MB_CHK_SET_ERR( rval, "scdint->construct_box failed" );
+    rval = scdint->construct_box( moab::HomCoord( 0, 0, 0 ), moab::HomCoord( 2, 2, 2 ), vertex_coords, NUMVTX, scdbox );MB_CHK_SET_ERR( rval, "scdint->construct_box failed" );
 
     // moab::HomCoord is a little class that is used to represent a
     // coordinate in logical space. Above, we told MOAB that we want

@@ -77,22 +77,20 @@ class AWQualityMetric : public TMPQualityMetric
 
     MESQUITE_EXPORT virtual std::string get_name( ) const;
 
-    MESQUITE_EXPORT virtual bool evaluate_with_gradient( PatchData& pd, size_t handle,
-                                                         double&                  value,
+    MESQUITE_EXPORT virtual bool evaluate_with_gradient( PatchData& pd, size_t handle, double& value,
                                                          std::vector< size_t >&   indices,
-                                                         std::vector< Vector3D >& gradient,
-                                                         MsqError&                err );
+                                                         std::vector< Vector3D >& gradient, MsqError& err );
 
-    MESQUITE_EXPORT virtual bool evaluate_with_Hessian_diagonal(
-        PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
-        std::vector< Vector3D >& gradient, std::vector< SymMatrix3D >& Hessian_diagonal,
-        MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate_with_Hessian_diagonal( PatchData& pd, size_t handle, double& value,
+                                                                 std::vector< size_t >&      indices,
+                                                                 std::vector< Vector3D >&    gradient,
+                                                                 std::vector< SymMatrix3D >& Hessian_diagonal,
+                                                                 MsqError&                   err );
 
     MESQUITE_EXPORT virtual bool evaluate_with_Hessian( PatchData& pd, size_t handle, double& value,
                                                         std::vector< size_t >&   indices,
                                                         std::vector< Vector3D >& gradient,
-                                                        std::vector< Matrix3D >& Hessian,
-                                                        MsqError&                err );
+                                                        std::vector< Matrix3D >& Hessian, MsqError& err );
 
     AWMetric* get_target_metric( ) const
     {
@@ -104,9 +102,8 @@ class AWQualityMetric : public TMPQualityMetric
     }
 
   protected:
-    MESQUITE_EXPORT virtual bool evaluate_internal( PatchData& pd, size_t handle, double& value,
-                                                    size_t* indices, size_t& num_indices,
-                                                    MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate_internal( PatchData& pd, size_t handle, double& value, size_t* indices,
+                                                    size_t& num_indices, MsqError& err );
 
   private:
     AWMetric* targetMetric;

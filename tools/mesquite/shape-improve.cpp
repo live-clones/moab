@@ -17,10 +17,9 @@ int main( int argc, char* argv[] )
 
     CLArgs args( "msqshape", "Run Shape Improvement smoother for input mesh.",
                  "Read VTK file, smooth, and re-write file." );
-    args.double_flag(
-        'b', "Vtx Movement Beta",
-        "fraction of mean edge length to use as termination criterion on vertex movement",
-        &movement_beta );
+    args.double_flag( 'b', "Vtx Movement Beta",
+                      "fraction of mean edge length to use as termination criterion on vertex movement",
+                      &movement_beta );
     args.double_flag( 't', "Cpu Seconds", "time-out", &cpu_time );
 
     add_domain_args( args );

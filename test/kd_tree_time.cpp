@@ -10,8 +10,7 @@ using namespace moab;
 
 void usage( const char* argv0 )
 {
-    fprintf( stderr, "usage: %s [-t] [-d <result_file>] <tree_file> <point_file> [<count>]\n",
-             argv0 );
+    fprintf( stderr, "usage: %s [-t] [-d <result_file>] <tree_file> <point_file> [<count>]\n", argv0 );
     exit( 1 );
 }
 
@@ -149,11 +148,10 @@ int main( int argc, char* argv[] )
         else if( rfile )
         {
             if( query_triangles )
-                fprintf( rfile, "%f %f %f %f %f %f %lu\n", coords[ 0 ], coords[ 1 ], coords[ 2 ],
-                         pt[ 0 ], pt[ 1 ], pt[ 2 ], (unsigned long)leaf );
+                fprintf( rfile, "%f %f %f %f %f %f %lu\n", coords[ 0 ], coords[ 1 ], coords[ 2 ], pt[ 0 ], pt[ 1 ],
+                         pt[ 2 ], (unsigned long)leaf );
             else
-                fprintf( rfile, "%f %f %f %lu\n", coords[ 0 ], coords[ 1 ], coords[ 2 ],
-                         (unsigned long)leaf );
+                fprintf( rfile, "%f %f %f %lu\n", coords[ 0 ], coords[ 1 ], coords[ 2 ], (unsigned long)leaf );
         }
     }
     printf( "%0.2f seconds\n", ( clock( ) - t ) / (double)CLOCKS_PER_SEC );

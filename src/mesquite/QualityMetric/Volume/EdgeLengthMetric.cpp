@@ -70,8 +70,8 @@ bool EdgeLengthMetric::evaluate( PatchData& pd, size_t p_handle, double& value, 
 }
 
 bool EdgeLengthMetric::evaluate_with_gradient( PatchData& pd, size_t p_handle, double& value,
-                                               std::vector< size_t >&   indices,
-                                               std::vector< Vector3D >& gradient, MsqError& err )
+                                               std::vector< size_t >& indices, std::vector< Vector3D >& gradient,
+                                               MsqError& err )
 {
     MsqMeshEntity&  e = pd.element_by_index( elem( p_handle ) );
     const unsigned* vert_nums;

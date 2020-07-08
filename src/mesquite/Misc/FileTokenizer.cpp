@@ -34,8 +34,7 @@ namespace MBMesquite
 {
 
 FileTokenizer::FileTokenizer( std::FILE* file_ptr )
-    : filePtr( file_ptr ), nextToken( buffer ), bufferEnd( buffer ), lineNumber( 1 ),
-      lastChar( '\0' )
+    : filePtr( file_ptr ), nextToken( buffer ), bufferEnd( buffer ), lineNumber( 1 ), lastChar( '\0' )
 {
 }
 
@@ -146,8 +145,7 @@ bool FileTokenizer::get_double_internal( double& result, MsqError& err )
     if( token[ 0 ] && token[ 1 ] && token[ 0 ] == '0' && toupper( token[ 1 ] ) == 'X' )
     {
         MSQ_SETERR( err )
-        ( MsqError::PARSE_ERROR, "Syntax error at line %d: expected number, got \"%s\"",
-          line_number( ), token );
+        ( MsqError::PARSE_ERROR, "Syntax error at line %d: expected number, got \"%s\"", line_number( ), token );
         return false;
     }
 
@@ -160,8 +158,7 @@ bool FileTokenizer::get_double_internal( double& result, MsqError& err )
     if( *token_end )
     {
         MSQ_SETERR( err )
-        ( MsqError::PARSE_ERROR, "Syntax error at line %d: expected number, got \"%s\"",
-          line_number( ), token );
+        ( MsqError::PARSE_ERROR, "Syntax error at line %d: expected number, got \"%s\"", line_number( ), token );
         return false;
     }
 
@@ -199,8 +196,7 @@ bool FileTokenizer::get_long_int_internal( long& result, MsqError& err )
     if( *token_end )
     {
         MSQ_SETERR( err )
-        ( MsqError::PARSE_ERROR, "Syntax error at line %d: expected integer, got \"%s\"",
-          line_number( ), token );
+        ( MsqError::PARSE_ERROR, "Syntax error at line %d: expected integer, got \"%s\"", line_number( ), token );
         return false;
     }
 
@@ -264,8 +260,7 @@ bool FileTokenizer::get_boolean_internal( bool& result, MsqError& err )
     if( token[ 1 ] || ( token[ 0 ] != '0' && token[ 0 ] != '1' ) )
     {
         MSQ_SETERR( err )
-        ( MsqError::PARSE_ERROR, "Syntax error at line %d: expected 0 or 1, got \"%s\"",
-          line_number( ), token );
+        ( MsqError::PARSE_ERROR, "Syntax error at line %d: expected 0 or 1, got \"%s\"", line_number( ), token );
         return false;
     }
 
@@ -375,8 +370,7 @@ bool FileTokenizer::match_token( const char* str, MsqError& err )
 
     // Construct error message
     MSQ_SETERR( err )
-    ( MsqError::PARSE_ERROR, "Syntax error at line %d: expected \"%s\", got \"%s\"", line_number( ),
-      str, token );
+    ( MsqError::PARSE_ERROR, "Syntax error at line %d: expected \"%s\", got \"%s\"", line_number( ), str, token );
     return false;
 }  // namespace MBMesquite
 

@@ -130,8 +130,7 @@ int main( int argc, char* argv[] )
     CubitNode** node_array = new CubitNode*[ nodes_tot ];
     int         i;
     for( i = 0; i < nodes_tot; i++ )
-        node_array[ i ] =
-            new CubitNode( coords[ 3 * i ], coords[ 3 * i + 1 ], coords[ 3 * i + 2 ] );
+        node_array[ i ] = new CubitNode( coords[ 3 * i ], coords[ 3 * i + 1 ], coords[ 3 * i + 2 ] );
 
     int        nelem_tot = nelem * nelem * nelem;
     NodeHex**  hex_array = new NodeHex*[ nelem_tot ];
@@ -159,8 +158,8 @@ int main( int argc, char* argv[] )
     for( i = 0; i < nelem_tot; i++ )
     {
         double centroid[ 3 ] = { 0.0, 0.0, 0.0 };
-        hex_array[ i ]->hex_nodes( conn[ 0 ], conn[ 1 ], conn[ 2 ], conn[ 3 ], conn[ 4 ], conn[ 5 ],
-                                   conn[ 6 ], conn[ 7 ] );
+        hex_array[ i ]->hex_nodes( conn[ 0 ], conn[ 1 ], conn[ 2 ], conn[ 3 ], conn[ 4 ], conn[ 5 ], conn[ 6 ],
+                                   conn[ 7 ] );
         for( j = 0; j < 8; j++ )
         {
             centroid[ 0 ] += conn[ j ]->node_x( );
@@ -183,9 +182,8 @@ int main( int argc, char* argv[] )
 
     print_time( false, ttime3, utime, stime );
 
-    std::cout << "CUBIT: nelem, construct, e_to_v query, v_to_e query = " << nelem << ", "
-              << ttime1 - ttime0 << ", " << ttime2 - ttime1 << ", " << ttime3 - ttime2 << " seconds"
-              << std::endl;
+    std::cout << "CUBIT: nelem, construct, e_to_v query, v_to_e query = " << nelem << ", " << ttime1 - ttime0 << ", "
+              << ttime2 - ttime1 << ", " << ttime3 - ttime2 << " seconds" << std::endl;
     return 0;
 }
 
@@ -197,8 +195,7 @@ void print_time( const bool print_em, double& tot_time, double& utime, double& s
     stime = (double)r_usage.ru_stime.tv_sec + ( (double)r_usage.ru_stime.tv_usec / 1.e6 );
     tot_time = utime + stime;
     if( print_em )
-        std::cout << "User, system, total time = " << utime << ", " << stime << ", " << tot_time
-                  << std::endl;
+        std::cout << "User, system, total time = " << utime << ", " << stime << ", " << tot_time << std::endl;
 #ifndef LINUX
     std::cout << "Max resident set size = " << r_usage.ru_maxrss * 4096 << " bytes" << std::endl;
     std::cout << "Int resident set size = " << r_usage.ru_idrss << std::endl;

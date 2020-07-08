@@ -27,8 +27,7 @@
 #include "measure.hpp"
 using namespace moab;
 
-inline static double tet_volume( const CartVect& v0, const CartVect& v1, const CartVect& v2,
-                                 const CartVect& v3 )
+inline static double tet_volume( const CartVect& v0, const CartVect& v1, const CartVect& v2, const CartVect& v3 )
 {
     return 1. / 6. * ( ( ( v1 - v0 ) * ( v2 - v0 ) ) % ( v3 - v0 ) );
 }
@@ -48,8 +47,7 @@ double measure( moab::EntityType type, int num_vertices, const double* vertex_co
         case moab::MBEDGE:
             return ( coords[ 0 ] - coords[ 1 ] ).length( );
         case moab::MBTRI:
-            return 0.5 *
-                   ( ( coords[ 1 ] - coords[ 0 ] ) * ( coords[ 2 ] - coords[ 0 ] ) ).length( );
+            return 0.5 * ( ( coords[ 1 ] - coords[ 0 ] ) * ( coords[ 2 ] - coords[ 0 ] ) ).length( );
         case moab::MBQUAD:
             num_vertices = 4;
         case moab::MBPOLYGON: {

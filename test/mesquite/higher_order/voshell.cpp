@@ -76,15 +76,14 @@ struct Example
 
 int run_example( const Example& e, bool write_output_file );
 
-const Example examples[] = {
-    { 'H', &get_homogenious_example, "homogenous mesh (curvey surface) example" },
-    { 't', &get_part_example_tri, "part mesh with triangles" },
-    { 'q', &get_part_example_quad, "part mesh with quads" },
-    { 'c', &get_sphere_cube_example, "cube with subtracted hemisphere" },
-    { 'l', &get_cut_cube_example, "cube with slot removed" },
-    { 's', &get_sphere_cylinder_example, "cylinder with subtracted sphere" },
-    { 'x', &get_hex_3d_part_example, "rectangular prism with two cylindrical slots" } };
-const int num_examples = sizeof( examples ) / sizeof( examples[ 0 ] );
+const Example examples[] = { { 'H', &get_homogenious_example, "homogenous mesh (curvey surface) example" },
+                             { 't', &get_part_example_tri, "part mesh with triangles" },
+                             { 'q', &get_part_example_quad, "part mesh with quads" },
+                             { 'c', &get_sphere_cube_example, "cube with subtracted hemisphere" },
+                             { 'l', &get_cut_cube_example, "cube with slot removed" },
+                             { 's', &get_sphere_cylinder_example, "cylinder with subtracted sphere" },
+                             { 'x', &get_hex_3d_part_example, "rectangular prism with two cylindrical slots" } };
+const int     num_examples = sizeof( examples ) / sizeof( examples[ 0 ] );
 
 void usage( const char* argv0, bool help = false )
 {
@@ -170,8 +169,7 @@ int run_example( const Example& e, bool write_output_file )
     std::cout << std::endl
               << "--------------------------------------------------------------------" << std::endl
               << e.desc << std::endl
-              << "--------------------------------------------------------------------"
-              << std::endl;
+              << "--------------------------------------------------------------------" << std::endl;
 
     std::string name = e.func( domain, mesh, err );
     if( MSQ_CHKERR( err ) ) return 2;
@@ -212,8 +210,7 @@ int run_example( const Example& e, bool write_output_file )
     return smoother.quality_assessor( ).invalid_elements( );
 }
 
-void get_planar_example( const char* filename, DomainClassifier& geom, MeshImpl& mesh,
-                         MsqError& err )
+void get_planar_example( const char* filename, DomainClassifier& geom, MeshImpl& mesh, MsqError& err )
 {
     static PlanarDomain z( PlanarDomain::XY );
     mesh.read_vtk( filename, err );MSQ_ERRRTN( err );
@@ -298,8 +295,7 @@ std::string get_sphere_cube_example( DomainClassifier& geom, MeshImpl& mesh, Msq
     MeshDomain* base_domains[] = {
         &pt_tfl, &pt_tfr, &pt_tbl, &pt_tbr, &pt_bfl, &pt_bfr, &pt_bbl, &pt_bbr,
 
-        &ln_tf, &lin_tb, &ln_tl, &lin_tr, &ln_bf, &lin_bb, &ln_bl, &lin_br, &ln_lf, &lin_rf, &ln_lb,
-        &lin_rb,
+        &ln_tf, &lin_tb, &ln_tl, &lin_tr, &ln_bf, &lin_bb, &ln_bl, &lin_br, &ln_lf, &lin_rf, &ln_lb, &lin_rb,
 
         //  &cr_tf, &cr_tn,
         //  &cr_bf, &cr_bn,
@@ -320,8 +316,7 @@ std::string get_sphere_cube_example( DomainClassifier& geom, MeshImpl& mesh, Msq
 
     mesh.read_vtk( filename.c_str( ), err );
     MSQ_ERRZERO( err );
-    DomainClassifier::classify_skin_geometrically( geom, &mesh, 0.1, base_domains, dim_array, NDOM,
-                                                   err );
+    DomainClassifier::classify_skin_geometrically( geom, &mesh, 0.1, base_domains, dim_array, NDOM, err );
     MSQ_ERRZERO( err );
     mesh.set_skin_flags( false, false, true, err );
     MSQ_ERRZERO( err );
@@ -378,14 +373,13 @@ std::string get_cut_cube_example( DomainClassifier& geom, MeshImpl& mesh, MsqErr
     static CylinderDomain  cy( 1.0, vec_k, vec_bs );
     static SphericalDomain sp_t( vec_ts, 1.0 ), sp_b( vec_bs, 1.0 );
 
-    MeshDomain* base_domains[] = {
-        &pt_tfl, &pt_tfr, &pt_tbl, &pt_tbr, &pt_bfl, &pt_bfr, &pt_bbl, &pt_bbr,
+    MeshDomain* base_domains[] = { &pt_tfl, &pt_tfr, &pt_tbl, &pt_tbr, &pt_bfl, &pt_bfr, &pt_bbl, &pt_bbr,
 
-        &ln_tf,  &lin_tb, &ln_tl,  &lin_tr, &ln_bf,  &lin_bb, &ln_bl,  &lin_br, &ln_lf,
-        &lin_rf, &ln_lb,  &lin_rb, &cr_tf,  &cr_tn,  &cr_bf,  &cr_bn,
+                                   &ln_tf,  &lin_tb, &ln_tl,  &lin_tr, &ln_bf,  &lin_bb, &ln_bl,  &lin_br, &ln_lf,
+                                   &lin_rf, &ln_lb,  &lin_rb, &cr_tf,  &cr_tn,  &cr_bf,  &cr_bn,
 
-        &sf_i,   &sf_ni,  &sf_j,   &sf_nj,  &sf_k,   &sf_nk,  &cy,     &sp_t,   &sp_b };
-    const int NDOM = sizeof( base_domains ) / sizeof( base_domains[ 0 ] );
+                                   &sf_i,   &sf_ni,  &sf_j,   &sf_nj,  &sf_k,   &sf_nk,  &cy,     &sp_t,   &sp_b };
+    const int   NDOM = sizeof( base_domains ) / sizeof( base_domains[ 0 ] );
 
     int dim_array[ NDOM ] = { 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1,
                               1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2 };
@@ -394,8 +388,7 @@ std::string get_cut_cube_example( DomainClassifier& geom, MeshImpl& mesh, MsqErr
 
     mesh.read_vtk( filename.c_str( ), err );
     MSQ_ERRZERO( err );
-    DomainClassifier::classify_skin_geometrically( geom, &mesh, 0.1, base_domains, dim_array, NDOM,
-                                                   err );
+    DomainClassifier::classify_skin_geometrically( geom, &mesh, 0.1, base_domains, dim_array, NDOM, err );
     MSQ_ERRZERO( err );
     mesh.set_skin_flags( false, false, true, err );
     MSQ_ERRZERO( err );
@@ -434,8 +427,7 @@ std::string get_sphere_cylinder_example( DomainClassifier& geom, MeshImpl& mesh,
 
     mesh.read_vtk( filename.c_str( ), err );
     MSQ_ERRZERO( err );
-    DomainClassifier::classify_skin_geometrically( geom, &mesh, 0.001, base_domains, dim_array,
-                                                   NDOM, err );
+    DomainClassifier::classify_skin_geometrically( geom, &mesh, 0.001, base_domains, dim_array, NDOM, err );
     MSQ_ERRZERO( err );
     mesh.set_skin_flags( false, false, true, err );
     MSQ_ERRZERO( err );
@@ -541,8 +533,7 @@ std::string get_hex_3d_part_example( DomainClassifier& geom, MeshImpl& mesh, Msq
 
                                          &l00, &l01, &l02, &l03,
 
-                                         &l04, &l05, &l06, &l07, &l08, &l09, &l10, &l11,
-                                         &l12, &l13, &l14, &l15,
+                                         &l04, &l05, &l06, &l07, &l08, &l09, &l10, &l11, &l12, &l13, &l14, &l15,
 
                                          &C00, &C01, &P00, &P01, &P02, &P03, &P04, &P05 };
 
@@ -553,8 +544,7 @@ std::string get_hex_3d_part_example( DomainClassifier& geom, MeshImpl& mesh, Msq
 
     mesh.read_vtk( filename.c_str( ), err );
     MSQ_ERRZERO( err );
-    DomainClassifier::classify_skin_geometrically( geom, &mesh, 0.1, base_domains, dim_array, NDOM,
-                                                   err );
+    DomainClassifier::classify_skin_geometrically( geom, &mesh, 0.1, base_domains, dim_array, NDOM, err );
     MSQ_ERRZERO( err );
     mesh.set_skin_flags( false, false, true, err );
     MSQ_ERRZERO( err );

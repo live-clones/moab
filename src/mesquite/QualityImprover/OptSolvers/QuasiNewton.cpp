@@ -55,10 +55,7 @@ PatchSet* QuasiNewton::get_patch_set( )
     return PatchSetUser::get_patch_set( );
 }
 
-QuasiNewton::QuasiNewton( ObjectiveFunction* of )
-    : VertexMover( of ), PatchSetUser( true ), mMemento( 0 )
-{
-}
+QuasiNewton::QuasiNewton( ObjectiveFunction* of ) : VertexMover( of ), PatchSetUser( true ), mMemento( 0 ) {}
 
 QuasiNewton::~QuasiNewton( )
 {
@@ -242,8 +239,7 @@ void QuasiNewton::optimize_vertex_positions( PatchData& pd, MsqError& err )
         if( err.error_code( ) == err.BARRIER_VIOLATED )
             err.clear( );  // barrier violated does not represent an actual error here
         MSQ_ERRRTN( err );
-        if( !valid ||
-            ( obj - objn < -alpha * beta - epsilon && length( &( v[ QNVEC ][ 0 ] ), nn ) >= tol1 ) )
+        if( !valid || ( obj - objn < -alpha * beta - epsilon && length( &( v[ QNVEC ][ 0 ] ), nn ) >= tol1 ) )
         {
 
             if( !valid )  // function not defined at trial point

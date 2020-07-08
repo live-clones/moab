@@ -69,8 +69,8 @@ namespace MBMesquite
 const Settings PatchData::defaultSettings;
 
 PatchData::PatchData( )
-    : myMesh( 0 ), myDomain( 0 ), numFreeVertices( 0 ), numSlaveVertices( 0 ),
-      haveComputedInfos( 0 ), dataList( 0 ), mSettings( &defaultSettings )
+    : myMesh( 0 ), myDomain( 0 ), numFreeVertices( 0 ), numSlaveVertices( 0 ), haveComputedInfos( 0 ), dataList( 0 ),
+      mSettings( &defaultSettings )
 {
 }
 
@@ -123,8 +123,7 @@ void PatchData::get_minmax_edge_length( double& min, double& max ) const
         {
             const unsigned* edge = TopologyInfo::edge_vertices( elem.get_element_type( ), e );
             const double    len_sqr =
-                ( vertex_by_index( conn[ edge[ 0 ] ] ) - vertex_by_index( conn[ edge[ 1 ] ] ) )
-                    .length_squared( );
+                ( vertex_by_index( conn[ edge[ 0 ] ] ) - vertex_by_index( conn[ edge[ 1 ] ] ) ).length_squared( );
             if( len_sqr < min ) min = len_sqr;
             if( len_sqr > max ) max = len_sqr;
         }
@@ -346,8 +345,7 @@ void PatchData::reorder( )
    \param step_size will multiply the moving direction given in dk
    for each vertex.
   */
-void PatchData::move_free_vertices_constrained( Vector3D dk[], size_t nb_vtx, double step_size,
-                                                MsqError& err )
+void PatchData::move_free_vertices_constrained( Vector3D dk[], size_t nb_vtx, double step_size, MsqError& err )
 {
     if( nb_vtx != num_free_vertices( ) )
     {
@@ -384,8 +382,8 @@ in the PatchData; the PatchDataVerticesMemento is unchanged.
    \param step_size will multiply the moving direction given in dk
    for each vertex.
   */
-void PatchData::set_free_vertices_constrained( PatchDataVerticesMemento* memento, Vector3D dk[],
-                                               size_t nb_vtx, double step_size, MsqError& err )
+void PatchData::set_free_vertices_constrained( PatchDataVerticesMemento* memento, Vector3D dk[], size_t nb_vtx,
+                                               double step_size, MsqError& err )
 {
     if( memento->originator != this || nb_vtx != num_free_vertices( ) )
     {
@@ -459,8 +457,7 @@ void PatchData::project_gradient( std::vector< Vector3D >& gradient, MsqError& e
             const size_t* elems = get_vertex_element_adjacencies( i, num_elem, err );MSQ_ERRRTN( err );
             for( j = 0; j < num_elem; ++j )
             {
-                if( 2 ==
-                    TopologyInfo::dimension( element_by_index( elems[ j ] ).get_element_type( ) ) )
+                if( 2 == TopologyInfo::dimension( element_by_index( elems[ j ] ).get_element_type( ) ) )
                 {
                     norm = vertexArray[ i ];
                     get_domain( )->element_normal_at( elementHandlesArray[ elems[ j ] ], norm );
@@ -523,8 +520,7 @@ void PatchData::set_all_vertices_soft_free( MsqError& /*err*/ )
     \param coords This vector will have the coordinates appended to it.
     If necessary, make sure to clear the vector before calling the function.
   */
-void PatchData::get_element_vertex_coordinates( size_t elem_index, std::vector< Vector3D >& coords,
-                                                MsqError& /*err*/ )
+void PatchData::get_element_vertex_coordinates( size_t elem_index, std::vector< Vector3D >& coords, MsqError& /*err*/ )
 {
     // Check index
     if( elem_index >= num_elements( ) ) return;
@@ -545,8 +541,7 @@ void PatchData::get_element_vertex_coordinates( size_t elem_index, std::vector< 
     MsqMeshEntity::get_vertex_index_array() if you don't need
     to fill an STL vector.
 */
-void PatchData::get_element_vertex_indices( size_t                 elem_index,
-                                            std::vector< size_t >& vertex_indices,
+void PatchData::get_element_vertex_indices( size_t elem_index, std::vector< size_t >& vertex_indices,
                                             MsqError& /*err*/ )
 {
     // Ask the element for its vertex indices
@@ -554,8 +549,7 @@ void PatchData::get_element_vertex_indices( size_t                 elem_index,
     elementArray[ elem_index ].get_vertex_indices( vertex_indices );
 }
 
-void PatchData::get_vertex_element_indices( size_t                 vertex_index,
-                                            std::vector< size_t >& elem_indices, MsqError& err )
+void PatchData::get_vertex_element_indices( size_t vertex_index, std::vector< size_t >& elem_indices, MsqError& err )
 {
     size_t        count;
     const size_t* ptr;
@@ -580,8 +574,7 @@ void PatchData::get_vertex_element_indices( size_t vertex_index, unsigned elemen
     }
 }
 
-const size_t* PatchData::get_vertex_element_adjacencies( size_t vertex_index, size_t& array_len_out,
-                                                         MsqError& )
+const size_t* PatchData::get_vertex_element_adjacencies( size_t vertex_index, size_t& array_len_out, MsqError& )
 {
     // Make sure we've got the data
     if( vertAdjacencyArray.empty( ) ) { generate_vertex_to_element_data( ); }
@@ -600,9 +593,8 @@ const size_t* PatchData::get_vertex_element_adjacencies( size_t vertex_index, si
     the vector.
 
 */
-void PatchData::get_adjacent_vertex_indices( size_t                 vertex_index,
-                                             std::vector< size_t >& vert_indices,
-                                             MsqError&              err ) const
+void PatchData::get_adjacent_vertex_indices( size_t vertex_index, std::vector< size_t >& vert_indices,
+                                             MsqError& err ) const
 {
     bitMap.clear( );
     bitMap.resize( num_nodes( ), false );
@@ -675,8 +667,7 @@ void PatchData::get_adjacent_vertex_indices( size_t                 vertex_index
     The adj_ents vector is cleared at the beginning of the call.
 
 */
-void PatchData::get_adjacent_entities_via_n_dim( int n, size_t ent_ind,
-                                                 std::vector< size_t >& adj_ents, MsqError& err )
+void PatchData::get_adjacent_entities_via_n_dim( int n, size_t ent_ind, std::vector< size_t >& adj_ents, MsqError& err )
 {
     // reset the vector
     adj_ents.clear( );
@@ -771,8 +762,7 @@ void PatchData::update_mesh( MsqError& err, const TagHandle* tag )
     {
         for( size_t i = 0; i < not_fixed; ++i )
         {
-            myMesh->tag_set_vertex_data( *tag, 1, &vertexHandlesArray[ i ],
-                                         vertexArray[ i ].to_array( ), err );MSQ_ERRRTN( err );
+            myMesh->tag_set_vertex_data( *tag, 1, &vertexHandlesArray[ i ], vertexArray[ i ].to_array( ), err );MSQ_ERRRTN( err );
         }
     }
     else
@@ -858,8 +848,7 @@ void PatchData::update_slave_node_coordinates( MsqError& err )
         if( vertex_by_index( i ).is_flag_set( MsqVertex::MSQ_MARK ) )
         {
             MSQ_SETERR( err )
-            ( MsqError::INVALID_MESH,
-              "No element with mapping function adjacent to slave vertex %lu (%lu)\n",
+            ( MsqError::INVALID_MESH, "No element with mapping function adjacent to slave vertex %lu (%lu)\n",
               (unsigned long)i, (unsigned long)get_vertex_handles_array( )[ i ] );
             // make sure we finish with all marks cleared
             vertexArray[ i ].flags( ) &= ~MsqVertex::MSQ_MARK;
@@ -876,8 +865,7 @@ void PatchData::update_slave_node_coordinates( MsqError& err )
     }
 }
 
-void PatchData::update_slave_node_coordinates( const size_t* elements, size_t num_elems,
-                                               MsqError& err )
+void PatchData::update_slave_node_coordinates( const size_t* elements, size_t num_elems, MsqError& err )
 {
     // update slave vertices
     if( 0 == num_slave_vertices( ) ) return;
@@ -1018,8 +1006,8 @@ void PatchData::generate_vertex_to_element_data( )
     vertAdjacencyOffsets[ num_nodes( ) ] = num_vert_uses;
 }
 
-void PatchData::get_subpatch( size_t center_vertex_index, unsigned num_adj_elem_layers,
-                              PatchData& subpatch, MsqError& err )
+void PatchData::get_subpatch( size_t center_vertex_index, unsigned num_adj_elem_layers, PatchData& subpatch,
+                              MsqError& err )
 {
     // Make sure we're in range
     if( center_vertex_index >= num_free_vertices( ) )
@@ -1044,8 +1032,7 @@ void PatchData::get_subpatch( size_t center_vertex_index, unsigned num_adj_elem_
         for( unsigned v = 0; v < vertices.size( ); ++v )
         {
             size_t        num_elem;
-            const size_t* vert_elems =
-                get_vertex_element_adjacencies( vertices[ v ], num_elem, err );MSQ_ERRRTN( err );
+            const size_t* vert_elems = get_vertex_element_adjacencies( vertices[ v ], num_elem, err );MSQ_ERRRTN( err );
             elements.insert( elements.end( ), vert_elems, vert_elems + num_elem );
         }
         std::sort( elements.begin( ), elements.end( ) );
@@ -1086,8 +1073,7 @@ void PatchData::get_subpatch( size_t center_vertex_index, unsigned num_adj_elem_
         for( unsigned j = 0; j < elem.node_count( ); ++j )
         {
             subpatch.elemConnectivityArray[ curr_offset++ ] =
-                std::lower_bound( vertices.begin( ), vertices.end( ), verts[ j ] ) -
-                vertices.begin( );
+                std::lower_bound( vertices.begin( ), vertices.end( ), verts[ j ] ) - vertices.begin( );
         }
     }
     offsets[ elements.size( ) ] = curr_offset;
@@ -1105,11 +1091,9 @@ void PatchData::get_subpatch( size_t center_vertex_index, unsigned num_adj_elem_
     for( size_t pi = 0; pi < vertices.size( ); ++pi )
     {
         if( vertices[ pi ] == center_vertex_index )
-            subpatch.byteArray[ pi ] =
-                vertexArray[ vertices[ pi ] ].get_flags( ) & ~MsqVertex::MSQ_PATCH_FIXED;
+            subpatch.byteArray[ pi ] = vertexArray[ vertices[ pi ] ].get_flags( ) & ~MsqVertex::MSQ_PATCH_FIXED;
         else
-            subpatch.byteArray[ pi ] =
-                vertexArray[ vertices[ pi ] ].get_flags( ) | MsqVertex::MSQ_PATCH_FIXED;
+            subpatch.byteArray[ pi ] = vertexArray[ vertices[ pi ] ].get_flags( ) | MsqVertex::MSQ_PATCH_FIXED;
     }
 
     // Re-order vertices and initialize other data in subpatch
@@ -1132,8 +1116,7 @@ void PatchData::get_subpatch( size_t center_vertex_index, unsigned num_adj_elem_
     subpatch.myDomain = myDomain;
     subpatch.mSettings = mSettings;
 
-    notify_sub_patch( subpatch, arrptr( vertices ), elements.empty( ) ? 0 : arrptr( elements ),
-                      err );MSQ_CHKERR( err );
+    notify_sub_patch( subpatch, arrptr( vertices ), elements.empty( ) ? 0 : arrptr( elements ), err );MSQ_CHKERR( err );
 }
 
 //! Adjust the position of the specified vertex so that it
@@ -1145,28 +1128,22 @@ void PatchData::snap_vertex_to_domain( size_t vertex_index, MsqError& err )
     {
         // if not doing normal caching or vertex is not on a single surface
         if( normalData.empty( ) )
-        {
-            get_domain( )->snap_to( vertexHandlesArray[ vertex_index ],
-                                    vertexArray[ vertex_index ] );
-        }
+        { get_domain( )->snap_to( vertexHandlesArray[ vertex_index ], vertexArray[ vertex_index ] ); }
         // entire domain is 2-D (all vertices have a single normal)
         else if( vertexNormalIndices.empty( ) )
         {
-            get_domain( )->closest_point(
-                vertexHandlesArray[ vertex_index ], Vector3D( vertexArray[ vertex_index ] ),
-                vertexArray[ vertex_index ], normalData[ vertex_index ], err );MSQ_ERRRTN( err );
+            get_domain( )->closest_point( vertexHandlesArray[ vertex_index ], Vector3D( vertexArray[ vertex_index ] ),
+                                          vertexArray[ vertex_index ], normalData[ vertex_index ], err );MSQ_ERRRTN( err );
         }
         else if( vertexNormalIndices[ vertex_index ] < normalData.size( ) )
         {  // vertex has a unique normal
-            get_domain( )->closest_point( vertexHandlesArray[ vertex_index ],
-                                          Vector3D( vertexArray[ vertex_index ] ),
+            get_domain( )->closest_point( vertexHandlesArray[ vertex_index ], Vector3D( vertexArray[ vertex_index ] ),
                                           vertexArray[ vertex_index ],
                                           normalData[ vertexNormalIndices[ vertex_index ] ], err );MSQ_ERRRTN( err );
         }
         else
         {  // vertex has multiple normals
-            get_domain( )->snap_to( vertexHandlesArray[ vertex_index ],
-                                    vertexArray[ vertex_index ] );
+            get_domain( )->snap_to( vertexHandlesArray[ vertex_index ], vertexArray[ vertex_index ] );
         }
     }
 }
@@ -1184,8 +1161,7 @@ void PatchData::update_cached_normals( MsqError& err )
 
     // Determine which vertices lie on surfaces
     vertexDomainDOF.resize( num_nodes( ) );
-    domain->domain_DoF( arrptr( vertexHandlesArray ), arrptr( vertexDomainDOF ), num_nodes( ),
-                        err );MSQ_ERRRTN( err );
+    domain->domain_DoF( arrptr( vertexHandlesArray ), arrptr( vertexDomainDOF ), num_nodes( ), err );MSQ_ERRRTN( err );
 
     // Count how many vertices have a single normal
     // Sun doesn't support partial template specialization, so can't use std::count
@@ -1202,8 +1178,7 @@ void PatchData::update_cached_normals( MsqError& err )
     if( n == num_nodes( ) )
     {
         std::copy( vertexArray.begin( ), vertexArray.end( ), normalData.begin( ) );
-        domain->vertex_normal_at( arrptr( vertexHandlesArray ), arrptr( normalData ), num_nodes( ),
-                                  err );
+        domain->vertex_normal_at( arrptr( vertexHandlesArray ), arrptr( normalData ), num_nodes( ), err );
         vertexNormalIndices.clear( );
         vertexDomainDOF.clear( );MSQ_ERRRTN( err );
     }
@@ -1229,18 +1204,17 @@ void PatchData::update_cached_normals( MsqError& err )
     }
 }
 
-void PatchData::get_domain_normal_at_element( size_t elem_index, Vector3D& surf_norm,
-                                              MsqError& err )
+void PatchData::get_domain_normal_at_element( size_t elem_index, Vector3D& surf_norm, MsqError& err )
 {
     // check if element as a mid-face node
     const MsqMeshEntity& elem = element_by_index( elem_index );
-    const int            mid_node = TopologyInfo::higher_order_from_side( elem.get_element_type( ),
-                                                               elem.node_count( ), 2, 0, err );MSQ_ERRRTN( err );
+    const int            mid_node =
+        TopologyInfo::higher_order_from_side( elem.get_element_type( ), elem.node_count( ), 2, 0, err );MSQ_ERRRTN( err );
     // if we have the mid-element vertex, get cached normal for it
     if( mid_node > 0 )
     {
-        get_domain_normal_at_vertex( elem.get_vertex_index_array( )[ mid_node ],
-                                     elementHandlesArray[ elem_index ], surf_norm, err );MSQ_ERRRTN( err );
+        get_domain_normal_at_vertex( elem.get_vertex_index_array( )[ mid_node ], elementHandlesArray[ elem_index ],
+                                     surf_norm, err );MSQ_ERRRTN( err );
     }
     // otherwise query domain for normal at element centroid
     else if( domain_set( ) )
@@ -1253,24 +1227,22 @@ void PatchData::get_domain_normal_at_element( size_t elem_index, Vector3D& surf_
         MSQ_SETERR( err )( "No domain constraint set.", MsqError::INVALID_STATE );
 }
 
-void PatchData::get_domain_normal_at_mid_edge( size_t elem_index, unsigned edge_num,
-                                               Vector3D& normal, MsqError& err )
+void PatchData::get_domain_normal_at_mid_edge( size_t elem_index, unsigned edge_num, Vector3D& normal, MsqError& err )
 {
     // check if element as a mid-edge node
     const MsqMeshEntity& elem = element_by_index( elem_index );
-    const int            mid_node = TopologyInfo::higher_order_from_side(
-        elem.get_element_type( ), elem.node_count( ), 1, edge_num, err );MSQ_ERRRTN( err );
+    const int            mid_node =
+        TopologyInfo::higher_order_from_side( elem.get_element_type( ), elem.node_count( ), 1, edge_num, err );MSQ_ERRRTN( err );
     // if we have the mid-edge vertex, get cached normal for it
     if( mid_node > 0 )
     {
-        get_domain_normal_at_vertex( elem.get_vertex_index_array( )[ mid_node ],
-                                     elementHandlesArray[ elem_index ], normal, err );MSQ_ERRRTN( err );
+        get_domain_normal_at_vertex( elem.get_vertex_index_array( )[ mid_node ], elementHandlesArray[ elem_index ],
+                                     normal, err );MSQ_ERRRTN( err );
     }
     // otherwise query domain for normal at center of edge
     else if( domain_set( ) )
     {
-        const unsigned* edge =
-            TopologyInfo::edge_vertices( elem.get_element_type( ), edge_num, err );MSQ_ERRRTN( err );
+        const unsigned* edge = TopologyInfo::edge_vertices( elem.get_element_type( ), edge_num, err );MSQ_ERRRTN( err );
         const MsqVertex& v1 = vertex_by_index( elem.get_vertex_index_array( )[ edge[ 0 ] ] );
         const MsqVertex& v2 = vertex_by_index( elem.get_vertex_index_array( )[ edge[ 1 ] ] );
         normal = 0.5 * ( v1 + v2 );
@@ -1283,8 +1255,7 @@ void PatchData::get_domain_normal_at_mid_edge( size_t elem_index, unsigned edge_
     }
 }
 
-void PatchData::get_domain_normals_at_corners( size_t elem_index, Vector3D normals_out[],
-                                               MsqError& err )
+void PatchData::get_domain_normals_at_corners( size_t elem_index, Vector3D normals_out[], MsqError& err )
 {
     if( !domain_set( ) )
     {
@@ -1323,8 +1294,8 @@ void PatchData::get_domain_normals_at_corners( size_t elem_index, Vector3D norma
     }
 }
 
-void PatchData::get_domain_normal_at_vertex( size_t vert_index, Mesh::EntityHandle handle,
-                                             Vector3D& normal, MsqError& err )
+void PatchData::get_domain_normal_at_vertex( size_t vert_index, Mesh::EntityHandle handle, Vector3D& normal,
+                                             MsqError& err )
 {
     if( !domain_set( ) )
     {
@@ -1349,8 +1320,7 @@ void PatchData::get_domain_normal_at_vertex( size_t vert_index, Mesh::EntityHand
     }
 }
 
-void PatchData::get_domain_normal_at_corner( size_t elem_index, unsigned corner, Vector3D& normal,
-                                             MsqError& err )
+void PatchData::get_domain_normal_at_corner( size_t elem_index, unsigned corner, Vector3D& normal, MsqError& err )
 {
     assert( elem_index < elementArray.size( ) );
     if( 2 != TopologyInfo::dimension( elementArray[ elem_index ].get_element_type( ) ) )
@@ -1361,8 +1331,7 @@ void PatchData::get_domain_normal_at_corner( size_t elem_index, unsigned corner,
 
     MsqMeshEntity&      elem = elementArray[ elem_index ];
     const size_t* const vertex_indices = elem.get_vertex_index_array( );
-    get_domain_normal_at_vertex( vertex_indices[ corner ], elementHandlesArray[ elem_index ],
-                                 normal, err );MSQ_CHKERR( err );
+    get_domain_normal_at_vertex( vertex_indices[ corner ], elementHandlesArray[ elem_index ], normal, err );MSQ_CHKERR( err );
 }
 
 void PatchData::set_mesh( Mesh* ms )
@@ -1457,9 +1426,9 @@ ostream& operator<<( ostream& stream, const PatchData& pd )
            << " " << setfill( ' ' ) << "-------------" << std::endl;
     for( i = 0; i < pd.num_nodes( ); ++i )
     {
-        stream << setw( iw ) << i << " " << setw( hw ) << pd.vertexHandlesArray[ i ] << " "
-               << setw( cw ) << pd.vertexArray[ i ].x( ) << "," << setw( cw )
-               << pd.vertexArray[ i ].y( ) << "," << setw( cw ) << pd.vertexArray[ i ].z( ) << " ";
+        stream << setw( iw ) << i << " " << setw( hw ) << pd.vertexHandlesArray[ i ] << " " << setw( cw )
+               << pd.vertexArray[ i ].x( ) << "," << setw( cw ) << pd.vertexArray[ i ].y( ) << "," << setw( cw )
+               << pd.vertexArray[ i ].z( ) << " ";
         if( pd.vertexArray[ i ].is_flag_set( MsqVertex::MSQ_CULLED ) )
             stream << "C";
         else
@@ -1506,10 +1475,9 @@ ostream& operator<<( ostream& stream, const PatchData& pd )
     for( i = 0; i < pd.num_elements( ); ++i )
     {
         EntityTopology type = pd.elementArray[ i ].get_element_type( );
-        stream << setw( iw ) << i << " " << setw( hw ) << pd.elementHandlesArray[ i ] << " "
-               << setw( tw ) << TopologyInfo::short_name( type ) << left << setw( 2 )
-               << pd.elementArray[ i ].node_count( ) << internal << " " << setw( iw )
-               << pd.elementArray[ i ].get_vertex_index_array( )[ 0 ];
+        stream << setw( iw ) << i << " " << setw( hw ) << pd.elementHandlesArray[ i ] << " " << setw( tw )
+               << TopologyInfo::short_name( type ) << left << setw( 2 ) << pd.elementArray[ i ].node_count( )
+               << internal << " " << setw( iw ) << pd.elementArray[ i ].get_vertex_index_array( )[ 0 ];
         for( size_t j = 1; j < pd.elementArray[ i ].node_count( ); ++j )
             stream << "," << setw( iw ) << pd.elementArray[ i ].get_vertex_index_array( )[ j ];
         stream << endl;
@@ -1526,23 +1494,17 @@ ostream& operator<<( ostream& stream, const PatchData& pd )
     {
         stream << "ComputedInfos:" << endl;
         if( pd.have_computed_info( PatchData::MIN_UNSIGNED_AREA ) )
-            stream << "\t MIN_UNSINGED_AREA = " << pd.computedInfos[ PatchData::MIN_UNSIGNED_AREA ]
-                   << endl;
+            stream << "\t MIN_UNSINGED_AREA = " << pd.computedInfos[ PatchData::MIN_UNSIGNED_AREA ] << endl;
         if( pd.have_computed_info( PatchData::MAX_UNSIGNED_AREA ) )
-            stream << "\t MAX_UNSIGNED_AREA = " << pd.computedInfos[ PatchData::MAX_UNSIGNED_AREA ]
-                   << endl;
+            stream << "\t MAX_UNSIGNED_AREA = " << pd.computedInfos[ PatchData::MAX_UNSIGNED_AREA ] << endl;
         if( pd.have_computed_info( PatchData::MIN_EDGE_LENGTH ) )
-            stream << "\t MIN_EDGE_LENGTH = " << pd.computedInfos[ PatchData::MIN_EDGE_LENGTH ]
-                   << endl;
+            stream << "\t MIN_EDGE_LENGTH = " << pd.computedInfos[ PatchData::MIN_EDGE_LENGTH ] << endl;
         if( pd.have_computed_info( PatchData::MAX_EDGE_LENGTH ) )
-            stream << "\t MAX_EDGE_LENGTH = " << pd.computedInfos[ PatchData::MAX_EDGE_LENGTH ]
-                   << endl;
+            stream << "\t MAX_EDGE_LENGTH = " << pd.computedInfos[ PatchData::MAX_EDGE_LENGTH ] << endl;
         if( pd.have_computed_info( PatchData::MINMAX_SIGNED_DET2D ) )
-            stream << "\t MINMAX_SIGNED_DET2D = "
-                   << pd.computedInfos[ PatchData::MINMAX_SIGNED_DET2D ] << endl;
+            stream << "\t MINMAX_SIGNED_DET2D = " << pd.computedInfos[ PatchData::MINMAX_SIGNED_DET2D ] << endl;
         if( pd.have_computed_info( PatchData::MINMAX_SIGNED_DET3D ) )
-            stream << "\t MINMAX_SIGNED_DET3D = "
-                   << pd.computedInfos[ PatchData::MINMAX_SIGNED_DET3D ] << endl;
+            stream << "\t MINMAX_SIGNED_DET3D = " << pd.computedInfos[ PatchData::MINMAX_SIGNED_DET3D ] << endl;
         if( pd.have_computed_info( PatchData::AVERAGE_DET3D ) )
             stream << "\t AVERAGE_DET3D = " << pd.computedInfos[ PatchData::AVERAGE_DET3D ] << endl;
     }
@@ -1555,8 +1517,8 @@ void print_patch_data( const PatchData& pd )
     std::cout << pd << std::endl;
 }
 
-void PatchData::enslave_higher_order_nodes( const size_t*  elem_offset_array,
-                                            unsigned char* vertex_flags, MsqError& ) const
+void PatchData::enslave_higher_order_nodes( const size_t* elem_offset_array, unsigned char* vertex_flags,
+                                            MsqError& ) const
 {
     for( size_t i = 0; i < elementArray.size( ); ++i )
     {
@@ -1639,8 +1601,7 @@ void PatchData::initialize_data( size_t* elem_offset_array, unsigned char* verte
     numSlaveVertices = 0;
     for( i = 0; i < vertexHandlesArray.size( ); ++i )
     {
-        if( ( vertex_flags[ i ] & MsqVertex::MSQ_DEPENDENT ) &&
-            !( vertex_flags[ i ] & MsqVertex::MSQ_FIXED ) )
+        if( ( vertex_flags[ i ] & MsqVertex::MSQ_DEPENDENT ) && !( vertex_flags[ i ] & MsqVertex::MSQ_FIXED ) )
             ++numSlaveVertices;
     }
     numFreeVertices -= numSlaveVertices;
@@ -1704,20 +1665,17 @@ void PatchData::fill( size_t num_vertex, const double* coords, size_t num_elem, 
     this->fill( num_vertex, coords, num_elem, type_ptr, connectivity, fixed, err );MSQ_CHKERR( err );
 }
 
-void PatchData::fill( size_t num_vertex, const double* coords, size_t num_elem,
-                      const EntityTopology* types, const size_t* conn, const bool* fixed,
-                      MsqError& err )
+void PatchData::fill( size_t num_vertex, const double* coords, size_t num_elem, const EntityTopology* types,
+                      const size_t* conn, const bool* fixed, MsqError& err )
 {
     std::vector< size_t > lengths( num_elem );
-    std::transform( types, types + num_elem, lengths.begin( ),
-                    std::ptr_fun( TopologyInfo::corners ) );
+    std::transform( types, types + num_elem, lengths.begin( ), std::ptr_fun( TopologyInfo::corners ) );
     const size_t* len_ptr = num_elem ? arrptr( lengths ) : 0;
     this->fill( num_vertex, coords, num_elem, types, len_ptr, conn, fixed, err );MSQ_CHKERR( err );
 }
 
-void PatchData::fill( size_t num_vertex, const double* coords, size_t num_elem,
-                      const EntityTopology* types, const size_t* lengths, const size_t* conn,
-                      const bool* fixed, MsqError& err )
+void PatchData::fill( size_t num_vertex, const double* coords, size_t num_elem, const EntityTopology* types,
+                      const size_t* lengths, const size_t* conn, const bool* fixed, MsqError& err )
 {
     size_t i;
 
@@ -1740,8 +1698,7 @@ void PatchData::fill( size_t num_vertex, const double* coords, size_t num_elem,
     {
         byteArray.resize( num_vertex, 0 );
         for( i = 0; i < num_vertex; ++i )
-            if( fixed[ i ] )
-                byteArray[ i ] |= ( MsqVertex::MSQ_HARD_FIXED | MsqVertex::MSQ_PATCH_FIXED );
+            if( fixed[ i ] ) byteArray[ i ] |= ( MsqVertex::MSQ_HARD_FIXED | MsqVertex::MSQ_PATCH_FIXED );
     }
 
     for( i = 0; i < num_elem; ++i )
@@ -1830,8 +1787,7 @@ void PatchData::fill_global_patch( MsqError& err )
     gp.set_mesh( get_mesh( ) );
     PatchIterator iter( &gp );
     bool          b = iter.get_next_patch( *this, err );MSQ_ERRRTN( err );
-    if( !b )
-        MSQ_SETERR( err )( "Empty patch in PatchData::fill_global_patch", MsqError::INVALID_MESH );
+    if( !b ) MSQ_SETERR( err )( "Empty patch in PatchData::fill_global_patch", MsqError::INVALID_MESH );
     assert( b );
 }
 
@@ -1852,9 +1808,8 @@ void PatchData::set_mesh_entities( std::vector< Mesh::ElementHandle >& elements,
     }
 
     elementHandlesArray = elements;
-    get_mesh( )->elements_get_attached_vertices( arrptr( elementHandlesArray ),
-                                                 elementHandlesArray.size( ), vertexHandlesArray,
-                                                 offsetArray, err );MSQ_ERRRTN( err );
+    get_mesh( )->elements_get_attached_vertices( arrptr( elementHandlesArray ), elementHandlesArray.size( ),
+                                                 vertexHandlesArray, offsetArray, err );MSQ_ERRRTN( err );
 
     // Construct CSR-rep element connectivity data
     size_t num_vert = vertexHandlesArray.size( );
@@ -1869,8 +1824,8 @@ void PatchData::set_mesh_entities( std::vector< Mesh::ElementHandle >& elements,
 
     // get vertex bits from mesh
     byteArray.resize( vertexHandlesArray.size( ) );
-    get_mesh( )->vertices_get_byte( arrptr( vertexHandlesArray ), arrptr( byteArray ),
-                                    vertexHandlesArray.size( ), err );MSQ_ERRRTN( err );
+    get_mesh( )->vertices_get_byte( arrptr( vertexHandlesArray ), arrptr( byteArray ), vertexHandlesArray.size( ),
+                                    err );MSQ_ERRRTN( err );
 
     // if free_vertices is not empty, then we need to mark as
     // fixed any vertices *not* in that list.
@@ -1886,14 +1841,12 @@ void PatchData::set_mesh_entities( std::vector< Mesh::ElementHandle >& elements,
     {
         // sort and remove duplicates from free_vertices list.
         std::sort( free_vertices.begin( ), free_vertices.end( ) );
-        free_vertices.erase( std::unique( free_vertices.begin( ), free_vertices.end( ) ),
-                             free_vertices.end( ) );
+        free_vertices.erase( std::unique( free_vertices.begin( ), free_vertices.end( ) ), free_vertices.end( ) );
 
         for( size_t i = 0; i < vertexHandlesArray.size( ); ++i )
         {
             if( ( byteArray[ i ] & MsqVertex::MSQ_DEPENDENT ) ||
-                std::binary_search( free_vertices.begin( ), free_vertices.end( ),
-                                    vertexHandlesArray[ i ] ) )
+                std::binary_search( free_vertices.begin( ), free_vertices.end( ), vertexHandlesArray[ i ] ) )
                 byteArray[ i ] &= ~MsqVertex::MSQ_PATCH_FIXED;
             else
                 byteArray[ i ] |= MsqVertex::MSQ_PATCH_FIXED;
@@ -1918,8 +1871,7 @@ void PatchData::set_mesh_entities( std::vector< Mesh::ElementHandle >& elements,
         vertexArray[ i ].flags( ) = byteArray[ i ];
 }
 
-void PatchData::get_sample_location( size_t element_index, Sample sample, Vector3D& result,
-                                     MsqError& err ) const
+void PatchData::get_sample_location( size_t element_index, Sample sample, Vector3D& result, MsqError& err ) const
 {
     const MsqMeshEntity&         elem = element_by_index( element_index );
     const NodeSet                ho_bits = non_slave_node_set( element_index );
@@ -1965,8 +1917,7 @@ NodeSet PatchData::non_slave_node_set( size_t element_index ) const
     {
         for( unsigned i = 0; i < num_edge; ++i )
         {
-            if( !( vertex_by_index( conn[ num_corner + i ] ).get_flags( ) &
-                   MsqVertex::MSQ_DEPENDENT ) )
+            if( !( vertex_by_index( conn[ num_corner + i ] ).get_flags( ) & MsqVertex::MSQ_DEPENDENT ) )
                 result.set_mid_edge_node( i );
         }
     }
@@ -1974,14 +1925,12 @@ NodeSet PatchData::non_slave_node_set( size_t element_index ) const
     {
         for( unsigned i = 0; i < num_face; ++i )
         {
-            if( !( vertex_by_index( conn[ num_corner + num_edge + i ] ).get_flags( ) &
-                   MsqVertex::MSQ_DEPENDENT ) )
+            if( !( vertex_by_index( conn[ num_corner + num_edge + i ] ).get_flags( ) & MsqVertex::MSQ_DEPENDENT ) )
                 result.set_mid_face_node( i );
         }
     }
     if( have_midelem &&
-        !( vertex_by_index( conn[ num_corner + num_edge + num_face ] ).get_flags( ) &
-           MsqVertex::MSQ_DEPENDENT ) )
+        !( vertex_by_index( conn[ num_corner + num_edge + num_face ] ).get_flags( ) & MsqVertex::MSQ_DEPENDENT ) )
         result.set_mid_region_node( );
 
     return result;
@@ -2055,8 +2004,8 @@ void PatchData::notify_new_patch( )
         iter->notify_new_patch( );
 }
 
-void PatchData::notify_sub_patch( PatchData& sub_patch, const size_t* vertex_map,
-                                  const size_t* element_map, MsqError& err )
+void PatchData::notify_sub_patch( PatchData& sub_patch, const size_t* vertex_map, const size_t* element_map,
+                                  MsqError& err )
 {
     for( ExtraData* iter = dataList; iter; iter = iter->patchNext )
     {

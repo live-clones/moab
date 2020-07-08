@@ -58,8 +58,7 @@ DataType DamselUtil::dtom_data_type[] = {
 };
 
 DamselUtil::DamselUtil( )
-    : dmslLib( DAMSEL_LIBRARY_INVALID ), dmslModel( DAMSEL_MODEL_INVALID ),
-      moabHandleType( DAMSEL_HANDLE_TYPE_INVALID )
+    : dmslLib( DAMSEL_LIBRARY_INVALID ), dmslModel( DAMSEL_MODEL_INVALID ), moabHandleType( DAMSEL_HANDLE_TYPE_INVALID )
 {
 }
 

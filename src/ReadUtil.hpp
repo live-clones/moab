@@ -42,15 +42,14 @@ class ReadUtil : public ReadUtilIface
     ~ReadUtil( ) {}
 
     //! Get arrays for coordinate data from the MB
-    ErrorCode get_node_coords( const int num_arrays, const int num_nodes,
-                               const int preferred_start_id, EntityHandle& actual_start_handle,
-                               std::vector< double* >& arrays, int sequence_size = -1 );
+    ErrorCode get_node_coords( const int num_arrays, const int num_nodes, const int preferred_start_id,
+                               EntityHandle& actual_start_handle, std::vector< double* >& arrays,
+                               int sequence_size = -1 );
 
     //! Get array for connectivity data from the MB
-    ErrorCode get_element_connect( const int num_elements, const int verts_per_element,
-                                   const EntityType mdb_type, const int preferred_start_id,
-                                   EntityHandle& actual_start_handle, EntityHandle*& array,
-                                   int sequence_size = -1 );
+    ErrorCode get_element_connect( const int num_elements, const int verts_per_element, const EntityType mdb_type,
+                                   const int preferred_start_id, EntityHandle& actual_start_handle,
+                                   EntityHandle*& array, int sequence_size = -1 );
 
     /**
      *\brief Gather entities related to those in the partition
@@ -61,16 +60,14 @@ class ReadUtil : public ReadUtilIface
      * \param all_sets If non-NULL, all sets in mesh instance are returned
      * in the pointed-to range
      */
-    ErrorCode gather_related_ents( Range& partition, Range& related_ents,
-                                   EntityHandle* file_set = NULL );
+    ErrorCode gather_related_ents( Range& partition, Range& related_ents, EntityHandle* file_set = NULL );
 
-    ErrorCode create_entity_sets( EntityID num_sets, const unsigned* set_flags,
-                                  EntityID preffered_start_id, EntityHandle& actual_start_handle );
+    ErrorCode create_entity_sets( EntityID num_sets, const unsigned* set_flags, EntityID preffered_start_id,
+                                  EntityHandle& actual_start_handle );
 
     //! Tell MB which elements have been added to the database
     ErrorCode update_adjacencies( const EntityHandle start_handle, const int number_elements,
-                                  const int           number_vertices_per_element,
-                                  const EntityHandle* conn_array );
+                                  const int number_vertices_per_element, const EntityHandle* conn_array );
 
     //! Given an ordered list of bounding entities and the sense of
     //! those entities, return an ordered list of vertices

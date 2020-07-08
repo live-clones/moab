@@ -99,8 +99,7 @@ class ManPage
         return str << std::endl << ".TH " << name << " " << section << std::endl;
     }
 
-    static std::ostream& write_text( std::ostream& str, bool hanging_indent,
-                                     const std::string& text );
+    static std::ostream& write_text( std::ostream& str, bool hanging_indent, const std::string& text );
 };
 
 #endif

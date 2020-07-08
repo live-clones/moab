@@ -33,12 +33,10 @@ int main( int argc, char* argv[] )
     std::string inputfile, outfile( "out.h5m" ), sourcefile, variable_name;
     int         dual_mesh = 0;
     opts.addOpt< std::string >( "input,i", "input mesh filename", &inputfile );
-    opts.addOpt< std::string >( "source,s", "h5m file aligned with the mesh input file",
-                                &sourcefile );
+    opts.addOpt< std::string >( "source,s", "h5m file aligned with the mesh input file", &sourcefile );
     opts.addOpt< std::string >( "output,o", "output mesh filename", &outfile );
 
-    opts.addOpt< std::string >( "var,v", "variable to extract and add to output file",
-                                &variable_name );
+    opts.addOpt< std::string >( "var,v", "variable to extract and add to output file", &variable_name );
     opts.addOpt< int >( "pentagon,p", "switch for dual mesh ", &dual_mesh );
 
     opts.parseCommandLine( argc, argv );
@@ -91,8 +89,7 @@ int main( int argc, char* argv[] )
         defVal = (void*)( &defDouble );
     }
 
-    rval = mb->tag_get_handle( variable_name.c_str( ), sizeTag, type, newTag,
-                               MB_TAG_DENSE | MB_TAG_CREAT, defVal );MB_CHK_SET_ERR( rval, "can't create new tag " );
+    rval = mb->tag_get_handle( variable_name.c_str( ), sizeTag, type, newTag, MB_TAG_DENSE | MB_TAG_CREAT, defVal );MB_CHK_SET_ERR( rval, "can't create new tag " );
 
     // get vertices on ini mesh; get global id on ini mesh
     // get global id on source mesh

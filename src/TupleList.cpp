@@ -69,8 +69,8 @@ TupleList::TupleList( uint p_mi, uint p_ml, uint p_mul, uint p_mr, uint p_max )
 }
 
 TupleList::TupleList( )
-    : vi_rd( NULL ), vl_rd( NULL ), vul_rd( NULL ), vr_rd( NULL ), mi( 0 ), ml( 0 ), mul( 0 ),
-      mr( 0 ), n( 0 ), max( 0 ), vi( NULL ), vl( NULL ), vul( NULL ), vr( NULL ), last_sorted( -1 )
+    : vi_rd( NULL ), vl_rd( NULL ), vul_rd( NULL ), vr_rd( NULL ), mi( 0 ), ml( 0 ), mul( 0 ), mr( 0 ), n( 0 ),
+      max( 0 ), vi( NULL ), vl( NULL ), vul( NULL ), vr( NULL ), last_sorted( -1 )
 {
     disableWriteAccess( );
 }
@@ -90,8 +90,7 @@ void TupleList::initialize( uint p_mi, uint p_ml, uint p_mul, uint p_mr, uint p_
     {
         sz = max * mi * sizeof( sint );
         void* resi = malloc( sz );
-        if( !resi && max * mi > 0 )
-            fail( "%s: allocation of %d bytes failed\n", __FILE__, (int)sz );
+        if( !resi && max * mi > 0 ) fail( "%s: allocation of %d bytes failed\n", __FILE__, (int)sz );
         vi = (sint*)resi;
     }
     else
@@ -100,8 +99,7 @@ void TupleList::initialize( uint p_mi, uint p_ml, uint p_mul, uint p_mr, uint p_
     {
         sz = max * ml * sizeof( slong );
         void* resl = malloc( sz );
-        if( !resl && max * ml > 0 )
-            fail( "%s: allocation of %d bytes failed\n", __FILE__, (int)sz );
+        if( !resl && max * ml > 0 ) fail( "%s: allocation of %d bytes failed\n", __FILE__, (int)sz );
         vl = (slong*)resl;
     }
     else
@@ -110,8 +108,7 @@ void TupleList::initialize( uint p_mi, uint p_ml, uint p_mul, uint p_mr, uint p_
     {
         sz = max * mul * sizeof( Ulong );
         void* resu = malloc( sz );
-        if( !resu && max * mul > 0 )
-            fail( "%s: allocation of %d bytes failed\n", __FILE__, (int)sz );
+        if( !resu && max * mul > 0 ) fail( "%s: allocation of %d bytes failed\n", __FILE__, (int)sz );
         vul = (Ulong*)resu;
     }
     else
@@ -120,8 +117,7 @@ void TupleList::initialize( uint p_mi, uint p_ml, uint p_mul, uint p_mr, uint p_
     {
         sz = max * mr * sizeof( realType );
         void* resr = malloc( sz );
-        if( !resr && max * ml > 0 )
-            fail( "%s: allocation of %d bytes failed\n", __FILE__, (int)sz );
+        if( !resr && max * ml > 0 ) fail( "%s: allocation of %d bytes failed\n", __FILE__, (int)sz );
         vr = (realType*)resr;
     }
     else
@@ -368,8 +364,7 @@ realType TupleList::get_double( unsigned int index, unsigned int m )
     return 0;
 }
 
-ErrorCode TupleList::get( unsigned int index, const sint*& sp, const slong*& ip, const Ulong*& lp,
-                          const realType*& dp )
+ErrorCode TupleList::get( unsigned int index, const sint*& sp, const slong*& ip, const Ulong*& lp, const realType*& dp )
 {
     if( index <= n )
     {
@@ -508,8 +503,8 @@ void TupleList::print_to_file( const char* filename ) const
 }
 void TupleList::permute( uint* perm, void* work )
 {
-    const unsigned int_size = mi * sizeof( sint ), long_size = ml * sizeof( slong ),
-                   Ulong_size = mul * sizeof( Ulong ), real_size = mr * sizeof( realType );
+    const unsigned int_size = mi * sizeof( sint ), long_size = ml * sizeof( slong ), Ulong_size = mul * sizeof( Ulong ),
+                   real_size = mr * sizeof( realType );
     if( mi )
     {
         uint *p = perm, *pe = p + n;
@@ -610,8 +605,7 @@ ErrorCode TupleList::sort( uint key, TupleList::buffer* buf )
     COUNT_DIGIT_32( n, i + 32 )
 
 template< class Value >
-Value TupleList::radix_count( const Value* A, const Value* end, Index stride,
-                              Index count[ DIGITS ][ DIGIT_VALUES ] )
+Value TupleList::radix_count( const Value* A, const Value* end, Index stride, Index count[ DIGITS ][ DIGIT_VALUES ] )
 {
     Value bitorkey = 0;
     memset( count, 0, COUNT_SIZE * sizeof( Index ) );
@@ -647,8 +641,8 @@ void TupleList::radix_offsets( Index* c )
 }
 
 template< class Value >
-unsigned TupleList::radix_zeros( Value bitorkey, Index count[ DIGITS ][ DIGIT_VALUES ],
-                                 unsigned* shift, Index** offsets )
+unsigned TupleList::radix_zeros( Value bitorkey, Index count[ DIGITS ][ DIGIT_VALUES ], unsigned* shift,
+                                 Index** offsets )
 {
     unsigned digits = 0, sh = 0;
     Index*   c = &count[ 0 ][ 0 ];
@@ -673,8 +667,8 @@ void TupleList::radix_index_pass_b( const Value* A, Index n, Index stride, unsig
 }
 
 template< class Value >
-void TupleList::radix_index_pass_m( const SortData< Value >* src, const SortData< Value >* end,
-                                    unsigned sh, Index* off, SortData< Value >* out )
+void TupleList::radix_index_pass_m( const SortData< Value >* src, const SortData< Value >* end, unsigned sh, Index* off,
+                                    SortData< Value >* out )
 {
     do
     {
@@ -684,8 +678,8 @@ void TupleList::radix_index_pass_m( const SortData< Value >* src, const SortData
 }
 
 template< class Value >
-void TupleList::radix_index_pass_e( const SortData< Value >* src, const SortData< Value >* end,
-                                    unsigned sh, Index* off, Index* out )
+void TupleList::radix_index_pass_e( const SortData< Value >* src, const SortData< Value >* end, unsigned sh, Index* off,
+                                    Index* out )
 {
     do
         out[ off[ ( src->v >> sh ) & DIGIT_MASK ]++ ] = src->i;
@@ -693,8 +687,7 @@ void TupleList::radix_index_pass_e( const SortData< Value >* src, const SortData
 }
 
 template< class Value >
-void TupleList::radix_index_pass_be( const Value* A, Index n, Index stride, unsigned sh, Index* off,
-                                     Index* out )
+void TupleList::radix_index_pass_be( const Value* A, Index n, Index stride, unsigned sh, Index* off, Index* out )
 {
     Index i = 0;
     do
@@ -703,8 +696,7 @@ void TupleList::radix_index_pass_be( const Value* A, Index n, Index stride, unsi
 }
 
 template< class Value >
-void TupleList::radix_index_sort( const Value* A, Index n, Index stride, Index* idx,
-                                  SortData< Value >* work )
+void TupleList::radix_index_sort( const Value* A, Index n, Index stride, Index* idx, SortData< Value >* work )
 {
     Index    count[ DIGITS ][ DIGIT_VALUES ];
     Value    bitorkey = radix_count( A, A + n * stride, stride, count );
@@ -742,8 +734,7 @@ void TupleList::radix_index_sort( const Value* A, Index n, Index stride, Index* 
 }
 
 template< class Value >
-void TupleList::merge_index_sort( const Value* A, const Index An, Index stride, Index* idx,
-                                  SortData< Value >* work )
+void TupleList::merge_index_sort( const Value* A, const Index An, Index stride, Index* idx, SortData< Value >* work )
 {
     SortData< Value >* const buf[ 2 ] = { work + An, work };
     Index                    n = An, base = -n, odd = 0, c = 0, b = 1;
@@ -778,31 +769,31 @@ void TupleList::merge_index_sort( const Value* A, const Index An, Index stride, 
             if( v[ 1 ] < v[ 0 ] )
             {
                 if( v[ 2 ] < v[ 1 ] )
-                    p[ 0 ].v = v[ 2 ], p[ 1 ].v = v[ 1 ], p[ 2 ].v = v[ 0 ], p[ 0 ].i = i + 2,
-                         p[ 1 ].i = i + 1, p[ 2 ].i = i;
+                    p[ 0 ].v = v[ 2 ], p[ 1 ].v = v[ 1 ], p[ 2 ].v = v[ 0 ], p[ 0 ].i = i + 2, p[ 1 ].i = i + 1,
+                         p[ 2 ].i = i;
                 else
                 {
                     if( v[ 2 ] < v[ 0 ] )
-                        p[ 0 ].v = v[ 1 ], p[ 1 ].v = v[ 2 ], p[ 2 ].v = v[ 0 ], p[ 0 ].i = i + 1,
-                             p[ 1 ].i = i + 2, p[ 2 ].i = i;
+                        p[ 0 ].v = v[ 1 ], p[ 1 ].v = v[ 2 ], p[ 2 ].v = v[ 0 ], p[ 0 ].i = i + 1, p[ 1 ].i = i + 2,
+                             p[ 2 ].i = i;
                     else
-                        p[ 0 ].v = v[ 1 ], p[ 1 ].v = v[ 0 ], p[ 2 ].v = v[ 2 ], p[ 0 ].i = i + 1,
-                             p[ 1 ].i = i, p[ 2 ].i = i + 2;
+                        p[ 0 ].v = v[ 1 ], p[ 1 ].v = v[ 0 ], p[ 2 ].v = v[ 2 ], p[ 0 ].i = i + 1, p[ 1 ].i = i,
+                             p[ 2 ].i = i + 2;
                 }
             }
             else
             {
                 if( v[ 2 ] < v[ 0 ] )
-                    p[ 0 ].v = v[ 2 ], p[ 1 ].v = v[ 0 ], p[ 2 ].v = v[ 1 ], p[ 0 ].i = i + 2,
-                         p[ 1 ].i = i, p[ 2 ].i = i + 1;
+                    p[ 0 ].v = v[ 2 ], p[ 1 ].v = v[ 0 ], p[ 2 ].v = v[ 1 ], p[ 0 ].i = i + 2, p[ 1 ].i = i,
+                         p[ 2 ].i = i + 1;
                 else
                 {
                     if( v[ 2 ] < v[ 1 ] )
-                        p[ 0 ].v = v[ 0 ], p[ 1 ].v = v[ 2 ], p[ 2 ].v = v[ 1 ], p[ 0 ].i = i,
-                             p[ 1 ].i = i + 2, p[ 2 ].i = i + 1;
+                        p[ 0 ].v = v[ 0 ], p[ 1 ].v = v[ 2 ], p[ 2 ].v = v[ 1 ], p[ 0 ].i = i, p[ 1 ].i = i + 2,
+                             p[ 2 ].i = i + 1;
                     else
-                        p[ 0 ].v = v[ 0 ], p[ 1 ].v = v[ 1 ], p[ 2 ].v = v[ 2 ], p[ 0 ].i = i,
-                             p[ 1 ].i = i + 1, p[ 2 ].i = i + 2;
+                        p[ 0 ].v = v[ 0 ], p[ 1 ].v = v[ 1 ], p[ 2 ].v = v[ 2 ], p[ 0 ].i = i, p[ 1 ].i = i + 1,
+                             p[ 2 ].i = i + 2;
                 }
             }
             i += 3;
@@ -840,8 +831,7 @@ void TupleList::merge_index_sort( const Value* A, const Index An, Index stride, 
 }
 
 template< class Value >
-void TupleList::index_sort( const Value* A, Index n, Index stride, Index* idx,
-                            SortData< Value >* work )
+void TupleList::index_sort( const Value* A, Index n, Index stride, Index* idx, SortData< Value >* work )
 {
     if( n < DIGIT_VALUES )
     {

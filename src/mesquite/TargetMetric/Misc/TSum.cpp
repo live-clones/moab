@@ -46,8 +46,7 @@ std::string TSum::get_name( ) const
 
 TSum::~TSum( ) {}
 
-template< unsigned DIM >
-inline bool TSum::eval( const MsqMatrix< DIM, DIM >& T, double& result, MsqError& err )
+template< unsigned DIM > inline bool TSum::eval( const MsqMatrix< DIM, DIM >& T, double& result, MsqError& err )
 {
     double val2;
     bool   rval = mu1->evaluate( T, result, err );
@@ -59,8 +58,7 @@ inline bool TSum::eval( const MsqMatrix< DIM, DIM >& T, double& result, MsqError
 }
 
 template< unsigned DIM >
-inline bool TSum::grad( const MsqMatrix< DIM, DIM >& T, double& result,
-                        MsqMatrix< DIM, DIM >& deriv, MsqError& err )
+inline bool TSum::grad( const MsqMatrix< DIM, DIM >& T, double& result, MsqMatrix< DIM, DIM >& deriv, MsqError& err )
 {
     double                val2;
     MsqMatrix< DIM, DIM > grad2;
@@ -74,9 +72,8 @@ inline bool TSum::grad( const MsqMatrix< DIM, DIM >& T, double& result,
 }
 
 template< unsigned DIM >
-inline bool TSum::hess( const MsqMatrix< DIM, DIM >& T, double& result,
-                        MsqMatrix< DIM, DIM >& deriv_wrt_T, MsqMatrix< DIM, DIM >* second_wrt_T,
-                        MsqError& err )
+inline bool TSum::hess( const MsqMatrix< DIM, DIM >& T, double& result, MsqMatrix< DIM, DIM >& deriv_wrt_T,
+                        MsqMatrix< DIM, DIM >* second_wrt_T, MsqError& err )
 {
     const int             HL = ( DIM * ( DIM + 1 ) ) / 2;
     double                val2;

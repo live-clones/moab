@@ -56,8 +56,7 @@ using std::endl;
 
 using namespace MBMesquite;
 
-static int print_iGeom_error( const char* desc, int err, iGeom_Instance geom, const char* file,
-                              int line )
+static int print_iGeom_error( const char* desc, int err, iGeom_Instance geom, const char* file, int line )
 {
     char buffer[ 1024 ];
     iGeom_getDescription( geom, buffer, sizeof( buffer ) );
@@ -71,8 +70,7 @@ static int print_iGeom_error( const char* desc, int err, iGeom_Instance geom, co
     return -1;  // must always return false or CHECK macro will break
 }
 
-static int print_iMesh_error( const char* desc, int err, iMesh_Instance mesh, const char* file,
-                              int line )
+static int print_iMesh_error( const char* desc, int err, iMesh_Instance mesh, const char* file, int line )
 {
     char buffer[ 1024 ];
     iMesh_getDescription( mesh, buffer, sizeof( buffer ) );
@@ -92,10 +90,8 @@ static int print_iMesh_error( const char* desc, int err, iMesh_Instance mesh, co
 #define CHECK_IMESH( STR ) \
     if( err != iBase_SUCCESS ) return print_iMesh_error( STR, err, instance, __FILE__, __LINE__ )
 
-const std::string default_file_name =
-    std::string( MESH_DIR ) + std::string( "/surfrandomtris-4part.h5m" );
-const std::string default_geometry_file_name =
-    std::string( MESH_DIR ) + std::string( "/surfrandom.facet" );
+const std::string default_file_name = std::string( MESH_DIR ) + std::string( "/surfrandomtris-4part.h5m" );
+const std::string default_geometry_file_name = std::string( MESH_DIR ) + std::string( "/surfrandom.facet" );
 
 std::vector< double > solution_indicator;
 
@@ -140,18 +136,15 @@ int main( int argc, char* argv[] )
 #endif
     ProgOptions opts;
 
-    opts.addOpt< void >( std::string( "native,N" ),
-                         std::string( "Use native representation (default=false)" ), &use_native );
-    opts.addOpt< int >( std::string( "dim,d" ),
-                        std::string( "Topological dimension of the mesh (default=2)" ),
+    opts.addOpt< void >( std::string( "native,N" ), std::string( "Use native representation (default=false)" ),
+                         &use_native );
+    opts.addOpt< int >( std::string( "dim,d" ), std::string( "Topological dimension of the mesh (default=2)" ),
                         &dimension );
-    opts.addOpt< std::string >(
-        std::string( "input_geo,i" ),
-        std::string( "Input file name for the geometry (pattern=*.stl, *.facet)" ),
-        &geometry_file_name );
-    opts.addOpt< std::string >(
-        std::string( "input_mesh,m" ),
-        std::string( "Input file name for the mesh (pattern=*.vtk, *.h5m)" ), &file_name );
+    opts.addOpt< std::string >( std::string( "input_geo,i" ),
+                                std::string( "Input file name for the geometry (pattern=*.stl, *.facet)" ),
+                                &geometry_file_name );
+    opts.addOpt< std::string >( std::string( "input_mesh,m" ),
+                                std::string( "Input file name for the mesh (pattern=*.vtk, *.h5m)" ), &file_name );
 
     opts.parseCommandLine( argc, argv );
 
@@ -336,8 +329,7 @@ int run_global_smoother( MeshDomainAssoc& mesh_and_domain, MsqError& err, double
 int write_vtk_mesh( Mesh* mesh, const char* filename )
 {
     moab::Interface* mbi =
-        reinterpret_cast< MBiMesh* >( dynamic_cast< MsqIMesh* >( mesh )->get_imesh_instance( ) )
-            ->mbImpl;
+        reinterpret_cast< MBiMesh* >( dynamic_cast< MsqIMesh* >( mesh )->get_imesh_instance( ) )->mbImpl;
 
     mbi->write_file( filename );
 
@@ -349,8 +341,7 @@ int run_local_smoother( MeshDomainAssoc& mesh_and_domain, MsqError& err, double 
 {
     Mesh*            mesh = mesh_and_domain.get_mesh( );
     moab::Interface* mbi =
-        reinterpret_cast< MBiMesh* >( dynamic_cast< MsqIMesh* >( mesh )->get_imesh_instance( ) )
-            ->mbImpl;
+        reinterpret_cast< MBiMesh* >( dynamic_cast< MsqIMesh* >( mesh )->get_imesh_instance( ) )->mbImpl;
 
     moab::Tag       fixed;
     moab::ErrorCode rval = mbi->tag_get_handle( "fixed", 1, moab::MB_TYPE_INTEGER, fixed );MB_CHK_SET_ERR( rval, "Getting tag handle failed" );
@@ -616,14 +607,12 @@ int get_imesh_mesh( MBMesquite::Mesh** mesh, const char* file_name, int dimensio
         moab::Tag          fixed;
         int                def_val = 0;
         err = 0;
-        moab::ErrorCode rval =
-            mbi->tag_get_handle( "fixed", 1, moab::MB_TYPE_INTEGER, fixed,
-                                 moab::MB_TAG_CREAT | moab::MB_TAG_DENSE, &def_val );MB_CHK_SET_ERR( rval, "Getting tag handle failed" );
+        moab::ErrorCode rval = mbi->tag_get_handle( "fixed", 1, moab::MB_TYPE_INTEGER, fixed,
+                                                    moab::MB_TAG_CREAT | moab::MB_TAG_DENSE, &def_val );MB_CHK_SET_ERR( rval, "Getting tag handle failed" );
         moab::Range verts, cells, skin_verts;
         rval = mbi->get_entities_by_type( currset, moab::MBVERTEX, verts );MB_CHK_SET_ERR( rval, "Querying vertices failed" );
         rval = mbi->get_entities_by_dimension( currset, dimension, cells );MB_CHK_SET_ERR( rval, "Querying elements failed" );
-        std::cout << "Found " << verts.size( ) << " vertices and " << cells.size( ) << " elements"
-                  << std::endl;
+        std::cout << "Found " << verts.size( ) << " vertices and " << cells.size( ) << " elements" << std::endl;
 
         moab::Skinner skinner( mbi );
         rval = skinner.find_skin( currset, cells, true, skin_verts );MB_CHK_SET_ERR( rval,
@@ -632,8 +621,7 @@ int get_imesh_mesh( MBMesquite::Mesh** mesh, const char* file_name, int dimensio
 
         std::vector< int > fix_tag( skin_verts.size( ), 1 );  // initialized to 1 to indicate fixed
         rval = mbi->tag_set_data( fixed, skin_verts, &fix_tag[ 0 ] );MB_CHK_SET_ERR( rval, "Setting tag data failed" );
-        std::cout << "Found " << skin_verts.size( ) << " vertices on the skin of the domain."
-                  << std::endl;
+        std::cout << "Found " << skin_verts.size( ) << " vertices on the skin of the domain." << std::endl;
 
         // fix_tag.resize(verts.size(),0);
         // rval = mbi->tag_get_data(fixed, verts, &fix_tag[0]); MB_CHK_SET_ERR(rval, "Getting tag

@@ -335,13 +335,12 @@ void TMPDerivsTest::test_set_scaled_sum_outer_product_3D( )
     set_scaled_sum_outer_product( R, a, A, B );
 
 #ifdef MSQ_ROW_BASED_OUTER_PRODUCT
-    const MsqMatrix< 3, 3 > E[ 6 ] = {
-        transpose( A.row( 0 ) ) * B.row( 0 ) + transpose( B.row( 0 ) ) * A.row( 0 ),
-        transpose( A.row( 0 ) ) * B.row( 1 ) + transpose( B.row( 0 ) ) * A.row( 1 ),
-        transpose( A.row( 0 ) ) * B.row( 2 ) + transpose( B.row( 0 ) ) * A.row( 2 ),
-        transpose( A.row( 1 ) ) * B.row( 1 ) + transpose( B.row( 1 ) ) * A.row( 1 ),
-        transpose( A.row( 1 ) ) * B.row( 2 ) + transpose( B.row( 1 ) ) * A.row( 2 ),
-        transpose( A.row( 2 ) ) * B.row( 2 ) + transpose( B.row( 2 ) ) * A.row( 2 ) };
+    const MsqMatrix< 3, 3 > E[ 6 ] = { transpose( A.row( 0 ) ) * B.row( 0 ) + transpose( B.row( 0 ) ) * A.row( 0 ),
+                                       transpose( A.row( 0 ) ) * B.row( 1 ) + transpose( B.row( 0 ) ) * A.row( 1 ),
+                                       transpose( A.row( 0 ) ) * B.row( 2 ) + transpose( B.row( 0 ) ) * A.row( 2 ),
+                                       transpose( A.row( 1 ) ) * B.row( 1 ) + transpose( B.row( 1 ) ) * A.row( 1 ),
+                                       transpose( A.row( 1 ) ) * B.row( 2 ) + transpose( B.row( 1 ) ) * A.row( 2 ),
+                                       transpose( A.row( 2 ) ) * B.row( 2 ) + transpose( B.row( 2 ) ) * A.row( 2 ) };
 #else
     const MsqMatrix< 3, 3 > E[ 6 ] = {
         A.column( 0 ) * transpose( B.column( 0 ) ) + B.column( 0 ) * transpose( A.column( 0 ) ),
@@ -516,9 +515,8 @@ void TMPDerivsTest::test_pluseq_scaled_outer_product_I_I_2D( )
 void TMPDerivsTest::test_pluseq_scaled_outer_product_I_I_3D( )
 {
     const double      e = 1e-12;
-    MsqMatrix< 3, 3 > R[ 6 ] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
-                           S[ 6 ] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
-    const double alpha = 3.14;
+    MsqMatrix< 3, 3 > R[ 6 ] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }, S[ 6 ] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+    const double      alpha = 3.14;
     pluseq_scaled_outer_product( R, alpha, MsqMatrix< 3, 3 >( 1.0 ) );
     pluseq_scaled_outer_product_I_I( S, alpha );
     ASSERT_MATRICES_EQUAL( R[ 0 ], S[ 0 ], e );

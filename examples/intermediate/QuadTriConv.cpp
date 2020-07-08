@@ -65,8 +65,7 @@ int main( int argc, char** argv )
             index++;
         }
         // add the last one only if different from previous and first node
-        if( ( connec[ num_verts - 1 ] != connec[ num_verts - 2 ] ) &&
-            ( connec[ num_verts - 1 ] != connec[ 0 ] ) )
+        if( ( connec[ num_verts - 1 ] != connec[ num_verts - 2 ] ) && ( connec[ num_verts - 1 ] != connec[ 0 ] ) )
         {
             newConnec.push_back( connec[ num_verts - 1 ] );
             new_size++;

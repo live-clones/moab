@@ -59,8 +59,8 @@ int main( int argc, char* argv[] )
 
     if( argc == 1 )
     {
-        std::cout << "Using default input files: " << filename_bot << " " << filename_top << " "
-                  << polygon_file_name << " " << min_dot << " " << vol_file << std::endl;
+        std::cout << "Using default input files: " << filename_bot << " " << filename_top << " " << polygon_file_name
+                  << " " << min_dot << " " << vol_file << std::endl;
         std::cout << "    default output file: " << vol_file << " will be deleted \n";
     }
     else if( argc == 6 )
@@ -82,8 +82,7 @@ int main( int argc, char* argv[] )
 
     ErrorCode rval = mb->load_file( filename_bot.c_str( ) );MB_CHK_SET_ERR( rval, "failed to load bed file" );
 
-    rval = mb->load_file(
-        filename_top.c_str( ) );  // load the second face (we know we have one face in each file)
+    rval = mb->load_file( filename_top.c_str( ) );  // load the second face (we know we have one face in each file)
     MB_CHK_SET_ERR( rval, "failed to load top file" );
 
     FBEngine* pFacet = new FBEngine( mb, NULL, true );  // smooth facetting, no OBB tree passed
@@ -156,12 +155,10 @@ ErrorCode volume_test( FBEngine* pFacet )
         return MB_FAILURE;
     }
     EntityHandle newFace1;  // first test is with closed surface
-    rval = pFacet->split_surface_with_direction( faces[ 0 ], xyz, direction, /*closed*/ 1, min_dot,
-                                                 newFace1 );MB_CHK_SET_ERR( rval, "Failed to crop first face." );
+    rval = pFacet->split_surface_with_direction( faces[ 0 ], xyz, direction, /*closed*/ 1, min_dot, newFace1 );MB_CHK_SET_ERR( rval, "Failed to crop first face." );
 
     EntityHandle newFace2;  // first test is with closed surface
-    rval = pFacet->split_surface_with_direction( faces[ 1 ], xyz, direction, /*closed*/ 1, min_dot,
-                                                 newFace2 );MB_CHK_SET_ERR( rval, "Failed to crop second face." );
+    rval = pFacet->split_surface_with_direction( faces[ 1 ], xyz, direction, /*closed*/ 1, min_dot, newFace2 );MB_CHK_SET_ERR( rval, "Failed to crop second face." );
 
     // here we make the assumption that the edges, vertices are matching fine...
     EntityHandle volume;

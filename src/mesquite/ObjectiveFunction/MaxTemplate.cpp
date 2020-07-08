@@ -41,10 +41,7 @@
 namespace MBMesquite
 {
 
-MaxTemplate::MaxTemplate( QualityMetric* qualitymetric )
-    : ObjectiveFunctionTemplate( qualitymetric )
-{
-}
+MaxTemplate::MaxTemplate( QualityMetric* qualitymetric ) : ObjectiveFunctionTemplate( qualitymetric ) {}
 
 // Lori:  need to clean up here
 MaxTemplate::~MaxTemplate( ) {}
@@ -56,14 +53,12 @@ ObjectiveFunction* MaxTemplate::clone( ) const
 
 void MaxTemplate::clear( ) {}
 
-bool MaxTemplate::evaluate( EvalType type, PatchData& pd, double& value_out, bool free,
-                            MsqError& err )
+bool MaxTemplate::evaluate( EvalType type, PatchData& pd, double& value_out, bool free, MsqError& err )
 {
     if( type != ObjectiveFunction::CALCULATE )
     {
         MSQ_SETERR( err )
-        ( "MaxTemplate does not support block coodinate descent algoritms",
-          MsqError::INVALID_STATE );
+        ( "MaxTemplate does not support block coodinate descent algoritms", MsqError::INVALID_STATE );
         return false;
     }
 

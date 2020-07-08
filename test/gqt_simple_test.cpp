@@ -16,15 +16,14 @@ GeomTopoTool*  GTT;
 GeomQueryTool* GQT;
 Interface*     MBI;
 
-#define CHKERR( A )                                                                          \
-    do                                                                                       \
-    {                                                                                        \
-        if( MB_SUCCESS != ( A ) )                                                            \
-        {                                                                                    \
-            std::cerr << "Failure (error code " << ( A ) << ") at " __FILE__ ":" << __LINE__ \
-                      << std::endl;                                                          \
-            return A;                                                                        \
-        }                                                                                    \
+#define CHKERR( A )                                                                                        \
+    do                                                                                                     \
+    {                                                                                                      \
+        if( MB_SUCCESS != ( A ) )                                                                          \
+        {                                                                                                  \
+            std::cerr << "Failure (error code " << ( A ) << ") at " __FILE__ ":" << __LINE__ << std::endl; \
+            return A;                                                                                      \
+        }                                                                                                  \
     } while( false )
 
 const std::string input_file = TestDir + "/test_geom.h5m";
@@ -366,8 +365,7 @@ int main( int /* argc */, char** /* argv */ )
     result += RUN_TEST( gqt_test_obb_retreval );  // check that we are retreving loaded obbs
     cleanup( );
 
-    result +=
-        RUN_TEST( gqt_test_obb_retreval_rayfire );  // check that we can ray fire on loaded obbs
+    result += RUN_TEST( gqt_test_obb_retreval_rayfire );  // check that we can ray fire on loaded obbs
     cleanup( );
 
     result += RUN_TEST( gqt_point_in );  // check entity by point

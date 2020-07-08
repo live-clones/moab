@@ -15,15 +15,14 @@ using moab::DagMC;
 
 DagMC* DAG;
 
-#define CHKERR( A )                                                                          \
-    do                                                                                       \
-    {                                                                                        \
-        if( MB_SUCCESS != ( A ) )                                                            \
-        {                                                                                    \
-            std::cerr << "Failure (error code " << ( A ) << ") at " __FILE__ ":" << __LINE__ \
-                      << std::endl;                                                          \
-            return A;                                                                        \
-        }                                                                                    \
+#define CHKERR( A )                                                                                        \
+    do                                                                                                     \
+    {                                                                                                      \
+        if( MB_SUCCESS != ( A ) )                                                                          \
+        {                                                                                                  \
+            std::cerr << "Failure (error code " << ( A ) << ") at " __FILE__ ":" << __LINE__ << std::endl; \
+            return A;                                                                                      \
+        }                                                                                                  \
     } while( false )
 
 const std::string input_file = TestDir + "/test_geom.h5m";
@@ -300,8 +299,7 @@ int main( int /* argc */, char** /* argv */ )
     result += RUN_TEST( dagmc_load_file_dagmc_via_moab_build_obb );  //
     result += RUN_TEST( dagmc_load_file_dagmc_internal_build_obb );  //
     result += RUN_TEST( dagmc_test_obb_retreval );  // check that we are retreving loaded obbs
-    result +=
-        RUN_TEST( dagmc_test_obb_retreval_rayfire );  // check that we can ray fire on loaded obbs
+    result += RUN_TEST( dagmc_test_obb_retreval_rayfire );  // check that we can ray fire on loaded obbs
     result += RUN_TEST( dagmc_point_in );  // check entity by point
     result += RUN_TEST( dagmc_rayfire );  // ensure ray fire distance is correct
     result += RUN_TEST( dagmc_closest_to );  // check the distance to surface nearest point

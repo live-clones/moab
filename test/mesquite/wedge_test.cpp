@@ -109,8 +109,8 @@ using namespace MBMesquite;
 // move the vertex to the specified position, smooth the mesh,
 // and verify that the vertex was moved back to the origin by
 // the smoother.
-bool smooth_mesh( MeshImpl* mesh, Mesh* ref_mesh, Mesh::VertexHandle vertex_8,
-                  Mesh::VertexHandle vertex_9, Vector3D delta, QualityMetric* metric );
+bool smooth_mesh( MeshImpl* mesh, Mesh* ref_mesh, Mesh::VertexHandle vertex_8, Mesh::VertexHandle vertex_9,
+                  Vector3D delta, QualityMetric* metric );
 
 const unsigned NUM_ELEM = 6;
 const unsigned NUM_VERT = 14;
@@ -153,8 +153,7 @@ int main( int argc, char*[] )
     mesh.get_all_elements( elem_array, err );
     CPPUNIT_ASSERT( !err );
     CPPUNIT_ASSERT_EQUAL( elem_array.size( ), NUM_ELEM );
-    mesh.elements_get_attached_vertices( arrptr( elem_array ), elem_array.size( ), vert_array,
-                                         conn_offsets, err );
+    mesh.elements_get_attached_vertices( arrptr( elem_array ), elem_array.size( ), vert_array, conn_offsets, err );
     CPPUNIT_ASSERT( !err );
     CPPUNIT_ASSERT_EQUAL( vert_array.size( ), VERT_PER_ELEM * NUM_ELEM );
     CPPUNIT_ASSERT_EQUAL( conn_offsets.size( ), NUM_ELEM + 1 );
@@ -222,15 +221,14 @@ int main( int argc, char*[] )
     return 0;
 }
 
-bool smooth_mesh( MeshImpl* mesh, Mesh*, Mesh::VertexHandle vert1, Mesh::VertexHandle vert2,
-                  Vector3D delta, QualityMetric* metric )
+bool smooth_mesh( MeshImpl* mesh, Mesh*, Mesh::VertexHandle vert1, Mesh::VertexHandle vert2, Vector3D delta,
+                  QualityMetric* metric )
 {
     MBMesquite::MsqPrintError err( cout );
     const Vector3D            origin( 0, 0, 0 );
 
     // print a little output so we know when we died
-    std::cout << "**************************************************************************"
-              << std::endl
+    std::cout << "**************************************************************************" << std::endl
               << "* Smoothing..." << std::endl
               << "* Metric: " << metric->get_name( ) << std::endl
               << "* Offset: " << delta
@@ -297,16 +295,15 @@ bool smooth_mesh( MeshImpl* mesh, Mesh*, Mesh::VertexHandle vert1, Mesh::VertexH
 
     // print a little output so we know when we died
     std::cout  //<<
-        //"**************************************************************************"
+               //"**************************************************************************"
         << std::endl
         << "* Done Smoothing:" << std::endl
         << "* Metric: " << metric->get_name( ) << std::endl
-        << "* Position1: " << new_coords[ 0 ][ 0 ] << " " << new_coords[ 0 ][ 1 ] << " "
-        << new_coords[ 0 ][ 2 ] << std::endl
-        << "* Position2: " << new_coords[ 1 ][ 0 ] << " " << new_coords[ 1 ][ 1 ] << " "
-        << new_coords[ 1 ][ 2 ] << std::endl
-        << "**************************************************************************"
-        << std::endl;
+        << "* Position1: " << new_coords[ 0 ][ 0 ] << " " << new_coords[ 0 ][ 1 ] << " " << new_coords[ 0 ][ 2 ]
+        << std::endl
+        << "* Position2: " << new_coords[ 1 ][ 0 ] << " " << new_coords[ 1 ][ 1 ] << " " << new_coords[ 1 ][ 2 ]
+        << std::endl
+        << "**************************************************************************" << std::endl;
 
     CPPUNIT_ASSERT_VECTORS_EQUAL( coordinates[ 0 ], new_coords[ 0 ], TOL );
     CPPUNIT_ASSERT_VECTORS_EQUAL( coordinates[ 1 ], new_coords[ 1 ], TOL );

@@ -65,8 +65,8 @@ class Coupler
      * \param coupler_id Id of this coupler, should be the same over all procs
      * \param init_tree If true, initializes kdtree inside the constructor
      */
-    Coupler( Interface* impl, ParallelComm* pc, Range& local_elems, int coupler_id,
-             bool init_tree = true, int max_ent_dim = 3 );
+    Coupler( Interface* impl, ParallelComm* pc, Range& local_elems, int coupler_id, bool init_tree = true,
+             int max_ent_dim = 3 );
 
     /* Destructor
      */
@@ -91,8 +91,8 @@ class Coupler
      *           consisting of (p, i), p = proc, i = index on that proc
      * \param store_local If true, stores the tuple list in targetPts
      */
-    ErrorCode locate_points( double* xyz, unsigned int num_points, double rel_eps = 0.0,
-                             double abs_eps = 0.0, TupleList* tl = NULL, bool store_local = true );
+    ErrorCode locate_points( double* xyz, unsigned int num_points, double rel_eps = 0.0, double abs_eps = 0.0,
+                             TupleList* tl = NULL, bool store_local = true );
 
     /* \brief Locate entities on the source mesh
      * This function finds the element/processor/natural coordinates for the
@@ -110,8 +110,8 @@ class Coupler
      * \param store_local If true, stores the tuple list in targetPts
      *
      */
-    ErrorCode locate_points( Range& ents, double rel_eps = 0.0, double abs_eps = 0.0,
-                             TupleList* tl = NULL, bool store_local = true );
+    ErrorCode locate_points( Range& ents, double rel_eps = 0.0, double abs_eps = 0.0, TupleList* tl = NULL,
+                             bool store_local = true );
 
     /* \brief Interpolate data from the source mesh onto points
      * All entities/points or, if tuple_list is input, only those points
@@ -129,8 +129,8 @@ class Coupler
      *    in targetPts are interpolated
      * \param normalize If true, normalization is done according to method
      */
-    ErrorCode interpolate( Coupler::Method method, Tag tag, double* interp_vals,
-                           TupleList* tl = NULL, bool normalize = true );
+    ErrorCode interpolate( Coupler::Method method, Tag tag, double* interp_vals, TupleList* tl = NULL,
+                           bool normalize = true );
 
     /* \brief Interpolate data from the source mesh onto points
      * All entities/points or, if tuple_list is input, only those points
@@ -172,9 +172,8 @@ class Coupler
      *       stored in this object are interpolated
      * \param normalize If true, normalization is done according to method
      */
-    ErrorCode interpolate( Coupler::Method* methods, const std::string* tag_names,
-                           int* points_per_method, int num_methods, double* interp_vals,
-                           TupleList* tl = NULL, bool normalize = true );
+    ErrorCode interpolate( Coupler::Method* methods, const std::string* tag_names, int* points_per_method,
+                           int num_methods, double* interp_vals, TupleList* tl = NULL, bool normalize = true );
 
     /* \brief Interpolate data from multiple tags
      * All entities/points or, if tuple_list is input, only those points
@@ -197,9 +196,8 @@ class Coupler
      *       stored in this object are interpolated
      * \param normalize If true, normalization is done according to method
      */
-    ErrorCode interpolate( Coupler::Method* methods, Tag* tag_names, int* points_per_method,
-                           int num_methods, double* interp_vals, TupleList* tl = NULL,
-                           bool normalize = true );
+    ErrorCode interpolate( Coupler::Method* methods, Tag* tag_names, int* points_per_method, int num_methods,
+                           double* interp_vals, TupleList* tl = NULL, bool normalize = true );
 
     /* \brief Normalize a field over an entire mesh
      * A field existing on the vertices of elements of a mesh is integrated
@@ -212,8 +210,8 @@ class Coupler
      * \param integ_type Type of integration to perform
      * \param num_integ_pts The number of Gaussian integration points to use in each dimension
      */
-    ErrorCode normalize_mesh( EntityHandle root_set, const char* norm_tag,
-                              Coupler::IntegType integ_type, int num_integ_pts );
+    ErrorCode normalize_mesh( EntityHandle root_set, const char* norm_tag, Coupler::IntegType integ_type,
+                              int num_integ_pts );
 
     /* \brief Normalize a field over subsets of entities
      * A field existing on the vertices of elements of a mesh is integrated
@@ -231,9 +229,8 @@ class Coupler
      * \param integ_type Type of integration to perform
      * \param num_integ_pts The number of Gaussian integration points to use in each dimension
      */
-    ErrorCode normalize_subset( EntityHandle root_set, const char* norm_tag, const char** tag_names,
-                                int num_tags, const char** tag_values,
-                                Coupler::IntegType integ_type, int num_integ_pts );
+    ErrorCode normalize_subset( EntityHandle root_set, const char* norm_tag, const char** tag_names, int num_tags,
+                                const char** tag_values, Coupler::IntegType integ_type, int num_integ_pts );
 
     /* \brief Normalize a field over subsets of entities
      * A field existing on the vertices of elements of a mesh is integrated
@@ -251,9 +248,8 @@ class Coupler
      * \param integ_type Type of integration to perform
      * \param num_integ_pts The number of Gaussian integration points to use in each dimension
      */
-    ErrorCode normalize_subset( EntityHandle root_set, const char* norm_tag, Tag* tag_handles,
-                                int num_tags, const char** tag_values,
-                                Coupler::IntegType integ_type, int num_integ_pts );
+    ErrorCode normalize_subset( EntityHandle root_set, const char* norm_tag, Tag* tag_handles, int num_tags,
+                                const char** tag_values, Coupler::IntegType integ_type, int num_integ_pts );
 
     /* \brief Retrieve groups of entities matching tags and values(if present)
      * Retrieve a vector of vectors of entity handles matching the
@@ -265,8 +261,7 @@ class Coupler
      * \param integ_type Type of integration to perform
      * \param num_integ_pts The number of Gaussian integration points to use in each dimension
      */
-    ErrorCode do_normalization( const char*                                 norm_tag,
-                                std::vector< std::vector< EntityHandle > >& entity_sets,
+    ErrorCode do_normalization( const char* norm_tag, std::vector< std::vector< EntityHandle > >& entity_sets,
                                 std::vector< std::vector< EntityHandle > >& entity_groups,
                                 Coupler::IntegType integ_type, int num_integ_pts );
 
@@ -281,9 +276,8 @@ class Coupler
      * \param entity_sets Pointer to vector of vectors of entity set handles found in the search
      * \param entity_groups Pointer to vector of vectors of entity handles from each entity set
      */
-    ErrorCode get_matching_entities( EntityHandle root_set, const char** tag_names,
-                                     const char** tag_values, int num_tags,
-                                     std::vector< std::vector< EntityHandle > >* entity_sets,
+    ErrorCode get_matching_entities( EntityHandle root_set, const char** tag_names, const char** tag_values,
+                                     int num_tags, std::vector< std::vector< EntityHandle > >* entity_sets,
                                      std::vector< std::vector< EntityHandle > >* entity_groups );
 
     /* \brief Retrieve groups of entities matching tags and values(if present)
@@ -297,8 +291,7 @@ class Coupler
      * \param entity_sets Pointer to vector of vectors of entity set handles found in the search
      * \param entity_groups Pointer to vector of vectors of entity handles from each entity set
      */
-    ErrorCode get_matching_entities( EntityHandle root_set, Tag* tag_handles,
-                                     const char** tag_values, int num_tags,
+    ErrorCode get_matching_entities( EntityHandle root_set, Tag* tag_handles, const char** tag_values, int num_tags,
                                      std::vector< std::vector< EntityHandle > >* entity_sets,
                                      std::vector< std::vector< EntityHandle > >* entity_groups );
 
@@ -313,8 +306,7 @@ class Coupler
      * \param num_tags Number of tag names
      * \param tuples The returned tuple_list structure
      */
-    ErrorCode create_tuples( Range& ent_sets, const char** tag_names, unsigned int num_tags,
-                             TupleList** tuples );
+    ErrorCode create_tuples( Range& ent_sets, const char** tag_names, unsigned int num_tags, TupleList** tuples );
 
     /* \brief Return an array of tuples of tag values for each Entity Set
      * A list of n-tuples will be constructed with 1 n-tuple for each Entity Set.
@@ -327,8 +319,7 @@ class Coupler
      * \param num_tags Number of tag handles
      * \param tuples The returned tuple_list structure
      */
-    ErrorCode create_tuples( Range& ent_sets, Tag* tag_handles, unsigned int num_tags,
-                             TupleList** tuples );
+    ErrorCode create_tuples( Range& ent_sets, Tag* tag_handles, unsigned int num_tags, TupleList** tuples );
 
     /* \brief Consolidate an array of n-tuples lists into one n-tuple list with no duplicates
      * An array of list of n-tuples are consolidated into a single list of n-tuples
@@ -339,8 +330,7 @@ class Coupler
      * \param num_tuples Number of tuple_lists
      * \param unique_tuples The consolidated tuple_list with no duplicates
      */
-    ErrorCode consolidate_tuples( TupleList** all_tuples, unsigned int num_tuples,
-                                  TupleList** unique_tuples );
+    ErrorCode consolidate_tuples( TupleList** all_tuples, unsigned int num_tuples, TupleList** unique_tuples );
 
     /* \brief Calculate integrated field values for groups of entities
      * An integrated field value, as defined by the field function,
@@ -353,8 +343,8 @@ class Coupler
      * \param integ_type Type of integration to perform
      */
     ErrorCode get_group_integ_vals( std::vector< std::vector< EntityHandle > >& groups,
-                                    std::vector< double >& integ_vals, const char* norm_tag,
-                                    int num_integ_pts, Coupler::IntegType integ_type );
+                                    std::vector< double >& integ_vals, const char* norm_tag, int num_integ_pts,
+                                    Coupler::IntegType integ_type );
 
     /* \brief Apply a normalization factor to group of entities
      * Multiply a normalization factor with the value of norm_tag for each vertex
@@ -373,15 +363,14 @@ class Coupler
      * this method will look at source (and target sets?) sets, and look for the SEM_DIMS tag
      * if it exists, it will trigger a spectral element caching, with the order specified
      */
-    ErrorCode initialize_spectral_elements( EntityHandle rootSource, EntityHandle rootTarget,
-                                            bool& specSou, bool& specTar );
+    ErrorCode initialize_spectral_elements( EntityHandle rootSource, EntityHandle rootTarget, bool& specSou,
+                                            bool& specTar );
 
     /*
      * this method will put in an array, interleaved, the points of interest for coupling
      * with a target mesh (so where do we need to compute the field of interest)
      */
-    ErrorCode get_gl_points_on_elements( Range& targ_elems, std::vector< double >& vpos,
-                                         int& numPointsOfInterest );
+    ErrorCode get_gl_points_on_elements( Range& targ_elems, std::vector< double >& vpos, int& numPointsOfInterest );
 
     /* Get functions */
 
@@ -434,16 +423,15 @@ class Coupler
   private:
     // Given a coordinate position, find all entities containing
     // the point and the natural coords in those ents
-    ErrorCode nat_param( double xyz[ 3 ], std::vector< EntityHandle >& entities,
-                         std::vector< CartVect >& nat_coords, double epsilon = 0.0 );
+    ErrorCode nat_param( double xyz[ 3 ], std::vector< EntityHandle >& entities, std::vector< CartVect >& nat_coords,
+                         double epsilon = 0.0 );
 
     ErrorCode interp_field( EntityHandle elem, CartVect nat_coord, Tag tag, double& field );
 
     ErrorCode constant_interp( EntityHandle elem, Tag tag, double& field );
 
-    ErrorCode test_local_box( double* xyz, int from_proc, int remote_index, int index,
-                              bool& point_located, double rel_eps = 0.0, double abs_eps = 0.0,
-                              TupleList* tl = NULL );
+    ErrorCode test_local_box( double* xyz, int from_proc, int remote_index, int index, bool& point_located,
+                              double rel_eps = 0.0, double abs_eps = 0.0, TupleList* tl = NULL );
 
     /* \brief MOAB instance
      */
@@ -514,8 +502,8 @@ class Coupler
     bool spherical;
 };
 
-inline ErrorCode Coupler::interpolate( Coupler::Method method, Tag tag, double* interp_vals,
-                                       TupleList* tl, bool normalize )
+inline ErrorCode Coupler::interpolate( Coupler::Method method, Tag tag, double* interp_vals, TupleList* tl,
+                                       bool normalize )
 {
     int num_pts = ( tl ? tl->get_n( ) : targetPts->get_n( ) );
     return interpolate( &method, &tag, &num_pts, 1, interp_vals, tl, normalize );

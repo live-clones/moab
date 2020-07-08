@@ -75,8 +75,8 @@ class EdgeQM : public QualityMetric
                                                   bool free_vertices_only, MsqError& err );
 
     MESQUITE_EXPORT static void get_edge_evaluations( PatchData& pd, std::vector< size_t >& handles,
-                                                      bool free_vertices_only,
-                                                      bool single_pass_evaluate, MsqError& err );
+                                                      bool free_vertices_only, bool single_pass_evaluate,
+                                                      MsqError& err );
 
     /**\brief Default implementation for all edge-based metrics
      *
@@ -84,8 +84,7 @@ class EdgeQM : public QualityMetric
      * and call 'evaluate'.
      */
     MESQUITE_EXPORT virtual bool evaluate_with_indices( PatchData& pd, size_t handle, double& value,
-                                                        std::vector< size_t >& indices,
-                                                        MsqError&              err );
+                                                        std::vector< size_t >& indices, MsqError& err );
 
     enum
     {

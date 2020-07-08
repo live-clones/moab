@@ -11,28 +11,25 @@
 namespace moab
 {
 
-typedef ErrorCode ( *EvalFcn )( const double* params, const double* field, const int ndim,
-                                const int num_tuples, double* work, double* result );
+typedef ErrorCode ( *EvalFcn )( const double* params, const double* field, const int ndim, const int num_tuples,
+                                double* work, double* result );
 
-typedef ErrorCode ( *JacobianFcn )( const double* params, const double* verts, const int nverts,
-                                    const int ndim, double* work, double* result );
+typedef ErrorCode ( *JacobianFcn )( const double* params, const double* verts, const int nverts, const int ndim,
+                                    double* work, double* result );
 
-typedef ErrorCode ( *IntegrateFcn )( const double* field, const double* verts, const int nverts,
-                                     const int ndim, const int num_tuples, double* work,
-                                     double* result );
+typedef ErrorCode ( *IntegrateFcn )( const double* field, const double* verts, const int nverts, const int ndim,
+                                     const int num_tuples, double* work, double* result );
 
 typedef ErrorCode ( *InitFcn )( const double* verts, const int nverts, double*& work );
 
 typedef int ( *InsideFcn )( const double* verts, const int ndims, const double tol );
 
-typedef ErrorCode ( *ReverseEvalFcn )( EvalFcn eval, JacobianFcn jacob, InsideFcn ins,
-                                       const double* posn, const double* verts, const int nverts,
-                                       const int ndim, const double iter_tol,
-                                       const double inside_tol, double* work, double* params,
-                                       int* is_inside );
+typedef ErrorCode ( *ReverseEvalFcn )( EvalFcn eval, JacobianFcn jacob, InsideFcn ins, const double* posn,
+                                       const double* verts, const int nverts, const int ndim, const double iter_tol,
+                                       const double inside_tol, double* work, double* params, int* is_inside );
 
-typedef ErrorCode ( *NormalFcn )( const int ientDim, const int facet, const int nverts,
-                                  const double* verts, double normal[ 3 ] );
+typedef ErrorCode ( *NormalFcn )( const int ientDim, const int facet, const int nverts, const double* verts,
+                                  double normal[ 3 ] );
 
 class EvalSet
 {
@@ -61,16 +58,16 @@ class EvalSet
 
     /** \brief Bare constructor */
     EvalSet( )
-        : evalFcn( NULL ), reverseEvalFcn( NULL ), normalFcn( NULL ), jacobianFcn( NULL ),
-          integrateFcn( NULL ), initFcn( NULL ), insideFcn( NULL )
+        : evalFcn( NULL ), reverseEvalFcn( NULL ), normalFcn( NULL ), jacobianFcn( NULL ), integrateFcn( NULL ),
+          initFcn( NULL ), insideFcn( NULL )
     {
     }
 
     /** \brief Constructor */
-    EvalSet( EvalFcn eval, ReverseEvalFcn rev, NormalFcn normal, JacobianFcn jacob,
-             IntegrateFcn integ, InitFcn initf, InsideFcn insidef )
-        : evalFcn( eval ), reverseEvalFcn( rev ), normalFcn( normal ), jacobianFcn( jacob ),
-          integrateFcn( integ ), initFcn( initf ), insideFcn( insidef )
+    EvalSet( EvalFcn eval, ReverseEvalFcn rev, NormalFcn normal, JacobianFcn jacob, IntegrateFcn integ, InitFcn initf,
+             InsideFcn insidef )
+        : evalFcn( eval ), reverseEvalFcn( rev ), normalFcn( normal ), jacobianFcn( jacob ), integrateFcn( integ ),
+          initFcn( initf ), insideFcn( insidef )
     {
     }
 
@@ -95,11 +92,9 @@ class EvalSet
 
     /** \brief Common function to do reverse evaluation based on evaluation and jacobian functions
      */
-    static ErrorCode evaluate_reverse( EvalFcn eval, JacobianFcn jacob, InsideFcn inside_f,
-                                       const double* posn, const double* verts, const int nverts,
-                                       const int ndim, const double iter_tol,
-                                       const double inside_tol, double* work, double* params,
-                                       int* inside );
+    static ErrorCode evaluate_reverse( EvalFcn eval, JacobianFcn jacob, InsideFcn inside_f, const double* posn,
+                                       const double* verts, const int nverts, const int ndim, const double iter_tol,
+                                       const double inside_tol, double* work, double* params, int* inside );
     /** \brief Common function that returns true if params is in [-1,1]^ndims */
     static int inside_function( const double* params, const int ndims, const double tol );
 };
@@ -207,8 +202,8 @@ class ElemEvaluator
      * evaulation failed for some reason (point not in element is NOT a reason for failure)
      */
     ErrorCode find_containing_entity( Range& entities, const double* point, const double iter_tol,
-                                      const double inside_tol, EntityHandle& containing_ent,
-                                      double* params, unsigned int* num_evals = NULL );
+                                      const double inside_tol, EntityHandle& containing_ent, double* params,
+                                      unsigned int* num_evals = NULL );
 
     /** \brief Given an entity set, return the contained entity the point is in, or none
      * This function reverse-evaluates the entities, returning the first entity containing the
@@ -226,9 +221,8 @@ class ElemEvaluator
      * \return Returns non-success only if evaulation failed for some reason (point not in element
      * is NOT a reason for failure)
      */
-    ErrorCode find_containing_entity( EntityHandle ent_set, const double* point,
-                                      const double iter_tol, const double inside_tol,
-                                      EntityHandle& containing_ent, double* params,
+    ErrorCode find_containing_entity( EntityHandle ent_set, const double* point, const double iter_tol,
+                                      const double inside_tol, EntityHandle& containing_ent, double* params,
                                       unsigned int* num_evals = NULL );
 
     /** \brief Set the eval set for a given type entity
@@ -370,11 +364,9 @@ class ElemEvaluator
 
 };  // class ElemEvaluator
 
-inline ElemEvaluator::ElemEvaluator( Interface* impl, EntityHandle ent, Tag tag,
-                                     int tagged_ent_dim )
-    : mbImpl( impl ), entHandle( 0 ), entType( MBMAXTYPE ), entDim( -1 ), numVerts( 0 ),
-      vertHandles( NULL ), tagHandle( 0 ), tagCoords( false ), numTuples( 0 ), taggedEntDim( 0 ),
-      workSpace( NULL )
+inline ElemEvaluator::ElemEvaluator( Interface* impl, EntityHandle ent, Tag tag, int tagged_ent_dim )
+    : mbImpl( impl ), entHandle( 0 ), entType( MBMAXTYPE ), entDim( -1 ), numVerts( 0 ), vertHandles( NULL ),
+      tagHandle( 0 ), tagCoords( false ), numTuples( 0 ), taggedEntDim( 0 ), workSpace( NULL )
 {
     if( ent ) set_ent_handle( ent );
     if( tag ) set_tag_handle( tag, tagged_ent_dim );
@@ -398,11 +390,10 @@ inline ErrorCode ElemEvaluator::set_ent_handle( EntityHandle ent )
     entDim = mbImpl->dimension_from_handle( ent );
 
     std::vector< EntityHandle > dum_vec;
-    ErrorCode rval = mbImpl->get_connectivity( ent, vertHandles, numVerts, false, &dum_vec );
+    ErrorCode                   rval = mbImpl->get_connectivity( ent, vertHandles, numVerts, false, &dum_vec );
     if( MB_SUCCESS != rval ) return rval;
 
-    if( !evalSets[ entType ].evalFcn )
-        EvalSet::get_eval_set( entType, numVerts, evalSets[ entType ] );
+    if( !evalSets[ entType ].evalFcn ) EvalSet::get_eval_set( entType, numVerts, evalSets[ entType ] );
 
     rval = mbImpl->get_coords( vertHandles, numVerts, vertPos[ 0 ].array( ) );
     if( MB_SUCCESS != rval ) return rval;
@@ -515,8 +506,7 @@ inline ErrorCode ElemEvaluator::set_eval_set( EntityType tp, const EvalSet& eval
     evalSets[ tp ] = eval_set;
     if( entHandle && evalSets[ entType ].initFcn )
     {
-        ErrorCode rval =
-            ( *evalSets[ entType ].initFcn )( vertPos[ 0 ].array( ), numVerts, workSpace );
+        ErrorCode rval = ( *evalSets[ entType ].initFcn )( vertPos[ 0 ].array( ), numVerts, workSpace );
         if( MB_SUCCESS != rval ) return rval;
     }
     return MB_SUCCESS;
@@ -526,37 +516,31 @@ inline ErrorCode ElemEvaluator::eval( const double* params, double* result, int 
 {
     assert( entHandle && MBMAXTYPE != entType );
     return ( *evalSets[ entType ].evalFcn )(
-        params,
-        ( tagCoords ? (const double*)vertPos[ 0 ].array( ) : (const double*)&tagSpace[ 0 ] ),
-        entDim, ( -1 == num_tuples ? numTuples : num_tuples ), workSpace, result );
+        params, ( tagCoords ? (const double*)vertPos[ 0 ].array( ) : (const double*)&tagSpace[ 0 ] ), entDim,
+        ( -1 == num_tuples ? numTuples : num_tuples ), workSpace, result );
 }
 
-inline ErrorCode ElemEvaluator::reverse_eval( const double* posn, const double iter_tol,
-                                              const double inside_tol, double* params,
-                                              int* ins ) const
+inline ErrorCode ElemEvaluator::reverse_eval( const double* posn, const double iter_tol, const double inside_tol,
+                                              double* params, int* ins ) const
 {
     assert( entHandle && MBMAXTYPE != entType );
-    return ( *evalSets[ entType ].reverseEvalFcn )(
-        evalSets[ entType ].evalFcn, evalSets[ entType ].jacobianFcn, evalSets[ entType ].insideFcn,
-        posn, vertPos[ 0 ].array( ), numVerts, entDim, iter_tol, inside_tol, workSpace, params,
-        ins );
+    return ( *evalSets[ entType ].reverseEvalFcn )( evalSets[ entType ].evalFcn, evalSets[ entType ].jacobianFcn,
+                                                    evalSets[ entType ].insideFcn, posn, vertPos[ 0 ].array( ),
+                                                    numVerts, entDim, iter_tol, inside_tol, workSpace, params, ins );
 }
 
 /** \brief Evaluate the normal of the cached entity at a given facet */
-inline ErrorCode ElemEvaluator::get_normal( const int ientDim, const int facet,
-                                            double normal[] ) const
+inline ErrorCode ElemEvaluator::get_normal( const int ientDim, const int facet, double normal[] ) const
 {
     assert( entHandle && MBMAXTYPE != entType );
-    return ( *evalSets[ entType ].normalFcn )( ientDim, facet, numVerts, vertPos[ 0 ].array( ),
-                                               normal );
+    return ( *evalSets[ entType ].normalFcn )( ientDim, facet, numVerts, vertPos[ 0 ].array( ), normal );
 }
 
 /** \brief Evaluate the jacobian of the cached entity at a given parametric location */
 inline ErrorCode ElemEvaluator::jacobian( const double* params, double* result ) const
 {
     assert( entHandle && MBMAXTYPE != entType );
-    return ( *evalSets[ entType ].jacobianFcn )( params, vertPos[ 0 ].array( ), numVerts, entDim,
-                                                 workSpace, result );
+    return ( *evalSets[ entType ].jacobianFcn )( params, vertPos[ 0 ].array( ), numVerts, entDim, workSpace, result );
 }
 
 /** \brief Integrate the cached tag over the cached entity */
@@ -572,16 +556,15 @@ inline ErrorCode ElemEvaluator::integrate( double* result ) const
             rval = mbImpl->tag_get_data( tagHandle, &entHandle, 1, (void*)&tagSpace[ 0 ] );
         if( MB_SUCCESS != rval ) return rval;
     }
-    return ( *evalSets[ entType ].integrateFcn )(
-        ( tagCoords ? vertPos[ 0 ].array( ) : (const double*)&tagSpace[ 0 ] ),
-        vertPos[ 0 ].array( ), numVerts, entDim, numTuples, workSpace, result );
+    return ( *evalSets[ entType ].integrateFcn )( ( tagCoords ? vertPos[ 0 ].array( ) : (const double*)&tagSpace[ 0 ] ),
+                                                  vertPos[ 0 ].array( ), numVerts, entDim, numTuples, workSpace,
+                                                  result );
 }
 
 inline ErrorCode ElemEvaluator::find_containing_entity( EntityHandle ent_set, const double* point,
-                                                        const double  iter_tol,
-                                                        const double  inside_tol,
-                                                        EntityHandle& containing_ent,
-                                                        double* params, unsigned int* num_evals )
+                                                        const double iter_tol, const double inside_tol,
+                                                        EntityHandle& containing_ent, double* params,
+                                                        unsigned int* num_evals )
 {
     assert( mbImpl->type_from_handle( ent_set ) == MBENTITYSET );
     Range     entities;
@@ -589,8 +572,7 @@ inline ErrorCode ElemEvaluator::find_containing_entity( EntityHandle ent_set, co
     if( MB_SUCCESS != rval )
         return rval;
     else
-        return find_containing_entity( entities, point, iter_tol, inside_tol, containing_ent,
-                                       params, num_evals );
+        return find_containing_entity( entities, point, iter_tol, inside_tol, containing_ent, params, num_evals );
 }
 
 inline int ElemEvaluator::inside( const double* params, const double tol ) const
@@ -601,8 +583,7 @@ inline int ElemEvaluator::inside( const double* params, const double tol ) const
 inline ErrorCode ElemEvaluator::set_eval_set( const EntityHandle eh )
 {
     EvalSet   eset;
-    ErrorCode rval =
-        EvalSet::get_eval_set( mbImpl, eh, evalSets[ mbImpl->type_from_handle( eh ) ] );
+    ErrorCode rval = EvalSet::get_eval_set( mbImpl, eh, evalSets[ mbImpl->type_from_handle( eh ) ] );
     return rval;
 }
 

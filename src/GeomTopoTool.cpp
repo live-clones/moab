@@ -43,36 +43,33 @@ const char OBB_GSET_TAG_NAME[] = "OBB_GSET";
 
 const char IMPLICIT_COMPLEMENT_NAME[] = "impl_complement";
 
-GeomTopoTool::GeomTopoTool( Interface* impl, bool find_geoments, EntityHandle modelRootSet,
-                            bool p_rootSets_vector, bool restore_rootSets )
-    : mdbImpl( impl ), sense2Tag( 0 ), senseNEntsTag( 0 ), senseNSensesTag( 0 ), geomTag( 0 ),
-      gidTag( 0 ), obbRootTag( 0 ), obbGsetTag( 0 ), modelSet( modelRootSet ), updated( false ),
-      setOffset( 0 ), m_rootSets_vector( p_rootSets_vector ), oneVolRootSet( 0 )
+GeomTopoTool::GeomTopoTool( Interface* impl, bool find_geoments, EntityHandle modelRootSet, bool p_rootSets_vector,
+                            bool restore_rootSets )
+    : mdbImpl( impl ), sense2Tag( 0 ), senseNEntsTag( 0 ), senseNSensesTag( 0 ), geomTag( 0 ), gidTag( 0 ),
+      obbRootTag( 0 ), obbGsetTag( 0 ), modelSet( modelRootSet ), updated( false ), setOffset( 0 ),
+      m_rootSets_vector( p_rootSets_vector ), oneVolRootSet( 0 )
 {
 
     obbTree = new OrientedBoxTreeTool( impl, NULL, true );
 
-    ErrorCode rval = mdbImpl->tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, geomTag,
-                                              MB_TAG_CREAT | MB_TAG_SPARSE );MB_CHK_SET_ERR_CONT( rval, "Error: Failed to create geometry dimension tag" );
+    ErrorCode rval =
+        mdbImpl->tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, geomTag, MB_TAG_CREAT | MB_TAG_SPARSE );MB_CHK_SET_ERR_CONT( rval, "Error: Failed to create geometry dimension tag" );
 
     // global id tag is not really needed, but mbsize complains if we do not set it for
     // geometry entities
     gidTag = mdbImpl->globalId_tag( );
 
-    rval = mdbImpl->tag_get_handle( NAME_TAG_NAME, NAME_TAG_SIZE, MB_TYPE_OPAQUE, nameTag,
-                                    MB_TAG_CREAT | MB_TAG_SPARSE );MB_CHK_SET_ERR_CONT( rval, "Error: Failed to create name tag" );
+    rval =
+        mdbImpl->tag_get_handle( NAME_TAG_NAME, NAME_TAG_SIZE, MB_TYPE_OPAQUE, nameTag, MB_TAG_CREAT | MB_TAG_SPARSE );MB_CHK_SET_ERR_CONT( rval, "Error: Failed to create name tag" );
 
-    rval = mdbImpl->tag_get_handle( OBB_ROOT_TAG_NAME, 1, MB_TYPE_HANDLE, obbRootTag,
-                                    MB_TAG_CREAT | MB_TAG_SPARSE );MB_CHK_SET_ERR_CONT( rval, "Error: Failed to create obb root tag" );
+    rval = mdbImpl->tag_get_handle( OBB_ROOT_TAG_NAME, 1, MB_TYPE_HANDLE, obbRootTag, MB_TAG_CREAT | MB_TAG_SPARSE );MB_CHK_SET_ERR_CONT( rval, "Error: Failed to create obb root tag" );
 
-    rval = mdbImpl->tag_get_handle( OBB_GSET_TAG_NAME, 1, MB_TYPE_HANDLE, obbGsetTag,
-                                    MB_TAG_CREAT | MB_TAG_SPARSE );MB_CHK_SET_ERR_CONT( rval, "Error: Failed to create obb gset tag" );
+    rval = mdbImpl->tag_get_handle( OBB_GSET_TAG_NAME, 1, MB_TYPE_HANDLE, obbGsetTag, MB_TAG_CREAT | MB_TAG_SPARSE );MB_CHK_SET_ERR_CONT( rval, "Error: Failed to create obb gset tag" );
 
     // set this value to zero for comparisons
     impl_compl_handle = 0;
 
-    maxGlobalId[ 0 ] = maxGlobalId[ 1 ] = maxGlobalId[ 2 ] = maxGlobalId[ 3 ] = maxGlobalId[ 4 ] =
-        0;
+    maxGlobalId[ 0 ] = maxGlobalId[ 1 ] = maxGlobalId[ 2 ] = maxGlobalId[ 3 ] = maxGlobalId[ 4 ] = 0;
     if( find_geoments )
     {
         find_geomsets( );
@@ -141,8 +138,7 @@ int GeomTopoTool::global_id( EntityHandle this_set )
 
 EntityHandle GeomTopoTool::entity_by_id( int dimension1, int id )
 {
-    if( 0 > dimension1 && 3 < dimension1 )
-    { MB_CHK_SET_ERR_CONT( MB_FAILURE, "Incorrect dimension provided" ); };
+    if( 0 > dimension1 && 3 < dimension1 ) { MB_CHK_SET_ERR_CONT( MB_FAILURE, "Incorrect dimension provided" ); };
     const Tag         tags[] = { gidTag, geomTag };
     const void* const vals[] = { &id, &dimension1 };
     ErrorCode         rval;
@@ -155,8 +151,8 @@ EntityHandle GeomTopoTool::entity_by_id( int dimension1, int id )
     return results.front( );
 }
 
-ErrorCode GeomTopoTool::other_entity( EntityHandle bounded, EntityHandle not_this,
-                                      EntityHandle across, EntityHandle& other )
+ErrorCode GeomTopoTool::other_entity( EntityHandle bounded, EntityHandle not_this, EntityHandle across,
+                                      EntityHandle& other )
 {
     other = 0;
 
@@ -197,8 +193,7 @@ ErrorCode GeomTopoTool::restore_obb_index( )
     EntityHandle root;
 
     for( int dim = 2; dim <= 3; dim++ )
-        for( Range::iterator rit = geomRanges[ dim ].begin( ); rit != geomRanges[ dim ].end( );
-             ++rit )
+        for( Range::iterator rit = geomRanges[ dim ].begin( ); rit != geomRanges[ dim ].end( ); ++rit )
         {
             rval = mdbImpl->tag_get_data( obbRootTag, &( *rit ), 1, &root );
 
@@ -224,8 +219,7 @@ ErrorCode GeomTopoTool::find_geomsets( Range* ranges )
         rval = mdbImpl->tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, geomTag );MB_CHK_SET_ERR( rval, "Failed to get geom dimension tag handle" );
     }
 
-    rval = mdbImpl->get_entities_by_type_and_tag( modelSet, MBENTITYSET, &geomTag, NULL, 1,
-                                                  geom_sets );MB_CHK_SET_ERR( rval, "Failed to get the geometry entities" );
+    rval = mdbImpl->get_entities_by_type_and_tag( modelSet, MBENTITYSET, &geomTag, NULL, 1, geom_sets );MB_CHK_SET_ERR( rval, "Failed to get the geometry entities" );
 
     rval = separate_by_dimension( geom_sets );MB_CHK_SET_ERR( rval, "Failed to separate geometry sets by dimension" );
 
@@ -246,8 +240,7 @@ ErrorCode GeomTopoTool::get_gsets_by_dimension( int dim, Range& gset )
 
     const int         val = dim;
     const void* const dim_val[] = { &val };
-    rval =
-        mdbImpl->get_entities_by_type_and_tag( modelSet, MBENTITYSET, &geomTag, dim_val, 1, gset );MB_CHK_SET_ERR( rval, "Failed to get entity set by type and tag" );
+    rval = mdbImpl->get_entities_by_type_and_tag( modelSet, MBENTITYSET, &geomTag, dim_val, 1, gset );MB_CHK_SET_ERR( rval, "Failed to get entity set by type and tag" );
 
     return MB_SUCCESS;
 }
@@ -296,8 +289,7 @@ ErrorCode GeomTopoTool::is_owned_set( EntityHandle eh )
     // make sure entity set is part of the model
     Range     model_ents;
     ErrorCode rval = mdbImpl->get_entities_by_handle( modelSet, model_ents );MB_CHK_SET_ERR( rval, "Failed to get entities" );
-    if( model_ents.find( eh ) == model_ents.end( ) )
-    { MB_SET_ERR( MB_FAILURE, "Entity handle not in model set" ); }
+    if( model_ents.find( eh ) == model_ents.end( ) ) { MB_SET_ERR( MB_FAILURE, "Entity handle not in model set" ); }
     return MB_SUCCESS;
 }
 
@@ -343,8 +335,7 @@ ErrorCode GeomTopoTool::delete_obb_tree( EntityHandle gset, bool vol_only )
             {
                 Range new_child_tree_nodes;
                 rval = mdbImpl->get_child_meshsets( child, new_child_tree_nodes );MB_CHK_SET_ERR( rval, "Problem getting child nodes" );
-                child_tree_nodes.insert_list( new_child_tree_nodes.begin( ),
-                                              new_child_tree_nodes.end( ) );
+                child_tree_nodes.insert_list( new_child_tree_nodes.begin( ), new_child_tree_nodes.end( ) );
                 nodes_to_delete.insert( child );
             }
             // We're done checking this node, so can erase from child list
@@ -608,13 +599,12 @@ ErrorCode GeomTopoTool::restore_topology_from_adjacency( )
         // each dimension so prev dim's tag data goes away
         Tag          owner_tag;
         EntityHandle dum_val = 0;
-        result = mdbImpl->tag_get_handle( "__owner_tag", 1, MB_TYPE_HANDLE, owner_tag,
-                                          MB_TAG_DENSE | MB_TAG_CREAT, &dum_val );
+        result = mdbImpl->tag_get_handle( "__owner_tag", 1, MB_TYPE_HANDLE, owner_tag, MB_TAG_DENSE | MB_TAG_CREAT,
+                                          &dum_val );
         if( MB_SUCCESS != result ) continue;
         Range                       dp1ents;
         std::vector< EntityHandle > owners;
-        for( Range::iterator rit = geomRanges[ dim + 1 ].begin( );
-             rit != geomRanges[ dim + 1 ].end( ); ++rit )
+        for( Range::iterator rit = geomRanges[ dim + 1 ].begin( ); rit != geomRanges[ dim + 1 ].end( ); ++rit )
         {
             dp1ents.clear( );
             result = mdbImpl->get_entities_by_dimension( *rit, dim + 1, dp1ents );
@@ -625,8 +615,7 @@ ErrorCode GeomTopoTool::restore_topology_from_adjacency( )
             if( MB_SUCCESS != result ) continue;
         }
 
-        for( Range::iterator d_it = geomRanges[ dim ].begin( ); d_it != geomRanges[ dim ].end( );
-             ++d_it )
+        for( Range::iterator d_it = geomRanges[ dim ].begin( ); d_it != geomRanges[ dim ].end( ); ++d_it )
         {
             Range dents;
             result = mdbImpl->get_entities_by_dimension( *d_it, dim, dents );
@@ -641,8 +630,7 @@ ErrorCode GeomTopoTool::restore_topology_from_adjacency( )
             // get owner tags
             parents.resize( dp1ents.size( ) );
             result = mdbImpl->tag_get_data( owner_tag, dp1ents, &parents[ 0 ] );
-            if( MB_TAG_NOT_FOUND == result )
-            { MB_CHK_SET_ERR( result, "Could not find owner tag" ); }
+            if( MB_TAG_NOT_FOUND == result ) { MB_CHK_SET_ERR( result, "Could not find owner tag" ); }
             if( MB_SUCCESS != result ) continue;
 
             // compress to a range to remove duplicates
@@ -662,16 +650,14 @@ ErrorCode GeomTopoTool::restore_topology_from_adjacency( )
                 result = mdbImpl->get_connectivity( dp1ents[ i ], conn3, len3, true );MB_CHK_SET_ERR( result, "Failed to get the connectivity of the element" );
                 result = mdbImpl->get_connectivity( dents.front( ), conn2, len2, true );MB_CHK_SET_ERR( result, "Failed to get the connectivity of the first element" );
                 if( len2 > 4 ) { MB_SET_ERR( MB_FAILURE, "Connectivity of incorrect length" ); }
-                err = CN::SideNumber( TYPE_FROM_HANDLE( dp1ents[ i ] ), conn3, conn2, len2, dim,
-                                      num, sense, offset );
+                err = CN::SideNumber( TYPE_FROM_HANDLE( dp1ents[ i ] ), conn3, conn2, len2, dim, num, sense, offset );
                 if( err ) return MB_FAILURE;
 
                 result = set_sense( *d_it, parents[ i ], sense );
                 if( MB_MULTIPLE_ENTITIES_FOUND == result )
                 {
                     if( 2 == dim )
-                        std::cerr << "Warning: Multiple volumes use surface with same sense."
-                                  << std::endl
+                        std::cerr << "Warning: Multiple volumes use surface with same sense." << std::endl
                                   << "         Some geometric sense data lost." << std::endl;
                 }
                 else if( MB_SUCCESS != result )
@@ -844,28 +830,23 @@ ErrorCode GeomTopoTool::set_sense( EntityHandle entity, EntityHandle wrt_entity,
 
         EntityHandle sense_data[ 2 ] = { 0, 0 };
         rval = mdbImpl->tag_get_data( sense2Tag, &entity, 1, sense_data );
-        if( MB_TAG_NOT_FOUND != rval && MB_SUCCESS != rval )
-            MB_CHK_SET_ERR( rval, "Failed to get the sense2Tag data" );
+        if( MB_TAG_NOT_FOUND != rval && MB_SUCCESS != rval ) MB_CHK_SET_ERR( rval, "Failed to get the sense2Tag data" );
 
         if( 0 == sense )
         {
-            if( 0 != sense_data[ 0 ] && wrt_entity != sense_data[ 0 ] )
-                return MB_MULTIPLE_ENTITIES_FOUND;
-            if( 0 != sense_data[ 1 ] && wrt_entity != sense_data[ 1 ] )
-                return MB_MULTIPLE_ENTITIES_FOUND;
+            if( 0 != sense_data[ 0 ] && wrt_entity != sense_data[ 0 ] ) return MB_MULTIPLE_ENTITIES_FOUND;
+            if( 0 != sense_data[ 1 ] && wrt_entity != sense_data[ 1 ] ) return MB_MULTIPLE_ENTITIES_FOUND;
             sense_data[ 0 ] = sense_data[ 1 ] = wrt_entity;
         }
         else if( -1 == sense )
         {
-            if( 0 != sense_data[ 1 ] && wrt_entity != sense_data[ 1 ] )
-                return MB_MULTIPLE_ENTITIES_FOUND;
+            if( 0 != sense_data[ 1 ] && wrt_entity != sense_data[ 1 ] ) return MB_MULTIPLE_ENTITIES_FOUND;
             if( sense_data[ 1 ] == wrt_entity ) return MB_SUCCESS;  // already set as we want
             sense_data[ 1 ] = wrt_entity;
         }
         else if( 1 == sense )
         {
-            if( 0 != sense_data[ 0 ] && wrt_entity != sense_data[ 0 ] )
-                return MB_MULTIPLE_ENTITIES_FOUND;
+            if( 0 != sense_data[ 0 ] && wrt_entity != sense_data[ 0 ] ) return MB_MULTIPLE_ENTITIES_FOUND;
             if( sense_data[ 0 ] == wrt_entity ) return MB_SUCCESS;  // already set as we want
             sense_data[ 0 ] = wrt_entity;
         }
@@ -896,8 +877,7 @@ ErrorCode GeomTopoTool::get_sense( EntityHandle entity, EntityHandle wrt_entity,
         rval = get_senses( entity, faces, senses );  // the tags should be defined here
         MB_CHK_SET_ERR( rval, "Failed to get the curve to surface sense data" );
 
-        std::vector< EntityHandle >::iterator it =
-            std::find( faces.begin( ), faces.end( ), wrt_entity );
+        std::vector< EntityHandle >::iterator it = std::find( faces.begin( ), faces.end( ), wrt_entity );
         if( it == faces.end( ) ) return MB_ENTITY_NOT_FOUND;
         unsigned int index = it - faces.begin( );
         sense = senses[ index ];
@@ -930,8 +910,7 @@ ErrorCode GeomTopoTool::get_surface_senses( EntityHandle surface_ent, EntityHand
     // sense relationships
     int ent_dim = dimension( surface_ent );
     // verify the incoming entity dimensions for this call
-    if( ent_dim != 2 )
-    { MB_SET_ERR( MB_FAILURE, "Entity dimension is incorrect for surface meshset" ); }
+    if( ent_dim != 2 ) { MB_SET_ERR( MB_FAILURE, "Entity dimension is incorrect for surface meshset" ); }
 
     // get the sense information for this surface
     EntityHandle parent_vols[ 2 ] = { 0, 0 };
@@ -952,8 +931,7 @@ ErrorCode GeomTopoTool::set_surface_senses( EntityHandle surface_ent, EntityHand
     // sense relationships
     int ent_dim = dimension( surface_ent );
     // verify the incoming entity dimensions for this call
-    if( ent_dim != 2 )
-    { MB_SET_ERR( MB_FAILURE, "Entity dimension is incorrect for surface meshset" ); }
+    if( ent_dim != 2 ) { MB_SET_ERR( MB_FAILURE, "Entity dimension is incorrect for surface meshset" ); }
 
     // set the sense information for this surface
     EntityHandle parent_vols[ 2 ] = { forward_vol, reverse_vol };
@@ -963,8 +941,8 @@ ErrorCode GeomTopoTool::set_surface_senses( EntityHandle surface_ent, EntityHand
 }
 
 // get sense of surface(s) wrt volume
-ErrorCode GeomTopoTool::get_surface_senses( EntityHandle volume, int num_surfaces,
-                                            const EntityHandle* surfaces, int* senses_out )
+ErrorCode GeomTopoTool::get_surface_senses( EntityHandle volume, int num_surfaces, const EntityHandle* surfaces,
+                                            int* senses_out )
 {
 
     /* The sense tags do not reference the implicit complement handle.
@@ -1070,8 +1048,7 @@ ErrorCode GeomTopoTool::set_senses( EntityHandle entity, std::vector< EntityHand
     return MB_SUCCESS;
 }
 
-ErrorCode GeomTopoTool::next_vol( EntityHandle surface, EntityHandle old_volume,
-                                  EntityHandle& new_volume )
+ErrorCode GeomTopoTool::next_vol( EntityHandle surface, EntityHandle old_volume, EntityHandle& new_volume )
 {
     std::vector< EntityHandle > parents;
     ErrorCode                   rval = mdbImpl->get_parent_meshsets( surface, parents );
@@ -1104,8 +1081,7 @@ ErrorCode GeomTopoTool::check_geom_tag( bool create )
     if( !geomTag )
     {
         // get any kind of tag that already exists
-        rval =
-            mdbImpl->tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, geomTag, flags );MB_CHK_SET_ERR( rval, "Could not get/create the geometry dimension tag" );
+        rval = mdbImpl->tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, geomTag, flags );MB_CHK_SET_ERR( rval, "Could not get/create the geometry dimension tag" );
     }
     return MB_SUCCESS;
 }
@@ -1127,13 +1103,11 @@ ErrorCode GeomTopoTool::check_gid_tag( bool create )
 ErrorCode GeomTopoTool::check_face_sense_tag( bool create )
 {
     ErrorCode rval;
-    unsigned  flags =
-        create ? MB_TAG_SPARSE | MB_TAG_CREAT | MB_TAG_ANY : MB_TAG_SPARSE | MB_TAG_ANY;
+    unsigned  flags = create ? MB_TAG_SPARSE | MB_TAG_CREAT | MB_TAG_ANY : MB_TAG_SPARSE | MB_TAG_ANY;
     if( !sense2Tag )
     {
         EntityHandle def_val[ 2 ] = { 0, 0 };
-        rval = mdbImpl->tag_get_handle( GEOM_SENSE_2_TAG_NAME, 2, MB_TYPE_HANDLE, sense2Tag, flags,
-                                        def_val );MB_CHK_SET_ERR( rval, "Could not get/create the sense2Tag" );
+        rval = mdbImpl->tag_get_handle( GEOM_SENSE_2_TAG_NAME, 2, MB_TYPE_HANDLE, sense2Tag, flags, def_val );MB_CHK_SET_ERR( rval, "Could not get/create the sense2Tag" );
     }
     return MB_SUCCESS;
 }
@@ -1146,10 +1120,8 @@ ErrorCode GeomTopoTool::check_edge_sense_tags( bool create )
     if( create ) flags |= MB_TAG_CREAT;
     if( !senseNEntsTag )
     {
-        rval = mdbImpl->tag_get_handle( GEOM_SENSE_N_ENTS_TAG_NAME, 0, MB_TYPE_HANDLE,
-                                        senseNEntsTag, flags );MB_CHK_SET_ERR( rval, "Failed to get the curve to surface entity tag handle" );
-        rval = mdbImpl->tag_get_handle( GEOM_SENSE_N_SENSES_TAG_NAME, 0, MB_TYPE_INTEGER,
-                                        senseNSensesTag, flags );MB_CHK_SET_ERR( rval, "Failed to get the curve to surface sense tag handle" );
+        rval = mdbImpl->tag_get_handle( GEOM_SENSE_N_ENTS_TAG_NAME, 0, MB_TYPE_HANDLE, senseNEntsTag, flags );MB_CHK_SET_ERR( rval, "Failed to get the curve to surface entity tag handle" );
+        rval = mdbImpl->tag_get_handle( GEOM_SENSE_N_SENSES_TAG_NAME, 0, MB_TYPE_INTEGER, senseNSensesTag, flags );MB_CHK_SET_ERR( rval, "Failed to get the curve to surface sense tag handle" );
     }
     return MB_SUCCESS;
 }
@@ -1240,8 +1212,8 @@ ErrorCode GeomTopoTool::geometrize_surface_set( EntityHandle surface, EntityHand
         for( Range::iterator it = edge_ents.begin( ); it != edge_ents.end( ); ++it )
         {
             EntityHandle ed = *it;
-            std::cout << "edge: " << mdbImpl->id_from_handle( ed )
-                      << " type:" << mdbImpl->type_from_handle( ed ) << "\n";
+            std::cout << "edge: " << mdbImpl->id_from_handle( ed ) << " type:" << mdbImpl->type_from_handle( ed )
+                      << "\n";
             std::cout << mdbImpl->list_entity( ed );
         }
     }
@@ -1318,8 +1290,7 @@ ErrorCode GeomTopoTool::geometrize_surface_set( EntityHandle surface, EntityHand
             if( good_edges.size( ) != 1 )
             {
                 std::cout << " good_edges.size()=" << good_edges.size( ) << " STOP\n";
-                MB_SET_ERR( MB_FAILURE,
-                            "Number of good edges is not one. Could not complete the loop" );
+                MB_SET_ERR( MB_FAILURE, "Number of good edges is not one. Could not complete the loop" );
             }
             // see if the orientation is good; if not, revert it
 
@@ -1333,8 +1304,8 @@ ErrorCode GeomTopoTool::geometrize_surface_set( EntityHandle surface, EntityHand
                 {
                     // the edge is not connected then to current edge
                     // bail out
-                    std::cout << "edge " << mdbImpl->id_from_handle( current_edge )
-                              << " not connected to node " << next_node << "\n";
+                    std::cout << "edge " << mdbImpl->id_from_handle( current_edge ) << " not connected to node "
+                              << next_node << "\n";
                     MB_SET_ERR( MB_FAILURE, "Current edge is not connected to node" );
                     ;
                 }
@@ -1348,8 +1319,7 @@ ErrorCode GeomTopoTool::geometrize_surface_set( EntityHandle surface, EntityHand
                 rval = mdbImpl->set_connectivity( current_edge, nn2, 2 );MB_CHK_SET_ERR( rval, "Failed to set the connectivity of the current edge" );
 
                 {
-                    std::cout << "after revert edge " << mdbImpl->id_from_handle( current_edge )
-                              << "\n";
+                    std::cout << "after revert edge " << mdbImpl->id_from_handle( current_edge ) << "\n";
                     std::cout << mdbImpl->list_entity( current_edge );
                     std::cout << " conn2: " << conn2[ 0 ] << " " << conn2[ 1 ] << "\n";
                 }
@@ -1406,10 +1376,7 @@ ErrorCode GeomTopoTool::geometrize_surface_set( EntityHandle surface, EntityHand
         rval = mdbImpl->add_entities( output, &vertex, 1 );MB_CHK_SET_ERR( rval, "Failed to add the vertex meshset to the output set" );
 
         if( debugFlag )
-        {
-            std::cout << "add edge with start node " << start_node << " with " << edges_loop.size( )
-                      << " edges\n";
-        }
+        { std::cout << "add edge with start node " << start_node << " with " << edges_loop.size( ) << " edges\n"; }
     }
 
     return MB_SUCCESS;
@@ -1431,8 +1398,7 @@ ErrorCode GeomTopoTool::geometrize_surface_set( EntityHandle surface, EntityHand
  *   the right size.
  *
  */
-ErrorCode GeomTopoTool::duplicate_model( GeomTopoTool*&               duplicate,
-                                         std::vector< EntityHandle >* pvGEnts )
+ErrorCode GeomTopoTool::duplicate_model( GeomTopoTool*& duplicate, std::vector< EntityHandle >* pvGEnts )
 {
     // will
     EntityHandle rootModelSet;
@@ -1454,8 +1420,7 @@ ErrorCode GeomTopoTool::duplicate_model( GeomTopoTool*&               duplicate,
         {
             EntityHandle geomSet = ( *pvGEnts )[ k ];
             // will keep accumulating to the depSets range
-            rval =
-                mdbImpl->get_child_meshsets( geomSet, depSets, 0 );  // 0 for numHops means that all
+            rval = mdbImpl->get_child_meshsets( geomSet, depSets, 0 );  // 0 for numHops means that all
             // dependents are returned, not only the direct children.
             MB_CHK_SET_ERR( rval, "Failed to get the geometry set's child meshsets" );
 
@@ -1494,8 +1459,7 @@ ErrorCode GeomTopoTool::duplicate_model( GeomTopoTool*&               duplicate,
                 std::vector< EntityHandle > mesh_edges;
                 rval = mdbImpl->get_entities_by_handle( set, mesh_edges );MB_CHK_SET_ERR( rval, "Failed to get the meshset entities by handle" );
 
-                rval =
-                    mdbImpl->add_entities( newSet, &( mesh_edges[ 0 ] ), (int)mesh_edges.size( ) );MB_CHK_SET_ERR( rval, "Failed to add the new entities to the new meshset" );
+                rval = mdbImpl->add_entities( newSet, &( mesh_edges[ 0 ] ), (int)mesh_edges.size( ) );MB_CHK_SET_ERR( rval, "Failed to add the new entities to the new meshset" );
             }
             else
             {
@@ -1515,8 +1479,7 @@ ErrorCode GeomTopoTool::duplicate_model( GeomTopoTool*&               duplicate,
                 for( Range::iterator it2 = children.begin( ); it2 != children.end( ); ++it2 )
                 {
                     EntityHandle newChildSet = relate[ *it2 ];
-                    rval = mdbImpl->add_parent_child( newSet, newChildSet );MB_CHK_SET_ERR(
-                        rval, "Failed to create parent child relationship to the new meshset" );
+                    rval = mdbImpl->add_parent_child( newSet, newChildSet );MB_CHK_SET_ERR( rval, "Failed to create parent child relationship to the new meshset" );
                 }
             }
         }
@@ -1545,8 +1508,7 @@ ErrorCode GeomTopoTool::duplicate_model( GeomTopoTool*&               duplicate,
             // or use the
             std::vector< EntityHandle > solids;
             std::vector< int >          senses;
-            rval = this->get_senses( surf, solids, senses );MB_CHK_SET_ERR(
-                rval, "Failed to get the sense data for the surface with respect to its volumes" );
+            rval = this->get_senses( surf, solids, senses );MB_CHK_SET_ERR( rval, "Failed to get the sense data for the surface with respect to its volumes" );
 
             std::vector< EntityHandle > newSolids;
             std::vector< int >          newSenses;
@@ -1559,9 +1521,7 @@ ErrorCode GeomTopoTool::duplicate_model( GeomTopoTool*&               duplicate,
                 newSolids.push_back( newSolid );
                 newSenses.push_back( senses[ i ] );
             }
-            rval = duplicate->set_senses( newSurf, newSolids, newSenses );MB_CHK_SET_ERR(
-                rval,
-                "Failed to set the sense data for the surface with respect to the new volumes" );
+            rval = duplicate->set_senses( newSurf, newSolids, newSenses );MB_CHK_SET_ERR( rval, "Failed to set the sense data for the surface with respect to the new volumes" );
         }
     }
     // if the original root model set for this model is 0 (root set), then create
@@ -1608,8 +1568,7 @@ ErrorCode GeomTopoTool::setup_implicit_complement( )
     // if not, then query for a set with it's name
     Range             entities;
     const void* const tagdata[] = { IMPLICIT_COMPLEMENT_NAME };
-    ErrorCode         rval = mdbImpl->get_entities_by_type_and_tag( modelSet, MBENTITYSET, &nameTag,
-                                                            tagdata, 1, entities );
+    ErrorCode rval = mdbImpl->get_entities_by_type_and_tag( modelSet, MBENTITYSET, &nameTag, tagdata, 1, entities );
     // query error
     MB_CHK_SET_ERR( rval, "Unable to query for implicit complement" );
 
@@ -1621,8 +1580,7 @@ ErrorCode GeomTopoTool::setup_implicit_complement( )
     }
 
     // found too many
-    if( entities.size( ) > 1 )
-        MB_CHK_SET_ERR( MB_MULTIPLE_ENTITIES_FOUND, "Too many implicit complement sets" );
+    if( entities.size( ) > 1 ) MB_CHK_SET_ERR( MB_MULTIPLE_ENTITIES_FOUND, "Too many implicit complement sets" );
 
     // found none
     if( entities.empty( ) )
@@ -1638,8 +1596,8 @@ ErrorCode GeomTopoTool::setup_implicit_complement( )
         // implicit complement has all the appearance of being the same as any
         // other volume
         Tag category_tag;
-        rval = mdbImpl->tag_get_handle( CATEGORY_TAG_NAME, CATEGORY_TAG_SIZE, MB_TYPE_OPAQUE,
-                                        category_tag, MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_SET_ERR( rval, "Could not get the category tag" );
+        rval = mdbImpl->tag_get_handle( CATEGORY_TAG_NAME, CATEGORY_TAG_SIZE, MB_TYPE_OPAQUE, category_tag,
+                                        MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_SET_ERR( rval, "Could not get the category tag" );
 
         static const char volume_category[ CATEGORY_TAG_SIZE ] = "Volume\0";
         rval = mdbImpl->tag_set_data( category_tag, &impl_compl_handle, 1, volume_category );MB_CHK_SET_ERR( rval, "Could not set the category tag for the implicit complement" );
@@ -1691,8 +1649,7 @@ ErrorCode GeomTopoTool::generate_implicit_complement( EntityHandle& implicit_com
             else if( 0 == sense_data[ 1 ] )
                 sense_data[ 1 ] = implicit_complement_set;
             else
-                MB_SET_ERR( MB_FAILURE,
-                            "Could not insert implicit complement into surface sense data" );
+                MB_SET_ERR( MB_FAILURE, "Could not insert implicit complement into surface sense data" );
 
             // set the new sense data for this surface
             rval = set_surface_senses( *surf_i, sense_data[ 0 ], sense_data[ 1 ] );MB_CHK_SET_ERR( rval, "Failed to set sense tag data" );
@@ -1727,8 +1684,7 @@ bool GeomTopoTool::check_model( )
         rval = mdbImpl->get_parent_meshsets( vSet, edges );
         if( MB_SUCCESS != rval ) RETFALSE( " can't get parent edges for a node set ", vSet )
         Range notEdges = subtract( edges, geomRanges[ 1 ] );
-        if( !notEdges.empty( ) )
-            RETFALSE( " some parents of a node set are not geo edges ", notEdges[ 0 ] )
+        if( !notEdges.empty( ) ) RETFALSE( " some parents of a node set are not geo edges ", notEdges[ 0 ] )
     }
 
     // edges to be formed by continuous chain of mesh edges, oriented correctly
@@ -1748,8 +1704,7 @@ bool GeomTopoTool::check_model( )
         for( int i = 0; i < num_edges; i++ )
         {
             rval = mdbImpl->get_connectivity( mesh_edges[ i ], conn2, nnodes2 );
-            if( MB_SUCCESS != rval || nnodes2 != 2 )
-                RETFALSE( " mesh edge connectivity is wrong ", mesh_edges[ i ] )
+            if( MB_SUCCESS != rval || nnodes2 != 2 ) RETFALSE( " mesh edge connectivity is wrong ", mesh_edges[ i ] )
             if( i == 0 )
             {
                 firstNode = conn2[ 0 ];
@@ -1774,8 +1729,7 @@ bool GeomTopoTool::check_model( )
         rval = mdbImpl->get_child_meshsets( edge, vertSets );
         if( MB_SUCCESS != rval ) RETFALSE( " can't get vertex children ", edge )
         Range notVertices = subtract( vertSets, geomRanges[ 0 ] );
-        if( !notVertices.empty( ) )
-            RETFALSE( " children sets that are not vertices ", notVertices[ 0 ] )
+        if( !notVertices.empty( ) ) RETFALSE( " children sets that are not vertices ", notVertices[ 0 ] )
         for( Range::iterator it = vertSets.begin( ); it != vertSets.end( ); ++it )
         {
             if( !mdbImpl->contains_entities( *it, &firstNode, 1 ) &&
@@ -1796,8 +1750,7 @@ bool GeomTopoTool::check_model( )
         // get all entities/elements adjacent to it
         Range adjElem;
         rval = mdbImpl->get_adjacencies( &firstMeshEdge, 1, 2, false, adjElem );
-        if( MB_SUCCESS != rval )
-            RETFALSE( " can't get adjacent elements to the edge ", firstMeshEdge )
+        if( MB_SUCCESS != rval ) RETFALSE( " can't get adjacent elements to the edge ", firstMeshEdge )
         for( Range::iterator it2 = adjElem.begin( ); it2 != adjElem.end( ); ++it2 )
         {
             EntityHandle elem = *it2;
@@ -1813,21 +1766,18 @@ bool GeomTopoTool::check_model( )
                 }
             }
             if( 0 == gFace )
-                RETFALSE(
-                    " can't find adjacent surface that contains the adjacent element to the edge ",
-                    firstMeshEdge )
+                RETFALSE( " can't find adjacent surface that contains the adjacent element to the edge ",
+                          firstMeshEdge )
 
             // now, check the sense of mesh_edge in element, and the sense of gedge in gface
             // side_number
             int side_n, sense, offset;
             rval = mdbImpl->side_number( elem, firstMeshEdge, side_n, sense, offset );
-            if( MB_SUCCESS != rval )
-                RETFALSE( " can't get sense and side number of an element ", elem )
+            if( MB_SUCCESS != rval ) RETFALSE( " can't get sense and side number of an element ", elem )
             // now get the sense
             int topoSense;
             rval = this->get_sense( edge, gFace, topoSense );
-            if( topoSense != sense )
-                RETFALSE( " geometric topo sense and element sense do not agree ", edge )
+            if( topoSense != sense ) RETFALSE( " geometric topo sense and element sense do not agree ", edge )
         }
     }
     // surfaces to be true meshes
@@ -1845,8 +1795,7 @@ bool GeomTopoTool::check_model( )
         rval = mdbImpl->get_child_meshsets( faceSet, edges );
         if( MB_SUCCESS != rval ) RETFALSE( " can't get children edges for a face set ", faceSet )
         Range notEdges = subtract( edges, geomRanges[ 1 ] );
-        if( !notEdges.empty( ) )
-            RETFALSE( " some children of a face set are not geo edges ", notEdges[ 0 ] )
+        if( !notEdges.empty( ) ) RETFALSE( " some children of a face set are not geo edges ", notEdges[ 0 ] )
 
         Range boundary_mesh_edges;
         for( Range::iterator it = edges.begin( ); it != edges.end( ); ++it )
@@ -1858,15 +1807,13 @@ bool GeomTopoTool::check_model( )
         // most of these should be triangles and quads
         Range surface_ents, edge_ents;
         rval = mdbImpl->get_entities_by_dimension( faceSet, 2, surface_ents );
-        if( MB_SUCCESS != rval )
-            RETFALSE( " can't get surface elements from the face set ", faceSet )
+        if( MB_SUCCESS != rval ) RETFALSE( " can't get surface elements from the face set ", faceSet )
 
         rval = tool.find_skin( 0, surface_ents, 1, edge_ents );
         if( MB_SUCCESS != rval ) RETFALSE( "can't skin a surface ", surface_ents[ 0 ] )
 
         // those 2 ranges for boundary edges now must be equal
-        if( boundary_mesh_edges != edge_ents )
-            RETFALSE( "boundary ranges are different", boundary_mesh_edges[ 0 ] )
+        if( boundary_mesh_edges != edge_ents ) RETFALSE( "boundary ranges are different", boundary_mesh_edges[ 0 ] )
     }
 
     // solids to be filled correctly, maybe a skin procedure too.
@@ -1883,8 +1830,7 @@ bool GeomTopoTool::have_obb_tree( )
 // This function gets coordinates of the minimum and maxmiumum points
 // from an OBB/AABB, ie. such that these points represent
 // the maximum and minium extents of an AABB
-ErrorCode GeomTopoTool::get_bounding_coords( EntityHandle volume, double minPt[ 3 ],
-                                             double maxPt[ 3 ] )
+ErrorCode GeomTopoTool::get_bounding_coords( EntityHandle volume, double minPt[ 3 ], double maxPt[ 3 ] )
 {
     double center[ 3 ], axis1[ 3 ], axis2[ 3 ], axis3[ 3 ];
 
@@ -1901,8 +1847,8 @@ ErrorCode GeomTopoTool::get_bounding_coords( EntityHandle volume, double minPt[ 
     return MB_SUCCESS;
 }
 
-ErrorCode GeomTopoTool::get_obb( EntityHandle volume, double center[ 3 ], double axis1[ 3 ],
-                                 double axis2[ 3 ], double axis3[ 3 ] )
+ErrorCode GeomTopoTool::get_obb( EntityHandle volume, double center[ 3 ], double axis1[ 3 ], double axis2[ 3 ],
+                                 double axis3[ 3 ] )
 {
     // find EntityHandle node_set for use in box
     EntityHandle root;
@@ -1958,8 +1904,7 @@ bool GeomTopoTool::A_is_in_B( EntityHandle volume_A, EntityHandle volume_B, Geom
     return ( result != 0 );
 }
 
-ErrorCode GeomTopoTool::insert_in_tree( EntityHandle ct_root, EntityHandle volume,
-                                        GeomQueryTool* GQT )
+ErrorCode GeomTopoTool::insert_in_tree( EntityHandle ct_root, EntityHandle volume, GeomQueryTool* GQT )
 {
     ErrorCode rval;
 
@@ -1974,8 +1919,7 @@ ErrorCode GeomTopoTool::insert_in_tree( EntityHandle ct_root, EntityHandle volum
     {
         // if current volume is insde of tree volume-- always true if tree volume
         // is the root of the tree
-        if( tree_volume == ct_root ||
-            ( tree_volume != ct_root && A_is_in_B( current_volume, tree_volume, GQT ) ) )
+        if( tree_volume == ct_root || ( tree_volume != ct_root && A_is_in_B( current_volume, tree_volume, GQT ) ) )
         {
 
             parent = tree_volume;
@@ -2042,16 +1986,14 @@ ErrorCode GeomTopoTool::restore_topology_from_geometric_inclusion( const Range& 
     }
 
     // for each original volume, get its child volumes
-    for( Range::iterator parent_it = flat_volumes.begin( ); parent_it != flat_volumes.end( );
-         parent_it++ )
+    for( Range::iterator parent_it = flat_volumes.begin( ); parent_it != flat_volumes.end( ); parent_it++ )
     {
         Range volume_children = get_ct_children_by_dimension( *parent_it, 3 );
 
         if( volume_children.size( ) != 0 )
         {
             // loop over all of original volume's child volumes
-            for( Range::iterator child_it = volume_children.begin( );
-                 child_it != volume_children.end( ); ++child_it )
+            for( Range::iterator child_it = volume_children.begin( ); child_it != volume_children.end( ); ++child_it )
             {
                 // set the sense of the surface mapped to the child volume to REVERSE
                 // wrt the parent volume

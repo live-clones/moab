@@ -66,17 +66,16 @@ WriteSTL::~WriteSTL( )
     mbImpl->release_interface( mWriteIface );
 }
 
-ErrorCode WriteSTL::write_file( const char* file_name, const bool overwrite,
-                                const FileOptions& opts, const EntityHandle* ent_handles,
-                                const int num_sets, const std::vector< std::string >& qa_list,
-                                const Tag* tag_list, int num_tags, int /* export_dimension */ )
+ErrorCode WriteSTL::write_file( const char* file_name, const bool overwrite, const FileOptions& opts,
+                                const EntityHandle* ent_handles, const int num_sets,
+                                const std::vector< std::string >& qa_list, const Tag* tag_list, int num_tags,
+                                int /* export_dimension */ )
 {
     char      header[ 81 ];
     Range     triangles;
     ErrorCode rval;
 
-    if( tag_list && num_tags )
-    { MB_SET_ERR( MB_TYPE_OUT_OF_RANGE, "STL file does not support tag data" ); }
+    if( tag_list && num_tags ) { MB_SET_ERR( MB_TYPE_OUT_OF_RANGE, "STL file does not support tag data" ); }
 
     rval = make_header( header, qa_list );
     if( MB_SUCCESS != rval ) return rval;
@@ -94,10 +93,8 @@ ErrorCode WriteSTL::write_file( const char* file_name, const bool overwrite,
     bool big_endian = false, little_endian = false;
     if( MB_SUCCESS == opts.get_null_option( "BIG_ENDIAN" ) ) big_endian = true;
     if( MB_SUCCESS == opts.get_null_option( "LITTLE_ENDIAN" ) ) little_endian = true;
-    if( big_endian && little_endian )
-    { MB_SET_ERR( MB_FAILURE, "Conflicting options: BIG_ENDIAN LITTLE_ENDIAN" ); }
-    ByteOrder byte_order =
-        big_endian ? STL_BIG_ENDIAN : little_endian ? STL_LITTLE_ENDIAN : STL_UNKNOWN_BYTE_ORDER;
+    if( big_endian && little_endian ) { MB_SET_ERR( MB_FAILURE, "Conflicting options: BIG_ENDIAN LITTLE_ENDIAN" ); }
+    ByteOrder byte_order = big_endian ? STL_BIG_ENDIAN : little_endian ? STL_LITTLE_ENDIAN : STL_UNKNOWN_BYTE_ORDER;
 
     FILE* file = open_file( file_name, overwrite, is_binary );
     if( !file ) return MB_FILE_DOES_NOT_EXIST;
@@ -108,8 +105,7 @@ ErrorCode WriteSTL::write_file( const char* file_name, const bool overwrite,
     {
         // Get precision for node coordinates
         int precision;
-        if( MB_SUCCESS != opts.get_int_option( "PRECISION", precision ) )
-            precision = DEFAULT_PRECISION;
+        if( MB_SUCCESS != opts.get_int_option( "PRECISION", precision ) ) precision = DEFAULT_PRECISION;
 
         rval = ascii_write_triangles( file, header, triangles, precision );
     }
@@ -171,11 +167,9 @@ ErrorCode WriteSTL::make_header( char header[ 81 ], const std::vector< std::stri
     return MB_SUCCESS;
 }
 
-ErrorCode WriteSTL::get_triangles( const EntityHandle* set_array, int set_array_length,
-                                   Range& triangles )
+ErrorCode WriteSTL::get_triangles( const EntityHandle* set_array, int set_array_length, Range& triangles )
 {
-    if( !set_array || 0 == set_array_length )
-        return mbImpl->get_entities_by_type( 0, MBTRI, triangles );
+    if( !set_array || 0 == set_array_length ) return mbImpl->get_entities_by_type( 0, MBTRI, triangles );
 
     const EntityHandle* iter = set_array;
     const EntityHandle* end = iter + set_array_length;
@@ -190,8 +184,8 @@ ErrorCode WriteSTL::get_triangles( const EntityHandle* set_array, int set_array_
     return MB_SUCCESS;
 }
 
-ErrorCode WriteSTL::get_triangle_data( const double coords[ 9 ], float v1[ 3 ], float v2[ 3 ],
-                                       float v3[ 3 ], float n[ 3 ] )
+ErrorCode WriteSTL::get_triangle_data( const double coords[ 9 ], float v1[ 3 ], float v2[ 3 ], float v3[ 3 ],
+                                       float n[ 3 ] )
 {
     CartVect  cv1, cv2, cv3, cn;
     ErrorCode rval = get_triangle_data( coords, cv1, cv2, cv3, cn );
@@ -205,8 +199,7 @@ ErrorCode WriteSTL::get_triangle_data( const double coords[ 9 ], float v1[ 3 ], 
     return MB_SUCCESS;
 }
 
-ErrorCode WriteSTL::get_triangle_data( const double coords[ 9 ], CartVect& v1, CartVect& v2,
-                                       CartVect& v3, CartVect& n )
+ErrorCode WriteSTL::get_triangle_data( const double coords[ 9 ], CartVect& v1, CartVect& v2, CartVect& v3, CartVect& n )
 {
     v1 = coords;
     v2 = coords + 3;
@@ -219,8 +212,7 @@ ErrorCode WriteSTL::get_triangle_data( const double coords[ 9 ], CartVect& v1, C
     return MB_SUCCESS;
 }
 
-ErrorCode WriteSTL::ascii_write_triangles( FILE* file, const char header[ 81 ],
-                                           const Range& triangles, int prec )
+ErrorCode WriteSTL::ascii_write_triangles( FILE* file, const char header[ 81 ], const Range& triangles, int prec )
 {
     const char solid_name[] = "MOAB";
 
@@ -250,12 +242,9 @@ ErrorCode WriteSTL::ascii_write_triangles( FILE* file, const char header[ 81 ],
 
         fprintf( file, "facet normal %e %e %e\n", n[ 0 ], n[ 1 ], n[ 2 ] );
         fprintf( file, "outer loop\n" );
-        fprintf( file, "vertex %.*e %.*e %.*e\n", prec, (float)v1[ 0 ], prec, (float)v1[ 1 ], prec,
-                 (float)v1[ 2 ] );
-        fprintf( file, "vertex %.*e %.*e %.*e\n", prec, (float)v2[ 0 ], prec, (float)v2[ 1 ], prec,
-                 (float)v2[ 2 ] );
-        fprintf( file, "vertex %.*e %.*e %.*e\n", prec, (float)v3[ 0 ], prec, (float)v3[ 1 ], prec,
-                 (float)v3[ 2 ] );
+        fprintf( file, "vertex %.*e %.*e %.*e\n", prec, (float)v1[ 0 ], prec, (float)v1[ 1 ], prec, (float)v1[ 2 ] );
+        fprintf( file, "vertex %.*e %.*e %.*e\n", prec, (float)v2[ 0 ], prec, (float)v2[ 1 ], prec, (float)v2[ 2 ] );
+        fprintf( file, "vertex %.*e %.*e %.*e\n", prec, (float)v3[ 0 ], prec, (float)v3[ 1 ], prec, (float)v3[ 2 ] );
         fprintf( file, "endloop\n" );
         fprintf( file, "endfacet\n" );
     }
@@ -273,8 +262,8 @@ struct BinTri
     char  pad[ 2 ];
 };
 
-ErrorCode WriteSTL::binary_write_triangles( FILE* file, const char header[ 81 ],
-                                            ByteOrder byte_order, const Range& triangles )
+ErrorCode WriteSTL::binary_write_triangles( FILE* file, const char header[ 81 ], ByteOrder byte_order,
+                                            const Range& triangles )
 {
     ErrorCode rval;
     if( 1 != fwrite( header, 80, 1, file ) ) return MB_FILE_WRITE_ERROR;

@@ -28,9 +28,8 @@ ReadTetGen::~ReadTetGen( )
     if( mbIface && readTool ) mbIface->release_interface( readTool );
 }
 
-ErrorCode ReadTetGen::open_file( const std::string& filename, const std::string& basename,
-                                 const std::string& suffix, const char* exp_suffix,
-                                 const char* opt_name, const FileOptions& opts,
+ErrorCode ReadTetGen::open_file( const std::string& filename, const std::string& basename, const std::string& suffix,
+                                 const char* exp_suffix, const char* opt_name, const FileOptions& opts,
                                  std::ifstream& file_stream, bool file_required )
 {
     std::string real_file_name;
@@ -55,25 +54,19 @@ ErrorCode ReadTetGen::open_file( const std::string& filename, const std::string&
 }
 
 ErrorCode ReadTetGen::read_tag_values( const char* /* file_name */, const char* /* tag_name */,
-                                       const FileOptions& /* opts */,
-                                       std::vector< int >& /* tag_values_out */,
+                                       const FileOptions& /* opts */, std::vector< int >& /* tag_values_out */,
                                        const SubsetList* /* subset_list */ )
 {
     return MB_NOT_IMPLEMENTED;
 }
 
-ErrorCode ReadTetGen::load_file( const char*        file_name_c, const EntityHandle* /* file_set */,
-                                 const FileOptions& opts,
-                                 const ReaderIface::SubsetList* subset_list,
-                                 const Tag*                     file_id_tag )
+ErrorCode ReadTetGen::load_file( const char* file_name_c, const EntityHandle* /* file_set */, const FileOptions& opts,
+                                 const ReaderIface::SubsetList* subset_list, const Tag* file_id_tag )
 {
     std::ifstream node_file, ele_file, face_file, edge_file;
     ErrorCode     rval;
 
-    if( subset_list )
-    {
-        MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "Reading subset of files not supported for TetGen" );
-    }
+    if( subset_list ) { MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "Reading subset of files not supported for TetGen" ); }
 
     std::string suffix, base, filename( file_name_c );
     size_t      dot_idx = filename.find_last_of( '.' );
@@ -103,8 +96,7 @@ ErrorCode ReadTetGen::load_file( const char*        file_name_c, const EntityHan
 
     std::vector< Tag > attr_tags[ 4 ];
     std::vector< int > attr_idx[ 4 ];
-    const char*        option_names[ 4 ] = { "NODE_ATTR_LIST", "EDGE_ATTR_LIST", "TRI_ATTR_LIST",
-                                      "TET_ATTR_LIST" };
+    const char*        option_names[ 4 ] = { "NODE_ATTR_LIST", "EDGE_ATTR_LIST", "TRI_ATTR_LIST", "TET_ATTR_LIST" };
     const char*        group_names[ 4 ] = { 0, "CURVE_ID", "SURFACE_ID", "VOLUME_ID" };
     for( int i = 0; i < 4; ++i )
     {
@@ -112,23 +104,17 @@ ErrorCode ReadTetGen::load_file( const char*        file_name_c, const EntityHan
         rval = opts.get_str_option( option_names[ i ], opt_str );
         if( MB_SUCCESS != rval ) continue;
         rval = parse_attr_list( opt_str, attr_tags[ i ], attr_idx[ i ], group_names[ i ] );
-        if( MB_SUCCESS != rval )
-        { MB_SET_ERR( MB_TYPE_OUT_OF_RANGE, option_names[ i ] << ": invalid option value" ); }
+        if( MB_SUCCESS != rval ) { MB_SET_ERR( MB_TYPE_OUT_OF_RANGE, option_names[ i ] << ": invalid option value" ); }
     }
 
     Range                       tets, tris, edges;
     std::vector< EntityHandle > nodes;
-    rval = read_node_file( node_file, &attr_tags[ 0 ][ 0 ], &attr_idx[ 0 ][ 0 ],
-                           attr_tags[ 0 ].size( ), nodes );
-    if( MB_SUCCESS == rval && ele_file.is_open( ) )
-        rval = read_elem_file( MBTET, ele_file, nodes, tets );
-    if( MB_SUCCESS == rval && face_file.is_open( ) )
-        rval = read_elem_file( MBTRI, face_file, nodes, tris );
-    if( MB_SUCCESS == rval && edge_file.is_open( ) )
-        rval = read_elem_file( MBEDGE, edge_file, nodes, edges );
+    rval = read_node_file( node_file, &attr_tags[ 0 ][ 0 ], &attr_idx[ 0 ][ 0 ], attr_tags[ 0 ].size( ), nodes );
+    if( MB_SUCCESS == rval && ele_file.is_open( ) ) rval = read_elem_file( MBTET, ele_file, nodes, tets );
+    if( MB_SUCCESS == rval && face_file.is_open( ) ) rval = read_elem_file( MBTRI, face_file, nodes, tris );
+    if( MB_SUCCESS == rval && edge_file.is_open( ) ) rval = read_elem_file( MBEDGE, edge_file, nodes, edges );
 
-    if( file_id_tag && MB_SUCCESS == rval )
-        rval = readTool->assign_ids( *file_id_tag, &nodes[ 0 ], nodes.size( ) );
+    if( file_id_tag && MB_SUCCESS == rval ) rval = readTool->assign_ids( *file_id_tag, &nodes[ 0 ], nodes.size( ) );
     if( file_id_tag && MB_SUCCESS == rval ) rval = readTool->assign_ids( *file_id_tag, edges );
     if( file_id_tag && MB_SUCCESS == rval ) rval = readTool->assign_ids( *file_id_tag, tris );
     if( file_id_tag && MB_SUCCESS == rval ) rval = readTool->assign_ids( *file_id_tag, tets );
@@ -137,8 +123,7 @@ ErrorCode ReadTetGen::load_file( const char*        file_name_c, const EntityHan
 }
 
 ErrorCode ReadTetGen::parse_attr_list( const std::string& option_str, std::vector< Tag >& tag_list,
-                                       std::vector< int >& index_list,
-                                       const char*         group_designator )
+                                       std::vector< int >& index_list, const char* group_designator )
 {
     std::vector< std::string > name_list;
     size_t                     prev_pos = 0;
@@ -168,9 +153,8 @@ ErrorCode ReadTetGen::parse_attr_list( const std::string& option_str, std::vecto
         }
         else
         {
-            ErrorCode rval = mbIface->tag_get_handle( name_list[ i ].c_str( ),
-                                                      name_count[ name_list[ i ] ], MB_TYPE_DOUBLE,
-                                                      tag_list[ i ], MB_TAG_DENSE | MB_TAG_CREAT );
+            ErrorCode rval = mbIface->tag_get_handle( name_list[ i ].c_str( ), name_count[ name_list[ i ] ],
+                                                      MB_TYPE_DOUBLE, tag_list[ i ], MB_TAG_DENSE | MB_TAG_CREAT );
             if( MB_SUCCESS != rval ) return rval;
         }
     }
@@ -202,8 +186,7 @@ ErrorCode ReadTetGen::read_line( std::istream& file, std::string& line, int& lin
     return MB_SUCCESS;
 }
 
-ErrorCode ReadTetGen::read_line( std::istream& file, double* values_out, int num_values,
-                                 int& lineno )
+ErrorCode ReadTetGen::read_line( std::istream& file, double* values_out, int num_values, int& lineno )
 {
     // Get a line of text
     std::string line;
@@ -215,24 +198,20 @@ ErrorCode ReadTetGen::read_line( std::istream& file, double* values_out, int num
     for( int i = 0; i < num_values; ++i )
     {
         double v;
-        if( !( str >> v ) )
-        { MB_SET_ERR( MB_FAILURE, "Error reading node data at line " << lineno ); }
+        if( !( str >> v ) ) { MB_SET_ERR( MB_FAILURE, "Error reading node data at line " << lineno ); }
         values_out[ i ] = v;
     }
 
     // Check that we're at the end of the line
     int junk;
     if( ( str >> junk ) || !str.eof( ) )
-    {
-        MB_SET_ERR( MB_FAILURE, "Unexpected trailing data for line " << lineno << " of node data" );
-    }
+    { MB_SET_ERR( MB_FAILURE, "Unexpected trailing data for line " << lineno << " of node data" ); }
 
     return MB_SUCCESS;
 }
 
-ErrorCode ReadTetGen::read_node_file( std::istream& file, const Tag* attr_tag_list,
-                                      const int* attr_tag_index, int attr_tag_list_len,
-                                      std::vector< EntityHandle >& nodes )
+ErrorCode ReadTetGen::read_node_file( std::istream& file, const Tag* attr_tag_list, const int* attr_tag_index,
+                                      int attr_tag_list_len, std::vector< EntityHandle >& nodes )
 {
     int       lineno = 0;
     ErrorCode rval;
@@ -304,8 +283,7 @@ ErrorCode ReadTetGen::read_node_file( std::istream& file, const Tag* attr_tag_li
 
         // Get attribute data
         for( int j = 0; j < attr_tag_list_len; ++j )
-            if( attr_data[ j ] )
-                attr_data[ j ][ i * attr_size[ j ] + attr_tag_index[ j ] ] = data[ j + 1 + dim ];
+            if( attr_data[ j ] ) attr_data[ j ][ i * attr_size[ j ] + attr_tag_index[ j ] ] = data[ j + 1 + dim ];
 
         // Discard boundary bit
     }
@@ -313,8 +291,7 @@ ErrorCode ReadTetGen::read_node_file( std::istream& file, const Tag* attr_tag_li
     // Store tag data
     Range node_range;
     node_range.insert( start_handle, start_handle + num_vtx - 1 );
-    for( std::map< Tag, std::vector< double > >::iterator i = tag_data.begin( );
-         i != tag_data.end( ); ++i )
+    for( std::map< Tag, std::vector< double > >::iterator i = tag_data.begin( ); i != tag_data.end( ); ++i )
     {
         rval = mbIface->tag_set_data( i->first, node_range, &i->second[ 0 ] );
         if( MB_SUCCESS != rval ) return rval;
@@ -327,8 +304,8 @@ ErrorCode ReadTetGen::read_node_file( std::istream& file, const Tag* attr_tag_li
     return MB_SUCCESS;
 }
 
-ErrorCode ReadTetGen::read_elem_file( EntityType type, std::istream& file,
-                                      const std::vector< EntityHandle >& nodes, Range& elems )
+ErrorCode ReadTetGen::read_elem_file( EntityType type, std::istream& file, const std::vector< EntityHandle >& nodes,
+                                      Range& elems )
 {
     int       lineno = 0;
     ErrorCode rval;
@@ -370,14 +347,13 @@ ErrorCode ReadTetGen::read_elem_file( EntityType type, std::istream& file,
     id_tag = mbIface->globalId_tag( );
 
     const int negone = -1;
-    rval = mbIface->tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, dim_tag,
-                                    MB_TAG_SPARSE | MB_TAG_CREAT, &negone );
+    rval = mbIface->tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, dim_tag, MB_TAG_SPARSE | MB_TAG_CREAT,
+                                    &negone );
     if( MB_SUCCESS != rval ) return rval;
 
     // Allocate elements
     EntityHandle start_handle, *conn_array;
-    rval =
-        readTool->get_element_connect( num_elem, node_per_elem, type, 1, start_handle, conn_array );
+    rval = readTool->get_element_connect( num_elem, node_per_elem, type, 1, start_handle, conn_array );
     if( MB_SUCCESS != rval ) return rval;
     elems.insert( start_handle, start_handle + num_elem - 1 );
 

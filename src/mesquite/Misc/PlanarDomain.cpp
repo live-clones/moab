@@ -34,16 +34,14 @@
 
 MBMesquite::PlanarDomain::~PlanarDomain( ) {}
 
-void MBMesquite::PlanarDomain::set_plane( const MBMesquite::Vector3D& normal,
-                                          const MBMesquite::Vector3D& point )
+void MBMesquite::PlanarDomain::set_plane( const MBMesquite::Vector3D& normal, const MBMesquite::Vector3D& point )
 {
     mNormal = normal;
     mNormal.normalize( );
     mCoeff = -( mNormal % point );
 }
 
-void MBMesquite::PlanarDomain::snap_to( MBMesquite::Mesh::VertexHandle /*entity_handle*/,
-                                        Vector3D& coordinate ) const
+void MBMesquite::PlanarDomain::snap_to( MBMesquite::Mesh::VertexHandle /*entity_handle*/, Vector3D& coordinate ) const
 {
     coordinate -= mNormal * ( mNormal % coordinate + mCoeff );
 }
@@ -60,26 +58,23 @@ void MBMesquite::PlanarDomain::element_normal_at( MBMesquite::Mesh::ElementHandl
     coordinate = mNormal;
 }
 
-void MBMesquite::PlanarDomain::vertex_normal_at( const MBMesquite::Mesh::VertexHandle*,
-                                                 Vector3D coords[], unsigned count,
-                                                 MBMesquite::MsqError& ) const
+void MBMesquite::PlanarDomain::vertex_normal_at( const MBMesquite::Mesh::VertexHandle*, Vector3D coords[],
+                                                 unsigned count, MBMesquite::MsqError& ) const
 {
     for( unsigned i = 0; i < count; ++i )
         coords[ i ] = mNormal;
 }
 
-void MBMesquite::PlanarDomain::closest_point( MBMesquite::Mesh::VertexHandle,
-                                              const MBMesquite::Vector3D& position,
-                                              MBMesquite::Vector3D&       closest,
-                                              MBMesquite::Vector3D&       normal,
+void MBMesquite::PlanarDomain::closest_point( MBMesquite::Mesh::VertexHandle, const MBMesquite::Vector3D& position,
+                                              MBMesquite::Vector3D& closest, MBMesquite::Vector3D& normal,
                                               MBMesquite::MsqError& ) const
 {
     normal = mNormal;
     closest = position - mNormal * ( mNormal % position + mCoeff );
 }
 
-void MBMesquite::PlanarDomain::domain_DoF( const Mesh::VertexHandle*, unsigned short* dof_array,
-                                           size_t num_vertices, MsqError& ) const
+void MBMesquite::PlanarDomain::domain_DoF( const Mesh::VertexHandle*, unsigned short* dof_array, size_t num_vertices,
+                                           MsqError& ) const
 {
     std::fill( dof_array, dof_array + num_vertices, 2 );
 }
@@ -152,10 +147,8 @@ void MBMesquite::PlanarDomain::fit_vertices( Mesh* mesh, MsqError& err, double e
     if( 2 * inverted_count > total_count ) this->flip( );
 }
 
-void MBMesquite::PlanarDomain::fit_vertices( MBMesquite::Mesh*                     mesh,
-                                             const MBMesquite::Mesh::VertexHandle* verts,
-                                             size_t num_verts, MBMesquite::MsqError& err,
-                                             double epsilon )
+void MBMesquite::PlanarDomain::fit_vertices( MBMesquite::Mesh* mesh, const MBMesquite::Mesh::VertexHandle* verts,
+                                             size_t num_verts, MBMesquite::MsqError& err, double epsilon )
 {
     std::vector< MsqVertex > coords( num_verts );
     mesh->vertices_get_coordinates( verts, arrptr( coords ), num_verts, err );MSQ_ERRRTN( err );

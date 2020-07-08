@@ -82,8 +82,7 @@ void test_bound_box( )
     CHECK( !result );
     result = box.intersects_box( BoundBox( &vals[ 0 ] ), tol );
     CHECK( result );
-    result = box.intersects_box(
-        BoundBox( 1.2 * CartVect( &vals[ 0 ] ), 1.1 * CartVect( &vals[ 0 ] ) ), tol );
+    result = box.intersects_box( BoundBox( 1.2 * CartVect( &vals[ 0 ] ), 1.1 * CartVect( &vals[ 0 ] ) ), tol );
     CHECK( !result );
 
     // check length functions

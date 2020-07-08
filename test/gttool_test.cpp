@@ -80,8 +80,8 @@ int main( int argc, char* argv[] )
 
     if( argc == 1 )
     {
-        std::cout << "Using default input file and output files " << filename << " " << ofile << " "
-                  << ofile2 << " " << ofile3 << std::endl;
+        std::cout << "Using default input file and output files " << filename << " " << ofile << " " << ofile2 << " "
+                  << ofile3 << std::endl;
     }
     else if( argc == 5 )
     {
@@ -106,8 +106,7 @@ int main( int argc, char* argv[] )
     }
     else
     {
-        std::cerr << "Usage: " << argv[ 0 ]
-                  << " [surface_mesh] [mbgeo_file] [shellfile] [copyshellfile] " << std::endl;
+        std::cerr << "Usage: " << argv[ 0 ] << " [surface_mesh] [mbgeo_file] [shellfile] [copyshellfile] " << std::endl;
         return 1;
     }
 
@@ -195,20 +194,19 @@ ErrorCode create_shell_test( Interface* mb )
     ErrorCode rval = mb->delete_mesh( );MB_CHK_SET_ERR( rval, "Can't delete existing mesh\n" );
 
     // create some vertices
-    double coords[] = { 0, 0,   0,    1, 0,   0.1,  2, 0,   0,    3,   0,   -0.1, 0,   1,   0,
-                        1, 1,   0,    2, 1,   0,    3, 1,   -0.1, 0,   2,   0,    1,   2,   -0.1,
-                        2, 2,   -0.1, 3, 2,   -0.2, 0, 0,   1,    1,   0,   0.9,  2,   0.1, 0.85,
-                        3, 0.2, 0.8,  0, 0.1, 2,    1, 0.1, 2,    2.1, 0.2, 2.1,  3.1, 0.2, 2.1 };
+    double coords[] = { 0, 0,   0,    1, 0,   0.1, 2, 0,   0,    3, 0,   -0.1, 0,   1,   0,    1,   1,   0,  2, 1, 0,
+                        3, 1,   -0.1, 0, 2,   0,   1, 2,   -0.1, 2, 2,   -0.1, 3,   2,   -0.2, 0,   0,   1,  1, 0, 0.9,
+                        2, 0.1, 0.85, 3, 0.2, 0.8, 0, 0.1, 2,    1, 0.1, 2,    2.1, 0.2, 2.1,  3.1, 0.2, 2.1 };
 
     int   nvert = 20;
     Range verts;
     rval = mb->create_vertices( coords, nvert, verts );MB_CHK_SET_ERR( rval, "Can't create vertices\n" );
 
     EntityHandle connec[] = {
-        1,  2,  5,  5,  2,  6,  2,  3,  6,  6,  3,  7,  3,  4,  7,  7,  4,  8, 5,
-        6,  9,  9,  6,  10, 6,  7,  10, 10, 7,  11, 7,  8,  11, 11, 8,  12,  // first face, 1-12
-        13, 14, 1,  1,  14, 2,  14, 15, 2,  2,  15, 3,  15, 16, 3,  3,  16, 4, 17,
-        18, 13, 13, 18, 14, 18, 19, 14, 14, 19, 15, 19, 20, 15, 15, 20, 16  // second face, 13-24
+        1,  2,  5,  5,  2,  6,  2,  3,  6,  6,  3,  7,  3,  4,  7,  7,  4,  8,
+        5,  6,  9,  9,  6,  10, 6,  7,  10, 10, 7,  11, 7,  8,  11, 11, 8,  12,  // first face, 1-12
+        13, 14, 1,  1,  14, 2,  14, 15, 2,  2,  15, 3,  15, 16, 3,  3,  16, 4,
+        17, 18, 13, 13, 18, 14, 18, 19, 14, 14, 19, 15, 19, 20, 15, 15, 20, 16  // second face, 13-24
     };
     EntityHandle                elem;
     int                         nbTri = sizeof( connec ) / 3 / sizeof( EntityHandle );
@@ -442,8 +440,7 @@ ErrorCode test_root_sets_resize( Interface* mb )
 
     Tag geomTag;
 
-    rval = mb->tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, geomTag,
-                               MB_TAG_CREAT | MB_TAG_SPARSE );MB_CHK_SET_ERR( rval, "Error: Failed to create geometry dimension tag" );
+    rval = mb->tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, geomTag, MB_TAG_CREAT | MB_TAG_SPARSE );MB_CHK_SET_ERR( rval, "Error: Failed to create geometry dimension tag" );
 
     Range surfs;
 
@@ -519,8 +516,7 @@ ErrorCode test_delete_obb_tree( Interface* mb )
     rval = gTopoTool->construct_obb_tree( test_vol );MB_CHK_SET_ERR( rval, "Error constructing all trees." );
 
     // Get the obbRootTag for vol
-    rval = mb->tag_get_handle( OBB_ROOT_TAG_NAME, 1, MB_TYPE_HANDLE, obbRootTag,
-                               MB_TAG_CREAT | MB_TAG_SPARSE );MB_CHK_SET_ERR_CONT( rval, "Error: Failed to create obb root tag" );
+    rval = mb->tag_get_handle( OBB_ROOT_TAG_NAME, 1, MB_TYPE_HANDLE, obbRootTag, MB_TAG_CREAT | MB_TAG_SPARSE );MB_CHK_SET_ERR_CONT( rval, "Error: Failed to create obb root tag" );
     EntityHandle gbroot;
     rval = mb->tag_get_data( obbRootTag, &test_vol, 1, &gbroot );MB_CHK_SET_ERR( rval, "Failed to get the obb root tag" );
 
@@ -667,8 +663,7 @@ ErrorCode test_restore_obb_trees( Interface* mb, Interface* mb2, Interface* mb3 
     moab::GeomTopoTool* gTopoTool5 = new GeomTopoTool( mb2, true, 0, true, false );
 
     // Get the obbRootTag for vol
-    rval = mb2->tag_get_handle( OBB_ROOT_TAG_NAME, 1, MB_TYPE_HANDLE, obbRootTag,
-                                MB_TAG_CREAT | MB_TAG_SPARSE );MB_CHK_SET_ERR_CONT( rval, "Error: Failed to create obb root tag" );
+    rval = mb2->tag_get_handle( OBB_ROOT_TAG_NAME, 1, MB_TYPE_HANDLE, obbRootTag, MB_TAG_CREAT | MB_TAG_SPARSE );MB_CHK_SET_ERR_CONT( rval, "Error: Failed to create obb root tag" );
 
     vols.clear( );
     rval = gTopoTool5->get_gsets_by_dimension( 3, vols );MB_CHK_SET_ERR( rval, "Failed to get volume gsets" );

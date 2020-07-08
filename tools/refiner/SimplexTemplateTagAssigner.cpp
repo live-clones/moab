@@ -42,9 +42,8 @@ SimplexTemplateTagAssigner::~SimplexTemplateTagAssigner( ) {}
  * world coordinates (3).
  * @param[in] t1 Pointer to endpoint 1 tag values.
  */
-void SimplexTemplateTagAssigner::operator( )( const double* c0, const void* t0, EntityHandle h0,
-                                              const double* cm, void* tm, const double* c1,
-                                              const void* t1, EntityHandle h1 )
+void SimplexTemplateTagAssigner::operator( )( const double* c0, const void* t0, EntityHandle h0, const double* cm,
+                                              void* tm, const double* c1, const void* t1, EntityHandle h1 )
 {
     double c0m_squared = 0.;
     double c01_squared = 0.;
@@ -82,15 +81,13 @@ void SimplexTemplateTagAssigner::operator( )( const double* c0, const void* t0, 
             }
             break;
             default:
-                memcpy( (char*)tm + tag_offset, (char*)( h0 < h1 ? t0 : t1 ) + tag_offset,
-                        tag_size );
+                memcpy( (char*)tm + tag_offset, (char*)( h0 < h1 ? t0 : t1 ) + tag_offset, tag_size );
                 break;
         }
     }
 }
 
-void SimplexTemplateTagAssigner::operator( )( const void* t0, const void* t1, const void* t2,
-                                              void* tp )
+void SimplexTemplateTagAssigner::operator( )( const void* t0, const void* t1, const void* t2, void* tp )
 {
     (void)t0;
     (void)t1;

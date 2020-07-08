@@ -77,8 +77,8 @@ int test_get_set( )
     }
 
     // ijkh
-    if( coords2.i( ) != coordsb[ 0 ] || coords2.j( ) != coordsb[ 1 ] ||
-        coords2.k( ) != coordsb[ 2 ] || coords2.h( ) != coordsb[ 3 ] )
+    if( coords2.i( ) != coordsb[ 0 ] || coords2.j( ) != coordsb[ 1 ] || coords2.k( ) != coordsb[ 2 ] ||
+        coords2.h( ) != coordsb[ 3 ] )
     {
         std::cout << "ijkh test failed." << std::endl;
         errors++;
@@ -88,8 +88,8 @@ int test_get_set( )
     coords2.set( 3, 3, 3 );
 
     // hom_coord()
-    if( coords2.hom_coord( )[ 0 ] != 3 || coords2.hom_coord( )[ 1 ] != 3 ||
-        coords2.hom_coord( )[ 2 ] != 3 || coords2.hom_coord( )[ 3 ] != 1 )
+    if( coords2.hom_coord( )[ 0 ] != 3 || coords2.hom_coord( )[ 1 ] != 3 || coords2.hom_coord( )[ 2 ] != 3 ||
+        coords2.hom_coord( )[ 3 ] != 1 )
     {
         std::cout << "Set (int) test failed." << std::endl;
         errors++;
@@ -182,10 +182,9 @@ int test_xform_constructors( )
         }
     }
 
-    HomXform xform3( test_int[ 0 ], test_int[ 1 ], test_int[ 2 ], test_int[ 3 ], test_int[ 4 ],
-                     test_int[ 5 ], test_int[ 6 ], test_int[ 7 ], test_int[ 8 ], test_int[ 9 ],
-                     test_int[ 10 ], test_int[ 11 ], test_int[ 12 ], test_int[ 13 ], test_int[ 14 ],
-                     test_int[ 15 ] );
+    HomXform xform3( test_int[ 0 ], test_int[ 1 ], test_int[ 2 ], test_int[ 3 ], test_int[ 4 ], test_int[ 5 ],
+                     test_int[ 6 ], test_int[ 7 ], test_int[ 8 ], test_int[ 9 ], test_int[ 10 ], test_int[ 11 ],
+                     test_int[ 12 ], test_int[ 13 ], test_int[ 14 ], test_int[ 15 ] );
     for( int i = 0; i < 16; i++ )
     {
         if( xform3[ i ] != i )
@@ -204,20 +203,14 @@ int test_xform_constructors( )
     HomXform xform2( rotate, scale, translate );
 
     // test where those went in the xform
-    if( !( xform2[ XFORM_INDEX( 0, 0 ) ] == rotate[ 0 ] &&
-           xform2[ XFORM_INDEX( 0, 1 ) ] == rotate[ 1 ] &&
-           xform2[ XFORM_INDEX( 0, 2 ) ] == rotate[ 2 ] &&
-           xform2[ XFORM_INDEX( 1, 0 ) ] == rotate[ 3 ] &&
-           xform2[ XFORM_INDEX( 1, 1 ) ] == rotate[ 4 ] &&
-           xform2[ XFORM_INDEX( 1, 2 ) ] == rotate[ 5 ] &&
-           xform2[ XFORM_INDEX( 2, 0 ) ] == rotate[ 6 ] &&
-           xform2[ XFORM_INDEX( 2, 1 ) ] == rotate[ 7 ] &&
-           xform2[ XFORM_INDEX( 2, 2 ) ] == rotate[ 8 ] &&
-           xform2[ XFORM_INDEX( 3, 0 ) ] == translate[ 0 ] &&
-           xform2[ XFORM_INDEX( 3, 1 ) ] == translate[ 1 ] &&
-           xform2[ XFORM_INDEX( 3, 2 ) ] == translate[ 2 ] && xform2[ XFORM_INDEX( 0, 3 ) ] == 0 &&
-           xform2[ XFORM_INDEX( 1, 3 ) ] == 0 && xform2[ XFORM_INDEX( 2, 3 ) ] == 0 &&
-           xform2[ XFORM_INDEX( 3, 3 ) ] == 1 ) )
+    if( !( xform2[ XFORM_INDEX( 0, 0 ) ] == rotate[ 0 ] && xform2[ XFORM_INDEX( 0, 1 ) ] == rotate[ 1 ] &&
+           xform2[ XFORM_INDEX( 0, 2 ) ] == rotate[ 2 ] && xform2[ XFORM_INDEX( 1, 0 ) ] == rotate[ 3 ] &&
+           xform2[ XFORM_INDEX( 1, 1 ) ] == rotate[ 4 ] && xform2[ XFORM_INDEX( 1, 2 ) ] == rotate[ 5 ] &&
+           xform2[ XFORM_INDEX( 2, 0 ) ] == rotate[ 6 ] && xform2[ XFORM_INDEX( 2, 1 ) ] == rotate[ 7 ] &&
+           xform2[ XFORM_INDEX( 2, 2 ) ] == rotate[ 8 ] && xform2[ XFORM_INDEX( 3, 0 ) ] == translate[ 0 ] &&
+           xform2[ XFORM_INDEX( 3, 1 ) ] == translate[ 1 ] && xform2[ XFORM_INDEX( 3, 2 ) ] == translate[ 2 ] &&
+           xform2[ XFORM_INDEX( 0, 3 ) ] == 0 && xform2[ XFORM_INDEX( 1, 3 ) ] == 0 &&
+           xform2[ XFORM_INDEX( 2, 3 ) ] == 0 && xform2[ XFORM_INDEX( 3, 3 ) ] == 1 ) )
     {
         std::cout << "HomXform rotate, scale, translate constructor failed." << std::endl;
         errors++;

@@ -50,18 +50,17 @@ using namespace moab;
 
 double LENGTH = 1.0;
 
-void testA( const int nelem, const double* coords );
-void testB( const int nelem, const double* coords, int* connect );
-void testC( const int nelem, const double* coords );
-void testD( const int nelem, const double* coords, int ver );
-void testE( const int nelem, const double* coords, int* connect );
-void print_time( const bool print_em, double& tot_time, double& utime, double& stime, long& imem,
-                 long& rmem );
-void query_vert_to_elem( );
-void query_elem_to_vert( );
-void query_struct_elem_to_vert( );
-void query_elem_to_vert_direct( );
-void query_vert_to_elem_direct( );
+void      testA( const int nelem, const double* coords );
+void      testB( const int nelem, const double* coords, int* connect );
+void      testC( const int nelem, const double* coords );
+void      testD( const int nelem, const double* coords, int ver );
+void      testE( const int nelem, const double* coords, int* connect );
+void      print_time( const bool print_em, double& tot_time, double& utime, double& stime, long& imem, long& rmem );
+void      query_vert_to_elem( );
+void      query_elem_to_vert( );
+void      query_struct_elem_to_vert( );
+void      query_elem_to_vert_direct( );
+void      query_vert_to_elem_direct( );
 ErrorCode normalize_elems( double* coords );
 void      check_answers( const char* );
 
@@ -88,8 +87,7 @@ void compute_edge( double* start, const int nelem, const double xint, const int 
     }
 }
 
-void compute_face( double* a, const int nelem, const double xint, const int stride1,
-                   const int stride2 )
+void compute_face( double* a, const int nelem, const double xint, const int stride1, const int stride2 )
 {
     // 2D TFI on a face starting at a, with strides stride1 in ada and stride2 in tse
     for( int j = 1; j < nelem; j++ )
@@ -102,15 +100,11 @@ void compute_face( double* a, const int nelem, const double xint, const int stri
             a[ i * stride1 + j * stride2 ] =
                 ( 1.0 - ada ) * a[ i * stride1 ] + ada * a[ i * stride1 + nelem * stride2 ] +
                 ( 1.0 - tse ) * a[ j * stride2 ] + tse * a[ j * stride2 + nelem * stride1 ] -
-                ( 1.0 - tse ) * ( 1.0 - ada ) * a[ 0 ] -
-                ( 1.0 - tse ) * ada * a[ nelem * stride1 ] -
-                tse * ( 1.0 - ada ) * a[ nelem * stride2 ] -
-                tse * ada * a[ nelem * ( stride1 + stride2 ) ];
+                ( 1.0 - tse ) * ( 1.0 - ada ) * a[ 0 ] - ( 1.0 - tse ) * ada * a[ nelem * stride1 ] -
+                tse * ( 1.0 - ada ) * a[ nelem * stride2 ] - tse * ada * a[ nelem * ( stride1 + stride2 ) ];
             a[ nelem + 1 + i * stride1 + j * stride2 ] =
-                ( 1.0 - ada ) * a[ nelem + 1 + i * stride1 ] +
-                ada * a[ nelem + 1 + i * stride1 + nelem * stride2 ] +
-                ( 1.0 - tse ) * a[ nelem + 1 + j * stride2 ] +
-                tse * a[ nelem + 1 + j * stride2 + nelem * stride1 ] -
+                ( 1.0 - ada ) * a[ nelem + 1 + i * stride1 ] + ada * a[ nelem + 1 + i * stride1 + nelem * stride2 ] +
+                ( 1.0 - tse ) * a[ nelem + 1 + j * stride2 ] + tse * a[ nelem + 1 + j * stride2 + nelem * stride1 ] -
                 ( 1.0 - tse ) * ( 1.0 - ada ) * a[ nelem + 1 + 0 ] -
                 ( 1.0 - tse ) * ada * a[ nelem + 1 + nelem * stride1 ] -
                 tse * ( 1.0 - ada ) * a[ nelem + 1 + nelem * stride2 ] -
@@ -229,16 +223,14 @@ void build_coords( const int nelem, double*& coords )
                 double* aij0 = &coords[ VINDEX( 0, j, i ) ];
                 double* aijg = &coords[ VINDEX( gammaInts, j, i ) ];
 
-                coords[ VINDEX( i, j, k ) ] =
-                    ( am1 * ai0k[ 0 ] + ada * aiak[ 0 ] + tm1 * a0jk[ 0 ] + tse * atjk[ 0 ] +
-                      gm1 * aij0[ 0 ] + gamma * aijg[ 0 ] ) /
-                        2.0 -
-                    cX / 2.0;
+                coords[ VINDEX( i, j, k ) ] = ( am1 * ai0k[ 0 ] + ada * aiak[ 0 ] + tm1 * a0jk[ 0 ] + tse * atjk[ 0 ] +
+                                                gm1 * aij0[ 0 ] + gamma * aijg[ 0 ] ) /
+                                                  2.0 -
+                                              cX / 2.0;
 
                 coords[ nelem + 1 + VINDEX( i, j, k ) ] =
                     ( am1 * ai0k[ nelem + 1 ] + ada * aiak[ nelem + 1 ] + tm1 * a0jk[ nelem + 1 ] +
-                      tse * atjk[ nelem + 1 ] + gm1 * aij0[ nelem + 1 ] +
-                      gamma * aijg[ nelem + 1 ] ) /
+                      tse * atjk[ nelem + 1 ] + gm1 * aij0[ nelem + 1 ] + gamma * aijg[ nelem + 1 ] ) /
                         2.0 -
                     cY / 2.0;
 
@@ -311,12 +303,11 @@ void init( )
 {
     gMB = new Core( );
     double    def_val[ 3 ] = { 0.0, 0.0, 0.0 };
-    ErrorCode rval = gMB->tag_get_handle( "position_tag", 3, MB_TYPE_DOUBLE, pos_tag,
-                                          MB_TAG_DENSE | MB_TAG_CREAT, def_val );
+    ErrorCode rval =
+        gMB->tag_get_handle( "position_tag", 3, MB_TYPE_DOUBLE, pos_tag, MB_TAG_DENSE | MB_TAG_CREAT, def_val );
     assert( MB_SUCCESS == rval );
     if( rval ) {}  // empty line to remove compiler warning
-    rval = gMB->tag_get_handle( "position2_tag", 3, MB_TYPE_DOUBLE, pos2_tag,
-                                MB_TAG_DENSE | MB_TAG_CREAT, def_val );
+    rval = gMB->tag_get_handle( "position2_tag", 3, MB_TYPE_DOUBLE, pos2_tag, MB_TAG_DENSE | MB_TAG_CREAT, def_val );
     assert( MB_SUCCESS == rval );
 }
 
@@ -325,8 +316,7 @@ int main( int argc, char* argv[] )
     int nelem = 20;
     if( argc < 3 )
     {
-        std::cout << "Usage: " << argv[ 0 ] << " <ints_per_side> [A|B|C|D [1|2|3|4]|E]"
-                  << std::endl;
+        std::cout << "Usage: " << argv[ 0 ] << " <ints_per_side> [A|B|C|D [1|2|3|4]|E]" << std::endl;
         return 1;
     }
 
@@ -337,8 +327,8 @@ int main( int argc, char* argv[] )
     if( argc >= 3 ) sscanf( argv[ 2 ], "%c", &which_test );
     if( argc >= 4 ) sscanf( argv[ 3 ], "%d", &ver );
 
-    if( 3 <= argc && which_test != 'A' && which_test != 'B' && which_test != 'C' &&
-        which_test != 'D' && which_test != 'E' )
+    if( 3 <= argc && which_test != 'A' && which_test != 'B' && which_test != 'C' && which_test != 'D' &&
+        which_test != 'E' )
     {
         std::cout << "Must indicate A or B, C, D or E for test." << std::endl;
         return 1;
@@ -428,8 +418,7 @@ void query_vert_to_elem( )
         result = gMB->get_adjacencies( &( *vit ), 1, 3, false, neighbor_hexes );
         RC( "query_vert_to_elem" );
         assert( neighbor_pos.size( ) >= 3 * neighbor_hexes.size( ) );
-        result = gMB->tag_get_data( pos2_tag, &neighbor_hexes[ 0 ], neighbor_hexes.size( ),
-                                    &neighbor_pos[ 0 ] );
+        result = gMB->tag_get_data( pos2_tag, &neighbor_hexes[ 0 ], neighbor_hexes.size( ), &neighbor_pos[ 0 ] );
         RC( "query_vert_to_elem" );
         for( unsigned int i = 0; i < neighbor_hexes.size( ); i++ )
         {
@@ -438,8 +427,7 @@ void query_vert_to_elem( )
             neighbor_pos[ 3 * i + 2 ] += coords[ 2 ];
         }
 
-        result = gMB->tag_set_data( pos2_tag, &neighbor_hexes[ 0 ], neighbor_hexes.size( ),
-                                    &neighbor_pos[ 0 ] );
+        result = gMB->tag_set_data( pos2_tag, &neighbor_hexes[ 0 ], neighbor_hexes.size( ), &neighbor_pos[ 0 ] );
         RC( "query_vert_to_elem" );
     }
 
@@ -448,13 +436,12 @@ void query_vert_to_elem( )
     RC( "query_vert_to_elem" );
 }
 
-void query_elem_to_vert_iters( int chunk_size, bool check_valid,
-                               std::vector< EntityHandle >& connect, double* dum_coords,
-                               double* dum_pos )
+void query_elem_to_vert_iters( int chunk_size, bool check_valid, std::vector< EntityHandle >& connect,
+                               double* dum_coords, double* dum_pos )
 {
     std::vector< EntityHandle > hexes;
     SetIterator*                iter;
-    ErrorCode result = gMB->create_set_iterator( 0, MBHEX, -1, chunk_size, check_valid, iter );
+    ErrorCode                   result = gMB->create_set_iterator( 0, MBHEX, -1, chunk_size, check_valid, iter );
     RC( "query_elem_to_vert_iters" );
     bool atend = false;
     while( !atend )
@@ -488,13 +475,12 @@ void query_elem_to_vert_iters( int chunk_size, bool check_valid,
     delete iter;
 }
 
-void query_vert_to_elem_iters( int chunk_size, bool                              check_valid,
-                               std::vector< EntityHandle >& /*connect*/, double* dum_coords,
-                               double* dum_pos )
+void query_vert_to_elem_iters( int chunk_size, bool check_valid, std::vector< EntityHandle >& /*connect*/,
+                               double* dum_coords, double* dum_pos )
 {
     std::vector< EntityHandle > verts, neighbor_hexes;
     SetIterator*                iter;
-    ErrorCode result = gMB->create_set_iterator( 0, MBVERTEX, -1, chunk_size, check_valid, iter );
+    ErrorCode                   result = gMB->create_set_iterator( 0, MBVERTEX, -1, chunk_size, check_valid, iter );
     RC( "query_vert_to_elem_iters" );
     assert( MB_SUCCESS == result );
     bool atend = false;
@@ -511,8 +497,7 @@ void query_vert_to_elem_iters( int chunk_size, bool                             
             neighbor_hexes.clear( );
             result = gMB->get_adjacencies( &verts[ i ], 1, 3, false, neighbor_hexes );
             RC( "query_vert_to_elem_iters" );
-            result = gMB->tag_get_data( pos2_tag, &neighbor_hexes[ 0 ], neighbor_hexes.size( ),
-                                        dum_pos );
+            result = gMB->tag_get_data( pos2_tag, &neighbor_hexes[ 0 ], neighbor_hexes.size( ), dum_pos );
             RC( "query_vert_to_elem_iters" );
             for( unsigned int j = 0; j < neighbor_hexes.size( ); j++ )
             {
@@ -520,8 +505,7 @@ void query_vert_to_elem_iters( int chunk_size, bool                             
                 dum_pos[ 3 * j + 1 ] += dum_coords[ 3 * i + 1 ];
                 dum_pos[ 3 * j + 2 ] += dum_coords[ 3 * i + 2 ];
             }
-            result = gMB->tag_set_data( pos2_tag, &neighbor_hexes[ 0 ], neighbor_hexes.size( ),
-                                        dum_pos );
+            result = gMB->tag_set_data( pos2_tag, &neighbor_hexes[ 0 ], neighbor_hexes.size( ), dum_pos );
             RC( "query_vert_to_elem_iters" );
         }
     }
@@ -583,8 +567,7 @@ void query_struct_elem_to_vert( )
 }
 
 #if defined( _MSC_VER ) || defined( __MINGW32__ )
-void print_time( const bool print_em, double& tot_time, double& utime, double& stime, long& imem,
-                 long& rmem )
+void print_time( const bool print_em, double& tot_time, double& utime, double& stime, long& imem, long& rmem )
 {
     utime = (double)clock( ) / CLOCKS_PER_SEC;
     if( print_em ) std::cout << "Total wall time = " << utime << std::endl;
@@ -592,8 +575,7 @@ void print_time( const bool print_em, double& tot_time, double& utime, double& s
     imem = rmem = 0;
 }
 #else
-void print_time( const bool print_em, double& tot_time, double& utime, double& stime, long& imem,
-                 long& rmem )
+void print_time( const bool print_em, double& tot_time, double& utime, double& stime, long& imem, long& rmem )
 {
     struct rusage r_usage;
     getrusage( RUSAGE_SELF, &r_usage );
@@ -601,8 +583,7 @@ void print_time( const bool print_em, double& tot_time, double& utime, double& s
     stime = (double)r_usage.ru_stime.tv_sec + ( (double)r_usage.ru_stime.tv_usec / 1.e6 );
     tot_time = utime + stime;
     if( print_em )
-        std::cout << "User, system, total time = " << utime << ", " << stime << ", " << tot_time
-                  << std::endl;
+        std::cout << "User, system, total time = " << utime << ", " << stime << ", " << tot_time << std::endl;
 #ifndef LINUX
     if( print_em )
     {
@@ -621,10 +602,8 @@ void print_time( const bool print_em, double& tot_time, double& utime, double& s
 
 void testA( const int nelem, const double* coords )
 {
-    double ttime0 = 0.0, ttime1 = 0.0, ttime2 = 0.0, ttime3 = 0.0, ttime4 = 0.0, utime = 0.0,
-           stime = 0.0;
-    long imem0 = 0, rmem0 = 0, imem1 = 0, rmem1 = 0, imem2 = 0, rmem2 = 0, imem3 = 0, rmem3 = 0,
-         imem4 = 0, rmem4 = 0;
+    double ttime0 = 0.0, ttime1 = 0.0, ttime2 = 0.0, ttime3 = 0.0, ttime4 = 0.0, utime = 0.0, stime = 0.0;
+    long   imem0 = 0, rmem0 = 0, imem1 = 0, rmem1 = 0, imem2 = 0, rmem2 = 0, imem3 = 0, rmem3 = 0, imem4 = 0, rmem4 = 0;
 
     print_time( false, ttime0, utime, stime, imem0, rmem0 );
 
@@ -639,22 +618,19 @@ void testA( const int nelem, const double* coords )
     HomCoord         vseq_minmax[ 2 ] = { HomCoord( 0, 0, 0 ), HomCoord( nelem, nelem, nelem ) };
     EntityHandle     vstart, estart;
 
-    ErrorCode result = seq_mgr->create_scd_sequence( vseq_minmax[ 0 ], vseq_minmax[ 1 ], MBVERTEX,
-                                                     1, vstart, dum_seq );
+    ErrorCode result = seq_mgr->create_scd_sequence( vseq_minmax[ 0 ], vseq_minmax[ 1 ], MBVERTEX, 1, vstart, dum_seq );
     RC( "testA" );
     if( NULL != dum_seq ) vseq = dynamic_cast< ScdVertexData* >( dum_seq->data( ) );
     assert( MB_FAILURE != result && vstart != 0 && dum_seq != NULL && vseq != NULL );
     // now the element sequence
-    result = seq_mgr->create_scd_sequence( vseq_minmax[ 0 ], vseq_minmax[ 1 ], MBHEX, 1, estart,
-                                           dum_seq );
+    result = seq_mgr->create_scd_sequence( vseq_minmax[ 0 ], vseq_minmax[ 1 ], MBHEX, 1, estart, dum_seq );
     if( NULL != dum_seq ) eseq = dynamic_cast< StructuredElementSeq* >( dum_seq );
     assert( MB_FAILURE != result && estart != 0 && dum_seq != NULL && eseq != NULL );
 
     // only need to add one vseq to this, unity transform
     // trick: if I know it's going to be unity, just input 3 sets of equivalent points
-    result =
-        eseq->sdata( )->add_vsequence( vseq, vseq_minmax[ 0 ], vseq_minmax[ 0 ], vseq_minmax[ 0 ],
-                                       vseq_minmax[ 0 ], vseq_minmax[ 0 ], vseq_minmax[ 0 ] );
+    result = eseq->sdata( )->add_vsequence( vseq, vseq_minmax[ 0 ], vseq_minmax[ 0 ], vseq_minmax[ 0 ],
+                                            vseq_minmax[ 0 ], vseq_minmax[ 0 ], vseq_minmax[ 0 ] );
     assert( MB_SUCCESS == result );
 
     // set the coordinates of the vertices
@@ -690,19 +666,17 @@ void testA( const int nelem, const double* coords )
 
     print_time( false, ttime4, utime, stime, imem4, rmem4 );
 
-    std::cout << "MOAB_scd:nelem,construct,e_to_v,v_to_e,after_dtor,total= " << nelem << " "
-              << ttime1 - ttime0 << " " << ttime2 - ttime1 << " " << ttime3 - ttime2 << " "
-              << ttime4 - ttime3 << " " << ttime4 - ttime0 << " seconds" << std::endl;
-    std::cout << "MOAB_scd_memory(rss):initial,after_construction,e-v,v-e,after_dtor= " << rmem0
-              << " " << rmem1 << " " << rmem2 << " " << rmem3 << " " << rmem4 << " kb" << std::endl;
+    std::cout << "MOAB_scd:nelem,construct,e_to_v,v_to_e,after_dtor,total= " << nelem << " " << ttime1 - ttime0 << " "
+              << ttime2 - ttime1 << " " << ttime3 - ttime2 << " " << ttime4 - ttime3 << " " << ttime4 - ttime0
+              << " seconds" << std::endl;
+    std::cout << "MOAB_scd_memory(rss):initial,after_construction,e-v,v-e,after_dtor= " << rmem0 << " " << rmem1 << " "
+              << rmem2 << " " << rmem3 << " " << rmem4 << " kb" << std::endl;
 }
 
 void testB( const int nelem, const double* coords, int* connect )
 {
-    double ttime0 = 0.0, ttime1 = 0.0, ttime2 = 0.0, ttime3 = 0.0, ttime4 = 0.0, utime = 0.0,
-           stime = 0.0;
-    long imem0 = 0, rmem0 = 0, imem1 = 0, rmem1 = 0, imem2 = 0, rmem2 = 0, imem3 = 0, rmem3 = 0,
-         imem4 = 0, rmem4 = 0;
+    double ttime0 = 0.0, ttime1 = 0.0, ttime2 = 0.0, ttime3 = 0.0, ttime4 = 0.0, utime = 0.0, stime = 0.0;
+    long   imem0 = 0, rmem0 = 0, imem1 = 0, rmem1 = 0, imem2 = 0, rmem2 = 0, imem3 = 0, rmem3 = 0, imem4 = 0, rmem4 = 0;
 
     print_time( false, ttime0, utime, stime, imem0, rmem0 );
 
@@ -718,10 +692,9 @@ void testB( const int nelem, const double* coords, int* connect )
     // create a sequence to hold the node coordinates
     // get the current number of entities and start at the next slot
     std::vector< double* > coord_arrays;
-    ErrorCode result = readMeshIface->get_node_coords( 3, num_verts, 1, vstart, coord_arrays );
+    ErrorCode              result = readMeshIface->get_node_coords( 3, num_verts, 1, vstart, coord_arrays );
     RC( "testB" );
-    assert( MB_SUCCESS == result && 1 == vstart && coord_arrays[ 0 ] && coord_arrays[ 1 ] &&
-            coord_arrays[ 2 ] );
+    assert( MB_SUCCESS == result && 1 == vstart && coord_arrays[ 0 ] && coord_arrays[ 1 ] && coord_arrays[ 2 ] );
     // memcpy the coordinate data into place
     memcpy( coord_arrays[ 0 ], coords, sizeof( double ) * num_verts );
     memcpy( coord_arrays[ 1 ], &coords[ num_verts ], sizeof( double ) * num_verts );
@@ -757,20 +730,17 @@ void testB( const int nelem, const double* coords, int* connect )
 
     print_time( false, ttime4, utime, stime, imem4, rmem4 );
 
-    std::cout << "MOAB_ucd_blocked:nelem,construct,e_to_v,v_to_e,after_dtor,total= " << nelem << " "
-              << ttime1 - ttime0 << " " << ttime2 - ttime1 << " " << ttime3 - ttime2 << " "
-              << ttime4 - ttime3 << " " << ttime4 - ttime0 << " seconds" << std::endl;
-    std::cout << "MOAB_ucdblocked_memory_(rss):initial,after_construction,e-v,v-e,after_dtor= "
-              << rmem0 << " " << rmem1 << " " << rmem2 << " " << rmem3 << " " << rmem4 << " kb"
-              << std::endl;
+    std::cout << "MOAB_ucd_blocked:nelem,construct,e_to_v,v_to_e,after_dtor,total= " << nelem << " " << ttime1 - ttime0
+              << " " << ttime2 - ttime1 << " " << ttime3 - ttime2 << " " << ttime4 - ttime3 << " " << ttime4 - ttime0
+              << " seconds" << std::endl;
+    std::cout << "MOAB_ucdblocked_memory_(rss):initial,after_construction,e-v,v-e,after_dtor= " << rmem0 << " " << rmem1
+              << " " << rmem2 << " " << rmem3 << " " << rmem4 << " kb" << std::endl;
 }
 
 void testC( const int nelem, const double* coords )
 {
-    double ttime0 = 0.0, ttime1 = 0.0, ttime2 = 0.0, ttime3 = 0.0, ttime4 = 0.0, utime = 0.0,
-           stime = 0.0;
-    long imem0 = 0, rmem0 = 0, imem1 = 0, rmem1 = 0, imem2 = 0, rmem2 = 0, imem3 = 0, rmem3 = 0,
-         imem4 = 0, rmem4 = 0;
+    double ttime0 = 0.0, ttime1 = 0.0, ttime2 = 0.0, ttime3 = 0.0, ttime4 = 0.0, utime = 0.0, stime = 0.0;
+    long   imem0 = 0, rmem0 = 0, imem1 = 0, rmem1 = 0, imem2 = 0, rmem2 = 0, imem3 = 0, rmem3 = 0, imem4 = 0, rmem4 = 0;
 
     print_time( false, ttime0, utime, stime, imem0, rmem0 );
 
@@ -839,22 +809,20 @@ void testC( const int nelem, const double* coords )
 
     print_time( false, ttime4, utime, stime, imem4, rmem4 );
 
-    std::cout << "MOAB_ucd_indiv:nelem,construct,e_to_v,v_to_e,after_dtor,total= " << nelem << " "
-              << ttime1 - ttime0 << " " << ttime2 - ttime1 << " " << ttime3 - ttime2 << " "
-              << ttime4 - ttime3 << " " << ttime4 - ttime0 << " seconds" << std::endl;
-    std::cout << "MOAB_ucd_indiv_memory_(rss):initial,after_construction,e-v,v-e,after_dtor= "
-              << rmem0 << " " << rmem1 << " " << rmem2 << " " << rmem3 << " " << rmem4 << " kb"
-              << std::endl;
+    std::cout << "MOAB_ucd_indiv:nelem,construct,e_to_v,v_to_e,after_dtor,total= " << nelem << " " << ttime1 - ttime0
+              << " " << ttime2 - ttime1 << " " << ttime3 - ttime2 << " " << ttime4 - ttime3 << " " << ttime4 - ttime0
+              << " seconds" << std::endl;
+    std::cout << "MOAB_ucd_indiv_memory_(rss):initial,after_construction,e-v,v-e,after_dtor= " << rmem0 << " " << rmem1
+              << " " << rmem2 << " " << rmem3 << " " << rmem4 << " kb" << std::endl;
 }
 
 void testD( const int nelem, const double* coords, int ver )
 {
-    double ttime0 = 0.0, ttime1 = 0.0, ttime2 = 0.0, ttime3 = 0.0, ttime4 = 0.0, ttime5 = 0.0,
-           ttime6 = 0.0, ttime7 = 0.0, ttime8 = 0.0, ttime9 = 0.0, ttime10 = 0.0, utime = 0.0,
-           stime = 0.0;
-    long imem0 = 0, rmem0 = 0, imem1 = 0, rmem1 = 0, imem2 = 0, rmem2 = 0, imem3 = 0, rmem3 = 0,
-         imem4 = 0, rmem4 = 0, imem5 = 0, rmem5 = 0, imem6 = 0, rmem6 = 0, imem7 = 0, rmem7 = 0,
-         imem8 = 0, rmem8 = 0, imem9 = 0, rmem9 = 0, imem10 = 0, rmem10 = 0;
+    double ttime0 = 0.0, ttime1 = 0.0, ttime2 = 0.0, ttime3 = 0.0, ttime4 = 0.0, ttime5 = 0.0, ttime6 = 0.0,
+           ttime7 = 0.0, ttime8 = 0.0, ttime9 = 0.0, ttime10 = 0.0, utime = 0.0, stime = 0.0;
+    long imem0 = 0, rmem0 = 0, imem1 = 0, rmem1 = 0, imem2 = 0, rmem2 = 0, imem3 = 0, rmem3 = 0, imem4 = 0, rmem4 = 0,
+         imem5 = 0, rmem5 = 0, imem6 = 0, rmem6 = 0, imem7 = 0, rmem7 = 0, imem8 = 0, rmem8 = 0, imem9 = 0, rmem9 = 0,
+         imem10 = 0, rmem10 = 0;
 
     print_time( false, ttime0, utime, stime, imem0, rmem0 );
 
@@ -925,13 +893,13 @@ void testD( const int nelem, const double* coords, int ver )
         check_answers( "D" );
         result = gMB->tag_delete( pos_tag );
         assert( MB_SUCCESS == result );
-        result = gMB->tag_get_handle( "position_tag", 3, MB_TYPE_DOUBLE, pos_tag,
-                                      MB_TAG_DENSE | MB_TAG_CREAT, def_val );
+        result =
+            gMB->tag_get_handle( "position_tag", 3, MB_TYPE_DOUBLE, pos_tag, MB_TAG_DENSE | MB_TAG_CREAT, def_val );
         assert( MB_SUCCESS == result );
         result = gMB->tag_delete( pos2_tag );
         assert( MB_SUCCESS == result );
-        result = gMB->tag_get_handle( "position2_tag", 3, MB_TYPE_DOUBLE, pos2_tag,
-                                      MB_TAG_DENSE | MB_TAG_CREAT, def_val );
+        result =
+            gMB->tag_get_handle( "position2_tag", 3, MB_TYPE_DOUBLE, pos2_tag, MB_TAG_DENSE | MB_TAG_CREAT, def_val );
         assert( MB_SUCCESS == result );
 #endif
     }
@@ -947,13 +915,13 @@ void testD( const int nelem, const double* coords, int ver )
         check_answers( "D" );
         result = gMB->tag_delete( pos_tag );
         assert( MB_SUCCESS == result );
-        result = gMB->tag_get_handle( "position_tag", 3, MB_TYPE_DOUBLE, pos_tag,
-                                      MB_TAG_DENSE | MB_TAG_CREAT, def_val );
+        result =
+            gMB->tag_get_handle( "position_tag", 3, MB_TYPE_DOUBLE, pos_tag, MB_TAG_DENSE | MB_TAG_CREAT, def_val );
         assert( MB_SUCCESS == result );
         result = gMB->tag_delete( pos2_tag );
         assert( MB_SUCCESS == result );
-        result = gMB->tag_get_handle( "position2_tag", 3, MB_TYPE_DOUBLE, pos2_tag,
-                                      MB_TAG_DENSE | MB_TAG_CREAT, def_val );
+        result =
+            gMB->tag_get_handle( "position2_tag", 3, MB_TYPE_DOUBLE, pos2_tag, MB_TAG_DENSE | MB_TAG_CREAT, def_val );
         assert( MB_SUCCESS == result );
 #endif
     }
@@ -974,13 +942,13 @@ void testD( const int nelem, const double* coords, int ver )
         check_answers( "D" );
         result = gMB->tag_delete( pos_tag );
         assert( MB_SUCCESS == result );
-        result = gMB->tag_get_handle( "position_tag", 3, MB_TYPE_DOUBLE, pos_tag,
-                                      MB_TAG_DENSE | MB_TAG_CREAT, def_val );
+        result =
+            gMB->tag_get_handle( "position_tag", 3, MB_TYPE_DOUBLE, pos_tag, MB_TAG_DENSE | MB_TAG_CREAT, def_val );
         assert( MB_SUCCESS == result );
         result = gMB->tag_delete( pos2_tag );
         assert( MB_SUCCESS == result );
-        result = gMB->tag_get_handle( "position2_tag", 3, MB_TYPE_DOUBLE, pos2_tag,
-                                      MB_TAG_DENSE | MB_TAG_CREAT, def_val );
+        result =
+            gMB->tag_get_handle( "position2_tag", 3, MB_TYPE_DOUBLE, pos2_tag, MB_TAG_DENSE | MB_TAG_CREAT, def_val );
         assert( MB_SUCCESS == result );
 #endif
     }
@@ -996,13 +964,13 @@ void testD( const int nelem, const double* coords, int ver )
         check_answers( "D" );
         result = gMB->tag_delete( pos_tag );
         assert( MB_SUCCESS == result );
-        result = gMB->tag_get_handle( "position_tag", 3, MB_TYPE_DOUBLE, pos_tag,
-                                      MB_TAG_DENSE | MB_TAG_CREAT, def_val );
+        result =
+            gMB->tag_get_handle( "position_tag", 3, MB_TYPE_DOUBLE, pos_tag, MB_TAG_DENSE | MB_TAG_CREAT, def_val );
         assert( MB_SUCCESS == result );
         result = gMB->tag_delete( pos2_tag );
         assert( MB_SUCCESS == result );
-        result = gMB->tag_get_handle( "position2_tag", 3, MB_TYPE_DOUBLE, pos2_tag,
-                                      MB_TAG_DENSE | MB_TAG_CREAT, def_val );
+        result =
+            gMB->tag_get_handle( "position2_tag", 3, MB_TYPE_DOUBLE, pos2_tag, MB_TAG_DENSE | MB_TAG_CREAT, def_val );
         assert( MB_SUCCESS == result );
 #endif
     }
@@ -1014,56 +982,48 @@ void testD( const int nelem, const double* coords, int ver )
 
     if( ver == 0 || ver == 1 )
     {
-        std::cout << "MOAB_ucd_iters_!check_valid_1:nelem,construct,e-v,v-e,after_dtor,total= "
-                  << nelem << " " << ttime1 - ttime0 << " " << ttime2 - ttime1 << " "
-                  << ttime3 - ttime2 << " " << ttime10 - ttime9 << " "
-                  << ttime3 - ttime0 + ttime10 - ttime9 << std::endl;
+        std::cout << "MOAB_ucd_iters_!check_valid_1:nelem,construct,e-v,v-e,after_dtor,total= " << nelem << " "
+                  << ttime1 - ttime0 << " " << ttime2 - ttime1 << " " << ttime3 - ttime2 << " " << ttime10 - ttime9
+                  << " " << ttime3 - ttime0 + ttime10 - ttime9 << std::endl;
         std::cout << "MOAB_ucd_iters_memory_(rss)_!check_valid_1:initial,after_construction,e-v,v-"
                      "e,after_dtor= "
-                  << rmem0 << " " << rmem1 << " " << rmem2 << " " << rmem3 << " " << rmem10 << " kb"
-                  << std::endl;
+                  << rmem0 << " " << rmem1 << " " << rmem2 << " " << rmem3 << " " << rmem10 << " kb" << std::endl;
     }
     if( ver == 0 || ver == 2 )
     {
-        std::cout << "MOAB_ucd_iters_check_valid_1:nelem,construct,e-v,v-e,after_dtor,total= "
-                  << nelem << " " << ttime1 - ttime0 << " " << ttime4 - ttime3 << " "
-                  << ttime5 - ttime4 << " " << ttime10 - ttime9 << " "
-                  << ttime1 - ttime0 + ttime5 - ttime3 + ttime10 - ttime9 << std::endl;
+        std::cout << "MOAB_ucd_iters_check_valid_1:nelem,construct,e-v,v-e,after_dtor,total= " << nelem << " "
+                  << ttime1 - ttime0 << " " << ttime4 - ttime3 << " " << ttime5 - ttime4 << " " << ttime10 - ttime9
+                  << " " << ttime1 - ttime0 + ttime5 - ttime3 + ttime10 - ttime9 << std::endl;
         std::cout << "MOAB_ucd_iters_memory_(rss)_check_valid_1:initial,after_construction,e-v,v-e,"
                      "after_dtor= "
-                  << rmem0 << " " << rmem1 << " " << rmem2 << " " << rmem3 << " " << rmem10 << " kb"
-                  << std::endl;
+                  << rmem0 << " " << rmem1 << " " << rmem2 << " " << rmem3 << " " << rmem10 << " kb" << std::endl;
     }
     if( ver == 0 || ver == 3 )
     {
-        std::cout << "MOAB_ucd_iters_!check_valid_100:nelem,construct,e-v,v-e,after_dtor,total= "
-                  << nelem << " " << ttime1 - ttime0 << " " << ttime6 - ttime5 << " "
-                  << ttime7 - ttime6 << " " << ttime10 - ttime9 << " "
-                  << ttime1 - ttime0 + ttime7 - ttime5 + ttime10 - ttime9 << std::endl;
+        std::cout << "MOAB_ucd_iters_!check_valid_100:nelem,construct,e-v,v-e,after_dtor,total= " << nelem << " "
+                  << ttime1 - ttime0 << " " << ttime6 - ttime5 << " " << ttime7 - ttime6 << " " << ttime10 - ttime9
+                  << " " << ttime1 - ttime0 + ttime7 - ttime5 + ttime10 - ttime9 << std::endl;
         std::cout << "MOAB_ucd_iters_memory_(rss)_!check_valid_100:initial,after_construction,e-v,"
                      "v-e,after_dtor= "
-                  << rmem0 << " " << rmem1 << " " << rmem6 << " " << rmem7 << " " << rmem10 << " kb"
-                  << std::endl;
+                  << rmem0 << " " << rmem1 << " " << rmem6 << " " << rmem7 << " " << rmem10 << " kb" << std::endl;
     }
     if( ver == 0 || ver == 4 )
     {
-        std::cout << "MOAB_ucd_iters_check_valid_100:nelem,construct,e-v,v-e,after_dtor,total= "
-                  << nelem << " " << ttime1 - ttime0 << " " << ttime8 - ttime7 << " "
-                  << ttime9 - ttime8 << " " << ttime10 - ttime9 << " "
-                  << ttime1 - ttime0 + ttime10 - ttime7 << std::endl;
+        std::cout << "MOAB_ucd_iters_check_valid_100:nelem,construct,e-v,v-e,after_dtor,total= " << nelem << " "
+                  << ttime1 - ttime0 << " " << ttime8 - ttime7 << " " << ttime9 - ttime8 << " " << ttime10 - ttime9
+                  << " " << ttime1 - ttime0 + ttime10 - ttime7 << std::endl;
         std::cout << "MOAB_ucd_iters_memory_(rss)_check_valid_100:initial,after_construction,e-v,v-"
                      "e,after_dtor= "
-                  << rmem0 << " " << rmem1 << " " << rmem8 << " " << rmem9 << " " << rmem10 << " kb"
-                  << std::endl;
+                  << rmem0 << " " << rmem1 << " " << rmem8 << " " << rmem9 << " " << rmem10 << " kb" << std::endl;
     }
 }
 
 void testE( const int nelem, const double* coords, int* connect )
 {
-    double ttime0 = 0.0, ttime1 = 0.0, ttime2 = 0.0, ttime3 = 0.0, ttime4 = 0.0, ttime5 = 0.0,
-           ttime6 = 0.0, utime = 0.0, stime = 0.0;
-    long imem0 = 0, rmem0 = 0, imem1 = 0, rmem1 = 0, imem2 = 0, rmem2 = 0, imem3 = 0, rmem3 = 0,
-         imem4 = 0, rmem4 = 0, imem5 = 0, rmem5 = 0, imem6 = 0, rmem6 = 0;
+    double ttime0 = 0.0, ttime1 = 0.0, ttime2 = 0.0, ttime3 = 0.0, ttime4 = 0.0, ttime5 = 0.0, ttime6 = 0.0,
+           utime = 0.0, stime = 0.0;
+    long imem0 = 0, rmem0 = 0, imem1 = 0, rmem1 = 0, imem2 = 0, rmem2 = 0, imem3 = 0, rmem3 = 0, imem4 = 0, rmem4 = 0,
+         imem5 = 0, rmem5 = 0, imem6 = 0, rmem6 = 0;
 
     print_time( false, ttime0, utime, stime, imem0, rmem0 );
 
@@ -1079,10 +1039,9 @@ void testE( const int nelem, const double* coords, int* connect )
     // create a sequence to hold the node coordinates
     // get the current number of entities and start at the next slot
     std::vector< double* > coord_arrays;
-    ErrorCode result = readMeshIface->get_node_coords( 3, num_verts, 1, vstart, coord_arrays );
+    ErrorCode              result = readMeshIface->get_node_coords( 3, num_verts, 1, vstart, coord_arrays );
     RC( "testE" );
-    assert( MB_SUCCESS == result && 1 == vstart && coord_arrays[ 0 ] && coord_arrays[ 1 ] &&
-            coord_arrays[ 2 ] );
+    assert( MB_SUCCESS == result && 1 == vstart && coord_arrays[ 0 ] && coord_arrays[ 1 ] && coord_arrays[ 2 ] );
     // memcpy the coordinate data into place
     memcpy( coord_arrays[ 0 ], coords, sizeof( double ) * num_verts );
     memcpy( coord_arrays[ 1 ], &coords[ num_verts ], sizeof( double ) * num_verts );
@@ -1132,21 +1091,17 @@ void testE( const int nelem, const double* coords, int* connect )
 
     print_time( false, ttime6, utime, stime, imem6, rmem6 );
 
-    std::cout << "MOAB_ucd_direct:nelem,construct,e_to_v,v_to_e,after_dtor,total= " << nelem << " "
-              << ttime1 - ttime0 << " " << ttime2 - ttime1 << " " << ttime3 - ttime2 << " "
-              << ttime6 - ttime5 << " " << ttime3 - ttime0 + ttime6 - ttime5 << " seconds"
-              << std::endl;
-    std::cout << "MOAB_ucd_direct_memory_(rss):initial,after_construction,e-v,v-e,after_dtor= "
-              << rmem0 << " " << rmem1 << " " << rmem2 << " " << rmem3 << " " << rmem6 << " kb"
-              << std::endl;
+    std::cout << "MOAB_ucd_direct:nelem,construct,e_to_v,v_to_e,after_dtor,total= " << nelem << " " << ttime1 - ttime0
+              << " " << ttime2 - ttime1 << " " << ttime3 - ttime2 << " " << ttime6 - ttime5 << " "
+              << ttime3 - ttime0 + ttime6 - ttime5 << " seconds" << std::endl;
+    std::cout << "MOAB_ucd_direct_memory_(rss):initial,after_construction,e-v,v-e,after_dtor= " << rmem0 << " " << rmem1
+              << " " << rmem2 << " " << rmem3 << " " << rmem6 << " kb" << std::endl;
 
-    std::cout << "MOAB_ucd_direct2:nelem,construct,e_to_v,v_to_e,after_dtor,total= " << nelem << " "
-              << ttime1 - ttime0 << " " << ttime4 - ttime3 << " " << ttime5 - ttime4 << " "
-              << ttime6 - ttime5 << " " << ttime1 - ttime0 + ttime6 - ttime3 << " seconds"
-              << std::endl;
-    std::cout << "MOAB_ucd_direct2_memory_(rss):initial,after_construction,e-v,v-e,after_dtor= "
-              << rmem0 << " " << rmem1 << " " << rmem4 << " " << rmem5 << " " << rmem6 << " kb"
-              << std::endl;
+    std::cout << "MOAB_ucd_direct2:nelem,construct,e_to_v,v_to_e,after_dtor,total= " << nelem << " " << ttime1 - ttime0
+              << " " << ttime4 - ttime3 << " " << ttime5 - ttime4 << " " << ttime6 - ttime5 << " "
+              << ttime1 - ttime0 + ttime6 - ttime3 << " seconds" << std::endl;
+    std::cout << "MOAB_ucd_direct2_memory_(rss):initial,after_construction,e-v,v-e,after_dtor= " << rmem0 << " "
+              << rmem1 << " " << rmem4 << " " << rmem5 << " " << rmem6 << " kb" << std::endl;
 }
 
 void query_elem_to_vert_direct( )
@@ -1166,16 +1121,14 @@ void query_elem_to_vert_direct( )
         std::cout << "FAILED in connect_iterate!" << std::endl;
         return;
     }
-    result = gMB->coords_iterate( all_verts.begin( ), all_verts.end( ), coords[ 0 ], coords[ 1 ],
-                                  coords[ 2 ], vcount );
+    result = gMB->coords_iterate( all_verts.begin( ), all_verts.end( ), coords[ 0 ], coords[ 1 ], coords[ 2 ], vcount );
     if( MB_SUCCESS != result || vcount != (int)all_verts.size( ) )
     {
         std::cout << "FAILED in coords_iterate!" << std::endl;
         return;
     }
     double* centroid;
-    result =
-        gMB->tag_iterate( pos_tag, all_hexes.begin( ), all_hexes.end( ), ecount, (void*&)centroid );
+    result = gMB->tag_iterate( pos_tag, all_hexes.begin( ), all_hexes.end( ), ecount, (void*&)centroid );
     if( MB_SUCCESS != result || ecount != (int)all_hexes.size( ) )
     {
         std::cout << "FAILED in connect_iterate!" << std::endl;
@@ -1222,8 +1175,7 @@ void query_vert_to_elem_direct( )
     }
 
     double* coords[ 3 ];
-    result = gMB->coords_iterate( all_verts.begin( ), all_verts.end( ), coords[ 0 ], coords[ 1 ],
-                                  coords[ 2 ], count );
+    result = gMB->coords_iterate( all_verts.begin( ), all_verts.end( ), coords[ 0 ], coords[ 1 ], coords[ 2 ], count );
     if( MB_SUCCESS != result || count != (int)all_verts.size( ) )
     {
         std::cout << "FAILED in coords_iterate!" << std::endl;
@@ -1235,8 +1187,7 @@ void query_vert_to_elem_direct( )
     tmp_ents.clear( );
     result = gMB->get_entities_by_type( 0, MBHEX, tmp_ents );
     assert( MB_SUCCESS == result );
-    result =
-        gMB->tag_iterate( pos2_tag, tmp_ents.begin( ), tmp_ents.end( ), ecount, (void*&)centroid );
+    result = gMB->tag_iterate( pos2_tag, tmp_ents.begin( ), tmp_ents.end( ), ecount, (void*&)centroid );
     if( MB_SUCCESS != result || ecount != (int)tmp_ents.size( ) )
     {
         std::cout << "FAILED in tag_iterate!" << std::endl;
@@ -1249,8 +1200,7 @@ void query_vert_to_elem_direct( )
     for( vit = all_verts.begin( ), i = 0; vit != all_verts.end( ); ++vit, i++ )
     {
         assert( adjs[ i ] );
-        for( std::vector< EntityHandle >::const_iterator vit2 = adjs[ i ]->begin( );
-             vit2 != adjs[ i ]->end( ); ++vit2 )
+        for( std::vector< EntityHandle >::const_iterator vit2 = adjs[ i ]->begin( ); vit2 != adjs[ i ]->end( ); ++vit2 )
             if( *vit >= estart )
             {
                 int eind = *vit2 - estart;
@@ -1287,10 +1237,9 @@ void check_answers( const char* /*test_name*/ )
             del[ i ] = fabs( coords1[ i ] - coords2[ i ] );
         if( del[ 0 ] || del[ 1 ] || del[ 2 ] )
         {
-            double len2 = std::max( coords1[ 0 ] * coords1[ 0 ] + coords1[ 1 ] * coords1[ 1 ] +
-                                        coords1[ 2 ] * coords1[ 2 ],
-                                    coords2[ 0 ] * coords2[ 0 ] + coords2[ 1 ] * coords2[ 1 ] +
-                                        coords2[ 2 ] * coords2[ 2 ] ),
+            double len2 = std::max(
+                       coords1[ 0 ] * coords1[ 0 ] + coords1[ 1 ] * coords1[ 1 ] + coords1[ 2 ] * coords1[ 2 ],
+                       coords2[ 0 ] * coords2[ 0 ] + coords2[ 1 ] * coords2[ 1 ] + coords2[ 2 ] * coords2[ 2 ] ),
                    num = del[ 0 ] * del[ 0 ] + del[ 1 ] * del[ 1 ] + del[ 2 ] * del[ 2 ];
             if( len2 > 0.0 )
                 diff = std::max( diff, num / sqrt( len2 ) );

@@ -40,8 +40,8 @@ MBMesquite::Wrapper::~Wrapper( )
     delete qualAssessor;
 }
 
-void MBMesquite::Wrapper::run_common( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh,
-                                      Settings* opt, MsqError& err )
+void MBMesquite::Wrapper::run_common( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh, Settings* opt,
+                                      MsqError& err )
 {
     QualityAssessor qa( *qualAssessor );  // use copy so that subclass changes aren't persistent.
     run_wrapper( mesh_and_domain, pmesh, opt, &qa, err );MSQ_CHKERR( err );  // udpate stack trace, don't care about value

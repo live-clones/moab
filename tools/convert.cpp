@@ -66,8 +66,7 @@ static void print_usage( const char* name, std::ostream& stream )
            << "\t-a <acis_file> - ACIS SAT file dumped by .cub reader (same as \"-o "
               "SAT_FILE=acis_file\""
            << std::endl
-           << "\t-A             - .cub file reader should not dump a SAT file (depricated default)"
-           << std::endl
+           << "\t-A             - .cub file reader should not dump a SAT file (depricated default)" << std::endl
            << "\t-o option      - Specify write option." << std::endl
            << "\t-O option      - Specify read option." << std::endl
            << "\t-t             - Time read and write of files." << std::endl
@@ -77,8 +76,7 @@ static void print_usage( const char* name, std::ostream& stream )
            << "\t-I <dim>       - Generate internal entities of specified dimension." << std::endl
 #ifdef MOAB_HAVE_MPI
            << "\t-P             - Append processor ID to output file name" << std::endl
-           << "\t-p             - Replace '%' with processor ID in input and output file name"
-           << std::endl
+           << "\t-p             - Replace '%' with processor ID in input and output file name" << std::endl
            << "\t-M[0|1|2]      - Read/write in parallel, optionally also doing "
               "resolve_shared_ents (1) and exchange_ghosts (2)"
            << std::endl
@@ -88,12 +86,10 @@ static void print_usage( const char* name, std::ostream& stream )
 #endif
 
 #ifdef MOAB_HAVE_TEMPESTREMAP
-           << "\t-B             - Use TempestRemap exodus file reader and convert to MOAB format"
-           << std::endl
+           << "\t-B             - Use TempestRemap exodus file reader and convert to MOAB format" << std::endl
            << "\t-b             - Convert MOAB mesh to TempestRemap exodus file writer" << std::endl
            << "\t-i             - Name of the global DoF tag to use with mbtempest" << std::endl
-           << "\t-r             - Order of field DoF (discretization) data; FV=1,SE=[1,N]"
-           << std::endl
+           << "\t-r             - Order of field DoF (discretization) data; FV=1,SE=[1,N]" << std::endl
 #endif
            << "\t--             - treat all subsequent options as file names" << std::endl
            << "\t                 (allows file names beginning with '-')" << std::endl
@@ -146,14 +142,14 @@ static void usage_error( const char* name )
     exit( USAGE_ERROR );
 }
 
-static void list_formats( Interface* );
-static bool parse_id_list( const char* string, std::set< int >& );
-static void print_id_list( const char*, std::ostream& stream, const std::set< int >& list );
-static void reset_times( );
-static void write_times( std::ostream& stream );
-static void remove_entities_from_sets( Interface* gMB, Range& dead_entities, Range& empty_sets );
-static void remove_from_vector( std::vector< EntityHandle >& vect, const Range& ents_to_remove );
-static bool make_opts_string( std::vector< std::string > options, std::string& result );
+static void        list_formats( Interface* );
+static bool        parse_id_list( const char* string, std::set< int >& );
+static void        print_id_list( const char*, std::ostream& stream, const std::set< int >& list );
+static void        reset_times( );
+static void        write_times( std::ostream& stream );
+static void        remove_entities_from_sets( Interface* gMB, Range& dead_entities, Range& empty_sets );
+static void        remove_from_vector( std::vector< EntityHandle >& vect, const Range& ents_to_remove );
+static bool        make_opts_string( std::vector< std::string > options, std::string& result );
 static std::string percent_subst( const std::string& s, int val );
 
 static int process_partition_file( Interface* gMB, std::string& metis_partition_file );
@@ -197,8 +193,8 @@ int main( int argc, char* argv[] )
     int         spectral_order = 1;
 #endif
 
-    const char* const mesh_tag_names[] = { DIRICHLET_SET_TAG_NAME, NEUMANN_SET_TAG_NAME,
-                                           MATERIAL_SET_TAG_NAME, PARALLEL_PARTITION_TAG_NAME };
+    const char* const mesh_tag_names[] = { DIRICHLET_SET_TAG_NAME, NEUMANN_SET_TAG_NAME, MATERIAL_SET_TAG_NAME,
+                                           PARALLEL_PARTITION_TAG_NAME };
     const char* const geom_names[] = { "VERTEX", "CURVE", "SURFACE", "VOLUME" };
 
     // scan arguments
@@ -213,8 +209,7 @@ int main( int argc, char* argv[] )
 
         if( do_flag && argv[ i ][ 0 ] == '-' )
         {
-            if( !argv[ i ][ 1 ] || ( argv[ i ][ 1 ] != 'M' && argv[ i ][ 2 ] ) )
-                usage_error( argv[ 0 ] );
+            if( !argv[ i ][ 1 ] || ( argv[ i ][ 1 ] != 'M' && argv[ i ][ 2 ] ) ) usage_error( argv[ 0 ] );
 
             switch( argv[ i ][ 1 ] )
             {
@@ -344,8 +339,7 @@ int main( int argc, char* argv[] )
 
                     if( !pval )
                     {
-                        std::cerr << "Invalid flag or flag value: " << argv[ i - 1 ] << " "
-                                  << argv[ i ] << std::endl;
+                        std::cerr << "Invalid flag or flag value: " << argv[ i - 1 ] << " " << argv[ i ] << std::endl;
                         usage_error( argv[ 0 ] );
                     }
             }
@@ -390,8 +384,7 @@ int main( int argc, char* argv[] )
     if( resolve_shared ) read_opts.push_back( "PARALLEL_RESOLVE_SHARED_ENTS" );
     if( exchange_ghosts ) read_opts.push_back( "PARALLEL_GHOSTS=3.0.1" );
 
-    if( !make_opts_string( read_opts, read_options ) ||
-        !make_opts_string( write_opts, write_options ) )
+    if( !make_opts_string( read_opts, read_options ) || !make_opts_string( write_opts, write_options ) )
     {
 #ifdef MOAB_HAVE_MPI
         MPI_Finalize( );
@@ -447,8 +440,7 @@ int main( int argc, char* argv[] )
         if( tempestin )
         {
             // convert
-            result = remapper->LoadMesh( moab::Remapper::SourceMesh, *j,
-                                         moab::TempestRemapper::DEFAULT );MB_CHK_ERR( result );
+            result = remapper->LoadMesh( moab::Remapper::SourceMesh, *j, moab::TempestRemapper::DEFAULT );MB_CHK_ERR( result );
 
             Mesh* tempestMesh = remapper->GetMesh( moab::Remapper::SourceMesh );
             tempestMesh->RemoveZeroEdges( );
@@ -473,8 +465,7 @@ int main( int argc, char* argv[] )
 
                 const Range& faces = remapper->GetMeshEntities( moab::Remapper::SourceMesh );
 
-                std::vector< int > gids( faces.size( ) ), srcpar( faces.size( ) ),
-                    tgtpar( faces.size( ) );
+                std::vector< int > gids( faces.size( ) ), srcpar( faces.size( ) ), tgtpar( faces.size( ) );
                 result = gMB->tag_get_data( id_tag, faces, &gids[ 0 ] );MB_CHK_ERR( result );
 
                 for( unsigned ii = 0; ii < faces.size( ); ++ii )
@@ -534,8 +525,7 @@ int main( int argc, char* argv[] )
         if( MB_SUCCESS != result )
         {
             std::cerr << "Failed to load \"" << *j << "\"." << std::endl;
-            std::cerr << "Error code: " << gMB->get_error_string( result ) << " (" << result << ")"
-                      << std::endl;
+            std::cerr << "Error code: " << gMB->get_error_string( result ) << " (" << result << ")" << std::endl;
             std::string message;
             if( MB_SUCCESS == gMB->get_last_error( message ) && !message.empty( ) )
                 std::cerr << "Error message: " << message << std::endl;
@@ -585,8 +575,7 @@ int main( int argc, char* argv[] )
         for( dim = 0; dim <= 3; ++dim )
         {
             int init_count = set_list.size( );
-            for( std::set< int >::iterator iter = geom[ dim ].begin( ); iter != geom[ dim ].end( );
-                 ++iter )
+            for( std::set< int >::iterator iter = geom[ dim ].begin( ); iter != geom[ dim ].end( ); ++iter )
             {
                 id_val = *iter;
                 range.clear( );
@@ -600,8 +589,8 @@ int main( int argc, char* argv[] )
             }
 
             if( verbose )
-                std::cout << "Found " << ( set_list.size( ) - init_count ) << ' '
-                          << geom_names[ dim ] << " sets" << std::endl;
+                std::cout << "Found " << ( set_list.size( ) - init_count ) << ' ' << geom_names[ dim ] << " sets"
+                          << std::endl;
         }
     }
 
@@ -638,8 +627,8 @@ int main( int argc, char* argv[] )
         }
 
         if( verbose )
-            std::cout << "Found " << ( set_list.size( ) - init_count ) << ' ' << mesh_tag_names[ i ]
-                      << " sets" << std::endl;
+            std::cout << "Found " << ( set_list.size( ) - init_count ) << ' ' << mesh_tag_names[ i ] << " sets"
+                      << std::endl;
     }
 
     // Check if output is limited to certain dimensions of elements
@@ -652,14 +641,12 @@ int main( int argc, char* argv[] )
     {
         if( generate[ 1 ] && !dims[ 1 ] )
         {
-            std::cerr << "Warning: Request to generate 1D internal entities but not export them."
-                      << std::endl;
+            std::cerr << "Warning: Request to generate 1D internal entities but not export them." << std::endl;
             generate[ 1 ] = false;
         }
         if( generate[ 2 ] && !dims[ 2 ] )
         {
-            std::cerr << "Warning: Request to generate 2D internal entities but not export them."
-                      << std::endl;
+            std::cerr << "Warning: Request to generate 2D internal entities but not export them." << std::endl;
             generate[ 2 ] = false;
         }
     }
@@ -733,8 +720,7 @@ int main( int argc, char* argv[] )
         int err = process_partition_file( gMB, metis_partition_file );
         if( err )
         {
-            std::cerr << "Failed to process partition file \"" << metis_partition_file << "\"."
-                      << std::endl;
+            std::cerr << "Failed to process partition file \"" << metis_partition_file << "\"." << std::endl;
 #ifdef MOAB_HAVE_MPI
             MPI_Finalize( );
 #endif
@@ -744,8 +730,7 @@ int main( int argc, char* argv[] )
     if( verbose )
     {
         if( have_sets )
-            std::cout << "Found " << set_list.size( ) << " specified sets to write (total)."
-                      << std::endl;
+            std::cout << "Found " << set_list.size( ) << " specified sets to write (total)." << std::endl;
         else
             std::cout << "No sets specifed.  Writing entire mesh." << std::endl;
     }
@@ -754,16 +739,15 @@ int main( int argc, char* argv[] )
     reset_times( );
 #ifdef MOAB_HAVE_TEMPESTREMAP
     Range faces;
-    Mesh* tempestMesh = remapper->GetMesh(
-        ( use_overlap_context ? moab::Remapper::OverlapMesh : moab::Remapper::SourceMesh ) );
-    moab::EntityHandle& srcmesh = remapper->GetMeshSet(
-        ( use_overlap_context ? moab::Remapper::OverlapMesh : moab::Remapper::SourceMesh ) );
+    Mesh* tempestMesh =
+        remapper->GetMesh( ( use_overlap_context ? moab::Remapper::OverlapMesh : moab::Remapper::SourceMesh ) );
+    moab::EntityHandle& srcmesh =
+        remapper->GetMeshSet( ( use_overlap_context ? moab::Remapper::OverlapMesh : moab::Remapper::SourceMesh ) );
     result = gMB->get_entities_by_dimension( srcmesh, 2, faces );MB_CHK_ERR( result );
     int ntot_elements = 0, nelements = faces.size( );
 #ifdef MOAB_HAVE_MPI
     int ierr = MPI_Allreduce( &nelements, &ntot_elements, 1, MPI_INT, MPI_SUM, pcomm->comm( ) );
-    if( ierr != 0 )
-        MB_CHK_SET_ERR( MB_FAILURE, "MPI_Allreduce failed to get total source elements" );
+    if( ierr != 0 ) MB_CHK_SET_ERR( MB_FAILURE, "MPI_Allreduce failed to get total source elements" );
 #else
     ntot_elements = nelements;
 #endif
@@ -787,8 +771,8 @@ int main( int argc, char* argv[] )
     // Useful only for SE meshes with GLL DoFs
     if( spectral_order > 1 && globalid_tag_name.size( ) > 1 )
     {
-        result = remapper->GenerateMeshMetadata( *tempestMesh, ntot_elements, faces, NULL,
-                                                 globalid_tag_name, spectral_order );MB_CHK_ERR( result );
+        result = remapper->GenerateMeshMetadata( *tempestMesh, ntot_elements, faces, NULL, globalid_tag_name,
+                                                 spectral_order );MB_CHK_ERR( result );
     }
 
     if( tempestout )
@@ -799,10 +783,8 @@ int main( int argc, char* argv[] )
         {
             const int nOverlapFaces = faces.size( );
             // Overlap mesh: resize the source and target connection arrays
-            tempestMesh->vecSourceFaceIx.resize(
-                nOverlapFaces );  // 0-based indices corresponding to source mesh
-            tempestMesh->vecTargetFaceIx.resize(
-                nOverlapFaces );  // 0-based indices corresponding to target mesh
+            tempestMesh->vecSourceFaceIx.resize( nOverlapFaces );  // 0-based indices corresponding to source mesh
+            tempestMesh->vecTargetFaceIx.resize( nOverlapFaces );  // 0-based indices corresponding to target mesh
             result = gMB->tag_get_data( srcParentTag, faces, &tempestMesh->vecSourceFaceIx[ 0 ] );MB_CHK_ERR( result );
             result = gMB->tag_get_data( tgtParentTag, faces, &tempestMesh->vecTargetFaceIx[ 0 ] );MB_CHK_ERR( result );
         }
@@ -814,15 +796,13 @@ int main( int argc, char* argv[] )
 #endif
 
         if( have_sets )
-            result = gMB->write_file( out.c_str( ), format, write_options.c_str( ), &set_list[ 0 ],
-                                      set_list.size( ) );
+            result = gMB->write_file( out.c_str( ), format, write_options.c_str( ), &set_list[ 0 ], set_list.size( ) );
         else
             result = gMB->write_file( out.c_str( ), format, write_options.c_str( ) );
         if( MB_SUCCESS != result )
         {
             std::cerr << "Failed to write \"" << out << "\"." << std::endl;
-            std::cerr << "Error code: " << gMB->get_error_string( result ) << " (" << result << ")"
-                      << std::endl;
+            std::cerr << "Error code: " << gMB->get_error_string( result ) << " (" << result << ")" << std::endl;
             std::string message;
             if( MB_SUCCESS == gMB->get_last_error( message ) && !message.empty( ) )
                 std::cerr << "Error message: " << message << std::endl;
@@ -887,8 +867,7 @@ bool parse_id_list( const char* string, std::set< int >& results )
         }
 
         for( ; val <= val2; ++val )
-            if( !results.insert( (int)val ).second )
-                std::cerr << "Warning: duplicate Id: " << val << std::endl;
+            if( !results.insert( (int)val ).second ) std::cerr << "Warning: duplicate Id: " << val << std::endl;
     }
 
     free( mystr );
@@ -1065,9 +1044,8 @@ void list_formats( Interface* gMB )
     {
         std::vector< std::string > ext;
         i->get_extensions( ext );
-        str << std::setw( 6 ) << i->name( ) << "  " << std::setw( w ) << std::left
-            << i->description( ) << "  " << ( i->have_reader( ) ? " yes" : "  no" ) << "  "
-            << ( i->have_writer( ) ? "  yes" : "   no" ) << " ";
+        str << std::setw( 6 ) << i->name( ) << "  " << std::setw( w ) << std::left << i->description( ) << "  "
+            << ( i->have_reader( ) ? " yes" : "  no" ) << "  " << ( i->have_writer( ) ? "  yes" : "   no" ) << " ";
         for( std::vector< std::string >::iterator j = ext.begin( ); j != ext.end( ); ++j )
             str << " " << *j;
         str << std::endl;
@@ -1168,14 +1146,13 @@ int process_partition_file( Interface* mb, std::string& metis_partition_file )
     std::cout << " partitions range: " << *pmin << " " << *pmax << "\n";
     Tag part_set_tag;
     int dum_id = -1;
-    rval = mb->tag_get_handle( "PARALLEL_PARTITION", 1, MB_TYPE_INTEGER, part_set_tag,
-                               MB_TAG_SPARSE | MB_TAG_CREAT, &dum_id );MB_CHK_ERR( rval );
+    rval = mb->tag_get_handle( "PARALLEL_PARTITION", 1, MB_TYPE_INTEGER, part_set_tag, MB_TAG_SPARSE | MB_TAG_CREAT,
+                               &dum_id );MB_CHK_ERR( rval );
 
     // get any sets already with this tag, and clear them
     // remove the parallel partition sets if they exist
     Range tagged_sets;
-    rval = mb->get_entities_by_type_and_tag( 0, MBENTITYSET, &part_set_tag, NULL, 1, tagged_sets,
-                                             Interface::UNION );MB_CHK_ERR( rval );
+    rval = mb->get_entities_by_type_and_tag( 0, MBENTITYSET, &part_set_tag, NULL, 1, tagged_sets, Interface::UNION );MB_CHK_ERR( rval );
     if( !tagged_sets.empty( ) )
     {
         rval = mb->clear_meshset( tagged_sets );MB_CHK_ERR( rval );

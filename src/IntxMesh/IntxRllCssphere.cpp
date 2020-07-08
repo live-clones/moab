@@ -44,14 +44,13 @@ double IntxRllCssphere::setup_tgt_cell( EntityHandle tgt, int& nsTgt )
     {
         // populate coords in the plane for intersection
         // they should be oriented correctly, positively
-        int rc = IntxUtils::gnomonic_projection( tgtCoords[ j ], R, plane, tgtCoords2D[ 2 * j ],
-                                                 tgtCoords2D[ 2 * j + 1 ] );
+        int rc =
+            IntxUtils::gnomonic_projection( tgtCoords[ j ], R, plane, tgtCoords2D[ 2 * j ], tgtCoords2D[ 2 * j + 1 ] );
         if( rc != 0 ) return 1;
     }
 
     for( int j = 1; j < nsTgt - 1; j++ )
-        cellArea += IntxUtils::area2D( &tgtCoords2D[ 0 ], &tgtCoords2D[ 2 * j ],
-                                       &tgtCoords2D[ 2 * j + 2 ] );
+        cellArea += IntxUtils::area2D( &tgtCoords2D[ 0 ], &tgtCoords2D[ 2 * j ], &tgtCoords2D[ 2 * j + 2 ] );
 
     // take tgt coords in order and compute area in plane
     return cellArea;
@@ -60,11 +59,10 @@ double IntxRllCssphere::setup_tgt_cell( EntityHandle tgt, int& nsTgt )
 /* the elements are convex for sure, then do a gnomonic projection of both,
  *  compute intersection in the plane, then go back to the sphere for the points
  *  */
-ErrorCode IntxRllCssphere::computeIntersectionBetweenTgtAndSrc( EntityHandle tgt, EntityHandle src,
-                                                                double* P, int& nP, double& area,
-                                                                int markb[ MAXEDGES ],
-                                                                int markr[ MAXEDGES ], int& nsSrc,
-                                                                int& nsTgt, bool check_boxes_first )
+ErrorCode IntxRllCssphere::computeIntersectionBetweenTgtAndSrc( EntityHandle tgt, EntityHandle src, double* P, int& nP,
+                                                                double& area, int markb[ MAXEDGES ],
+                                                                int markr[ MAXEDGES ], int& nsSrc, int& nsTgt,
+                                                                bool check_boxes_first )
 {
     // the area will be used from now on, to see how well we fill the tgt cell with polygons
     // the points will be at most 40; they will describe a convex patch, after the points will be
@@ -116,8 +114,8 @@ ErrorCode IntxRllCssphere::computeIntersectionBetweenTgtAndSrc( EntityHandle tgt
 #endif
     for( int j = 0; j < nsSrc; j++ )
     {
-        rval = IntxUtils::gnomonic_projection( srcCoords[ j ], R, plane, srcCoords2D[ 2 * j ],
-                                               srcCoords2D[ 2 * j + 1 ] );MB_CHK_ERR( rval );
+        rval =
+            IntxUtils::gnomonic_projection( srcCoords[ j ], R, plane, srcCoords2D[ 2 * j ], srcCoords2D[ 2 * j + 1 ] );MB_CHK_ERR( rval );
     }
 #ifdef ENABLE_DEBUG
     if( dbg_1 )
@@ -134,13 +132,12 @@ ErrorCode IntxRllCssphere::computeIntersectionBetweenTgtAndSrc( EntityHandle tgt
         }
     }
 #endif
-    rval = IntxUtils::EdgeIntxRllCs( srcCoords2D, srcCoords, srcEdgeType, nsSrc, tgtCoords2D,
-                                     tgtCoords, nsTgt, markb, markr, plane, R, P, nP );MB_CHK_ERR( rval );
+    rval = IntxUtils::EdgeIntxRllCs( srcCoords2D, srcCoords, srcEdgeType, nsSrc, tgtCoords2D, tgtCoords, nsTgt, markb,
+                                     markr, plane, R, P, nP );MB_CHK_ERR( rval );
 
-    int side[ MAXEDGES ] = {
-        0 };  // this refers to what side? src or tgt?// more tolerant here with epsilon_area
-    int extraPoints = IntxUtils::borderPointsOfXinY2( srcCoords2D, nsSrc, tgtCoords2D, nsTgt,
-                                                      &( P[ 2 * nP ] ), side, 2 * epsilon_area );
+    int side[ MAXEDGES ] = { 0 };  // this refers to what side? src or tgt?// more tolerant here with epsilon_area
+    int extraPoints = IntxUtils::borderPointsOfXinY2( srcCoords2D, nsSrc, tgtCoords2D, nsTgt, &( P[ 2 * nP ] ), side,
+                                                      2 * epsilon_area );
     if( extraPoints >= 1 )
     {
         for( int k = 0; k < nsSrc; k++ )
@@ -203,16 +200,15 @@ ErrorCode IntxRllCssphere::computeIntersectionBetweenTgtAndSrc( EntityHandle tgt
 // also, we could just create new vertices every time, and merge only in the end;
 // could be too expensive, and the tolerance for merging could be an
 // interesting topic
-ErrorCode IntxRllCssphere::findNodes( EntityHandle tgt, int nsTgt, EntityHandle src, int nsSrc,
-                                      double* iP, int nP )
+ErrorCode IntxRllCssphere::findNodes( EntityHandle tgt, int nsTgt, EntityHandle src, int nsSrc, double* iP, int nP )
 {
     // first of all, check against tgt and src vertices
     //
 #ifdef ENABLE_DEBUG
     if( dbg_1 )
     {
-        std::cout << "tgt, src, nP, P " << mb->id_from_handle( tgt ) << " "
-                  << mb->id_from_handle( src ) << " " << nP << "\n";
+        std::cout << "tgt, src, nP, P " << mb->id_from_handle( tgt ) << " " << mb->id_from_handle( src ) << " " << nP
+                  << "\n";
         for( int n = 0; n < nP; n++ )
             std::cout << " \t" << iP[ 2 * n ] << "\t" << iP[ 2 * n + 1 ] << "\n";
     }
@@ -254,10 +250,9 @@ ErrorCode IntxRllCssphere::findNodes( EntityHandle tgt, int nsTgt, EntityHandle 
                 found = 1;
 #ifdef ENABLE_DEBUG
                 if( dbg_1 )
-                    std::cout << "  tgt node j:" << j
-                              << " id:" << mb->id_from_handle( tgtConn[ j ] )
-                              << " 2d coords:" << tgtCoords2D[ 2 * j ] << "  "
-                              << tgtCoords2D[ 2 * j + 1 ] << " d2: " << d2 << " \n";
+                    std::cout << "  tgt node j:" << j << " id:" << mb->id_from_handle( tgtConn[ j ] )
+                              << " 2d coords:" << tgtCoords2D[ 2 * j ] << "  " << tgtCoords2D[ 2 * j + 1 ]
+                              << " d2: " << d2 << " \n";
 #endif
             }
         }
@@ -274,8 +269,8 @@ ErrorCode IntxRllCssphere::findNodes( EntityHandle tgt, int nsTgt, EntityHandle 
                 found = 1;
 #ifdef ENABLE_DEBUG
                 if( dbg_1 )
-                    std::cout << "  src node " << j << " " << mb->id_from_handle( srcConn[ j ] )
-                              << " d2:" << d2 << " \n";
+                    std::cout << "  src node " << j << " " << mb->id_from_handle( srcConn[ j ] ) << " d2:" << d2
+                              << " \n";
 #endif
             }
         }
@@ -286,13 +281,11 @@ ErrorCode IntxRllCssphere::findNodes( EntityHandle tgt, int nsTgt, EntityHandle 
             for( j = 0; j < nsTgt; j++ )
             {
                 int    j1 = ( j + 1 ) % nsTgt;
-                double area =
-                    IntxUtils::area2D( &tgtCoords2D[ 2 * j ], &tgtCoords2D[ 2 * j1 ], pp );
+                double area = IntxUtils::area2D( &tgtCoords2D[ 2 * j ], &tgtCoords2D[ 2 * j1 ], pp );
 #ifdef ENABLE_DEBUG
                 if( dbg_1 )
-                    std::cout << "   edge " << j << ": " << mb->id_from_handle( adjTgtEdges[ j ] )
-                              << " " << tgtConn[ j ] << " " << tgtConn[ j1 ] << "  area : " << area
-                              << "\n";
+                    std::cout << "   edge " << j << ": " << mb->id_from_handle( adjTgtEdges[ j ] ) << " "
+                              << tgtConn[ j ] << " " << tgtConn[ j1 ] << "  area : " << area << "\n";
 #endif
                 if( fabs( area ) < epsilon_1 / 2 )
                 {
@@ -302,8 +295,7 @@ ErrorCode IntxRllCssphere::findNodes( EntityHandle tgt, int nsTgt, EntityHandle 
                     // CID 181167 (#1 of 1): Argument cannot be negative (NEGATIVE_RETURNS)
                     if( indx < 0 )
                     {
-                        std::cerr << " error in adjacent tgt edge: "
-                                  << mb->id_from_handle( adjTgtEdges[ j ] ) << "\n";
+                        std::cerr << " error in adjacent tgt edge: " << mb->id_from_handle( adjTgtEdges[ j ] ) << "\n";
                         delete[] foundIds;
                         return MB_FAILURE;
                     }
@@ -315,8 +307,7 @@ ErrorCode IntxRllCssphere::findNodes( EntityHandle tgt, int nsTgt, EntityHandle 
                     if( nbExtraNodesSoFar > 0 )
                     {
                         CartVect* coords1 = new CartVect[ nbExtraNodesSoFar ];
-                        mb->get_coords( &( *expts )[ 0 ], nbExtraNodesSoFar,
-                                        &( coords1[ 0 ][ 0 ] ) );
+                        mb->get_coords( &( *expts )[ 0 ], nbExtraNodesSoFar, &( coords1[ 0 ][ 0 ] ) );
                         // std::list<int>::iterator it;
                         for( int k = 0; k < nbExtraNodesSoFar && !found; k++ )
                         {
@@ -327,8 +318,7 @@ ErrorCode IntxRllCssphere::findNodes( EntityHandle tgt, int nsTgt, EntityHandle 
                                 found = 1;
                                 foundIds[ i ] = ( *expts )[ k ];
 #ifdef ENABLE_DEBUG
-                                if( dbg_1 )
-                                    std::cout << " found node:" << foundIds[ i ] << std::endl;
+                                if( dbg_1 ) std::cout << " found node:" << foundIds[ i ] << std::endl;
 #endif
                             }
                         }
@@ -359,8 +349,8 @@ ErrorCode IntxRllCssphere::findNodes( EntityHandle tgt, int nsTgt, EntityHandle 
             {
                 std::cout << tgtCoords2D[ 2 * j1 ] << " " << tgtCoords2D[ 2 * j1 + 1 ] << "\n";
             }
-            std::cout << " a point pp is not on a tgt quad " << *pp << " " << pp[ 1 ]
-                      << " tgt quad " << mb->id_from_handle( tgt ) << " \n";
+            std::cout << " a point pp is not on a tgt quad " << *pp << " " << pp[ 1 ] << " tgt quad "
+                      << mb->id_from_handle( tgt ) << " \n";
             delete[] foundIds;
             return MB_FAILURE;
         }

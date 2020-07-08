@@ -22,15 +22,14 @@ const char* const FILENAME = "iMeshP_test_file";
                               Error Checking
  **************************************************************************/
 
-#define CHKERR                                                                           \
-    do                                                                                   \
-    {                                                                                    \
-        if( ierr )                                                                       \
-        {                                                                                \
-            std::cerr << "Error code  " << ierr << " at " << __FILE__ << ":" << __LINE__ \
-                      << std::endl;                                                      \
-            return ierr;                                                                 \
-        }                                                                                \
+#define CHKERR                                                                                         \
+    do                                                                                                 \
+    {                                                                                                  \
+        if( ierr )                                                                                     \
+        {                                                                                              \
+            std::cerr << "Error code  " << ierr << " at " << __FILE__ << ":" << __LINE__ << std::endl; \
+            return ierr;                                                                               \
+        }                                                                                              \
     } while( false )
 
 #define PCHECK                            \
@@ -41,18 +40,17 @@ const char* const FILENAME = "iMeshP_test_file";
     } while( false )
 
 // Use my_rank instead of rank to avoid shadowed declaration
-#define ASSERT( A )                                                         \
-    do                                                                      \
-    {                                                                       \
-        if( is_any_proc_error( !( A ) ) )                                   \
-        {                                                                   \
-            int my_rank = 0;                                                \
-            MPI_Comm_rank( MPI_COMM_WORLD, &my_rank );                      \
-            if( 0 == my_rank )                                              \
-                std::cerr << "Failed assertion: " #A << std::endl           \
-                          << "  at " __FILE__ ":" << __LINE__ << std::endl; \
-            return 1;                                                       \
-        }                                                                   \
+#define ASSERT( A )                                                                                                 \
+    do                                                                                                              \
+    {                                                                                                               \
+        if( is_any_proc_error( !( A ) ) )                                                                           \
+        {                                                                                                           \
+            int my_rank = 0;                                                                                        \
+            MPI_Comm_rank( MPI_COMM_WORLD, &my_rank );                                                              \
+            if( 0 == my_rank )                                                                                      \
+                std::cerr << "Failed assertion: " #A << std::endl << "  at " __FILE__ ":" << __LINE__ << std::endl; \
+            return 1;                                                                                               \
+        }                                                                                                           \
     } while( false )
 
 // Test if is_my_error is non-zero on any processor in MPI_COMM_WORLD
@@ -285,8 +283,7 @@ class PartMap
   private:
     inline int idx_from_part_id( iMeshP_Part id ) const
     {
-        return std::lower_bound( sortedPartList.begin( ), sortedPartList.end( ), id ) -
-               sortedPartList.begin( );
+        return std::lower_bound( sortedPartList.begin( ), sortedPartList.end( ), id ) - sortedPartList.begin( );
     }
     inline int idx_from_local_id( int id ) const
     {
@@ -302,15 +299,13 @@ class PartMap
 /**\brief Create mesh for use in parallel tests */
 int create_mesh( const char* filename, int num_parts );
 
-int create_mesh_in_memory( int rank, int size, iMesh_Instance imesh, iMeshP_PartitionHandle& prtn,
-                           PartMap& map );
+int create_mesh_in_memory( int rank, int size, iMesh_Instance imesh, iMeshP_PartitionHandle& prtn, PartMap& map );
 
 /**\brief get unique identifier for each vertex */
 int vertex_tag( iMesh_Instance imesh, iBase_EntityHandle vertex, int& tag );
 
-int get_local_parts( iMesh_Instance instance, iMeshP_PartitionHandle prtn,
-                     std::vector< iMeshP_PartHandle >& handles,
-                     std::vector< iMeshP_Part >*       ids = 0 )
+int get_local_parts( iMesh_Instance instance, iMeshP_PartitionHandle prtn, std::vector< iMeshP_PartHandle >& handles,
+                     std::vector< iMeshP_Part >* ids = 0 )
 {
     iMeshP_PartHandle* arr = 0;
     int                ierr, alloc = 0, size;
@@ -323,8 +318,7 @@ int get_local_parts( iMesh_Instance instance, iMeshP_PartitionHandle prtn,
     ids->resize( size );
     alloc = size;
     iMeshP_Part* ptr = &( *ids )[ 0 ];
-    iMeshP_getPartIdsFromPartHandlesArr( instance, prtn, &handles[ 0 ], handles.size( ), &ptr,
-                                         &alloc, &size, &ierr );CHKERR;
+    iMeshP_getPartIdsFromPartHandlesArr( instance, prtn, &handles[ 0 ], handles.size( ), &ptr, &alloc, &size, &ierr );CHKERR;
     assert( size == (int)ids->size( ) );
     assert( ptr == &( *ids )[ 0 ] );
     return iBase_SUCCESS;
@@ -357,8 +351,8 @@ static int get_part_quads_and_verts( iMesh_Instance imesh, iMeshP_PartHandle par
     int                 junk1 = verts.size( ), count, junk2 = junk.size( ), junk3;
     iBase_EntityHandle* junk4 = &verts[ 0 ];
     int*                junk5 = &junk[ 0 ];
-    iMesh_getEntArrAdj( imesh, &elems[ 0 ], elems.size( ), iBase_VERTEX, &junk4, &junk1, &count,
-                        &junk5, &junk2, &junk3, &ierr );CHKERR;
+    iMesh_getEntArrAdj( imesh, &elems[ 0 ], elems.size( ), iBase_VERTEX, &junk4, &junk1, &count, &junk5, &junk2, &junk3,
+                        &ierr );CHKERR;
     assert( junk1 == (int)verts.size( ) );
     assert( count == (int)( 4 * elems.size( ) ) );
     assert( junk2 == (int)junk.size( ) );
@@ -369,15 +363,13 @@ static int get_part_quads_and_verts( iMesh_Instance imesh, iMeshP_PartHandle par
     return iBase_SUCCESS;
 }
 
-static int get_coords( iMesh_Instance imesh, const iBase_EntityHandle* verts, int num_verts,
-                       double* coords )
+static int get_coords( iMesh_Instance imesh, const iBase_EntityHandle* verts, int num_verts, double* coords )
 {
     double* junk1 = coords;
     int     junk2 = 3 * num_verts;
     int     junk3;
     int     ierr;
-    iMesh_getVtxArrCoords( imesh, verts, num_verts, iBase_INTERLEAVED, &junk1, &junk2, &junk3,
-                           &ierr );
+    iMesh_getVtxArrCoords( imesh, verts, num_verts, iBase_INTERLEAVED, &junk1, &junk2, &junk3, &ierr );
     if( iBase_SUCCESS != ierr ) return ierr;
     assert( junk1 == coords );
     assert( junk2 == 3 * num_verts );
@@ -391,8 +383,7 @@ static int get_coords( iMesh_Instance imesh, const iBase_EntityHandle* verts, in
 
 #define RUN_TEST( A ) run_test( &A, #A )
 
-int run_test( int ( *func )( iMesh_Instance, iMeshP_PartitionHandle, const PartMap& ),
-              const char* func_name )
+int run_test( int ( *func )( iMesh_Instance, iMeshP_PartitionHandle, const PartMap& ), const char* func_name )
 {
     int rank, size, ierr;
     MPI_Comm_rank( MPI_COMM_WORLD, &rank );
@@ -412,11 +403,7 @@ int run_test( int ( *func )( iMesh_Instance, iMeshP_PartitionHandle, const PartM
     MPI_Bcast( &ierr, 1, MPI_INT, 0, MPI_COMM_WORLD );
     if( ierr )
     {
-        if( rank == 0 )
-        {
-            std::cerr << "Failed to create input test file on root processor.  Aborting."
-                      << std::endl;
-        }
+        if( rank == 0 ) { std::cerr << "Failed to create input test file on root processor.  Aborting." << std::endl; }
         abort( );
     }
 
@@ -467,8 +454,7 @@ int main( int argc, char* argv[] )
     if( argc > 2 && !strcmp( argv[ 1 ], "-p" ) )
     {
 #if !defined( _MSC_VER ) && !defined( __MINGW32__ )
-        std::cout << "Processor " << rank << " of " << size << " with PID " << getpid( )
-                  << std::endl;
+        std::cout << "Processor " << rank << " of " << size << " with PID " << getpid( ) << std::endl;
         std::cout.flush( );
 #endif
         // loop forever on requested processor, giving the user time
@@ -594,14 +580,13 @@ int create_mesh( const char* filename, int num_parts )
     int vl_pos = 0;
     for( int i = 0; i <= num_cols; ++i )
     {
-        double coords[ 15 ] = { static_cast< double >( i ), 0, 0, static_cast< double >( i ), 1, 0,
+        double              coords[ 15 ] = { static_cast< double >( i ), 0, 0, static_cast< double >( i ), 1, 0,
                                 static_cast< double >( i ), 2, 0, static_cast< double >( i ), 3, 0,
                                 static_cast< double >( i ), 4, 0 };
         iBase_EntityHandle* ptr = vertices[ i ];
         const int           n = ( num_full_cols == num_cols || i <= num_full_cols ) ? 5 : 3;
         int                 junk1 = n, junk2 = n;
-        iMesh_createVtxArr( imesh, n, iBase_INTERLEAVED, coords, 3 * n, &ptr, &junk1, &junk2,
-                            &ierr );CHKERR;
+        iMesh_createVtxArr( imesh, n, iBase_INTERLEAVED, coords, 3 * n, &ptr, &junk1, &junk2, &ierr );CHKERR;
         assert( ptr == vertices[ i ] );
         assert( junk1 == n );
         assert( junk2 == n );
@@ -625,8 +610,8 @@ int create_mesh( const char* filename, int num_parts )
         int                 junk1 = n, junk2 = n, junk3 = n, junk4 = n;
         int                 stat[ 4 ];
         int*                ptr2 = stat;
-        iMesh_createEntArr( imesh, iMesh_QUADRILATERAL, conn, 4 * n, &ptr, &junk1, &junk2, &ptr2,
-                            &junk3, &junk4, &ierr );CHKERR;
+        iMesh_createEntArr( imesh, iMesh_QUADRILATERAL, conn, 4 * n, &ptr, &junk1, &junk2, &ptr2, &junk3, &junk4,
+                            &ierr );CHKERR;
         assert( ptr == elements[ i ] );
         assert( junk1 == n );
         assert( junk2 == n );
@@ -642,10 +627,9 @@ int create_mesh( const char* filename, int num_parts )
     {
         iMeshP_PartHandle part;
         iMeshP_createPart( imesh, partition, &part, &ierr );CHKERR;
-        iBase_EntityHandle quads[] = { elements[ 2 * ( i / 2 ) ][ 2 * ( i % 2 ) ],
-                                       elements[ 2 * ( i / 2 ) + 1 ][ 2 * ( i % 2 ) ],
-                                       elements[ 2 * ( i / 2 ) ][ 2 * ( i % 2 ) + 1 ],
-                                       elements[ 2 * ( i / 2 ) + 1 ][ 2 * ( i % 2 ) + 1 ] };
+        iBase_EntityHandle quads[] = {
+            elements[ 2 * ( i / 2 ) ][ 2 * ( i % 2 ) ], elements[ 2 * ( i / 2 ) + 1 ][ 2 * ( i % 2 ) ],
+            elements[ 2 * ( i / 2 ) ][ 2 * ( i % 2 ) + 1 ], elements[ 2 * ( i / 2 ) + 1 ][ 2 * ( i % 2 ) + 1 ] };
         iMesh_addEntArrToSet( imesh, quads, 4, part, &ierr );CHKERR;
     }
 
@@ -664,8 +648,7 @@ int create_mesh( const char* filename, int num_parts )
     {
         iMesh_createTag( imesh, tagname, 1, iBase_INTEGER, &id_tag, &ierr, strlen( tagname ) );CHKERR;
     }
-    iMesh_setIntArrData( imesh, &vertex_list[ 0 ], num_vtx, id_tag, &vertex_ids[ 0 ], num_vtx,
-                         &ierr );CHKERR;
+    iMesh_setIntArrData( imesh, &vertex_list[ 0 ], num_vtx, id_tag, &vertex_ids[ 0 ], num_vtx, &ierr );CHKERR;
 
     // write file
     iBase_EntitySetHandle root_set;
@@ -676,8 +659,8 @@ int create_mesh( const char* filename, int num_parts )
 
     return 0;
 }
-int create_mesh_in_memory( int rank, int num_parts, iMesh_Instance imesh,
-                           iMeshP_PartitionHandle& partition, PartMap& map )
+int create_mesh_in_memory( int rank, int num_parts, iMesh_Instance imesh, iMeshP_PartitionHandle& partition,
+                           PartMap& map )
 {
     const char* tagname = "GLOBAL_ID";
     int         ierr;
@@ -712,8 +695,7 @@ int create_mesh_in_memory( int rank, int num_parts, iMesh_Instance imesh,
         iBase_EntityHandle* ptr = vertices[ i ];
         const int           n = 3;
         int                 junk1 = n, junk2 = n;
-        iMesh_createVtxArr( imesh, n, iBase_INTERLEAVED, coords, 3 * n, &ptr, &junk1, &junk2,
-                            &ierr );CHKERR;
+        iMesh_createVtxArr( imesh, n, iBase_INTERLEAVED, coords, 3 * n, &ptr, &junk1, &junk2, &ierr );CHKERR;
         assert( ptr == vertices[ i ] );
         assert( junk1 == n );
         assert( junk2 == n );
@@ -737,8 +719,8 @@ int create_mesh_in_memory( int rank, int num_parts, iMesh_Instance imesh,
         int                 junk1 = n, junk2 = n, junk3 = n, junk4 = n;
         int                 stat[ 4 ];
         int*                ptr2 = stat;
-        iMesh_createEntArr( imesh, iMesh_QUADRILATERAL, conn, 4 * n, &ptr, &junk1, &junk2, &ptr2,
-                            &junk3, &junk4, &ierr );CHKERR;
+        iMesh_createEntArr( imesh, iMesh_QUADRILATERAL, conn, 4 * n, &ptr, &junk1, &junk2, &ptr2, &junk3, &junk4,
+                            &ierr );CHKERR;
         assert( ptr == elements[ i ] );
         assert( junk1 == n );
         assert( junk2 == n );
@@ -752,8 +734,7 @@ int create_mesh_in_memory( int rank, int num_parts, iMesh_Instance imesh,
 
     iMeshP_PartHandle part;
     iMeshP_createPart( imesh, partition, &part, &ierr );CHKERR;
-    iBase_EntityHandle quads[] = { elements[ 0 ][ 0 ], elements[ 0 ][ 1 ], elements[ 1 ][ 0 ],
-                                   elements[ 1 ][ 1 ] };
+    iBase_EntityHandle quads[] = { elements[ 0 ][ 0 ], elements[ 0 ][ 1 ], elements[ 1 ][ 0 ], elements[ 1 ][ 1 ] };
     iMesh_addEntArrToSet( imesh, quads, 4, part, &ierr );CHKERR;
 
     // assign global ids to vertices
@@ -771,8 +752,7 @@ int create_mesh_in_memory( int rank, int num_parts, iMesh_Instance imesh,
     {
         iMesh_createTag( imesh, tagname, 1, iBase_INTEGER, &id_tag, &ierr, strlen( tagname ) );CHKERR;
     }
-    iMesh_setIntArrData( imesh, &vertex_list[ 0 ], num_vtx, id_tag, &vertex_ids[ 0 ], num_vtx,
-                         &ierr );CHKERR;
+    iMesh_setIntArrData( imesh, &vertex_list[ 0 ], num_vtx, id_tag, &vertex_ids[ 0 ], num_vtx, &ierr );CHKERR;
 
     // some mesh sync
     iMeshP_syncPartitionAll( imesh, partition, &ierr );CHKERR;
@@ -807,8 +787,7 @@ int test_load( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, PartMap& map, 
     iBase_EntitySetHandle root_set;
     iMesh_getRootSet( imesh, &root_set, &ierr );
     const char* opt = "moab:PARTITION=PARALLEL_PARTITION";
-    iMeshP_loadAll( imesh, prtn, root_set, FILENAME, opt, &ierr, strlen( FILENAME ),
-                    strlen( opt ) );
+    iMeshP_loadAll( imesh, prtn, root_set, FILENAME, opt, &ierr, strlen( FILENAME ), strlen( opt ) );
     PCHECK;
 
     ierr = map.build_map( imesh, prtn, proc_size );CHKERR;
@@ -887,15 +866,13 @@ int test_get_parts( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, const Par
     return iBase_SUCCESS;
 }
 
-static int test_get_by_type_topo_all( iMesh_Instance imesh, iMeshP_PartitionHandle prtn,
-                                      bool test_type, int num_parts )
+static int test_get_by_type_topo_all( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, bool test_type, int num_parts )
 {
     // calculate number of quads and vertices in entire mesh
     // from number of parts (see create_mesh(..) function.)
     const int expected_global_quad_count = 4 * num_parts;
     const int num_col = 2 * ( num_parts / 2 + num_parts % 2 );
-    const int expected_global_vtx_count =
-        num_parts == 1 ? 9 : num_parts % 2 ? 1 + 5 * num_col : 5 + 5 * num_col;
+    const int expected_global_vtx_count = num_parts == 1 ? 9 : num_parts % 2 ? 1 + 5 * num_col : 5 + 5 * num_col;
 
     // test getNumOf*All for root set
     int                   ierr, count;
@@ -942,8 +919,7 @@ static int test_get_by_type_topo_all( iMesh_Instance imesh, iMeshP_PartitionHand
     return 0;
 }
 
-static int test_get_by_type_topo_local( iMesh_Instance imesh, iMeshP_PartitionHandle prtn,
-                                        bool test_type )
+static int test_get_by_type_topo_local( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, bool test_type )
 {
     int                   ierr;
     iBase_EntitySetHandle root;
@@ -979,14 +955,12 @@ static int test_get_by_type_topo_local( iMesh_Instance imesh, iMeshP_PartitionHa
     iBase_EntityHandle* ptr = 0;
     int                 num_ent, junk1 = 0;
     iMeshP_getEntities( imesh, prtn, part, root, test_type ? iBase_FACE : iBase_ALL_TYPES,
-                        test_type ? iMesh_ALL_TOPOLOGIES : iMesh_QUADRILATERAL, &ptr, &junk1,
-                        &num_ent, &ierr );CHKERR;
+                        test_type ? iMesh_ALL_TOPOLOGIES : iMesh_QUADRILATERAL, &ptr, &junk1, &num_ent, &ierr );CHKERR;
     std::vector< iBase_EntityHandle > act_quads( ptr, ptr + num_ent );
     free( ptr );
     junk1 = num_ent = 0;
     ptr = 0;
-    iMeshP_getEntities( imesh, prtn, part, root, iBase_ALL_TYPES, iMesh_ALL_TOPOLOGIES, &ptr,
-                        &junk1, &num_ent, &ierr );CHKERR;
+    iMeshP_getEntities( imesh, prtn, part, root, iBase_ALL_TYPES, iMesh_ALL_TOPOLOGIES, &ptr, &junk1, &num_ent, &ierr );CHKERR;
     std::vector< iBase_EntityHandle > act_all( ptr, ptr + num_ent );
     free( ptr );
     std::sort( part_quads.begin( ), part_quads.end( ) );
@@ -1010,8 +984,8 @@ static int test_get_by_type_topo_local( iMesh_Instance imesh, iMeshP_PartitionHa
     ierr = get_entities( imesh, root, iBase_FACE, iMesh_QUADRILATERAL, all_quads );CHKERR;
     std::sort( all_quads.begin( ), all_quads.end( ) );
     std::sort( part_quads.begin( ), part_quads.end( ) );
-    std::set_difference( all_quads.begin( ), all_quads.end( ), part_quads.begin( ),
-                         part_quads.end( ), std::back_inserter( other_quads ) );
+    std::set_difference( all_quads.begin( ), all_quads.end( ), part_quads.begin( ), part_quads.end( ),
+                         std::back_inserter( other_quads ) );
     iMesh_addEntArrToSet( imesh, &other_quads[ 0 ], other_quads.size( ), set, &ierr );CHKERR;
 
     // compare local counts (using non-root set)
@@ -1034,8 +1008,7 @@ static int test_get_by_type_topo_local( iMesh_Instance imesh, iMeshP_PartitionHa
     num_ent = 0;
     ptr = 0;
     iMeshP_getEntities( imesh, prtn, part, set, test_type ? iBase_FACE : iBase_ALL_TYPES,
-                        test_type ? iMesh_ALL_TOPOLOGIES : iMesh_QUADRILATERAL, &ptr, &junk1,
-                        &num_ent, &ierr );CHKERR;
+                        test_type ? iMesh_ALL_TOPOLOGIES : iMesh_QUADRILATERAL, &ptr, &junk1, &num_ent, &ierr );CHKERR;
     act_quads.resize( num_ent );
     std::copy( ptr, ptr + num_ent, act_quads.begin( ) );
     free( ptr );
@@ -1114,8 +1087,7 @@ int test_part_id_handle( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, cons
     std::vector< iMeshP_Part > ids2( ids.size( ) );
     int                        junk1 = ids.size( ), junk2 = 0;
     iMeshP_Part*               ptr = &ids2[ 0 ];
-    iMeshP_getPartIdsFromPartHandlesArr( imesh, prtn, &handles[ 0 ], handles.size( ), &ptr, &junk1,
-                                         &junk2, &ierr );
+    iMeshP_getPartIdsFromPartHandlesArr( imesh, prtn, &handles[ 0 ], handles.size( ), &ptr, &junk1, &junk2, &ierr );
     PCHECK;
     ASSERT( ptr == &ids2[ 0 ] );
     ASSERT( junk2 == (int)ids2.size( ) );
@@ -1126,8 +1098,7 @@ int test_part_id_handle( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, cons
     junk1 = handles.size( );
     junk2 = 0;
     iMeshP_PartHandle* ptr2 = &handles2[ 0 ];
-    iMeshP_getPartHandlesFromPartsIdsArr( imesh, prtn, &ids[ 0 ], ids.size( ), &ptr2, &junk1,
-                                          &junk2, &ierr );
+    iMeshP_getPartHandlesFromPartsIdsArr( imesh, prtn, &ids[ 0 ], ids.size( ), &ptr2, &junk1, &junk2, &ierr );
     PCHECK;
     ASSERT( ptr2 == &handles2[ 0 ] );
     ASSERT( junk2 == (int)handles2.size( ) );
@@ -1160,14 +1131,14 @@ int test_part_rank( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, const Par
     }
     if( !failed.empty( ) )
     {
-        std::cerr << "Processor " << rank << ": iMeshP_getRankOfPart failed for " << failed.size( )
-                  << " parts." << std::endl;
+        std::cerr << "Processor " << rank << ": iMeshP_getRankOfPart failed for " << failed.size( ) << " parts."
+                  << std::endl;
         ierr = iBase_FAILURE;
     }
     if( !invalid.empty( ) )
     {
-        std::cerr << "Processor " << rank << ": iMeshP_getRankOfPart was incorrect for "
-                  << invalid.size( ) << " parts." << std::endl;
+        std::cerr << "Processor " << rank << ": iMeshP_getRankOfPart was incorrect for " << invalid.size( ) << " parts."
+                  << std::endl;
         ierr = iBase_FAILURE;
     }
     PCHECK;
@@ -1175,8 +1146,8 @@ int test_part_rank( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, const Par
     // test iMeshP_getRankOfPartArr
     std::vector< int > ranks( map.get_parts( ).size( ) );
     int                junk1 = ranks.size( ), junk2, *ptr = &ranks[ 0 ];
-    iMeshP_getRankOfPartArr( imesh, prtn, &map.get_parts( )[ 0 ], map.get_parts( ).size( ), &ptr,
-                             &junk1, &junk2, &ierr );
+    iMeshP_getRankOfPartArr( imesh, prtn, &map.get_parts( )[ 0 ], map.get_parts( ).size( ), &ptr, &junk1, &junk2,
+                             &ierr );
     PCHECK;
     assert( ptr == &ranks[ 0 ] );
     assert( junk1 == (int)ranks.size( ) );
@@ -1187,8 +1158,8 @@ int test_part_rank( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, const Par
     }
     if( !invalid.empty( ) )
     {
-        std::cerr << "Processor " << rank << ": iMeshP_getRankOfPartArr was incorrect for "
-                  << invalid.size( ) << " parts." << std::endl;
+        std::cerr << "Processor " << rank << ": iMeshP_getRankOfPartArr was incorrect for " << invalid.size( )
+                  << " parts." << std::endl;
         ierr = iBase_FAILURE;
     }
     PCHECK;
@@ -1197,8 +1168,7 @@ int test_part_rank( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, const Par
 }
 
 // see create_mesh(..)
-static void get_part_neighbors( int logical_part_id, int num_parts, int neighbors[ 5 ],
-                                int& num_neighbors )
+static void get_part_neighbors( int logical_part_id, int num_parts, int neighbors[ 5 ], int& num_neighbors )
 {
     num_neighbors = 0;
     if( logical_part_id + 1 < num_parts ) neighbors[ num_neighbors++ ] = logical_part_id + 1;
@@ -1243,8 +1213,8 @@ int test_get_neighbors( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, const
     std::vector< iMeshP_PartHandle > handles( local_parts.size( ) );
     iMeshP_PartHandle*               ptr = &handles[ 0 ];
     int                              junk1 = handles.size( ), junk2 = 0;
-    iMeshP_getPartHandlesFromPartsIdsArr( imesh, prtn, &local_parts[ 0 ], local_parts.size( ), &ptr,
-                                          &junk1, &junk2, &ierr );
+    iMeshP_getPartHandlesFromPartsIdsArr( imesh, prtn, &local_parts[ 0 ], local_parts.size( ), &ptr, &junk1, &junk2,
+                                          &ierr );
     PCHECK;
     assert( ptr == &handles[ 0 ] );
     assert( junk2 == (int)handles.size( ) );
@@ -1278,15 +1248,15 @@ int test_get_neighbors( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, const
     }
     if( !failed.empty( ) )
     {
-        std::cerr << "Processor " << rank << ": iMeshP_getNumPartNbors failed for "
-                  << failed.size( ) << " parts." << std::endl;
+        std::cerr << "Processor " << rank << ": iMeshP_getNumPartNbors failed for " << failed.size( ) << " parts."
+                  << std::endl;
         ierr = iBase_FAILURE;
         PCHECK;
     }
     if( !invalid.empty( ) )
     {
-        std::cerr << "Processor " << rank << ": iMeshP_getNumPartNbors was incorrect for "
-                  << invalid.size( ) << " parts." << std::endl;
+        std::cerr << "Processor " << rank << ": iMeshP_getNumPartNbors was incorrect for " << invalid.size( )
+                  << " parts." << std::endl;
         ierr = iBase_FAILURE;
         PCHECK;
     }
@@ -1297,8 +1267,7 @@ int test_get_neighbors( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, const
     {
         int          count, junk = 0, another_count;
         iMeshP_Part* list = 0;
-        iMeshP_getPartNbors( imesh, prtn, handles[ i ], iBase_VERTEX, &another_count, &list, &junk,
-                             &count, &ierr );
+        iMeshP_getPartNbors( imesh, prtn, handles[ i ], iBase_VERTEX, &another_count, &list, &junk, &count, &ierr );
         assert( count == another_count );
         if( ierr )
             failed.push_back( local_parts[ i ] );
@@ -1312,14 +1281,14 @@ int test_get_neighbors( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, const
     }
     if( !failed.empty( ) )
     {
-        std::cerr << "Processor " << rank << ": iMeshP_getPartNbors failed for " << failed.size( )
-                  << " parts." << std::endl;
+        std::cerr << "Processor " << rank << ": iMeshP_getPartNbors failed for " << failed.size( ) << " parts."
+                  << std::endl;
         ierr = iBase_FAILURE;
     }
     if( !invalid.empty( ) )
     {
-        std::cerr << "Processor " << rank << ": iMeshP_getPartNbors was incorrect for "
-                  << invalid.size( ) << " parts." << std::endl;
+        std::cerr << "Processor " << rank << ": iMeshP_getPartNbors was incorrect for " << invalid.size( ) << " parts."
+                  << std::endl;
         ierr = iBase_FAILURE;
     }
     PCHECK;
@@ -1328,8 +1297,8 @@ int test_get_neighbors( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, const
     std::vector< int > count_vect( handles.size( ) );
     int*               count_arr = &count_vect[ 0 ];
     junk1 = handles.size( );
-    iMeshP_getNumPartNborsArr( imesh, prtn, &handles[ 0 ], handles.size( ), iBase_VERTEX,
-                               &count_arr, &junk1, &junk2, &ierr );
+    iMeshP_getNumPartNborsArr( imesh, prtn, &handles[ 0 ], handles.size( ), iBase_VERTEX, &count_arr, &junk1, &junk2,
+                               &ierr );
     PCHECK;
     assert( count_arr == &count_vect[ 0 ] );
     assert( junk2 == (int)handles.size( ) );
@@ -1339,8 +1308,8 @@ int test_get_neighbors( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, const
     }
     if( !invalid.empty( ) )
     {
-        std::cerr << "Processor " << rank << ": iMeshP_getNumPartNborsArr was incorrect for "
-                  << invalid.size( ) << " parts." << std::endl;
+        std::cerr << "Processor " << rank << ": iMeshP_getNumPartNborsArr was incorrect for " << invalid.size( )
+                  << " parts." << std::endl;
         ierr = iBase_FAILURE;
     }
     PCHECK;
@@ -1349,8 +1318,8 @@ int test_get_neighbors( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, const
     iMeshP_Part* nbor_arr = 0;
     junk1 = handles.size( ), junk2 = 0;
     int junk3 = 0, nbor_size;
-    iMeshP_getPartNborsArr( imesh, prtn, &handles[ 0 ], handles.size( ), iBase_VERTEX, &count_arr,
-                            &junk1, &junk2, &nbor_arr, &junk3, &nbor_size, &ierr );
+    iMeshP_getPartNborsArr( imesh, prtn, &handles[ 0 ], handles.size( ), iBase_VERTEX, &count_arr, &junk1, &junk2,
+                            &nbor_arr, &junk3, &nbor_size, &ierr );
     PCHECK;
     assert( count_arr == &count_vect[ 0 ] );
     assert( junk2 == (int)handles.size( ) );
@@ -1365,26 +1334,24 @@ int test_get_neighbors( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, const
             bad_length = true;
             break;
         }
-        if( count_arr[ i ] != (int)neighbors[ i ].size( ) )
-        { invalid.push_back( local_parts[ i ] ); }
+        if( count_arr[ i ] != (int)neighbors[ i ].size( ) ) { invalid.push_back( local_parts[ i ] ); }
         else
         {
             std::vector< iMeshP_Part >::iterator e = j + count_arr[ i ];
             std::sort( j, e );
-            if( !std::equal( j, e, neighbors[ i ].begin( ) ) )
-                invalid.push_back( local_parts[ i ] );
+            if( !std::equal( j, e, neighbors[ i ].begin( ) ) ) invalid.push_back( local_parts[ i ] );
         }
     }
     if( bad_length )
     {
-        std::cerr << "Processor " << rank
-                  << ": iMeshP_getPartNborsArr had inconsistent result array lengths." << std::endl;
+        std::cerr << "Processor " << rank << ": iMeshP_getPartNborsArr had inconsistent result array lengths."
+                  << std::endl;
         ierr = iBase_FAILURE;
     }
     if( !invalid.empty( ) )
     {
-        std::cerr << "Processor " << rank << ": iMeshP_getPartNborsArr was incorrect for "
-                  << invalid.size( ) << " parts." << std::endl;
+        std::cerr << "Processor " << rank << ": iMeshP_getPartNborsArr was incorrect for " << invalid.size( )
+                  << " parts." << std::endl;
         ierr = iBase_FAILURE;
     }
     PCHECK;
@@ -1396,9 +1363,8 @@ int test_get_neighbors( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, const
 // Returns no vertices for non-adjacient parts and fails if both parts
 // are the same.
 // See create_mesh(..) for the assumed mesh.
-static int interface_verts( iMesh_Instance imesh, iMeshP_PartitionHandle prtn,
-                            iMeshP_PartHandle local_part, iMeshP_Part other_part,
-                            const PartMap& map, std::vector< iBase_EntityHandle >& vtx_handles )
+static int interface_verts( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, iMeshP_PartHandle local_part,
+                            iMeshP_Part other_part, const PartMap& map, std::vector< iBase_EntityHandle >& vtx_handles )
 {
     int ierr, rank;
     MPI_Comm_rank( MPI_COMM_WORLD, &rank );
@@ -1418,8 +1384,7 @@ static int interface_verts( iMesh_Instance imesh, iMeshP_PartitionHandle prtn,
     // get quads in partition
     iBase_EntityHandle quads[ 4 ], *ptr = quads;
     int                junk1 = 4, junk2;
-    iMesh_getEntities( imesh, local_part, iBase_FACE, iMesh_QUADRILATERAL, &ptr, &junk1, &junk2,
-                       &ierr );CHKERR;
+    iMesh_getEntities( imesh, local_part, iBase_FACE, iMesh_QUADRILATERAL, &ptr, &junk1, &junk2, &ierr );CHKERR;
     assert( ptr == quads );
     assert( junk1 == 4 );
     assert( junk2 == 4 );
@@ -1429,8 +1394,7 @@ static int interface_verts( iMesh_Instance imesh, iMeshP_PartitionHandle prtn,
     int                offsets[ 5 ], *off_ptr = offsets, junk3 = 5, junk4;
     ptr = conn;
     junk1 = 16;
-    iMesh_getEntArrAdj( imesh, quads, 4, iBase_VERTEX, &ptr, &junk1, &junk2, &off_ptr, &junk3,
-                        &junk4, &ierr );CHKERR;
+    iMesh_getEntArrAdj( imesh, quads, 4, iBase_VERTEX, &ptr, &junk1, &junk2, &off_ptr, &junk3, &junk4, &ierr );CHKERR;
     assert( ptr == conn );
     assert( junk1 == 16 );
     assert( junk2 == 16 );
@@ -1455,8 +1419,8 @@ static int interface_verts( iMesh_Instance imesh, iMeshP_PartitionHandle prtn,
         if( x < 0 || x > 2 || y < 0 || y > 2 )
         {
             std::cerr << "Processor " << rank << ": Error at " __FILE__ ":" << __LINE__ << std::endl
-                      << "  Invalid vertex coordinate: (" << coords[ 3 * i ] << ", "
-                      << coords[ 3 * i + 1 ] << ", " << coords[ 3 * i + 2 ] << ")" << std::endl
+                      << "  Invalid vertex coordinate: (" << coords[ 3 * i ] << ", " << coords[ 3 * i + 1 ] << ", "
+                      << coords[ 3 * i + 2 ] << ")" << std::endl
                       << "  For logical partition " << local_id << std::endl;
             return iBase_FAILURE;
         }
@@ -1553,14 +1517,12 @@ int test_get_part_boundary( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, c
 
     // for each combination of local part with any other part,
     // check for valid function values.
-    std::vector< std::pair< iMeshP_Part, iMeshP_Part > > num_failed, num_error, list_failed,
-        list_error, error;
+    std::vector< std::pair< iMeshP_Part, iMeshP_Part > > num_failed, num_error, list_failed, list_error, error;
     for( size_t i = 0; i < local_handles.size( ); ++i )
     {
         iMeshP_PartHandle local_handle = local_handles[ i ];
         iMeshP_Part       local_id = local_ids[ i ];
-        for( std::vector< iMeshP_Part >::iterator j = all_parts.begin( ); j != all_parts.end( );
-             ++j )
+        for( std::vector< iMeshP_Part >::iterator j = all_parts.begin( ); j != all_parts.end( ); ++j )
         {
             iMeshP_Part other_id = *j;
             if( other_id == local_id ) continue;
@@ -1581,8 +1543,7 @@ int test_get_part_boundary( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, c
 
             // test iMeshP_getNumPartBdryEnts
             int count;
-            iMeshP_getNumPartBdryEnts( imesh, prtn, local_handle, iBase_VERTEX, iMesh_POINT,
-                                       other_id, &count, &ierr );
+            iMeshP_getNumPartBdryEnts( imesh, prtn, local_handle, iBase_VERTEX, iMesh_POINT, other_id, &count, &ierr );
             if( iBase_SUCCESS != ierr )
                 num_error.push_back( part_pair );
             else if( count != (int)shared_verts.size( ) )
@@ -1591,14 +1552,13 @@ int test_get_part_boundary( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, c
             // test iMeshP_getPartBdryEnts
             iBase_EntityHandle* ptr = 0;
             int                 junk = 0;
-            iMeshP_getPartBdryEnts( imesh, prtn, local_handle, iBase_VERTEX, iMesh_POINT, other_id,
-                                    &ptr, &junk, &count, &ierr );
+            iMeshP_getPartBdryEnts( imesh, prtn, local_handle, iBase_VERTEX, iMesh_POINT, other_id, &ptr, &junk, &count,
+                                    &ierr );
             if( iBase_SUCCESS != ierr )
                 list_error.push_back( part_pair );
             else
             {
-                std::copy( ptr, ptr + count,
-                           std::back_inserter( part_bdry[ local_handles[ i ] ] ) );
+                std::copy( ptr, ptr + count, std::back_inserter( part_bdry[ local_handles[ i ] ] ) );
                 std::sort( ptr, ptr + count );
                 if( (int)shared_verts.size( ) != count ||
                     !std::equal( shared_verts.begin( ), shared_verts.end( ), ptr ) )
@@ -1617,29 +1577,28 @@ int test_get_part_boundary( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, c
     if( !num_error.empty( ) )
     {
         std::cerr << "Processor " << rank << ": Error at " __FILE__ ":" << __LINE__ << std::endl
-                  << "  iMeshP_getNumPartBdryEnts return error for " << num_error.size( )
-                  << " part pairs." << std::endl;
+                  << "  iMeshP_getNumPartBdryEnts return error for " << num_error.size( ) << " part pairs."
+                  << std::endl;
         ierr = iBase_FAILURE;
     }
     if( !list_error.empty( ) )
     {
         std::cerr << "Processor " << rank << ": Error at " __FILE__ ":" << __LINE__ << std::endl
-                  << "  iMeshP_getPartBdryEnts return error for " << list_error.size( )
-                  << " part pairs." << std::endl;
+                  << "  iMeshP_getPartBdryEnts return error for " << list_error.size( ) << " part pairs." << std::endl;
         ierr = iBase_FAILURE;
     }
     if( !num_failed.empty( ) )
     {
         std::cerr << "Processor " << rank << ": Error at " __FILE__ ":" << __LINE__ << std::endl
-                  << "  iMeshP_getNumPartBdryEnts return incorrect results for "
-                  << num_failed.size( ) << " part pairs." << std::endl;
+                  << "  iMeshP_getNumPartBdryEnts return incorrect results for " << num_failed.size( ) << " part pairs."
+                  << std::endl;
         ierr = iBase_FAILURE;
     }
     if( !list_failed.empty( ) )
     {
         std::cerr << "Processor " << rank << ": Error at " __FILE__ ":" << __LINE__ << std::endl
-                  << "  iMeshP_getPartBdryEnts return incorrect results for " << list_failed.size( )
-                  << " part pairs." << std::endl;
+                  << "  iMeshP_getPartBdryEnts return incorrect results for " << list_failed.size( ) << " part pairs."
+                  << std::endl;
         ierr = iBase_FAILURE;
     }
 
@@ -1656,8 +1615,8 @@ int test_get_part_boundary( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, c
         part_pair.second = iMeshP_ALL_PARTS;
 
         int num = 0;
-        iMeshP_getNumPartBdryEnts( imesh, prtn, local_handles[ i ], iBase_VERTEX, iMesh_POINT,
-                                   iMeshP_ALL_PARTS, &num, &ierr );
+        iMeshP_getNumPartBdryEnts( imesh, prtn, local_handles[ i ], iBase_VERTEX, iMesh_POINT, iMeshP_ALL_PARTS, &num,
+                                   &ierr );
         if( ierr )
             num_error.push_back( part_pair );
         else if( num != (int)exp_bdry.size( ) )
@@ -1665,8 +1624,8 @@ int test_get_part_boundary( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, c
 
         iBase_EntityHandle* bdry = 0;
         int                 junk = num = 0;
-        iMeshP_getPartBdryEnts( imesh, prtn, local_handles[ i ], iBase_VERTEX, iMesh_POINT,
-                                iMeshP_ALL_PARTS, &bdry, &junk, &num, &ierr );
+        iMeshP_getPartBdryEnts( imesh, prtn, local_handles[ i ], iBase_VERTEX, iMesh_POINT, iMeshP_ALL_PARTS, &bdry,
+                                &junk, &num, &ierr );
         if( ierr )
             list_error.push_back( part_pair );
         else
@@ -1680,29 +1639,28 @@ int test_get_part_boundary( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, c
     if( !num_error.empty( ) )
     {
         std::cerr << "Processor " << rank << ": Error at " __FILE__ ":" << __LINE__ << std::endl
-                  << "  iMeshP_getNumPartBdryEnts return error for " << num_error.size( )
-                  << " part pairs." << std::endl;
+                  << "  iMeshP_getNumPartBdryEnts return error for " << num_error.size( ) << " part pairs."
+                  << std::endl;
         ierr = iBase_FAILURE;
     }
     if( !list_error.empty( ) )
     {
         std::cerr << "Processor " << rank << ": Error at " __FILE__ ":" << __LINE__ << std::endl
-                  << "  iMeshP_getPartBdryEnts return error for " << list_error.size( )
-                  << " part pairs." << std::endl;
+                  << "  iMeshP_getPartBdryEnts return error for " << list_error.size( ) << " part pairs." << std::endl;
         ierr = iBase_FAILURE;
     }
     if( !num_failed.empty( ) )
     {
         std::cerr << "Processor " << rank << ": Error at " __FILE__ ":" << __LINE__ << std::endl
-                  << "  iMeshP_getNumPartBdryEnts return incorrect results for "
-                  << num_failed.size( ) << " part pairs." << std::endl;
+                  << "  iMeshP_getNumPartBdryEnts return incorrect results for " << num_failed.size( ) << " part pairs."
+                  << std::endl;
         ierr = iBase_FAILURE;
     }
     if( !list_failed.empty( ) )
     {
         std::cerr << "Processor " << rank << ": Error at " __FILE__ ":" << __LINE__ << std::endl
-                  << "  iMeshP_getPartBdryEnts return incorrect results for " << list_failed.size( )
-                  << " part pairs." << std::endl;
+                  << "  iMeshP_getPartBdryEnts return incorrect results for " << list_failed.size( ) << " part pairs."
+                  << std::endl;
         ierr = iBase_FAILURE;
     }
 
@@ -1726,14 +1684,13 @@ int test_part_boundary_iter( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, 
     std::vector< iMeshP_Part >       all_parts = map.get_parts( );
     ierr = get_local_parts( imesh, prtn, local_handles, &local_ids );CHKERR;
 
-    std::vector< std::pair< iMeshP_Part, iMeshP_Part > > single_failed, single_error,
-        single_step_error, array_failed, array_error, array_step_error;
+    std::vector< std::pair< iMeshP_Part, iMeshP_Part > > single_failed, single_error, single_step_error, array_failed,
+        array_error, array_step_error;
     for( size_t i = 0; i < local_handles.size( ); ++i )
     {
         iMeshP_PartHandle local_handle = local_handles[ i ];
         iMeshP_Part       local_id = local_ids[ i ];
-        for( std::vector< iMeshP_Part >::iterator j = all_parts.begin( ); j != all_parts.end( );
-             ++j )
+        for( std::vector< iMeshP_Part >::iterator j = all_parts.begin( ); j != all_parts.end( ); ++j )
         {
             iMeshP_Part other_id = *j;
             if( other_id == local_id ) continue;
@@ -1750,8 +1707,7 @@ int test_part_boundary_iter( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, 
 
             // test single entity iterator
             iBase_EntityIterator siter;
-            iMeshP_initPartBdryEntIter( imesh, prtn, local_handle, iBase_VERTEX, iMesh_POINT,
-                                        other_id, &siter, &ierr );
+            iMeshP_initPartBdryEntIter( imesh, prtn, local_handle, iBase_VERTEX, iMesh_POINT, other_id, &siter, &ierr );
             if( ierr != iBase_SUCCESS ) { single_error.push_back( part_pair ); }
             else
             {
@@ -1778,8 +1734,8 @@ int test_part_boundary_iter( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, 
 
             // test array iterator
             iBase_EntityArrIterator aiter;
-            iMeshP_initPartBdryEntArrIter( imesh, prtn, local_handle, iBase_VERTEX, iMesh_POINT,
-                                           shared_verts.size( ), other_id, &aiter, &ierr );
+            iMeshP_initPartBdryEntArrIter( imesh, prtn, local_handle, iBase_VERTEX, iMesh_POINT, shared_verts.size( ),
+                                           other_id, &aiter, &ierr );
             if( ierr != iBase_SUCCESS )
             {
                 array_error.push_back( part_pair );
@@ -1808,15 +1764,15 @@ int test_part_boundary_iter( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, 
     if( !single_error.empty( ) )
     {
         std::cerr << "Processor " << rank << ": Error at " __FILE__ ":" << __LINE__ << std::endl
-                  << "  iMeshP_initPartBdryEntIter return error for " << single_error.size( )
-                  << " part pairs." << std::endl;
+                  << "  iMeshP_initPartBdryEntIter return error for " << single_error.size( ) << " part pairs."
+                  << std::endl;
         ierr = iBase_FAILURE;
     }
     if( !single_step_error.empty( ) )
     {
         std::cerr << "Processor " << rank << ": Error at " __FILE__ ":" << __LINE__ << std::endl
-                  << "  iMesh_getNextEntIter return error for " << single_step_error.size( )
-                  << " part pairs." << std::endl;
+                  << "  iMesh_getNextEntIter return error for " << single_step_error.size( ) << " part pairs."
+                  << std::endl;
         ierr = iBase_FAILURE;
     }
     if( !single_failed.empty( ) )
@@ -1830,15 +1786,15 @@ int test_part_boundary_iter( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, 
     if( !array_error.empty( ) )
     {
         std::cerr << "Processor " << rank << ": Error at " __FILE__ ":" << __LINE__ << std::endl
-                  << "  iMeshP_initPartBdryEntArrIter return error for " << array_error.size( )
-                  << " part pairs." << std::endl;
+                  << "  iMeshP_initPartBdryEntArrIter return error for " << array_error.size( ) << " part pairs."
+                  << std::endl;
         ierr = iBase_FAILURE;
     }
     if( !array_step_error.empty( ) )
     {
         std::cerr << "Processor " << rank << ": Error at " __FILE__ ":" << __LINE__ << std::endl
-                  << "  iMesh_getNextEntArrIter return error for " << array_step_error.size( )
-                  << " part pairs." << std::endl;
+                  << "  iMesh_getNextEntArrIter return error for " << array_step_error.size( ) << " part pairs."
+                  << std::endl;
         ierr = iBase_FAILURE;
     }
     if( !array_failed.empty( ) )
@@ -1857,8 +1813,7 @@ int test_part_boundary_iter( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, 
  * Test:
  * - iMeshP_getAdjEntities
  */
-int test_get_adjacencies( iMesh_Instance /* imesh */, iMeshP_PartitionHandle /* prtn */,
-                          const PartMap& )
+int test_get_adjacencies( iMesh_Instance /* imesh */, iMeshP_PartitionHandle /* prtn */, const PartMap& )
 {
     return iBase_SUCCESS;
 }
@@ -1869,8 +1824,7 @@ int test_get_adjacencies( iMesh_Instance /* imesh */, iMeshP_PartitionHandle /* 
  * - iMeshP_initEntIter
  * - iMeshP_initEntArrIter
  */
-int test_entity_iterator( iMesh_Instance /*imesh */, iMeshP_PartitionHandle /*prtn*/,
-                          const PartMap& )
+int test_entity_iterator( iMesh_Instance /*imesh */, iMeshP_PartitionHandle /*prtn*/, const PartMap& )
 {
     return iBase_SUCCESS;
 }
@@ -1928,12 +1882,10 @@ int test_entity_owner( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, const 
         ierr = get_entities( imesh, local_handles[ 0 ], iBase_FACE, iMesh_QUADRILATERAL, quads );
         if( ierr ) break;
 
-        std::vector< iMeshP_Part > owners( quads.size( ) ),
-            expected( quads.size( ), local_ids[ i ] );
-        int          junk = owners.size( ), count;
-        iMeshP_Part* ptr = &owners[ 0 ];
-        iMeshP_getEntOwnerPartArr( imesh, prtn, &quads[ 0 ], quads.size( ), &ptr, &junk, &count,
-                                   &ierr );
+        std::vector< iMeshP_Part > owners( quads.size( ) ), expected( quads.size( ), local_ids[ i ] );
+        int                        junk = owners.size( ), count;
+        iMeshP_Part*               ptr = &owners[ 0 ];
+        iMeshP_getEntOwnerPartArr( imesh, prtn, &quads[ 0 ], quads.size( ), &ptr, &junk, &count, &ierr );
         if( ierr ) break;
         assert( ptr == &owners[ 0 ] );
         assert( junk == (int)owners.size( ) );
@@ -1947,8 +1899,8 @@ int test_entity_owner( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, const 
     iBase_EntityHandle* vtx_arr = 0;
     int                 junk1 = 0, num_vtx;
     int *               junk2 = 0, junk3 = 0, junk4;
-    iMesh_getEntArrAdj( imesh, &all_quads[ 0 ], all_quads.size( ), iBase_VERTEX, &vtx_arr, &junk1,
-                        &num_vtx, &junk2, &junk3, &junk4, &ierr );
+    iMesh_getEntArrAdj( imesh, &all_quads[ 0 ], all_quads.size( ), iBase_VERTEX, &vtx_arr, &junk1, &num_vtx, &junk2,
+                        &junk3, &junk4, &ierr );
     PCHECK;
     free( junk2 );
     std::sort( vtx_arr, vtx_arr + num_vtx );
@@ -1961,8 +1913,7 @@ int test_entity_owner( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, const 
     std::vector< iMeshP_Part > vert_owners( all_verts.size( ) );
     junk1 = vert_owners.size( );
     iMeshP_Part* junk5 = &vert_owners[ 0 ];
-    iMeshP_getEntOwnerPartArr( imesh, prtn, &all_verts[ 0 ], all_verts.size( ), &junk5, &junk1,
-                               &junk3, &ierr );
+    iMeshP_getEntOwnerPartArr( imesh, prtn, &all_verts[ 0 ], all_verts.size( ), &junk5, &junk1, &junk3, &ierr );
     PCHECK;
     assert( junk5 == &vert_owners[ 0 ] );
     assert( junk1 == (int)vert_owners.size( ) );
@@ -1991,8 +1942,7 @@ int test_entity_owner( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, const 
         for( size_t j = 0; ierr == iBase_SUCCESS && j < all_entities.size( ); ++j )
         {
             int is_owner;
-            iMeshP_isEntOwner( imesh, prtn, local_handles[ i ], all_entities[ j ], &is_owner,
-                               &ierr );
+            iMeshP_isEntOwner( imesh, prtn, local_handles[ i ], all_entities[ j ], &is_owner, &ierr );
             if( ierr != iBase_SUCCESS ) break;
             if( !is_owner == ( local_ids[ i ] == all_owners[ j ] ) ) ++invalid_count;
         }
@@ -2006,8 +1956,8 @@ int test_entity_owner( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, const 
         std::vector< int > is_owner_list( all_entities.size( ) );
         junk1 = is_owner_list.size( );
         int* junk6 = &is_owner_list[ 0 ];
-        iMeshP_isEntOwnerArr( imesh, prtn, local_handles[ i ], &all_entities[ 0 ],
-                              all_entities.size( ), &junk6, &junk1, &junk3, &ierr );
+        iMeshP_isEntOwnerArr( imesh, prtn, local_handles[ i ], &all_entities[ 0 ], all_entities.size( ), &junk6, &junk1,
+                              &junk3, &ierr );
         if( iBase_SUCCESS != ierr ) break;
         assert( junk6 == &is_owner_list[ 0 ] );
         assert( junk1 == (int)is_owner_list.size( ) );
@@ -2049,8 +1999,8 @@ int test_entity_owner( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, const 
     }
 
     // we could have used a simple gather, because all sequences are the same
-    ierr = MPI_Gatherv( &vtxdata[ 0 ], vtxdata.size( ), MPI_INT, &all_data[ 0 ], &counts[ 0 ],
-                        &displ[ 0 ], MPI_INT, 0, MPI_COMM_WORLD );CHKERR;
+    ierr = MPI_Gatherv( &vtxdata[ 0 ], vtxdata.size( ), MPI_INT, &all_data[ 0 ], &counts[ 0 ], &displ[ 0 ], MPI_INT, 0,
+                        MPI_COMM_WORLD );CHKERR;
 
     if( rank == 0 )
     {
@@ -2076,20 +2026,17 @@ int test_entity_owner( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, const 
 
                 ierr = iBase_FAILURE;
 
-                int proc1 =
-                    std::lower_bound( displ.begin( ), displ.end( ), 2 * idx1 ) - displ.begin( );
+                int proc1 = std::lower_bound( displ.begin( ), displ.end( ), 2 * idx1 ) - displ.begin( );
                 if( displ[ proc1 ] != 2 * idx1 ) ++proc1;
-                int proc2 =
-                    std::lower_bound( displ.begin( ), displ.end( ), 2 * idx2 ) - displ.begin( );
+                int proc2 = std::lower_bound( displ.begin( ), displ.end( ), 2 * idx2 ) - displ.begin( );
                 if( displ[ proc2 ] != 2 * idx2 ) ++proc2;
 
                 std::cerr << "Error at " __FILE__ ":" << __LINE__ << " : " << std::endl
-                          << "  For vertex at (" << ( a->first >> 2 ) << ", " << ( a->first & 3 )
-                          << ") :" << std::endl
-                          << "  Processor " << proc1 << " has " << all_data[ 2 * idx1 + 1 ]
-                          << " as the owning part" << std::endl
-                          << "  Processor " << proc2 << " has " << all_data[ 2 * idx2 + 1 ]
-                          << " as the owning part" << std::endl;
+                          << "  For vertex at (" << ( a->first >> 2 ) << ", " << ( a->first & 3 ) << ") :" << std::endl
+                          << "  Processor " << proc1 << " has " << all_data[ 2 * idx1 + 1 ] << " as the owning part"
+                          << std::endl
+                          << "  Processor " << proc2 << " has " << all_data[ 2 * idx2 + 1 ] << " as the owning part"
+                          << std::endl;
             }
         }
     }
@@ -2097,9 +2044,8 @@ int test_entity_owner( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, const 
     return ierr;
 }
 
-static int get_part_boundary_verts( iMesh_Instance imesh, iMeshP_PartitionHandle prtn,
-                                    const PartMap& map, iMeshP_PartHandle part,
-                                    std::vector< iBase_EntityHandle >& boundary )
+static int get_part_boundary_verts( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, const PartMap& map,
+                                    iMeshP_PartHandle part, std::vector< iBase_EntityHandle >& boundary )
 {
     int ierr, logical_id;
     ierr = map.part_from_coords( imesh, part, logical_id );CHKERR;
@@ -2169,8 +2115,7 @@ int test_entity_status( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, const
         std::vector< int > stat_list( quads.size( ) );
         int*               junk1 = &stat_list[ 0 ];
         int                junk2 = stat_list.size( ), count;
-        iMeshP_getEntStatusArr( imesh, prtn, part, &quads[ 0 ], quads.size( ), &junk1, &junk2,
-                                &count, &ierr );
+        iMeshP_getEntStatusArr( imesh, prtn, part, &quads[ 0 ], quads.size( ), &junk1, &junk2, &count, &ierr );
         if( ierr != iBase_SUCCESS )
         {
             ++num_quad_arr_error;
@@ -2201,16 +2146,14 @@ int test_entity_status( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, const
                 continue;
             }
             bool on_boundary = std::binary_search( boundary.begin( ), boundary.end( ), verts[ j ] );
-            if( status != ( on_boundary ? iMeshP_BOUNDARY : iMeshP_INTERNAL ) )
-                ++num_vert_ent_incorrect;
+            if( status != ( on_boundary ? iMeshP_BOUNDARY : iMeshP_INTERNAL ) ) ++num_vert_ent_incorrect;
         }
 
         // check vert status using iMeshP_getEntStatusArr
         stat_list.resize( verts.size( ) );
         junk1 = &stat_list[ 0 ];
         junk2 = stat_list.size( );
-        iMeshP_getEntStatusArr( imesh, prtn, part, &verts[ 0 ], verts.size( ), &junk1, &junk2,
-                                &count, &ierr );
+        iMeshP_getEntStatusArr( imesh, prtn, part, &verts[ 0 ], verts.size( ), &junk1, &junk2, &count, &ierr );
         if( ierr != iBase_SUCCESS )
         {
             ++num_vert_arr_error;
@@ -2223,8 +2166,7 @@ int test_entity_status( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, const
         for( size_t j = 0; j < verts.size( ); ++j )
         {
             bool on_boundary = std::binary_search( boundary.begin( ), boundary.end( ), verts[ j ] );
-            if( stat_list[ j ] != ( on_boundary ? iMeshP_BOUNDARY : iMeshP_INTERNAL ) )
-                ++num_vert_arr_incorrect;
+            if( stat_list[ j ] != ( on_boundary ? iMeshP_BOUNDARY : iMeshP_INTERNAL ) ) ++num_vert_arr_incorrect;
         }
     }
     PCHECK;  // check if loop interrupted by any internal errors
@@ -2286,7 +2228,7 @@ int test_entity_copy_parts( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, c
 
     // test getNumCopies for each vertex
     std::map< iBase_EntityHandle, std::vector< iMeshP_Part > >::iterator i;
-    int num_failed = 0, num_incorrect = 0;
+    int                                                                  num_failed = 0, num_incorrect = 0;
     for( i = vert_sharing.begin( ); i != vert_sharing.end( ); ++i )
     {
         int                count;
@@ -2347,8 +2289,7 @@ struct VtxCopyData
  * - iMeshP_getCopyOnPart
  * - iMeshP_getOwnerCopy
  */
-int test_entity_copies( iMesh_Instance imesh, iMeshP_PartitionHandle prtn,
-                        const PartMap& /* map */ )
+int test_entity_copies( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, const PartMap& /* map */ )
 {
     int ierr, rank, size;
     MPI_Comm_rank( MPI_COMM_WORLD, &rank );
@@ -2378,8 +2319,7 @@ int test_entity_copies( iMesh_Instance imesh, iMeshP_PartitionHandle prtn,
     std::vector< iMeshP_Part > part_ids( parts.size( ) );
     iMeshP_Part*               junk1 = &part_ids[ 0 ];
     int                        junk2 = part_ids.size( ), junk3;
-    iMeshP_getPartIdsFromPartHandlesArr( imesh, prtn, &parts[ 0 ], parts.size( ), &junk1, &junk2,
-                                         &junk3, &ierr );
+    iMeshP_getPartIdsFromPartHandlesArr( imesh, prtn, &parts[ 0 ], parts.size( ), &junk1, &junk2, &junk3, &ierr );
     PCHECK;
     assert( junk1 == &part_ids[ 0 ] );
     assert( junk2 == (int)part_ids.size( ) );
@@ -2414,8 +2354,7 @@ int test_entity_copies( iMesh_Instance imesh, iMeshP_PartitionHandle prtn,
 
     // build list of local vertices
     std::sort( local_vertices.begin( ), local_vertices.end( ) );
-    local_vertices.erase( std::unique( local_vertices.begin( ), local_vertices.end( ) ),
-                          local_vertices.end( ) );
+    local_vertices.erase( std::unique( local_vertices.begin( ), local_vertices.end( ) ), local_vertices.end( ) );
     std::vector< int > local_vtx_tags( local_vertices.size( ) );CHKERR;
     for( size_t i = 0; i < local_vertices.size( ); ++i )
     {
@@ -2432,8 +2371,8 @@ int test_entity_copies( iMesh_Instance imesh, iMeshP_PartitionHandle prtn,
     for( int i = 1; i < size; ++i )
         gdisp[ i ] = gdisp[ i - 1 ] + gcounts[ i - 1 ];
     std::vector< iBase_EntityHandle > global_data( gdisp[ size - 1 ] + gcounts[ size - 1 ] );
-    ierr = MPI_Allgatherv( &local_data[ 0 ], local_data_size, type, &global_data[ 0 ],
-                           &gcounts[ 0 ], &gdisp[ 0 ], type, MPI_COMM_WORLD );CHKERR;
+    ierr = MPI_Allgatherv( &local_data[ 0 ], local_data_size, type, &global_data[ 0 ], &gcounts[ 0 ], &gdisp[ 0 ], type,
+                           MPI_COMM_WORLD );CHKERR;
 
     // arrange global data in a more useful way
     std::map< int, VtxCopyData > vtx_sharing;
@@ -2453,12 +2392,11 @@ int test_entity_copies( iMesh_Instance imesh, iMeshP_PartitionHandle prtn,
     {
         int num_copies = -1;
         // iMeshP_Part* part_ids = 0;
-        iMeshP_Part* ptr_part_ids =
-            0;  // Use ptr_part_ids to avoid shadowing std::vector<iMeshP_Part> part_ids
+        iMeshP_Part*        ptr_part_ids = 0;  // Use ptr_part_ids to avoid shadowing std::vector<iMeshP_Part> part_ids
         iBase_EntityHandle* copies = 0;
         junk2 = junk3 = junk4 = 0;
-        iMeshP_getCopies( imesh, prtn, local_vertices[ i ], &ptr_part_ids, &junk2, &num_copies,
-                          &copies, &junk3, &junk4, &ierr );
+        iMeshP_getCopies( imesh, prtn, local_vertices[ i ], &ptr_part_ids, &junk2, &num_copies, &copies, &junk3, &junk4,
+                          &ierr );
         if( iBase_SUCCESS != ierr )
         {
             ++num_error;
@@ -2472,9 +2410,7 @@ int test_entity_copies( iMesh_Instance imesh, iMeshP_PartitionHandle prtn,
         else
             for( size_t j = 0; j < expected.parts.size( ); ++j )
             {
-                int idx =
-                    std::find( ptr_part_ids, ptr_part_ids + num_copies, expected.parts[ j ] ) -
-                    ptr_part_ids;
+                int idx = std::find( ptr_part_ids, ptr_part_ids + num_copies, expected.parts[ j ] ) - ptr_part_ids;
                 if( idx == num_copies || copies[ idx ] != expected.handles[ j ] )
                 {
                     ++num_incorrect;
@@ -2495,8 +2431,7 @@ int test_entity_copies( iMesh_Instance imesh, iMeshP_PartitionHandle prtn,
         for( size_t j = 0; j < expected.parts.size( ); ++j )
         {
             iBase_EntityHandle copy;
-            iMeshP_getCopyOnPart( imesh, prtn, local_vertices[ i ], expected.parts[ j ], &copy,
-                                  &ierr );
+            iMeshP_getCopyOnPart( imesh, prtn, local_vertices[ i ], expected.parts[ j ], &copy, &ierr );
             if( iBase_SUCCESS != ierr )
                 ++num_error;
             else if( expected.handles[ j ] != copy )
@@ -2515,8 +2450,7 @@ int test_entity_copies( iMesh_Instance imesh, iMeshP_PartitionHandle prtn,
         iMeshP_getEntOwnerPart( imesh, prtn, local_vertices[ i ], &owner_id, &ierr );
         if( iBase_SUCCESS != ierr ) continue;  // not testing getEntOwnerPart here
 
-        size_t idx = std::find( expected.parts.begin( ), expected.parts.end( ), owner_id ) -
-                     expected.parts.begin( );
+        size_t idx = std::find( expected.parts.begin( ), expected.parts.end( ), owner_id ) - expected.parts.begin( );
         if( idx == expected.parts.size( ) ) continue;  // not testing getEntOwnerPart here
 
         iMeshP_Part        owner_id_2 = 0;
@@ -2542,8 +2476,7 @@ int get_num_adj_quads( iMesh_Instance imesh, iBase_EntityHandle vtx, int& num )
     return ierr;
 }
 
-int get_adj( iMesh_Instance imesh, iBase_EntityHandle ent, int type,
-             std::vector< iBase_EntityHandle >& adj )
+int get_adj( iMesh_Instance imesh, iBase_EntityHandle ent, int type, std::vector< iBase_EntityHandle >& adj )
 {
     iBase_EntityHandle* list = 0;
     int                 ierr, num, junk = 0;
@@ -2577,8 +2510,7 @@ int check_one_layer( iMesh_Instance imesh, iBase_EntityHandle vtx,
                      const std::vector< iBase_EntityHandle >& sorted_vertices )
 {
     int ierr;
-    if( std::binary_search( sorted_vertices.begin( ), sorted_vertices.end( ), vtx ) )
-        return iBase_SUCCESS;
+    if( std::binary_search( sorted_vertices.begin( ), sorted_vertices.end( ), vtx ) ) return iBase_SUCCESS;
     std::vector< iBase_EntityHandle > quads, verts;
     ierr = get_adj( imesh, vtx, iBase_FACE, quads );CHKERR;
     for( size_t i = 0; i < quads.size( ); ++i )
@@ -2619,18 +2551,16 @@ int get_num_adj_all( iMesh_Instance imesh, const std::vector< iBase_EntityHandle
         displ[ i ] = displ[ i - 1 ] + counts[ i - 1 ];
     int                total = displ[ size - 1 ] + counts[ size - 1 ];
     std::vector< int > all_tags( total ), all_adj_counts( total );
-    ierr = MPI_Allgatherv( &vtx_tags[ 0 ], vtx_tags.size( ), MPI_INT, &all_tags[ 0 ], &counts[ 0 ],
+    ierr = MPI_Allgatherv( &vtx_tags[ 0 ], vtx_tags.size( ), MPI_INT, &all_tags[ 0 ], &counts[ 0 ], &displ[ 0 ],
+                           MPI_INT, MPI_COMM_WORLD );CHKERR;
+    ierr = MPI_Allgatherv( &num_local_adj[ 0 ], num_local_adj.size( ), MPI_INT, &all_adj_counts[ 0 ], &counts[ 0 ],
                            &displ[ 0 ], MPI_INT, MPI_COMM_WORLD );CHKERR;
-    ierr =
-        MPI_Allgatherv( &num_local_adj[ 0 ], num_local_adj.size( ), MPI_INT, &all_adj_counts[ 0 ],
-                        &counts[ 0 ], &displ[ 0 ], MPI_INT, MPI_COMM_WORLD );CHKERR;
 
     num_all_adj.clear( );
     num_all_adj.resize( total, 0 );
     for( int i = 0; i < total; ++i )
     {
-        std::vector< int >::iterator it =
-            std::find( vtx_tags.begin( ), vtx_tags.end( ), all_tags[ i ] );
+        std::vector< int >::iterator it = std::find( vtx_tags.begin( ), vtx_tags.end( ), all_tags[ i ] );
         if( it == vtx_tags.end( ) ) continue;
         int idx = it - vtx_tags.begin( );
         num_all_adj[ idx ] += all_adj_counts[ i ];
@@ -2644,8 +2574,7 @@ int get_num_adj_all( iMesh_Instance imesh, const std::vector< iBase_EntityHandle
  * Test:
  * - iMeshP_createGhostEntsAll
  */
-int test_create_ghost_ents( iMesh_Instance imesh, iMeshP_PartitionHandle prtn,
-                            const PartMap& /* map */ )
+int test_create_ghost_ents( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, const PartMap& /* map */ )
 {
     int ierr;
 
@@ -2753,8 +2682,8 @@ int test_exchange_ents( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, const
     }
 
     // exchange entities
-    iMeshP_exchEntArrToPartsAll( imesh, prtn, &all_elems[ 0 ], all_elems.size( ), &all_ids[ 0 ], 0,
-                                 0, &request, &ierr );
+    iMeshP_exchEntArrToPartsAll( imesh, prtn, &all_elems[ 0 ], all_elems.size( ), &all_ids[ 0 ], 0, 0, &request,
+                                 &ierr );
     if( iBase_SUCCESS != ierr ) ++num_err;
 
     // get local quads after exchange
@@ -2775,8 +2704,7 @@ int test_exchange_ents( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, const
  * - iMeshP_pushTags
  * - iMeshP_pushTagsEnt
  */
-int test_push_tag_data_common( iMesh_Instance imesh, iMeshP_PartitionHandle prtn,
-                               int num_ghost_layers )
+int test_push_tag_data_common( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, int num_ghost_layers )
 {
     const char* src_name = "test_src";
     const char* dst_name = "test_dst";
@@ -2785,8 +2713,7 @@ int test_push_tag_data_common( iMesh_Instance imesh, iMeshP_PartitionHandle prtn
 
     if( num_ghost_layers )
     {
-        iMeshP_createGhostEntsAll( imesh, prtn, iBase_FACE, iBase_VERTEX, num_ghost_layers, 0,
-                                   &ierr );
+        iMeshP_createGhostEntsAll( imesh, prtn, iBase_FACE, iBase_VERTEX, num_ghost_layers, 0, &ierr );
         PCHECK;
     }
 
@@ -2805,8 +2732,7 @@ int test_push_tag_data_common( iMesh_Instance imesh, iMeshP_PartitionHandle prtn
     // after push, each vertex should be tagged with the rank of its owner
 
     std::vector< int > tag_vals( verts.size( ), rank );
-    iMesh_setIntArrData( imesh, &verts[ 0 ], verts.size( ), src_tag, &tag_vals[ 0 ],
-                         tag_vals.size( ), &ierr );CHKERR;
+    iMesh_setIntArrData( imesh, &verts[ 0 ], verts.size( ), src_tag, &tag_vals[ 0 ], tag_vals.size( ), &ierr );CHKERR;
 
     iMeshP_pushTags( imesh, prtn, src_tag, dst_tag, iBase_VERTEX, iMesh_POINT, &ierr );
     PCHECK;
@@ -2825,8 +2751,7 @@ int test_push_tag_data_common( iMesh_Instance imesh, iMeshP_PartitionHandle prtn
         iMesh_getIntData( imesh, verts[ i ], dst_tag, &tag_vals[ i ], &ierr );
         if( ierr != iBase_SUCCESS )
         {
-            std::cerr << "Rank " << rank << " : getIntData failed for vertex " << ids[ i ]
-                      << std::endl;
+            std::cerr << "Rank " << rank << " : getIntData failed for vertex " << ids[ i ] << std::endl;
             std::cerr.flush( );
             ++errcount;
         }
@@ -2842,16 +2767,14 @@ int test_push_tag_data_common( iMesh_Instance imesh, iMeshP_PartitionHandle prtn
     std::vector< iMeshP_Part > parts( verts.size( ) );
     iMeshP_Part*               junk4 = &parts[ 0 ];
     junk2 = parts.size( );
-    iMeshP_getEntOwnerPartArr( imesh, prtn, &verts[ 0 ], verts.size( ), &junk4, &junk2, &junk3,
-                               &ierr );
+    iMeshP_getEntOwnerPartArr( imesh, prtn, &verts[ 0 ], verts.size( ), &junk4, &junk2, &junk3, &ierr );
     PCHECK;
     assert( junk4 == &parts[ 0 ] );
     assert( junk2 == (int)parts.size( ) );
     assert( junk3 == (int)verts.size( ) );
     junk1 = &expected[ 0 ];
     junk2 = expected.size( );
-    iMeshP_getRankOfPartArr( imesh, prtn, &parts[ 0 ], parts.size( ), &junk1, &junk2, &junk3,
-                             &ierr );
+    iMeshP_getRankOfPartArr( imesh, prtn, &parts[ 0 ], parts.size( ), &junk1, &junk2, &junk3, &ierr );
     PCHECK;
     assert( junk1 == &expected[ 0 ] );
     assert( junk2 == (int)expected.size( ) );
@@ -2866,12 +2789,10 @@ int test_push_tag_data_common( iMesh_Instance imesh, iMeshP_PartitionHandle prtn
 
     tag_vals.clear( );
     tag_vals.resize( verts.size( ), -1 );
-    iMesh_setIntArrData( imesh, &verts[ 0 ], verts.size( ), src_tag, &tag_vals[ 0 ],
-                         tag_vals.size( ), &ierr );
+    iMesh_setIntArrData( imesh, &verts[ 0 ], verts.size( ), src_tag, &tag_vals[ 0 ], tag_vals.size( ), &ierr );
     PCHECK;
     tag_vals.resize( verts.size( ), -1 );
-    iMesh_setIntArrData( imesh, &verts[ 0 ], verts.size( ), dst_tag, &tag_vals[ 0 ],
-                         tag_vals.size( ), &ierr );
+    iMesh_setIntArrData( imesh, &verts[ 0 ], verts.size( ), dst_tag, &tag_vals[ 0 ], tag_vals.size( ), &ierr );
     PCHECK;
 
     std::vector< iBase_EntityHandle > some;
@@ -2888,8 +2809,7 @@ int test_push_tag_data_common( iMesh_Instance imesh, iMeshP_PartitionHandle prtn
 
     tag_vals.clear( );
     tag_vals.resize( some.size( ), rank );
-    iMesh_setIntArrData( imesh, &some[ 0 ], some.size( ), src_tag, &tag_vals[ 0 ], tag_vals.size( ),
-                         &ierr );
+    iMesh_setIntArrData( imesh, &some[ 0 ], some.size( ), src_tag, &tag_vals[ 0 ], tag_vals.size( ), &ierr );
     PCHECK;
 
     iMeshP_pushTagsEnt( imesh, prtn, src_tag, dst_tag, &some[ 0 ], some.size( ), &ierr );
@@ -2899,8 +2819,7 @@ int test_push_tag_data_common( iMesh_Instance imesh, iMeshP_PartitionHandle prtn
     tag_vals.resize( verts.size( ), -1 );
     junk1 = &tag_vals[ 0 ];
     junk2 = tag_vals.size( );
-    iMesh_getIntArrData( imesh, &verts[ 0 ], verts.size( ), dst_tag, &junk1, &junk2, &junk3,
-                         &ierr );CHKERR;
+    iMesh_getIntArrData( imesh, &verts[ 0 ], verts.size( ), dst_tag, &junk1, &junk2, &junk3, &ierr );CHKERR;
     assert( junk1 == &tag_vals[ 0 ] );
     assert( junk2 == (int)tag_vals.size( ) );
     assert( junk3 == (int)verts.size( ) );
@@ -2958,8 +2877,8 @@ int PartMap::build_map( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, int n
     ierr = MPI_Allreduce( &num_local, &num_global, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD );CHKERR;
     if( num_global != num_expected_parts )
     {
-        std::cerr << "Invalid/unexpected global part count at " __FILE__ ":" << __LINE__
-                  << " (proc " << rank << "): " << std::endl
+        std::cerr << "Invalid/unexpected global part count at " __FILE__ ":" << __LINE__ << " (proc " << rank
+                  << "): " << std::endl
                   << "  Expected: " << num_expected_parts << std::endl
                   << "  Actual:   " << num_global << std::endl;
         return 1;
@@ -2975,13 +2894,13 @@ int PartMap::build_map( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, int n
     // gather iMeshP_Part list from each processor
     std::vector< unsigned > global_part_ids( num_expected_parts );
     assert( sizeof( iMeshP_Part ) == sizeof( int ) );
-    ierr = MPI_Allgatherv( &imesh_ids[ 0 ], num_local, MPI_UNSIGNED, &global_part_ids[ 0 ],
-                           &counts[ 0 ], &dspls[ 0 ], MPI_UNSIGNED, MPI_COMM_WORLD );CHKERR;
+    ierr = MPI_Allgatherv( &imesh_ids[ 0 ], num_local, MPI_UNSIGNED, &global_part_ids[ 0 ], &counts[ 0 ], &dspls[ 0 ],
+                           MPI_UNSIGNED, MPI_COMM_WORLD );CHKERR;
 
     // gather local ids from each processor
     std::vector< int > global_id_list( num_expected_parts );
-    ierr = MPI_Allgatherv( &local_ids[ 0 ], num_local, MPI_INT, &global_id_list[ 0 ], &counts[ 0 ],
-                           &dspls[ 0 ], MPI_INT, MPI_COMM_WORLD );CHKERR;
+    ierr = MPI_Allgatherv( &local_ids[ 0 ], num_local, MPI_INT, &global_id_list[ 0 ], &counts[ 0 ], &dspls[ 0 ],
+                           MPI_INT, MPI_COMM_WORLD );CHKERR;
 
     // build owner list
     std::vector< int > global_owners( num_expected_parts );
@@ -2996,8 +2915,7 @@ int PartMap::build_map( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, int n
     partRanks.resize( num_expected_parts );
     for( int i = 0; i < num_expected_parts; ++i )
     {
-        int idx = std::lower_bound( sortedPartList.begin( ), sortedPartList.end( ),
-                                    global_part_ids[ i ] ) -
+        int idx = std::lower_bound( sortedPartList.begin( ), sortedPartList.end( ), global_part_ids[ i ] ) -
                   sortedPartList.begin( );
         partLocalIds[ idx ] = global_id_list[ i ];
         partRanks[ idx ] = global_owners[ i ];
@@ -3007,10 +2925,7 @@ int PartMap::build_map( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, int n
     if( std::unique( sortedPartList.begin( ), sortedPartList.end( ) ) != sortedPartList.end( ) )
     {
         if( rank == 0 )
-        {
-            std::cerr << "ERROR: Duplicate iMeshP_Part values detected at " __FILE__ ":" << __LINE__
-                      << std::endl;
-        }
+        { std::cerr << "ERROR: Duplicate iMeshP_Part values detected at " __FILE__ ":" << __LINE__ << std::endl; }
         return 1;
     }
 
@@ -3075,8 +2990,7 @@ int PartMap::part_from_coords( iMesh_Instance imesh, iMeshP_PartHandle part, int
     if( n != num_elem )
     {
         std::cerr << "Internal error at " __FILE__ ":" << __LINE__ << " (proc " << rank
-                  << "): Expected all parts to have " << num_elem << " elements.  Found one with "
-                  << n << std::endl;
+                  << "): Expected all parts to have " << num_elem << " elements.  Found one with " << n << std::endl;
         return 1;
     }
 
@@ -3087,8 +3001,7 @@ int PartMap::part_from_coords( iMesh_Instance imesh, iMeshP_PartHandle part, int
     junk1 = sizeof( adj_array ) / sizeof( adj_array[ 0 ] );
     junk2 = sizeof( offset_array ) / sizeof( offset_array[ 0 ] );
     int* ptr2 = offset_array;
-    iMesh_getEntArrAdj( imesh, array, num_elem, iBase_VERTEX, &ptr, &junk1, &n, &ptr2, &junk2,
-                        &junk3, &ierr );CHKERR;
+    iMesh_getEntArrAdj( imesh, array, num_elem, iBase_VERTEX, &ptr, &junk1, &n, &ptr2, &junk2, &junk3, &ierr );CHKERR;
     assert( ptr == adj_array );
     assert( ptr2 == offset_array );
     assert( junk1 == sizeof( adj_array ) / sizeof( adj_array[ 0 ] ) );

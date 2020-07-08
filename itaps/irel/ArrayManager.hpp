@@ -6,14 +6,14 @@
 // Check the array size, and allocate the array if necessary.
 // Free the array upon leaving scope unless KEEP_ARRAY
 // is invoked.
-#define ALLOC_CHECK_ARRAY( array, this_size )                                                  \
-    ArrayManager array##_manager( reinterpret_cast< void** >( array ), *( array##_allocated ), \
-                                  *( array##_size ), this_size, sizeof( **array ), err );      \
+#define ALLOC_CHECK_ARRAY( array, this_size )                                                                     \
+    ArrayManager array##_manager( reinterpret_cast< void** >( array ), *( array##_allocated ), *( array##_size ), \
+                                  this_size, sizeof( **array ), err );                                            \
     if( iBase_SUCCESS != *err ) return
 
-#define ALLOC_CHECK_TAG_ARRAY( array, this_size )                                              \
-    ArrayManager array##_manager( reinterpret_cast< void** >( array ), *( array##_allocated ), \
-                                  *( array##_size ), this_size, 1, err );                      \
+#define ALLOC_CHECK_TAG_ARRAY( array, this_size )                                                                 \
+    ArrayManager array##_manager( reinterpret_cast< void** >( array ), *( array##_allocated ), *( array##_size ), \
+                                  this_size, 1, err );                                                            \
     if( iBase_SUCCESS != *err ) return
 
 #define KEEP_ARRAY( array ) array##_manager.keep_array( )
@@ -30,8 +30,7 @@ class ArrayManager
     void** arrayPtr;
 
   public:
-    ArrayManager( void** array_ptr, int& array_allocated_space, int& array_size, int count,
-                  int val_size, int* err )
+    ArrayManager( void** array_ptr, int& array_allocated_space, int& array_size, int count, int val_size, int* err )
         : arrayPtr( 0 )
     {
         if( !*array_ptr || !array_allocated_space )

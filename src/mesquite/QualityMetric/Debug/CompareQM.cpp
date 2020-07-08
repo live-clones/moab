@@ -38,10 +38,8 @@
 namespace MBMesquite
 {
 
-CompareQM::CompareQM( QualityMetric* primary, QualityMetric* other, const char* primary_name,
-                      const char* other_name )
-    : primaryMetric( primary ), otherMetric( other ), abortOnMismatch( false ),
-      toleranceFactor( 1e-6 )
+CompareQM::CompareQM( QualityMetric* primary, QualityMetric* other, const char* primary_name, const char* other_name )
+    : primaryMetric( primary ), otherMetric( other ), abortOnMismatch( false ), toleranceFactor( 1e-6 )
 {
     if( primary_name ) primaryName = primary_name;
     if( other_name ) otherName = other_name;
@@ -72,8 +70,7 @@ QualityMetric::MetricType CompareQM::get_metric_type( ) const
     type2 = otherMetric->get_metric_type( );
     if( type1 != type2 )
     {
-        std::cerr << "Incompatible metric types in CompareQM" << std::endl
-                  << __FILE__ << ':' << __LINE__ << std::endl;
+        std::cerr << "Incompatible metric types in CompareQM" << std::endl << __FILE__ << ':' << __LINE__ << std::endl;
         if( abortOnMismatch ) abort( );
         // otherwise just return some type because this function can't
         // flag an error.  The mismatch should cause get_evaluations
@@ -92,8 +89,7 @@ int CompareQM::get_negate_flag( ) const
     return primaryMetric->get_negate_flag( );
 }
 
-void CompareQM::get_evaluations( PatchData& pd, std::vector< size_t >& handles, bool free_only,
-                                 MsqError& err )
+void CompareQM::get_evaluations( PatchData& pd, std::vector< size_t >& handles, bool free_only, MsqError& err )
 {
     primaryMetric->get_evaluations( pd, handles, free_only, err );MSQ_ERRRTN( err );
 
@@ -111,8 +107,7 @@ bool CompareQM::check_valid( size_t handle, bool rval1, bool rval2 )
 {
     if( rval1 != rval2 )
     {
-        std::cerr << "Metrics returned conflicting validity at location " << std::hex << handle
-                  << std::dec << std::endl
+        std::cerr << "Metrics returned conflicting validity at location " << std::hex << handle << std::dec << std::endl
                   << __FILE__ << ":" << __LINE__ << std::endl;
         if( abortOnMismatch )
             abort( );
@@ -138,8 +133,7 @@ void CompareQM::check_value( size_t handle, double value, double value2 )
     {
         if( fabs( value - value2 ) > epsilon( value, value2 ) )
         {
-            std::cerr << "Metric values to not match at location " << std::hex << handle << std::dec
-                      << std::endl
+            std::cerr << "Metric values to not match at location " << std::hex << handle << std::dec << std::endl
                       << "Primary: " << value << std::endl
                       << "Other  : " << value2 << std::endl
                       << __FILE__ << ":" << __LINE__ << std::endl;
@@ -162,8 +156,8 @@ bool CompareQM::evaluate( PatchData& pd, size_t handle, double& value, MsqError&
     return true;
 }
 
-void CompareQM::index_mismatch( size_t handle, const std::vector< size_t >& idx1,
-                                const std::vector< size_t >& idx2, MsqError& err )
+void CompareQM::index_mismatch( size_t handle, const std::vector< size_t >& idx1, const std::vector< size_t >& idx2,
+                                MsqError& err )
 {
     std::vector< size_t >::const_iterator i;
 
@@ -195,9 +189,8 @@ void CompareQM::index_mismatch( size_t handle, const std::vector< size_t >& idx1
     MSQ_SETERR( err )( "Cannot compare incompatible metrics", MsqError::INVALID_STATE );
 }
 
-void CompareQM::check_indices( size_t handle, const std::vector< size_t >& idx1,
-                               const std::vector< size_t >& idx2, std::vector< size_t >& map_out,
-                               MsqError& err )
+void CompareQM::check_indices( size_t handle, const std::vector< size_t >& idx1, const std::vector< size_t >& idx2,
+                               std::vector< size_t >& map_out, MsqError& err )
 {
     if( idx1.size( ) != idx2.size( ) )
     {
@@ -217,8 +210,8 @@ void CompareQM::check_indices( size_t handle, const std::vector< size_t >& idx1,
     }
 }
 
-bool CompareQM::evaluate_with_indices( PatchData& pd, size_t handle, double& value,
-                                       std::vector< size_t >& indices, MsqError& err )
+bool CompareQM::evaluate_with_indices( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
+                                       MsqError& err )
 {
     bool                  valid1, valid2;
     double                value2;
@@ -235,10 +228,8 @@ bool CompareQM::evaluate_with_indices( PatchData& pd, size_t handle, double& val
     return true;
 }
 
-void CompareQM::check_grad( size_t handle, const std::vector< size_t >& indices,
-                            const std::vector< size_t >&   index_map,
-                            const std::vector< Vector3D >& grad1,
-                            const std::vector< Vector3D >& grad2 )
+void CompareQM::check_grad( size_t handle, const std::vector< size_t >& indices, const std::vector< size_t >& index_map,
+                            const std::vector< Vector3D >& grad1, const std::vector< Vector3D >& grad2 )
 {
     assert( index_map.size( ) == indices.size( ) );
     assert( index_map.size( ) == grad1.size( ) );
@@ -254,10 +245,9 @@ void CompareQM::check_grad( size_t handle, const std::vector< size_t >& indices,
             if( ( grad1[ i ] - grad2[ index_map[ i ] ] ).length( ) >
                 epsilon( grad1[ i ].length( ), grad2[ index_map[ i ] ].length( ) ) )
             {
-                std::cerr << "Gradients differ for metric evaluation at " << std::hex << handle
-                          << std::dec << std::endl
-                          << "Primary metric derivs with respect to vertex " << indices[ i ] << ": "
-                          << grad1[ i ] << std::endl
+                std::cerr << "Gradients differ for metric evaluation at " << std::hex << handle << std::dec << std::endl
+                          << "Primary metric derivs with respect to vertex " << indices[ i ] << ": " << grad1[ i ]
+                          << std::endl
                           << "Other metric derivs with presect to vertex " << indices[ i ] << ": "
                           << grad2[ index_map[ i ] ] << std::endl
                           << __FILE__ << ":" << __LINE__ << std::endl;
@@ -267,8 +257,7 @@ void CompareQM::check_grad( size_t handle, const std::vector< size_t >& indices,
     }
 }
 
-bool CompareQM::evaluate_with_gradient( PatchData& pd, size_t handle, double& value,
-                                        std::vector< size_t >&   indices,
+bool CompareQM::evaluate_with_gradient( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
                                         std::vector< Vector3D >& grad, MsqError& err )
 {
     bool                    valid1, valid2;
@@ -289,8 +278,7 @@ bool CompareQM::evaluate_with_gradient( PatchData& pd, size_t handle, double& va
 }
 
 void CompareQM::check_hess_diag( size_t handle, const std::vector< size_t >& indices,
-                                 const std::vector< size_t >&      index_map,
-                                 const std::vector< SymMatrix3D >& hess1,
+                                 const std::vector< size_t >& index_map, const std::vector< SymMatrix3D >& hess1,
                                  const std::vector< SymMatrix3D >& hess2 )
 {
     assert( index_map.size( ) == indices.size( ) );
@@ -307,10 +295,9 @@ void CompareQM::check_hess_diag( size_t handle, const std::vector< size_t >& ind
             double eps = epsilon( Frobenius( hess1[ i ] ), Frobenius( hess2[ index_map[ i ] ] ) );
             if( Frobenius( hess1[ i ] - hess2[ index_map[ i ] ] ) > eps )
             {
-                std::cerr << "Hessian diagonal blocks differ for metric evaluation at " << std::hex
-                          << handle << std::dec << std::endl
-                          << "For second derivatives with repsect to vertex " << indices[ i ]
-                          << "twice" << std::endl
+                std::cerr << "Hessian diagonal blocks differ for metric evaluation at " << std::hex << handle
+                          << std::dec << std::endl
+                          << "For second derivatives with repsect to vertex " << indices[ i ] << "twice" << std::endl
                           << "Primary metric derivs: " << hess1[ i ] << std::endl
                           << "Other metric derivs: " << hess2[ index_map[ i ] ] << std::endl
                           << __FILE__ << ":" << __LINE__ << std::endl;
@@ -321,8 +308,7 @@ void CompareQM::check_hess_diag( size_t handle, const std::vector< size_t >& ind
 }
 
 bool CompareQM::evaluate_with_Hessian_diagonal( PatchData& pd, size_t handle, double& value,
-                                                std::vector< size_t >&      indices,
-                                                std::vector< Vector3D >&    grad,
+                                                std::vector< size_t >& indices, std::vector< Vector3D >& grad,
                                                 std::vector< SymMatrix3D >& hess, MsqError& err )
 {
     bool                       valid1, valid2;
@@ -330,11 +316,9 @@ bool CompareQM::evaluate_with_Hessian_diagonal( PatchData& pd, size_t handle, do
     std::vector< size_t >      indices2, map;
     std::vector< Vector3D >    grad2;
     std::vector< SymMatrix3D > hess2;
-    valid1 = primaryMetric->evaluate_with_Hessian_diagonal( pd, handle, value, indices, grad, hess,
-                                                            err );
+    valid1 = primaryMetric->evaluate_with_Hessian_diagonal( pd, handle, value, indices, grad, hess, err );
     MSQ_ERRZERO( err );
-    valid2 = otherMetric->evaluate_with_Hessian_diagonal( pd, handle, value2, indices2, grad2,
-                                                          hess2, err );
+    valid2 = otherMetric->evaluate_with_Hessian_diagonal( pd, handle, value2, indices2, grad2, hess2, err );
     MSQ_ERRZERO( err );
     if( !check_valid( handle, valid1, valid2 ) ) return false;
 
@@ -346,10 +330,8 @@ bool CompareQM::evaluate_with_Hessian_diagonal( PatchData& pd, size_t handle, do
     return true;
 }
 
-void CompareQM::check_hess( size_t handle, const std::vector< size_t >& indices,
-                            const std::vector< size_t >&   index_map,
-                            const std::vector< Matrix3D >& hess1,
-                            const std::vector< Matrix3D >& hess2 )
+void CompareQM::check_hess( size_t handle, const std::vector< size_t >& indices, const std::vector< size_t >& index_map,
+                            const std::vector< Matrix3D >& hess1, const std::vector< Matrix3D >& hess2 )
 {
     const size_t n = index_map.size( );
     const size_t N = ( n + 1 ) * n / 2;
@@ -391,14 +373,13 @@ void CompareQM::check_hess( size_t handle, const std::vector< size_t >& indices,
 
             if( abortOnMismatch )
             {
-                double eps =
-                    epsilon( sqrt( Frobenius_2( hess1[ idx1 ] ) ), sqrt( Frobenius_2( h2 ) ) );
+                double eps = epsilon( sqrt( Frobenius_2( hess1[ idx1 ] ) ), sqrt( Frobenius_2( h2 ) ) );
                 if( sqrt( Frobenius_2( hess1[ idx1 ] - h2 ) ) > eps )
                 {
-                    std::cerr << "Hessian blocks differ for metric evaluation at " << std::hex
-                              << handle << std::dec << std::endl
-                              << "For second derivatives with repsect to vertices " << indices[ r ]
-                              << " and " << indices[ c ] << std::endl
+                    std::cerr << "Hessian blocks differ for metric evaluation at " << std::hex << handle << std::dec
+                              << std::endl
+                              << "For second derivatives with repsect to vertices " << indices[ r ] << " and "
+                              << indices[ c ] << std::endl
                               << "Primary metric derivs: " << hess1[ idx1 ] << std::endl
                               << "Other metric derivs: " << h2 << std::endl
                               << __FILE__ << ":" << __LINE__ << std::endl;
@@ -409,10 +390,8 @@ void CompareQM::check_hess( size_t handle, const std::vector< size_t >& indices,
     }
 }
 
-bool CompareQM::evaluate_with_Hessian( PatchData& pd, size_t handle, double& value,
-                                       std::vector< size_t >&   indices,
-                                       std::vector< Vector3D >& grad, std::vector< Matrix3D >& hess,
-                                       MsqError& err )
+bool CompareQM::evaluate_with_Hessian( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
+                                       std::vector< Vector3D >& grad, std::vector< Matrix3D >& hess, MsqError& err )
 {
     bool                    valid1, valid2;
     double                  value2;
@@ -470,17 +449,16 @@ void CompareQM::HessStat::add_diag( SymMatrix3D hess )
 void CompareQM::HessStat::add_diag_diff( Matrix3D hess1, Matrix3D hess2 )
 {
     Matrix3D d = hess1 - hess2;
-    Matrix3D hess( fabs( d[ 0 ][ 0 ] ), fabs( d[ 0 ][ 1 ] ), fabs( d[ 0 ][ 2 ] ),
-                   fabs( d[ 1 ][ 0 ] ), fabs( d[ 1 ][ 1 ] ), fabs( d[ 1 ][ 2 ] ),
-                   fabs( d[ 2 ][ 0 ] ), fabs( d[ 2 ][ 1 ] ), fabs( d[ 2 ][ 2 ] ) );
+    Matrix3D hess( fabs( d[ 0 ][ 0 ] ), fabs( d[ 0 ][ 1 ] ), fabs( d[ 0 ][ 2 ] ), fabs( d[ 1 ][ 0 ] ),
+                   fabs( d[ 1 ][ 1 ] ), fabs( d[ 1 ][ 2 ] ), fabs( d[ 2 ][ 0 ] ), fabs( d[ 2 ][ 1 ] ),
+                   fabs( d[ 2 ][ 2 ] ) );
     add_diag( hess );
 }
 
 void CompareQM::HessStat::add_diag_diff( SymMatrix3D hess1, SymMatrix3D hess2 )
 {
     SymMatrix3D d = hess1 - hess2;
-    SymMatrix3D hess( fabs( d[ 0 ] ), fabs( d[ 1 ] ), fabs( d[ 2 ] ), fabs( d[ 3 ] ),
-                      fabs( d[ 4 ] ), fabs( d[ 5 ] ) );
+    SymMatrix3D hess( fabs( d[ 0 ] ), fabs( d[ 1 ] ), fabs( d[ 2 ] ), fabs( d[ 3 ] ), fabs( d[ 4 ] ), fabs( d[ 5 ] ) );
     add_diag( hess );
 }
 
@@ -500,29 +478,27 @@ void CompareQM::HessStat::add_nondiag( Matrix3D hess )
 void CompareQM::HessStat::add_nondiag_diff( Matrix3D hess1, Matrix3D hess2 )
 {
     Matrix3D d = hess1 - hess2;
-    Matrix3D hess( fabs( d[ 0 ][ 0 ] ), fabs( d[ 0 ][ 1 ] ), fabs( d[ 0 ][ 2 ] ),
-                   fabs( d[ 1 ][ 0 ] ), fabs( d[ 1 ][ 1 ] ), fabs( d[ 1 ][ 2 ] ),
-                   fabs( d[ 2 ][ 0 ] ), fabs( d[ 2 ][ 1 ] ), fabs( d[ 2 ][ 2 ] ) );
+    Matrix3D hess( fabs( d[ 0 ][ 0 ] ), fabs( d[ 0 ][ 1 ] ), fabs( d[ 0 ][ 2 ] ), fabs( d[ 1 ][ 0 ] ),
+                   fabs( d[ 1 ][ 1 ] ), fabs( d[ 1 ][ 2 ] ), fabs( d[ 2 ][ 0 ] ), fabs( d[ 2 ][ 1 ] ),
+                   fabs( d[ 2 ][ 2 ] ) );
     add_nondiag( hess );
 }
 
 static void print( const char* title, const char* name1, const char* name2, const SimpleStats& s1,
                    const SimpleStats& s2, const SimpleStats& sd )
 {
-    const char          named[] = "difference";
-    int                 len = std::max( std::max( strlen( named ), strlen( title ) ),
-                        std::max( strlen( name1 ), strlen( name2 ) ) );
+    const char named[] = "difference";
+    int len = std::max( std::max( strlen( named ), strlen( title ) ), std::max( strlen( name1 ), strlen( name2 ) ) );
     std::vector< char > dashes( len, '-' );
     dashes.push_back( '\0' );
-    printf( "%*s %12s %12s %12s %12s %12s\n", len, title, "minimum", "average", "rms", "maximum",
-            "std.dev." );
+    printf( "%*s %12s %12s %12s %12s %12s\n", len, title, "minimum", "average", "rms", "maximum", "std.dev." );
     printf( "%s ------------ ------------ ------------ ------------ ------------\n", &dashes[ 0 ] );
-    printf( "%*s % 12g % 12g % 12g % 12g % 12g\n", len, name1, s1.minimum( ), s1.average( ),
-            s1.rms( ), s1.maximum( ), s1.standard_deviation( ) );
-    printf( "%*s % 12g % 12g % 12g % 12g % 12g\n", len, name2, s2.minimum( ), s2.average( ),
-            s2.rms( ), s2.maximum( ), s2.standard_deviation( ) );
-    printf( "%*s % 12g % 12g % 12g % 12g % 12g\n", len, named, sd.minimum( ), sd.average( ),
-            sd.rms( ), sd.maximum( ), sd.standard_deviation( ) );
+    printf( "%*s % 12g % 12g % 12g % 12g % 12g\n", len, name1, s1.minimum( ), s1.average( ), s1.rms( ), s1.maximum( ),
+            s1.standard_deviation( ) );
+    printf( "%*s % 12g % 12g % 12g % 12g % 12g\n", len, name2, s2.minimum( ), s2.average( ), s2.rms( ), s2.maximum( ),
+            s2.standard_deviation( ) );
+    printf( "%*s % 12g % 12g % 12g % 12g % 12g\n", len, named, sd.minimum( ), sd.average( ), sd.rms( ), sd.maximum( ),
+            sd.standard_deviation( ) );
     printf( "\n" );
 }
 
@@ -534,18 +510,12 @@ void CompareQM::print_stats( ) const
     print( "Gradient X", name1.c_str( ), name2.c_str( ), gradPrimary.x, gradOther.x, gradDiff.x );
     print( "Gradient Y", name1.c_str( ), name2.c_str( ), gradPrimary.y, gradOther.y, gradDiff.y );
     print( "Gradient Z", name1.c_str( ), name2.c_str( ), gradPrimary.z, gradOther.z, gradDiff.z );
-    print( "Hessian XX", name1.c_str( ), name2.c_str( ), hessPrimary.xx, hessOther.xx,
-           hessDiff.xx );
-    print( "Hessian XY", name1.c_str( ), name2.c_str( ), hessPrimary.xy, hessOther.xy,
-           hessDiff.xy );
-    print( "Hessian XZ", name1.c_str( ), name2.c_str( ), hessPrimary.xz, hessOther.xz,
-           hessDiff.xz );
-    print( "Hessian YY", name1.c_str( ), name2.c_str( ), hessPrimary.yy, hessOther.yy,
-           hessDiff.yy );
-    print( "Hessian YZ", name1.c_str( ), name2.c_str( ), hessPrimary.yz, hessOther.yz,
-           hessDiff.yz );
-    print( "Hessian ZZ", name1.c_str( ), name2.c_str( ), hessPrimary.zz, hessOther.zz,
-           hessDiff.zz );
+    print( "Hessian XX", name1.c_str( ), name2.c_str( ), hessPrimary.xx, hessOther.xx, hessDiff.xx );
+    print( "Hessian XY", name1.c_str( ), name2.c_str( ), hessPrimary.xy, hessOther.xy, hessDiff.xy );
+    print( "Hessian XZ", name1.c_str( ), name2.c_str( ), hessPrimary.xz, hessOther.xz, hessDiff.xz );
+    print( "Hessian YY", name1.c_str( ), name2.c_str( ), hessPrimary.yy, hessOther.yy, hessDiff.yy );
+    print( "Hessian YZ", name1.c_str( ), name2.c_str( ), hessPrimary.yz, hessOther.yz, hessDiff.yz );
+    print( "Hessian ZZ", name1.c_str( ), name2.c_str( ), hessPrimary.zz, hessOther.zz, hessDiff.zz );
 }
 
 }  // namespace MBMesquite

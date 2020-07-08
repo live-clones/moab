@@ -30,8 +30,7 @@ namespace moab
 {
 
 // forward declarations
-template< typename _Entity_handles, typename _Box, typename _Moab, typename _Parametrizer >
-class Bvh_tree;
+template< typename _Entity_handles, typename _Box, typename _Moab, typename _Parametrizer > class Bvh_tree;
 
 // non-exported functionality
 namespace
@@ -45,7 +44,7 @@ namespace
             std::size_t                                                     child;
             double                                                          Lmax, Rmin;
             Entities                                                        entities;
-            _Node& operator=( const _Node& f )
+            _Node&                                                          operator=( const _Node& f )
             {
                 dim = f.dim;
                 child = f.child;
@@ -56,8 +55,7 @@ namespace
             }
         };  // _Node
 
-        template< typename Split >
-        class Split_comparator : public std::binary_function< Split, Split, bool >
+        template< typename Split > class Split_comparator : public std::binary_function< Split, Split, bool >
         {
             inline double objective( const Split& a ) const
             {
@@ -87,14 +85,13 @@ namespace
           public:
             typedef ct::Box< double > Box;
             _Split_data( )
-                : dim( 0 ), nl( 0 ), nr( 0 ), split( 0.0 ), Lmax( 0.0 ), Rmin( 0.0 ),
-                  bounding_box( ), left_box( ), right_box( )
+                : dim( 0 ), nl( 0 ), nr( 0 ), split( 0.0 ), Lmax( 0.0 ), Rmin( 0.0 ), bounding_box( ), left_box( ),
+                  right_box( )
             {
             }
             _Split_data( const _Split_data& f )
-                : dim( f.dim ), nl( f.nl ), nr( f.nr ), split( f.split ), Lmax( f.Lmax ),
-                  Rmin( f.Rmin ), bounding_box( f.bounding_box ), left_box( f.left_box ),
-                  right_box( f.right_box )
+                : dim( f.dim ), nl( f.nl ), nr( f.nr ), split( f.split ), Lmax( f.Lmax ), Rmin( f.Rmin ),
+                  bounding_box( f.bounding_box ), left_box( f.left_box ), right_box( f.right_box )
             {
             }
             std::size_t  dim;
@@ -138,8 +135,7 @@ namespace
     }  // namespace _bvh
 }  // namespace
 
-template< typename _Entity_handles, typename _Box, typename _Moab, typename _Parametrizer >
-class Bvh_tree
+template< typename _Entity_handles, typename _Box, typename _Moab, typename _Parametrizer > class Bvh_tree
 {
     // public types
   public:
@@ -158,13 +154,12 @@ class Bvh_tree
     // public methods
   public:
     // Constructor
-    Bvh_tree( Entity_handles& _entities, Moab& _moab, Box& _bounding_box,
-              Parametrizer& _entity_contains )
+    Bvh_tree( Entity_handles& _entities, Moab& _moab, Box& _bounding_box, Parametrizer& _entity_contains )
         : entity_handles_( _entities ), tree_( ), moab( _moab ), bounding_box( _bounding_box ),
           entity_contains( _entity_contains )
     {
-        typedef typename Entity_handles::iterator       Entity_handle_iterator;
-        typedef ct::_Element_data< const _Box, double > Element_data;
+        typedef typename Entity_handles::iterator                               Entity_handle_iterator;
+        typedef ct::_Element_data< const _Box, double >                         Element_data;
         typedef typename std::tr1::unordered_map< Entity_handle, Element_data > Entity_map;
         typedef typename Entity_map::iterator                                   Entity_map_iterator;
         typedef std::vector< Entity_map_iterator >                              Vector;
@@ -191,8 +186,7 @@ class Bvh_tree
         {
             // initially all bits are set
             tree_.push_back( Node( ) );
-            const int depth =
-                build_tree( entity_ordering.begin( ), entity_ordering.end( ), 0, bounding_box );
+            const int depth = build_tree( entity_ordering.begin( ), entity_ordering.end( ), 0, bounding_box );
 #ifdef BVH_TREE_DEBUG
             typedef typename Nodes::iterator          Node_iterator;
             typedef typename Node::Entities::iterator Entity_iterator;
@@ -220,8 +214,8 @@ class Bvh_tree
 
     // Copy constructor
     Bvh_tree( Self& s )
-        : entity_handles_( s.entity_handles_ ), tree_( s.tree_ ), moab( s.moab ),
-          bounding_box( s.bounding_box ), entity_contains( s.entity_contains )
+        : entity_handles_( s.entity_handles_ ), tree_( s.tree_ ), moab( s.moab ), bounding_box( s.bounding_box ),
+          entity_contains( s.entity_contains )
     {
     }
 
@@ -314,10 +308,7 @@ class Bvh_tree
                 ct::update_bounding_box( test_box, buckets_[ nonempty[ i ] ].bounding_box );
             }
             if( !box_contains_box( test_box, interval ) )
-            {
-                std::cout << "union of buckets in dimension: " << d
-                          << "does not contain original box!" << std::endl;
-            }
+            { std::cout << "union of buckets in dimension: " << d << "does not contain original box!" << std::endl; }
             if( !box_contains_box( interval, test_box ) )
             {
                 std::cout << "original box does "
@@ -491,16 +482,15 @@ class Bvh_tree
     {
         typedef typename Iterator::value_type                  Map_iterator;
         typedef typename Map_iterator::value_type::second_type Box_data;
-        typedef typename Box_data::first_type
-            _Bounding_box;  // Note, not global typedef moab::common_tree::Box< double>
-                            // Bounding_box;
+        typedef typename Box_data::first_type _Bounding_box;  // Note, not global typedef moab::common_tree::Box<
+                                                              // double> Bounding_box;
         typedef typename std::vector< Split_data >    Split_list;
         typedef typename std::vector< Split_list >    Splits;
         typedef typename Splits::iterator             Split_iterator;
         typedef typename std::vector< _bvh::_Bucket > Bucket_list;
         typedef typename std::vector< Bucket_list >   Buckets;
-        Buckets buckets( NUM_DIM, Bucket_list( NUM_BUCKETS ) );
-        Splits  splits( NUM_DIM, Split_list( NUM_SPLITS, data ) );
+        Buckets                                       buckets( NUM_DIM, Bucket_list( NUM_BUCKETS ) );
+        Splits                                        splits( NUM_DIM, Split_list( NUM_SPLITS, data ) );
 
         const _Bounding_box interval = data.bounding_box;
         establish_buckets( begin, end, interval, buckets );
@@ -584,9 +574,7 @@ class Bvh_tree
             std::cerr << "total: " << std::distance( begin, end ) << std::endl;
             std::cerr << "Dim: " << data.dim << std::endl;
             std::cerr << data.Lmax << " , " << data.Rmin << std::endl;
-            std::cerr << "Right box: " << std::endl
-                      << data.right_box << "Left box: " << std::endl
-                      << data.left_box;
+            std::cerr << "Right box: " << std::endl << data.right_box << "Left box: " << std::endl << data.left_box;
             std::cerr << "supposed to be: " << data.nl << " " << data.nr << std::endl;
             std::cerr << "accountant says: " << count_left << " " << count_right << std::endl;
             std::exit( -1 );
@@ -597,8 +585,7 @@ class Bvh_tree
     // private functionality
   private:
     template< typename Iterator >
-    int build_tree( const Iterator begin, const Iterator end, const int index, const Box& box,
-                    const int depth = 0 )
+    int build_tree( const Iterator begin, const Iterator end, const int index, const Box& box, const int depth = 0 )
     {
 #ifdef BVH_TREE_DEBUG
         for( Iterator i = begin; i != end; ++i )
@@ -628,10 +615,8 @@ class Bvh_tree
             // insert left, right children;
             tree_.push_back( Node( ) );
             tree_.push_back( Node( ) );
-            const int left_depth =
-                build_tree( begin, begin + data.nl, node.child, data.left_box, depth + 1 );
-            const int right_depth =
-                build_tree( begin + data.nl, end, node.child + 1, data.right_box, depth + 1 );
+            const int left_depth = build_tree( begin, begin + data.nl, node.child, data.left_box, depth + 1 );
+            const int right_depth = build_tree( begin + data.nl, end, node.child + 1, data.right_box, depth + 1 );
             return std::max( left_depth, right_depth );
         }
         node.dim = 3;
@@ -640,8 +625,7 @@ class Bvh_tree
     }
 
     template< typename Vector, typename Node_index, typename Result >
-    Result& _find_point( const Vector& point, const Node_index& index, const double tol,
-                         Result& result ) const
+    Result& _find_point( const Vector& point, const Node_index& index, const double tol, Result& result ) const
     {
         typedef typename Node::Entities::const_iterator Entity_iterator;
         const Node&                                     node = tree_[ index ];
@@ -662,8 +646,7 @@ class Bvh_tree
         // 0 < Rmin - Lmax < 2tol
         if( ( node.Lmax + tol ) < ( node.Rmin - tol ) )
         {
-            if( point[ node.dim ] <= ( node.Lmax + tol ) )
-            { return _find_point( point, node.child, tol, result ); }
+            if( point[ node.dim ] <= ( node.Lmax + tol ) ) { return _find_point( point, node.child, tol, result ); }
             else if( point[ node.dim ] >= ( node.Rmin - tol ) )
             {
                 return _find_point( point, node.child + 1, tol, result );
@@ -714,8 +697,7 @@ class Bvh_tree
 
     // public functionality
   public:
-    template< typename Vector >
-    Entity_handle bruteforce_find( const Vector& point, const double tol ) const
+    template< typename Vector > Entity_handle bruteforce_find( const Vector& point, const double tol ) const
     {
         typedef typename Vector::const_iterator         Point_iterator;
         typedef typename Nodes::value_type              Node;
@@ -729,8 +711,7 @@ class Bvh_tree
                 {
                     if( ct::box_contains_point( j->first, point, tol ) )
                     {
-                        const std::pair< bool, Vector > result =
-                            entity_contains( moab, j->second, point );
+                        const std::pair< bool, Vector > result = entity_contains( moab, j->second, point );
                         if( result.first ) { return j->second; }
                     }
                 }

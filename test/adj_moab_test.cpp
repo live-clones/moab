@@ -62,8 +62,7 @@ ErrorCode ahf_test( const char* filename )
 
     if( procs > 1 )
     {
-        read_options =
-            "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_SHARED_ENTS;";
+        read_options = "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_SHARED_ENTS;";
 
         error = mbImpl->load_file( filename, &fileset, read_options.c_str( ) );CHECK_ERR( error );
     }

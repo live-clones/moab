@@ -89,8 +89,7 @@ class MsqHessianTest : public CppUnit::TestFixture, public MBMesquite::MsqHessia
   public:
     MsqHessianTest( ) {}
 
-    void accumulate_entries( const PatchData& pd, size_t elem_index, const Matrix3D* mat3d_array,
-                             MsqError& err );
+    void accumulate_entries( const PatchData& pd, size_t elem_index, const Matrix3D* mat3d_array, MsqError& err );
 
     void test_initialize( )
     {
@@ -287,8 +286,8 @@ class MsqHessianTest : public CppUnit::TestFixture, public MBMesquite::MsqHessia
     }
 };
 
-void MsqHessianTest::accumulate_entries( const PatchData& pd, size_t elem_index,
-                                         const Matrix3D* mat3d_array, MsqError& err )
+void MsqHessianTest::accumulate_entries( const PatchData& pd, size_t elem_index, const Matrix3D* mat3d_array,
+                                         MsqError& err )
 {
     const MsqMeshEntity& elem = pd.element_by_index( elem_index );
     const size_t         nv = elem.vertex_count( );

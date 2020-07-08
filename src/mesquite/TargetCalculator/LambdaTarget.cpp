@@ -44,8 +44,8 @@ LambdaTarget::LambdaTarget( TargetCalculator* lambda_source, TargetCalculator* c
 
 LambdaTarget::~LambdaTarget( ) {}
 
-bool LambdaTarget::get_3D_target( PatchData& pd, size_t element, Sample sample,
-                                  MsqMatrix< 3, 3 >& W_out, MsqError& err )
+bool LambdaTarget::get_3D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 3, 3 >& W_out,
+                                  MsqError& err )
 {
     bool valid = lambdaSource->get_3D_target( pd, element, sample, W_out, err );
     if( MSQ_CHKERR( err ) && !valid ) return false;
@@ -61,8 +61,8 @@ bool LambdaTarget::get_3D_target( PatchData& pd, size_t element, Sample sample,
     return true;
 }
 
-bool LambdaTarget::get_2D_target( PatchData& pd, size_t element, Sample sample,
-                                  MsqMatrix< 2, 2 >& W_out, MsqError& err )
+bool LambdaTarget::get_2D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 2, 2 >& W_out,
+                                  MsqError& err )
 {
     bool valid = lambdaSource->get_2D_target( pd, element, sample, W_out, err );
     if( MSQ_CHKERR( err ) && !valid ) return false;
@@ -78,8 +78,8 @@ bool LambdaTarget::get_2D_target( PatchData& pd, size_t element, Sample sample,
     return true;
 }
 
-bool LambdaTarget::get_surface_target( PatchData& pd, size_t element, Sample sample,
-                                       MsqMatrix< 3, 2 >& W_out, MsqError& err )
+bool LambdaTarget::get_surface_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 3, 2 >& W_out,
+                                       MsqError& err )
 {
     bool valid = lambdaSource->get_surface_target( pd, element, sample, W_out, err );
     if( MSQ_CHKERR( err ) && !valid ) return false;

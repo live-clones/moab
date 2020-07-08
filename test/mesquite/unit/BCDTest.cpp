@@ -50,8 +50,8 @@
 using namespace MBMesquite;
 using namespace std;
 
-const char HEX_MESH[] = MESH_FILES_DIR "3D/vtk/hexes/untangled/1000hex-block-internal-bias.vtk";
-const char TET_MESH[] = MESH_FILES_DIR "3D/vtk/tets/untangled/tire.vtk";
+const char             HEX_MESH[] = MESH_FILES_DIR "3D/vtk/hexes/untangled/1000hex-block-internal-bias.vtk";
+const char             TET_MESH[] = MESH_FILES_DIR "3D/vtk/tets/untangled/tire.vtk";
 typedef FeasibleNewton SolverType;
 
 class BCDTest : public CppUnit::TestFixture
@@ -138,8 +138,7 @@ void BCDTest::compare_bcd( ObjectiveFunction* OF, string name, const char* mesh_
     ASSERT_NO_ERROR( err );
     CPPUNIT_ASSERT( !vertex_list.empty( ) );
     initial_coords.resize( vertex_list.size( ) );
-    mesh.vertices_get_coordinates( arrptr( vertex_list ), arrptr( initial_coords ),
-                                   vertex_list.size( ), err );
+    mesh.vertices_get_coordinates( arrptr( vertex_list ), arrptr( initial_coords ), vertex_list.size( ), err );
     ASSERT_NO_ERROR( err );
 
     // run global smoother
@@ -147,8 +146,7 @@ void BCDTest::compare_bcd( ObjectiveFunction* OF, string name, const char* mesh_
     ASSERT_NO_ERROR( err );
     mesh.write_vtk( ( name + "-gbl.vtk" ).c_str( ), err );
     global_coords.resize( vertex_list.size( ) );
-    mesh.vertices_get_coordinates( arrptr( vertex_list ), arrptr( global_coords ),
-                                   vertex_list.size( ), err );
+    mesh.vertices_get_coordinates( arrptr( vertex_list ), arrptr( global_coords ), vertex_list.size( ), err );
     ASSERT_NO_ERROR( err );
 
     // restore initial vertex positions
@@ -163,8 +161,7 @@ void BCDTest::compare_bcd( ObjectiveFunction* OF, string name, const char* mesh_
     ASSERT_NO_ERROR( err );
     mesh.write_vtk( ( name + "-bcd.vtk" ).c_str( ), err );
     bcd_coords.resize( vertex_list.size( ) );
-    mesh.vertices_get_coordinates( arrptr( vertex_list ), arrptr( bcd_coords ), vertex_list.size( ),
-                                   err );
+    mesh.vertices_get_coordinates( arrptr( vertex_list ), arrptr( bcd_coords ), vertex_list.size( ), err );
     ASSERT_NO_ERROR( err );
 
     // compare results

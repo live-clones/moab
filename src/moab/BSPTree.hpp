@@ -56,8 +56,7 @@ class BSPTree
         return 1e-6;
     }
 
-    BSPTree( Interface* iface, const char* tagname = 0,
-             unsigned meshset_creation_flags = MESHSET_SET );
+    BSPTree( Interface* iface, const char* tagname = 0, unsigned meshset_creation_flags = MESHSET_SET );
 
     BSPTree( Interface* iface, bool destroy_created_trees, const char* tagname = 0,
              unsigned meshset_creation_flags = MESHSET_SET );
@@ -141,8 +140,7 @@ class BSPTree
 
         void set( const double normal[ 3 ], const double point[ 3 ] )
         {
-            const double dot =
-                normal[ 0 ] * point[ 0 ] + normal[ 1 ] * point[ 1 ] + normal[ 2 ] * point[ 2 ];
+            const double dot = normal[ 0 ] * point[ 0 ] + normal[ 1 ] * point[ 1 ] + normal[ 2 ] * point[ 2 ];
             *this = Plane( normal, -dot );
         }
 
@@ -178,13 +176,11 @@ class BSPTree
     ErrorCode get_tree_box( EntityHandle root_node, double corner_coords[ 24 ] );
 
     //! Set bounding box for entire tree
-    ErrorCode set_tree_box( EntityHandle root_node, const double box_min[ 3 ],
-                            const double box_max[ 3 ] );
+    ErrorCode set_tree_box( EntityHandle root_node, const double box_min[ 3 ], const double box_max[ 3 ] );
     ErrorCode set_tree_box( EntityHandle root_node, const double corner_coords[ 8 ][ 3 ] );
 
     //! Create tree root node
-    ErrorCode create_tree( const double box_min[ 3 ], const double box_max[ 3 ],
-                           EntityHandle& root_handle );
+    ErrorCode create_tree( const double box_min[ 3 ], const double box_max[ 3 ], EntityHandle& root_handle );
     ErrorCode create_tree( const double corner_coords[ 8 ][ 3 ], EntityHandle& root_handle );
 
     //! Create tree root node
@@ -213,18 +209,15 @@ class BSPTree
 
     //! Split leaf of tree
     //! Updates iterator location to point to first new leaf node.
-    ErrorCode split_leaf( BSPTreeIter& leaf, Plane plane, EntityHandle& left_child,
-                          EntityHandle& right_child );
+    ErrorCode split_leaf( BSPTreeIter& leaf, Plane plane, EntityHandle& left_child, EntityHandle& right_child );
 
     //! Split leaf of tree
     //! Updates iterator location to point to first new leaf node.
-    ErrorCode split_leaf( BSPTreeIter& leaf, Plane plane, const Range& left_entities,
-                          const Range& right_entities );
+    ErrorCode split_leaf( BSPTreeIter& leaf, Plane plane, const Range& left_entities, const Range& right_entities );
 
     //! Split leaf of tree
     //! Updates iterator location to point to first new leaf node.
-    ErrorCode split_leaf( BSPTreeIter& leaf, Plane plane,
-                          const std::vector< EntityHandle >& left_entities,
+    ErrorCode split_leaf( BSPTreeIter& leaf, Plane plane, const std::vector< EntityHandle >& left_entities,
                           const std::vector< EntityHandle >& right_entities );
 
     //! Merge the leaf pointed to by the current iterator with it's
@@ -240,15 +233,13 @@ class BSPTree
     //!   caller can test against that box and not call this method
     //!   at all if the point is outside the box, as there is no leaf
     //!   containing the point in that case.
-    ErrorCode leaf_containing_point( EntityHandle tree_root, const double point[ 3 ],
-                                     EntityHandle& leaf_out );
+    ErrorCode leaf_containing_point( EntityHandle tree_root, const double point[ 3 ], EntityHandle& leaf_out );
 
     //! Get iterator at leaf containing input position.
     //!
     //! Returns MB_ENTITY_NOT_FOUND if point is not within
     //! bounding box of tree.
-    ErrorCode leaf_containing_point( EntityHandle tree_root, const double xyz[ 3 ],
-                                     BSPTreeIter& result );
+    ErrorCode leaf_containing_point( EntityHandle tree_root, const double xyz[ 3 ], BSPTreeIter& result );
 };
 
 /** \class BSPTreeIter
@@ -345,8 +336,8 @@ class BSPTreeIter
     //!                 the ray exited the leaf.  If return value is false,
     //!                 then this value is undefined.
     //!\return true if ray intersects leaf, false otherwise.
-    virtual bool intersect_ray( const double ray_point[ 3 ], const double ray_vect[ 3 ],
-                                double& t_enter, double& t_exit ) const;
+    virtual bool intersect_ray( const double ray_point[ 3 ], const double ray_vect[ 3 ], double& t_enter,
+                                double& t_exit ) const;
 
     //! Return true if thos node and the passed node share the
     //! same immediate parent.
@@ -402,8 +393,7 @@ class BSPTreeBoxIter : public BSPTreeIter
         B4567 = 0xF0  //!< Face defined by corners {4,5,6,7}: 6th Exodus side
     };
 
-    static SideBits side_above_plane( const double          hex_coords[ 8 ][ 3 ],
-                                      const BSPTree::Plane& plane );
+    static SideBits side_above_plane( const double hex_coords[ 8 ][ 3 ], const BSPTree::Plane& plane );
 
     static SideBits side_on_plane( const double hex_coords[ 8 ][ 3 ], const BSPTree::Plane& plane );
 
@@ -498,8 +488,7 @@ class BSPTreeBoxIter : public BSPTreeIter
     //!              this value can be used to control whether or not
     //!              leaves adjacent at only their edges or corners are
     //!              returned.
-    ErrorCode get_neighbors( SideBits side, std::vector< BSPTreeBoxIter >& results,
-                             double epsilon = 0.0 ) const;
+    ErrorCode get_neighbors( SideBits side, std::vector< BSPTreeBoxIter >& results, double epsilon = 0.0 ) const;
 
     //! Calculate the convex polyhedron bounding this leaf.
     ErrorCode calculate_polyhedron( BSPTreePoly& polyhedron_out ) const;

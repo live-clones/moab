@@ -189,19 +189,16 @@ class ParCommGraph
     ErrorCode send_mesh_parts( MPI_Comm jcomm, ParallelComm* pco, Range& owned );
 
     // this is called on receiver side
-    ErrorCode receive_comm_graph( MPI_Comm jcomm, ParallelComm* pco,
-                                  std::vector< int >& pack_array );
+    ErrorCode receive_comm_graph( MPI_Comm jcomm, ParallelComm* pco, std::vector< int >& pack_array );
 
     ErrorCode receive_mesh( MPI_Comm jcomm, ParallelComm* pco, EntityHandle local_set,
                             std::vector< int >& senders_local );
 
     ErrorCode release_send_buffers( );
 
-    ErrorCode send_tag_values( MPI_Comm jcomm, ParallelComm* pco, Range& owned,
-                               std::vector< Tag >& tag_handles );
+    ErrorCode send_tag_values( MPI_Comm jcomm, ParallelComm* pco, Range& owned, std::vector< Tag >& tag_handles );
 
-    ErrorCode receive_tag_values( MPI_Comm jcomm, ParallelComm* pco, Range& owned,
-                                  std::vector< Tag >& tag_handles );
+    ErrorCode receive_tag_values( MPI_Comm jcomm, ParallelComm* pco, Range& owned, std::vector< Tag >& tag_handles );
 
     // getter method
     const std::vector< int >& senders( )
@@ -217,8 +214,7 @@ class ParCommGraph
 
     // this will set after_cov_rec_sizes
     void SetReceivingAfterCoverage(
-        std::map< int, std::set< int > >&
-            idsFromProcs );  // will make sense only on receivers, right now after cov
+        std::map< int, std::set< int > >& idsFromProcs );  // will make sense only on receivers, right now after cov
 
     // strideComp is np x np, or 1, in our cases
     // will fill up ordered lists for corresponding IDs on the other component
@@ -251,13 +247,12 @@ class ParCommGraph
     int                rankInJoin, joinSize;
     int                compid1, compid2;
     int                context_id;  // used to identify the other comp for intersection
-    EntityHandle cover_set;  // will be initialized only if it is the receiver parcomm graph, in
+    EntityHandle       cover_set;  // will be initialized only if it is the receiver parcomm graph, in
                              // CoverageGraph
 
     // communication graph from group1 to group2;
     //  graph[task1] = vec1; // vec1 is a stl vector of tasks in group2
-    std::map< int, std::vector< int > >
-        recv_graph;  // to what tasks from group2 to send  (actual communication graph)
+    std::map< int, std::vector< int > > recv_graph;  // to what tasks from group2 to send  (actual communication graph)
     std::map< int, std::vector< int > >
         recv_sizes;  // how many elements to actually send from a sender task to receiver tasks
     std::map< int, std::vector< int > >
@@ -265,8 +260,7 @@ class ParCommGraph
     std::map< int, std::vector< int > >
         sender_sizes;  // how many elements to actually send from a sender task to receiver tasks
 
-    std::vector< ParallelComm::Buffer* >
-        localSendBuffs;  // this will store the pointers to the Buffers
+    std::vector< ParallelComm::Buffer* > localSendBuffs;  // this will store the pointers to the Buffers
     //                                    will be  released only when all mpi requests are waited
     //                                    for
     int* comm_graph;  // this will store communication graph, on sender master, sent by nonblocking
@@ -277,8 +271,7 @@ class ParCommGraph
     // joint comm
     std::map< int, Range > split_ranges;
 
-    std::vector< MPI_Request >
-        sendReqs;  // there will be multiple requests, 2 for comm graph, 2 for each Buffer
+    std::vector< MPI_Request > sendReqs;  // there will be multiple requests, 2 for comm graph, 2 for each Buffer
     // there are as many buffers as sender_graph[rankInJoin].size()
 
     // active on both receiver and sender sides
@@ -290,15 +283,12 @@ class ParCommGraph
 
     // these will be used now after coverage, quick fix; they will also be populated by
     // iMOAB_CoverageGraph
-    TypeGraph
-        graph_type;  // this should be false , set to true in settle send graph, to use send_IDs_map
-    std::map< int, std::vector< int > >
-        involved_IDs_map;  // replace send and recv IDs_mapp with involved_IDs_map
+    TypeGraph graph_type;  // this should be false , set to true in settle send graph, to use send_IDs_map
+    std::map< int, std::vector< int > > involved_IDs_map;  // replace send and recv IDs_mapp with involved_IDs_map
     // used only for third method: DOF_BASED
     std::map< int, std::vector< int > >
-        map_index;  // from index in involved[] to index in values[] of tag, for each corr task
-    std::map< int, std::vector< int > >
-        map_ptr;  //  lmap[ie], lmap[ie+1], pointer into map_index[corrTask]
+                                        map_index;  // from index in involved[] to index in values[] of tag, for each corr task
+    std::map< int, std::vector< int > > map_ptr;  //  lmap[ie], lmap[ie+1], pointer into map_index[corrTask]
 };
 
 }  // namespace moab

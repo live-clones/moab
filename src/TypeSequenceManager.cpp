@@ -68,8 +68,7 @@ ErrorCode TypeSequenceManager::check_merge_next( iterator i )
 {
     iterator j = i;
     ++j;
-    if( j == end( ) || ( *j )->data( ) != ( *i )->data( ) ||
-        ( *j )->start_handle( ) > ( *i )->end_handle( ) + 1 )
+    if( j == end( ) || ( *j )->data( ) != ( *i )->data( ) || ( *j )->start_handle( ) > ( *i )->end_handle( ) + 1 )
         return MB_SUCCESS;
 
     assert( ( *i )->end_handle( ) + 1 == ( *j )->start_handle( ) );
@@ -82,8 +81,7 @@ ErrorCode TypeSequenceManager::check_merge_prev( iterator i )
 
     iterator j = i;
     --j;
-    if( ( *j )->data( ) != ( *i )->data( ) || ( *j )->end_handle( ) + 1 < ( *i )->start_handle( ) )
-        return MB_SUCCESS;
+    if( ( *j )->data( ) != ( *i )->data( ) || ( *j )->end_handle( ) + 1 < ( *i )->start_handle( ) ) return MB_SUCCESS;
 
     assert( ( *j )->end_handle( ) + 1 == ( *i )->start_handle( ) );
     return merge_internal( i, j );
@@ -94,16 +92,14 @@ ErrorCode TypeSequenceManager::insert_sequence( EntitySequence* seq_ptr )
     if( !seq_ptr->data( ) ) return MB_FAILURE;
 
     if( seq_ptr->data( )->start_handle( ) > seq_ptr->start_handle( ) ||
-        seq_ptr->data( )->end_handle( ) < seq_ptr->end_handle( ) ||
-        seq_ptr->end_handle( ) < seq_ptr->start_handle( ) )
+        seq_ptr->data( )->end_handle( ) < seq_ptr->end_handle( ) || seq_ptr->end_handle( ) < seq_ptr->start_handle( ) )
         return MB_FAILURE;
 
     iterator i = lower_bound( seq_ptr->start_handle( ) );
     if( i != end( ) )
     {
         if( ( *i )->start_handle( ) <= seq_ptr->end_handle( ) ) return MB_ALREADY_ALLOCATED;
-        if( seq_ptr->data( ) != ( *i )->data( ) &&
-            ( *i )->data( )->start_handle( ) <= seq_ptr->data( )->end_handle( ) )
+        if( seq_ptr->data( ) != ( *i )->data( ) && ( *i )->data( )->start_handle( ) <= seq_ptr->data( )->end_handle( ) )
             return MB_ALREADY_ALLOCATED;
     }
 
@@ -111,8 +107,7 @@ ErrorCode TypeSequenceManager::insert_sequence( EntitySequence* seq_ptr )
     {
         iterator j = i;
         --j;
-        if( seq_ptr->data( ) != ( *j )->data( ) &&
-            ( *j )->data( )->end_handle( ) >= seq_ptr->data( )->start_handle( ) )
+        if( seq_ptr->data( ) != ( *j )->data( ) && ( *j )->data( )->end_handle( ) >= seq_ptr->data( )->start_handle( ) )
             return MB_ALREADY_ALLOCATED;
     }
 
@@ -158,15 +153,13 @@ ErrorCode TypeSequenceManager::insert_sequence( EntitySequence* seq_ptr )
     return MB_SUCCESS;
 }
 
-ErrorCode TypeSequenceManager::replace_subsequence( EntitySequence* seq_ptr, const int* tag_sizes,
-                                                    int num_tag_sizes )
+ErrorCode TypeSequenceManager::replace_subsequence( EntitySequence* seq_ptr, const int* tag_sizes, int num_tag_sizes )
 {
     // Find the sequence of interest
     iterator i = lower_bound( seq_ptr->start_handle( ) );
     if( i == end( ) || ( *i )->data( ) == seq_ptr->data( ) ) return MB_FAILURE;
     // New sequence must be a subset of an existing one
-    if( seq_ptr->start_handle( ) < ( *i )->start_handle( ) ||
-        seq_ptr->end_handle( ) > ( *i )->end_handle( ) )
+    if( seq_ptr->start_handle( ) < ( *i )->start_handle( ) || seq_ptr->end_handle( ) > ( *i )->end_handle( ) )
         return MB_FAILURE;
     // New sequence's data must be new also, and cannot intersect
     // any existing sequence (just require that the data range
@@ -237,30 +230,26 @@ ErrorCode TypeSequenceManager::replace_subsequence( EntitySequence* seq_ptr, con
     {
         iterator last = i;
         --last;
-        SequenceData* new_data =
-            ( *p )->create_data_subset( ( *p )->start_handle( ), ( *last )->end_handle( ) );
+        SequenceData* new_data = ( *p )->create_data_subset( ( *p )->start_handle( ), ( *last )->end_handle( ) );
         new_data->seqManData.firstSequence = p;
 
         for( ; p != i; ++p )
             ( *p )->data( new_data );
         // Copy tag data (move ownership of var-len data)
         dead_data->move_tag_data( new_data, tag_sizes, num_tag_sizes );
-        if( !( *new_data->seqManData.firstSequence )->using_entire_data( ) )
-            availableList.insert( new_data );
+        if( !( *new_data->seqManData.firstSequence )->using_entire_data( ) ) availableList.insert( new_data );
     }
     if( i != n )
     {
         iterator last = n;
         --last;
-        SequenceData* new_data =
-            ( *i )->create_data_subset( ( *i )->start_handle( ), ( *last )->end_handle( ) );
+        SequenceData* new_data = ( *i )->create_data_subset( ( *i )->start_handle( ), ( *last )->end_handle( ) );
         new_data->seqManData.firstSequence = i;
         for( ; i != n; ++i )
             ( *i )->data( new_data );
         // Copy tag data (move ownership of var-len data)
         dead_data->move_tag_data( new_data, tag_sizes, num_tag_sizes );
-        if( !( *new_data->seqManData.firstSequence )->using_entire_data( ) )
-            availableList.insert( new_data );
+        if( !( *new_data->seqManData.firstSequence )->using_entire_data( ) ) availableList.insert( new_data );
     }
     delete dead_data;
 
@@ -318,8 +307,7 @@ TypeSequenceManager::iterator TypeSequenceManager::erase( iterator i )
     return i;
 }
 
-ErrorCode TypeSequenceManager::remove_sequence( const EntitySequence* seq_ptr,
-                                                bool&                 unreferenced_data )
+ErrorCode TypeSequenceManager::remove_sequence( const EntitySequence* seq_ptr, bool& unreferenced_data )
 {
     // Remove sequence from set
     iterator i = lower_bound( seq_ptr->start_handle( ) );
@@ -339,39 +327,31 @@ ErrorCode TypeSequenceManager::remove_sequence( const EntitySequence* seq_ptr,
             seq_ptr->data( )->seqManData.firstSequence = i;  // Might be 'i' already
     }
 
-    if( lastReferenced == seq_ptr )
-        lastReferenced = sequenceSet.empty( ) ? 0 : *sequenceSet.begin( );
+    if( lastReferenced == seq_ptr ) lastReferenced = sequenceSet.empty( ) ? 0 : *sequenceSet.begin( );
 
     return MB_SUCCESS;
 }
 
 TypeSequenceManager::iterator TypeSequenceManager::find_free_handle( EntityHandle min_start_handle,
-                                                                     EntityHandle max_end_handle,
-                                                                     bool&        append_out,
-                                                                     int          values_per_ent )
+                                                                     EntityHandle max_end_handle, bool& append_out,
+                                                                     int values_per_ent )
 {
     for( data_iterator i = availableList.begin( ); i != availableList.end( ); ++i )
     {
-        if( ( *( *i )->seqManData.firstSequence )->values_per_entity( ) != values_per_ent )
-            continue;
+        if( ( *( *i )->seqManData.firstSequence )->values_per_entity( ) != values_per_ent ) continue;
 
-        if( ( *i )->start_handle( ) > max_end_handle || ( *i )->end_handle( ) < min_start_handle )
-            continue;
+        if( ( *i )->start_handle( ) > max_end_handle || ( *i )->end_handle( ) < min_start_handle ) continue;
 
         for( iterator j = ( *i )->seqManData.firstSequence;
-             j != end( ) && ( *j )->start_handle( ) <= ( max_end_handle + 1 ) &&
-             ( *j )->data( ) == *i;
-             ++j )
+             j != end( ) && ( *j )->start_handle( ) <= ( max_end_handle + 1 ) && ( *j )->data( ) == *i; ++j )
         {
             if( ( *j )->end_handle( ) + 1 < min_start_handle ) continue;
-            if( ( *j )->start_handle( ) > ( *i )->start_handle( ) &&
-                ( *j )->start_handle( ) > min_start_handle )
+            if( ( *j )->start_handle( ) > ( *i )->start_handle( ) && ( *j )->start_handle( ) > min_start_handle )
             {
                 append_out = false;
                 return j;
             }
-            if( ( *j )->end_handle( ) < ( *i )->end_handle( ) &&
-                ( *j )->end_handle( ) < max_end_handle )
+            if( ( *j )->end_handle( ) < ( *i )->end_handle( ) && ( *j )->end_handle( ) < max_end_handle )
             {
                 append_out = true;
                 return j;
@@ -382,8 +362,8 @@ TypeSequenceManager::iterator TypeSequenceManager::find_free_handle( EntityHandl
     return end( );
 }
 
-bool TypeSequenceManager::is_free_sequence( EntityHandle start, EntityID num_entities,
-                                            SequenceData*& data_out, int values_per_ent )
+bool TypeSequenceManager::is_free_sequence( EntityHandle start, EntityID num_entities, SequenceData*& data_out,
+                                            int values_per_ent )
 {
     data_out = 0;
     if( empty( ) ) return true;
@@ -419,8 +399,7 @@ bool TypeSequenceManager::is_free_sequence( EntityHandle start, EntityID num_ent
         data_out = ( *i )->data( );
         if( ( *i )->values_per_entity( ) != values_per_ent ) return false;
         // If overlap, must be entirely contained
-        return start >= data_out->start_handle( ) &&
-               start + num_entities - 1 <= data_out->end_handle( );
+        return start >= data_out->start_handle( ) && start + num_entities - 1 <= data_out->end_handle( );
     }
 
     // Check if we overlap the data for the previous sequence
@@ -439,8 +418,7 @@ bool TypeSequenceManager::is_free_sequence( EntityHandle start, EntityID num_ent
     return true;
 }
 
-EntityHandle TypeSequenceManager::find_free_block( EntityID     num_entities,
-                                                   EntityHandle min_start_handle,
+EntityHandle TypeSequenceManager::find_free_block( EntityID num_entities, EntityHandle min_start_handle,
                                                    EntityHandle max_end_handle )
 {
     const_iterator i = lower_bound( min_start_handle );
@@ -483,11 +461,9 @@ static bool check_range( const range_data& d, bool prefer_end, EntityHandle& res
     return true;
 }
 
-EntityHandle TypeSequenceManager::find_free_sequence( EntityID       num_entities,
-                                                      EntityHandle   min_start_handle,
-                                                      EntityHandle   max_end_handle,
-                                                      SequenceData*& data_out, EntityID& data_size,
-                                                      int num_verts )
+EntityHandle TypeSequenceManager::find_free_sequence( EntityID num_entities, EntityHandle min_start_handle,
+                                                      EntityHandle max_end_handle, SequenceData*& data_out,
+                                                      EntityID& data_size, int num_verts )
 {
     if( max_end_handle < min_start_handle + num_entities - 1 ) return 0;
 
@@ -754,10 +730,8 @@ TypeSequenceManager::iterator TypeSequenceManager::split_sequence( iterator i, E
     return i;
 }
 
-ErrorCode TypeSequenceManager::is_free_handle( EntityHandle handle, iterator& seq_iter_out,
-                                               SequenceData*& data_ptr_out,
-                                               EntityHandle& block_start, EntityHandle& block_end,
-                                               int values_per_ent )
+ErrorCode TypeSequenceManager::is_free_handle( EntityHandle handle, iterator& seq_iter_out, SequenceData*& data_ptr_out,
+                                               EntityHandle& block_start, EntityHandle& block_end, int values_per_ent )
 {
     int junk;
     block_start = CREATE_HANDLE( TYPE_FROM_HANDLE( handle ), MB_START_ID, junk );
@@ -853,20 +827,18 @@ ErrorCode TypeSequenceManager::notify_prepended( iterator seq )
     return rval;
 }
 
-void TypeSequenceManager::get_memory_use( unsigned long long& entity_storage,
-                                          unsigned long long& total_storage ) const
+void TypeSequenceManager::get_memory_use( unsigned long long& entity_storage, unsigned long long& total_storage ) const
 {
     entity_storage = total_storage = 0;
     if( empty( ) ) return;
 
     EntityType mytype = TYPE_FROM_HANDLE( lastReferenced->start_handle( ) );
     int        junk;
-    get_memory_use( CREATE_HANDLE( mytype, MB_START_ID, junk ),
-                    CREATE_HANDLE( mytype, MB_END_ID, junk ), entity_storage, total_storage );
+    get_memory_use( CREATE_HANDLE( mytype, MB_START_ID, junk ), CREATE_HANDLE( mytype, MB_END_ID, junk ),
+                    entity_storage, total_storage );
 }
 
-void TypeSequenceManager::append_memory_use( EntityHandle first, EntityHandle last,
-                                             const SequenceData* data,
+void TypeSequenceManager::append_memory_use( EntityHandle first, EntityHandle last, const SequenceData* data,
                                              unsigned long long& entity_storage,
                                              unsigned long long& total_storage ) const
 {
@@ -907,8 +879,7 @@ void TypeSequenceManager::append_memory_use( EntityHandle first, EntityHandle la
     }
 }
 
-void TypeSequenceManager::get_memory_use( EntityHandle first, EntityHandle last,
-                                          unsigned long long& entity_storage,
+void TypeSequenceManager::get_memory_use( EntityHandle first, EntityHandle last, unsigned long long& entity_storage,
                                           unsigned long long& total_storage ) const
 {
     entity_storage = total_storage = 0;
@@ -919,8 +890,7 @@ void TypeSequenceManager::get_memory_use( EntityHandle first, EntityHandle last,
         if( i == end( ) ) return;
 
         SequenceData* data = ( *i )->data( );
-        if( first < data->end_handle( ) )
-        { append_memory_use( first, last, data, entity_storage, total_storage ); }
+        if( first < data->end_handle( ) ) { append_memory_use( first, last, data, entity_storage, total_storage ); }
         first = data->end_handle( ) + 1;
     }
 }
@@ -928,8 +898,7 @@ void TypeSequenceManager::get_memory_use( EntityHandle first, EntityHandle last,
 EntityID TypeSequenceManager::get_occupied_size( const SequenceData* data ) const
 {
     EntityID result = 0;
-    for( const_iterator i = data->seqManData.firstSequence; i != end( ) && ( *i )->data( ) == data;
-         ++i )
+    for( const_iterator i = data->seqManData.firstSequence; i != end( ) && ( *i )->data( ) == data; ++i )
         result += ( *i )->size( );
 
     return result;

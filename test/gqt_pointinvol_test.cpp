@@ -16,15 +16,14 @@ Core*          MBI;
 GeomTopoTool*  GTT;
 GeomQueryTool* GQT;
 
-#define CHKERR( A )                                                                          \
-    do                                                                                       \
-    {                                                                                        \
-        if( MB_SUCCESS != ( A ) )                                                            \
-        {                                                                                    \
-            std::cerr << "Failure (error code " << ( A ) << ") at " __FILE__ ":" << __LINE__ \
-                      << std::endl;                                                          \
-            return A;                                                                        \
-        }                                                                                    \
+#define CHKERR( A )                                                                                        \
+    do                                                                                                     \
+    {                                                                                                      \
+        if( MB_SUCCESS != ( A ) )                                                                          \
+        {                                                                                                  \
+            std::cerr << "Failure (error code " << ( A ) << ") at " __FILE__ ":" << __LINE__ << std::endl; \
+            return A;                                                                                      \
+        }                                                                                                  \
     } while( false )
 
 const std::string input_file = TestDir + "/test_geom.h5m";

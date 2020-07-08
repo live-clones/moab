@@ -70,8 +70,7 @@ class HypreParVector
     HypreParVector( moab::ParallelComm* p_comm );
     /** Creates vector with given global size and partitioning of the columns.
         Processor P owns columns [col[P],col[P+1]) */
-    HypreParVector( moab::ParallelComm* p_comm, HYPRE_Int glob_size, HYPRE_Int rstart,
-                    HYPRE_Int rend );
+    HypreParVector( moab::ParallelComm* p_comm, HYPRE_Int glob_size, HYPRE_Int rstart, HYPRE_Int rend );
     /// Creates vector compatible with y
     HypreParVector( const HypreParVector& y );
     /// Creates vector compatible with (i.e. in the domain of) A or A^T
@@ -126,14 +125,11 @@ class HypreParVector
     HypreParVector& operator=( double d );
     HypreParVector& operator=( const HypreParVector& y );
 
-    HYPRE_Int GetValues( const int ndata, const HYPRE_Int* indices,
-                         HYPRE_Complex* const _data ) const;
+    HYPRE_Int GetValues( const int ndata, const HYPRE_Int* indices, HYPRE_Complex* const _data ) const;
 
-    HYPRE_Int SetValues( const int ndata, const HYPRE_Int* indices,
-                         const HYPRE_Complex* const _data );
+    HYPRE_Int SetValues( const int ndata, const HYPRE_Int* indices, const HYPRE_Complex* const _data );
 
-    HYPRE_Int AddValues( const int ndata, const HYPRE_Int* indices,
-                         const HYPRE_Complex* const _data );
+    HYPRE_Int AddValues( const int ndata, const HYPRE_Int* indices, const HYPRE_Complex* const _data );
 
     HYPRE_Int GetValue( const HYPRE_Int index, HYPRE_Complex* const _data ) const;
 

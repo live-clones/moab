@@ -114,8 +114,7 @@ static void lob_bnd_ext_free( lob_bnd_ext* p )
 static void lob_bnd_base_setup( lob_bnd_base* p, const realType* z, const realType* w )
 {
     unsigned  i, j, m = p->m, n = p->n, mm = 2 * m - 1;
-    realType *q = tmalloc( realType, ( 2 * n + 1 ) * mm + 6 * n ), *J = q + mm, *D = J + n * mm,
-             *work = D + n * mm;
+    realType *q = tmalloc( realType, ( 2 * n + 1 ) * mm + 6 * n ), *J = q + mm, *D = J + n * mm, *work = D + n * mm;
     p->z = z;
     for( i = 0; i < n; ++i )
         p->Q0[ i ] = w[ i ] / 2, p->Q1[ i ] = 3 * p->Q0[ i ] * z[ i ];
@@ -134,10 +133,8 @@ static void lob_bnd_base_setup( lob_bnd_base* p, const realType* z, const realTy
         for( j = 1; j < m - 1; ++j )
         {
             unsigned jj = 2 * j;
-            realType c0 =
-                J[ ( jj - 1 ) * n + i ] + ( q[ jj ] - q[ jj - 1 ] ) * D[ ( jj - 1 ) * n + i ];
-            realType c1 =
-                J[ ( jj + 1 ) * n + i ] + ( q[ jj ] - q[ jj + 1 ] ) * D[ ( jj + 1 ) * n + i ];
+            realType c0 = J[ ( jj - 1 ) * n + i ] + ( q[ jj ] - q[ jj - 1 ] ) * D[ ( jj - 1 ) * n + i ];
+            realType c1 = J[ ( jj + 1 ) * n + i ] + ( q[ jj ] - q[ jj + 1 ] ) * D[ ( jj + 1 ) * n + i ];
             realType c2 = J[ jj * n + i ];
             rminmax_3( &uv[ j ], &ov[ j ], c0, c1, c2 );
         }
@@ -200,12 +197,12 @@ static void lob_bnd_1( const lob_bnd_base* p, const realType* u, realType bnd[ 2
 }
 
 /* work holds 2*mr + 2*mr*ns + 2*mr*ms doubles */
-static void lob_bnd_2( const lob_bnd_base* pr, const lob_bnd_ext* ps, const realType* u,
-                       realType bnd[ 2 ], realType* work )
+static void lob_bnd_2( const lob_bnd_base* pr, const lob_bnd_ext* ps, const realType* u, realType bnd[ 2 ],
+                       realType* work )
 {
     unsigned  nr = pr->n, mr = pr->m, ns = ps->b.n, ms = ps->b.m;
-    realType *a0 = work, *a1 = a0 + mr, *ar_ = a1 + mr, *ar = ar_, *br_ = ar + mr * ns, *br = br_,
-             *a_ = br + mr * ns, *a = a_, *b_ = a + mr * ms, *b = b_, *uvp, *ovp, *uvn, *ovn;
+    realType *a0 = work, *a1 = a0 + mr, *ar_ = a1 + mr, *ar = ar_, *br_ = ar + mr * ns, *br = br_, *a_ = br + mr * ns,
+             *a = a_, *b_ = a + mr * ms, *b = b_, *uvp, *ovp, *uvn, *ovn;
     realType b0, b1;
     unsigned i, j, k;
     for( i = 0; i < mr; ++i )
@@ -273,8 +270,7 @@ static void mat_inv_2( const realType A[ 4 ], realType inv[ 4 ] )
 static void mat_inv_3( const realType A[ 9 ], realType inv[ 9 ] )
 {
     const realType a = A[ 4 ] * A[ 8 ] - A[ 5 ] * A[ 7 ], b = A[ 5 ] * A[ 6 ] - A[ 3 ] * A[ 8 ],
-                   c = A[ 3 ] * A[ 7 ] - A[ 4 ] * A[ 6 ],
-                   idet = 1 / ( A[ 0 ] * a + A[ 1 ] * b + A[ 2 ] * c );
+                   c = A[ 3 ] * A[ 7 ] - A[ 4 ] * A[ 6 ], idet = 1 / ( A[ 0 ] * a + A[ 1 ] * b + A[ 2 ] * c );
     inv[ 0 ] = idet * a;
     inv[ 1 ] = idet * ( A[ 2 ] * A[ 7 ] - A[ 1 ] * A[ 8 ] );
     inv[ 2 ] = idet * ( A[ 1 ] * A[ 5 ] - A[ 2 ] * A[ 4 ] );
@@ -330,8 +326,7 @@ static void tinyla_solve_3( realType x[ 3 ], const realType A[ 9 ], const realTy
    A[0] x0 + A[2] x1 = b0,
    A[2] x0 + A[1] x1 = b1
 */
-static void tinyla_solve_sym_2( realType* x0, realType* x1, const realType A[ 3 ], realType b0,
-                                realType b1 )
+static void tinyla_solve_sym_2( realType* x0, realType* x1, const realType A[ 3 ], realType b0, realType b1 )
 {
     const realType idet = 1 / ( A[ 0 ] * A[ 1 ] - A[ 2 ] * A[ 2 ] );
     *x0 = idet * ( A[ 1 ] * b0 - A[ 2 ] * b1 );
@@ -429,12 +424,9 @@ static void obbox_data_free_2( obbox_data_2* p )
 
 static void obbox_data_alloc_3( obbox_data_3* p, const unsigned n[ 3 ], const unsigned m[ 3 ] )
 {
-    const unsigned wk1 =
-        3 * n[ 0 ] * n[ 1 ] + 2 * m[ 0 ] + 2 * m[ 0 ] * n[ 1 ] + 2 * m[ 0 ] * m[ 1 ];
-    const unsigned wk2 =
-        3 * n[ 0 ] * n[ 2 ] + 2 * m[ 0 ] + 2 * m[ 0 ] * n[ 2 ] + 2 * m[ 0 ] * m[ 2 ];
-    const unsigned wk3 =
-        3 * n[ 1 ] * n[ 2 ] + 2 * m[ 1 ] + 2 * m[ 1 ] * n[ 2 ] + 2 * m[ 1 ] * m[ 2 ];
+    const unsigned wk1 = 3 * n[ 0 ] * n[ 1 ] + 2 * m[ 0 ] + 2 * m[ 0 ] * n[ 1 ] + 2 * m[ 0 ] * m[ 1 ];
+    const unsigned wk2 = 3 * n[ 0 ] * n[ 2 ] + 2 * m[ 0 ] + 2 * m[ 0 ] * n[ 2 ] + 2 * m[ 0 ] * m[ 2 ];
+    const unsigned wk3 = 3 * n[ 1 ] * n[ 2 ] + 2 * m[ 1 ] + 2 * m[ 1 ] * n[ 2 ] + 2 * m[ 1 ] * m[ 2 ];
     const unsigned wk_max = umax_3( wk1, wk2, wk3 );
     lob_bnd_base_alloc( &p->dr, n[ 0 ], m[ 0 ] );
     lob_bnd_ext_alloc( &p->ds, n[ 1 ], m[ 1 ] );
@@ -456,8 +448,8 @@ static void obbox_data_free_3( obbox_data_3* p )
     free( p->Jr0 );
 }
 
-static obbox_data_2* obbox_setup_2( const realType* const z[ 2 ], const realType* const w[ 2 ],
-                                    const unsigned n[ 2 ], const unsigned m[ 2 ] )
+static obbox_data_2* obbox_setup_2( const realType* const z[ 2 ], const realType* const w[ 2 ], const unsigned n[ 2 ],
+                                    const unsigned m[ 2 ] )
 {
     const realType zero = 0;
     realType*      work;
@@ -472,8 +464,8 @@ static obbox_data_2* obbox_setup_2( const realType* const z[ 2 ], const realType
     return p;
 }
 
-static obbox_data_3* obbox_setup_3( const realType* const z[ 3 ], const realType* const w[ 3 ],
-                                    const unsigned n[ 3 ], const unsigned m[ 3 ] )
+static obbox_data_3* obbox_setup_3( const realType* const z[ 3 ], const realType* const w[ 3 ], const unsigned n[ 3 ],
+                                    const unsigned m[ 3 ] )
 {
     const realType zero = 0;
     realType*      work;
@@ -539,8 +531,8 @@ int obbox_test_3( const obbox_3* p, const realType x[ 3 ], realType r[ 3 ] )
     return mbabs( r[ 2 ] ) > 1;
 }
 
-void obbox_calc_tfm_2( const realType* x, const realType* y, unsigned n, unsigned s,
-                       const realType c0[ 2 ], const realType A[ 4 ], realType* u )
+void obbox_calc_tfm_2( const realType* x, const realType* y, unsigned n, unsigned s, const realType c0[ 2 ],
+                       const realType A[ 4 ], realType* u )
 {
     unsigned  i;
     realType* v = u + n;
@@ -552,9 +544,8 @@ void obbox_calc_tfm_2( const realType* x, const realType* y, unsigned n, unsigne
     }
 }
 
-void obbox_calc_tfm_3( const realType* x, const realType* y, const realType* z, unsigned nr,
-                       unsigned sr, unsigned ns, unsigned ss, const realType c0[ 3 ],
-                       const realType A[ 9 ], realType* u )
+void obbox_calc_tfm_3( const realType* x, const realType* y, const realType* z, unsigned nr, unsigned sr, unsigned ns,
+                       unsigned ss, const realType c0[ 3 ], const realType A[ 9 ], realType* u )
 {
     unsigned  i, j;
     realType *v = u + nr * ns, *w = v + nr * ns;
@@ -589,9 +580,8 @@ void obbox_merge_3( realType* b, const realType* ob )
 }
 
 /* work holds 2*n + 2*m realTypes */
-void obbox_side_2( const realType* x, const realType* y, unsigned n, unsigned s,
-                   const realType c0[ 2 ], const realType A[ 4 ], realType* work,
-                   const lob_bnd_base* lbd, realType bnd[ 4 ] )
+void obbox_side_2( const realType* x, const realType* y, unsigned n, unsigned s, const realType c0[ 2 ],
+                   const realType A[ 4 ], realType* work, const lob_bnd_base* lbd, realType bnd[ 4 ] )
 {
     obbox_calc_tfm_2( x, y, n, s, c0, A, work );
     lob_bnd_1( lbd, work, bnd, work + 2 * n );
@@ -599,9 +589,8 @@ void obbox_side_2( const realType* x, const realType* y, unsigned n, unsigned s,
 }
 
 /* work holds 3*nr*ns + 2*mr + 2*mr*ns + 2*mr*ms realTypes */
-void obbox_side_3( const realType* x, const realType* y, const realType* z, unsigned nr,
-                   unsigned sr, unsigned ns, unsigned ss, const realType c0[ 3 ],
-                   const realType A[ 9 ], realType* work, const lob_bnd_base* dr,
+void obbox_side_3( const realType* x, const realType* y, const realType* z, unsigned nr, unsigned sr, unsigned ns,
+                   unsigned ss, const realType c0[ 3 ], const realType A[ 9 ], realType* work, const lob_bnd_base* dr,
                    const lob_bnd_ext* ds, realType bnd[ 6 ] )
 {
     obbox_calc_tfm_3( x, y, z, nr, sr, ns, ss, c0, A, work );
@@ -613,8 +602,8 @@ void obbox_side_3( const realType* x, const realType* y, const realType* z, unsi
 /* return bounds on u = A (x - c0)
    bnd[0] <= u_0 <= bnd[1]
    bnd[2] <= u_1 <= bnd[3] */
-void obbox_bnd_2( const obbox_data_2* p, const realType* x, const realType* y,
-                  const realType c0[ 2 ], const realType A[ 4 ], realType bnd[ 4 ] )
+void obbox_bnd_2( const obbox_data_2* p, const realType* x, const realType* y, const realType c0[ 2 ],
+                  const realType A[ 4 ], realType bnd[ 4 ] )
 {
     unsigned i, nr = p->dr.n, ns = p->ds.n;
     realType obnd[ 4 ];
@@ -659,8 +648,7 @@ void obbox_bnd_3( const obbox_data_3* p, const realType* x, const realType* y, c
     obbox_merge_3( bnd, obnd );
 }
 
-void obbox_calc_2( const obbox_data_2* p, realType tol, const realType* x, const realType* y,
-                   obbox_2* b )
+void obbox_calc_2( const obbox_data_2* p, realType tol, const realType* x, const realType* y, obbox_2* b )
 {
     const realType zero[ 2 ] = { 0, 0 }, id[ 4 ] = { 1, 0, 0, 1 };
     realType       c0[ 2 ], jac[ 4 ], inv[ 4 ], bnd[ 4 ], u0[ 2 ], d[ 2 ];
@@ -687,8 +675,8 @@ void obbox_calc_2( const obbox_data_2* p, realType tol, const realType* x, const
     b->A[ 2 ] = d[ 1 ] * inv[ 2 ], b->A[ 3 ] = d[ 1 ] * inv[ 3 ];
 }
 
-void obbox_calc_3( const obbox_data_3* p, realType tol, const realType* x, const realType* y,
-                   const realType* z, obbox_3* b )
+void obbox_calc_3( const obbox_data_3* p, realType tol, const realType* x, const realType* y, const realType* z,
+                   obbox_3* b )
 {
     const realType zero[ 3 ] = { 0, 0 }, id[ 9 ] = { 1, 0, 0, 0, 1, 0, 0, 0, 1 };
     realType       c0[ 3 ], jac[ 9 ], inv[ 9 ], bnd[ 6 ], u0[ 3 ], d[ 3 ];
@@ -701,12 +689,12 @@ void obbox_calc_3( const obbox_data_3* p, realType tol, const realType* x, const
     b->axis_bnd[ 2 ] -= tol * d[ 1 ], b->axis_bnd[ 3 ] += tol * d[ 1 ];
     b->axis_bnd[ 4 ] -= tol * d[ 2 ], b->axis_bnd[ 5 ] += tol * d[ 2 ];
 
-    c0[ 0 ] = tensor_ig3( p->Jr0, p->Dr0, p->dr.n, p->Js0, p->Ds0, p->ds.b.n, p->Jt0, p->Dt0,
-                          p->dt.b.n, x, jac, p->work );
-    c0[ 1 ] = tensor_ig3( p->Jr0, p->Dr0, p->dr.n, p->Js0, p->Ds0, p->ds.b.n, p->Jt0, p->Dt0,
-                          p->dt.b.n, y, jac + 3, p->work );
-    c0[ 2 ] = tensor_ig3( p->Jr0, p->Dr0, p->dr.n, p->Js0, p->Ds0, p->ds.b.n, p->Jt0, p->Dt0,
-                          p->dt.b.n, z, jac + 6, p->work );
+    c0[ 0 ] =
+        tensor_ig3( p->Jr0, p->Dr0, p->dr.n, p->Js0, p->Ds0, p->ds.b.n, p->Jt0, p->Dt0, p->dt.b.n, x, jac, p->work );
+    c0[ 1 ] = tensor_ig3( p->Jr0, p->Dr0, p->dr.n, p->Js0, p->Ds0, p->ds.b.n, p->Jt0, p->Dt0, p->dt.b.n, y, jac + 3,
+                          p->work );
+    c0[ 2 ] = tensor_ig3( p->Jr0, p->Dr0, p->dr.n, p->Js0, p->Ds0, p->ds.b.n, p->Jt0, p->Dt0, p->dt.b.n, z, jac + 6,
+                          p->work );
     mat_inv_3( jac, inv );
 
     obbox_bnd_3( p, x, y, z, c0, inv, bnd );
@@ -909,8 +897,8 @@ static uint hash_opt_size_3( hash_data_3* p, uint nel, uint max_size )
     return size_low;
 }
 
-static void hash_getbb_2( hash_data_2* p, const realType* const elx[ 2 ], const unsigned n[ 2 ],
-                          uint nel, realType tol )
+static void hash_getbb_2( hash_data_2* p, const realType* const elx[ 2 ], const unsigned n[ 2 ], uint nel,
+                          realType tol )
 {
     obbox_data_2*   data;
     realType *      z[ 2 ], *w[ 2 ];
@@ -943,8 +931,8 @@ static void hash_getbb_2( hash_data_2* p, const realType* const elx[ 2 ], const 
     free( z[ 0 ] );
 }
 
-static void hash_getbb_3( hash_data_3* p, const realType* const elx[ 3 ], const unsigned n[ 3 ],
-                          uint nel, realType tol )
+static void hash_getbb_3( hash_data_3* p, const realType* const elx[ 3 ], const unsigned n[ 3 ], uint nel,
+                          realType tol )
 {
     obbox_data_3*   data;
     const realType* x[ 3 ];
@@ -978,8 +966,8 @@ static void hash_getbb_3( hash_data_3* p, const realType* const elx[ 3 ], const 
     free( z[ 0 ] );
 }
 
-static void hash_build_2( hash_data_2* p, const realType* const x[ 2 ], const unsigned n[ 2 ],
-                          uint nel, uint max_hash_size, realType tol )
+static void hash_build_2( hash_data_2* p, const realType* const x[ 2 ], const unsigned n[ 2 ], uint nel,
+                          uint max_hash_size, realType tol )
 {
     uint      i, el, size, hn2, sum;
     unsigned  hn;
@@ -1024,8 +1012,8 @@ static void hash_build_2( hash_data_2* p, const realType* const x[ 2 ], const un
     free( count );
 }
 
-static void hash_build_3( hash_data_3* p, const realType* const x[ 3 ], const unsigned n[ 3 ],
-                          uint nel, uint max_hash_size, realType tol )
+static void hash_build_3( hash_data_3* p, const realType* const x[ 3 ], const unsigned n[ 3 ], uint nel,
+                          uint max_hash_size, realType tol )
 {
     uint      i, el, size, hn3, sum;
     unsigned  hn;
@@ -1207,9 +1195,8 @@ static unsigned opt_constr_pack_3( const unsigned* c )
 
 void opt_alloc_3( opt_data_3* p, lagrange_data* ld )
 {
-    const unsigned nr = ld[ 0 ].n, ns = ld[ 1 ].n, nt = ld[ 2 ].n,
-                   nf = umax_3( nr * ns, nr * nt, ns * nt ), ne = umax_3( nr, ns, nt ),
-                   nw = 2 * ns * nt + 3 * ns;
+    const unsigned nr = ld[ 0 ].n, ns = ld[ 1 ].n, nt = ld[ 2 ].n, nf = umax_3( nr * ns, nr * nt, ns * nt ),
+                   ne = umax_3( nr, ns, nt ), nw = 2 * ns * nt + 3 * ns;
     p->size[ 0 ] = 1;
     p->size[ 1 ] = nr;
     p->size[ 2 ] = nr * ns;
@@ -1252,9 +1239,8 @@ static void opt_vol_intp_3( opt_data_3* p )
     const lagrange_data* ld = p->ld;
 
     for( d = 0; d < 3; ++d )
-        p->x[ d ] =
-            tensor_ig3( ld[ 0 ].J, ld[ 0 ].D, ld[ 0 ].n, ld[ 1 ].J, ld[ 1 ].D, ld[ 1 ].n, ld[ 2 ].J,
-                        ld[ 2 ].D, ld[ 2 ].n, p->elx[ d ], &p->jac[ d * 3 ], p->work );
+        p->x[ d ] = tensor_ig3( ld[ 0 ].J, ld[ 0 ].D, ld[ 0 ].n, ld[ 1 ].J, ld[ 1 ].D, ld[ 1 ].n, ld[ 2 ].J, ld[ 2 ].D,
+                                ld[ 2 ].n, p->elx[ d ], &p->jac[ d * 3 ], p->work );
 }
 
 void opt_vol_set_intp_3( opt_data_3* p, const realType r[ 3 ] )
@@ -1266,12 +1252,10 @@ void opt_vol_set_intp_3( opt_data_3* p, const realType r[ 3 ] )
 static void opt_face_proj_3( opt_data_3* p )
 {
     unsigned       d, off = 0;
-    const unsigned dn = p->fd.dn, d1 = p->fd.d1, d2 = p->fd.d2,
-                   so = p->size[ d2 ] - p->size[ d1 + 1 ], s1 = p->size[ d1 ], sn = p->size[ dn ],
-                   n1 = p->ld[ d1 ].n, n2 = p->ld[ d2 ].n, nn = p->ld[ dn ].n;
+    const unsigned dn = p->fd.dn, d1 = p->fd.d1, d2 = p->fd.d2, so = p->size[ d2 ] - p->size[ d1 + 1 ],
+                   s1 = p->size[ d1 ], sn = p->size[ dn ], n1 = p->ld[ d1 ].n, n2 = p->ld[ d2 ].n, nn = p->ld[ dn ].n;
     const realType* D = p->ld[ dn ].D_z0;
-    if( opt_constr( p->fd.constraints, dn ) == 2 )
-        off = p->size[ dn + 1 ] - p->size[ dn ], D = p->ld[ dn ].D_zn;
+    if( opt_constr( p->fd.constraints, dn ) == 2 ) off = p->size[ dn + 1 ] - p->size[ dn ], D = p->ld[ dn ].D_zn;
     for( d = 0; d < 3; ++d )
     {
         unsigned        i, j, k, arrindex = 0;
@@ -1306,11 +1290,9 @@ static void opt_face_set_3( opt_data_3* p, const realType r[ 3 ], unsigned const
 /* work holds 2*ld[d2].n realTypes */
 static void opt_face_intp_3( opt_data_3* p )
 {
-    unsigned       d;
-    const unsigned dn = p->fd.dn, d1 = p->fd.d1, d2 = p->fd.d2, n1 = p->ld[ d1 ].n,
-                   n2 = p->ld[ d2 ].n;
-    const realType *J1 = p->ld[ d1 ].J, *J2 = p->ld[ d2 ].J, *D1 = p->ld[ d1 ].D,
-                   *D2 = p->ld[ d2 ].D;
+    unsigned        d;
+    const unsigned  dn = p->fd.dn, d1 = p->fd.d1, d2 = p->fd.d2, n1 = p->ld[ d1 ].n, n2 = p->ld[ d2 ].n;
+    const realType *J1 = p->ld[ d1 ].J, *J2 = p->ld[ d2 ].J, *D1 = p->ld[ d1 ].D, *D2 = p->ld[ d2 ].D;
 
     for( d = 0; d < 3; ++d )
     {
@@ -1332,8 +1314,8 @@ static void opt_face_hess_3( opt_data_3* p, realType hess[ 9 ] )
 {
     unsigned        d;
     const unsigned  d1 = p->fd.d1, d2 = p->fd.d2, n1 = p->ld[ d1 ].n, n2 = p->ld[ d2 ].n;
-    const realType *J1 = p->ld[ d1 ].J, *J2 = p->ld[ d2 ].J, *D1 = p->ld[ d1 ].D,
-                   *D2 = p->ld[ d2 ].D, *S1 = p->ld[ d1 ].D2, *S2 = p->ld[ d2 ].D2;
+    const realType *J1 = p->ld[ d1 ].J, *J2 = p->ld[ d2 ].J, *D1 = p->ld[ d1 ].D, *D2 = p->ld[ d2 ].D,
+                   *S1 = p->ld[ d1 ].D2, *S2 = p->ld[ d2 ].D2;
 
     lagrange_2u( &p->ld[ d1 ] );
     lagrange_2u( &p->ld[ d2 ] );
@@ -1350,9 +1332,8 @@ static void opt_face_hess_3( opt_data_3* p, realType hess[ 9 ] )
 static void opt_edge_proj_3( opt_data_3* p )
 {
     unsigned       d, off, off1 = 0, off2 = 0;
-    const unsigned de = p->ed.de, d1 = p->ed.d1, d2 = p->ed.d2, se = p->size[ de ],
-                   s1 = p->size[ d1 ], s2 = p->size[ d2 ], ne = p->ld[ de ].n, n1 = p->ld[ d1 ].n,
-                   n2 = p->ld[ d2 ].n;
+    const unsigned de = p->ed.de, d1 = p->ed.d1, d2 = p->ed.d2, se = p->size[ de ], s1 = p->size[ d1 ],
+                   s2 = p->size[ d2 ], ne = p->ld[ de ].n, n1 = p->ld[ d1 ].n, n2 = p->ld[ d2 ].n;
     const realType *fD1, *fD2;
     if( opt_constr( p->ed.constraints, d1 ) == 0 )
         fD1 = p->ld[ d1 ].D_z0;
@@ -1473,8 +1454,8 @@ static void opt_point_set_intp_3( opt_data_3* p, unsigned constr )
 
 #define DIAGNOSTICS 0
 
-double opt_findpt_3( opt_data_3* p, const realType* const elx[ 3 ], const realType xstar[ 3 ],
-                     realType r[ 3 ], unsigned* constr )
+double opt_findpt_3( opt_data_3* p, const realType* const elx[ 3 ], const realType xstar[ 3 ], realType r[ 3 ],
+                     unsigned* constr )
 {
     realType dr[ 3 ], resid[ 3 ], steep[ 3 ];
 
@@ -1537,8 +1518,7 @@ double opt_findpt_3( opt_data_3* p, const realType* const elx[ 3 ], const realTy
             printf( "    steepest descent = %g, %g, %g\n", steep[ 0 ], steep[ 1 ], steep[ 2 ] );
 #endif
             for( d = 0; d < 3; ++d )
-                if( ( cc[ d ] == 0 && steep[ d ] > 0 ) || ( cc[ d ] == 2 && steep[ d ] < 0 ) )
-                    cc[ d ] = 1;
+                if( ( cc[ d ] == 0 && steep[ d ] > 0 ) || ( cc[ d ] == 2 && steep[ d ] < 0 ) ) cc[ d ] = 1;
             ac = opt_constr_pack_3( cc );
         }
         /* update face/edge/point data if necessary */
@@ -1654,8 +1634,8 @@ static void opt_area_intp_2( opt_data_2* p )
     const lagrange_data* ld = p->ld;
 
     for( d = 0; d < 2; ++d )
-        p->x[ d ] = tensor_ig2( ld[ 0 ].J, ld[ 0 ].D, ld[ 0 ].n, ld[ 1 ].J, ld[ 1 ].D, ld[ 1 ].n,
-                                p->elx[ d ], &p->jac[ d * 2 ], p->work );
+        p->x[ d ] = tensor_ig2( ld[ 0 ].J, ld[ 0 ].D, ld[ 0 ].n, ld[ 1 ].J, ld[ 1 ].D, ld[ 1 ].n, p->elx[ d ],
+                                &p->jac[ d * 2 ], p->work );
 }
 
 static void opt_area_set_intp_2( opt_data_2* p, const realType r[ 2 ] )
@@ -1667,8 +1647,8 @@ static void opt_area_set_intp_2( opt_data_2* p, const realType r[ 2 ] )
 static void opt_edge_proj_2( opt_data_2* p )
 {
     unsigned       d, off = 0;
-    const unsigned de = p->ed.de, d1 = p->ed.d1, se = p->size[ de ], s1 = p->size[ d1 ],
-                   ne = p->ld[ de ].n, n1 = p->ld[ d1 ].n;
+    const unsigned de = p->ed.de, d1 = p->ed.d1, se = p->size[ de ], s1 = p->size[ d1 ], ne = p->ld[ de ].n,
+                   n1 = p->ld[ d1 ].n;
     const realType* fD1;
     if( opt_constr( p->ed.constraints, d1 ) == 0 )
         fD1 = p->ld[ d1 ].D_z0;
@@ -1779,8 +1759,8 @@ static void opt_point_set_intp_2( opt_data_2* p, unsigned constr )
 
 #define DIAGNOSTICS 0
 
-double opt_findpt_2( opt_data_2* p, const realType* const elx[ 2 ], const realType xstar[ 2 ],
-                     realType r[ 2 ], unsigned* constr )
+double opt_findpt_2( opt_data_2* p, const realType* const elx[ 2 ], const realType xstar[ 2 ], realType r[ 2 ],
+                     unsigned* constr )
 {
     realType dr[ 2 ], resid[ 2 ], steep[ 2 ];
 
@@ -1839,8 +1819,7 @@ double opt_findpt_2( opt_data_2* p, const realType* const elx[ 2 ], const realTy
             printf( "    steepest descent = %g, %g\n", steep[ 0 ], steep[ 1 ] );
 #endif
             for( d = 0; d < 2; ++d )
-                if( ( cc[ d ] == 0 && steep[ d ] > 0 ) || ( cc[ d ] == 2 && steep[ d ] < 0 ) )
-                    cc[ d ] = 1;
+                if( ( cc[ d ] == 0 && steep[ d ] > 0 ) || ( cc[ d ] == 2 && steep[ d ] < 0 ) ) cc[ d ] = 1;
             ac = opt_constr_pack_2( cc );
         }
         /* update face/edge/point data if necessary */
@@ -1871,8 +1850,7 @@ double opt_findpt_2( opt_data_2* p, const realType* const elx[ 2 ], const realTy
                 realType        fac, H[ 2 ];
                 const realType* J = p->jac + de;
                 opt_edge_hess_2( p, H );
-                fac = J[ 0 ] * J[ 0 ] + J[ 2 ] * J[ 2 ] -
-                      ( resid[ 0 ] * H[ 0 ] + resid[ 1 ] * H[ 1 ] );
+                fac = J[ 0 ] * J[ 0 ] + J[ 2 ] * J[ 2 ] - ( resid[ 0 ] * H[ 0 ] + resid[ 1 ] * H[ 1 ] );
                 dr[ de ] = steep[ de ] / fac;
                 dr[ d1 ] = 0;
             }
@@ -1971,8 +1949,8 @@ static void findpt_list_sort( findpt_listel** A, unsigned n )
     }
 }
 
-findpt_data_2* findpt_setup_2( const realType* const xw[ 2 ], const unsigned n[ 2 ], uint nel,
-                               uint max_hash_size, realType bbox_tol )
+findpt_data_2* findpt_setup_2( const realType* const xw[ 2 ], const unsigned n[ 2 ], uint nel, uint max_hash_size,
+                               realType bbox_tol )
 {
     unsigned       d;
     findpt_data_2* p = tmalloc( findpt_data_2, 1 );
@@ -2002,8 +1980,8 @@ findpt_data_2* findpt_setup_2( const realType* const xw[ 2 ], const unsigned n[ 
     return p;
 }
 
-findpt_data_3* findpt_setup_3( const realType* const xw[ 3 ], const unsigned n[ 3 ], uint nel,
-                               uint max_hash_size, realType bbox_tol )
+findpt_data_3* findpt_setup_3( const realType* const xw[ 3 ], const unsigned n[ 3 ], uint nel, uint max_hash_size,
+                               realType bbox_tol )
 {
     unsigned       d;
     findpt_data_3* p = tmalloc( findpt_data_3, 1 );
@@ -2115,8 +2093,7 @@ static void findpt_hash_3( findpt_data_3* p, const realType x[ 3 ] )
     if( p->end != p->sorted ) findpt_list_sort( p->sorted, p->end - p->sorted );
 }
 
-static int findpt_guess_2( findpt_data_2* p, const realType x[ 2 ], uint el, realType r[ 2 ],
-                           realType* dist )
+static int findpt_guess_2( findpt_data_2* p, const realType x[ 2 ], uint el, realType r[ 2 ], realType* dist )
 {
     const uint      arrindex = p->nptel * el;
     const realType* elx[ 2 ];
@@ -2130,8 +2107,7 @@ static int findpt_guess_2( findpt_data_2* p, const realType x[ 2 ], uint el, rea
     return c == opt_no_constraints_2;
 }
 
-static int findpt_guess_3( findpt_data_3* p, const realType x[ 3 ], uint el, realType r[ 3 ],
-                           realType* dist )
+static int findpt_guess_3( findpt_data_3* p, const realType x[ 3 ], uint el, realType r[ 3 ], realType* dist )
 {
     const uint      arrindex = p->nptel * el;
     const realType* elx[ 3 ];
@@ -2148,8 +2124,7 @@ static int findpt_guess_3( findpt_data_3* p, const realType x[ 3 ], uint el, rea
 
 #define DIAGNOSTICS 0
 
-static int findpt_pass_2( findpt_data_2* p, const realType x[ 2 ], uint* el, realType r[ 2 ],
-                          realType* dist_min )
+static int findpt_pass_2( findpt_data_2* p, const realType x[ 2 ], uint* el, realType r[ 2 ], realType* dist_min )
 {
     findpt_listel** qq = p->sorted;
     const realType* bnd;
@@ -2175,8 +2150,7 @@ static int findpt_pass_2( findpt_data_2* p, const realType x[ 2 ], uint* el, rea
     return *dist_min > r2norm_2( bnd[ 1 ] - bnd[ 0 ], bnd[ 3 ] - bnd[ 2 ] ) ? -1 : 1;
 }
 
-static int findpt_pass_3( findpt_data_3* p, const realType x[ 3 ], uint* el, realType r[ 3 ],
-                          realType* dist_min )
+static int findpt_pass_3( findpt_data_3* p, const realType x[ 3 ], uint* el, realType r[ 3 ], realType* dist_min )
 {
     findpt_listel** qq = p->sorted;
     const realType* bnd;
@@ -2206,13 +2180,10 @@ static int findpt_pass_3( findpt_data_3* p, const realType x[ 3 ], uint* el, rea
         }
     } while( ++qq != p->end );
     bnd = p->hash->obb[ *el ].axis_bnd;
-    return *dist_min > r2norm_3( bnd[ 1 ] - bnd[ 0 ], bnd[ 3 ] - bnd[ 2 ], bnd[ 5 ] - bnd[ 4 ] )
-               ? -1
-               : 1;
+    return *dist_min > r2norm_3( bnd[ 1 ] - bnd[ 0 ], bnd[ 3 ] - bnd[ 2 ], bnd[ 5 ] - bnd[ 4 ] ) ? -1 : 1;
 }
 
-int findpt_2( findpt_data_2* p, const realType x[ 2 ], int guess, uint* el, realType r[ 2 ],
-              realType* dist )
+int findpt_2( findpt_data_2* p, const realType x[ 2 ], int guess, uint* el, realType r[ 2 ], realType* dist )
 {
     if( guess && findpt_guess_2( p, x, *el, r, dist ) ) return 0;
     findpt_hash_2( p, x );
@@ -2220,8 +2191,7 @@ int findpt_2( findpt_data_2* p, const realType x[ 2 ], int guess, uint* el, real
     return findpt_pass_2( p, x, el, r, dist );
 }
 
-int findpt_3( findpt_data_3* p, const realType x[ 3 ], int guess, uint* el, realType r[ 3 ],
-              realType* dist )
+int findpt_3( findpt_data_3* p, const realType x[ 3 ], int guess, uint* el, realType r[ 3 ], realType* dist )
 {
     if( guess && findpt_guess_3( p, x, *el, r, dist ) ) return 0;
     findpt_hash_3( p, x );
@@ -2252,6 +2222,6 @@ double findpt_eval_2( findpt_data_2* p, const realType* u )
 
 double findpt_eval_3( findpt_data_3* p, const realType* u )
 {
-    return tensor_i3( p->ld[ 0 ].J, p->ld[ 0 ].n, p->ld[ 1 ].J, p->ld[ 1 ].n, p->ld[ 2 ].J,
-                      p->ld[ 2 ].n, u, p->od_work );
+    return tensor_i3( p->ld[ 0 ].J, p->ld[ 0 ].n, p->ld[ 1 ].J, p->ld[ 1 ].n, p->ld[ 2 ].J, p->ld[ 2 ].n, u,
+                      p->od_work );
 }

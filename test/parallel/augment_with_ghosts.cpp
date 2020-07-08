@@ -12,8 +12,7 @@ using namespace moab;
 void report_sets( moab::Core* mb, int rank, int nproc )
 {
     // check neumann and material sets, and see if their number of quads / hexes  in them
-    const char* const shared_set_tag_names[] = { MATERIAL_SET_TAG_NAME, DIRICHLET_SET_TAG_NAME,
-                                                 NEUMANN_SET_TAG_NAME,
+    const char* const shared_set_tag_names[] = { MATERIAL_SET_TAG_NAME, DIRICHLET_SET_TAG_NAME, NEUMANN_SET_TAG_NAME,
                                                  PARALLEL_PARTITION_TAG_NAME };
 
     int num_tags = sizeof( shared_set_tag_names ) / sizeof( shared_set_tag_names[ 0 ] );
@@ -26,11 +25,9 @@ void report_sets( moab::Core* mb, int rank, int nproc )
             for( int i = 0; i < num_tags; i++ )
             {
                 Tag       tag;
-                ErrorCode rval = mb->tag_get_handle( shared_set_tag_names[ i ], 1, MB_TYPE_INTEGER,
-                                                     tag, MB_TAG_ANY );CHECK_ERR( rval );
+                ErrorCode rval = mb->tag_get_handle( shared_set_tag_names[ i ], 1, MB_TYPE_INTEGER, tag, MB_TAG_ANY );CHECK_ERR( rval );
                 Range sets;
-                rval = mb->get_entities_by_type_and_tag( 0, MBENTITYSET, &tag, 0, 1, sets,
-                                                         Interface::UNION );CHECK_ERR( rval );
+                rval = mb->get_entities_by_type_and_tag( 0, MBENTITYSET, &tag, 0, 1, sets, Interface::UNION );CHECK_ERR( rval );
 
                 std::vector< int > vals( sets.size( ) );
                 rval = mb->tag_get_data( tag, sets, &vals[ 0 ] );CHECK_ERR( rval );
@@ -40,9 +37,8 @@ void report_sets( moab::Core* mb, int rank, int nproc )
                 {
                     Range ents;
                     rval = mb->get_entities_by_handle( *it, ents );CHECK_ERR( rval );
-                    std::cout << "    set " << mb->id_from_handle( *it )
-                              << " with tagval=" << vals[ j ] << " has " << ents.size( )
-                              << " entities\n";
+                    std::cout << "    set " << mb->id_from_handle( *it ) << " with tagval=" << vals[ j ] << " has "
+                              << ents.size( ) << " entities\n";
                 }
             }
         }
@@ -83,8 +79,7 @@ void test_read_and_ghost_after( )
     ErrorCode           rval = MB_SUCCESS;
 
     // first read in parallel, then ghost, then augment
-    char read_opts[] =
-        "PARALLEL=READ_PART;PARALLEL_RESOLVE_SHARED_ENTS;PARTITION=PARALLEL_PARTITION";
+    char read_opts[] = "PARALLEL=READ_PART;PARALLEL_RESOLVE_SHARED_ENTS;PARTITION=PARALLEL_PARTITION";
     rval = mb->load_file( filename.c_str( ), 0, read_opts );CHECK_ERR( rval );
 
     int ghost_dim = 3, bridge = 0, layers = 1, addl_ents = 3;

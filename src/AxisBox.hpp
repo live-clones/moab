@@ -106,8 +106,7 @@ class AxisBox
      * position is outside the box, the outside position will be the
      * closest point on the box boundary to the input position.
      */
-    inline void closest_position_within_box( const double* input_position,
-                                             double*       output_position ) const;
+    inline void closest_position_within_box( const double* input_position, double* output_position ) const;
 
   private:
     double minVect[ 3 ], maxVect[ 3 ];
@@ -202,12 +201,9 @@ inline void AxisBox::diagonal( double* diagonal_out ) const
 
 inline bool AxisBox::intersects( const AxisBox& other, double tolerance ) const
 {
-    return minVect[ 0 ] - other.maxVect[ 0 ] <= tolerance &&
-           minVect[ 1 ] - other.maxVect[ 1 ] <= tolerance &&
-           minVect[ 2 ] - other.maxVect[ 2 ] <= tolerance &&
-           other.minVect[ 0 ] - maxVect[ 0 ] <= tolerance &&
-           other.minVect[ 1 ] - maxVect[ 1 ] <= tolerance &&
-           other.minVect[ 2 ] - maxVect[ 2 ] <= tolerance;
+    return minVect[ 0 ] - other.maxVect[ 0 ] <= tolerance && minVect[ 1 ] - other.maxVect[ 1 ] <= tolerance &&
+           minVect[ 2 ] - other.maxVect[ 2 ] <= tolerance && other.minVect[ 0 ] - maxVect[ 0 ] <= tolerance &&
+           other.minVect[ 1 ] - maxVect[ 1 ] <= tolerance && other.minVect[ 2 ] - maxVect[ 2 ] <= tolerance;
 }
 
 inline bool AxisBox::intersects( const double* point, double tolerance ) const
@@ -219,12 +215,10 @@ inline bool AxisBox::intersects( const double* point, double tolerance ) const
 
 inline bool AxisBox::valid( ) const
 {
-    return minVect[ 0 ] <= maxVect[ 0 ] && minVect[ 1 ] <= maxVect[ 1 ] &&
-           minVect[ 2 ] <= maxVect[ 2 ];
+    return minVect[ 0 ] <= maxVect[ 0 ] && minVect[ 1 ] <= maxVect[ 1 ] && minVect[ 2 ] <= maxVect[ 2 ];
 }
 
-inline void AxisBox::closest_position_within_box( const double* input_position,
-                                                  double*       output_position ) const
+inline void AxisBox::closest_position_within_box( const double* input_position, double* output_position ) const
 {
     for( int i = 0; i < 3; ++i )
     {

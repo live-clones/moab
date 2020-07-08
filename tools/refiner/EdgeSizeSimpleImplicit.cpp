@@ -19,8 +19,8 @@ EdgeSizeSimpleImplicit::EdgeSizeSimpleImplicit( )
 
 EdgeSizeSimpleImplicit::~EdgeSizeSimpleImplicit( ) {}
 
-bool EdgeSizeSimpleImplicit::evaluate_edge( const double* p0, const void* t0, double* p1, void* t1,
-                                            const double* p2, const void* t2 )
+bool EdgeSizeSimpleImplicit::evaluate_edge( const double* p0, const void* t0, double* p1, void* t1, const double* p2,
+                                            const void* t2 )
 {
     (void)t0;
     (void)t1;
@@ -37,10 +37,9 @@ bool EdgeSizeSimpleImplicit::evaluate_edge( const double* p0, const void* t0, do
     double x = p1[ 3 ];
     double y = p1[ 4 ];
     double z = p1[ 5 ];
-    double F2 = this->coeffA[ 0 ] * x * x + 2. * this->coeffA[ 1 ] * x * y +
-                2. * this->coeffA[ 2 ] * x * z + this->coeffA[ 3 ] * y * y +
-                2. * this->coeffA[ 4 ] * y * z + this->coeffA[ 5 ] * z * z + this->coeffB[ 0 ] * x +
-                this->coeffB[ 1 ] * y + this->coeffB[ 2 ] * z + this->coeffC;
+    double F2 = this->coeffA[ 0 ] * x * x + 2. * this->coeffA[ 1 ] * x * y + 2. * this->coeffA[ 2 ] * x * z +
+                this->coeffA[ 3 ] * y * y + 2. * this->coeffA[ 4 ] * y * z + this->coeffA[ 5 ] * z * z +
+                this->coeffB[ 0 ] * x + this->coeffB[ 1 ] * y + this->coeffB[ 2 ] * z + this->coeffC;
     F2 = F2 * F2;  // square it
     double r2 = this->ratio * this->ratio;
     if( 4. * F2 / L2 < r2 ) return true;  // Midpoint is close to surface => split edge

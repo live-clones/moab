@@ -36,13 +36,12 @@
 namespace MBMesquite
 {
 
-static Vector3D unit_quad[ 4 ] = { Vector3D( -0.5, -0.5, 0.0 ), Vector3D( 0.5, -0.5, 0.0 ),
-                                   Vector3D( 0.5, 0.5, 0.0 ), Vector3D( -0.5, 0.5, 0.0 ) };
+static Vector3D unit_quad[ 4 ] = { Vector3D( -0.5, -0.5, 0.0 ), Vector3D( 0.5, -0.5, 0.0 ), Vector3D( 0.5, 0.5, 0.0 ),
+                                   Vector3D( -0.5, 0.5, 0.0 ) };
 
-static Vector3D unit_hex[ 8 ] = { Vector3D( 0.5, -0.5, -0.5 ), Vector3D( 0.5, 0.5, -0.5 ),
-                                  Vector3D( -0.5, 0.5, -0.5 ), Vector3D( -0.5, -0.5, -0.5 ),
-                                  Vector3D( 0.5, -0.5, 0.5 ),  Vector3D( 0.5, 0.5, 0.5 ),
-                                  Vector3D( -0.5, 0.5, 0.5 ),  Vector3D( -0.5, -0.5, 0.5 ) };
+static Vector3D unit_hex[ 8 ] = { Vector3D( 0.5, -0.5, -0.5 ),  Vector3D( 0.5, 0.5, -0.5 ), Vector3D( -0.5, 0.5, -0.5 ),
+                                  Vector3D( -0.5, -0.5, -0.5 ), Vector3D( 0.5, -0.5, 0.5 ), Vector3D( 0.5, 0.5, 0.5 ),
+                                  Vector3D( -0.5, 0.5, 0.5 ),   Vector3D( -0.5, -0.5, 0.5 ) };
 
 static Vector3D unit_edge_tri[ 3 ];
 static Vector3D unit_edge_tet[ 4 ];

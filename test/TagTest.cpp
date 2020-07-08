@@ -96,11 +96,11 @@ int main( )
 
 void setup_mesh( Interface& mesh );
 
-Tag test_create_tag( Interface& mb, const char* name, int num_vals, TagType storage, DataType type,
-                     const void* defval, ErrorCode expect = MB_SUCCESS );
+Tag test_create_tag( Interface& mb, const char* name, int num_vals, TagType storage, DataType type, const void* defval,
+                     ErrorCode expect = MB_SUCCESS );
 
-Tag test_create_var_len_tag( Interface& mb, const char* name, TagType storage, DataType type,
-                             const void* defval, int defval_size, ErrorCode expect = MB_SUCCESS );
+Tag test_create_var_len_tag( Interface& mb, const char* name, TagType storage, DataType type, const void* defval,
+                             int defval_size, ErrorCode expect = MB_SUCCESS );
 
 enum SetMode
 {
@@ -109,19 +109,19 @@ enum SetMode
     ONE_VALUE
 };
 
-void test_get_set( const char* name, int vals_per_ent, TagType storage, DataType type,
-                   const void* some_values, int num_values, const void* default_value,
-                   SetMode set_by_pointer = NORMAL, bool get_by_pointer = false );
+void test_get_set( const char* name, int vals_per_ent, TagType storage, DataType type, const void* some_values,
+                   int num_values, const void* default_value, SetMode set_by_pointer = NORMAL,
+                   bool get_by_pointer = false );
 
-void test_get_set_variable_length( const char* name, TagType storage, DataType type,
-                                   const void** values, const int* lengths, int num_values,
-                                   const void* default_value, int default_value_length );
+void test_get_set_variable_length( const char* name, TagType storage, DataType type, const void** values,
+                                   const int* lengths, int num_values, const void* default_value,
+                                   int default_value_length );
 
-void test_mesh_value( Interface& mb, const char* tag_name, unsigned tag_size, TagType tag_storage,
-                      DataType tag_type, const void* value );
+void test_mesh_value( Interface& mb, const char* tag_name, unsigned tag_size, TagType tag_storage, DataType tag_type,
+                      const void* value );
 
-Tag test_create_tag( Interface& mb, const char* name, int num_vals, TagType storage, DataType type,
-                     const void* defval, ErrorCode expect )
+Tag test_create_tag( Interface& mb, const char* name, int num_vals, TagType storage, DataType type, const void* defval,
+                     ErrorCode expect )
 {
     ErrorCode rval;
     Tag       tag;
@@ -198,14 +198,13 @@ Tag test_create_tag( Interface& mb, const char* name, int num_vals, TagType stor
     return tag;
 }
 
-Tag test_create_var_len_tag( Interface& mb, const char* name, TagType storage, DataType type,
-                             const void* defval, int defval_size, ErrorCode expect )
+Tag test_create_var_len_tag( Interface& mb, const char* name, TagType storage, DataType type, const void* defval,
+                             int defval_size, ErrorCode expect )
 {
     ErrorCode rval;
     Tag       tag;
 
-    rval = mb.tag_get_handle( name, defval_size, type, tag, storage | MB_TAG_VARLEN | MB_TAG_EXCL,
-                              defval );
+    rval = mb.tag_get_handle( name, defval_size, type, tag, storage | MB_TAG_VARLEN | MB_TAG_EXCL, defval );
     if( expect != MB_SUCCESS )
     {
         CHECK_EQUAL( expect, rval );
@@ -252,8 +251,7 @@ Tag test_create_var_len_tag( Interface& mb, const char* name, TagType storage, D
     }
 
     // make sure we can't create a second tag w/ the same name
-    rval =
-        mb.tag_get_handle( name, defval_size, type, tag2, storage | MB_TAG_VARLEN | MB_TAG_EXCL );
+    rval = mb.tag_get_handle( name, defval_size, type, tag2, storage | MB_TAG_VARLEN | MB_TAG_EXCL );
     CHECK_EQUAL( MB_ALREADY_ALLOCATED, rval );
     // we should get back the handle of the existing tag
     CHECK_EQUAL( tag, tag2 );
@@ -325,9 +323,8 @@ static void concat_to_list( const void* concat, std::vector< const void* >& list
 }
 
 // test get/set of tag values
-void test_get_set( const char* name, int vals_per_ent, TagType storage, DataType type,
-                   const void* some_values, int num_values, const void* default_value,
-                   SetMode set_mode, bool get_by_pointer )
+void test_get_set( const char* name, int vals_per_ent, TagType storage, DataType type, const void* some_values,
+                   int num_values, const void* default_value, SetMode set_mode, bool get_by_pointer )
 {
     std::vector< unsigned char > data;
 
@@ -374,8 +371,7 @@ void test_get_set( const char* name, int vals_per_ent, TagType storage, DataType
 
     Range                       handle_range;
     std::vector< EntityHandle > handle_list;
-    for( Range::const_pair_iterator i = entities.const_pair_begin( );
-         i != entities.const_pair_end( ); ++i )
+    for( Range::const_pair_iterator i = entities.const_pair_begin( ); i != entities.const_pair_end( ); ++i )
     {
         if( i->first == i->second || i->second - i->first == 1 )
         {
@@ -434,8 +430,7 @@ void test_get_set( const char* name, int vals_per_ent, TagType storage, DataType
     {
         const int n = std::min( (int)handle_list.size( ) - i, step );
         list.resize( n );
-        if( set_mode == NORMAL )
-        { rval = mb.tag_set_data( tag, &handle_list[ i ], n, some_values ); }
+        if( set_mode == NORMAL ) { rval = mb.tag_set_data( tag, &handle_list[ i ], n, some_values ); }
         else if( set_mode == POINTER )
         {
             concat_to_list( some_values, list, bytes );
@@ -478,8 +473,7 @@ void test_get_set( const char* name, int vals_per_ent, TagType storage, DataType
     {
         std::vector< unsigned char > input_data( handle_range.size( ) * bytes );
         for( int i = 0; i < (int)input_data.size( ); i += num_values * bytes )
-            memcpy( &input_data[ i ], some_values,
-                    std::min( (int)input_data.size( ) - i, num_values * bytes ) );
+            memcpy( &input_data[ i ], some_values, std::min( (int)input_data.size( ) - i, num_values * bytes ) );
         rval = mb.tag_set_data( tag, handle_range, &input_data[ 0 ] );
     }
     else if( set_mode == POINTER )
@@ -528,8 +522,7 @@ void test_get_set( const char* name, int vals_per_ent, TagType storage, DataType
     for( size_t i = 0; i < list.size( ); ++i )
     {
         CHECK( list[ i * dstep ] != NULL );
-        const void* ptr =
-            reinterpret_cast< const char* >( some_values ) + ( i % num_values ) * bytes;
+        const void* ptr = reinterpret_cast< const char* >( some_values ) + ( i % num_values ) * bytes;
         CHECK( !memcmp( list[ i * dstep ], ptr, bytes ) );
     }
 
@@ -588,8 +581,7 @@ void test_get_set( const char* name, int vals_per_ent, TagType storage, DataType
     rval = mb.tag_get_by_ptr( tag, handle_range, &list[ 0 ] );CHECK_ERR( rval );
     for( size_t i = 0; i < handle_range.size( ); ++i )
     {
-        const void* ptr =
-            reinterpret_cast< const char* >( some_values ) + ( i % num_values ) * bytes;
+        const void* ptr = reinterpret_cast< const char* >( some_values ) + ( i % num_values ) * bytes;
         CHECK( !memcmp( ptr, list[ i ], bytes ) );
     }
 }
@@ -608,26 +600,23 @@ void test_get_set_sparse_int( )
 
 void test_get_set_dense_int( )
 {
-    const int data[] = { 231, 416, 294, 504, 318, 558, 494, 006, 464, 648, 737,
-                         045, 179, 852, 944, 336, 773, 248, 434, 615, 677, 667,
-                         521, 748, 820, 533, 955, 300, 108, 726, 747, 597 };
+    const int data[] = { 231, 416, 294, 504, 318, 558, 494, 006, 464, 648, 737, 045, 179, 852, 944, 336,
+                         773, 248, 434, 615, 677, 667, 521, 748, 820, 533, 955, 300, 108, 726, 747, 597 };
     const int num_val = sizeof( data ) / sizeof( data[ 0 ] );
 
     test_get_set( "dense_int", 1, MB_TAG_DENSE, MB_TYPE_INTEGER, data, num_val, 0 );
 
     const int defaultval[] = { 5, 8, 1974 };
-    test_get_set( "dense_int_def", 3, MB_TAG_DENSE, MB_TYPE_INTEGER, data, num_val / 3,
-                  defaultval );
+    test_get_set( "dense_int_def", 3, MB_TAG_DENSE, MB_TYPE_INTEGER, data, num_val / 3, defaultval );
 }
 
 void test_get_set_dense_double( )
 {
     const double pi = 3.1415926535897931;
     const double e = 2.7182818284590451;
-    const double data[] = { 1,      1.,     pi,     e,      2,      1. / 2, 2 * pi,
-                            e / 2,  3,      1. / 3, 3 * pi, e / 3,  4,      1. / 4,
-                            4 * pi, e / 4,  5,      1. / 5, 5 * pi, e / 5,  6,
-                            1. / 6, 6 * pi, e / 6,  0,      100,    1000,   10000 };
+    const double data[] = { 1,      1.,     pi,     e,      2,      1. / 2, 2 * pi, e / 2,  3,      1. / 3,
+                            3 * pi, e / 3,  4,      1. / 4, 4 * pi, e / 4,  5,      1. / 5, 5 * pi, e / 5,
+                            6,      1. / 6, 6 * pi, e / 6,  0,      100,    1000,   10000 };
     const int    num_val = sizeof( data ) / sizeof( data[ 0 ] );
 
     test_get_set( "dense_dbl", 1, MB_TAG_DENSE, MB_TYPE_DOUBLE, data, num_val, 0 );
@@ -641,12 +630,10 @@ void test_get_pointers_sparse( )
     const double data[] = { 1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 16 };
     const int    num_val = sizeof( data ) / sizeof( data[ 0 ] );
 
-    test_get_set( "sparse_dbl_ptr", 2, MB_TAG_SPARSE, MB_TYPE_DOUBLE, data, num_val / 2, 0, NORMAL,
-                  true );
+    test_get_set( "sparse_dbl_ptr", 2, MB_TAG_SPARSE, MB_TYPE_DOUBLE, data, num_val / 2, 0, NORMAL, true );
 
     const double defaultval[] = { -1, -2 };
-    test_get_set( "sparse_dbl_ptr_def", 2, MB_TAG_SPARSE, MB_TYPE_DOUBLE, data, num_val / 2,
-                  defaultval, NORMAL, true );
+    test_get_set( "sparse_dbl_ptr_def", 2, MB_TAG_SPARSE, MB_TYPE_DOUBLE, data, num_val / 2, defaultval, NORMAL, true );
 }
 
 void test_get_pointers_dense( )
@@ -654,12 +641,10 @@ void test_get_pointers_dense( )
     const unsigned char data[] = "a few aribtrary bytes entered as a string";
     const int           num_val = sizeof( data ) / sizeof( data[ 0 ] );
 
-    test_get_set( "dense_byte_ptr", 2, MB_TAG_DENSE, MB_TYPE_OPAQUE, data, num_val / 2, 0, NORMAL,
-                  true );
+    test_get_set( "dense_byte_ptr", 2, MB_TAG_DENSE, MB_TYPE_OPAQUE, data, num_val / 2, 0, NORMAL, true );
 
     const unsigned char defaultval[] = "XY";
-    test_get_set( "dense_byte_ptr_def", 2, MB_TAG_DENSE, MB_TYPE_OPAQUE, data, num_val / 2,
-                  defaultval, NORMAL, true );
+    test_get_set( "dense_byte_ptr_def", 2, MB_TAG_DENSE, MB_TYPE_OPAQUE, data, num_val / 2, defaultval, NORMAL, true );
 }
 
 void test_set_pointers_sparse( )
@@ -667,12 +652,11 @@ void test_set_pointers_sparse( )
     const double data[] = { 1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 16 };
     const int    num_val = sizeof( data ) / sizeof( data[ 0 ] );
 
-    test_get_set( "sparse_dbl_ptr", 2, MB_TAG_SPARSE, MB_TYPE_DOUBLE, data, num_val / 2, 0, POINTER,
-                  false );
+    test_get_set( "sparse_dbl_ptr", 2, MB_TAG_SPARSE, MB_TYPE_DOUBLE, data, num_val / 2, 0, POINTER, false );
 
     const double defaultval[] = { -1, -2 };
-    test_get_set( "sparse_dbl_ptr_def", 2, MB_TAG_SPARSE, MB_TYPE_DOUBLE, data, num_val / 2,
-                  defaultval, POINTER, false );
+    test_get_set( "sparse_dbl_ptr_def", 2, MB_TAG_SPARSE, MB_TYPE_DOUBLE, data, num_val / 2, defaultval, POINTER,
+                  false );
 }
 
 void test_set_pointers_dense( )
@@ -680,46 +664,40 @@ void test_set_pointers_dense( )
     const unsigned char data[] = "a few aribtrary bytes entered as a string";
     const int           num_val = sizeof( data ) / sizeof( data[ 0 ] );
 
-    test_get_set( "dense_byte_ptr", 2, MB_TAG_DENSE, MB_TYPE_OPAQUE, data, num_val / 2, 0, POINTER,
-                  false );
+    test_get_set( "dense_byte_ptr", 2, MB_TAG_DENSE, MB_TYPE_OPAQUE, data, num_val / 2, 0, POINTER, false );
 
     const unsigned char defaultval[] = "XY";
-    test_get_set( "dense_byte_ptr_def", 2, MB_TAG_DENSE, MB_TYPE_OPAQUE, data, num_val / 2,
-                  defaultval, POINTER, false );
+    test_get_set( "dense_byte_ptr_def", 2, MB_TAG_DENSE, MB_TYPE_OPAQUE, data, num_val / 2, defaultval, POINTER,
+                  false );
 
     const double dbldata[ 3 ] = { 1.0, 2.0, 3.0 };
     const int    dbl_num_val = sizeof( dbldata ) / sizeof( double );
 
-    test_get_set( "dense_double_ptr", 3, MB_TAG_DENSE, MB_TYPE_DOUBLE, dbldata, dbl_num_val, 0,
-                  POINTER, false );
+    test_get_set( "dense_double_ptr", 3, MB_TAG_DENSE, MB_TYPE_DOUBLE, dbldata, dbl_num_val, 0, POINTER, false );
 
     const double dbldefaultval[ 3 ] = { 0.0, 0.0, 0.0 };
-    test_get_set( "dense_byte_ptr_def", 3, MB_TAG_DENSE, MB_TYPE_DOUBLE, dbldata, dbl_num_val,
-                  dbldefaultval, POINTER, false );
+    test_get_set( "dense_byte_ptr_def", 3, MB_TAG_DENSE, MB_TYPE_DOUBLE, dbldata, dbl_num_val, dbldefaultval, POINTER,
+                  false );
 }
 
 void test_clear_dense( )
 {
     const int int_val = 0xcab;
-    test_get_set( "clear_dense_int", 1, MB_TAG_DENSE, MB_TYPE_INTEGER, &int_val, 1, 0, ONE_VALUE,
-                  false );
+    test_get_set( "clear_dense_int", 1, MB_TAG_DENSE, MB_TYPE_INTEGER, &int_val, 1, 0, ONE_VALUE, false );
 
     const double dbl_val[] = { 3.14159, -3.14159 };
     const double default_val[] = { -2, 5 };
-    test_get_set( "clear_dense_double", 2, MB_TAG_DENSE, MB_TYPE_DOUBLE, &dbl_val, 1, default_val,
-                  ONE_VALUE, false );
+    test_get_set( "clear_dense_double", 2, MB_TAG_DENSE, MB_TYPE_DOUBLE, &dbl_val, 1, default_val, ONE_VALUE, false );
 }
 
 void test_clear_sparse( )
 {
     const int int_val = 0xcab;
-    test_get_set( "clear_sparse_int", 1, MB_TAG_SPARSE, MB_TYPE_INTEGER, &int_val, 1, 0, ONE_VALUE,
-                  false );
+    test_get_set( "clear_sparse_int", 1, MB_TAG_SPARSE, MB_TYPE_INTEGER, &int_val, 1, 0, ONE_VALUE, false );
 
     const double dbl_val[] = { 3.14159, -3.14159 };
     const double default_val[] = { -2, 5 };
-    test_get_set( "clear_sparse_double", 2, MB_TAG_SPARSE, MB_TYPE_DOUBLE, &dbl_val, 1, default_val,
-                  ONE_VALUE, false );
+    test_get_set( "clear_sparse_double", 2, MB_TAG_SPARSE, MB_TYPE_DOUBLE, &dbl_val, 1, default_val, ONE_VALUE, false );
 }
 
 void test_get_set_bit( )
@@ -816,12 +794,11 @@ void test_get_by_tag( )
 
     // get five handles
     CHECK( entities.size( ) > 6 );
-    EntityHandle arr[ 5 ] = { *( entities.begin( ) += entities.size( ) / 6 ),
-                              *( entities.begin( ) += 2 * entities.size( ) / 6 ),
-                              *( entities.begin( ) += 3 * entities.size( ) / 6 ),
-                              *( entities.begin( ) += 4 * entities.size( ) / 6 ),
-                              *( entities.begin( ) += 5 * entities.size( ) / 6 ) };
-    int          values[ 5 ] = { 1, 2, 3, 4, 5 };
+    EntityHandle arr[ 5 ] = {
+        *( entities.begin( ) += entities.size( ) / 6 ), *( entities.begin( ) += 2 * entities.size( ) / 6 ),
+        *( entities.begin( ) += 3 * entities.size( ) / 6 ), *( entities.begin( ) += 4 * entities.size( ) / 6 ),
+        *( entities.begin( ) += 5 * entities.size( ) / 6 ) };
+    int values[ 5 ] = { 1, 2, 3, 4, 5 };
     rval = mb.tag_set_data( tag, arr, 5, values );CHECK_ERR( rval );
     const void* const valarr[ 1 ] = { 0 };
 
@@ -902,12 +879,11 @@ void test_get_by_tag_value( )
 
     // get five handles
     CHECK( entities.size( ) > 6 );
-    EntityHandle arr[ 5 ] = { *( entities.begin( ) += entities.size( ) / 6 ),
-                              *( entities.begin( ) += 2 * entities.size( ) / 6 ),
-                              *( entities.begin( ) += 3 * entities.size( ) / 6 ),
-                              *( entities.begin( ) += 4 * entities.size( ) / 6 ),
-                              *( entities.begin( ) += 5 * entities.size( ) / 6 ) };
-    int          values[ 5 ] = { 0xBEEF, 0xBEEF, 0xBEEF, 0xBEEF, 0xBEEF };
+    EntityHandle arr[ 5 ] = {
+        *( entities.begin( ) += entities.size( ) / 6 ), *( entities.begin( ) += 2 * entities.size( ) / 6 ),
+        *( entities.begin( ) += 3 * entities.size( ) / 6 ), *( entities.begin( ) += 4 * entities.size( ) / 6 ),
+        *( entities.begin( ) += 5 * entities.size( ) / 6 ) };
+    int values[ 5 ] = { 0xBEEF, 0xBEEF, 0xBEEF, 0xBEEF, 0xBEEF };
     rval = mb.tag_set_data( tag, arr, 5, values );CHECK_ERR( rval );
     const void* const valarr[ 1 ] = { values };
 
@@ -1000,8 +976,7 @@ void test_get_by_tag_value_dense( )
     results = elements;
     results.erase( arr[ 1 ] );
     results.insert( vertices.front( ) );
-    rval = mb.get_entities_by_type_and_tag( 0, MBHEX, &tag, findarr, 1, results,
-                                            Interface::INTERSECT );CHECK_ERR( rval );
+    rval = mb.get_entities_by_type_and_tag( 0, MBHEX, &tag, findarr, 1, results, Interface::INTERSECT );CHECK_ERR( rval );
     CHECK_EQUAL( (size_t)2, results.size( ) );
     CHECK_EQUAL( arr[ 0 ], results.front( ) );
     CHECK_EQUAL( arr[ 2 ], results.back( ) );
@@ -1018,8 +993,8 @@ void test_get_by_tag_value_dense( )
     CHECK( expected == results );
 }
 
-void test_mesh_value( Interface& mb, const char* tag_name, unsigned tag_size, TagType tag_storage,
-                      DataType tag_type, const void* value )
+void test_mesh_value( Interface& mb, const char* tag_name, unsigned tag_size, TagType tag_storage, DataType tag_type,
+                      const void* value )
 {
     // create  tag
     Tag tag = test_create_tag( mb, tag_name, tag_size, tag_storage, tag_type, 0 );
@@ -1138,8 +1113,7 @@ static void test_delete_type_tag( TagType storage )
 }
 
 template< typename Container >
-ErrorCode set_bit_data( Interface& mb, Tag tag, const Container& handles,
-                        const std::vector< unsigned char >& data )
+ErrorCode set_bit_data( Interface& mb, Tag tag, const Container& handles, const std::vector< unsigned char >& data )
 {
     ErrorCode rval;
     data.resize( handles.size( ) );
@@ -1205,8 +1179,8 @@ void test_get_entity_tags( )
     }
 
     // get tags on each entity
-    std::vector< Tag > sparse_ent_tags, dense_ent_tags, bit_ent_tags, sparse_dense_ent_tags,
-        sparse_bit_ent_tags, dense_bit_ent_tags, all_tag_ent_tags, no_tag_ent_tags;
+    std::vector< Tag > sparse_ent_tags, dense_ent_tags, bit_ent_tags, sparse_dense_ent_tags, sparse_bit_ent_tags,
+        dense_bit_ent_tags, all_tag_ent_tags, no_tag_ent_tags;
     rval = mb.tag_get_tags_on_entity( sparse_ent, sparse_ent_tags );CHECK_ERR( rval );
     rval = mb.tag_get_tags_on_entity( dense_ent, dense_ent_tags );CHECK_ERR( rval );
     rval = mb.tag_get_tags_on_entity( bit_ent, bit_ent_tags );CHECK_ERR( rval );
@@ -1414,9 +1388,9 @@ void test_delete_bit_data( )
     CHECK_EQUAL( defval, val );
 }
 
-void test_get_set_variable_length( const char* name, TagType storage, DataType type,
-                                   const void** values, const int* lengths, int num_values,
-                                   const void* default_value, int default_value_length )
+void test_get_set_variable_length( const char* name, TagType storage, DataType type, const void** values,
+                                   const int* lengths, int num_values, const void* default_value,
+                                   int default_value_length )
 {
     std::vector< const void* > data;
     std::vector< int >         data_lens;
@@ -1425,8 +1399,7 @@ void test_get_set_variable_length( const char* name, TagType storage, DataType t
     Core       moab;
     Interface& mb = moab;
     setup_mesh( mb );
-    Tag tag =
-        test_create_var_len_tag( mb, name, storage, type, default_value, default_value_length );
+    Tag tag = test_create_var_len_tag( mb, name, storage, type, default_value, default_value_length );
 
     // get some handles to work with
     Range     entities;
@@ -1445,8 +1418,7 @@ void test_get_set_variable_length( const char* name, TagType storage, DataType t
 
     Range                       handle_range;
     std::vector< EntityHandle > handle_list;
-    for( Range::const_pair_iterator i = entities.const_pair_begin( );
-         i != entities.const_pair_end( ); ++i )
+    for( Range::const_pair_iterator i = entities.const_pair_begin( ); i != entities.const_pair_end( ); ++i )
     {
         if( i->first == i->second || i->second - i->first == 1 )
         {
@@ -1636,8 +1608,7 @@ void test_get_set_variable_length_sparse( )
                                ints + 21, ints + 28, ints + 29, ints + 31 };
     const int   ilens[ 9 ] = { 1, 2, 9, 5, 4, 7, 1, 2, 1 };
     const int   defvals[] = { 42, 5, 8, 74 };
-    test_get_set_variable_length( "vdef", MB_TAG_SPARSE, MB_TYPE_INTEGER, ivals, ilens, 9, defvals,
-                                  4 );
+    test_get_set_variable_length( "vdef", MB_TAG_SPARSE, MB_TYPE_INTEGER, ivals, ilens, 9, defvals, 4 );
 }
 
 void test_get_set_variable_length_dense( )
@@ -1653,8 +1624,7 @@ void test_get_set_variable_length_dense( )
                                ints + 21, ints + 28, ints + 29, ints + 31 };
     const int   ilens[ 9 ] = { 1, 2, 9, 5, 4, 7, 1, 2, 1 };
     const int   defvals[] = { 42, 5, 8, 74 };
-    test_get_set_variable_length( "vdef", MB_TAG_DENSE, MB_TYPE_INTEGER, ivals, ilens, 9, defvals,
-                                  4 );
+    test_get_set_variable_length( "vdef", MB_TAG_DENSE, MB_TYPE_INTEGER, ivals, ilens, 9, defvals, 4 );
 }
 
 void test_get_set_variable_length_mesh( )
@@ -1703,8 +1673,7 @@ void test_clear_variable_length( TagType storage )
     const void* ivals[] = { ints };
     const int   ilen = sizeof( ints ) / sizeof( int );
     const int   defvals[] = { 42, 5, 8, 74 };
-    test_get_set_variable_length( "vdef_clear", storage, MB_TYPE_INTEGER, ivals, &ilen, 1, defvals,
-                                  4 );
+    test_get_set_variable_length( "vdef_clear", storage, MB_TYPE_INTEGER, ivals, &ilen, 1, defvals, 4 );
 }
 
 void test_clear_sparse_varlen( )
@@ -1744,9 +1713,8 @@ void test_get_ents_with_default_value( )
     }
 
     // create a sparse tag and set some verts to non-default value
-    int default_sparse = 5;
-    Tag tag_sparse =
-        test_create_tag( mb, "int", 1, MB_TAG_SPARSE, MB_TYPE_INTEGER, &default_sparse );
+    int                default_sparse = 5;
+    Tag                tag_sparse = test_create_tag( mb, "int", 1, MB_TAG_SPARSE, MB_TYPE_INTEGER, &default_sparse );
     std::vector< int > sparse_vals( sets[ 0 ].size( ), -1 );
     rval = mb.tag_set_data( tag_sparse, sets[ 0 ], &sparse_vals[ 0 ] );CHECK_ERR( rval );
 
@@ -1757,9 +1725,8 @@ void test_get_ents_with_default_value( )
     CHECK_EQUAL( subtract( verts, sets[ 0 ] ), result );
 
     // create a dense tag and set some verts to non-default value
-    double default_dense = -1.0;
-    Tag    tag_dense =
-        test_create_tag( mb, "double", 1, MB_TAG_DENSE, MB_TYPE_DOUBLE, &default_dense );
+    double                default_dense = -1.0;
+    Tag                   tag_dense = test_create_tag( mb, "double", 1, MB_TAG_DENSE, MB_TYPE_DOUBLE, &default_dense );
     std::vector< double > dense_vals( sets[ 1 ].size( ), 3.14159 );
     rval = mb.tag_set_data( tag_dense, sets[ 1 ], &dense_vals[ 0 ] );CHECK_ERR( rval );
 
@@ -1775,15 +1742,15 @@ void test_get_ents_with_default_value( )
     // Tag tag_vlen = test_create_var_len_tag( mb, "vlen", MB_TAG_SPARSE, MB_TYPE_INTEGER,
     // default_vlen, sizeof(default_vlen) ); int other_vlen[] = { 4, 5, 6, 7 }; std::vector<const
     // void*> vlen_ptrs( sets[2].size(), other_vlen ); std::vector<int> vlen_sizes( sets[2].size)(),
-    // sizeof(other_vlen) ); rval = mb.tag_set_data( tag_vlen, sets[2], &vlen_ptrs[0], &vlen_sizes[0]
+    // sizeof(other_vlen) ); rval = mb.tag_set_data( tag_vlen, sets[2], &vlen_ptrs[0],
+    // &vlen_sizes[0]
     // ); CHECK_ERR(rval);
 
     // check that INTERSECT option works as expected
     result.clear( );
     result.insert( sets[ 1 ].front( ) );
     ptrs[ 0 ] = &default_sparse;
-    rval = mb.get_entities_by_type_and_tag( 0, MBVERTEX, &tag_sparse, ptrs, 1, result,
-                                            Interface::INTERSECT );CHECK_ERR( rval );
+    rval = mb.get_entities_by_type_and_tag( 0, MBVERTEX, &tag_sparse, ptrs, 1, result, Interface::INTERSECT );CHECK_ERR( rval );
     CHECK_EQUAL( (size_t)1, result.size( ) );
     CHECK_EQUAL( sets[ 1 ].front( ), result.front( ) );
 
@@ -1791,8 +1758,7 @@ void test_get_ents_with_default_value( )
     result.clear( );
     result.insert( edge );
     ptrs[ 0 ] = &default_sparse;
-    rval = mb.get_entities_by_type_and_tag( 0, MBVERTEX, &tag_sparse, ptrs, 1, result,
-                                            Interface::UNION );CHECK_ERR( rval );
+    rval = mb.get_entities_by_type_and_tag( 0, MBVERTEX, &tag_sparse, ptrs, 1, result, Interface::UNION );CHECK_ERR( rval );
     CHECK_EQUAL( edge, result.back( ) );
 }
 
@@ -1868,24 +1834,22 @@ void test_bit_tag_big( )
 
 void setup_mesh( Interface& mb )
 {
-    Range        vertex_handles;
-    const double vertex_coords[] = {
-        0, 0, 0, 1, 0, 0, 2, 0, 0, 0, 1, 0, 1, 1, 0, 2, 1, 0, 0, 2, 0, 1, 2, 0, 2, 2, 0,
+    Range          vertex_handles;
+    const double   vertex_coords[] = { 0, 0, 0, 1, 0, 0, 2, 0, 0, 0, 1, 0, 1, 1, 0, 2, 1, 0, 0, 2, 0, 1, 2, 0, 2, 2, 0,
 
-        0, 0, 1, 1, 0, 1, 2, 0, 1, 0, 1, 1, 1, 1, 1, 2, 1, 1, 0, 2, 1, 1, 2, 1, 2, 2, 1,
+                                     0, 0, 1, 1, 0, 1, 2, 0, 1, 0, 1, 1, 1, 1, 1, 2, 1, 1, 0, 2, 1, 1, 2, 1, 2, 2, 1,
 
-        0, 0, 2, 1, 0, 2, 2, 0, 2, 0, 1, 2, 1, 1, 2, 2, 1, 2, 0, 2, 2, 1, 2, 2, 2, 2, 2 };
+                                     0, 0, 2, 1, 0, 2, 2, 0, 2, 0, 1, 2, 1, 1, 2, 2, 1, 2, 0, 2, 2, 1, 2, 2, 2, 2, 2 };
     const unsigned num_vtx = sizeof( vertex_coords ) / ( 3 * sizeof( double ) );
     ErrorCode      rval = mb.create_vertices( vertex_coords, num_vtx, vertex_handles );CHECK_ERR( rval );
     CHECK_EQUAL( num_vtx, (unsigned)vertex_handles.size( ) );
 
     CHECK_EQUAL( 27u, num_vtx );
     EntityHandle elements[ 8 ];
-    EntityHandle conn[ 8 ][ 8 ] = {
-        { 0, 1, 4, 3, 9, 10, 13, 12 },      { 1, 2, 5, 4, 10, 11, 14, 13 },
-        { 3, 4, 7, 6, 12, 13, 16, 15 },     { 4, 5, 8, 7, 13, 14, 17, 16 },
-        { 9, 10, 13, 12, 18, 19, 22, 21 },  { 10, 11, 14, 13, 19, 20, 23, 22 },
-        { 12, 13, 16, 15, 21, 22, 25, 24 }, { 13, 14, 17, 16, 22, 23, 26, 25 } };
+    EntityHandle conn[ 8 ][ 8 ] = { { 0, 1, 4, 3, 9, 10, 13, 12 },      { 1, 2, 5, 4, 10, 11, 14, 13 },
+                                    { 3, 4, 7, 6, 12, 13, 16, 15 },     { 4, 5, 8, 7, 13, 14, 17, 16 },
+                                    { 9, 10, 13, 12, 18, 19, 22, 21 },  { 10, 11, 14, 13, 19, 20, 23, 22 },
+                                    { 12, 13, 16, 15, 21, 22, 25, 24 }, { 13, 14, 17, 16, 22, 23, 26, 25 } };
     for( unsigned i = 0; i < 8; ++i )
     {
         rval = mb.create_element( MBHEX, conn[ i ], 8, elements[ i ] );CHECK_ERR( rval );
@@ -1915,8 +1879,7 @@ void regression_one_entity_by_var_tag( )
     rval = moab.create_vertex( coords, vertex );CHECK_ERR( rval );
 
     Tag tag;
-    rval = moab.tag_get_handle( "testtag", 0, MB_TYPE_INTEGER, tag,
-                                MB_TAG_DENSE | MB_TAG_VARLEN | MB_TAG_EXCL );CHECK_ERR( rval );
+    rval = moab.tag_get_handle( "testtag", 0, MB_TYPE_INTEGER, tag, MB_TAG_DENSE | MB_TAG_VARLEN | MB_TAG_EXCL );CHECK_ERR( rval );
 
     int         taglen = 1;
     const void* ptrarr[ 1 ] = { &taglen };
@@ -1942,10 +1905,8 @@ void regression_tag_on_nonexistent_entity( )
 
     // create all three types of tags
     Tag dense, sparse, bit;
-    rval =
-        moab.tag_get_handle( "test_dense", 1, MB_TYPE_INTEGER, dense, MB_TAG_DENSE | MB_TAG_EXCL );CHECK_ERR( rval );
-    rval = moab.tag_get_handle( "test_sparse", 1, MB_TYPE_INTEGER, sparse,
-                                MB_TAG_SPARSE | MB_TAG_EXCL );CHECK_ERR( rval );
+    rval = moab.tag_get_handle( "test_dense", 1, MB_TYPE_INTEGER, dense, MB_TAG_DENSE | MB_TAG_EXCL );CHECK_ERR( rval );
+    rval = moab.tag_get_handle( "test_sparse", 1, MB_TYPE_INTEGER, sparse, MB_TAG_SPARSE | MB_TAG_EXCL );CHECK_ERR( rval );
     rval = moab.tag_get_handle( "test_bit", 4, MB_TYPE_BIT, bit, MB_TAG_EXCL );CHECK_ERR( rval );
 
     // for each tag type, check all four mechanisms for setting tag data
@@ -2041,8 +2002,7 @@ void test_tag_iterate_common( TagType storage, bool with_default )
     // Create an integer tag
     Tag       tag;
     const int defval = 0;
-    rval = mb.tag_get_handle( "TEST_TAG", 1, MB_TYPE_INTEGER, tag, storage | MB_TAG_CREAT,
-                              with_default ? &defval : 0 );CHECK_ERR( rval );
+    rval = mb.tag_get_handle( "TEST_TAG", 1, MB_TYPE_INTEGER, tag, storage | MB_TAG_CREAT, with_default ? &defval : 0 );CHECK_ERR( rval );
 
     // Set tag values
     std::vector< int > values( verts.size( ), defval );
@@ -2065,8 +2025,7 @@ void test_tag_iterate_common( TagType storage, bool with_default )
         assert( total + count <= (int)verts.size( ) );
         CHECK_ARRAYS_EQUAL( &values[ total ], count, reinterpret_cast< int* >( ptr ), count );
 
-        if( i == verts.begin( ) && with_default && storage == MB_TAG_SPARSE )
-            ( (int*)ptr )[ 0 ] = 1.0;
+        if( i == verts.begin( ) && with_default && storage == MB_TAG_SPARSE ) ( (int*)ptr )[ 0 ] = 1.0;
 
         i += count;
         total += count;
@@ -2152,13 +2111,11 @@ void test_tag_iterate_invalid( )
     // Check that we cannot iterate over variable-length tags
     // (this will never be possible because this API function cannot
     //  pass back the length of the tag values)
-    rval = mb.tag_get_handle( "vden", 1, MB_TYPE_INTEGER, tag,
-                              MB_TAG_VARLEN | MB_TAG_DENSE | MB_TAG_EXCL, &zero );CHECK_ERR( rval );
+    rval = mb.tag_get_handle( "vden", 1, MB_TYPE_INTEGER, tag, MB_TAG_VARLEN | MB_TAG_DENSE | MB_TAG_EXCL, &zero );CHECK_ERR( rval );
     rval = mb.tag_iterate( tag, verts.begin( ), verts.end( ), count, ptr );
     CHECK_EQUAL( MB_VARIABLE_DATA_LENGTH, rval );
 
-    rval = mb.tag_get_handle( "vspr", 1, MB_TYPE_INTEGER, tag,
-                              MB_TAG_VARLEN | MB_TAG_SPARSE | MB_TAG_EXCL, &zero );CHECK_ERR( rval );
+    rval = mb.tag_get_handle( "vspr", 1, MB_TYPE_INTEGER, tag, MB_TAG_VARLEN | MB_TAG_SPARSE | MB_TAG_EXCL, &zero );CHECK_ERR( rval );
     rval = mb.tag_iterate( tag, verts.begin( ), verts.end( ), count, ptr );
     CHECK_EQUAL( MB_VARIABLE_DATA_LENGTH, rval );
 }

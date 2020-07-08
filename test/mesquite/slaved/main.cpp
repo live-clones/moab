@@ -61,8 +61,8 @@ void usage( const char* argv0 )
     exit( 1 );
 }
 
-int check_slaved_coords( Mesh& mesh, Settings::HigherOrderSlaveMode mode, std::string name,
-                         bool have_slaved_flag, MsqError& err );
+int check_slaved_coords( Mesh& mesh, Settings::HigherOrderSlaveMode mode, std::string name, bool have_slaved_flag,
+                         MsqError& err );
 
 // compare vertex coodinates between two topologically equivalent meshes
 int compare_node_coords( Mesh& mesh1, Mesh& mesh2, MsqError& err );
@@ -120,8 +120,7 @@ int main( int argc, char* argv[] )
     const int NUM_MODES = 4;
 
     Settings::HigherOrderSlaveMode modes[ NUM_MODES ] = { Settings::SLAVE_NONE, Settings::SLAVE_ALL,
-                                                          Settings::SLAVE_CALCULATED,
-                                                          Settings::SLAVE_FLAG };
+                                                          Settings::SLAVE_CALCULATED, Settings::SLAVE_FLAG };
 
     std::string names[ NUM_MODES ] = { "NONE", "ALL", "CALCULATED", "FLAG" };
 
@@ -150,8 +149,7 @@ int main( int argc, char* argv[] )
             if( err )
             {
                 have_slaved_flag = false;
-                std::cout << "Skipped because input file does not contain slaved attribute"
-                          << std::endl;
+                std::cout << "Skipped because input file does not contain slaved attribute" << std::endl;
                 err.clear( );
                 continue;
             }
@@ -196,8 +194,7 @@ int main( int argc, char* argv[] )
                       << "     Mode: " << names[ i ] << std::endl
                       << "-----------------------------------------------" << std::endl;
 
-            exit_code +=
-                check_slaved_coords( meshes[ i ], modes[ i ], names[ i ], have_slaved_flag, err );
+            exit_code += check_slaved_coords( meshes[ i ], modes[ i ], names[ i ], have_slaved_flag, err );
             if( err ) return 1;
         }
 
@@ -206,8 +203,7 @@ int main( int argc, char* argv[] )
         if( have_slaved_flag )
         {
             int flag_idx = std::find( modes, modes + NUM_MODES, Settings::SLAVE_FLAG ) - modes;
-            int calc_idx =
-                std::find( modes, modes + NUM_MODES, Settings::SLAVE_CALCULATED ) - modes;
+            int calc_idx = std::find( modes, modes + NUM_MODES, Settings::SLAVE_CALCULATED ) - modes;
             exit_code += compare_node_coords( meshes[ flag_idx ], meshes[ calc_idx ], err );
             if( err ) return 1;
         }
@@ -257,8 +253,8 @@ Vector3D get_slaved_coords( Mesh& mesh, Mesh::VertexHandle vertex, MsqError& err
     return sum / n;
 }
 
-int check_slaved_coords( Mesh& mesh, Settings::HigherOrderSlaveMode mode, std::string name,
-                         bool have_slaved_flag, MsqError& err )
+int check_slaved_coords( Mesh& mesh, Settings::HigherOrderSlaveMode mode, std::string name, bool have_slaved_flag,
+                         MsqError& err )
 {
     const double EPSILON = 1e-4;
 
@@ -268,8 +264,7 @@ int check_slaved_coords( Mesh& mesh, Settings::HigherOrderSlaveMode mode, std::s
     // have it defined
     if( !have_slaved_flag )
     {
-        std::cerr << "slaved flag not specified in input file. Cannot validate results."
-                  << std::endl;
+        std::cerr << "slaved flag not specified in input file. Cannot validate results." << std::endl;
         return 1;
     }
 
@@ -332,8 +327,7 @@ int check_slaved_coords( Mesh& mesh, Settings::HigherOrderSlaveMode mode, std::s
             exp -= free_coords[ i ];
             if( exp.length( ) > EPSILON )
             {
-                std::cerr << "Slaved vertex " << (size_t)free[ i ]
-                          << " not at expected slaved location" << std::endl;
+                std::cerr << "Slaved vertex " << (size_t)free[ i ] << " not at expected slaved location" << std::endl;
                 ++error_count;
             }
         }
@@ -369,8 +363,8 @@ int check_slaved_coords( Mesh& mesh, Settings::HigherOrderSlaveMode mode, std::s
             exp -= slave_coords[ i ];
             if( exp.length( ) > EPSILON )
             {
-                std::cerr << "Interior vertex " << (size_t)slave[ i ]
-                          << " not at expected slaved location" << std::endl;
+                std::cerr << "Interior vertex " << (size_t)slave[ i ] << " not at expected slaved location"
+                          << std::endl;
                 ++error_count;
             }
         }
@@ -438,8 +432,7 @@ int check_no_slaved_corners( Mesh& mesh, MsqError& err )
         {
             if( slaved[ offsets[ i ] + j ] )
             {
-                std::cerr << "Element " << (size_t)elems[ i ] << " corner " << j << " is slaved"
-                          << std::endl;
+                std::cerr << "Element " << (size_t)elems[ i ] << " corner " << j << " is slaved" << std::endl;
                 ++error_count;
             }
         }

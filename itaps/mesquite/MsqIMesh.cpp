@@ -39,8 +39,7 @@
 #include <algorithm>
 
 #ifdef IMESH_MAJOR_VERSION
-#define IMESH_VERSION_ATLEAST( MAJOR, MINOR ) \
-    1000 * IMESH_MAJOR_VERSION + IMESH_MINOR_VERSION <= 1000 * MAJOR + MINOR
+#define IMESH_VERSION_ATLEAST( MAJOR, MINOR ) 1000 * IMESH_MAJOR_VERSION + IMESH_MINOR_VERSION <= 1000 * MAJOR + MINOR
 #else
 #define IMESH_VERSION_ATLEAST( MAJOR, MINOR ) 0
 #endif
@@ -52,20 +51,19 @@ namespace MBMesquite
  *                          Mesh Definition
  ************************************************************************/
 
-MsqIMesh::MsqIMesh( iMesh_Instance mesh, iBase_EntitySetHandle meshset, iBase_EntityType type,
-                    MsqError& err, const iBase_TagHandle* fixed_tag,
-                    const iBase_TagHandle* slaved_tag )
-    : meshInstance( mesh ), inputSetType( iBase_ALL_TYPES ), inputSet( 0 ), byteTag( 0 ),
-      createdByteTag( false ), geometricDimension( 0 )
+MsqIMesh::MsqIMesh( iMesh_Instance mesh, iBase_EntitySetHandle meshset, iBase_EntityType type, MsqError& err,
+                    const iBase_TagHandle* fixed_tag, const iBase_TagHandle* slaved_tag )
+    : meshInstance( mesh ), inputSetType( iBase_ALL_TYPES ), inputSet( 0 ), byteTag( 0 ), createdByteTag( false ),
+      geometricDimension( 0 )
 {
     init_active_mesh( mesh, err, fixed_tag, slaved_tag );MSQ_ERRRTN( err );
     set_active_set( meshset, type, err );MSQ_ERRRTN( err );
 }
 
-MsqIMesh::MsqIMesh( iMesh_Instance mesh, iBase_EntityType type, MsqError& err,
-                    const iBase_TagHandle* fixed_tag, const iBase_TagHandle* slaved_tag )
-    : meshInstance( mesh ), inputSetType( iBase_ALL_TYPES ), inputSet( 0 ), byteTag( 0 ),
-      createdByteTag( false ), geometricDimension( 0 )
+MsqIMesh::MsqIMesh( iMesh_Instance mesh, iBase_EntityType type, MsqError& err, const iBase_TagHandle* fixed_tag,
+                    const iBase_TagHandle* slaved_tag )
+    : meshInstance( mesh ), inputSetType( iBase_ALL_TYPES ), inputSet( 0 ), byteTag( 0 ), createdByteTag( false ),
+      geometricDimension( 0 )
 {
     init_active_mesh( mesh, err, fixed_tag, slaved_tag );MSQ_ERRRTN( err );
 
@@ -96,8 +94,7 @@ iBase_EntitySetHandle MsqIMesh::get_entity_set( ) const
     return inputSet;
 }
 
-iBase_TagValueType MsqIMesh::check_valid_flag_tag( iBase_TagHandle tag, const char* which_flag,
-                                                   MsqError& err )
+iBase_TagValueType MsqIMesh::check_valid_flag_tag( iBase_TagHandle tag, const char* which_flag, MsqError& err )
 {
     int       ierr, size, type;
     const int MAX_NAME_LEN = 127;
@@ -128,8 +125,7 @@ iBase_TagValueType MsqIMesh::check_valid_flag_tag( iBase_TagHandle tag, const ch
     return static_cast< iBase_TagValueType >( type );
 }
 
-void MsqIMesh::init_active_mesh( iMesh_Instance /*mesh*/, MsqError& err,
-                                 const iBase_TagHandle* fixed_tag,
+void MsqIMesh::init_active_mesh( iMesh_Instance /*mesh*/, MsqError& err, const iBase_TagHandle* fixed_tag,
                                  const iBase_TagHandle* slaved_tag )
 {
     int ierr;
@@ -140,8 +136,7 @@ void MsqIMesh::init_active_mesh( iMesh_Instance /*mesh*/, MsqError& err,
     if( mapsize < iMesh_ALL_TOPOLOGIES )
     {
         MSQ_SETERR( err )
-        ( "MsqIMesh needs to be updated for new iMesh element topologies.",
-          MsqError::INTERNAL_ERROR );
+        ( "MsqIMesh needs to be updated for new iMesh element topologies.", MsqError::INTERNAL_ERROR );
     }
 
     for( size_t i = 0; i <= iMesh_ALL_TOPOLOGIES; ++i )
@@ -173,8 +168,7 @@ void MsqIMesh::init_active_mesh( iMesh_Instance /*mesh*/, MsqError& err,
     }
 
     // Get/create tag for vertex byte
-    iMesh_getTagHandle( meshInstance, VERTEX_BYTE_TAG_NAME, &byteTag, &ierr,
-                        strlen( VERTEX_BYTE_TAG_NAME ) );
+    iMesh_getTagHandle( meshInstance, VERTEX_BYTE_TAG_NAME, &byteTag, &ierr, strlen( VERTEX_BYTE_TAG_NAME ) );
     if( iBase_SUCCESS != ierr )
     {
         iMesh_createTag( meshInstance, VERTEX_BYTE_TAG_NAME, 1, iBase_INTEGER, &byteTag, &ierr,
@@ -194,16 +188,14 @@ void MsqIMesh::init_active_mesh( iMesh_Instance /*mesh*/, MsqError& err,
         if( iBase_SUCCESS != ierr || size != sizeof( int ) )
         {
             MSQ_SETERR( err )
-            ( MsqError::INVALID_STATE, "Tag \"%s\" exists with invalid size",
-              VERTEX_BYTE_TAG_NAME );
+            ( MsqError::INVALID_STATE, "Tag \"%s\" exists with invalid size", VERTEX_BYTE_TAG_NAME );
             return;
         }
         iMesh_getTagType( meshInstance, byteTag, &type, &ierr );
         if( iBase_SUCCESS != ierr || type != iBase_INTEGER )
         {
             MSQ_SETERR( err )
-            ( MsqError::INVALID_STATE, "Tag \"%s\" exists with invalid type",
-              VERTEX_BYTE_TAG_NAME );
+            ( MsqError::INVALID_STATE, "Tag \"%s\" exists with invalid type", VERTEX_BYTE_TAG_NAME );
             return;
         }
     }
@@ -251,8 +243,7 @@ const iBase_TagHandle* MsqIMesh::get_slaved_tag( ) const
     return haveSlavedTag ? &slavedTag : 0;
 }
 
-void MsqIMesh::set_active_set( iBase_EntitySetHandle elem_set, iBase_EntityType type_in,
-                               MsqError& err )
+void MsqIMesh::set_active_set( iBase_EntitySetHandle elem_set, iBase_EntityType type_in, MsqError& err )
 {
     inputSetType = type_in;
     inputSet = elem_set;
@@ -276,8 +267,8 @@ int MsqIMesh::get_geometric_dimension( MBMesquite::MsqError& /*err*/ )
 //************ Vertex Properties ********************
 
 void MsqIMesh::get_flag_data( iBase_TagHandle tag, bool have_tag, iBase_TagValueType type,
-                              const VertexHandle vert_array[], std::vector< bool >& flag_array,
-                              size_t num_vtx, MsqError& err )
+                              const VertexHandle vert_array[], std::vector< bool >& flag_array, size_t num_vtx,
+                              MsqError& err )
 {
     if( !num_vtx ) return;
 
@@ -334,23 +325,21 @@ void MsqIMesh::get_flag_data( iBase_TagHandle tag, bool have_tag, iBase_TagValue
 // is fixed and cannot be moved.  Note that this is a read-only
 // property; this flag can't be modified by users of the
 // MBMesquite::Mesh interface.
-void MsqIMesh::vertices_get_fixed_flag( const VertexHandle   vert_array[],
-                                        std::vector< bool >& bool_array, size_t num_vtx,
-                                        MsqError& err )
+void MsqIMesh::vertices_get_fixed_flag( const VertexHandle vert_array[], std::vector< bool >& bool_array,
+                                        size_t num_vtx, MsqError& err )
 {
     get_flag_data( fixedTag, haveFixedTag, fixedTagType, vert_array, bool_array, num_vtx, err );
 }
 
-void MsqIMesh::vertices_get_slaved_flag( const VertexHandle   vert_array[],
-                                         std::vector< bool >& bool_array, size_t num_vtx,
-                                         MsqError& err )
+void MsqIMesh::vertices_get_slaved_flag( const VertexHandle vert_array[], std::vector< bool >& bool_array,
+                                         size_t num_vtx, MsqError& err )
 {
     get_flag_data( slavedTag, haveSlavedTag, slavedTagType, vert_array, bool_array, num_vtx, err );
 }
 
 // Get vertex coordinates
-void MsqIMesh::vertices_get_coordinates( const MBMesquite::Mesh::VertexHandle vert_array[],
-                                         MsqVertex* coordinates, size_t num_vtx, MsqError& err )
+void MsqIMesh::vertices_get_coordinates( const MBMesquite::Mesh::VertexHandle vert_array[], MsqVertex* coordinates,
+                                         size_t num_vtx, MsqError& err )
 {
     if( !num_vtx ) return;
 
@@ -360,8 +349,7 @@ void MsqIMesh::vertices_get_coordinates( const MBMesquite::Mesh::VertexHandle ve
     int ierr, junk = 3 * num_vtx, junk2;
     assert( sizeof( VertexHandle ) == sizeof( iBase_EntityHandle ) );
     const iBase_EntityHandle* arr = reinterpret_cast< const iBase_EntityHandle* >( vert_array );
-    iMesh_getVtxArrCoords( meshInstance, arr, num_vtx, iBase_INTERLEAVED, &dbl_array, &junk, &junk2,
-                           &ierr );
+    iMesh_getVtxArrCoords( meshInstance, arr, num_vtx, iBase_INTERLEAVED, &dbl_array, &junk, &junk2, &ierr );
     if( iBase_SUCCESS != ierr )
     {
         MSQ_SETERR( err )( process_itaps_error( ierr ), MsqError::INTERNAL_ERROR );
@@ -391,32 +379,28 @@ void MsqIMesh::vertices_get_coordinates( const MBMesquite::Mesh::VertexHandle ve
     }
 }
 
-void MsqIMesh::vertex_set_coordinates( MBMesquite::Mesh::VertexHandle vertex,
-                                       const Vector3D& coords, MsqError& err )
+void MsqIMesh::vertex_set_coordinates( MBMesquite::Mesh::VertexHandle vertex, const Vector3D& coords, MsqError& err )
 {
     int                ierr;
     iBase_EntityHandle bh = static_cast< iBase_EntityHandle >( vertex );
     iMesh_setVtxCoord( meshInstance, bh, coords[ 0 ], coords[ 1 ], coords[ 2 ], &ierr );
-    if( iBase_SUCCESS != ierr )
-        MSQ_SETERR( err )( process_itaps_error( ierr ), MsqError::INTERNAL_ERROR );
+    if( iBase_SUCCESS != ierr ) MSQ_SETERR( err )( process_itaps_error( ierr ), MsqError::INTERNAL_ERROR );
 }
 
 // Each vertex has a byte-sized flag that can be used to store
 // flags.  This byte's value is neither set nor used by the mesh
 // implementation.  It is intended to be used by Mesquite algorithms.
 // Until a vertex's byte has been explicitly set, its value is 0.
-void MsqIMesh::vertex_set_byte( MBMesquite::Mesh::VertexHandle vertex, unsigned char byte,
-                                MsqError& err )
+void MsqIMesh::vertex_set_byte( MBMesquite::Mesh::VertexHandle vertex, unsigned char byte, MsqError& err )
 {
     int                ierr, value = byte;
     iBase_EntityHandle bh = static_cast< iBase_EntityHandle >( vertex );
     iMesh_setIntData( meshInstance, bh, byteTag, value, &ierr );
-    if( iBase_SUCCESS != ierr )
-        MSQ_SETERR( err )( process_itaps_error( ierr ), MsqError::INTERNAL_ERROR );
+    if( iBase_SUCCESS != ierr ) MSQ_SETERR( err )( process_itaps_error( ierr ), MsqError::INTERNAL_ERROR );
 }
 
-void MsqIMesh::vertices_set_byte( const VertexHandle* vert_array, const unsigned char* byte_array,
-                                  size_t array_size, MsqError& err )
+void MsqIMesh::vertices_set_byte( const VertexHandle* vert_array, const unsigned char* byte_array, size_t array_size,
+                                  MsqError& err )
 {
     if( !array_size ) return;
 
@@ -425,28 +409,24 @@ void MsqIMesh::vertices_set_byte( const VertexHandle* vert_array, const unsigned
     int ierr;
     assert( sizeof( VertexHandle ) == sizeof( iBase_EntityHandle ) );
     const iBase_EntityHandle* arr = reinterpret_cast< const iBase_EntityHandle* >( vert_array );
-    iMesh_setIntArrData( meshInstance, arr, array_size, byteTag, arrptr( data ), array_size,
-                         &ierr );
-    if( iBase_SUCCESS != ierr )
-        MSQ_SETERR( err )( process_itaps_error( ierr ), MsqError::INTERNAL_ERROR );
+    iMesh_setIntArrData( meshInstance, arr, array_size, byteTag, arrptr( data ), array_size, &ierr );
+    if( iBase_SUCCESS != ierr ) MSQ_SETERR( err )( process_itaps_error( ierr ), MsqError::INTERNAL_ERROR );
 }
 
 // Retrieve the byte value for the specified vertex or vertices.
 // The byte value is 0 if it has not yet been set via one of the
 // *_set_byte() functions.
-void MsqIMesh::vertex_get_byte( MBMesquite::Mesh::VertexHandle vertex, unsigned char* byte,
-                                MsqError& err )
+void MsqIMesh::vertex_get_byte( MBMesquite::Mesh::VertexHandle vertex, unsigned char* byte, MsqError& err )
 {
     int                ierr, value;
     iBase_EntityHandle bh = static_cast< iBase_EntityHandle >( vertex );
     iMesh_getIntData( meshInstance, bh, byteTag, &value, &ierr );
-    if( iBase_SUCCESS != ierr )
-        MSQ_SETERR( err )( process_itaps_error( ierr ), MsqError::INTERNAL_ERROR );
+    if( iBase_SUCCESS != ierr ) MSQ_SETERR( err )( process_itaps_error( ierr ), MsqError::INTERNAL_ERROR );
     *byte = value;
 }
 
-void MsqIMesh::vertices_get_byte( const VertexHandle* vert_array, unsigned char* byte_array,
-                                  size_t array_size, MsqError& err )
+void MsqIMesh::vertices_get_byte( const VertexHandle* vert_array, unsigned char* byte_array, size_t array_size,
+                                  MsqError& err )
 {
     if( !array_size ) return;
 
@@ -457,17 +437,15 @@ void MsqIMesh::vertices_get_byte( const VertexHandle* vert_array, unsigned char*
     assert( sizeof( VertexHandle ) == sizeof( iBase_EntityHandle ) );
     const iBase_EntityHandle* arr = reinterpret_cast< const iBase_EntityHandle* >( vert_array );
     iMesh_getIntArrData( meshInstance, arr, array_size, byteTag, &ptr, &junk1, &junk2, &ierr );
-    if( iBase_SUCCESS != ierr )
-        MSQ_SETERR( err )( process_itaps_error( ierr ), MsqError::INTERNAL_ERROR );
+    if( iBase_SUCCESS != ierr ) MSQ_SETERR( err )( process_itaps_error( ierr ), MsqError::INTERNAL_ERROR );
     std::copy( data.begin( ), data.end( ), byte_array );
 }
 
 //**************** Topology *****************
 
-void MsqIMesh::get_adjacent_entities( const iBase_EntityHandle* source, size_t num_source,
-                                      iBase_EntityType             target_type,
-                                      std::vector< EntityHandle >& target,
-                                      std::vector< size_t >& offsets, MsqError& err )
+void MsqIMesh::get_adjacent_entities( const iBase_EntityHandle* source, size_t num_source, iBase_EntityType target_type,
+                                      std::vector< EntityHandle >& target, std::vector< size_t >& offsets,
+                                      MsqError& err )
 {
     if( num_source == 0 )
     {
@@ -503,8 +481,8 @@ void MsqIMesh::get_adjacent_entities( const iBase_EntityHandle* source, size_t n
         target.resize( target.capacity( ) );
         int                 junk1 = target.capacity( ), junk3 = offsets.size( );
         iBase_EntityHandle* ptr = reinterpret_cast< iBase_EntityHandle* >( arrptr( target ) );
-        iMesh_getEntArrAdj( meshInstance, source, num_source, target_type, &ptr, &junk1, &num_adj,
-                            &ptr2, &junk3, &num_offset, &ierr );
+        iMesh_getEntArrAdj( meshInstance, source, num_source, target_type, &ptr, &junk1, &num_adj, &ptr2, &junk3,
+                            &num_offset, &ierr );
         if( iBase_SUCCESS == ierr )
         {
             have_adj = true;
@@ -518,8 +496,8 @@ void MsqIMesh::get_adjacent_entities( const iBase_EntityHandle* source, size_t n
         target.resize( num_adj );
         int                 junk1 = target.capacity( ), junk3 = offsets.size( );
         iBase_EntityHandle* ptr = reinterpret_cast< iBase_EntityHandle* >( arrptr( target ) );
-        iMesh_getEntArrAdj( meshInstance, source, num_source, target_type, &ptr, &junk1, &num_adj,
-                            &ptr2, &junk3, &num_offset, &ierr );
+        iMesh_getEntArrAdj( meshInstance, source, num_source, target_type, &ptr, &junk1, &num_adj, &ptr2, &junk3,
+                            &num_offset, &ierr );
         if( iBase_SUCCESS == ierr ) have_adj = true;
     }
 
@@ -528,8 +506,8 @@ void MsqIMesh::get_adjacent_entities( const iBase_EntityHandle* source, size_t n
     {
         iBase_EntityHandle* mArray = 0;
         int                 junk1 = 0, junk3 = offsets.size( );
-        iMesh_getEntArrAdj( meshInstance, source, num_source, target_type, &mArray, &junk1,
-                            &num_adj, &ptr2, &junk3, &num_offset, &ierr );
+        iMesh_getEntArrAdj( meshInstance, source, num_source, target_type, &mArray, &junk1, &num_adj, &ptr2, &junk3,
+                            &num_offset, &ierr );
         if( iBase_SUCCESS != ierr )
         {
             MSQ_SETERR( err )( process_itaps_error( ierr ), MsqError::INTERNAL_ERROR );
@@ -537,8 +515,7 @@ void MsqIMesh::get_adjacent_entities( const iBase_EntityHandle* source, size_t n
         }
 
         target.resize( num_adj );
-        std::copy( mArray, mArray + num_adj,
-                   reinterpret_cast< iBase_EntityHandle* >( arrptr( target ) ) );
+        std::copy( mArray, mArray + num_adj, reinterpret_cast< iBase_EntityHandle* >( arrptr( target ) ) );
         free( mArray );
     }
 
@@ -556,8 +533,8 @@ void MsqIMesh::get_adjacent_entities( const iBase_EntityHandle* source, size_t n
 }
 
 void MsqIMesh::vertices_get_attached_elements( const VertexHandle* vertices, size_t num_vertex,
-                                               std::vector< ElementHandle >& elements,
-                                               std::vector< size_t >& offsets, MsqError& err )
+                                               std::vector< ElementHandle >& elements, std::vector< size_t >& offsets,
+                                               MsqError& err )
 {
     int ierr, cont;
     assert( sizeof( EntityHandle ) == sizeof( iBase_EntityHandle ) );
@@ -610,9 +587,8 @@ void MsqIMesh::vertices_get_attached_elements( const VertexHandle* vertices, siz
  *\param offsets  - Indices into \ref vertex_handles, one per element
  */
 void MsqIMesh::elements_get_attached_vertices( const ElementHandle* elements, size_t num_elems,
-                                               std::vector< VertexHandle >& vertices,
-                                               std::vector< size_t >&       offsets,
-                                               MBMesquite::MsqError&        err )
+                                               std::vector< VertexHandle >& vertices, std::vector< size_t >& offsets,
+                                               MBMesquite::MsqError& err )
 {
     assert( sizeof( iBase_EntityHandle ) == sizeof( EntityHandle ) );
     const iBase_EntityHandle* elems = reinterpret_cast< const iBase_EntityHandle* >( elements );
@@ -646,8 +622,8 @@ void MsqIMesh::get_all_elements( std::vector< ElementHandle >& elements, MsqErro
         if( num_face )
         {
             count_in = num_face + num_vol;
-            iMesh_getEntities( meshInstance, inputSet, iBase_FACE, iMesh_ALL_TOPOLOGIES, &ptr,
-                               &count_in, &count_out, &ierr );
+            iMesh_getEntities( meshInstance, inputSet, iBase_FACE, iMesh_ALL_TOPOLOGIES, &ptr, &count_in, &count_out,
+                               &ierr );
             if( iBase_SUCCESS != ierr )
             {
                 MSQ_SETERR( err )( process_itaps_error( ierr ), MsqError::INTERNAL_ERROR );
@@ -660,8 +636,8 @@ void MsqIMesh::get_all_elements( std::vector< ElementHandle >& elements, MsqErro
         {
             ptr += num_face;
             count_in = num_vol;
-            iMesh_getEntities( meshInstance, inputSet, iBase_REGION, iMesh_ALL_TOPOLOGIES, &ptr,
-                               &count_in, &count_out, &ierr );
+            iMesh_getEntities( meshInstance, inputSet, iBase_REGION, iMesh_ALL_TOPOLOGIES, &ptr, &count_in, &count_out,
+                               &ierr );
             if( iBase_SUCCESS != ierr )
             {
                 MSQ_SETERR( err )( process_itaps_error( ierr ), MsqError::INTERNAL_ERROR );
@@ -685,8 +661,8 @@ void MsqIMesh::get_all_elements( std::vector< ElementHandle >& elements, MsqErro
 
         iBase_EntityHandle* ptr = reinterpret_cast< iBase_EntityHandle* >( arrptr( elements ) );
         count_in = count;
-        iMesh_getEntities( meshInstance, inputSet, inputSetType, iMesh_ALL_TOPOLOGIES, &ptr,
-                           &count_in, &count_out, &ierr );
+        iMesh_getEntities( meshInstance, inputSet, inputSetType, iMesh_ALL_TOPOLOGIES, &ptr, &count_in, &count_out,
+                           &ierr );
         if( iBase_SUCCESS != ierr )
         {
             MSQ_SETERR( err )( process_itaps_error( ierr ), MsqError::INTERNAL_ERROR );
@@ -711,9 +687,8 @@ void MsqIMesh::get_all_vertices( std::vector< VertexHandle >& vertices, MsqError
 
 // Returns the topologies of the given entities.  The "entity_topologies"
 // array must be at least "num_elements" in size.
-void MsqIMesh::elements_get_topologies( const ElementHandle* element_handle_array,
-                                        EntityTopology* element_topologies, size_t num_elements,
-                                        MsqError& err )
+void MsqIMesh::elements_get_topologies( const ElementHandle* element_handle_array, EntityTopology* element_topologies,
+                                        size_t num_elements, MsqError& err )
 {
     if( !num_elements ) return;
 
@@ -730,8 +705,7 @@ void MsqIMesh::elements_get_topologies( const ElementHandle* element_handle_arra
 
     int ierr, junk1 = num_elements, junk2;
     assert( sizeof( ElementHandle ) == sizeof( iBase_EntityHandle ) );
-    const iBase_EntityHandle* arr =
-        reinterpret_cast< const iBase_EntityHandle* >( element_handle_array );
+    const iBase_EntityHandle* arr = reinterpret_cast< const iBase_EntityHandle* >( element_handle_array );
     iMesh_getEntArrTopo( meshInstance, arr, num_elements, &topo_array, &junk1, &junk2, &ierr );
     if( iBase_SUCCESS != ierr )
     {
@@ -746,8 +720,8 @@ void MsqIMesh::elements_get_topologies( const ElementHandle* element_handle_arra
 //**************** Memory Management ****************
 // Tells the mesh that the client is finished with a given
 // entity handle.
-void MsqIMesh::release_entity_handles( const MBMesquite::Mesh::EntityHandle* /*handle_array*/,
-                                       size_t /*num_handles*/, MsqError& /*err*/ )
+void MsqIMesh::release_entity_handles( const MBMesquite::Mesh::EntityHandle* /*handle_array*/, size_t /*num_handles*/,
+                                       MsqError& /*err*/ )
 {
     // Do nothing
 }
@@ -760,8 +734,7 @@ void MsqIMesh::release_entity_handles( const MBMesquite::Mesh::EntityHandle* /*h
 void MsqIMesh::release( ) {}
 
 //**************** Tags ****************
-TagHandle MsqIMesh::tag_create( const std::string& name, TagType type, unsigned length, const void*,
-                                MsqError& err )
+TagHandle MsqIMesh::tag_create( const std::string& name, TagType type, unsigned length, const void*, MsqError& err )
 {
     int itaps_type;
     switch( type )
@@ -785,8 +758,7 @@ TagHandle MsqIMesh::tag_create( const std::string& name, TagType type, unsigned 
 
     int             ierr;
     iBase_TagHandle result;
-    iMesh_createTag( meshInstance, name.c_str( ), length, itaps_type, &result, &ierr,
-                     name.size( ) );
+    iMesh_createTag( meshInstance, name.c_str( ), length, itaps_type, &result, &ierr, name.size( ) );
     if( iBase_SUCCESS != ierr )
     {
         MSQ_SETERR( err )( process_itaps_error( ierr ), MsqError::INTERNAL_ERROR );
@@ -825,8 +797,8 @@ TagHandle MsqIMesh::tag_get( const std::string& name, MsqError& err )
     return static_cast< TagHandle >( handle );
 }
 
-void MsqIMesh::tag_properties( TagHandle handle, std::string& name_out, TagType& type_out,
-                               unsigned& length_out, MsqError& err )
+void MsqIMesh::tag_properties( TagHandle handle, std::string& name_out, TagType& type_out, unsigned& length_out,
+                               MsqError& err )
 {
     char buffer[ 256 ];
     int  ierr1, ierr2, ierr3, itype;
@@ -871,20 +843,20 @@ void MsqIMesh::tag_properties( TagHandle handle, std::string& name_out, TagType&
     }
 }
 
-void MsqIMesh::tag_set_element_data( TagHandle tag, size_t num_elems, const ElementHandle* array,
-                                     const void* data, MsqError& err )
+void MsqIMesh::tag_set_element_data( TagHandle tag, size_t num_elems, const ElementHandle* array, const void* data,
+                                     MsqError& err )
 {
     tag_set_data( tag, num_elems, array, data, err );
 }
 
-void MsqIMesh::tag_set_vertex_data( TagHandle tag, size_t num_elems, const VertexHandle* array,
-                                    const void* data, MsqError& err )
+void MsqIMesh::tag_set_vertex_data( TagHandle tag, size_t num_elems, const VertexHandle* array, const void* data,
+                                    MsqError& err )
 {
     tag_set_data( tag, num_elems, array, data, err );
 }
 
-void MsqIMesh::tag_set_data( TagHandle tag, size_t num_elems, const EntityHandle* array,
-                             const void* data, MsqError& err )
+void MsqIMesh::tag_set_data( TagHandle tag, size_t num_elems, const EntityHandle* array, const void* data,
+                             MsqError& err )
 {
     int ierr, size;
     iMesh_getTagSizeBytes( meshInstance, static_cast< iBase_TagHandle >( tag ), &size, &ierr );
@@ -904,20 +876,19 @@ void MsqIMesh::tag_set_data( TagHandle tag, size_t num_elems, const EntityHandle
     }
 }
 
-void MsqIMesh::tag_get_element_data( TagHandle tag, size_t num_elems, const ElementHandle* array,
-                                     void* data, MsqError& err )
+void MsqIMesh::tag_get_element_data( TagHandle tag, size_t num_elems, const ElementHandle* array, void* data,
+                                     MsqError& err )
 {
     tag_get_data( tag, num_elems, array, data, err );
 }
 
-void MsqIMesh::tag_get_vertex_data( TagHandle tag, size_t num_elems, const VertexHandle* array,
-                                    void* data, MsqError& err )
+void MsqIMesh::tag_get_vertex_data( TagHandle tag, size_t num_elems, const VertexHandle* array, void* data,
+                                    MsqError& err )
 {
     tag_get_data( tag, num_elems, array, data, err );
 }
 
-void MsqIMesh::tag_get_data( TagHandle tag, size_t num_elems, const EntityHandle* array, void* data,
-                             MsqError& err )
+void MsqIMesh::tag_get_data( TagHandle tag, size_t num_elems, const EntityHandle* array, void* data, MsqError& err )
 {
     int ierr, size;
     iMesh_getTagSizeBytes( meshInstance, static_cast< iBase_TagHandle >( tag ), &size, &ierr );
@@ -934,8 +905,8 @@ void MsqIMesh::tag_get_data( TagHandle tag, size_t num_elems, const EntityHandle
     int junk1 = size * num_elems, junk2;
     assert( sizeof( EntityHandle ) == sizeof( iBase_EntityHandle ) );
     const iBase_EntityHandle* arr = reinterpret_cast< const iBase_EntityHandle* >( array );
-    iMesh_getArrData( meshInstance, arr, num_elems, static_cast< iBase_TagHandle >( tag ), &ptr,
-                      &junk1, &junk2, &ierr );
+    iMesh_getArrData( meshInstance, arr, num_elems, static_cast< iBase_TagHandle >( tag ), &ptr, &junk1, &junk2,
+                      &ierr );
     if( iBase_SUCCESS != ierr )
     {
         MSQ_SETERR( err )( process_itaps_error( ierr ), MsqError::INTERNAL_ERROR );

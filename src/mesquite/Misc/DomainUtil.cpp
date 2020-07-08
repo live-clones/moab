@@ -58,9 +58,8 @@ namespace DomainUtil
         Vector3D min, max;
         bounding_box( vertex_array, num_vertices, min, max );
         max -= min;
-        return ( max[ 0 ] >= max[ 1 ] && max[ 0 ] >= max[ 2 ] )
-                   ? max[ 0 ]
-                   : ( max[ 1 ] >= max[ 2 ] ) ? max[ 1 ] : max[ 2 ];
+        return ( max[ 0 ] >= max[ 1 ] && max[ 0 ] >= max[ 2 ] ) ? max[ 0 ]
+                                                                : ( max[ 1 ] >= max[ 2 ] ) ? max[ 1 ] : max[ 2 ];
     }
 
     void get_fixed_vertices( Mesh* mesh, const Mesh::VertexHandle* verts, size_t num_verts,
@@ -72,8 +71,7 @@ namespace DomainUtil
             if( fixed[ i ] ) fixed_verts.push_back( verts[ i ] );
     }
 
-    bool non_colinear_vertices( const MsqVertex* verts, size_t num_verts, Vector3D coords_out[ 3 ],
-                                double epsilon )
+    bool non_colinear_vertices( const MsqVertex* verts, size_t num_verts, Vector3D coords_out[ 3 ], double epsilon )
     {
         // This function will attempt to find trhee non-colinear
         // vertices from the input list.  Further, it will attempt
@@ -139,8 +137,7 @@ namespace DomainUtil
         return true;
     }
 
-    bool non_coplanar_vertices( const MsqVertex* verts, size_t num_verts, Vector3D coords_out[ 4 ],
-                                double epsilon )
+    bool non_coplanar_vertices( const MsqVertex* verts, size_t num_verts, Vector3D coords_out[ 4 ], double epsilon )
     {
         // This function will attempt to find four non-coplanar
         // vertices from the input list.  Further, it will attempt
@@ -155,8 +152,7 @@ namespace DomainUtil
         if( !non_colinear_vertices( verts, num_verts, coords_out, epsilon ) ) return false;
 
         // The plane of the first three vertices:
-        Vector3D norm =
-            ( coords_out[ 1 ] - coords_out[ 0 ] ) * ( coords_out[ 2 ] - coords_out[ 0 ] );
+        Vector3D norm = ( coords_out[ 1 ] - coords_out[ 0 ] ) * ( coords_out[ 2 ] - coords_out[ 0 ] );
         norm /= norm.length( );
         double d = -( norm % coords_out[ 0 ] );
 

@@ -38,14 +38,13 @@ const int ELEMEVAL = 0, ELEMUTIL = 1;
 
 static void fail( ErrorCode error_code, const char* str, const char* file_name, int line_number )
 {
-    std::cerr << str << ", line " << line_number << " of file " << file_name << ", error code "
-              << error_code << std::endl;
+    std::cerr << str << ", line " << line_number << " of file " << file_name << ", error code " << error_code
+              << std::endl;
 }
 
 double mytime( );
 
-ErrorCode get_ents( Interface& mbi, std::string& filename, int& dim, Range& elems, EntityType& tp,
-                    int& nv )
+ErrorCode get_ents( Interface& mbi, std::string& filename, int& dim, Range& elems, EntityType& tp, int& nv )
 {
     ErrorCode rval = mbi.load_file( filename.c_str( ), 0 );
     while( elems.empty( ) && dim >= 1 )
@@ -74,16 +73,13 @@ ErrorCode get_ents( Interface& mbi, std::string& filename, int& dim, Range& elem
 
 void parse_options( ProgOptions& opts, int& dim, std::string& filename )
 {
-    opts.addOpt< int >(
-        std::string( "dim" ),
-        std::string( "Evaluate 1d/2d/3d elements (default: maximal dimension in mesh)" ), &dim,
-        ProgOptions::int_flag );
-    opts.addOpt< std::string >( std::string( "filename,f" ),
-                                std::string( "Filename containing mesh" ), &filename );
+    opts.addOpt< int >( std::string( "dim" ),
+                        std::string( "Evaluate 1d/2d/3d elements (default: maximal dimension in mesh)" ), &dim,
+                        ProgOptions::int_flag );
+    opts.addOpt< std::string >( std::string( "filename,f" ), std::string( "Filename containing mesh" ), &filename );
 }
 
-ErrorCode get_elem_map( EntityType tp, std::vector< CartVect >& vcoords, int nconn,
-                        Element::Map*& elemmap )
+ErrorCode get_elem_map( EntityType tp, std::vector< CartVect >& vcoords, int nconn, Element::Map*& elemmap )
 {
     switch( tp )
     {
@@ -123,9 +119,8 @@ ErrorCode get_elem_map( EntityType tp, std::vector< CartVect >& vcoords, int nco
     return MB_SUCCESS;
 }
 
-ErrorCode time_forward_eval( Interface* mbi, int method, Range& elems,
-                             std::vector< CartVect >& params, std::vector< CartVect >& coords,
-                             double& evtime )
+ErrorCode time_forward_eval( Interface* mbi, int method, Range& elems, std::vector< CartVect >& params,
+                             std::vector< CartVect >& coords, double& evtime )
 {
     evtime = mytime( );
     ErrorCode       rval;
@@ -170,9 +165,8 @@ ErrorCode time_forward_eval( Interface* mbi, int method, Range& elems,
     return MB_SUCCESS;
 }
 
-ErrorCode time_reverse_eval( Interface* mbi, int method, Range& elems,
-                             std::vector< CartVect >& coords, std::vector< CartVect >& params,
-                             double& retime )
+ErrorCode time_reverse_eval( Interface* mbi, int method, Range& elems, std::vector< CartVect >& coords,
+                             std::vector< CartVect >& params, double& retime )
 {
     retime = mytime( );
     ErrorCode       rval;
@@ -188,8 +182,7 @@ ErrorCode time_reverse_eval( Interface* mbi, int method, Range& elems,
         for( rit = elems.begin( ), i = 0; rit != elems.end( ); ++rit, i++ )
         {
             eeval.set_ent_handle( *rit );
-            rval = eeval.reverse_eval( coords[ i ].array( ), 1.0e-10, 1.0e-6, params[ i ].array( ),
-                                       &ins );
+            rval = eeval.reverse_eval( coords[ i ].array( ), 1.0e-10, 1.0e-6, params[ i ].array( ), &ins );
             assert( ins );
 #ifndef NDEBUG
             if( MB_SUCCESS != rval ) return rval;
@@ -217,8 +210,7 @@ ErrorCode time_reverse_eval( Interface* mbi, int method, Range& elems,
     return MB_SUCCESS;
 }
 
-ErrorCode time_jacobian( Interface* mbi, int method, Range& elems, std::vector< CartVect >& params,
-                         double& jactime )
+ErrorCode time_jacobian( Interface* mbi, int method, Range& elems, std::vector< CartVect >& params, double& jactime )
 {
     jactime = mytime( );
     ErrorCode       rval;
@@ -324,9 +316,9 @@ ErrorCode put_random_field( Interface& mbi, Tag& tag, Range& elems )
     return rval;
 }
 
-ErrorCode elem_evals( Interface* mbi, int method, Range& elems, Tag tag,
-                      std::vector< CartVect >& params, std::vector< CartVect >& coords,
-                      double& evtime, double& retime, double& jactime, double& inttime )
+ErrorCode elem_evals( Interface* mbi, int method, Range& elems, Tag tag, std::vector< CartVect >& params,
+                      std::vector< CartVect >& coords, double& evtime, double& retime, double& jactime,
+                      double& inttime )
 {
     evtime = 0, retime = 0, jactime = 0, inttime = 0;  // initializations to avoid compiler warning
 
@@ -388,32 +380,31 @@ int main( int argc, char* argv[] )
     double evtime[ 2 ], retime[ 2 ], jactime[ 2 ],
         inttime[ 2 ];  // initializations to avoid compiler warning
 
-    rval = elem_evals( &mbi, ELEMEVAL, elems, tag, params, coords, evtime[ 0 ], retime[ 0 ],
-                       jactime[ 0 ], inttime[ 0 ] );
+    rval =
+        elem_evals( &mbi, ELEMEVAL, elems, tag, params, coords, evtime[ 0 ], retime[ 0 ], jactime[ 0 ], inttime[ 0 ] );
     CHK( rval, "new elem_evals" );
 
-    rval = elem_evals( &mbi, ELEMUTIL, elems, tag, params, coords, evtime[ 1 ], retime[ 1 ],
-                       jactime[ 1 ], inttime[ 1 ] );
+    rval =
+        elem_evals( &mbi, ELEMUTIL, elems, tag, params, coords, evtime[ 1 ], retime[ 1 ], jactime[ 1 ], inttime[ 1 ] );
     CHK( rval, "old elem_evals" );
 
-    std::cout << filename << ": " << elems.size( ) << " " << CN::EntityTypeName( tp )
-              << " elements, " << nv << " vertices per element." << std::endl
+    std::cout << filename << ": " << elems.size( ) << " " << CN::EntityTypeName( tp ) << " elements, " << nv
+              << " vertices per element." << std::endl
               << std::endl;
     std::cout << "New, old element evaluation code:" << std::endl;
     std::cout << "Evaluation type, time, time per element:" << std::endl;
-    std::cout << "                             New                   Old            (New/Old)*100"
-              << std::endl;
-    std::cout << "Forward evaluation " << evtime[ 0 ] << ", " << evtime[ 0 ] / elems.size( )
-              << "    " << evtime[ 1 ] << ", " << evtime[ 1 ] / elems.size( ) << "    "
+    std::cout << "                             New                   Old            (New/Old)*100" << std::endl;
+    std::cout << "Forward evaluation " << evtime[ 0 ] << ", " << evtime[ 0 ] / elems.size( ) << "    " << evtime[ 1 ]
+              << ", " << evtime[ 1 ] / elems.size( ) << "    "
               << ( evtime[ 0 ] / ( evtime[ 1 ] ? evtime[ 1 ] : 1 ) ) * 100.0 << std::endl;
-    std::cout << "Reverse evaluation " << retime[ 0 ] << ", " << retime[ 0 ] / elems.size( )
-              << "    " << retime[ 1 ] << ", " << retime[ 1 ] / elems.size( ) << "    "
+    std::cout << "Reverse evaluation " << retime[ 0 ] << ", " << retime[ 0 ] / elems.size( ) << "    " << retime[ 1 ]
+              << ", " << retime[ 1 ] / elems.size( ) << "    "
               << ( retime[ 0 ] / ( retime[ 1 ] ? retime[ 1 ] : 1 ) ) * 100.0 << std::endl;
-    std::cout << "Jacobian           " << jactime[ 0 ] << ", " << jactime[ 0 ] / elems.size( )
-              << "    " << jactime[ 1 ] << ", " << jactime[ 1 ] / elems.size( ) << "    "
+    std::cout << "Jacobian           " << jactime[ 0 ] << ", " << jactime[ 0 ] / elems.size( ) << "    " << jactime[ 1 ]
+              << ", " << jactime[ 1 ] / elems.size( ) << "    "
               << ( jactime[ 0 ] / ( jactime[ 1 ] ? jactime[ 1 ] : 1 ) ) * 100.0 << std::endl;
-    std::cout << "Integration        " << inttime[ 0 ] << ", " << inttime[ 0 ] / elems.size( )
-              << "    " << inttime[ 1 ] << ", " << inttime[ 1 ] / elems.size( ) << "    "
+    std::cout << "Integration        " << inttime[ 0 ] << ", " << inttime[ 0 ] / elems.size( ) << "    " << inttime[ 1 ]
+              << ", " << inttime[ 1 ] / elems.size( ) << "    "
               << ( inttime[ 0 ] / ( inttime[ 1 ] ? inttime[ 1 ] : 1 ) ) * 100.0 << std::endl;
 }
 

@@ -170,10 +170,7 @@ class MsqError
         std::string file;
         int         line;
 
-        Trace( const char* fun, const char* fil, int lin )
-            : function( fun ), file( fil ), line( lin )
-        {
-        }
+        Trace( const char* fun, const char* fil, int lin ) : function( fun ), file( fil ), line( lin ) {}
     };
 
     //! Get error message

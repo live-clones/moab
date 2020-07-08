@@ -30,8 +30,8 @@ HomCoord& HomCoord::getUnitv( int c )
 int      dum[] = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
 HomXform HomXform::IDENTITY( dum );
 
-void HomXform::three_pt_xform( const HomCoord& p1, const HomCoord& q1, const HomCoord& p2,
-                               const HomCoord& q2, const HomCoord& p3, const HomCoord& q3 )
+void HomXform::three_pt_xform( const HomCoord& p1, const HomCoord& q1, const HomCoord& p2, const HomCoord& q2,
+                               const HomCoord& p3, const HomCoord& q3 )
 {
     // pmin and pmax are min and max bounding box corners which are mapped to
     // qmin and qmax, resp.  qmin and qmax are not necessarily min/max corners,
@@ -123,12 +123,12 @@ void HomXform::three_pt_xform( const HomCoord& p1, const HomCoord& q1, const Hom
 
     // form v^-1 as transpose (ok for orthogonal vectors); put directly into
     // transform matrix, since it's eventually going to become R
-    *this = HomXform( v1.i( ), v2.i( ), v3.i( ), 0, v1.j( ), v2.j( ), v3.j( ), 0, v1.k( ), v2.k( ),
-                      v3.k( ), 0, 0, 0, 0, 1 );
+    *this = HomXform( v1.i( ), v2.i( ), v3.i( ), 0, v1.j( ), v2.j( ), v3.j( ), 0, v1.k( ), v2.k( ), v3.k( ), 0, 0, 0, 0,
+                      1 );
 
     // multiply by w to get R
-    *this *= HomXform( w1.i( ), w1.j( ), w1.k( ), 0, w2.i( ), w2.j( ), w2.k( ), 0, w3.i( ), w3.j( ),
-                       w3.k( ), 0, 0, 0, 0, 1 );
+    *this *= HomXform( w1.i( ), w1.j( ), w1.k( ), 0, w2.i( ), w2.j( ), w2.k( ), 0, w3.i( ), w3.j( ), w3.k( ), 0, 0, 0,
+                       0, 1 );
 
     // compute t and put into last row
     HomCoord t = q1 - p1 * *this;

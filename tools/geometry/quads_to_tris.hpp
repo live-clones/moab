@@ -14,7 +14,6 @@ moab::ErrorCode make_tris_from_quad( moab::Interface* MBI, moab::EntityHandle qu
                                      moab::EntityHandle& tri0, /* output */
                                      moab::EntityHandle& tri1 /* output */ );
 
-moab::ErrorCode make_tris_from_quads( moab::Interface* MBI, const moab::Range quads,
-                                      moab::Range& tris );
+moab::ErrorCode make_tris_from_quads( moab::Interface* MBI, const moab::Range quads, moab::Range& tris );
 
 moab::ErrorCode quads_to_tris( moab::Interface* MBI, moab::EntityHandle input_meshset );

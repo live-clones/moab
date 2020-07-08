@@ -237,8 +237,7 @@ int main( int argc, char* argv[] )
             else if( flag == 'c' )
             {
                 TagSpec spec;
-                if( parse_tag_create( argv[ i ], spec, iface ) )
-                    parse_error( "Failed to parse tag spec", argv[ i ] );
+                if( parse_tag_create( argv[ i ], spec, iface ) ) parse_error( "Failed to parse tag spec", argv[ i ] );
 
                 if( have_data_tag ) parse_error( "Invalid argument", argv[ i ] );
 
@@ -248,8 +247,7 @@ int main( int argc, char* argv[] )
             else
             {
                 TagSpec spec;
-                if( parse_tag_spec( argv[ i ], spec, iface ) )
-                    parse_error( "Failed to parse tag spec", argv[ i ] );
+                if( parse_tag_spec( argv[ i ], spec, iface ) ) parse_error( "Failed to parse tag spec", argv[ i ] );
 
                 if( flag == 'd' )
                 {
@@ -291,8 +289,8 @@ int main( int argc, char* argv[] )
         DataType data_type;
         CALL( tag_get_data_type, ( data_tag.handle, data_type ) );
 
-        CALL( tag_get_handle, ( write_tag_name, data_size, data_type, write_tag,
-                                MB_TAG_SPARSE | MB_TAG_BYTES | MB_TAG_CREAT ) );
+        CALL( tag_get_handle,
+              ( write_tag_name, data_size, data_type, write_tag, MB_TAG_SPARSE | MB_TAG_BYTES | MB_TAG_CREAT ) );
     }
 
     /**************** Done processing input -- do actual work ****************/
@@ -302,8 +300,7 @@ int main( int argc, char* argv[] )
     for( TagVect::iterator i = ident_tags.begin( ); i != ident_tags.end( ); ++i )
     {
         const void* value[] = { i->value };
-        CALL( get_entities_by_type_and_tag,
-              ( 0, MBENTITYSET, &i->handle, i->value ? value : 0, 1, temp ) );
+        CALL( get_entities_by_type_and_tag, ( 0, MBENTITYSET, &i->handle, i->value ? value : 0, 1, temp ) );
         sets.merge( temp );
     }
 
@@ -317,8 +314,7 @@ int main( int argc, char* argv[] )
         {
             if( !data_tag.value )
             {
-                std::cerr << "Data tag not set for entityset " << iface->id_from_handle( *i )
-                          << std::endl;
+                std::cerr << "Data tag not set for entityset " << iface->id_from_handle( *i ) << std::endl;
                 continue;
             }
             memcpy( &tag_data[ 0 ], data_tag.value, data_size );
@@ -332,8 +328,8 @@ int main( int argc, char* argv[] )
         Range entities;
         CALL( get_entities_by_handle, ( *i, entities, true ) );
         int             junk;
-        Range::iterator eb = entities.lower_bound( entities.begin( ), entities.end( ),
-                                                   CREATE_HANDLE( MBEDGE, 0, junk ) );
+        Range::iterator eb =
+            entities.lower_bound( entities.begin( ), entities.end( ), CREATE_HANDLE( MBEDGE, 0, junk ) );
         if( elems_spec )
             for( Range::iterator j = eb; j != entities.end( ); ++j )
                 CALL( tag_set_data, ( write_tag, &*j, 1, &tag_data[ 0 ] ) );

@@ -123,13 +123,11 @@ class ReadOBJ : public ReaderIface
     //! factory method
     static ReaderIface* factory( Interface* );
 
-    ErrorCode load_file( const char* file_name, const EntityHandle* file_set,
-                         const FileOptions& opts, const SubsetList* subset_list = 0,
-                         const Tag* file_id_tag = 0 );
+    ErrorCode load_file( const char* file_name, const EntityHandle* file_set, const FileOptions& opts,
+                         const SubsetList* subset_list = 0, const Tag* file_id_tag = 0 );
 
     ErrorCode read_tag_values( const char* file_name, const char* tag_name, const FileOptions& opts,
-                               std::vector< int >& tag_values_out,
-                               const SubsetList*   subset_list = 0 );
+                               std::vector< int >& tag_values_out, const SubsetList* subset_list = 0 );
 
     //! Constructor
     ReadOBJ( Interface* impl = NULL );
@@ -145,8 +143,7 @@ class ReadOBJ : public ReaderIface
 
     GeomTopoTool* myGeomTool;
 
-    Tag geom_tag, id_tag, name_tag, category_tag, faceting_tol_tag, geometry_resabs_tag,
-        obj_name_tag;
+    Tag geom_tag, id_tag, name_tag, category_tag, faceting_tol_tag, geometry_resabs_tag, obj_name_tag;
 
     /*  The keyword type function matches the first character extracted from each line to a type of
      * line
@@ -155,26 +152,22 @@ class ReadOBJ : public ReaderIface
 
     /*  The match function searches a list of map keys for a match with the token
      */
-    template< typename T >
-    std::string match( const std::string& token, std::map< std::string, T >& tokenList );
+    template< typename T > std::string match( const std::string& token, std::map< std::string, T >& tokenList );
 
     /* The tokenize function takes a string as input and splits it into
      * a vector of strings based on the delimiter
      */
     static const char* delimiters;
 
-    void tokenize( const std::string& str, std::vector< std::string >& tokens,
-                   const char* delimiters );
+    void tokenize( const std::string& str, std::vector< std::string >& tokens, const char* delimiters );
 
     /*
      * The create_object funtion will create a new meshset for
      * each object that contains all vertices and faces
      */
-    ErrorCode create_new_object( std::string object_name, int object_id,
-                                 EntityHandle& curr_obj_meshset );
+    ErrorCode create_new_object( std::string object_name, int object_id, EntityHandle& curr_obj_meshset );
 
-    ErrorCode create_new_group( std::string object_name, int curr_object,
-                                EntityHandle& object_meshset );
+    ErrorCode create_new_group( std::string object_name, int curr_object, EntityHandle& object_meshset );
 
     /* create_new_vertex converts tokenized string input to
        vertex structure
@@ -184,17 +177,16 @@ class ReadOBJ : public ReaderIface
     /* create_new_face converts tokenized string input to
      * face structure
      */
-    ErrorCode create_new_face( std::vector< std::string >         f_tokens,
-                               const std::vector< EntityHandle >& vertex_list,
-                               EntityHandle&                      face_eh );
+    ErrorCode create_new_face( std::vector< std::string > f_tokens, const std::vector< EntityHandle >& vertex_list,
+                               EntityHandle& face_eh );
 
     /*
      * The split_quad function creates 1 new vertex and 4 new tri faces
      * from a quad face.
      */
 
-    ErrorCode split_quad( std::vector< std::string >   f_tokens,
-                          std::vector< EntityHandle >& vertex_list, Range& face_eh );
+    ErrorCode split_quad( std::vector< std::string > f_tokens, std::vector< EntityHandle >& vertex_list,
+                          Range& face_eh );
 
     ErrorCode create_tri_faces( std::vector< EntityHandle > quad_vert_eh,
                                 //				       EntityHandle center_vertex_eh,

@@ -7,8 +7,7 @@ class geomObject
 {
   public:
     virtual ~geomObject( ) {}
-    virtual void   project_points2geom( int dim, double* oldcoords, double* newcoords,
-                                        double* derivs ) const = 0;
+    virtual void   project_points2geom( int dim, double* oldcoords, double* newcoords, double* derivs ) const = 0;
     virtual double compute_projecterror( int dim, double* oldcoords ) const
     {
         double* newcoords = new double[ dim ]( );
@@ -23,8 +22,8 @@ class geomObject
         delete[] newcoords;
         return sqrt( ans );
     }
-    virtual void compute_projecterror( int dim, int nverts, double* oldcoords, double& l1err,
-                                       double& l2err, double& linferr ) const
+    virtual void compute_projecterror( int dim, int nverts, double* oldcoords, double& l1err, double& l2err,
+                                       double& linferr ) const
     {
         l1err = l2err = linferr = 0;
 
@@ -63,8 +62,7 @@ class sphere : public geomObject
     virtual ~sphere( ) {}
     void project_points2geom( int dim, double* oldcoords, double* newcoords, double* derivs ) const
     {
-        if( oldcoords == NULL || newcoords == NULL )
-        { throw std::invalid_argument( "NULL pointer" ); }
+        if( oldcoords == NULL || newcoords == NULL ) { throw std::invalid_argument( "NULL pointer" ); }
 
         std::vector< double > direction;
         direction.push_back( oldcoords[ 0 ] - centerx );
@@ -126,13 +124,11 @@ class torus : public geomObject
     void project_points2geom( int dim, double* oldcoords, double* newcoords, double* derivs ) const
     {
         assert( dim == 3 && oldcoords && newcoords );
-        double transfer[ 3 ] = { oldcoords[ 0 ] - centerx, oldcoords[ 1 ] - centery,
-                                 oldcoords[ 2 ] - centerz };
+        double transfer[ 3 ] = { oldcoords[ 0 ] - centerx, oldcoords[ 1 ] - centery, oldcoords[ 2 ] - centerz };
         double twodnrm = geomObject::Twonorm( 2, transfer );
-        double tubecenter[ 3 ] = { c * transfer[ 0 ] / twodnrm + centerx,
-                                   c * transfer[ 1 ] / twodnrm + centery, centerz };
-        double direction[ 3 ] = { oldcoords[ 0 ] - tubecenter[ 0 ],
-                                  oldcoords[ 1 ] - tubecenter[ 1 ],
+        double tubecenter[ 3 ] = { c * transfer[ 0 ] / twodnrm + centerx, c * transfer[ 1 ] / twodnrm + centery,
+                                   centerz };
+        double direction[ 3 ] = { oldcoords[ 0 ] - tubecenter[ 0 ], oldcoords[ 1 ] - tubecenter[ 1 ],
                                   oldcoords[ 2 ] - tubecenter[ 2 ] };
         double len = geomObject::Twonorm( 3, direction );
         assert( len > 0 );

@@ -71,9 +71,8 @@ struct SettingData
 };
 
 SettingData::SettingData( )
-    : trapFPE( IQ_TRAP_FPE_DEFAULT ), fixedMode( Settings::FIXED_FLAG ),
-      slaveMode( Settings::SLAVE_ALL ), mapArray( MIXED, 0 ), mapArray2D( MIXED, 0 ),
-      mapArray3D( MIXED, 0 )
+    : trapFPE( IQ_TRAP_FPE_DEFAULT ), fixedMode( Settings::FIXED_FLAG ), slaveMode( Settings::SLAVE_ALL ),
+      mapArray( MIXED, 0 ), mapArray2D( MIXED, 0 ), mapArray3D( MIXED, 0 )
 {
     mapArray[ TRIANGLE ] = &defTriFunc;
     mapArray[ QUADRILATERAL ] = &defQuadFunc;
@@ -90,8 +89,8 @@ SettingData::SettingData( )
 }
 
 SettingData::SettingData( const SettingData& other )
-    : trapFPE( other.trapFPE ), fixedMode( other.fixedMode ), slaveMode( other.slaveMode ),
-      mapArray( other.mapArray ), mapArray2D( other.mapArray2D ), mapArray3D( other.mapArray3D )
+    : trapFPE( other.trapFPE ), fixedMode( other.fixedMode ), slaveMode( other.slaveMode ), mapArray( other.mapArray ),
+      mapArray2D( other.mapArray2D ), mapArray3D( other.mapArray3D )
 {
     fix_copy( other );
 }
@@ -117,8 +116,7 @@ void SettingData::fix_copy( const SettingData& other )
     if( mapArray[ PRISM ] == &other.defPriFunc ) mapArray[ PRISM ] = &defPriFunc;
     if( mapArray[ HEXAHEDRON ] == &other.defHexFunc ) mapArray[ HEXAHEDRON ] = &defHexFunc;
     if( mapArray2D[ TRIANGLE ] == &other.defTriFunc ) mapArray2D[ TRIANGLE ] = &defTriFunc;
-    if( mapArray2D[ QUADRILATERAL ] == &other.defQuadFunc )
-        mapArray2D[ QUADRILATERAL ] = &defQuadFunc;
+    if( mapArray2D[ QUADRILATERAL ] == &other.defQuadFunc ) mapArray2D[ QUADRILATERAL ] = &defQuadFunc;
     if( mapArray3D[ TETRAHEDRON ] == &other.defTetFunc ) mapArray3D[ TETRAHEDRON ] = &defTetFunc;
     if( mapArray3D[ PYRAMID ] == &other.defPyrFunc ) mapArray3D[ PYRAMID ] = &defPyrFunc;
     if( mapArray3D[ PRISM ] == &other.defPriFunc ) mapArray3D[ PRISM ] = &defPriFunc;

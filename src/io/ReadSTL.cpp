@@ -58,8 +58,7 @@ bool ReadSTL::Point::operator<( const ReadSTL::Point& other ) const
 }
 
 ErrorCode ReadSTL::read_tag_values( const char* /* file_name */, const char* /* tag_name */,
-                                    const FileOptions& /* opts */,
-                                    std::vector< int >& /* tag_values_out */,
+                                    const FileOptions& /* opts */, std::vector< int >& /* tag_values_out */,
                                     const SubsetList* /* subset_list */ )
 {
     return MB_NOT_IMPLEMENTED;
@@ -68,12 +67,10 @@ ErrorCode ReadSTL::read_tag_values( const char* /* file_name */, const char* /* 
 // Generic load function for both ASCII and binary. Calls
 // pure-virtual function implemented in subclasses to read
 // the data from the file.
-ErrorCode ReadSTL::load_file( const char*        filename, const EntityHandle* /* file_set */,
-                              const FileOptions& opts, const ReaderIface::SubsetList* subset_list,
-                              const Tag* file_id_tag )
+ErrorCode ReadSTL::load_file( const char* filename, const EntityHandle* /* file_set */, const FileOptions& opts,
+                              const ReaderIface::SubsetList* subset_list, const Tag* file_id_tag )
 {
-    if( subset_list )
-    { MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "Reading subset of files not supported for STL" ); }
+    if( subset_list ) { MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "Reading subset of files not supported for STL" ); }
 
     ErrorCode result;
 
@@ -87,10 +84,8 @@ ErrorCode ReadSTL::load_file( const char*        filename, const EntityHandle* /
     bool big_endian = false, little_endian = false;
     if( MB_SUCCESS == opts.get_null_option( "BIG_ENDIAN" ) ) big_endian = true;
     if( MB_SUCCESS == opts.get_null_option( "LITTLE_ENDIAN" ) ) little_endian = true;
-    if( big_endian && little_endian )
-    { MB_SET_ERR( MB_FAILURE, "Conflicting options: BIG_ENDIAN LITTLE_ENDIAN" ); }
-    ByteOrder byte_order =
-        big_endian ? STL_BIG_ENDIAN : little_endian ? STL_LITTLE_ENDIAN : STL_UNKNOWN_BYTE_ORDER;
+    if( big_endian && little_endian ) { MB_SET_ERR( MB_FAILURE, "Conflicting options: BIG_ENDIAN LITTLE_ENDIAN" ); }
+    ByteOrder byte_order = big_endian ? STL_BIG_ENDIAN : little_endian ? STL_LITTLE_ENDIAN : STL_UNKNOWN_BYTE_ORDER;
 
     if( is_ascii )
         result = ascii_read_triangles( filename, triangles );
@@ -119,15 +114,13 @@ ErrorCode ReadSTL::load_file( const char*        filename, const EntityHandle* /
     // Create vertices
     std::vector< double* > coord_arrays;
     EntityHandle           vtx_handle = 0;
-    result = readMeshIface->get_node_coords( 3, vertex_map.size( ), MB_START_ID, vtx_handle,
-                                             coord_arrays );
+    result = readMeshIface->get_node_coords( 3, vertex_map.size( ), MB_START_ID, vtx_handle, coord_arrays );
     if( MB_SUCCESS != result ) return result;
 
     // Copy vertex coordinates into entity sequence coordinate arrays
     // and copy handle into vertex_map.
     double *x = coord_arrays[ 0 ], *y = coord_arrays[ 1 ], *z = coord_arrays[ 2 ];
-    for( std::map< Point, EntityHandle >::iterator i = vertex_map.begin( ); i != vertex_map.end( );
-         ++i )
+    for( std::map< Point, EntityHandle >::iterator i = vertex_map.begin( ); i != vertex_map.end( ); ++i )
     {
         i->second = vtx_handle;
         ++vtx_handle;
@@ -142,8 +135,7 @@ ErrorCode ReadSTL::load_file( const char*        filename, const EntityHandle* /
     // Allocate triangles
     EntityHandle  elm_handle = 0;
     EntityHandle* connectivity;
-    result = readMeshIface->get_element_connect( triangles.size( ), 3, MBTRI, MB_START_ID,
-                                                 elm_handle, connectivity );
+    result = readMeshIface->get_element_connect( triangles.size( ), 3, MBTRI, MB_START_ID, elm_handle, connectivity );
     if( MB_SUCCESS != result ) return result;
 
     // Use vertex_map to recover triangle connectivity from

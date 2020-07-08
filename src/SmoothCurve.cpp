@@ -106,11 +106,10 @@ bool SmoothCurve::position_from_u( double u, double& x, double& y, double& z, do
 {
 
     // _fractions are increasing, so find the
-    double* ptr =
-        std::lower_bound( &_fractions[ 0 ], ( &_fractions[ 0 ] ) + _fractions.size( ), u );
-    int    index = ptr - &_fractions[ 0 ];
-    double nextFraction = _fractions[ index ];
-    double prevFraction = 0;
+    double* ptr = std::lower_bound( &_fractions[ 0 ], ( &_fractions[ 0 ] ) + _fractions.size( ), u );
+    int     index = ptr - &_fractions[ 0 ];
+    double  nextFraction = _fractions[ index ];
+    double  prevFraction = 0;
     if( index > 0 ) { prevFraction = _fractions[ index - 1 ]; }
     double t = ( u - prevFraction ) / ( nextFraction - prevFraction );
 
@@ -234,8 +233,7 @@ double SmoothCurve::u_from_position( double x, double y, double z, EntityHandle&
             // nodes of the 2 connected edges
             CartVect prevNodePos = coordNodes[ edgeIndex - 1 ];
             CartVect nextNodePos = coordNodes[ edgeIndex + 1 ];
-            if( ( prevNodePos - initialPos ).length_squared( ) <
-                ( nextNodePos - initialPos ).length_squared( ) )
+            if( ( prevNodePos - initialPos ).length_squared( ) < ( nextNodePos - initialPos ).length_squared( ) )
             { edgeIndex--; }
         }
     }
@@ -257,8 +255,7 @@ double SmoothCurve::u_from_position( double x, double y, double z, EntityHandle&
         rval = _mb->tag_get_handle( "CONTROLEDGE", 9, MB_TYPE_DOUBLE, _edgeTag );
         if( rval != MB_SUCCESS ) return 0;
     }
-    rval =
-        _mb->tag_get_data( _edgeTag, &( _entities[ edgeIndex ] ), 1, (double*)&controlPoints[ 0 ] );
+    rval = _mb->tag_get_data( _edgeTag, &( _entities[ edgeIndex ] ), 1, (double*)&controlPoints[ 0 ] );
     if( rval != MB_SUCCESS ) return rval;
 
     // starting point
@@ -284,19 +281,16 @@ double SmoothCurve::u_from_position( double x, double y, double z, EntityHandle&
         one_minus_t4 = one_minus_t3 * one_minus_t;
 
         outv = one_minus_t4 * P[ 0 ] + 4. * one_minus_t3 * tt * controlPoints[ 0 ] +
-               6. * one_minus_t2 * t2 * controlPoints[ 1 ] +
-               4. * one_minus_t * t3 * controlPoints[ 2 ] + t4 * P[ 1 ];
+               6. * one_minus_t2 * t2 * controlPoints[ 1 ] + 4. * one_minus_t * t3 * controlPoints[ 2 ] + t4 * P[ 1 ];
 
         CartVect out_tangent = -4. * one_minus_t3 * P[ 0 ] +
                                4. * ( one_minus_t3 - 3. * tt * one_minus_t2 ) * controlPoints[ 0 ] +
                                12. * ( tt * one_minus_t2 - t2 * one_minus_t ) * controlPoints[ 1 ] +
-                               4. * ( 3. * t2 * one_minus_t - t3 ) * controlPoints[ 2 ] +
-                               4. * t3 * P[ 1 ];
+                               4. * ( 3. * t2 * one_minus_t - t3 ) * controlPoints[ 2 ] + 4. * t3 * P[ 1 ];
 
         CartVect second_deriv =
             12. * one_minus_t2 * P[ 0 ] +
-            4. * ( -3. * one_minus_t2 - 3. * one_minus_t2 + 6. * tt * one_minus_t ) *
-                controlPoints[ 0 ] +
+            4. * ( -3. * one_minus_t2 - 3. * one_minus_t2 + 6. * tt * one_minus_t ) * controlPoints[ 0 ] +
             12. * ( one_minus_t2 - 4 * tt * one_minus_t + t2 ) * controlPoints[ 1 ] +
             4. * ( 6. * tt - 12 * t2 ) * controlPoints[ 2 ] + 12. * t2 * P[ 1 ];
         CartVect diff = outv - initialPos;
@@ -398,8 +392,7 @@ void SmoothCurve::compute_tangents_for_each_edge( )
     // the directions of the loops again, do we need to decide the "closed" loop or not? Not yet...
     EntityHandle previousEdge = entities[ 0 ];  // this is the first edge in the chain
     CartVect     TP[ 2 ];  // tangents for the previous edge
-    rval =
-        _mb->tag_get_data( tangentsTag, &previousEdge, 1, &TP[ 0 ] );  // tangents for previous edge
+    rval = _mb->tag_get_data( tangentsTag, &previousEdge, 1, &TP[ 0 ] );  // tangents for previous edge
     if( rval != MB_SUCCESS ) return;  // some error should be thrown
     CartVect     TC[ 2 ];  // tangents for the current edge
     EntityHandle currentEdge;
@@ -427,8 +420,8 @@ void SmoothCurve::compute_tangents_for_each_edge( )
     return;
 }
 
-void SmoothCurve::compute_control_points_on_boundary_edges(
-    double, std::map< EntityHandle, SmoothFace* >& mapSurfaces, Tag controlPointsTag, Tag markTag )
+void SmoothCurve::compute_control_points_on_boundary_edges( double, std::map< EntityHandle, SmoothFace* >& mapSurfaces,
+                                                            Tag controlPointsTag, Tag markTag )
 {
     // these points really need the surfaces they belong to, because the control points on edges
     // depend on the normals on surfaces
@@ -503,8 +496,8 @@ void SmoothCurve::compute_control_points_on_boundary_edges(
             rval = smoothFaceArray[ i ]->get_normals_for_vertices( conn2, N );
             if( rval != MB_SUCCESS ) return;
 
-            rval = smoothFaceArray[ i ]->init_edge_control_points( P[ 0 ], P[ 1 ], N[ 0 ], N[ 1 ],
-                                                                   T[ 0 ], T[ 1 ], controlForEdge );
+            rval = smoothFaceArray[ i ]->init_edge_control_points( P[ 0 ], P[ 1 ], N[ 0 ], N[ 1 ], T[ 0 ], T[ 1 ],
+                                                                   controlForEdge );
             if( rval != MB_SUCCESS ) return;
 
             // accumulate those over faces!!!
@@ -535,8 +528,7 @@ void SmoothCurve::compute_control_points_on_boundary_edges(
         _fractions[ e ] /= _leng;
 }
 
-ErrorCode SmoothCurve::evaluate_smooth_edge( EntityHandle eh, double& tt, CartVect& outv,
-                                             CartVect& out_tangent )
+ErrorCode SmoothCurve::evaluate_smooth_edge( EntityHandle eh, double& tt, CartVect& outv, CartVect& out_tangent )
 {
     CartVect P[ 2 ];  // P0 and P1
     CartVect controlPoints[ 3 ];  // edge control points
@@ -573,11 +565,9 @@ ErrorCode SmoothCurve::evaluate_smooth_edge( EntityHandle eh, double& tt, CartVe
     one_minus_t4 = one_minus_t3 * one_minus_t;
 
     outv = one_minus_t4 * P[ 0 ] + 4. * one_minus_t3 * tt * controlPoints[ 0 ] +
-           6. * one_minus_t2 * t2 * controlPoints[ 1 ] +
-           4. * one_minus_t * t3 * controlPoints[ 2 ] + t4 * P[ 1 ];
+           6. * one_minus_t2 * t2 * controlPoints[ 1 ] + 4. * one_minus_t * t3 * controlPoints[ 2 ] + t4 * P[ 1 ];
 
-    out_tangent = -4. * one_minus_t3 * P[ 0 ] +
-                  4. * ( one_minus_t3 - 3. * tt * one_minus_t2 ) * controlPoints[ 0 ] +
+    out_tangent = -4. * one_minus_t3 * P[ 0 ] + 4. * ( one_minus_t3 - 3. * tt * one_minus_t2 ) * controlPoints[ 0 ] +
                   12. * ( tt * one_minus_t2 - t2 * one_minus_t ) * controlPoints[ 1 ] +
                   4. * ( 3. * t2 * one_minus_t - t3 ) * controlPoints[ 2 ] + 4. * t3 * P[ 1 ];
     return MB_SUCCESS;

@@ -149,8 +149,7 @@ class ObjectiveFunctionTest : public CppUnit::TestFixture, public ObjectiveFunct
 
     CPPUNIT_TEST_SUITE_END( );
 
-    void test_LPtoP_value( short P, bool scale, const std::vector< double >& values,
-                           OFTestMode mode );
+    void test_LPtoP_value( short P, bool scale, const std::vector< double >& values, OFTestMode mode );
 
     void test_LInf_value( const std::vector< double >& values );
 
@@ -631,8 +630,8 @@ void ObjectiveFunctionTest::test_compute_ana_hessian_tet_scaled( )
     delete mean_ratio;
 }
 
-void ObjectiveFunctionTest::test_LPtoP_value( short P, bool scale,
-                                              const std::vector< double >& values, OFTestMode mode )
+void ObjectiveFunctionTest::test_LPtoP_value( short P, bool scale, const std::vector< double >& values,
+                                              OFTestMode mode )
 {
     CPPUNIT_ASSERT( !values.empty( ) );
 

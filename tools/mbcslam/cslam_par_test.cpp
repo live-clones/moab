@@ -63,8 +63,8 @@ int main( int argc, char** argv )
             index++;
         }
     }
-    std::cout << " run: -input " << input_mesh_file << "  -eps " << EPS1 << " -radius " << Radius
-              << " -deltaT " << deltaT << "\n";
+    std::cout << " run: -input " << input_mesh_file << "  -eps " << EPS1 << " -radius " << Radius << " -deltaT "
+              << deltaT << "\n";
 
     result += RUN_TEST( test_intx_in_parallel_elem_based );
 
@@ -88,8 +88,7 @@ ErrorCode compute_lagrange_mesh_on_sphere( Interface* mb, EntityHandle euler_set
     // the LOC tag, should be provided by the user?
     Tag         tagh = 0;
     std::string tag_name( "DP" );
-    rval = mb->tag_get_handle( tag_name.c_str( ), 3, MB_TYPE_DOUBLE, tagh,
-                               MB_TAG_DENSE | MB_TAG_CREAT );MB_CHK_ERR( rval );
+    rval = mb->tag_get_handle( tag_name.c_str( ), 3, MB_TYPE_DOUBLE, tagh, MB_TAG_DENSE | MB_TAG_CREAT );MB_CHK_ERR( rval );
     void* data;  // pointer to the DP in memory, for each vertex
     int   count;
 
@@ -194,7 +193,6 @@ void test_intx_in_parallel_elem_based( )
     moab::IntxAreaUtils sphAreaUtils;
     double              intx_area = sphAreaUtils.area_on_sphere( &mb, outputSet, Radius );
     double              arrival_area = sphAreaUtils.area_on_sphere( &mb, euler_set, Radius );
-    std::cout << "On rank : " << rank << " arrival area: " << arrival_area
-              << "  intersection area:" << intx_area
+    std::cout << "On rank : " << rank << " arrival area: " << arrival_area << "  intersection area:" << intx_area
               << " rel error: " << fabs( ( intx_area - arrival_area ) / arrival_area ) << "\n";
 }

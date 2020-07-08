@@ -27,11 +27,10 @@ int main( int argc, char* argv[] )
     }
     else
     {
-        printf( "Usage: %s <mesh_filename1> <mesh_filename2> <radius> <epsrel> <newFile>\n",
-                argv[ 0 ] );
+        printf( "Usage: %s <mesh_filename1> <mesh_filename2> <radius> <epsrel> <newFile>\n", argv[ 0 ] );
         if( argc != 1 ) return 1;
-        printf( "No files specified.  Defaulting to: %s  %s  %f %g %s\n", filename_mesh1,
-                filename_mesh2, R, epsrel, newFile );
+        printf( "No files specified.  Defaulting to: %s  %s  %f %g %s\n", filename_mesh1, filename_mesh2, R, epsrel,
+                newFile );
     }
 
     // read meshes in 2 file sets

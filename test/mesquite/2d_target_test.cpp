@@ -106,8 +106,8 @@ std::string           DEFAULT_OUTPUT_FILE = "./out.vtk";
 
 static PlanarDomain make_domain( Mesh* mesh, MsqError& );
 
-static int do_smoother( const char* input_file, const char* output_file, const char* ref_mesh_file,
-                        double of_power, unsigned metric_idx, AveragingScheme avg_scheme )
+static int do_smoother( const char* input_file, const char* output_file, const char* ref_mesh_file, double of_power,
+                        unsigned metric_idx, AveragingScheme avg_scheme )
 {
     MsqPrintError err( cerr );
 
@@ -147,8 +147,7 @@ static int do_smoother( const char* input_file, const char* output_file, const c
 
     PMeanPTemplate     obj1( of_power, metric );
     PatchPowerMeanP    obj2( of_power, metric );
-    ObjectiveFunction& objective =
-        *( ( avg_scheme == PATCH ) ? (ObjectiveFunction*)&obj2 : (ObjectiveFunction*)&obj1 );
+    ObjectiveFunction& objective = *( ( avg_scheme == PATCH ) ? (ObjectiveFunction*)&obj2 : (ObjectiveFunction*)&obj1 );
 
     ConjugateGradient solver( &objective, err );
     if( MSQ_CHKERR( err ) ) return 1;
@@ -237,12 +236,11 @@ static void usage( const char* argv0, bool help = false )
         << argv0 << " <-l|-h>" << std::endl;
     if( help )
     {
-        str << "     -p  : specify exponent value for p-mean^p OF template (default: "
-            << DEFAULT_OF_POWER << ")" << endl
-            << "     -m  : specify 2D target metric to use (default: "
-            << metrics[ DEFAULT_METRIC_IDX ].n << ")" << endl
-            << "     -a  : specify metric averaging scheme (default: "
-            << averaging_names[ DEFAULT_AVG_SCHEME ] << ")" << endl
+        str << "     -p  : specify exponent value for p-mean^p OF template (default: " << DEFAULT_OF_POWER << ")"
+            << endl
+            << "     -m  : specify 2D target metric to use (default: " << metrics[ DEFAULT_METRIC_IDX ].n << ")" << endl
+            << "     -a  : specify metric averaging scheme (default: " << averaging_names[ DEFAULT_AVG_SCHEME ] << ")"
+            << endl
             << "              (none,vertex,element,patch)" << endl
             << "     -e  : sample at mid-edge points (default is corners only)" << endl
             << "     -r  : use reference mesh instead of ideal elements for targets" << endl

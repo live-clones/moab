@@ -40,41 +40,39 @@ ErrorCode generate_mesh( Interface& moab, int intervals );
 const char args[] = "[-i <intervals>] [-o <filename>] [-L <filename>] [-g <n>]";
 void       help( )
 {
-    std::cout
-        << "parallel_write_test " << args << std::endl
-        << "  -i <N>    Each processor owns an NxNxN cube of hex elements (default: "
-        << DEFAULT_INTERVALS << ")" << std::endl
-        << "  -o <name> Retain output file and name it as specified." << std::endl
-        << "  -L <name> Write local mesh to file name prefixed with MPI rank" << std::endl
-        << "  -g <n>    Specify writer debug output level" << std::endl
-        << "  -R        Skip resolve of shared entities (interface ents will be duplicated in file)"
-        << std::endl
-        << std::endl
-        << "This program creates a (non-strict) subset of a regular hex mesh "
-           "such that the mesh is already partitioned, and then attempts to "
-           "write that mesh using MOAB's parallel HDF5 writer.  The mesh size "
-           "will scale with the number of processors and the number of elements "
-           "per processor (the latter is a function of the value specified "
-           "with the '-i' flag.)"
-        << std::endl
-        << std::endl
-        << "Let N = ceil(cbrt(P)), where P is the number of processes.  "
-           "The mesh will be some subset of a cube with one corner at the "
-           "origin and the other at (N,N,N).  Each processor will own a "
-           "non-overlapping 1x1x1 unit block of mesh within that cube.  "
-           "If P is a power of 3, then the entire NxNxN cube will be "
-           "filled with hex elements.  Otherwise, some connected subset "
-           "of the cube will be meshed.  Each processor is assigned a "
-           "sub-block of the cube by rank where the blocks are enumerated "
-           "sequentally with x increasing most rapidly and z least rapidly."
-        << std::endl
-        << std::endl
-        << "The size of the mesh owned by each processor is controlled by "
-           "the number of intervals along each edge of its block of mesh.  "
-           "If each block has N intervals, than each processor will have "
-           "N^3 hex elements."
-        << std::endl
-        << std::endl;
+    std::cout << "parallel_write_test " << args << std::endl
+              << "  -i <N>    Each processor owns an NxNxN cube of hex elements (default: " << DEFAULT_INTERVALS << ")"
+              << std::endl
+              << "  -o <name> Retain output file and name it as specified." << std::endl
+              << "  -L <name> Write local mesh to file name prefixed with MPI rank" << std::endl
+              << "  -g <n>    Specify writer debug output level" << std::endl
+              << "  -R        Skip resolve of shared entities (interface ents will be duplicated in file)" << std::endl
+              << std::endl
+              << "This program creates a (non-strict) subset of a regular hex mesh "
+                 "such that the mesh is already partitioned, and then attempts to "
+                 "write that mesh using MOAB's parallel HDF5 writer.  The mesh size "
+                 "will scale with the number of processors and the number of elements "
+                 "per processor (the latter is a function of the value specified "
+                 "with the '-i' flag.)"
+              << std::endl
+              << std::endl
+              << "Let N = ceil(cbrt(P)), where P is the number of processes.  "
+                 "The mesh will be some subset of a cube with one corner at the "
+                 "origin and the other at (N,N,N).  Each processor will own a "
+                 "non-overlapping 1x1x1 unit block of mesh within that cube.  "
+                 "If P is a power of 3, then the entire NxNxN cube will be "
+                 "filled with hex elements.  Otherwise, some connected subset "
+                 "of the cube will be meshed.  Each processor is assigned a "
+                 "sub-block of the cube by rank where the blocks are enumerated "
+                 "sequentally with x increasing most rapidly and z least rapidly."
+              << std::endl
+              << std::endl
+              << "The size of the mesh owned by each processor is controlled by "
+                 "the number of intervals along each edge of its block of mesh.  "
+                 "If each block has N intervals, than each processor will have "
+                 "N^3 hex elements."
+              << std::endl
+              << std::endl;
 }
 
 int main( int argc, char* argv[] )
@@ -139,8 +137,7 @@ int main( int argc, char* argv[] )
             debug_level = atoi( argv[ i ] );
             if( debug_level < 1 )
             {
-                std::cerr << "Invalid argument following -g flag: \"" << argv[ i ] << '"'
-                          << std::endl;
+                std::cerr << "Invalid argument following -g flag: \"" << argv[ i ] << '"' << std::endl;
                 return 1;
             }
             expect_debug_level = false;
@@ -250,8 +247,7 @@ int main( int argc, char* argv[] )
     {
         std::string msg;
         moab.get_last_error( msg );
-        std::cerr << "File creation failed with error code: " << moab.get_error_string( rval )
-                  << std::endl;
+        std::cerr << "File creation failed with error code: " << moab.get_error_string( rval ) << std::endl;
         std::cerr << "\t\"" << msg << '"' << std::endl;
         return (int)rval;
     }
@@ -265,8 +261,7 @@ int main( int argc, char* argv[] )
     if( 0 == rank )
     {
         double sec = (double)t / CLOCKS_PER_SEC;
-        std::cout << "Wrote " << hexes.size( ) * size << " hexes in " << sec << " seconds."
-                  << std::endl;
+        std::cout << "Wrote " << hexes.size( ) * size << " hexes in " << sec << " seconds." << std::endl;
 
         if( !keep_output_file )
         {
@@ -315,14 +310,13 @@ ErrorCode generate_mesh( Interface& moab, int num_interval )
     // and will be 1.0 units on a side
 
     // create vertices
-    const int                             num_x_vtx = num_interval * num_x_blocks + 1;
-    const int                             num_y_vtx = num_interval * num_y_blocks + 1;
-    const int                             x_offset = my_x_block * num_interval;
-    const int                             y_offset = my_y_block * num_interval;
-    const int                             z_offset = my_z_block * num_interval;
-    double                                step = 1.0 / num_interval;
-    std::vector< EntityHandle >           vertices( ( num_interval + 1 ) * ( num_interval + 1 ) *
-                                          ( num_interval + 1 ) );
+    const int                   num_x_vtx = num_interval * num_x_blocks + 1;
+    const int                   num_y_vtx = num_interval * num_y_blocks + 1;
+    const int                   x_offset = my_x_block * num_interval;
+    const int                   y_offset = my_y_block * num_interval;
+    const int                   z_offset = my_z_block * num_interval;
+    double                      step = 1.0 / num_interval;
+    std::vector< EntityHandle > vertices( ( num_interval + 1 ) * ( num_interval + 1 ) * ( num_interval + 1 ) );
     std::vector< EntityHandle >::iterator v = vertices.begin( );
     for( int k = 0; k <= num_interval; ++k )
     {
@@ -330,14 +324,12 @@ ErrorCode generate_mesh( Interface& moab, int num_interval )
         {
             for( int i = 0; i <= num_interval; ++i )
             {
-                double       coords[] = { my_x_block + i * step, my_y_block + j * step,
-                                    my_z_block + k * step };
+                double       coords[] = { my_x_block + i * step, my_y_block + j * step, my_z_block + k * step };
                 EntityHandle h;
                 rval = moab.create_vertex( coords, h );
                 if( MB_SUCCESS != rval ) return rval;
 
-                int id = 1 + x_offset + i + ( y_offset + j ) * num_x_vtx +
-                         ( z_offset + k ) * num_x_vtx * num_y_vtx;
+                int id = 1 + x_offset + i + ( y_offset + j ) * num_x_vtx + ( z_offset + k ) * num_x_vtx * num_y_vtx;
                 rval = moab.tag_set_data( global_id, &h, 1, &id );
                 if( MB_SUCCESS != rval ) return rval;
 

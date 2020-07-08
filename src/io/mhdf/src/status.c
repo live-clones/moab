@@ -46,7 +46,6 @@ void mhdf_setFail( mhdf_Status* status, const char* fmt, ... )
         va_start( args, fmt );
         vsnprintf( status->message, MHDF_MESSAGE_BUFFER_LEN, fmt, args );
         va_end( args );
-        if( !status->message[ 0 ] )
-            strncpy( status->message, "(Uknown error)", MHDF_MESSAGE_BUFFER_LEN );
+        if( !status->message[ 0 ] ) strncpy( status->message, "(Uknown error)", MHDF_MESSAGE_BUFFER_LEN );
     }
 }

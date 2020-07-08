@@ -46,15 +46,13 @@ using namespace MBMesquite;
 
 Instruction::~Instruction( ) {}
 
-double Instruction::loop_over_mesh( ParallelMesh* mesh, MeshDomain* domain,
-                                    const Settings* settings, MsqError& err )
+double Instruction::loop_over_mesh( ParallelMesh* mesh, MeshDomain* domain, const Settings* settings, MsqError& err )
 {
     MeshDomainAssoc mesh_and_domain = MeshDomainAssoc( (Mesh*)mesh, domain, false, true );
     return loop_over_mesh( &mesh_and_domain, settings, err );
 }
 
-void Instruction::initialize_vertex_byte( MeshDomainAssoc* mesh_and_domain,
-                                          const Settings* settings, MsqError& err )
+void Instruction::initialize_vertex_byte( MeshDomainAssoc* mesh_and_domain, const Settings* settings, MsqError& err )
 {
     std::vector< Mesh::VertexHandle > verts;
     std::vector< unsigned char >      bytes;
@@ -84,8 +82,7 @@ void Instruction::initialize_vertex_byte( MeshDomainAssoc* mesh_and_domain,
 
             bytes.clear( );
             bytes.resize( verts.size( ), 0 );
-            std::fill( bytes.begin( ) + TopologyInfo::corners( type ), bytes.end( ),
-                       MsqVertex::MSQ_DEPENDENT );
+            std::fill( bytes.begin( ) + TopologyInfo::corners( type ), bytes.end( ), MsqVertex::MSQ_DEPENDENT );
             mesh->vertices_set_byte( arrptr( verts ), arrptr( bytes ), verts.size( ), err );MSQ_ERRRTN( err );
         }
     }

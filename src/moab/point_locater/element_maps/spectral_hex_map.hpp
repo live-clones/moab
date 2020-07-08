@@ -67,9 +67,8 @@ namespace element_utility
       public:
         // Natural coordinates
         template< typename Moab, typename Entity_handle, typename Points, typename Point >
-        std::pair< bool, Point > operator( )( const Moab& /* moab */, const Entity_handle& /* h */,
-                                              const Points& v, const Point& p,
-                                              const double tol = 1.e-6 )
+        std::pair< bool, Point > operator( )( const Moab& /* moab */, const Entity_handle& /* h */, const Points& v,
+                                              const Point& p, const double tol = 1.e-6 )
         {
             Point result( 3, 0.0 );
             /*
@@ -96,8 +95,7 @@ namespace element_utility
         }
 
         template< typename Point, typename Points >
-        bool solve_inverse( const Point& x, Point& xi, const Points& points,
-                            const double tol = 1.e-6 )
+        bool solve_inverse( const Point& x, Point& xi, const Points& points, const double tol = 1.e-6 )
         {
             const double error_tol_sqr = tol * tol;
             Point        delta( 3, 0.0 );
@@ -112,16 +110,14 @@ namespace element_utility
             ss << "Hex: ";
             for( int i = 0; i < 8; ++i )
             {
-                ss << points[ i ][ 0 ] << ", " << points[ i ][ 1 ] << ", " << points[ i ][ 2 ]
-                   << std::endl;
+                ss << points[ i ][ 0 ] << ", " << points[ i ][ 1 ] << ", " << points[ i ][ 2 ] << std::endl;
             }
             ss << std::endl;
 #endif
             while( normsq( delta ) > error_tol_sqr )
             {
 #ifdef SPECTRAL_HEX_DEBUG
-                ss << "Iter #: " << num_iterations << " Err: " << sqrt( normsq( delta ) )
-                   << " Iterate: ";
+                ss << "Iter #: " << num_iterations << " Err: " << sqrt( normsq( delta ) ) << " Iterate: ";
                 ss << xi[ 0 ] << ", " << xi[ 1 ] << ", " << xi[ 2 ] << std::endl;
 #endif
                 if( ++num_iterations >= 5 ) { return false; }
@@ -155,8 +151,8 @@ namespace element_utility
             }
             for( int d = 0; d < 3; ++d )
             {
-                f[ d ] = tensor_i3( _ld[ 0 ].J, _ld[ 0 ].n, _ld[ 1 ].J, _ld[ 1 ].n, _ld[ 2 ].J,
-                                    _ld[ 2 ].n, _xyz[ d ], _odwork );
+                f[ d ] = tensor_i3( _ld[ 0 ].J, _ld[ 0 ].n, _ld[ 1 ].J, _ld[ 1 ].n, _ld[ 2 ].J, _ld[ 2 ].n, _xyz[ d ],
+                                    _odwork );
             }
             return f;
         }
@@ -169,8 +165,7 @@ namespace element_utility
             {
                 lagrange_0( &_ld[ d ], p[ d ] );
             }
-            return tensor_i3( _ld[ 0 ].J, _ld[ 0 ].n, _ld[ 1 ].J, _ld[ 1 ].n, _ld[ 2 ].J,
-                              _ld[ 2 ].n, field, _odwork );
+            return tensor_i3( _ld[ 0 ].J, _ld[ 0 ].n, _ld[ 1 ].J, _ld[ 1 ].n, _ld[ 2 ].J, _ld[ 2 ].n, field, _odwork );
         }
         template< typename Points, typename Field >
         double integrate_scalar_field( const Points& p, const Field& field ) const

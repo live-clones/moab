@@ -12,15 +12,14 @@
 
 using namespace moab;
 
-#define CHKERR( A )                                                                          \
-    do                                                                                       \
-    {                                                                                        \
-        if( MB_SUCCESS != ( A ) )                                                            \
-        {                                                                                    \
-            std::cerr << "Failure (error code " << ( A ) << ") at " __FILE__ ":" << __LINE__ \
-                      << std::endl;                                                          \
-            return A;                                                                        \
-        }                                                                                    \
+#define CHKERR( A )                                                                                        \
+    do                                                                                                     \
+    {                                                                                                      \
+        if( MB_SUCCESS != ( A ) )                                                                          \
+        {                                                                                                  \
+            std::cerr << "Failure (error code " << ( A ) << ") at " __FILE__ ":" << __LINE__ << std::endl; \
+            return A;                                                                                      \
+        }                                                                                                  \
     } while( false )
 
 #ifdef HAVE_OCC_STEP
@@ -44,8 +43,7 @@ void check_group_data( std::vector< int >& group_ids, std::vector< std::string >
 #endif
 
 // Function for loading all reference data
-void load_group_references( std::vector< int >& ids, std::vector< std::string >& names,
-                            std::vector< int >& ent_ids );
+void load_group_references( std::vector< int >& ids, std::vector< std::string >& names, std::vector< int >& ent_ids );
 
 // List of tests in this file
 void read_cylcube_groups_test( );
@@ -175,8 +173,7 @@ void check_group_data( std::vector< int >& group_ids, std::vector< std::string >
 #endif
 }
 
-void load_group_references( std::vector< int >& ids, std::vector< std::string >& names,
-                            std::vector< int >& ent_ids )
+void load_group_references( std::vector< int >& ids, std::vector< std::string >& names, std::vector< int >& ent_ids )
 {
     // First set of group info
     names.push_back( "Group 3" );

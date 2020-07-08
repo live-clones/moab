@@ -81,8 +81,8 @@ void ParallelMeshImpl::set_processor_id_tag( const char* name, MsqError& err )
 
 //**************** Parallel Methods ******************************
 
-void ParallelMeshImpl::vertices_get_global_id( const VertexHandle vert_array[], size_t gid[],
-                                               size_t num_vtx, MsqError& err )
+void ParallelMeshImpl::vertices_get_global_id( const VertexHandle vert_array[], size_t gid[], size_t num_vtx,
+                                               MsqError& err )
 {
     if( gid_tag )
     {
@@ -94,8 +94,8 @@ void ParallelMeshImpl::vertices_get_global_id( const VertexHandle vert_array[], 
     }
 }
 
-void ParallelMeshImpl::vertices_set_global_id( const VertexHandle vert_array[], size_t gid[],
-                                               size_t num_vtx, MsqError& err )
+void ParallelMeshImpl::vertices_set_global_id( const VertexHandle vert_array[], size_t gid[], size_t num_vtx,
+                                               MsqError& err )
 {
     if( gid_tag == 0 )
     {
@@ -114,8 +114,8 @@ void ParallelMeshImpl::vertices_set_global_id( const VertexHandle vert_array[], 
     tag_set_vertex_data( gid_tag, num_vtx, vert_array, gid, err );MSQ_CHKERR( err );
 }
 
-void ParallelMeshImpl::vertices_get_processor_id( const VertexHandle vert_array[], int pid[],
-                                                  size_t num_vtx, MsqError& err )
+void ParallelMeshImpl::vertices_get_processor_id( const VertexHandle vert_array[], int pid[], size_t num_vtx,
+                                                  MsqError& err )
 {
     if( pid_tag )
     {
@@ -127,8 +127,8 @@ void ParallelMeshImpl::vertices_get_processor_id( const VertexHandle vert_array[
     }
 }
 
-void ParallelMeshImpl::vertices_set_processor_id( const VertexHandle vert_array[], int pid[],
-                                                  size_t num_vtx, MsqError& err )
+void ParallelMeshImpl::vertices_set_processor_id( const VertexHandle vert_array[], int pid[], size_t num_vtx,
+                                                  MsqError& err )
 {
     if( pid_tag == 0 )
     {
@@ -162,29 +162,25 @@ void ParallelMeshImpl::get_all_vertices( std::vector< VertexHandle >& verts, Msq
     myMesh->get_all_vertices( verts, err );
 }
 
-void ParallelMeshImpl::vertices_get_fixed_flag( const VertexHandle   vert_array[],
-                                                std::vector< bool >& flag_array, size_t num_vtx,
-                                                MsqError& err )
+void ParallelMeshImpl::vertices_get_fixed_flag( const VertexHandle vert_array[], std::vector< bool >& flag_array,
+                                                size_t num_vtx, MsqError& err )
 {
     myMesh->vertices_get_fixed_flag( vert_array, flag_array, num_vtx, err );
 }
 
-void ParallelMeshImpl::vertices_get_coordinates( const Mesh::VertexHandle vert_array[],
-                                                 MsqVertex* coordinates, size_t num_vtx,
-                                                 MsqError& err )
+void ParallelMeshImpl::vertices_get_coordinates( const Mesh::VertexHandle vert_array[], MsqVertex* coordinates,
+                                                 size_t num_vtx, MsqError& err )
 {
     myMesh->vertices_get_coordinates( vert_array, coordinates, num_vtx, err );
 }
 
-void ParallelMeshImpl::vertices_get_slaved_flag( const VertexHandle   vert_array[],
-                                                 std::vector< bool >& flag_array, size_t num_vtx,
-                                                 MsqError& err )
+void ParallelMeshImpl::vertices_get_slaved_flag( const VertexHandle vert_array[], std::vector< bool >& flag_array,
+                                                 size_t num_vtx, MsqError& err )
 {
     myMesh->vertices_get_slaved_flag( vert_array, flag_array, num_vtx, err );
 }
 
-void ParallelMeshImpl::vertex_set_coordinates( VertexHandle vertex, const Vector3D& coordinates,
-                                               MsqError& err )
+void ParallelMeshImpl::vertex_set_coordinates( VertexHandle vertex, const Vector3D& coordinates, MsqError& err )
 {
     myMesh->vertex_set_coordinates( vertex, coordinates, err );
 }
@@ -194,52 +190,45 @@ void ParallelMeshImpl::vertex_set_byte( VertexHandle vertex, unsigned char byte,
     myMesh->vertex_set_byte( vertex, byte, err );
 }
 
-void ParallelMeshImpl::vertices_set_byte( const VertexHandle*  vert_array,
-                                          const unsigned char* byte_array, size_t array_size,
-                                          MsqError& err )
+void ParallelMeshImpl::vertices_set_byte( const VertexHandle* vert_array, const unsigned char* byte_array,
+                                          size_t array_size, MsqError& err )
 {
     myMesh->vertices_set_byte( vert_array, byte_array, array_size, err );
 }
 
-void ParallelMeshImpl::vertex_get_byte( const VertexHandle vertex, unsigned char* byte,
-                                        MsqError& err )
+void ParallelMeshImpl::vertex_get_byte( const VertexHandle vertex, unsigned char* byte, MsqError& err )
 {
     myMesh->vertex_get_byte( vertex, byte, err );
 }
 
-void ParallelMeshImpl::vertices_get_byte( const VertexHandle* vert_array, unsigned char* byte_array,
-                                          size_t array_size, MsqError& err )
+void ParallelMeshImpl::vertices_get_byte( const VertexHandle* vert_array, unsigned char* byte_array, size_t array_size,
+                                          MsqError& err )
 {
     myMesh->vertices_get_byte( vert_array, byte_array, array_size, err );
 }
 
-void ParallelMeshImpl::vertices_get_attached_elements( const VertexHandle*           vertices,
-                                                       size_t                        num_vertices,
+void ParallelMeshImpl::vertices_get_attached_elements( const VertexHandle* vertices, size_t num_vertices,
                                                        std::vector< ElementHandle >& elements,
-                                                       std::vector< size_t >&        offsets,
-                                                       MsqError&                     err )
+                                                       std::vector< size_t >& offsets, MsqError& err )
 {
     myMesh->vertices_get_attached_elements( vertices, num_vertices, elements, offsets, err );
 }
 
-void ParallelMeshImpl::elements_get_attached_vertices( const ElementHandle*         elements,
-                                                       size_t                       num_elems,
+void ParallelMeshImpl::elements_get_attached_vertices( const ElementHandle* elements, size_t num_elems,
                                                        std::vector< VertexHandle >& vertices,
-                                                       std::vector< size_t >&       offsets,
-                                                       MsqError&                    err )
+                                                       std::vector< size_t >& offsets, MsqError& err )
 {
     myMesh->elements_get_attached_vertices( elements, num_elems, vertices, offsets, err );
 }
 
 void ParallelMeshImpl::elements_get_topologies( const ElementHandle* element_handle_array,
-                                                EntityTopology*      element_topologies,
-                                                size_t num_elements, MsqError& err )
+                                                EntityTopology* element_topologies, size_t num_elements, MsqError& err )
 {
     myMesh->elements_get_topologies( element_handle_array, element_topologies, num_elements, err );
 }
 
-TagHandle ParallelMeshImpl::tag_create( const std::string& name, TagType type, unsigned length,
-                                        const void* defval, MsqError& err )
+TagHandle ParallelMeshImpl::tag_create( const std::string& name, TagType type, unsigned length, const void* defval,
+                                        MsqError& err )
 {
     return myMesh->tag_create( name, type, length, defval, err );
 }
@@ -254,42 +243,37 @@ TagHandle ParallelMeshImpl::tag_get( const std::string& name, MsqError& err )
     return myMesh->tag_get( name, err );
 }
 
-void ParallelMeshImpl::tag_properties( TagHandle handle, std::string& name, TagType& type,
-                                       unsigned& length, MsqError& err )
+void ParallelMeshImpl::tag_properties( TagHandle handle, std::string& name, TagType& type, unsigned& length,
+                                       MsqError& err )
 {
     myMesh->tag_properties( handle, name, type, length, err );
 }
 
-void ParallelMeshImpl::tag_set_element_data( TagHandle handle, size_t num_elems,
-                                             const ElementHandle* elem_array, const void* values,
-                                             MsqError& err )
+void ParallelMeshImpl::tag_set_element_data( TagHandle handle, size_t num_elems, const ElementHandle* elem_array,
+                                             const void* values, MsqError& err )
 {
     myMesh->tag_set_element_data( handle, num_elems, elem_array, values, err );
 }
 
-void ParallelMeshImpl::tag_get_element_data( TagHandle handle, size_t num_elems,
-                                             const ElementHandle* elem_array, void* values,
-                                             MsqError& err )
+void ParallelMeshImpl::tag_get_element_data( TagHandle handle, size_t num_elems, const ElementHandle* elem_array,
+                                             void* values, MsqError& err )
 {
     myMesh->tag_get_element_data( handle, num_elems, elem_array, values, err );
 }
 
-void ParallelMeshImpl::tag_set_vertex_data( TagHandle handle, size_t num_verts,
-                                            const VertexHandle* vert_array, const void* values,
-                                            MsqError& err )
+void ParallelMeshImpl::tag_set_vertex_data( TagHandle handle, size_t num_verts, const VertexHandle* vert_array,
+                                            const void* values, MsqError& err )
 {
     myMesh->tag_set_vertex_data( handle, num_verts, vert_array, values, err );
 }
 
-void ParallelMeshImpl::tag_get_vertex_data( TagHandle handle, size_t num_verts,
-                                            const VertexHandle* vert_array, void* values,
-                                            MsqError& err )
+void ParallelMeshImpl::tag_get_vertex_data( TagHandle handle, size_t num_verts, const VertexHandle* vert_array,
+                                            void* values, MsqError& err )
 {
     myMesh->tag_get_vertex_data( handle, num_verts, vert_array, values, err );
 }
 
-void ParallelMeshImpl::release_entity_handles( const EntityHandle* handle_array, size_t num_handles,
-                                               MsqError& err )
+void ParallelMeshImpl::release_entity_handles( const EntityHandle* handle_array, size_t num_handles, MsqError& err )
 
 {
     myMesh->release_entity_handles( handle_array, num_handles, err );

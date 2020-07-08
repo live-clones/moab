@@ -43,8 +43,8 @@ class LloydSmoother
      * \param abs_tol Absolute tolerance measuring convergence
      * \param rel_tol Relative tolerance measuring convergence
      */
-    LloydSmoother( Interface* impl, ParallelComm* pc, Range& elems, Tag cds_tag = 0,
-                   Tag fixed_tag = 0, double abs_tol = -1.0, double rel_tol = 1.0e-6 );
+    LloydSmoother( Interface* impl, ParallelComm* pc, Range& elems, Tag cds_tag = 0, Tag fixed_tag = 0,
+                   double abs_tol = -1.0, double rel_tol = 1.0e-6 );
 
     /* \brief Destructor
      */

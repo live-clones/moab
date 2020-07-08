@@ -134,22 +134,18 @@ int main( int argc, char* argv[] )
                         use_scd = true;
                         break;
                     case 'b':
-                        if( i == argc || 0 >= ( block = strtol( argv[ i ], &endptr, 0 ) ) ||
-                            *endptr )
+                        if( i == argc || 0 >= ( block = strtol( argv[ i ], &endptr, 0 ) ) || *endptr )
                         {
-                            std::cerr << "Expected positive integer following '-b' flag"
-                                      << std::endl;
+                            std::cerr << "Expected positive integer following '-b' flag" << std::endl;
                             usage( argv[ 0 ] );
                         }
                         matsets.push_back( (int)block );
                         ++i;
                         break;
                     case 's':
-                        if( i == argc || 0 >= ( neuset_num = strtol( argv[ i ], &endptr, 0 ) ) ||
-                            *endptr )
+                        if( i == argc || 0 >= ( neuset_num = strtol( argv[ i ], &endptr, 0 ) ) || *endptr )
                         {
-                            std::cerr << "Expected positive integer following '-s' flag"
-                                      << std::endl;
+                            std::cerr << "Expected positive integer following '-s' flag" << std::endl;
                             usage( argv[ 0 ] );
                         }
                         ++i;
@@ -163,11 +159,9 @@ int main( int argc, char* argv[] )
                         fixed_tag = argv[ i++ ];
                         break;
                     case 'M':
-                        if( i == argc || 0.0 > ( merge_epsilon = strtod( argv[ i ], &endptr ) ) ||
-                            *endptr )
+                        if( i == argc || 0.0 > ( merge_epsilon = strtod( argv[ i ], &endptr ) ) || *endptr )
                         {
-                            std::cerr << "Expected positive numeric value following '-M' flag"
-                                      << std::endl;
+                            std::cerr << "Expected positive numeric value following '-M' flag" << std::endl;
                             usage( argv[ 0 ] );
                         }
                         merge_vertices = true;
@@ -209,8 +203,8 @@ int main( int argc, char* argv[] )
     {
         double tmp_time1, tmp_mem1;
         get_time_mem( tmp_time1, tmp_mem1 );
-        std::cout << "Before reading: cpu time = " << tmp_time1 << ", memory = " << tmp_mem1 / 1.0e6
-                  << "MB." << std::endl;
+        std::cout << "Before reading: cpu time = " << tmp_time1 << ", memory = " << tmp_mem1 / 1.0e6 << "MB."
+                  << std::endl;
     }
 
     // read input file
@@ -225,8 +219,8 @@ int main( int argc, char* argv[] )
     {
         double tmp_time2, tmp_mem2;
         get_time_mem( tmp_time2, tmp_mem2 );
-        std::cout << "After reading: cpu time = " << tmp_time2 << ", memory = " << tmp_mem2 / 1.0e6
-                  << "MB." << std::endl;
+        std::cout << "After reading: cpu time = " << tmp_time2 << ", memory = " << tmp_mem2 / 1.0e6 << "MB."
+                  << std::endl;
     }
 
     if( merge_vertices )
@@ -279,8 +273,8 @@ int main( int argc, char* argv[] )
             int         this_matset = *vit;
             const void* this_matset_ptr = &this_matset;
             Range       this_range, ent_range;
-            result = iface->get_entities_by_type_and_tag( 0, MBENTITYSET, &matset_tag,
-                                                          &this_matset_ptr, 1, this_range );
+            result =
+                iface->get_entities_by_type_and_tag( 0, MBENTITYSET, &matset_tag, &this_matset_ptr, 1, this_range );
             if( MB_SUCCESS != result )
             {
                 std::cerr << "Trouble getting material set #" << *vit << std::endl;
@@ -316,8 +310,8 @@ int main( int argc, char* argv[] )
     if( print_perf )
     {
         get_time_mem( tmp_time, tmp_mem );
-        std::cout << "Before skinning: cpu time = " << tmp_time << ", memory = " << tmp_mem / 1.0e6
-                  << "MB." << std::endl;
+        std::cout << "Before skinning: cpu time = " << tmp_time << ", memory = " << tmp_mem / 1.0e6 << "MB."
+                  << std::endl;
     }
 
     // skin the mesh
@@ -352,8 +346,7 @@ int main( int argc, char* argv[] )
         // get tag handle
         Tag tag;
         int zero = 0;
-        result = iface->tag_get_handle( fixed_tag, 1, MB_TYPE_INTEGER, tag,
-                                        MB_TAG_DENSE | MB_TAG_CREAT, &zero );CHKERROR( result );
+        result = iface->tag_get_handle( fixed_tag, 1, MB_TYPE_INTEGER, tag, MB_TAG_DENSE | MB_TAG_CREAT, &zero );CHKERROR( result );
 
         // Set tags
         std::vector< int > ones;
@@ -400,8 +393,8 @@ int main( int argc, char* argv[] )
             if( MB_SUCCESS != result ) return 1;
             Tag sense_tag;
             int dum_sense = 0;
-            result = iface->tag_get_handle( "SENSE", 1, MB_TYPE_INTEGER, sense_tag,
-                                            MB_TAG_SPARSE | MB_TAG_CREAT, &dum_sense );
+            result = iface->tag_get_handle( "SENSE", 1, MB_TYPE_INTEGER, sense_tag, MB_TAG_SPARSE | MB_TAG_CREAT,
+                                            &dum_sense );
             if( result != MB_SUCCESS ) return 1;
             int sense_val = -1;
             result = iface->tag_set_data( neuset_tag, &reverse_neuset, 1, &sense_val );
@@ -496,20 +489,19 @@ void get_time_mem( double& tot_time, double& tot_mem )
         // read the preceding fields and the ones we really want...
         int          dum_int;
         unsigned int dum_uint, vm_size, rss;
-        int          num_fields = sscanf(
-            file_str,
-            "%d "  // pid
-            "%s "  // comm
-            "%c "  // state
-            "%d %d %d %d %d "  // ppid, pgrp, session, tty, tpgid
-            "%u %u %u %u %u "  // flags, minflt, cminflt, majflt, cmajflt
-            "%d %d %d %d %d %d "  // utime, stime, cutime, cstime, counter, priority
-            "%u %u "  // timeout, itrealvalue
-            "%d "  // starttime
-            "%u %u",  // vsize, rss
-            &dum_int, dum_str, dum_str, &dum_int, &dum_int, &dum_int, &dum_int, &dum_int, &dum_uint,
-            &dum_uint, &dum_uint, &dum_uint, &dum_uint, &dum_int, &dum_int, &dum_int, &dum_int,
-            &dum_int, &dum_int, &dum_uint, &dum_uint, &dum_int, &vm_size, &rss );
+        int          num_fields = sscanf( file_str,
+                                 "%d "  // pid
+                                 "%s "  // comm
+                                 "%c "  // state
+                                 "%d %d %d %d %d "  // ppid, pgrp, session, tty, tpgid
+                                 "%u %u %u %u %u "  // flags, minflt, cminflt, majflt, cmajflt
+                                 "%d %d %d %d %d %d "  // utime, stime, cutime, cstime, counter, priority
+                                 "%u %u "  // timeout, itrealvalue
+                                 "%d "  // starttime
+                                 "%u %u",  // vsize, rss
+                                 &dum_int, dum_str, dum_str, &dum_int, &dum_int, &dum_int, &dum_int, &dum_int,
+                                 &dum_uint, &dum_uint, &dum_uint, &dum_uint, &dum_uint, &dum_int, &dum_int, &dum_int,
+                                 &dum_int, &dum_int, &dum_int, &dum_uint, &dum_uint, &dum_int, &vm_size, &rss );
         if( num_fields == 24 ) tot_mem = ( (double)vm_size );
     }
 }
@@ -614,8 +606,7 @@ ErrorCode merge_duplicate_vertices( Interface& moab, const double epsilon )
             coords2[ 0 ] -= coords[ 0 ];
             coords2[ 1 ] -= coords[ 1 ];
             coords2[ 2 ] -= coords[ 2 ];
-            double dsqr = coords2[ 0 ] * coords2[ 0 ] + coords2[ 1 ] * coords2[ 1 ] +
-                          coords2[ 2 ] * coords2[ 2 ];
+            double dsqr = coords2[ 0 ] * coords2[ 0 ] + coords2[ 1 ] * coords2[ 1 ] + coords2[ 2 ] * coords2[ 2 ];
             if( dsqr <= epsilon * epsilon )
             {
                 merge = *j;

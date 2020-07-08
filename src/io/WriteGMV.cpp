@@ -35,8 +35,7 @@
 namespace moab
 {
 
-const char* WriteGMV::gmvTypeNames[] = { "",        "line",  "tri", "quad", "", "tet",
-                                         "pyramid", "prism", "",    "hex",  "", "" };
+const char* WriteGMV::gmvTypeNames[] = { "", "line", "tri", "quad", "", "tet", "pyramid", "prism", "", "hex", "", "" };
 
 WriterIface* WriteGMV::factory( Interface* iface )
 {
@@ -61,20 +60,20 @@ WriteGMV::WriteGMV( Interface* impl ) : mbImpl( impl )
     // initialize in case tag_get_handle fails below
     //! get and cache predefined tag handles
     int negone = -1;
-    impl->tag_get_handle( MATERIAL_SET_TAG_NAME, 1, MB_TYPE_INTEGER, mMaterialSetTag,
-                          MB_TAG_SPARSE | MB_TAG_CREAT, &negone );
+    impl->tag_get_handle( MATERIAL_SET_TAG_NAME, 1, MB_TYPE_INTEGER, mMaterialSetTag, MB_TAG_SPARSE | MB_TAG_CREAT,
+                          &negone );
 
-    impl->tag_get_handle( DIRICHLET_SET_TAG_NAME, 1, MB_TYPE_INTEGER, mDirichletSetTag,
-                          MB_TAG_SPARSE | MB_TAG_CREAT, &negone );
+    impl->tag_get_handle( DIRICHLET_SET_TAG_NAME, 1, MB_TYPE_INTEGER, mDirichletSetTag, MB_TAG_SPARSE | MB_TAG_CREAT,
+                          &negone );
 
-    impl->tag_get_handle( NEUMANN_SET_TAG_NAME, 1, MB_TYPE_INTEGER, mNeumannSetTag,
-                          MB_TAG_SPARSE | MB_TAG_CREAT, &negone );
+    impl->tag_get_handle( NEUMANN_SET_TAG_NAME, 1, MB_TYPE_INTEGER, mNeumannSetTag, MB_TAG_SPARSE | MB_TAG_CREAT,
+                          &negone );
 
     mGlobalIdTag = impl->globalId_tag( );
 
     int dum_val_array[] = { -1, -1, -1, -1 };
-    impl->tag_get_handle( HAS_MID_NODES_TAG_NAME, 4, MB_TYPE_INTEGER, mHasMidNodesTag,
-                          MB_TAG_SPARSE | MB_TAG_CREAT, dum_val_array );
+    impl->tag_get_handle( HAS_MID_NODES_TAG_NAME, 4, MB_TYPE_INTEGER, mHasMidNodesTag, MB_TAG_SPARSE | MB_TAG_CREAT,
+                          dum_val_array );
 }
 
 WriteGMV::~WriteGMV( )
@@ -82,8 +81,8 @@ WriteGMV::~WriteGMV( )
     mbImpl->release_interface( mWriteIface );
 }
 
-ErrorCode WriteGMV::write_file( const char* file_name, const EntityHandle output_set,
-                                const int user_dimension, const bool mesh, const bool poly_mesh )
+ErrorCode WriteGMV::write_file( const char* file_name, const EntityHandle output_set, const int user_dimension,
+                                const bool mesh, const bool poly_mesh )
 {
     // general function for writing a mesh
 
@@ -106,7 +105,7 @@ ErrorCode WriteGMV::write_file( const char* file_name, const EntityHandle output
     return result;
 }
 
-ErrorCode WriteGMV::write_file( const char* filename, const bool, const FileOptions& /*opts*/,
+ErrorCode WriteGMV::write_file( const char*         filename, const bool, const FileOptions& /*opts*/,
                                 const EntityHandle* output_sets, const int num_output_sets,
                                 const std::vector< std::string >&, const Tag*, int, int dimension )
 {
@@ -122,9 +121,8 @@ ErrorCode WriteGMV::write_file( const char* filename, const bool, const FileOpti
     return write_file( filename, output_set, dimension, true, true );
 }
 
-ErrorCode WriteGMV::local_write_mesh( const char* file_name, const EntityHandle output_set,
-                                      const int user_dimension, const bool mesh,
-                                      const bool poly_mesh )
+ErrorCode WriteGMV::local_write_mesh( const char* file_name, const EntityHandle output_set, const int user_dimension,
+                                      const bool mesh, const bool poly_mesh )
 {
     std::ofstream ofile;
     ErrorCode     result;
@@ -220,10 +218,10 @@ ErrorCode WriteGMV::local_write_mesh( const char* file_name, const EntityHandle 
             if( otype == MBPOLYGON || otype == MBPOLYHEDRON ) continue;
 
             // get the first element of this type in the range, and one past the last
-            Range::iterator lower = Range::lower_bound( elements.begin( ), elements.end( ),
-                                                        CREATE_HANDLE( otype, MB_START_ID, i ) );
-            Range::iterator upper = Range::lower_bound(
-                elements.begin( ), elements.end( ), CREATE_HANDLE( otype + 1, MB_START_ID, i ) );
+            Range::iterator lower =
+                Range::lower_bound( elements.begin( ), elements.end( ), CREATE_HANDLE( otype, MB_START_ID, i ) );
+            Range::iterator upper =
+                Range::lower_bound( elements.begin( ), elements.end( ), CREATE_HANDLE( otype + 1, MB_START_ID, i ) );
 
             if( lower == upper ) continue;
 
@@ -233,12 +231,11 @@ ErrorCode WriteGMV::local_write_mesh( const char* file_name, const EntityHandle 
 
             // make sure the connectivity array is big enough
             int verts_per = CN::VerticesPerEntity( otype );
-            if( connect.size( ) < verts_per * sub_range.size( ) )
-                connect.resize( verts_per * sub_range.size( ) );
+            if( connect.size( ) < verts_per * sub_range.size( ) ) connect.resize( verts_per * sub_range.size( ) );
 
             // get the connectivity
-            result = mWriteIface->get_element_connect( sub_range.size( ), verts_per, mGlobalIdTag,
-                                                       sub_range, mGlobalIdTag, 1, &connect[ 0 ] );
+            result = mWriteIface->get_element_connect( sub_range.size( ), verts_per, mGlobalIdTag, sub_range,
+                                                       mGlobalIdTag, 1, &connect[ 0 ] );
             if( MB_SUCCESS != result ) return result;
 
             //========================================
@@ -302,9 +299,8 @@ ErrorCode WriteGMV::local_write_mesh( const char* file_name, const EntityHandle 
             // pre-set polyhedra ids in case there aren't any
             connect[ connecth.size( ) ] = 0;
             connect[ connecth.size( ) + 1 ] = 0;
-            result =
-                mbImpl->tag_get_data( mGlobalIdTag, &connecth[ 0 ],
-                                      connecth.size( ) - 2 + polyhedra.size( ), &connect[ 0 ] );
+            result = mbImpl->tag_get_data( mGlobalIdTag, &connecth[ 0 ], connecth.size( ) - 2 + polyhedra.size( ),
+                                           &connect[ 0 ] );
             if( MB_SUCCESS != result ) return result;
 
             // write the data

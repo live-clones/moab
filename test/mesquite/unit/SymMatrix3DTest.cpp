@@ -201,9 +201,9 @@ void SymMatrix3DTest::test_plus_nonsym( )
     const Matrix3D    B( 1, 2, 3, 4, 5, 6, 7, 8, 9 );
     const Matrix3D    C( A + B );
     const Matrix3D    D( B + A );
-    const Matrix3D    E( A( 0, 0 ) + B( 0, 0 ), A( 0, 1 ) + B( 0, 1 ), A( 0, 2 ) + B( 0, 2 ),
-                      A( 1, 0 ) + B( 1, 0 ), A( 1, 1 ) + B( 1, 1 ), A( 1, 2 ) + B( 1, 2 ),
-                      A( 2, 0 ) + B( 2, 0 ), A( 2, 1 ) + B( 2, 1 ), A( 2, 2 ) + B( 2, 2 ) );
+    const Matrix3D    E( A( 0, 0 ) + B( 0, 0 ), A( 0, 1 ) + B( 0, 1 ), A( 0, 2 ) + B( 0, 2 ), A( 1, 0 ) + B( 1, 0 ),
+                      A( 1, 1 ) + B( 1, 1 ), A( 1, 2 ) + B( 1, 2 ), A( 2, 0 ) + B( 2, 0 ), A( 2, 1 ) + B( 2, 1 ),
+                      A( 2, 2 ) + B( 2, 2 ) );
     CPPUNIT_ASSERT_MATRICES_EQUAL( E, C, DBL_EPSILON );
     CPPUNIT_ASSERT_MATRICES_EQUAL( E, D, DBL_EPSILON );
 }
@@ -214,15 +214,15 @@ void SymMatrix3DTest::test_minus_nonsym( )
     const Matrix3D    B( 1, 2, 3, 4, 5, 6, 7, 8, 9 );
 
     const Matrix3D C( A - B );
-    const Matrix3D E( A( 0, 0 ) - B( 0, 0 ), A( 0, 1 ) - B( 0, 1 ), A( 0, 2 ) - B( 0, 2 ),
-                      A( 1, 0 ) - B( 1, 0 ), A( 1, 1 ) - B( 1, 1 ), A( 1, 2 ) - B( 1, 2 ),
-                      A( 2, 0 ) - B( 2, 0 ), A( 2, 1 ) - B( 2, 1 ), A( 2, 2 ) - B( 2, 2 ) );
+    const Matrix3D E( A( 0, 0 ) - B( 0, 0 ), A( 0, 1 ) - B( 0, 1 ), A( 0, 2 ) - B( 0, 2 ), A( 1, 0 ) - B( 1, 0 ),
+                      A( 1, 1 ) - B( 1, 1 ), A( 1, 2 ) - B( 1, 2 ), A( 2, 0 ) - B( 2, 0 ), A( 2, 1 ) - B( 2, 1 ),
+                      A( 2, 2 ) - B( 2, 2 ) );
     CPPUNIT_ASSERT_MATRICES_EQUAL( E, C, DBL_EPSILON );
 
     const Matrix3D D( B - A );
-    const Matrix3D F( B( 0, 0 ) - A( 0, 0 ), B( 0, 1 ) - A( 0, 1 ), B( 0, 2 ) - A( 0, 2 ),
-                      B( 1, 0 ) - A( 1, 0 ), B( 1, 1 ) - A( 1, 1 ), B( 1, 2 ) - A( 1, 2 ),
-                      B( 2, 0 ) - A( 2, 0 ), B( 2, 1 ) - A( 2, 1 ), B( 2, 2 ) - A( 2, 2 ) );
+    const Matrix3D F( B( 0, 0 ) - A( 0, 0 ), B( 0, 1 ) - A( 0, 1 ), B( 0, 2 ) - A( 0, 2 ), B( 1, 0 ) - A( 1, 0 ),
+                      B( 1, 1 ) - A( 1, 1 ), B( 1, 2 ) - A( 1, 2 ), B( 2, 0 ) - A( 2, 0 ), B( 2, 1 ) - A( 2, 1 ),
+                      B( 2, 2 ) - A( 2, 2 ) );
     CPPUNIT_ASSERT_MATRICES_EQUAL( F, D, DBL_EPSILON );
 }
 

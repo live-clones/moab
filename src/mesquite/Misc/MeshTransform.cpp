@@ -47,8 +47,7 @@ MeshTransform::~MeshTransform( ) {}
 /*!
   Actually apply the affine transformation
   */
-double MeshTransform::loop_over_mesh( MeshDomainAssoc* mesh_and_domain, const Settings*,
-                                      MsqError&        err )
+double MeshTransform::loop_over_mesh( MeshDomainAssoc* mesh_and_domain, const Settings*, MsqError& err )
 {
     Mesh* mesh = mesh_and_domain->get_mesh( );
 
@@ -90,8 +89,7 @@ void MeshTransform::add_rotation( const Vector3D& axis, double radians )
     const double   c = cos( radians );
     const double   s = sin( radians );
     const Vector3D a = axis / axis.length( );
-    const Matrix3D m1( c, -a[ 2 ] * s, a[ 1 ] * s, a[ 2 ] * s, c, -a[ 0 ] * s, -a[ 1 ] * s,
-                       a[ 0 ] * s, c );
+    const Matrix3D m1( c, -a[ 2 ] * s, a[ 1 ] * s, a[ 2 ] * s, c, -a[ 0 ] * s, -a[ 1 ] * s, a[ 0 ] * s, c );
     Matrix3D       m2;
     m2.outer_product( a, a );
     Matrix3D rot = m1 + ( 1.0 - c ) * m2;

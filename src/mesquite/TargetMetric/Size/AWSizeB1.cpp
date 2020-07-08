@@ -46,8 +46,7 @@ std::string AWSizeB1::get_name( ) const
 
 AWSizeB1::~AWSizeB1( ) {}
 
-bool AWSizeB1::evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result,
-                         MsqError& err )
+bool AWSizeB1::evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result, MsqError& err )
 {
     const double alpha = det( A );
     const double omega = det( W );
@@ -64,8 +63,8 @@ bool AWSizeB1::evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W,
     return true;
 }
 
-bool AWSizeB1::evaluate_with_grad( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W,
-                                   double& result, MsqMatrix< 2, 2 >& deriv_wrt_A, MsqError& err )
+bool AWSizeB1::evaluate_with_grad( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result,
+                                   MsqMatrix< 2, 2 >& deriv_wrt_A, MsqError& err )
 {
     const double alpha = det( A );
     const double omega = det( W );
@@ -84,8 +83,7 @@ bool AWSizeB1::evaluate_with_grad( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 
     return true;
 }
 
-bool AWSizeB1::evaluate( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >& W, double& result,
-                         MsqError& err )
+bool AWSizeB1::evaluate( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >& W, double& result, MsqError& err )
 {
     const double alpha = det( A );
     const double omega = det( W );
@@ -102,8 +100,8 @@ bool AWSizeB1::evaluate( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >& W,
     return true;
 }
 
-bool AWSizeB1::evaluate_with_grad( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >& W,
-                                   double& result, MsqMatrix< 3, 3 >& deriv_wrt_A, MsqError& err )
+bool AWSizeB1::evaluate_with_grad( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >& W, double& result,
+                                   MsqMatrix< 3, 3 >& deriv_wrt_A, MsqError& err )
 {
     const double alpha = det( A );
     const double omega = det( W );

@@ -112,8 +112,8 @@ class MESQUITE_EXPORT MsqHessian
 
     void cg_solver( Vector3D x[], Vector3D b[], MsqError& err );
     //! Hessian - vector product, summed with a second vector (optional).
-    friend void axpy( Vector3D res[], size_t size_r, const MsqHessian& H, const Vector3D x[],
-                      size_t size_x, const Vector3D y[], size_t size_y, MsqError& err );
+    friend void axpy( Vector3D res[], size_t size_r, const MsqHessian& H, const Vector3D x[], size_t size_x,
+                      const Vector3D y[], size_t size_y, MsqError& err );
 
     //! r = this * x, where r and x are arrays of length size().
     void product( Vector3D* r, const Vector3D* x ) const;
@@ -232,8 +232,7 @@ inline void MsqHessian::add( size_t row, size_t col, const Matrix3D& m, MsqError
     }
 
     MSQ_SETERR( err )
-    ( MsqError::INVALID_ARG, "Hessian entry (%lu,%lu) does not exist.", (unsigned long)row,
-      (unsigned long)col );
+    ( MsqError::INVALID_ARG, "Hessian entry (%lu,%lu) does not exist.", (unsigned long)row, (unsigned long)col );
 }
 
 /*!
@@ -244,8 +243,8 @@ inline void MsqHessian::add( size_t row, size_t col, const Matrix3D& m, MsqError
   \param y: vector added to the Hessian vector product. Set to 0 (NULL) if not needed.
   \param size_y: size of the y array. Set to 0 if not needed.
 */
-inline void axpy( Vector3D res[], size_t size_r, const MsqHessian& H, const Vector3D x[],
-                  size_t size_x, const Vector3D y[], size_t size_y, MsqError& /*err*/ )
+inline void axpy( Vector3D res[], size_t size_r, const MsqHessian& H, const Vector3D x[], size_t size_x,
+                  const Vector3D y[], size_t size_y, MsqError& /*err*/ )
 {
     if( ( size_r != H.mSize ) || ( size_x != H.mSize ) || ( size_y != H.mSize && size_y != 0 ) )
     {

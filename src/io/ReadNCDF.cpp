@@ -47,20 +47,19 @@ namespace moab
 
 #define INS_ID( stringvar, prefix, id ) sprintf( stringvar, prefix, id )
 
-#define GET_DIM( ncdim, name, val )                                                   \
-    {                                                                                 \
-        int gdfail = nc_inq_dimid( ncFile, name, &ncdim );                            \
-        if( NC_NOERR == gdfail )                                                      \
-        {                                                                             \
-            size_t tmp_val;                                                           \
-            gdfail = nc_inq_dimlen( ncFile, ncdim, &tmp_val );                        \
-            if( NC_NOERR != gdfail )                                                  \
-            { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Couldn't get dimension length" ); } \
-            else                                                                      \
-                val = tmp_val;                                                        \
-        }                                                                             \
-        else                                                                          \
-            val = 0;                                                                  \
+#define GET_DIM( ncdim, name, val )                                                                            \
+    {                                                                                                          \
+        int gdfail = nc_inq_dimid( ncFile, name, &ncdim );                                                     \
+        if( NC_NOERR == gdfail )                                                                               \
+        {                                                                                                      \
+            size_t tmp_val;                                                                                    \
+            gdfail = nc_inq_dimlen( ncFile, ncdim, &tmp_val );                                                 \
+            if( NC_NOERR != gdfail ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Couldn't get dimension length" ); } \
+            else                                                                                               \
+                val = tmp_val;                                                                                 \
+        }                                                                                                      \
+        else                                                                                                   \
+            val = 0;                                                                                           \
     }
 
 #define GET_DIMB( ncdim, name, varname, id, val ) \
@@ -85,39 +84,35 @@ namespace moab
         }                                                                                       \
     }
 
-#define GET_1D_INT_VAR( name, id, vals )                                                  \
-    {                                                                                     \
-        GET_VAR( name, id, vals );                                                        \
-        if( -1 != id )                                                                    \
-        {                                                                                 \
-            size_t ntmp;                                                                  \
-            int    ivfail = nc_inq_dimlen( ncFile, vals[ 0 ], &ntmp );                    \
-            if( NC_NOERR != ivfail )                                                      \
-            { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Couldn't get dimension length" ); }     \
-            vals.resize( ntmp );                                                          \
-            size_t ntmp1 = 0;                                                             \
-            ivfail = nc_get_vara_int( ncFile, id, &ntmp1, &ntmp, &vals[ 0 ] );            \
-            if( NC_NOERR != ivfail )                                                      \
-            { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting variable " << name ); } \
-        }                                                                                 \
+#define GET_1D_INT_VAR( name, id, vals )                                                                           \
+    {                                                                                                              \
+        GET_VAR( name, id, vals );                                                                                 \
+        if( -1 != id )                                                                                             \
+        {                                                                                                          \
+            size_t ntmp;                                                                                           \
+            int    ivfail = nc_inq_dimlen( ncFile, vals[ 0 ], &ntmp );                                             \
+            if( NC_NOERR != ivfail ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Couldn't get dimension length" ); }     \
+            vals.resize( ntmp );                                                                                   \
+            size_t ntmp1 = 0;                                                                                      \
+            ivfail = nc_get_vara_int( ncFile, id, &ntmp1, &ntmp, &vals[ 0 ] );                                     \
+            if( NC_NOERR != ivfail ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting variable " << name ); } \
+        }                                                                                                          \
     }
 
-#define GET_1D_DBL_VAR( name, id, vals )                                                  \
-    {                                                                                     \
-        std::vector< int > dum_dims;                                                      \
-        GET_VAR( name, id, dum_dims );                                                    \
-        if( -1 != id )                                                                    \
-        {                                                                                 \
-            size_t ntmp;                                                                  \
-            int    dvfail = nc_inq_dimlen( ncFile, dum_dims[ 0 ], &ntmp );                \
-            if( NC_NOERR != dvfail )                                                      \
-            { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Couldn't get dimension length" ); }     \
-            vals.resize( ntmp );                                                          \
-            size_t ntmp1 = 0;                                                             \
-            dvfail = nc_get_vara_double( ncFile, id, &ntmp1, &ntmp, &vals[ 0 ] );         \
-            if( NC_NOERR != dvfail )                                                      \
-            { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting variable " << name ); } \
-        }                                                                                 \
+#define GET_1D_DBL_VAR( name, id, vals )                                                                           \
+    {                                                                                                              \
+        std::vector< int > dum_dims;                                                                               \
+        GET_VAR( name, id, dum_dims );                                                                             \
+        if( -1 != id )                                                                                             \
+        {                                                                                                          \
+            size_t ntmp;                                                                                           \
+            int    dvfail = nc_inq_dimlen( ncFile, dum_dims[ 0 ], &ntmp );                                         \
+            if( NC_NOERR != dvfail ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Couldn't get dimension length" ); }     \
+            vals.resize( ntmp );                                                                                   \
+            size_t ntmp1 = 0;                                                                                      \
+            dvfail = nc_get_vara_double( ncFile, id, &ntmp1, &ntmp, &vals[ 0 ] );                                  \
+            if( NC_NOERR != dvfail ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting variable " << name ); } \
+        }                                                                                                          \
     }
 
 ReaderIface* ReadNCDF::factory( Interface* iface )
@@ -197,23 +192,16 @@ ReadNCDF::~ReadNCDF( )
     mdbImpl->release_interface( readMeshIface );
 }
 
-ErrorCode ReadNCDF::read_tag_values( const char* file_name, const char*                 tag_name,
-                                     const FileOptions& /* opts */, std::vector< int >& id_array,
-                                     const SubsetList* subset_list )
+ErrorCode ReadNCDF::read_tag_values( const char* file_name, const char* tag_name, const FileOptions& /* opts */,
+                                     std::vector< int >& id_array, const SubsetList* subset_list )
 {
     if( subset_list )
-    {
-        MB_SET_ERR( MB_UNSUPPORTED_OPERATION,
-                    "ExodusII reader supports subset read only by material ID" );
-    }
+    { MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "ExodusII reader supports subset read only by material ID" ); }
 
     // Open netcdf/exodus file
     int fail = nc_open( file_name, 0, &ncFile );
     if( NC_NOWRITE != fail )
-    {
-        MB_SET_ERR( MB_FILE_DOES_NOT_EXIST,
-                    "ReadNCDF:: problem opening Netcdf/Exodus II file " << file_name );
-    }
+    { MB_SET_ERR( MB_FILE_DOES_NOT_EXIST, "ReadNCDF:: problem opening Netcdf/Exodus II file " << file_name ); }
 
     // 1. Read the header
     ErrorCode rval = read_exodus_header( );
@@ -261,9 +249,8 @@ ErrorCode ReadNCDF::read_tag_values( const char* file_name, const char*         
     return MB_SUCCESS;
 }
 
-ErrorCode ReadNCDF::load_file( const char* exodus_file_name, const EntityHandle* file_set,
-                               const FileOptions& opts, const ReaderIface::SubsetList* subset_list,
-                               const Tag* file_id_tag )
+ErrorCode ReadNCDF::load_file( const char* exodus_file_name, const EntityHandle* file_set, const FileOptions& opts,
+                               const ReaderIface::SubsetList* subset_list, const Tag* file_id_tag )
 {
     ErrorCode status;
     int       fail;
@@ -272,17 +259,10 @@ ErrorCode ReadNCDF::load_file( const char* exodus_file_name, const EntityHandle*
     const int* blocks_to_load = 0;
     if( subset_list )
     {
-        if( subset_list->tag_list_length > 1 ||
-            !strcmp( subset_list->tag_list[ 0 ].tag_name, MATERIAL_SET_TAG_NAME ) )
-        {
-            MB_SET_ERR( MB_UNSUPPORTED_OPERATION,
-                        "ExodusII reader supports subset read only by material ID" );
-        }
+        if( subset_list->tag_list_length > 1 || !strcmp( subset_list->tag_list[ 0 ].tag_name, MATERIAL_SET_TAG_NAME ) )
+        { MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "ExodusII reader supports subset read only by material ID" ); }
         if( subset_list->num_parts )
-        {
-            MB_SET_ERR( MB_UNSUPPORTED_OPERATION,
-                        "ExodusII reader does not support mesh partitioning" );
-        }
+        { MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "ExodusII reader does not support mesh partitioning" ); }
         blocks_to_load = subset_list->tag_list[ 0 ].tag_values;
         num_blocks = subset_list->tag_list[ 0 ].num_tag_values;
     }
@@ -304,10 +284,7 @@ ErrorCode ReadNCDF::load_file( const char* exodus_file_name, const EntityHandle*
     // open netcdf/exodus file
     fail = nc_open( exodus_file_name, 0, &ncFile );
     if( NC_NOERR != fail )
-    {
-        MB_SET_ERR( MB_FILE_DOES_NOT_EXIST,
-                    "ReadNCDF:: problem opening Netcdf/Exodus II file " << exodus_file_name );
-    }
+    { MB_SET_ERR( MB_FILE_DOES_NOT_EXIST, "ReadNCDF:: problem opening Netcdf/Exodus II file " << exodus_file_name ); }
 
     // 1. Read the header
     status = read_exodus_header( );
@@ -381,17 +358,15 @@ ErrorCode ReadNCDF::read_exodus_header( )
     int fail = nc_inq_ndims( ncFile, &ndims );
     if( NC_NOERR != fail || ndims > NC_MAX_DIMS )
     {
-        MB_SET_ERR( MB_FAILURE, "ReadNCDF: File contains "
-                                    << ndims << " dims but NetCDF library supports only "
-                                    << (int)NC_MAX_DIMS );
+        MB_SET_ERR( MB_FAILURE, "ReadNCDF: File contains " << ndims << " dims but NetCDF library supports only "
+                                                           << (int)NC_MAX_DIMS );
     }
     int nvars;
     fail = nc_inq_nvars( ncFile, &nvars );
     if( nvars > NC_MAX_VARS )
     {
-        MB_SET_ERR( MB_FAILURE, "ReadNCDF: File contains "
-                                    << nvars << " vars but NetCDF library supports only "
-                                    << (int)NC_MAX_VARS );
+        MB_SET_ERR( MB_FAILURE, "ReadNCDF: File contains " << nvars << " vars but NetCDF library supports only "
+                                                           << (int)NC_MAX_VARS );
     }
 
     // Get the attributes
@@ -409,8 +384,7 @@ ErrorCode ReadNCDF::read_exodus_header( )
 
     // Exodus version
     fail = nc_inq_att( ncFile, NC_GLOBAL, "version", &att_type, &att_len );
-    if( NC_NOERR != fail )
-    { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting version attribute" ); }
+    if( NC_NOERR != fail ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting version attribute" ); }
     if( att_type != NC_FLOAT || att_len != 1 )
     { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Version didn't have type float or size 1" ); }
     // float version = temp_att->as_float(0);
@@ -430,10 +404,8 @@ ErrorCode ReadNCDF::read_exodus_header( )
 
     // Title; why are we even bothering if we're not going to keep it???
     fail = nc_inq_att( ncFile, NC_GLOBAL, "title", &att_type, &att_len );
-    if( NC_NOERR != fail )
-    { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting title attribute" ); }
-    if( att_type != NC_CHAR )
-    { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: title didn't have type char" ); }
+    if( NC_NOERR != fail ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting title attribute" ); }
+    if( att_type != NC_CHAR ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: title didn't have type char" ); }
     char* title = new char[ att_len + 1 ];
     fail = nc_get_att_text( ncFile, NC_GLOBAL, "title", title );
     if( NC_NOERR != fail )
@@ -475,10 +447,7 @@ ErrorCode ReadNCDF::read_nodes( const Tag* file_id_tag )
             start[ 0 ] = d;
             fail = nc_get_vara_double( ncFile, coord, start, count, arrays[ d ] );
             if( NC_NOERR != fail )
-            {
-                MB_SET_ERR( MB_FAILURE,
-                            "ReadNCDF:: Problem getting " << (char)( 'x' + d ) << " coord array" );
-            }
+            { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting " << (char)( 'x' + d ) << " coord array" ); }
         }
     }
     // Var for each coord
@@ -490,17 +459,11 @@ ErrorCode ReadNCDF::read_nodes( const Tag* file_id_tag )
             varname[ 5 ] = 'x' + (char)d;
             fail = nc_inq_varid( ncFile, varname, &coord );
             if( NC_NOERR != fail )
-            {
-                MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting " << (char)( 'x' + d )
-                                                                      << " coord variable" );
-            }
+            { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting " << (char)( 'x' + d ) << " coord variable" ); }
 
             fail = nc_get_vara_double( ncFile, coord, start, &count[ 1 ], arrays[ d ] );
             if( NC_NOERR != fail )
-            {
-                MB_SET_ERR( MB_FAILURE,
-                            "ReadNCDF:: Problem getting " << (char)( 'x' + d ) << " coord array" );
-            }
+            { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting " << (char)( 'x' + d ) << " coord array" ); }
         }
     }
 
@@ -529,8 +492,7 @@ ErrorCode ReadNCDF::read_block_headers( const int* blocks_to_load, const int num
     std::vector< int > block_ids( numberElementBlocks_loading );
     int                nc_block_ids = -1;
     GET_1D_INT_VAR( "eb_prop1", nc_block_ids, block_ids );
-    if( -1 == nc_block_ids )
-    { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting eb_prop1 variable" ); }
+    if( -1 == nc_block_ids ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting eb_prop1 variable" ); }
 
     int exodus_id = 1;
 
@@ -587,8 +549,7 @@ ErrorCode ReadNCDF::read_face_blocks_headers( )
     std::vector< int > fblock_ids( numberFaceBlocks_loading );
     int                nc_fblock_ids = -1;
     GET_1D_INT_VAR( "fa_prop1", nc_fblock_ids, fblock_ids );
-    if( -1 == nc_fblock_ids )
-    { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting fa_prop1 variable" ); }
+    if( -1 == nc_fblock_ids ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting fa_prop1 variable" ); }
 
     int                 temp_dim;
     std::vector< char > temp_string_storage( max_str_length + 1 );
@@ -625,7 +586,7 @@ ErrorCode ReadNCDF::read_polyhedra_faces( )
     std::vector< char > temp_string_storage( max_str_length + 1 );
     char*               temp_string = &temp_string_storage[ 0 ];
     nodesInLoadedBlocks.resize( numberNodes_loading + 1 );
-    size_t start[ 1 ] = { 0 }, count[ 1 ];  // one dim arrays only here!
+    size_t                                     start[ 1 ] = { 0 }, count[ 1 ];  // one dim arrays only here!
     std::vector< ReadFaceBlockData >::iterator this_it;
     this_it = faceBlocksLoading.begin( );
 
@@ -647,16 +608,14 @@ ErrorCode ReadNCDF::read_polyhedra_faces( )
         count[ 0 ] = num_nod_per_fa;
 
         fail = nc_get_vara_int( ncFile, nc_var, start, count, &fbconn[ 0 ] );
-        if( NC_NOERR != fail )
-        { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting face polyhedra connectivity " ); }
+        if( NC_NOERR != fail ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting face polyhedra connectivity " ); }
         std::vector< int > fbepecnt;
         fbepecnt.resize( num_fa_in_blk );
         INS_ID( temp_string, "fbepecnt%d", fblock_seq_id );
         GET_VAR( temp_string, nc_var, dims );
         count[ 0 ] = num_fa_in_blk;
         fail = nc_get_vara_int( ncFile, nc_var, start, count, &fbepecnt[ 0 ] );
-        if( NC_NOERR != fail )
-        { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting face polyhedra connectivity " ); }
+        if( NC_NOERR != fail ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting face polyhedra connectivity " ); }
         // now we can create some polygons
         std::vector< EntityHandle > polyConn;
         int                         ix = 0;
@@ -675,8 +634,7 @@ ErrorCode ReadNCDF::read_polyhedra_faces( )
                                          const int num_vertices,
                                          EntityHandle &element_handle)
              */
-            if( mdbImpl->create_element( MBPOLYGON, &polyConn[ 0 ], fbepecnt[ i ], newp ) !=
-                MB_SUCCESS )
+            if( mdbImpl->create_element( MBPOLYGON, &polyConn[ 0 ], fbepecnt[ i ], newp ) != MB_SUCCESS )
                 return MB_FAILURE;
 
             // add the element in order
@@ -733,8 +691,7 @@ ErrorCode ReadNCDF::read_elements( const Tag* file_id_tag )
         nc_type att_type;
         size_t  att_len;
         int     fail = nc_inq_att( ncFile, nc_var, "elem_type", &att_type, &att_len );
-        if( NC_NOERR != fail )
-        { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting elem type attribute" ); }
+        if( NC_NOERR != fail ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting elem type attribute" ); }
         std::vector< char > dum_str( att_len + 1 );
         fail = nc_get_att_text( ncFile, nc_var, "elem_type", &dum_str[ 0 ] );
         if( NC_NOERR != fail ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting elem type" ); }
@@ -749,16 +706,14 @@ ErrorCode ReadNCDF::read_elements( const Tag* file_id_tag )
         {
             // need to read another variable, num_nod_per_el, and
             int num_nodes_poly_conn;
-            GET_DIMB( temp_dim, temp_string, "num_nod_per_el%d", block_seq_id,
-                      num_nodes_poly_conn );
+            GET_DIMB( temp_dim, temp_string, "num_nod_per_el%d", block_seq_id, num_nodes_poly_conn );
             // read the connec1 array, which is of dimensions num_nodes_poly_conn (only one )
             std::vector< int > connec;
             connec.resize( num_nodes_poly_conn );
             count[ 0 ] = num_nodes_poly_conn;
 
             fail = nc_get_vara_int( ncFile, nc_var, start, count, &connec[ 0 ] );
-            if( NC_NOERR != fail )
-            { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting polygon connectivity " ); }
+            if( NC_NOERR != fail ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting polygon connectivity " ); }
             // ebepecnt1
             std::vector< int > ebec;
             ebec.resize( this_it->numElements );
@@ -767,11 +722,9 @@ ErrorCode ReadNCDF::read_elements( const Tag* file_id_tag )
             GET_VAR( temp_string, nc_var, dims );
             count[ 0 ] = this_it->numElements;
             fail = nc_get_vara_int( ncFile, nc_var, start, count, &ebec[ 0 ] );
-            if( NC_NOERR != fail )
-            { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting polygon nodes per elem " ); }
+            if( NC_NOERR != fail ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting polygon nodes per elem " ); }
             EntityHandle ms_handle;
-            if( mdbImpl->create_meshset( MESHSET_SET | MESHSET_TRACK_OWNER, ms_handle ) !=
-                MB_SUCCESS )
+            if( mdbImpl->create_meshset( MESHSET_SET | MESHSET_TRACK_OWNER, ms_handle ) != MB_SUCCESS )
                 return MB_FAILURE;
             // create polygons one by one, and put them in the list
             // also need to read the number of nodes for each polygon, then create
@@ -792,8 +745,7 @@ ErrorCode ReadNCDF::read_elements( const Tag* file_id_tag )
                                              const int num_vertices,
                                              EntityHandle &element_handle)
                  */
-                if( mdbImpl->create_element( MBPOLYGON, &polyConn[ 0 ], ebec[ i ], newp ) !=
-                    MB_SUCCESS )
+                if( mdbImpl->create_element( MBPOLYGON, &polyConn[ 0 ], ebec[ i ], newp ) != MB_SUCCESS )
                     return MB_FAILURE;
 
                 // add the element in order
@@ -801,10 +753,8 @@ ErrorCode ReadNCDF::read_elements( const Tag* file_id_tag )
                 if( mdbImpl->add_entities( ms_handle, &newp, 1 ) != MB_SUCCESS ) return MB_FAILURE;
             }
             // Set the block id with an offset
-            if( mdbImpl->tag_set_data( mMaterialSetTag, &ms_handle, 1, &block_id ) != MB_SUCCESS )
-                return MB_FAILURE;
-            if( mdbImpl->tag_set_data( mGlobalIdTag, &ms_handle, 1, &block_id ) != MB_SUCCESS )
-                return MB_FAILURE;
+            if( mdbImpl->tag_set_data( mMaterialSetTag, &ms_handle, 1, &block_id ) != MB_SUCCESS ) return MB_FAILURE;
+            if( mdbImpl->tag_set_data( mGlobalIdTag, &ms_handle, 1, &block_id ) != MB_SUCCESS ) return MB_FAILURE;
         }
         else if( mb_type == MBPOLYHEDRON )
         {
@@ -817,8 +767,7 @@ ErrorCode ReadNCDF::read_elements( const Tag* file_id_tag )
             count[ 0 ] = num_fac_per_el;
 
             fail = nc_get_vara_int( ncFile, nc_var, start, count, &facconn[ 0 ] );
-            if( NC_NOERR != fail )
-            { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting polygon connectivity " ); }
+            if( NC_NOERR != fail ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting polygon connectivity " ); }
             // ebepecnt1
             std::vector< int > ebepecnt;
             ebepecnt.resize( this_it->numElements );
@@ -827,11 +776,9 @@ ErrorCode ReadNCDF::read_elements( const Tag* file_id_tag )
             GET_VAR( temp_string, nc_var, dims );
             count[ 0 ] = this_it->numElements;
             fail = nc_get_vara_int( ncFile, nc_var, start, count, &ebepecnt[ 0 ] );
-            if( NC_NOERR != fail )
-            { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting polygon nodes per elem " ); }
+            if( NC_NOERR != fail ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting polygon nodes per elem " ); }
             EntityHandle ms_handle;
-            if( mdbImpl->create_meshset( MESHSET_SET | MESHSET_TRACK_OWNER, ms_handle ) !=
-                MB_SUCCESS )
+            if( mdbImpl->create_meshset( MESHSET_SET | MESHSET_TRACK_OWNER, ms_handle ) != MB_SUCCESS )
                 return MB_FAILURE;
             // create polygons one by one, and put them in the list
             // also need to read the number of nodes for each polygon, then create
@@ -851,8 +798,7 @@ ErrorCode ReadNCDF::read_elements( const Tag* file_id_tag )
                                              const int num_vertices,
                                              EntityHandle &element_handle)
                  */
-                if( mdbImpl->create_element( MBPOLYHEDRON, &polyConn[ 0 ], ebepecnt[ i ], newp ) !=
-                    MB_SUCCESS )
+                if( mdbImpl->create_element( MBPOLYHEDRON, &polyConn[ 0 ], ebepecnt[ i ], newp ) != MB_SUCCESS )
                     return MB_FAILURE;
 
                 // add the element in order
@@ -860,16 +806,14 @@ ErrorCode ReadNCDF::read_elements( const Tag* file_id_tag )
                 if( mdbImpl->add_entities( ms_handle, &newp, 1 ) != MB_SUCCESS ) return MB_FAILURE;
             }
             // Set the block id with an offset
-            if( mdbImpl->tag_set_data( mMaterialSetTag, &ms_handle, 1, &block_id ) != MB_SUCCESS )
-                return MB_FAILURE;
-            if( mdbImpl->tag_set_data( mGlobalIdTag, &ms_handle, 1, &block_id ) != MB_SUCCESS )
-                return MB_FAILURE;
+            if( mdbImpl->tag_set_data( mMaterialSetTag, &ms_handle, 1, &block_id ) != MB_SUCCESS ) return MB_FAILURE;
+            if( mdbImpl->tag_set_data( mGlobalIdTag, &ms_handle, 1, &block_id ) != MB_SUCCESS ) return MB_FAILURE;
         }
         else  // this is regular
         {
             // Allocate an array to read in connectivity data
-            readMeshIface->get_element_connect( this_it->numElements, verts_per_element, mb_type,
-                                                this_it->startExoId, this_it->startMBId, conn );
+            readMeshIface->get_element_connect( this_it->numElements, verts_per_element, mb_type, this_it->startExoId,
+                                                this_it->startMBId, conn );
 
             // Create a range for this sequence of elements
             EntityHandle start_range, end_range;
@@ -883,16 +827,14 @@ ErrorCode ReadNCDF::read_elements( const Tag* file_id_tag )
             // Create a MBSet for this block and set the material tag
 
             EntityHandle ms_handle;
-            if( mdbImpl->create_meshset( MESHSET_SET | MESHSET_TRACK_OWNER, ms_handle ) !=
-                MB_SUCCESS )
+            if( mdbImpl->create_meshset( MESHSET_SET | MESHSET_TRACK_OWNER, ms_handle ) != MB_SUCCESS )
                 return MB_FAILURE;
 
             if( mdbImpl->add_entities( ms_handle, new_range ) != MB_SUCCESS ) return MB_FAILURE;
 
             int mid_nodes[ 4 ];
             CN::HasMidNodes( mb_type, verts_per_element, mid_nodes );
-            if( mdbImpl->tag_set_data( mHasMidNodesTag, &ms_handle, 1, mid_nodes ) != MB_SUCCESS )
-                return MB_FAILURE;
+            if( mdbImpl->tag_set_data( mHasMidNodesTag, &ms_handle, 1, mid_nodes ) != MB_SUCCESS ) return MB_FAILURE;
 
             // Just a check because the following code won't work if this case fails
             assert( sizeof( EntityHandle ) >= sizeof( int ) );
@@ -905,8 +847,7 @@ ErrorCode ReadNCDF::read_elements( const Tag* file_id_tag )
             count[ 0 ] = this_it->numElements;
             count[ 1 ] = verts_per_element;
             fail = nc_get_vara_int( ncFile, nc_var, start, count, tmp_ptr );
-            if( NC_NOERR != fail )
-            { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting connectivity" ); }
+            if( NC_NOERR != fail ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting connectivity" ); }
 
             // Convert from exodus indices to vertex handles.
             // Iterate backwards in case handles are larger than ints.
@@ -920,24 +861,17 @@ ErrorCode ReadNCDF::read_elements( const Tag* file_id_tag )
 
             // Adjust connectivity order if necessary
             const int* reorder = exodus_elem_order_map[ mb_type ][ verts_per_element ];
-            if( reorder )
-                ReadUtilIface::reorder( reorder, conn, this_it->numElements, verts_per_element );
+            if( reorder ) ReadUtilIface::reorder( reorder, conn, this_it->numElements, verts_per_element );
 
-            readMeshIface->update_adjacencies(
-                ( *this_it ).startMBId, ( *this_it ).numElements,
-                ExoIIUtil::VerticesPerElement[ ( *this_it ).elemType ], conn );
+            readMeshIface->update_adjacencies( ( *this_it ).startMBId, ( *this_it ).numElements,
+                                               ExoIIUtil::VerticesPerElement[ ( *this_it ).elemType ], conn );
 
             if( result == -1 )
-            {
-                MB_SET_ERR( MB_FAILURE, "ReadNCDF:: error getting element connectivity for block "
-                                            << block_id );
-            }
+            { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: error getting element connectivity for block " << block_id ); }
 
             // Set the block id with an offset
-            if( mdbImpl->tag_set_data( mMaterialSetTag, &ms_handle, 1, &block_id ) != MB_SUCCESS )
-                return MB_FAILURE;
-            if( mdbImpl->tag_set_data( mGlobalIdTag, &ms_handle, 1, &block_id ) != MB_SUCCESS )
-                return MB_FAILURE;
+            if( mdbImpl->tag_set_data( mMaterialSetTag, &ms_handle, 1, &block_id ) != MB_SUCCESS ) return MB_FAILURE;
+            if( mdbImpl->tag_set_data( mGlobalIdTag, &ms_handle, 1, &block_id ) != MB_SUCCESS ) return MB_FAILURE;
 
             if( file_id_tag )
             {
@@ -971,8 +905,7 @@ ErrorCode ReadNCDF::read_global_ids( )
                     if( iter->startMBId != 0 )
                     {
                         Range     range( iter->startMBId, iter->startMBId + iter->numElements - 1 );
-                        ErrorCode error =
-                            mdbImpl->tag_set_data( mGlobalIdTag, range, &ids[ id_pos ] );
+                        ErrorCode error = mdbImpl->tag_set_data( mGlobalIdTag, range, &ids[ id_pos ] );
                         if( error != MB_SUCCESS ) return error;
                         id_pos += iter->numElements;
                     }
@@ -981,12 +914,11 @@ ErrorCode ReadNCDF::read_global_ids( )
                 }
                 else  // polygons or polyhedrons; use id from elements
                 {
-                    for( std::vector< EntityHandle >::iterator eit = iter->polys.begin( );
-                         eit != iter->polys.end( ); eit++, id_pos++ )
+                    for( std::vector< EntityHandle >::iterator eit = iter->polys.begin( ); eit != iter->polys.end( );
+                         eit++, id_pos++ )
                     {
                         EntityHandle peh = *eit;
-                        if( mdbImpl->tag_set_data( mGlobalIdTag, &peh, 1, &ids[ id_pos ] ) !=
-                            MB_SUCCESS )
+                        if( mdbImpl->tag_set_data( mGlobalIdTag, &peh, 1, &ids[ id_pos ] ) != MB_SUCCESS )
                             return MB_FAILURE;
                     }
                 }
@@ -999,11 +931,9 @@ ErrorCode ReadNCDF::read_global_ids( )
     GET_1D_INT_VAR( "node_num_map", varid, ids );
     if( -1 != varid )
     {
-        Range     range( MB_START_ID + vertexOffset,
-                     MB_START_ID + vertexOffset + numberNodes_loading - 1 );
+        Range     range( MB_START_ID + vertexOffset, MB_START_ID + vertexOffset + numberNodes_loading - 1 );
         ErrorCode error = mdbImpl->tag_set_data( mGlobalIdTag, range, &ids[ 0 ] );
-        if( MB_SUCCESS != error )
-            MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem setting node global ids" );
+        if( MB_SUCCESS != error ) MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem setting node global ids" );
     }
 
     return MB_SUCCESS;
@@ -1044,8 +974,7 @@ ErrorCode ReadNCDF::read_nodesets( )
         {
             INS_ID( temp_string, "dist_fact_ns%d", i + 1 );
             GET_1D_DBL_VAR( temp_string, temp_dim, temp_dist_factor_vector );
-            if( -1 == temp_dim )
-            { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting dist fact variable" ); }
+            if( -1 == temp_dim ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting dist fact variable" ); }
         }
 
         // Size new arrays and get ids and distribution factors
@@ -1058,8 +987,7 @@ ErrorCode ReadNCDF::read_nodesets( )
         INS_ID( temp_string, "node_ns%d", i + 1 );
         int temp_var = -1;
         GET_1D_INT_VAR( temp_string, temp_var, node_handles );
-        if( -1 == temp_var )
-        { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting nodeset node variable" ); }
+        if( -1 == temp_var ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting nodeset node variable" ); }
 
         // Maybe there is already a nodesets meshset here we can append to
         Range child_meshsets;
@@ -1075,9 +1003,7 @@ ErrorCode ReadNCDF::read_nodesets( )
         for( ; iter != end_iter; ++iter )
         {
             int nodeset_id;
-            if( mdbImpl->tag_get_data( mDirichletSetTag, &( *iter ), 1, &nodeset_id ) !=
-                MB_SUCCESS )
-                continue;
+            if( mdbImpl->tag_get_data( mDirichletSetTag, &( *iter ), 1, &nodeset_id ) != MB_SUCCESS ) continue;
 
             if( id_array[ i ] == nodeset_id )
             {
@@ -1089,8 +1015,7 @@ ErrorCode ReadNCDF::read_nodesets( )
 
         std::vector< EntityHandle > nodes_of_nodeset;
         if( ns_handle )
-            if( mdbImpl->get_entities_by_handle( ns_handle, nodes_of_nodeset, true ) != MB_SUCCESS )
-                return MB_FAILURE;
+            if( mdbImpl->get_entities_by_handle( ns_handle, nodes_of_nodeset, true ) != MB_SUCCESS ) return MB_FAILURE;
 
         // Make these into entity handles
         // TODO: could we have read it into EntityHandle sized array in the first place?
@@ -1103,15 +1028,13 @@ ErrorCode ReadNCDF::read_nodesets( )
             if( nodesInLoadedBlocks[ node_handles[ j ] ] == 1 )
             {
                 // Make sure that it already isn't in a nodeset
-                unsigned int node_id =
-                    CREATE_HANDLE( MBVERTEX, node_handles[ j ] + vertexOffset, temp );
-                if( !ns_handle || std::find( nodes_of_nodeset.begin( ), nodes_of_nodeset.end( ),
-                                             node_id ) == nodes_of_nodeset.end( ) )
+                unsigned int node_id = CREATE_HANDLE( MBVERTEX, node_handles[ j ] + vertexOffset, temp );
+                if( !ns_handle || std::find( nodes_of_nodeset.begin( ), nodes_of_nodeset.end( ), node_id ) ==
+                                      nodes_of_nodeset.end( ) )
                 {
                     nodes.push_back( node_id );
 
-                    if( number_dist_factors_in_set != 0 )
-                        dist_factor_vector.push_back( temp_dist_factor_vector[ j ] );
+                    if( number_dist_factors_in_set != 0 ) dist_factor_vector.push_back( temp_dist_factor_vector[ j ] );
                 }
             }
         }
@@ -1122,26 +1045,21 @@ ErrorCode ReadNCDF::read_nodesets( )
         // If there was no meshset found --> create one
         if( ns_handle == 0 )
         {
-            if( mdbImpl->create_meshset( MESHSET_ORDERED | MESHSET_TRACK_OWNER, ns_handle ) !=
-                MB_SUCCESS )
+            if( mdbImpl->create_meshset( MESHSET_ORDERED | MESHSET_TRACK_OWNER, ns_handle ) != MB_SUCCESS )
                 return MB_FAILURE;
 
             // Set a tag signifying dirichlet bc
             // TODO: create this tag another way
 
             int nodeset_id = id_array[ i ];
-            if( mdbImpl->tag_set_data( mDirichletSetTag, &ns_handle, 1, &nodeset_id ) !=
-                MB_SUCCESS )
-                return MB_FAILURE;
-            if( mdbImpl->tag_set_data( mGlobalIdTag, &ns_handle, 1, &nodeset_id ) != MB_SUCCESS )
-                return MB_FAILURE;
+            if( mdbImpl->tag_set_data( mDirichletSetTag, &ns_handle, 1, &nodeset_id ) != MB_SUCCESS ) return MB_FAILURE;
+            if( mdbImpl->tag_set_data( mGlobalIdTag, &ns_handle, 1, &nodeset_id ) != MB_SUCCESS ) return MB_FAILURE;
 
             if( !dist_factor_vector.empty( ) )
             {
                 int         size = dist_factor_vector.size( );
                 const void* data = &dist_factor_vector[ 0 ];
-                if( mdbImpl->tag_set_by_ptr( mDistFactorTag, &ns_handle, 1, &data, &size ) !=
-                    MB_SUCCESS )
+                if( mdbImpl->tag_set_by_ptr( mDistFactorTag, &ns_handle, 1, &data, &size ) != MB_SUCCESS )
                     return MB_FAILURE;
             }
         }
@@ -1150,23 +1068,18 @@ ErrorCode ReadNCDF::read_nodesets( )
             // Append dist factors to vector
             const void* ptr = 0;
             int         size = 0;
-            if( mdbImpl->tag_get_by_ptr( mDistFactorTag, &ns_handle, 1, &ptr, &size ) !=
-                MB_SUCCESS )
-                return MB_FAILURE;
+            if( mdbImpl->tag_get_by_ptr( mDistFactorTag, &ns_handle, 1, &ptr, &size ) != MB_SUCCESS ) return MB_FAILURE;
 
             const double* data = reinterpret_cast< const double* >( ptr );
             dist_factor_vector.reserve( dist_factor_vector.size( ) + size );
             std::copy( data, data + size, std::back_inserter( dist_factor_vector ) );
             size = dist_factor_vector.size( );
             ptr = &dist_factor_vector[ 0 ];
-            if( mdbImpl->tag_set_by_ptr( mDistFactorTag, &ns_handle, 1, &ptr, &size ) !=
-                MB_SUCCESS )
-                return MB_FAILURE;
+            if( mdbImpl->tag_set_by_ptr( mDistFactorTag, &ns_handle, 1, &ptr, &size ) != MB_SUCCESS ) return MB_FAILURE;
         }
 
         // Add the nodes to the meshset
-        if( mdbImpl->add_entities( ns_handle, &nodes[ 0 ], nodes.size( ) ) != MB_SUCCESS )
-            return MB_FAILURE;
+        if( mdbImpl->add_entities( ns_handle, &nodes[ 0 ], nodes.size( ) ) != MB_SUCCESS ) return MB_FAILURE;
     }
 
     return MB_SUCCESS;
@@ -1185,8 +1098,7 @@ ErrorCode ReadNCDF::read_sidesets( )
     std::vector< int > id_array( numberSideSets_loading );
     int                temp_var = -1;
     GET_1D_INT_VAR( "ss_prop1", temp_var, id_array );
-    if( -1 == temp_var )
-    { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting ss_prop1 variable" ); }
+    if( -1 == temp_var ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting ss_prop1 variable" ); }
 
     // Create a side set for each one
     int number_sides_in_set;
@@ -1194,8 +1106,7 @@ ErrorCode ReadNCDF::read_sidesets( )
 
     // Maybe there is already a sidesets meshset here we can append to
     Range child_meshsets;
-    if( mdbImpl->get_entities_by_type( 0, MBENTITYSET, child_meshsets ) != MB_SUCCESS )
-        return MB_FAILURE;
+    if( mdbImpl->get_entities_by_type( 0, MBENTITYSET, child_meshsets ) != MB_SUCCESS ) return MB_FAILURE;
 
     child_meshsets = subtract( child_meshsets, initRange );
 
@@ -1217,21 +1128,18 @@ ErrorCode ReadNCDF::read_sidesets( )
         INS_ID( temp_string, "side_ss%d", i + 1 );
         temp_var = -1;
         GET_1D_INT_VAR( temp_string, temp_var, side_list );
-        if( -1 == temp_var )
-        { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting sideset side variable" ); }
+        if( -1 == temp_var ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting sideset side variable" ); }
 
         INS_ID( temp_string, "elem_ss%d", i + 1 );
         temp_var = -1;
         GET_1D_INT_VAR( temp_string, temp_var, element_list );
-        if( -1 == temp_var )
-        { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting sideset elem variable" ); }
+        if( -1 == temp_var ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting sideset elem variable" ); }
 
         std::vector< double >       temp_dist_factor_vector;
         std::vector< EntityHandle > entities_to_add, reverse_entities;
         // Create the sideset entities
-        if( create_ss_elements( &element_list[ 0 ], &side_list[ 0 ], number_sides_in_set,
-                                number_dist_factors_in_set, entities_to_add, reverse_entities,
-                                temp_dist_factor_vector, i + 1 ) != MB_SUCCESS )
+        if( create_ss_elements( &element_list[ 0 ], &side_list[ 0 ], number_sides_in_set, number_dist_factors_in_set,
+                                entities_to_add, reverse_entities, temp_dist_factor_vector, i + 1 ) != MB_SUCCESS )
             return MB_FAILURE;
 
         // If there are elements to add
@@ -1244,9 +1152,7 @@ ErrorCode ReadNCDF::read_sidesets( )
             for( ; iter != end_iter; ++iter )
             {
                 int sideset_id;
-                if( mdbImpl->tag_get_data( mNeumannSetTag, &( *iter ), 1, &sideset_id ) !=
-                    MB_SUCCESS )
-                    continue;
+                if( mdbImpl->tag_get_data( mNeumannSetTag, &( *iter ), 1, &sideset_id ) != MB_SUCCESS ) continue;
 
                 if( id_array[ i ] == sideset_id )
                 {
@@ -1259,34 +1165,28 @@ ErrorCode ReadNCDF::read_sidesets( )
             // If we didn't find a sideset already
             if( ss_handle == 0 )
             {
-                if( mdbImpl->create_meshset( MESHSET_ORDERED | MESHSET_TRACK_OWNER, ss_handle ) !=
-                    MB_SUCCESS )
+                if( mdbImpl->create_meshset( MESHSET_ORDERED | MESHSET_TRACK_OWNER, ss_handle ) != MB_SUCCESS )
                     return MB_FAILURE;
 
                 if( ss_handle == 0 ) return MB_FAILURE;
 
                 int sideset_id = id_array[ i ];
-                if( mdbImpl->tag_set_data( mNeumannSetTag, &ss_handle, 1, &sideset_id ) !=
-                    MB_SUCCESS )
+                if( mdbImpl->tag_set_data( mNeumannSetTag, &ss_handle, 1, &sideset_id ) != MB_SUCCESS )
                     return MB_FAILURE;
-                if( mdbImpl->tag_set_data( mGlobalIdTag, &ss_handle, 1, &sideset_id ) !=
-                    MB_SUCCESS )
-                    return MB_FAILURE;
+                if( mdbImpl->tag_set_data( mGlobalIdTag, &ss_handle, 1, &sideset_id ) != MB_SUCCESS ) return MB_FAILURE;
 
                 if( !reverse_entities.empty( ) )
                 {
                     // Also make a reverse set to put in this set
                     EntityHandle reverse_set;
-                    if( mdbImpl->create_meshset( MESHSET_SET | MESHSET_TRACK_OWNER, reverse_set ) !=
-                        MB_SUCCESS )
+                    if( mdbImpl->create_meshset( MESHSET_SET | MESHSET_TRACK_OWNER, reverse_set ) != MB_SUCCESS )
                         return MB_FAILURE;
 
                     // Add the reverse set to the sideset set and the entities to the reverse set
                     ErrorCode result = mdbImpl->add_entities( ss_handle, &reverse_set, 1 );
                     if( MB_SUCCESS != result ) return result;
 
-                    result = mdbImpl->add_entities( reverse_set, &reverse_entities[ 0 ],
-                                                    reverse_entities.size( ) );
+                    result = mdbImpl->add_entities( reverse_set, &reverse_entities[ 0 ], reverse_entities.size( ) );
                     if( MB_SUCCESS != result ) return result;
 
                     // Set the reverse tag
@@ -1301,8 +1201,7 @@ ErrorCode ReadNCDF::read_sidesets( )
                 }
             }
 
-            if( mdbImpl->add_entities( ss_handle,
-                                       ( entities_to_add.empty( ) ) ? NULL : &entities_to_add[ 0 ],
+            if( mdbImpl->add_entities( ss_handle, ( entities_to_add.empty( ) ) ? NULL : &entities_to_add[ 0 ],
                                        entities_to_add.size( ) ) != MB_SUCCESS )
                 return MB_FAILURE;
 
@@ -1312,8 +1211,7 @@ ErrorCode ReadNCDF::read_sidesets( )
                 // If this sideset does not already has a distribution factor array...set one
                 const void* ptr = 0;
                 int         size = 0;
-                if( MB_SUCCESS ==
-                    mdbImpl->tag_get_by_ptr( mDistFactorTag, &ss_handle, 1, &ptr, &size ) )
+                if( MB_SUCCESS == mdbImpl->tag_get_by_ptr( mDistFactorTag, &ss_handle, 1, &ptr, &size ) )
                 {
                     const double* data = reinterpret_cast< const double* >( ptr );
                     std::copy( data, data + size, std::back_inserter( temp_dist_factor_vector ) );
@@ -1321,8 +1219,7 @@ ErrorCode ReadNCDF::read_sidesets( )
 
                 ptr = &temp_dist_factor_vector[ 0 ];
                 size = temp_dist_factor_vector.size( );
-                if( mdbImpl->tag_set_by_ptr( mDistFactorTag, &ss_handle, 1, &ptr, &size ) !=
-                    MB_SUCCESS )
+                if( mdbImpl->tag_set_by_ptr( mDistFactorTag, &ss_handle, 1, &ptr, &size ) != MB_SUCCESS )
                     return MB_FAILURE;
             }
         }
@@ -1331,8 +1228,7 @@ ErrorCode ReadNCDF::read_sidesets( )
     return MB_SUCCESS;
 }
 
-ErrorCode ReadNCDF::create_ss_elements( int* element_ids, int* side_list, int num_sides,
-                                        int                          num_dist_factors,
+ErrorCode ReadNCDF::create_ss_elements( int* element_ids, int* side_list, int num_sides, int num_dist_factors,
                                         std::vector< EntityHandle >& entities_to_add,
                                         std::vector< EntityHandle >& reverse_entities,
                                         std::vector< double >& dist_factor_vector, int ss_seq_id )
@@ -1351,8 +1247,7 @@ ErrorCode ReadNCDF::create_ss_elements( int* element_ids, int* side_list, int nu
         INS_ID( temp_string, "dist_fact_ss%d", ss_seq_id );
         temp_var = -1;
         GET_1D_DBL_VAR( temp_string, temp_var, temp_dist_factor_vector );
-        if( -1 == temp_var )
-        { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting dist fact variable" ); }
+        if( -1 == temp_var ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting dist fact variable" ); }
     }
 
     EntityType                  subtype;
@@ -1369,8 +1264,7 @@ ErrorCode ReadNCDF::create_ss_elements( int* element_ids, int* side_list, int nu
         ReadBlockData    block_data;
         block_data.elemType = EXOII_MAX_ELEM_TYPE;
 
-        if( find_side_element_type( element_ids[ i ], exoii_type, block_data, df_index,
-                                    side_list[ i ] ) != MB_SUCCESS )
+        if( find_side_element_type( element_ids[ i ], exoii_type, block_data, df_index, side_list[ i ] ) != MB_SUCCESS )
             continue;  // Isn't being read in this time
 
         EntityType type = ExoIIUtil::ExoIIElementMBEntity[ exoii_type ];
@@ -1381,19 +1275,16 @@ ErrorCode ReadNCDF::create_ss_elements( int* element_ids, int* side_list, int nu
         if( type == MBHEX )
         {
             // Get the nodes of the element
-            if( mdbImpl->get_connectivity( ent_handle, nodes, num_elem_nodes ) != MB_SUCCESS )
-                return MB_FAILURE;
+            if( mdbImpl->get_connectivity( ent_handle, nodes, num_elem_nodes ) != MB_SUCCESS ) return MB_FAILURE;
 
-            CN::SubEntityNodeIndices( type, num_elem_nodes, 2, side_num, subtype, num_side_nodes,
-                                      side_node_idx );
+            CN::SubEntityNodeIndices( type, num_elem_nodes, 2, side_num, subtype, num_side_nodes, side_node_idx );
             if( num_side_nodes <= 0 ) return MB_FAILURE;
 
             connectivity.resize( num_side_nodes );
             for( int k = 0; k < num_side_nodes; ++k )
                 connectivity[ k ] = nodes[ side_node_idx[ k ] ];
 
-            if( MB_SUCCESS != create_sideset_element( connectivity, subtype, ent_handle, sense ) )
-                return MB_FAILURE;
+            if( MB_SUCCESS != create_sideset_element( connectivity, subtype, ent_handle, sense ) ) return MB_FAILURE;
             if( 1 == sense )
                 entities_to_add.push_back( ent_handle );
             else
@@ -1411,19 +1302,16 @@ ErrorCode ReadNCDF::create_ss_elements( int* element_ids, int* side_list, int nu
         else if( type == MBTET )
         {
             // Get the nodes of the element
-            if( mdbImpl->get_connectivity( ent_handle, nodes, num_elem_nodes ) != MB_SUCCESS )
-                return MB_FAILURE;
+            if( mdbImpl->get_connectivity( ent_handle, nodes, num_elem_nodes ) != MB_SUCCESS ) return MB_FAILURE;
 
-            CN::SubEntityNodeIndices( type, num_elem_nodes, 2, side_num, subtype, num_side_nodes,
-                                      side_node_idx );
+            CN::SubEntityNodeIndices( type, num_elem_nodes, 2, side_num, subtype, num_side_nodes, side_node_idx );
             if( num_side_nodes <= 0 ) return MB_FAILURE;
 
             connectivity.resize( num_side_nodes );
             for( int k = 0; k < num_side_nodes; ++k )
                 connectivity[ k ] = nodes[ side_node_idx[ k ] ];
 
-            if( MB_SUCCESS != create_sideset_element( connectivity, subtype, ent_handle, sense ) )
-                return MB_FAILURE;
+            if( MB_SUCCESS != create_sideset_element( connectivity, subtype, ent_handle, sense ) ) return MB_FAILURE;
             if( 1 == sense )
                 entities_to_add.push_back( ent_handle );
             else
@@ -1471,19 +1359,17 @@ ErrorCode ReadNCDF::create_ss_elements( int* element_ids, int* side_list, int nu
             else
             {
                 // Get the nodes of the element
-                if( mdbImpl->get_connectivity( ent_handle, nodes, num_elem_nodes ) != MB_SUCCESS )
-                    return MB_FAILURE;
+                if( mdbImpl->get_connectivity( ent_handle, nodes, num_elem_nodes ) != MB_SUCCESS ) return MB_FAILURE;
 
-                CN::SubEntityNodeIndices( type, num_elem_nodes, 1, side_num - 2, subtype,
-                                          num_side_nodes, side_node_idx );
+                CN::SubEntityNodeIndices( type, num_elem_nodes, 1, side_num - 2, subtype, num_side_nodes,
+                                          side_node_idx );
                 if( num_side_nodes <= 0 ) return MB_FAILURE;
 
                 connectivity.resize( num_side_nodes );
                 for( int k = 0; k < num_side_nodes; ++k )
                     connectivity[ k ] = nodes[ side_node_idx[ k ] ];
 
-                if( MB_SUCCESS !=
-                    create_sideset_element( connectivity, subtype, ent_handle, sense ) )
+                if( MB_SUCCESS != create_sideset_element( connectivity, subtype, ent_handle, sense ) )
                     return MB_FAILURE;
                 if( 1 == sense )
                     entities_to_add.push_back( ent_handle );
@@ -1501,19 +1387,16 @@ ErrorCode ReadNCDF::create_ss_elements( int* element_ids, int* side_list, int nu
         else if( type == MBQUAD )
         {
             // Get the nodes of the element
-            if( mdbImpl->get_connectivity( ent_handle, nodes, num_elem_nodes ) != MB_SUCCESS )
-                return MB_FAILURE;
+            if( mdbImpl->get_connectivity( ent_handle, nodes, num_elem_nodes ) != MB_SUCCESS ) return MB_FAILURE;
 
-            CN::SubEntityNodeIndices( type, num_elem_nodes, 1, side_num, subtype, num_side_nodes,
-                                      side_node_idx );
+            CN::SubEntityNodeIndices( type, num_elem_nodes, 1, side_num, subtype, num_side_nodes, side_node_idx );
             if( num_side_nodes <= 0 ) return MB_FAILURE;
 
             connectivity.resize( num_side_nodes );
             for( int k = 0; k < num_side_nodes; ++k )
                 connectivity[ k ] = nodes[ side_node_idx[ k ] ];
 
-            if( MB_SUCCESS != create_sideset_element( connectivity, subtype, ent_handle, sense ) )
-                return MB_FAILURE;
+            if( MB_SUCCESS != create_sideset_element( connectivity, subtype, ent_handle, sense ) ) return MB_FAILURE;
             if( 1 == sense )
                 entities_to_add.push_back( ent_handle );
             else
@@ -1549,19 +1432,17 @@ ErrorCode ReadNCDF::create_ss_elements( int* element_ids, int* side_list, int nu
                 }
 
                 // Get the nodes of the element
-                if( mdbImpl->get_connectivity( ent_handle, nodes, num_elem_nodes ) != MB_SUCCESS )
-                    return MB_FAILURE;
+                if( mdbImpl->get_connectivity( ent_handle, nodes, num_elem_nodes ) != MB_SUCCESS ) return MB_FAILURE;
 
-                CN::SubEntityNodeIndices( type, num_elem_nodes, 1, side_num - side_offset, subtype,
-                                          num_side_nodes, side_node_idx );
+                CN::SubEntityNodeIndices( type, num_elem_nodes, 1, side_num - side_offset, subtype, num_side_nodes,
+                                          side_node_idx );
                 if( num_side_nodes <= 0 ) return MB_FAILURE;
 
                 connectivity.resize( num_side_nodes );
                 for( int k = 0; k < num_side_nodes; ++k )
                     connectivity[ k ] = nodes[ side_node_idx[ k ] ];
 
-                if( MB_SUCCESS !=
-                    create_sideset_element( connectivity, subtype, ent_handle, sense ) )
+                if( MB_SUCCESS != create_sideset_element( connectivity, subtype, ent_handle, sense ) )
                     return MB_FAILURE;
                 if( 1 == sense )
                     entities_to_add.push_back( ent_handle );
@@ -1580,8 +1461,8 @@ ErrorCode ReadNCDF::create_ss_elements( int* element_ids, int* side_list, int nu
     return MB_SUCCESS;
 }
 
-ErrorCode ReadNCDF::create_sideset_element( const std::vector< EntityHandle >& connectivity,
-                                            EntityType type, EntityHandle& handle, int& sense )
+ErrorCode ReadNCDF::create_sideset_element( const std::vector< EntityHandle >& connectivity, EntityType type,
+                                            EntityHandle& handle, int& sense )
 {
     // Get adjacent entities
     ErrorCode error = MB_SUCCESS;
@@ -1653,14 +1534,13 @@ ErrorCode ReadNCDF::create_sideset_element( const std::vector< EntityHandle >& c
     }
 
     // If we didn't find a match, create an element
-    if( !match_found )
-        error = mdbImpl->create_element( type, &connectivity[ 0 ], connectivity.size( ), handle );
+    if( !match_found ) error = mdbImpl->create_element( type, &connectivity[ 0 ], connectivity.size( ), handle );
 
     return error;
 }
 
-ErrorCode ReadNCDF::find_side_element_type( const int exodus_id, ExoIIElementType& elem_type,
-                                            ReadBlockData& block_data, int& df_index, int side_id )
+ErrorCode ReadNCDF::find_side_element_type( const int exodus_id, ExoIIElementType& elem_type, ReadBlockData& block_data,
+                                            int& df_index, int side_id )
 {
     std::vector< ReadBlockData >::iterator iter, end_iter;
     iter = blocksLoading.begin( );
@@ -1669,8 +1549,7 @@ ErrorCode ReadNCDF::find_side_element_type( const int exodus_id, ExoIIElementTyp
 
     for( ; iter != end_iter; ++iter )
     {
-        if( exodus_id >= ( *iter ).startExoId &&
-            exodus_id < ( *iter ).startExoId + ( *iter ).numElements )
+        if( exodus_id >= ( *iter ).startExoId && exodus_id < ( *iter ).startExoId + ( *iter ).numElements )
         {
             elem_type = ( *iter ).elemType;
 
@@ -1722,8 +1601,7 @@ ErrorCode ReadNCDF::read_qa_records( EntityHandle file_set )
     {
         const void* ptr = &tag_data[ 0 ];
         int         size = tag_data.size( );
-        if( mdbImpl->tag_set_by_ptr( mQaRecordTag, &file_set, 1, &ptr, &size ) != MB_SUCCESS )
-        { return MB_FAILURE; }
+        if( mdbImpl->tag_set_by_ptr( mQaRecordTag, &file_set, 1, &ptr, &size ) != MB_SUCCESS ) { return MB_FAILURE; }
     }
 
     return MB_SUCCESS;
@@ -1772,10 +1650,7 @@ ErrorCode ReadNCDF::read_qa_string( char* temp_string, int record_number, int re
     count[ 2 ] = max_str_length;
     int fail = nc_get_vara_text( ncFile, temp_var, start, count, temp_string );
     if( NC_NOERR != fail )
-    {
-        MB_SET_ERR( MB_FAILURE,
-                    "ReadNCDF:: Problem setting current record number variable position" );
-    }
+    { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem setting current record number variable position" ); }
     // Get the variable id in the exodus file
 
     return MB_SUCCESS;
@@ -1784,9 +1659,8 @@ ErrorCode ReadNCDF::read_qa_string( char* temp_string, int record_number, int re
 // The cub_file_set contains the mesh to be updated. There could exist other
 // file sets that should be kept separate, such as the geometry file set from
 // ReadCGM.
-ErrorCode ReadNCDF::update( const char* exodus_file_name, const FileOptions& opts,
-                            const int num_blocks, const int* blocks_to_load,
-                            const EntityHandle cub_file_set )
+ErrorCode ReadNCDF::update( const char* exodus_file_name, const FileOptions& opts, const int num_blocks,
+                            const int* blocks_to_load, const EntityHandle cub_file_set )
 {
     // Function : updating current database from new exodus_file.
     // Creator:   Jane Hu
@@ -1819,8 +1693,7 @@ ErrorCode ReadNCDF::update( const char* exodus_file_name, const FileOptions& opt
     ErrorCode   rval;
     std::string s;
     rval = opts.get_str_option( "tdata", s );
-    if( MB_SUCCESS != rval )
-    { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem reading file options" ); }
+    if( MB_SUCCESS != rval ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem reading file options" ); }
     std::vector< std::string > tokens;
     tokenize( s, tokens, "," );
 
@@ -1851,10 +1724,7 @@ ErrorCode ReadNCDF::update( const char* exodus_file_name, const FileOptions& opt
     ncFile = 0;
     int fail = nc_open( exodus_file_name, 0, &ncFile );
     if( !ncFile )
-    {
-        MB_SET_ERR( MB_FILE_DOES_NOT_EXIST,
-                    "ReadNCDF:: problem opening Netcdf/Exodus II file " << exodus_file_name );
-    }
+    { MB_SET_ERR( MB_FILE_DOES_NOT_EXIST, "ReadNCDF:: problem opening Netcdf/Exodus II file " << exodus_file_name ); }
 
     rval = read_exodus_header( );
     if( MB_SUCCESS != rval ) return rval;
@@ -1882,8 +1752,7 @@ ErrorCode ReadNCDF::update( const char* exodus_file_name, const FileOptions& opt
     if( -1 == nc_var ) { std::cout << "ReadNCDF: unable to get time variable" << std::endl; }
     else
     {
-        std::cout << "  Step " << time_step << " is at " << times[ time_step - 1 ] << " seconds"
-                  << std::endl;
+        std::cout << "  Step " << time_step << " is at " << times[ time_step - 1 ] << " seconds" << std::endl;
     }
 
     // Read in the node_num_map.
@@ -1891,8 +1760,7 @@ ErrorCode ReadNCDF::update( const char* exodus_file_name, const FileOptions& opt
 
     int varid = -1;
     GET_1D_INT_VAR( "node_num_map", varid, ptr );
-    if( -1 == varid )
-    { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting node number map data" ); }
+    if( -1 == varid ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting node number map data" ); }
 
     // Read in the deformations.
     std::vector< std::vector< double > > deformed_arrays( 3 );
@@ -1914,17 +1782,14 @@ ErrorCode ReadNCDF::update( const char* exodus_file_name, const FileOptions& opt
     { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting coords variable" ); }
 
     fail = nc_get_vara_double( ncFile, coordx, start, count, &deformed_arrays[ 0 ][ 0 ] );
-    if( NC_NOERR != fail )
-    { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting x deformation array" ); }
+    if( NC_NOERR != fail ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting x deformation array" ); }
 
     fail = nc_get_vara_double( ncFile, coordy, start, count, &deformed_arrays[ 1 ][ 0 ] );
-    if( NC_NOERR != fail )
-    { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting y deformation array" ); }
+    if( NC_NOERR != fail ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting y deformation array" ); }
     if( numberDimensions_loading == 3 )
     {
         fail = nc_get_vara_double( ncFile, coordz, start, count, &deformed_arrays[ 2 ][ 0 ] );
-        if( NC_NOERR != fail )
-        { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting z deformation array" ); }
+        if( NC_NOERR != fail ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting z deformation array" ); }
     }
 
     int coord1 = -1, coord2 = -1, coord3 = -1;
@@ -1974,8 +1839,7 @@ ErrorCode ReadNCDF::update( const char* exodus_file_name, const FileOptions& opt
         if( MB_SUCCESS != rval ) return rval;
         for( unsigned i = 0; i != cub_verts.size( ); ++i )
         {
-            cub_verts_id_map.insert(
-                std::pair< int, EntityHandle >( cub_ids[ i ], cub_verts[ i ] ) );
+            cub_verts_id_map.insert( std::pair< int, EntityHandle >( cub_ids[ i ], cub_verts[ i ] ) );
         }
 
         // Place cub verts in a kdtree for searching by proximity
@@ -1993,8 +1857,8 @@ ErrorCode ReadNCDF::update( const char* exodus_file_name, const FileOptions& opt
     // For each exo vert, find the matching cub vert
     for( int i = 0; i < numberNodes_loading; ++i )
     {
-        int      exo_id = ptr[ i ];
-        CartVect exo_coords( orig_coords[ 0 ][ i ], orig_coords[ 1 ][ i ], orig_coords[ 2 ][ i ] );
+        int          exo_id = ptr[ i ];
+        CartVect     exo_coords( orig_coords[ 0 ][ i ], orig_coords[ 1 ][ i ], orig_coords[ 2 ][ i ] );
         EntityHandle cub_vert = 0;
         bool         found_match = false;
 
@@ -2022,14 +1886,12 @@ ErrorCode ReadNCDF::update( const char* exodus_file_name, const FileOptions& opt
             double                      min_dist = MAX_NODE_DIST;
             rval = kdtree.distance_search( exo_coords.array( ), MAX_NODE_DIST, leaves );
             if( MB_SUCCESS != rval ) return rval;
-            for( std::vector< EntityHandle >::const_iterator j = leaves.begin( );
-                 j != leaves.end( ); ++j )
+            for( std::vector< EntityHandle >::const_iterator j = leaves.begin( ); j != leaves.end( ); ++j )
             {
                 std::vector< EntityHandle > leaf_verts;
                 rval = mdbImpl->get_entities_by_type( *j, MBVERTEX, leaf_verts );
                 if( MB_SUCCESS != rval ) return rval;
-                for( std::vector< EntityHandle >::const_iterator k = leaf_verts.begin( );
-                     k != leaf_verts.end( ); ++k )
+                for( std::vector< EntityHandle >::const_iterator k = leaf_verts.begin( ); k != leaf_verts.end( ); ++k )
                 {
                     CartVect orig_cub_coords, difference;
                     rval = mdbImpl->get_coords( &( *k ), 1, orig_cub_coords.array( ) );
@@ -2081,8 +1943,7 @@ ErrorCode ReadNCDF::update( const char* exodus_file_name, const FileOptions& opt
         {
             unmatched_cub_verts.erase( i->second );
         }
-        for( Range::const_iterator i = unmatched_cub_verts.begin( );
-             i != unmatched_cub_verts.end( ); ++i )
+        for( Range::const_iterator i = unmatched_cub_verts.begin( ); i != unmatched_cub_verts.end( ); ++i )
         {
             int cub_id;
             rval = mdbImpl->tag_get_data( mGlobalIdTag, &( *i ), 1, &cub_id );
@@ -2092,8 +1953,8 @@ ErrorCode ReadNCDF::update( const char* exodus_file_name, const FileOptions& opt
             if( MB_SUCCESS != rval ) return rval;
             std::cout << "cannot match cub node " << cub_id << " " << cub_coords << std::endl;
         }
-        std::cout << "  " << unmatched_cub_verts.size( )
-                  << " nodes from the cub file could not be matched." << std::endl;
+        std::cout << "  " << unmatched_cub_verts.size( ) << " nodes from the cub file could not be matched."
+                  << std::endl;
     }
 
     // Summarize statistics
@@ -2107,13 +1968,11 @@ ErrorCode ReadNCDF::update( const char* exodus_file_name, const FileOptions& opt
     // Fail if all of the nodes could not be matched.
     if( 0 != lost )
     {
-        std::cout << "Error:  " << lost << " nodes from the exodus file could not be matched."
-                  << std::endl;
+        std::cout << "Error:  " << lost << " nodes from the exodus file could not be matched." << std::endl;
         // return MB_FAILURE;
     }
     std::cout << "  maximum node displacement magnitude: " << max_magnitude << " cm" << std::endl;
-    std::cout << "  average node displacement magnitude: " << average_magnitude / found << " cm"
-              << std::endl;
+    std::cout << "  average node displacement magnitude: " << average_magnitude / found << " cm" << std::endl;
 
     // *******************************************************************
     // Remove dead elements from the MOAB instance.
@@ -2136,8 +1995,7 @@ ErrorCode ReadNCDF::update( const char* exodus_file_name, const FileOptions& opt
         return MB_FAILURE;
     }
     int status = nc_get_var_text( ncFile, varid, &names_memory[ 0 ] );
-    if( NC_NOERR != status )
-    { MB_SET_ERR( MB_FAILURE, "ReadNCDF: Problem getting element variable names" ); }
+    if( NC_NOERR != status ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF: Problem getting element variable names" ); }
 
     // Is one of the element variable names "death_status"? If so, get its index
     // in the element variable array.
@@ -2156,8 +2014,7 @@ ErrorCode ReadNCDF::update( const char* exodus_file_name, const FileOptions& opt
             break;
         }
     }
-    if( !found_death_index )
-    { MB_SET_ERR( MB_FAILURE, "ReadNCDF: Problem getting index of death_status variable" ); }
+    if( !found_death_index ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF: Problem getting index of death_status variable" ); }
 
     // The exodus header has already been read. This contains the number of element
     // blocks.
@@ -2165,8 +2022,7 @@ ErrorCode ReadNCDF::update( const char* exodus_file_name, const FileOptions& opt
     // Dead elements are listed by block. Read the block headers to determine how
     // many elements are in each block.
     rval = read_block_headers( blocks_to_load, num_blocks );
-    if( MB_FAILURE == rval )
-    { MB_SET_ERR( MB_FAILURE, "ReadNCDF: Problem reading block headers" ); }
+    if( MB_FAILURE == rval ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF: Problem reading block headers" ); }
 
     // Dead elements from the Exodus file can be located in the cub_file_set by id
     // or by connectivity. Currently, finding elements by id requires careful book
@@ -2180,8 +2036,7 @@ ErrorCode ReadNCDF::update( const char* exodus_file_name, const FileOptions& opt
     if( !match_elems_by_connectivity )
     {
         GET_1D_INT_VAR( "elem_num_map", varid, elem_ids );
-        if( -1 == varid )
-        { MB_SET_ERR( MB_FAILURE, "ReadNCDF: Problem getting element number map data" ); }
+        if( -1 == varid ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF: Problem getting element number map data" ); }
     }
 
     // For each block
@@ -2189,8 +2044,7 @@ ErrorCode ReadNCDF::update( const char* exodus_file_name, const FileOptions& opt
     int block_count = 1;  // NetCDF variables start with 1
     int total_elems = 0;
     int total_dead_elems = 0;
-    for( std::vector< ReadBlockData >::iterator i = blocksLoading.begin( );
-         i != blocksLoading.end( ); ++i )
+    for( std::vector< ReadBlockData >::iterator i = blocksLoading.begin( ); i != blocksLoading.end( ); ++i )
     {
         // Get the ncdf connect variable
         std::string       temp_string( "connect" );
@@ -2205,8 +2059,7 @@ ErrorCode ReadNCDF::update( const char* exodus_file_name, const FileOptions& opt
         nc_type att_type;
         size_t  att_len;
         fail = nc_inq_att( ncFile, nc_var, "elem_type", &att_type, &att_len );
-        if( NC_NOERR != fail )
-        { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting elem type attribute" ); }
+        if( NC_NOERR != fail ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting elem type attribute" ); }
         std::vector< char > dum_str( att_len + 1 );
         fail = nc_get_att_text( ncFile, nc_var, "elem_type", &dum_str[ 0 ] );
         if( NC_NOERR != fail ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting elem type" ); }
@@ -2232,9 +2085,8 @@ ErrorCode ReadNCDF::update( const char* exodus_file_name, const FileOptions& opt
         }
 
         // Get the death_status at the correct time step.
-        std::vector< double > death_status(
-            i->numElements );  // It seems wrong, but it uses doubles
-        std::string array_name( "vals_elem_var" );
+        std::vector< double > death_status( i->numElements );  // It seems wrong, but it uses doubles
+        std::string           array_name( "vals_elem_var" );
         temp_ss.str( "" );  // stringstream won't clear by temp.clear()
         temp_ss << death_index;
         array_name += temp_ss.str( );
@@ -2244,8 +2096,7 @@ ErrorCode ReadNCDF::update( const char* exodus_file_name, const FileOptions& opt
         array_name += temp_ss.str( );
         array_name += "\0";
         GET_VAR( array_name.c_str( ), nc_var, ldims );
-        if( !nc_var )
-        { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting death status variable" ); }
+        if( !nc_var ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting death status variable" ); }
         lstart[ 0 ] = time_step - 1;
         lstart[ 1 ] = 0;
         lcount[ 0 ] = 1;
@@ -2292,9 +2143,8 @@ ErrorCode ReadNCDF::update( const char* exodus_file_name, const FileOptions& opt
 
                         if( k_iter == matched_cub_vert_id_map.end( ) )
                         {
-                            std::cout
-                                << "ReadNCDF: Found no cub node with id=" << elem_conn_node_ids[ k ]
-                                << ", but expected to find only 1." << std::endl;
+                            std::cout << "ReadNCDF: Found no cub node with id=" << elem_conn_node_ids[ k ]
+                                      << ", but expected to find only 1." << std::endl;
                             break;
                         }
                         cub_nodes.insert( k_iter->second );
@@ -2302,8 +2152,7 @@ ErrorCode ReadNCDF::update( const char* exodus_file_name, const FileOptions& opt
 
                     if( nodes_per_element != cub_nodes.size( ) )
                     {
-                        std::cout << "ReadNCDF: nodes_per_elemenet != cub_nodes.size()"
-                                  << std::endl;
+                        std::cout << "ReadNCDF: nodes_per_elemenet != cub_nodes.size()" << std::endl;
                         delete[] exo_conn;
                         return MB_INVALID_SIZE;
                     }
@@ -2327,8 +2176,7 @@ ErrorCode ReadNCDF::update( const char* exodus_file_name, const FileOptions& opt
                     int   elem_id = elem_ids[ first_elem_id_in_block + j ];
                     void* id[] = { &elem_id };
                     // Get the element by id
-                    rval = mdbImpl->get_entities_by_type_and_tag( cub_file_set, mb_type,
-                                                                  &mGlobalIdTag, id, 1, cub_elem,
+                    rval = mdbImpl->get_entities_by_type_and_tag( cub_file_set, mb_type, &mGlobalIdTag, id, 1, cub_elem,
                                                                   Interface::INTERSECT );
                     if( MB_SUCCESS != rval )
                     {
@@ -2357,8 +2205,7 @@ ErrorCode ReadNCDF::update( const char* exodus_file_name, const FileOptions& opt
                 else
                 {
                     std::cout << "ReadNCDF: Should have found 1 element with  type=" << mb_type
-                              << " in cub_file_set, but instead found " << cub_elem.size( )
-                              << std::endl;
+                              << " in cub_file_set, but instead found " << cub_elem.size( ) << std::endl;
                     rval = mdbImpl->list_entities( cub_nodes );
                     ++missing_elem_counter;
                     delete[] exo_conn;
@@ -2372,13 +2219,12 @@ ErrorCode ReadNCDF::update( const char* exodus_file_name, const FileOptions& opt
         temp_ss << i->blockId;
         total_dead_elems += dead_elem_counter;
         total_elems += i->numElements;
-        std::cout << "  Block " << temp_ss.str( ) << " has " << dead_elem_counter << "/"
-                  << i->numElements << " dead elements." << std::endl;
+        std::cout << "  Block " << temp_ss.str( ) << " has " << dead_elem_counter << "/" << i->numElements
+                  << " dead elements." << std::endl;
         if( 0 != missing_elem_counter )
         {
             std::cout << "    " << missing_elem_counter
-                      << " dead elements in this block were not found in the cub_file_set."
-                      << std::endl;
+                      << " dead elements in this block were not found in the cub_file_set." << std::endl;
         }
 
         // Advance the pointers into element ids and block_count. Memory cleanup.
@@ -2387,8 +2233,7 @@ ErrorCode ReadNCDF::update( const char* exodus_file_name, const FileOptions& opt
         delete[] exo_conn;
     }
 
-    std::cout << " Total: " << total_dead_elems << "/" << total_elems << " dead elements."
-              << std::endl;
+    std::cout << " Total: " << total_dead_elems << "/" << total_elems << " dead elements." << std::endl;
 
     // Close the file
     fail = nc_close( ncFile );
@@ -2398,8 +2243,7 @@ ErrorCode ReadNCDF::update( const char* exodus_file_name, const FileOptions& opt
     return MB_SUCCESS;
 }
 
-void ReadNCDF::tokenize( const std::string& str, std::vector< std::string >& tokens,
-                         const char* delimiters )
+void ReadNCDF::tokenize( const std::string& str, std::vector< std::string >& tokens, const char* delimiters )
 {
     std::string::size_type last = str.find_first_not_of( delimiters, 0 );
     std::string::size_type pos = str.find_first_of( delimiters, last );

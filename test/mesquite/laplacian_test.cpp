@@ -193,8 +193,7 @@ int main( int argc, char* argv[] )
         {
             std::cerr << "Free vertex not at origin after Laplace smooth." << std::endl
                       << "Expected location: (0,0)" << std::endl
-                      << "Actual location: (" << coords[ 0 ] << "," << coords[ 1 ] << ")"
-                      << std::endl;
+                      << "Actual location: (" << coords[ 0 ] << "," << coords[ 1 ] << ")" << std::endl;
             return 2;
         }
     }

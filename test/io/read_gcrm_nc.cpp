@@ -34,8 +34,7 @@ int main( int argc, char* argv[] )
     int fail = MPI_Init( &argc, &argv );
     if( fail ) return 1;
 #else
-    argv[ 0 ] =
-        argv[ argc - argc ];  // To remove the warnings in serial mode about unused variables
+    argv[ 0 ] = argv[ argc - argc ];  // To remove the warnings in serial mode about unused variables
 #endif
 
     result += RUN_TEST( test_read_all );
@@ -500,8 +499,8 @@ void test_gather_onevar( )
 
         // Check vorticity0 tag values on 4 gather set cells: first cell, two median cells, and last
         // cell
-        EntityHandle cell_ents[] = { gather_set_cells[ 0 ], gather_set_cells[ 320 ],
-                                     gather_set_cells[ 321 ], gather_set_cells[ 641 ] };
+        EntityHandle cell_ents[] = { gather_set_cells[ 0 ], gather_set_cells[ 320 ], gather_set_cells[ 321 ],
+                                     gather_set_cells[ 641 ] };
         double       vorticity0_val[ 4 * layers ];
         rval = mb.tag_get_data( vorticity_tag0, cell_ents, 4, vorticity0_val );CHECK_ERR( rval );
 

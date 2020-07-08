@@ -51,8 +51,7 @@ void CachingTargetCalculator::notify_patch_destroyed( CachedTargetData& data )
     data.clear( );
 }
 
-void CachingTargetCalculator::notify_sub_patch( PatchData&, CachedTargetData& data,
-                                                PatchData&    subpatch, const size_t*,
+void CachingTargetCalculator::notify_sub_patch( PatchData&, CachedTargetData& data, PatchData& subpatch, const size_t*,
                                                 const size_t* element_map, MsqError& /*err*/ )
 {
     // If no cached data for this patch, just return
@@ -91,19 +90,16 @@ void CachingTargetCalculator::notify_sub_patch( PatchData&, CachedTargetData& da
         size_t         count = samples.num_nodes( );
 
         if( TopologyInfo::dimension( type ) == 3 )
-            memcpy( &sub_data.targets3D[ off ], &data.targets3D[ old_off ],
-                    count * sizeof( MsqMatrix< 3, 3 > ) );
+            memcpy( &sub_data.targets3D[ off ], &data.targets3D[ old_off ], count * sizeof( MsqMatrix< 3, 3 > ) );
         else if( orient )
             memcpy( &sub_data.targetsSurface[ off ], &data.targetsSurface[ old_off ],
                     count * sizeof( MsqMatrix< 3, 2 > ) );
         else
-            memcpy( &sub_data.targets2D[ off ], &data.targets2D[ old_off ],
-                    count * sizeof( MsqMatrix< 2, 2 > ) );
+            memcpy( &sub_data.targets2D[ off ], &data.targets2D[ old_off ], count * sizeof( MsqMatrix< 2, 2 > ) );
     }
 }
 
-static void populate_data( PatchData& pd, CachedTargetData* data, TargetCalculator* calc,
-                           MsqError& err )
+static void populate_data( PatchData& pd, CachedTargetData* data, TargetCalculator* calc, MsqError& err )
 {
     size_t i, j;
 
@@ -173,8 +169,7 @@ static void populate_data( PatchData& pd, CachedTargetData* data, TargetCalculat
                 if( sample_pts.corner_node( j ) )
                 {
                     assert( off2 < data->targetsSurface.size( ) );
-                    calc->get_surface_target( pd, i, Sample( 0, j ), data->targetsSurface[ off2++ ],
-                                              err );MSQ_ERRRTN( err );
+                    calc->get_surface_target( pd, i, Sample( 0, j ), data->targetsSurface[ off2++ ], err );MSQ_ERRRTN( err );
                 }
             }
             for( j = 0; j < TopologyInfo::edges( type ); ++j )
@@ -182,15 +177,13 @@ static void populate_data( PatchData& pd, CachedTargetData* data, TargetCalculat
                 if( sample_pts.mid_edge_node( j ) )
                 {
                     assert( off2 < data->targetsSurface.size( ) );
-                    calc->get_surface_target( pd, i, Sample( 1, j ), data->targetsSurface[ off2++ ],
-                                              err );MSQ_ERRRTN( err );
+                    calc->get_surface_target( pd, i, Sample( 1, j ), data->targetsSurface[ off2++ ], err );MSQ_ERRRTN( err );
                 }
             }
             if( sample_pts.mid_face_node( 0 ) )
             {
                 assert( off2 < data->targetsSurface.size( ) );
-                calc->get_surface_target( pd, i, Sample( 2, 0 ), data->targetsSurface[ off2++ ],
-                                          err );MSQ_ERRRTN( err );
+                calc->get_surface_target( pd, i, Sample( 2, 0 ), data->targetsSurface[ off2++ ], err );MSQ_ERRRTN( err );
             }
         }
         else
@@ -221,8 +214,8 @@ static void populate_data( PatchData& pd, CachedTargetData* data, TargetCalculat
     }
 }
 
-bool CachingTargetCalculator::get_3D_target( PatchData& pd, size_t element, Sample sample,
-                                             MsqMatrix< 3, 3 >& W_out, MsqError& err )
+bool CachingTargetCalculator::get_3D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 3, 3 >& W_out,
+                                             MsqError& err )
 {
     CachedTargetData& data = get_data( pd );
     if( data.targets3D.empty( ) )
@@ -239,8 +232,8 @@ bool CachingTargetCalculator::get_3D_target( PatchData& pd, size_t element, Samp
     return true;
 }
 
-bool CachingTargetCalculator::get_2D_target( PatchData& pd, size_t element, Sample sample,
-                                             MsqMatrix< 2, 2 >& W_out, MsqError& err )
+bool CachingTargetCalculator::get_2D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 2, 2 >& W_out,
+                                             MsqError& err )
 {
     CachedTargetData& data = get_data( pd );
     if( data.targets2D.empty( ) )

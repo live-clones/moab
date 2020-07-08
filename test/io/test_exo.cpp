@@ -41,24 +41,21 @@ int main( int argc, char* argv[] )
     ReadWriteExoII reader( &mdb );
     ErrorCode      result = reader.load_file( argv[ 1 ], NULL );
 
-    std::cout << "Result of reading file = " << ( MB_FAILURE == result ? "FAILURE." : "SUCCESS." )
-              << std::endl;
+    std::cout << "Result of reading file = " << ( MB_FAILURE == result ? "FAILURE." : "SUCCESS." ) << std::endl;
 
     // print some data about the mesh
     int num_nodes = mdb.total_num_nodes( );
     int num_elements = mdb.total_num_elements( );
-    std::cout << "Total number of nodes, elements read = " << num_nodes << ", " << num_elements
-              << std::endl;
+    std::cout << "Total number of nodes, elements read = " << num_nodes << ", " << num_elements << std::endl;
 
     // get the nodeset meshsets and blocks
     std::vector< MB_MBSet* >     blocks, nodesets, sidesets;
     std::vector< int >           block_ids, nodeset_ids, sideset_ids;
     const std::set< MB_MBSet* >& gms = MB_MBSet::GlobalMBSets( );
 
-    std::set< MB_MBSet* >::const_iterator this_it = gms.begin( ),
-                                          end_it = MB_MBSet::GlobalMBSets( ).end( );
-    MB_MBSet* this_meshset;
-    int       bc_tag;
+    std::set< MB_MBSet* >::const_iterator this_it = gms.begin( ), end_it = MB_MBSet::GlobalMBSets( ).end( );
+    MB_MBSet*                             this_meshset;
+    int                                   bc_tag;
     for( ; this_it != end_it; ++this_it )
     {
         // get the next set

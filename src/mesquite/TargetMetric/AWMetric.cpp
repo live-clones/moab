@@ -40,8 +40,7 @@ namespace MBMesquite
 
 template< unsigned Dim >
 static inline double do_finite_difference( int r, int c, AWMetric* metric, MsqMatrix< Dim, Dim > A,
-                                           const MsqMatrix< Dim, Dim >& W, double value,
-                                           MsqError& err )
+                                           const MsqMatrix< Dim, Dim >& W, double value, MsqError& err )
 {
     const double INITAL_STEP = std::max( 1e-6, fabs( 1e-14 * value ) );
     const double init = A( r, c );
@@ -72,9 +71,8 @@ static inline double do_finite_difference( int r, int c, AWMetric* metric, MsqMa
 }
 
 template< unsigned Dim >
-static inline bool do_numerical_gradient( AWMetric* mu, MsqMatrix< Dim, Dim > A,
-                                          const MsqMatrix< Dim, Dim >& W, double& result,
-                                          MsqMatrix< Dim, Dim >& wrt_A, MsqError& err )
+static inline bool do_numerical_gradient( AWMetric* mu, MsqMatrix< Dim, Dim > A, const MsqMatrix< Dim, Dim >& W,
+                                          double& result, MsqMatrix< Dim, Dim >& wrt_A, MsqError& err )
 {
     bool valid;
     valid = mu->evaluate( A, W, result, err );
@@ -112,9 +110,8 @@ static inline bool do_numerical_gradient( AWMetric* mu, MsqMatrix< Dim, Dim > A,
 }
 
 template< unsigned Dim >
-static inline bool do_numerical_hessian( AWMetric* metric, MsqMatrix< Dim, Dim > A,
-                                         const MsqMatrix< Dim, Dim >& W, double& value,
-                                         MsqMatrix< Dim, Dim >& grad, MsqMatrix< Dim, Dim >* Hess,
+static inline bool do_numerical_hessian( AWMetric* metric, MsqMatrix< Dim, Dim > A, const MsqMatrix< Dim, Dim >& W,
+                                         double& value, MsqMatrix< Dim, Dim >& grad, MsqMatrix< Dim, Dim >* Hess,
                                          MsqError& err )
 {
     // zero hessian data
@@ -148,8 +145,7 @@ static inline bool do_numerical_hessian( AWMetric* metric, MsqMatrix< Dim, Dim >
             // if no valid step size, try step in other direction
             if( !valid )
             {
-                for( step = -INITAL_STEP; step < -std::numeric_limits< double >::epsilon( );
-                     step *= 0.1 )
+                for( step = -INITAL_STEP; step < -std::numeric_limits< double >::epsilon( ); step *= 0.1 )
                 {
                     A( r, c ) = in_val + step;
                     valid = metric->evaluate_with_grad( A, W, value2, grad2, err );
@@ -161,8 +157,7 @@ static inline bool do_numerical_hessian( AWMetric* metric, MsqMatrix< Dim, Dim >
                 if( !valid )
                 {
                     MSQ_SETERR( err )
-                    ( "No valid step size for finite difference of 2D target metric.",
-                      MsqError::INTERNAL_ERROR );
+                    ( "No valid step size for finite difference of 2D target metric.", MsqError::INTERNAL_ERROR );
                     return false;
                 }
             }
@@ -197,40 +192,38 @@ static inline bool do_numerical_hessian( AWMetric* metric, MsqMatrix< Dim, Dim >
 
 AWMetric::~AWMetric( ) {}
 
-bool AWMetric::evaluate( const MsqMatrix< 2, 2 >& /*A*/, const MsqMatrix< 2, 2 >& /*W*/,
-                         double& /*result*/, MsqError& /*err*/ )
+bool AWMetric::evaluate( const MsqMatrix< 2, 2 >& /*A*/, const MsqMatrix< 2, 2 >& /*W*/, double& /*result*/,
+                         MsqError& /*err*/ )
 {
     return false;
 }
 
-bool AWMetric::evaluate( const MsqMatrix< 3, 3 >& /*A*/, const MsqMatrix< 3, 3 >& /*W*/,
-                         double& /*result*/, MsqError& /*err*/ )
+bool AWMetric::evaluate( const MsqMatrix< 3, 3 >& /*A*/, const MsqMatrix< 3, 3 >& /*W*/, double& /*result*/,
+                         MsqError& /*err*/ )
 {
     return false;
 }
 
-bool AWMetric::evaluate_with_grad( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W,
-                                   double& result, MsqMatrix< 2, 2 >& wrt_A, MsqError& err )
+bool AWMetric::evaluate_with_grad( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result,
+                                   MsqMatrix< 2, 2 >& wrt_A, MsqError& err )
 {
     return do_numerical_gradient( this, A, W, result, wrt_A, err );
 }
 
-bool AWMetric::evaluate_with_grad( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >& W,
-                                   double& result, MsqMatrix< 3, 3 >& wrt_A, MsqError& err )
+bool AWMetric::evaluate_with_grad( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >& W, double& result,
+                                   MsqMatrix< 3, 3 >& wrt_A, MsqError& err )
 {
     return do_numerical_gradient( this, A, W, result, wrt_A, err );
 }
 
-bool AWMetric::evaluate_with_hess( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W,
-                                   double& result, MsqMatrix< 2, 2 >& deriv_wrt_A,
-                                   MsqMatrix< 2, 2 > hess_wrt_A[ 3 ], MsqError& err )
+bool AWMetric::evaluate_with_hess( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result,
+                                   MsqMatrix< 2, 2 >& deriv_wrt_A, MsqMatrix< 2, 2 > hess_wrt_A[ 3 ], MsqError& err )
 {
     return do_numerical_hessian( this, A, W, result, deriv_wrt_A, hess_wrt_A, err );
 }
 
-bool AWMetric::evaluate_with_hess( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >& W,
-                                   double& result, MsqMatrix< 3, 3 >& deriv_wrt_A,
-                                   MsqMatrix< 3, 3 > hess_wrt_A[ 6 ], MsqError& err )
+bool AWMetric::evaluate_with_hess( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >& W, double& result,
+                                   MsqMatrix< 3, 3 >& deriv_wrt_A, MsqMatrix< 3, 3 > hess_wrt_A[ 6 ], MsqError& err )
 {
     return do_numerical_hessian( this, A, W, result, deriv_wrt_A, hess_wrt_A, err );
 }
@@ -238,16 +231,14 @@ bool AWMetric::evaluate_with_hess( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 
 AWMetric2D::~AWMetric2D( ) {}
 AWMetric3D::~AWMetric3D( ) {}
 
-bool AWMetric2D::evaluate( const MsqMatrix< 3, 3 >&, const MsqMatrix< 3, 3 >&, double&,
-                           MsqError& err )
+bool AWMetric2D::evaluate( const MsqMatrix< 3, 3 >&, const MsqMatrix< 3, 3 >&, double&, MsqError& err )
 {
     MSQ_SETERR( err )
     ( "2D target metric cannot be evaluated for volume elements", MsqError::UNSUPPORTED_ELEMENT );
     return false;
 }
 
-bool AWMetric3D::evaluate( const MsqMatrix< 2, 2 >&, const MsqMatrix< 2, 2 >&, double&,
-                           MsqError& err )
+bool AWMetric3D::evaluate( const MsqMatrix< 2, 2 >&, const MsqMatrix< 2, 2 >&, double&, MsqError& err )
 {
     MSQ_SETERR( err )
     ( "2D target metric cannot be evaluated for volume elements", MsqError::UNSUPPORTED_ELEMENT );

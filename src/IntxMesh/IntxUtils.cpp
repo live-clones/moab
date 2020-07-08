@@ -37,8 +37,7 @@ namespace moab
 #define CORRTAGNAME "__correspondent"
 #define MAXEDGES 10
 
-int IntxUtils::borderPointsOfXinY2( double* X, int nX, double* Y, int nY, double* P, int* side,
-                                    double epsilon_area )
+int IntxUtils::borderPointsOfXinY2( double* X, int nX, double* Y, int nY, double* P, int* side, double epsilon_area )
 {
     // 2 triangles, 3 corners, is the corner of X in Y?
     // Y must have a positive area
@@ -60,8 +59,7 @@ int IntxUtils::borderPointsOfXinY2( double* X, int nX, double* Y, int nY, double
             int     j1 = ( j + 1 ) % nY;
             double* C = Y + 2 * j1;  // no copy of data
 
-            double area2 = ( B[ 0 ] - A[ 0 ] ) * ( C[ 1 ] - A[ 1 ] ) -
-                           ( C[ 0 ] - A[ 0 ] ) * ( B[ 1 ] - A[ 1 ] );
+            double area2 = ( B[ 0 ] - A[ 0 ] ) * ( C[ 1 ] - A[ 1 ] ) - ( C[ 0 ] - A[ 0 ] ) * ( B[ 1 ] - A[ 1 ] );
             if( area2 < -epsilon_area )
             {
                 inside = 0;
@@ -158,21 +156,18 @@ int IntxUtils::SortAndRemoveDoubles2( double* P, int& nP, double epsilon_1 )
     // test also the last point with the first one (index 0)
     // the first one could be at -PI; last one could be at +PI, according to atan2 span
 
-    double d2 =
-        dist2( P, &P[ 2 * i ] );  // check the first and last points (ordered from -pi to +pi)
+    double d2 = dist2( P, &P[ 2 * i ] );  // check the first and last points (ordered from -pi to +pi)
     if( d2 > epsilon_1 ) { nP = i + 1; }
     else
         nP = i;  // effectively delete the last point (that would have been the same with first)
-    if( nP == 0 )
-        nP =
-            1;  // we should be left with at least one point we already tested if nP is 0 originally
+    if( nP == 0 ) nP = 1;  // we should be left with at least one point we already tested if nP is 0 originally
     return 0;
 }
 
 // the marks will show what edges of blue intersect the red
 
-ErrorCode IntxUtils::EdgeIntersections2( double* blue, int nsBlue, double* red, int nsRed,
-                                         int* markb, int* markr, double* points, int& nPoints )
+ErrorCode IntxUtils::EdgeIntersections2( double* blue, int nsBlue, double* red, int nsRed, int* markb, int* markr,
+                                         double* points, int& nPoints )
 {
     /* EDGEINTERSECTIONS computes edge intersections of two elements
      [P,n]=EdgeIntersections(X,Y) computes for the two given elements  * red
@@ -217,8 +212,7 @@ ErrorCode IntxUtils::EdgeIntersections2( double* blue, int nsBlue, double* red, 
                     for( int k = 0; k < 2; k++ )
                     {
                         points[ 2 * nPoints + k ] =
-                            blue[ 2 * i + k ] +
-                            alfa * ( blue[ 2 * iPlus1 + k ] - blue[ 2 * i + k ] );
+                            blue[ 2 * i + k ] + alfa * ( blue[ 2 * iPlus1 + k ] - blue[ 2 * i + k ] );
                     }
                     markb[ i ] = 1;  // so neighbor number i of blue will be considered too.
                     markr[ j ] = 1;  // this will be used in advancing red around blue quad
@@ -232,9 +226,9 @@ ErrorCode IntxUtils::EdgeIntersections2( double* blue, int nsBlue, double* red, 
 }
 
 // special one, for intersection between rll (constant latitude)  and cs quads
-ErrorCode IntxUtils::EdgeIntxRllCs( double* blue, CartVect* bluec, int* blueEdgeType, int nsBlue,
-                                    double* red, CartVect* redc, int nsRed, int* markb, int* markr,
-                                    int plane, double R, double* points, int& nPoints )
+ErrorCode IntxUtils::EdgeIntxRllCs( double* blue, CartVect* bluec, int* blueEdgeType, int nsBlue, double* red,
+                                    CartVect* redc, int nsRed, int* markb, int* markr, int plane, double R,
+                                    double* points, int& nPoints )
 {
     // if blue edge type is 1, intersect in 3d then project to 2d by gnomonic projection
     // everything else the same (except if there are 2 points resulting, which is rare)
@@ -273,8 +267,7 @@ ErrorCode IntxUtils::EdgeIntxRllCs( double* blue, CartVect* bluec, int* blueEdge
                         for( int k = 0; k < 2; k++ )
                         {
                             points[ 2 * nPoints + k ] =
-                                blue[ 2 * i + k ] +
-                                alfa * ( blue[ 2 * iPlus1 + k ] - blue[ 2 * i + k ] );
+                                blue[ 2 * i + k ] + alfa * ( blue[ 2 * iPlus1 + k ] - blue[ 2 * i + k ] );
                         }
                         markb[ i ] = 1;  // so neighbor number i of blue will be considered too.
                         markr[ j ] = 1;  // this will be used in advancing red around blue quad
@@ -294,11 +287,9 @@ ErrorCode IntxUtils::EdgeIntxRllCs( double* blue, CartVect* bluec, int* blueEdge
                 CartVect& B = redc[ jPlus1 ];
                 int       np = 0;
                 double    E[ 9 ];
-                intersect_great_circle_arc_with_clat_arc( A.array( ), B.array( ), C.array( ),
-                                                          D.array( ), R, E, np );
+                intersect_great_circle_arc_with_clat_arc( A.array( ), B.array( ), C.array( ), D.array( ), R, E, np );
                 if( np == 0 ) continue;
-                if( np >= 2 )
-                { std::cout << "intersection with 2 points :" << A << B << C << D << "\n"; }
+                if( np >= 2 ) { std::cout << "intersection with 2 points :" << A << B << C << D << "\n"; }
                 for( int k = 0; k < np; k++ )
                 {
                     gnomonic_projection( CartVect( E + k * 3 ), R, plane, points[ 2 * nPoints ],
@@ -372,8 +363,7 @@ void IntxUtils::decide_gnomonic_plane( const CartVect& pos, int& plane )
 }
 
 // point on a sphere is projected on one of six planes, decided earlier
-ErrorCode IntxUtils::gnomonic_projection( const CartVect& pos, double R, int plane, double& c1,
-                                          double& c2 )
+ErrorCode IntxUtils::gnomonic_projection( const CartVect& pos, double R, int plane, double& c1, double& c2 )
 {
     double alfa = 1.;  // the new point will be on line alfa*pos
 
@@ -429,8 +419,8 @@ ErrorCode IntxUtils::gnomonic_projection( const CartVect& pos, double R, int pla
 }
 
 // given the position on plane (one out of 6), find out the position on sphere
-ErrorCode IntxUtils::reverse_gnomonic_projection( const double& c1, const double& c2, double R,
-                                                  int plane, CartVect& pos )
+ErrorCode IntxUtils::reverse_gnomonic_projection( const double& c1, const double& c2, double R, int plane,
+                                                  CartVect& pos )
 {
 
     // the new point will be on line beta*pos
@@ -530,8 +520,7 @@ IntxUtils::SphereCoords IntxUtils::cart_to_spherical( CartVect& cart3d )
     }
     res.lat = asin( cart3d[ 2 ] / res.R );
     res.lon = atan2( cart3d[ 1 ], cart3d[ 0 ] );
-    if( res.lon < 0 )
-        res.lon += 2 * M_PI;  // M_PI is defined in math.h? it seems to be true, although
+    if( res.lon < 0 ) res.lon += 2 * M_PI;  // M_PI is defined in math.h? it seems to be true, although
     // there are some defines it depends on :(
     // #if defined __USE_BSD || defined __USE_XOPEN ???
 
@@ -597,9 +586,7 @@ double IntxAreaUtils::spherical_angle( double* A, double* B, double* C, double R
     CartVect c( C );
     double   err1 = a.length_squared( ) - Radius * Radius;
     if( fabs( err1 ) > 0.0001 )
-    {
-        std::cout << " error in input " << a << " radius: " << Radius << " error:" << err1 << "\n";
-    }
+    { std::cout << " error in input " << a << " radius: " << Radius << " error:" << err1 << "\n"; }
     CartVect normalOAB = a * b;
     CartVect normalOCB = c * b;
     return angle( normalOAB, normalOCB );
@@ -659,8 +646,7 @@ double IntxAreaUtils::area_spherical_polygon( double* A, int N, double Radius, i
     }
 }
 
-double IntxAreaUtils::area_spherical_triangle_girard( double* A, double* B, double* C,
-                                                      double Radius )
+double IntxAreaUtils::area_spherical_triangle_girard( double* A, double* B, double* C, double Radius )
 {
     double correction = spherical_angle( A, B, C, Radius ) + spherical_angle( B, C, A, Radius ) +
                         spherical_angle( C, A, B, Radius ) - M_PI;
@@ -775,8 +761,7 @@ double IntxAreaUtils::area_spherical_triangle_GQ( double* ptA, double* ptB, doub
  *
  *  E = 4*atan(sqrt(tan(s/2)*tan((s-a)/2)*tan((s-b)/2)*tan((s-c)/2)))
  */
-double IntxAreaUtils::area_spherical_triangle_lHuiller( double* ptA, double* ptB, double* ptC,
-                                                        double Radius )
+double IntxAreaUtils::area_spherical_triangle_lHuiller( double* ptA, double* ptB, double* ptC, double Radius )
 {
 
     // now, a is angle BOC, O is origin
@@ -876,8 +861,8 @@ double IntxUtils::distance_on_great_circle( CartVect& p1, CartVect& p2 )
     SphereCoords sph1 = cart_to_spherical( p1 );
     SphereCoords sph2 = cart_to_spherical( p2 );
     // radius should be the same
-    return sph1.R * acos( sin( sph1.lon ) * sin( sph2.lon ) +
-                          cos( sph1.lat ) * cos( sph2.lat ) * cos( sph2.lon - sph2.lon ) );
+    return sph1.R *
+           acos( sin( sph1.lon ) * sin( sph2.lon ) + cos( sph1.lat ) * cos( sph2.lat ) * cos( sph2.lon - sph2.lon ) );
 }
 
 // break the nonconvex quads into triangles; remove the quad from the set? yes.
@@ -981,8 +966,7 @@ ErrorCode IntxUtils::enforce_convexity( Interface* mb, EntityHandle lset, int my
                 // break the next triangle, even though not optimal
                 // so create the triangle i+1, i+2, i+3; remove i+2 from original list
                 // even though not optimal in general, it is good enough.
-                EntityHandle conn3[ 3 ] = { verts[ ( i + 1 ) % nsides ],
-                                            verts[ ( i + 2 ) % nsides ],
+                EntityHandle conn3[ 3 ] = { verts[ ( i + 1 ) % nsides ], verts[ ( i + 2 ) % nsides ],
                                             verts[ ( i + 3 ) % nsides ] };
                 // create a polygon with num_nodes-1 vertices, and connectivity
                 // verts[i+1], verts[i+3], (all except i+2)
@@ -1125,8 +1109,7 @@ ErrorCode IntxAreaUtils::positive_orientation( Interface* mb, EntityHandle set, 
             }
             else
             {
-                std::cout << " nonconvex problem first area:" << area << " total area: " << totArea
-                          << std::endl;
+                std::cout << " nonconvex problem first area:" << area << " total area: " << totArea << std::endl;
             }
         }
     }
@@ -1144,8 +1127,7 @@ double IntxUtils::distance_on_sphere( double la1, double te1, double la2, double
  * given 2 great circle arcs, AB and CD, compute the unique intersection point, if it exists
  *  in between
  */
-ErrorCode IntxUtils::intersect_great_circle_arcs( double* A, double* B, double* C, double* D,
-                                                  double R, double* E )
+ErrorCode IntxUtils::intersect_great_circle_arcs( double* A, double* B, double* C, double* D, double R, double* E )
 {
     // first verify A, B, C, D are on the same sphere
     double       R2 = R * R;
@@ -1153,8 +1135,8 @@ ErrorCode IntxUtils::intersect_great_circle_arcs( double* A, double* B, double* 
 
     CartVect a( A ), b( B ), c( C ), d( D );
 
-    if( fabs( a.length_squared( ) - R2 ) + fabs( b.length_squared( ) - R2 ) +
-            fabs( c.length_squared( ) - R2 ) + fabs( d.length_squared( ) - R2 ) >
+    if( fabs( a.length_squared( ) - R2 ) + fabs( b.length_squared( ) - R2 ) + fabs( c.length_squared( ) - R2 ) +
+            fabs( d.length_squared( ) - R2 ) >
         10 * Tolerance )
         return MB_FAILURE;
 
@@ -1232,9 +1214,8 @@ static bool verify( CartVect a, CartVect b, CartVect c, CartVect d, double x, do
     return true;
 }
 
-ErrorCode IntxUtils::intersect_great_circle_arc_with_clat_arc( double* A, double* B, double* C,
-                                                               double* D, double R, double* E,
-                                                               int& np )
+ErrorCode IntxUtils::intersect_great_circle_arc_with_clat_arc( double* A, double* B, double* C, double* D, double R,
+                                                               double* E, int& np )
 {
     const double distTol = R * 1.e-6;
     const double Tolerance = R * R * 1.e-12;  // radius should be 1, usually
@@ -1242,8 +1223,8 @@ ErrorCode IntxUtils::intersect_great_circle_arc_with_clat_arc( double* A, double
     CartVect a( A ), b( B ), c( C ), d( D );
     // check input first
     double R2 = R * R;
-    if( fabs( a.length_squared( ) - R2 ) + fabs( b.length_squared( ) - R2 ) +
-            fabs( c.length_squared( ) - R2 ) + fabs( d.length_squared( ) - R2 ) >
+    if( fabs( a.length_squared( ) - R2 ) + fabs( b.length_squared( ) - R2 ) + fabs( c.length_squared( ) - R2 ) +
+            fabs( d.length_squared( ) - R2 ) >
         10 * Tolerance )
         return MB_FAILURE;
 
@@ -1255,8 +1236,7 @@ ErrorCode IntxUtils::intersect_great_circle_arc_with_clat_arc( double* A, double
     if( fabs( C[ 2 ] - D[ 2 ] ) > distTol )  // cd is not on the same z (constant latitude)
         return MB_FAILURE;
 
-    if( fabs( R - C[ 2 ] ) < distTol || fabs( R + C[ 2 ] ) < distTol )
-        return MB_FAILURE;  // too close to the poles
+    if( fabs( R - C[ 2 ] ) < distTol || fabs( R + C[ 2 ] ) < distTol ) return MB_FAILURE;  // too close to the poles
 
     // find the points on the circle P(teta) = (r*sin(teta), r*cos(teta), C[2]) that are on the
     // great circle arc AB normal to the AB circle:
@@ -1542,9 +1522,8 @@ ErrorCode set_edge_type_flag(Interface * mb, EntityHandle sf1)
 
 // decide in a different metric if the corners of CS quad are
 // in the interior of an RLL quad
-int IntxUtils::borderPointsOfCSinRLL( CartVect* redc, double* red2dc, int nsRed, CartVect* bluec,
-                                      int nsBlue, int* blueEdgeType, double* P, int* side,
-                                      double epsil )
+int IntxUtils::borderPointsOfCSinRLL( CartVect* redc, double* red2dc, int nsRed, CartVect* bluec, int nsBlue,
+                                      int* blueEdgeType, double* P, int* side, double epsil )
 {
     int extraPoints = 0;
     // first decide the blue z coordinates
@@ -1591,8 +1570,7 @@ int IntxUtils::borderPointsOfCSinRLL( CartVect* redc, double* red2dc, int nsRed,
     return extraPoints;
 }
 
-ErrorCode IntxUtils::deep_copy_set_with_quads( Interface* mb, EntityHandle source_set,
-                                               EntityHandle dest_set )
+ErrorCode IntxUtils::deep_copy_set_with_quads( Interface* mb, EntityHandle source_set, EntityHandle dest_set )
 {
     ReadUtilIface* read_iface;
     ErrorCode      rval = mb->query_interface( read_iface );MB_CHK_ERR( rval );
@@ -1600,8 +1578,7 @@ ErrorCode IntxUtils::deep_copy_set_with_quads( Interface* mb, EntityHandle sourc
 
     EntityHandle dum = 0;
     Tag          corrTag = 0;  // it will be created here
-    rval = mb->tag_get_handle( CORRTAGNAME, 1, MB_TYPE_HANDLE, corrTag, MB_TAG_DENSE | MB_TAG_CREAT,
-                               &dum );MB_CHK_ERR( rval );
+    rval = mb->tag_get_handle( CORRTAGNAME, 1, MB_TYPE_HANDLE, corrTag, MB_TAG_DENSE | MB_TAG_CREAT, &dum );MB_CHK_ERR( rval );
 
     // give the same global id to new verts and cells created in the lagr(departure) mesh
     Tag gid = mb->globalId_tag( );

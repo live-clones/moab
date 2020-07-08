@@ -20,8 +20,7 @@ static void usage_error( const char* name )
               << "\t-g           -  Write GNU Plot data file (default)." << std::endl
               << "\t-p           -  Write encapsulated postscript file" << std::endl
               << "\t-s           -  Write an SVG file" << std::endl
-              << "\t<Surface_ID> -  ID of surface containing mesh to export (0 for entire file)."
-              << std::endl
+              << "\t<Surface_ID> -  ID of surface containing mesh to export (0 for entire file)." << std::endl
               << "\t<input_file> -  Mesh file to read." << std::endl
               << std::endl
               << "  This utility plots the mesh of a single geometric surface "
@@ -153,8 +152,8 @@ static void find_rotation( CartVect3D plane_normal, double matrix[ 3 ][ 3 ] )
     const double cosine = plane_normal % Z;
     const double sine = sqrt( 1 - cosine * cosine );
 
-    std::cerr << "Rotation: " << acos( cosine ) << " [" << vector.x << ' ' << vector.y << ' '
-              << vector.z << ']' << std::endl;
+    std::cerr << "Rotation: " << acos( cosine ) << " [" << vector.x << ' ' << vector.y << ' ' << vector.z << ']'
+              << std::endl;
 
     const double x = vector.x;
     const double y = vector.y;
@@ -191,8 +190,7 @@ static void write_gnuplot( std::ostream& stream, const std::vector< CartVect3D >
 
 static void write_svg( std::ostream& stream, const std::vector< CartVect3D >& list );
 
-static void write_eps( std::ostream& stream, const std::vector< CartVect3D >& list,
-                       int surface_id );
+static void write_eps( std::ostream& stream, const std::vector< CartVect3D >& list, int surface_id );
 
 enum FileType
 {
@@ -263,8 +261,7 @@ int main( int argc, char* argv[] )
         moab->get_entities_by_type_and_tag( 0, MBENTITYSET, tags, tag_values, 2, surfaces );
         if( surfaces.size( ) != 1 )
         {
-            std::cerr << "Found " << surfaces.size( ) << " surfaces with ID " << surface_id
-                      << std::endl;
+            std::cerr << "Found " << surfaces.size( ) << " surfaces with ID " << surface_id << std::endl;
             return SURFACE_NOT_FOUND;
         }
         surface = *surfaces.begin( );
@@ -298,8 +295,7 @@ int main( int argc, char* argv[] )
         }
         coords.clear( );
         coords.resize( vertices.size( ) );
-        result = moab->get_coords( &vertices[ 0 ], vertices.size( ),
-                                   reinterpret_cast< double* >( &coords[ 0 ] ) );
+        result = moab->get_coords( &vertices[ 0 ], vertices.size( ), reinterpret_cast< double* >( &coords[ 0 ] ) );
         if( MB_SUCCESS != result )
         {
             std::cerr << "Internal error\n";
@@ -309,8 +305,7 @@ int main( int argc, char* argv[] )
         for( size_t j = 0; j < coords.size( ); ++j )
         {
             CartVect3D v1 = coords[ ( j + 1 ) % coords.size( ) ] - coords[ j ];
-            CartVect3D v2 =
-                coords[ ( j + 1 ) % coords.size( ) ] - coords[ ( j + 2 ) % coords.size( ) ];
+            CartVect3D v2 = coords[ ( j + 1 ) % coords.size( ) ] - coords[ ( j + 2 ) % coords.size( ) ];
             normal += ( v1 * v2 );
         }
     }
@@ -337,8 +332,7 @@ int main( int argc, char* argv[] )
     }
     coords.clear( );
     coords.resize( vertices.size( ) );
-    result = moab->get_coords( &vertices[ 0 ], vertices.size( ),
-                               reinterpret_cast< double* >( &coords[ 0 ] ) );
+    result = moab->get_coords( &vertices[ 0 ], vertices.size( ), reinterpret_cast< double* >( &coords[ 0 ] ) );
     if( MB_SUCCESS != result )
     {
         std::cerr << "Internal error\n";
@@ -349,8 +343,7 @@ int main( int argc, char* argv[] )
     // can be accomplished by discarding the 'z' coordinate of each
     // point.
 
-    std::cerr << "Plane normal: [" << normal.x << ' ' << normal.y << ' ' << normal.z << ']'
-              << std::endl;
+    std::cerr << "Plane normal: [" << normal.x << ' ' << normal.y << ' ' << normal.z << ']' << std::endl;
     double transform[ 3 ][ 3 ];
     find_rotation( normal, transform );
 

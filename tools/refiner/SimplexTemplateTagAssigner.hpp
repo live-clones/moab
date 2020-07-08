@@ -42,8 +42,8 @@ class SimplexTemplateTagAssigner
     SimplexTemplateTagAssigner( SimplexTemplateRefiner* );
     virtual ~SimplexTemplateTagAssigner( );
 
-    virtual void operator( )( const double* c0, const void* t0, EntityHandle h0, const double* cm,
-                              void* tm, const double* c1, const void* t1, EntityHandle h1 );
+    virtual void operator( )( const double* c0, const void* t0, EntityHandle h0, const double* cm, void* tm,
+                              const double* c1, const void* t1, EntityHandle h1 );
     virtual void operator( )( const void* t0, const void* t1, const void* t2, void* tp );
     virtual void set_tag_manager( RefinerTagManager* tmgr );
 

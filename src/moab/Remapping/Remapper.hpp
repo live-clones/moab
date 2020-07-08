@@ -39,8 +39,7 @@ class Remapper
 {
   public:
 #ifdef MOAB_HAVE_MPI
-    Remapper( moab::Interface* mbInt, moab::ParallelComm* pcomm = NULL )
-        : m_interface( mbInt ), m_pcomm( pcomm )
+    Remapper( moab::Interface* mbInt, moab::ParallelComm* pcomm = NULL ) : m_interface( mbInt ), m_pcomm( pcomm )
 #else
     Remapper( moab::Interface* mbInt ) : m_interface( mbInt )
 #endif
@@ -76,8 +75,7 @@ class Remapper
     }
 #endif
 
-    ErrorCode LoadNativeMesh( std::string filename, moab::EntityHandle& meshset,
-                              const char* readopts = 0 )
+    ErrorCode LoadNativeMesh( std::string filename, moab::EntityHandle& meshset, const char* readopts = 0 )
     {
 #ifdef MOAB_HAVE_MPI
         size_t      lastindex = filename.find_last_of( "." );
@@ -86,8 +84,7 @@ class Remapper
         if( m_pcomm->size( ) > 1 )
         {
             if( extension != "h5m" )
-                opts = std::string(
-                    "PARALLEL=BCAST_DELETE;PARTITION=TRIVIAL;PARALLEL_RESOLVE_SHARED_ENTS" );
+                opts = std::string( "PARALLEL=BCAST_DELETE;PARTITION=TRIVIAL;PARALLEL_RESOLVE_SHARED_ENTS" );
             else
                 opts = std::string( "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_"
                                     "RESOLVE_SHARED_ENTS" );
@@ -101,8 +98,7 @@ class Remapper
                 opts = std::string( readopts );
         }
 
-        if( !m_pcomm->rank( ) )
-            std::cout << "Reading file (" << filename << ") with options = [" << opts << "]\n";
+        if( !m_pcomm->rank( ) ) std::cout << "Reading file (" << filename << ") with options = [" << opts << "]\n";
 #else
         const std::string opts = std::string( ( readopts ? readopts : "" ) );
         std::cout << "Reading file (" << filename << ") with options = [" << opts << "]\n";

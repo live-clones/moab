@@ -125,8 +125,7 @@ void pack_unpack_noremoteh( Core& moab, Range& entities )
     buff.reset_ptr( sizeof( int ) );
     std::vector< EntityHandle > entities_vec( entities.size( ) );
     std::copy( entities.begin( ), entities.end( ), entities_vec.begin( ) );
-    rval = pcomm->unpack_buffer( buff.buff_ptr, false, -1, -1, L1hloc, L1hrem, L1p, L2hloc, L2hrem,
-                                 L2p, entities_vec );CHECK_ERR( rval );
+    rval = pcomm->unpack_buffer( buff.buff_ptr, false, -1, -1, L1hloc, L1hrem, L1p, L2hloc, L2hrem, L2p, entities_vec );CHECK_ERR( rval );
     std::copy( entities_vec.begin( ), entities_vec.end( ), range_inserter( entities ) );
 
     delete pcomm;
@@ -138,9 +137,8 @@ void pack_unpack_noremoteh( Core& moab )
 }
 
 /* Utility method -- check expected sizes */
-void check_sizes( Interface& moab, int num_vtx, int num_edge, int num_tri, int num_quad,
-                  int num_polygon, int num_tet, int num_pyr, int num_wedge, int num_knife,
-                  int num_hex, int num_polyhedron )
+void check_sizes( Interface& moab, int num_vtx, int num_edge, int num_tri, int num_quad, int num_polygon, int num_tet,
+                  int num_pyr, int num_wedge, int num_knife, int num_hex, int num_polyhedron )
 {
     int       count;
     ErrorCode rval;
@@ -212,15 +210,13 @@ void create_simple_grid( Interface& moab, unsigned x, unsigned y, unsigned z )
                                                  verts[ idx + x * y + 1 ],
                                                  verts[ idx + x * y + x + 1 ],
                                                  verts[ idx + x * y + x ] };
-                rval = moab.create_element(
-                    MBHEX, conn, 8, elems[ ( x - 1 ) * ( y - 1 ) * k + ( x - 1 ) * j + i ] );CHECK_ERR( rval );
+                rval = moab.create_element( MBHEX, conn, 8, elems[ ( x - 1 ) * ( y - 1 ) * k + ( x - 1 ) * j + i ] );CHECK_ERR( rval );
             }
     delete[] verts;
     delete[] elems;
 }
 
-ErrorCode create_patch( Interface* moab, Range& verts, Range& quads, unsigned int n, double* xyz,
-                        int* gids )
+ErrorCode create_patch( Interface* moab, Range& verts, Range& quads, unsigned int n, double* xyz, int* gids )
 {
     // create vertices/quads in square array
     ErrorCode result = moab->create_vertices( xyz, n * n, verts );
@@ -283,13 +279,11 @@ ErrorCode create_shared_grid_2d( ParallelComm** pc, Range* verts, Range* quads )
         2, 19, 20, 5,  21, 22, 8,  23, 24  // P3
     };
     double xyz[] = {
-        -1.0, 0.0, 0.0,  -0.5, 0.0,  0.0,  0.0,  0.0,  0.0,  -1.0, 0.5, 0.0,  -0.5, 0.5,
-        0.0,  0.0, 0.5,  0.0,  -1.0, 1.0,  0.0,  -0.5, 1.0,  0.0,  0.0, 1.0,  0.0,  // n0-8
-        0.0,  0.0, -0.5, 0.0,  0.0,  -1.0, 0.0,  0.5,  -0.5, 0.0,  0.5, -1.0, 0.0,  1.0,
-        -0.5, 0.0, 1.0,  -1.0,  // n9-14
-        -0.5, 1.0, -0.5, -0.5, 1.0,  -1.0, -1.0, 1.0,  -0.5, -1.0, 1.0, -1.0,  // n15-18
-        0.5,  0.0, 0.0,  1.0,  0.0,  0.0,  0.5,  0.5,  0.0,  1.0,  0.5, 0.0,  0.5,  1.0,
-        0.0,  1.0, 1.0,  0.0,  // n19-24
+        -1.0, 0.0, 0.0,  -0.5, 0.0, 0.0,  0.0,  0.0, 0.0,  -1.0, 0.5, 0.0,  -0.5, 0.5, 0.0,  0.0, 0.5, 0.0,
+        -1.0, 1.0, 0.0,  -0.5, 1.0, 0.0,  0.0,  1.0, 0.0,  // n0-8
+        0.0,  0.0, -0.5, 0.0,  0.0, -1.0, 0.0,  0.5, -0.5, 0.0,  0.5, -1.0, 0.0,  1.0, -0.5, 0.0, 1.0, -1.0,  // n9-14
+        -0.5, 1.0, -0.5, -0.5, 1.0, -1.0, -1.0, 1.0, -0.5, -1.0, 1.0, -1.0,  // n15-18
+        0.5,  0.0, 0.0,  1.0,  0.0, 0.0,  0.5,  0.5, 0.0,  1.0,  0.5, 0.0,  0.5,  1.0, 0.0,  1.0, 1.0, 0.0,  // n19-24
     };
     double xyztmp[ 27 ];
 
@@ -337,9 +331,9 @@ ErrorCode create_shared_grid_3d( ParallelComm** pc, Range* verts, Range* hexes )
     int nijk[ P ][ 3 ];
     int NIJK[ 3 ] = { 0, 0, 0 };
 #define INDEXG( i, j, k ) ( k * NIJK[ 1 ] * NIJK[ 0 ] + j * NIJK[ 0 ] + i )
-#define INDEXL( i, j, k )                                          \
-    ( ( k - ijkmin[ p ][ 2 ] ) * nijk[ p ][ 1 ] * nijk[ p ][ 0 ] + \
-      ( j - ijkmin[ p ][ 1 ] ) * nijk[ p ][ 0 ] + ( i - ijkmin[ p ][ 0 ] ) )
+#define INDEXL( i, j, k )                                                                                      \
+    ( ( k - ijkmin[ p ][ 2 ] ) * nijk[ p ][ 1 ] * nijk[ p ][ 0 ] + ( j - ijkmin[ p ][ 1 ] ) * nijk[ p ][ 0 ] + \
+      ( i - ijkmin[ p ][ 0 ] ) )
 
     int p, i, j, k;
     for( p = 0; p < P; p++ )
@@ -440,8 +434,7 @@ void test_pack_vertices( )
     {
         unsigned j;
         for( j = 0; j < num_verts; ++j )
-            if( coords[ 3 * j ] == coords2[ 3 * i ] &&
-                coords[ 3 * j + 1 ] == coords2[ 3 * i + 1 ] &&
+            if( coords[ 3 * j ] == coords2[ 3 * i ] && coords[ 3 * j + 1 ] == coords2[ 3 * i + 1 ] &&
                 coords[ 3 * j + 2 ] == coords2[ 3 * i + 2 ] )
                 break;
         CHECK( j < num_verts );
@@ -459,9 +452,8 @@ void test_pack_elements( )
     // define some vertices
     const size_t num_verts = 12;
     EntityHandle verts[ num_verts ];
-    const double hex_corners[ 3 * num_verts ] = { -1, -1, -1, 1, -1, -1, 1, 1, -1, -1, 1, -1,
-                                                  -1, -1, 0,  1, -1, 0,  1, 1, 0,  -1, 1, 0,
-                                                  -1, -1, 1,  1, -1, 1,  1, 1, 1,  -1, 1, 1 };
+    const double hex_corners[ 3 * num_verts ] = { -1, -1, -1, 1, -1, -1, 1,  1, -1, -1, 1, -1, -1, -1, 0,  1, -1, 0, 1,
+                                                  1,  0,  -1, 1, 0,  -1, -1, 1, 1,  -1, 1, 1,  1,  1,  -1, 1, 1 };
     for( size_t i = 0; i < num_verts; ++i )
     {
         rval = moab.create_vertex( hex_corners + 3 * i, verts[ i ] );CHECK_ERR( rval );
@@ -569,9 +561,8 @@ void test_pack_elements( )
     CHECK_EQUAL( conn1[ 6 ], conn3[ 2 ] );
     CHECK_EQUAL( conn1[ 7 ], conn3[ 3 ] );
     // Check coordinates
-    const EntityHandle combined[ 12 ] = { conn1[ 0 ], conn1[ 1 ], conn1[ 2 ], conn1[ 3 ],
-                                          conn3[ 0 ], conn3[ 1 ], conn3[ 2 ], conn3[ 3 ],
-                                          conn2[ 4 ], conn2[ 5 ], conn2[ 6 ], conn2[ 7 ] };
+    const EntityHandle combined[ 12 ] = { conn1[ 0 ], conn1[ 1 ], conn1[ 2 ], conn1[ 3 ], conn3[ 0 ], conn3[ 1 ],
+                                          conn3[ 2 ], conn3[ 3 ], conn2[ 4 ], conn2[ 5 ], conn2[ 6 ], conn2[ 7 ] };
     double             coords[ 36 ];
     rval = moab.get_coords( combined, 12, coords );CHECK_ERR( rval );
     for( int i = 0; i < 36; ++i )
@@ -589,9 +580,9 @@ void test_pack_higher_order( )
     // define coordinates for a pyramid decomposed
     // into two 10-node tets
     const size_t num_vert = 14;
-    const double coords[ 3 * num_vert ] = {
-        -1, -1, 0, 0, -1, 0, 1, -1, 0, 1,   0,   0,  1,  1,   0,  0,  1,  0,  -1,  1,  0,
-        -1, 0,  0, 0, 0,  0, 0, 0,  1, -.5, -.5, .5, .5, -.5, .5, .5, .5, .5, -.5, .5, .5 };
+    const double coords[ 3 * num_vert ] = { -1, -1, 0,   0,   -1, 0,  1,   -1, 0,  1,  0,  0,   1,  1,
+                                            0,  0,  1,   0,   -1, 1,  0,   -1, 0,  0,  0,  0,   0,  0,
+                                            0,  1,  -.5, -.5, .5, .5, -.5, .5, .5, .5, .5, -.5, .5, .5 };
     EntityHandle verts[ num_vert ];
     for( size_t i = 0; i < num_vert; ++i )
     {
@@ -600,11 +591,10 @@ void test_pack_higher_order( )
 
     // define two tets
     const size_t num_tet = 2;
-    EntityHandle tet_conn[ 2 ][ 10 ] = {
-        { verts[ 0 ], verts[ 4 ], verts[ 9 ], verts[ 2 ], verts[ 8 ], verts[ 12 ], verts[ 10 ],
-          verts[ 1 ], verts[ 3 ], verts[ 11 ] },
-        { verts[ 0 ], verts[ 9 ], verts[ 4 ], verts[ 6 ], verts[ 10 ], verts[ 12 ], verts[ 8 ],
-          verts[ 7 ], verts[ 13 ], verts[ 5 ] } };
+    EntityHandle tet_conn[ 2 ][ 10 ] = { { verts[ 0 ], verts[ 4 ], verts[ 9 ], verts[ 2 ], verts[ 8 ], verts[ 12 ],
+                                           verts[ 10 ], verts[ 1 ], verts[ 3 ], verts[ 11 ] },
+                                         { verts[ 0 ], verts[ 9 ], verts[ 4 ], verts[ 6 ], verts[ 10 ], verts[ 12 ],
+                                           verts[ 8 ], verts[ 7 ], verts[ 13 ], verts[ 5 ] } };
 
     EntityHandle tets[ num_tet ];
     rval = moab.create_element( MBTET, tet_conn[ 0 ], 10, tets[ 0 ] );CHECK_ERR( rval );
@@ -614,8 +604,7 @@ void test_pack_higher_order( )
 
     // define interior tri face
     const size_t num_tri = 1;
-    EntityHandle tri_conn[ 6 ] = { verts[ 0 ], verts[ 4 ],  verts[ 9 ],
-                                   verts[ 8 ], verts[ 12 ], verts[ 10 ] };
+    EntityHandle tri_conn[ 6 ] = { verts[ 0 ], verts[ 4 ], verts[ 9 ], verts[ 8 ], verts[ 12 ], verts[ 10 ] };
     EntityHandle tri;
     rval = moab.create_element( MBTRI, tri_conn, 6, tri );CHECK_ERR( rval );
     elems.insert( tri );
@@ -662,10 +651,10 @@ void test_pack_higher_order( )
     CHECK_EQUAL( conn1[ 6 ], conn3[ 5 ] );
 
     // order vertex handles corresponding to original coordinate list
-    const EntityHandle combined[ num_vert ] = {
-        conn1[ 0 ], conn1[ 7 ], conn1[ 3 ], conn1[ 8 ], conn1[ 1 ], conn2[ 9 ], conn2[ 3 ],
-        conn2[ 7 ], conn1[ 4 ], conn1[ 2 ], conn1[ 6 ], conn1[ 9 ], conn1[ 5 ], conn2[ 8 ] };
-    double coords2[ 3 * num_vert ];
+    const EntityHandle combined[ num_vert ] = { conn1[ 0 ], conn1[ 7 ], conn1[ 3 ], conn1[ 8 ], conn1[ 1 ],
+                                                conn2[ 9 ], conn2[ 3 ], conn2[ 7 ], conn1[ 4 ], conn1[ 2 ],
+                                                conn1[ 6 ], conn1[ 9 ], conn1[ 5 ], conn2[ 8 ] };
+    double             coords2[ 3 * num_vert ];
     rval = moab.get_coords( combined, num_vert, coords2 );CHECK_ERR( rval );
 
     // check vertex coordinates
@@ -703,8 +692,7 @@ void test_pack_poly( )
     EntityHandle tri[ num_tri ];
     for( size_t i = 0; i < num_tri; ++i )
     {
-        const EntityHandle conn[ 3 ] = { verts[ i ], verts[ ( i + 1 ) % num_tri ],
-                                         verts[ num_tri ] };
+        const EntityHandle conn[ 3 ] = { verts[ i ], verts[ ( i + 1 ) % num_tri ], verts[ num_tri ] };
         rval = moab.create_element( MBTRI, conn, 3, tri[ i ] );CHECK_ERR( rval );
     }
 
@@ -793,9 +781,8 @@ void test_pack_sets_simple( )
     // 4) one with a single vertex,
     // 5) an empty set,
     EntityHandle       all_set, half1_set, half2_set, vertex_set, empty_set;
-    const unsigned int all_opt = MESHSET_SET | MESHSET_TRACK_OWNER, half1_opt = MESHSET_SET,
-                       half2_opt = MESHSET_SET, vertex_opt = MESHSET_ORDERED,
-                       empty_opt = MESHSET_ORDERED | MESHSET_TRACK_OWNER;
+    const unsigned int all_opt = MESHSET_SET | MESHSET_TRACK_OWNER, half1_opt = MESHSET_SET, half2_opt = MESHSET_SET,
+                       vertex_opt = MESHSET_ORDERED, empty_opt = MESHSET_ORDERED | MESHSET_TRACK_OWNER;
     rval = moab.create_meshset( all_opt, all_set );CHECK_ERR( rval );
     entities.insert( all_set );
     rval = moab.create_meshset( half1_opt, half1_set );CHECK_ERR( rval );
@@ -1114,8 +1101,8 @@ void test_pack_tag_data_sparse( )
     // coordinates of the first vertex in the elements connectivity list.
     const char sparse_2_int_tag_name[] = "test tag 1";
     Tag        sparse_2_int_tag;
-    rval = mb.tag_get_handle( sparse_2_int_tag_name, 2, MB_TYPE_INTEGER, sparse_2_int_tag,
-                              MB_TAG_SPARSE | MB_TAG_CREAT );CHECK_ERR( rval );
+    rval =
+        mb.tag_get_handle( sparse_2_int_tag_name, 2, MB_TYPE_INTEGER, sparse_2_int_tag, MB_TAG_SPARSE | MB_TAG_CREAT );CHECK_ERR( rval );
     bool skip = false;
     for( i = elems.begin( ); i != elems.end( ); ++i, skip = !skip )
     {
@@ -1187,14 +1174,13 @@ void test_pack_tag_data_dense( )
     // in this tag.
     const char dense_1_double_tag_name[] = "test tag 2";
     Tag        dense_1_double_tag;
-    rval = mb.tag_get_handle( dense_1_double_tag_name, 1, MB_TYPE_DOUBLE, dense_1_double_tag,
-                              MB_TAG_DENSE | MB_TAG_EXCL );CHECK_ERR( rval );
+    rval =
+        mb.tag_get_handle( dense_1_double_tag_name, 1, MB_TYPE_DOUBLE, dense_1_double_tag, MB_TAG_DENSE | MB_TAG_EXCL );CHECK_ERR( rval );
     for( i = verts.begin( ); i != verts.end( ); ++i )
     {
         double coords[ 3 ];
         rval = mb.get_coords( &*i, 1, coords );CHECK_ERR( rval );
-        double val = sqrt( coords[ 0 ] * coords[ 0 ] + coords[ 1 ] * coords[ 1 ] +
-                           coords[ 2 ] * coords[ 2 ] );
+        double val = sqrt( coords[ 0 ] * coords[ 0 ] + coords[ 1 ] * coords[ 1 ] + coords[ 2 ] * coords[ 2 ] );
         rval = mb.tag_set_data( dense_1_double_tag, &*i, 1, &val );CHECK_ERR( rval );
     }
 
@@ -1222,8 +1208,8 @@ void test_pack_tag_data_dense( )
         double coords[ 3 ];
         rval = mb.get_coords( &*i, 1, coords );CHECK_ERR( rval );
 
-        const double expected = sqrt( coords[ 0 ] * coords[ 0 ] + coords[ 1 ] * coords[ 1 ] +
-                                      coords[ 2 ] * coords[ 2 ] );
+        const double expected =
+            sqrt( coords[ 0 ] * coords[ 0 ] + coords[ 1 ] * coords[ 1 ] + coords[ 2 ] * coords[ 2 ] );
         rval = mb.tag_get_data( dense_1_double_tag, &*i, 1, &dval );CHECK_ERR( rval );
         CHECK_REAL_EQUAL( expected, dval, 1e-6 );
     }
@@ -1404,8 +1390,8 @@ void test_pack_variable_length_tag( )
     const int   defval_size = 5;
     const int   default_val[ defval_size ] = { 0xBEEF, 0xFEED, 0xDEAD, 0xBAD, 0xBEAD };
     Tag         tag;
-    rval = mb.tag_get_handle( tag_name, defval_size, MB_TYPE_INTEGER, tag,
-                              MB_TAG_DENSE | MB_TAG_VARLEN | MB_TAG_EXCL, default_val );CHECK_ERR( rval );
+    rval = mb.tag_get_handle( tag_name, defval_size, MB_TYPE_INTEGER, tag, MB_TAG_DENSE | MB_TAG_VARLEN | MB_TAG_EXCL,
+                              default_val );CHECK_ERR( rval );
 
     // for each vertex, store in the tag an integer between 1 and 3,
     // followed by the floor of the cooresponding number of vertex
@@ -1490,8 +1476,7 @@ void test_pack_tag_handle_data( )
     const char*  tag_name = "entity tag";
     EntityHandle default_val[ 8 ] = { 0, 0, 0, 0, 0, 0, 0, 0 };
     Tag          tag;
-    rval = mb.tag_get_handle( tag_name, 8, MB_TYPE_HANDLE, tag, MB_TAG_SPARSE | MB_TAG_EXCL,
-                              &default_val );CHECK_ERR( rval );
+    rval = mb.tag_get_handle( tag_name, 8, MB_TYPE_HANDLE, tag, MB_TAG_SPARSE | MB_TAG_EXCL, &default_val );CHECK_ERR( rval );
 
     // Store on each vertex the handles of the adjacent hexes, padded
     // with NULL handles.
@@ -1581,8 +1566,8 @@ void test_pack_tag_handle_data( )
     }
 }
 
-ErrorCode get_entities( Interface* mb, std::vector< EntityHandle >& ent_verts, int verts_per_entity,
-                        int dim, Range& ents )
+ErrorCode get_entities( Interface* mb, std::vector< EntityHandle >& ent_verts, int verts_per_entity, int dim,
+                        Range& ents )
 {
     assert( !( ent_verts.size( ) % verts_per_entity ) );
     unsigned int num_ents = ent_verts.size( ) / verts_per_entity;
@@ -1590,8 +1575,7 @@ ErrorCode get_entities( Interface* mb, std::vector< EntityHandle >& ent_verts, i
     ErrorCode    result;
     for( unsigned int i = 0; i < num_ents; i++ )
     {
-        result = mb->get_adjacencies( &ent_verts[ verts_per_entity * i ], verts_per_entity, dim,
-                                      true, dum_ents );CHECK_ERR( result );
+        result = mb->get_adjacencies( &ent_verts[ verts_per_entity * i ], verts_per_entity, dim, true, dum_ents );CHECK_ERR( result );
         assert( dum_ents.size( ) == 1 );
         ents.merge( dum_ents );
         dum_ents.clear( );
@@ -1695,15 +1679,13 @@ void test_filter_pstatus( )
     pvals[ 2 ] = ( PSTATUS_INTERFACE | PSTATUS_SHARED | PSTATUS_MULTISHARED );  // p0, p1
     rval = moab.tag_set_data( pcomm->sharedps_tag( ), &verts[ 2 ], 1, &procs[ 0 ] );CHECK_ERR( rval );
     // interface, multi-shared, not owned
-    pvals[ 3 ] =
-        ( PSTATUS_INTERFACE | PSTATUS_MULTISHARED | PSTATUS_NOT_OWNED | PSTATUS_SHARED );  // p1, p2
+    pvals[ 3 ] = ( PSTATUS_INTERFACE | PSTATUS_MULTISHARED | PSTATUS_NOT_OWNED | PSTATUS_SHARED );  // p1, p2
     rval = moab.tag_set_data( pcomm->sharedps_tag( ), &verts[ 3 ], 1, &procs[ 1 ] );CHECK_ERR( rval );
     // ghost, shared
     pvals[ 4 ] = ( PSTATUS_GHOST | PSTATUS_SHARED | PSTATUS_NOT_OWNED );  // p2
     rval = moab.tag_set_data( pcomm->sharedp_tag( ), &verts[ 4 ], 1, &procs[ 2 ] );CHECK_ERR( rval );
     // ghost, multi-shared
-    pvals[ 5 ] =
-        ( PSTATUS_GHOST | PSTATUS_MULTISHARED | PSTATUS_NOT_OWNED | PSTATUS_SHARED );  // p2, p3
+    pvals[ 5 ] = ( PSTATUS_GHOST | PSTATUS_MULTISHARED | PSTATUS_NOT_OWNED | PSTATUS_SHARED );  // p2, p3
     rval = moab.tag_set_data( pcomm->sharedps_tag( ), &verts[ 5 ], 1, &procs[ 2 ] );CHECK_ERR( rval );
     // owned, shared
     pvals[ 6 ] = ( PSTATUS_SHARED );  // p4
@@ -1720,23 +1702,19 @@ void test_filter_pstatus( )
 
     // interface ents
     rval = pcomm->filter_pstatus( tmp_range, PSTATUS_INTERFACE, PSTATUS_AND );CHECK_ERR( rval );
-    CHECK( tmp_range.size( ) == 4 && *tmp_range.begin( ) == verts[ 0 ] &&
-           *tmp_range.rbegin( ) == verts[ 3 ] );
+    CHECK( tmp_range.size( ) == 4 && *tmp_range.begin( ) == verts[ 0 ] && *tmp_range.rbegin( ) == verts[ 3 ] );
     // not interface
     tmp_range = vertsr;
     rval = pcomm->filter_pstatus( tmp_range, PSTATUS_INTERFACE, PSTATUS_NOT );CHECK_ERR( rval );
-    CHECK( tmp_range.size( ) == 5 && *tmp_range.begin( ) == verts[ 4 ] &&
-           *tmp_range.rbegin( ) == verts[ 8 ] );
+    CHECK( tmp_range.size( ) == 5 && *tmp_range.begin( ) == verts[ 4 ] && *tmp_range.rbegin( ) == verts[ 8 ] );
     // interface not owned
     tmp_range = vertsr;
     rval = pcomm->filter_pstatus( tmp_range, PSTATUS_INTERFACE | PSTATUS_NOT_OWNED, PSTATUS_AND );CHECK_ERR( rval );
-    CHECK( tmp_range.size( ) == 2 && *tmp_range.begin( ) == verts[ 1 ] &&
-           *tmp_range.rbegin( ) == verts[ 3 ] );
+    CHECK( tmp_range.size( ) == 2 && *tmp_range.begin( ) == verts[ 1 ] && *tmp_range.rbegin( ) == verts[ 3 ] );
     // ghost
     tmp_range = vertsr;
     rval = pcomm->filter_pstatus( tmp_range, PSTATUS_GHOST, PSTATUS_AND );CHECK_ERR( rval );
-    CHECK( tmp_range.size( ) == 2 && *tmp_range.begin( ) == verts[ 4 ] &&
-           *tmp_range.rbegin( ) == verts[ 5 ] );
+    CHECK( tmp_range.size( ) == 2 && *tmp_range.begin( ) == verts[ 4 ] && *tmp_range.rbegin( ) == verts[ 5 ] );
     // shared not multi-shared
     tmp_range = vertsr;
     rval = pcomm->filter_pstatus( tmp_range, PSTATUS_SHARED, PSTATUS_AND );CHECK_ERR( rval );
@@ -1764,9 +1742,8 @@ void test_new_pcomm_instance( )
 
     // This parallel read will create a ParallelComm instance implicitly
     std::string example = TestDir + "/64bricks_1khex.h5m";
-    std::string read_options =
-        "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_SHARED_ENTS";
-    ErrorCode rval = mb.load_file( example.c_str( ), 0, read_options.c_str( ) );CHECK_ERR( rval );
+    std::string read_options = "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_SHARED_ENTS";
+    ErrorCode   rval = mb.load_file( example.c_str( ), 0, read_options.c_str( ) );CHECK_ERR( rval );
 
     // It is highly recommended to reuse existing ParallelComm instance with
     // ParallelComm::get_pcomm() Creating a new ParallelComm instance should still be allowed,

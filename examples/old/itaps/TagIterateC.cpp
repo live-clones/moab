@@ -44,12 +44,10 @@ int main( int argc, char* argv[] )
     iMesh_getNumOfType( mesh, root_set, iBase_REGION, &num_regions, &err );CHKERR( err, "Failed to get number of regions." );
 
     /* get an iterator to all regions in the model */
-    iMesh_initEntArrIter( mesh, root_set, iBase_REGION, iMesh_ALL_TOPOLOGIES, num_regions, 0, &iter,
-                          &err );CHKERR( err, "Failed to create iterator over regions." );
+    iMesh_initEntArrIter( mesh, root_set, iBase_REGION, iMesh_ALL_TOPOLOGIES, num_regions, 0, &iter, &err );CHKERR( err, "Failed to create iterator over regions." );
 
     /* create a tag to put on the regions */
-    iMesh_createTagWithOptions( mesh, "dumtag",
-                                "moab:TAG_STORAGE_TYPE=DENSE moab:TAG_DEFAULT_VALUE=0.0", 1,
+    iMesh_createTagWithOptions( mesh, "dumtag", "moab:TAG_STORAGE_TYPE=DENSE moab:TAG_DEFAULT_VALUE=0.0", 1,
                                 iBase_DOUBLE, &tagh, &err, 6, 54 );CHKERR( err, "Failed to create a tag.\n" );
 
     atend = 0;

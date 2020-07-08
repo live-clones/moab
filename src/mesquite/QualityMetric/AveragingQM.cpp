@@ -46,9 +46,8 @@
 namespace MBMesquite
 {
 
-double AveragingQM::average_corner_gradients( EntityTopology type, uint32_t fixed_vertices,
-                                              unsigned num_corner, double corner_values[],
-                                              const Vector3D corner_grads[],
+double AveragingQM::average_corner_gradients( EntityTopology type, uint32_t fixed_vertices, unsigned num_corner,
+                                              double corner_values[], const Vector3D corner_grads[],
                                               Vector3D vertex_grads[], MsqError& err )
 {
     const unsigned num_vertex = TopologyInfo::corners( type );
@@ -135,10 +134,9 @@ class CornerHessDiagIterator
 };
 
 template< typename HessIter >
-static inline double
-    sum_corner_diagonals( EntityTopology type, unsigned num_corner, const double corner_values[],
-                          const Vector3D corner_grads[], HessIter corner_diag_blocks,
-                          Vector3D vertex_grads[], SymMatrix3D vertex_hessians[] )
+static inline double sum_corner_diagonals( EntityTopology type, unsigned num_corner, const double corner_values[],
+                                           const Vector3D corner_grads[], HessIter corner_diag_blocks,
+                                           Vector3D vertex_grads[], SymMatrix3D vertex_hessians[] )
 {
     unsigned        i, n, r, R, idx[ 4 ];
     const unsigned* adj_list;
@@ -171,11 +169,9 @@ static inline double
 }
 
 template< typename HessIter >
-static inline double sum_sqr_corner_diagonals( EntityTopology type, unsigned num_corner,
-                                               const double   corner_values[],
-                                               const Vector3D corner_grads[],
-                                               HessIter corner_diag_blocks, Vector3D vertex_grads[],
-                                               SymMatrix3D vertex_hessians[] )
+static inline double sum_sqr_corner_diagonals( EntityTopology type, unsigned num_corner, const double corner_values[],
+                                               const Vector3D corner_grads[], HessIter corner_diag_blocks,
+                                               Vector3D vertex_grads[], SymMatrix3D vertex_hessians[] )
 {
     unsigned        i, n, r, R, idx[ 4 ];
     const unsigned* adj_list;
@@ -211,10 +207,9 @@ static inline double sum_sqr_corner_diagonals( EntityTopology type, unsigned num
 }
 
 template< typename HessIter >
-static inline double
-    pmean_corner_diagonals( EntityTopology type, unsigned num_corner, const double corner_values[],
-                            const Vector3D corner_grads[], HessIter corner_diag_blocks,
-                            Vector3D vertex_grads[], SymMatrix3D vertex_hessians[], double p )
+static inline double pmean_corner_diagonals( EntityTopology type, unsigned num_corner, const double corner_values[],
+                                             const Vector3D corner_grads[], HessIter corner_diag_blocks,
+                                             Vector3D vertex_grads[], SymMatrix3D vertex_hessians[], double p )
 {
     const unsigned  N = TopologyInfo::corners( type );
     unsigned        i, n, r, R, idx[ 4 ];
@@ -271,12 +266,10 @@ static inline double
 }
 
 template< typename HessIter >
-static inline double average_corner_diagonals( EntityTopology                 type,
-                                               QualityMetric::AveragingMethod method,
+static inline double average_corner_diagonals( EntityTopology type, QualityMetric::AveragingMethod method,
                                                unsigned num_corner, const double corner_values[],
-                                               const Vector3D corner_grads[],
-                                               HessIter corner_diag_blocks, Vector3D vertex_grads[],
-                                               SymMatrix3D vertex_hessians[], MsqError& err )
+                                               const Vector3D corner_grads[], HessIter corner_diag_blocks,
+                                               Vector3D vertex_grads[], SymMatrix3D vertex_hessians[], MsqError& err )
 {
     unsigned i;
     double   avg, inv;
@@ -292,13 +285,13 @@ static inline double average_corner_diagonals( EntityTopology                 ty
     switch( method )
     {
         case QualityMetric::SUM:
-            avg = sum_corner_diagonals( type, num_corner, corner_values, corner_grads,
-                                        corner_diag_blocks, vertex_grads, vertex_hessians );
+            avg = sum_corner_diagonals( type, num_corner, corner_values, corner_grads, corner_diag_blocks, vertex_grads,
+                                        vertex_hessians );
             break;
 
         case QualityMetric::LINEAR:
-            avg = sum_corner_diagonals( type, num_corner, corner_values, corner_grads,
-                                        corner_diag_blocks, vertex_grads, vertex_hessians );
+            avg = sum_corner_diagonals( type, num_corner, corner_values, corner_grads, corner_diag_blocks, vertex_grads,
+                                        vertex_hessians );
             inv = 1.0 / num_corner;
             avg *= inv;
             for( i = 0; i < num_vertex; ++i )
@@ -309,23 +302,23 @@ static inline double average_corner_diagonals( EntityTopology                 ty
             break;
 
         case QualityMetric::SUM_SQUARED:
-            avg = sum_sqr_corner_diagonals( type, num_corner, corner_values, corner_grads,
-                                            corner_diag_blocks, vertex_grads, vertex_hessians );
+            avg = sum_sqr_corner_diagonals( type, num_corner, corner_values, corner_grads, corner_diag_blocks,
+                                            vertex_grads, vertex_hessians );
             break;
 
         case QualityMetric::RMS:
-            avg = pmean_corner_diagonals( type, num_corner, corner_values, corner_grads,
-                                          corner_diag_blocks, vertex_grads, vertex_hessians, 2.0 );
+            avg = pmean_corner_diagonals( type, num_corner, corner_values, corner_grads, corner_diag_blocks,
+                                          vertex_grads, vertex_hessians, 2.0 );
             break;
 
         case QualityMetric::HARMONIC:
-            avg = pmean_corner_diagonals( type, num_corner, corner_values, corner_grads,
-                                          corner_diag_blocks, vertex_grads, vertex_hessians, -1.0 );
+            avg = pmean_corner_diagonals( type, num_corner, corner_values, corner_grads, corner_diag_blocks,
+                                          vertex_grads, vertex_hessians, -1.0 );
             break;
 
         case QualityMetric::HMS:
-            avg = pmean_corner_diagonals( type, num_corner, corner_values, corner_grads,
-                                          corner_diag_blocks, vertex_grads, vertex_hessians, -2.0 );
+            avg = pmean_corner_diagonals( type, num_corner, corner_values, corner_grads, corner_diag_blocks,
+                                          vertex_grads, vertex_hessians, -2.0 );
             break;
 
         default:
@@ -336,32 +329,28 @@ static inline double average_corner_diagonals( EntityTopology                 ty
     return avg;
 }
 
-double AveragingQM::average_corner_hessian_diagonals(
-    EntityTopology element_type, uint32_t, unsigned num_corners, const double corner_values[],
-    const Vector3D corner_grads[], const Matrix3D corner_hessians[], Vector3D vertex_grads[],
-    SymMatrix3D vertex_hessians[], MsqError& err )
+double AveragingQM::average_corner_hessian_diagonals( EntityTopology element_type, uint32_t, unsigned num_corners,
+                                                      const double corner_values[], const Vector3D corner_grads[],
+                                                      const Matrix3D corner_hessians[], Vector3D vertex_grads[],
+                                                      SymMatrix3D vertex_hessians[], MsqError& err )
 {
-    return average_corner_diagonals( element_type, avgMethod, num_corners, corner_values,
-                                     corner_grads,
-                                     CornerHessDiagIterator( corner_hessians, element_type ),
-                                     vertex_grads, vertex_hessians, err );
+    return average_corner_diagonals( element_type, avgMethod, num_corners, corner_values, corner_grads,
+                                     CornerHessDiagIterator( corner_hessians, element_type ), vertex_grads,
+                                     vertex_hessians, err );
 }
 
-double AveragingQM::average_corner_hessian_diagonals(
-    EntityTopology element_type, uint32_t, unsigned num_corners, const double corner_values[],
-    const Vector3D corner_grads[], const SymMatrix3D corner_hess_diag[], Vector3D vertex_grads[],
-    SymMatrix3D vertex_hessians[], MsqError& err )
+double AveragingQM::average_corner_hessian_diagonals( EntityTopology element_type, uint32_t, unsigned num_corners,
+                                                      const double corner_values[], const Vector3D corner_grads[],
+                                                      const SymMatrix3D corner_hess_diag[], Vector3D vertex_grads[],
+                                                      SymMatrix3D vertex_hessians[], MsqError& err )
 {
-    return average_corner_diagonals( element_type, avgMethod, num_corners, corner_values,
-                                     corner_grads, corner_hess_diag, vertex_grads, vertex_hessians,
-                                     err );
+    return average_corner_diagonals( element_type, avgMethod, num_corners, corner_values, corner_grads,
+                                     corner_hess_diag, vertex_grads, vertex_hessians, err );
 }
 
-static inline double sum_corner_hessians( EntityTopology type, unsigned num_corner,
-                                          const double   corner_values[],
-                                          const Vector3D corner_grads[],
-                                          const Matrix3D corner_hessians[], Vector3D vertex_grads[],
-                                          Matrix3D vertex_hessians[] )
+static inline double sum_corner_hessians( EntityTopology type, unsigned num_corner, const double corner_values[],
+                                          const Vector3D corner_grads[], const Matrix3D corner_hessians[],
+                                          Vector3D vertex_grads[], Matrix3D vertex_hessians[] )
 {
     const unsigned  N = TopologyInfo::corners( type );
     unsigned        i, n, r, c, R, C, idx[ 4 ];
@@ -401,10 +390,8 @@ static inline double sum_corner_hessians( EntityTopology type, unsigned num_corn
     return avg;
 }
 
-static inline double sum_sqr_corner_hessians( EntityTopology type, unsigned num_corner,
-                                              const double   corner_values[],
-                                              const Vector3D corner_grads[],
-                                              const Matrix3D corner_hessians[],
+static inline double sum_sqr_corner_hessians( EntityTopology type, unsigned num_corner, const double corner_values[],
+                                              const Vector3D corner_grads[], const Matrix3D corner_hessians[],
                                               Vector3D vertex_grads[], Matrix3D vertex_hessians[] )
 {
     const unsigned  N = TopologyInfo::corners( type );
@@ -450,10 +437,9 @@ static inline double sum_sqr_corner_hessians( EntityTopology type, unsigned num_
     return avg;
 }
 
-static inline double
-    pmean_corner_hessians( EntityTopology type, unsigned num_corner, const double corner_values[],
-                           const Vector3D corner_grads[], const Matrix3D corner_hessians[],
-                           Vector3D vertex_grads[], Matrix3D vertex_hessians[], double p )
+static inline double pmean_corner_hessians( EntityTopology type, unsigned num_corner, const double corner_values[],
+                                            const Vector3D corner_grads[], const Matrix3D corner_hessians[],
+                                            Vector3D vertex_grads[], Matrix3D vertex_hessians[], double p )
 {
     const unsigned  N = TopologyInfo::corners( type );
     unsigned        i, n, r, c, R, C, idx[ 4 ];
@@ -526,11 +512,9 @@ static inline double
 }
 
 double AveragingQM::average_corner_hessians( EntityTopology type, uint32_t, unsigned num_corner,
-                                             const double   corner_values[],
-                                             const Vector3D corner_grads[],
-                                             const Matrix3D corner_hessians[],
-                                             Vector3D vertex_grads[], Matrix3D vertex_hessians[],
-                                             MsqError& err )
+                                             const double corner_values[], const Vector3D corner_grads[],
+                                             const Matrix3D corner_hessians[], Vector3D vertex_grads[],
+                                             Matrix3D vertex_hessians[], MsqError& err )
 {
     unsigned i;
     double   avg, inv;
@@ -546,13 +530,13 @@ double AveragingQM::average_corner_hessians( EntityTopology type, uint32_t, unsi
     switch( avgMethod )
     {
         case QualityMetric::SUM:
-            avg = sum_corner_hessians( type, num_corner, corner_values, corner_grads,
-                                       corner_hessians, vertex_grads, vertex_hessians );
+            avg = sum_corner_hessians( type, num_corner, corner_values, corner_grads, corner_hessians, vertex_grads,
+                                       vertex_hessians );
             break;
 
         case QualityMetric::LINEAR:
-            avg = sum_corner_hessians( type, num_corner, corner_values, corner_grads,
-                                       corner_hessians, vertex_grads, vertex_hessians );
+            avg = sum_corner_hessians( type, num_corner, corner_values, corner_grads, corner_hessians, vertex_grads,
+                                       vertex_hessians );
             inv = 1.0 / num_corner;
             avg *= inv;
             for( i = 0; i < num_vertex; ++i )
@@ -562,23 +546,23 @@ double AveragingQM::average_corner_hessians( EntityTopology type, uint32_t, unsi
             break;
 
         case QualityMetric::SUM_SQUARED:
-            avg = sum_sqr_corner_hessians( type, num_corner, corner_values, corner_grads,
-                                           corner_hessians, vertex_grads, vertex_hessians );
+            avg = sum_sqr_corner_hessians( type, num_corner, corner_values, corner_grads, corner_hessians, vertex_grads,
+                                           vertex_hessians );
             break;
 
         case QualityMetric::RMS:
-            avg = pmean_corner_hessians( type, num_corner, corner_values, corner_grads,
-                                         corner_hessians, vertex_grads, vertex_hessians, 2.0 );
+            avg = pmean_corner_hessians( type, num_corner, corner_values, corner_grads, corner_hessians, vertex_grads,
+                                         vertex_hessians, 2.0 );
             break;
 
         case QualityMetric::HARMONIC:
-            avg = pmean_corner_hessians( type, num_corner, corner_values, corner_grads,
-                                         corner_hessians, vertex_grads, vertex_hessians, -1.0 );
+            avg = pmean_corner_hessians( type, num_corner, corner_values, corner_grads, corner_hessians, vertex_grads,
+                                         vertex_hessians, -1.0 );
             break;
 
         case QualityMetric::HMS:
-            avg = pmean_corner_hessians( type, num_corner, corner_values, corner_grads,
-                                         corner_hessians, vertex_grads, vertex_hessians, -2.0 );
+            avg = pmean_corner_hessians( type, num_corner, corner_values, corner_grads, corner_hessians, vertex_grads,
+                                         vertex_hessians, -2.0 );
             break;
 
         default:
@@ -896,8 +880,8 @@ double AveragingQM::average_metrics( const double metric_values[], int num_value
                 if( fabs( metric_values[ j ] ) < MSQ_MIN ) { return MSQ_MAX_CAP; }
                 for( i = 0; i < num_values; ++i )
                 {
-                    total_value += ( ( metric_values[ i ] / metric_values[ j ] ) *
-                                     ( metric_values[ i ] / metric_values[ j ] ) );
+                    total_value +=
+                        ( ( metric_values[ i ] / metric_values[ j ] ) * ( metric_values[ i ] / metric_values[ j ] ) );
                 }
             }
             total_value /= (double)( num_values * num_values );

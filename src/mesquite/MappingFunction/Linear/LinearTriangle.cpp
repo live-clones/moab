@@ -31,8 +31,7 @@
 namespace MBMesquite
 {
 
-static const char* nonlinear_error =
-    "Attempt to use LinearTriangle mapping function for a nonlinear element\n";
+static const char* nonlinear_error = "Attempt to use LinearTriangle mapping function for a nonlinear element\n";
 
 EntityTopology LinearTriangle::element_topology( ) const
 {
@@ -51,8 +50,8 @@ NodeSet LinearTriangle::sample_points( NodeSet ) const
     return result;
 }
 
-void LinearTriangle::coefficients( Sample loc, NodeSet nodeset, double* coeff_out,
-                                   size_t* indices_out, size_t& num_coeff, MsqError& err ) const
+void LinearTriangle::coefficients( Sample loc, NodeSet nodeset, double* coeff_out, size_t* indices_out,
+                                   size_t& num_coeff, MsqError& err ) const
 {
     if( nodeset.have_any_mid_node( ) )
     {
@@ -86,12 +85,10 @@ void LinearTriangle::coefficients( Sample loc, NodeSet nodeset, double* coeff_ou
     }
 }
 
-void LinearTriangle::derivatives( Sample, NodeSet nodeset, size_t* vertices,
-                                  MsqVector< 2 >* coeff_derivs, size_t& num_vtx,
-                                  MsqError& err ) const
+void LinearTriangle::derivatives( Sample, NodeSet nodeset, size_t* vertices, MsqVector< 2 >* coeff_derivs,
+                                  size_t& num_vtx, MsqError& err ) const
 {
-    if( nodeset.have_any_mid_node( ) )
-    { MSQ_SETERR( err )( nonlinear_error, MsqError::UNSUPPORTED_ELEMENT ); }
+    if( nodeset.have_any_mid_node( ) ) { MSQ_SETERR( err )( nonlinear_error, MsqError::UNSUPPORTED_ELEMENT ); }
     else
     {
         num_vtx = 3;

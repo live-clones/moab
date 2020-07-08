@@ -53,8 +53,7 @@ void create_parallel_mesh( )
     par_data.pComm = &pc;
     par_data.gDims[ 0 ] = par_data.gDims[ 1 ] = par_data.gDims[ 2 ] = 0;
     par_data.gDims[ 3 ] = par_data.gDims[ 4 ] = par_data.gDims[ 5 ] = NC;
-    if( ( par_data.gDims[ 3 ] - par_data.gDims[ 0 ] ) *
-            ( par_data.gDims[ 3 ] - par_data.gDims[ 0 ] ) *
+    if( ( par_data.gDims[ 3 ] - par_data.gDims[ 0 ] ) * ( par_data.gDims[ 3 ] - par_data.gDims[ 0 ] ) *
             ( par_data.gDims[ 3 ] - par_data.gDims[ 0 ] ) <
         (int)pc.size( ) )
     {
@@ -100,8 +99,7 @@ void create_parallel_mesh( )
 
     // Create a tag, used in exchange_tags
     int def_val = 1.0;
-    rval = mbint.tag_get_handle( "test_tag", 1, MB_TYPE_DOUBLE, tag, MB_TAG_DENSE | MB_TAG_EXCL,
-                                 &def_val );CHECK_ERR( rval );
+    rval = mbint.tag_get_handle( "test_tag", 1, MB_TYPE_DOUBLE, tag, MB_TAG_DENSE | MB_TAG_EXCL, &def_val );CHECK_ERR( rval );
 
     Range empty_range;
     if( !pc.rank( ) ) std::cout << "Exchanging tags: ";

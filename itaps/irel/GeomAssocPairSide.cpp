@@ -25,17 +25,14 @@
 static const char* GLOBAL_ID_TAG_NAME = "GLOBAL_ID";
 static const char* RELATION_TAG_NAME = "__GEOM_ASSOCIATION";
 
-GeomAssocPairSide::GeomAssocPairSide( iRel_Instance p_relation, iBase_Instance p_instance,
-                                      int p_id )
-    : relation( p_relation ), instance_( reinterpret_cast< iGeom_Instance >( p_instance ) ),
-      id( p_id )
+GeomAssocPairSide::GeomAssocPairSide( iRel_Instance p_relation, iBase_Instance p_instance, int p_id )
+    : relation( p_relation ), instance_( reinterpret_cast< iGeom_Instance >( p_instance ) ), id( p_id )
 {
     int result;
 
     create_relation_side( );
 
-    iGeom_getTagHandle( instance_, GLOBAL_ID_TAG_NAME, &gid_tag, &result,
-                        strlen( GLOBAL_ID_TAG_NAME ) );
+    iGeom_getTagHandle( instance_, GLOBAL_ID_TAG_NAME, &gid_tag, &result, strlen( GLOBAL_ID_TAG_NAME ) );
     if( result == iBase_TAG_NOT_FOUND )
     {
         iGeom_createTag( instance_, GLOBAL_ID_TAG_NAME, 1, iBase_INTEGER, &gid_tag, &result,
@@ -65,12 +62,11 @@ int GeomAssocPairSide::create_relation_side( )
     ss << RELATION_TAG_NAME << id;
     std::string rel_tag_name( ss.str( ) );
 
-    iGeom_getTagHandle( instance_, rel_tag_name.c_str( ), &relation_tag, &result,
-                        rel_tag_name.size( ) );
+    iGeom_getTagHandle( instance_, rel_tag_name.c_str( ), &relation_tag, &result, rel_tag_name.size( ) );
     if( result == iBase_TAG_NOT_FOUND )
     {
-        iGeom_createTag( instance_, rel_tag_name.c_str( ), 1, iBase_ENTITY_HANDLE, &relation_tag,
-                         &result, rel_tag_name.size( ) );
+        iGeom_createTag( instance_, rel_tag_name.c_str( ), 1, iBase_ENTITY_HANDLE, &relation_tag, &result,
+                         rel_tag_name.size( ) );
     }
 
     PROCESS_ERROR;
@@ -91,8 +87,8 @@ int GeomAssocPairSide::destroy_relation_side( )
     RETURNR( iBase_SUCCESS );
 }
 
-int GeomAssocPairSide::get_all_entities( int dimension, iBase_EntityHandle** entities,
-                                         int* entities_alloc, int* entities_size )
+int GeomAssocPairSide::get_all_entities( int dimension, iBase_EntityHandle** entities, int* entities_alloc,
+                                         int* entities_size )
 {
     int this_type = ( dimension == -1 ? iBase_ALL_TYPES : dimension );
     int result;
@@ -111,26 +107,23 @@ int GeomAssocPairSide::get_all_sets( iBase_EntitySetHandle** sets, int* sets_all
     RETURNR( iBase_SUCCESS );
 }
 
-int GeomAssocPairSide::get_entities( int dimension, iBase_EntitySetHandle set_handle,
-                                     iBase_EntityHandle** entities, int* entities_alloc,
-                                     int* entities_size )
+int GeomAssocPairSide::get_entities( int dimension, iBase_EntitySetHandle set_handle, iBase_EntityHandle** entities,
+                                     int* entities_alloc, int* entities_size )
 {
     int this_type = ( dimension == -1 ? iBase_ALL_TYPES : dimension );
     int result;
 
-    iGeom_getEntities( instance_, set_handle, this_type, entities, entities_alloc, entities_size,
-                       &result );
+    iGeom_getEntities( instance_, set_handle, this_type, entities, entities_alloc, entities_size, &result );
     PROCESS_ERROR;
     RETURNR( iBase_SUCCESS );
 }
 
-int GeomAssocPairSide::get_ents_dims( iBase_EntityHandle* entities, int entities_size,
-                                      int** ent_types, int* ent_types_alloc, int* ent_types_size )
+int GeomAssocPairSide::get_ents_dims( iBase_EntityHandle* entities, int entities_size, int** ent_types,
+                                      int* ent_types_alloc, int* ent_types_size )
 {
     int result;
 
-    iGeom_getArrType( instance_, entities, entities_size, ent_types, ent_types_alloc,
-                      ent_types_size, &result );
+    iGeom_getArrType( instance_, entities, entities_size, ent_types, ent_types_alloc, ent_types_size, &result );
     PROCESS_ERROR;
     RETURNR( iBase_SUCCESS );
 }
@@ -141,21 +134,18 @@ int GeomAssocPairSide::get_related_ents( iBase_EntityHandle** /*entities*/, int*
     RETURNR( iBase_FAILURE );
 }
 
-int GeomAssocPairSide::get_related_sets( iBase_EntitySetHandle** /*sets*/, int* /*sets_alloc*/,
-                                         int* /*sets_size*/ )
+int GeomAssocPairSide::get_related_sets( iBase_EntitySetHandle** /*sets*/, int* /*sets_alloc*/, int* /*sets_size*/ )
 {
     RETURNR( iBase_FAILURE );
 }
 
-int GeomAssocPairSide::get_relation_side( iBase_EntityHandle* entities, int num_entities,
-                                          void* values )
+int GeomAssocPairSide::get_relation_side( iBase_EntityHandle* entities, int num_entities, void* values )
 {
     int values_alloc = num_entities * sizeof( iBase_EntityHandle );
     int values_size;
     int result;
 
-    iGeom_getArrData( instance_, entities, num_entities, relation_tag, &values, &values_alloc,
-                      &values_size, &result );
+    iGeom_getArrData( instance_, entities, num_entities, relation_tag, &values, &values_alloc, &values_size, &result );
     PROCESS_ERROR;
     RETURNR( iBase_SUCCESS );
 }
@@ -169,29 +159,25 @@ int GeomAssocPairSide::get_relation_side( iBase_EntitySetHandle* sets, int num_s
 
     for( int i = 0; i < num_sets; i++ )
     {
-        iGeom_getEntSetData( instance_, sets[ i ], relation_tag,
-                             reinterpret_cast< void** >( &data ), &values_alloc, &values_size,
-                             &result );
+        iGeom_getEntSetData( instance_, sets[ i ], relation_tag, reinterpret_cast< void** >( &data ), &values_alloc,
+                             &values_size, &result );
         data += values_size;
         PROCESS_ERROR;
     }
     RETURNR( iBase_SUCCESS );
 }
 
-int GeomAssocPairSide::set_relation_side( iBase_EntityHandle* entities, int num_entities,
-                                          const void* values )
+int GeomAssocPairSide::set_relation_side( iBase_EntityHandle* entities, int num_entities, const void* values )
 {
     int result;
 
-    iGeom_setArrData( instance_, entities, num_entities, relation_tag,
-                      static_cast< const char* >( values ),
+    iGeom_setArrData( instance_, entities, num_entities, relation_tag, static_cast< const char* >( values ),
                       num_entities * sizeof( iBase_EntityHandle ), &result );
     PROCESS_ERROR;
     RETURNR( iBase_SUCCESS );
 }
 
-int GeomAssocPairSide::set_relation_side( iBase_EntitySetHandle* sets, int num_sets,
-                                          const void* values )
+int GeomAssocPairSide::set_relation_side( iBase_EntitySetHandle* sets, int num_sets, const void* values )
 {
     const char* data = static_cast< const char* >( values );
     int         size = sizeof( iBase_EntityHandle );
@@ -241,8 +227,8 @@ int GeomAssocPairSide::get_gids( iBase_EntityHandle* entities, int num_entities,
     int values_size;
     int result;
 
-    iGeom_getArrData( instance_, entities, num_entities, gid_tag,
-                      reinterpret_cast< void** >( &values ), &values_alloc, &values_size, &result );
+    iGeom_getArrData( instance_, entities, num_entities, gid_tag, reinterpret_cast< void** >( &values ), &values_alloc,
+                      &values_size, &result );
     PROCESS_ERROR;
     RETURNR( iBase_SUCCESS );
 }
@@ -256,22 +242,20 @@ int GeomAssocPairSide::get_gids( iBase_EntitySetHandle* sets, int num_sets, int*
 
     for( int i = 0; i < num_sets; i++ )
     {
-        iGeom_getEntSetData( instance_, sets[ i ], gid_tag, reinterpret_cast< void** >( &data ),
-                             &values_alloc, &values_size, &result );
+        iGeom_getEntSetData( instance_, sets[ i ], gid_tag, reinterpret_cast< void** >( &data ), &values_alloc,
+                             &values_size, &result );
         data += values_size;
         PROCESS_ERROR;
     }
     RETURNR( iBase_SUCCESS );
 }
 
-int GeomAssocPairSide::get_dims( iBase_EntityHandle* /*entities*/, int /*num_entities*/,
-                                 int* /*values*/ )
+int GeomAssocPairSide::get_dims( iBase_EntityHandle* /*entities*/, int /*num_entities*/, int* /*values*/ )
 {
     RETURNR( iBase_FAILURE );
 }
 
-int GeomAssocPairSide::get_dims( iBase_EntitySetHandle* /*sets*/, int /*num_sets*/,
-                                 int* /*values*/ )
+int GeomAssocPairSide::get_dims( iBase_EntitySetHandle* /*sets*/, int /*num_sets*/, int* /*values*/ )
 {
     RETURNR( iBase_FAILURE );
 }

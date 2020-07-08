@@ -91,8 +91,7 @@ ErrorCode quads_to_tris( Interface* MBI, EntityHandle input_meshset )
     // create a geometry tag to find the surfaces with
     ErrorCode result;
     Tag       geom_tag, id_tag;
-    result = MBI->tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, geom_tag,
-                                  MB_TAG_DENSE | MB_TAG_CREAT );
+    result = MBI->tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, geom_tag, MB_TAG_DENSE | MB_TAG_CREAT );
     if( MB_SUCCESS != result ) return result;
 
     // create an id tag to find the surface id with
@@ -102,8 +101,7 @@ ErrorCode quads_to_tris( Interface* MBI, EntityHandle input_meshset )
     Range surface_meshsets;
     int   dim = 2;
     void* input_dim[] = { &dim };
-    result = MBI->get_entities_by_type_and_tag( input_meshset, MBENTITYSET, &geom_tag, input_dim, 1,
-                                                surface_meshsets );
+    result = MBI->get_entities_by_type_and_tag( input_meshset, MBENTITYSET, &geom_tag, input_dim, 1, surface_meshsets );
     assert( MB_SUCCESS == result );
     std::cout << surface_meshsets.size( ) << " surfaces found." << std::endl;
 

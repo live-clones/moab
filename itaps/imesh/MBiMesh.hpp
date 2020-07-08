@@ -55,8 +55,7 @@ static inline MBiMesh* mbimeshi_instance( iMesh_Instance instance )
 #define MOABI MBIMESHI->mbImpl
 
 inline MBiMesh::MBiMesh( Interface* impl )
-    : haveDeletedEntities( false ), iCreatedInterface( false ), mbImpl( impl ),
-      lastErrorType( iBase_SUCCESS )
+    : haveDeletedEntities( false ), iCreatedInterface( false ), mbImpl( impl ), lastErrorType( iBase_SUCCESS )
 {
     lastErrorDescription[ 0 ] = '\0';
 

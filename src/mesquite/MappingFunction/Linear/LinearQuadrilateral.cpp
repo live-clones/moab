@@ -34,8 +34,7 @@
 namespace MBMesquite
 {
 
-static const char* nonlinear_error =
-    "Attempt to use LinearQuadrilateral mapping function for a nonlinear element\n";
+static const char* nonlinear_error = "Attempt to use LinearQuadrilateral mapping function for a nonlinear element\n";
 
 EntityTopology LinearQuadrilateral::element_topology( ) const
 {
@@ -47,9 +46,8 @@ int LinearQuadrilateral::num_nodes( ) const
     return 4;
 }
 
-void LinearQuadrilateral::coefficients( Sample location, NodeSet nodeset, double* coeff_out,
-                                        size_t* indices_out, size_t& num_coeff,
-                                        MsqError& err ) const
+void LinearQuadrilateral::coefficients( Sample location, NodeSet nodeset, double* coeff_out, size_t* indices_out,
+                                        size_t& num_coeff, MsqError& err ) const
 {
     if( nodeset.have_any_mid_node( ) )
     {
@@ -60,8 +58,8 @@ void LinearQuadrilateral::coefficients( Sample location, NodeSet nodeset, double
     coefficients( location, nodeset, coeff_out, indices_out, num_coeff );
 }
 
-void LinearQuadrilateral::coefficients( Sample location, NodeSet, double* coeff_out,
-                                        size_t* indices_out, size_t& num_coeff )
+void LinearQuadrilateral::coefficients( Sample location, NodeSet, double* coeff_out, size_t* indices_out,
+                                        size_t& num_coeff )
 {
     switch( location.dimension )
     {
@@ -98,8 +96,7 @@ const unsigned eta = 1;
 const int      sign[ 2 ][ 4 ] = { { -1, 1, 1, -1 },  // xi
                              { -1, -1, 1, 1 } };  // eta
 
-static void derivatives_at_corner( unsigned corner, size_t* vertex_indices, MsqVector< 2 >* derivs,
-                                   size_t& num_vtx )
+static void derivatives_at_corner( unsigned corner, size_t* vertex_indices, MsqVector< 2 >* derivs, size_t& num_vtx )
 {
     const unsigned adj_in_xi = ( 5 - corner ) % 4;
     const unsigned adj_in_eta = 3 - corner;
@@ -117,8 +114,7 @@ static void derivatives_at_corner( unsigned corner, size_t* vertex_indices, MsqV
     derivs[ 2 ][ 1 ] = sign[ eta ][ adj_in_eta ];
 }
 
-static void derivatives_at_mid_edge( unsigned edge, size_t* vertices, MsqVector< 2 >* derivs,
-                                     size_t& num_vtx )
+static void derivatives_at_mid_edge( unsigned edge, size_t* vertices, MsqVector< 2 >* derivs, size_t& num_vtx )
 {
     const unsigned start_vtx = edge;
     const unsigned end_vtx = ( edge + 1 ) % 4;
@@ -162,8 +158,7 @@ static void derivatives_at_mid_elem( size_t* vertices, MsqVector< 2 >* derivs, s
 }
 
 void LinearQuadrilateral::derivatives( Sample loc, NodeSet nodeset, size_t* vertex_indices_out,
-                                       MsqVector< 2 >* d_coeff_d_xi_out, size_t& num_vtx,
-                                       MsqError& err ) const
+                                       MsqVector< 2 >* d_coeff_d_xi_out, size_t& num_vtx, MsqError& err ) const
 {
     if( nodeset.have_any_mid_node( ) )
     {

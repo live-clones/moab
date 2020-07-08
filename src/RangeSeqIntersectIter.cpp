@@ -99,8 +99,7 @@ ErrorCode RangeSeqIntersectIter::update_entity_sequence( )
         // Check that the mStartHandle is valid
         if( TYPE_FROM_HANDLE( mStartHandle ) >= MBMAXTYPE ) return MB_TYPE_OUT_OF_RANGE;
 
-        if( MB_SUCCESS != mSequenceManager->find( mStartHandle, mSequence ) )
-            return find_invalid_range( );
+        if( MB_SUCCESS != mSequenceManager->find( mStartHandle, mSequence ) ) return find_invalid_range( );
     }
 
     // if mEndHandle is past end of sequence or block of used

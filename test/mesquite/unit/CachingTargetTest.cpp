@@ -97,29 +97,23 @@ class CachedTargetCalculator : public TargetCalculator
     static MsqMatrix< 2, 2 > make_2d( size_t elem, Sample sample );
     static MsqMatrix< 3, 2 > make_surf( size_t elem, Sample sample );
 
-    CachedTargetCalculator( )
-        : called_3d( 0 ), called_2d( 0 ), called_surf( 0 ), surfOrientFlag( true )
-    {
-    }
+    CachedTargetCalculator( ) : called_3d( 0 ), called_2d( 0 ), called_surf( 0 ), surfOrientFlag( true ) {}
 
-    virtual bool get_3D_target( PatchData&, size_t elem, Sample sample, MsqMatrix< 3, 3 >& result,
-                                MsqError& )
+    virtual bool get_3D_target( PatchData&, size_t elem, Sample sample, MsqMatrix< 3, 3 >& result, MsqError& )
     {
         ++called_3d;
         result = make_3d( elem, sample );
         return true;
     }
 
-    virtual bool get_2D_target( PatchData&, size_t elem, Sample sample, MsqMatrix< 2, 2 >& result,
-                                MsqError& )
+    virtual bool get_2D_target( PatchData&, size_t elem, Sample sample, MsqMatrix< 2, 2 >& result, MsqError& )
     {
         ++called_2d;
         result = make_2d( elem, sample );
         return true;
     }
 
-    virtual bool get_surface_target( PatchData&, size_t elem, Sample sample,
-                                     MsqMatrix< 3, 2 >& result, MsqError& )
+    virtual bool get_surface_target( PatchData&, size_t elem, Sample sample, MsqMatrix< 3, 2 >& result, MsqError& )
     {
         ++called_surf;
         result = make_surf( elem, sample );
@@ -389,7 +383,7 @@ void CachingTargetTest::test_surface_target_values( )
         for( unsigned j = 0; j < locations.size( ); ++j )
         {
             MsqMatrix< 3, 2 > W;
-            bool rval = cacher->get_surface_target( patch_2d, i, locations[ j ], W, err );
+            bool              rval = cacher->get_surface_target( patch_2d, i, locations[ j ], W, err );
             CPPUNIT_ASSERT( rval && !err );
 
             MsqMatrix< 3, 2 > M = CachedTargetCalculator::make_surf( i, locations[ j ] );
@@ -437,7 +431,7 @@ void CachingTargetTest::test_3d_target_subpatch( )
 
             Mesh::ElementHandle  h = subpatch.get_element_handles_array( )[ i ];
             Mesh::ElementHandle* old_h = patch_3d.get_element_handles_array( );
-            size_t old_idx = std::find( old_h, old_h + patch_3d.num_elements( ), h ) - old_h;
+            size_t               old_idx = std::find( old_h, old_h + patch_3d.num_elements( ), h ) - old_h;
             CPPUNIT_ASSERT( old_idx < patch_3d.num_elements( ) );
             MsqMatrix< 3, 3 > M = CachedTargetCalculator::make_3d( old_idx, locations[ j ] );
             ASSERT_MATRICES_EQUAL( W, M, DBL_EPSILON );
@@ -485,7 +479,7 @@ void CachingTargetTest::test_2d_target_subpatch( )
 
             Mesh::ElementHandle  h = subpatch.get_element_handles_array( )[ i ];
             Mesh::ElementHandle* old_h = patch_2d.get_element_handles_array( );
-            size_t old_idx = std::find( old_h, old_h + patch_2d.num_elements( ), h ) - old_h;
+            size_t               old_idx = std::find( old_h, old_h + patch_2d.num_elements( ), h ) - old_h;
             CPPUNIT_ASSERT( old_idx < patch_2d.num_elements( ) );
             MsqMatrix< 2, 2 > M = CachedTargetCalculator::make_2d( old_idx, locations[ j ] );
             ASSERT_MATRICES_EQUAL( W, M, DBL_EPSILON );
@@ -528,12 +522,12 @@ void CachingTargetTest::test_surface_target_subpatch( )
         for( unsigned j = 0; j < locations.size( ); ++j )
         {
             MsqMatrix< 3, 2 > W;
-            bool rval = cacher->get_surface_target( subpatch, i, locations[ j ], W, err );
+            bool              rval = cacher->get_surface_target( subpatch, i, locations[ j ], W, err );
             CPPUNIT_ASSERT( rval && !err );
 
             Mesh::ElementHandle  h = subpatch.get_element_handles_array( )[ i ];
             Mesh::ElementHandle* old_h = patch_2d.get_element_handles_array( );
-            size_t old_idx = std::find( old_h, old_h + patch_2d.num_elements( ), h ) - old_h;
+            size_t               old_idx = std::find( old_h, old_h + patch_2d.num_elements( ), h ) - old_h;
             CPPUNIT_ASSERT( old_idx < patch_2d.num_elements( ) );
             MsqMatrix< 3, 2 > M = CachedTargetCalculator::make_surf( old_idx, locations[ j ] );
             ASSERT_MATRICES_EQUAL( W, M, DBL_EPSILON );

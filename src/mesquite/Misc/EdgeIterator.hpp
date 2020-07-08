@@ -68,8 +68,7 @@ class EdgeIterator
 
 inline bool operator<( const EdgeIterator::Edge& e1, const EdgeIterator::Edge& e2 )
 {
-    return e1.otherVertex < e2.otherVertex ||
-           ( e1.otherVertex == e2.otherVertex && e1.midVertex < e2.midVertex );
+    return e1.otherVertex < e2.otherVertex || ( e1.otherVertex == e2.otherVertex && e1.midVertex < e2.midVertex );
 }
 
 inline bool operator==( const EdgeIterator::Edge& e1, const EdgeIterator::Edge& e2 )
@@ -94,9 +93,7 @@ const Vector3D& EdgeIterator::end( ) const
 
 const Vector3D* EdgeIterator::mid( ) const
 {
-    return adjIter->midVertex < patchPtr->num_nodes( )
-               ? &patchPtr->vertex_by_index( adjIter->midVertex )
-               : 0;
+    return adjIter->midVertex < patchPtr->num_nodes( ) ? &patchPtr->vertex_by_index( adjIter->midVertex ) : 0;
 }
 
 void EdgeIterator::step( MsqError& err )

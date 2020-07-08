@@ -74,8 +74,8 @@ DualTool::DualTool( Interface* impl ) : mbImpl( impl )
                                      MB_TAG_SPARSE | MB_TAG_CREAT, &dum_handle );
     assert( MB_SUCCESS == result );
 
-    result = mbImpl->tag_get_handle( DUAL_CURVE_TAG_NAME, 1, MB_TYPE_HANDLE, dualCurveTag,
-                                     MB_TAG_SPARSE | MB_TAG_CREAT, &dum_handle );
+    result = mbImpl->tag_get_handle( DUAL_CURVE_TAG_NAME, 1, MB_TYPE_HANDLE, dualCurveTag, MB_TAG_SPARSE | MB_TAG_CREAT,
+                                     &dum_handle );
     assert( MB_SUCCESS == result );
 
     unsigned int dummy = 0;
@@ -87,20 +87,18 @@ DualTool::DualTool( Interface* impl ) : mbImpl( impl )
                                      MB_TAG_DENSE | MB_TAG_CREAT, &dum_handle );
     assert( MB_SUCCESS == result );
 
-    result =
-        mbImpl->tag_get_handle( EXTRA_DUAL_ENTITY_TAG_NAME, 1, MB_TYPE_HANDLE, extraDualEntityTag,
-                                MB_TAG_SPARSE | MB_TAG_CREAT, &dum_handle );
+    result = mbImpl->tag_get_handle( EXTRA_DUAL_ENTITY_TAG_NAME, 1, MB_TYPE_HANDLE, extraDualEntityTag,
+                                     MB_TAG_SPARSE | MB_TAG_CREAT, &dum_handle );
     assert( MB_SUCCESS == result );
 
     static const char dum_name[ CATEGORY_TAG_SIZE ] = { 0 };
-    result = mbImpl->tag_get_handle( CATEGORY_TAG_NAME, CATEGORY_TAG_SIZE, MB_TYPE_OPAQUE,
-                                     categoryTag, MB_TAG_SPARSE | MB_TAG_CREAT, dum_name );
+    result = mbImpl->tag_get_handle( CATEGORY_TAG_NAME, CATEGORY_TAG_SIZE, MB_TYPE_OPAQUE, categoryTag,
+                                     MB_TAG_SPARSE | MB_TAG_CREAT, dum_name );
     assert( MB_SUCCESS == result );
 
     DualTool::GraphicsPoint dum_pt( 0.0, 0.0, 0.0, -1 );
-    result = mbImpl->tag_get_handle(
-        DUAL_GRAPHICS_POINT_TAG_NAME, sizeof( DualTool::GraphicsPoint ), MB_TYPE_DOUBLE,
-        dualGraphicsPointTag, MB_TAG_DENSE | MB_TAG_CREAT | MB_TAG_BYTES, &dum_pt );
+    result = mbImpl->tag_get_handle( DUAL_GRAPHICS_POINT_TAG_NAME, sizeof( DualTool::GraphicsPoint ), MB_TYPE_DOUBLE,
+                                     dualGraphicsPointTag, MB_TAG_DENSE | MB_TAG_CREAT | MB_TAG_BYTES, &dum_pt );
     assert( MB_SUCCESS == result );
 
     globalIdTag = mbImpl->globalId_tag( );
@@ -152,24 +150,19 @@ ErrorCode DualTool::construct_dual( EntityHandle* entities, const int num_entiti
         unsigned int    i;
         for( rit = regions.begin( ), i = 0; rit != regions.end( ); ++rit, i++ )
         {
-            if( gid_vec[ i ] > maxHexId && mbImpl->type_from_handle( *rit ) == MBHEX )
-                maxHexId = gid_vec[ i ];
+            if( gid_vec[ i ] > maxHexId && mbImpl->type_from_handle( *rit ) == MBHEX ) maxHexId = gid_vec[ i ];
         }
     }
     else
     {
         // get entities of various dimensions adjacent to these
-        result =
-            mbImpl->get_adjacencies( entities, num_entities, 0, true, vertices, Interface::UNION );
+        result = mbImpl->get_adjacencies( entities, num_entities, 0, true, vertices, Interface::UNION );
         if( MB_SUCCESS != result ) return result;
-        result =
-            mbImpl->get_adjacencies( entities, num_entities, 1, true, edges, Interface::UNION );
+        result = mbImpl->get_adjacencies( entities, num_entities, 1, true, edges, Interface::UNION );
         if( MB_SUCCESS != result ) return result;
-        result =
-            mbImpl->get_adjacencies( entities, num_entities, 2, true, faces, Interface::UNION );
+        result = mbImpl->get_adjacencies( entities, num_entities, 2, true, faces, Interface::UNION );
         if( MB_SUCCESS != result ) return result;
-        result =
-            mbImpl->get_adjacencies( entities, num_entities, 3, true, regions, Interface::UNION );
+        result = mbImpl->get_adjacencies( entities, num_entities, 3, true, regions, Interface::UNION );
         if( MB_SUCCESS != result ) return result;
     }
 
@@ -235,8 +228,8 @@ ErrorCode DualTool::construct_dual_vertices( const Range& all_regions, Range& du
     return result;
 }
 
-ErrorCode DualTool::construct_dual_vertex( EntityHandle entity, EntityHandle& dual_ent,
-                                           const bool extra, const bool add_graphics_pt )
+ErrorCode DualTool::construct_dual_vertex( EntityHandle entity, EntityHandle& dual_ent, const bool extra,
+                                           const bool add_graphics_pt )
 {
     // no dual entity; construct one; first need the avg coordinates
     unsigned int is_dual = 0x1;
@@ -321,8 +314,7 @@ ErrorCode DualTool::construct_dual_edges( const Range& all_faces, Range& dual_en
 
         // get the dual vertices
         std::vector< EntityHandle > dual_verts( out_ents.size( ) );
-        tmp_result = mbImpl->tag_get_data( dualEntity_tag( ), &out_ents[ 0 ], out_ents.size( ),
-                                           &dual_verts[ 0 ] );
+        tmp_result = mbImpl->tag_get_data( dualEntity_tag( ), &out_ents[ 0 ], out_ents.size( ), &dual_verts[ 0 ] );
         if( MB_SUCCESS != tmp_result ) continue;
         assert( dual_verts.size( ) <= 2 );
 
@@ -411,8 +403,7 @@ ErrorCode DualTool::construct_dual_faces( const Range& all_edges, Range& dual_en
         tmp_result = get_radial_dverts( *rit, rad_dverts, bdy_edge );
         TRC if( rad_dverts.empty( ) ) continue;
 
-        tmp_result =
-            mbImpl->create_element( MBPOLYGON, &rad_dverts[ 0 ], rad_dverts.size( ), dual_ent );
+        tmp_result = mbImpl->create_element( MBPOLYGON, &rad_dverts[ 0 ], rad_dverts.size( ), dual_ent );
         TRC
 
             // tag it indicating it's a dual entity, and tag primal/dual with dual/primal
@@ -433,8 +424,7 @@ ErrorCode DualTool::construct_dual_faces( const Range& all_edges, Range& dual_en
 
             // add a new dual edge betw last 2 verts
             EntityHandle new_edge;
-            tmp_result = mbImpl->create_element( MBEDGE, &rad_dverts[ rad_dverts.size( ) - 2 ], 2,
-                                                 new_edge );
+            tmp_result = mbImpl->create_element( MBEDGE, &rad_dverts[ rad_dverts.size( ) - 2 ], 2, new_edge );
             TRC tmp_result = mbImpl->tag_set_data( isDualCell_tag( ), &new_edge, 1, &is_dual );
             TRC
 
@@ -565,9 +555,8 @@ ErrorCode DualTool::check_dual_equiv_edges( Range& dual_edges )
                 // check that there are really adjacencies and *vit is in them
                 const EntityHandle* adjs;
                 int                 num_adjs;
-                tmp_result =
-                    reinterpret_cast< Core* >( mbImpl )->a_entity_factory( )->get_adjacencies(
-                        this_edge, adjs, num_adjs );
+                tmp_result = reinterpret_cast< Core* >( mbImpl )->a_entity_factory( )->get_adjacencies( this_edge, adjs,
+                                                                                                        num_adjs );
                 if( NULL == adjs || std::find( adjs, adjs + num_adjs, *vit ) == adjs + num_adjs )
                     std::cout << "Add_adjacencies failed in construct_dual_faces." << std::endl;
             }
@@ -598,8 +587,8 @@ ErrorCode DualTool::check_dual_equiv_edges( Range& dual_edges )
         tmp_result = mbImpl->get_adjacencies( dum_quad_range, 1, false, adj_edges );
         if( MB_MULTIPLE_ENTITIES_FOUND == tmp_result )
         {
-            std::cout << "Multiple entities returned for polygon " << mbImpl->id_from_handle( *vit )
-                      << "." << std::endl;
+            std::cout << "Multiple entities returned for polygon " << mbImpl->id_from_handle( *vit ) << "."
+                      << std::endl;
             continue;
         }
     }
@@ -641,8 +630,7 @@ ErrorCode DualTool::construct_dual_cells( const Range& all_verts, Range& dual_en
 
         // get the dual faces corresponding to the edges
         dfaces.resize( edges.size( ) );
-        tmp_result =
-            mbImpl->tag_get_data( dualEntity_tag( ), &edges[ 0 ], edges.size( ), &dfaces[ 0 ] );
+        tmp_result = mbImpl->tag_get_data( dualEntity_tag( ), &edges[ 0 ], edges.size( ), &dfaces[ 0 ] );
         if( MB_SUCCESS != tmp_result ) continue;
 
         // create the dual cell from those faces
@@ -668,14 +656,13 @@ ErrorCode DualTool::construct_dual_cells( const Range& all_verts, Range& dual_en
 
 //! given an edge handle, return a list of dual vertices in radial order
 //! around the edge
-ErrorCode DualTool::get_radial_dverts( const EntityHandle           edge,
-                                       std::vector< EntityHandle >& rad_dverts, bool& bdy_edge )
+ErrorCode DualTool::get_radial_dverts( const EntityHandle edge, std::vector< EntityHandle >& rad_dverts,
+                                       bool& bdy_edge )
 {
     rad_dverts.clear( );
 
     std::vector< EntityHandle > rad_faces, rad_ents;
-    ErrorCode                   result =
-        MeshTopoUtil( mbImpl ).star_entities( edge, rad_faces, bdy_edge, 0, &rad_ents );
+    ErrorCode result = MeshTopoUtil( mbImpl ).star_entities( edge, rad_faces, bdy_edge, 0, &rad_ents );
     if( MB_SUCCESS != result ) return result;
 
     if( bdy_edge )
@@ -705,8 +692,7 @@ ErrorCode DualTool::get_radial_dverts( const EntityHandle           edge,
 
             // we want the one that's not already on the list; reuse last_face
             int          last_hex = ( i == rad_ents.size( ) - 1 ? 0 : i - 1 );
-            EntityHandle last_face =
-                ( connect[ 0 ] == rad_dverts[ last_hex ] ? connect[ 1 ] : connect[ 0 ] );
+            EntityHandle last_face = ( connect[ 0 ] == rad_dverts[ last_hex ] ? connect[ 1 ] : connect[ 0 ] );
             rad_dverts[ i ] = last_face;
         }
     }
@@ -753,8 +739,7 @@ ErrorCode DualTool::construct_hex_dual( EntityHandle* entities, const int num_en
     result = construct_hp_parent_child( );
     if( MB_SUCCESS != result )
     {
-        std::cerr << "Problem constructing parent/child relations between hyperplanes."
-                  << std::endl;
+        std::cerr << "Problem constructing parent/child relations between hyperplanes." << std::endl;
         return result;
     }
 
@@ -763,8 +748,7 @@ ErrorCode DualTool::construct_hex_dual( EntityHandle* entities, const int num_en
 }
 
 //! get the cells of the dual
-ErrorCode DualTool::get_dual_entities( const int dim, EntityHandle* entities,
-                                       const int num_entities, Range& dual_ents )
+ErrorCode DualTool::get_dual_entities( const int dim, EntityHandle* entities, const int num_entities, Range& dual_ents )
 {
     if( 0 == isDualCell_tag( ) ) return MB_SUCCESS;
     if( 0 > dim || 3 < dim ) return MB_INDEX_OUT_OF_RANGE;
@@ -780,14 +764,12 @@ ErrorCode DualTool::get_dual_entities( const int dim, EntityHandle* entities,
     if( 0 == entities || 0 == num_entities )
     {
         // just get all the dual entities of this dimension
-        result = mbImpl->get_entities_by_type_and_tag( 0, dual_type[ dim ], &isDualCellTag,
-                                                       &dum_ptr, 1, dual_ents );
+        result = mbImpl->get_entities_by_type_and_tag( 0, dual_type[ dim ], &isDualCellTag, &dum_ptr, 1, dual_ents );
     }
     else
     {
         // else look for specific dual entities
-        result = mbImpl->get_adjacencies( entities, num_entities, 3 - dim, false, dim_ents,
-                                          Interface::UNION );
+        result = mbImpl->get_adjacencies( entities, num_entities, 3 - dim, false, dim_ents, Interface::UNION );
         if( MB_SUCCESS != result ) return result;
         std::vector< EntityHandle > dual_ents_vec( dim_ents.size( ) );
         result = mbImpl->tag_get_data( dualEntity_tag( ), dim_ents, &dual_ents_vec[ 0 ] );
@@ -799,8 +781,7 @@ ErrorCode DualTool::get_dual_entities( const int dim, EntityHandle* entities,
 }
 
 //! get the faces of the dual
-ErrorCode DualTool::get_dual_entities( const int dim, EntityHandle* entities,
-                                       const int                    num_entities,
+ErrorCode DualTool::get_dual_entities( const int dim, EntityHandle* entities, const int num_entities,
                                        std::vector< EntityHandle >& dual_ents )
 {
     Range     tmp_range;
@@ -829,14 +810,12 @@ ErrorCode DualTool::get_dual_hyperplanes( const Interface* impl, const int dim, 
         result = impl->tag_get_handle( DUAL_SURFACE_TAG_NAME, 1, MB_TYPE_HANDLE, dual_tag );
 
     if( MB_SUCCESS == result )
-        result = impl->get_entities_by_type_and_tag( 0, MBENTITYSET, &dual_tag, NULL, 1, dual_ents,
-                                                     Interface::UNION );
+        result = impl->get_entities_by_type_and_tag( 0, MBENTITYSET, &dual_tag, NULL, 1, dual_ents, Interface::UNION );
 
     return result;
 }
 
-ErrorCode DualTool::construct_dual_hyperplanes( const int dim, EntityHandle* entities,
-                                                const int num_entities )
+ErrorCode DualTool::construct_dual_hyperplanes( const int dim, EntityHandle* entities, const int num_entities )
 {
     // this function traverses dual faces of input dimension, constructing
     // dual hyperplanes of them in sets as it goes
@@ -904,8 +883,7 @@ ErrorCode DualTool::construct_dual_hyperplanes( const int dim, EntityHandle* ent
     return MB_SUCCESS;
 }
 
-ErrorCode DualTool::traverse_hyperplane( const Tag hp_tag, EntityHandle& this_hp,
-                                         EntityHandle this_ent )
+ErrorCode DualTool::traverse_hyperplane( const Tag hp_tag, EntityHandle& this_hp, EntityHandle this_ent )
 {
     Range                       tmp_star, star, tmp_range, new_hyperplane_ents;
     std::vector< EntityHandle > hp_untreated;
@@ -916,8 +894,7 @@ ErrorCode DualTool::traverse_hyperplane( const Tag hp_tag, EntityHandle& this_hp
 
     unsigned short mark_val = 0x0;
     Tag            mark_tag;
-    result = mbImpl->tag_get_handle( "__hyperplane_mark", 1, MB_TYPE_BIT, mark_tag,
-                                     MB_TAG_CREAT | MB_TAG_BIT );
+    result = mbImpl->tag_get_handle( "__hyperplane_mark", 1, MB_TYPE_BIT, mark_tag, MB_TAG_CREAT | MB_TAG_BIT );
     if( MB_SUCCESS != result ) return result;
     mark_val = 0x1;
 
@@ -929,8 +906,8 @@ ErrorCode DualTool::traverse_hyperplane( const Tag hp_tag, EntityHandle& this_hp
         if( 0 == tmp_hp ) new_hyperplane_ents.insert( this_ent );
 
         if( debug && hp_untreated.size( ) % 10 == 0 )
-            std::cout << "Dual surface " << this_hp
-                      << ", hp_untreated list size = " << hp_untreated.size( ) << "." << std::endl;
+            std::cout << "Dual surface " << this_hp << ", hp_untreated list size = " << hp_untreated.size( ) << "."
+                      << std::endl;
 
         // get the 2nd order adjacencies through lower dimension
         tmp_range.clear( );
@@ -994,8 +971,7 @@ ErrorCode DualTool::traverse_hyperplane( const Tag hp_tag, EntityHandle& this_hp
             std::cout << "quads:" << std::endl;
         std::vector< EntityHandle > pents( new_hyperplane_ents.size( ) );
         result = mbImpl->tag_get_data( dualEntity_tag( ), new_hyperplane_ents, &pents[ 0 ] );RR;
-        for( std::vector< EntityHandle >::iterator vit = pents.begin( ); vit != pents.end( );
-             ++vit )
+        for( std::vector< EntityHandle >::iterator vit = pents.begin( ); vit != pents.end( ); ++vit )
         {
             if( vit != pents.begin( ) ) std::cout << ", ";
             std::cout << mbImpl->id_from_handle( *vit );
@@ -1101,8 +1077,7 @@ ErrorCode DualTool::construct_new_hyperplane( const int dim, EntityHandle& new_h
 {
     ErrorCode result;
     if( 1 == dim )
-        result =
-            mbImpl->create_meshset( ( MESHSET_ORDERED | MESHSET_TRACK_OWNER ), new_hyperplane );
+        result = mbImpl->create_meshset( ( MESHSET_ORDERED | MESHSET_TRACK_OWNER ), new_hyperplane );
     else
         result = mbImpl->create_meshset( ( MESHSET_SET | MESHSET_TRACK_OWNER ), new_hyperplane );
     if( MB_SUCCESS != result ) return result;
@@ -1112,8 +1087,7 @@ ErrorCode DualTool::construct_new_hyperplane( const int dim, EntityHandle& new_h
         Range all_hyperplanes;
         result = get_dual_hyperplanes( mbImpl, dim, all_hyperplanes );RR;
         std::vector< int > gids( all_hyperplanes.size( ) );
-        result = mbImpl->tag_get_data( globalIdTag, all_hyperplanes,
-                                       ( gids.empty( ) ) ? NULL : &gids[ 0 ] );RR;
+        result = mbImpl->tag_get_data( globalIdTag, all_hyperplanes, ( gids.empty( ) ) ? NULL : &gids[ 0 ] );RR;
         for( unsigned int i = 0; i < gids.size( ); i++ )
             if( gids[ i ] > id ) id = gids[ i ];
         id++;
@@ -1127,8 +1101,7 @@ ErrorCode DualTool::construct_new_hyperplane( const int dim, EntityHandle& new_h
     // assign a category name to these sets
     static const char dual_category_names[ 2 ][ CATEGORY_TAG_SIZE ] = { "Chord\0", "Sheet\0" };
 
-    result =
-        mbImpl->tag_set_data( categoryTag, &new_hyperplane, 1, dual_category_names[ dim - 1 ] );
+    result = mbImpl->tag_set_data( categoryTag, &new_hyperplane, 1, dual_category_names[ dim - 1 ] );
 
     return result;
 }
@@ -1261,8 +1234,7 @@ ErrorCode DualTool::get_cell_points( EntityHandle dual_ent, std::vector< int >& 
 
     // get graphics points for 0cells and for this cell
     result = mbImpl->tag_get_data( dualGraphicsPoint_tag( ), one_cells, &dum_gps[ 0 ] );RR;
-    result =
-        mbImpl->tag_get_data( dualGraphicsPoint_tag( ), &dual_ent, 1, &( dum_gps[ num_edges ] ) );RR;
+    result = mbImpl->tag_get_data( dualGraphicsPoint_tag( ), &dual_ent, 1, &( dum_gps[ num_edges ] ) );RR;
 
     Range::iterator     eit;
     const EntityHandle* connect;
@@ -1291,8 +1263,7 @@ ErrorCode DualTool::get_cell_points( EntityHandle dual_ent, std::vector< int >& 
     return result;
 }
 
-ErrorCode DualTool::get_graphics_points( const Range&                  in_range,
-                                         std::vector< GraphicsPoint >& points,
+ErrorCode DualTool::get_graphics_points( const Range& in_range, std::vector< GraphicsPoint >& points,
                                          const bool assign_ids, const int start_id )
 {
     // return graphics points on dual entities in in_range or in entities
@@ -1335,8 +1306,7 @@ ErrorCode DualTool::get_graphics_points( const Range&                  in_range,
     {
         int i = start_id;
 
-        for( std::vector< GraphicsPoint >::iterator vit = points.begin( ); vit != points.end( );
-             ++vit )
+        for( std::vector< GraphicsPoint >::iterator vit = points.begin( ); vit != points.end( ); ++vit )
             vit->id = i++;
 
         result = mbImpl->tag_set_data( dualGraphicsPoint_tag( ), all_cells, &points[ 0 ] );RR;
@@ -1351,8 +1321,7 @@ EntityHandle DualTool::next_loop_vertex( const EntityHandle last_v, const Entity
     // given two vertices, find the next one on the loop; if one is a dual
     // surface, then just choose either one for that surface
     assert( ( 0 == last_v || mbImpl->type_from_handle( last_v ) == MBVERTEX ) &&
-            mbImpl->type_from_handle( this_v ) == MBVERTEX &&
-            mbImpl->type_from_handle( dual_surf ) == MBENTITYSET );
+            mbImpl->type_from_handle( this_v ) == MBVERTEX && mbImpl->type_from_handle( dual_surf ) == MBENTITYSET );
 
     // get the connected vertices
     MeshTopoUtil tpu( mbImpl );
@@ -1404,8 +1373,7 @@ EntityHandle DualTool::get_dual_hyperplane( const EntityHandle ncell )
     if( MB_SUCCESS != result ) return 0;
 
     EntityHandle dum_set;
-    for( std::vector< EntityHandle >::iterator vit = adj_sets.begin( ); vit != adj_sets.end( );
-         ++vit )
+    for( std::vector< EntityHandle >::iterator vit = adj_sets.begin( ); vit != adj_sets.end( ); ++vit )
     {
         if( mbImpl->tag_get_data( dualCurve_tag( ), &( *vit ), 1, &dum_set ) != MB_TAG_NOT_FOUND ||
             mbImpl->tag_get_data( dualSurface_tag( ), &( *vit ), 1, &dum_set ) != MB_TAG_NOT_FOUND )
@@ -1416,9 +1384,8 @@ EntityHandle DualTool::get_dual_hyperplane( const EntityHandle ncell )
 }
 
 //! set the dual surface or curve for an entity
-ErrorCode DualTool::set_dual_surface_or_curve( EntityHandle       entity,
-                                               const EntityHandle dual_hyperplane,
-                                               const int          dual_entity_dimension )
+ErrorCode DualTool::set_dual_surface_or_curve( EntityHandle entity, const EntityHandle dual_hyperplane,
+                                               const int dual_entity_dimension )
 {
     if( 1 == dual_entity_dimension )
         mbImpl->tag_set_data( dualCurve_tag( ), &entity, 1, &dual_hyperplane );
@@ -1757,11 +1724,10 @@ ErrorCode DualTool::face_open_collapse( EntityHandle ocl, EntityHandle ocr )
     std::cout << ")" << std::endl;
 
     // get the primal entities we're dealing with
-    EntityHandle split_quads[ 2 ] = { 0 }, split_edges[ 3 ] = { 0 }, split_nodes[ 2 ] = { 0 },
-                                other_edges[ 6 ] = { 0 }, other_nodes[ 6 ] = { 0 };
+    EntityHandle split_quads[ 2 ] = { 0 }, split_edges[ 3 ] = { 0 }, split_nodes[ 2 ] = { 0 }, other_edges[ 6 ] = { 0 },
+                                other_nodes[ 6 ] = { 0 };
     Range     hexes;
-    ErrorCode result = foc_get_ents( ocl, ocr, split_quads, split_edges, split_nodes, hexes,
-                                     other_edges, other_nodes );RR;
+    ErrorCode result = foc_get_ents( ocl, ocr, split_quads, split_edges, split_nodes, hexes, other_edges, other_nodes );RR;
 
     // get star entities around edges, separated into halves
     std::vector< EntityHandle > star_dp1[ 2 ], star_dp2[ 2 ];
@@ -1775,8 +1741,8 @@ ErrorCode DualTool::face_open_collapse( EntityHandle ocl, EntityHandle ocr )
     if( MB_SUCCESS != result ) return result;
 
     EntityHandle new_quads[ 2 ], new_edges[ 3 ], new_nodes[ 2 ];
-    result = split_pair_nonmanifold( split_quads, split_edges, split_nodes, star_dp1, star_dp2,
-                                     other_edges, other_nodes, new_quads, new_edges, new_nodes );
+    result = split_pair_nonmanifold( split_quads, split_edges, split_nodes, star_dp1, star_dp2, other_edges,
+                                     other_nodes, new_quads, new_edges, new_nodes );
     if( MB_SUCCESS != result ) return result;
 
     // now merge entities, the C of foc
@@ -1822,9 +1788,8 @@ ErrorCode DualTool::face_open_collapse( EntityHandle ocl, EntityHandle ocr )
 }
 
 ErrorCode DualTool::foc_get_ents( EntityHandle ocl, EntityHandle ocr, EntityHandle* split_quads,
-                                  EntityHandle* split_edges, EntityHandle* split_nodes,
-                                  Range& hexes, EntityHandle* other_edges,
-                                  EntityHandle* other_nodes )
+                                  EntityHandle* split_edges, EntityHandle* split_nodes, Range& hexes,
+                                  EntityHandle* other_edges, EntityHandle* other_nodes )
 {
     // get the entities used for foc; ocl and ocr are dual 1-cells
     // representing quads to be split; returned from this function:
@@ -1888,9 +1853,8 @@ ErrorCode DualTool::foc_get_ents( EntityHandle ocl, EntityHandle ocr, EntityHand
         other_nodes[ 1 ] = mtu.common_entity( split_edges[ 2 ], other_edges[ 1 ], 0 );
 
         assert( other_nodes[ 0 ] && other_nodes[ 1 ] && split_nodes[ 0 ] && split_nodes[ 1 ] );
-        assert( split_edges[ 0 ] && split_edges[ 1 ] && split_edges[ 2 ] &&
-                split_edges[ 0 ] != split_edges[ 1 ] && split_edges[ 1 ] != split_edges[ 2 ] &&
-                split_edges[ 0 ] != split_edges[ 2 ] );
+        assert( split_edges[ 0 ] && split_edges[ 1 ] && split_edges[ 2 ] && split_edges[ 0 ] != split_edges[ 1 ] &&
+                split_edges[ 1 ] != split_edges[ 2 ] && split_edges[ 0 ] != split_edges[ 2 ] );
     }
     else if( common_edges.size( ) == 2 )
     {
@@ -1906,11 +1870,9 @@ ErrorCode DualTool::foc_get_ents( EntityHandle ocl, EntityHandle ocr, EntityHand
             // 1st other edge is opposite second split edge
             result = mtu.opposite_entity( split_quads[ i ], split_edges[ 1 ], other_edges[ i ] );RR;
             // 2nd other edge is opposite first split edge
-            result =
-                mtu.opposite_entity( split_quads[ i ], split_edges[ 0 ], other_edges[ 2 + i ] );RR;
+            result = mtu.opposite_entity( split_quads[ i ], split_edges[ 0 ], other_edges[ 2 + i ] );RR;
             // last other node is opposite split node on split quad
-            result =
-                mtu.opposite_entity( split_quads[ i ], split_nodes[ 0 ], other_nodes[ 2 + i ] );RR;
+            result = mtu.opposite_entity( split_quads[ i ], split_nodes[ 0 ], other_nodes[ 2 + i ] );RR;
         }
     }
     else
@@ -1938,50 +1900,41 @@ ErrorCode DualTool::foc_get_ents( EntityHandle ocl, EntityHandle ocr, EntityHand
             other_edges[ i ] = *tmp_range2.begin( );
             // get edge connected to other node on split edge & split quad; that's
             // opposite prev other_edges on the split quad; that's other_edges[4+i]
-            result =
-                mtu.opposite_entity( split_quads[ i ], other_edges[ i ], other_edges[ 4 + i ] );RR;
+            result = mtu.opposite_entity( split_quads[ i ], other_edges[ i ], other_edges[ 4 + i ] );RR;
             // get the edge on the split quad opposite the split edge; that's other_edges[2+i]
-            result =
-                mtu.opposite_entity( split_quads[ i ], split_edges[ 0 ], other_edges[ 2 + i ] );RR;
+            result = mtu.opposite_entity( split_quads[ i ], split_edges[ 0 ], other_edges[ 2 + i ] );RR;
             // get nodes on other side of split quad from split edge, by getting common
             // node between top/bottom edge and opposite edge
             other_nodes[ 2 + i ] = mtu.common_entity( other_edges[ i ], other_edges[ 2 + i ], 0 );
-            other_nodes[ 4 + i ] =
-                mtu.common_entity( other_edges[ 4 + i ], other_edges[ 2 + i ], 0 );
+            other_nodes[ 4 + i ] = mtu.common_entity( other_edges[ 4 + i ], other_edges[ 2 + i ], 0 );
             if( 0 == other_nodes[ 2 + i ] || 0 == other_nodes[ 4 + i ] ) return MB_FAILURE;
         }
     }
 
-    result = mbImpl->get_adjacencies( split_edges, common_edges.size( ), 3, false, hexes,
-                                      Interface::UNION );
+    result = mbImpl->get_adjacencies( split_edges, common_edges.size( ), 3, false, hexes, Interface::UNION );
     if( MB_SUCCESS != result ) return result;
 
     assert( "split node not in other_nodes" && other_nodes[ 0 ] != split_nodes[ 0 ] &&
             other_nodes[ 0 ] != split_nodes[ 1 ] && other_nodes[ 1 ] != split_nodes[ 0 ] &&
             other_nodes[ 1 ] != split_nodes[ 1 ] );
+    assert( "each split node on an end of a split edge" && mtu.common_entity( other_nodes[ 0 ], split_edges[ 0 ], 0 ) &&
+            ( ( ( split_edges[ 2 ] && mtu.common_entity( other_nodes[ 1 ], split_edges[ 2 ], 0 ) ) ||
+                ( split_edges[ 1 ] && mtu.common_entity( other_nodes[ 1 ], split_edges[ 1 ], 0 ) ) ||
+                mtu.common_entity( other_nodes[ 1 ], split_edges[ 0 ], 0 ) ) ) );
     assert(
-        "each split node on an end of a split edge" &&
-        mtu.common_entity( other_nodes[ 0 ], split_edges[ 0 ], 0 ) &&
-        ( ( ( split_edges[ 2 ] && mtu.common_entity( other_nodes[ 1 ], split_edges[ 2 ], 0 ) ) ||
-            ( split_edges[ 1 ] && mtu.common_entity( other_nodes[ 1 ], split_edges[ 1 ], 0 ) ) ||
-            mtu.common_entity( other_nodes[ 1 ], split_edges[ 0 ], 0 ) ) ) );
-    assert( "opposite other edges meet at an other node" &&
-            ( mtu.common_entity( other_edges[ 0 ], other_edges[ 1 ], 0 ) == other_nodes[ 0 ] ||
-              ( split_edges[ 2 ] && mtu.common_entity( other_edges[ 0 ], other_edges[ 1 ], 0 ) ==
-                                        other_nodes[ 1 ] ) ) &&
-            ( split_edges[ 2 ] ||
-              ( split_edges[ 1 ] &&
-                mtu.common_entity( other_edges[ 2 ], other_edges[ 3 ], 0 ) == other_nodes[ 1 ] ) ||
-              mtu.common_entity( other_edges[ 4 ], other_edges[ 5 ], 0 ) == other_nodes[ 1 ] ) );
+        "opposite other edges meet at an other node" &&
+        ( mtu.common_entity( other_edges[ 0 ], other_edges[ 1 ], 0 ) == other_nodes[ 0 ] ||
+          ( split_edges[ 2 ] && mtu.common_entity( other_edges[ 0 ], other_edges[ 1 ], 0 ) == other_nodes[ 1 ] ) ) &&
+        ( split_edges[ 2 ] ||
+          ( split_edges[ 1 ] && mtu.common_entity( other_edges[ 2 ], other_edges[ 3 ], 0 ) == other_nodes[ 1 ] ) ||
+          mtu.common_entity( other_edges[ 4 ], other_edges[ 5 ], 0 ) == other_nodes[ 1 ] ) );
 
     return MB_SUCCESS;
 }
 
 ErrorCode DualTool::split_pair_nonmanifold( EntityHandle* split_quads, EntityHandle* split_edges,
-                                            EntityHandle*                split_nodes,
-                                            std::vector< EntityHandle >* star_dp1,
-                                            std::vector< EntityHandle >* star_dp2,
-                                            EntityHandle* /*other_edges*/,
+                                            EntityHandle* split_nodes, std::vector< EntityHandle >* star_dp1,
+                                            std::vector< EntityHandle >* star_dp2, EntityHandle* /*other_edges*/,
                                             EntityHandle* /*other_nodes*/, EntityHandle* new_quads,
                                             EntityHandle* new_edges, EntityHandle* new_nodes )
 {
@@ -1993,11 +1946,9 @@ ErrorCode DualTool::split_pair_nonmanifold( EntityHandle* split_quads, EntityHan
 
     // get which star the split faces are in, and choose the other one
     int new_side = -1;
-    if( std::find( star_dp1[ 0 ].begin( ), star_dp1[ 0 ].end( ), split_quads[ 0 ] ) !=
-        star_dp1[ 0 ].end( ) )
+    if( std::find( star_dp1[ 0 ].begin( ), star_dp1[ 0 ].end( ), split_quads[ 0 ] ) != star_dp1[ 0 ].end( ) )
         new_side = 1;
-    else if( std::find( star_dp1[ 1 ].begin( ), star_dp1[ 1 ].end( ), split_quads[ 0 ] ) !=
-             star_dp1[ 1 ].end( ) )
+    else if( std::find( star_dp1[ 1 ].begin( ), star_dp1[ 1 ].end( ), split_quads[ 0 ] ) != star_dp1[ 1 ].end( ) )
         new_side = 0;
     assert( -1 != new_side );
     if( -1 == new_side ) return MB_FAILURE;
@@ -2022,8 +1973,8 @@ ErrorCode DualTool::split_pair_nonmanifold( EntityHandle* split_quads, EntityHan
         assert( 0 != gowith_hex );
 
         // split manifold each of the split_quads, and put the results on the merge list
-        result = mtu.split_entities_manifold( split_quads + i, 1, new_quads + i, NULL,
-                                              ( gowith_hex ? &gowith_hex : NULL ) );RR;
+        result =
+            mtu.split_entities_manifold( split_quads + i, 1, new_quads + i, NULL, ( gowith_hex ? &gowith_hex : NULL ) );RR;
     }
 
     // make ranges of faces which need to be explicitly adj to old, new
@@ -2032,8 +1983,7 @@ ErrorCode DualTool::split_pair_nonmanifold( EntityHandle* split_quads, EntityHan
     Range tmp_addl_faces[ 2 ], addl_faces[ 2 ];
     for( int i = 0; i < 2; i++ )
     {
-        std::copy( star_dp1[ i ].begin( ), star_dp1[ i ].end( ),
-                   range_inserter( tmp_addl_faces[ i ] ) );
+        std::copy( star_dp1[ i ].begin( ), star_dp1[ i ].end( ), range_inserter( tmp_addl_faces[ i ] ) );
         tmp_addl_faces[ new_side ].insert( new_quads[ i ] );
     }
 #ifndef NDEBUG
@@ -2073,8 +2023,8 @@ ErrorCode DualTool::split_pair_nonmanifold( EntityHandle* split_quads, EntityHan
         }
 
         // split edge
-        result = mtu.split_entity_nonmanifold( split_edges[ j ], addl_faces[ 1 - new_side ],
-                                               addl_faces[ new_side ], new_edges[ j ] );RR;
+        result = mtu.split_entity_nonmanifold( split_edges[ j ], addl_faces[ 1 - new_side ], addl_faces[ new_side ],
+                                               new_edges[ j ] );RR;
     }
 
     //=============== split node(s)
@@ -2086,8 +2036,7 @@ ErrorCode DualTool::split_pair_nonmanifold( EntityHandle* split_quads, EntityHan
         // if we're splitting multiple edges, there might be other edges that have the split
         // node; also need to know which side they're on
         Range tmp_addl_edges[ 2 ];
-        result =
-            foc_get_addl_ents( star_dp1, star_dp2, split_edges, split_nodes[ j ], tmp_addl_edges );RR;
+        result = foc_get_addl_ents( star_dp1, star_dp2, split_edges, split_nodes[ j ], tmp_addl_edges );RR;
 
         // also, we need to know which of the split/new edges go
         // with the split/new node; new edges go with side 0, split with 1
@@ -2101,10 +2050,8 @@ ErrorCode DualTool::split_pair_nonmanifold( EntityHandle* split_quads, EntityHan
         // same for star faces and hexes
         for( int i = 0; i < 2; i++ )
         {
-            std::copy( star_dp1[ i ].begin( ), star_dp1[ i ].end( ),
-                       range_inserter( tmp_addl_edges[ i ] ) );
-            std::copy( star_dp2[ i ].begin( ), star_dp2[ i ].end( ),
-                       range_inserter( tmp_addl_edges[ i ] ) );
+            std::copy( star_dp1[ i ].begin( ), star_dp1[ i ].end( ), range_inserter( tmp_addl_edges[ i ] ) );
+            std::copy( star_dp2[ i ].begin( ), star_dp2[ i ].end( ), range_inserter( tmp_addl_edges[ i ] ) );
         }
 
         // finally, new quads
@@ -2115,25 +2062,23 @@ ErrorCode DualTool::split_pair_nonmanifold( EntityHandle* split_quads, EntityHan
         Range addl_edges[ 2 ];
         for( int i = 0; i < 2; i++ )
         {
-            for( Range::reverse_iterator rit = tmp_addl_edges[ i ].rbegin( );
-                 rit != tmp_addl_edges[ i ].rend( ); ++rit )
+            for( Range::reverse_iterator rit = tmp_addl_edges[ i ].rbegin( ); rit != tmp_addl_edges[ i ].rend( );
+                 ++rit )
             {
                 if( mtu.common_entity( *rit, split_nodes[ j ], 0 ) ) addl_edges[ i ].insert( *rit );
             }
         }
 
         // now split the node too
-        result = mtu.split_entity_nonmanifold( split_nodes[ j ], addl_edges[ 1 - new_side ],
-                                               addl_edges[ new_side ], new_nodes[ j ] );RR;
+        result = mtu.split_entity_nonmanifold( split_nodes[ j ], addl_edges[ 1 - new_side ], addl_edges[ new_side ],
+                                               new_nodes[ j ] );RR;
     }
 
     return MB_SUCCESS;
 }
 
-ErrorCode DualTool::foc_get_addl_ents( std::vector< EntityHandle >* star_dp1,
-                                       std::vector< EntityHandle >* /*star_dp2*/,
-                                       EntityHandle* split_edges, EntityHandle split_node,
-                                       Range* addl_ents )
+ErrorCode DualTool::foc_get_addl_ents( std::vector< EntityHandle >* star_dp1, std::vector< EntityHandle >* /*star_dp2*/,
+                                       EntityHandle* split_edges, EntityHandle split_node, Range* addl_ents )
 {
     // if we're splitting 2 edges, there might be other edges that have the split
     // node; also need to know which side they're on
@@ -2152,8 +2097,7 @@ ErrorCode DualTool::foc_get_addl_ents( std::vector< EntityHandle >* star_dp1,
     for( int i = 0; i < 2; i++ )
     {
         Range R1, R3;
-        result = mbImpl->get_adjacencies( &star_dp1[ i ][ 0 ], star_dp1[ i ].size( ), 1, false, R1,
-                                          Interface::UNION );RR;
+        result = mbImpl->get_adjacencies( &star_dp1[ i ][ 0 ], star_dp1[ i ].size( ), 1, false, R1, Interface::UNION );RR;
         R3 = intersect( R1, R2 );
         for( int j = 0; j < 3; j++ )
             if( split_edges[ j ] ) R3.erase( split_edges[ j ] );
@@ -2164,8 +2108,7 @@ ErrorCode DualTool::foc_get_addl_ents( std::vector< EntityHandle >* star_dp1,
 }
 
 ErrorCode DualTool::foc_get_stars( EntityHandle* split_quads, EntityHandle* split_edges,
-                                   std::vector< EntityHandle >* star_dp1,
-                                   std::vector< EntityHandle >* star_dp2 )
+                                   std::vector< EntityHandle >* star_dp1, std::vector< EntityHandle >* star_dp2 )
 {
     bool         on_bdy = false, on_bdy_tmp;
     ErrorCode    result;
@@ -2203,8 +2146,7 @@ ErrorCode DualTool::foc_get_stars( EntityHandle* split_quads, EntityHandle* spli
         // need to be careful about direction on later iters
         else if( hstar[ qpos ] == hstar_tmp[ qpos_tmp ] )
             forward = true;
-        else if( hstar[ qpos ] ==
-                     hstar_tmp[ ( qpos_tmp + qstar_tmp.size( ) - 1 ) % qstar_tmp.size( ) ] &&
+        else if( hstar[ qpos ] == hstar_tmp[ ( qpos_tmp + qstar_tmp.size( ) - 1 ) % qstar_tmp.size( ) ] &&
                  hstar_tmp[ qpos_tmp ] == hstar[ ( qpos + qstar.size( ) - 1 ) % qstar.size( ) ] )
             forward = false;
         else
@@ -2276,16 +2218,14 @@ ErrorCode DualTool::foc_get_stars( EntityHandle* split_quads, EntityHandle* spli
         if( std::find( star_dp2[ 0 ].begin( ), star_dp2[ 0 ].end( ), 0 ) != star_dp2[ 0 ].end( ) )
         {
             // remove *all* the zeros
-            star_dp2[ 0 ].erase( std::remove( star_dp2[ 0 ].begin( ), star_dp2[ 0 ].end( ), 0 ),
-                                 star_dp2[ 0 ].end( ) );
+            star_dp2[ 0 ].erase( std::remove( star_dp2[ 0 ].begin( ), star_dp2[ 0 ].end( ), 0 ), star_dp2[ 0 ].end( ) );
             // put the split quads on this half
             star_dp1[ 0 ].push_back( split_quads[ 0 ] );
             star_dp1[ 0 ].push_back( split_quads[ 1 ] );
         }
         else
         {
-            star_dp2[ 1 ].erase( std::remove( star_dp2[ 1 ].begin( ), star_dp2[ 1 ].end( ), 0 ),
-                                 star_dp2[ 1 ].end( ) );
+            star_dp2[ 1 ].erase( std::remove( star_dp2[ 1 ].begin( ), star_dp2[ 1 ].end( ), 0 ), star_dp2[ 1 ].end( ) );
             // put the split quads on this half
             star_dp1[ 1 ].push_back( split_quads[ 0 ] );
             star_dp1[ 1 ].push_back( split_quads[ 1 ] );
@@ -2298,21 +2238,14 @@ ErrorCode DualTool::foc_get_stars( EntityHandle* split_quads, EntityHandle* spli
     }
 
     // some error checking
-    if( !( ( ( std::find( star_dp1[ 0 ].begin( ), star_dp1[ 0 ].end( ), split_quads[ 0 ] ) ==
-                   star_dp1[ 0 ].end( ) &&
-               std::find( star_dp1[ 0 ].begin( ), star_dp1[ 0 ].end( ), split_quads[ 1 ] ) ==
-                   star_dp1[ 0 ].end( ) &&
-               std::find( star_dp1[ 1 ].begin( ), star_dp1[ 1 ].end( ), split_quads[ 0 ] ) !=
-                   star_dp1[ 1 ].end( ) &&
-               std::find( star_dp1[ 1 ].begin( ), star_dp1[ 1 ].end( ), split_quads[ 1 ] ) !=
-                   star_dp1[ 1 ].end( ) ) ||
+    if( !( ( ( std::find( star_dp1[ 0 ].begin( ), star_dp1[ 0 ].end( ), split_quads[ 0 ] ) == star_dp1[ 0 ].end( ) &&
+               std::find( star_dp1[ 0 ].begin( ), star_dp1[ 0 ].end( ), split_quads[ 1 ] ) == star_dp1[ 0 ].end( ) &&
+               std::find( star_dp1[ 1 ].begin( ), star_dp1[ 1 ].end( ), split_quads[ 0 ] ) != star_dp1[ 1 ].end( ) &&
+               std::find( star_dp1[ 1 ].begin( ), star_dp1[ 1 ].end( ), split_quads[ 1 ] ) != star_dp1[ 1 ].end( ) ) ||
 
-             ( std::find( star_dp1[ 1 ].begin( ), star_dp1[ 1 ].end( ), split_quads[ 0 ] ) ==
-                   star_dp1[ 1 ].end( ) &&
-               std::find( star_dp1[ 1 ].begin( ), star_dp1[ 1 ].end( ), split_quads[ 1 ] ) ==
-                   star_dp1[ 1 ].end( ) &&
-               std::find( star_dp1[ 0 ].begin( ), star_dp1[ 0 ].end( ), split_quads[ 0 ] ) !=
-                   star_dp1[ 0 ].end( ) &&
+             ( std::find( star_dp1[ 1 ].begin( ), star_dp1[ 1 ].end( ), split_quads[ 0 ] ) == star_dp1[ 1 ].end( ) &&
+               std::find( star_dp1[ 1 ].begin( ), star_dp1[ 1 ].end( ), split_quads[ 1 ] ) == star_dp1[ 1 ].end( ) &&
+               std::find( star_dp1[ 0 ].begin( ), star_dp1[ 0 ].end( ), split_quads[ 0 ] ) != star_dp1[ 0 ].end( ) &&
                std::find( star_dp1[ 0 ].begin( ), star_dp1[ 0 ].end( ), split_quads[ 1 ] ) !=
                    star_dp1[ 0 ].end( ) ) ) ) )
     {
@@ -2331,8 +2264,7 @@ ErrorCode DualTool::foc_get_stars( EntityHandle* split_quads, EntityHandle* spli
     return MB_SUCCESS;
 }
 
-ErrorCode DualTool::foc_delete_dual( EntityHandle* split_quads, EntityHandle* split_edges,
-                                     Range& hexes )
+ErrorCode DualTool::foc_delete_dual( EntityHandle* split_quads, EntityHandle* split_edges, Range& hexes )
 {
     // special delete dual procedure, because in some cases we need to delete
     // a sheet too since it'll get merged into another
@@ -2459,8 +2391,7 @@ bool DualTool::is_blind( const EntityHandle chord_or_sheet )
 
 //! given a 1-cell and a chord, return the neighboring vertices on the
 //! chord, in the same order as the 1-cell's vertices
-ErrorCode DualTool::get_opposite_verts( const EntityHandle middle_edge, const EntityHandle chord,
-                                        EntityHandle* verts )
+ErrorCode DualTool::get_opposite_verts( const EntityHandle middle_edge, const EntityHandle chord, EntityHandle* verts )
 {
     // get the edges on the chord, in order, and move to middle_edge
     std::vector< EntityHandle > chord_edges;
@@ -2468,8 +2399,7 @@ ErrorCode DualTool::get_opposite_verts( const EntityHandle middle_edge, const En
     int                         num_connect;
 
     ErrorCode result = mbImpl->get_entities_by_handle( chord, chord_edges );RR;
-    std::vector< EntityHandle >::iterator vit =
-        std::find( chord_edges.begin( ), chord_edges.end( ), middle_edge );
+    std::vector< EntityHandle >::iterator vit = std::find( chord_edges.begin( ), chord_edges.end( ), middle_edge );
     result = mbImpl->get_connectivity( middle_edge, connect, num_connect );RR;
 
     if(
@@ -2541,8 +2471,8 @@ ErrorCode DualTool::get_opposite_verts( const EntityHandle middle_edge, const En
     return MB_SUCCESS;
 }
 
-ErrorCode DualTool::get_dual_entities( const EntityHandle dual_ent, Range* dcells, Range* dedges,
-                                       Range* dverts, Range* dverts_loop, Range* dedges_loop )
+ErrorCode DualTool::get_dual_entities( const EntityHandle dual_ent, Range* dcells, Range* dedges, Range* dverts,
+                                       Range* dverts_loop, Range* dedges_loop )
 {
     ErrorCode result = MB_SUCCESS;
 
@@ -2642,14 +2572,13 @@ ErrorCode DualTool::list_entities( const Range& entities ) const
     for( Range::const_iterator iter = entities.begin( ); iter != entities.end( ); ++iter )
     {
         EntityType this_type = TYPE_FROM_HANDLE( *iter );
-        std::cout << CN::EntityTypeName( this_type ) << " " << ID_FROM_HANDLE( *iter ) << ":"
-                  << std::endl;
+        std::cout << CN::EntityTypeName( this_type ) << " " << ID_FROM_HANDLE( *iter ) << ":" << std::endl;
 
         EntityHandle dual_ent = get_dual_entity( *iter );
         if( 0 != dual_ent )
         {
-            std::cout << "Dual to " << CN::EntityTypeName( mbImpl->type_from_handle( dual_ent ) )
-                      << " " << mbImpl->id_from_handle( dual_ent ) << std::endl;
+            std::cout << "Dual to " << CN::EntityTypeName( mbImpl->type_from_handle( dual_ent ) ) << " "
+                      << mbImpl->id_from_handle( dual_ent ) << std::endl;
         }
 
         if( TYPE_FROM_HANDLE( *iter ) == MBENTITYSET )
@@ -2843,10 +2772,8 @@ ErrorCode DualTool::face_shrink( EntityHandle odedge )
     if( MB_SUCCESS != result ) return result;
 
     // check for and fix any explicit adjacencies on either end quad
-    if( mtu.equivalent_entities( quads[ 0 ] ) )
-        mbImpl->add_adjacencies( quads[ 0 ], &hexes[ 1 ], 1, false );
-    if( mtu.equivalent_entities( quads[ 2 ] ) )
-        mbImpl->add_adjacencies( quads[ 2 ], &hexes[ 0 ], 1, false );
+    if( mtu.equivalent_entities( quads[ 0 ] ) ) mbImpl->add_adjacencies( quads[ 0 ], &hexes[ 1 ], 1, false );
+    if( mtu.equivalent_entities( quads[ 2 ] ) ) mbImpl->add_adjacencies( quads[ 2 ], &hexes[ 0 ], 1, false );
 
     // re-set the global ids for the hexes to what they were
     result = mbImpl->tag_set_data( globalId_tag( ), hexes, 2, tmp_ids );
@@ -2891,8 +2818,7 @@ ErrorCode DualTool::fs_get_quad_loops( EntityHandle* hexes, std::vector< EntityH
     return MB_SUCCESS;
 }
 
-ErrorCode DualTool::fs_check_quad_sense( EntityHandle hex0, EntityHandle quad0,
-                                         std::vector< EntityHandle >* connects )
+ErrorCode DualTool::fs_check_quad_sense( EntityHandle hex0, EntityHandle quad0, std::vector< EntityHandle >* connects )
 {
     // check sense of 0th quad wrt hex; since sense is out of element,
     // switch if quad is NOT reversed wrt hex
@@ -2918,8 +2844,7 @@ ErrorCode DualTool::fs_check_quad_sense( EntityHandle hex0, EntityHandle quad0,
             index0 = i;
             if( 0 != mtu.common_entity( connects[ 0 ][ 1 ], connects[ 1 ][ ( i + 1 ) % 4 ], 1 ) )
                 sense0 = 1;
-            else if( 0 != mtu.common_entity( connects[ 0 ][ 1 ], connects[ 1 ][ ( i + 4 - 1 ) % 4 ],
-                                             1 ) )
+            else if( 0 != mtu.common_entity( connects[ 0 ][ 1 ], connects[ 1 ][ ( i + 4 - 1 ) % 4 ], 1 ) )
                 sense0 = -1;
             break;
         }
@@ -2950,8 +2875,7 @@ ErrorCode DualTool::fs_check_quad_sense( EntityHandle hex0, EntityHandle quad0,
             index2 = i;
             if( 0 != mtu.common_entity( connects[ 1 ][ 1 ], connects[ 2 ][ ( i + 1 ) % 4 ], 1 ) )
                 sense2 = 1;
-            else if( 0 != mtu.common_entity( connects[ 1 ][ 1 ], connects[ 2 ][ ( i + 4 - 1 ) % 4 ],
-                                             1 ) )
+            else if( 0 != mtu.common_entity( connects[ 1 ][ 1 ], connects[ 2 ][ ( i + 4 - 1 ) % 4 ], 1 ) )
                 sense2 = -1;
             break;
         }
@@ -3006,8 +2930,7 @@ ErrorCode DualTool::rev_face_shrink( EntityHandle odedge )
     result = fsr_get_fourth_quad( connects, side_quads );
     if( MB_SUCCESS != result )
     {
-        std::cout << "Can't do -FS here, two hexes must be adjacent to ring of 4 hexes."
-                  << std::endl;
+        std::cout << "Can't do -FS here, two hexes must be adjacent to ring of 4 hexes." << std::endl;
         return result;
     }
 
@@ -3016,8 +2939,7 @@ ErrorCode DualTool::rev_face_shrink( EntityHandle odedge )
     // first get the entities connected to interior 4 verts
     for( int i = 1; i <= 3; i++ )
     {
-        result =
-            mbImpl->get_adjacencies( &connects[ 1 ][ 0 ], 4, i, false, adj_ents, Interface::UNION );
+        result = mbImpl->get_adjacencies( &connects[ 1 ][ 0 ], 4, i, false, adj_ents, Interface::UNION );
         if( MB_SUCCESS != result ) return result;
     }
 
@@ -3201,8 +3123,7 @@ ErrorCode DualTool::fs_get_quads( EntityHandle odedge, EntityHandle* quads, Enti
 
     std::vector< EntityHandle >::iterator vit = std::find( edges.begin( ), edges.end( ), odedge );
     // shouldn't be first or last edge on chord
-    if( vit == edges.end( ) || *edges.begin( ) == *vit || *edges.rbegin( ) == *vit )
-        return MB_FAILURE;
+    if( vit == edges.end( ) || *edges.begin( ) == *vit || *edges.rbegin( ) == *vit ) return MB_FAILURE;
 
     // get quads/connectivity for first 3 quads
     quads[ 0 ] = get_dual_entity( *( vit - 1 ) );
@@ -3240,14 +3161,11 @@ ErrorCode DualTool::delete_whole_dual( )
 
     // gather up all dual entities
     Range dual_ents;
-    result = mbImpl->get_entities_by_type_and_tag( 0, MBVERTEX, &isDualCellTag, NULL, 1, dual_ents,
-                                                   Interface::UNION );RR;
-    result = mbImpl->get_entities_by_type_and_tag( 0, MBEDGE, &isDualCellTag, NULL, 1, dual_ents,
-                                                   Interface::UNION );RR;
-    result = mbImpl->get_entities_by_type_and_tag( 0, MBPOLYGON, &isDualCellTag, NULL, 1, dual_ents,
-                                                   Interface::UNION );RR;
-    result = mbImpl->get_entities_by_type_and_tag( 0, MBPOLYHEDRON, &isDualCellTag, NULL, 1,
-                                                   dual_ents, Interface::UNION );RR;
+    result = mbImpl->get_entities_by_type_and_tag( 0, MBVERTEX, &isDualCellTag, NULL, 1, dual_ents, Interface::UNION );RR;
+    result = mbImpl->get_entities_by_type_and_tag( 0, MBEDGE, &isDualCellTag, NULL, 1, dual_ents, Interface::UNION );RR;
+    result = mbImpl->get_entities_by_type_and_tag( 0, MBPOLYGON, &isDualCellTag, NULL, 1, dual_ents, Interface::UNION );RR;
+    result =
+        mbImpl->get_entities_by_type_and_tag( 0, MBPOLYHEDRON, &isDualCellTag, NULL, 1, dual_ents, Interface::UNION );RR;
 
     // delete them, in reverse order of dimension
     ErrorCode tmp_result;
@@ -3309,8 +3227,7 @@ ErrorCode DualTool::check_dual_adjs( )
         {
             // get corresponding dual entity of dimension dd = 3-pd
             EntityHandle dual_ent = get_dual_entity( *prit );
-            if( 0 == dual_ent )
-                std::cerr << "Problem getting dual entity for " << PRENT( *prit ) << std::endl;
+            if( 0 == dual_ent ) std::cerr << "Problem getting dual entity for " << PRENT( *prit ) << std::endl;
 
             // for each sub dimension sd = 0..pd-1
             for( int sd = 0; sd < pd; sd++ )
@@ -3335,8 +3252,8 @@ ErrorCode DualTool::check_dual_adjs( )
                     EntityHandle tmp_dual = get_dual_entity( *r1it );
                     if( R2.find( tmp_dual ) == R2.end( ) )
                     {
-                        std::cerr << PRENT( *prit ) << ": adj entity " << PRENT( *r1it )
-                                  << " isn't adjacent in dual." << std::endl;
+                        std::cerr << PRENT( *prit ) << ": adj entity " << PRENT( *r1it ) << " isn't adjacent in dual."
+                                  << std::endl;
                         overall_result = MB_FAILURE;
                     }
                 }
@@ -3346,8 +3263,8 @@ ErrorCode DualTool::check_dual_adjs( )
                     EntityHandle tmp_prim = get_dual_entity( *r2it );
                     if( R1.find( tmp_prim ) == R1.end( ) )
                     {
-                        std::cerr << PRENT( *prit ) << ": adj entity " << PRENT( *r2it )
-                                  << " isn't adjacent in primal." << std::endl;
+                        std::cerr << PRENT( *prit ) << ": adj entity " << PRENT( *r2it ) << " isn't adjacent in primal."
+                                  << std::endl;
                         overall_result = MB_FAILURE;
                     }
                 }

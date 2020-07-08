@@ -50,8 +50,7 @@ void GlobalPatch::get_patch_handles( std::vector< PatchHandle >& patch_handles_o
     patch_handles_out[ 0 ] = GLOBAL_PATCH_HANDLE;
 }
 
-void GlobalPatch::get_patch( PatchHandle                         patch_handle,
-                             std::vector< Mesh::ElementHandle >& elem_handles_out,
+void GlobalPatch::get_patch( PatchHandle patch_handle, std::vector< Mesh::ElementHandle >& elem_handles_out,
                              std::vector< Mesh::VertexHandle >& free_vertices_out, MsqError& err )
 {
     free_vertices_out.clear( );

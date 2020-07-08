@@ -82,7 +82,7 @@ void MeshUtilTest::test_edge_length_distribution_types( )
 {
     // create a mesh that contains one of each element type,
     // completely disconnected from any other element
-    double         coords[] = { // triangle : 0 - 2
+    double              coords[] = { // triangle : 0 - 2
                         0, 0, 0, 2, 0, 0, 1, 1, 0,
                         // quad : 3 - 6
                         3, 0, 0, 3, 1, 0, 3, 2, 2, 3, 0, 1,
@@ -94,15 +94,15 @@ void MeshUtilTest::test_edge_length_distribution_types( )
                         0, 0, -2, 2, 0, -2, 1, 1, -2, 0, 0, -1.5, 2, 0, -1.5, 1, 1, -1, 5,
                         // hex : 22 - 29
                         4, 0, 0, 4, 1, 0, 4, 2, 2, 4, 0, 1, 5, 0, 0, 5, 1, 0, 5, 2, 2, 5, 0, 1 };
-    const int      tri_offset = 0;
-    const int      quad_offset = tri_offset + 3;
-    const int      tet_offset = quad_offset + 4;
-    const int      pyr_offset = tet_offset + 4;
-    const int      wedge_offset = pyr_offset + 5;
-    const int      hex_offset = wedge_offset + 6;
-    const int      num_vtx = hex_offset + 8;
-    const int      fixed[ num_vtx ] = { 0 };
-    EntityTopology types[] = { TRIANGLE, QUADRILATERAL, TETRAHEDRON, PYRAMID, PRISM, HEXAHEDRON };
+    const int           tri_offset = 0;
+    const int           quad_offset = tri_offset + 3;
+    const int           tet_offset = quad_offset + 4;
+    const int           pyr_offset = tet_offset + 4;
+    const int           wedge_offset = pyr_offset + 5;
+    const int           hex_offset = wedge_offset + 6;
+    const int           num_vtx = hex_offset + 8;
+    const int           fixed[ num_vtx ] = { 0 };
+    EntityTopology      types[] = { TRIANGLE, QUADRILATERAL, TETRAHEDRON, PYRAMID, PRISM, HEXAHEDRON };
     const unsigned long conn[] = {
         0,  1,  2,  // triangle
         3,  4,  5,  6,  // quadrilateral
@@ -255,8 +255,7 @@ void MeshUtilTest::test_edge_length_distribution_empty( )
 void MeshUtilTest::test_lambda_distribution( )
 {
     // simple regular unit quad mesh one deformed corner
-    double              coords[] = { 0, 2, 0, 1, 2, 0, 2, 2, 0, 0, 1, 0, 1, 1,
-                        0, 2, 1, 0, 0, 0, 0, 1, 0, 0, 3, 0, 0 };
+    double              coords[] = { 0, 2, 0, 1, 2, 0, 2, 2, 0, 0, 1, 0, 1, 1, 0, 2, 1, 0, 0, 0, 0, 1, 0, 0, 3, 0, 0 };
     const unsigned long conn[] = { 3, 4, 1, 0, 4, 5, 2, 1, 6, 7, 4, 3, 7, 8, 5, 4 };
     const int           fixed[ 9 ] = { 0 };
 
@@ -304,7 +303,7 @@ void MeshUtilTest::test_lambda_distribution_mixed( )
 {
     // create a mesh that contains one of each element type,
     // completely disconnected from any other element
-    double         coords[] = { // triangle : 0 - 2
+    double              coords[] = { // triangle : 0 - 2
                         0, 0, 0, 2, 0, 0, 1, 1, 0,
                         // quad : 3 - 6
                         3, 0, 0, 3, 1, 0, 3, 2, 2, 3, 0, 1,
@@ -316,15 +315,15 @@ void MeshUtilTest::test_lambda_distribution_mixed( )
                         0, 0, -2, 2, 0, -2, 1, 1, -2, 0, 0, -1.5, 2, 0, -1.5, 1, 1, -1, 5,
                         // hex : 22 - 29
                         4, 0, 0, 4, 1, 0, 4, 2, 2, 4, 0, 1, 5, 0, 0, 5, 1, 0, 5, 2, 2, 5, 0, 1 };
-    const int      tri_offset = 0;
-    const int      quad_offset = tri_offset + 3;
-    const int      tet_offset = quad_offset + 4;
-    const int      pyr_offset = tet_offset + 4;
-    const int      wedge_offset = pyr_offset + 5;
-    const int      hex_offset = wedge_offset + 6;
-    const int      num_vtx = hex_offset + 8;
-    const int      fixed[ num_vtx ] = { 0 };
-    EntityTopology types[] = { TRIANGLE, QUADRILATERAL, TETRAHEDRON, PYRAMID, PRISM, HEXAHEDRON };
+    const int           tri_offset = 0;
+    const int           quad_offset = tri_offset + 3;
+    const int           tet_offset = quad_offset + 4;
+    const int           pyr_offset = tet_offset + 4;
+    const int           wedge_offset = pyr_offset + 5;
+    const int           hex_offset = wedge_offset + 6;
+    const int           num_vtx = hex_offset + 8;
+    const int           fixed[ num_vtx ] = { 0 };
+    EntityTopology      types[] = { TRIANGLE, QUADRILATERAL, TETRAHEDRON, PYRAMID, PRISM, HEXAHEDRON };
     const unsigned long conn[] = {
         0,  1,  2,  // triangle
         3,  4,  5,  6,  // quadrilateral

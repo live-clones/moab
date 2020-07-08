@@ -14,10 +14,9 @@
 namespace moab
 {
 
-LloydSmoother::LloydSmoother( Interface* impl, ParallelComm* pc, Range& elms, Tag ctag, Tag ftag,
-                              double at, double rt )
-    : mbImpl( impl ), myPcomm( pc ), myElems( elms ), coordsTag( ctag ), fixedTag( ftag ),
-      absTol( at ), relTol( rt ), reportIts( 0 ), numIts( 0 ), iCreatedTag( false )
+LloydSmoother::LloydSmoother( Interface* impl, ParallelComm* pc, Range& elms, Tag ctag, Tag ftag, double at, double rt )
+    : mbImpl( impl ), myPcomm( pc ), myElems( elms ), coordsTag( ctag ), fixedTag( ftag ), absTol( at ), relTol( rt ),
+      reportIts( 0 ), numIts( 0 ), iCreatedTag( false )
 {
 }
 
@@ -34,8 +33,7 @@ ErrorCode LloydSmoother::perform_smooth( )
     ErrorCode rval;
 
     if( myElems.empty( ) ) { MB_SET_ERR( MB_FAILURE, "No elements specified to Lloyd smoother" ); }
-    else if( mbImpl->dimension_from_handle( *myElems.begin( ) ) !=
-             mbImpl->dimension_from_handle( *myElems.rbegin( ) ) )
+    else if( mbImpl->dimension_from_handle( *myElems.begin( ) ) != mbImpl->dimension_from_handle( *myElems.rbegin( ) ) )
     {
         MB_SET_ERR( MB_FAILURE, "Elements of unequal dimension specified to Lloyd smoother" );
     }
@@ -84,8 +82,7 @@ ErrorCode LloydSmoother::perform_smooth( )
     {
         rval = myPcomm->filter_pstatus( verts, PSTATUS_NOT_OWNED, PSTATUS_NOT, -1, &owned_verts );MB_CHK_SET_ERR( rval, "Failed to filter on pstatus" );
         // get shared owned verts, for exchanging tags
-        rval = myPcomm->filter_pstatus( owned_verts, PSTATUS_SHARED, PSTATUS_AND, -1,
-                                        &shared_owned_verts );MB_CHK_SET_ERR( rval, "Failed to filter for shared owned" );
+        rval = myPcomm->filter_pstatus( owned_verts, PSTATUS_SHARED, PSTATUS_AND, -1, &shared_owned_verts );MB_CHK_SET_ERR( rval, "Failed to filter for shared owned" );
         // workaround: if no shared owned verts, put a non-shared one in the list, to prevent
         // exchanging tags for all shared entities
         if( shared_owned_verts.empty( ) ) shared_owned_verts.insert( *verts.begin( ) );
@@ -107,8 +104,7 @@ ErrorCode LloydSmoother::perform_smooth( )
     // some declarations for later iterations
     std::vector< double > fcentroids( 3 * myElems.size( ) );  // fcentroids for element centroids
     std::vector< double > ctag(
-        3 *
-        CN::MAX_NODES_PER_ELEMENT );  // temporary coordinate storage for verts bounding an element
+        3 * CN::MAX_NODES_PER_ELEMENT );  // temporary coordinate storage for verts bounding an element
     const EntityHandle*         conn;  // const ptr & size to elem connectivity
     int                         nconn;
     Range::iterator             eit, vit;  // for iterating over elems, verts
@@ -150,8 +146,7 @@ ErrorCode LloydSmoother::perform_smooth( )
             // vertex centroid = sum(cell centroids)/ncells
             adj_elems.clear( );
             rval = mbImpl->get_adjacencies( &( *vit ), 1, dim, false, adj_elems );MB_CHK_SET_ERR( rval, "Failed getting adjs" );
-            rval = mbImpl->tag_get_data( centroid, &adj_elems[ 0 ], adj_elems.size( ),
-                                         &fcentroids[ 0 ] );MB_CHK_SET_ERR( rval, "Failed to get elem centroid" );
+            rval = mbImpl->tag_get_data( centroid, &adj_elems[ 0 ], adj_elems.size( ), &fcentroids[ 0 ] );MB_CHK_SET_ERR( rval, "Failed to get elem centroid" );
             double vnew[] = { 0.0, 0.0, 0.0 };
             for( e = 0; e < (int)adj_elems.size( ); e++ )
             {
@@ -214,8 +209,7 @@ ErrorCode LloydSmoother::initialize( )
     if( !fixedTag )
     {
         unsigned char fixed = 0x0;
-        rval = mbImpl->tag_get_handle( "", 1, MB_TYPE_OPAQUE, fixedTag, MB_TAG_DENSE | MB_TAG_CREAT,
-                                       &fixed );MB_CHK_SET_ERR( rval, "Trouble making fixed tag" );
+        rval = mbImpl->tag_get_handle( "", 1, MB_TYPE_OPAQUE, fixedTag, MB_TAG_DENSE | MB_TAG_CREAT, &fixed );MB_CHK_SET_ERR( rval, "Trouble making fixed tag" );
         iCreatedTag = true;
 
         // get the skin; get facets, because we might need to filter on shared entities

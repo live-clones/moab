@@ -54,8 +54,7 @@ ReaderIface* ReadRTT::factory( Interface* iface )
 
 // constructor
 ReadRTT::ReadRTT( Interface* impl )
-    : MBI( impl ), geom_tag( 0 ), id_tag( 0 ), name_tag( 0 ), category_tag( 0 ),
-      faceting_tol_tag( 0 )
+    : MBI( impl ), geom_tag( 0 ), id_tag( 0 ), name_tag( 0 ), category_tag( 0 ), faceting_tol_tag( 0 )
 {
     assert( NULL != impl );
     myGeomTool = new GeomTopoTool( impl );
@@ -66,18 +65,17 @@ ReadRTT::ReadRTT( Interface* impl )
     int       negone = -1;
     double    zero = 0.;
     ErrorCode rval;
-    rval = MBI->tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, geom_tag,
-                                MB_TAG_SPARSE | MB_TAG_CREAT, &negone );
+    rval = MBI->tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, geom_tag, MB_TAG_SPARSE | MB_TAG_CREAT,
+                                &negone );
     assert( !rval );
     id_tag = MBI->globalId_tag( );
-    rval = MBI->tag_get_handle( NAME_TAG_NAME, NAME_TAG_SIZE, MB_TYPE_OPAQUE, name_tag,
-                                MB_TAG_SPARSE | MB_TAG_CREAT );
+    rval = MBI->tag_get_handle( NAME_TAG_NAME, NAME_TAG_SIZE, MB_TYPE_OPAQUE, name_tag, MB_TAG_SPARSE | MB_TAG_CREAT );
     assert( !rval );
     rval = MBI->tag_get_handle( CATEGORY_TAG_NAME, CATEGORY_TAG_SIZE, MB_TYPE_OPAQUE, category_tag,
                                 MB_TAG_SPARSE | MB_TAG_CREAT );
     assert( !rval );
-    rval = MBI->tag_get_handle( "FACETING_TOL", 1, MB_TYPE_DOUBLE, faceting_tol_tag,
-                                MB_TAG_SPARSE | MB_TAG_CREAT, &zero );
+    rval =
+        MBI->tag_get_handle( "FACETING_TOL", 1, MB_TYPE_DOUBLE, faceting_tol_tag, MB_TAG_SPARSE | MB_TAG_CREAT, &zero );
     assert( !rval );
 #ifdef NDEBUG
     if( !rval ) {};  // Line to avoid compiler warning about variable set but not used
@@ -96,18 +94,15 @@ ReadRTT::~ReadRTT( )
     delete myGeomTool;
 }
 
-ErrorCode ReadRTT::read_tag_values( const char* /*file_name*/, const char* /*tag_name*/,
-                                    const FileOptions& /*opts*/,
-                                    std::vector< int >& /*tag_values_out*/,
-                                    const SubsetList* /*subset_list*/ )
+ErrorCode ReadRTT::read_tag_values( const char* /*file_name*/, const char* /*tag_name*/, const FileOptions& /*opts*/,
+                                    std::vector< int >& /*tag_values_out*/, const SubsetList* /*subset_list*/ )
 {
     return MB_NOT_IMPLEMENTED;
 }
 
 // load the file as called by the Interface function
-ErrorCode ReadRTT::load_file( const char* filename, const EntityHandle*, const FileOptions&,
-                              const ReaderIface::SubsetList* subset_list,
-                              const Tag* /*file_id_tag*/ )
+ErrorCode ReadRTT::load_file( const char*                    filename, const EntityHandle*, const FileOptions&,
+                              const ReaderIface::SubsetList* subset_list, const Tag* /*file_id_tag*/ )
 {
     ErrorCode rval;
 
@@ -155,8 +150,7 @@ ErrorCode ReadRTT::load_file( const char* filename, const EntityHandle*, const F
     if( rval != MB_SUCCESS ) return rval;
 
     // make the map of surface number in the rttmesh to the surface meshset
-    std::map< int, EntityHandle >
-        surface_map;  // corrsespondance of surface number to entity handle
+    std::map< int, EntityHandle > surface_map;  // corrsespondance of surface number to entity handle
     rval = ReadRTT::generate_topology( side_data, cell_data, surface_map );
     if( rval != MB_SUCCESS ) return rval;
 
@@ -178,8 +172,7 @@ ErrorCode ReadRTT::generate_topology( std::vector< side > side_data, std::vector
     std::vector< EntityHandle > entmap[ 4 ];
     int                         num_ents[ 4 ];  // number of entities in each dimension
 
-    const char geom_categories[][ CATEGORY_TAG_SIZE ] = { "Vertex\0", "Curve\0", "Surface\0",
-                                                          "Volume\0", "Group\0" };
+    const char geom_categories[][ CATEGORY_TAG_SIZE ] = { "Vertex\0", "Curve\0", "Surface\0", "Volume\0", "Group\0" };
 
     std::vector< int > surface_numbers;  // the surface numbers in the problem
 
@@ -244,8 +237,7 @@ ErrorCode ReadRTT::generate_topology( std::vector< side > side_data, std::vector
  * builds the moab representation of the mesh
  */
 ErrorCode ReadRTT::build_moab( std::vector< node > node_data, std::vector< facet > facet_data,
-                               std::vector< tet >            tet_data,
-                               std::map< int, EntityHandle > surface_map )
+                               std::vector< tet > tet_data, std::map< int, EntityHandle > surface_map )
 {
 
     ErrorCode    rval;  // reusable return value
@@ -273,10 +265,9 @@ ErrorCode ReadRTT::build_moab( std::vector< node > node_data, std::vector< facet
     // create sense tag
     Tag side_id_tag, surface_number_tag;
     //  int zero = 0;
-    rval = MBI->tag_get_handle( "SIDEID_TAG", 1, MB_TYPE_INTEGER, side_id_tag,
-                                MB_TAG_SPARSE | MB_TAG_CREAT );
-    rval = MBI->tag_get_handle( "SURFACE_NUMBER", 1, MB_TYPE_INTEGER, surface_number_tag,
-                                MB_TAG_SPARSE | MB_TAG_CREAT );
+    rval = MBI->tag_get_handle( "SIDEID_TAG", 1, MB_TYPE_INTEGER, side_id_tag, MB_TAG_SPARSE | MB_TAG_CREAT );
+    rval =
+        MBI->tag_get_handle( "SURFACE_NUMBER", 1, MB_TYPE_INTEGER, surface_number_tag, MB_TAG_SPARSE | MB_TAG_CREAT );
 
     // create the facets
     EntityHandle                   triangle;
@@ -288,8 +279,7 @@ ErrorCode ReadRTT::build_moab( std::vector< node > node_data, std::vector< facet
     {
         facet tmp = *it_f;
         // get the nodes for the triangle
-        EntityHandle tri_nodes[ 3 ] = { mb_coords[ tmp.connectivity[ 0 ] - 1 ],
-                                        mb_coords[ tmp.connectivity[ 1 ] - 1 ],
+        EntityHandle tri_nodes[ 3 ] = { mb_coords[ tmp.connectivity[ 0 ] - 1 ], mb_coords[ tmp.connectivity[ 1 ] - 1 ],
                                         mb_coords[ tmp.connectivity[ 2 ] - 1 ] };
         // create a triangle element
         rval = MBI->create_element( MBTRI, tri_nodes, 3, triangle );
@@ -315,8 +305,7 @@ ErrorCode ReadRTT::build_moab( std::vector< node > node_data, std::vector< facet
     // create material number tag
     Tag mat_num_tag;
     //  int zero = 0;
-    rval = MBI->tag_get_handle( "MATERIAL_NUMBER", 1, MB_TYPE_INTEGER, mat_num_tag,
-                                MB_TAG_SPARSE | MB_TAG_CREAT );
+    rval = MBI->tag_get_handle( "MATERIAL_NUMBER", 1, MB_TYPE_INTEGER, mat_num_tag, MB_TAG_SPARSE | MB_TAG_CREAT );
 
     // create the tets
     EntityHandle                 tetra;  // handle for a specific tet
@@ -327,9 +316,9 @@ ErrorCode ReadRTT::build_moab( std::vector< node > node_data, std::vector< facet
     {
         tet tmp = *it_t;
         // get the handles for the tet
-        EntityHandle tet_nodes[ 4 ] = {
-            mb_coords[ tmp.connectivity[ 0 ] - 1 ], mb_coords[ tmp.connectivity[ 1 ] - 1 ],
-            mb_coords[ tmp.connectivity[ 2 ] - 1 ], mb_coords[ tmp.connectivity[ 3 ] - 1 ] };
+        EntityHandle tet_nodes[ 4 ] = { mb_coords[ tmp.connectivity[ 0 ] - 1 ], mb_coords[ tmp.connectivity[ 1 ] - 1 ],
+                                        mb_coords[ tmp.connectivity[ 2 ] - 1 ],
+                                        mb_coords[ tmp.connectivity[ 3 ] - 1 ] };
         // create the tet
         rval = MBI->create_element( MBTET, tet_nodes, 4, tetra );
         int mat_number = tmp.material_number;
@@ -595,8 +584,7 @@ ReadRTT::side ReadRTT::get_side_data( std::string sidedata )
 
     std::vector< std::string >::iterator it;
     // set the side id
-    if( tokens.size( ) != 2 )
-    { MB_SET_ERR_RET_VAL( "Error, too many tokens found from side_data", new_side ); }
+    if( tokens.size( ) != 2 ) { MB_SET_ERR_RET_VAL( "Error, too many tokens found from side_data", new_side ); }
     // create the new side
     new_side.id = std::atoi( tokens[ 0 ].c_str( ) );
 
@@ -634,8 +622,7 @@ ReadRTT::cell ReadRTT::get_cell_data( std::string celldata )
     std::vector< std::string >::iterator it;
 
     // set the side id
-    if( tokens.size( ) != 2 )
-    { MB_SET_ERR_RET_VAL( "Error, too many tokens found from cell_data", new_cell ); }
+    if( tokens.size( ) != 2 ) { MB_SET_ERR_RET_VAL( "Error, too many tokens found from cell_data", new_cell ); }
     // create the new side
     new_cell.id = std::atoi( tokens[ 0 ].c_str( ) );
     new_cell.name = tokens[ 1 ];
@@ -653,8 +640,7 @@ ReadRTT::node ReadRTT::get_node_data( std::string nodedata )
     tokens = ReadRTT::split_string( nodedata, ' ' );
 
     // set the side id
-    if( tokens.size( ) != 5 )
-    { MB_SET_ERR_RET_VAL( "Error, too many tokens found from get_node_data", new_node ); }
+    if( tokens.size( ) != 5 ) { MB_SET_ERR_RET_VAL( "Error, too many tokens found from get_node_data", new_node ); }
     std::vector< std::string >::iterator it;
     new_node.id = std::atoi( tokens[ 0 ].c_str( ) );
     new_node.x = std::atof( tokens[ 1 ].c_str( ) );
@@ -673,8 +659,7 @@ ReadRTT::facet ReadRTT::get_facet_data( std::string facetdata )
     tokens = ReadRTT::split_string( facetdata, ' ' );
 
     // set the side id
-    if( tokens.size( ) != 7 )
-    { MB_SET_ERR_RET_VAL( "Error, too many tokens found from get_facet_data", new_facet ); }
+    if( tokens.size( ) != 7 ) { MB_SET_ERR_RET_VAL( "Error, too many tokens found from get_facet_data", new_facet ); }
 
     new_facet.id = std::atoi( tokens[ 0 ].c_str( ) );
     // branch on the rtt version number
@@ -712,8 +697,7 @@ ReadRTT::tet ReadRTT::get_tet_data( std::string tetdata )
     tokens = ReadRTT::split_string( tetdata, ' ' );
 
     // set the side id
-    if( tokens.size( ) != 7 )
-    { MB_SET_ERR_RET_VAL( "Error, too many tokens found from get_tet_data", new_tet ); }
+    if( tokens.size( ) != 7 ) { MB_SET_ERR_RET_VAL( "Error, too many tokens found from get_tet_data", new_tet ); }
     new_tet.id = std::atoi( tokens[ 0 ].c_str( ) );
     // branch on the version number
     if( header_data.version == "v1.0.0" )
@@ -800,10 +784,8 @@ std::vector< std::string > ReadRTT::split_string( std::string string_to_split, c
 /*
  * Generate the parent-child links bwetween the cell and surface meshsets
  */
-void ReadRTT::generate_parent_child_links( int                         num_ents[ 4 ],
-                                           std::vector< EntityHandle > entity_map[ 4 ],
-                                           std::vector< side >         side_data,
-                                           std::vector< cell >         cell_data )
+void ReadRTT::generate_parent_child_links( int num_ents[ 4 ], std::vector< EntityHandle > entity_map[ 4 ],
+                                           std::vector< side > side_data, std::vector< cell > cell_data )
 {
     ErrorCode rval;  // return value
     // loop over the number of surfaces
@@ -828,8 +810,7 @@ void ReadRTT::generate_parent_child_links( int                         num_ents[
                     EntityHandle cell_handle = entity_map[ 3 ][ j ];
                     // parent
                     rval = MBI->add_parent_child( cell_handle, surf_handle );
-                    if( rval != MB_SUCCESS )
-                    { std::cerr << "Failed to add parent child relationship" << std::endl; }
+                    if( rval != MB_SUCCESS ) { std::cerr << "Failed to add parent child relationship" << std::endl; }
                 }
             }
         }
@@ -871,8 +852,7 @@ void ReadRTT::set_surface_senses( int num_ents[ 4 ], std::vector< EntityHandle >
                     else
                         rval = myGeomTool->set_sense( surf_handle, 0, SENSE_REVERSE );
 
-                    if( rval != MB_SUCCESS )
-                    { std::cerr << "Failed to set sense appropriately" << std::endl; }
+                    if( rval != MB_SUCCESS ) { std::cerr << "Failed to set sense appropriately" << std::endl; }
                 }
             }
         }
@@ -902,8 +882,7 @@ EntityHandle ReadRTT::create_group( std::string group_name, int id )
 {
     ErrorCode rval;
     // category tags
-    const char geom_categories[][ CATEGORY_TAG_SIZE ] = { "Vertex\0", "Curve\0", "Surface\0",
-                                                          "Volume\0", "Group\0" };
+    const char geom_categories[][ CATEGORY_TAG_SIZE ] = { "Vertex\0", "Curve\0", "Surface\0", "Volume\0", "Group\0" };
 
     EntityHandle handle;
     rval = MBI->create_meshset( MESHSET_SET, handle );

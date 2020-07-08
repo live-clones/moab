@@ -73,8 +73,7 @@ class Intx2Mesh
     /*
      *  slower intx, use kd tree only, no adjacency, no adv front
      */
-    ErrorCode intersect_meshes_kdtree( EntityHandle mbset1, EntityHandle mbset2,
-                                       EntityHandle& outputSet );
+    ErrorCode intersect_meshes_kdtree( EntityHandle mbset1, EntityHandle mbset2, EntityHandle& outputSet );
 
     // mark could be (3 or 4, depending on type: ) no, it could go to 10
     // no, it will be MAXEDGES = 10
@@ -85,13 +84,13 @@ class Intx2Mesh
     // so, if you intersect 2 convex polygons with MAXEDGES , you will get a convex polygon
     // with 2*MAXEDGES, at most
     // will also return the number of nodes of tgt and src elements
-    virtual ErrorCode computeIntersectionBetweenTgtAndSrc(
-        EntityHandle tgt, EntityHandle src, double* P, int& nP, double& area, int markb[ MAXEDGES ],
-        int markr[ MAXEDGES ], int& nsidesSrc, int& nsidesTgt, bool check_boxes_first = false ) = 0;
+    virtual ErrorCode computeIntersectionBetweenTgtAndSrc( EntityHandle tgt, EntityHandle src, double* P, int& nP,
+                                                           double& area, int markb[ MAXEDGES ], int markr[ MAXEDGES ],
+                                                           int& nsidesSrc, int& nsidesTgt,
+                                                           bool check_boxes_first = false ) = 0;
 
     // this is also abstract
-    virtual ErrorCode findNodes( EntityHandle tgt, int nsTgt, EntityHandle src, int nsSrc,
-                                 double* iP, int nP ) = 0;
+    virtual ErrorCode findNodes( EntityHandle tgt, int nsTgt, EntityHandle src, int nsSrc, double* iP, int nP ) = 0;
 
     // this is also computing the area of the tgt cell in plane (gnomonic plane for sphere)
     // setting the local variables:
@@ -133,8 +132,7 @@ class Intx2Mesh
         box_error = berror;
     }
 
-    ErrorCode create_departure_mesh_2nd_alg( EntityHandle& euler_set,
-                                             EntityHandle& covering_lagr_set );
+    ErrorCode create_departure_mesh_2nd_alg( EntityHandle& euler_set, EntityHandle& covering_lagr_set );
 
     // in this method, used in parallel, each departure elements are already created, and at their
     // positions the covering_set is output, will contain the departure cells that cover the euler
@@ -192,8 +190,8 @@ class Intx2Mesh
 
     EntityHandle mbs1;
     EntityHandle mbs2;
-    Range rs1;  // range set 1 (departure set, lagrange set, src set, manufactured set, target mesh)
-    Range rs2;  // range set 2 (arrival set, euler set, tgt set, initial set, source mesh)
+    Range        rs1;  // range set 1 (departure set, lagrange set, src set, manufactured set, target mesh)
+    Range        rs2;  // range set 2 (arrival set, euler set, tgt set, initial set, source mesh)
 
     EntityHandle outSet;  // will contain intersection
     Tag          gid;  // global id tag will be used to set the parents of the intersection cell
@@ -247,14 +245,13 @@ class Intx2Mesh
     double                box_error;
     /* \brief Local root of the kdtree */
     EntityHandle localRoot;
-    Range localEnts;  // this range is for local elements of interest, euler cells, or "first mesh"
+    Range        localEnts;  // this range is for local elements of interest, euler cells, or "first mesh"
     unsigned int my_rank;
 
 #ifdef MOAB_HAVE_MPI
     ParallelComm* parcomm;
     TupleList*    remote_cells;  // not used anymore for communication, just a container
-    TupleList*
-                                  remote_cells_with_tracers;  // these will be used now to update tracers on remote procs
+    TupleList*    remote_cells_with_tracers;  // these will be used now to update tracers on remote procs
     std::map< int, EntityHandle > globalID_to_eh;  // needed for parallel, mostly
 #endif
     int max_edges_1;  // maximum number of edges in the lagrange set (first set, src)

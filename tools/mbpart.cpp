@@ -45,8 +45,7 @@ const char ZOLTAN_OCTPART_METHOD[] = "OCTPART";
 const char METIS_DEFAULT_METHOD[] = "ML_KWAY";
 /* const char METIS_ALTERNATIVE_METHOD[] = "ML_RB"; */
 
-const char BRIEF_DESC[] =
-    "Use Zoltan or Metis to partition MOAB meshes for use on parallel computers";
+const char         BRIEF_DESC[] = "Use Zoltan or Metis to partition MOAB meshes for use on parallel computers";
 std::ostringstream LONG_DESC;
 
 int main( int argc, char* argv[] )
@@ -70,13 +69,12 @@ int main( int argc, char* argv[] )
     bool moab_use_metis = false;
 #endif
 
-    LONG_DESC
-        << "This utility invokes the ZoltanPartitioner or MetisPartitioner component of MOAB/CGM "
-           "to partition a mesh/geometry."
-        << std::endl
-        << "If no partitioning method is specified, the defaults are: "
-        << "for Zoltan=\"" << DEFAULT_ZOLTAN_METHOD << "\" and Metis=\"" << METIS_DEFAULT_METHOD
-        << " method" << std::endl;
+    LONG_DESC << "This utility invokes the ZoltanPartitioner or MetisPartitioner component of MOAB/CGM "
+                 "to partition a mesh/geometry."
+              << std::endl
+              << "If no partitioning method is specified, the defaults are: "
+              << "for Zoltan=\"" << DEFAULT_ZOLTAN_METHOD << "\" and Metis=\"" << METIS_DEFAULT_METHOD << " method"
+              << std::endl;
 
     ProgOptions opts( LONG_DESC.str( ), BRIEF_DESC );
 
@@ -94,24 +92,19 @@ int main( int argc, char* argv[] )
                                 "are synonymous).",
                                 &zoltan_method );
 #ifdef MOAB_HAVE_PARMETIS
-    opts.addOpt< std::string >(
-        "parmetis,p", "(Zoltan+PARMetis) Specify PARMetis partition method.", &parm_method );
+    opts.addOpt< std::string >( "parmetis,p", "(Zoltan+PARMetis) Specify PARMetis partition method.", &parm_method );
 #endif  // MOAB_HAVE_PARMETIS
-    opts.addOpt< std::string >( "octpart,o", "(Zoltan) Specify OctPart partition method.",
-                                &oct_method );
+    opts.addOpt< std::string >( "octpart,o", "(Zoltan) Specify OctPart partition method.", &oct_method );
 
     bool incl_closure = false;
-    opts.addOpt< void >( "include_closure,c", "Include element closure for part sets.",
-                         &incl_closure );
+    opts.addOpt< void >( "include_closure,c", "Include element closure for part sets.", &incl_closure );
 #endif  // MOAB_HAVE_ZOLTAN
 
     double imbal_tol = 1.03;
-    opts.addOpt< double >( "imbalance,i", "Imbalance tolerance (used in PHG/Hypergraph method)",
-                           &imbal_tol );
+    opts.addOpt< double >( "imbalance,i", "Imbalance tolerance (used in PHG/Hypergraph method)", &imbal_tol );
 
 #ifdef MOAB_HAVE_METIS
-    opts.addOpt< std::string >( "metis,m",
-                                "(Metis) Specify Metis partition method. One of ML_RB or ML_KWAY.",
+    opts.addOpt< std::string >( "metis,m", "(Metis) Specify Metis partition method. One of ML_RB or ML_KWAY.",
                                 &metis_method );
 #endif  // MOAB_HAVE_METIS
 
@@ -120,8 +113,7 @@ int main( int argc, char* argv[] )
     opts.addOpt< void >( "tags,t", "Write partition by tagging entities", &write_tags );
 
     int power = -1;
-    opts.addOpt< int >( "power,M", "Generate multiple partitions, in powers of 2, up to 2^(pow)",
-                        &power );
+    opts.addOpt< int >( "power,M", "Generate multiple partitions, in powers of 2, up to 2^(pow)", &power );
 
     bool reorder = false;
     opts.addOpt< void >( "reorder,R", "Reorder mesh to group entities by partition", &reorder );
@@ -130,8 +122,7 @@ int main( int argc, char* argv[] )
 #ifdef MOAB_HAVE_ZOLTAN
     bool part_surf = false;
 #ifdef MOAB_HAVE_CGM
-    opts.addOpt< double >( "geom,g", "(CGM) If partition geometry, specify mesh size.",
-                           &part_geom_mesh_size );
+    opts.addOpt< double >( "geom,g", "(CGM) If partition geometry, specify mesh size.", &part_geom_mesh_size );
     opts.addOpt< void >( "surf,f", "(CGM) Specify if partition geometry surface.", &part_surf );
 #endif  // MOAB_HAVE_CGM
 
@@ -139,8 +130,7 @@ int main( int argc, char* argv[] )
     opts.addOpt< void >( "ghost,H", "(Zoltan) Specify if partition ghost geometry body." );
 
     int obj_weight = 0;
-    opts.addOpt< int >( "vertex_w,v",
-                        "(Zoltan) Number of weights associated with a graph vertex." );
+    opts.addOpt< int >( "vertex_w,v", "(Zoltan) Number of weights associated with a graph vertex." );
 
     int edge_weight = 0;
     opts.addOpt< int >( "edge_w,e", "(Zoltan) Number of weights associated with an edge." );
@@ -161,22 +151,21 @@ int main( int argc, char* argv[] )
 #endif  // MOAB_HAVE_ZOLTAN
 
     long num_parts;
-    opts.addOpt< std::vector< int > >(
-        "set_l,l", "Load material set(s) with specified ids (comma separated) for partition" );
+    opts.addOpt< std::vector< int > >( "set_l,l",
+                                       "Load material set(s) with specified ids (comma separated) for partition" );
 
     opts.addRequiredArg< int >( "#parts", "Number of parts in partition" );
 
     std::string input_file, output_file;
     opts.addRequiredArg< std::string >( "input_file", "Mesh/geometry to partition", &input_file );
-    opts.addRequiredArg< std::string >(
-        "output_file", "File to which to write partitioned mesh/geometry", &output_file );
+    opts.addRequiredArg< std::string >( "output_file", "File to which to write partitioned mesh/geometry",
+                                        &output_file );
 
     bool print_time = false;
     opts.addOpt< void >( ",T", "Print CPU time for each phase.", &print_time );
 
     bool spherical_coords = false;
-    opts.addOpt< void >( "project_on_sphere,s", "use spherical coordinates for partitioning ",
-                         &spherical_coords );
+    opts.addOpt< void >( "project_on_sphere,s", "use spherical coordinates for partitioning ", &spherical_coords );
 
 #ifdef MOAB_HAVE_METIS
     bool partition_tagged_sets = false;
@@ -186,16 +175,14 @@ int main( int argc, char* argv[] )
     opts.addOpt< void >( "taggedents,y", "(Metis) Partition tagged ents.", &partition_tagged_ents );
 
     std::string aggregating_tag;
-    opts.addOpt< std::string >(
-        "aggregatingtag,a",
-        "(Metis) Specify aggregating tag to partion tagged sets or tagged entities.",
-        &aggregating_tag );
+    opts.addOpt< std::string >( "aggregatingtag,a",
+                                "(Metis) Specify aggregating tag to partion tagged sets or tagged entities.",
+                                &aggregating_tag );
 
     std::string aggregating_bc_tag;
-    opts.addOpt< std::string >(
-        "aggregatingBCtag,B",
-        "(Metis) Specify boundary id tag name used to group cells with same boundary ids.",
-        &aggregating_bc_tag );
+    opts.addOpt< std::string >( "aggregatingBCtag,B",
+                                "(Metis) Specify boundary id tag name used to group cells with same boundary ids.",
+                                &aggregating_bc_tag );
 
     std::string        boundaryIds;
     std::vector< int > BCids;
@@ -228,8 +215,7 @@ int main( int argc, char* argv[] )
     // check if partition geometry, if it is, should get mesh size for the geometry
     if( part_geom_mesh_size != -1.0 && part_geom_mesh_size <= 0.0 )
     {
-        std::cerr << part_geom_mesh_size << ": invalid geometry partition mesh size." << std::endl
-                  << std::endl;
+        std::cerr << part_geom_mesh_size << ": invalid geometry partition mesh size." << std::endl << std::endl;
         opts.printHelp( );
         return EXIT_FAILURE;
     }
@@ -257,8 +243,7 @@ int main( int argc, char* argv[] )
             GeometryQueryTool* gti = GeometryQueryTool::instance( );
             zoltan_tool = new ZoltanPartitioner( &mb, false, argc, argv, gti );
 #else
-            std::cerr << "CGM should be configured to partition geometry." << std::endl
-                      << std::endl;
+            std::cerr << "CGM should be configured to partition geometry." << std::endl << std::endl;
             opts.printHelp( );
             return EXIT_FAILURE;
 #endif  // MOAB_HAVE_CGM
@@ -266,8 +251,7 @@ int main( int argc, char* argv[] )
         zoltan_tool->set_global_id_option( assign_global_ids );
     }
 
-    if( zoltan_method.empty( ) && parm_method.empty( ) && oct_method.empty( ) )
-        zoltan_method = DEFAULT_ZOLTAN_METHOD;
+    if( zoltan_method.empty( ) && parm_method.empty( ) && oct_method.empty( ) ) zoltan_method = DEFAULT_ZOLTAN_METHOD;
     if( !parm_method.empty( ) ) zoltan_method = ZOLTAN_PARMETIS_METHOD;
     if( !oct_method.empty( ) ) zoltan_method = ZOLTAN_OCTPART_METHOD;
 #endif  // MOAB_HAVE_ZOLTAN
@@ -280,8 +264,7 @@ int main( int argc, char* argv[] )
         metis_tool->set_global_id_option( assign_global_ids );
     }
 
-    if( ( aggregating_tag.empty( ) && partition_tagged_sets ) ||
-        ( aggregating_tag.empty( ) && partition_tagged_ents ) )
+    if( ( aggregating_tag.empty( ) && partition_tagged_sets ) || ( aggregating_tag.empty( ) && partition_tagged_ents ) )
         aggregating_tag = DEFAULT_TAGGEDSETS_TAG;
     if( !write_sets && !write_tags ) write_sets = true;
 
@@ -311,8 +294,7 @@ int main( int argc, char* argv[] )
     }
     else if( power < 1 || power > 18 )
     {
-        std::cerr << power << ": invalid power for multiple partitions. Expected value in [1,18]"
-                  << std::endl
+        std::cerr << power << ": invalid power for multiple partitions. Expected value in [1,18]" << std::endl
                   << std::endl;
         opts.printHelp( );
         return EXIT_FAILURE;
@@ -350,9 +332,7 @@ int main( int argc, char* argv[] )
 
     if( num_parts <= 1 )
     {
-        std::cerr << "** Please specify #parts = " << num_parts << " to be greater than 1."
-                  << std::endl
-                  << std::endl;
+        std::cerr << "** Please specify #parts = " << num_parts << " to be greater than 1." << std::endl << std::endl;
         opts.printHelp( );
         return EXIT_FAILURE;
     }
@@ -375,8 +355,7 @@ int main( int argc, char* argv[] )
         rval = mb.load_mesh( input_file.c_str( ), &set_l[ 0 ], (int)set_l.size( ) );MB_CHK_SET_ERR( rval, "Failed to load input mesh: " + input_file );
     }
     if( print_time )
-        std::cout << "Read input file in " << ( clock( ) - t ) / (double)CLOCKS_PER_SEC
-                  << " seconds" << std::endl;
+        std::cout << "Read input file in " << ( clock( ) - t ) / (double)CLOCKS_PER_SEC << " seconds" << std::endl;
 
     for( int dim = part_dim; dim >= 0; --dim )
     {
@@ -404,17 +383,15 @@ int main( int argc, char* argv[] )
         {
             rval = zoltan_tool->partition_mesh_and_geometry(
                 part_geom_mesh_size, num_parts, zoltan_method.c_str( ),
-                ( !parm_method.empty( ) ? parm_method.c_str( ) : oct_method.c_str( ) ), imbal_tol,
-                part_dim, write_sets, write_tags, obj_weight, edge_weight, part_surf, ghost,
-                spherical_coords, print_time );MB_CHK_SET_ERR( rval, "Zoltan partitioner failed." );
+                ( !parm_method.empty( ) ? parm_method.c_str( ) : oct_method.c_str( ) ), imbal_tol, part_dim, write_sets,
+                write_tags, obj_weight, edge_weight, part_surf, ghost, spherical_coords, print_time );MB_CHK_SET_ERR( rval, "Zoltan partitioner failed." );
         }
 #endif
 #ifdef MOAB_HAVE_METIS
         if( moab_use_metis )
         {
-            rval = metis_tool->partition_mesh( num_parts, metis_method.c_str( ), part_dim,
-                                               write_sets, write_tags, partition_tagged_sets,
-                                               partition_tagged_ents, aggregating_tag.c_str( ),
+            rval = metis_tool->partition_mesh( num_parts, metis_method.c_str( ), part_dim, write_sets, write_tags,
+                                               partition_tagged_sets, partition_tagged_ents, aggregating_tag.c_str( ),
                                                print_time );MB_CHK_SET_ERR( rval, "Metis partitioner failed." );
         }
 #endif
@@ -446,8 +423,8 @@ int main( int argc, char* argv[] )
 
             rval = mb.tag_delete( order );MB_CHK_SET_ERR( rval, "Failed to delete tag." );
             if( print_time )
-                std::cout << "Reordered mesh in " << ( clock( ) - t ) / (double)CLOCKS_PER_SEC
-                          << " seconds" << std::endl;
+                std::cout << "Reordered mesh in " << ( clock( ) - t ) / (double)CLOCKS_PER_SEC << " seconds"
+                          << std::endl;
         }
 
 #ifdef MOAB_HAVE_ZOLTAN
@@ -476,8 +453,7 @@ int main( int argc, char* argv[] )
             }
             else
             {
-                tmp_output_file << output_file.substr( 0, idx ) << "_" << num_parts
-                                << output_file.substr( idx );
+                tmp_output_file << output_file.substr( 0, idx ) << "_" << num_parts << output_file.substr( idx );
             }
         }
         else
@@ -491,8 +467,7 @@ int main( int argc, char* argv[] )
             if( MB_SUCCESS != rval )
             {
                 std::cerr << tmp_output_file.str( ) << " : failed to write file." << std::endl;
-                std::cerr << "  Error code: " << mb.get_error_string( rval ) << " (" << rval << ")"
-                          << std::endl;
+                std::cerr << "  Error code: " << mb.get_error_string( rval ) << " (" << rval << ")" << std::endl;
                 std::string errstr;
                 mb.get_last_error( errstr );
                 if( !errstr.empty( ) ) std::cerr << "  Error message: " << errstr << std::endl;
@@ -506,8 +481,7 @@ int main( int argc, char* argv[] )
             std::string::size_type idx = output_file.find_last_of( "." );
             int                    c_size = output_file.length( ) - idx;
             const char*            file_type = NULL;
-            if( output_file.compare( idx, c_size, ".occ" ) == 0 ||
-                output_file.compare( idx, c_size, ".OCC" ) == 0 )
+            if( output_file.compare( idx, c_size, ".occ" ) == 0 || output_file.compare( idx, c_size, ".OCC" ) == 0 )
                 file_type = "OCC";
             else if( output_file.compare( idx, c_size, ".sab" ) == 0 )
                 file_type = "ACIS_SAB";
@@ -515,16 +489,15 @@ int main( int argc, char* argv[] )
                 file_type = "ACIS_SAT";
             else
             {
-                std::cerr << "File type for " << output_file.c_str( ) << " not supported."
-                          << std::endl;
+                std::cerr << "File type for " << output_file.c_str( ) << " not supported." << std::endl;
                 return 1;
             }
 
             int                   num_ents_exported = 0;
             DLIList< RefEntity* > ref_entity_list;
-            CubitStatus           status = CubitCompat_export_solid_model(
-                ref_entity_list, tmp_output_file.str( ).c_str( ), file_type, num_ents_exported,
-                CubitString( __FILE__ ) );
+            CubitStatus           status =
+                CubitCompat_export_solid_model( ref_entity_list, tmp_output_file.str( ).c_str( ), file_type,
+                                                num_ents_exported, CubitString( __FILE__ ) );
             if( CUBIT_SUCCESS != status )
             {
                 std::cerr << "CGM couldn't export models." << std::endl;
@@ -535,8 +508,8 @@ int main( int argc, char* argv[] )
 #endif
 
         if( print_time )
-            std::cout << "Wrote \"" << tmp_output_file.str( ) << "\" in "
-                      << ( clock( ) - t ) / (double)CLOCKS_PER_SEC << " seconds" << std::endl;
+            std::cout << "Wrote \"" << tmp_output_file.str( ) << "\" in " << ( clock( ) - t ) / (double)CLOCKS_PER_SEC
+                      << " seconds" << std::endl;
 
 #ifdef MOAB_HAVE_ZOLTAN
 
@@ -551,15 +524,12 @@ int main( int argc, char* argv[] )
                 Range        masterverts;
                 rval = mb.get_entities_by_dimension( rootset, 0, masterverts );MB_CHK_SET_ERR( rval, "Can't create vertices on master set" );
                 double       points[ 6 ];
-                EntityHandle mfrontback[ 2 ] = { masterverts[ 0 ],
-                                                 masterverts[ masterverts.size( ) - 1 ] };
+                EntityHandle mfrontback[ 2 ] = { masterverts[ 0 ], masterverts[ masterverts.size( ) - 1 ] };
                 rval = mb.get_coords( &mfrontback[ 0 ], 2, points );MB_CHK_ERR( rval );
                 const double mr1 =
-                    std::sqrt( points[ 0 ] * points[ 0 ] + points[ 1 ] * points[ 1 ] +
-                               points[ 2 ] * points[ 2 ] );
+                    std::sqrt( points[ 0 ] * points[ 0 ] + points[ 1 ] * points[ 1 ] + points[ 2 ] * points[ 2 ] );
                 const double mr2 =
-                    std::sqrt( points[ 3 ] * points[ 3 ] + points[ 4 ] * points[ 4 ] +
-                               points[ 5 ] * points[ 5 ] );
+                    std::sqrt( points[ 3 ] * points[ 3 ] + points[ 4 ] * points[ 4 ] + points[ 5 ] * points[ 5 ] );
                 master_radius = 0.5 * ( mr1 + mr2 );
             }
             EntityHandle slaveset;
@@ -570,15 +540,12 @@ int main( int argc, char* argv[] )
                 double points[ 6 ];
                 Range  slaveverts;
                 rval = mb.get_entities_by_dimension( slaveset, 0, slaveverts );MB_CHK_SET_ERR( rval, "Can't create vertices on master set" );
-                EntityHandle sfrontback[ 2 ] = { slaveverts[ 0 ],
-                                                 slaveverts[ slaveverts.size( ) - 1 ] };
+                EntityHandle sfrontback[ 2 ] = { slaveverts[ 0 ], slaveverts[ slaveverts.size( ) - 1 ] };
                 rval = mb.get_coords( &sfrontback[ 0 ], 2, points );MB_CHK_ERR( rval );
                 const double sr1 =
-                    std::sqrt( points[ 0 ] * points[ 0 ] + points[ 1 ] * points[ 1 ] +
-                               points[ 2 ] * points[ 2 ] );
+                    std::sqrt( points[ 0 ] * points[ 0 ] + points[ 1 ] * points[ 1 ] + points[ 2 ] * points[ 2 ] );
                 const double sr2 =
-                    std::sqrt( points[ 3 ] * points[ 3 ] + points[ 4 ] * points[ 4 ] +
-                               points[ 5 ] * points[ 5 ] );
+                    std::sqrt( points[ 3 ] * points[ 3 ] + points[ 4 ] * points[ 4 ] + points[ 5 ] * points[ 5 ] );
                 slave_radius = 0.5 * ( sr1 + sr2 );
                 // Let us rescale both master and slave meshes to a unit sphere
                 rval = moab::IntxUtils::ScaleToRadius( &mb, slaveset, master_radius );MB_CHK_ERR( rval );
@@ -594,14 +561,13 @@ int main( int argc, char* argv[] )
 
             if( print_time )
             {
-                std::cout << "Time taken to infer slave mesh partitions = "
-                          << ( clock( ) - t ) / (double)CLOCKS_PER_SEC << " seconds" << std::endl;
+                std::cout << "Time taken to infer slave mesh partitions = " << ( clock( ) - t ) / (double)CLOCKS_PER_SEC
+                          << " seconds" << std::endl;
             }
 
             size_t      lastindex = slave_file_name.find_last_of( "." );
-            std::string inferred_output_file =
-                slave_file_name.substr( 0, lastindex ) + "_inferred" +
-                slave_file_name.substr( lastindex, slave_file_name.size( ) );
+            std::string inferred_output_file = slave_file_name.substr( 0, lastindex ) + "_inferred" +
+                                               slave_file_name.substr( lastindex, slave_file_name.size( ) );
 
             // Save the resulting mesh
             std::cout << "Saving inferred file to " << inferred_output_file << "..." << std::endl;
@@ -609,8 +575,7 @@ int main( int argc, char* argv[] )
             if( MB_SUCCESS != rval )
             {
                 std::cerr << tmp_output_file.str( ) << " : failed to write file." << std::endl;
-                std::cerr << "  Error code: " << mb.get_error_string( rval ) << " (" << rval << ")"
-                          << std::endl;
+                std::cerr << "  Error code: " << mb.get_error_string( rval ) << " (" << rval << ")" << std::endl;
                 std::string errstr;
                 mb.get_last_error( errstr );
                 if( !errstr.empty( ) ) std::cerr << "  Error message: " << errstr << std::endl;

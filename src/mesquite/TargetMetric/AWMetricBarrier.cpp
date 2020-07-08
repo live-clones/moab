@@ -42,16 +42,14 @@ AWMetricBarrier::~AWMetricBarrier( ) {}
 AWMetricBarrier2D::~AWMetricBarrier2D( ) {}
 AWMetricBarrier3D::~AWMetricBarrier3D( ) {}
 
-bool AWMetricBarrier2D::evaluate( const MsqMatrix< 3, 3 >&, const MsqMatrix< 3, 3 >&, double&,
-                                  MsqError& err )
+bool AWMetricBarrier2D::evaluate( const MsqMatrix< 3, 3 >&, const MsqMatrix< 3, 3 >&, double&, MsqError& err )
 {
     MSQ_SETERR( err )
     ( "2D target metric cannot be evaluated for volume elements", MsqError::UNSUPPORTED_ELEMENT );
     return false;
 }
 
-bool AWMetricBarrier3D::evaluate( const MsqMatrix< 2, 2 >&, const MsqMatrix< 2, 2 >&, double&,
-                                  MsqError& err )
+bool AWMetricBarrier3D::evaluate( const MsqMatrix< 2, 2 >&, const MsqMatrix< 2, 2 >&, double&, MsqError& err )
 {
     MSQ_SETERR( err )
     ( "2D target metric cannot be evaluated for volume elements", MsqError::UNSUPPORTED_ELEMENT );

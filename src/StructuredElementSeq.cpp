@@ -24,12 +24,10 @@
 namespace moab
 {
 
-StructuredElementSeq::StructuredElementSeq( EntityHandle shandle, const int imin, const int jmin,
-                                            const int kmin, const int imax, const int jmax,
-                                            const int kmax, int* is_per )
+StructuredElementSeq::StructuredElementSeq( EntityHandle shandle, const int imin, const int jmin, const int kmin,
+                                            const int imax, const int jmax, const int kmax, int* is_per )
     : ElementSequence( shandle,
-                       ScdElementData::calc_num_entities( shandle, imax - imin, jmax - jmin,
-                                                          kmax - kmin, is_per ),
+                       ScdElementData::calc_num_entities( shandle, imax - imin, jmax - jmin, kmax - kmin, is_per ),
                        CN::VerticesPerEntity( TYPE_FROM_HANDLE( shandle ) ),
                        new ScdElementData( shandle, imin, jmin, kmin, imax, jmax, kmax, is_per ) )
 {
@@ -37,8 +35,7 @@ StructuredElementSeq::StructuredElementSeq( EntityHandle shandle, const int imin
 
 StructuredElementSeq::~StructuredElementSeq( ) {}
 
-ErrorCode StructuredElementSeq::get_connectivity( EntityHandle                 handle,
-                                                  std::vector< EntityHandle >& connect,
+ErrorCode StructuredElementSeq::get_connectivity( EntityHandle handle, std::vector< EntityHandle >& connect,
                                                   bool /*topological*/ ) const
 {
     int       i, j, k;
@@ -90,8 +87,7 @@ SequenceData* StructuredElementSeq::create_data_subset( EntityHandle, EntityHand
     return 0;
 }
 
-void StructuredElementSeq::get_const_memory_use( unsigned long& bytes_per_entity,
-                                                 unsigned long& sequence_size ) const
+void StructuredElementSeq::get_const_memory_use( unsigned long& bytes_per_entity, unsigned long& sequence_size ) const
 {
     sequence_size = sizeof( *this );
     bytes_per_entity = sdata( )->get_memory_use( ) / sdata( )->size( );

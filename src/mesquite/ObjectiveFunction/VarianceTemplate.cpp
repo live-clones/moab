@@ -52,8 +52,8 @@ void VarianceTemplate::clear( )
     saveSum = saveSqrSum = 0;
 }
 
-void VarianceTemplate::accumulate( double sum, double sqr_sum, size_t count, EvalType type,
-                                   double& result_sum, double& result_sqr, size_t& global_count )
+void VarianceTemplate::accumulate( double sum, double sqr_sum, size_t count, EvalType type, double& result_sum,
+                                   double& result_sqr, size_t& global_count )
 {
     switch( type )
     {
@@ -95,8 +95,7 @@ void VarianceTemplate::accumulate( double sum, double sqr_sum, size_t count, Eva
     }
 }
 
-bool VarianceTemplate::evaluate( EvalType type, PatchData& pd, double& value_out, bool free,
-                                 MsqError& err )
+bool VarianceTemplate::evaluate( EvalType type, PatchData& pd, double& value_out, bool free, MsqError& err )
 {
     QualityMetric* qm = get_quality_metric( );
     if( type == ObjectiveFunction::ACCUMULATE )
@@ -199,11 +198,9 @@ bool VarianceTemplate::evaluate_with_gradient( EvalType type, PatchData& pd, dou
     return true;
 }
 
-bool VarianceTemplate::evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd,
-                                                       double&                     value_out,
+bool VarianceTemplate::evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd, double& value_out,
                                                        std::vector< Vector3D >&    grad_out,
-                                                       std::vector< SymMatrix3D >& hess_diag_out,
-                                                       MsqError&                   err )
+                                                       std::vector< SymMatrix3D >& hess_diag_out, MsqError& err )
 {
     QualityMetric* qm = get_quality_metric( );
     qm->get_evaluations( pd, qmHandles, OF_FREE_EVALS_ONLY, err );
@@ -216,8 +213,7 @@ bool VarianceTemplate::evaluate_with_Hessian_diagonal( EvalType type, PatchData&
     gradSum.resize( pd.num_free_vertices( ), Vector3D( 0.0, 0.0, 0.0 ) );
     hessSum.clear( );  // store sum of Hessians of metrics
     hessSum.resize( pd.num_free_vertices( ), SymMatrix3D( 0.0 ) );
-    hess_diag_out
-        .clear( );  // store sum of metric * outer_product(metric gradient), and later OF Hessian
+    hess_diag_out.clear( );  // store sum of metric * outer_product(metric gradient), and later OF Hessian
     hess_diag_out.resize( pd.num_free_vertices( ), SymMatrix3D( 0.0 ) );
 
     // calculate OF value and gradient for just the patch
@@ -226,8 +222,7 @@ bool VarianceTemplate::evaluate_with_Hessian_diagonal( EvalType type, PatchData&
     double                                value, sum = 0.0, sqr = 0.0;
     for( i = qmHandles.begin( ); i != qmHandles.end( ); ++i )
     {
-        bool result = qm->evaluate_with_Hessian_diagonal( pd, *i, value, mIndices, mGradient,
-                                                          mHessDiag, err );
+        bool result = qm->evaluate_with_Hessian_diagonal( pd, *i, value, mIndices, mGradient, mHessDiag, err );
         if( MSQ_CHKERR( err ) || !result ) return false;
         if( fabs( value ) < DBL_EPSILON ) continue;
 

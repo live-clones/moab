@@ -12,15 +12,14 @@
 
 using namespace moab;
 
-#define CHKERR( A )                                                                          \
-    do                                                                                       \
-    {                                                                                        \
-        if( MB_SUCCESS != ( A ) )                                                            \
-        {                                                                                    \
-            std::cerr << "Failure (error code " << ( A ) << ") at " __FILE__ ":" << __LINE__ \
-                      << std::endl;                                                          \
-            return A;                                                                        \
-        }                                                                                    \
+#define CHKERR( A )                                                                                        \
+    do                                                                                                     \
+    {                                                                                                      \
+        if( MB_SUCCESS != ( A ) )                                                                          \
+        {                                                                                                  \
+            std::cerr << "Failure (error code " << ( A ) << ") at " __FILE__ ":" << __LINE__ << std::endl; \
+            return A;                                                                                      \
+        }                                                                                                  \
     } while( false )
 
 #ifdef HAVE_OCC_STEP
@@ -114,8 +113,7 @@ void read_cube_curves_test( )
     int   dim = 1;
     void* val[] = { &dim };
     int   number_of_curves;
-    rval = mb->get_number_entities_by_type_and_tag( 0, MBENTITYSET, &geom_tag, val, 1,
-                                                    number_of_curves );CHECK_ERR( rval );
+    rval = mb->get_number_entities_by_type_and_tag( 0, MBENTITYSET, &geom_tag, val, 1, number_of_curves );CHECK_ERR( rval );
     // For a cube, there should be exactly 12 curves loaded from the file
     CHECK_EQUAL( 12, number_of_curves );
 }
@@ -139,8 +137,7 @@ void read_cube_surfs_test( )
     int   dim = 2;
     void* val[] = { &dim };
     int   number_of_surfs;
-    rval = mb->get_number_entities_by_type_and_tag( 0, MBENTITYSET, &geom_tag, val, 1,
-                                                    number_of_surfs );CHECK_ERR( rval );
+    rval = mb->get_number_entities_by_type_and_tag( 0, MBENTITYSET, &geom_tag, val, 1, number_of_surfs );CHECK_ERR( rval );
     // For a cube, there should be exactly 6 surfaces
     CHECK_EQUAL( 6, number_of_surfs );
 }
@@ -162,8 +159,7 @@ void read_cube_vols_test( )
     int   dim = 3;
     void* val[] = { &dim };
     int   number_of_vols;
-    rval = mb->get_number_entities_by_type_and_tag( 0, MBENTITYSET, &geom_tag, val, 1,
-                                                    number_of_vols );CHECK_ERR( rval );
+    rval = mb->get_number_entities_by_type_and_tag( 0, MBENTITYSET, &geom_tag, val, 1, number_of_vols );CHECK_ERR( rval );
     CHECK_EQUAL( 1, number_of_vols );
 }
 

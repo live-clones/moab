@@ -66,8 +66,8 @@ static Intx2MeshOnSphere* pworker = NULL;
 extern "C" {
 #endif
 
-void initialize_area_and_tracer( iMesh_Instance instance, iBase_EntitySetHandle imesh_euler_set,
-                                 double* area_vals, int* ierr )
+void initialize_area_and_tracer( iMesh_Instance instance, iBase_EntitySetHandle imesh_euler_set, double* area_vals,
+                                 int* ierr )
 {
 
     EntityHandle eul_set = (EntityHandle)imesh_euler_set;
@@ -85,8 +85,7 @@ void initialize_area_and_tracer( iMesh_Instance instance, iBase_EntitySetHandle 
     // time step
     Tag         tagArea = 0;
     std::string tag_name4( "Area" );
-    rval = mb->tag_get_handle( tag_name4.c_str( ), 1, MB_TYPE_DOUBLE, tagArea,
-                               MB_TAG_DENSE | MB_TAG_CREAT );
+    rval = mb->tag_get_handle( tag_name4.c_str( ), 1, MB_TYPE_DOUBLE, tagArea, MB_TAG_DENSE | MB_TAG_CREAT );
     ERRORV( rval, "can't get area tag" );
 
     std::cout << " num quads = " << eulQuads.size( ) << "\n";
@@ -99,8 +98,7 @@ void initialize_area_and_tracer( iMesh_Instance instance, iBase_EntitySetHandle 
 }
 
 void update_tracer_test( iMesh_Instance instance, iBase_EntitySetHandle imesh_euler_set,
-                         iBase_EntitySetHandle imesh_output_set, int numTracers,
-                         double* tracer_vals, int* ierr )
+                         iBase_EntitySetHandle imesh_output_set, int numTracers, double* tracer_vals, int* ierr )
 {
 
     EntityHandle eul_set = (EntityHandle)imesh_euler_set;
@@ -118,16 +116,14 @@ void update_tracer_test( iMesh_Instance instance, iBase_EntitySetHandle imesh_eu
     // tagElem is the average computed at each element, from nodal values
     Tag         tagElem = 0;
     std::string tag_name2( "TracerAverage" );
-    rval = mb->tag_get_handle( tag_name2.c_str( ), numTracers, MB_TYPE_DOUBLE, tagElem,
-                               MB_TAG_DENSE | MB_TAG_CREAT );
+    rval = mb->tag_get_handle( tag_name2.c_str( ), numTracers, MB_TYPE_DOUBLE, tagElem, MB_TAG_DENSE | MB_TAG_CREAT );
     ERRORV( rval, "can't get tracer tag " );
 
     // area of the euler element is fixed, store it; it is used to recompute the averages at each
     // time step
     Tag         tagArea = 0;
     std::string tag_name4( "Area" );
-    rval = mb->tag_get_handle( tag_name4.c_str( ), 1, MB_TYPE_DOUBLE, tagArea,
-                               MB_TAG_DENSE | MB_TAG_CREAT );
+    rval = mb->tag_get_handle( tag_name4.c_str( ), 1, MB_TYPE_DOUBLE, tagArea, MB_TAG_DENSE | MB_TAG_CREAT );
     ERRORV( rval, "can't get area tag" );
 
     std::cout << " num quads = " << eulQuads.size( ) << "\n";
@@ -198,16 +194,14 @@ void update_tracer( iMesh_Instance instance, iBase_EntitySetHandle imesh_euler_s
     // tagElem is the average computed at each element, from nodal values
     Tag         tagElem = 0;
     std::string tag_name2( "TracerAverage" );
-    rval = mb->tag_get_handle( tag_name2.c_str( ), 1, MB_TYPE_DOUBLE, tagElem,
-                               MB_TAG_DENSE | MB_TAG_CREAT );
+    rval = mb->tag_get_handle( tag_name2.c_str( ), 1, MB_TYPE_DOUBLE, tagElem, MB_TAG_DENSE | MB_TAG_CREAT );
     ERRORV( rval, "can't get tracer tag " );
 
     // area of the euler element is fixed, store it; it is used to recompute the averages at each
     // time step
     Tag         tagArea = 0;
     std::string tag_name4( "Area" );
-    rval = mb->tag_get_handle( tag_name4.c_str( ), 1, MB_TYPE_DOUBLE, tagArea,
-                               MB_TAG_DENSE | MB_TAG_CREAT );
+    rval = mb->tag_get_handle( tag_name4.c_str( ), 1, MB_TYPE_DOUBLE, tagArea, MB_TAG_DENSE | MB_TAG_CREAT );
     ERRORV( rval, "can't get area tag" );
 
     rval = worker.update_tracer_data( outputSet, tagElem, tagArea );
@@ -219,9 +213,8 @@ void update_tracer( iMesh_Instance instance, iBase_EntitySetHandle imesh_euler_s
     return;
 }
 
-ErrorCode create_coarse_mesh( Interface* mb, ParallelComm* pcomm, EntityHandle coarseSet,
-                              double* coords, int* corners, int nc, int nelem,
-                              EntityHandle& start_vert, int& totalNumVertices,
+ErrorCode create_coarse_mesh( Interface* mb, ParallelComm* pcomm, EntityHandle coarseSet, double* coords, int* corners,
+                              int nc, int nelem, EntityHandle& start_vert, int& totalNumVertices,
                               int& numCornerVertices, std::vector< double* >& coordv )
 {
 
@@ -233,8 +226,8 @@ ErrorCode create_coarse_mesh( Interface* mb, ParallelComm* pcomm, EntityHandle c
 
     int dum_id = -1;
     Tag partitionTag;
-    mb->tag_get_handle( PARALLEL_PARTITION_TAG_NAME, 1, MB_TYPE_INTEGER, partitionTag,
-                        MB_TAG_SPARSE | MB_TAG_CREAT, &dum_id );
+    mb->tag_get_handle( PARALLEL_PARTITION_TAG_NAME, 1, MB_TYPE_INTEGER, partitionTag, MB_TAG_SPARSE | MB_TAG_CREAT,
+                        &dum_id );
 
     // there are nelem*4 corners, and 3*(nc2+1)*(nc2+1)*nelem coordinates
     // create first a coarse mesh,
@@ -268,11 +261,9 @@ ErrorCode create_coarse_mesh( Interface* mb, ParallelComm* pcomm, EntityHandle c
     int e_max = nelem + numCornerVertices - 1;
     // total number of extra vertices will be
     int numVertsOnEdges = ( nc - 1 ) * e_max;
-    int numExtraVerts =
-        numVertsOnEdges + ( nc - 1 ) * ( nc - 1 ) * nelem;  // internal fine vertices
+    int numExtraVerts = numVertsOnEdges + ( nc - 1 ) * ( nc - 1 ) * nelem;  // internal fine vertices
 
-    totalNumVertices =
-        numCornerVertices + numExtraVerts;  // this could be overestimated, because we are not sure
+    totalNumVertices = numCornerVertices + numExtraVerts;  // this could be overestimated, because we are not sure
     // about the number of edges
 
     // used to determine the if the nodes are matching at corners of elements
@@ -310,8 +301,8 @@ ErrorCode create_coarse_mesh( Interface* mb, ParallelComm* pcomm, EntityHandle c
         if( index_used[ index ] )
         {
             if( fabs( coordv[ 0 ][ index ] - coords[ ind_coord ] ) > 0.000001 )
-                std::cout << " id:" << corners[ i ] << " i:" << i << " j:" << j << " "
-                          << coordv[ 0 ][ index ] << " " << coords[ ind_coord ] << "\n";
+                std::cout << " id:" << corners[ i ] << " i:" << i << " j:" << j << " " << coordv[ 0 ][ index ] << " "
+                          << coords[ ind_coord ] << "\n";
             continue;
         }
         coordv[ 0 ][ index ] = coords[ ind_coord ];
@@ -344,8 +335,8 @@ ErrorCode create_coarse_mesh( Interface* mb, ParallelComm* pcomm, EntityHandle c
     mb->add_entities( coarseSet, coarseEdges );
 
     // see how much we overestimated the number e_max
-    std::cout << " on rank " << rank << " e_max is " << e_max
-              << " actual number of edges: " << coarseEdges.size( ) << "\n";
+    std::cout << " on rank " << rank << " e_max is " << e_max << " actual number of edges: " << coarseEdges.size( )
+              << "\n";
     rval = pcomm->resolve_shared_ents( coarseSet, 2, 1 );  // resolve vertices and edges
     ERRORR( rval, "can't resolve shared vertices and edges " );
 
@@ -365,9 +356,9 @@ ErrorCode create_coarse_mesh( Interface* mb, ParallelComm* pcomm, EntityHandle c
 }
 
 // start_v and coordv refer to all vertices, including the coarse ones
-ErrorCode fill_coord_on_edges( Interface* mb, std::vector< double* >& coordv, double* coords,
-                               Range& edges, EntityHandle start_v, Range& coarseQuads, int nc,
-                               int numCornerVertices, Tag& fineVertOnEdgeTag )
+ErrorCode fill_coord_on_edges( Interface* mb, std::vector< double* >& coordv, double* coords, Range& edges,
+                               EntityHandle start_v, Range& coarseQuads, int nc, int numCornerVertices,
+                               Tag& fineVertOnEdgeTag )
 {
     ErrorCode rval = MB_SUCCESS;
 
@@ -377,8 +368,7 @@ ErrorCode fill_coord_on_edges( Interface* mb, std::vector< double* >& coordv, do
 
     assert( NC == nc );
 
-    int edges_index[ 4 ]
-                   [ NC - 1 ];  // indices in the coords array for vertices, oriented positively
+    int edges_index[ 4 ][ NC - 1 ];  // indices in the coords array for vertices, oriented positively
     /*
      *  first j, then i, so this is the order of the points in coords array, now:
      *
@@ -455,15 +445,13 @@ ErrorCode fill_coord_on_edges( Interface* mb, std::vector< double* >& coordv, do
  ErrorCode rval;
  int rank=pcomm->proc_config().proc_rank();
  Range sharedCoarseEdges=edges;// filter the non shared ones
- rval = pcomm->filter_pstatus(sharedCoarseEdges, PSTATUS_SHARED, PSTATUS_AND);ERRORR(rval, "can't filter coarse edges  ");
- ParallelMergeMesh pmerge(pcomm, 0.0001);
- ErrorCode rval = pmerge.merge();
+ rval = pcomm->filter_pstatus(sharedCoarseEdges, PSTATUS_SHARED, PSTATUS_AND);ERRORR(rval, "can't filter coarse edges
+ "); ParallelMergeMesh pmerge(pcomm, 0.0001); ErrorCode rval = pmerge.merge();
 
  return rval;
  }*/
-ErrorCode create_fine_mesh( Interface* mb, ParallelComm* pcomm, EntityHandle coarseSet,
-                            EntityHandle fine_set, double* coords, int nc, int nelem,
-                            EntityHandle start_vert, int numCornerVertices,
+ErrorCode create_fine_mesh( Interface* mb, ParallelComm* pcomm, EntityHandle coarseSet, EntityHandle fine_set,
+                            double* coords, int nc, int nelem, EntityHandle start_vert, int numCornerVertices,
                             std::vector< double* >& coordv )
 {
     int rank = pcomm->proc_config( ).proc_rank( );
@@ -473,8 +461,8 @@ ErrorCode create_fine_mesh( Interface* mb, ParallelComm* pcomm, EntityHandle coa
     Tag fineVertTag;
     // will store the first refined vertex on an edge in a entity handle tag
     EntityHandle def = 0;
-    ErrorCode    rval = mb->tag_get_handle( "__firstvertex", 1, MB_TYPE_HANDLE, fineVertTag,
-                                         MB_TAG_DENSE | MB_TAG_CREAT, &def );ERRORR( rval, "can't get tag on first vertex" );
+    ErrorCode    rval =
+        mb->tag_get_handle( "__firstvertex", 1, MB_TYPE_HANDLE, fineVertTag, MB_TAG_DENSE | MB_TAG_CREAT, &def );ERRORR( rval, "can't get tag on first vertex" );
 
     Range coarseQuads;
     Range edges;
@@ -490,8 +478,8 @@ ErrorCode create_fine_mesh( Interface* mb, ParallelComm* pcomm, EntityHandle coa
 
     int dum_id = -1;
     Tag partitionTag;
-    mb->tag_get_handle( PARALLEL_PARTITION_TAG_NAME, 1, MB_TYPE_INTEGER, partitionTag,
-                        MB_TAG_SPARSE | MB_TAG_CREAT, &dum_id );
+    mb->tag_get_handle( PARALLEL_PARTITION_TAG_NAME, 1, MB_TYPE_INTEGER, partitionTag, MB_TAG_SPARSE | MB_TAG_CREAT,
+                        &dum_id );
     // fine mesh, with all coordinates
     // std::vector<double *> coordv2;
 
@@ -508,8 +496,8 @@ ErrorCode create_fine_mesh( Interface* mb, ParallelComm* pcomm, EntityHandle coa
     // ERRORR(rval, "can't get coords fine mesh");
     // fill coordinates for vertices on the edges, then vertices in the interior of coarse quads
     // we know that all quads are in order, their index corresponds to index in coords array
-    rval = fill_coord_on_edges( mb, coordv, coords, edges, start_vert, coarseQuads, nc,
-                                numCornerVertices, fineVertTag );ERRORR( rval, "can't fill edges vertex coords on fine mesh" );
+    rval =
+        fill_coord_on_edges( mb, coordv, coords, edges, start_vert, coarseQuads, nc, numCornerVertices, fineVertTag );ERRORR( rval, "can't fill edges vertex coords on fine mesh" );
 
     EntityHandle start_elem, *connect;
     rval = read_iface->get_element_connect( nelem * nc * nc, 4, MBQUAD, 0, start_elem, connect );ERRORR( rval, "can't create elements fine mesh" );
@@ -518,9 +506,11 @@ ErrorCode create_fine_mesh( Interface* mb, ParallelComm* pcomm, EntityHandle coa
     start_vert = start_vert + numCornerVertices + ( nc - 1 ) * edges.size( );
 
     /* // add a child to the mesh set, with the ordered vertices, as they come out in the list of
-     coordinates EntityHandle vertSet; rval = mb->create_meshset(MESHSET_ORDERED, vertSet);ERRORR(rval, "can't create vertex set ");
+     coordinates EntityHandle vertSet; rval = mb->create_meshset(MESHSET_ORDERED, vertSet);ERRORR(rval, "can't create
+     vertex set ");
 
-     rval = mb->add_parent_child(fine_set, vertSet);ERRORR(rval, "can't create parent child relation between fine set and vertSet ");*/
+     rval = mb->add_parent_child(fine_set, vertSet);ERRORR(rval, "can't create parent child relation between fine set
+     and vertSet ");*/
 
     std::vector< EntityHandle > vertList;
     vertList.reserve( nelem * ( nc + 1 ) * ( nc + 1 ) );  // will have a list of vertices, in order
@@ -671,7 +661,8 @@ ErrorCode create_fine_mesh( Interface* mb, ParallelComm* pcomm, EntityHandle coa
         }
     }
     /*
-     rval = mb->add_entities(vertSet, &vertList[0], (int)vertList.size());ERRORR(rval,"can't add to the vert set the list of ordered vertices");*/
+     rval = mb->add_entities(vertSet, &vertList[0], (int)vertList.size());ERRORR(rval,"can't add to the vert set the
+     list of ordered vertices");*/
 
     mb->add_entities( fine_set, quads3 );
     // notify MOAB of the new elements
@@ -737,8 +728,7 @@ ErrorCode create_fine_mesh( Interface* mb, ParallelComm* pcomm, EntityHandle coa
             std::cout << " can't locate vertex " << v << " in vertex Range \n";
             return MB_FAILURE;
         }
-        if( mapping_to_coords[ index ] ==
-            -1 )  // it means the vertex v was not yet encountered in the vertList
+        if( mapping_to_coords[ index ] == -1 )  // it means the vertex v was not yet encountered in the vertList
         { mapping_to_coords[ index ] = kk; }
     }
     // check that every mapping has an index different from -1
@@ -747,8 +737,7 @@ ErrorCode create_fine_mesh( Interface* mb, ParallelComm* pcomm, EntityHandle coa
         if( mapping_to_coords[ k ] == -1 )
         {
             {
-                std::cout << " vertex at index " << k << " in vertex Range " << verts[ k ]
-                          << " is not mapped \n";
+                std::cout << " vertex at index " << k << " in vertex Range " << verts[ k ] << " is not mapped \n";
                 return MB_FAILURE;  //
             }
         }
@@ -759,8 +748,8 @@ ErrorCode create_fine_mesh( Interface* mb, ParallelComm* pcomm, EntityHandle coa
 
 // this is called from Fortran 90
 void create_mesh( iMesh_Instance instance, iBase_EntitySetHandle* imesh_euler_set,
-                  iBase_EntitySetHandle* imesh_departure_set, iBase_EntitySetHandle* imesh_intx_set,
-                  double* coords, int* corners, int nc, int nelem, MPI_Fint comm, int* ierr )
+                  iBase_EntitySetHandle* imesh_departure_set, iBase_EntitySetHandle* imesh_intx_set, double* coords,
+                  int* corners, int nc, int nelem, MPI_Fint comm, int* ierr )
 {
     /* double * coords=(double*) icoords;
      int * corners = (int*) icorners;*/
@@ -778,16 +767,15 @@ void create_mesh( iMesh_Instance instance, iBase_EntitySetHandle* imesh_euler_se
     int                    totalNumVertices;
     int                    numCornerVertices;
     std::vector< double* > coordv;
-    rval = create_coarse_mesh( mb, pcomm, coarseSet, coords, corners, nc, nelem, start_vert,
-                               totalNumVertices, numCornerVertices, coordv );
+    rval = create_coarse_mesh( mb, pcomm, coarseSet, coords, corners, nc, nelem, start_vert, totalNumVertices,
+                               numCornerVertices, coordv );
     ERRORV( rval, "can't create coarse set " );
 
     EntityHandle fine_set;
     rval = mb->create_meshset( MESHSET_SET, fine_set );
     ERRORV( rval, "can't create fine set " );
 
-    rval = create_fine_mesh( mb, pcomm, coarseSet, fine_set, coords, nc, nelem, start_vert,
-                             numCornerVertices, coordv );
+    rval = create_fine_mesh( mb, pcomm, coarseSet, fine_set, coords, nc, nelem, start_vert, numCornerVertices, coordv );
     ERRORV( rval, "can't create fine mesh set " );
 
     *imesh_departure_set = (iBase_EntitySetHandle)fine_set;
@@ -820,8 +808,7 @@ void create_mesh( iMesh_Instance instance, iBase_EntitySetHandle* imesh_euler_se
     *ierr = 0;
     return;
 }
-ErrorCode set_departure_points_position( Interface* mb, EntityHandle lagrSet, double* dep_coords,
-                                         double radius2 )
+ErrorCode set_departure_points_position( Interface* mb, EntityHandle lagrSet, double* dep_coords, double radius2 )
 {
 
     // the departure quads are created in the same order as the fine quads
@@ -854,9 +841,8 @@ ErrorCode set_departure_points_position( Interface* mb, EntityHandle lagrSet, do
 
     return MB_SUCCESS;
 }
-void intersection_at_level( iMesh_Instance instance, iBase_EntitySetHandle fine_set,
-                            iBase_EntitySetHandle lagr_set, iBase_EntitySetHandle intx_set,
-                            double* dep_coords, double radius2, int* ierr )
+void intersection_at_level( iMesh_Instance instance, iBase_EntitySetHandle fine_set, iBase_EntitySetHandle lagr_set,
+                            iBase_EntitySetHandle intx_set, double* dep_coords, double radius2, int* ierr )
 {
     *ierr = 1;
     Interface* mb = MOABI;
@@ -909,8 +895,7 @@ void intersection_at_level( iMesh_Instance instance, iBase_EntitySetHandle fine_
     return;
 }
 void cleanup_after_intersection( iMesh_Instance instance, iBase_EntitySetHandle fine_set,
-                                 iBase_EntitySetHandle lagr_set, iBase_EntitySetHandle intx_set,
-                                 int* ierr )
+                                 iBase_EntitySetHandle lagr_set, iBase_EntitySetHandle intx_set, int* ierr )
 {
     *ierr = 1;
     Interface* mb = MOABI;
@@ -930,8 +915,8 @@ void cleanup_after_intersection( iMesh_Instance instance, iBase_EntitySetHandle 
     ERRORV( rval, "can't get all polys from fine set" );
 
     // add to polys range the lagr polys
-    rval = mb->get_entities_by_dimension(
-        (EntityHandle)lagr_set, 2, polys );  // do not delete lagr set either, with its vertices
+    rval = mb->get_entities_by_dimension( (EntityHandle)lagr_set, 2,
+                                          polys );  // do not delete lagr set either, with its vertices
     ERRORV( rval, "can't get all polys from lagr set" );
     // add to the connecVerts range all verts, from all initial polys
     Range vertsToStay;

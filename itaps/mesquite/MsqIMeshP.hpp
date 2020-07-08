@@ -55,25 +55,22 @@ class MsqIMeshP : public MsqIMesh, virtual public ParallelMesh
     MsqIMeshP( );
     virtual ~MsqIMeshP( );
 
-    MsqIMeshP( iMesh_Instance imesh, iMeshP_PartitionHandle partition,
-               iBase_EntitySetHandle meshset, iBase_EntityType element_dimension, MsqError& err,
-               const iBase_TagHandle* fixed_tag = 0, const iBase_TagHandle* slaved_tag = 0 );
+    MsqIMeshP( iMesh_Instance imesh, iMeshP_PartitionHandle partition, iBase_EntitySetHandle meshset,
+               iBase_EntityType element_dimension, MsqError& err, const iBase_TagHandle* fixed_tag = 0,
+               const iBase_TagHandle* slaved_tag = 0 );
 
-    MsqIMeshP( iMesh_Instance imesh, iMeshP_PartitionHandle partition,
-               iBase_EntityType element_dimension, MsqError& err,
-               const iBase_TagHandle* fixed_tag = 0, const iBase_TagHandle* slaved_tag = 0 );
+    MsqIMeshP( iMesh_Instance imesh, iMeshP_PartitionHandle partition, iBase_EntityType element_dimension,
+               MsqError& err, const iBase_TagHandle* fixed_tag = 0, const iBase_TagHandle* slaved_tag = 0 );
 
     //********** Inherited Functions from ParallelMesh ****************
 
     /*! Get global ids for given vertices.
      */
-    virtual void vertices_get_global_id( const VertexHandle vert_array[], size_t gid[],
-                                         size_t num_vtx, MsqError& err );
+    virtual void vertices_get_global_id( const VertexHandle vert_array[], size_t gid[], size_t num_vtx, MsqError& err );
 
     /*! Get processor ids for given vertices.
      */
-    virtual void vertices_get_processor_id( const VertexHandle vert_array[], int pid[],
-                                            size_t num_vtx, MsqError& err );
+    virtual void vertices_get_processor_id( const VertexHandle vert_array[], int pid[], size_t num_vtx, MsqError& err );
 
   protected:
     iMeshP_PartitionHandle partitionInstance;

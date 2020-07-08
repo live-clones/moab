@@ -140,22 +140,17 @@ int main( int argc, char* argv[] )
     Tag t;
     if( printGeomSets )
     {
-        if( MB_SUCCESS == mb.tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, t ) )
-        { geomTag = t; }
+        if( MB_SUCCESS == mb.tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, t ) ) { geomTag = t; }
     }
     if( printMeshSets )
     {
-        if( MB_SUCCESS == mb.tag_get_handle( MATERIAL_SET_TAG_NAME, 1, MB_TYPE_INTEGER, t ) )
-        { blockTag = t; }
-        if( MB_SUCCESS == mb.tag_get_handle( DIRICHLET_SET_TAG_NAME, 1, MB_TYPE_INTEGER, t ) )
-        { nodeTag = t; }
-        if( MB_SUCCESS == mb.tag_get_handle( NEUMANN_SET_TAG_NAME, 1, MB_TYPE_INTEGER, t ) )
-        { sideTag = t; }
+        if( MB_SUCCESS == mb.tag_get_handle( MATERIAL_SET_TAG_NAME, 1, MB_TYPE_INTEGER, t ) ) { blockTag = t; }
+        if( MB_SUCCESS == mb.tag_get_handle( DIRICHLET_SET_TAG_NAME, 1, MB_TYPE_INTEGER, t ) ) { nodeTag = t; }
+        if( MB_SUCCESS == mb.tag_get_handle( NEUMANN_SET_TAG_NAME, 1, MB_TYPE_INTEGER, t ) ) { sideTag = t; }
     }
     if( printNamedSets )
     {
-        if( MB_SUCCESS == mb.tag_get_handle( NAME_TAG_NAME, NAME_TAG_SIZE, MB_TYPE_OPAQUE, t ) )
-        { nameTag = t; }
+        if( MB_SUCCESS == mb.tag_get_handle( NAME_TAG_NAME, NAME_TAG_SIZE, MB_TYPE_OPAQUE, t ) ) { nameTag = t; }
     }
     idTag = mb.globalId_tag( );
 
@@ -191,13 +186,11 @@ static void dot_write_node( std::ostream& s, EntityHandle h, const char* label, 
     s << "\"];" << std::endl;
 }
 
-static void dot_write_id_nodes( std::ostream& s, const Range& entites, Tag id_tag,
-                                const char* type_name )
+static void dot_write_id_nodes( std::ostream& s, const Range& entites, Tag id_tag, const char* type_name )
 {
     int id;
     for( Range::iterator i = entites.begin( ); i != entites.end( ); ++i )
-        if( MB_SUCCESS == mb.tag_get_data( id_tag, &*i, 1, &id ) )
-            dot_write_node( s, *i, type_name, &id );
+        if( MB_SUCCESS == mb.tag_get_data( id_tag, &*i, 1, &id ) ) dot_write_node( s, *i, type_name, &id );
 }
 
 void dot_nodes( std::ostream& s, Range& sets )

@@ -50,8 +50,7 @@ function defaults to the analytical gradient.
   \param alp (double)
   \param Obj (ObjectiveFunction*)
  */
-CompositeOFScalarMultiply::CompositeOFScalarMultiply( double alp, ObjectiveFunction* Obj,
-                                                      bool delete_of )
+CompositeOFScalarMultiply::CompositeOFScalarMultiply( double alp, ObjectiveFunction* Obj, bool delete_of )
     : deleteObjFunc( delete_of )
 {
     objFunc = Obj;
@@ -74,32 +73,29 @@ void CompositeOFScalarMultiply::clear( )
     objFunc->clear( );
 }
 
-void CompositeOFScalarMultiply::initialize_queue( MeshDomainAssoc* mesh_and_domain,
-                                                  const Settings* settings, MsqError& err )
+void CompositeOFScalarMultiply::initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
+                                                  MsqError& err )
 {
     objFunc->initialize_queue( mesh_and_domain, settings, err );MSQ_ERRRTN( err );
 }
 
-bool CompositeOFScalarMultiply::initialize_block_coordinate_descent(
-    MeshDomainAssoc* mesh_and_domain, const Settings* settings, PatchSet* user_set, MsqError& err )
+bool CompositeOFScalarMultiply::initialize_block_coordinate_descent( MeshDomainAssoc* mesh_and_domain,
+                                                                     const Settings* settings, PatchSet* user_set,
+                                                                     MsqError& err )
 {
-    bool rval =
-        objFunc->initialize_block_coordinate_descent( mesh_and_domain, settings, user_set, err );
+    bool rval = objFunc->initialize_block_coordinate_descent( mesh_and_domain, settings, user_set, err );
     return !MSQ_CHKERR( err ) && rval;
 }
 
-bool CompositeOFScalarMultiply::evaluate( EvalType type, PatchData& pd, double& value_out,
-                                          bool free, MsqError& err )
+bool CompositeOFScalarMultiply::evaluate( EvalType type, PatchData& pd, double& value_out, bool free, MsqError& err )
 {
     bool ok = objFunc->evaluate( type, pd, value_out, free, err );
     value_out *= mAlpha;
     return !MSQ_CHKERR( err ) && ok;
 }
 
-bool CompositeOFScalarMultiply::evaluate_with_gradient( EvalType type, PatchData& pd,
-                                                        double&                  value_out,
-                                                        std::vector< Vector3D >& grad_out,
-                                                        MsqError&                err )
+bool CompositeOFScalarMultiply::evaluate_with_gradient( EvalType type, PatchData& pd, double& value_out,
+                                                        std::vector< Vector3D >& grad_out, MsqError& err )
 {
     bool ok = objFunc->evaluate_with_gradient( type, pd, value_out, grad_out, err );
     value_out *= mAlpha;
@@ -108,12 +104,11 @@ bool CompositeOFScalarMultiply::evaluate_with_gradient( EvalType type, PatchData
     return !MSQ_CHKERR( err ) && ok;
 }
 
-bool CompositeOFScalarMultiply::evaluate_with_Hessian_diagonal(
-    EvalType type, PatchData& pd, double& value_out, std::vector< Vector3D >& grad_out,
-    std::vector< SymMatrix3D >& diag_out, MsqError& err )
+bool CompositeOFScalarMultiply::evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd, double& value_out,
+                                                                std::vector< Vector3D >&    grad_out,
+                                                                std::vector< SymMatrix3D >& diag_out, MsqError& err )
 {
-    bool ok =
-        objFunc->evaluate_with_Hessian_diagonal( type, pd, value_out, grad_out, diag_out, err );
+    bool ok = objFunc->evaluate_with_Hessian_diagonal( type, pd, value_out, grad_out, diag_out, err );
     value_out *= mAlpha;
     for( size_t i = 0; i < pd.num_free_vertices( ); ++i )
     {
@@ -123,10 +118,9 @@ bool CompositeOFScalarMultiply::evaluate_with_Hessian_diagonal(
     return !MSQ_CHKERR( err ) && ok;
 }
 
-bool CompositeOFScalarMultiply::evaluate_with_Hessian( EvalType type, PatchData& pd,
-                                                       double&                  value_out,
-                                                       std::vector< Vector3D >& grad_out,
-                                                       MsqHessian& Hessian_out, MsqError& err )
+bool CompositeOFScalarMultiply::evaluate_with_Hessian( EvalType type, PatchData& pd, double& value_out,
+                                                       std::vector< Vector3D >& grad_out, MsqHessian& Hessian_out,
+                                                       MsqError& err )
 {
     bool ok = objFunc->evaluate_with_Hessian( type, pd, value_out, grad_out, Hessian_out, err );
     value_out *= mAlpha;

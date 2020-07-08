@@ -81,8 +81,8 @@ ObjectiveFunction* LPtoPTemplate::clone( ) const
     return new LPtoPTemplate( *this );
 }
 
-double LPtoPTemplate::get_value( double power_sum, size_t count, EvalType type,
-                                 size_t& global_count, MsqError& /*err*/ )
+double LPtoPTemplate::get_value( double power_sum, size_t count, EvalType type, size_t& global_count,
+                                 MsqError& /*err*/ )
 {
     double result = 0;
     switch( type )
@@ -133,8 +133,7 @@ double LPtoPTemplate::get_value( double power_sum, size_t count, EvalType type,
     return result;
 }
 
-bool LPtoPTemplate::evaluate( EvalType type, PatchData& pd, double& value_out, bool free,
-                              MsqError& err )
+bool LPtoPTemplate::evaluate( EvalType type, PatchData& pd, double& value_out, bool free, MsqError& err )
 {
     QualityMetric* qm = get_quality_metric( );
     if( type == ObjectiveFunction::ACCUMULATE )
@@ -159,8 +158,7 @@ bool LPtoPTemplate::evaluate( EvalType type, PatchData& pd, double& value_out, b
 
     // get overall OF value, update member data, etc.
     size_t global_count;
-    value_out = qm->get_negate_flag( ) *
-                get_value( working_sum, qmHandles.size( ), type, global_count, err );
+    value_out = qm->get_negate_flag( ) * get_value( working_sum, qmHandles.size( ), type, global_count, err );
     //  if (!global_count)
     //    return false;  // invalid mesh
     //  else
@@ -212,8 +210,7 @@ bool LPtoPTemplate::evaluate_with_gradient( EvalType type, PatchData& pd, double
 
     // get overall OF value, update member data, etc.
     size_t global_count;
-    OF_val =
-        qm->get_negate_flag( ) * get_value( OF_val, qmHandles.size( ), type, global_count, err );
+    OF_val = qm->get_negate_flag( ) * get_value( OF_val, qmHandles.size( ), type, global_count, err );
     //  if (!global_count)
     //    return false;  // invalid mesh
 
@@ -230,8 +227,7 @@ bool LPtoPTemplate::evaluate_with_gradient( EvalType type, PatchData& pd, double
 
 bool LPtoPTemplate::evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd, double& OF_val,
                                                     std::vector< Vector3D >&    grad,
-                                                    std::vector< SymMatrix3D >& hess_diag,
-                                                    MsqError&                   err )
+                                                    std::vector< SymMatrix3D >& hess_diag, MsqError& err )
 {
     QualityMetric* qm = get_quality_metric( );
     qm->get_evaluations( pd, qmHandles, OF_FREE_EVALS_ONLY, err );
@@ -256,8 +252,7 @@ bool LPtoPTemplate::evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd
     for( k = qmHandles.begin( ); k != qmHandles.end( ); ++k )
     {
         // Computes \nabla^2 Q(e). Only the free vertices will have non-zero entries.
-        qm_bool =
-            qm->evaluate_with_Hessian_diagonal( pd, *k, QM_val, mIndices, mGradient, mDiag, err );
+        qm_bool = qm->evaluate_with_Hessian_diagonal( pd, *k, QM_val, mIndices, mGradient, mDiag, err );
         if( MSQ_CHKERR( err ) || !qm_bool ) return false;
         QM_val = fabs( QM_val );
 
@@ -358,9 +353,8 @@ bool LPtoPTemplate::evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd
            hessian is computed.
     \param hessian this object must have been previously initialized.
 */
-bool LPtoPTemplate::evaluate_with_Hessian( EvalType type, PatchData& pd, double& OF_val,
-                                           std::vector< Vector3D >& grad, MsqHessian& hessian,
-                                           MsqError& err )
+bool LPtoPTemplate::evaluate_with_Hessian( EvalType type, PatchData& pd, double& OF_val, std::vector< Vector3D >& grad,
+                                           MsqHessian& hessian, MsqError& err )
 {
     QualityMetric* qm = get_quality_metric( );
     qm->get_evaluations( pd, qmHandles, OF_FREE_EVALS_ONLY, err );

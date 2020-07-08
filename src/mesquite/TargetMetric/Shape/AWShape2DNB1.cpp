@@ -44,8 +44,7 @@ std::string AWShape2DNB1::get_name( ) const
 
 AWShape2DNB1::~AWShape2DNB1( ) {}
 
-bool AWShape2DNB1::evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result,
-                             MsqError& )
+bool AWShape2DNB1::evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result, MsqError& )
 {
     MsqMatrix< 2, 2 > tmp = det( W ) * transpose( A ) * A;
     tmp -= det( A ) * W * transpose( W );
@@ -53,8 +52,8 @@ bool AWShape2DNB1::evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >
     return true;
 }
 
-bool AWShape2DNB1::evaluate_with_grad( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W,
-                                       double& result, MsqMatrix< 2, 2 >& deriv_wrt_A, MsqError& )
+bool AWShape2DNB1::evaluate_with_grad( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result,
+                                       MsqMatrix< 2, 2 >& deriv_wrt_A, MsqError& )
 {
     const double            alpha = det( A );
     const double            omega = det( W );

@@ -82,8 +82,8 @@ bool VertexMaxQM::evaluate( PatchData& pd, size_t handle, double& value, MsqErro
     return valid;
 }
 
-bool VertexMaxQM::evaluate_with_indices( PatchData& pd, size_t handle, double& value,
-                                         std::vector< size_t >& indices, MsqError& err )
+bool VertexMaxQM::evaluate_with_indices( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
+                                         MsqError& err )
 {
     ElemSampleQM* qm = get_quality_metric( );
     get_vertex_corner_handles( pd, handle, mHandles, err );

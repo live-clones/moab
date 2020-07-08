@@ -65,15 +65,12 @@ class FakeMesh : public MBMesquite::Mesh
 
     void get_all_vertices( vector< VertexHandle >& verts, MsqError& err );
 
-    void vertices_get_fixed_flag( const VertexHandle* verts, std::vector< bool >& fixed, size_t n,
-                                  MsqError& err );
+    void vertices_get_fixed_flag( const VertexHandle* verts, std::vector< bool >& fixed, size_t n, MsqError& err );
 
-    void vertices_get_slaved_flag( const VertexHandle* verts, std::vector< bool >& fixed, size_t n,
-                                   MsqError& err );
+    void vertices_get_slaved_flag( const VertexHandle* verts, std::vector< bool >& fixed, size_t n, MsqError& err );
 
-    void vertices_get_attached_elements( const VertexHandle* array, size_t len,
-                                         vector< ElementHandle >& elems, vector< size_t >& offsets,
-                                         MsqError& err );
+    void vertices_get_attached_elements( const VertexHandle* array, size_t len, vector< ElementHandle >& elems,
+                                         vector< size_t >& offsets, MsqError& err );
 
     int get_geometric_dimension( MsqError& err )
     {
@@ -109,8 +106,8 @@ class FakeMesh : public MBMesquite::Mesh
     }
     void vertices_get_byte( const VertexHandle*, unsigned char*, size_t, MsqError& err );
 
-    void elements_get_attached_vertices( const ElementHandle*, size_t, vector< VertexHandle >&,
-                                         vector< size_t >&, MsqError& err )
+    void elements_get_attached_vertices( const ElementHandle*, size_t, vector< VertexHandle >&, vector< size_t >&,
+                                         MsqError& err )
     {
         NI( err );
     }
@@ -209,8 +206,7 @@ void FakeMesh::get_all_vertices( vector< Mesh::VertexHandle >& verts, MsqError& 
     verts = vertHandles;
 }
 
-void FakeMesh::vertices_get_fixed_flag( const VertexHandle* verts, std::vector< bool >& fixed,
-                                        size_t n, MsqError& err )
+void FakeMesh::vertices_get_fixed_flag( const VertexHandle* verts, std::vector< bool >& fixed, size_t n, MsqError& err )
 {
     if( doError )
     {
@@ -237,14 +233,12 @@ void FakeMesh::vertices_get_fixed_flag( const VertexHandle* verts, std::vector< 
     }
 }
 
-void FakeMesh::vertices_get_slaved_flag( const VertexHandle*, std::vector< bool >&, size_t,
-                                         MsqError& )
+void FakeMesh::vertices_get_slaved_flag( const VertexHandle*, std::vector< bool >&, size_t, MsqError& )
 {
     CPPUNIT_ASSERT( false );
 }
 
-void FakeMesh::vertices_get_attached_elements( const VertexHandle* verts, size_t n,
-                                               vector< ElementHandle >& elems,
+void FakeMesh::vertices_get_attached_elements( const VertexHandle* verts, size_t n, vector< ElementHandle >& elems,
                                                vector< size_t >& offsets, MsqError& err )
 {
     if( doError )
@@ -278,8 +272,7 @@ void FakeMesh::vertices_get_attached_elements( const VertexHandle* verts, size_t
     offsets.push_back( elems.size( ) );
 }
 
-void FakeMesh::vertices_get_byte( const VertexHandle* handles, unsigned char* bytes, size_t count,
-                                  MsqError& err )
+void FakeMesh::vertices_get_byte( const VertexHandle* handles, unsigned char* bytes, size_t count, MsqError& err )
 {
     for( size_t i = 0; i < count; ++i )
     {
@@ -293,8 +286,7 @@ void FakeMesh::vertices_get_byte( const VertexHandle* handles, unsigned char* by
     }
 }
 
-void FakeMesh::vertices_set_byte( const VertexHandle* handles, const unsigned char* bytes,
-                                  size_t count, MsqError& err )
+void FakeMesh::vertices_set_byte( const VertexHandle* handles, const unsigned char* bytes, size_t count, MsqError& err )
 {
     for( size_t i = 0; i < count; ++i )
     {
@@ -407,8 +399,7 @@ void PatchSetTest::test_vertex_patches( )
 
         // Get adjacent elements from myMesh to compare with
         element_handles.clear( );
-        myMesh.vertices_get_attached_elements( arrptr( patch_verts ), 1, element_handles, offsets,
-                                               err );
+        myMesh.vertices_get_attached_elements( arrptr( patch_verts ), 1, element_handles, offsets, err );
         ASSERT_NO_ERROR( err );
 
         // Compare element handle lists

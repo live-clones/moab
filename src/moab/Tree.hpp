@@ -81,8 +81,7 @@ class Tree
      * \param max Maximum corner of bounding box
      * \param max_dep Maximum depth of tree below root
      */
-    virtual ErrorCode get_info( EntityHandle root, double min[ 3 ], double max[ 3 ],
-                                unsigned int& max_dep );
+    virtual ErrorCode get_info( EntityHandle root, double min[ 3 ], double max[ 3 ], unsigned int& max_dep );
 
     /** \brief Find all trees, by bounding box tag
      */
@@ -106,8 +105,7 @@ class Tree
      * \param start_node Start from this tree node (non-NULL) instead of tree root (NULL)
      * \return Non-success returned only in case of failure; not-found indicated by leaf_out=0
      */
-    virtual ErrorCode point_search( const double* point, EntityHandle& leaf_out,
-                                    const double iter_tol = 1.0e-10,
+    virtual ErrorCode point_search( const double* point, EntityHandle& leaf_out, const double iter_tol = 1.0e-10,
                                     const double inside_tol = 1.0e-6, bool* multiple_leaves = NULL,
                                     EntityHandle* start_node = NULL, CartVect* params = NULL ) = 0;
 
@@ -127,12 +125,10 @@ class Tree
      * \param start_node Start from this tree node (non-NULL) instead of tree root (NULL)
      */
     virtual ErrorCode distance_search( const double* point, const double distance,
-                                       std::vector< EntityHandle >& leaves_out,
-                                       const double                 iter_tol = 1.0e-10,
-                                       const double                 inside_tol = 1.0e-6,
-                                       std::vector< double >*       dists_out = NULL,
-                                       std::vector< CartVect >*     params_out = NULL,
-                                       EntityHandle*                start_node = NULL ) = 0;
+                                       std::vector< EntityHandle >& leaves_out, const double iter_tol = 1.0e-10,
+                                       const double inside_tol = 1.0e-6, std::vector< double >* dists_out = NULL,
+                                       std::vector< CartVect >* params_out = NULL,
+                                       EntityHandle*            start_node = NULL ) = 0;
 
     /** \brief Return the MOAB interface associated with this tree
      */
@@ -174,8 +170,7 @@ class Tree
 
     /** \brief Create tree root and tag with bounding box
      */
-    ErrorCode create_root( const double box_min[ 3 ], const double box_max[ 3 ],
-                           EntityHandle& root_handle );
+    ErrorCode create_root( const double box_min[ 3 ], const double box_max[ 3 ], EntityHandle& root_handle );
 
     //! print various things about this tree
     virtual ErrorCode print( ) = 0;
@@ -252,8 +247,8 @@ class Tree
 };
 
 inline Tree::Tree( Interface* iface )
-    : mbImpl( iface ), maxPerLeaf( 6 ), maxDepth( 30 ), treeDepth( -1 ), minWidth( 1.0e-10 ),
-      meshsetFlags( 0 ), cleanUp( true ), myRoot( 0 ), boxTag( 0 ), myEval( 0 )
+    : mbImpl( iface ), maxPerLeaf( 6 ), maxDepth( 30 ), treeDepth( -1 ), minWidth( 1.0e-10 ), meshsetFlags( 0 ),
+      cleanUp( true ), myRoot( 0 ), boxTag( 0 ), myEval( 0 )
 {
 }
 
@@ -281,8 +276,8 @@ inline Tag Tree::get_box_tag( bool create_if_missing )
     if( !boxTag && create_if_missing )
     {
         assert( boxTagName.length( ) > 0 );
-        ErrorCode rval = moab( )->tag_get_handle( boxTagName.c_str( ), 6, MB_TYPE_DOUBLE, boxTag,
-                                                  MB_TAG_CREAT | MB_TAG_SPARSE );
+        ErrorCode rval =
+            moab( )->tag_get_handle( boxTagName.c_str( ), 6, MB_TYPE_DOUBLE, boxTag, MB_TAG_CREAT | MB_TAG_SPARSE );
         if( MB_INVALID_SIZE == rval )
         {
             // delete the tag and get it again, legacy file...

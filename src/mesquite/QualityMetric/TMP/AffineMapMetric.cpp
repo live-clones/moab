@@ -56,8 +56,7 @@ const double TET_XFORM_VALS[] = {
     0.0, sqrt( 3.0 / 2.0 ) };
 MsqMatrix< 3, 3 > TET_XFORM( TET_XFORM_VALS );
 
-AffineMapMetric::AffineMapMetric( TargetCalculator* tc, WeightCalculator* wc,
-                                  TMetric* target_metric )
+AffineMapMetric::AffineMapMetric( TargetCalculator* tc, WeightCalculator* wc, TMetric* target_metric )
     : targetCalc( tc ), weightCalc( wc ), targetMetric( target_metric )
 {
 }
@@ -77,14 +76,13 @@ std::string AffineMapMetric::get_name( ) const
     return std::string( "AffineMap(" ) + targetMetric->get_name( ) + ')';
 }
 
-void AffineMapMetric::get_evaluations( PatchData& pd, std::vector< size_t >& handles, bool free,
-                                       MsqError& err )
+void AffineMapMetric::get_evaluations( PatchData& pd, std::vector< size_t >& handles, bool free, MsqError& err )
 {
     get_sample_pt_evaluations( pd, handles, free, err );
 }
 
-void AffineMapMetric::get_element_evaluations( PatchData& pd, size_t p_elem,
-                                               std::vector< size_t >& handles, MsqError& err )
+void AffineMapMetric::get_element_evaluations( PatchData& pd, size_t p_elem, std::vector< size_t >& handles,
+                                               MsqError& err )
 {
     get_elem_sample_points( pd, p_elem, handles, err );
 }

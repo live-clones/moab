@@ -21,22 +21,19 @@ class GeomAssocPairSide : public AssocPairSide
 
     virtual int get_all_sets( iBase_EntitySetHandle** sets, int* sets_alloc, int* sets_size );
 
-    virtual int get_entities( int dimension, iBase_EntitySetHandle set_handle,
-                              iBase_EntityHandle** entities, int* entities_alloc,
-                              int* entities_size );
+    virtual int get_entities( int dimension, iBase_EntitySetHandle set_handle, iBase_EntityHandle** entities,
+                              int* entities_alloc, int* entities_size );
 
-    virtual int get_ents_dims( iBase_EntityHandle* entities, int entities_size, int** ent_types,
-                               int* ent_types_alloc, int* ent_types_size );
+    virtual int get_ents_dims( iBase_EntityHandle* entities, int entities_size, int** ent_types, int* ent_types_alloc,
+                               int* ent_types_size );
 
-    virtual int get_related_ents( iBase_EntityHandle** entities, int* entities_alloc,
-                                  int* entities_size );
+    virtual int get_related_ents( iBase_EntityHandle** entities, int* entities_alloc, int* entities_size );
     virtual int get_related_sets( iBase_EntitySetHandle** sets, int* sets_alloc, int* sets_size );
 
     virtual int get_relation_side( iBase_EntityHandle* entities, int num_entities, void* values );
     virtual int get_relation_side( iBase_EntitySetHandle* sets, int num_sets, void* values );
 
-    virtual int set_relation_side( iBase_EntityHandle* entities, int num_entities,
-                                   const void* values );
+    virtual int set_relation_side( iBase_EntityHandle* entities, int num_entities, const void* values );
     virtual int set_relation_side( iBase_EntitySetHandle* sets, int num_sets, const void* values );
 
     virtual int rmv_relation_side( iBase_EntityHandle* entities, int num_entities );

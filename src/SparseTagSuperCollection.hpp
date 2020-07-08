@@ -75,8 +75,7 @@ class SparseTagSuperCollection
     /** Set fixed-length tag values.
      *\NOTE Will fail for variable-length tag data.
      */
-    ErrorCode set_data( TagId tag_handle, const EntityHandle* handles, int num_handles,
-                        const void* data );
+    ErrorCode set_data( TagId tag_handle, const EntityHandle* handles, int num_handles, const void* data );
 
     /** Set tag values for array of entity handles
      *\param tag_id      The tag.
@@ -88,8 +87,7 @@ class SparseTagSuperCollection
      *                   first passed tag value.
      */
     ErrorCode set_data( TagId tag_handle, const EntityHandle* handles, int num_handles,
-                        void const* const* data_pointers, const int* lengths = 0,
-                        bool one_value = false );
+                        void const* const* data_pointers, const int* lengths = 0, bool one_value = false );
 
     /** Set fixed-length tag value for an Range of entities
      *\NOTE Will fail for variable-length tag data
@@ -134,8 +132,8 @@ class SparseTagSuperCollection
      *      even though MOAB would normally not explicitly store tag values
      *      for such entities.
      */
-    ErrorCode tag_iterate( TagId tag_handle, Range::iterator& iter, const Range::iterator& end,
-                           void*& data_ptr, const void* default_value );
+    ErrorCode tag_iterate( TagId tag_handle, Range::iterator& iter, const Range::iterator& end, void*& data_ptr,
+                           const void* default_value );
 
     /** Get fixed-length tag values for array of entities
      *\NOTE Will fail with MB_VARIABLE_DATA_LENGTH if called
@@ -154,16 +152,14 @@ class SparseTagSuperCollection
      *\param default_value_length  Length of default tag value.  Ingored for
      *                   fixed-length tags.
      */
-    ErrorCode get_data( TagId tag_handle, const EntityHandle* handles, int num_handles,
-                        const void** data, int* lengths, const void* default_value,
-                        int default_value_length ) const;
+    ErrorCode get_data( TagId tag_handle, const EntityHandle* handles, int num_handles, const void** data, int* lengths,
+                        const void* default_value, int default_value_length ) const;
 
     /** Get fixed-length tag value for an Range of entities
      *\NOTE Will fail with MB_VARIABLE_DATA_LENGTH if called
      *      for variable-length tag.
      */
-    ErrorCode get_data( TagId tag_handle, const Range& handles, void* data,
-                        const void* default_value ) const;
+    ErrorCode get_data( TagId tag_handle, const Range& handles, void* data, const void* default_value ) const;
 
     /** Get pointers to tag data for an Range of entities.
      *
@@ -192,28 +188,25 @@ class SparseTagSuperCollection
     ErrorCode get_entities( const TagId tag_handle, const EntityType type, Range& entities );
 
     //! gets all entity handles that match a tag
-    ErrorCode get_entities( const Range& range, const TagId tag_handle, const EntityType type,
-                            Range& entities );
+    ErrorCode get_entities( const Range& range, const TagId tag_handle, const EntityType type, Range& entities );
 
     //! gets all tags on a given entity handle
     ErrorCode get_tags( const EntityHandle entity, std::vector< Tag >& all_tags );
 
     //! gets all entity handles that match a tag
-    ErrorCode get_entities_with_tag_value( const TagId tag_handle, const TagInfo& tag_info,
-                                           const EntityType type, Range& entities,
-                                           const void* tag_value, int value_size );
+    ErrorCode get_entities_with_tag_value( const TagId tag_handle, const TagInfo& tag_info, const EntityType type,
+                                           Range& entities, const void* tag_value, int value_size );
 
     //! gets all entity handles that match a tag
-    ErrorCode get_entities_with_tag_value( const Range& range, const TagId tag_handle,
-                                           const TagInfo& tag_info, const EntityType type,
-                                           Range& entities, const void* tag_value, int value_size );
+    ErrorCode get_entities_with_tag_value( const Range& range, const TagId tag_handle, const TagInfo& tag_info,
+                                           const EntityType type, Range& entities, const void* tag_value,
+                                           int value_size );
 
     //! gets the number of entities that match a tag
     ErrorCode get_number_entities( const TagId tag_handle, const EntityType type, int& num_ent );
 
     //! gets the number of entities that match a tag
-    ErrorCode get_number_entities( const Range& range, const TagId tag_handle,
-                                   const EntityType type, int& num_ent );
+    ErrorCode get_number_entities( const Range& range, const TagId tag_handle, const EntityType type, int& num_ent );
 
     ErrorCode get_memory_use( TagId tag_id, unsigned long& total, unsigned long& per_entity );
 

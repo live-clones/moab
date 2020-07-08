@@ -38,11 +38,11 @@
 
 using namespace moab;
 
-const static double radius = 1.0;
-const double        MOAB_PI = 3.1415926535897932384626433832795028841971693993751058209749445923;
-const static double surface_area = 4.0 * MOAB_PI * radius * radius;
-const static std::string outFilenames[ 5 ] = {
-    "outTempestCS.g", "outTempestRLL.g", "outTempestICO.g", "outTempestICOD.g", "outTempestOV.g" };
+const static double      radius = 1.0;
+const double             MOAB_PI = 3.1415926535897932384626433832795028841971693993751058209749445923;
+const static double      surface_area = 4.0 * MOAB_PI * radius * radius;
+const static std::string outFilenames[ 5 ] = { "outTempestCS.g", "outTempestRLL.g", "outTempestICO.g",
+                                               "outTempestICOD.g", "outTempestOV.g" };
 
 void test_tempest_cs_create( );
 void test_tempest_rll_create( );
@@ -94,12 +94,12 @@ void test_tempest_rll_create( )
 
     std::cout << "Creating TempestRemap Latitude-Longitude Mesh ...\n";
     Mesh tempest_mesh;
-    int  ierr = GenerateRLLMesh(
-        tempest_mesh, blockSize * 2, blockSize, 0.0, 360.0, -90.0, 90.0, false, false, true, "", "",
-        "",  // std::string strInputFile, std::string strInputFileLonName, std::string
-             // strInputFileLatName,
-        outFilename, "NetCDF4",  // std::string strOutputFile, std::string strOutputFormat
-        false );
+    int  ierr =
+        GenerateRLLMesh( tempest_mesh, blockSize * 2, blockSize, 0.0, 360.0, -90.0, 90.0, false, false, true, "", "",
+                         "",  // std::string strInputFile, std::string strInputFileLonName, std::string
+                              // strInputFileLatName,
+                         outFilename, "NetCDF4",  // std::string strOutputFile, std::string strOutputFormat
+                         false );
     CHECK_EQUAL( ierr, 0 );
 
     // Compute the surface area of RLL mesh
@@ -155,12 +155,11 @@ void test_tempest_overlap_combinations( )
     {
         for( int jsrc = 0; jsrc < 4; ++jsrc )
         {
-            std::cout << "Computing Overlap between " << outFilenames[ isrc ] << " and "
-                      << outFilenames[ jsrc ] << " ...\n";
+            std::cout << "Computing Overlap between " << outFilenames[ isrc ] << " and " << outFilenames[ jsrc ]
+                      << " ...\n";
             Mesh tempest_mesh;
-            int  ierr =
-                GenerateOverlapMesh( outFilenames[ isrc ], outFilenames[ jsrc ], tempest_mesh,
-                                     outFilename, "NetCDF4", "exact", false, false, false, false );
+            int  ierr = GenerateOverlapMesh( outFilenames[ isrc ], outFilenames[ jsrc ], tempest_mesh, outFilename,
+                                            "NetCDF4", "exact", false, false, false, false );
             CHECK_EQUAL( ierr, 0 );
             // verify overlap mesh area
             const double ovArea = tempest_mesh.CalculateFaceAreas( false );
@@ -187,8 +186,7 @@ void test_tempest_to_moab_convert( )
 
     rval = pcomm->check_all_shared_handles( );CHECK_ERR( rval );
 
-    rval = remapper->LoadMesh( moab::Remapper::SourceMesh, outFilenames[ 0 ],
-                               moab::TempestRemapper::CS );CHECK_ERR( rval );
+    rval = remapper->LoadMesh( moab::Remapper::SourceMesh, outFilenames[ 0 ], moab::TempestRemapper::CS );CHECK_ERR( rval );
 
     // Load the meshes and validate
     rval = remapper->ConvertTempestMesh( moab::Remapper::SourceMesh );CHECK_ERR( rval );
@@ -206,10 +204,8 @@ void test_tempest_to_moab_convert( )
 
     Mesh* tgtTempest = remapper->GetMesh( moab::Remapper::TargetMesh );
 
-    const size_t tempest_nodes_src = srcTempest->nodes.size( ),
-                 tempest_elems_src = srcTempest->faces.size( );
-    const size_t tempest_nodes_tgt = tgtTempest->nodes.size( ),
-                 tempest_elems_tgt = tgtTempest->faces.size( );
+    const size_t tempest_nodes_src = srcTempest->nodes.size( ), tempest_elems_src = srcTempest->faces.size( );
+    const size_t tempest_nodes_tgt = tgtTempest->nodes.size( ), tempest_elems_tgt = tgtTempest->faces.size( );
     CHECK_EQUAL( tempest_nodes_src, tempest_nodes_tgt );
     CHECK_EQUAL( tempest_elems_src, tempest_elems_tgt );
 

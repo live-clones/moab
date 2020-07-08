@@ -22,13 +22,11 @@ class MergeMesh
 
     /* \brief Merge vertices in elements passed in
      */
-    ErrorCode merge_entities( EntityHandle* elems, int elems_size, const double merge_tol,
-                              const int do_merge = true, const int update_sets = false,
-                              Tag merge_tag = 0, bool do_higher_dim = true );
+    ErrorCode merge_entities( EntityHandle* elems, int elems_size, const double merge_tol, const int do_merge = true,
+                              const int update_sets = false, Tag merge_tag = 0, bool do_higher_dim = true );
 
     ErrorCode merge_entities( Range& elems, const double merge_tol, const int do_merge = true,
-                              const int update_sets = false, Tag merge_tag = 0,
-                              bool do_higher_dim = true );
+                              const int update_sets = false, Tag merge_tag = 0, bool do_higher_dim = true );
 
     // Identify higher dimension to be merged
     ErrorCode merge_higher_dimensions( Range& elems );

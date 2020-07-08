@@ -76,12 +76,11 @@ class MESQUITE_EXPORT LinearPyramid : public MappingFunction3D
 
     virtual NodeSet sample_points( NodeSet higher_order_nodes ) const;
 
-    virtual void coefficients( Sample location, NodeSet nodeset, double* coeff_out,
-                               size_t* indices_out, size_t& num_coeff_out, MsqError& err ) const;
+    virtual void coefficients( Sample location, NodeSet nodeset, double* coeff_out, size_t* indices_out,
+                               size_t& num_coeff_out, MsqError& err ) const;
 
     virtual void derivatives( Sample location, NodeSet nodeset, size_t* vertex_indices_out,
-                              MsqVector< 3 >* d_coeff_d_xi_out, size_t& num_vtx,
-                              MsqError& err ) const;
+                              MsqVector< 3 >* d_coeff_d_xi_out, size_t& num_vtx, MsqError& err ) const;
 
     virtual void ideal( Sample location, MsqMatrix< 3, 3 >& J, MsqError& err ) const;
 };

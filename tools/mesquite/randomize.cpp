@@ -74,8 +74,7 @@ void UnOptimizer::optimize_vertex_positions( PatchData& pd, MsqError& err )
     double                  val, junk, coeff;
     bool                    state;
 
-    state = objectiveFunction->evaluate_with_gradient( ObjectiveFunction::CALCULATE, pd, val, grad,
-                                                       err );MSQ_ERRRTN( err );
+    state = objectiveFunction->evaluate_with_gradient( ObjectiveFunction::CALCULATE, pd, val, grad, err );MSQ_ERRRTN( err );
     if( !state )
     {
         MSQ_SETERR( err )( MsqError::INVALID_MESH );
@@ -110,8 +109,7 @@ int main( int argc, char* argv[] )
                  "Read VTK file, randomize locations of containded vertices, and re-write file." );
     args.toggle_flag( INVALID_FLAG, "Allow inverted elements in output", &allow_invalid );
     args.double_flag( PERCENT_FLAG, "fract", "Randomize fraction", &rand_percent );
-    args.int_flag( UNOPTIMIZE_FLAG, "N", "Use UnOptimizer with N passes rather than Randomize",
-                   &unoptimize );
+    args.int_flag( UNOPTIMIZE_FLAG, "N", "Use UnOptimizer with N passes rather than Randomize", &unoptimize );
     add_domain_args( args );
     args.add_required_arg( "input_file" );
     args.add_required_arg( "output_file" );
@@ -166,12 +164,10 @@ int main( int argc, char* argv[] )
     if( qa.get_inverted_element_count( inverted, junk, err ) && inverted )
     {
         if( allow_invalid.value( ) )
-            std::cerr << "Warning: output mesh contains " << inverted << " inverted elements"
-                      << std::endl;
+            std::cerr << "Warning: output mesh contains " << inverted << " inverted elements" << std::endl;
         else
         {
-            std::cerr << "Error: output mesh contains " << inverted << " inverted elements"
-                      << std::endl;
+            std::cerr << "Error: output mesh contains " << inverted << " inverted elements" << std::endl;
             return 4;
         }
     }

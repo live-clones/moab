@@ -209,8 +209,7 @@ int coords_by_idx( int idx, double coords[][ 3 ] )
     return idx % 5 + 1;
 }
 
-void recursive_build_tree( int max_depth, Interface& mb, Tag tag, EntityHandle p, int depth,
-                           int& idx )
+void recursive_build_tree( int max_depth, Interface& mb, Tag tag, EntityHandle p, int depth, int& idx )
 {
     ErrorCode rval = mb.tag_set_data( tag, &p, 1, &idx );CHECK_ERR( rval );
 
@@ -232,8 +231,7 @@ void recursive_build_tree( int max_depth, Interface& mb, Tag tag, EntityHandle p
     recursive_build_tree( max_depth, mb, tag, r, depth + 1, idx );
 }
 
-void recursive_check_tree( int max_depth, Interface& mb, Tag tag, EntityHandle p, int depth,
-                           int& idx )
+void recursive_check_tree( int max_depth, Interface& mb, Tag tag, EntityHandle p, int depth, int& idx )
 {
     int       id;
     ErrorCode rval = mb.tag_get_data( tag, &p, 1, &id );CHECK_ERR( rval );
@@ -255,8 +253,7 @@ void recursive_check_tree( int max_depth, Interface& mb, Tag tag, EntityHandle p
         {
             if( !match[ j ] )
             {
-                double d[ 3 ] = { coords[ i ][ 0 ] - coords2[ j ][ 0 ],
-                                  coords[ i ][ 1 ] - coords2[ j ][ 1 ],
+                double d[ 3 ] = { coords[ i ][ 0 ] - coords2[ j ][ 0 ], coords[ i ][ 1 ] - coords2[ j ][ 1 ],
                                   coords[ i ][ 2 ] - coords2[ j ][ 2 ] };
                 double ds = d[ 0 ] * d[ 0 ] + d[ 1 ] * d[ 1 ] + d[ 2 ] * d[ 2 ];
                 if( ds < 1e-12 )

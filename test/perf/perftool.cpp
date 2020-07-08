@@ -86,11 +86,9 @@ void usage( const char* argv0, bool error = true )
         << std::endl;
     str << "       " << argv0 << " [-h|-l]" << std::endl;
     if( error ) return;
-    str << "  -i  : specify interverals per side (num hex = ints^3, default: " << DEFAULT_INTERVALS
-        << std::endl;
+    str << "  -i  : specify interverals per side (num hex = ints^3, default: " << DEFAULT_INTERVALS << std::endl;
     str << "  -d  : specify element dimension, default: 3" << std::endl;
-    str << "  -n  : specify an integer value that for which the meaning is test-specific"
-        << std::endl;
+    str << "  -n  : specify an integer value that for which the meaning is test-specific" << std::endl;
     str << "  -h  : print this help text." << std::endl;
     str << "  -l  : list available tests" << std::endl;
 }
@@ -100,19 +98,16 @@ void list_tests( )
     unsigned max_test_name = 0, max_test_desc = 0;
     for( int i = 0; i < TestListSize; ++i )
     {
-        if( TestList[ i ].testName.size( ) > max_test_name )
-            max_test_name = TestList[ i ].testName.size( );
-        if( TestList[ i ].testDesc.size( ) > max_test_desc )
-            max_test_desc = TestList[ i ].testDesc.size( );
+        if( TestList[ i ].testName.size( ) > max_test_name ) max_test_name = TestList[ i ].testName.size( );
+        if( TestList[ i ].testDesc.size( ) > max_test_desc ) max_test_desc = TestList[ i ].testDesc.size( );
     }
     std::cout << std::setw( max_test_name ) << "NAME"
               << "   " << std::setw( max_test_desc ) << std::left << "DESCRIPTION" << std::endl
               << std::setfill( '-' ) << std::setw( max_test_name ) << ""
-              << "   " << std::setfill( '-' ) << std::setw( max_test_desc ) << ""
-              << std::setfill( ' ' ) << std::endl;
+              << "   " << std::setfill( '-' ) << std::setw( max_test_desc ) << "" << std::setfill( ' ' ) << std::endl;
     for( int i = 0; i < TestListSize; ++i )
-        std::cout << std::setw( max_test_name ) << TestList[ i ].testName << " : "
-                  << std::setw( max_test_desc ) << std::left << TestList[ i ].testDesc << std::endl;
+        std::cout << std::setw( max_test_name ) << TestList[ i ].testName << " : " << std::setw( max_test_desc )
+                  << std::left << TestList[ i ].testDesc << std::endl;
 }
 
 int main( int argc, char* argv[] )
@@ -275,8 +270,7 @@ void create_regular_mesh( Interface* gMB, int interval, int dim )
 
     // Offsets of element vertices in grid relative to corner closest to origin
     long       c = dims[ 0 ] * dims[ 1 ];
-    const long corners[ 8 ] = { 0, 1,     1 + dims[ 0 ],     dims[ 0 ],
-                                c, c + 1, c + 1 + dims[ 0 ], c + dims[ 0 ] };
+    const long corners[ 8 ] = { 0, 1, 1 + dims[ 0 ], dims[ 0 ], c, c + 1, c + 1 + dims[ 0 ], c + dims[ 0 ] };
 
     // Populate element list
     EntityHandle* iter = conn;
@@ -349,8 +343,8 @@ void skin_common( int interval, int dim, int num, bool use_adj )
         }
     }
     d = ( (double)t ) / CLOCKS_PER_SEC;
-    std::cout << "Got skin vertices for " << numblocks << " blocks of " << blocksize
-              << " elements in " << d << " seconds." << std::endl;
+    std::cout << "Got skin vertices for " << numblocks << " blocks of " << blocksize << " elements in " << d
+              << " seconds." << std::endl;
 
     for( int e = 0; e < 2; ++e )
     {  // do this twice
@@ -362,8 +356,7 @@ void skin_common( int interval, int dim, int num, bool use_adj )
             gMB->get_adjacencies( elems, dim - 1, true, skin, Interface::UNION );
             t = clock( ) - t;
             d = ( (double)t ) / CLOCKS_PER_SEC;
-            std::cout << "Created " << skin.size( ) << " entities of dimension-1 in " << d
-                      << " seconds" << std::endl;
+            std::cout << "Created " << skin.size( ) << " entities of dimension-1 in " << d << " seconds" << std::endl;
         }
 
         skin.clear( );
@@ -376,8 +369,7 @@ void skin_common( int interval, int dim, int num, bool use_adj )
             exit( 2 );
         }
         d = ( (double)t ) / CLOCKS_PER_SEC;
-        std::cout << "Got " << skin.size( ) << " skin elements in " << d << " seconds."
-                  << std::endl;
+        std::cout << "Got " << skin.size( ) << " skin elements in " << d << " seconds." << std::endl;
 
         t = 0;
         it = elems.begin( );
@@ -398,8 +390,8 @@ void skin_common( int interval, int dim, int num, bool use_adj )
             }
         }
         d = ( (double)t ) / CLOCKS_PER_SEC;
-        std::cout << "Got skin elements for " << numblocks << " blocks of " << blocksize
-                  << " elements in " << d << " seconds." << std::endl;
+        std::cout << "Got skin elements for " << numblocks << " blocks of " << blocksize << " elements in " << d
+                  << " seconds." << std::endl;
     }
 }
 

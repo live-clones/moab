@@ -93,10 +93,7 @@ template< typename T > class TagTypeEqual
     int      size;
 
   public:
-    TagTypeEqual( const void* v, int s )
-        : value( reinterpret_cast< const T* >( v ) ), size( s / sizeof( T ) )
-    {
-    }
+    TagTypeEqual( const void* v, int s ) : value( reinterpret_cast< const T* >( v ) ), size( s / sizeof( T ) ) {}
 
     bool operator( )( const void* data ) const
     {
@@ -115,10 +112,7 @@ template< typename T > class TagTypeLess
     int      size;
 
   public:
-    TagTypeLess( const void* v, int s )
-        : value( reinterpret_cast< const T* >( v ) ), size( s / sizeof( T ) )
-    {
-    }
+    TagTypeLess( const void* v, int s ) : value( reinterpret_cast< const T* >( v ) ), size( s / sizeof( T ) ) {}
 
     bool operator( )( const void* data ) const
     {
@@ -175,10 +169,7 @@ template< typename T > class TagVarTypeEqual
     int      size;
 
   public:
-    TagVarTypeEqual( const void* v, int s )
-        : value( reinterpret_cast< const T* >( v ) ), size( s / sizeof( T ) )
-    {
-    }
+    TagVarTypeEqual( const void* v, int s ) : value( reinterpret_cast< const T* >( v ) ), size( s / sizeof( T ) ) {}
 
     bool operator( )( const void* data ) const
     {
@@ -208,10 +199,7 @@ template< typename T > class TagVarTypeLess
     int      size;
 
   public:
-    TagVarTypeLess( const void* v, int s )
-        : value( reinterpret_cast< const T* >( v ) ), size( s / sizeof( T ) )
-    {
-    }
+    TagVarTypeLess( const void* v, int s ) : value( reinterpret_cast< const T* >( v ) ), size( s / sizeof( T ) ) {}
     bool operator( )( const void* data ) const
     {
         const VarLenTag* vdata = reinterpret_cast< const VarLenTag* >( data );
@@ -271,8 +259,7 @@ typedef TagOneTypeLess< double >  TagOneDoubleLess;
 /* SEARCHING */
 
 template< class Functor, class IteratorType >
-static inline void find_tag_values( Functor compare, IteratorType begin, IteratorType end,
-                                    Range& results )
+static inline void find_tag_values( Functor compare, IteratorType begin, IteratorType end, Range& results )
 {
     Range::iterator insert = results.begin( );
     for( IteratorType i = begin; i != end; ++i )
@@ -288,9 +275,8 @@ static inline void find_tag_values( Functor compare, IteratorType begin, Iterato
 }
 
 template< class Functor, class TagMap >
-static inline void find_map_values( Functor compare, Range::const_iterator lower,
-                                    Range::const_iterator upper, const TagMap& tag_map,
-                                    Range& results )
+static inline void find_map_values( Functor compare, Range::const_iterator lower, Range::const_iterator upper,
+                                    const TagMap& tag_map, Range& results )
 {
     Range::iterator insert = results.begin( );
     for( ; lower != upper; ++lower )
@@ -307,67 +293,56 @@ static inline void find_map_values( Functor compare, Range::const_iterator lower
  *\param ContainerType : std::vector<EntityHandle> or Range
  */
 template< class IteratorType, class ContainerType >
-static inline void find_tag_values_equal( const TagInfo& tag_info, const void* value, int size,
-                                          IteratorType begin, IteratorType end,
-                                          ContainerType& results )
+static inline void find_tag_values_equal( const TagInfo& tag_info, const void* value, int size, IteratorType begin,
+                                          IteratorType end, ContainerType& results )
 {
     switch( tag_info.get_data_type( ) )
     {
         case MB_TYPE_INTEGER:
             if( size == sizeof( int ) )
-                find_tag_values< TagOneIntEqual, IteratorType >( TagOneIntEqual( value ), begin,
-                                                                 end, results );
+                find_tag_values< TagOneIntEqual, IteratorType >( TagOneIntEqual( value ), begin, end, results );
             else
-                find_tag_values< TagIntsEqual, IteratorType >( TagIntsEqual( value, size ), begin,
-                                                               end, results );
+                find_tag_values< TagIntsEqual, IteratorType >( TagIntsEqual( value, size ), begin, end, results );
             break;
 
         case MB_TYPE_DOUBLE:
             if( size == sizeof( double ) )
-                find_tag_values< TagOneDoubleEqual, IteratorType >( TagOneDoubleEqual( value ),
-                                                                    begin, end, results );
+                find_tag_values< TagOneDoubleEqual, IteratorType >( TagOneDoubleEqual( value ), begin, end, results );
             else
-                find_tag_values< TagDoublesEqual, IteratorType >( TagDoublesEqual( value, size ),
-                                                                  begin, end, results );
+                find_tag_values< TagDoublesEqual, IteratorType >( TagDoublesEqual( value, size ), begin, end, results );
             break;
 
         case MB_TYPE_HANDLE:
             if( size == sizeof( EntityHandle ) )
-                find_tag_values< TagOneHandleEqual, IteratorType >( TagOneHandleEqual( value ),
-                                                                    begin, end, results );
+                find_tag_values< TagOneHandleEqual, IteratorType >( TagOneHandleEqual( value ), begin, end, results );
             else
-                find_tag_values< TagHandlesEqual, IteratorType >( TagHandlesEqual( value, size ),
-                                                                  begin, end, results );
+                find_tag_values< TagHandlesEqual, IteratorType >( TagHandlesEqual( value, size ), begin, end, results );
             break;
 
         default:
-            find_tag_values< TagBytesEqual, IteratorType >( TagBytesEqual( value, size ), begin,
-                                                            end, results );
+            find_tag_values< TagBytesEqual, IteratorType >( TagBytesEqual( value, size ), begin, end, results );
             break;
     }
 }
 template< class IteratorType, class ContainerType >
-static inline void find_tag_varlen_values_equal( const TagInfo& tag_info, const void* value,
-                                                 int size, IteratorType begin, IteratorType end,
-                                                 ContainerType& results )
+static inline void find_tag_varlen_values_equal( const TagInfo& tag_info, const void* value, int size,
+                                                 IteratorType begin, IteratorType end, ContainerType& results )
 {
     switch( tag_info.get_data_type( ) )
     {
         case MB_TYPE_INTEGER:
-            find_tag_values< TagVarIntsEqual, IteratorType >( TagVarIntsEqual( value, size ), begin,
-                                                              end, results );
+            find_tag_values< TagVarIntsEqual, IteratorType >( TagVarIntsEqual( value, size ), begin, end, results );
             break;
         case MB_TYPE_DOUBLE:
-            find_tag_values< TagVarDoublesEqual, IteratorType >( TagVarDoublesEqual( value, size ),
-                                                                 begin, end, results );
+            find_tag_values< TagVarDoublesEqual, IteratorType >( TagVarDoublesEqual( value, size ), begin, end,
+                                                                 results );
             break;
         case MB_TYPE_HANDLE:
-            find_tag_values< TagVarHandlesEqual, IteratorType >( TagVarHandlesEqual( value, size ),
-                                                                 begin, end, results );
+            find_tag_values< TagVarHandlesEqual, IteratorType >( TagVarHandlesEqual( value, size ), begin, end,
+                                                                 results );
             break;
         default:
-            find_tag_values< TagVarBytesEqual, IteratorType >( TagVarBytesEqual( value, size ),
-                                                               begin, end, results );
+            find_tag_values< TagVarBytesEqual, IteratorType >( TagVarBytesEqual( value, size ), begin, end, results );
             break;
     }
 }
@@ -380,67 +355,62 @@ static inline void find_tag_varlen_values_equal( const TagInfo& tag_info, const 
  */
 template< class TagMap >
 static inline void find_map_values_equal( const TagInfo& tag_info, const void* value, int size,
-                                          Range::const_iterator begin, Range::const_iterator end,
-                                          const TagMap& tag_map, Range& results )
+                                          Range::const_iterator begin, Range::const_iterator end, const TagMap& tag_map,
+                                          Range& results )
 {
     switch( tag_info.get_data_type( ) )
     {
         case MB_TYPE_INTEGER:
             if( size == sizeof( int ) )
-                find_map_values< TagOneIntEqual, TagMap >( TagOneIntEqual( value ), begin, end,
-                                                           tag_map, results );
+                find_map_values< TagOneIntEqual, TagMap >( TagOneIntEqual( value ), begin, end, tag_map, results );
             else
-                find_map_values< TagIntsEqual, TagMap >( TagIntsEqual( value, size ), begin, end,
-                                                         tag_map, results );
+                find_map_values< TagIntsEqual, TagMap >( TagIntsEqual( value, size ), begin, end, tag_map, results );
             break;
 
         case MB_TYPE_DOUBLE:
             if( size == sizeof( double ) )
-                find_map_values< TagOneDoubleEqual, TagMap >( TagOneDoubleEqual( value ), begin,
-                                                              end, tag_map, results );
+                find_map_values< TagOneDoubleEqual, TagMap >( TagOneDoubleEqual( value ), begin, end, tag_map,
+                                                              results );
             else
-                find_map_values< TagDoublesEqual, TagMap >( TagDoublesEqual( value, size ), begin,
-                                                            end, tag_map, results );
+                find_map_values< TagDoublesEqual, TagMap >( TagDoublesEqual( value, size ), begin, end, tag_map,
+                                                            results );
             break;
 
         case MB_TYPE_HANDLE:
             if( size == sizeof( EntityHandle ) )
-                find_map_values< TagOneHandleEqual, TagMap >( TagOneHandleEqual( value ), begin,
-                                                              end, tag_map, results );
+                find_map_values< TagOneHandleEqual, TagMap >( TagOneHandleEqual( value ), begin, end, tag_map,
+                                                              results );
             else
-                find_map_values< TagHandlesEqual, TagMap >( TagHandlesEqual( value, size ), begin,
-                                                            end, tag_map, results );
+                find_map_values< TagHandlesEqual, TagMap >( TagHandlesEqual( value, size ), begin, end, tag_map,
+                                                            results );
             break;
 
         default:
-            find_map_values< TagBytesEqual, TagMap >( TagBytesEqual( value, size ), begin, end,
-                                                      tag_map, results );
+            find_map_values< TagBytesEqual, TagMap >( TagBytesEqual( value, size ), begin, end, tag_map, results );
             break;
     }
 }
 template< class TagMap >
-static inline void find_map_varlen_values_equal( const TagInfo& tag_info, const void* value,
-                                                 int size, Range::const_iterator begin,
-                                                 Range::const_iterator end, const TagMap& tag_map,
-                                                 Range& results )
+static inline void find_map_varlen_values_equal( const TagInfo& tag_info, const void* value, int size,
+                                                 Range::const_iterator begin, Range::const_iterator end,
+                                                 const TagMap& tag_map, Range& results )
 {
     switch( tag_info.get_data_type( ) )
     {
         case MB_TYPE_INTEGER:
-            find_map_values< TagVarIntsEqual, TagMap >( TagVarIntsEqual( value, size ), begin, end,
-                                                        tag_map, results );
+            find_map_values< TagVarIntsEqual, TagMap >( TagVarIntsEqual( value, size ), begin, end, tag_map, results );
             break;
         case MB_TYPE_DOUBLE:
-            find_map_values< TagVarDoublesEqual, TagMap >( TagVarDoublesEqual( value, size ), begin,
-                                                           end, tag_map, results );
+            find_map_values< TagVarDoublesEqual, TagMap >( TagVarDoublesEqual( value, size ), begin, end, tag_map,
+                                                           results );
             break;
         case MB_TYPE_HANDLE:
-            find_map_values< TagVarHandlesEqual, TagMap >( TagVarHandlesEqual( value, size ), begin,
-                                                           end, tag_map, results );
+            find_map_values< TagVarHandlesEqual, TagMap >( TagVarHandlesEqual( value, size ), begin, end, tag_map,
+                                                           results );
             break;
         default:
-            find_map_values< TagVarBytesEqual, TagMap >( TagVarBytesEqual( value, size ), begin,
-                                                         end, tag_map, results );
+            find_map_values< TagVarBytesEqual, TagMap >( TagVarBytesEqual( value, size ), begin, end, tag_map,
+                                                         results );
             break;
     }
 }
@@ -462,8 +432,7 @@ class ByteArrayIterator
     {
     }
     ByteArrayIterator( EntityHandle start_handle, const void* data_array, const TagInfo& tag_info )
-        : step( tag_info.get_size( ) == MB_VARIABLE_LENGTH ? sizeof( VarLenTag )
-                                                           : tag_info.get_size( ) ),
+        : step( tag_info.get_size( ) == MB_VARIABLE_LENGTH ? sizeof( VarLenTag ) : tag_info.get_size( ) ),
           data( start_handle, reinterpret_cast< const char* >( data_array ) )
     {
     }

@@ -74,8 +74,8 @@ bool TShapeSizeOrientB2::evaluate( const MsqMatrix< 3, 3 >& T, double& result, M
 }
 
 /** \f$ \frac{1}{\tau^2}|T|^2 - \frac{2}{\tau}tr(adj T) + 2 \f$ */
-bool TShapeSizeOrientB2::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& result,
-                                             MsqMatrix< 2, 2 >& deriv_wrt_T, MsqError& err )
+bool TShapeSizeOrientB2::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& result, MsqMatrix< 2, 2 >& deriv_wrt_T,
+                                             MsqError& err )
 {
     const double tau = det( T );
     if( invalid_determinant( tau ) )
@@ -97,8 +97,8 @@ bool TShapeSizeOrientB2::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double&
 }
 
 /** \f$ \frac{1}{\tau^2}|adj T|^2 - \frac{2}{\tau}tr(adj T) + 3 \f$ */
-bool TShapeSizeOrientB2::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& result,
-                                             MsqMatrix< 3, 3 >& deriv_wrt_T, MsqError& err )
+bool TShapeSizeOrientB2::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& result, MsqMatrix< 3, 3 >& deriv_wrt_T,
+                                             MsqError& err )
 {
     const double tau = det( T );
     if( invalid_determinant( tau ) )
@@ -129,8 +129,7 @@ bool TShapeSizeOrientB2::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double&
     return true;
 }
 
-bool TShapeSizeOrientB2::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& result,
-                                             MsqMatrix< 2, 2 >& deriv_wrt_T,
+bool TShapeSizeOrientB2::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& result, MsqMatrix< 2, 2 >& deriv_wrt_T,
                                              MsqMatrix< 2, 2 > second[ 3 ], MsqError& err )
 {
     const double tau = det( T );
@@ -150,19 +149,16 @@ bool TShapeSizeOrientB2::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double&
     deriv_wrt_T += it * it * ( trace( T ) - it * sqr_Frobenius( T ) ) * adjt;
     deriv_wrt_T *= 2.0;
 
-    set_scaled_outer_product(
-        second, it * it * it * ( 6 * it * sqr_Frobenius( T ) - 4 * trace( T ) ), adjt );
+    set_scaled_outer_product( second, it * it * it * ( 6 * it * sqr_Frobenius( T ) - 4 * trace( T ) ), adjt );
     pluseq_scaled_I( second, 2 * it * it );
-    pluseq_scaled_2nd_deriv_of_det( second,
-                                    2 * it * it * ( trace( T ) - it * sqr_Frobenius( T ) ) );
+    pluseq_scaled_2nd_deriv_of_det( second, 2 * it * it * ( trace( T ) - it * sqr_Frobenius( T ) ) );
     pluseq_scaled_sum_outer_product( second, -4 * it * it * it, T, adjt );
     pluseq_scaled_sum_outer_product_I( second, 2 * it * it, adjt );
 
     return true;
 }
 
-bool TShapeSizeOrientB2::evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result,
-                                             MsqMatrix< 3, 3 >& deriv_wrt_T,
+bool TShapeSizeOrientB2::evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result, MsqMatrix< 3, 3 >& deriv_wrt_T,
                                              MsqMatrix< 3, 3 > second[ 6 ], MsqError& err )
 {
     const double tau = det( T );

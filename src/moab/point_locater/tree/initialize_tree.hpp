@@ -30,8 +30,7 @@ ErrorCode initialize_tree( )
             if( num_iterations != i )
             {
                 settings.maxEntPerLeaf *= 2;
-                std::cout << "; increasing elements/leaf to " << settings.maxEntPerLeaf
-                          << std::endl;
+                std::cout << "; increasing elements/leaf to " << settings.maxEntPerLeaf << std::endl;
                 ;
             }
             else
@@ -63,9 +62,8 @@ ErrorCode initialize_tree( )
     double       min[ 3 ] = { 0, 0, 0 }, max[ 3 ] = { 0, 0, 0 };
     unsigned int dep;
     tree.get_info( local_root, min, max, dep );
-    std::cerr << "Proc " << rank << ": box min/max, tree depth = (" << min[ 0 ] << "," << min[ 1 ]
-              << "," << min[ 2 ] << "), (" << max[ 0 ] << "," << max[ 1 ] << "," << max[ 2 ]
-              << "), " << dep << std::endl;
+    std::cerr << "Proc " << rank << ": box min/max, tree depth = (" << min[ 0 ] << "," << min[ 1 ] << "," << min[ 2 ]
+              << "), (" << max[ 0 ] << "," << max[ 1 ] << "," << max[ 2 ] << "), " << dep << std::endl;
 #endif
 
     return result;

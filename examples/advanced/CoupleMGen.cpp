@@ -77,28 +77,18 @@ int main( int argc, char* argv[] )
 
     ProgOptions popts;
 
-    popts.addOpt< int >( string( "blockSize,b" ), string( "Block size of mesh (default=4)" ),
-                         &opts.blockSize );
-    popts.addOpt< int >( string( "xproc,M" ), string( "Number of processors in x dir (default=1)" ),
-                         &opts.M );
-    popts.addOpt< int >( string( "yproc,N" ), string( "Number of processors in y dir (default=1)" ),
-                         &opts.N );
-    popts.addOpt< int >( string( "zproc,K" ), string( "Number of processors in z dir (default=1)" ),
-                         &opts.K );
+    popts.addOpt< int >( string( "blockSize,b" ), string( "Block size of mesh (default=4)" ), &opts.blockSize );
+    popts.addOpt< int >( string( "xproc,M" ), string( "Number of processors in x dir (default=1)" ), &opts.M );
+    popts.addOpt< int >( string( "yproc,N" ), string( "Number of processors in y dir (default=1)" ), &opts.N );
+    popts.addOpt< int >( string( "zproc,K" ), string( "Number of processors in z dir (default=1)" ), &opts.K );
 
-    popts.addOpt< int >( string( "xblocks,A" ),
-                         string( "Number of blocks on a task in x dir (default=2)" ), &opts.A );
-    popts.addOpt< int >( string( "yblocks,B" ),
-                         string( "Number of blocks on a task in y dir (default=2)" ), &opts.B );
-    popts.addOpt< int >( string( "zblocks,C" ),
-                         string( "Number of blocks on a task in x dir (default=2)" ), &opts.C );
+    popts.addOpt< int >( string( "xblocks,A" ), string( "Number of blocks on a task in x dir (default=2)" ), &opts.A );
+    popts.addOpt< int >( string( "yblocks,B" ), string( "Number of blocks on a task in y dir (default=2)" ), &opts.B );
+    popts.addOpt< int >( string( "zblocks,C" ), string( "Number of blocks on a task in x dir (default=2)" ), &opts.C );
 
-    popts.addOpt< double >( string( "xsize,x" ), string( "Total size in x direction (default=1.)" ),
-                            &opts.xsize );
-    popts.addOpt< double >( string( "ysize,y" ), string( "Total size in y direction (default=1.)" ),
-                            &opts.ysize );
-    popts.addOpt< double >( string( "zsize,z" ), string( "Total size in z direction (default=1.)" ),
-                            &opts.zsize );
+    popts.addOpt< double >( string( "xsize,x" ), string( "Total size in x direction (default=1.)" ), &opts.xsize );
+    popts.addOpt< double >( string( "ysize,y" ), string( "Total size in y direction (default=1.)" ), &opts.ysize );
+    popts.addOpt< double >( string( "zsize,z" ), string( "Total size in z direction (default=1.)" ), &opts.zsize );
 
     popts.addOpt< void >( "newMerge,w", "use new merging method", &opts.newMergeMethod );
 
@@ -110,17 +100,14 @@ int main( int argc, char* argv[] )
 
     popts.addOpt< void >( "faces_edges,f", "create all faces and edges", &opts.adjEnts );
 
-    popts.addOpt< int >( string( "ghost_layers,g" ), string( "Number of ghost layers (default=0)" ),
-                         &opts.GL );
+    popts.addOpt< int >( string( "ghost_layers,g" ), string( "Number of ghost layers (default=0)" ), &opts.GL );
 
-    popts.addOpt< void >( "parallel_merge,p", "use parallel mesh merge, not vertex ID based merge",
-                          &opts.parmerge );
+    popts.addOpt< void >( "parallel_merge,p", "use parallel mesh merge, not vertex ID based merge", &opts.parmerge );
 
     Coupler::Method method = Coupler::LINEAR_FE;
 
     double toler = 1.e-6;
-    popts.addOpt< double >( string( "eps,e" ),
-                            string( "tolerance for coupling, used in locating points" ), &toler );
+    popts.addOpt< double >( string( "eps,e" ), string( "tolerance for coupling, used in locating points" ), &toler );
 
     bool writeMeshes = false;
     popts.addOpt< void >( "print,p", "write meshes", &writeMeshes );
@@ -143,8 +130,7 @@ int main( int argc, char* argv[] )
     // set an interpolation tag on source mesh, from phys field
     std::string interpTag( "interp_tag" );
     Tag         tag;
-    rval = mb->tag_get_handle( interpTag.c_str( ), 1, MB_TYPE_DOUBLE, tag,
-                               MB_TAG_CREAT | MB_TAG_DENSE );MB_CHK_ERR( rval );
+    rval = mb->tag_get_handle( interpTag.c_str( ), 1, MB_TYPE_DOUBLE, tag, MB_TAG_CREAT | MB_TAG_DENSE );MB_CHK_ERR( rval );
 
     Range src_elems;
     rval = pc1->get_part_entities( src_elems, 3 );MB_CHK_ERR( rval );
@@ -184,10 +170,8 @@ int main( int argc, char* argv[] )
     // test the sets are fine
     if( writeMeshes )
     {
-        rval = mb->write_file( "mesh1.h5m", 0, ";;PARALLEL=WRITE_PART;CPUTIME;PARALLEL_COMM=0;",
-                               &fileset1, 1 );MB_CHK_SET_ERR( rval, "Can't write in parallel mesh 1" );
-        rval = mb->write_file( "mesh2.h5m", 0, ";;PARALLEL=WRITE_PART;CPUTIME;PARALLEL_COMM=1;",
-                               &fileset2, 1 );MB_CHK_SET_ERR( rval, "Can't write in parallel mesh 1" );
+        rval = mb->write_file( "mesh1.h5m", 0, ";;PARALLEL=WRITE_PART;CPUTIME;PARALLEL_COMM=0;", &fileset1, 1 );MB_CHK_SET_ERR( rval, "Can't write in parallel mesh 1" );
+        rval = mb->write_file( "mesh2.h5m", 0, ";;PARALLEL=WRITE_PART;CPUTIME;PARALLEL_COMM=1;", &fileset2, 1 );MB_CHK_SET_ERR( rval, "Can't write in parallel mesh 1" );
         double write_files = MPI_Wtime( );
         if( !proc_id ) std::cout << " write files " << write_files - current << "\n";
         current = write_files;

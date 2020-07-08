@@ -82,16 +82,13 @@ void create_mesh( const char* filename )
 
     Tag int_tag, real_tag, handle_tag, bit_tag, row_tag;
 
-    rval = mb.tag_get_handle( "int_tag", 2, MB_TYPE_INTEGER, int_tag, MB_TAG_DENSE | MB_TAG_EXCL,
-                              default_int_tag );CHECK_ERR( rval );
+    rval = mb.tag_get_handle( "int_tag", 2, MB_TYPE_INTEGER, int_tag, MB_TAG_DENSE | MB_TAG_EXCL, default_int_tag );CHECK_ERR( rval );
     rval = mb.tag_set_data( int_tag, &root, 1, mesh_int_tag );CHECK_ERR( rval );
 
-    rval = mb.tag_get_handle( "real_tag", 8, MB_TYPE_DOUBLE, real_tag, MB_TAG_DENSE | MB_TAG_EXCL,
-                              default_real_tag );CHECK_ERR( rval );
+    rval = mb.tag_get_handle( "real_tag", 8, MB_TYPE_DOUBLE, real_tag, MB_TAG_DENSE | MB_TAG_EXCL, default_real_tag );CHECK_ERR( rval );
     rval = mb.tag_set_data( real_tag, &root, 1, mesh_real_tag );CHECK_ERR( rval );
 
-    rval = mb.tag_get_handle( "handle_tag", 1, MB_TYPE_HANDLE, handle_tag,
-                              MB_TAG_SPARSE | MB_TAG_EXCL );CHECK_ERR( rval );
+    rval = mb.tag_get_handle( "handle_tag", 1, MB_TYPE_HANDLE, handle_tag, MB_TAG_SPARSE | MB_TAG_EXCL );CHECK_ERR( rval );
 
     rval = mb.tag_get_handle( "bit_tag", 1, MB_TYPE_BIT, bit_tag, MB_TAG_EXCL );CHECK_ERR( rval );
 
@@ -509,8 +506,7 @@ void test_read_partial( const char* filename )
     Core       core;
     Interface& mb = core;
     const int  odd = 1;
-    ErrorCode  rval =
-        mb.load_file( filename, 0, "CHILDREN=NONE;SETS=NONE;" READ_OPTS, "rowset", &odd, 1 );CHECK_ERR( rval );
+    ErrorCode  rval = mb.load_file( filename, 0, "CHILDREN=NONE;SETS=NONE;" READ_OPTS, "rowset", &odd, 1 );CHECK_ERR( rval );
     // check the elements
     test_elements( mb, true );
 }

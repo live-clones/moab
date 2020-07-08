@@ -51,8 +51,7 @@ ReaderIface* ReadABAQUS::factory( Interface* iface )
 }
 
 ReadABAQUS::ReadABAQUS( Interface* impl )
-    : mdbImpl( impl ), readMeshIface( NULL ), lineNo( 0 ), next_line_type( abq_undefined_line ),
-      mat_id( 0 )
+    : mdbImpl( impl ), readMeshIface( NULL ), lineNo( 0 ), next_line_type( abq_undefined_line ), mat_id( 0 )
 {
     assert( impl != NULL );
     reset( );
@@ -78,27 +77,19 @@ ReadABAQUS::ReadABAQUS( Interface* impl )
     //! Get and cache predefined tag handles
     int negone = -1, negonearr[] = { -1, -1, -1, -1 };
     mMaterialSetTag = get_tag( MATERIAL_SET_TAG_NAME, 1, MB_TAG_SPARSE, MB_TYPE_INTEGER, &negone );
-    mDirichletSetTag =
-        get_tag( DIRICHLET_SET_TAG_NAME, 1, MB_TAG_SPARSE, MB_TYPE_INTEGER, &negone );
+    mDirichletSetTag = get_tag( DIRICHLET_SET_TAG_NAME, 1, MB_TAG_SPARSE, MB_TYPE_INTEGER, &negone );
     mNeumannSetTag = get_tag( NEUMANN_SET_TAG_NAME, 1, MB_TAG_SPARSE, MB_TYPE_INTEGER, &negone );
-    mHasMidNodesTag =
-        get_tag( HAS_MID_NODES_TAG_NAME, 4, MB_TAG_SPARSE, MB_TYPE_INTEGER, negonearr );
+    mHasMidNodesTag = get_tag( HAS_MID_NODES_TAG_NAME, 4, MB_TAG_SPARSE, MB_TYPE_INTEGER, negonearr );
 
     mSetTypeTag = get_tag( ABAQUS_SET_TYPE_TAG_NAME, 1, MB_TAG_SPARSE, MB_TYPE_INTEGER );
     mPartHandleTag = get_tag( ABAQUS_PART_HANDLE_TAG_NAME, 1, MB_TAG_SPARSE, MB_TYPE_HANDLE );
-    mInstanceHandleTag =
-        get_tag( ABAQUS_INSTANCE_HANDLE_TAG_NAME, 1, MB_TAG_DENSE, MB_TYPE_HANDLE );
-    mAssemblyHandleTag =
-        get_tag( ABAQUS_ASSEMBLY_HANDLE_TAG_NAME, 1, MB_TAG_DENSE, MB_TYPE_HANDLE );
-    mInstancePIDTag =
-        get_tag( ABAQUS_INSTANCE_PART_ID_TAG_NAME, 1, MB_TAG_SPARSE, MB_TYPE_INTEGER );
-    mInstanceGIDTag =
-        get_tag( ABAQUS_INSTANCE_GLOBAL_ID_TAG_NAME, 1, MB_TAG_SPARSE, MB_TYPE_INTEGER, &negone );
+    mInstanceHandleTag = get_tag( ABAQUS_INSTANCE_HANDLE_TAG_NAME, 1, MB_TAG_DENSE, MB_TYPE_HANDLE );
+    mAssemblyHandleTag = get_tag( ABAQUS_ASSEMBLY_HANDLE_TAG_NAME, 1, MB_TAG_DENSE, MB_TYPE_HANDLE );
+    mInstancePIDTag = get_tag( ABAQUS_INSTANCE_PART_ID_TAG_NAME, 1, MB_TAG_SPARSE, MB_TYPE_INTEGER );
+    mInstanceGIDTag = get_tag( ABAQUS_INSTANCE_GLOBAL_ID_TAG_NAME, 1, MB_TAG_SPARSE, MB_TYPE_INTEGER, &negone );
     mLocalIDTag = get_tag( ABAQUS_LOCAL_ID_TAG_NAME, 1, MB_TAG_DENSE, MB_TYPE_INTEGER );
-    mSetNameTag = get_tag( ABAQUS_SET_NAME_TAG_NAME, ABAQUS_SET_NAME_LENGTH, MB_TAG_SPARSE,
-                           MB_TYPE_OPAQUE, 0 );
-    mMatNameTag = get_tag( ABAQUS_MAT_NAME_TAG_NAME, ABAQUS_MAT_NAME_LENGTH, MB_TAG_SPARSE,
-                           MB_TYPE_OPAQUE, 0 );
+    mSetNameTag = get_tag( ABAQUS_SET_NAME_TAG_NAME, ABAQUS_SET_NAME_LENGTH, MB_TAG_SPARSE, MB_TYPE_OPAQUE, 0 );
+    mMatNameTag = get_tag( ABAQUS_MAT_NAME_TAG_NAME, ABAQUS_MAT_NAME_LENGTH, MB_TAG_SPARSE, MB_TYPE_OPAQUE, 0 );
 }
 
 void ReadABAQUS::reset( ) {}
@@ -118,25 +109,20 @@ ErrorCode ReadABAQUS::check_file_stats()
 */
 
 ErrorCode ReadABAQUS::read_tag_values( const char* /* file_name */, const char* /* tag_name */,
-                                       const FileOptions& /* opts */,
-                                       std::vector< int >& /* tag_values_out */,
+                                       const FileOptions& /* opts */, std::vector< int >& /* tag_values_out */,
                                        const SubsetList* /* subset_list */ )
 {
     return MB_NOT_IMPLEMENTED;
 }
 
-ErrorCode ReadABAQUS::load_file( const char* abaqus_file_name, const EntityHandle* file_set_ptr,
-                                 const FileOptions& /*opts*/,
-                                 const ReaderIface::SubsetList* subset_list,
+ErrorCode ReadABAQUS::load_file( const char* abaqus_file_name, const EntityHandle*           file_set_ptr,
+                                 const FileOptions& /*opts*/, const ReaderIface::SubsetList* subset_list,
                                  const Tag* /*file_id_tag*/ )
 {
     ErrorCode status;
 
     if( subset_list )
-    {
-        MB_SET_ERR( MB_UNSUPPORTED_OPERATION,
-                    "Reading subset of files not supported for ABAQUS data" );
-    }
+    { MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "Reading subset of files not supported for ABAQUS data" ); }
 
     // Open file
     lineNo = 0;
@@ -195,8 +181,7 @@ ErrorCode ReadABAQUS::load_file( const char* abaqus_file_name, const EntityHandl
     Range part_sets;
     int   tag_val = ABQ_PART_SET;
     void* tag_data[] = { &tag_val };
-    status = mdbImpl->get_entities_by_type_and_tag( file_set, MBENTITYSET, &mSetTypeTag, tag_data,
-                                                    1, part_sets );
+    status = mdbImpl->get_entities_by_type_and_tag( file_set, MBENTITYSET, &mSetTypeTag, tag_data, 1, part_sets );
     MB_RETURN_IF_FAIL;
 
     for( Range::iterator part_set = part_sets.begin( ); part_set != part_sets.end( ); ++part_set )
@@ -205,8 +190,7 @@ ErrorCode ReadABAQUS::load_file( const char* abaqus_file_name, const EntityHandl
         tag_val = ABQ_NODE_SET;
         tag_data[ 0 ] = &tag_val;
 
-        status = mdbImpl->get_entities_by_type_and_tag( *part_set, MBENTITYSET, &mSetTypeTag,
-                                                        tag_data, 1, ent_sets );
+        status = mdbImpl->get_entities_by_type_and_tag( *part_set, MBENTITYSET, &mSetTypeTag, tag_data, 1, ent_sets );
         MB_RETURN_IF_FAIL;
 
         status = mdbImpl->delete_entities( ent_sets );
@@ -215,8 +199,7 @@ ErrorCode ReadABAQUS::load_file( const char* abaqus_file_name, const EntityHandl
         tag_val = ABQ_ELEMENT_SET;
         tag_data[ 0 ] = &tag_val;
 
-        status = mdbImpl->get_entities_by_type_and_tag( *part_set, MBENTITYSET, &mSetTypeTag,
-                                                        tag_data, 1, ent_sets );
+        status = mdbImpl->get_entities_by_type_and_tag( *part_set, MBENTITYSET, &mSetTypeTag, tag_data, 1, ent_sets );
         MB_RETURN_IF_FAIL;
 
         status = mdbImpl->delete_entities( ent_sets );
@@ -279,8 +262,7 @@ ErrorCode ReadABAQUS::read_assembly( EntityHandle file_set )
     extract_keyword_parameters( tokens, params );
 
     // Search for required parameters
-    for( std::map< std::string, abaqus_assembly_params >::iterator thisParam =
-             requiredParams.begin( );
+    for( std::map< std::string, abaqus_assembly_params >::iterator thisParam = requiredParams.begin( );
          thisParam != requiredParams.end( ); ++thisParam )
     {
         std::string param_key = match( ( *thisParam ).first, params );
@@ -301,8 +283,8 @@ ErrorCode ReadABAQUS::read_assembly( EntityHandle file_set )
     }
 
     // Process parameters
-    for( std::map< std::string, std::string >::iterator thisParam = params.begin( );
-         thisParam != params.end( ); ++thisParam )
+    for( std::map< std::string, std::string >::iterator thisParam = params.begin( ); thisParam != params.end( );
+         ++thisParam )
     {
         // Look for unambiguous match with this node parameter
         param = allowableParams[ match( ( *thisParam ).first, allowableParams ) ];
@@ -402,8 +384,7 @@ ErrorCode ReadABAQUS::read_instance( EntityHandle assembly_set, EntityHandle fil
     extract_keyword_parameters( tokens, params );
 
     // Search for required parameters
-    for( std::map< std::string, abaqus_instance_params >::iterator thisParam =
-             requiredParams.begin( );
+    for( std::map< std::string, abaqus_instance_params >::iterator thisParam = requiredParams.begin( );
          thisParam != requiredParams.end( ); ++thisParam )
     {
         std::string param_key = match( ( *thisParam ).first, params );
@@ -428,8 +409,8 @@ ErrorCode ReadABAQUS::read_instance( EntityHandle assembly_set, EntityHandle fil
     // part_name <<  std::endl; // REMOVE
 
     // Process parameters
-    for( std::map< std::string, std::string >::iterator thisParam = params.begin( );
-         thisParam != params.end( ); ++thisParam )
+    for( std::map< std::string, std::string >::iterator thisParam = params.begin( ); thisParam != params.end( );
+         ++thisParam )
     {
         // Look for unambiguous match with this node parameter
         param = allowableParams[ match( ( *thisParam ).first, allowableParams ) ];
@@ -505,10 +486,7 @@ ErrorCode ReadABAQUS::read_instance( EntityHandle assembly_set, EntityHandle fil
                     if( !read_translation )
                     {
                         if( tokens.size( ) != 3 )
-                        {
-                            MB_SET_ERR( MB_FAILURE,
-                                        "Wrong number of entries on INSTANCE translation line" );
-                        }
+                        { MB_SET_ERR( MB_FAILURE, "Wrong number of entries on INSTANCE translation line" ); }
 
                         for( unsigned int i = 0; i < 3; i++ )
                             translation[ i ] = atof( tokens[ i ].c_str( ) );
@@ -518,10 +496,7 @@ ErrorCode ReadABAQUS::read_instance( EntityHandle assembly_set, EntityHandle fil
                     else if( !read_rotation )
                     {
                         if( tokens.size( ) != 7 )
-                        {
-                            MB_SET_ERR( MB_FAILURE,
-                                        "Wrong number of entries on INSTANCE rotation line" );
-                        }
+                        { MB_SET_ERR( MB_FAILURE, "Wrong number of entries on INSTANCE rotation line" ); }
                         for( unsigned int i = 0; i < 7; i++ )
                             rotation[ i ] = atof( tokens[ i ].c_str( ) );
 
@@ -541,8 +516,8 @@ ErrorCode ReadABAQUS::read_instance( EntityHandle assembly_set, EntityHandle fil
         }  // switch (next_line_type)
     }  // while (next_line_type != abq_eof && !end_instance)
 
-    status = create_instance_of_part( file_set, assembly_set, part_name, instance_name,
-                                      instance_set, translation, rotation );
+    status = create_instance_of_part( file_set, assembly_set, part_name, instance_name, instance_set, translation,
+                                      rotation );
     MB_RETURN_IF_FAIL;
 
     return MB_SUCCESS;
@@ -587,8 +562,8 @@ ErrorCode ReadABAQUS::read_part( EntityHandle file_set )
     }
 
     // Process parameters
-    for( std::map< std::string, std::string >::iterator thisParam = params.begin( );
-         thisParam != params.end( ); ++thisParam )
+    for( std::map< std::string, std::string >::iterator thisParam = params.begin( ); thisParam != params.end( );
+         ++thisParam )
     {
         // Look for unambiguous match with this node parameter
         param = allowableParams[ match( ( *thisParam ).first, allowableParams ) ];
@@ -653,8 +628,7 @@ ErrorCode ReadABAQUS::read_part( EntityHandle file_set )
                 next_line_type = get_next_line_type( );
                 break;
             case abq_data_line:
-                if( !in_unsupported )
-                { MB_SET_ERR( MB_FAILURE, "Data lines not allowed in PART keyword" ); }
+                if( !in_unsupported ) { MB_SET_ERR( MB_FAILURE, "Data lines not allowed in PART keyword" ); }
                 next_line_type = get_next_line_type( );
                 break;
             case abq_blank_line:
@@ -691,8 +665,7 @@ ErrorCode ReadABAQUS::read_solid_section( EntityHandle parent_set )
     std::string elset_name, mat_name;
 
     // Search for required parameters
-    for( std::map< std::string, abaqus_solid_section_params >::iterator thisParam =
-             requiredParams.begin( );
+    for( std::map< std::string, abaqus_solid_section_params >::iterator thisParam = requiredParams.begin( );
          thisParam != requiredParams.end( ); ++thisParam )
     {
         std::string param_key = match( ( *thisParam ).first, params );
@@ -715,8 +688,8 @@ ErrorCode ReadABAQUS::read_solid_section( EntityHandle parent_set )
     // " << mat_name << std::endl; // REMOVE
 
     // Process parameters
-    for( std::map< std::string, std::string >::iterator thisParam = params.begin( );
-         thisParam != params.end( ); ++thisParam )
+    for( std::map< std::string, std::string >::iterator thisParam = params.begin( ); thisParam != params.end( );
+         ++thisParam )
     {
         // Look for unambiguous match with this node parameter
         param = allowableParams[ match( ( *thisParam ).first, allowableParams ) ];
@@ -755,8 +728,7 @@ ErrorCode ReadABAQUS::read_solid_section( EntityHandle parent_set )
     return MB_SUCCESS;
 }
 
-ErrorCode ReadABAQUS::read_element_set( EntityHandle parent_set, EntityHandle file_set,
-                                        EntityHandle assembly_set )
+ErrorCode ReadABAQUS::read_element_set( EntityHandle parent_set, EntityHandle file_set, EntityHandle assembly_set )
 {
     ErrorCode status;
 
@@ -802,8 +774,8 @@ ErrorCode ReadABAQUS::read_element_set( EntityHandle parent_set, EntityHandle fi
     }
 
     // Process parameters
-    for( std::map< std::string, std::string >::iterator thisParam = params.begin( );
-         thisParam != params.end( ); ++thisParam )
+    for( std::map< std::string, std::string >::iterator thisParam = params.begin( ); thisParam != params.end( );
+         ++thisParam )
     {
         // Look for unambiguous match with this node parameter
         param = allowableParams[ match( ( *thisParam ).first, allowableParams ) ];
@@ -814,8 +786,7 @@ ErrorCode ReadABAQUS::read_element_set( EntityHandle parent_set, EntityHandle fi
                 break;
             case abq_elset_instance:
                 instance_name = ( *thisParam ).second;
-                status = get_set_by_name( parent_set, ABQ_INSTANCE_SET, instance_name,
-                                          element_container_set );
+                status = get_set_by_name( parent_set, ABQ_INSTANCE_SET, instance_name, element_container_set );
                 MB_RETURN_IF_FAIL;
                 break;
             case abq_elset_ambiguous:
@@ -842,10 +813,7 @@ ErrorCode ReadABAQUS::read_element_set( EntityHandle parent_set, EntityHandle fi
             if( generate_elset )
             {
                 if( tokens.size( ) != 3 )
-                {
-                    MB_SET_ERR( MB_FAILURE,
-                                "Wrong number of entries on GENERATE element set data line" );
-                }
+                { MB_SET_ERR( MB_FAILURE, "Wrong number of entries on GENERATE element set data line" ); }
                 int e1 = atoi( tokens[ 0 ].c_str( ) );
                 int e2 = atoi( tokens[ 1 ].c_str( ) );
                 int incr = atoi( tokens[ 2 ].c_str( ) );
@@ -861,8 +829,8 @@ ErrorCode ReadABAQUS::read_element_set( EntityHandle parent_set, EntityHandle fi
                     if( isalpha( tokens[ idx ][ 0 ] ) )
                     {
                         tmp_element_range.clear( );
-                        status = get_set_elements_by_name( element_container_set, ABQ_ELEMENT_SET,
-                                                           tokens[ idx ], tmp_element_range );
+                        status = get_set_elements_by_name( element_container_set, ABQ_ELEMENT_SET, tokens[ idx ],
+                                                           tmp_element_range );
                         MB_RETURN_IF_FAIL;
 
                         element_range.merge( tmp_element_range );
@@ -910,8 +878,7 @@ ErrorCode ReadABAQUS::read_element_set( EntityHandle parent_set, EntityHandle fi
     return MB_SUCCESS;
 }
 
-ErrorCode ReadABAQUS::read_node_set( EntityHandle parent_set, EntityHandle file_set,
-                                     EntityHandle assembly_set )
+ErrorCode ReadABAQUS::read_node_set( EntityHandle parent_set, EntityHandle file_set, EntityHandle assembly_set )
 {
     ErrorCode status;
 
@@ -959,8 +926,8 @@ ErrorCode ReadABAQUS::read_node_set( EntityHandle parent_set, EntityHandle file_
     }
 
     // Process parameters
-    for( std::map< std::string, std::string >::iterator thisParam = params.begin( );
-         thisParam != params.end( ); ++thisParam )
+    for( std::map< std::string, std::string >::iterator thisParam = params.begin( ); thisParam != params.end( );
+         ++thisParam )
     {
         // Look for unambiguous match with this node parameter
         param = allowableParams[ match( ( *thisParam ).first, allowableParams ) ];
@@ -975,8 +942,7 @@ ErrorCode ReadABAQUS::read_node_set( EntityHandle parent_set, EntityHandle file_
                 break;
             case abq_nset_instance:
                 instance_name = ( *thisParam ).second;
-                status = get_set_by_name( parent_set, ABQ_INSTANCE_SET, instance_name,
-                                          node_container_set );
+                status = get_set_by_name( parent_set, ABQ_INSTANCE_SET, instance_name, node_container_set );
                 MB_RETURN_IF_FAIL;
                 break;
             case abq_nset_ambiguous:
@@ -1013,10 +979,7 @@ ErrorCode ReadABAQUS::read_node_set( EntityHandle parent_set, EntityHandle file_
                 if( generate_nset )
                 {
                     if( tokens.size( ) != 3 )
-                    {
-                        MB_SET_ERR( MB_FAILURE,
-                                    "Wrong number of entries on GENERATE node set data line" );
-                    }
+                    { MB_SET_ERR( MB_FAILURE, "Wrong number of entries on GENERATE node set data line" ); }
                     int n1 = atoi( tokens[ 0 ].c_str( ) );
                     int n2 = atoi( tokens[ 1 ].c_str( ) );
                     int incr = atoi( tokens[ 2 ].c_str( ) );
@@ -1032,8 +995,7 @@ ErrorCode ReadABAQUS::read_node_set( EntityHandle parent_set, EntityHandle file_
                         if( isalpha( tokens[ idx ][ 0 ] ) )
                         {
                             tmp_node_range.clear( );
-                            status = get_set_nodes( parent_set, ABQ_NODE_SET, tokens[ idx ],
-                                                    tmp_node_range );
+                            status = get_set_nodes( parent_set, ABQ_NODE_SET, tokens[ idx ], tmp_node_range );
                             MB_RETURN_IF_FAIL;
 
                             node_range.merge( tmp_node_range );
@@ -1133,8 +1095,7 @@ ErrorCode ReadABAQUS::read_element_list( EntityHandle parent_set, EntityHandle a
     extract_keyword_parameters( tokens, params );
 
     // Search for required parameters
-    for( std::map< std::string, abaqus_element_params >::iterator thisParam =
-             requiredParams.begin( );
+    for( std::map< std::string, abaqus_element_params >::iterator thisParam = requiredParams.begin( );
          thisParam != requiredParams.end( ); ++thisParam )
     {
         std::string param_key = match( ( *thisParam ).first, params );
@@ -1157,8 +1118,8 @@ ErrorCode ReadABAQUS::read_element_list( EntityHandle parent_set, EntityHandle a
     }
 
     // Process parameters
-    for( std::map< std::string, std::string >::iterator thisParam = params.begin( );
-         thisParam != params.end( ); ++thisParam )
+    for( std::map< std::string, std::string >::iterator thisParam = params.begin( ); thisParam != params.end( );
+         ++thisParam )
     {
         // Look for unambiguous match with this node parameter
         param = allowableParams[ match( ( *thisParam ).first, allowableParams ) ];
@@ -1205,8 +1166,7 @@ ErrorCode ReadABAQUS::read_element_list( EntityHandle parent_set, EntityHandle a
     EntityHandle* connect;
 
     status = readMeshIface->get_element_connect( num_elements, nodes_per_element[ element_type ],
-                                                 entityTypeMap[ element_type ], MB_START_ID,
-                                                 start_element, connect );
+                                                 entityTypeMap[ element_type ], MB_START_ID, start_element, connect );
     MB_RETURN_IF_FAIL;
     if( 0 == start_element ) return MB_FAILURE;
 
@@ -1248,8 +1208,7 @@ ErrorCode ReadABAQUS::read_element_list( EntityHandle parent_set, EntityHandle a
 
         std::vector< EntityHandle > tmp_assembly_handles;
         tmp_assembly_handles.assign( element_range.size( ), assembly_set );
-        status = mdbImpl->tag_set_data( mAssemblyHandleTag, element_range,
-                                        &( tmp_assembly_handles[ 0 ] ) );
+        status = mdbImpl->tag_set_data( mAssemblyHandleTag, element_range, &( tmp_assembly_handles[ 0 ] ) );
         MB_RETURN_IF_FAIL;
     }
 
@@ -1300,8 +1259,8 @@ ErrorCode ReadABAQUS::read_node_list( EntityHandle parent_set, EntityHandle asse
     // std::cout << "\tAdding NODES"  << std::endl; // REMOVE
 
     // Process parameters
-    for( std::map< std::string, std::string >::iterator thisParam = params.begin( );
-         thisParam != params.end( ); ++thisParam )
+    for( std::map< std::string, std::string >::iterator thisParam = params.begin( ); thisParam != params.end( );
+         ++thisParam )
     {
         // Look for unambiguous match with this node parameter
         param = allowableParams[ match( ( *thisParam ).first, allowableParams ) ];
@@ -1336,8 +1295,7 @@ ErrorCode ReadABAQUS::read_node_list( EntityHandle parent_set, EntityHandle asse
         if( abq_data_line == next_line_type )
         {
             tokenize( readline, tokens, ", \n" );
-            if( tokens.size( ) < 4 )
-            { MB_SET_ERR( MB_FAILURE, "Not enough data on node data line" ); }
+            if( tokens.size( ) < 4 ) { MB_SET_ERR( MB_FAILURE, "Not enough data on node data line" ); }
             node_ids.push_back( atoi( tokens[ 0 ].c_str( ) ) );
             for( unsigned int i = 1; i < 4; i++ )
                 coord_list.push_back( atof( tokens[ i ].c_str( ) ) );
@@ -1402,8 +1360,7 @@ ErrorCode ReadABAQUS::read_node_list( EntityHandle parent_set, EntityHandle asse
 
         std::vector< EntityHandle > tmp_assembly_handles;
         tmp_assembly_handles.assign( node_range.size( ), assembly_set );
-        status =
-            mdbImpl->tag_set_data( mAssemblyHandleTag, node_range, &( tmp_assembly_handles[ 0 ] ) );
+        status = mdbImpl->tag_set_data( mAssemblyHandleTag, node_range, &( tmp_assembly_handles[ 0 ] ) );
         MB_RETURN_IF_FAIL;
     }
 
@@ -1430,9 +1387,8 @@ ErrorCode ReadABAQUS::read_node_list( EntityHandle parent_set, EntityHandle asse
 
 // SET CREATION & ACCESS UTILITIES
 
-ErrorCode ReadABAQUS::get_elements_by_id( EntityHandle       parent_set,
-                                          std::vector< int > element_ids_subset,
-                                          Range&             element_range )
+ErrorCode ReadABAQUS::get_elements_by_id( EntityHandle parent_set, std::vector< int > element_ids_subset,
+                                          Range& element_range )
 {
     ErrorCode status;
     Range     all_elements;
@@ -1448,15 +1404,14 @@ ErrorCode ReadABAQUS::get_elements_by_id( EntityHandle       parent_set,
     for( unsigned int idx = 0; idx < all_elements.size( ); idx++ )
         elementIdMap[ element_ids[ idx ] ] = all_elements[ idx ];
 
-    for( std::vector< int >::iterator element = element_ids_subset.begin( );
-         element != element_ids_subset.end( ); ++element )
+    for( std::vector< int >::iterator element = element_ids_subset.begin( ); element != element_ids_subset.end( );
+         ++element )
         element_range.insert( elementIdMap[ *element ] );
 
     return MB_SUCCESS;
 }
 
-ErrorCode ReadABAQUS::get_nodes_by_id( EntityHandle parent_set, std::vector< int > node_ids_subset,
-                                       Range& node_range )
+ErrorCode ReadABAQUS::get_nodes_by_id( EntityHandle parent_set, std::vector< int > node_ids_subset, Range& node_range )
 {
     ErrorCode status;
 
@@ -1472,15 +1427,14 @@ ErrorCode ReadABAQUS::get_nodes_by_id( EntityHandle parent_set, std::vector< int
     for( unsigned int idx = 0; idx < all_nodes.size( ); idx++ )
         nodeIdMap[ node_ids[ idx ] ] = all_nodes[ idx ];
 
-    for( std::vector< int >::iterator node = node_ids_subset.begin( );
-         node != node_ids_subset.end( ); ++node )
+    for( std::vector< int >::iterator node = node_ids_subset.begin( ); node != node_ids_subset.end( ); ++node )
         node_range.insert( nodeIdMap[ *node ] );
 
     return MB_SUCCESS;
 }
 
-ErrorCode ReadABAQUS::get_set_by_name( EntityHandle parent_set, int ABQ_set_type,
-                                       const std::string& set_name, EntityHandle& set_handle )
+ErrorCode ReadABAQUS::get_set_by_name( EntityHandle parent_set, int ABQ_set_type, const std::string& set_name,
+                                       EntityHandle& set_handle )
 {
     ErrorCode status;
 
@@ -1490,11 +1444,9 @@ ErrorCode ReadABAQUS::get_set_by_name( EntityHandle parent_set, int ABQ_set_type
 
     Range sets;
     void* tag_data[] = { &ABQ_set_type };
-    status = mdbImpl->get_entities_by_type_and_tag( parent_set, MBENTITYSET, &mSetTypeTag, tag_data,
-                                                    1, sets );MB_CHK_SET_ERR( status, "Did not find any sets of that type" );
+    status = mdbImpl->get_entities_by_type_and_tag( parent_set, MBENTITYSET, &mSetTypeTag, tag_data, 1, sets );MB_CHK_SET_ERR( status, "Did not find any sets of that type" );
 
-    for( Range::iterator this_set = sets.begin( ); this_set != sets.end( ) && 0 == set_handle;
-         ++this_set )
+    for( Range::iterator this_set = sets.begin( ); this_set != sets.end( ) && 0 == set_handle; ++this_set )
     {
         std::fill( this_set_name, this_set_name + ABAQUS_SET_NAME_LENGTH, '\0' );
         status = mdbImpl->tag_get_data( mSetNameTag, &( *this_set ), 1, &this_set_name[ 0 ] );
@@ -1527,8 +1479,8 @@ ErrorCode ReadABAQUS::get_set_elements( EntityHandle set_handle, Range& element_
     return MB_SUCCESS;
 }
 
-ErrorCode ReadABAQUS::get_set_elements_by_name( EntityHandle parent_set, int ABQ_set_type,
-                                                const std::string& set_name, Range& element_range )
+ErrorCode ReadABAQUS::get_set_elements_by_name( EntityHandle parent_set, int ABQ_set_type, const std::string& set_name,
+                                                Range& element_range )
 {
     ErrorCode status;
 
@@ -1547,8 +1499,8 @@ ErrorCode ReadABAQUS::get_set_elements_by_name( EntityHandle parent_set, int ABQ
     return MB_SUCCESS;
 }
 
-ErrorCode ReadABAQUS::get_set_nodes( EntityHandle parent_set, int ABQ_set_type,
-                                     const std::string& set_name, Range& node_range )
+ErrorCode ReadABAQUS::get_set_nodes( EntityHandle parent_set, int ABQ_set_type, const std::string& set_name,
+                                     Range& node_range )
 {
     ErrorCode status;
 
@@ -1571,27 +1523,26 @@ ErrorCode ReadABAQUS::get_set_nodes( EntityHandle parent_set, int ABQ_set_type,
     status = mdbImpl->get_adjacencies( ent_list, 0, false, node_range );
     MB_RETURN_IF_FAIL;
 
-    if( node_range.size( ) == 0 )
-    { std::cout << "No nodes were found in set " << set_name << std::endl; }
+    if( node_range.size( ) == 0 ) { std::cout << "No nodes were found in set " << set_name << std::endl; }
 
     return MB_SUCCESS;
 }
 
-Tag ReadABAQUS::get_tag( const char* tag_name, int tag_size, TagType tag_type,
-                         DataType tag_data_type, const void* def_val )
+Tag ReadABAQUS::get_tag( const char* tag_name, int tag_size, TagType tag_type, DataType tag_data_type,
+                         const void* def_val )
 {
     Tag retval;
 
-    ErrorCode rval = mdbImpl->tag_get_handle( tag_name, tag_size, tag_data_type, retval,
-                                              tag_type | MB_TAG_CREAT, def_val );
+    ErrorCode rval =
+        mdbImpl->tag_get_handle( tag_name, tag_size, tag_data_type, retval, tag_type | MB_TAG_CREAT, def_val );
     assert( MB_SUCCESS == rval );
     return MB_SUCCESS == rval ? retval : 0;
 }
 
-ErrorCode ReadABAQUS::create_instance_of_part(
-    const EntityHandle file_set, const EntityHandle assembly_set, const std::string& part_name,
-    const std::string& /*instance_name*/, EntityHandle& instance_set,
-    const std::vector< double >& translation, const std::vector< double >& rotation )
+ErrorCode ReadABAQUS::create_instance_of_part( const EntityHandle file_set, const EntityHandle assembly_set,
+                                               const std::string& part_name, const std::string& /*instance_name*/,
+                                               EntityHandle& instance_set, const std::vector< double >& translation,
+                                               const std::vector< double >& rotation )
 {
     ErrorCode status;
 
@@ -1637,15 +1588,13 @@ ErrorCode ReadABAQUS::create_instance_of_part(
         // Create new nodes
         std::vector< double* > coord_arrays( 3 );
         EntityHandle           start_node = 0;
-        status = readMeshIface->get_node_coords( 3, part_node_list.size( ), MB_START_ID, start_node,
-                                                 coord_arrays );
+        status = readMeshIface->get_node_coords( 3, part_node_list.size( ), MB_START_ID, start_node, coord_arrays );
         MB_RETURN_IF_FAIL;
 
         if( 0 == start_node ) return MB_FAILURE;
 
         // Copy coordinates into new coord_arrays
-        status = mdbImpl->get_coords( part_node_list, coord_arrays[ 0 ], coord_arrays[ 1 ],
-                                      coord_arrays[ 2 ] );
+        status = mdbImpl->get_coords( part_node_list, coord_arrays[ 0 ], coord_arrays[ 1 ], coord_arrays[ 2 ] );
 
         // Rotate to new position
         double rot_axis[ 3 ];
@@ -1654,8 +1603,7 @@ ErrorCode ReadABAQUS::create_instance_of_part(
         rot_axis[ 2 ] = rotation[ 5 ] - rotation[ 2 ];
 
         AffineXform rotationXform;
-        if( rotation[ 6 ] != 0 )
-            rotationXform = AffineXform::rotation( rotation[ 6 ] * DEG2RAD, rot_axis );
+        if( rotation[ 6 ] != 0 ) rotationXform = AffineXform::rotation( rotation[ 6 ] * DEG2RAD, rot_axis );
 
         // Translate to new position
         for( unsigned int idx = 0; idx < part_node_list.size( ); idx++ )
@@ -1721,8 +1669,8 @@ ErrorCode ReadABAQUS::create_instance_of_part(
         std::vector< int >           instance_element_ids;
         std::vector< int >::iterator part_element_id = part_element_ids.begin( );
 
-        for( Range::iterator part_element = part_element_list.begin( );
-             part_element != part_element_list.end( ); ++part_element, ++part_element_id )
+        for( Range::iterator part_element = part_element_list.begin( ); part_element != part_element_list.end( );
+             ++part_element, ++part_element_id )
         {
             EntityType                  element_type = mdbImpl->type_from_handle( *part_element );
             std::vector< EntityHandle > part_connectivity, instance_connectivity;
@@ -1731,13 +1679,12 @@ ErrorCode ReadABAQUS::create_instance_of_part(
             MB_RETURN_IF_FAIL;
 
             instance_connectivity.clear( );
-            for( std::vector< EntityHandle >::iterator connectivity_node =
-                     part_connectivity.begin( );
+            for( std::vector< EntityHandle >::iterator connectivity_node = part_connectivity.begin( );
                  connectivity_node != part_connectivity.end( ); ++connectivity_node )
                 instance_connectivity.push_back( p2i_nodes[ *connectivity_node ] );
 
-            status = mdbImpl->create_element( element_type, &instance_connectivity[ 0 ],
-                                              instance_connectivity.size( ), new_element );
+            status = mdbImpl->create_element( element_type, &instance_connectivity[ 0 ], instance_connectivity.size( ),
+                                              new_element );
             MB_RETURN_IF_FAIL;
 
             instance_element_list.insert( new_element );
@@ -1758,8 +1705,7 @@ ErrorCode ReadABAQUS::create_instance_of_part(
         MB_RETURN_IF_FAIL;
 
         // Tag elements with their local ID's
-        status = mdbImpl->tag_set_data( mLocalIDTag, instance_element_list,
-                                        &( instance_element_ids[ 0 ] ) );
+        status = mdbImpl->tag_set_data( mLocalIDTag, instance_element_list, &( instance_element_ids[ 0 ] ) );
         MB_RETURN_IF_FAIL;
     }
 
@@ -1769,13 +1715,12 @@ ErrorCode ReadABAQUS::create_instance_of_part(
     Range part_node_sets;
     int   tag_val = ABQ_NODE_SET;
     void* tag_data[] = { &tag_val };
-    status = mdbImpl->get_entities_by_type_and_tag( part_set, MBENTITYSET, &mSetTypeTag, tag_data,
-                                                    1, part_node_sets );
+    status = mdbImpl->get_entities_by_type_and_tag( part_set, MBENTITYSET, &mSetTypeTag, tag_data, 1, part_node_sets );
     MB_RETURN_IF_FAIL;
 
     Range part_node_set_list, instance_node_set_list;
-    for( Range::iterator part_node_set = part_node_sets.begin( );
-         part_node_set != part_node_sets.end( ); ++part_node_set )
+    for( Range::iterator part_node_set = part_node_sets.begin( ); part_node_set != part_node_sets.end( );
+         ++part_node_set )
     {
         char node_set_name[ ABAQUS_SET_NAME_LENGTH ];
         std::fill( node_set_name, node_set_name + ABAQUS_SET_NAME_LENGTH, '\0' );
@@ -1786,8 +1731,7 @@ ErrorCode ReadABAQUS::create_instance_of_part(
         status = mdbImpl->get_entities_by_dimension( *part_node_set, 0, part_node_set_list );
 
         instance_node_set_list.clear( );
-        for( Range::iterator set_node = part_node_set_list.begin( );
-             set_node != part_node_set_list.end( ); ++set_node )
+        for( Range::iterator set_node = part_node_set_list.begin( ); set_node != part_node_set_list.end( ); ++set_node )
             instance_node_set_list.insert( p2i_nodes[ *set_node ] );
 
         EntityHandle instance_node_set;
@@ -1814,31 +1758,29 @@ ErrorCode ReadABAQUS::create_instance_of_part(
     Range part_element_sets;
     tag_val = ABQ_ELEMENT_SET;
     tag_data[ 0 ] = &tag_val;
-    status = mdbImpl->get_entities_by_type_and_tag( part_set, MBENTITYSET, &mSetTypeTag, tag_data,
-                                                    1, part_element_sets );
+    status =
+        mdbImpl->get_entities_by_type_and_tag( part_set, MBENTITYSET, &mSetTypeTag, tag_data, 1, part_element_sets );
     MB_RETURN_IF_FAIL;
 
     Range part_element_set_list, instance_element_set_list;
-    for( Range::iterator part_element_set = part_element_sets.begin( );
-         part_element_set != part_element_sets.end( ); ++part_element_set )
+    for( Range::iterator part_element_set = part_element_sets.begin( ); part_element_set != part_element_sets.end( );
+         ++part_element_set )
     {
         char element_set_name[ ABAQUS_SET_NAME_LENGTH ];
         std::fill( element_set_name, element_set_name + ABAQUS_SET_NAME_LENGTH, '\0' );
-        status =
-            mdbImpl->tag_get_data( mSetNameTag, &( *part_element_set ), 1, &element_set_name[ 0 ] );
+        status = mdbImpl->tag_get_data( mSetNameTag, &( *part_element_set ), 1, &element_set_name[ 0 ] );
         if( MB_SUCCESS != status && MB_TAG_NOT_FOUND != status ) return status;
 
         part_element_set_list.clear( );
         status = get_set_elements( *part_element_set, part_element_set_list );
 
         instance_element_set_list.clear( );
-        for( Range::iterator set_element = part_element_set_list.begin( );
-             set_element != part_element_set_list.end( ); ++set_element )
+        for( Range::iterator set_element = part_element_set_list.begin( ); set_element != part_element_set_list.end( );
+             ++set_element )
             instance_element_set_list.insert( p2i_elements[ *set_element ] );
 
         EntityHandle instance_element_set;
-        status =
-            add_entity_set( instance_set, ABQ_ELEMENT_SET, element_set_name, instance_element_set );
+        status = add_entity_set( instance_set, ABQ_ELEMENT_SET, element_set_name, instance_element_set );
         MB_RETURN_IF_FAIL;
 
         // std::cerr << instance_set << "\t" << instance_element_set << std::endl;
@@ -1854,32 +1796,27 @@ ErrorCode ReadABAQUS::create_instance_of_part(
         status = mdbImpl->tag_set_data( mPartHandleTag, &instance_element_set, 1, &part_set );
         MB_RETURN_IF_FAIL;
 
-        status =
-            mdbImpl->tag_set_data( mAssemblyHandleTag, &instance_element_set, 1, &assembly_set );
+        status = mdbImpl->tag_set_data( mAssemblyHandleTag, &instance_element_set, 1, &assembly_set );
         MB_RETURN_IF_FAIL;
 
         char element_set_matname[ ABAQUS_SET_NAME_LENGTH ];
         std::fill( element_set_matname, element_set_matname + ABAQUS_SET_NAME_LENGTH, '\0' );
-        status = mdbImpl->tag_get_data( mMatNameTag, &( *part_element_set ), 1,
-                                        &element_set_matname[ 0 ] );
+        status = mdbImpl->tag_get_data( mMatNameTag, &( *part_element_set ), 1, &element_set_matname[ 0 ] );
         if( MB_SUCCESS != status && MB_TAG_NOT_FOUND != status ) return status;
 
         if( MB_TAG_NOT_FOUND != status )
         {
-            status =
-                mdbImpl->tag_set_data( mMatNameTag, &instance_element_set, 1, element_set_matname );
+            status = mdbImpl->tag_set_data( mMatNameTag, &instance_element_set, 1, element_set_matname );
             MB_RETURN_IF_FAIL;
         }
 
         int element_set_mat_id;
-        status = mdbImpl->tag_get_data( mMaterialSetTag, &( *part_element_set ), 1,
-                                        &element_set_mat_id );
+        status = mdbImpl->tag_get_data( mMaterialSetTag, &( *part_element_set ), 1, &element_set_mat_id );
         if( MB_SUCCESS != status && MB_TAG_NOT_FOUND != status ) return status;
 
         if( MB_TAG_NOT_FOUND != status )
         {
-            status = mdbImpl->tag_set_data( mMaterialSetTag, &instance_element_set, 1,
-                                            &element_set_mat_id );
+            status = mdbImpl->tag_set_data( mMaterialSetTag, &instance_element_set, 1, &element_set_mat_id );
             MB_RETURN_IF_FAIL;
         }
     }
@@ -1893,8 +1830,7 @@ ErrorCode ReadABAQUS::create_instance_of_part(
 
     std::vector< EntityHandle > tmp_instance_handles;
     tmp_instance_handles.assign( instance_entity_list.size( ), instance_set );
-    status = mdbImpl->tag_set_data( mInstanceHandleTag, instance_entity_list,
-                                    &tmp_instance_handles[ 0 ] );
+    status = mdbImpl->tag_set_data( mInstanceHandleTag, instance_entity_list, &tmp_instance_handles[ 0 ] );
     MB_RETURN_IF_FAIL;
 
     instance_entity_list.clear( );
@@ -1903,43 +1839,40 @@ ErrorCode ReadABAQUS::create_instance_of_part(
 
     tmp_instance_handles.clear( );
     tmp_instance_handles.assign( instance_entity_list.size( ), instance_set );
-    status = mdbImpl->tag_set_data( mInstanceHandleTag, instance_entity_list,
-                                    &tmp_instance_handles[ 0 ] );
+    status = mdbImpl->tag_set_data( mInstanceHandleTag, instance_entity_list, &tmp_instance_handles[ 0 ] );
     MB_RETURN_IF_FAIL;
 
     // Get all node sets in instance
     instance_entity_list.clear( );
     tag_val = ABQ_NODE_SET;
     tag_data[ 0 ] = &tag_val;
-    status = mdbImpl->get_entities_by_type_and_tag( instance_set, MBENTITYSET, &mSetTypeTag,
-                                                    tag_data, 1, instance_entity_list );
+    status = mdbImpl->get_entities_by_type_and_tag( instance_set, MBENTITYSET, &mSetTypeTag, tag_data, 1,
+                                                    instance_entity_list );
     MB_RETURN_IF_FAIL;
 
     tmp_instance_handles.clear( );
     tmp_instance_handles.assign( instance_entity_list.size( ), instance_set );
-    status = mdbImpl->tag_set_data( mInstanceHandleTag, instance_entity_list,
-                                    &tmp_instance_handles[ 0 ] );
+    status = mdbImpl->tag_set_data( mInstanceHandleTag, instance_entity_list, &tmp_instance_handles[ 0 ] );
     MB_RETURN_IF_FAIL;
 
     // Get all element sets in part
     instance_entity_list.clear( );
     tag_val = ABQ_ELEMENT_SET;
     tag_data[ 0 ] = &tag_val;
-    status = mdbImpl->get_entities_by_type_and_tag( instance_set, MBENTITYSET, &mSetTypeTag,
-                                                    tag_data, 1, instance_entity_list );
+    status = mdbImpl->get_entities_by_type_and_tag( instance_set, MBENTITYSET, &mSetTypeTag, tag_data, 1,
+                                                    instance_entity_list );
     MB_RETURN_IF_FAIL;
 
     tmp_instance_handles.clear( );
     tmp_instance_handles.assign( instance_entity_list.size( ), instance_set );
-    status = mdbImpl->tag_set_data( mInstanceHandleTag, instance_entity_list,
-                                    &tmp_instance_handles[ 0 ] );
+    status = mdbImpl->tag_set_data( mInstanceHandleTag, instance_entity_list, &tmp_instance_handles[ 0 ] );
     MB_RETURN_IF_FAIL;
 
     return MB_SUCCESS;
 }
 
-ErrorCode ReadABAQUS::add_entity_set( EntityHandle parent_set, int ABQ_Set_Type,
-                                      const std::string& set_name, EntityHandle& entity_set )
+ErrorCode ReadABAQUS::add_entity_set( EntityHandle parent_set, int ABQ_Set_Type, const std::string& set_name,
+                                      EntityHandle& entity_set )
 {
     ErrorCode status;
 
@@ -2055,16 +1988,15 @@ abaqus_keyword_type ReadABAQUS::get_keyword( )
 
 // For a map of strings to values of type T
 // search the key list of the map for an unambiguous partial match with the token
-template< typename T >
-std::string ReadABAQUS::match( const std::string& token, std::map< std::string, T >& tokenList )
+template< typename T > std::string ReadABAQUS::match( const std::string& token, std::map< std::string, T >& tokenList )
 {
     // Initialize with no match and ABQ_UNDEFINED as return string
     bool        found_match = false;
     std::string best_match = ABQ_UNDEFINED;
 
     // Search the map
-    for( typename std::map< std::string, T >::iterator thisToken = tokenList.begin( );
-         thisToken != tokenList.end( ); ++thisToken )
+    for( typename std::map< std::string, T >::iterator thisToken = tokenList.begin( ); thisToken != tokenList.end( );
+         ++thisToken )
     {
         // If a perfect match break the loop (assume keyword list is unambiguous)
         if( token == ( *thisToken ).first )
@@ -2074,9 +2006,8 @@ std::string ReadABAQUS::match( const std::string& token, std::map< std::string, 
         }
         else
         {
-            int short_length = ( token.length( ) < ( *thisToken ).first.length( )
-                                     ? token.length( )
-                                     : ( *thisToken ).first.length( ) );
+            int short_length =
+                ( token.length( ) < ( *thisToken ).first.length( ) ? token.length( ) : ( *thisToken ).first.length( ) );
             // If the token matches the first token.length() characters of the keyword
             // consider this a match
             if( token.substr( short_length ) == ( *thisToken ).first.substr( short_length ) )
@@ -2114,8 +2045,7 @@ void ReadABAQUS::extract_keyword_parameters( const std::vector< std::string >&  
     std::string key, value;
 
     // NOTE: skip first token - it is the keyword
-    for( std::vector< std::string >::const_iterator token = tokens.begin( ) + 1;
-         token != tokens.end( ); ++token )
+    for( std::vector< std::string >::const_iterator token = tokens.begin( ) + 1; token != tokens.end( ); ++token )
     {
         std::string::size_type pos = token->find( '=' );
         stringToUpper( token->substr( 0, pos ), key );
@@ -2130,8 +2060,7 @@ void ReadABAQUS::extract_keyword_parameters( const std::vector< std::string >&  
 }
 
 // Tokenize a string based on a set of possible delimiters
-void ReadABAQUS::tokenize( const std::string& str, std::vector< std::string >& tokens,
-                           const char* delimiters )
+void ReadABAQUS::tokenize( const std::string& str, std::vector< std::string >& tokens, const char* delimiters )
 {
     tokens.clear( );
 

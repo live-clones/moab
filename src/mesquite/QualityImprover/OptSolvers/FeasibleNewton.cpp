@@ -65,8 +65,7 @@ PatchSet* FeasibleNewton::get_patch_set( )
 }
 
 FeasibleNewton::FeasibleNewton( ObjectiveFunction* of )
-    : VertexMover( of ), PatchSetUser( true ), convTol( 1e-6 ), coordsMem( 0 ),
-      havePrintedDirectionMessage( false )
+    : VertexMover( of ), PatchSetUser( true ), convTol( 1e-6 ), coordsMem( 0 ), havePrintedDirectionMessage( false )
 {
     TerminationCriterion* default_crit = get_inner_termination_criterion( );
     default_crit->add_absolute_gradient_L2_norm( 5e-5 );
@@ -254,8 +253,7 @@ void FeasibleNewton::optimize_vertex_positions( PatchData& pd, MsqError& err )
                 ( fn_bool && ( length( arrptr( grad ), nv ) < 100 * convTol ) ) )
             {
                 // Armijo linesearch rules passed.
-                MSQ_DBGOUT( 3 ) << "  o  beta = " << beta << " (accepted without line search)"
-                                << std::endl;
+                MSQ_DBGOUT( 3 ) << "  o  beta = " << beta << " (accepted without line search)" << std::endl;
             }
             else
             {
@@ -270,8 +268,7 @@ void FeasibleNewton::optimize_vertex_positions( PatchData& pd, MsqError& err )
                     // Function defined, but not sufficient decrease
                     // Use the lower decrease rate.
                     beta *= beta1;
-                    MSQ_DBGOUT( 3 )
-                        << "  o  beta = " << beta << " (insufficient decrease)" << std::endl;
+                    MSQ_DBGOUT( 3 ) << "  o  beta = " << beta << " (insufficient decrease)" << std::endl;
                 }
                 pd.set_to_vertices_memento( coordsMem, err );MSQ_ERRRTN( err );
 
@@ -416,8 +413,7 @@ void FeasibleNewton::optimize_vertex_positions( PatchData& pd, MsqError& err )
     }
     else
     {
-        std::cout << "WARNING: Feasible Newton optimization only supported for volume meshes"
-                  << std::endl
+        std::cout << "WARNING: Feasible Newton optimization only supported for volume meshes" << std::endl
                   << "   and XYPlanarDomain surface meshes." << std::endl
                   << std::endl
                   << "Try a different solver such as Steepest Descent." << std::endl;

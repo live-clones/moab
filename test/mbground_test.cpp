@@ -66,8 +66,8 @@ int main( int argc, char* argv[] )
 
     if( argc == 1 )
     {
-        std::cout << "Using default input " << filename << " " << polyline_file_name << " "
-                  << min_dot << " " << filename_out << std::endl;
+        std::cout << "Using default input " << filename << " " << polyline_file_name << " " << min_dot << " "
+                  << filename_out << std::endl;
         std::cout << "    default output file: " << filename_out << " will be deleted \n";
     }
     else if( argc == 5 )
@@ -80,8 +80,7 @@ int main( int argc, char* argv[] )
     }
     else
     {
-        std::cerr << "Usage: " << argv[ 0 ]
-                  << " [geom_filename] [polygon_file] [min_dot] [output_file]" << std::endl;
+        std::cerr << "Usage: " << argv[ 0 ] << " [geom_filename] [polygon_file] [min_dot] [output_file]" << std::endl;
         return 1;
     }
 

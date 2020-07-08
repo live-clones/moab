@@ -70,13 +70,10 @@ int    main( int argc, char** argv )
         if( val != -1 )
         {
             num_deleted_sets++;
-            rval =
-                mb->delete_entities( &eh, 1 );  // delete the set, we will have a new partition soon
+            rval = mb->delete_entities( &eh, 1 );  // delete the set, we will have a new partition soon
         }
     }
-    if( num_deleted_sets )
-        cout << "delete " << num_deleted_sets
-             << " existing  partition sets, and create new ones \n";
+    if( num_deleted_sets ) cout << "delete " << num_deleted_sets << " existing  partition sets, and create new ones \n";
     Range cells;  // get them by dimension 2!
     rval = mb->get_entities_by_dimension( 0, 2, cells );MB_CHK_ERR( rval );
     EntityHandle* psets = new EntityHandle[ nparts ];

@@ -143,13 +143,11 @@ ErrorCode umr_perf_test( Core* mb, int* level_degrees, int num_levels, OUTTYPE o
 
         unsigned long long vTotS, vTAS, vES, vAES, vAS, vAAS, vTS, vATS;
         vTotS = vTAS = vES = vAES = vAS = vAAS = vTS = vATS = 0;
-        mbImpl->estimated_memory_use( inverts, &vTotS, &vTAS, &vES, &vAES, &vAS, &vAAS, NULL, 0,
-                                      &vTS, &vATS );
+        mbImpl->estimated_memory_use( inverts, &vTotS, &vTAS, &vES, &vAES, &vAS, &vAAS, NULL, 0, &vTS, &vATS );
 
         unsigned long long eTotS, eTAS, eES, eAES, eAS, eAAS, eTS, eATS;
         eTotS = eTAS = eES = eAES = eAS = eAAS = eTS = eATS = 0;
-        mbImpl->estimated_memory_use( init_ents, &eTotS, &eTAS, &eES, &eAES, &eAS, &eAAS, NULL, 0,
-                                      &eTS, &eATS );
+        mbImpl->estimated_memory_use( init_ents, &eTotS, &eTAS, &eES, &eAES, &eAS, &eAAS, NULL, 0, &eTS, &eATS );
 
         umem[ 0 ].total_storage = vTotS + eTotS;
         umem[ 0 ].vertex_storage = vES;
@@ -188,8 +186,8 @@ ErrorCode umr_perf_test( Core* mb, int* level_degrees, int num_levels, OUTTYPE o
 
     if( output == TIME || output == BOTH )
     {
-        std::cout << "Total time in secs:: generate mesh hierarchy:: L = " << num_levels
-                  << " :: " << time_total << std::endl;
+        std::cout << "Total time in secs:: generate mesh hierarchy:: L = " << num_levels << " :: " << time_total
+                  << std::endl;
         std::cout << std::endl;
     }
 
@@ -210,12 +208,10 @@ ErrorCode umr_perf_test( Core* mb, int* level_degrees, int num_levels, OUTTYPE o
             std::cout << std::endl;
             unsigned long long vTotS, vTAS, vES, vAES, vAS, vAAS, vTS, vATS;
             vTotS = vTAS = vES = vAES = vAS = vAAS = vTS = vATS = 0;
-            mbImpl->estimated_memory_use( verts, &vTotS, &vTAS, &vES, &vAES, &vAS, &vAAS, NULL, 0,
-                                          &vTS, &vATS );
+            mbImpl->estimated_memory_use( verts, &vTotS, &vTAS, &vES, &vAES, &vAS, &vAAS, NULL, 0, &vTS, &vATS );
             unsigned long long eTotS, eTAS, eES, eAES, eAS, eAAS, eTS, eATS;
             eTotS = eTAS = eES = eAES = eAS = eAAS = eTS = eATS = 0;
-            mbImpl->estimated_memory_use( ents, &eTotS, &eTAS, &eES, &eAES, &eAS, &eAAS, NULL, 0,
-                                          &eTS, &eATS );
+            mbImpl->estimated_memory_use( ents, &eTotS, &eTAS, &eES, &eAES, &eAS, &eAAS, NULL, 0, &eTS, &eATS );
 
             umem[ l + 1 ].total_storage = vTotS + eTotS;
             umem[ l + 1 ].vertex_storage = vES;
@@ -264,8 +260,7 @@ ErrorCode umr_perf_test( Core* mb, int* level_degrees, int num_levels, OUTTYPE o
             time_avg = time_total / (double)verts.size( );
 
             std::cout << "Class NR :: OPERATION:: get_coordinates"
-                      << " :: Time_total = " << time_total << " :: Time_avg = " << time_avg
-                      << std::endl;
+                      << " :: Time_total = " << time_total << " :: Time_avg = " << time_avg << std::endl;
 
             time_start = mt->time_elapsed( );
             for( Range::iterator i = verts.begin( ); i != verts.end( ); ++i )
@@ -278,8 +273,7 @@ ErrorCode umr_perf_test( Core* mb, int* level_degrees, int num_levels, OUTTYPE o
             time_avg = time_total / (double)verts.size( );
 
             std::cout << "Class Core :: OPERATION:: get_coordinates"
-                      << " :: Time_total = " << time_total << " :: Time_avg = " << time_avg
-                      << std::endl;
+                      << " :: Time_total = " << time_total << " :: Time_avg = " << time_avg << std::endl;
 
             // Loop over all entities and get their connectivity
             time_start = mt->time_elapsed( );
@@ -292,8 +286,7 @@ ErrorCode umr_perf_test( Core* mb, int* level_degrees, int num_levels, OUTTYPE o
             time_avg = time_total / (double)ents.size( );
             std::cout << std::endl;
             std::cout << "Class NR :: OPERATION:: get_connectivity"
-                      << " :: Time_total = " << time_total << " :: Time_avg = " << time_avg
-                      << std::endl;
+                      << " :: Time_total = " << time_total << " :: Time_avg = " << time_avg << std::endl;
 
             time_start = mt->time_elapsed( );
             for( Range::iterator i = ents.begin( ); i != ents.end( ); ++i )
@@ -305,8 +298,7 @@ ErrorCode umr_perf_test( Core* mb, int* level_degrees, int num_levels, OUTTYPE o
             time_avg = time_total / (double)ents.size( );
 
             std::cout << "Class Core :: OPERATION:: get_connectivity"
-                      << " :: Time_total = " << time_total << " :: Time_avg = " << time_avg
-                      << std::endl;
+                      << " :: Time_total = " << time_total << " :: Time_avg = " << time_avg << std::endl;
             std::cout << std::endl;
         }
     }
@@ -375,9 +367,8 @@ ErrorCode create_simple_mesh( Core* mb, EntityType type )
     }
     else if( type == MBTRI )
     {
-        const double coords[] = { 0,  0,   0,   1,  0,   0,   2,  0,    0,   2.5, 1,
-                                  0,  1.5, 1,   0,  0.5, 1,   0,  -0.5, 1,   0,   -0.5,
-                                  -1, 0,   0.5, -1, 0,   1.5, -1, 0,    2.5, -1,  0 };
+        const double coords[] = { 0, 0,    0, 1, 0,    0,  2, 0,   0,  2.5, 1,   0,  1.5, 1,   0,  0.5, 1,
+                                  0, -0.5, 1, 0, -0.5, -1, 0, 0.5, -1, 0,   1.5, -1, 0,   2.5, -1, 0 };
 
         const size_t num_vtx = sizeof( coords ) / sizeof( double ) / 3;
 
@@ -405,15 +396,13 @@ ErrorCode create_simple_mesh( Core* mb, EntityType type )
     }
     else if( type == MBQUAD )
     {
-        const double coords[] = { 0, 0, 0, 1, 0, 0, 2, 0, 0, 3, 0, 0, 4, 0, 0, 5, 0, 0,
-                                  0, 1, 0, 1, 1, 0, 2, 1, 0, 3, 1, 0, 4, 1, 0, 5, 1, 0,
-                                  0, 2, 0, 1, 2, 0, 2, 2, 0, 3, 2, 0, 4, 2, 0, 5, 2, 0 };
+        const double coords[] = { 0, 0, 0, 1, 0, 0, 2, 0, 0, 3, 0, 0, 4, 0, 0, 5, 0, 0, 0, 1, 0, 1, 1, 0, 2, 1, 0,
+                                  3, 1, 0, 4, 1, 0, 5, 1, 0, 0, 2, 0, 1, 2, 0, 2, 2, 0, 3, 2, 0, 4, 2, 0, 5, 2, 0 };
 
         const size_t num_vtx = sizeof( coords ) / sizeof( double ) / 3;
 
-        const int conn[] = { 0,  1, 7,  6,  1,  2,  8,  7,  2,  3,  9,  8, 3,  4,
-                             10, 9, 4,  5,  11, 10, 6,  7,  13, 12, 7,  8, 14, 13,
-                             8,  9, 15, 14, 9,  10, 16, 15, 10, 11, 17, 16 };
+        const int conn[] = { 0, 1, 7,  6,  1, 2, 8,  7,  2, 3, 9,  8,  3, 4,  10, 9,  4,  5,  11, 10,
+                             6, 7, 13, 12, 7, 8, 14, 13, 8, 9, 15, 14, 9, 10, 16, 15, 10, 11, 17, 16 };
 
         const size_t num_elems = sizeof( conn ) / sizeof( int ) / 4;
 
@@ -463,9 +452,8 @@ ErrorCode create_simple_mesh( Core* mb, EntityType type )
     }
     else if( type == MBHEX )
     {
-        const double coords[] = { 0, 0, 0, 1, 0, 0, 2, 0, 0, 0, 1, 0, 1, 1, 0, 2, 1, 0,
-                                  0, 2, 0, 1, 2, 0, 2, 2, 0, 0, 0, 1, 1, 0, 1, 2, 0, 1,
-                                  0, 1, 1, 1, 1, 1, 2, 1, 1, 0, 2, 1, 1, 2, 1, 2, 2, 1 };
+        const double coords[] = { 0, 0, 0, 1, 0, 0, 2, 0, 0, 0, 1, 0, 1, 1, 0, 2, 1, 0, 0, 2, 0, 1, 2, 0, 2, 2, 0,
+                                  0, 0, 1, 1, 0, 1, 2, 0, 1, 0, 1, 1, 1, 1, 1, 2, 1, 1, 0, 2, 1, 1, 2, 1, 2, 2, 1 };
         const size_t num_vtx = sizeof( coords ) / sizeof( double ) / 3;
 
         const int    conn[] = { 0, 1, 4, 3, 9,  10, 13, 12, 1, 2, 5, 4, 10, 11, 14, 13,
@@ -652,8 +640,7 @@ ErrorCode perf_inmesh( const char* filename, int* level_degrees, int num_levels,
 
     if( procs > 1 )
     {
-        read_options =
-            "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_SHARED_ENTS;";
+        read_options = "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_SHARED_ENTS;";
 
         error = mbImpl->load_file( filename, 0, read_options.c_str( ) );CHECK_ERR( error );
     }

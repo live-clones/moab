@@ -118,13 +118,11 @@ int main( int argc, char* argv[] )
 
     if( smoother.quality_assessor( ).invalid_elements( ) )
     {
-        std::cerr << "Resulting mesh contains invalid elements: untangler did not succeed"
-                  << std::endl;
+        std::cerr << "Resulting mesh contains invalid elements: untangler did not succeed" << std::endl;
         return 4;
     }
 
-    const QualityAssessor::Assessor* quality =
-        smoother.quality_assessor( ).get_results( &extra_metric );
+    const QualityAssessor::Assessor* quality = smoother.quality_assessor( ).get_results( &extra_metric );
     if( !quality )
     {
         std::cerr << "Failed to get quality stats for IMR metric" << std::endl;

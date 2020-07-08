@@ -69,8 +69,8 @@ class ReadHDF5Dataset
      *\NOTE Class instance will not be usable until one of either
      *      \c set_file_ids or \c set_all_file_ids is called.
      */
-    ReadHDF5Dataset( const char* debug_desc, hid_t data_set_handle, bool parallel,
-                     const Comm* communicator = 0, bool close_data_set_on_destruct = true );
+    ReadHDF5Dataset( const char* debug_desc, hid_t data_set_handle, bool parallel, const Comm* communicator = 0,
+                     bool close_data_set_on_destruct = true );
 
     ReadHDF5Dataset( const char* debug_desc, bool parallel, const Comm* communicator = 0 );
     void init( hid_t data_set_handle, bool close_data_set_on_destruct = true );
@@ -96,8 +96,7 @@ class ReadHDF5Dataset
      *\param data_type       The data type of the buffer into which table values
      *                       are to be read.
      */
-    void set_file_ids( const Range& file_ids, EntityHandle start_id, hsize_t row_cout,
-                       hid_t data_type );
+    void set_file_ids( const Range& file_ids, EntityHandle start_id, hsize_t row_cout, hid_t data_type );
 
     /**\brief Read all values in dataset (undo set_file_ids)
      *

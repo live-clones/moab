@@ -224,8 +224,7 @@ ExoIIElementType ExoIIUtil::static_element_name_to_type( const char* name )
 }
 
 ExoIIElementType ExoIIUtil::static_get_element_type( Interface* mdbImpl, const EntityHandle entity,
-                                                     const Tag        mid_nodes_tag,
-                                                     const Tag        geom_dimension_tag,
+                                                     const Tag mid_nodes_tag, const Tag geom_dimension_tag,
                                                      const EntityType indiv_entity_type )
 {
     // branch based on what kind of entity we're looking at
@@ -254,8 +253,8 @@ ExoIIElementType ExoIIUtil::static_get_element_type( Interface* mdbImpl, const E
                 else
                     dimension = CN::Dimension( indiv_entity_type );
 
-                return get_element_type_from_num_verts( CN::VerticesPerEntity( indiv_entity_type ),
-                                                        indiv_entity_type, dimension );
+                return get_element_type_from_num_verts( CN::VerticesPerEntity( indiv_entity_type ), indiv_entity_type,
+                                                        dimension );
             }
             else
                 return EXOII_MAX_ELEM_TYPE;
@@ -268,12 +267,9 @@ ExoIIElementType ExoIIUtil::static_get_element_type( Interface* mdbImpl, const E
 
         for( int i = 0; i < EXOII_MAX_ELEM_TYPE; i++ )
         {
-            if( ( indiv_entity_type == MBMAXTYPE ||
-                  indiv_entity_type == ExoIIElementMBEntity[ i ] ) &&
-                has_mid_nodes[ 0 ] == HasMidNodes[ i ][ 0 ] &&
-                has_mid_nodes[ 1 ] == HasMidNodes[ i ][ 1 ] &&
-                has_mid_nodes[ 2 ] == HasMidNodes[ i ][ 2 ] &&
-                has_mid_nodes[ 3 ] == HasMidNodes[ i ][ 3 ] &&
+            if( ( indiv_entity_type == MBMAXTYPE || indiv_entity_type == ExoIIElementMBEntity[ i ] ) &&
+                has_mid_nodes[ 0 ] == HasMidNodes[ i ][ 0 ] && has_mid_nodes[ 1 ] == HasMidNodes[ i ][ 1 ] &&
+                has_mid_nodes[ 2 ] == HasMidNodes[ i ][ 2 ] && has_mid_nodes[ 3 ] == HasMidNodes[ i ][ 3 ] &&
                 ( -1 == dimension || ElementGeometricDimension[ i ] == dimension ) )
                 return (ExoIIElementType)i;
         }
@@ -298,9 +294,8 @@ ExoIIElementType ExoIIUtil::static_get_element_type( Interface* mdbImpl, const E
     // return EXOII_MAX_ELEM_TYPE;
 }
 
-ExoIIElementType ExoIIUtil::get_element_type_from_num_verts( const int        num_verts,
-                                                             const EntityType entity_type,
-                                                             const int        dimension )
+ExoIIElementType ExoIIUtil::get_element_type_from_num_verts( const int num_verts, const EntityType entity_type,
+                                                             const int dimension )
 {
     if( MBPOLYGON == entity_type && 2 == dimension ) return EXOII_POLYGON;
     if( MBPOLYHEDRON == entity_type && 3 == dimension ) return EXOII_POLYHEDRON;

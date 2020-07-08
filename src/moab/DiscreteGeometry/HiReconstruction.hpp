@@ -59,8 +59,7 @@ class HiReconstruction
      * computing. \param reset Boolean, reset=true will recompute the fittings based on user input
      * and replace the existing one.
      */
-    ErrorCode reconstruct3D_surf_geom( int degree, bool interp, bool safeguard,
-                                       bool reset = false );
+    ErrorCode reconstruct3D_surf_geom( int degree, bool interp, bool safeguard, bool reset = false );
 
     //! \brief Reconstruct a high order surface on given surface mesh
     /** Given a mesh, compute vertex based polynomial fittings for all vertices hosted by current
@@ -76,8 +75,7 @@ class HiReconstruction
      * true=using safe guarded method in numerical computing. \param reset Boolean, reset=true will
      * recompute the fittings based on user input and replace the existing one.
      */
-    ErrorCode reconstruct3D_surf_geom( size_t npts, int* degrees, bool* interps, bool safeguard,
-                                       bool reset = false );
+    ErrorCode reconstruct3D_surf_geom( size_t npts, int* degrees, bool* interps, bool safeguard, bool reset = false );
 
     //! \brief Reconstruct a high order curve on given curve mesh
     /** Given a curve mesh, compute vertex based polynomail fittings for all vertices hosted by
@@ -88,8 +86,7 @@ class HiReconstruction
      * safe guarded method in numerical computing. \param reset Boolean, reset=true will recompute
      * the fittings based on user input and replace the existing one.
      */
-    ErrorCode reconstruct3D_curve_geom( int degree, bool interp, bool safeguard,
-                                        bool reset = false );
+    ErrorCode reconstruct3D_curve_geom( int degree, bool interp, bool safeguard, bool reset = false );
 
     //! \brief Reconstruct a high order curve on given curve mesh
     /** Given a curve mesh, compute vertex based polynomail fittings for all vertices hosted by
@@ -107,8 +104,7 @@ class HiReconstruction
      * Boolean, reset=true will recompute the fittings based on user input and replace the existing
      * one.
      */
-    ErrorCode reconstruct3D_curve_geom( size_t npts, int* degrees, bool* interps, bool safeguard,
-                                        bool reset = false );
+    ErrorCode reconstruct3D_curve_geom( size_t npts, int* degrees, bool* interps, bool safeguard, bool reset = false );
 
     //! \brief Construct vertex based polynomial fitting on a surface mesh
     /** Given a vertex on a surface mesh, construct a local fitting around this vertex. Stencils
@@ -127,10 +123,9 @@ class HiReconstruction
      * fitting \param coeffs, Pointer to double, preallocated memory for coefficients of local
      * fittings, should have at least (degree+2)(degree+1)/2 doubles.
      */
-    ErrorCode polyfit3d_walf_surf_vertex( const EntityHandle vid, const bool interp, int degree,
-                                          int minpnts, const bool safeguard, const int ncoords,
-                                          double* coords, int* degree_out, const int ncoeffs,
-                                          double* coeffs );
+    ErrorCode polyfit3d_walf_surf_vertex( const EntityHandle vid, const bool interp, int degree, int minpnts,
+                                          const bool safeguard, const int ncoords, double* coords, int* degree_out,
+                                          const int ncoeffs, double* coeffs );
 
     //! \brief Construct vertex based polynomial fitting on a curve mesh
     /** Given a vertex on a curve mesh, construct three one-parameter local fittings for each
@@ -150,10 +145,9 @@ class HiReconstruction
      * degree of resulted fitting \param coeffs, Pointer to double, preallocated memory for
      * coefficients of local fittings, should have at least 3*(degree+1) doubles.
      */
-    ErrorCode polyfit3d_walf_curve_vertex( const EntityHandle vid, const bool interp, int degree,
-                                           int minpnts, const bool safeguard, const int ncoords,
-                                           double* coords, int* degree_out, const int ncoeffs,
-                                           double* coeffs );
+    ErrorCode polyfit3d_walf_curve_vertex( const EntityHandle vid, const bool interp, int degree, int minpnts,
+                                           const bool safeguard, const int ncoords, double* coords, int* degree_out,
+                                           const int ncoeffs, double* coeffs );
 
     //! \brief Perform high order projection of points in an element, using estimated geometry by
     //! reconstruction class
@@ -185,8 +179,8 @@ class HiReconstruction
      * Pointer to array of doubles, preallocated by user, size=3*npts2fit, estimated positions of
      * input points.
      */
-    ErrorCode hiproj_walf_around_vertex( EntityHandle vid, const int npts2fit,
-                                         const double* coords2fit, double* hiproj_new );
+    ErrorCode hiproj_walf_around_vertex( EntityHandle vid, const int npts2fit, const double* coords2fit,
+                                         double* hiproj_new );
 
     //! \brief Perform high order projection of points around a center vertex, assume geometry is
     //! surface
@@ -205,10 +199,9 @@ class HiReconstruction
      * estimated \param hiproj_new Pointer to array of doubles, size=3*npts2fit, memory preallocated
      * by user to store the fitting/estimated positions of input points.
      */
-    void walf3d_surf_vertex_eval( const double* local_origin, const double* local_coords,
-                                  const int local_deg, const double* local_coeffs,
-                                  const bool interp, const int npts2fit, const double* coords2fit,
-                                  double* hiproj_new );
+    void walf3d_surf_vertex_eval( const double* local_origin, const double* local_coords, const int local_deg,
+                                  const double* local_coeffs, const bool interp, const int npts2fit,
+                                  const double* coords2fit, double* hiproj_new );
 
     //! \brief Perform high order projection of points around a center vertex, assume geometry is
     //! curve
@@ -228,10 +221,9 @@ class HiReconstruction
      * Pointer to array of doubles, size=3*npts2fit, memory preallocated by user to store the
      * fitting/estimated positions of input points.
      */
-    void walf3d_curve_vertex_eval( const double* local_origin, const double* local_coords,
-                                   const int local_deg, const double* local_coeffs,
-                                   const bool interp, const int npts2fit, const double* coords2fit,
-                                   double* hiproj_new );
+    void walf3d_curve_vertex_eval( const double* local_origin, const double* local_coords, const int local_deg,
+                                   const double* local_coeffs, const bool interp, const int npts2fit,
+                                   const double* coords2fit, double* hiproj_new );
 
     //! \brief Get interally stored fitting results
     /** Get fittings results of a vertex, stored internally, results will be writtend to user
@@ -242,8 +234,8 @@ class HiReconstruction
      * of local polynomial fittings in monomial basis will be appended to the end of coeffs \param
      * interp Reference to Boolean, true =  interpolation
      */
-    bool get_fittings_data( EntityHandle vid, GEOMTYPE& geomtype, std::vector< double >& coords,
-                            int& degree_out, std::vector< double >& coeffs, bool& interp );
+    bool get_fittings_data( EntityHandle vid, GEOMTYPE& geomtype, std::vector< double >& coords, int& degree_out,
+                            std::vector< double >& coeffs, bool& interp );
 
     // Helper function: estimate require number of ghost layers in parallel setting
     static int estimate_num_ghost_layers( int degree, bool interp = false )
@@ -263,7 +255,7 @@ class HiReconstruction
     // mesh on which to perform reconstruction
     EntityHandle _mesh2rec;
     //_verts2rec all locally hosted vertices, in parallel might be different from _invert which is
-    //all the vertices in _mesh2rec, including ghost vertices
+    // all the vertices in _mesh2rec, including ghost vertices
     Range  _verts2rec, _inverts, _inedges, _infaces, _incells;
     size_t _nv2rec;  // size of _verts2rec
 
@@ -307,8 +299,7 @@ class HiReconstruction
      * Range, the n-ring vertices of vid, including vid. If too many points found, i.e. more than
      * _MAXPNTS, then terminate early.
      */
-    ErrorCode obtain_nring_ngbvs( const EntityHandle vid, int ring, const int minpnts,
-                                  Range& ngbvs );
+    ErrorCode obtain_nring_ngbvs( const EntityHandle vid, int ring, const int minpnts, Range& ngbvs );
 
     /** Initialize the storage for fitting results over _mesh2rec, curve/surface mesh
      * Two options are provided: a) use uniform degree for all vertices b) use customized degrees
@@ -394,16 +385,14 @@ class HiReconstruction
      * determined by stencil size/number of points \param degree_qr Pointer to integer, polynomial
      * fitting order determined by Vandermonde system condition number
      */
-    void polyfit3d_surf_get_coeff( const int nverts, const double* ngbcors, const double* ngbnrms,
-                                   int degree, const bool interp, const bool safeguard,
-                                   const int ncoords, double* coords, const int ncoeffs,
-                                   double* coeffs, int* degree_out, int* degree_pnt,
+    void polyfit3d_surf_get_coeff( const int nverts, const double* ngbcors, const double* ngbnrms, int degree,
+                                   const bool interp, const bool safeguard, const int ncoords, double* coords,
+                                   const int ncoeffs, double* coeffs, int* degree_out, int* degree_pnt,
                                    int* degree_qr );
     //! \brief Form and solve Vandermonde system of bi-variables
-    void eval_vander_bivar_cmf( const int npts2fit, const double* us, const int ndim, double* bs,
-                                int degree, const double* ws, const bool interp,
-                                const bool safeguard, int* degree_out, int* degree_pnt,
-                                int* degree_qr );
+    void eval_vander_bivar_cmf( const int npts2fit, const double* us, const int ndim, double* bs, int degree,
+                                const double* ws, const bool interp, const bool safeguard, int* degree_out,
+                                int* degree_pnt, int* degree_qr );
 
     //! \brief Compute local single variable coordinate system of a vertex, and perform vertex based
     //! polynomial fittings of three global coordinates axis
@@ -423,17 +412,15 @@ class HiReconstruction
      * for storing coefficients of local fittings in monomial basis \param degree_out Pointer to
      * integer, order of resulted polynomial of fitting, could be downgraded due to numerical issues
      */
-    void polyfit3d_curve_get_coeff( const int nverts, const double* ngbcors, const double* ngbtangs,
-                                    int degree, const bool interp, const bool safeguard,
-                                    const int ncoords, double* coords, const int ncoeffs,
-                                    double* coeffs, int* degree_out );
+    void polyfit3d_curve_get_coeff( const int nverts, const double* ngbcors, const double* ngbtangs, int degree,
+                                    const bool interp, const bool safeguard, const int ncoords, double* coords,
+                                    const int ncoeffs, double* coeffs, int* degree_out );
     //! \brief Form and solve Vandermonde system of single-variables
-    void eval_vander_univar_cmf( const int npts2fit, const double* us, const int ndim, double* bs,
-                                 int degree, const double* ws, const bool interp,
-                                 const bool safeguard, int* degree_out );
+    void eval_vander_univar_cmf( const int npts2fit, const double* us, const int ndim, double* bs, int degree,
+                                 const double* ws, const bool interp, const bool safeguard, int* degree_out );
     //! \brief Compute weights for points selected in weighted least square fittigns
-    int compute_weights( const int nrows, const int ncols, const double* us, const int nngbs,
-                         const double* ngbnrms, const int degree, const double toler, double* ws );
+    int compute_weights( const int nrows, const int ncols, const double* us, const int nngbs, const double* ngbnrms,
+                         const int degree, const double toler, double* ws );
     //! \brief Check the correctness of barycentric coordination, wi>=0 and sum(wi)=1
     bool check_barycentric_coords( const int nws, const double* naturalcoords );
 };  // class HiReconstruction

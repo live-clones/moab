@@ -7,9 +7,8 @@
 namespace moab
 {
 
-const double LinearHex::corner[ 8 ][ 3 ] = { { -1, -1, -1 }, { 1, -1, -1 }, { 1, 1, -1 },
-                                             { -1, 1, -1 },  { -1, -1, 1 }, { 1, -1, 1 },
-                                             { 1, 1, 1 },    { -1, 1, 1 } };
+const double LinearHex::corner[ 8 ][ 3 ] = { { -1, -1, -1 }, { 1, -1, -1 }, { 1, 1, -1 }, { -1, 1, -1 },
+                                             { -1, -1, 1 },  { 1, -1, 1 },  { 1, 1, 1 },  { -1, 1, 1 } };
 
 /* For each point, its weight and location are stored as an array.
    Hence, the inner dimension is 2, the outer dimension is gauss_count.
@@ -17,8 +16,8 @@ const double LinearHex::corner[ 8 ][ 3 ] = { { -1, -1, -1 }, { 1, -1, -1 }, { 1,
 */
 const double LinearHex::gauss[ 1 ][ 2 ] = { { 2.0, 0.0 } };
 
-ErrorCode LinearHex::jacobianFcn( const double* params, const double* verts, const int /*nverts*/,
-                                  const int ndim, double*, double* result )
+ErrorCode LinearHex::jacobianFcn( const double* params, const double* verts, const int /*nverts*/, const int ndim,
+                                  double*, double* result )
 {
     assert( params && verts );
     Matrix3* J = reinterpret_cast< Matrix3* >( result );
@@ -45,16 +44,15 @@ ErrorCode LinearHex::jacobianFcn( const double* params, const double* verts, con
     return MB_SUCCESS;
 }  // LinearHex::jacobian()
 
-ErrorCode LinearHex::evalFcn( const double* params, const double* field, const int /*ndim*/,
-                              const int num_tuples, double*, double* result )
+ErrorCode LinearHex::evalFcn( const double* params, const double* field, const int /*ndim*/, const int num_tuples,
+                              double*, double* result )
 {
     assert( params && field && num_tuples != -1 );
     for( int i = 0; i < num_tuples; i++ )
         result[ i ] = 0.0;
     for( unsigned i = 0; i < 8; ++i )
     {
-        const double N_i = ( 1 + params[ 0 ] * corner[ i ][ 0 ] ) *
-                           ( 1 + params[ 1 ] * corner[ i ][ 1 ] ) *
+        const double N_i = ( 1 + params[ 0 ] * corner[ i ][ 0 ] ) * ( 1 + params[ 1 ] * corner[ i ][ 1 ] ) *
                            ( 1 + params[ 2 ] * corner[ i ][ 2 ] );
         for( int j = 0; j < num_tuples; j++ )
             result[ j ] += N_i * field[ i * num_tuples + j ];
@@ -65,9 +63,8 @@ ErrorCode LinearHex::evalFcn( const double* params, const double* field, const i
     return MB_SUCCESS;
 }
 
-ErrorCode LinearHex::integrateFcn( const double* field, const double* verts, const int nverts,
-                                   const int ndim, const int num_tuples, double* work,
-                                   double* result )
+ErrorCode LinearHex::integrateFcn( const double* field, const double* verts, const int nverts, const int ndim,
+                                   const int num_tuples, double* work, double* result )
 {
     assert( field && verts && num_tuples != -1 );
     double    tmp_result[ 8 ];
@@ -102,14 +99,13 @@ ErrorCode LinearHex::integrateFcn( const double* field, const double* verts, con
     return MB_SUCCESS;
 }  // LinearHex::integrate_vector()
 
-ErrorCode LinearHex::reverseEvalFcn( EvalFcn eval, JacobianFcn jacob, InsideFcn ins,
-                                     const double* posn, const double* verts, const int nverts,
-                                     const int ndim, const double iter_tol, const double inside_tol,
-                                     double* work, double* params, int* is_inside )
+ErrorCode LinearHex::reverseEvalFcn( EvalFcn eval, JacobianFcn jacob, InsideFcn ins, const double* posn,
+                                     const double* verts, const int nverts, const int ndim, const double iter_tol,
+                                     const double inside_tol, double* work, double* params, int* is_inside )
 {
     assert( posn && verts );
-    return EvalSet::evaluate_reverse( eval, jacob, ins, posn, verts, nverts, ndim, iter_tol,
-                                      inside_tol, work, params, is_inside );
+    return EvalSet::evaluate_reverse( eval, jacob, ins, posn, verts, nverts, ndim, iter_tol, inside_tol, work, params,
+                                      is_inside );
 }
 
 int LinearHex::insideFcn( const double* params, const int ndim, const double tol )
@@ -117,17 +113,13 @@ int LinearHex::insideFcn( const double* params, const int ndim, const double tol
     return EvalSet::inside_function( params, ndim, tol );
 }
 
-ErrorCode LinearHex::normalFcn( const int ientDim, const int facet, const int nverts,
-                                const double* verts, double normal[ 3 ] )
+ErrorCode LinearHex::normalFcn( const int ientDim, const int facet, const int nverts, const double* verts,
+                                double normal[ 3 ] )
 {
     // assert(facet < 6 && ientDim == 2 && nverts == 8);
-    if( nverts != 8 )
-        MB_SET_ERR( MB_FAILURE, "Incorrect vertex count for passed hex :: expected value = 8 " );
-    if( ientDim != 2 )
-        MB_SET_ERR( MB_FAILURE,
-                    "Requesting normal for unsupported dimension :: expected value = 2 " );
-    if( facet > 6 || facet < 0 )
-        MB_SET_ERR( MB_FAILURE, "Incorrect local face id :: expected value = one of 0-5" );
+    if( nverts != 8 ) MB_SET_ERR( MB_FAILURE, "Incorrect vertex count for passed hex :: expected value = 8 " );
+    if( ientDim != 2 ) MB_SET_ERR( MB_FAILURE, "Requesting normal for unsupported dimension :: expected value = 2 " );
+    if( facet > 6 || facet < 0 ) MB_SET_ERR( MB_FAILURE, "Incorrect local face id :: expected value = one of 0-5" );
 
     int id0 = CN::mConnectivityMap[ MBHEX ][ ientDim - 1 ].conn[ facet ][ 0 ];
     int id1 = CN::mConnectivityMap[ MBHEX ][ ientDim - 1 ].conn[ facet ][ 1 ];

@@ -170,9 +170,8 @@ int main( int argc, char* argv[] )
         if( dist( coords + 3 * i, exp_coords + 3 * i ) > eps )
         {
             ++invalid;
-            printf( "Vertex %d at (%f,%f,%f), expected at (%f,%f,%f)\n", i, coords[ 3 * i ],
-                    coords[ 3 * i + 1 ], coords[ 3 * i + 2 ], exp_coords[ 3 * i ],
-                    exp_coords[ 3 * i + 1 ], exp_coords[ 3 * i + 2 ] );
+            printf( "Vertex %d at (%f,%f,%f), expected at (%f,%f,%f)\n", i, coords[ 3 * i ], coords[ 3 * i + 1 ],
+                    coords[ 3 * i + 2 ], exp_coords[ 3 * i ], exp_coords[ 3 * i + 1 ], exp_coords[ 3 * i + 2 ] );
         }
     }
 

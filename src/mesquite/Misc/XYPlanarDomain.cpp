@@ -34,8 +34,7 @@
 
 MBMesquite::XYPlanarDomain::~XYPlanarDomain( ) {}
 
-void MBMesquite::XYPlanarDomain::snap_to( MBMesquite::Mesh::VertexHandle /*entity_handle*/,
-                                          Vector3D& coordinate ) const
+void MBMesquite::XYPlanarDomain::snap_to( MBMesquite::Mesh::VertexHandle /*entity_handle*/, Vector3D& coordinate ) const
 {
     coordinate[ 2 ] = 0.0;
 }
@@ -46,31 +45,28 @@ void MBMesquite::XYPlanarDomain::vertex_normal_at( MBMesquite::Mesh::VertexHandl
     coordinate = Vector3D( 0.0, 0.0, 1.0 );
 }
 
-void MBMesquite::XYPlanarDomain::element_normal_at(
-    MBMesquite::Mesh::ElementHandle /*entity_handle*/, MBMesquite::Vector3D& coordinate ) const
+void MBMesquite::XYPlanarDomain::element_normal_at( MBMesquite::Mesh::ElementHandle /*entity_handle*/,
+                                                    MBMesquite::Vector3D& coordinate ) const
 {
     coordinate = Vector3D( 0.0, 0.0, 1.0 );
 }
 
-void MBMesquite::XYPlanarDomain::vertex_normal_at( const MBMesquite::Mesh::VertexHandle*,
-                                                   Vector3D coords[], unsigned count,
-                                                   MBMesquite::MsqError& ) const
+void MBMesquite::XYPlanarDomain::vertex_normal_at( const MBMesquite::Mesh::VertexHandle*, Vector3D coords[],
+                                                   unsigned count, MBMesquite::MsqError& ) const
 {
     for( unsigned i = 0; i < count; ++i )
         coords[ i ] = Vector3D( 0.0, 0.0, 1.0 );
 }
 
-void MBMesquite::XYPlanarDomain::closest_point( MBMesquite::Mesh::VertexHandle,
-                                                const MBMesquite::Vector3D& position,
-                                                MBMesquite::Vector3D&       closest,
-                                                MBMesquite::Vector3D& /*normal*/,
+void MBMesquite::XYPlanarDomain::closest_point( MBMesquite::Mesh::VertexHandle, const MBMesquite::Vector3D& position,
+                                                MBMesquite::Vector3D& closest, MBMesquite::Vector3D& /*normal*/,
                                                 MBMesquite::MsqError& ) const
 {
     closest = Vector3D( position[ 0 ], position[ 1 ], 0.0 );
 }
 
-void MBMesquite::XYPlanarDomain::domain_DoF( const Mesh::VertexHandle*, unsigned short* dof_array,
-                                             size_t num_vertices, MsqError& ) const
+void MBMesquite::XYPlanarDomain::domain_DoF( const Mesh::VertexHandle*, unsigned short* dof_array, size_t num_vertices,
+                                             MsqError& ) const
 {
     std::fill( dof_array, dof_array + num_vertices, 2 );
 }

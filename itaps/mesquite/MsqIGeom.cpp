@@ -73,25 +73,22 @@ void MsqIGeom::vertex_normal_at( const Mesh::VertexHandle*, Vector3D coordinates
                                  MsqError& err ) const
 {
     int ierr = normal( geomEntHandle, coordinates, count );
-    if( iBase_SUCCESS != ierr )
-        MSQ_SETERR( err )( process_itaps_error( ierr ), MsqError::INTERNAL_ERROR );
+    if( iBase_SUCCESS != ierr ) MSQ_SETERR( err )( process_itaps_error( ierr ), MsqError::INTERNAL_ERROR );
 }
 
-void MsqIGeom::closest_point( Mesh::VertexHandle /*handle*/, const Vector3D& position,
-                              Vector3D& closest, Vector3D& p_normal, MsqError& err ) const
+void MsqIGeom::closest_point( Mesh::VertexHandle /*handle*/, const Vector3D& position, Vector3D& closest,
+                              Vector3D& p_normal, MsqError& err ) const
 {
     int ierr = closest_and_normal( geomEntHandle, position, closest, p_normal );
-    if( iBase_SUCCESS != ierr )
-        MSQ_SETERR( err )( process_itaps_error( ierr ), MsqError::INTERNAL_ERROR );
+    if( iBase_SUCCESS != ierr ) MSQ_SETERR( err )( process_itaps_error( ierr ), MsqError::INTERNAL_ERROR );
 }
 
-void MsqIGeom::domain_DoF( const Mesh::VertexHandle*, unsigned short* dof_array,
-                           size_t num_vertices, MsqError& err ) const
+void MsqIGeom::domain_DoF( const Mesh::VertexHandle*, unsigned short* dof_array, size_t num_vertices,
+                           MsqError& err ) const
 {
     unsigned short dim;
     int            ierr = get_dimension( &geomEntHandle, &dim, 1 );
-    if( iBase_SUCCESS != ierr )
-        MSQ_SETERR( err )( process_itaps_error( ierr ), MsqError::INTERNAL_ERROR );
+    if( iBase_SUCCESS != ierr ) MSQ_SETERR( err )( process_itaps_error( ierr ), MsqError::INTERNAL_ERROR );
     std::fill( dof_array, dof_array + num_vertices, dim );
 }
 
@@ -125,8 +122,7 @@ int MsqCommonIGeom::normal( iBase_EntityHandle geom, Vector3D coords[], unsigned
     return normal( arrptr( geomHandles ), coords, count );
 }
 
-int MsqCommonIGeom::normal( const iBase_EntityHandle* geom_handles, Vector3D coords[],
-                            unsigned count ) const
+int MsqCommonIGeom::normal( const iBase_EntityHandle* geom_handles, Vector3D coords[], unsigned count ) const
 {
     // going to assume this in the following reinterpret_cast, so
     // check to make sure it is true
@@ -142,24 +138,22 @@ int MsqCommonIGeom::normal( const iBase_EntityHandle* geom_handles, Vector3D coo
 
     // get the normals
     int ierr;
-    iGeom_getArrNrmlXYZ( geomIFace, geom_handles, count, iBase_INTERLEAVED, arrptr( coordArray ),
-                         count * 3, &norm_ptr, &junk_1, &junk_2, &ierr );
+    iGeom_getArrNrmlXYZ( geomIFace, geom_handles, count, iBase_INTERLEAVED, arrptr( coordArray ), count * 3, &norm_ptr,
+                         &junk_1, &junk_2, &ierr );
 
     return ierr;
 }
 
-int MsqCommonIGeom::closest_and_normal( iBase_EntityHandle geom, const Vector3D& position,
-                                        Vector3D& closest, Vector3D& p_normal ) const
+int MsqCommonIGeom::closest_and_normal( iBase_EntityHandle geom, const Vector3D& position, Vector3D& closest,
+                                        Vector3D& p_normal ) const
 {
     int ierr;
-    iGeom_getEntNrmlPlXYZ( geomIFace, geom, position[ 0 ], position[ 1 ], position[ 2 ],
-                           &closest[ 0 ], &closest[ 1 ], &closest[ 2 ], &p_normal[ 0 ],
-                           &p_normal[ 1 ], &p_normal[ 2 ], &ierr );
+    iGeom_getEntNrmlPlXYZ( geomIFace, geom, position[ 0 ], position[ 1 ], position[ 2 ], &closest[ 0 ], &closest[ 1 ],
+                           &closest[ 2 ], &p_normal[ 0 ], &p_normal[ 1 ], &p_normal[ 2 ], &ierr );
     return ierr;
 }
 
-int MsqCommonIGeom::get_dimension( const iBase_EntityHandle* geom_handle, unsigned short* dof_out,
-                                   size_t count ) const
+int MsqCommonIGeom::get_dimension( const iBase_EntityHandle* geom_handle, unsigned short* dof_out, size_t count ) const
 {
     int ierr;
     typeArray.resize( count );

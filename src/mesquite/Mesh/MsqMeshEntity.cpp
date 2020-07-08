@@ -101,8 +101,7 @@ void MsqMeshEntity::get_centroid( Vector3D& centroid, const PatchData& pd, MsqEr
     centroid /= nve;
 }
 
-static inline double corner_volume( const Vector3D& v0, const Vector3D& v1, const Vector3D& v2,
-                                    const Vector3D& v3 )
+static inline double corner_volume( const Vector3D& v0, const Vector3D& v1, const Vector3D& v2, const Vector3D& v3 )
 {
     return ( v1 - v0 ) * ( v2 - v0 ) % ( v3 - v0 );
 }
@@ -145,12 +144,11 @@ double MsqMeshEntity::compute_unsigned_area( PatchData& pd, MsqError& err )
         case TETRAHEDRON:
             return 1.0 / 6.0 *
                    fabs( corner_volume( verts[ vertexIndices[ 0 ] ], verts[ vertexIndices[ 1 ] ],
-                                        verts[ vertexIndices[ 2 ] ],
-                                        verts[ vertexIndices[ 3 ] ] ) );
+                                        verts[ vertexIndices[ 2 ] ], verts[ vertexIndices[ 3 ] ] ) );
 
         case PYRAMID: {
-            Vector3D m = verts[ vertexIndices[ 0 ] ] + verts[ vertexIndices[ 1 ] ] +
-                         verts[ vertexIndices[ 2 ] ] + verts[ vertexIndices[ 3 ] ];
+            Vector3D m = verts[ vertexIndices[ 0 ] ] + verts[ vertexIndices[ 1 ] ] + verts[ vertexIndices[ 2 ] ] +
+                         verts[ vertexIndices[ 3 ] ];
             Vector3D t1 = verts[ vertexIndices[ 0 ] ] - verts[ vertexIndices[ 2 ] ];
             Vector3D t2 = verts[ vertexIndices[ 1 ] ] - verts[ vertexIndices[ 3 ] ];
             tem = ( ( t1 + t2 ) * ( t1 - t2 ) ) % ( verts[ vertexIndices[ 4 ] ] - 0.25 * m );
@@ -158,42 +156,41 @@ double MsqMeshEntity::compute_unsigned_area( PatchData& pd, MsqError& err )
         }
 
         case PRISM: {
-            tem = corner_volume( verts[ vertexIndices[ 0 ] ], verts[ vertexIndices[ 1 ] ],
-                                 verts[ vertexIndices[ 2 ] ], verts[ vertexIndices[ 3 ] ] );
+            tem = corner_volume( verts[ vertexIndices[ 0 ] ], verts[ vertexIndices[ 1 ] ], verts[ vertexIndices[ 2 ] ],
+                                 verts[ vertexIndices[ 3 ] ] );
 
-            tem += corner_volume( verts[ vertexIndices[ 1 ] ], verts[ vertexIndices[ 2 ] ],
-                                  verts[ vertexIndices[ 3 ] ], verts[ vertexIndices[ 4 ] ] );
+            tem += corner_volume( verts[ vertexIndices[ 1 ] ], verts[ vertexIndices[ 2 ] ], verts[ vertexIndices[ 3 ] ],
+                                  verts[ vertexIndices[ 4 ] ] );
 
-            tem += corner_volume( verts[ vertexIndices[ 2 ] ], verts[ vertexIndices[ 3 ] ],
-                                  verts[ vertexIndices[ 4 ] ], verts[ vertexIndices[ 5 ] ] );
+            tem += corner_volume( verts[ vertexIndices[ 2 ] ], verts[ vertexIndices[ 3 ] ], verts[ vertexIndices[ 4 ] ],
+                                  verts[ vertexIndices[ 5 ] ] );
 
             return 1.0 / 6.0 * fabs( tem );
         }
 
         case HEXAHEDRON: {
 
-            tem = corner_volume( verts[ vertexIndices[ 1 ] ], verts[ vertexIndices[ 2 ] ],
-                                 verts[ vertexIndices[ 0 ] ], verts[ vertexIndices[ 5 ] ] );
+            tem = corner_volume( verts[ vertexIndices[ 1 ] ], verts[ vertexIndices[ 2 ] ], verts[ vertexIndices[ 0 ] ],
+                                 verts[ vertexIndices[ 5 ] ] );
 
-            tem += corner_volume( verts[ vertexIndices[ 3 ] ], verts[ vertexIndices[ 0 ] ],
-                                  verts[ vertexIndices[ 2 ] ], verts[ vertexIndices[ 7 ] ] );
+            tem += corner_volume( verts[ vertexIndices[ 3 ] ], verts[ vertexIndices[ 0 ] ], verts[ vertexIndices[ 2 ] ],
+                                  verts[ vertexIndices[ 7 ] ] );
 
-            tem += corner_volume( verts[ vertexIndices[ 4 ] ], verts[ vertexIndices[ 7 ] ],
-                                  verts[ vertexIndices[ 5 ] ], verts[ vertexIndices[ 0 ] ] );
+            tem += corner_volume( verts[ vertexIndices[ 4 ] ], verts[ vertexIndices[ 7 ] ], verts[ vertexIndices[ 5 ] ],
+                                  verts[ vertexIndices[ 0 ] ] );
 
-            tem += corner_volume( verts[ vertexIndices[ 6 ] ], verts[ vertexIndices[ 5 ] ],
-                                  verts[ vertexIndices[ 7 ] ], verts[ vertexIndices[ 2 ] ] );
+            tem += corner_volume( verts[ vertexIndices[ 6 ] ], verts[ vertexIndices[ 5 ] ], verts[ vertexIndices[ 7 ] ],
+                                  verts[ vertexIndices[ 2 ] ] );
 
-            tem += corner_volume( verts[ vertexIndices[ 5 ] ], verts[ vertexIndices[ 2 ] ],
-                                  verts[ vertexIndices[ 0 ] ], verts[ vertexIndices[ 7 ] ] );
+            tem += corner_volume( verts[ vertexIndices[ 5 ] ], verts[ vertexIndices[ 2 ] ], verts[ vertexIndices[ 0 ] ],
+                                  verts[ vertexIndices[ 7 ] ] );
 
             return ( 1.0 / 6.0 ) * fabs( tem );
         }
 
         default:
             MSQ_SETERR( err )
-            ( "Invalid type of element passed to compute unsigned area.",
-              MsqError::UNSUPPORTED_ELEMENT );
+            ( "Invalid type of element passed to compute unsigned area.", MsqError::UNSUPPORTED_ELEMENT );
             return 0;
     }
     return 0;
@@ -251,8 +248,7 @@ double MsqMeshEntity::compute_signed_area( PatchData& pd, MsqError& err )
 
         default:
             MSQ_SETERR( err )
-            ( "Invalid type of element passed to compute unsigned area.",
-              MsqError::UNSUPPORTED_ELEMENT );
+            ( "Invalid type of element passed to compute unsigned area.", MsqError::UNSUPPORTED_ELEMENT );
             return 0;
     };
     return 0.0;
@@ -264,9 +260,8 @@ double MsqMeshEntity::compute_signed_area( PatchData& pd, MsqError& err )
   entity.
 
 */
-void MsqMeshEntity::get_connected_vertices( std::size_t                 vertex_index,
-                                            std::vector< std::size_t >& vert_indices,
-                                            MsqError&                   err )
+void MsqMeshEntity::get_connected_vertices( std::size_t vertex_index, std::vector< std::size_t >& vert_indices,
+                                            MsqError& err )
 {
     // index is set to the index in the vertexIndices corresponding
     // to vertex_index
@@ -405,9 +400,8 @@ ostream& operator<<( ostream& stream, const MsqMeshEntity& entity )
   relaxation methods in the laplacian smoothers.
 
 */
-size_t MsqMeshEntity::get_local_matrix_map_about_vertex( PatchData& pd, MsqVertex* vert,
-                                                         size_t local_map_size, int* local_map,
-                                                         MsqError& err ) const
+size_t MsqMeshEntity::get_local_matrix_map_about_vertex( PatchData& pd, MsqVertex* vert, size_t local_map_size,
+                                                         int* local_map, MsqError& err ) const
 {
     // i iterates through elem's vertices
     int i = 0;
@@ -428,8 +422,7 @@ size_t MsqMeshEntity::get_local_matrix_map_about_vertex( PatchData& pd, MsqVerte
 
         case QUADRILATERAL:
             MSQ_SETERR( err )
-            ( "Requested function not yet supported for Quadrilaterals.",
-              MsqError::NOT_IMPLEMENTED );
+            ( "Requested function not yet supported for Quadrilaterals.", MsqError::NOT_IMPLEMENTED );
 
             break;
 
@@ -497,8 +490,7 @@ size_t MsqMeshEntity::get_local_matrix_map_about_vertex( PatchData& pd, MsqVerte
     return return_val;
 }
 
-void MsqMeshEntity::check_element_orientation( PatchData& pd, int& inverted, int& total,
-                                               MsqError& err )
+void MsqMeshEntity::check_element_orientation( PatchData& pd, int& inverted, int& total, MsqError& err )
 {
     NodeSet all = all_nodes( err );MSQ_ERRRTN( err );
     unsigned i;
@@ -526,17 +518,14 @@ void MsqMeshEntity::check_element_orientation( PatchData& pd, int& inverted, int
         if( sample.have_any_corner_node( ) )
         {
             for( i = 0; i < TopologyInfo::corners( mType ); ++i )
-                if( sample.corner_node( i ) )
-                    inverted += inverted_jacobian_2d( pd, all, Sample( 0, i ), err );
+                if( sample.corner_node( i ) ) inverted += inverted_jacobian_2d( pd, all, Sample( 0, i ), err );
         }
         if( sample.have_any_mid_edge_node( ) )
         {
             for( i = 0; i < TopologyInfo::edges( mType ); ++i )
-                if( sample.mid_edge_node( i ) )
-                    inverted += inverted_jacobian_2d( pd, all, Sample( 1, i ), err );
+                if( sample.mid_edge_node( i ) ) inverted += inverted_jacobian_2d( pd, all, Sample( 1, i ), err );
         }
-        if( sample.have_any_mid_face_node( ) )
-            inverted += inverted_jacobian_2d( pd, all, Sample( 2, 0 ), err );
+        if( sample.have_any_mid_face_node( ) ) inverted += inverted_jacobian_2d( pd, all, Sample( 2, 0 ), err );
     }
     else
     {
@@ -554,28 +543,23 @@ void MsqMeshEntity::check_element_orientation( PatchData& pd, int& inverted, int
         if( sample.have_any_corner_node( ) )
         {
             for( i = 0; i < TopologyInfo::corners( mType ); ++i )
-                if( sample.corner_node( i ) )
-                    inverted += inverted_jacobian_3d( pd, all, Sample( 0, i ), err );
+                if( sample.corner_node( i ) ) inverted += inverted_jacobian_3d( pd, all, Sample( 0, i ), err );
         }
         if( sample.have_any_mid_edge_node( ) )
         {
             for( i = 0; i < TopologyInfo::edges( mType ); ++i )
-                if( sample.mid_edge_node( i ) )
-                    inverted += inverted_jacobian_3d( pd, all, Sample( 1, i ), err );
+                if( sample.mid_edge_node( i ) ) inverted += inverted_jacobian_3d( pd, all, Sample( 1, i ), err );
         }
         if( sample.have_any_mid_face_node( ) )
         {
             for( i = 0; i < TopologyInfo::faces( mType ); ++i )
-                if( sample.mid_face_node( i ) )
-                    inverted += inverted_jacobian_3d( pd, all, Sample( 2, i ), err );
+                if( sample.mid_face_node( i ) ) inverted += inverted_jacobian_3d( pd, all, Sample( 2, i ), err );
         }
-        if( sample.have_any_mid_region_node( ) )
-        { inverted += inverted_jacobian_3d( pd, all, Sample( 3, 0 ), err ); }
+        if( sample.have_any_mid_region_node( ) ) { inverted += inverted_jacobian_3d( pd, all, Sample( 3, 0 ), err ); }
     }
 }
 
-bool MsqMeshEntity::inverted_jacobian_3d( PatchData& pd, NodeSet nodes, Sample sample,
-                                          MsqError& err )
+bool MsqMeshEntity::inverted_jacobian_3d( PatchData& pd, NodeSet nodes, Sample sample, MsqError& err )
 {
     MsqMatrix< 3, 3 > J;
     MsqVector< 3 >    junk[ 27 ];
@@ -593,8 +577,7 @@ bool MsqMeshEntity::inverted_jacobian_3d( PatchData& pd, NodeSet nodes, Sample s
     return d < 0 || d * d < DBL_EPSILON * DBL_EPSILON * l1 * l2 * l3;
 }
 
-bool MsqMeshEntity::inverted_jacobian_2d( PatchData& pd, NodeSet nodes, Sample sample,
-                                          MsqError& err )
+bool MsqMeshEntity::inverted_jacobian_2d( PatchData& pd, NodeSet nodes, Sample sample, MsqError& err )
 {
     MsqMatrix< 3, 2 > J;
     MsqVector< 2 >    junk[ 9 ];
@@ -634,8 +617,7 @@ NodeSet MsqMeshEntity::all_nodes( MsqError& err ) const
     return result;
 }
 
-void MsqMeshEntity::check_element_orientation_corners( PatchData& pd, int& inverted, int& total,
-                                                       MsqError& err )
+void MsqMeshEntity::check_element_orientation_corners( PatchData& pd, int& inverted, int& total, MsqError& err )
 {
     int num_nodes = node_count( );
     total = inverted = 0;
@@ -664,8 +646,7 @@ void MsqMeshEntity::check_element_orientation_corners( PatchData& pd, int& inver
             if( !pd.domain_set( ) ) return;
 
             pd.get_domain_normal_at_element( this, coord_vectors[ 2 ], err );MSQ_ERRRTN( err );
-            coord_vectors[ 2 ] =
-                coord_vectors[ 2 ] / coord_vectors[ 2 ].length( );  // Need unit normal
+            coord_vectors[ 2 ] = coord_vectors[ 2 ] / coord_vectors[ 2 ].length( );  // Need unit normal
             center_vector = vertices[ vertexIndices[ 0 ] ];
             coord_vectors[ 0 ] = vertices[ vertexIndices[ 1 ] ] - center_vector;
             coord_vectors[ 1 ] = vertices[ vertexIndices[ 2 ] ] - center_vector;
@@ -678,8 +659,7 @@ void MsqMeshEntity::check_element_orientation_corners( PatchData& pd, int& inver
             if( !pd.domain_set( ) ) return;
 
             pd.get_domain_normal_at_element( this, coord_vectors[ 2 ], err );MSQ_ERRRTN( err );
-            coord_vectors[ 2 ] =
-                coord_vectors[ 2 ] / coord_vectors[ 2 ].length( );  // Need unit normal
+            coord_vectors[ 2 ] = coord_vectors[ 2 ] / coord_vectors[ 2 ].length( );  // Need unit normal
 
             for( i = 0; i < 4; ++i )
             {
@@ -687,8 +667,7 @@ void MsqMeshEntity::check_element_orientation_corners( PatchData& pd, int& inver
                 coord_vectors[ 0 ] = vertices[ vertexIndices[ ( i + 1 ) % 4 ] ] - center_vector;
                 coord_vectors[ 1 ] = vertices[ vertexIndices[ ( i + 3 ) % 4 ] ] - center_vector;
                 ++total;
-                inverted +=
-                    ( coord_vectors[ 2 ] % ( coord_vectors[ 0 ] * coord_vectors[ 1 ] ) <= 0.0 );
+                inverted += ( coord_vectors[ 2 ] % ( coord_vectors[ 0 ] * coord_vectors[ 1 ] ) <= 0.0 );
             }
             break;
 
@@ -706,19 +685,15 @@ void MsqMeshEntity::check_element_orientation_corners( PatchData& pd, int& inver
             if( !pd.domain_set( ) ) return;
 
             pd.get_domain_normal_at_element( this, coord_vectors[ 2 ], err );MSQ_ERRRTN( err );
-            coord_vectors[ 2 ] =
-                coord_vectors[ 2 ] / coord_vectors[ 2 ].length( );  // Need unit normal
+            coord_vectors[ 2 ] = coord_vectors[ 2 ] / coord_vectors[ 2 ].length( );  // Need unit normal
 
             for( i = 0; i < num_nodes; ++i )
             {
                 center_vector = vertices[ vertexIndices[ i ] ];
-                coord_vectors[ 0 ] =
-                    vertices[ vertexIndices[ ( i + 1 ) % num_nodes ] ] - center_vector;
-                coord_vectors[ 1 ] =
-                    vertices[ vertexIndices[ ( i + num_nodes - 1 ) % num_nodes ] ] - center_vector;
+                coord_vectors[ 0 ] = vertices[ vertexIndices[ ( i + 1 ) % num_nodes ] ] - center_vector;
+                coord_vectors[ 1 ] = vertices[ vertexIndices[ ( i + num_nodes - 1 ) % num_nodes ] ] - center_vector;
                 ++total;
-                inverted +=
-                    ( coord_vectors[ 2 ] % ( coord_vectors[ 0 ] * coord_vectors[ 1 ] ) <= 0.0 );
+                inverted += ( coord_vectors[ 2 ] % ( coord_vectors[ 0 ] * coord_vectors[ 1 ] ) <= 0.0 );
             }
             break;
 
@@ -741,8 +716,7 @@ void MsqMeshEntity::check_element_orientation_corners( PatchData& pd, int& inver
                 coord_vectors[ 1 ] = vertices[ vertexIndices[ adj_idx[ 1 ] ] ] - center_vector;
                 coord_vectors[ 2 ] = vertices[ vertexIndices[ adj_idx[ 2 ] ] ] - center_vector;
                 ++total;
-                inverted +=
-                    ( coord_vectors[ 0 ] % ( coord_vectors[ 1 ] * coord_vectors[ 2 ] ) <= 0.0 );
+                inverted += ( coord_vectors[ 0 ] % ( coord_vectors[ 1 ] * coord_vectors[ 2 ] ) <= 0.0 );
             }
             break;
         }

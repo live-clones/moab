@@ -150,10 +150,10 @@ class MsqVertexTest : public CppUnit::TestFixture
         vtx.set_hard_fixed_flag( );
         CPPUNIT_ASSERT( vtx.is_flag_set( MsqVertex::MSQ_CULLED ) == false );
         CPPUNIT_ASSERT( vtx.is_flag_set( MsqVertex::MSQ_HARD_FIXED ) == true );
-        CPPUNIT_ASSERT( ( vtx.is_flag_set( MsqVertex::MSQ_CULLED ) ||
-                          vtx.is_flag_set( MsqVertex::MSQ_HARD_FIXED ) ) == true );
-        CPPUNIT_ASSERT( ( vtx.is_flag_set( MsqVertex::MSQ_CULLED ) &&
-                          vtx.is_flag_set( MsqVertex::MSQ_HARD_FIXED ) ) == false );
+        CPPUNIT_ASSERT( ( vtx.is_flag_set( MsqVertex::MSQ_CULLED ) || vtx.is_flag_set( MsqVertex::MSQ_HARD_FIXED ) ) ==
+                        true );
+        CPPUNIT_ASSERT( ( vtx.is_flag_set( MsqVertex::MSQ_CULLED ) && vtx.is_flag_set( MsqVertex::MSQ_HARD_FIXED ) ) ==
+                        false );
     }
 };
 

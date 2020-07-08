@@ -53,8 +53,7 @@ class ElementQM : public QualityMetric
     MESQUITE_EXPORT virtual void get_evaluations( PatchData& pd, std::vector< size_t >& handles,
                                                   bool free_vertices_only, MsqError& err );
 
-    MESQUITE_EXPORT static void get_element_evaluations( PatchData&             pd,
-                                                         std::vector< size_t >& handles,
+    MESQUITE_EXPORT static void get_element_evaluations( PatchData& pd, std::vector< size_t >& handles,
                                                          bool free_vertices_only, MsqError& err );
 
     /**\brief Default implementation for all element-based metrics
@@ -63,8 +62,7 @@ class ElementQM : public QualityMetric
      * and call 'evaluate'.
      */
     MESQUITE_EXPORT virtual bool evaluate_with_indices( PatchData& pd, size_t handle, double& value,
-                                                        std::vector< size_t >& indices,
-                                                        MsqError&              err );
+                                                        std::vector< size_t >& indices, MsqError& err );
 };
 
 }  // namespace MBMesquite

@@ -62,11 +62,10 @@ WriteSmf::~WriteSmf( )
     mbImpl->release_interface( writeTool );
 }
 
-ErrorCode WriteSmf::write_file( const char* file_name, const bool overwrite,
-                                const FileOptions& opts, const EntityHandle* output_list,
-                                const int num_sets, const std::vector< std::string >& /* qa_list */,
-                                const Tag* /* tag_list */, int /* num_tags */,
-                                int /* export_dimension */ )
+ErrorCode WriteSmf::write_file( const char* file_name, const bool overwrite, const FileOptions& opts,
+                                const EntityHandle* output_list, const int num_sets,
+                                const std::vector< std::string >& /* qa_list */, const Tag* /* tag_list */,
+                                int /* num_tags */, int /* export_dimension */ )
 {
     ErrorCode rval;
 
@@ -104,8 +103,7 @@ ErrorCode WriteSmf::write_file( const char* file_name, const bool overwrite,
     // Use an array with all the connectivities in the triangles; it will be converted later to ints
     int           numTriangles = triangles.size( );
     int           array_alloc = 3 * numTriangles;  // Allocated size of 'array'
-    EntityHandle* array =
-        new EntityHandle[ array_alloc ];  // ptr to working array of result handles
+    EntityHandle* array = new EntityHandle[ array_alloc ];  // ptr to working array of result handles
     // Fill up array with node handles; reorder and uniquify
     if( !array ) return MB_MEMORY_ALLOCATION_FAILED;
     int fillA = 0;

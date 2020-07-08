@@ -46,8 +46,7 @@ std::string AWSizeNB1::get_name( ) const
 AWSizeNB1::~AWSizeNB1( ) {}
 
 template< unsigned DIM >
-static inline bool eval( const MsqMatrix< DIM, DIM >& A, const MsqMatrix< DIM, DIM >& W,
-                         double& result )
+static inline bool eval( const MsqMatrix< DIM, DIM >& A, const MsqMatrix< DIM, DIM >& W, double& result )
 {
     result = det( A ) - det( W );
     result *= result;
@@ -55,8 +54,8 @@ static inline bool eval( const MsqMatrix< DIM, DIM >& A, const MsqMatrix< DIM, D
 }
 
 template< unsigned DIM >
-static inline bool grad( const MsqMatrix< DIM, DIM >& A, const MsqMatrix< DIM, DIM >& W,
-                         double& result, MsqMatrix< DIM, DIM >& deriv )
+static inline bool grad( const MsqMatrix< DIM, DIM >& A, const MsqMatrix< DIM, DIM >& W, double& result,
+                         MsqMatrix< DIM, DIM >& deriv )
 {
     result = det( A ) - det( W );
     deriv = transpose_adj( A );
@@ -66,9 +65,8 @@ static inline bool grad( const MsqMatrix< DIM, DIM >& A, const MsqMatrix< DIM, D
 }
 
 template< unsigned DIM >
-static inline bool hess( const MsqMatrix< DIM, DIM >& A, const MsqMatrix< DIM, DIM >& W,
-                         double& result, MsqMatrix< DIM, DIM >& deriv,
-                         MsqMatrix< DIM, DIM >* second )
+static inline bool hess( const MsqMatrix< DIM, DIM >& A, const MsqMatrix< DIM, DIM >& W, double& result,
+                         MsqMatrix< DIM, DIM >& deriv, MsqMatrix< DIM, DIM >* second )
 {
     result = det( A ) - det( W );
     deriv = transpose_adj( A );

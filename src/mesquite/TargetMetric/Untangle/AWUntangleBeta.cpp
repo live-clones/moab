@@ -48,8 +48,7 @@ AWUntangleBeta::~AWUntangleBeta( ) {}
 const int P = 3;
 
 template< unsigned DIM >
-inline bool AWUntangleBeta::eval( const MsqMatrix< DIM, DIM >& A, const MsqMatrix< DIM, DIM >& W,
-                                  double& result )
+inline bool AWUntangleBeta::eval( const MsqMatrix< DIM, DIM >& A, const MsqMatrix< DIM, DIM >& W, double& result )
 {
     const double alpha = det( A );
     const double omega = det( W );
@@ -63,8 +62,8 @@ inline bool AWUntangleBeta::eval( const MsqMatrix< DIM, DIM >& A, const MsqMatri
 }
 
 template< unsigned DIM >
-inline bool AWUntangleBeta::grad( const MsqMatrix< DIM, DIM >& A, const MsqMatrix< DIM, DIM >& W,
-                                  double& result, MsqMatrix< DIM, DIM >& deriv )
+inline bool AWUntangleBeta::grad( const MsqMatrix< DIM, DIM >& A, const MsqMatrix< DIM, DIM >& W, double& result,
+                                  MsqMatrix< DIM, DIM >& deriv )
 {
     const double alpha = det( A );
     const double omega = det( W );

@@ -49,10 +49,7 @@ class PatchSetUser
             activePatchSet = &myVertexPatches;
     }
 
-    PatchSetUser( PatchSet* my_patch_set )
-        : myVertexPatches( 1, true ), activePatchSet( my_patch_set )
-    {
-    }
+    PatchSetUser( PatchSet* my_patch_set ) : myVertexPatches( 1, true ), activePatchSet( my_patch_set ) {}
 
     virtual ~PatchSetUser( );
 

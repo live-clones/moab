@@ -46,8 +46,8 @@ class AWShape2DB1 : public AWMetricBarrier2D
 
     MESQUITE_EXPORT virtual std::string get_name( ) const;
 
-    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W,
-                                           double& result, MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result,
+                                           MsqError& err );
     /*
       MESQUITE_EXPORT virtual
       bool evaluate_with_grad( const MsqMatrix<2,2>& A,

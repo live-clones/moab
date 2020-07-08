@@ -40,8 +40,7 @@ void test_write_elements( );
 void test_write_shared_sets( );
 void test_var_length_parallel( );
 
-void test_read_elements_common( bool by_rank, int intervals, bool print_time,
-                                const char* extra_opts = 0 );
+void test_read_elements_common( bool by_rank, int intervals, bool print_time, const char* extra_opts = 0 );
 
 int  ReadIntervals = 0;
 void test_read_elements( )
@@ -105,8 +104,7 @@ enum Mode
 const Mode DEFAULT_MODE = READ_PART;
 const bool DEFAULT_BY_RANK = false;
 
-std::string get_read_options( bool by_rank = DEFAULT_BY_RANK, Mode mode = DEFAULT_MODE,
-                              const char* extra_opts = 0 );
+std::string get_read_options( bool by_rank = DEFAULT_BY_RANK, Mode mode = DEFAULT_MODE, const char* extra_opts = 0 );
 std::string get_read_options( const char* extra_opts )
 {
     return get_read_options( DEFAULT_BY_RANK, DEFAULT_MODE, extra_opts );
@@ -195,8 +193,7 @@ int main( int argc, char* argv[] )
         else
         {
             std::cerr << "Usage: " << argv[ 0 ]
-                      << " [-k] [-p] [-R <intervals>] [-r <level>] [-w <level>] [-b <blocks>]  [-A]"
-                      << std::endl;
+                      << " [-k] [-p] [-R <intervals>] [-r <level>] [-w <level>] [-b <blocks>]  [-A]" << std::endl;
             return 1;
         }
     }
@@ -274,11 +271,9 @@ void print_partitioned_entities( Interface& moab, bool list_non_shared = false )
     // get tags for parallel data
     Tag sharedp_tag, sharedps_tag, sharedh_tag, sharedhs_tag, pstatus_tag;
     rval = moab.tag_get_handle( PARALLEL_SHARED_PROC_TAG_NAME, 1, MB_TYPE_INTEGER, sharedp_tag );CHECK_ERR( rval );
-    rval = moab.tag_get_handle( PARALLEL_SHARED_PROCS_TAG_NAME, MAX_SHARING_PROCS, MB_TYPE_INTEGER,
-                                sharedps_tag );CHECK_ERR( rval );
+    rval = moab.tag_get_handle( PARALLEL_SHARED_PROCS_TAG_NAME, MAX_SHARING_PROCS, MB_TYPE_INTEGER, sharedps_tag );CHECK_ERR( rval );
     rval = moab.tag_get_handle( PARALLEL_SHARED_HANDLE_TAG_NAME, 1, MB_TYPE_HANDLE, sharedh_tag );CHECK_ERR( rval );
-    rval = moab.tag_get_handle( PARALLEL_SHARED_HANDLES_TAG_NAME, MAX_SHARING_PROCS, MB_TYPE_HANDLE,
-                                sharedhs_tag );CHECK_ERR( rval );
+    rval = moab.tag_get_handle( PARALLEL_SHARED_HANDLES_TAG_NAME, MAX_SHARING_PROCS, MB_TYPE_HANDLE, sharedhs_tag );CHECK_ERR( rval );
     rval = moab.tag_get_handle( PARALLEL_STATUS_TAG_NAME, 1, MB_TYPE_OPAQUE, pstatus_tag );CHECK_ERR( rval );
 
     // for each geometric entity, check which processor we are sharing
@@ -343,14 +338,14 @@ void print_partitioned_entities( Interface& moab, bool list_non_shared = false )
             else if( num_shared != entities.size( ) )
             {
                 buffer << rank << ":\t" << topo_names_s[ t ] << " " << id << ":\t"
-                       << "ERROR: " << num_shared << " of " << entities.size( )
-                       << " entities marked as 'shared'" << std::endl;
+                       << "ERROR: " << num_shared << " of " << entities.size( ) << " entities marked as 'shared'"
+                       << std::endl;
             }
             else if( num_owned && num_owned != entities.size( ) )
             {
                 buffer << rank << ":\t" << topo_names_s[ t ] << " " << id << ":\t"
-                       << "ERROR: " << num_owned << " of " << entities.size( )
-                       << " entities owned by this processor" << std::endl;
+                       << "ERROR: " << num_owned << " of " << entities.size( ) << " entities owned by this processor"
+                       << std::endl;
             }
             else
             {
@@ -458,8 +453,7 @@ void save_and_load_on_root( Interface& moab, const char* tmp_filename )
     // as the pcomm tag will be deleted by moab.delete_mesh() below.
     std::vector< ParallelComm* > pc_list;
     ParallelComm::get_all_pcomm( &moab, pc_list );
-    for( std::vector< ParallelComm* >::iterator vit = pc_list.begin( ); vit != pc_list.end( );
-         ++vit )
+    for( std::vector< ParallelComm* >::iterator vit = pc_list.begin( ); vit != pc_list.end( ); ++vit )
         delete *vit;
 
     moab.delete_mesh( );
@@ -515,8 +509,7 @@ void check_identical_mesh( Interface& mb1, Interface& mb2 )
             coords2[ 0 ] -= coords1[ 0 ];
             coords2[ 1 ] -= coords1[ 1 ];
             coords2[ 2 ] -= coords1[ 2 ];
-            double lensqr = coords2[ 0 ] * coords2[ 0 ] + coords2[ 1 ] * coords2[ 1 ] +
-                            coords2[ 2 ] * coords2[ 2 ];
+            double lensqr = coords2[ 0 ] * coords2[ 0 ] + coords2[ 1 ] * coords2[ 1 ] + coords2[ 2 ] * coords2[ 2 ];
             if( lensqr < 1e-12 ) break;
         }
         CHECK( i2 != r2.end( ) );
@@ -543,8 +536,7 @@ void check_identical_mesh( Interface& mb1, Interface& mb2 )
                 conn2.clear( );
                 rval = mb2.get_connectivity( &*i2, 1, conn2 );CHECK_ERR( rval );
                 if( conn1.size( ) != conn2.size( ) ) continue;
-                for( std::vector< EntityHandle >::iterator j = conn2.begin( ); j != conn2.end( );
-                     ++j )
+                for( std::vector< EntityHandle >::iterator j = conn2.begin( ); j != conn2.end( ); ++j )
                     *j = entmap[ *j ];
                 if( conn1 == conn2 ) break;
             }
@@ -598,8 +590,7 @@ void test_write_elements( )
     {
         std::cerr << "Type\tPartnd\tWritten" << std::endl;
         for( EntityType t = MBVERTEX; t < MBENTITYSET; ++t )
-            std::cerr << CN::EntityTypeName( t ) << '\t' << all_counts[ t ] << '\t'
-                      << file_counts[ t ] << std::endl;
+            std::cerr << CN::EntityTypeName( t ) << '\t' << all_counts[ t ] << '\t' << file_counts[ t ] << std::endl;
     }
 
     CHECK( all_equal );
@@ -625,8 +616,8 @@ bool check_sets_sizes( Interface& mb1, EntityHandle set1, Interface& mb2, Entity
         rval = mb2.get_number_entities_by_type( set2, t, count2 );CHECK_ERR( rval );
         if( count1 != count2 )
         {
-            std::cerr << "Sets differ in number of " << CN::EntityTypeName( t ) << " : " << count1
-                      << " vs. " << count2 << std::endl;
+            std::cerr << "Sets differ in number of " << CN::EntityTypeName( t ) << " : " << count1 << " vs. " << count2
+                      << std::endl;
             result = false;
         }
     }
@@ -688,8 +679,7 @@ void test_var_length_parallel( )
 
     // If this tag doesn't exist, writer will fail
     Tag junk_tag;
-    mb.tag_get_handle( PARALLEL_GID_TAG_NAME, 1, MB_TYPE_INTEGER, junk_tag,
-                       MB_TAG_DENSE | MB_TAG_EXCL );
+    mb.tag_get_handle( PARALLEL_GID_TAG_NAME, 1, MB_TYPE_INTEGER, junk_tag, MB_TAG_DENSE | MB_TAG_EXCL );
 
     int numproc, rank;
     MPI_Comm_size( MPI_COMM_WORLD, &numproc );
@@ -700,8 +690,7 @@ void test_var_length_parallel( )
     rval = mb.create_vertices( &coords[ 0 ], rank + 1, verts );CHECK_ERR( rval );
 
     // Create a var-len tag
-    rval = mb.tag_get_handle( tagname, 0, MB_TYPE_INTEGER, vartag,
-                              MB_TAG_DENSE | MB_TAG_VARLEN | MB_TAG_EXCL );CHECK_ERR( rval );
+    rval = mb.tag_get_handle( tagname, 0, MB_TYPE_INTEGER, vartag, MB_TAG_DENSE | MB_TAG_VARLEN | MB_TAG_EXCL );CHECK_ERR( rval );
 
     // Write data on each vertex:
     // { n, rank, rank+1, ..., rank+n-1 } where n >= 1
@@ -809,18 +798,16 @@ void create_input_file( const char* file_name, int intervals, int num_cpu, int b
     Tag ijk_vert_tag = 0, ij_set_tag = 0, global_tag = 0;
     if( ijk_vert_tag_name )
     {
-        rval = mb.tag_get_handle( ijk_vert_tag_name, 3, MB_TYPE_INTEGER, ijk_vert_tag,
-                                  MB_TAG_EXCL | MB_TAG_DENSE );CHECK_ERR( rval );
+        rval = mb.tag_get_handle( ijk_vert_tag_name, 3, MB_TYPE_INTEGER, ijk_vert_tag, MB_TAG_EXCL | MB_TAG_DENSE );CHECK_ERR( rval );
     }
     if( ij_set_tag_name )
     {
-        rval = mb.tag_get_handle( ij_set_tag_name, 2, MB_TYPE_INTEGER, ij_set_tag,
-                                  MB_TAG_SPARSE | MB_TAG_EXCL );CHECK_ERR( rval );
+        rval = mb.tag_get_handle( ij_set_tag_name, 2, MB_TYPE_INTEGER, ij_set_tag, MB_TAG_SPARSE | MB_TAG_EXCL );CHECK_ERR( rval );
     }
     if( global_tag_name )
     {
-        rval = mb.tag_get_handle( global_tag_name, 1, MB_TYPE_INTEGER, global_tag,
-                                  MB_TAG_DENSE | MB_TAG_EXCL, global_default_value );CHECK_ERR( rval );
+        rval = mb.tag_get_handle( global_tag_name, 1, MB_TYPE_INTEGER, global_tag, MB_TAG_DENSE | MB_TAG_EXCL,
+                                  global_default_value );CHECK_ERR( rval );
         if( global_mesh_value )
         {
             EntityHandle root = 0;
@@ -888,8 +875,7 @@ void create_input_file( const char* file_name, int intervals, int num_cpu, int b
     }
 
     Tag part_tag;
-    rval = mb.tag_get_handle( PARTITION_TAG, 1, MB_TYPE_INTEGER, part_tag,
-                              MB_TAG_SPARSE | MB_TAG_EXCL );CHECK_ERR( rval );
+    rval = mb.tag_get_handle( PARTITION_TAG, 1, MB_TYPE_INTEGER, part_tag, MB_TAG_SPARSE | MB_TAG_EXCL );CHECK_ERR( rval );
 
     std::vector< EntityHandle > parts( num_cpu );
     for( int i = 0; i < num_cpu; ++i )
@@ -910,16 +896,14 @@ void create_input_file( const char* file_name, int intervals, int num_cpu, int b
         EntityHandle bcset;
         rval = mb.create_meshset( MESHSET_SET, bcset );CHECK_ERR( rval );
         Tag bcset_tag;
-        rval = mb.tag_get_handle( NEUMANN_SET_TAG_NAME, 1, MB_TYPE_INTEGER, bcset_tag,
-                                  MB_TAG_SPARSE | MB_TAG_CREAT );CHECK_ERR( rval );
+        rval = mb.tag_get_handle( NEUMANN_SET_TAG_NAME, 1, MB_TYPE_INTEGER, bcset_tag, MB_TAG_SPARSE | MB_TAG_CREAT );CHECK_ERR( rval );
         int dum = 100;
         rval = mb.tag_set_data( bcset_tag, &bcset, 1, &dum );CHECK_ERR( rval );
         rval = mb.add_entities( bcset, skin_ents );CHECK_ERR( rval );
 
         // dirichlet set
         rval = mb.create_meshset( MESHSET_SET, bcset );CHECK_ERR( rval );
-        rval = mb.tag_get_handle( DIRICHLET_SET_TAG_NAME, 1, MB_TYPE_INTEGER, bcset_tag,
-                                  MB_TAG_SPARSE | MB_TAG_CREAT );CHECK_ERR( rval );
+        rval = mb.tag_get_handle( DIRICHLET_SET_TAG_NAME, 1, MB_TYPE_INTEGER, bcset_tag, MB_TAG_SPARSE | MB_TAG_CREAT );CHECK_ERR( rval );
         dum = 200;
         rval = mb.tag_set_data( bcset_tag, &bcset, 1, &dum );CHECK_ERR( rval );
         Range nodes;
@@ -928,8 +912,7 @@ void create_input_file( const char* file_name, int intervals, int num_cpu, int b
 
         // material set
         rval = mb.create_meshset( MESHSET_SET, bcset );CHECK_ERR( rval );
-        rval = mb.tag_get_handle( MATERIAL_SET_TAG_NAME, 1, MB_TYPE_INTEGER, bcset_tag,
-                                  MB_TAG_SPARSE | MB_TAG_CREAT );CHECK_ERR( rval );
+        rval = mb.tag_get_handle( MATERIAL_SET_TAG_NAME, 1, MB_TYPE_INTEGER, bcset_tag, MB_TAG_SPARSE | MB_TAG_CREAT );CHECK_ERR( rval );
         dum = 300;
         rval = mb.tag_set_data( bcset_tag, &bcset, 1, &dum );CHECK_ERR( rval );
         rval = mb.add_entities( bcset, &elems[ 0 ], elems.size( ) );CHECK_ERR( rval );
@@ -938,8 +921,7 @@ void create_input_file( const char* file_name, int intervals, int num_cpu, int b
     rval = mb.write_file( file_name, "MOAB" );CHECK_ERR( rval );
 }
 
-void test_read_elements_common( bool by_rank, int intervals, bool /* print_time */,
-                                const char* extra_opts )
+void test_read_elements_common( bool by_rank, int intervals, bool /* print_time */, const char* extra_opts )
 {
     const char* file_name = by_rank ? "test_read_rank.h5m" : "test_read.h5m";
     int         numproc, rank;
@@ -1047,14 +1029,10 @@ void test_read_time( )
     if( 0 == rank )
     {
         printf( "%12s  %12s  %12s  %12s\n", "", "READ_PART", "READ_DELETE", "BCAST_DELETE" );
-        printf( "%12s  %12g  %12g  %12g\n", "Max Wall", max_times[ 0 ], max_times[ 2 ],
-                max_times[ 4 ] );
-        printf( "%12s  %12g  %12g  %12g\n", "Total Wall", sum_times[ 0 ], sum_times[ 2 ],
-                sum_times[ 4 ] );
-        printf( "%12s  %12g  %12g  %12g\n", "Max CPU", max_times[ 1 ], max_times[ 3 ],
-                max_times[ 5 ] );
-        printf( "%12s  %12g  %12g  %12g\n", "Total CPU", sum_times[ 1 ], sum_times[ 3 ],
-                sum_times[ 5 ] );
+        printf( "%12s  %12g  %12g  %12g\n", "Max Wall", max_times[ 0 ], max_times[ 2 ], max_times[ 4 ] );
+        printf( "%12s  %12g  %12g  %12g\n", "Total Wall", sum_times[ 0 ], sum_times[ 2 ], sum_times[ 4 ] );
+        printf( "%12s  %12g  %12g  %12g\n", "Max CPU", max_times[ 1 ], max_times[ 3 ], max_times[ 5 ] );
+        printf( "%12s  %12g  %12g  %12g\n", "Total CPU", sum_times[ 1 ], sum_times[ 3 ], sum_times[ 5 ] );
     }
 
     MPI_Barrier( MPI_COMM_WORLD );
@@ -1128,8 +1106,7 @@ void test_read_global_tags( )
     const int  global_val = -11;
 
     // if root processor, create hdf5 file for use in testing
-    if( 0 == rank )
-        create_input_file( file_name, 1, numproc, 1, 0, 0, tag_name, &global_val, &def_val );
+    if( 0 == rank ) create_input_file( file_name, 1, numproc, 1, 0, 0, tag_name, &global_val, &def_val );
     MPI_Barrier( MPI_COMM_WORLD );  // make sure root has completed writing the file
 
     // do parallel read unless only one processor
@@ -1224,8 +1201,7 @@ void test_read_bc_sets( )
 
     // if root processor, create hdf5 file for use in testing
     if( 0 == rank )
-        create_input_file( file_name, DefaultReadIntervals, numproc, 1, NULL, NULL, NULL, NULL,
-                           NULL, true );
+        create_input_file( file_name, DefaultReadIntervals, numproc, 1, NULL, NULL, NULL, NULL, NULL, true );
     MPI_Barrier( MPI_COMM_WORLD );  // make sure root has completed writing the file
 
     // do parallel read unless only one processor
@@ -1239,11 +1215,10 @@ void test_read_bc_sets( )
     Range       sets, contents;
     const char* names[] = { NEUMANN_SET_TAG_NAME, DIRICHLET_SET_TAG_NAME, MATERIAL_SET_TAG_NAME };
     int         vints = DefaultReadIntervals + 1;
-    int expected_num_ents[] = { ( numproc * 4 + 2 ) * DefaultReadIntervals * DefaultReadIntervals,
-                                ( ( numproc * 4 + 2 ) * ( vints - 2 ) * ( vints - 2 ) +
-                                  12 * numproc * ( vints - 2 ) + 8 * numproc ),
-                                numproc * DefaultReadIntervals * DefaultReadIntervals *
-                                    DefaultReadIntervals };
+    int         expected_num_ents[] = {
+        ( numproc * 4 + 2 ) * DefaultReadIntervals * DefaultReadIntervals,
+        ( ( numproc * 4 + 2 ) * ( vints - 2 ) * ( vints - 2 ) + 12 * numproc * ( vints - 2 ) + 8 * numproc ),
+        numproc * DefaultReadIntervals * DefaultReadIntervals * DefaultReadIntervals };
 
     for( int i = 0; i < 3; i++ )
     {
@@ -1321,20 +1296,18 @@ void test_write_different_element_types( )
 
 Tag get_tag( Interface& mb, int rank, bool create )
 {
-    DataType type = ( DataType )( rank % ( MB_MAX_DATA_TYPE + 1 ) );
-    TagType  storage =
-        ( type == MB_TYPE_BIT ) ? MB_TAG_BIT : ( rank % 2 ) ? MB_TAG_DENSE : MB_TAG_SPARSE;
+    DataType           type = ( DataType )( rank % ( MB_MAX_DATA_TYPE + 1 ) );
+    TagType            storage = ( type == MB_TYPE_BIT ) ? MB_TAG_BIT : ( rank % 2 ) ? MB_TAG_DENSE : MB_TAG_SPARSE;
     int                len = rank % 3 + 1;
     TagType            cbit = create ? MB_TAG_EXCL : (TagType)0;
     TagType            vbit = rank % 4 == 1 && storage != MB_TAG_BIT ? MB_TAG_VARLEN : (TagType)0;
     std::ostringstream name;
     name << "TestTag" << rank;
-    const void*         defval = 0;
-    const int           defint[] = { static_cast< int >( rank ), static_cast< int >( rank / 2 ),
-                           static_cast< int >( rank + 1 ), static_cast< int >( rank - 1 ) };
-    const double        defreal[] = { 0.1 * rank, 1.0 / rank, static_cast< double >( -rank ),
-                               static_cast< double >( rank ) };
-    const int           defhandle[] = { 0, 0, 0, 0 };
+    const void* defval = 0;
+    const int   defint[] = { static_cast< int >( rank ), static_cast< int >( rank / 2 ), static_cast< int >( rank + 1 ),
+                           static_cast< int >( rank - 1 ) };
+    const double defreal[] = { 0.1 * rank, 1.0 / rank, static_cast< double >( -rank ), static_cast< double >( rank ) };
+    const int    defhandle[] = { 0, 0, 0, 0 };
     const unsigned char defbit = 0x1;
     const char          defopq[] = "Jason";
     if( rank % 4 < 2 )
@@ -1360,8 +1333,7 @@ Tag get_tag( Interface& mb, int rank, bool create )
     }
 
     Tag       result;
-    ErrorCode rval =
-        mb.tag_get_handle( name.str( ).c_str( ), len, type, result, storage | cbit | vbit, defval );CHECK_ERR( rval );
+    ErrorCode rval = mb.tag_get_handle( name.str( ).c_str( ), len, type, result, storage | cbit | vbit, defval );CHECK_ERR( rval );
     return result;
 }
 
@@ -1408,8 +1380,7 @@ void test_write_polygons( )
         { -1, 0, static_cast< double >( rank ) },
         { static_cast< double >( -r ), static_cast< double >( -r ), static_cast< double >( rank ) },
         { 0, -1, static_cast< double >( rank ) },
-        { static_cast< double >( r ), static_cast< double >( -r ),
-          static_cast< double >( rank ) } };
+        { static_cast< double >( r ), static_cast< double >( -r ), static_cast< double >( rank ) } };
     const int                   nvtx = rank % 4 + 5;
     std::vector< EntityHandle > conn( nvtx );
     for( int i = 0; i < nvtx; ++i )
@@ -1555,8 +1526,7 @@ void test_write_dense_tags( )
     const char*  tagname = "element_tag";
     const double defVal = 0.;
     Tag          fieldTag;
-    rval = moab.tag_get_handle( tagname, 1, MB_TYPE_DOUBLE, fieldTag, MB_TAG_DENSE | MB_TAG_CREAT,
-                                &defVal );CHECK_ERR( rval );
+    rval = moab.tag_get_handle( tagname, 1, MB_TYPE_DOUBLE, fieldTag, MB_TAG_DENSE | MB_TAG_CREAT, &defVal );CHECK_ERR( rval );
 
     int numElems = (int)elems.size( );
 

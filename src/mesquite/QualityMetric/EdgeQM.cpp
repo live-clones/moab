@@ -40,14 +40,12 @@ namespace MBMesquite
 
 EdgeQM::~EdgeQM( ) {}
 
-void EdgeQM::get_evaluations( PatchData& pd, std::vector< size_t >& handles,
-                              bool free_vertices_only, MsqError& err )
+void EdgeQM::get_evaluations( PatchData& pd, std::vector< size_t >& handles, bool free_vertices_only, MsqError& err )
 {
     get_edge_evaluations( pd, handles, free_vertices_only, false, err );
 }
 
-void EdgeQM::get_single_pass( PatchData& pd, std::vector< size_t >& handles,
-                              bool free_vertices_only, MsqError& err )
+void EdgeQM::get_single_pass( PatchData& pd, std::vector< size_t >& handles, bool free_vertices_only, MsqError& err )
 {
     get_edge_evaluations( pd, handles, free_vertices_only, true, err );
 }
@@ -68,13 +66,12 @@ inline bool operator==( const EdgeData& e1, const EdgeData& e2 )
     return e1.endVtx == e2.endVtx;
 }
 
-void EdgeQM::get_edge_evaluations( PatchData& pd, std::vector< size_t >& handles,
-                                   bool free_vertices_only, bool single_pass_evaluate,
-                                   MsqError& err )
+void EdgeQM::get_edge_evaluations( PatchData& pd, std::vector< size_t >& handles, bool free_vertices_only,
+                                   bool single_pass_evaluate, MsqError& err )
 {
     std::vector< EdgeData > vtx_edges;
-    size_t n_verts = free_vertices_only ? pd.num_free_vertices( ) : pd.num_nodes( );
-    size_t n_cutoff = single_pass_evaluate ? pd.num_nodes( ) : n_verts;
+    size_t                  n_verts = free_vertices_only ? pd.num_free_vertices( ) : pd.num_nodes( );
+    size_t                  n_cutoff = single_pass_evaluate ? pd.num_nodes( ) : n_verts;
     handles.clear( );
 
     for( size_t i = 0; i < n_verts; ++i )
@@ -93,8 +90,7 @@ void EdgeQM::get_edge_evaluations( PatchData& pd, std::vector< size_t >& handles
             unsigned       n_edges = TopologyInfo::edges( elem.get_element_type( ) );
             for( unsigned k = 0; k < n_edges; ++k )
             {
-                const unsigned* edge =
-                    TopologyInfo::edge_vertices( elem.get_element_type( ), k, err );MSQ_ERRRTN( err );
+                const unsigned* edge = TopologyInfo::edge_vertices( elem.get_element_type( ), k, err );MSQ_ERRRTN( err );
 
                 size_t vtx1 = elem.get_vertex_index_array( )[ edge[ 0 ] ];
                 size_t vtx2 = elem.get_vertex_index_array( )[ edge[ 1 ] ];
@@ -131,8 +127,8 @@ void EdgeQM::get_edge_evaluations( PatchData& pd, std::vector< size_t >& handles
     }  // end for each (free) vertex
 }
 
-bool EdgeQM::evaluate_with_indices( PatchData& pd, size_t p_handle, double& value,
-                                    std::vector< size_t >& indices, MsqError& err )
+bool EdgeQM::evaluate_with_indices( PatchData& pd, size_t p_handle, double& value, std::vector< size_t >& indices,
+                                    MsqError& err )
 {
     const MsqMeshEntity& element = pd.element_by_index( elem( p_handle ) );
     EntityTopology       type = element.get_element_type( );

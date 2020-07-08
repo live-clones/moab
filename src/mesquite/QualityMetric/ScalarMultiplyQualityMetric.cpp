@@ -50,29 +50,24 @@ void ScalarMultiplyQualityMetric::get_evaluations( PatchData& pd, std::vector< s
     mMetric->get_evaluations( pd, handles, free_vertices_only, err );MSQ_CHKERR( err );
 }
 
-bool ScalarMultiplyQualityMetric::evaluate( PatchData& pd, size_t handle, double& value,
-                                            MsqError& err )
+bool ScalarMultiplyQualityMetric::evaluate( PatchData& pd, size_t handle, double& value, MsqError& err )
 {
     bool rval = mMetric->evaluate( pd, handle, value, err );
     value *= mScale;
     return rval;
 }
 
-bool ScalarMultiplyQualityMetric::evaluate_with_indices( PatchData& pd, size_t handle,
-                                                         double&                value,
-                                                         std::vector< size_t >& indices,
-                                                         MsqError&              err )
+bool ScalarMultiplyQualityMetric::evaluate_with_indices( PatchData& pd, size_t handle, double& value,
+                                                         std::vector< size_t >& indices, MsqError& err )
 {
     bool rval = mMetric->evaluate_with_indices( pd, handle, value, indices, err );
     value *= mScale;
     return !MSQ_CHKERR( err ) && rval;
 }
 
-bool ScalarMultiplyQualityMetric::evaluate_with_gradient( PatchData& pd, size_t handle,
-                                                          double&                  value,
+bool ScalarMultiplyQualityMetric::evaluate_with_gradient( PatchData& pd, size_t handle, double& value,
                                                           std::vector< size_t >&   indices,
-                                                          std::vector< Vector3D >& gradient,
-                                                          MsqError&                err )
+                                                          std::vector< Vector3D >& gradient, MsqError& err )
 {
     bool rval = mMetric->evaluate_with_gradient( pd, handle, value, indices, gradient, err );
     value *= mScale;
@@ -81,12 +76,12 @@ bool ScalarMultiplyQualityMetric::evaluate_with_gradient( PatchData& pd, size_t 
     return !MSQ_CHKERR( err ) && rval;
 }
 
-bool ScalarMultiplyQualityMetric::evaluate_with_Hessian(
-    PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
-    std::vector< Vector3D >& gradient, std::vector< Matrix3D >& Hessian, MsqError& err )
+bool ScalarMultiplyQualityMetric::evaluate_with_Hessian( PatchData& pd, size_t handle, double& value,
+                                                         std::vector< size_t >&   indices,
+                                                         std::vector< Vector3D >& gradient,
+                                                         std::vector< Matrix3D >& Hessian, MsqError& err )
 {
-    bool rval =
-        mMetric->evaluate_with_Hessian( pd, handle, value, indices, gradient, Hessian, err );
+    bool rval = mMetric->evaluate_with_Hessian( pd, handle, value, indices, gradient, Hessian, err );
     value *= mScale;
     for( std::vector< Vector3D >::iterator i = gradient.begin( ); i != gradient.end( ); ++i )
         *i *= mScale;

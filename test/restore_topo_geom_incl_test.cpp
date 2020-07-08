@@ -16,19 +16,18 @@ Tag name_tag;
 Tag obj_name_tag;
 Tag dim_tag, id_tag;
 
-bool check_tree( Interface* mbi, GeomTopoTool* GTT, std::map< int, std::set< int > >& ref_map );
+bool      check_tree( Interface* mbi, GeomTopoTool* GTT, std::map< int, std::set< int > >& ref_map );
 ErrorCode get_all_handles( Interface* mbi );
 Range     get_children_by_dimension( Interface* mbi, EntityHandle parent, int desired_dimension );
-void      heappermute( Interface* mbi, int v[], int n, std::map< int, std::set< int > > ref_map,
-                       int len );
+void      heappermute( Interface* mbi, int v[], int n, std::map< int, std::set< int > > ref_map, int len );
 void      swap( int* x, int* y );
 void      get_cube_info( int cube_id, std::vector< double >& scale, std::vector< double >& trans );
 void      test_two_cubes( );
 void      test_three_cubes( );
 void      test_four_cubes( );
 
-ErrorCode build_cube( Interface* mbi, std::vector< double > scale_vec,
-                      std::vector< double > trans_vec, int object_id, EntityHandle& volume )
+ErrorCode build_cube( Interface* mbi, std::vector< double > scale_vec, std::vector< double > trans_vec, int object_id,
+                      EntityHandle& volume )
 {
     GeomTopoTool* GTT = new GeomTopoTool( mbi );
 
@@ -97,8 +96,7 @@ ErrorCode build_cube( Interface* mbi, std::vector< double > scale_vec,
     // create triangles and add to meshset
     for( int i = 0; i < num_tris; ++i )
     {
-        const EntityHandle conn[] = { verts[ connectivity[ 3 * i ] ],
-                                      verts[ connectivity[ 3 * i + 1 ] ],
+        const EntityHandle conn[] = { verts[ connectivity[ 3 * i ] ], verts[ connectivity[ 3 * i + 1 ] ],
                                       verts[ connectivity[ 3 * i + 2 ] ] };
         rval = mbi->create_element( MBTRI, conn, 3, tris[ i ] );MB_CHK_ERR( rval );
 
@@ -152,15 +150,13 @@ ErrorCode get_all_handles( Interface* mbi )
 {
     ErrorCode rval;
 
-    rval = mbi->tag_get_handle( NAME_TAG_NAME, NAME_TAG_SIZE, MB_TYPE_OPAQUE, name_tag,
-                                MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_ERR( rval );
+    rval = mbi->tag_get_handle( NAME_TAG_NAME, NAME_TAG_SIZE, MB_TYPE_OPAQUE, name_tag, MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_ERR( rval );
 
-    rval = mbi->tag_get_handle( "OBJECT_NAME", 32, MB_TYPE_OPAQUE, obj_name_tag,
-                                MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_ERR( rval );
+    rval = mbi->tag_get_handle( "OBJECT_NAME", 32, MB_TYPE_OPAQUE, obj_name_tag, MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_ERR( rval );
 
     int negone = -1;
-    rval = mbi->tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, geom_tag,
-                                MB_TAG_SPARSE | MB_TAG_CREAT, &negone );MB_CHK_ERR( rval );
+    rval = mbi->tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, geom_tag, MB_TAG_SPARSE | MB_TAG_CREAT,
+                                &negone );MB_CHK_ERR( rval );
 
     id_tag = mbi->globalId_tag( );
 
@@ -367,8 +363,7 @@ void test_four_cubes( )
    This function is a modification of code found here:
    http://www.sanfoundry.com/c-program-implement-heap-algorithm-permutation-n-numbers
 */
-void heappermute( Interface* mbi, int v[], int n, std::map< int, std::set< int > > ref_map,
-                  int len )
+void heappermute( Interface* mbi, int v[], int n, std::map< int, std::set< int > > ref_map, int len )
 {
 
     ErrorCode             rval;

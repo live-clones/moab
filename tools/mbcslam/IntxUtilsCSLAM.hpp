@@ -33,15 +33,13 @@ class IntxUtilsCSLAM
 
     // looking at DP tag, create the spanning quads, write a file (with rank) and
     // then delete the new entities (vertices) and the set of quads
-    static moab::ErrorCode create_span_quads( moab::Interface* mb, moab::EntityHandle euler_set,
-                                              int rank );
+    static moab::ErrorCode create_span_quads( moab::Interface* mb, moab::EntityHandle euler_set, int rank );
 
     // copy the euler mesh into a new set, lagr_set (or lagr set into a new euler set)
     // it will be used in 3rd method, when the positions of nodes are modified, no new nodes are
     //  created
     // it will also be used to
-    static moab::ErrorCode deep_copy_set( moab::Interface* mb, moab::EntityHandle source,
-                                          moab::EntityHandle dest );
+    static moab::ErrorCode deep_copy_set( moab::Interface* mb, moab::EntityHandle source, moab::EntityHandle dest );
 };
 
 #endif

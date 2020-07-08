@@ -77,8 +77,7 @@ class HalfFacetRep
 {
 
   public:
-    HalfFacetRep( Core* impl, ParallelComm* comm = 0, moab::EntityHandle rset = 0,
-                  bool filter_ghosts = true );
+    HalfFacetRep( Core* impl, ParallelComm* comm = 0, moab::EntityHandle rset = 0, bool filter_ghosts = true );
 
     ~HalfFacetRep( );
 
@@ -105,8 +104,7 @@ class HalfFacetRep
      * \param target_entities Vector in which the adjacent EntityHandle are returned.
      */
 
-    ErrorCode get_adjacencies( const EntityHandle           source_entity,
-                               const unsigned int           target_dimension,
+    ErrorCode get_adjacencies( const EntityHandle source_entity, const unsigned int target_dimension,
                                std::vector< EntityHandle >& target_entities );
 
     //! Get the upward incidences associated with an entity.
@@ -120,9 +118,8 @@ class HalfFacetRep
      * \param lids Vector in which the local id's are returned.
      */
 
-    ErrorCode get_up_adjacencies( EntityHandle ent, int out_dim,
-                                  std::vector< EntityHandle >& adjents,
-                                  std::vector< int >*          lids = NULL );
+    ErrorCode get_up_adjacencies( EntityHandle ent, int out_dim, std::vector< EntityHandle >& adjents,
+                                  std::vector< int >* lids = NULL );
 
     //! Get the same-dimensional entities connected with an entity.
     /** Given an entity of dimension <em>d</em>, gather all the entities connected via <em>d-1</em>
@@ -142,8 +139,7 @@ class HalfFacetRep
      * \param adjents Vector in which the neighbor entities are returned.
      */
 
-    ErrorCode get_down_adjacencies( EntityHandle ent, int out_dim,
-                                    std::vector< EntityHandle >& adjents );
+    ErrorCode get_down_adjacencies( EntityHandle ent, int out_dim, std::vector< EntityHandle >& adjents );
 
     // 1D Maps and queries
 
@@ -252,10 +248,8 @@ class HalfFacetRep
      * \param leids Vector returning local edge ids
      */
 
-    ErrorCode get_up_adjacencies_2d( EntityHandle fid, int leid, bool add_inent,
-                                     std::vector< EntityHandle >& adj_ents,
-                                     std::vector< int >*          adj_leids = NULL,
-                                     std::vector< int >*          adj_orients = NULL );
+    ErrorCode get_up_adjacencies_2d( EntityHandle fid, int leid, bool add_inent, std::vector< EntityHandle >& adj_ents,
+                                     std::vector< int >* adj_leids = NULL, std::vector< int >* adj_orients = NULL );
 
     //! Given an edge, finds edge-connected neighbor face
     /** Given an face, it gathers all the neighbor faces of each local edge of the face.
@@ -351,15 +345,12 @@ class HalfFacetRep
      * input edge \param leids Vector returning local edge ids
      */
 
-    ErrorCode get_up_adjacencies_edg_3d( EntityHandle cid, int leid,
-                                         std::vector< EntityHandle >& adjents,
-                                         std::vector< int >*          leids = NULL,
-                                         std::vector< int >*          adj_orients = NULL );
+    ErrorCode get_up_adjacencies_edg_3d( EntityHandle cid, int leid, std::vector< EntityHandle >& adjents,
+                                         std::vector< int >* leids = NULL, std::vector< int >* adj_orients = NULL );
 
-    ErrorCode get_up_adjacencies_edg_3d_comp( EntityHandle cid, int leid,
-                                              std::vector< EntityHandle >& adjents,
-                                              std::vector< int >*          leids = NULL,
-                                              std::vector< int >*          adj_orients = NULL );
+    ErrorCode get_up_adjacencies_edg_3d_comp( EntityHandle cid, int leid, std::vector< EntityHandle >& adjents,
+                                              std::vector< int >* leids = NULL,
+                                              std::vector< int >* adj_orients = NULL );
 
     //! Given an face, finds the cells incident on it.
     /** Given an face, it first finds a matching half-face in a cell corresponding to face, and then
@@ -384,9 +375,8 @@ class HalfFacetRep
      * input face \param lfids Vector returning local face ids
      */
 
-    ErrorCode get_up_adjacencies_face_3d( EntityHandle cid, int lfid,
-                                          std::vector< EntityHandle >& adjents,
-                                          std::vector< int >*          lfids = NULL );
+    ErrorCode get_up_adjacencies_face_3d( EntityHandle cid, int lfid, std::vector< EntityHandle >& adjents,
+                                          std::vector< int >* lfids = NULL );
 
     //! Given a cell, finds face-connected neighbor cells
     /** Given a cell, it gathers all the neighbor cells of each local face of the cell.
@@ -415,15 +405,13 @@ class HalfFacetRep
      * \param adjents Vector returning its faces
      */
 
-    ErrorCode get_down_adjacencies_face_3d( EntityHandle                 cid,
-                                            std::vector< EntityHandle >& adjents );
+    ErrorCode get_down_adjacencies_face_3d( EntityHandle cid, std::vector< EntityHandle >& adjents );
 
     /* Find the number of edges and faces of given range of cells
      * */
     ErrorCode find_total_edges_faces_3d( Range cells, int* nedges, int* nfaces );
 
-    ErrorCode count_subentities( Range& edges, Range& faces, Range& cells, int* nedges,
-                                 int* nfaces );
+    ErrorCode count_subentities( Range& edges, Range& faces, Range& cells, int* nedges, int* nfaces );
 
     void get_memory_use( unsigned long long& entity_total, unsigned long long& memory_total );
 
@@ -441,29 +429,24 @@ class HalfFacetRep
 
     ErrorCode update_entity_ranges( EntityHandle fileset );
 
-    ErrorCode resize_hf_maps( EntityHandle start_vert, int nverts, EntityHandle start_edge,
-                              int nedges, EntityHandle start_face, int nfaces,
-                              EntityHandle start_cell, int ncells );
+    ErrorCode resize_hf_maps( EntityHandle start_vert, int nverts, EntityHandle start_edge, int nedges,
+                              EntityHandle start_face, int nfaces, EntityHandle start_cell, int ncells );
 
-    ErrorCode get_sibling_map( EntityType type, EntityHandle ent, EntityHandle* sib_entids,
-                               int* sib_lids, int num_halffacets );
+    ErrorCode get_sibling_map( EntityType type, EntityHandle ent, EntityHandle* sib_entids, int* sib_lids,
+                               int num_halffacets );
 
-    ErrorCode get_sibling_map( EntityType type, EntityHandle ent, int lid, EntityHandle& sib_entid,
-                               int& sib_lid );
+    ErrorCode get_sibling_map( EntityType type, EntityHandle ent, int lid, EntityHandle& sib_entid, int& sib_lid );
 
-    ErrorCode set_sibling_map( EntityType type, EntityHandle ent, EntityHandle* set_entids,
-                               int* set_lids, int num_halffacets );
+    ErrorCode set_sibling_map( EntityType type, EntityHandle ent, EntityHandle* set_entids, int* set_lids,
+                               int num_halffacets );
 
-    ErrorCode set_sibling_map( EntityType type, EntityHandle ent, int lid, EntityHandle& set_entid,
-                               int& set_lid );
+    ErrorCode set_sibling_map( EntityType type, EntityHandle ent, int lid, EntityHandle& set_entid, int& set_lid );
 
-    ErrorCode get_incident_map( EntityType type, EntityHandle vid,
-                                std::vector< EntityHandle >& inci_entid,
-                                std::vector< int >&          inci_lid );
+    ErrorCode get_incident_map( EntityType type, EntityHandle vid, std::vector< EntityHandle >& inci_entid,
+                                std::vector< int >& inci_lid );
 
-    ErrorCode set_incident_map( EntityType type, EntityHandle vid,
-                                std::vector< EntityHandle >& set_entid,
-                                std::vector< int >&          set_lid );
+    ErrorCode set_incident_map( EntityType type, EntityHandle vid, std::vector< EntityHandle >& set_entid,
+                                std::vector< int >& set_lid );
 
     bool check_nonmanifold_vertices( EntityType type, EntityHandle vid );
 
@@ -618,16 +601,15 @@ class HalfFacetRep
      * sharing the vertex
      */
 
-    ErrorCode gather_halfedges( EntityHandle vid, EntityHandle he_fid, int he_lid, int* qsize,
-                                int* count );
+    ErrorCode gather_halfedges( EntityHandle vid, EntityHandle he_fid, int he_lid, int* qsize, int* count );
 
     //! Obtains another half-edge belonging to the same face as the input half-edge
     /** It uses the local maps to find another half-edge that is either incident or outgoing
      * depending on vid and input half-edge
      */
 
-    ErrorCode another_halfedge( EntityHandle vid, EntityHandle he_fid, int he_lid,
-                                EntityHandle* he2_fid, int* he2_lid );
+    ErrorCode another_halfedge( EntityHandle vid, EntityHandle he_fid, int he_lid, EntityHandle* he2_fid,
+                                int* he2_lid );
 
     ErrorCode mark_halfedges( EntityHandle vid, EntityHandle he_fid, int he_lid, Range& faces,
                               std::vector< char >& markHEdgs, HFacet& bnd_hf );
@@ -638,12 +620,11 @@ class HalfFacetRep
      * a match.
      */
 
-    bool collect_and_compare( const EntityHandle vid, const EntityHandle* edg_vert, int* qsize,
-                              int* count, EntityHandle* he_fid, int* he_lid );
+    bool collect_and_compare( const EntityHandle vid, const EntityHandle* edg_vert, int* qsize, int* count,
+                              EntityHandle* he_fid, int* he_lid );
 
     ErrorCode add_cells_of_single_component( EntityHandle vid, EntityHandle curcid, int curlid,
-                                             std::multimap< EntityHandle, EntityHandle >& comps,
-                                             HFacet&                                      hf );
+                                             std::multimap< EntityHandle, EntityHandle >& comps, HFacet& hf );
     bool      find_cell_in_component( EntityHandle vid, EntityHandle cell,
                                       std::multimap< EntityHandle, EntityHandle >& comps );
 
@@ -672,8 +653,8 @@ class HalfFacetRep
 
     bool find_matching_halfface( EntityHandle fid, EntityHandle* cid, int* leid );
 
-    bool find_match_in_array( EntityHandle ent, EntityHandle* ent_list, int count,
-                              bool get_index = false, int* index = NULL );
+    bool find_match_in_array( EntityHandle ent, EntityHandle* ent_list, int count, bool get_index = false,
+                              int* index = NULL );
 };
 
 }  // namespace moab

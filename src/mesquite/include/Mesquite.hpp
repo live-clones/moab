@@ -126,8 +126,8 @@ MESQUITE_EXPORT MBMesquite::ReleaseType release_type( );
 const bool OF_FREE_EVALS_ONLY = true;
 
 // GLOBAL variables
-const int MSQ_MAX_NUM_VERT_PER_ENT = 8;
-const int MSQ_HIST_SIZE = 7;  // number of division in histogram
+const int           MSQ_MAX_NUM_VERT_PER_ENT = 8;
+const int           MSQ_HIST_SIZE = 7;  // number of division in histogram
 static const double MSQ_SQRT_TWO = std::sqrt( 2.0 );
 static const double MSQ_SQRT_THREE = std::sqrt( 3.0 );
 static const double MSQ_SQRT_THREE_DIV_TWO = MSQ_SQRT_THREE / 2.0;
@@ -245,8 +245,7 @@ template< typename T > inline T* arrptr( std::vector< T >& v, bool check_zero_si
     assert( !v.empty( ) );
     return &v[ 0 ];
 }
-template< typename T >
-inline const T* arrptr( const std::vector< T >& v, bool check_zero_size = false )
+template< typename T > inline const T* arrptr( const std::vector< T >& v, bool check_zero_size = false )
 {
     if( check_zero_size && !v.size( ) ) return 0;
     assert( !v.empty( ) );

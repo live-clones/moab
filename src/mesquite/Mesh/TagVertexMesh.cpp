@@ -65,18 +65,16 @@ void TagVertexMesh::initialize( Mesh* mesh, std::string name, MsqError& err )
     Mesh::TagType type;
     unsigned      length;
     tag_properties( tagHandle, t_name, type, length, err );MSQ_ERRRTN( err );
-    if( !( type == Mesh::DOUBLE && length == 3 ) &&
-        !( type == Mesh::BYTE && length == 3 * sizeof( double ) ) )
+    if( !( type == Mesh::DOUBLE && length == 3 ) && !( type == Mesh::BYTE && length == 3 * sizeof( double ) ) )
         MSQ_SETERR( err )
-        ( MsqError::TAG_ALREADY_EXISTS, "Tag \"%s\" has invalid type or size.", tagName.c_str( ) );
+    ( MsqError::TAG_ALREADY_EXISTS, "Tag \"%s\" has invalid type or size.", tagName.c_str( ) );
 
     // If tag is already defined and init was true, reset tag
     // values.
     haveTagHandle = true;
 }
 
-double TagVertexMesh::loop_over_mesh( MeshDomainAssoc* mesh_and_domain, const Settings*,
-                                      MsqError&        err )
+double TagVertexMesh::loop_over_mesh( MeshDomainAssoc* mesh_and_domain, const Settings*, MsqError& err )
 {
     Mesh* mesh = mesh_and_domain->get_mesh( );
     if( mesh != get_mesh( ) )
@@ -106,8 +104,7 @@ void TagVertexMesh::copy_all_coordinates( MsqError& err )
     if( handles.empty( ) ) return;
 
     std::vector< MsqVertex > coords( handles.size( ) );
-    get_mesh( )->vertices_get_coordinates( arrptr( handles ), arrptr( coords ), handles.size( ),
-                                           err );MSQ_ERRRTN( err );
+    get_mesh( )->vertices_get_coordinates( arrptr( handles ), arrptr( coords ), handles.size( ), err );MSQ_ERRRTN( err );
 
     std::vector< double >                    data( 3 * handles.size( ) );
     std::vector< double >::iterator          j = data.begin( );
@@ -164,8 +161,7 @@ void TagVertexMesh::clear( MsqError& err )
     }
 }
 
-void TagVertexMesh::vertices_get_coordinates( const VertexHandle vert_array[],
-                                              MsqVertex* coordinates, size_t num_vtx,
+void TagVertexMesh::vertices_get_coordinates( const VertexHandle vert_array[], MsqVertex* coordinates, size_t num_vtx,
                                               MsqError& err )
 {
     if( !num_vtx ) return;
@@ -188,8 +184,7 @@ void TagVertexMesh::vertices_get_coordinates( const VertexHandle vert_array[],
     }
 }
 
-void TagVertexMesh::vertex_set_coordinates( VertexHandle vertex, const Vector3D& coordinates,
-                                            MsqError& err )
+void TagVertexMesh::vertex_set_coordinates( VertexHandle vertex, const Vector3D& coordinates, MsqError& err )
 {
     if( !haveTagHandle )
     {
@@ -212,8 +207,7 @@ TagHandle TagVertexMesh::tag_create( const std::string& tag_name, TagType type, 
     if( tag_name == tagName )
     {
         MSQ_SETERR( err )
-        ( "Attempt to access internal tag data using tag interface.",
-          MsqError::TAG_ALREADY_EXISTS );
+        ( "Attempt to access internal tag data using tag interface.", MsqError::TAG_ALREADY_EXISTS );
         return (TagHandle)0;
     }
 

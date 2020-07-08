@@ -73,10 +73,8 @@ namespace SysUtil
 
     inline static uint32_t swap_bytes( uint32_t value )
     {
-        return ( ( value /*& (uint32_t)0xFF000000*/ ) >> 24 ) |
-               ( ( value & (uint32_t)0x00FF0000 ) >> 8 ) |
-               ( ( value & (uint32_t)0x0000FF00 ) << 8 ) |
-               ( ( value /*& (uint32_t)0X000000FF*/ ) << 24 );
+        return ( ( value /*& (uint32_t)0xFF000000*/ ) >> 24 ) | ( ( value & (uint32_t)0x00FF0000 ) >> 8 ) |
+               ( ( value & (uint32_t)0x0000FF00 ) << 8 ) | ( ( value /*& (uint32_t)0X000000FF*/ ) << 24 );
     }
 
     const uint64_t m64b1 = 0xFF;
@@ -90,9 +88,8 @@ namespace SysUtil
 
     inline static uint64_t swap_bytes( uint64_t value )
     {
-        return ( ( value /*& m64b8*/ ) >> 56 ) | ( ( value & m64b7 ) >> 40 ) |
-               ( ( value & m64b6 ) >> 24 ) | ( ( value & m64b5 ) >> 8 ) |
-               ( ( value & m64b4 ) << 8 ) | ( ( value & m64b3 ) << 24 ) |
+        return ( ( value /*& m64b8*/ ) >> 56 ) | ( ( value & m64b7 ) >> 40 ) | ( ( value & m64b6 ) >> 24 ) |
+               ( ( value & m64b5 ) >> 8 ) | ( ( value & m64b4 ) << 8 ) | ( ( value & m64b3 ) << 24 ) |
                ( ( value & m64b2 ) << 40 ) | ( ( value /*& m64b1*/ ) << 56 );
     }
     /*

@@ -44,8 +44,7 @@ int main( int argc, char* argv[] )
     int fail = MPI_Init( &argc, &argv );
     if( fail ) return 1;
 #else
-    argv[ 0 ] =
-        argv[ argc - argc ];  // To remove the warnings in serial mode about unused variables
+    argv[ 0 ] = argv[ argc - argc ];  // To remove the warnings in serial mode about unused variables
 #endif
 
     result += RUN_TEST( test_read_eul_all );
@@ -136,9 +135,9 @@ void test_read_eul_onevar( )
         rval = mb.get_entities_by_type( 0, MBQUAD, global_quads );CHECK_ERR( rval );
         CHECK_EQUAL( (size_t)4608, global_quads.size( ) );
 
-        EntityHandle gloabl_quad_ents[] = {
-            global_quads[ 0 ],  global_quads[ 2255 ], global_quads[ 2304 ], global_quads[ 4559 ],
-            global_quads[ 48 ], global_quads[ 2303 ], global_quads[ 2352 ], global_quads[ 4607 ] };
+        EntityHandle gloabl_quad_ents[] = { global_quads[ 0 ],    global_quads[ 2255 ], global_quads[ 2304 ],
+                                            global_quads[ 4559 ], global_quads[ 48 ],   global_quads[ 2303 ],
+                                            global_quads[ 2352 ], global_quads[ 4607 ] };
         rval = mb.tag_get_data( Ttag0, &gloabl_quad_ents[ 0 ], 8, val );
 
         CHECK_REAL_EQUAL( 252.8529, val[ 0 * levels ], eps );  // First global quad
@@ -156,8 +155,8 @@ void test_read_eul_onevar( )
         rval = mb.get_entities_by_type( 0, MBQUAD, local_quads );CHECK_ERR( rval );
         CHECK_EQUAL( (size_t)2304, local_quads.size( ) );
 
-        EntityHandle local_quad_ents[] = { local_quads[ 0 ], local_quads[ 1151 ],
-                                           local_quads[ 1152 ], local_quads[ 2303 ] };
+        EntityHandle local_quad_ents[] = { local_quads[ 0 ], local_quads[ 1151 ], local_quads[ 1152 ],
+                                           local_quads[ 2303 ] };
         rval = mb.tag_get_data( Ttag0, &local_quad_ents[ 0 ], 4, val );
 
         if( 0 == rank )
@@ -326,9 +325,9 @@ void test_read_fv_onevar( )
         rval = mb.get_entities_by_type( 0, MBQUAD, global_quads );CHECK_ERR( rval );
         CHECK_EQUAL( (size_t)3312, global_quads.size( ) );
 
-        EntityHandle gloabl_quad_ents[] = {
-            global_quads[ 0 ],  global_quads[ 1619 ], global_quads[ 1656 ], global_quads[ 3275 ],
-            global_quads[ 36 ], global_quads[ 1655 ], global_quads[ 1692 ], global_quads[ 3311 ] };
+        EntityHandle gloabl_quad_ents[] = { global_quads[ 0 ],    global_quads[ 1619 ], global_quads[ 1656 ],
+                                            global_quads[ 3275 ], global_quads[ 36 ],   global_quads[ 1655 ],
+                                            global_quads[ 1692 ], global_quads[ 3311 ] };
         rval = mb.tag_get_data( Ttag0, &gloabl_quad_ents[ 0 ], 8, val );
 
         CHECK_REAL_EQUAL( 253.6048, val[ 0 * levels ], eps );  // First global quad

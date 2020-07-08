@@ -12,8 +12,7 @@
 namespace moab
 {
 
-SharedSetData::SharedSetData( Interface& moab, int pcID, unsigned rank )
-    : mb( moab ), sharedSetTag( 0 )
+SharedSetData::SharedSetData( Interface& moab, int pcID, unsigned rank ) : mb( moab ), sharedSetTag( 0 )
 {
     SharedSetTagData zero;
 
@@ -29,9 +28,8 @@ SharedSetData::SharedSetData( Interface& moab, int pcID, unsigned rank )
     // pcID can be at most 64, it ranges from 0 to 63; problems appear at migrate mesh
     std::ostringstream sharedTagUniqueName;
     sharedTagUniqueName << "__sharedSetTag" << pcID;
-    ErrorCode rval =
-        mb.tag_get_handle( sharedTagUniqueName.str( ).c_str( ), sizeof( SharedSetTagData ),
-                           MB_TYPE_OPAQUE, sharedSetTag, MB_TAG_CREAT | MB_TAG_SPARSE, &zero );
+    ErrorCode rval = mb.tag_get_handle( sharedTagUniqueName.str( ).c_str( ), sizeof( SharedSetTagData ), MB_TYPE_OPAQUE,
+                                        sharedSetTag, MB_TAG_CREAT | MB_TAG_SPARSE, &zero );
     assert( MB_SUCCESS == rval );
     if( MB_SUCCESS != rval )
     {
@@ -54,8 +52,7 @@ ErrorCode SharedSetData::get_owning_procs( std::vector< unsigned >& ranks_out ) 
     return MB_SUCCESS;
 }
 
-ErrorCode SharedSetData::get_sharing_procs( EntityHandle             entity_set,
-                                            std::vector< unsigned >& ranks_out ) const
+ErrorCode SharedSetData::get_sharing_procs( EntityHandle entity_set, std::vector< unsigned >& ranks_out ) const
 {
     ErrorCode        rval;
     SharedSetTagData data;
@@ -91,8 +88,7 @@ ErrorCode SharedSetData::get_shared_sets( unsigned rank, Range& sets_out ) const
     //  }
 }
 
-ErrorCode SharedSetData::get_owner( EntityHandle entity_set, unsigned& rank_out,
-                                    EntityHandle& remote_handle_out ) const
+ErrorCode SharedSetData::get_owner( EntityHandle entity_set, unsigned& rank_out, EntityHandle& remote_handle_out ) const
 {
     ErrorCode        rval;
     SharedSetTagData data;
@@ -131,8 +127,7 @@ ErrorCode SharedSetData::get_local_handle( unsigned owner_rank, EntityHandle rem
     return MB_SUCCESS;
 }
 
-ErrorCode SharedSetData::set_owner( EntityHandle set, unsigned owner_rank,
-                                    EntityHandle owner_handle )
+ErrorCode SharedSetData::set_owner( EntityHandle set, unsigned owner_rank, EntityHandle owner_handle )
 {
     ErrorCode        rval;
     SharedSetTagData data;
@@ -159,8 +154,7 @@ ErrorCode SharedSetData::set_owner( EntityHandle set, unsigned owner_rank,
     return MB_SUCCESS;
 }
 
-ErrorCode SharedSetData::set_sharing_procs( EntityHandle             entity_set,
-                                            std::vector< unsigned >& ranks )
+ErrorCode SharedSetData::set_sharing_procs( EntityHandle entity_set, std::vector< unsigned >& ranks )
 {
     std::sort( ranks.begin( ), ranks.end( ) );
     RProcMap::iterator it = procListMap.insert( ranks ).first;

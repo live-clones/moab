@@ -20,8 +20,7 @@ namespace moab
 {
 
 MergeMesh::MergeMesh( Interface* impl, bool printErrorIn )
-    : mbImpl( impl ), mbMergeTag( 0 ), mergeTol( 0.001 ), mergeTolSq( 0.000001 ),
-      printError( printErrorIn )
+    : mbImpl( impl ), mbMergeTag( 0 ), mergeTol( 0.001 ), mergeTolSq( 0.000001 ), printError( printErrorIn )
 {
 }
 
@@ -31,16 +30,14 @@ MergeMesh::~MergeMesh( )
     mbMergeTag = NULL;
 }
 
-ErrorCode MergeMesh::merge_entities( EntityHandle* elems, int elems_size, const double merge_tol,
-                                     const int do_merge, const int update_sets, Tag merge_tag,
-                                     bool do_higher_dim )
+ErrorCode MergeMesh::merge_entities( EntityHandle* elems, int elems_size, const double merge_tol, const int do_merge,
+                                     const int update_sets, Tag merge_tag, bool do_higher_dim )
 {
     mergeTol = merge_tol;
     mergeTolSq = merge_tol * merge_tol;
     Range tmp_elems;
     tmp_elems.insert( elems, elems + elems_size );
-    ErrorCode result = merge_entities( tmp_elems, merge_tol, do_merge, update_sets, (Tag)merge_tag,
-                                       do_higher_dim );
+    ErrorCode result = merge_entities( tmp_elems, merge_tol, do_merge, update_sets, (Tag)merge_tag, do_higher_dim );
 
     return result;
 }
@@ -55,8 +52,8 @@ ErrorCode MergeMesh::merge_entities( EntityHandle* elems, int elems_size, const 
  throw MKException(iBase_FAILURE, "");
  }*/
 
-ErrorCode MergeMesh::merge_entities( Range& elems, const double merge_tol, const int do_merge,
-                                     const int, Tag merge_tag, bool merge_higher_dim )
+ErrorCode MergeMesh::merge_entities( Range& elems, const double merge_tol, const int do_merge, const int, Tag merge_tag,
+                                     bool merge_higher_dim )
 {
     // If merge_higher_dim is true, do_merge must also be true
     if( merge_higher_dim && !do_merge ) { return MB_FAILURE; }
@@ -74,8 +71,8 @@ ErrorCode MergeMesh::merge_entities( Range& elems, const double merge_tol, const
     EntityHandle tree_root = 0;
     if( 0 == merge_tag )
     {
-        result = mbImpl->tag_get_handle( "__merge_tag", 1, MB_TYPE_HANDLE, mbMergeTag,
-                                         MB_TAG_DENSE | MB_TAG_EXCL, &tree_root );
+        result = mbImpl->tag_get_handle( "__merge_tag", 1, MB_TYPE_HANDLE, mbMergeTag, MB_TAG_DENSE | MB_TAG_EXCL,
+                                         &tree_root );
         if( MB_SUCCESS != result ) return result;
     }
     else
@@ -112,8 +109,8 @@ ErrorCode MergeMesh::merge_all( EntityHandle meshset, const double merge_tol )
     if( 0 == mbMergeTag )
     {
         EntityHandle def_val = 0;
-        rval = mbImpl->tag_get_handle( "__merge_tag", 1, MB_TYPE_HANDLE, mbMergeTag,
-                                       MB_TAG_DENSE | MB_TAG_EXCL, &def_val );MB_CHK_ERR( rval );
+        rval = mbImpl->tag_get_handle( "__merge_tag", 1, MB_TYPE_HANDLE, mbMergeTag, MB_TAG_DENSE | MB_TAG_EXCL,
+                                       &def_val );MB_CHK_ERR( rval );
     }
     // get all entities;
     // get all vertices connected
@@ -154,9 +151,7 @@ ErrorCode MergeMesh::perform_merge( Tag merge_tag )
     ErrorCode result;
     if( deadEnts.size( ) == 0 )
     {
-        if( printError )
-            std::cout << "\nWarning: Geometries don't have a common face; Nothing to merge"
-                      << std::endl;
+        if( printError ) std::cout << "\nWarning: Geometries don't have a common face; Nothing to merge" << std::endl;
         return MB_SUCCESS;  // nothing to merge carry on with the program
     }
     if( mbImpl->type_from_handle( *deadEnts.rbegin( ) ) != MBVERTEX ) return MB_FAILURE;
@@ -169,8 +164,7 @@ ErrorCode MergeMesh::perform_merge( Tag merge_tag )
     for( rit = deadEnts.begin( ), i = 0; rit != deadEnts.end( ); ++rit, i++ )
     {
         assert( merge_tag_val[ i ] );
-        if( MBVERTEX == TYPE_FROM_HANDLE( merge_tag_val[ i ] ) )
-            mergedToVertices.insert( merge_tag_val[ i ] );
+        if( MBVERTEX == TYPE_FROM_HANDLE( merge_tag_val[ i ] ) ) mergedToVertices.insert( merge_tag_val[ i ] );
         result = mbImpl->merge_entities( merge_tag_val[ i ], *rit, false, false );
         if( MB_SUCCESS != result ) { return result; }
     }
@@ -213,8 +207,8 @@ ErrorCode MergeMesh::merge_using_integer_tag( Range& verts, Tag user_tag, Tag me
     if( 0 == merge_tag )
     {
         EntityHandle def_val = 0;
-        rval = mbImpl->tag_get_handle( "__merge_tag", 1, MB_TYPE_HANDLE, mbMergeTag,
-                                       MB_TAG_DENSE | MB_TAG_EXCL, &def_val );
+        rval = mbImpl->tag_get_handle( "__merge_tag", 1, MB_TYPE_HANDLE, mbMergeTag, MB_TAG_DENSE | MB_TAG_EXCL,
+                                       &def_val );
         if( MB_SUCCESS != rval ) return rval;
     }
     else
@@ -295,11 +289,10 @@ ErrorCode MergeMesh::find_merged_to( EntityHandle& tree_root, AdaptiveKDTree& tr
 
             // check close-by leaves too
             leaves_out.clear( );
-            result = tree.distance_search( from.array( ), mergeTol, leaves_out, mergeTol, 1.0e-6,
-                                           NULL, NULL, &tree_root );
+            result =
+                tree.distance_search( from.array( ), mergeTol, leaves_out, mergeTol, 1.0e-6, NULL, NULL, &tree_root );
             leaf_range2.clear( );
-            for( std::vector< EntityHandle >::iterator vit = leaves_out.begin( );
-                 vit != leaves_out.end( ); ++vit )
+            for( std::vector< EntityHandle >::iterator vit = leaves_out.begin( ); vit != leaves_out.end( ); ++vit )
             {
                 if( *vit > *it )
                 {  // if we haven't visited this leaf yet in the outer loop
@@ -338,8 +331,7 @@ ErrorCode MergeMesh::find_merged_to( EntityHandle& tree_root, AdaptiveKDTree& tr
             }
             if( outleaf_merged )
             {
-                result = mbImpl->tag_set_data( merge_tag, leaf_range2,
-                                               &merge_tag_val[ leaf_range.size( ) ] );
+                result = mbImpl->tag_set_data( merge_tag, leaf_range2, &merge_tag_val[ leaf_range.size( ) ] );
                 if( MB_SUCCESS != result ) return result;
                 outleaf_merged = false;
             }
@@ -374,13 +366,11 @@ ErrorCode MergeMesh::merge_higher_dimensions( Range& elems )
     {
         moreDeadEnts.clear( );
         possibleEntsToMerge.clear( );
-        result = mbImpl->get_adjacencies( vertsOfInterest, dim, false, possibleEntsToMerge,
-                                          Interface::UNION );
+        result = mbImpl->get_adjacencies( vertsOfInterest, dim, false, possibleEntsToMerge, Interface::UNION );
         if( MB_SUCCESS != result ) return result;
         // Go through each possible entity and see if it shares vertices with another entity of same
         // dimension
-        for( Range::iterator pit = possibleEntsToMerge.begin( ); pit != possibleEntsToMerge.end( );
-             ++pit )
+        for( Range::iterator pit = possibleEntsToMerge.begin( ); pit != possibleEntsToMerge.end( ); ++pit )
         {
             EntityHandle eh = *pit;  // possible entity to be matched
             conn.clear( );
@@ -394,8 +384,7 @@ ErrorCode MergeMesh::merge_higher_dimensions( Range& elems )
             if( MB_SUCCESS != result ) return result;
             if( matches.size( ) > 1 )
             {
-                for( Range::iterator matchIt = matches.begin( ); matchIt != matches.end( );
-                     ++matchIt )
+                for( Range::iterator matchIt = matches.begin( ); matchIt != matches.end( ); ++matchIt )
                 {
                     EntityHandle to_remove = *matchIt;
                     if( to_remove != eh )

@@ -34,8 +34,8 @@
 
 static int make_hdf_group( const char* path, hid_t file, size_t size, mhdf_Status* status );
 
-mhdf_FileHandle mhdf_createFile( const char* filename, int overwrite, const char** elem_type_list,
-                                 size_t elem_list_len, hid_t id_type, mhdf_Status* status )
+mhdf_FileHandle mhdf_createFile( const char* filename, int overwrite, const char** elem_type_list, size_t elem_list_len,
+                                 hid_t id_type, mhdf_Status* status )
 {
     FileHandle*   file_ptr;
     unsigned int  flags;
@@ -86,8 +86,7 @@ mhdf_FileHandle mhdf_createFile( const char* filename, int overwrite, const char
 #else
     group_id = H5Gopen( file_ptr->hdf_handle, ROOT_GROUP );
 #endif
-    rval = mhdf_create_scalar_attrib( group_id, MAX_ID_ATTRIB, H5T_NATIVE_ULONG, &file_ptr->max_id,
-                                      status );
+    rval = mhdf_create_scalar_attrib( group_id, MAX_ID_ATTRIB, H5T_NATIVE_ULONG, &file_ptr->max_id, status );
     H5Gclose( group_id );
     if( !rval )
     {
@@ -119,8 +118,7 @@ mhdf_FileHandle mhdf_createFile( const char* filename, int overwrite, const char
         }
     }
 #if defined( H5Tcommit_vers ) && H5Tcommit_vers > 1
-    if( H5Tcommit2( file_ptr->hdf_handle, TYPE_ENUM_PATH, enum_id, H5P_DEFAULT, H5P_DEFAULT,
-                    H5P_DEFAULT ) < 0 )
+    if( H5Tcommit2( file_ptr->hdf_handle, TYPE_ENUM_PATH, enum_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT ) < 0 )
 #else
     if( H5Tcommit( file_ptr->hdf_handle, TYPE_ENUM_PATH, enum_id ) < 0 )
 #endif
@@ -136,8 +134,8 @@ mhdf_FileHandle mhdf_createFile( const char* filename, int overwrite, const char
     return file_ptr;
 }
 
-mhdf_FileHandle mhdf_openFile( const char* filename, int writeable, unsigned long* max_id_out,
-                               hid_t id_type, mhdf_Status* status )
+mhdf_FileHandle mhdf_openFile( const char* filename, int writeable, unsigned long* max_id_out, hid_t id_type,
+                               mhdf_Status* status )
 {
     return mhdf_openFileWithOpt( filename, writeable, max_id_out, id_type, H5P_DEFAULT, status );
 }
@@ -147,8 +145,7 @@ int mhdf_countOpenHandles( mhdf_FileHandle file_handle )
     return H5Fget_obj_count( ( (FileHandle*)file_handle )->hdf_handle, H5F_OBJ_ALL );
 }
 
-static herr_t get_max_id( hid_t group_id, const char* subgroup, const char* datatable,
-                          unsigned long* data )
+static herr_t get_max_id( hid_t group_id, const char* subgroup, const char* datatable, unsigned long* data )
 {
     unsigned long id;
     hid_t         elem_id, conn_id, attr_id, space_id;
@@ -228,8 +225,7 @@ static int scan_for_max_id( FileHandle* file_ptr, mhdf_Status* status )
         mhdf_setFail( status, "Internal error - invalid file." );
         return 0;
     }
-    if( mhdf_read_scalar_attrib( group_id, MAX_ID_ATTRIB, H5T_NATIVE_ULONG, &file_ptr->max_id,
-                                 status ) )
+    if( mhdf_read_scalar_attrib( group_id, MAX_ID_ATTRIB, H5T_NATIVE_ULONG, &file_ptr->max_id, status ) )
     {
         H5Gclose( group_id );
         return 1;
@@ -245,8 +241,7 @@ static int scan_for_max_id( FileHandle* file_ptr, mhdf_Status* status )
     }
 
     /* Check node table too */
-    rval = get_max_id( group_id, NODE_GROUP_NAME, "coordinates",
-                       (unsigned long*)( &file_ptr->max_id ) );
+    rval = get_max_id( group_id, NODE_GROUP_NAME, "coordinates", (unsigned long*)( &file_ptr->max_id ) );
     if( rval )
     {
         H5Gclose( group_id );
@@ -261,8 +256,7 @@ static int scan_for_max_id( FileHandle* file_ptr, mhdf_Status* status )
         H5Gclose( group_id );
         return !rval;
     }
-    rval = get_max_id( group_id, SET_GROUP_NAME, SET_META_NAME,
-                       (unsigned long*)( &file_ptr->max_id ) );
+    rval = get_max_id( group_id, SET_GROUP_NAME, SET_META_NAME, (unsigned long*)( &file_ptr->max_id ) );
     H5Gclose( group_id );
     if( rval )
     {
@@ -273,8 +267,8 @@ static int scan_for_max_id( FileHandle* file_ptr, mhdf_Status* status )
     return 1;
 }
 
-mhdf_FileHandle mhdf_openFileWithOpt( const char* filename, int writable, unsigned long* max_id_out,
-                                      hid_t id_type, hid_t access_prop, mhdf_Status* status )
+mhdf_FileHandle mhdf_openFileWithOpt( const char* filename, int writable, unsigned long* max_id_out, hid_t id_type,
+                                      hid_t access_prop, mhdf_Status* status )
 {
     FileHandle*  file_ptr;
     unsigned int flags;
@@ -360,8 +354,8 @@ mhdf_FileHandle mhdf_openFileWithOpt( const char* filename, int writable, unsign
     return file_ptr;
 }
 
-void mhdf_getElemName( mhdf_FileHandle file_handle, unsigned int type_index, char* buffer,
-                       size_t buf_size, mhdf_Status* status )
+void mhdf_getElemName( mhdf_FileHandle file_handle, unsigned int type_index, char* buffer, size_t buf_size,
+                       mhdf_Status* status )
 {
     FileHandle* file_ptr;
     herr_t      rval;
@@ -380,8 +374,7 @@ void mhdf_getElemName( mhdf_FileHandle file_handle, unsigned int type_index, cha
     enum_id = get_elem_type_enum( file_ptr, status );
     if( enum_id < 0 ) return;
 
-    rval =
-        H5Tconvert( H5T_NATIVE_UINT, H5Tget_super( enum_id ), 1, &type_index, NULL, H5P_DEFAULT );
+    rval = H5Tconvert( H5T_NATIVE_UINT, H5Tget_super( enum_id ), 1, &type_index, NULL, H5P_DEFAULT );
     if( rval < 0 )
     {
         H5Tclose( enum_id );
@@ -494,8 +487,7 @@ void mhdf_closeData( mhdf_FileHandle file, hid_t handle, mhdf_Status* status )
     }
 }
 
-void mhdf_addElement( mhdf_FileHandle file_handle, const char* name, unsigned int elem_type,
-                      mhdf_Status* status )
+void mhdf_addElement( mhdf_FileHandle file_handle, const char* name, unsigned int elem_type, mhdf_Status* status )
 {
     FileHandle* file_ptr = (FileHandle*)file_handle;
     hid_t       group_id, tag_id, enum_id;
@@ -574,8 +566,7 @@ void mhdf_addElement( mhdf_FileHandle file_handle, const char* name, unsigned in
     API_END;
 }
 
-char** mhdf_getElemHandles( mhdf_FileHandle file_handle, unsigned int* count_out,
-                            mhdf_Status* status )
+char** mhdf_getElemHandles( mhdf_FileHandle file_handle, unsigned int* count_out, mhdf_Status* status )
 {
     hsize_t     count, length, i;
     char**      buffer;
@@ -644,8 +635,8 @@ char** mhdf_getElemHandles( mhdf_FileHandle file_handle, unsigned int* count_out
     return buffer;
 }
 
-void mhdf_getElemTypeName( mhdf_FileHandle file_handle, const char* elem_handle, char* buffer,
-                           size_t buf_len, mhdf_Status* status )
+void mhdf_getElemTypeName( mhdf_FileHandle file_handle, const char* elem_handle, char* buffer, size_t buf_len,
+                           mhdf_Status* status )
 {
     FileHandle* file_ptr;
     hid_t       elem_id, type_id, attr_id;
@@ -752,8 +743,7 @@ int mhdf_isPolyElement( mhdf_FileHandle file_handle, const char* elem_handle, mh
     return rval;
 }
 
-void mhdf_writeHistory( mhdf_FileHandle file_handle, const char** strings, int num_strings,
-                        mhdf_Status* status )
+void mhdf_writeHistory( mhdf_FileHandle file_handle, const char** strings, int num_strings, mhdf_Status* status )
 {
     FileHandle* file_ptr;
     hid_t       data_id, type_id, space_id;
@@ -781,8 +771,8 @@ void mhdf_writeHistory( mhdf_FileHandle file_handle, const char** strings, int n
     }
 
 #if defined( H5Dcreate_vers ) && H5Dcreate_vers > 1
-    data_id = H5Dcreate2( file_ptr->hdf_handle, HISTORY_PATH, type_id, space_id, H5P_DEFAULT,
-                          H5P_DEFAULT, H5P_DEFAULT );
+    data_id =
+        H5Dcreate2( file_ptr->hdf_handle, HISTORY_PATH, type_id, space_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
 #else
     data_id = H5Dcreate( file_ptr->hdf_handle, HISTORY_PATH, type_id, space_id, H5P_DEFAULT );
 #endif
@@ -861,8 +851,7 @@ char** mhdf_readHistory( mhdf_FileHandle file_handle, int* num_strings, mhdf_Sta
         return NULL;
     }
 
-    if( 1 != H5Sget_simple_extent_ndims( space_id ) ||
-        1 != H5Sget_simple_extent_dims( space_id, &dim, NULL ) )
+    if( 1 != H5Sget_simple_extent_ndims( space_id ) || 1 != H5Sget_simple_extent_dims( space_id, &dim, NULL ) )
     {
         H5Dclose( data_id );
         mhdf_setFail( status, "Invalid dimension for \"%s\".", HISTORY_PATH );

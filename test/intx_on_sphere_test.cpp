@@ -61,10 +61,9 @@ int main( int argc, char* argv[] )
 
     // check command line arg second grid is red, arrival, first mesh is blue, departure
     // will will keep the
-    std::string optsRead =
-        ( size == 1 ? ""
-                    : std::string( "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION" ) +
-                          std::string( ";PARALLEL_RESOLVE_SHARED_ENTS" ) );
+    std::string optsRead = ( size == 1 ? ""
+                                       : std::string( "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION" ) +
+                                             std::string( ";PARALLEL_RESOLVE_SHARED_ENTS" ) );
 
     // read meshes in 2 file sets
     ErrorCode    rval;
@@ -163,34 +162,24 @@ int main( int argc, char* argv[] )
             rval = mb->get_number_entities_by_dimension( comm_set, 2, num_comm_cells );MB_CHK_ERR( rval );
             double fraction_area = comm_area / area_cov_set;
             double fraction_num_cells =
-                (double)num_comm_cells /
-                num_cov_cells;  // determine min, max, average of these fractions
+                (double)num_comm_cells / num_cov_cells;  // determine min, max, average of these fractions
 
-            double max_fraction_area, max_fraction_num_cells, min_fraction_area,
-                min_fraction_num_cells;
+            double max_fraction_area, max_fraction_num_cells, min_fraction_area, min_fraction_num_cells;
             double average_fraction_area, average_fraction_num_cells;
-            MPI_Reduce( &fraction_area, &max_fraction_area, 1, MPI_DOUBLE, MPI_MAX, 0,
-                        MPI_COMM_WORLD );
-            MPI_Reduce( &fraction_num_cells, &max_fraction_num_cells, 1, MPI_DOUBLE, MPI_MAX, 0,
-                        MPI_COMM_WORLD );
-            MPI_Reduce( &fraction_area, &min_fraction_area, 1, MPI_DOUBLE, MPI_MIN, 0,
-                        MPI_COMM_WORLD );
-            MPI_Reduce( &fraction_num_cells, &min_fraction_num_cells, 1, MPI_DOUBLE, MPI_MIN, 0,
-                        MPI_COMM_WORLD );
-            MPI_Reduce( &fraction_area, &average_fraction_area, 1, MPI_DOUBLE, MPI_SUM, 0,
-                        MPI_COMM_WORLD );
-            MPI_Reduce( &fraction_num_cells, &average_fraction_num_cells, 1, MPI_DOUBLE, MPI_SUM, 0,
-                        MPI_COMM_WORLD );
+            MPI_Reduce( &fraction_area, &max_fraction_area, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD );
+            MPI_Reduce( &fraction_num_cells, &max_fraction_num_cells, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD );
+            MPI_Reduce( &fraction_area, &min_fraction_area, 1, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD );
+            MPI_Reduce( &fraction_num_cells, &min_fraction_num_cells, 1, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD );
+            MPI_Reduce( &fraction_area, &average_fraction_area, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD );
+            MPI_Reduce( &fraction_num_cells, &average_fraction_num_cells, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD );
             average_fraction_area /= size;
             average_fraction_num_cells /= size;
             if( rank == 0 )
             {
-                std::cout << " fraction area:      min: " << min_fraction_area
-                          << " max: " << max_fraction_area << " average :" << average_fraction_area
-                          << " \n";
+                std::cout << " fraction area:      min: " << min_fraction_area << " max: " << max_fraction_area
+                          << " average :" << average_fraction_area << " \n";
                 std::cout << " fraction num cells: min: " << min_fraction_num_cells
-                          << " max: " << max_fraction_num_cells
-                          << " average: " << average_fraction_num_cells << " \n";
+                          << " max: " << max_fraction_num_cells << " average: " << average_fraction_num_cells << " \n";
             }
         }
         if( write_files_rank )
@@ -218,8 +207,7 @@ int main( int argc, char* argv[] )
     }
 #ifdef MOAB_HAVE_MPI
     elapsed = MPI_Wtime( ) - elapsed;
-    if( 0 == rank )
-        std::cout << "\nTime to compute the intersection between meshes = " << elapsed << std::endl;
+    if( 0 == rank ) std::cout << "\nTime to compute the intersection between meshes = " << elapsed << std::endl;
 #endif
     // the output set does not have the intx vertices on the boundary shared, so they will be
     // duplicated right now we write this file just for checking it looks OK
@@ -243,8 +231,7 @@ int main( int argc, char* argv[] )
     }
     double intx_area = areaAdaptor.area_on_sphere( mb, outputSet, R );
     double arrival_area = areaAdaptor.area_on_sphere( mb, sf2, R );
-    std::cout << "On rank : " << rank << " arrival area: " << arrival_area
-              << "  intersection area:" << intx_area
+    std::cout << "On rank : " << rank << " arrival area: " << arrival_area << "  intersection area:" << intx_area
               << " rel error: " << fabs( ( intx_area - arrival_area ) / arrival_area ) << "\n";
 
 #ifdef MOAB_HAVE_MPI

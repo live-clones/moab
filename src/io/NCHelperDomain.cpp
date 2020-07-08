@@ -13,25 +13,20 @@ bool NCHelperDomain::can_read_file( ReadNC* readNC, int fileId )
     std::vector< std::string >& dimNames = readNC->dimNames;
 
     // If dimension names "n" AND "ni" AND "nj" AND "nv" exist then it should be the Domain grid
-    if( ( std::find( dimNames.begin( ), dimNames.end( ), std::string( "n" ) ) !=
-          dimNames.end( ) ) &&
-        ( std::find( dimNames.begin( ), dimNames.end( ), std::string( "ni" ) ) !=
-          dimNames.end( ) ) &&
-        ( std::find( dimNames.begin( ), dimNames.end( ), std::string( "nj" ) ) !=
-          dimNames.end( ) ) &&
-        ( std::find( dimNames.begin( ), dimNames.end( ), std::string( "nv" ) ) !=
-          dimNames.end( ) ) )
+    if( ( std::find( dimNames.begin( ), dimNames.end( ), std::string( "n" ) ) != dimNames.end( ) ) &&
+        ( std::find( dimNames.begin( ), dimNames.end( ), std::string( "ni" ) ) != dimNames.end( ) ) &&
+        ( std::find( dimNames.begin( ), dimNames.end( ), std::string( "nj" ) ) != dimNames.end( ) ) &&
+        ( std::find( dimNames.begin( ), dimNames.end( ), std::string( "nv" ) ) != dimNames.end( ) ) )
     {
         // Make sure it is CAM grid
-        std::map< std::string, ReadNC::AttData >::iterator attIt =
-            readNC->globalAtts.find( "source" );
+        std::map< std::string, ReadNC::AttData >::iterator attIt = readNC->globalAtts.find( "source" );
         if( attIt == readNC->globalAtts.end( ) ) return false;
         unsigned int sz = attIt->second.attLen;
         std::string  att_data;
         att_data.resize( sz + 1 );
         att_data[ sz ] = '\000';
-        int success = NCFUNC( get_att_text )( fileId, attIt->second.attVarId,
-                                              attIt->second.attName.c_str( ), &att_data[ 0 ] );
+        int success =
+            NCFUNC( get_att_text )( fileId, attIt->second.attVarId, attIt->second.attName.c_str( ), &att_data[ 0 ] );
         if( success ) return false;
         /*if (att_data.find("CAM") == std::string::npos)
           return false;*/
@@ -114,13 +109,12 @@ ErrorCode NCHelperDomain::init_mesh_vals( )
         int pdims[ 3 ];
 
         locallyPeriodic[ 0 ] = locallyPeriodic[ 1 ] = locallyPeriodic[ 2 ] = 0;
-        rval =
-            ScdInterface::compute_partition( procs, rank, parData, lDims, locallyPeriodic, pdims );MB_CHK_ERR( rval );
+        rval = ScdInterface::compute_partition( procs, rank, parData, lDims, locallyPeriodic, pdims );MB_CHK_ERR( rval );
         for( int i = 0; i < 3; i++ )
             parData.pDims[ i ] = pdims[ i ];
 
-        dbgOut.tprintf( 1, "Partition: %dx%d (out of %dx%d)\n", lDims[ 3 ] - lDims[ 0 ],
-                        lDims[ 4 ] - lDims[ 1 ], gDims[ 3 ] - gDims[ 0 ], gDims[ 4 ] - gDims[ 1 ] );
+        dbgOut.tprintf( 1, "Partition: %dx%d (out of %dx%d)\n", lDims[ 3 ] - lDims[ 0 ], lDims[ 4 ] - lDims[ 1 ],
+                        gDims[ 3 ] - gDims[ 0 ], gDims[ 4 ] - gDims[ 1 ] );
         if( 0 == rank )
             dbgOut.tprintf( 1, "Contiguous chunks of size %d bytes.\n",
                             8 * ( lDims[ 3 ] - lDims[ 0 ] ) * ( lDims[ 4 ] - lDims[ 1 ] ) );
@@ -156,8 +150,7 @@ ErrorCode NCHelperDomain::init_mesh_vals( )
 #endif
 
     dbgOut.tprintf( 1, "I=%d-%d, J=%d-%d\n", lDims[ 0 ], lDims[ 3 ], lDims[ 1 ], lDims[ 4 ] );
-    dbgOut.tprintf( 1, "%d elements, %d vertices\n",
-                    ( lDims[ 3 ] - lDims[ 0 ] ) * ( lDims[ 4 ] - lDims[ 1 ] ),
+    dbgOut.tprintf( 1, "%d elements, %d vertices\n", ( lDims[ 3 ] - lDims[ 0 ] ) * ( lDims[ 4 ] - lDims[ 1 ] ),
                     ( lDims[ 3 ] - lDims[ 0 ] ) * ( lDims[ 4 ] - lDims[ 1 ] ) * nv );
 
     // For each variable, determine the entity location type and number of levels
@@ -169,26 +162,19 @@ ErrorCode NCHelperDomain::init_mesh_vals( )
         // Default entLoc is ENTLOCSET
         if( std::find( vd.varDims.begin( ), vd.varDims.end( ), tDim ) != vd.varDims.end( ) )
         {
-            if( ( std::find( vd.varDims.begin( ), vd.varDims.end( ), iCDim ) !=
-                  vd.varDims.end( ) ) &&
-                ( std::find( vd.varDims.begin( ), vd.varDims.end( ), jCDim ) !=
-                  vd.varDims.end( ) ) )
+            if( ( std::find( vd.varDims.begin( ), vd.varDims.end( ), iCDim ) != vd.varDims.end( ) ) &&
+                ( std::find( vd.varDims.begin( ), vd.varDims.end( ), jCDim ) != vd.varDims.end( ) ) )
                 vd.entLoc = ReadNC::ENTLOCFACE;
-            else if( ( std::find( vd.varDims.begin( ), vd.varDims.end( ), jDim ) !=
-                       vd.varDims.end( ) ) &&
-                     ( std::find( vd.varDims.begin( ), vd.varDims.end( ), iCDim ) !=
-                       vd.varDims.end( ) ) )
+            else if( ( std::find( vd.varDims.begin( ), vd.varDims.end( ), jDim ) != vd.varDims.end( ) ) &&
+                     ( std::find( vd.varDims.begin( ), vd.varDims.end( ), iCDim ) != vd.varDims.end( ) ) )
                 vd.entLoc = ReadNC::ENTLOCNSEDGE;
-            else if( ( std::find( vd.varDims.begin( ), vd.varDims.end( ), jCDim ) !=
-                       vd.varDims.end( ) ) &&
-                     ( std::find( vd.varDims.begin( ), vd.varDims.end( ), iDim ) !=
-                       vd.varDims.end( ) ) )
+            else if( ( std::find( vd.varDims.begin( ), vd.varDims.end( ), jCDim ) != vd.varDims.end( ) ) &&
+                     ( std::find( vd.varDims.begin( ), vd.varDims.end( ), iDim ) != vd.varDims.end( ) ) )
                 vd.entLoc = ReadNC::ENTLOCEWEDGE;
         }
 
         // Default numLev is 0
-        if( std::find( vd.varDims.begin( ), vd.varDims.end( ), levDim ) != vd.varDims.end( ) )
-            vd.numLev = nLevels;
+        if( std::find( vd.varDims.begin( ), vd.varDims.end( ), levDim ) != vd.varDims.end( ) ) vd.numLev = nLevels;
     }
 
     std::vector< std::string > ijdimNames( 2 );
@@ -215,11 +201,9 @@ ErrorCode NCHelperDomain::init_mesh_vals( )
         std::stringstream ss_tag_name;
         ss_tag_name << ijdimNames[ i ] << "_LOC_MINMAX";
         tag_name = ss_tag_name.str( );
-        rval = mbImpl->tag_get_handle( tag_name.c_str( ), 2, MB_TYPE_INTEGER, tagh,
-                                       MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_SET_ERR( rval, "Trouble creating conventional tag " << tag_name );
+        rval = mbImpl->tag_get_handle( tag_name.c_str( ), 2, MB_TYPE_INTEGER, tagh, MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_SET_ERR( rval, "Trouble creating conventional tag " << tag_name );
         rval = mbImpl->tag_set_data( tagh, &_fileSet, 1, &val[ 0 ] );MB_CHK_SET_ERR( rval, "Trouble setting data to conventional tag " << tag_name );
-        if( MB_SUCCESS == rval )
-            dbgOut.tprintf( 2, "Conventional tag %s is created.\n", tag_name.c_str( ) );
+        if( MB_SUCCESS == rval ) dbgOut.tprintf( 2, "Conventional tag %s is created.\n", tag_name.c_str( ) );
     }
 
     // __<dim_name>_LOC_VALS (for slon, slat, lon and lat)
@@ -298,8 +282,7 @@ ErrorCode NCHelperDomain::create_mesh( Range& faces )
     vmask.readCounts.push_back( lDims[ 4 ] - lDims[ 1 ] );
     vmask.readCounts.push_back( lDims[ 3 ] - lDims[ 0 ] );
     std::vector< int > mask( local_elems );
-    success = NCFUNCAG( _vara_int )( _fileId, vmask.varId, &vmask.readStarts[ 0 ],
-                                     &vmask.readCounts[ 0 ], &mask[ 0 ] );
+    success = NCFUNCAG( _vara_int )( _fileId, vmask.varId, &vmask.readStarts[ 0 ], &vmask.readCounts[ 0 ], &mask[ 0 ] );
     if( success ) MB_SET_ERR( MB_FAILURE, "Failed to read int data for mask variable " );
 
     int nb_with_mask1 = 0;
@@ -319,50 +302,46 @@ ErrorCode NCHelperDomain::create_mesh( Range& faces )
     std::string           xvstr( "xv" );
     ReadNC::VarData&      var_xv = _readNC->varInfo[ xvstr ];
     std::vector< double > xv( local_elems * nv );
-    success =
-        NCFUNCAG( _vara_double )( _fileId, var_xv.varId, &startsv[ 0 ], &countsv[ 0 ], &xv[ 0 ] );
+    success = NCFUNCAG( _vara_double )( _fileId, var_xv.varId, &startsv[ 0 ], &countsv[ 0 ], &xv[ 0 ] );
     if( success ) MB_SET_ERR( MB_FAILURE, "Failed to read double data for xv variable " );
 
     std::string           yvstr( "yv" );
     ReadNC::VarData&      var_yv = _readNC->varInfo[ yvstr ];
     std::vector< double > yv( local_elems * nv );
-    success =
-        NCFUNCAG( _vara_double )( _fileId, var_yv.varId, &startsv[ 0 ], &countsv[ 0 ], &yv[ 0 ] );
+    success = NCFUNCAG( _vara_double )( _fileId, var_yv.varId, &startsv[ 0 ], &countsv[ 0 ], &yv[ 0 ] );
     if( success ) MB_SET_ERR( MB_FAILURE, "Failed to read double data for yv variable " );
 
     // read other variables, like xc, yc, frac, area
     std::string           xcstr( "xc" );
     ReadNC::VarData&      var_xc = _readNC->varInfo[ xcstr ];
     std::vector< double > xc( local_elems );
-    success = NCFUNCAG( _vara_double )( _fileId, var_xc.varId, &vmask.readStarts[ 0 ],
-                                        &vmask.readCounts[ 0 ], &xc[ 0 ] );
+    success =
+        NCFUNCAG( _vara_double )( _fileId, var_xc.varId, &vmask.readStarts[ 0 ], &vmask.readCounts[ 0 ], &xc[ 0 ] );
     if( success ) MB_SET_ERR( MB_FAILURE, "Failed to read double data for xc variable " );
 
     std::string           ycstr( "yc" );
     ReadNC::VarData&      var_yc = _readNC->varInfo[ ycstr ];
     std::vector< double > yc( local_elems );
-    success = NCFUNCAG( _vara_double )( _fileId, var_yc.varId, &vmask.readStarts[ 0 ],
-                                        &vmask.readCounts[ 0 ], &yc[ 0 ] );
+    success =
+        NCFUNCAG( _vara_double )( _fileId, var_yc.varId, &vmask.readStarts[ 0 ], &vmask.readCounts[ 0 ], &yc[ 0 ] );
     if( success ) MB_SET_ERR( MB_FAILURE, "Failed to read double data for yc variable " );
 
     std::string           fracstr( "frac" );
     ReadNC::VarData&      var_frac = _readNC->varInfo[ fracstr ];
     std::vector< double > frac( local_elems );
-    success = NCFUNCAG( _vara_double )( _fileId, var_frac.varId, &vmask.readStarts[ 0 ],
-                                        &vmask.readCounts[ 0 ], &frac[ 0 ] );
+    success =
+        NCFUNCAG( _vara_double )( _fileId, var_frac.varId, &vmask.readStarts[ 0 ], &vmask.readCounts[ 0 ], &frac[ 0 ] );
     if( success ) MB_SET_ERR( MB_FAILURE, "Failed to read double data for frac variable " );
     std::string           areastr( "area" );
     ReadNC::VarData&      var_area = _readNC->varInfo[ areastr ];
     std::vector< double > area( local_elems );
-    success = NCFUNCAG( _vara_double )( _fileId, var_area.varId, &vmask.readStarts[ 0 ],
-                                        &vmask.readCounts[ 0 ], &area[ 0 ] );
+    success =
+        NCFUNCAG( _vara_double )( _fileId, var_area.varId, &vmask.readStarts[ 0 ], &vmask.readCounts[ 0 ], &area[ 0 ] );
     if( success ) MB_SET_ERR( MB_FAILURE, "Failed to read double data for area variable " );
     // create tags for them
     Tag areaTag, fracTag, xcTag, ycTag;
-    rval =
-        mbImpl->tag_get_handle( "area", 1, MB_TYPE_DOUBLE, areaTag, MB_TAG_DENSE | MB_TAG_CREAT );MB_CHK_SET_ERR( rval, "Trouble creating area tag" );
-    rval =
-        mbImpl->tag_get_handle( "frac", 1, MB_TYPE_DOUBLE, fracTag, MB_TAG_DENSE | MB_TAG_CREAT );MB_CHK_SET_ERR( rval, "Trouble creating frac tag" );
+    rval = mbImpl->tag_get_handle( "area", 1, MB_TYPE_DOUBLE, areaTag, MB_TAG_DENSE | MB_TAG_CREAT );MB_CHK_SET_ERR( rval, "Trouble creating area tag" );
+    rval = mbImpl->tag_get_handle( "frac", 1, MB_TYPE_DOUBLE, fracTag, MB_TAG_DENSE | MB_TAG_CREAT );MB_CHK_SET_ERR( rval, "Trouble creating frac tag" );
     rval = mbImpl->tag_get_handle( "xc", 1, MB_TYPE_DOUBLE, xcTag, MB_TAG_DENSE | MB_TAG_CREAT );MB_CHK_SET_ERR( rval, "Trouble creating xc tag" );
     rval = mbImpl->tag_get_handle( "yc", 1, MB_TYPE_DOUBLE, ycTag, MB_TAG_DENSE | MB_TAG_CREAT );MB_CHK_SET_ERR( rval, "Trouble creating yc tag" );
 
@@ -385,8 +364,7 @@ ErrorCode NCHelperDomain::create_mesh( Range& faces )
 
     if( nv > 1 )
     {
-        rval = _readNC->readMeshIface->get_element_connect( nb_with_mask1, nv, mdb_type, 0,
-                                                            start_cell, conn_arr );MB_CHK_SET_ERR( rval, "Failed to create local cells" );
+        rval = _readNC->readMeshIface->get_element_connect( nb_with_mask1, nv, mdb_type, 0, start_cell, conn_arr );MB_CHK_SET_ERR( rval, "Failed to create local cells" );
 
         tmp_range.insert( start_cell, start_cell + nb_with_mask1 - 1 );
         // create also nv*nb_with_mask1 vertices, and compute their coordinates
@@ -414,8 +392,7 @@ ErrorCode NCHelperDomain::create_mesh( Range& faces )
     int local_row_size = lDims[ 3 ] - lDims[ 0 ];
     for( ; elem_index < local_elems; elem_index++ )
     {
-        if( 0 == mask[ elem_index ] )
-            continue;  // nothing to do, do not advance elem_index in actual moab arrays
+        if( 0 == mask[ elem_index ] ) continue;  // nothing to do, do not advance elem_index in actual moab arrays
         // set area and fraction on those elements too
         for( int j = 0; j < nv; j++ )
         {

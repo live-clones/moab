@@ -40,22 +40,16 @@ void print_usage( )
     std::cerr << "    -meshes" << std::endl;
     std::cerr << "        Read in mesh files <source_mesh> and <target_mesh>." << std::endl;
     std::cerr << "    -itag" << std::endl;
-    std::cerr << "        Interpolate tag <interp_tag> from source mesh to target mesh."
-              << std::endl;
+    std::cerr << "        Interpolate tag <interp_tag> from source mesh to target mesh." << std::endl;
     std::cerr << "    -gnorm" << std::endl;
-    std::cerr << "        Normalize the value of tag <gnorm_tag> over then entire mesh and save to"
-              << std::endl;
-    std::cerr << "        tag \"<gnorm_tag>_normf\" on the mesh set.  Do this for all meshes."
-              << std::endl;
+    std::cerr << "        Normalize the value of tag <gnorm_tag> over then entire mesh and save to" << std::endl;
+    std::cerr << "        tag \"<gnorm_tag>_normf\" on the mesh set.  Do this for all meshes." << std::endl;
     std::cerr << "    -ssnorm" << std::endl;
-    std::cerr
-        << "        Normalize the value of tag <ssnorm_tag> over subsets of a mesh and save to"
-        << std::endl;
+    std::cerr << "        Normalize the value of tag <ssnorm_tag> over subsets of a mesh and save to" << std::endl;
     std::cerr << "        tag \"<ssnorm_tag>_normf\" on the Entity Set for each subset.  Subsets "
                  "are selected"
               << std::endl;
-    std::cerr << "        using criteria in <ssnorm_selection>.  Do this for all meshes."
-              << std::endl;
+    std::cerr << "        using criteria in <ssnorm_selection>.  Do this for all meshes." << std::endl;
     std::cerr << "    -ropts" << std::endl;
     std::cerr << "        Read in the mesh files using options in <roptions>." << std::endl;
     std::cerr << "    -outfile" << std::endl;
@@ -63,35 +57,27 @@ void print_usage( )
     std::cerr << "    -wopts" << std::endl;
     std::cerr << "        Write out mesh files using options in <woptions>." << std::endl;
     std::cerr << "    -dbgout" << std::endl;
-    std::cerr << "        Write stdout and stderr streams to the file \'<dbg_file>.txt\'."
-              << std::endl;
+    std::cerr << "        Write stdout and stderr streams to the file \'<dbg_file>.txt\'." << std::endl;
     std::cerr << "    -eps" << std::endl;
     std::cerr << "        epsilon" << std::endl;
-    std::cerr
-        << "    -meth <method> (0=CONSTANT, 1=LINEAR_FE, 2=QUADRATIC_FE, 3=SPECTRAL, 4=SPHERICAL)"
-        << std::endl;
+    std::cerr << "    -meth <method> (0=CONSTANT, 1=LINEAR_FE, 2=QUADRATIC_FE, 3=SPECTRAL, 4=SPHERICAL)" << std::endl;
 }
 
 #ifdef MOAB_HAVE_HDF5
 
-ErrorCode get_file_options( int argc, char** argv, int nprocs, int rank,
-                            std::vector< std::string >& meshFiles, Coupler::Method& method,
-                            std::string& interpTag, std::string& gNormTag, std::string& ssNormTag,
-                            std::vector< const char* >& ssTagNames,
-                            std::vector< const char* >& ssTagValues, std::string& readOpts,
-                            std::string& outFile, std::string& writeOpts, std::string& dbgFile,
-                            bool& help, double& epsilon );
+ErrorCode get_file_options( int argc, char** argv, int nprocs, int rank, std::vector< std::string >& meshFiles,
+                            Coupler::Method& method, std::string& interpTag, std::string& gNormTag,
+                            std::string& ssNormTag, std::vector< const char* >& ssTagNames,
+                            std::vector< const char* >& ssTagValues, std::string& readOpts, std::string& outFile,
+                            std::string& writeOpts, std::string& dbgFile, bool& help, double& epsilon );
 
-ErrorCode report_iface_ents( Interface* mbImpl, std::vector< ParallelComm* >& pcs,
-                             bool print_results );
+ErrorCode report_iface_ents( Interface* mbImpl, std::vector< ParallelComm* >& pcs, bool print_results );
 
-ErrorCode test_interpolation( Interface* mbImpl, Coupler::Method method, std::string& interpTag,
-                              std::string& gNormTag, std::string& ssNormTag,
-                              std::vector< const char* >& ssTagNames,
+ErrorCode test_interpolation( Interface* mbImpl, Coupler::Method method, std::string& interpTag, std::string& gNormTag,
+                              std::string& ssNormTag, std::vector< const char* >& ssTagNames,
                               std::vector< const char* >& ssTagValues, EntityHandle* roots,
-                              std::vector< ParallelComm* >& pcs, double& instant_time,
-                              double& pointloc_time, double& interp_time, double& gnorm_time,
-                              double& ssnorm_time, double& toler );
+                              std::vector< ParallelComm* >& pcs, double& instant_time, double& pointloc_time,
+                              double& interp_time, double& gnorm_time, double& ssnorm_time, double& toler );
 
 void reduceMax( double& v )
 {
@@ -111,8 +97,8 @@ int main( int argc, char** argv )
 
     std::vector< const char* > ssTagNames, ssTagValues;
     std::vector< std::string > meshFiles;
-    std::string     interpTag, gNormTag, ssNormTag, readOpts, outFile, writeOpts, dbgFile;
-    Coupler::Method method = Coupler::CONSTANT;
+    std::string                interpTag, gNormTag, ssNormTag, readOpts, outFile, writeOpts, dbgFile;
+    Coupler::Method            method = Coupler::CONSTANT;
 
     ErrorCode result;
     bool      help = false;
@@ -123,9 +109,8 @@ int main( int argc, char** argv )
     ierr = MPI_Comm_rank( MPI_COMM_WORLD, &rank );
     assert( MPI_SUCCESS == ierr );
 
-    result = get_file_options( argc, argv, nprocs, rank, meshFiles, method, interpTag, gNormTag,
-                               ssNormTag, ssTagNames, ssTagValues, readOpts, outFile, writeOpts,
-                               dbgFile, help, toler );
+    result = get_file_options( argc, argv, nprocs, rank, meshFiles, method, interpTag, gNormTag, ssNormTag, ssTagNames,
+                               ssTagValues, readOpts, outFile, writeOpts, dbgFile, help, toler );
 
     if( result != MB_SUCCESS || help )
     {
@@ -172,21 +157,19 @@ int main( int argc, char** argv )
 
     result = report_iface_ents( mbImpl, pcs, true );MB_CHK_ERR( result );
 
-    double instant_time = 0.0, pointloc_time = 0.0, interp_time = 0.0, gnorm_time = 0.0,
-           ssnorm_time = 0.0;
+    double instant_time = 0.0, pointloc_time = 0.0, interp_time = 0.0, gnorm_time = 0.0, ssnorm_time = 0.0;
     // Test interpolation and global normalization and subset normalization
 
-    result = test_interpolation( mbImpl, method, interpTag, gNormTag, ssNormTag, ssTagNames,
-                                 ssTagValues, roots, pcs, instant_time, pointloc_time, interp_time,
-                                 gnorm_time, ssnorm_time, toler );MB_CHK_ERR( result );
+    result = test_interpolation( mbImpl, method, interpTag, gNormTag, ssNormTag, ssTagNames, ssTagValues, roots, pcs,
+                                 instant_time, pointloc_time, interp_time, gnorm_time, ssnorm_time, toler );MB_CHK_ERR( result );
 
     reduceMax( instant_time );
     reduceMax( pointloc_time );
     reduceMax( interp_time );
 
     if( 0 == rank )
-        printf( "\nMax time : %g %g %g (inst loc interp -- %d procs)\n", instant_time,
-                pointloc_time, interp_time, nprocs );
+        printf( "\nMax time : %g %g %g (inst loc interp -- %d procs)\n", instant_time, pointloc_time, interp_time,
+                nprocs );
 
     // Output mesh
     if( !outFile.empty( ) )
@@ -218,8 +201,7 @@ int main( int argc, char** argv )
     return 0;
 }
 
-ErrorCode report_iface_ents( Interface* mbImpl, std::vector< ParallelComm* >& pcs,
-                             const bool print_results )
+ErrorCode report_iface_ents( Interface* mbImpl, std::vector< ParallelComm* >& pcs, const bool print_results )
 {
     Range     iface_ents[ 6 ];
     ErrorCode result = MB_SUCCESS, tmp_result;
@@ -233,8 +215,8 @@ ErrorCode report_iface_ents( Interface* mbImpl, std::vector< ParallelComm* >& pc
 
             if( MB_SUCCESS != tmp_result )
             {
-                std::cerr << "get_iface_entities returned error on proc "
-                          << pcs[ p ]->proc_config( ).proc_rank( ) << "; message: " << std::endl;
+                std::cerr << "get_iface_entities returned error on proc " << pcs[ p ]->proc_config( ).proc_rank( )
+                          << "; message: " << std::endl;
                 std::string last_error;
                 result = mbImpl->get_last_error( last_error );
                 if( last_error.empty( ) )
@@ -248,8 +230,7 @@ ErrorCode report_iface_ents( Interface* mbImpl, std::vector< ParallelComm* >& pc
     }
 
     // Report # iface entities
-    result =
-        mbImpl->get_adjacencies( iface_ents[ 4 ], 0, false, iface_ents[ 5 ], Interface::UNION );MB_CHK_ERR( result );
+    result = mbImpl->get_adjacencies( iface_ents[ 4 ], 0, false, iface_ents[ 5 ], Interface::UNION );MB_CHK_ERR( result );
 
     int rank;
     MPI_Comm_rank( MPI_COMM_WORLD, &rank );
@@ -258,10 +239,8 @@ ErrorCode report_iface_ents( Interface* mbImpl, std::vector< ParallelComm* >& pc
     {
         std::cerr << "Proc " << rank << " iface entities: " << std::endl;
         for( int i = 0; i < 4; i++ )
-            std::cerr << "    " << iface_ents[ i ].size( ) << " " << i << "d iface entities."
-                      << std::endl;
-        std::cerr << "    (" << iface_ents[ 5 ].size( ) << " verts adj to other iface ents)"
-                  << std::endl;
+            std::cerr << "    " << iface_ents[ i ].size( ) << " " << i << "d iface entities." << std::endl;
+        std::cerr << "    (" << iface_ents[ 5 ].size( ) << " verts adj to other iface ents)" << std::endl;
     }
 
     return result;
@@ -278,28 +257,24 @@ bool check_for_flag( const char* str )
 }
 
 // get_file_options() function with added possibilities for mbcoupler_test.
-ErrorCode get_file_options( int argc, char** argv, int nprocs, int rank,
-                            std::vector< std::string >& meshFiles, Coupler::Method& method,
-                            std::string& interpTag, std::string& gNormTag, std::string& ssNormTag,
-                            std::vector< const char* >& ssTagNames,
-                            std::vector< const char* >& ssTagValues, std::string& readOpts,
-                            std::string& outFile, std::string& writeOpts, std::string& dbgFile,
-                            bool& help, double& epsilon )
+ErrorCode get_file_options( int argc, char** argv, int nprocs, int rank, std::vector< std::string >& meshFiles,
+                            Coupler::Method& method, std::string& interpTag, std::string& gNormTag,
+                            std::string& ssNormTag, std::vector< const char* >& ssTagNames,
+                            std::vector< const char* >& ssTagValues, std::string& readOpts, std::string& outFile,
+                            std::string& writeOpts, std::string& dbgFile, bool& help, double& epsilon )
 {
     // Initialize some of the outputs to null values indicating not present
     // in the argument list.
     gNormTag = "";
     ssNormTag = "";
-    readOpts =
-        ( nprocs > 1 ? "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARTITION_DISTRIBUTE;"
-                       "PARALLEL_RESOLVE_SHARED_ENTS;PARALLEL_GHOSTS=3.0.1;CPUTIME"
-                     : "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARTITION_DISTRIBUTE;"
-                       "PARALLEL_RESOLVE_SHARED_ENTS;CPUTIME" );
+    readOpts = ( nprocs > 1 ? "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARTITION_DISTRIBUTE;"
+                              "PARALLEL_RESOLVE_SHARED_ENTS;PARALLEL_GHOSTS=3.0.1;CPUTIME"
+                            : "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARTITION_DISTRIBUTE;"
+                              "PARALLEL_RESOLVE_SHARED_ENTS;CPUTIME" );
     outFile = "";
     writeOpts = ( nprocs > 1 ? "PARALLEL=WRITE_PART;CPUTIME" : "" );
     dbgFile = "";
-    std::string defaultDbgFile =
-        argv[ 0 ];  // The executable name will be the default debug output file.
+    std::string defaultDbgFile = argv[ 0 ];  // The executable name will be the default debug output file.
 
     // These will indicate if we've gotten our required parameters at the end of parsing.
     bool haveMeshes = false;
@@ -328,8 +303,7 @@ ErrorCode get_file_options( int argc, char** argv, int nprocs, int rank,
                     meshFiles[ i ] = argv[ npos++ ];
                 else
                 {
-                    std::cerr << "    ERROR - missing correct number of mesh filenames"
-                              << std::endl;
+                    std::cerr << "    ERROR - missing correct number of mesh filenames" << std::endl;
                     return MB_FAILURE;
                 }
             }
@@ -516,15 +490,14 @@ ErrorCode get_file_options( int argc, char** argv, int nprocs, int rank,
         meshFiles[ 0 ] = std::string( TestDir + "/64bricks_1khex.h5m" );
         meshFiles[ 1 ] = std::string( TestDir + "/64bricks_12ktet.h5m" );
         if( 0 == rank )
-            std::cout << "Mesh files not entered; using default files " << meshFiles[ 0 ] << " and "
-                      << meshFiles[ 1 ] << std::endl;
+            std::cout << "Mesh files not entered; using default files " << meshFiles[ 0 ] << " and " << meshFiles[ 1 ]
+                      << std::endl;
     }
 
     if( !haveInterpTag )
     {
         interpTag = "vertex_field";
-        std::cout << "Interpolation field name not given, using default of " << interpTag
-                  << std::endl;
+        std::cout << "Interpolation field name not given, using default of " << interpTag << std::endl;
     }
 
 #ifdef MOAB_HAVE_HDF5
@@ -540,13 +513,11 @@ ErrorCode get_file_options( int argc, char** argv, int nprocs, int rank,
 
 // End get_file_options()
 
-ErrorCode test_interpolation( Interface* mbImpl, Coupler::Method method, std::string& interpTag,
-                              std::string& gNormTag, std::string& ssNormTag,
-                              std::vector< const char* >& ssTagNames,
+ErrorCode test_interpolation( Interface* mbImpl, Coupler::Method method, std::string& interpTag, std::string& gNormTag,
+                              std::string& ssNormTag, std::vector< const char* >& ssTagNames,
                               std::vector< const char* >& ssTagValues, EntityHandle* roots,
-                              std::vector< ParallelComm* >& pcs, double& instant_time,
-                              double& pointloc_time, double& interp_time, double& gnorm_time,
-                              double& ssnorm_time, double& toler )
+                              std::vector< ParallelComm* >& pcs, double& instant_time, double& pointloc_time,
+                              double& interp_time, double& gnorm_time, double& ssnorm_time, double& toler )
 {
     assert( method >= Coupler::CONSTANT && method <= Coupler::SPHERICAL );
 
@@ -592,8 +563,8 @@ ErrorCode test_interpolation( Interface* mbImpl, Coupler::Method method, std::st
         vpos.resize( 3 * targ_verts.size( ) );
         result = mbImpl->get_coords( targ_verts, &vpos[ 0 ] );MB_CHK_ERR( result );
         // Locate those points in the source mesh
-        std::cout << "rank " << pcs[ 0 ]->proc_config( ).proc_rank( )
-                  << " points of interest: " << numPointsOfInterest << "\n";
+        std::cout << "rank " << pcs[ 0 ]->proc_config( ).proc_rank( ) << " points of interest: " << numPointsOfInterest
+                  << "\n";
         result = mbc.locate_points( &vpos[ 0 ], numPointsOfInterest, 0, toler );MB_CHK_ERR( result );
     }
     else
@@ -603,8 +574,8 @@ ErrorCode test_interpolation( Interface* mbImpl, Coupler::Method method, std::st
         // CartVect!!!
         result = pcs[ 1 ]->get_part_entities( targ_elems, 3 );MB_CHK_ERR( result );
         result = mbc.get_gl_points_on_elements( targ_elems, vpos, numPointsOfInterest );MB_CHK_ERR( result );
-        std::cout << "rank " << pcs[ 0 ]->proc_config( ).proc_rank( )
-                  << " points of interest: " << numPointsOfInterest << "\n";
+        std::cout << "rank " << pcs[ 0 ]->proc_config( ).proc_rank( ) << " points of interest: " << numPointsOfInterest
+                  << "\n";
     }
 
     pointloc_time = MPI_Wtime( );
@@ -633,11 +604,11 @@ ErrorCode test_interpolation( Interface* mbImpl, Coupler::Method method, std::st
     if( !ssNormTag.empty( ) )
     {
 
-        result = mbc.normalize_subset( roots[ 0 ], ssNormTag.c_str( ), &ssTagNames[ 0 ],
-                                       ssTagNames.size( ), &ssTagValues[ 0 ], Coupler::VOLUME, 4 );MB_CHK_ERR( result );
+        result = mbc.normalize_subset( roots[ 0 ], ssNormTag.c_str( ), &ssTagNames[ 0 ], ssTagNames.size( ),
+                                       &ssTagValues[ 0 ], Coupler::VOLUME, 4 );MB_CHK_ERR( result );
 
-        result = mbc.normalize_subset( roots[ 1 ], ssNormTag.c_str( ), &ssTagNames[ 0 ],
-                                       ssTagNames.size( ), &ssTagValues[ 0 ], Coupler::VOLUME, 4 );MB_CHK_ERR( result );
+        result = mbc.normalize_subset( roots[ 1 ], ssNormTag.c_str( ), &ssTagNames[ 0 ], ssTagNames.size( ),
+                                       &ssTagValues[ 0 ], Coupler::VOLUME, 4 );MB_CHK_ERR( result );
     }
 
     ssnorm_time = MPI_Wtime( );
@@ -654,8 +625,7 @@ ErrorCode test_interpolation( Interface* mbImpl, Coupler::Method method, std::st
         // Create a new tag for the values on the target
         Tag         tag;
         std::string newtag = interpTag + "_TAR";
-        result = mbImpl->tag_get_handle( newtag.c_str( ), 1, MB_TYPE_DOUBLE, tag,
-                                         MB_TAG_CREAT | MB_TAG_DENSE );MB_CHK_ERR( result );
+        result = mbImpl->tag_get_handle( newtag.c_str( ), 1, MB_TYPE_DOUBLE, tag, MB_TAG_CREAT | MB_TAG_DENSE );MB_CHK_ERR( result );
         result = mbImpl->tag_set_data( tag, targ_verts, &field[ 0 ] );MB_CHK_ERR( result );
     }
     else
@@ -678,8 +648,7 @@ ErrorCode test_interpolation( Interface* mbImpl, Coupler::Method method, std::st
             int         ntot = numPointsOfInterest / targ_elems.size( );
             Tag         tag;
             std::string newtag = interpTag + "_TAR";
-            result = mbImpl->tag_get_handle( newtag.c_str( ), ntot, MB_TYPE_DOUBLE, tag,
-                                             MB_TAG_CREAT | MB_TAG_DENSE );MB_CHK_ERR( result );
+            result = mbImpl->tag_get_handle( newtag.c_str( ), ntot, MB_TYPE_DOUBLE, tag, MB_TAG_CREAT | MB_TAG_DENSE );MB_CHK_ERR( result );
             result = mbImpl->tag_set_data( tag, targ_elems, &field[ 0 ] );MB_CHK_ERR( result );
         }
     }

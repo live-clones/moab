@@ -22,8 +22,7 @@ void* SequenceData::create_data( int index, int bytes_per_ent, const void* initi
     return array;
 }
 
-void* SequenceData::create_sequence_data( int array_num, int bytes_per_ent,
-                                          const void* initial_value )
+void* SequenceData::create_sequence_data( int array_num, int bytes_per_ent, const void* initial_value )
 {
     const int index = -1 - array_num;
     assert( array_num < numSequenceData );
@@ -77,16 +76,14 @@ void* SequenceData::allocate_tag_array( int tag_num, int bytes_per_ent, const vo
     return create_data( tag_num + 1, bytes_per_ent, default_value );
 }
 
-SequenceData* SequenceData::subset( EntityHandle start, EntityHandle end,
-                                    const int* sequence_data_sizes ) const
+SequenceData* SequenceData::subset( EntityHandle start, EntityHandle end, const int* sequence_data_sizes ) const
 {
     return new SequenceData( this, start, end, sequence_data_sizes );
 }
 
 SequenceData::SequenceData( const SequenceData* from, EntityHandle start, EntityHandle end,
                             const int* sequence_data_sizes )
-    : numSequenceData( from->numSequenceData ), numTagData( from->numTagData ),
-      startHandle( start ), endHandle( end )
+    : numSequenceData( from->numSequenceData ), numTagData( from->numTagData ), startHandle( start ), endHandle( end )
 {
     assert( start <= end );
     assert( from != 0 );
@@ -99,35 +96,30 @@ SequenceData::SequenceData( const SequenceData* from, EntityHandle start, Entity
     const size_t count = end - start + 1;
 
     for( int i = 0; i < numSequenceData; ++i )
-        copy_data_subset( -1 - i, sequence_data_sizes[ i ], from->get_sequence_data( i ), offset,
-                          count );
+        copy_data_subset( -1 - i, sequence_data_sizes[ i ], from->get_sequence_data( i ), offset, count );
     copy_data_subset( 0, sizeof( AdjacencyDataType* ), from->get_adjacency_data( ), offset, count );
     for( unsigned i = 1; i <= numTagData; ++i )
         arraySet[ i ] = 0;
 }
 
-void SequenceData::copy_data_subset( int index, int size_per_ent, const void* source, size_t offset,
-                                     size_t count )
+void SequenceData::copy_data_subset( int index, int size_per_ent, const void* source, size_t offset, size_t count )
 {
     if( !source )
         arraySet[ index ] = 0;
     else
     {
         arraySet[ index ] = malloc( count * size_per_ent );
-        memcpy( arraySet[ index ], (const char*)source + offset * size_per_ent,
-                count * size_per_ent );
+        memcpy( arraySet[ index ], (const char*)source + offset * size_per_ent, count * size_per_ent );
     }
 }
 
-void SequenceData::move_tag_data( SequenceData* destination, const int* tag_sizes,
-                                  int num_tag_sizes )
+void SequenceData::move_tag_data( SequenceData* destination, const int* tag_sizes, int num_tag_sizes )
 {
     assert( destination->start_handle( ) >= start_handle( ) );
     assert( destination->end_handle( ) <= end_handle( ) );
     const size_t offset = destination->start_handle( ) - start_handle( );
     const size_t count = destination->size( );
-    if( destination->numTagData < numTagData )
-        destination->increase_tag_count( numTagData - destination->numTagData );
+    if( destination->numTagData < numTagData ) destination->increase_tag_count( numTagData - destination->numTagData );
 
     for( unsigned i = 1; i <= numTagData; ++i )
     {
@@ -138,8 +130,8 @@ void SequenceData::move_tag_data( SequenceData* destination, const int* tag_size
 
         const int tag_size = tag_sizes[ i - 1 ];
         if( !destination->arraySet[ i ] ) destination->arraySet[ i ] = malloc( count * tag_size );
-        memcpy( destination->arraySet[ i ],
-                reinterpret_cast< char* >( arraySet[ i ] ) + offset * tag_size, count * tag_size );
+        memcpy( destination->arraySet[ i ], reinterpret_cast< char* >( arraySet[ i ] ) + offset * tag_size,
+                count * tag_size );
     }
 }
 

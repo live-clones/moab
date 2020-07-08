@@ -59,8 +59,7 @@ int AspectRatioGammaQualityMetric::get_negate_flag( ) const
 
 // note that we can define this metric for other element types?
 //! Evaluate aspect ratio gamma on ``element''
-bool AspectRatioGammaQualityMetric::evaluate( PatchData& pd, size_t elem_index, double& fval,
-                                              MsqError& err )
+bool AspectRatioGammaQualityMetric::evaluate( PatchData& pd, size_t elem_index, double& fval, MsqError& err )
 {
     MsqMeshEntity& element = pd.element_by_index( elem_index );
     EntityTopology entity = element.get_element_type( );
@@ -89,8 +88,7 @@ bool AspectRatioGammaQualityMetric::evaluate( PatchData& pd, size_t elem_index, 
             }
 
             // sum squares of edge lengths
-            fval = ( ( vert[ 1 ] - vert[ 0 ] ).length_squared( ) +
-                     ( vert[ 2 ] - vert[ 0 ] ).length_squared( ) +
+            fval = ( ( vert[ 1 ] - vert[ 0 ] ).length_squared( ) + ( vert[ 2 ] - vert[ 0 ] ).length_squared( ) +
                      ( vert[ 1 ] - vert[ 2 ] ).length_squared( ) );
             // average
             fval /= 3.0;
@@ -101,18 +99,14 @@ bool AspectRatioGammaQualityMetric::evaluate( PatchData& pd, size_t elem_index, 
             break;
 
         case TETRAHEDRON:
-            vol = ( vert[ 1 ] - vert[ 0 ] ) %
-                  ( ( vert[ 2 ] - vert[ 0 ] ) * ( vert[ 3 ] - vert[ 0 ] ) ) / 6.0;
+            vol = ( vert[ 1 ] - vert[ 0 ] ) % ( ( vert[ 2 ] - vert[ 0 ] ) * ( vert[ 3 ] - vert[ 0 ] ) ) / 6.0;
             if( vol < MSQ_MIN )  // zero for degenerate and negative for inverted
                 return false;
 
             // sum squares of edge lengths
-            fval = ( vert[ 1 ] - vert[ 0 ] ).length_squared( ) +
-                   ( vert[ 2 ] - vert[ 0 ] ).length_squared( ) +
-                   ( vert[ 3 ] - vert[ 0 ] ).length_squared( ) +
-                   ( vert[ 2 ] - vert[ 1 ] ).length_squared( ) +
-                   ( vert[ 3 ] - vert[ 1 ] ).length_squared( ) +
-                   ( vert[ 3 ] - vert[ 2 ] ).length_squared( );
+            fval = ( vert[ 1 ] - vert[ 0 ] ).length_squared( ) + ( vert[ 2 ] - vert[ 0 ] ).length_squared( ) +
+                   ( vert[ 3 ] - vert[ 0 ] ).length_squared( ) + ( vert[ 2 ] - vert[ 1 ] ).length_squared( ) +
+                   ( vert[ 3 ] - vert[ 1 ] ).length_squared( ) + ( vert[ 3 ] - vert[ 2 ] ).length_squared( );
             // average
             fval /= 6.0;
 
@@ -123,8 +117,7 @@ bool AspectRatioGammaQualityMetric::evaluate( PatchData& pd, size_t elem_index, 
             break;
         default:
             MSQ_SETERR( err )
-            ( MsqError::UNSUPPORTED_ELEMENT, "Entity type %d is not valid for Aspect Ratio Gamma\n",
-              (int)entity );
+            ( MsqError::UNSUPPORTED_ELEMENT, "Entity type %d is not valid for Aspect Ratio Gamma\n", (int)entity );
             return false;
     };
 

@@ -63,13 +63,11 @@ class ReadHDF5 : public ReaderIface
      * \param export_sets  Array of handles to sets to export, or NULL to export all.
      * \param export_set_count Length of <code>export_sets</code> array.
      */
-    ErrorCode load_file( const char* file_name, const EntityHandle* file_set,
-                         const FileOptions& opts, const SubsetList* subset_list = 0,
-                         const Tag* file_id_tag = 0 );
+    ErrorCode load_file( const char* file_name, const EntityHandle* file_set, const FileOptions& opts,
+                         const SubsetList* subset_list = 0, const Tag* file_id_tag = 0 );
 
-    ErrorCode read_tag_values( const char* file_name, const char* tag_name, const FileOptions& opts,
-                               std::vector< int >& tag_values_out,
-                               const SubsetList*   subset_list = 0 );
+    ErrorCode  read_tag_values( const char* file_name, const char* tag_name, const FileOptions& opts,
+                                std::vector< int >& tag_values_out, const SubsetList* subset_list = 0 );
     Interface* moab( ) const
     {
         return iFace;
@@ -85,12 +83,11 @@ class ReadHDF5 : public ReaderIface
   protected:
     ErrorCode load_file_impl( const FileOptions& opts );
 
-    ErrorCode load_file_partial( const ReaderIface::IDTag* subset_list, int subset_list_length,
-                                 int num_parts, int part_number, const FileOptions& opts );
+    ErrorCode load_file_partial( const ReaderIface::IDTag* subset_list, int subset_list_length, int num_parts,
+                                 int part_number, const FileOptions& opts );
 
     ErrorCode read_tag_values_all( int tag_index, std::vector< int >& results );
-    ErrorCode read_tag_values_partial( int tag_index, const Range& file_ids,
-                                       std::vector< int >& results );
+    ErrorCode read_tag_values_partial( int tag_index, const Range& file_ids, std::vector< int >& results );
 
     enum ReadTimingValues
     {
@@ -206,8 +203,7 @@ class ReadHDF5 : public ReaderIface
 
     //! Given a list of tags and values, get the file ids for the
     //! corresponding entities in the file.
-    ErrorCode get_subset_ids( const ReaderIface::IDTag* subset_list, int subset_list_length,
-                              Range& file_ids_out );
+    ErrorCode get_subset_ids( const ReaderIface::IDTag* subset_list, int subset_list_length, Range& file_ids_out );
 
     /**\brief Remove all but the specified fraction of sets from the passed range
      *
@@ -257,8 +253,7 @@ class ReadHDF5 : public ReaderIface
     // element. All new elements are added to idMap.
     //
     // NOTE: Collective IO calls in parallel.
-    ErrorCode read_node_adj_elems( const mhdf_ElemDesc& group, hid_t connectivity_handle,
-                                   Range* read_entities = 0 );
+    ErrorCode read_node_adj_elems( const mhdf_ElemDesc& group, hid_t connectivity_handle, Range* read_entities = 0 );
 
     //! Read poly(gons|hedra)
     ErrorCode read_poly( const mhdf_ElemDesc& elems, const Range& file_ids );
@@ -280,17 +275,16 @@ class ReadHDF5 : public ReaderIface
     ErrorCode create_tag( const mhdf_TagDesc& info, Tag& handle, hid_t& type );
 
     //! Read dense tag for all entities
-    ErrorCode read_dense_tag( Tag tag_handle, const char* ent_name, hid_t hdf_read_type,
-                              hid_t data_table, long start_id, long count );
+    ErrorCode read_dense_tag( Tag tag_handle, const char* ent_name, hid_t hdf_read_type, hid_t data_table,
+                              long start_id, long count );
 
     //! Read sparse tag for all entities.
-    ErrorCode read_sparse_tag( Tag tag_handle, hid_t hdf_read_type, hid_t ent_table,
-                               hid_t val_table, long num_entities );
+    ErrorCode read_sparse_tag( Tag tag_handle, hid_t hdf_read_type, hid_t ent_table, hid_t val_table,
+                               long num_entities );
 
     //! Read variable-length tag for all entities.
-    ErrorCode read_var_len_tag( Tag tag_handle, hid_t hdf_read_type, hid_t ent_table,
-                                hid_t val_table, hid_t off_table, long num_entities,
-                                long num_values );
+    ErrorCode read_var_len_tag( Tag tag_handle, hid_t hdf_read_type, hid_t ent_table, hid_t val_table, hid_t off_table,
+                                long num_entities, long num_values );
 
     /**\brief Read index table for sparse tag.
      *
@@ -315,34 +309,29 @@ class ReadHDF5 : public ReaderIface
      *                     the IDs occurred in handle order, then
      *                     this will be empty. Use \c handle_range instead.
      */
-    ErrorCode read_sparse_tag_indices( const char* name, hid_t id_table, EntityHandle start_offset,
-                                       Range& offset_range, Range& handle_range,
-                                       std::vector< EntityHandle >& handle_vect );
+    ErrorCode read_sparse_tag_indices( const char* name, hid_t id_table, EntityHandle start_offset, Range& offset_range,
+                                       Range& handle_range, std::vector< EntityHandle >& handle_vect );
 
     ErrorCode read_qa( EntityHandle file_set );
 
   public:
     ErrorCode convert_id_to_handle( EntityHandle* in_out_array, size_t array_length );
 
-    void convert_id_to_handle( EntityHandle* in_out_array, size_t array_length,
-                               size_t& array_length_out ) const
+    void convert_id_to_handle( EntityHandle* in_out_array, size_t array_length, size_t& array_length_out ) const
     {
         return convert_id_to_handle( in_out_array, array_length, array_length_out, idMap );
     }
 
-    ErrorCode convert_range_to_handle( const EntityHandle* ranges, size_t num_ranges,
-                                       Range& merge );
+    ErrorCode convert_range_to_handle( const EntityHandle* ranges, size_t num_ranges, Range& merge );
 
     static void convert_id_to_handle( EntityHandle* in_out_array, size_t array_length,
                                       const RangeMap< long, EntityHandle >& id_map );
 
-    static void convert_id_to_handle( EntityHandle* in_out_array, size_t array_length,
-                                      size_t&                               array_length_out,
+    static void convert_id_to_handle( EntityHandle* in_out_array, size_t array_length, size_t& array_length_out,
                                       const RangeMap< long, EntityHandle >& id_map );
 
     static void convert_range_to_handle( const EntityHandle* ranges, size_t num_ranges,
-                                         const RangeMap< long, EntityHandle >& id_map,
-                                         Range&                                merge );
+                                         const RangeMap< long, EntityHandle >& id_map, Range& merge );
 
     ErrorCode insert_in_id_map( const Range& file_ids, EntityHandle start_id );
 
@@ -358,8 +347,8 @@ class ReadHDF5 : public ReaderIface
      *                  order.
      *\param file_ids_out  File IDs for entities with specified tag values.
      */
-    ErrorCode search_tag_values( int tag_index, const std::vector< int >& sorted_values,
-                                 Range& file_ids_out, bool sets_only = false );
+    ErrorCode search_tag_values( int tag_index, const std::vector< int >& sorted_values, Range& file_ids_out,
+                                 bool sets_only = false );
 
     /**\brief Search for entities with specified tag
      *
@@ -383,8 +372,7 @@ class ReadHDF5 : public ReaderIface
      *\param value_indices Output: Offsets into the table of data at which
      *                       matching values were found.
      */
-    ErrorCode search_tag_values( hid_t tag_table, unsigned long table_size,
-                                 const std::vector< int >&    sorted_values,
+    ErrorCode search_tag_values( hid_t tag_table, unsigned long table_size, const std::vector< int >& sorted_values,
                                  std::vector< EntityHandle >& value_indices );
 
     /**\brief Get the file IDs for nodes and elements contained in sets.
@@ -438,9 +426,8 @@ class ReadHDF5 : public ReaderIface
     // range and do not make any changes to MOAB data
     // structures. If file_ids_out is NULL, then set_start_handle
     // is ignored.
-    ErrorCode read_set_data( const Range& set_file_ids, EntityHandle set_start_handle,
-                             ReadHDF5Dataset& set_data_set, SetMode which_data,
-                             Range* file_ids_out = 0 );
+    ErrorCode read_set_data( const Range& set_file_ids, EntityHandle set_start_handle, ReadHDF5Dataset& set_data_set,
+                             SetMode which_data, Range* file_ids_out = 0 );
 
     /**\brief Store file IDS in tag values
      *

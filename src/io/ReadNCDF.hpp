@@ -76,17 +76,14 @@ class ReadNCDF : public ReaderIface
   public:
     static ReaderIface* factory( Interface* );
 
-    void tokenize( const std::string& str, std::vector< std::string >& tokens,
-                   const char* delimiters );
+    void tokenize( const std::string& str, std::vector< std::string >& tokens, const char* delimiters );
 
     //! load an ExoII file
-    ErrorCode load_file( const char* file_name, const EntityHandle* file_set,
-                         const FileOptions& opts, const SubsetList* subset_list = 0,
-                         const Tag* file_id_tag = 0 );
+    ErrorCode load_file( const char* file_name, const EntityHandle* file_set, const FileOptions& opts,
+                         const SubsetList* subset_list = 0, const Tag* file_id_tag = 0 );
 
     ErrorCode read_tag_values( const char* file_name, const char* tag_name, const FileOptions& opts,
-                               std::vector< int >& tag_values_out,
-                               const SubsetList*   subset_list = 0 );
+                               std::vector< int >& tag_values_out, const SubsetList* subset_list = 0 );
 
     //! Constructor
     ReadNCDF( Interface* impl = NULL );
@@ -154,22 +151,20 @@ class ReadNCDF : public ReaderIface
 
     ErrorCode read_qa_string( char* string, int record_number, int record_position );
 
-    ErrorCode create_ss_elements( int* element_ids, int* side_list, int num_sides,
-                                  int                          num_dist_factors,
+    ErrorCode create_ss_elements( int* element_ids, int* side_list, int num_sides, int num_dist_factors,
                                   std::vector< EntityHandle >& entities_to_add,
                                   std::vector< EntityHandle >& reverse_entities,
                                   std::vector< double >& dist_factor_vector, int ss_seq_id );
 
-    ErrorCode find_side_element_type( const int element_id, ExoIIElementType& type,
-                                      ReadBlockData& block_data, int& df_index, int side_id );
+    ErrorCode find_side_element_type( const int element_id, ExoIIElementType& type, ReadBlockData& block_data,
+                                      int& df_index, int side_id );
 
     /* ErrorCode assign_block_ids_to_ssets(EntityHandle ss_handle,
                                             MB_MeshSet *ss_mesh_set);
                                             */
 
     //! creates an element with the given connectivity
-    ErrorCode create_sideset_element( const std::vector< EntityHandle >&, EntityType, EntityHandle&,
-                                      int& );
+    ErrorCode create_sideset_element( const std::vector< EntityHandle >&, EntityType, EntityHandle&, int& );
 
     int get_number_nodes( EntityHandle handle );
 

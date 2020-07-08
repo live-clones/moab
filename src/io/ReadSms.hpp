@@ -19,13 +19,11 @@ class ReadSms : public ReaderIface
     //! factory method
     static ReaderIface* factory( Interface* );
 
-    ErrorCode load_file( const char* file_name, const EntityHandle* file_set,
-                         const FileOptions& opts, const SubsetList* subset_list = 0,
-                         const Tag* file_id_tag = 0 );
+    ErrorCode load_file( const char* file_name, const EntityHandle* file_set, const FileOptions& opts,
+                         const SubsetList* subset_list = 0, const Tag* file_id_tag = 0 );
 
     ErrorCode read_tag_values( const char* file_name, const char* tag_name, const FileOptions& opts,
-                               std::vector< int >& tag_values_out,
-                               const SubsetList*   subset_list = 0 );
+                               std::vector< int >& tag_values_out, const SubsetList* subset_list = 0 );
 
     //! Constructor
     ReadSms( Interface* impl = NULL );
@@ -38,8 +36,8 @@ class ReadSms : public ReaderIface
 
     ErrorCode load_file_impl( FILE* file, const Tag* file_id_tag );
 
-    ErrorCode get_set( std::vector< EntityHandle >* sets, int set_type, int set_id, Tag set_tag,
-                       EntityHandle& this_set, const Tag* file_id_tag );
+    ErrorCode get_set( std::vector< EntityHandle >* sets, int set_type, int set_id, Tag set_tag, EntityHandle& this_set,
+                       const Tag* file_id_tag );
 
     ErrorCode read_parallel_info( FILE* file_ptr );
 

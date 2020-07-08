@@ -127,8 +127,7 @@ int main( int, char*[] )
         if( d > EPSILON ) ++invalid;
     }
 
-    std::cerr << invalid << " vertices not within " << EPSILON << " of expected location"
-              << std::endl;
+    std::cerr << invalid << " vertices not within " << EPSILON << " of expected location" << std::endl;
 
     return ( invalid != 0 );
 }

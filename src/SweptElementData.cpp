@@ -24,8 +24,7 @@
 namespace moab
 {
 
-EntityID SweptElementData::calc_num_entities( EntityHandle start_handle, int irange, int jrange,
-                                              int krange )
+EntityID SweptElementData::calc_num_entities( EntityHandle start_handle, int irange, int jrange, int krange )
 {
     size_t result = 1;
     switch( CN::Dimension( TYPE_FROM_HANDLE( start_handle ) ) )
@@ -44,12 +43,9 @@ EntityID SweptElementData::calc_num_entities( EntityHandle start_handle, int ira
     return result;
 }
 
-SweptElementData::SweptElementData( EntityHandle shandle, const int imin, const int jmin,
-                                    const int kmin, const int imax, const int jmax, const int kmax,
-                                    const int* /*Cq*/ )
-    : SequenceData( 0, shandle,
-                    shandle + calc_num_entities( shandle, imax - imin, jmax - jmin, kmax - kmin ) -
-                        1 )
+SweptElementData::SweptElementData( EntityHandle shandle, const int imin, const int jmin, const int kmin,
+                                    const int imax, const int jmax, const int kmax, const int* /*Cq*/ )
+    : SequenceData( 0, shandle, shandle + calc_num_entities( shandle, imax - imin, jmax - jmin, kmax - kmin ) - 1 )
 {
     // need to have meaningful parameters
     assert( imax >= imin && jmax >= jmin && kmax >= kmin );
@@ -79,8 +75,8 @@ bool SweptElementData::boundary_complete( ) const
 
     // pseudo code:
     // for each vertex sequence v:
-    for( std::vector< VertexDataRef >::const_iterator vseq = vertexSeqRefs.begin( );
-         vseq != vertexSeqRefs.end( ); ++vseq )
+    for( std::vector< VertexDataRef >::const_iterator vseq = vertexSeqRefs.begin( ); vseq != vertexSeqRefs.end( );
+         ++vseq )
     {
         //   test min corner mincorner:
         bool mincorner = true;
@@ -134,8 +130,7 @@ bool SweptElementData::boundary_complete( ) const
     //
     // if minlist.size = 1 & maxlist.size = 1 & minlist[0] = esequence.min &
     //         maxlist[0] = esequence.max+(1,1,1)
-    if( minlist.size( ) == 1 && maxlist.size( ) == 1 &&
-        minlist[ 0 ].minmax[ 0 ] == elementParams[ 0 ] &&
+    if( minlist.size( ) == 1 && maxlist.size( ) == 1 && minlist[ 0 ].minmax[ 0 ] == elementParams[ 0 ] &&
         maxlist[ 0 ].minmax[ 1 ] == elementParams[ 1 ] )
         //   complete
         return true;
@@ -145,8 +140,7 @@ bool SweptElementData::boundary_complete( ) const
 }
 
 SequenceData* SweptElementData::subset( EntityHandle /*start*/, EntityHandle /*end*/,
-                                        const int* /*sequence_data_sizes*/,
-                                        const int* /*tag_data_sizes*/ ) const
+                                        const int* /*sequence_data_sizes*/, const int* /*tag_data_sizes*/ ) const
 {
     return 0;
 }

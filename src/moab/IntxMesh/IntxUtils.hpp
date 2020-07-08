@@ -26,24 +26,21 @@ class IntxUtils
     static inline double area2D( double* a, double* b, double* c )
     {
         // (b-a)x(c-a) / 2
-        return ( ( b[ 0 ] - a[ 0 ] ) * ( c[ 1 ] - a[ 1 ] ) -
-                 ( b[ 1 ] - a[ 1 ] ) * ( c[ 0 ] - a[ 0 ] ) ) /
-               2;
+        return ( ( b[ 0 ] - a[ 0 ] ) * ( c[ 1 ] - a[ 1 ] ) - ( b[ 1 ] - a[ 1 ] ) * ( c[ 0 ] - a[ 0 ] ) ) / 2;
     }
 
-    static int borderPointsOfXinY2( double* X, int nX, double* Y, int nY, double* P, int* side,
-                                    double epsilon_area );
+    static int borderPointsOfXinY2( double* X, int nX, double* Y, int nY, double* P, int* side, double epsilon_area );
 
     static int SortAndRemoveDoubles2( double* P, int& nP, double epsilon );
     // the marks will show what edges of blue intersect the red
 
-    static ErrorCode EdgeIntersections2( double* blue, int nsBlue, double* red, int nsRed,
-                                         int* markb, int* markr, double* points, int& nPoints );
+    static ErrorCode EdgeIntersections2( double* blue, int nsBlue, double* red, int nsRed, int* markb, int* markr,
+                                         double* points, int& nPoints );
 
     // special one, for intersection between rll (constant latitude)  and cs quads
-    static ErrorCode EdgeIntxRllCs( double* blue, CartVect* bluec, int* blueEdgeType, int nsBlue,
-                                    double* red, CartVect* redc, int nsRed, int* markb, int* markr,
-                                    int plane, double Radius, double* points, int& nPoints );
+    static ErrorCode EdgeIntxRllCs( double* blue, CartVect* bluec, int* blueEdgeType, int nsBlue, double* red,
+                                    CartVect* redc, int nsRed, int* markb, int* markr, int plane, double Radius,
+                                    double* points, int& nPoints );
 
     // vec utils related to gnomonic projection on a sphere
     // vec utils
@@ -64,12 +61,11 @@ class IntxUtils
 
     // point on a sphere is projected on one of six planes, decided earlier
 
-    static ErrorCode gnomonic_projection( const CartVect& pos, double R, int plane, double& c1,
-                                          double& c2 );
+    static ErrorCode gnomonic_projection( const CartVect& pos, double R, int plane, double& c1, double& c2 );
 
     // given the position on plane (one out of 6), find out the position on sphere
-    static ErrorCode reverse_gnomonic_projection( const double& c1, const double& c2, double R,
-                                                  int plane, CartVect& pos );
+    static ErrorCode reverse_gnomonic_projection( const double& c1, const double& c2, double R, int plane,
+                                                  CartVect& pos );
 
     /*
     *   other methods to convert from spherical coord to cartesian, and back
@@ -141,26 +137,22 @@ class IntxUtils
      * given 2 arcs AB and CD, compute the unique intersection point, if it exists
      *  in between
      */
-    static ErrorCode intersect_great_circle_arcs( double* A, double* B, double* C, double* D,
-                                                  double R, double* E );
+    static ErrorCode intersect_great_circle_arcs( double* A, double* B, double* C, double* D, double R, double* E );
     /*
      * given 2 arcs AB and CD, compute the intersection points, if it exists
      *  AB is a great circle arc
      *  CD is a constant latitude arc
      */
-    static ErrorCode intersect_great_circle_arc_with_clat_arc( double* A, double* B, double* C,
-                                                               double* D, double R, double* E,
-                                                               int& np );
+    static ErrorCode intersect_great_circle_arc_with_clat_arc( double* A, double* B, double* C, double* D, double R,
+                                                               double* E, int& np );
 
     // ErrorCode  set_edge_type_flag(Interface * mb, EntityHandle sf1);
 
-    static int borderPointsOfCSinRLL( CartVect* redc, double* red2dc, int nsRed, CartVect* bluec,
-                                      int nsBlue, int* blueEdgeType, double* P, int* side,
-                                      double epsil );
+    static int borderPointsOfCSinRLL( CartVect* redc, double* red2dc, int nsRed, CartVect* bluec, int nsBlue,
+                                      int* blueEdgeType, double* P, int* side, double epsil );
 
     // used only by homme
-    static ErrorCode deep_copy_set_with_quads( Interface* mb, EntityHandle source_set,
-                                               EntityHandle dest_set );
+    static ErrorCode deep_copy_set_with_quads( Interface* mb, EntityHandle source_set, EntityHandle dest_set );
 };
 
 class IntxAreaUtils

@@ -18,10 +18,9 @@ struct iBase_EntityArrIterator_Private
     bool                 isRecursive;
 
   public:
-    iBase_EntityArrIterator_Private( iBase_EntityType type, iMesh_EntityTopology topology,
-                                     EntityHandle set, int array_sz, bool recursive = false )
-        : entType( type ), entTopo( topology ), entSet( set ), arrSize( array_sz ),
-          isRecursive( recursive )
+    iBase_EntityArrIterator_Private( iBase_EntityType type, iMesh_EntityTopology topology, EntityHandle set,
+                                     int array_sz, bool recursive = false )
+        : entType( type ), entTopo( topology ), entSet( set ), arrSize( array_sz ), isRecursive( recursive )
     {
     }
 
@@ -67,8 +66,7 @@ struct iBase_EntityArrIterator_Private
 // step_iterator will safely step forward N steps in a iterator. We specialize
 // for random-access iterators (vectors and Ranges) so that they perform better.
 
-template< typename T >
-inline ErrorCode step_iterator( T& curr, const T& end, int num_steps, bool& at_end )
+template< typename T > inline ErrorCode step_iterator( T& curr, const T& end, int num_steps, bool& at_end )
 {
     if( 0 > num_steps ) return MB_FAILURE;
 
@@ -83,8 +81,7 @@ inline ErrorCode step_iterator( T& curr, const T& end, int num_steps, bool& at_e
 
 template< typename T >
 inline ErrorCode step_iterator( typename std::vector< T >::const_iterator&       curr,
-                                const typename std::vector< T >::const_iterator& end, int num_steps,
-                                bool& at_end )
+                                const typename std::vector< T >::const_iterator& end, int num_steps, bool& at_end )
 {
     if( 0 > num_steps ) return MB_FAILURE;
 
@@ -98,8 +95,8 @@ inline ErrorCode step_iterator( typename std::vector< T >::const_iterator&      
     return MB_SUCCESS;
 }
 
-inline ErrorCode step_iterator( Range::const_iterator& curr, const Range::const_iterator& end,
-                                int num_steps, bool& at_end )
+inline ErrorCode step_iterator( Range::const_iterator& curr, const Range::const_iterator& end, int num_steps,
+                                bool& at_end )
 {
     if( 0 > num_steps ) return MB_FAILURE;
 
@@ -121,8 +118,7 @@ template< class Container > class MBIter : public iBase_EntityArrIterator_Privat
   public:
     MBIter( iBase_EntityType type, iMesh_EntityTopology topology, EntityHandle set, int arr_size,
             bool recursive = false )
-        : iBase_EntityArrIterator_Private( type, topology, set, arr_size, recursive ),
-          iterPos( iterData.end( ) )
+        : iBase_EntityArrIterator_Private( type, topology, set, arr_size, recursive ), iterPos( iterData.end( ) )
     {
     }
 
@@ -158,8 +154,7 @@ template< class Container > class MBIter : public iBase_EntityArrIterator_Privat
             if( entTopo == iMesh_SEPTAHEDRON )
                 result = MB_SUCCESS;
             else
-                result = mb->get_entities_by_type( entSet, mb_topology_table[ entTopo ], iterData,
-                                                   isRecursive );
+                result = mb->get_entities_by_type( entSet, mb_topology_table[ entTopo ], iterData, isRecursive );
         }
         else if( entType != iBase_ALL_TYPES )
         {

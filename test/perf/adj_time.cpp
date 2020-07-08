@@ -46,8 +46,8 @@ int main( )
         assert( adj.size( ) == 1 || adj.size( ) == 2 );
     }
     clock_t t_up = clock( ) - t_0;
-    std::cout << "Querying of volumes for " << faces.size( )
-              << " faces: " << t_up / (double)CLOCKS_PER_SEC << " seconds" << std::endl;
+    std::cout << "Querying of volumes for " << faces.size( ) << " faces: " << t_up / (double)CLOCKS_PER_SEC
+              << " seconds" << std::endl;
 
     // time downward adjacency query from volumes to faces
     t_0 = clock( );
@@ -59,8 +59,8 @@ int main( )
         assert( adj.size( ) > 3 );
     }
     clock_t t_down = clock( ) - t_0;
-    std::cout << "Querying of faces for " << vols.size( )
-              << " volumes: " << t_down / (double)CLOCKS_PER_SEC << " seconds" << std::endl;
+    std::cout << "Querying of faces for " << vols.size( ) << " volumes: " << t_down / (double)CLOCKS_PER_SEC
+              << " seconds" << std::endl;
 
     return 0;
 }

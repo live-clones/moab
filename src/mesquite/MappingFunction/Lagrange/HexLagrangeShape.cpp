@@ -43,14 +43,13 @@ int HexLagrangeShape::num_nodes( ) const
     return 27;
 }
 
-void HexLagrangeShape::coefficients( Sample loc, NodeSet nodeset, double* coeff_out,
-                                     size_t* indices_out, size_t& num_coeff, MsqError& err ) const
+void HexLagrangeShape::coefficients( Sample loc, NodeSet nodeset, double* coeff_out, size_t* indices_out,
+                                     size_t& num_coeff, MsqError& err ) const
 {
     if( nodeset.num_nodes( ) != 27 )
     {
         MSQ_SETERR( err )
-        ( "Mapping function supports only 27-node hexahedra with no slaved nodes.",
-          MsqError::UNSUPPORTED_ELEMENT );
+        ( "Mapping function supports only 27-node hexahedra with no slaved nodes.", MsqError::UNSUPPORTED_ELEMENT );
         return;
     }
 
@@ -85,26 +84,22 @@ void HexLagrangeShape::coefficients( Sample loc, NodeSet nodeset, double* coeff_
     }
 }
 
-void HexLagrangeShape::derivatives( Sample loc, NodeSet nodeset, size_t* vertices,
-                                    MsqVector< 3 >* derivs, size_t& num_vtx, MsqError& err ) const
+void HexLagrangeShape::derivatives( Sample loc, NodeSet nodeset, size_t* vertices, MsqVector< 3 >* derivs,
+                                    size_t& num_vtx, MsqError& err ) const
 {
     if( nodeset.num_nodes( ) != 27 )
     {
         MSQ_SETERR( err )
-        ( "Mapping function supports only 27-node hexahedra with no slaved nodes.",
-          MsqError::UNSUPPORTED_ELEMENT );
+        ( "Mapping function supports only 27-node hexahedra with no slaved nodes.", MsqError::UNSUPPORTED_ELEMENT );
         return;
     }
 
     // r coordinate
-    const int HLS1[] = { 1, 3, 3, 1, 1, 3, 3, 1, 2, 3, 2, 1, 1, 3,
-                         3, 1, 2, 3, 2, 1, 2, 3, 2, 1, 2, 2, 2 };
+    const int HLS1[] = { 1, 3, 3, 1, 1, 3, 3, 1, 2, 3, 2, 1, 1, 3, 3, 1, 2, 3, 2, 1, 2, 3, 2, 1, 2, 2, 2 };
     // s coordinate
-    const int HLS2[] = { 1, 1, 3, 3, 1, 1, 3, 3, 1, 2, 3, 2, 1, 1,
-                         3, 3, 1, 2, 3, 2, 1, 2, 3, 2, 2, 2, 2 };
+    const int HLS2[] = { 1, 1, 3, 3, 1, 1, 3, 3, 1, 2, 3, 2, 1, 1, 3, 3, 1, 2, 3, 2, 1, 2, 3, 2, 2, 2, 2 };
     // t coordinate
-    const int HLS3[] = { 1, 1, 1, 1, 3, 3, 3, 3, 1, 1, 1, 1, 2, 2,
-                         2, 2, 3, 3, 3, 3, 2, 2, 2, 2, 1, 3, 2 };
+    const int HLS3[] = { 1, 1, 1, 1, 3, 3, 3, 3, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 2, 2, 2, 2, 1, 3, 2 };
 
     const int HLSup1[] = { 12, 13, 14, 15, -1, -1, -1, -1, 20, 21, 22, 23, 4, 5,
                            6,  7,  -1, -1, -1, -1, 16, 17, 18, 19, 26, -1, 25 };

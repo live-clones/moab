@@ -836,20 +836,19 @@ void iRel_getSetSetRelation( iRel_Instance instance,
                                                                                * Description
                                                                                *unavailable.
                                                                                ******************************************************************************/
-void iRel_getEntSetIterRelation(
-    iRel_Instance instance,
-    /**< [in] iRel instance handle */
-    iRel_PairHandle pair,
-    /**< [in] Relation pair handle being queried */
-    iBase_EntityHandle ent1,
-    /**< [in] ent1 1st entity set of relation being queried */
-    int switch_order,
-    /**< [in] 1st entity is related to 1st interface (=0) or 2nd interface
-    (=1) of relation pair */
-    iBase_EntityIterator* entIter,
-    /**< [out] Returned entity iterator */
-    int* err
-    /**< [out] Returned Error status (see iBase_ErrorType) */
+void iRel_getEntSetIterRelation( iRel_Instance instance,
+                                 /**< [in] iRel instance handle */
+                                 iRel_PairHandle pair,
+                                 /**< [in] Relation pair handle being queried */
+                                 iBase_EntityHandle ent1,
+                                 /**< [in] ent1 1st entity set of relation being queried */
+                                 int switch_order,
+                                 /**< [in] 1st entity is related to 1st interface (=0) or 2nd interface
+                                 (=1) of relation pair */
+                                 iBase_EntityIterator* entIter,
+                                 /**< [out] Returned entity iterator */
+                                 int* err
+                                 /**< [out] Returned Error status (see iBase_ErrorType) */
 );
 
 /***************************************************************************/ /**
@@ -872,26 +871,25 @@ void iRel_getEntSetIterRelation(
                                                                                *with status
                                                                                * iRel_NOTEXIST.
                                                                                ******************************************************************************/
-void iRel_getEntArrEntArrRelation(
-    iRel_Instance instance,
-    /**< [in] iRel instance handle */
-    iRel_PairHandle pair,
-    /**< [in] Relation pair handle being queried */
-    iBase_EntityHandle* ent_array_1,
-    /**< [in] Array of entities whose relations are being queried */
-    int ent_array_1_size,
-    /**< [in] Number of entities in ent_array_1 */
-    int switch_order,
-    /**< [in] Entities in ent_array_1 are related with 1st (=0) or 2nd (=1)
-    interface of this relation pair */
-    iBase_EntityHandle** ent_array_2,
-    /**< [inout] Pointer to array of entity handles returned from function */
-    int* ent_array_2_allocated,
-    /**< [inout] Pointer to allocated size of ent_array_2 */
-    int* ent_array_2_size,
-    /**< [out] Pointer to occupied size of ent_array_2 */
-    int* err
-    /**< [out] Returned Error status (see iBase_ErrorType) */
+void iRel_getEntArrEntArrRelation( iRel_Instance instance,
+                                   /**< [in] iRel instance handle */
+                                   iRel_PairHandle pair,
+                                   /**< [in] Relation pair handle being queried */
+                                   iBase_EntityHandle* ent_array_1,
+                                   /**< [in] Array of entities whose relations are being queried */
+                                   int ent_array_1_size,
+                                   /**< [in] Number of entities in ent_array_1 */
+                                   int switch_order,
+                                   /**< [in] Entities in ent_array_1 are related with 1st (=0) or 2nd (=1)
+                                   interface of this relation pair */
+                                   iBase_EntityHandle** ent_array_2,
+                                   /**< [inout] Pointer to array of entity handles returned from function */
+                                   int* ent_array_2_allocated,
+                                   /**< [inout] Pointer to allocated size of ent_array_2 */
+                                   int* ent_array_2_size,
+                                   /**< [out] Pointer to occupied size of ent_array_2 */
+                                   int* err
+                                   /**< [out] Returned Error status (see iBase_ErrorType) */
 );
 
 /***************************************************************************/ /**
@@ -904,26 +902,25 @@ void iRel_getEntArrEntArrRelation(
                                                                                * Description
                                                                                *unavailable.
                                                                                ******************************************************************************/
-void iRel_getEntArrSetArrRelation(
-    iRel_Instance instance,
-    /**< [in] iRel instance handle */
-    iRel_PairHandle pair,
-    /**< [in] Relation pair handle being queried */
-    iBase_EntityHandle* ent_array_1,
-    /**< [in] Array of entities whose relations are being queried */
-    int ent_array_1_size,
-    /**< [in] Number of entities in ent_array_1 */
-    int switch_order,
-    /**< [in] Entities in ent_array_1 are related with 1st (=0) or 2nd (=1)
-    interface of this relation pair */
-    iBase_EntitySetHandle** entset_array_2,
-    /**< [inout] Pointer to array of entity set handles returned from function */
-    int* entset_array_2_allocated,
-    /**< [inout] Pointer to allocated size of entset_array_2 */
-    int* entset_array_2_size,
-    /**< [out] Pointer to occupied size of entset_array_2 */
-    int* err
-    /**< [out] Returned Error status (see iBase_ErrorType) */
+void iRel_getEntArrSetArrRelation( iRel_Instance instance,
+                                   /**< [in] iRel instance handle */
+                                   iRel_PairHandle pair,
+                                   /**< [in] Relation pair handle being queried */
+                                   iBase_EntityHandle* ent_array_1,
+                                   /**< [in] Array of entities whose relations are being queried */
+                                   int ent_array_1_size,
+                                   /**< [in] Number of entities in ent_array_1 */
+                                   int switch_order,
+                                   /**< [in] Entities in ent_array_1 are related with 1st (=0) or 2nd (=1)
+                                   interface of this relation pair */
+                                   iBase_EntitySetHandle** entset_array_2,
+                                   /**< [inout] Pointer to array of entity set handles returned from function */
+                                   int* entset_array_2_allocated,
+                                   /**< [inout] Pointer to allocated size of entset_array_2 */
+                                   int* entset_array_2_size,
+                                   /**< [out] Pointer to occupied size of entset_array_2 */
+                                   int* err
+                                   /**< [out] Returned Error status (see iBase_ErrorType) */
 );
 
 /***************************************************************************/ /**
@@ -936,26 +933,25 @@ void iRel_getEntArrSetArrRelation(
                                                                                * Description
                                                                                *unavailable.
                                                                                ******************************************************************************/
-void iRel_getSetArrEntArrRelation(
-    iRel_Instance instance,
-    /**< [in] iRel instance handle */
-    iRel_PairHandle pair,
-    /**< [in] Relation pair handle being queried */
-    iBase_EntitySetHandle* entset_array_1,
-    /**< [in] Array of entity sets whose relations are being queried */
-    int entset_array_1_size,
-    /**< [in] Number of entity sets in entset_array_1 */
-    int switch_order,
-    /**< [in] Entities in ent_array_1 are related with 1st (=0) or 2nd (=1)
-    interface of this relation pair */
-    iBase_EntityHandle** ent_array_2,
-    /**< [inout] Pointer to array of entity handles returned from function */
-    int* ent_array_2_allocated,
-    /**< [inout] Pointer to allocated size of ent_array_2 */
-    int* ent_array_2_size,
-    /**< [out] Pointer to occupied size of ent_array_2 */
-    int* err
-    /**< [out] Returned Error status (see iBase_ErrorType) */
+void iRel_getSetArrEntArrRelation( iRel_Instance instance,
+                                   /**< [in] iRel instance handle */
+                                   iRel_PairHandle pair,
+                                   /**< [in] Relation pair handle being queried */
+                                   iBase_EntitySetHandle* entset_array_1,
+                                   /**< [in] Array of entity sets whose relations are being queried */
+                                   int entset_array_1_size,
+                                   /**< [in] Number of entity sets in entset_array_1 */
+                                   int switch_order,
+                                   /**< [in] Entities in ent_array_1 are related with 1st (=0) or 2nd (=1)
+                                   interface of this relation pair */
+                                   iBase_EntityHandle** ent_array_2,
+                                   /**< [inout] Pointer to array of entity handles returned from function */
+                                   int* ent_array_2_allocated,
+                                   /**< [inout] Pointer to allocated size of ent_array_2 */
+                                   int* ent_array_2_size,
+                                   /**< [out] Pointer to occupied size of ent_array_2 */
+                                   int* err
+                                   /**< [out] Returned Error status (see iBase_ErrorType) */
 );
 
 /***************************************************************************/ /**
@@ -968,26 +964,25 @@ void iRel_getSetArrEntArrRelation(
                                                                                * Description
                                                                                *unavailable.
                                                                                ******************************************************************************/
-void iRel_getSetArrSetArrRelation(
-    iRel_Instance instance,
-    /**< [in] iRel instance handle */
-    iRel_PairHandle pair,
-    /**< [in] Relation pair handle being queried */
-    iBase_EntitySetHandle* entset_array_1,
-    /**< [in] Array of entity sets whose relations are being queried */
-    int entset_array_1_size,
-    /**< [in] Number of entity sets in entset_array_1 */
-    int switch_order,
-    /**< [in] Entities in ent_array_1 are related with 1st (=0) or 2nd (=1)
-    interface of this relation pair */
-    iBase_EntitySetHandle** entset_array_2,
-    /**< [inout] Pointer to array of entity handles returned from function */
-    int* entset_array_2_allocated,
-    /**< [inout] Pointer to allocated size of entset_array_2 */
-    int* entset_array_2_size,
-    /**< [out] Pointer to occupied size of entset_array_2 */
-    int* err
-    /**< [out] Returned Error status (see iBase_ErrorType) */
+void iRel_getSetArrSetArrRelation( iRel_Instance instance,
+                                   /**< [in] iRel instance handle */
+                                   iRel_PairHandle pair,
+                                   /**< [in] Relation pair handle being queried */
+                                   iBase_EntitySetHandle* entset_array_1,
+                                   /**< [in] Array of entity sets whose relations are being queried */
+                                   int entset_array_1_size,
+                                   /**< [in] Number of entity sets in entset_array_1 */
+                                   int switch_order,
+                                   /**< [in] Entities in ent_array_1 are related with 1st (=0) or 2nd (=1)
+                                   interface of this relation pair */
+                                   iBase_EntitySetHandle** entset_array_2,
+                                   /**< [inout] Pointer to array of entity handles returned from function */
+                                   int* entset_array_2_allocated,
+                                   /**< [inout] Pointer to allocated size of entset_array_2 */
+                                   int* entset_array_2_size,
+                                   /**< [out] Pointer to occupied size of entset_array_2 */
+                                   int* err
+                                   /**< [out] Returned Error status (see iBase_ErrorType) */
 );
 
 /***************************************************************************/ /**
@@ -1000,27 +995,26 @@ void iRel_getSetArrSetArrRelation(
                                                                                * Description
                                                                                *unavailable.
                                                                                ******************************************************************************/
-void iRel_getEntArrSetIterArrRelation(
-    iRel_Instance instance,
-    /**< [in] iRel instance handle */
-    iRel_PairHandle pair,
-    /**< [in] Relation pair handle being queried */
-    iBase_EntityHandle* ent_array_1,
-    /**< [in] Array of entities whose relations are being queried */
-    int ent_array_1_size,
-    /**< [in] Number of entities in ent_array_1 */
-    int switch_order,
-    /**< [in] Entities in ent_array_1 are related with 1st (=0) or 2nd (=1)
-    interface of this relation pair */
-    iBase_EntityIterator** entiter,
-    /**< [inout] Pointer to array of entity iterator handles returned from
-    function */
-    int* entiter_allocated,
-    /**< [inout] Pointer to allocated size of entiter */
-    int* entiter_size,
-    /**< [out] Pointer to occupied size of entiter */
-    int* err
-    /**< [out] Returned Error status (see iBase_ErrorType) */
+void iRel_getEntArrSetIterArrRelation( iRel_Instance instance,
+                                       /**< [in] iRel instance handle */
+                                       iRel_PairHandle pair,
+                                       /**< [in] Relation pair handle being queried */
+                                       iBase_EntityHandle* ent_array_1,
+                                       /**< [in] Array of entities whose relations are being queried */
+                                       int ent_array_1_size,
+                                       /**< [in] Number of entities in ent_array_1 */
+                                       int switch_order,
+                                       /**< [in] Entities in ent_array_1 are related with 1st (=0) or 2nd (=1)
+                                       interface of this relation pair */
+                                       iBase_EntityIterator** entiter,
+                                       /**< [inout] Pointer to array of entity iterator handles returned from
+                                       function */
+                                       int* entiter_allocated,
+                                       /**< [inout] Pointer to allocated size of entiter */
+                                       int* entiter_size,
+                                       /**< [out] Pointer to occupied size of entiter */
+                                       int* err
+                                       /**< [out] Returned Error status (see iBase_ErrorType) */
 );
 
 /***************************************************************************/ /**
@@ -1098,20 +1092,19 @@ void iRel_rmvEntArrRelation( iRel_Instance instance,
                                                                                *from an array of
                                                                                *entity sets
                                                                                ******************************************************************************/
-void iRel_rmvSetArrRelation(
-    iRel_Instance instance,
-    /**< [in] iRel instance handle */
-    iRel_PairHandle pair,
-    /**< [in] Relation pair handle being queried */
-    iBase_EntitySetHandle* entset_array_1,
-    /**< [in] Array of entity sets of relation being removed */
-    int num_entset1,
-    /**< [in] Number of entity sets in array */
-    int switch_order,
-    /**< [in] entity sets are related to 1st interface (=0) or 2nd interface
-    (=1) of relation pair */
-    int* err
-    /**< [out] Returned Error status (see iBase_ErrorType) */
+void iRel_rmvSetArrRelation( iRel_Instance instance,
+                             /**< [in] iRel instance handle */
+                             iRel_PairHandle pair,
+                             /**< [in] Relation pair handle being queried */
+                             iBase_EntitySetHandle* entset_array_1,
+                             /**< [in] Array of entity sets of relation being removed */
+                             int num_entset1,
+                             /**< [in] Number of entity sets in array */
+                             int switch_order,
+                             /**< [in] entity sets are related to 1st interface (=0) or 2nd interface
+                             (=1) of relation pair */
+                             int* err
+                             /**< [out] Returned Error status (see iBase_ErrorType) */
 );
 
 /***************************************************************************/ /**

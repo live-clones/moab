@@ -34,8 +34,8 @@ using namespace moab;
 std::string read_options;
 #endif
 
-ErrorCode test_closedsurface_mesh( const char* filename, int* level_degrees, int num_levels,
-                                   int degree, bool interp, int dim, geomObject* obj )
+ErrorCode test_closedsurface_mesh( const char* filename, int* level_degrees, int num_levels, int degree, bool interp,
+                                   int dim, geomObject* obj )
 {
     Core          moab;
     Interface*    mbImpl = &moab;
@@ -54,8 +54,7 @@ ErrorCode test_closedsurface_mesh( const char* filename, int* level_degrees, int
 
     if( procs > 1 )
     {
-        read_options =
-            "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_SHARED_ENTS;";
+        read_options = "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_SHARED_ENTS;";
         error = mbImpl->load_file( filename, &fileset, read_options.c_str( ) );MB_CHK_ERR( error );
     }
     else
@@ -115,8 +114,7 @@ ErrorCode test_closedsurface_mesh( const char* filename, int* level_degrees, int
 
         // project onto the estimated geometry
         double hicoords[ 3 ];
-        error = hirec.hiproj_walf_in_element( rootelem, nvpe, 1, &( naturalcoords2fit[ 0 ] ),
-                                              hicoords );MB_CHK_ERR( error );
+        error = hirec.hiproj_walf_in_element( rootelem, nvpe, 1, &( naturalcoords2fit[ 0 ] ), hicoords );MB_CHK_ERR( error );
 
         // estimate error
         double err = obj->compute_projecterror( 3, hicoords );
@@ -127,14 +125,12 @@ ErrorCode test_closedsurface_mesh( const char* filename, int* level_degrees, int
 
     l1err /= verts.size( ) - nvorig;
     l2err = sqrt( l2err / ( verts.size( ) - nvorig ) );
-    std::cout << "L1 error " << l1err << " L2 error " << l2err << " Linf error " << linferr
-              << std::endl;
+    std::cout << "L1 error " << l1err << " L2 error " << l2err << " Linf error " << linferr << std::endl;
     return error;
 }
 
-ErrorCode closedsurface_uref_hirec_convergence_study( const char* filename, int* level_degrees,
-                                                      int num_levels, std::vector< int >& degs2fit,
-                                                      bool interp, geomObject* obj )
+ErrorCode closedsurface_uref_hirec_convergence_study( const char* filename, int* level_degrees, int num_levels,
+                                                      std::vector< int >& degs2fit, bool interp, geomObject* obj )
 {
     Core          moab;
     Interface*    mbImpl = &moab;
@@ -153,8 +149,7 @@ ErrorCode closedsurface_uref_hirec_convergence_study( const char* filename, int*
 
     if( procs > 1 )
     {
-        read_options =
-            "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_SHARED_ENTS;";
+        read_options = "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_SHARED_ENTS;";
         error = mbImpl->load_file( filename, &fileset, read_options.c_str( ) );MB_CHK_ERR( error );
     }
     else
@@ -170,8 +165,8 @@ ErrorCode closedsurface_uref_hirec_convergence_study( const char* filename, int*
     std::vector< EntityHandle > meshes;
     std::vector< int >          meshsizes;
     error = uref.generate_mesh_hierarchy( num_levels, level_degrees, meshes );MB_CHK_ERR( error );
-    std::vector< std::vector< double > > geoml1errs( 1 + degs2fit.size( ) ),
-        geoml2errs( 1 + degs2fit.size( ) ), geomlinferrs( 1 + degs2fit.size( ) );
+    std::vector< std::vector< double > > geoml1errs( 1 + degs2fit.size( ) ), geoml2errs( 1 + degs2fit.size( ) ),
+        geomlinferrs( 1 + degs2fit.size( ) );
 
     // Perform high order reconstruction on each level of mesh (projected onto exact geometry) and
     // estimate geometric error with various degrees of fitting
@@ -228,31 +223,26 @@ ErrorCode closedsurface_uref_hirec_convergence_study( const char* filename, int*
                         a /= sum, b /= sum, c /= sum;
                     }
 
-                    testpnts.push_back( a * elemcoords[ 0 ] + b * elemcoords[ 3 ] +
-                                        c * elemcoords[ 6 ] );
-                    testpnts.push_back( a * elemcoords[ 1 ] + b * elemcoords[ 4 ] +
-                                        c * elemcoords[ 7 ] );
-                    testpnts.push_back( a * elemcoords[ 2 ] + b * elemcoords[ 5 ] +
-                                        c * elemcoords[ 8 ] );
+                    testpnts.push_back( a * elemcoords[ 0 ] + b * elemcoords[ 3 ] + c * elemcoords[ 6 ] );
+                    testpnts.push_back( a * elemcoords[ 1 ] + b * elemcoords[ 4 ] + c * elemcoords[ 7 ] );
+                    testpnts.push_back( a * elemcoords[ 2 ] + b * elemcoords[ 5 ] + c * elemcoords[ 8 ] );
                     testnaturalcoords.push_back( a );
                     testnaturalcoords.push_back( b );
                     testnaturalcoords.push_back( c );
                 }
                 else if( type == MBQUAD )
                 {
-                    double xi = (double)rand( ) / RAND_MAX, eta = (double)rand( ) / RAND_MAX,
-                           N[ 4 ];
+                    double xi = (double)rand( ) / RAND_MAX, eta = (double)rand( ) / RAND_MAX, N[ 4 ];
                     xi = 2 * xi - 1;
                     eta = 2 * eta - 1;
                     N[ 0 ] = ( 1 - xi ) * ( 1 - eta ) / 4, N[ 1 ] = ( 1 + xi ) * ( 1 - eta ) / 4,
-                         N[ 2 ] = ( 1 + xi ) * ( 1 + eta ) / 4,
-                         N[ 3 ] = ( 1 - xi ) * ( 1 + eta ) / 4;
-                    testpnts.push_back( N[ 0 ] * elemcoords[ 0 ] + N[ 1 ] * elemcoords[ 3 ] +
-                                        N[ 2 ] * elemcoords[ 6 ] + N[ 3 ] * elemcoords[ 9 ] );
-                    testpnts.push_back( N[ 0 ] * elemcoords[ 1 ] + N[ 1 ] * elemcoords[ 4 ] +
-                                        N[ 2 ] * elemcoords[ 7 ] + N[ 3 ] * elemcoords[ 10 ] );
-                    testpnts.push_back( N[ 0 ] * elemcoords[ 2 ] + N[ 1 ] * elemcoords[ 5 ] +
-                                        N[ 2 ] * elemcoords[ 8 ] + N[ 3 ] * elemcoords[ 11 ] );
+                         N[ 2 ] = ( 1 + xi ) * ( 1 + eta ) / 4, N[ 3 ] = ( 1 - xi ) * ( 1 + eta ) / 4;
+                    testpnts.push_back( N[ 0 ] * elemcoords[ 0 ] + N[ 1 ] * elemcoords[ 3 ] + N[ 2 ] * elemcoords[ 6 ] +
+                                        N[ 3 ] * elemcoords[ 9 ] );
+                    testpnts.push_back( N[ 0 ] * elemcoords[ 1 ] + N[ 1 ] * elemcoords[ 4 ] + N[ 2 ] * elemcoords[ 7 ] +
+                                        N[ 3 ] * elemcoords[ 10 ] );
+                    testpnts.push_back( N[ 0 ] * elemcoords[ 2 ] + N[ 1 ] * elemcoords[ 5 ] + N[ 2 ] * elemcoords[ 8 ] +
+                                        N[ 3 ] * elemcoords[ 11 ] );
                     testnaturalcoords.push_back( N[ 0 ] );
                     testnaturalcoords.push_back( N[ 1 ] );
                     testnaturalcoords.push_back( N[ 2 ] );
@@ -267,8 +257,7 @@ ErrorCode closedsurface_uref_hirec_convergence_study( const char* filename, int*
 
         // Compute error of linear interpolation
         double l1err, l2err, linferr;
-        obj->compute_projecterror( 3, elems.size( ) * nsamples, &( testpnts[ 0 ] ), l1err, l2err,
-                                   linferr );
+        obj->compute_projecterror( 3, elems.size( ) * nsamples, &( testpnts[ 0 ] ), l1err, l2err, linferr );
         geoml1errs[ 0 ].push_back( l1err );
         geoml2errs[ 0 ].push_back( l2err );
         geomlinferrs[ 0 ].push_back( linferr );
@@ -284,14 +273,13 @@ ErrorCode closedsurface_uref_hirec_convergence_study( const char* filename, int*
             for( Range::iterator ielem = elems.begin( ); ielem != elems.end( ); ++ielem, ++index )
             {
                 // Projection
-                error = hirec.hiproj_walf_in_element(
-                    *ielem, nvpe, nsamples, &( testnaturalcoords[ nvpe * nsamples * index ] ),
-                    &( testpnts[ 3 * nsamples * index ] ) );MB_CHK_ERR( error );
+                error = hirec.hiproj_walf_in_element( *ielem, nvpe, nsamples,
+                                                      &( testnaturalcoords[ nvpe * nsamples * index ] ),
+                                                      &( testpnts[ 3 * nsamples * index ] ) );MB_CHK_ERR( error );
             }
 
             // Estimate error
-            obj->compute_projecterror( 3, elems.size( ) * nsamples, &( testpnts[ 0 ] ), l1err,
-                                       l2err, linferr );
+            obj->compute_projecterror( 3, elems.size( ) * nsamples, &( testpnts[ 0 ] ), l1err, l2err, linferr );
             geoml1errs[ ideg + 1 ].push_back( l1err );
             geoml2errs[ ideg + 1 ].push_back( l2err );
             geomlinferrs[ ideg + 1 ].push_back( linferr );
@@ -421,14 +409,10 @@ int main( int argc, char* argv[] )
 #ifdef MOAB_HAVE_MPI
 
             if( 0 == rank )
-            {
-                std::cout << "Dimension of input mesh should be provided, positive and less than 3"
-                          << std::endl;
-            }
+            { std::cout << "Dimension of input mesh should be provided, positive and less than 3" << std::endl; }
 
 #else
-            std::cout << "Dimension of input mesh should be provided, positive and less than 3"
-                      << std::endl;
+            std::cout << "Dimension of input mesh should be provided, positive and less than 3" << std::endl;
 #endif
             return -1;
         }
@@ -456,8 +440,7 @@ int main( int argc, char* argv[] )
         {
             std::cout << "Testing on " << infile << " with dimension " << dim << "\n";
             std::string opts = interp ? "interpolation" : "least square fitting";
-            std::cout << "High order reconstruction with degree " << degree << " " << opts
-                      << std::endl;
+            std::cout << "High order reconstruction with degree " << degree << " " << opts << std::endl;
         }
 
 #else
@@ -486,8 +469,7 @@ int main( int argc, char* argv[] )
         else
             obj = new sphere( );
 
-        error = test_closedsurface_mesh( infile.c_str( ), level_degrees, num_levels, degree, interp,
-                                         dim, obj );MB_CHK_ERR( error );
+        error = test_closedsurface_mesh( infile.c_str( ), level_degrees, num_levels, degree, interp, dim, obj );MB_CHK_ERR( error );
 
         std::vector< int > degs2fit( 6 );
         for( int d = 1; d <= 6; ++d )
@@ -496,8 +478,8 @@ int main( int argc, char* argv[] )
         }
 
         // Call the higher order reconstruction routines and compute error convergence
-        error = closedsurface_uref_hirec_convergence_study( infile.c_str( ), level_degrees,
-                                                            num_levels, degs2fit, interp, obj );MB_CHK_ERR( error );
+        error = closedsurface_uref_hirec_convergence_study( infile.c_str( ), level_degrees, num_levels, degs2fit,
+                                                            interp, obj );MB_CHK_ERR( error );
         // cleanup memory
         delete obj;
     }

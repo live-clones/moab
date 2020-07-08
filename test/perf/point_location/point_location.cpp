@@ -51,8 +51,7 @@ static void usage( char* argv0, bool help = false )
     std::cout << "Usage: " << argv0 << " " << usage_str << std::endl
               << "  -k : Use kD Tree " << is_default_tree( UseKDTree ) << std::endl
               << "  -v : Use no tree" << is_default_tree( UseNoTree ) << std::endl
-              << "  -n : Specify number of test points (default = " << DEFAULT_NUM_TEST << ")"
-              << std::endl
+              << "  -n : Specify number of test points (default = " << DEFAULT_NUM_TEST << ")" << std::endl
               << "  -d : Specify maximum tree depth" << std::endl
               << "  -e : Specify maximum elements per leaf" << std::endl
               << " <input_mesh> : Mesh to build and query." << std::endl
@@ -60,19 +59,16 @@ static void usage( char* argv0, bool help = false )
     exit( 0 );
 }
 
-static void generate_random_points( Interface& mesh, size_t num_points,
-                                    std::vector< CartVect >&     points,
+static void generate_random_points( Interface& mesh, size_t num_points, std::vector< CartVect >& points,
                                     std::vector< EntityHandle >& point_elems );
 
 static void do_kdtree_test( Interface& mesh, int tree_depth, int elem_per_leaf, long num_test,
-                            const std::vector< CartVect >& points,
-                            std::vector< EntityHandle >& point_elems, clock_t& build_time,
-                            clock_t& test_time, size_t& depth );
+                            const std::vector< CartVect >& points, std::vector< EntityHandle >& point_elems,
+                            clock_t& build_time, clock_t& test_time, size_t& depth );
 
 static void do_linear_test( Interface& mesh, int tree_depth, int elem_per_leaf, long num_test,
-                            const std::vector< CartVect >& points,
-                            std::vector< EntityHandle >& point_elems, clock_t& build_time,
-                            clock_t& test_time, size_t& depth );
+                            const std::vector< CartVect >& points, std::vector< EntityHandle >& point_elems,
+                            clock_t& build_time, clock_t& test_time, size_t& depth );
 
 int main( int argc, char* argv[] )
 {
@@ -94,8 +90,7 @@ int main( int argc, char* argv[] )
             *valptr = strtol( argv[ i ], &endptr, 0 );
             if( *valptr < 1 || *endptr )
             {
-                std::cerr << "Invalid value for '" << argv[ i - 1 ] << "' flag: " << argv[ i ]
-                          << std::endl;
+                std::cerr << "Invalid value for '" << argv[ i - 1 ] << "' flag: " << argv[ i ] << std::endl;
                 exit( 1 );
             }
             valptr = 0;
@@ -188,12 +183,12 @@ int main( int argc, char* argv[] )
     {
         default:
         case UseKDTree:
-            do_kdtree_test( mb, tree_depth, elem_per_leaf, num_points, points, results, build_time,
-                            test_time, actual_depth );
+            do_kdtree_test( mb, tree_depth, elem_per_leaf, num_points, points, results, build_time, test_time,
+                            actual_depth );
             break;
         case UseNoTree:
-            do_linear_test( mb, tree_depth, elem_per_leaf, num_points, points, results, build_time,
-                            test_time, actual_depth );
+            do_linear_test( mb, tree_depth, elem_per_leaf, num_points, points, results, build_time, test_time,
+                            actual_depth );
             break;
     }
 
@@ -210,16 +205,12 @@ int main( int argc, char* argv[] )
 
     // SUMMARIZE RESULTS
     std::cout << "Number of test queries: " << num_points << std::endl;
-    std::cout << "Tree build time: " << ( (double)build_time ) / CLOCKS_PER_SEC << " seconds"
-              << std::endl;
-    std::cout << "Total query time: " << ( (double)test_time ) / CLOCKS_PER_SEC << " seconds"
-              << std::endl;
-    std::cout << "Time per query: " << ( (double)test_time ) / CLOCKS_PER_SEC / num_points
-              << " seconds" << std::endl;
+    std::cout << "Tree build time: " << ( (double)build_time ) / CLOCKS_PER_SEC << " seconds" << std::endl;
+    std::cout << "Total query time: " << ( (double)test_time ) / CLOCKS_PER_SEC << " seconds" << std::endl;
+    std::cout << "Time per query: " << ( (double)test_time ) / CLOCKS_PER_SEC / num_points << " seconds" << std::endl;
     std::cout << "Tree depth: " << actual_depth << std::endl;
     if( actual_depth )
-        std::cout << "Total query time/depth: "
-                  << ( (double)test_time ) / CLOCKS_PER_SEC / actual_depth << " seconds"
+        std::cout << "Total query time/depth: " << ( (double)test_time ) / CLOCKS_PER_SEC / actual_depth << " seconds"
                   << std::endl;
     std::cout << std::endl;
     std::cout << "Bytes before tree construction: " << init_total_storage << std::endl;
@@ -230,8 +221,7 @@ int main( int argc, char* argv[] )
 
 void fail( ErrorCode error_code, const char* file, int line )
 {
-    std::cerr << "Internal error (error code " << error_code << ") at " << file << ":" << line
-              << std::endl;
+    std::cerr << "Internal error (error code " << error_code << ") at " << file << ":" << line << std::endl;
     abort( );
 }
 
@@ -241,8 +231,7 @@ const int HexSign[ 8 ][ 3 ] = { { -1, -1, -1 }, { 1, -1, -1 }, { 1, 1, -1 }, { -
 static CartVect random_point_in_hex( Interface& mb, EntityHandle hex )
 {
     const double        f = RAND_MAX / 2;
-    CartVect            xi( ( (double)rand( ) - f ) / f, ( (double)rand( ) - f ) / f,
-                 ( (double)rand( ) - f ) / f );
+    CartVect            xi( ( (double)rand( ) - f ) / f, ( (double)rand( ) - f ) / f, ( (double)rand( ) - f ) / f );
     CartVect            coords[ 8 ];
     const EntityHandle* conn;
     int                 len;
@@ -303,9 +292,8 @@ void generate_random_points( Interface& mb, size_t num_points, std::vector< Cart
 }
 
 void do_kdtree_test( Interface& mb, int tree_depth, int elem_per_leaf, long num_test,
-                     const std::vector< CartVect >& points,
-                     std::vector< EntityHandle >& point_elems, clock_t& build_time,
-                     clock_t& test_time, size_t& depth )
+                     const std::vector< CartVect >& points, std::vector< EntityHandle >& point_elems,
+                     clock_t& build_time, clock_t& test_time, size_t& depth )
 {
     ErrorCode          rval;
     clock_t            init = clock( );
@@ -360,8 +348,7 @@ void do_kdtree_test( Interface& mb, int tree_depth, int elem_per_leaf, long num_
 }
 
 void do_linear_test( Interface& mb, int, int, long num_test, const std::vector< CartVect >& points,
-                     std::vector< EntityHandle >& point_elems, clock_t& build_time,
-                     clock_t& test_time, size_t& depth )
+                     std::vector< EntityHandle >& point_elems, clock_t& build_time, clock_t& test_time, size_t& depth )
 {
     clock_t   init = clock( );
     Range     hexes;

@@ -165,8 +165,7 @@ void find_volume_tests( )
         const FindVolTestResult& test = tests[ i - 1 ];
 
         const double* direction = NULL;
-        if( test.dir[ 0 ] != 0.0 || test.dir[ 1 ] != 0.0 || test.dir[ 2 ] != 0.0 )
-        { direction = test.dir; }
+        if( test.dir[ 0 ] != 0.0 || test.dir[ 1 ] != 0.0 || test.dir[ 2 ] != 0.0 ) { direction = test.dir; }
 
         // if we're testing a random direction, run the test many times
         int num_repeats = direction ? 1 : 100;
@@ -174,8 +173,7 @@ void find_volume_tests( )
         {
             rval = GQT->find_volume( test.pnt, volume_found, direction );
             // if not found, we will check later
-            if( rval != MB_ENTITY_NOT_FOUND )
-            { MB_CHK_SET_ERR_CONT( rval, "Failed in find_volume" ); }
+            if( rval != MB_ENTITY_NOT_FOUND ) { MB_CHK_SET_ERR_CONT( rval, "Failed in find_volume" ); }
 
             rval = id_lookup( volume_found, vol_id );MB_CHK_SET_ERR_CONT( rval, "Failed in id lookup" );
 

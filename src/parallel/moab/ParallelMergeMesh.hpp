@@ -38,11 +38,9 @@ class ParallelMergeMesh
     gs_data::crystal_data myCD;
 
     // Wrapper of merge() that performs the merge
-    ErrorCode PerformMerge( EntityHandle levelset = 0, bool skip_local_merge = false,
-                            int dim = -1 );
+    ErrorCode PerformMerge( EntityHandle levelset = 0, bool skip_local_merge = false, int dim = -1 );
     // Determine the local skin entities (fills mySkinEnts)
-    ErrorCode PopulateMySkinEnts( const EntityHandle meshset, int dim,
-                                  bool skip_local_merge = false );
+    ErrorCode PopulateMySkinEnts( const EntityHandle meshset, int dim, bool skip_local_merge = false );
     // Get the global bounding box
     ErrorCode GetGlobalBox( double* gbox );
     // Fill out the local myTup before the first gather-scatter
@@ -68,12 +66,10 @@ class ParallelMergeMesh
     static void SortTuplesByReal( TupleList& tup, double eps2 = 0 );
 
     // The recursive sorting function
-    static void PerformRealSort( TupleList& tup, unsigned long left, unsigned long right,
-                                 double eps2, uint tup_mr );
+    static void PerformRealSort( TupleList& tup, unsigned long left, unsigned long right, double eps2, uint tup_mr );
 
     // Determines whether tuple i is greater than tuple j
-    static bool TupleGreaterThan( TupleList& tup, unsigned long vrI, unsigned long vrJ, double eps2,
-                                  uint tup_mr );
+    static bool TupleGreaterThan( TupleList& tup, unsigned long vrI, unsigned long vrJ, double eps2, uint tup_mr );
 };
 
 }  // namespace moab

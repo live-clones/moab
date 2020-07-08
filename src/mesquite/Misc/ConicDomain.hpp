@@ -54,12 +54,10 @@ class MESQUITE_EXPORT ConicDomain : public MBMesquite::MeshDomain
      *\NOTE Cone is not bounded at apex.  It extends infinitely in both
      *      directions.
      */
-    inline ConicDomain( double radius_at_point, double height_to_apex,
-                        Vector3D axis_direction = Vector3D( 0, 0, 1 ),
+    inline ConicDomain( double radius_at_point, double height_to_apex, Vector3D axis_direction = Vector3D( 0, 0, 1 ),
                         Vector3D axis_point = Vector3D( 0, 0, 0 ), bool outward_normal = true )
-        : mAxis( axis_direction / axis_direction.length( ) ), mPoint( axis_point ),
-          mRadius( radius_at_point ), mHeight( height_to_apex ),
-          outwardSign( outward_normal ? 1.0 : -1.0 )
+        : mAxis( axis_direction / axis_direction.length( ) ), mPoint( axis_point ), mRadius( radius_at_point ),
+          mHeight( height_to_apex ), outwardSign( outward_normal ? 1.0 : -1.0 )
     {
     }
 
@@ -73,14 +71,14 @@ class MESQUITE_EXPORT ConicDomain : public MBMesquite::MeshDomain
 
     virtual void element_normal_at( Mesh::ElementHandle entity_handle, Vector3D& coordinate ) const;
 
-    virtual void vertex_normal_at( const Mesh::VertexHandle* handle, Vector3D coords[],
-                                   unsigned count, MsqError& err ) const;
+    virtual void vertex_normal_at( const Mesh::VertexHandle* handle, Vector3D coords[], unsigned count,
+                                   MsqError& err ) const;
 
-    virtual void closest_point( Mesh::VertexHandle handle, const Vector3D& position,
-                                Vector3D& closest, Vector3D& normal, MsqError& err ) const;
+    virtual void closest_point( Mesh::VertexHandle handle, const Vector3D& position, Vector3D& closest,
+                                Vector3D& normal, MsqError& err ) const;
 
-    virtual void domain_DoF( const Mesh::VertexHandle* handle_array, unsigned short* dof_array,
-                             size_t count, MsqError& err ) const;
+    virtual void domain_DoF( const Mesh::VertexHandle* handle_array, unsigned short* dof_array, size_t count,
+                             MsqError& err ) const;
 
     const Vector3D& axis( ) const
     {

@@ -32,8 +32,7 @@ class ParallelData
 
     //! get communication interface sets and the processors with which
     //! this processor communicates; sets are sorted by processor
-    ErrorCode get_interface_sets( std::vector< EntityHandle >& iface_sets,
-                                  std::vector< int >&          iface_procs );
+    ErrorCode get_interface_sets( std::vector< EntityHandle >& iface_sets, std::vector< int >& iface_procs );
 
   private:
     //! interface instance to which this instance corresponds
@@ -43,10 +42,7 @@ class ParallelData
     ParallelComm* parallelComm;
 };
 
-inline ParallelData::ParallelData( Interface* impl, ParallelComm* pcomm )
-    : mbImpl( impl ), parallelComm( pcomm )
-{
-}
+inline ParallelData::ParallelData( Interface* impl, ParallelComm* pcomm ) : mbImpl( impl ), parallelComm( pcomm ) {}
 
 }  // namespace moab
 

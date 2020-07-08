@@ -104,8 +104,7 @@ void read_one_cell_var( bool rcbzoltan )
 
     read_options = "PARALLEL=READ_PART;PARTITION_METHOD=TRIVIAL;NO_EDGES;VARIABLE=vorticity";
     if( rcbzoltan )
-        read_options =
-            "PARALLEL=READ_PART;PARTITION_METHOD=RCBZOLTAN;NO_EDGES;VARIABLE=vorticity;DEBUG_IO=1";
+        read_options = "PARALLEL=READ_PART;PARTITION_METHOD=RCBZOLTAN;NO_EDGES;VARIABLE=vorticity;DEBUG_IO=1";
 
     ErrorCode rval = mb.load_file( example.c_str( ), NULL, read_options.c_str( ) );CHECK_ERR( rval );
 
@@ -159,8 +158,7 @@ void read_one_cell_var( bool rcbzoltan )
                 CHECK_EQUAL( 162, (int)local_cell_gids[ 159 ] );
                 CHECK_EQUAL( 640, (int)local_cell_gids[ 318 ] );
 
-                EntityHandle cell_ents[] = { local_cells[ 0 ], local_cells[ 159 ],
-                                             local_cells[ 318 ] };
+                EntityHandle cell_ents[] = { local_cells[ 0 ], local_cells[ 159 ], local_cells[ 318 ] };
                 rval = mb.tag_get_data( vorticity_tag0, cell_ents, 3, vorticity0_val );CHECK_ERR( rval );
 
                 // Timestep 0
@@ -194,8 +192,7 @@ void read_one_cell_var( bool rcbzoltan )
                 CHECK_EQUAL( 366, (int)local_cell_gids[ 161 ] );
                 CHECK_EQUAL( 1, (int)local_cell_gids[ 322 ] );
 
-                EntityHandle cell_ents[] = { local_cells[ 0 ], local_cells[ 161 ],
-                                             local_cells[ 322 ] };
+                EntityHandle cell_ents[] = { local_cells[ 0 ], local_cells[ 161 ], local_cells[ 322 ] };
                 rval = mb.tag_get_data( vorticity_tag0, cell_ents, 3, vorticity0_val );CHECK_ERR( rval );
 
                 // Timestep 0
@@ -293,11 +290,9 @@ void read_mesh_parallel( bool rcbzoltan )
     Core       moab;
     Interface& mb = moab;
 
-    read_options =
-        "PARALLEL=READ_PART;PARTITION_METHOD=TRIVIAL;PARALLEL_RESOLVE_SHARED_ENTS;VARIABLE=";
+    read_options = "PARALLEL=READ_PART;PARTITION_METHOD=TRIVIAL;PARALLEL_RESOLVE_SHARED_ENTS;VARIABLE=";
     if( rcbzoltan )
-        read_options =
-            "PARALLEL=READ_PART;PARTITION_METHOD=RCBZOLTAN;PARALLEL_RESOLVE_SHARED_ENTS;VARIABLE=";
+        read_options = "PARALLEL=READ_PART;PARTITION_METHOD=RCBZOLTAN;PARALLEL_RESOLVE_SHARED_ENTS;VARIABLE=";
 
     ErrorCode rval = mb.load_file( example.c_str( ), NULL, read_options.c_str( ) );CHECK_ERR( rval );
 
@@ -434,8 +429,7 @@ void read_mesh_parallel( bool rcbzoltan )
     std::cout << "proc: " << rank << " verts:" << verts_num << "\n";
 
     int total_verts_num;
-    MPI_Reduce( &verts_num, &total_verts_num, 1, MPI_INT, MPI_SUM, 0,
-                pcomm->proc_config( ).proc_comm( ) );
+    MPI_Reduce( &verts_num, &total_verts_num, 1, MPI_INT, MPI_SUM, 0, pcomm->proc_config( ).proc_comm( ) );
     if( 0 == rank )
     {
         std::cout << "total vertices: " << total_verts_num << "\n";
@@ -445,8 +439,7 @@ void read_mesh_parallel( bool rcbzoltan )
     std::cout << "proc: " << rank << " edges:" << edges_num << "\n";
 
     int total_edges_num;
-    MPI_Reduce( &edges_num, &total_edges_num, 1, MPI_INT, MPI_SUM, 0,
-                pcomm->proc_config( ).proc_comm( ) );
+    MPI_Reduce( &edges_num, &total_edges_num, 1, MPI_INT, MPI_SUM, 0, pcomm->proc_config( ).proc_comm( ) );
     if( 0 == rank )
     {
         std::cout << "total edges: " << total_edges_num << "\n";
@@ -456,8 +449,7 @@ void read_mesh_parallel( bool rcbzoltan )
     std::cout << "proc: " << rank << " cells:" << cells_num << "\n";
 
     int total_cells_num;
-    MPI_Reduce( &cells_num, &total_cells_num, 1, MPI_INT, MPI_SUM, 0,
-                pcomm->proc_config( ).proc_comm( ) );
+    MPI_Reduce( &cells_num, &total_cells_num, 1, MPI_INT, MPI_SUM, 0, pcomm->proc_config( ).proc_comm( ) );
     if( 0 == rank )
     {
         std::cout << "total cells: " << total_cells_num << "\n";
@@ -530,8 +522,8 @@ void gather_one_cell_var( int gather_set_rank )
 
         // Check vorticity0 tag values on 4 gather set cells: first cell, two median cells, and last
         // cell
-        EntityHandle cell_ents[] = { gather_set_cells[ 0 ], gather_set_cells[ 320 ],
-                                     gather_set_cells[ 321 ], gather_set_cells[ 641 ] };
+        EntityHandle cell_ents[] = { gather_set_cells[ 0 ], gather_set_cells[ 320 ], gather_set_cells[ 321 ],
+                                     gather_set_cells[ 641 ] };
         double       vorticity0_val[ 4 * layers ];
         rval = mb.tag_get_data( vorticity_tag0, &cell_ents[ 0 ], 4, vorticity0_val );CHECK_ERR( rval );
 

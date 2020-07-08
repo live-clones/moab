@@ -16,8 +16,8 @@ void test_initial_inactive( )
     int             err;
     iRel_PairHandle pair;
 
-    iRel_createPair( rel, geom, iRel_SET, iRel_IGEOM_IFACE, iRel_INACTIVE, mesh, iRel_SET,
-                     iRel_IMESH_IFACE, iRel_ACTIVE, &pair, &err );CHECK_ERR( err );
+    iRel_createPair( rel, geom, iRel_SET, iRel_IGEOM_IFACE, iRel_INACTIVE, mesh, iRel_SET, iRel_IMESH_IFACE,
+                     iRel_ACTIVE, &pair, &err );CHECK_ERR( err );
 
     iBase_EntitySetHandle geom_set;
     iGeom_createEntSet( geom, false, &geom_set, &err );CHECK_ERR( err );
@@ -45,8 +45,8 @@ void test_initial_notexist( )
     int             err;
     iRel_PairHandle pair;
 
-    iRel_createPair( rel, geom, iRel_SET, iRel_IGEOM_IFACE, iRel_NOTEXIST, mesh, iRel_SET,
-                     iRel_IMESH_IFACE, iRel_ACTIVE, &pair, &err );CHECK_ERR( err );
+    iRel_createPair( rel, geom, iRel_SET, iRel_IGEOM_IFACE, iRel_NOTEXIST, mesh, iRel_SET, iRel_IMESH_IFACE,
+                     iRel_ACTIVE, &pair, &err );CHECK_ERR( err );
 
     iBase_EntitySetHandle geom_set;
     iGeom_createEntSet( geom, false, &geom_set, &err );CHECK_ERR( err );

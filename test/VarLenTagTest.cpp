@@ -19,8 +19,7 @@ int main( )
     count += RUN_TEST( test_valid_struct );
     if( count )
     {
-        std::cerr << "ABORTING VarLenTag TEST" << std::endl
-                  << "Structure is not valid" << std::endl;
+        std::cerr << "ABORTING VarLenTag TEST" << std::endl << "Structure is not valid" << std::endl;
         return count;
     }
 

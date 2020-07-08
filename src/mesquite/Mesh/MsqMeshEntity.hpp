@@ -87,8 +87,8 @@ class MESQUITE_EXPORT MsqMeshEntity
     //! gets the vertices of the mesh entity
     void   get_vertex_indices( std::vector< std::size_t >& vertex_list ) const;
     void   append_vertex_indices( std::vector< std::size_t >& vertex_list ) const;
-    size_t get_local_matrix_map_about_vertex( PatchData& pd, MsqVertex* vert, size_t local_map_size,
-                                              int* local_map, MsqError& err ) const;
+    size_t get_local_matrix_map_about_vertex( PatchData& pd, MsqVertex* vert, size_t local_map_size, int* local_map,
+                                              MsqError& err ) const;
     //! gets the vertices of the mesh entity
     void get_node_indices( std::vector< std::size_t >& vertex_list ) const;
     void append_node_indices( std::vector< std::size_t >& vertex_list ) const;
@@ -119,8 +119,7 @@ class MESQUITE_EXPORT MsqMeshEntity
 
     //! Fills a vector<size_t> with vertices connected to the given
     //! vertex through the edges of this MsqMeshEntity.
-    void get_connected_vertices( std::size_t vertex_index, std::vector< std::size_t >& vert_indices,
-                                 MsqError& err );
+    void get_connected_vertices( std::size_t vertex_index, std::vector< std::size_t >& vert_indices, MsqError& err );
 
     //! Computes the area of the element.
     //! The returned value is always non-negative.
@@ -136,10 +135,8 @@ class MESQUITE_EXPORT MsqMeshEntity
     //!                       mapping function Jacobian was negative.
     //!\param tested_count    The number of sampling locations in the
     //!                       element for which the Jacobian was tested.
-    void check_element_orientation( PatchData& pd, int& inverted_count, int& tested_count,
-                                    MsqError& err );
-    void check_element_orientation_corners( PatchData& pd, int& inverted_count, int& tested_count,
-                                            MsqError& err );
+    void check_element_orientation( PatchData& pd, int& inverted_count, int& tested_count, MsqError& err );
+    void check_element_orientation_corners( PatchData& pd, int& inverted_count, int& tested_count, MsqError& err );
 
     //! Uses a MeshDomain call-back function to compute the normal at the corner.
     // void compute_corner_normal( std::size_t corner_pt,

@@ -116,8 +116,7 @@ const VtkTypeInfo* VtkTypeInfo::find_type( unsigned vtk_type, MsqError& err )
     return &typeInfoList[ vtk_type ];
 }
 
-const VtkTypeInfo* VtkTypeInfo::find_type( EntityTopology msq_type, unsigned num_nodes,
-                                           MsqError& err )
+const VtkTypeInfo* VtkTypeInfo::find_type( EntityTopology msq_type, unsigned num_nodes, MsqError& err )
 {
     if( typeInfoList[ reverseIndexList[ msq_type ][ 0 ] ].numNodes == num_nodes )
         return &typeInfoList[ reverseIndexList[ msq_type ][ 0 ] ];
@@ -130,8 +129,8 @@ const VtkTypeInfo* VtkTypeInfo::find_type( EntityTopology msq_type, unsigned num
         return &typeInfoList[ reverseIndexList[ msq_type ][ 0 ] ];
 
     MSQ_SETERR( err )
-    ( MsqError::UNSUPPORTED_ELEMENT, "VTK file does not support element type %d with %u nodes",
-      (int)msq_type, num_nodes );
+    ( MsqError::UNSUPPORTED_ELEMENT, "VTK file does not support element type %d with %u nodes", (int)msq_type,
+      num_nodes );
     return 0;
 }
 

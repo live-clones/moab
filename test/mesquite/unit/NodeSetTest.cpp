@@ -319,8 +319,8 @@ static bool check_all( EntityTopology type, NodeSet set, unsigned dim, bool valu
 
 static bool check_range_set( EntityTopology type, NodeSet set, unsigned dim, bool value = true )
 {
-    const unsigned max_count[] = { NodeSet::NUM_CORNER_BITS, NodeSet::NUM_EDGE_BITS,
-                                   NodeSet::NUM_FACE_BITS, NodeSet::NUM_REGION_BITS };
+    const unsigned max_count[] = { NodeSet::NUM_CORNER_BITS, NodeSet::NUM_EDGE_BITS, NodeSet::NUM_FACE_BITS,
+                                   NodeSet::NUM_REGION_BITS };
 
     // test that any bits corresponding to some other dimension are not set.
     for( unsigned d = 0; d <= 3; ++d )
@@ -345,8 +345,7 @@ static bool check_range_set( EntityTopology type, NodeSet set, unsigned dim, boo
 
 void NodeSetTest::test_set_all( )
 {
-    const EntityTopology types[] = { TRIANGLE,   QUADRILATERAL, TETRAHEDRON,
-                                     HEXAHEDRON, PRISM,         PYRAMID };
+    const EntityTopology types[] = { TRIANGLE, QUADRILATERAL, TETRAHEDRON, HEXAHEDRON, PRISM, PYRAMID };
     const int            num_types = sizeof( types ) / sizeof( types[ 0 ] );
 
     for( int i = 0; i < num_types; ++i )

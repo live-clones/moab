@@ -298,8 +298,7 @@ class MetricLogger : public QualityMetric
         MSQ_SETERR( err )( MsqError::NOT_IMPLEMENTED );
         return false;
     }
-    bool evaluate_with_gradient( PatchData&, size_t, double&, vector< size_t >&,
-                                 vector< Vector3D >&, MsqError& err )
+    bool evaluate_with_gradient( PatchData&, size_t, double&, vector< size_t >&, vector< Vector3D >&, MsqError& err )
     {  // shouldn't be called by QualityAssessor
         CPPUNIT_ASSERT( false );
         MSQ_SETERR( err )( MsqError::NOT_IMPLEMENTED );
@@ -618,10 +617,8 @@ void QualityAssessorTest::test_power_mean( )
     // check values
     CPPUNIT_ASSERT_DOUBLES_EQUAL( P1, result1->get_power( ), DBL_EPSILON );
     CPPUNIT_ASSERT_DOUBLES_EQUAL( P2, result2->get_power( ), DBL_EPSILON );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( logger1.pmean( P1 ), result1->get_power_mean( ),
-                                  logger1.pmean( P1 ) * DBL_EPSILON );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( logger2.pmean( P2 ), result2->get_power_mean( ),
-                                  logger2.pmean( P2 ) * DBL_EPSILON );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( logger1.pmean( P1 ), result1->get_power_mean( ), logger1.pmean( P1 ) * DBL_EPSILON );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( logger2.pmean( P2 ), result2->get_power_mean( ), logger2.pmean( P2 ) * DBL_EPSILON );
 }
 
 void QualityAssessorTest::test_invalid_count( )
@@ -856,8 +853,7 @@ void QualityAssessorTest::test_tag_element( )
     CPPUNIT_ASSERT_EQUAL( logger.mValues.size( ), logger.mHandles.size( ) );
     CPPUNIT_ASSERT( !logger.mValues.empty( ) );
     vector< double > tag_values( logger.mValues.size( ) );
-    myMesh.tag_get_element_data( tag, logger.mHandles.size( ), &logger.mHandles[ 0 ],
-                                 arrptr( tag_values ), err );
+    myMesh.tag_get_element_data( tag, logger.mHandles.size( ), &logger.mHandles[ 0 ], arrptr( tag_values ), err );
     ASSERT_NO_ERROR( err );
 
     for( unsigned i = 0; i < logger.mValues.size( ); ++i )
@@ -892,8 +888,7 @@ void QualityAssessorTest::test_tag_vertex( )
 
     CPPUNIT_ASSERT_EQUAL( logger.mValues.size( ), logger.mHandles.size( ) );
     vector< double > tag_values( logger.mValues.size( ) );
-    myMesh.tag_get_vertex_data( tag, logger.mHandles.size( ), &logger.mHandles[ 0 ],
-                                arrptr( tag_values ), err );
+    myMesh.tag_get_vertex_data( tag, logger.mHandles.size( ), &logger.mHandles[ 0 ], arrptr( tag_values ), err );
     ASSERT_NO_ERROR( err );
 
     for( unsigned i = 0; i < logger.mValues.size( ); ++i )
@@ -1063,8 +1058,8 @@ void QualityAssessorTest::test_free_only( )
      *   +-----+-----o-----o
      */
 
-    double coords[] = { 0, 0, 0, 1, 0, 0, 0.5, 1, 0, 0, 1, 0, 2, 0, 0, 3, 0, 0, 3, 1, 0, 2, 1, 0 };
-    int    fixed[] = { true, true, true, true, false, false, false, false };
+    double        coords[] = { 0, 0, 0, 1, 0, 0, 0.5, 1, 0, 0, 1, 0, 2, 0, 0, 3, 0, 0, 3, 1, 0, 2, 1, 0 };
+    int           fixed[] = { true, true, true, true, false, false, false, false };
     unsigned long conn[] = { 0, 1, 2, 3, 1, 4, 7, 2, 4, 5, 6, 7 };
 
     MsqError                     err;

@@ -101,9 +101,8 @@ bool IdealWeightInverseMeanRatio::evaluate( PatchData& pd, size_t handle, double
     // Prism and Hex element descriptions
     static const int locs_pri[ 6 ][ 4 ] = { { 0, 1, 2, 3 }, { 1, 2, 0, 4 }, { 2, 0, 1, 5 },
                                             { 3, 5, 4, 0 }, { 4, 3, 5, 1 }, { 5, 4, 3, 2 } };
-    static const int locs_hex[ 8 ][ 4 ] = { { 0, 1, 3, 4 }, { 1, 2, 0, 5 }, { 2, 3, 1, 6 },
-                                            { 3, 0, 2, 7 }, { 4, 7, 5, 0 }, { 5, 4, 6, 1 },
-                                            { 6, 5, 7, 2 }, { 7, 6, 4, 3 } };
+    static const int locs_hex[ 8 ][ 4 ] = { { 0, 1, 3, 4 }, { 1, 2, 0, 5 }, { 2, 3, 1, 6 }, { 3, 0, 2, 7 },
+                                            { 4, 7, 5, 0 }, { 5, 4, 6, 1 }, { 6, 5, 7, 2 }, { 7, 6, 4, 3 } };
 
     const Vector3D d_con( 1.0, 1.0, 1.0 );
 
@@ -192,17 +191,16 @@ bool IdealWeightInverseMeanRatio::evaluate( PatchData& pd, size_t handle, double
 
         default:
             MSQ_SETERR( err )
-            ( MsqError::UNSUPPORTED_ELEMENT,
-              "Element type (%d) not supported in IdealWeightInverseMeanRatio", (int)topo );
+            ( MsqError::UNSUPPORTED_ELEMENT, "Element type (%d) not supported in IdealWeightInverseMeanRatio",
+              (int)topo );
             return false;
     }  // end switch over element type
     return true;
 }
 
 bool IdealWeightInverseMeanRatio::evaluate_with_gradient( PatchData& pd, size_t handle, double& m,
-                                                          std::vector< size_t >&   indices,
-                                                          std::vector< Vector3D >& g,
-                                                          MsqError&                err )
+                                                          std::vector< size_t >& indices, std::vector< Vector3D >& g,
+                                                          MsqError& err )
 {
     const MsqMeshEntity* e = &pd.element_by_index( handle );
     EntityTopology       topo = e->get_element_type( );
@@ -229,9 +227,8 @@ bool IdealWeightInverseMeanRatio::evaluate_with_gradient( PatchData& pd, size_t 
     // Prism and Hex element descriptions
     static const int locs_pri[ 6 ][ 4 ] = { { 0, 1, 2, 3 }, { 1, 2, 0, 4 }, { 2, 0, 1, 5 },
                                             { 3, 5, 4, 0 }, { 4, 3, 5, 1 }, { 5, 4, 3, 2 } };
-    static const int locs_hex[ 8 ][ 4 ] = { { 0, 1, 3, 4 }, { 1, 2, 0, 5 }, { 2, 3, 1, 6 },
-                                            { 3, 0, 2, 7 }, { 4, 7, 5, 0 }, { 5, 4, 6, 1 },
-                                            { 6, 5, 7, 2 }, { 7, 6, 4, 3 } };
+    static const int locs_hex[ 8 ][ 4 ] = { { 0, 1, 3, 4 }, { 1, 2, 0, 5 }, { 2, 3, 1, 6 }, { 3, 0, 2, 7 },
+                                            { 4, 7, 5, 0 }, { 5, 4, 6, 1 }, { 6, 5, 7, 2 }, { 7, 6, 4, 3 } };
 
     const Vector3D d_con( 1.0, 1.0, 1.0 );
 
@@ -264,14 +261,12 @@ bool IdealWeightInverseMeanRatio::evaluate_with_gradient( PatchData& pd, size_t 
                 mCoords[ 0 ] = vertices[ v_i[ locs_hex[ i ][ 0 ] ] ];
                 mCoords[ 1 ] = vertices[ v_i[ locs_hex[ i ][ 1 ] ] ];
                 mCoords[ 2 ] = vertices[ v_i[ locs_hex[ i ][ 2 ] ] ];
-                if( !g_fcn_2i( mMetrics[ i ], mGradients + 3 * i, mCoords, n, a2Con, b2Con, c2Con,
-                               d_con ) )
+                if( !g_fcn_2i( mMetrics[ i ], mGradients + 3 * i, mCoords, n, a2Con, b2Con, c2Con, d_con ) )
                     return false;
             }
 
             g.resize( 4 );
-            m = average_corner_gradients( QUADRILATERAL, fm, 4, mMetrics, mGradients, arrptr( g ),
-                                          err );
+            m = average_corner_gradients( QUADRILATERAL, fm, 4, mMetrics, mGradients, arrptr( g ), err );
             MSQ_ERRZERO( err );
             break;
 
@@ -292,8 +287,7 @@ bool IdealWeightInverseMeanRatio::evaluate_with_gradient( PatchData& pd, size_t 
                 mCoords[ 1 ] = vertices[ v_i[ ( i + 1 ) % 4 ] ];
                 mCoords[ 2 ] = vertices[ v_i[ ( i + 3 ) % 4 ] ];
                 mCoords[ 3 ] = vertices[ v_i[ 4 ] ];
-                metric_valid =
-                    g_fcn_3p( mMetrics[ i ], mGradients + 4 * i, mCoords, a3Con, b3Con, c3Con );
+                metric_valid = g_fcn_3p( mMetrics[ i ], mGradients + 4 * i, mCoords, a3Con, b3Con, c3Con );
                 if( !metric_valid ) return false;
             }
 
@@ -309,8 +303,7 @@ bool IdealWeightInverseMeanRatio::evaluate_with_gradient( PatchData& pd, size_t 
                 mCoords[ 1 ] = vertices[ v_i[ locs_pri[ i ][ 1 ] ] ];
                 mCoords[ 2 ] = vertices[ v_i[ locs_pri[ i ][ 2 ] ] ];
                 mCoords[ 3 ] = vertices[ v_i[ locs_pri[ i ][ 3 ] ] ];
-                if( !g_fcn_3w( mMetrics[ i ], mGradients + 4 * i, mCoords, a3Con, b3Con, c3Con ) )
-                    return false;
+                if( !g_fcn_3w( mMetrics[ i ], mGradients + 4 * i, mCoords, a3Con, b3Con, c3Con ) ) return false;
             }
 
             g.resize( 6 );
@@ -325,21 +318,18 @@ bool IdealWeightInverseMeanRatio::evaluate_with_gradient( PatchData& pd, size_t 
                 mCoords[ 1 ] = vertices[ v_i[ locs_hex[ i ][ 1 ] ] ];
                 mCoords[ 2 ] = vertices[ v_i[ locs_hex[ i ][ 2 ] ] ];
                 mCoords[ 3 ] = vertices[ v_i[ locs_hex[ i ][ 3 ] ] ];
-                if( !g_fcn_3i( mMetrics[ i ], mGradients + 4 * i, mCoords, a3Con, b3Con, c3Con,
-                               d_con ) )
-                    return false;
+                if( !g_fcn_3i( mMetrics[ i ], mGradients + 4 * i, mCoords, a3Con, b3Con, c3Con, d_con ) ) return false;
             }
 
             g.resize( 8 );
-            m = average_corner_gradients( HEXAHEDRON, fm, 8, mMetrics, mGradients, arrptr( g ),
-                                          err );
+            m = average_corner_gradients( HEXAHEDRON, fm, 8, mMetrics, mGradients, arrptr( g ), err );
             MSQ_ERRZERO( err );
             break;
 
         default:
             MSQ_SETERR( err )
-            ( MsqError::UNSUPPORTED_ELEMENT,
-              "Element type (%d) not supported in IdealWeightInverseMeanRatio", (int)topo );
+            ( MsqError::UNSUPPORTED_ELEMENT, "Element type (%d) not supported in IdealWeightInverseMeanRatio",
+              (int)topo );
             return false;
     }  // end switch over element type
 
@@ -347,9 +337,10 @@ bool IdealWeightInverseMeanRatio::evaluate_with_gradient( PatchData& pd, size_t 
     return true;
 }
 
-bool IdealWeightInverseMeanRatio::evaluate_with_Hessian_diagonal(
-    PatchData& pd, size_t handle, double& m, std::vector< size_t >& indices,
-    std::vector< Vector3D >& g, std::vector< SymMatrix3D >& h, MsqError& err )
+bool IdealWeightInverseMeanRatio::evaluate_with_Hessian_diagonal( PatchData& pd, size_t handle, double& m,
+                                                                  std::vector< size_t >&      indices,
+                                                                  std::vector< Vector3D >&    g,
+                                                                  std::vector< SymMatrix3D >& h, MsqError& err )
 {
     const MsqMeshEntity* e = &pd.element_by_index( handle );
     EntityTopology       topo = e->get_element_type( );
@@ -376,9 +367,8 @@ bool IdealWeightInverseMeanRatio::evaluate_with_Hessian_diagonal(
     // Prism and Hex element descriptions
     static const int locs_pri[ 6 ][ 4 ] = { { 0, 1, 2, 3 }, { 1, 2, 0, 4 }, { 2, 0, 1, 5 },
                                             { 3, 5, 4, 0 }, { 4, 3, 5, 1 }, { 5, 4, 3, 2 } };
-    static const int locs_hex[ 8 ][ 4 ] = { { 0, 1, 3, 4 }, { 1, 2, 0, 5 }, { 2, 3, 1, 6 },
-                                            { 3, 0, 2, 7 }, { 4, 7, 5, 0 }, { 5, 4, 6, 1 },
-                                            { 6, 5, 7, 2 }, { 7, 6, 4, 3 } };
+    static const int locs_hex[ 8 ][ 4 ] = { { 0, 1, 3, 4 }, { 1, 2, 0, 5 }, { 2, 3, 1, 6 }, { 3, 0, 2, 7 },
+                                            { 4, 7, 5, 0 }, { 5, 4, 6, 1 }, { 6, 5, 7, 2 }, { 7, 6, 4, 3 } };
 
     const Vector3D d_con( 1.0, 1.0, 1.0 );
 
@@ -400,8 +390,7 @@ bool IdealWeightInverseMeanRatio::evaluate_with_Hessian_diagonal(
             mCoords[ 2 ] = vertices[ v_i[ 2 ] ];
             g.resize( 3 );
             h.resize( 3 );
-            if( !h_fcn_2e( m, arrptr( g ), mHessians, mCoords, n, a2Con, b2Con, c2Con ) )
-                return false;
+            if( !h_fcn_2e( m, arrptr( g ), mHessians, mCoords, n, a2Con, b2Con, c2Con ) ) return false;
             h[ 0 ] = mHessians[ 0 ].upper( );
             h[ 1 ] = mHessians[ 3 ].upper( );
             h[ 2 ] = mHessians[ 5 ].upper( );
@@ -416,15 +405,15 @@ bool IdealWeightInverseMeanRatio::evaluate_with_Hessian_diagonal(
                 mCoords[ 0 ] = vertices[ v_i[ locs_hex[ i ][ 0 ] ] ];
                 mCoords[ 1 ] = vertices[ v_i[ locs_hex[ i ][ 1 ] ] ];
                 mCoords[ 2 ] = vertices[ v_i[ locs_hex[ i ][ 2 ] ] ];
-                if( !h_fcn_2i( mMetrics[ i ], mGradients + 3 * i, mHessians + 6 * i, mCoords, n,
-                               a2Con, b2Con, c2Con, d_con ) )
+                if( !h_fcn_2i( mMetrics[ i ], mGradients + 3 * i, mHessians + 6 * i, mCoords, n, a2Con, b2Con, c2Con,
+                               d_con ) )
                     return false;
             }
 
             g.resize( 4 );
             h.resize( 4 );
-            m = average_corner_hessian_diagonals( QUADRILATERAL, fm, 4, mMetrics, mGradients,
-                                                  mHessians, arrptr( g ), arrptr( h ), err );
+            m = average_corner_hessian_diagonals( QUADRILATERAL, fm, 4, mMetrics, mGradients, mHessians, arrptr( g ),
+                                                  arrptr( h ), err );
             MSQ_ERRZERO( err );
             break;
 
@@ -450,16 +439,16 @@ bool IdealWeightInverseMeanRatio::evaluate_with_Hessian_diagonal(
                 mCoords[ 1 ] = vertices[ v_i[ ( i + 1 ) % 4 ] ];
                 mCoords[ 2 ] = vertices[ v_i[ ( i + 3 ) % 4 ] ];
                 mCoords[ 3 ] = vertices[ v_i[ 4 ] ];
-                metric_valid = h_fcn_3p( mMetrics[ i ], mGradients + 4 * i, mHessians + 10 * i,
-                                         mCoords, a3Con, b3Con, c3Con );
+                metric_valid =
+                    h_fcn_3p( mMetrics[ i ], mGradients + 4 * i, mHessians + 10 * i, mCoords, a3Con, b3Con, c3Con );
 
                 if( !metric_valid ) return false;
             }
 
             g.resize( 5 );
             h.resize( 5 );
-            m = average_corner_hessian_diagonals( PYRAMID, fm, 4, mMetrics, mGradients, mHessians,
-                                                  arrptr( g ), arrptr( h ), err );
+            m = average_corner_hessian_diagonals( PYRAMID, fm, 4, mMetrics, mGradients, mHessians, arrptr( g ),
+                                                  arrptr( h ), err );
             MSQ_ERRZERO( err );
             break;
 
@@ -470,15 +459,14 @@ bool IdealWeightInverseMeanRatio::evaluate_with_Hessian_diagonal(
                 mCoords[ 1 ] = vertices[ v_i[ locs_pri[ i ][ 1 ] ] ];
                 mCoords[ 2 ] = vertices[ v_i[ locs_pri[ i ][ 2 ] ] ];
                 mCoords[ 3 ] = vertices[ v_i[ locs_pri[ i ][ 3 ] ] ];
-                if( !h_fcn_3w( mMetrics[ i ], mGradients + 4 * i, mHessians + 10 * i, mCoords,
-                               a3Con, b3Con, c3Con ) )
+                if( !h_fcn_3w( mMetrics[ i ], mGradients + 4 * i, mHessians + 10 * i, mCoords, a3Con, b3Con, c3Con ) )
                     return false;
             }
 
             g.resize( 6 );
             h.resize( 6 );
-            m = average_corner_hessian_diagonals( PRISM, fm, 6, mMetrics, mGradients, mHessians,
-                                                  arrptr( g ), arrptr( h ), err );
+            m = average_corner_hessian_diagonals( PRISM, fm, 6, mMetrics, mGradients, mHessians, arrptr( g ),
+                                                  arrptr( h ), err );
             MSQ_ERRZERO( err );
             break;
 
@@ -489,22 +477,22 @@ bool IdealWeightInverseMeanRatio::evaluate_with_Hessian_diagonal(
                 mCoords[ 1 ] = vertices[ v_i[ locs_hex[ i ][ 1 ] ] ];
                 mCoords[ 2 ] = vertices[ v_i[ locs_hex[ i ][ 2 ] ] ];
                 mCoords[ 3 ] = vertices[ v_i[ locs_hex[ i ][ 3 ] ] ];
-                if( !h_fcn_3i( mMetrics[ i ], mGradients + 4 * i, mHessians + 10 * i, mCoords,
-                               a3Con, b3Con, c3Con, d_con ) )
+                if( !h_fcn_3i( mMetrics[ i ], mGradients + 4 * i, mHessians + 10 * i, mCoords, a3Con, b3Con, c3Con,
+                               d_con ) )
                     return false;
             }
 
             g.resize( 8 );
             h.resize( 8 );
-            m = average_corner_hessian_diagonals( HEXAHEDRON, fm, 8, mMetrics, mGradients,
-                                                  mHessians, arrptr( g ), arrptr( h ), err );
+            m = average_corner_hessian_diagonals( HEXAHEDRON, fm, 8, mMetrics, mGradients, mHessians, arrptr( g ),
+                                                  arrptr( h ), err );
             MSQ_ERRZERO( err );
             break;
 
         default:
             MSQ_SETERR( err )
-            ( MsqError::UNSUPPORTED_ELEMENT,
-              "Element type (%d) not supported in IdealWeightInverseMeanRatio", (int)topo );
+            ( MsqError::UNSUPPORTED_ELEMENT, "Element type (%d) not supported in IdealWeightInverseMeanRatio",
+              (int)topo );
             return false;
     }  // end switch over element type
 
@@ -513,8 +501,7 @@ bool IdealWeightInverseMeanRatio::evaluate_with_Hessian_diagonal(
 }
 
 bool IdealWeightInverseMeanRatio::evaluate_with_Hessian( PatchData& pd, size_t handle, double& m,
-                                                         std::vector< size_t >&   indices,
-                                                         std::vector< Vector3D >& g,
+                                                         std::vector< size_t >& indices, std::vector< Vector3D >& g,
                                                          std::vector< Matrix3D >& h, MsqError& err )
 {
     const MsqMeshEntity* e = &pd.element_by_index( handle );
@@ -542,9 +529,8 @@ bool IdealWeightInverseMeanRatio::evaluate_with_Hessian( PatchData& pd, size_t h
     // Prism and Hex element descriptions
     static const int locs_pri[ 6 ][ 4 ] = { { 0, 1, 2, 3 }, { 1, 2, 0, 4 }, { 2, 0, 1, 5 },
                                             { 3, 5, 4, 0 }, { 4, 3, 5, 1 }, { 5, 4, 3, 2 } };
-    static const int locs_hex[ 8 ][ 4 ] = { { 0, 1, 3, 4 }, { 1, 2, 0, 5 }, { 2, 3, 1, 6 },
-                                            { 3, 0, 2, 7 }, { 4, 7, 5, 0 }, { 5, 4, 6, 1 },
-                                            { 6, 5, 7, 2 }, { 7, 6, 4, 3 } };
+    static const int locs_hex[ 8 ][ 4 ] = { { 0, 1, 3, 4 }, { 1, 2, 0, 5 }, { 2, 3, 1, 6 }, { 3, 0, 2, 7 },
+                                            { 4, 7, 5, 0 }, { 5, 4, 6, 1 }, { 6, 5, 7, 2 }, { 7, 6, 4, 3 } };
 
     const Vector3D d_con( 1.0, 1.0, 1.0 );
 
@@ -566,8 +552,7 @@ bool IdealWeightInverseMeanRatio::evaluate_with_Hessian( PatchData& pd, size_t h
             mCoords[ 2 ] = vertices[ v_i[ 2 ] ];
             g.resize( 3 );
             h.resize( 6 );
-            if( !h_fcn_2e( m, arrptr( g ), arrptr( h ), mCoords, n, a2Con, b2Con, c2Con ) )
-                return false;
+            if( !h_fcn_2e( m, arrptr( g ), arrptr( h ), mCoords, n, a2Con, b2Con, c2Con ) ) return false;
             break;
 
         case QUADRILATERAL:
@@ -579,15 +564,15 @@ bool IdealWeightInverseMeanRatio::evaluate_with_Hessian( PatchData& pd, size_t h
                 mCoords[ 0 ] = vertices[ v_i[ locs_hex[ i ][ 0 ] ] ];
                 mCoords[ 1 ] = vertices[ v_i[ locs_hex[ i ][ 1 ] ] ];
                 mCoords[ 2 ] = vertices[ v_i[ locs_hex[ i ][ 2 ] ] ];
-                if( !h_fcn_2i( mMetrics[ i ], mGradients + 3 * i, mHessians + 6 * i, mCoords, n,
-                               a2Con, b2Con, c2Con, d_con ) )
+                if( !h_fcn_2i( mMetrics[ i ], mGradients + 3 * i, mHessians + 6 * i, mCoords, n, a2Con, b2Con, c2Con,
+                               d_con ) )
                     return false;
             }
 
             g.resize( 4 );
             h.resize( 10 );
-            m = average_corner_hessians( QUADRILATERAL, fm, 4, mMetrics, mGradients, mHessians,
-                                         arrptr( g ), arrptr( h ), err );
+            m = average_corner_hessians( QUADRILATERAL, fm, 4, mMetrics, mGradients, mHessians, arrptr( g ),
+                                         arrptr( h ), err );
             MSQ_ERRZERO( err );
             break;
 
@@ -609,16 +594,16 @@ bool IdealWeightInverseMeanRatio::evaluate_with_Hessian( PatchData& pd, size_t h
                 mCoords[ 1 ] = vertices[ v_i[ ( i + 1 ) % 4 ] ];
                 mCoords[ 2 ] = vertices[ v_i[ ( i + 3 ) % 4 ] ];
                 mCoords[ 3 ] = vertices[ v_i[ 4 ] ];
-                metric_valid = h_fcn_3p( mMetrics[ i ], mGradients + 4 * i, mHessians + 10 * i,
-                                         mCoords, a3Con, b3Con, c3Con );
+                metric_valid =
+                    h_fcn_3p( mMetrics[ i ], mGradients + 4 * i, mHessians + 10 * i, mCoords, a3Con, b3Con, c3Con );
 
                 if( !metric_valid ) return false;
             }
 
             g.resize( 5 );
             h.resize( 15 );
-            m = average_corner_hessians( PYRAMID, fm, 4, mMetrics, mGradients, mHessians,
-                                         arrptr( g ), arrptr( h ), err );
+            m = average_corner_hessians( PYRAMID, fm, 4, mMetrics, mGradients, mHessians, arrptr( g ), arrptr( h ),
+                                         err );
             MSQ_ERRZERO( err );
             break;
 
@@ -629,15 +614,13 @@ bool IdealWeightInverseMeanRatio::evaluate_with_Hessian( PatchData& pd, size_t h
                 mCoords[ 1 ] = vertices[ v_i[ locs_pri[ i ][ 1 ] ] ];
                 mCoords[ 2 ] = vertices[ v_i[ locs_pri[ i ][ 2 ] ] ];
                 mCoords[ 3 ] = vertices[ v_i[ locs_pri[ i ][ 3 ] ] ];
-                if( !h_fcn_3w( mMetrics[ i ], mGradients + 4 * i, mHessians + 10 * i, mCoords,
-                               a3Con, b3Con, c3Con ) )
+                if( !h_fcn_3w( mMetrics[ i ], mGradients + 4 * i, mHessians + 10 * i, mCoords, a3Con, b3Con, c3Con ) )
                     return false;
             }
 
             g.resize( 6 );
             h.resize( 21 );
-            m = average_corner_hessians( PRISM, fm, 6, mMetrics, mGradients, mHessians, arrptr( g ),
-                                         arrptr( h ), err );
+            m = average_corner_hessians( PRISM, fm, 6, mMetrics, mGradients, mHessians, arrptr( g ), arrptr( h ), err );
             MSQ_ERRZERO( err );
             break;
 
@@ -648,22 +631,22 @@ bool IdealWeightInverseMeanRatio::evaluate_with_Hessian( PatchData& pd, size_t h
                 mCoords[ 1 ] = vertices[ v_i[ locs_hex[ i ][ 1 ] ] ];
                 mCoords[ 2 ] = vertices[ v_i[ locs_hex[ i ][ 2 ] ] ];
                 mCoords[ 3 ] = vertices[ v_i[ locs_hex[ i ][ 3 ] ] ];
-                if( !h_fcn_3i( mMetrics[ i ], mGradients + 4 * i, mHessians + 10 * i, mCoords,
-                               a3Con, b3Con, c3Con, d_con ) )
+                if( !h_fcn_3i( mMetrics[ i ], mGradients + 4 * i, mHessians + 10 * i, mCoords, a3Con, b3Con, c3Con,
+                               d_con ) )
                     return false;
             }
 
             g.resize( 8 );
             h.resize( 36 );
-            m = average_corner_hessians( HEXAHEDRON, fm, 8, mMetrics, mGradients, mHessians,
-                                         arrptr( g ), arrptr( h ), err );
+            m = average_corner_hessians( HEXAHEDRON, fm, 8, mMetrics, mGradients, mHessians, arrptr( g ), arrptr( h ),
+                                         err );
             MSQ_ERRZERO( err );
             break;
 
         default:
             MSQ_SETERR( err )
-            ( MsqError::UNSUPPORTED_ELEMENT,
-              "Element type (%d) not supported in IdealWeightInverseMeanRatio", (int)topo );
+            ( MsqError::UNSUPPORTED_ELEMENT, "Element type (%d) not supported in IdealWeightInverseMeanRatio",
+              (int)topo );
             return false;
     }  // end switch over element type
 

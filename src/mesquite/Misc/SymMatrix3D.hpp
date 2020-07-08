@@ -117,8 +117,8 @@ class MESQUITE_EXPORT SymMatrix3D
 
 inline SymMatrix3D operator-( const SymMatrix3D& m )
 {
-    return SymMatrix3D( -m[ SymMatrix3D::T00 ], -m[ SymMatrix3D::T01 ], -m[ SymMatrix3D::T02 ],
-                        -m[ SymMatrix3D::T11 ], -m[ SymMatrix3D::T12 ], -m[ SymMatrix3D::T22 ] );
+    return SymMatrix3D( -m[ SymMatrix3D::T00 ], -m[ SymMatrix3D::T01 ], -m[ SymMatrix3D::T02 ], -m[ SymMatrix3D::T11 ],
+                        -m[ SymMatrix3D::T12 ], -m[ SymMatrix3D::T22 ] );
 }
 
 inline SymMatrix3D& SymMatrix3D::operator+=( const SymMatrix3D& other )
@@ -216,8 +216,8 @@ inline Vector3D operator*( const SymMatrix3D& m, const Vector3D& v )
 /** Calculate the outer product of a vector with itself */
 inline SymMatrix3D outer( const Vector3D& v )
 {
-    return SymMatrix3D( v[ 0 ] * v[ 0 ], v[ 0 ] * v[ 1 ], v[ 0 ] * v[ 2 ], v[ 1 ] * v[ 1 ],
-                        v[ 1 ] * v[ 2 ], v[ 2 ] * v[ 2 ] );
+    return SymMatrix3D( v[ 0 ] * v[ 0 ], v[ 0 ] * v[ 1 ], v[ 0 ] * v[ 2 ], v[ 1 ] * v[ 1 ], v[ 1 ] * v[ 2 ],
+                        v[ 2 ] * v[ 2 ] );
 }
 
 /** Given to vectors u and v, calculate the symmetric matrix
@@ -226,9 +226,8 @@ inline SymMatrix3D outer( const Vector3D& v )
  */
 inline SymMatrix3D outer_plus_transpose( const Vector3D& u, const Vector3D& v )
 {
-    return SymMatrix3D( 2 * u[ 0 ] * v[ 0 ], u[ 0 ] * v[ 1 ] + u[ 1 ] * v[ 0 ],
-                        u[ 0 ] * v[ 2 ] + u[ 2 ] * v[ 0 ], 2 * u[ 1 ] * v[ 1 ],
-                        u[ 1 ] * v[ 2 ] + u[ 2 ] * v[ 1 ], 2 * u[ 2 ] * v[ 2 ] );
+    return SymMatrix3D( 2 * u[ 0 ] * v[ 0 ], u[ 0 ] * v[ 1 ] + u[ 1 ] * v[ 0 ], u[ 0 ] * v[ 2 ] + u[ 2 ] * v[ 0 ],
+                        2 * u[ 1 ] * v[ 1 ], u[ 1 ] * v[ 2 ] + u[ 2 ] * v[ 1 ], 2 * u[ 2 ] * v[ 2 ] );
 }
 
 inline const SymMatrix3D& transpose( const SymMatrix3D& a )
@@ -253,8 +252,8 @@ inline SymMatrix3D inverse( const SymMatrix3D& a )
 
 inline double Frobenius_2( const SymMatrix3D& a )
 {
-    return a[ 0 ] * a[ 0 ] + 2 * a[ 1 ] * a[ 1 ] + 2 * a[ 2 ] * a[ 2 ] + a[ 3 ] * a[ 3 ] +
-           2 * a[ 4 ] * a[ 5 ] + a[ 5 ] * a[ 5 ];
+    return a[ 0 ] * a[ 0 ] + 2 * a[ 1 ] * a[ 1 ] + 2 * a[ 2 ] * a[ 2 ] + a[ 3 ] * a[ 3 ] + 2 * a[ 4 ] * a[ 5 ] +
+           a[ 5 ] * a[ 5 ];
 }
 
 inline double Frobenius( const SymMatrix3D& a )

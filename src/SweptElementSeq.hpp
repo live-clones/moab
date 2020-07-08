@@ -32,8 +32,8 @@ class SweptElementSeq : public ElementSequence
 {
   public:
     //! constructor
-    SweptElementSeq( EntityHandle start_handle, const int imin, const int jmin, const int kmin,
-                     const int imax, const int jmax, const int kmax, const int* Cq );
+    SweptElementSeq( EntityHandle start_handle, const int imin, const int jmin, const int kmin, const int imax,
+                     const int jmax, const int kmax, const int* Cq );
 
     virtual ~SweptElementSeq( );
 
@@ -169,12 +169,10 @@ class SweptElementSeq : public ElementSequence
     virtual ErrorCode get_connectivity( EntityHandle handle, std::vector< EntityHandle >& connect,
                                         bool topological = false ) const;
 
-    virtual ErrorCode get_connectivity( EntityHandle handle, EntityHandle const*& connect,
-                                        int& connect_length, bool topological = false,
-                                        std::vector< EntityHandle >* storage = 0 ) const;
+    virtual ErrorCode get_connectivity( EntityHandle handle, EntityHandle const*& connect, int& connect_length,
+                                        bool topological = false, std::vector< EntityHandle >* storage = 0 ) const;
 
-    virtual ErrorCode set_connectivity( EntityHandle handle, EntityHandle const* connect,
-                                        int connect_length );
+    virtual ErrorCode set_connectivity( EntityHandle handle, EntityHandle const* connect, int connect_length );
 
     virtual EntityHandle* get_connectivity_array( );
 
@@ -188,17 +186,12 @@ class SweptElementSeq : public ElementSequence
 
     virtual EntitySequence* split( EntityHandle here );
 
-    virtual SequenceData* create_data_subset( EntityHandle start_handle,
-                                              EntityHandle end_handle ) const;
+    virtual SequenceData* create_data_subset( EntityHandle start_handle, EntityHandle end_handle ) const;
 
-    virtual void get_const_memory_use( unsigned long& bytes_per_entity,
-                                       unsigned long& size_of_sequence ) const;
+    virtual void get_const_memory_use( unsigned long& bytes_per_entity, unsigned long& size_of_sequence ) const;
 
   protected:
-    SweptElementSeq( SweptElementSeq& split_from, EntityHandle here )
-        : ElementSequence( split_from, here )
-    {
-    }
+    SweptElementSeq( SweptElementSeq& split_from, EntityHandle here ) : ElementSequence( split_from, here ) {}
 };
 
 }  // namespace moab

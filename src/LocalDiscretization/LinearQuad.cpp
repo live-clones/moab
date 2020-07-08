@@ -15,8 +15,8 @@ const double LinearQuad::corner[ 4 ][ 2 ] = { { -1, -1 }, { 1, -1 }, { 1, 1 }, {
 */
 const double LinearQuad::gauss[ 1 ][ 2 ] = { { 2.0, 0.0 } };
 
-ErrorCode LinearQuad::jacobianFcn( const double* params, const double* verts, const int /*nverts*/,
-                                   const int /*ndim*/, double*, double* result )
+ErrorCode LinearQuad::jacobianFcn( const double* params, const double* verts, const int /*nverts*/, const int /*ndim*/,
+                                   double*, double*                    result )
 {
     Matrix3* J = reinterpret_cast< Matrix3* >( result );
     *J = Matrix3( 0.0 );
@@ -36,15 +36,14 @@ ErrorCode LinearQuad::jacobianFcn( const double* params, const double* verts, co
     return MB_SUCCESS;
 }  // LinearQuad::jacobian()
 
-ErrorCode LinearQuad::evalFcn( const double* params, const double* field, const int /*ndim*/,
-                               const int num_tuples, double*, double* result )
+ErrorCode LinearQuad::evalFcn( const double* params, const double* field, const int /*ndim*/, const int num_tuples,
+                               double*, double* result )
 {
     for( int i = 0; i < num_tuples; i++ )
         result[ i ] = 0.0;
     for( unsigned i = 0; i < 4; ++i )
     {
-        const double N_i =
-            ( 1 + params[ 0 ] * corner[ i ][ 0 ] ) * ( 1 + params[ 1 ] * corner[ i ][ 1 ] );
+        const double N_i = ( 1 + params[ 0 ] * corner[ i ][ 0 ] ) * ( 1 + params[ 1 ] * corner[ i ][ 1 ] );
         for( int j = 0; j < num_tuples; j++ )
             result[ j ] += N_i * field[ i * num_tuples + j ];
     }
@@ -54,9 +53,8 @@ ErrorCode LinearQuad::evalFcn( const double* params, const double* field, const 
     return MB_SUCCESS;
 }
 
-ErrorCode LinearQuad::integrateFcn( const double* field, const double* verts, const int nverts,
-                                    const int ndim, const int num_tuples, double* work,
-                                    double* result )
+ErrorCode LinearQuad::integrateFcn( const double* field, const double* verts, const int nverts, const int ndim,
+                                    const int num_tuples, double* work, double* result )
 {
     double    tmp_result[ 4 ];
     ErrorCode rval = MB_SUCCESS;
@@ -84,14 +82,12 @@ ErrorCode LinearQuad::integrateFcn( const double* field, const double* verts, co
     return MB_SUCCESS;
 }  // LinearHex::integrate_vector()
 
-ErrorCode LinearQuad::reverseEvalFcn( EvalFcn eval, JacobianFcn jacob, InsideFcn ins,
-                                      const double* posn, const double* verts, const int nverts,
-                                      const int ndim, const double iter_tol,
-                                      const double inside_tol, double* work, double* params,
-                                      int* is_inside )
+ErrorCode LinearQuad::reverseEvalFcn( EvalFcn eval, JacobianFcn jacob, InsideFcn ins, const double* posn,
+                                      const double* verts, const int nverts, const int ndim, const double iter_tol,
+                                      const double inside_tol, double* work, double* params, int* is_inside )
 {
-    return EvalSet::evaluate_reverse( eval, jacob, ins, posn, verts, nverts, ndim, iter_tol,
-                                      inside_tol, work, params, is_inside );
+    return EvalSet::evaluate_reverse( eval, jacob, ins, posn, verts, nverts, ndim, iter_tol, inside_tol, work, params,
+                                      is_inside );
 }
 
 int LinearQuad::insideFcn( const double* params, const int ndim, const double tol )
@@ -99,17 +95,13 @@ int LinearQuad::insideFcn( const double* params, const int ndim, const double to
     return EvalSet::inside_function( params, ndim, tol );
 }
 
-ErrorCode LinearQuad::normalFcn( const int ientDim, const int facet, const int nverts,
-                                 const double* verts, double normal[ 3 ] )
+ErrorCode LinearQuad::normalFcn( const int ientDim, const int facet, const int nverts, const double* verts,
+                                 double normal[ 3 ] )
 {
     // assert(facet <4 && ientDim == 1 && nverts==4);
-    if( nverts != 4 )
-        MB_SET_ERR( MB_FAILURE, "Incorrect vertex count for passed quad :: expected value = 4" );
-    if( ientDim != 1 )
-        MB_SET_ERR( MB_FAILURE,
-                    "Requesting normal for unsupported dimension :: expected value = 1 " );
-    if( facet > 4 || facet < 0 )
-        MB_SET_ERR( MB_FAILURE, "Incorrect local edge id :: expected value = one of 0-3" );
+    if( nverts != 4 ) MB_SET_ERR( MB_FAILURE, "Incorrect vertex count for passed quad :: expected value = 4" );
+    if( ientDim != 1 ) MB_SET_ERR( MB_FAILURE, "Requesting normal for unsupported dimension :: expected value = 1 " );
+    if( facet > 4 || facet < 0 ) MB_SET_ERR( MB_FAILURE, "Incorrect local edge id :: expected value = one of 0-3" );
 
     // Get the local vertex ids of  local edge
     int id0 = CN::mConnectivityMap[ MBQUAD ][ ientDim - 1 ].conn[ facet ][ 0 ];

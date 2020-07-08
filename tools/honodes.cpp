@@ -16,18 +16,16 @@ int main( int argc, char* argv[] )
     bool            face = false;
     bool            volume = false;
 
-    LONG_DESC
-        << "mbhonodes tool reads a mesh file and adds higher order nodes." << std::endl
-        << "Options to add higher order nodes on all volume or face or edge elements of the mesh "
-           "are supported"
-        << std::endl
-        << "Example1: Use the following command to create hex mid volume nodes, in.h5m is a hex8 "
-           "mesh"
-        << std::endl
-        << " -> mbhonodes -i in.h5m -o o.h5m -f -e" << std::endl
-        << "Example2: Use the following command to create hex27 mesh o2.h5m, in.h5m is a hex8 mesh"
-        << std::endl
-        << " -> mbhonodes -i in.h5m -o o2.h5m" << std::endl;
+    LONG_DESC << "mbhonodes tool reads a mesh file and adds higher order nodes." << std::endl
+              << "Options to add higher order nodes on all volume or face or edge elements of the mesh "
+                 "are supported"
+              << std::endl
+              << "Example1: Use the following command to create hex mid volume nodes, in.h5m is a hex8 "
+                 "mesh"
+              << std::endl
+              << " -> mbhonodes -i in.h5m -o o.h5m -f -e" << std::endl
+              << "Example2: Use the following command to create hex27 mesh o2.h5m, in.h5m is a hex8 mesh" << std::endl
+              << " -> mbhonodes -i in.h5m -o o2.h5m" << std::endl;
 
     ProgOptions opts( LONG_DESC.str( ), BRIEF_DESC );
     string      inFileName = "";
@@ -37,8 +35,7 @@ int main( int argc, char* argv[] )
 #else
     string outFileName = "outfile.vtk";
 #endif
-    opts.addOpt< string >( "outFile,o", "Specify the output file name string (default outfile.h5m)",
-                           &outFileName );
+    opts.addOpt< string >( "outFile,o", "Specify the output file name string (default outfile.h5m)", &outFileName );
     opts.addOpt< void >( "edge,e", "DO NOT create mid nodes along edge (default=true)", &edge );
     opts.addOpt< void >( "face,f", "DO NOT create face mid nodes (default=true)", &face );
     opts.addOpt< void >( "volume,v", "DO NOT create volume mid nodes (default=true)", &volume );

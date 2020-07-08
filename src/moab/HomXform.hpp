@@ -165,15 +165,15 @@ class HomXform
     HomXform( const int rotate[ 9 ], const int scale[ 3 ], const int translate[ 3 ] );
 
     //! constructor taking 16 ints, useful for efficient operators
-    HomXform( int i1, int i2, int i3, int i4, int i5, int i6, int i7, int i8, int i9, int i10,
-              int i11, int i12, int i13, int i14, int i15, int i16 );
+    HomXform( int i1, int i2, int i3, int i4, int i5, int i6, int i7, int i8, int i9, int i10, int i11, int i12,
+              int i13, int i14, int i15, int i16 );
 
     //! return this.inverse
     inline HomXform inverse( ) const;
 
     //! compute a transform from three points
-    void three_pt_xform( const HomCoord& p1, const HomCoord& q1, const HomCoord& p2,
-                         const HomCoord& q2, const HomCoord& p3, const HomCoord& q3 );
+    void three_pt_xform( const HomCoord& p1, const HomCoord& q1, const HomCoord& p2, const HomCoord& q2,
+                         const HomCoord& p3, const HomCoord& q3 );
 
     //! operators
     int  operator[]( const int& count ) const;
@@ -265,8 +265,7 @@ inline HomCoord& HomCoord::operator=( const HomCoord& rhs1 )
 //! squared length
 inline int HomCoord::length_squared( ) const
 {
-    return homCoord[ 0 ] * homCoord[ 0 ] + homCoord[ 1 ] * homCoord[ 1 ] +
-           homCoord[ 2 ] * homCoord[ 2 ];
+    return homCoord[ 0 ] * homCoord[ 0 ] + homCoord[ 1 ] * homCoord[ 1 ] + homCoord[ 2 ] * homCoord[ 2 ];
 }
 
 //! length
@@ -284,8 +283,7 @@ inline void HomCoord::normalize( )
 // dot product
 inline int HomCoord::operator%( const HomCoord& rhs ) const
 {
-    return homCoord[ 0 ] * rhs.homCoord[ 0 ] + homCoord[ 1 ] * rhs.homCoord[ 1 ] +
-           homCoord[ 2 ] * rhs.homCoord[ 2 ];
+    return homCoord[ 0 ] * rhs.homCoord[ 0 ] + homCoord[ 1 ] * rhs.homCoord[ 1 ] + homCoord[ 2 ] * rhs.homCoord[ 2 ];
 }
 
 // cross product
@@ -346,23 +344,23 @@ inline HomCoord HomCoord::operator*( const HomXform& rhs2 ) const
     return HomCoord(
         //    homCoord[0]*rhs2[4*0+0] + homCoord[1]*rhs2[4*1+0] +
         //    homCoord[2]*rhs2[4*2+0] + homCoord[3]*rhs2[4*3+0],
-        homCoord[ 0 ] * rhs2.xForm[ 0 ] + homCoord[ 1 ] * rhs2.xForm[ 4 ] +
-            homCoord[ 2 ] * rhs2.xForm[ 8 ] + homCoord[ 3 ] * rhs2.xForm[ 12 ],
+        homCoord[ 0 ] * rhs2.xForm[ 0 ] + homCoord[ 1 ] * rhs2.xForm[ 4 ] + homCoord[ 2 ] * rhs2.xForm[ 8 ] +
+            homCoord[ 3 ] * rhs2.xForm[ 12 ],
 
         //    homCoord[0]*rhs2.xForm[4*0+1] + homCoord[1]*rhs2.xForm[4*1+1] +
         //    homCoord[2]*rhs2.xForm[4*2+1] + homCoord[3]*rhs2.xForm[4*3+1],
-        homCoord[ 0 ] * rhs2.xForm[ 1 ] + homCoord[ 1 ] * rhs2.xForm[ 5 ] +
-            homCoord[ 2 ] * rhs2.xForm[ 9 ] + homCoord[ 3 ] * rhs2.xForm[ 13 ],
+        homCoord[ 0 ] * rhs2.xForm[ 1 ] + homCoord[ 1 ] * rhs2.xForm[ 5 ] + homCoord[ 2 ] * rhs2.xForm[ 9 ] +
+            homCoord[ 3 ] * rhs2.xForm[ 13 ],
 
         //    homCoord[0]*rhs2.xForm[4*0+2] + homCoord[1]*rhs2.xForm[4*1+2] +
         //    homCoord[2]*rhs2.xForm[4*2+2] + homCoord[3]*rhs2.xForm[4*3+2],
-        homCoord[ 0 ] * rhs2.xForm[ 2 ] + homCoord[ 1 ] * rhs2.xForm[ 6 ] +
-            homCoord[ 2 ] * rhs2.xForm[ 10 ] + homCoord[ 3 ] * rhs2.xForm[ 14 ],
+        homCoord[ 0 ] * rhs2.xForm[ 2 ] + homCoord[ 1 ] * rhs2.xForm[ 6 ] + homCoord[ 2 ] * rhs2.xForm[ 10 ] +
+            homCoord[ 3 ] * rhs2.xForm[ 14 ],
 
         //    homCoord[0]*rhs2.xForm[4*0+3] + homCoord[1]*rhs2.xForm[4*1+3] +
         //    homCoord[2]*rhs2.xForm[4*2+3] + homCoord[3]*rhs2.xForm[4*3+3]
-        homCoord[ 0 ] * rhs2.xForm[ 3 ] + homCoord[ 1 ] * rhs2.xForm[ 7 ] +
-            homCoord[ 2 ] * rhs2.xForm[ 11 ] + homCoord[ 3 ] * rhs2.xForm[ 15 ] );
+        homCoord[ 0 ] * rhs2.xForm[ 3 ] + homCoord[ 1 ] * rhs2.xForm[ 7 ] + homCoord[ 2 ] * rhs2.xForm[ 11 ] +
+            homCoord[ 3 ] * rhs2.xForm[ 15 ] );
 }
 
 inline HomCoord& HomCoord::operator*=( const HomXform& rhs2 )
@@ -370,23 +368,23 @@ inline HomCoord& HomCoord::operator*=( const HomXform& rhs2 )
     *this = HomCoord(
         //    homCoord[0]*rhs2.xForm[4*0+0] + homCoord[1]*rhs2.xForm[4*1+0] +
         //    homCoord[2]*rhs2.xForm[4*2+0] + homCoord[3]*rhs2.xForm[4*3+0],
-        homCoord[ 0 ] * rhs2.xForm[ 0 ] + homCoord[ 1 ] * rhs2.xForm[ 4 ] +
-            homCoord[ 2 ] * rhs2.xForm[ 8 ] + homCoord[ 3 ] * rhs2.xForm[ 12 ],
+        homCoord[ 0 ] * rhs2.xForm[ 0 ] + homCoord[ 1 ] * rhs2.xForm[ 4 ] + homCoord[ 2 ] * rhs2.xForm[ 8 ] +
+            homCoord[ 3 ] * rhs2.xForm[ 12 ],
 
         //    homCoord[0]*rhs2.xForm[4*0+1] + homCoord[1]*rhs2.xForm[4*1+1] +
         //    homCoord[2]*rhs2.xForm[4*2+1] + homCoord[3]*rhs2.xForm[4*3+1],
-        homCoord[ 0 ] * rhs2.xForm[ 1 ] + homCoord[ 1 ] * rhs2.xForm[ 5 ] +
-            homCoord[ 2 ] * rhs2.xForm[ 9 ] + homCoord[ 3 ] * rhs2.xForm[ 13 ],
+        homCoord[ 0 ] * rhs2.xForm[ 1 ] + homCoord[ 1 ] * rhs2.xForm[ 5 ] + homCoord[ 2 ] * rhs2.xForm[ 9 ] +
+            homCoord[ 3 ] * rhs2.xForm[ 13 ],
 
         //    homCoord[0]*rhs2.xForm[4*0+2] + homCoord[1]*rhs2.xForm[4*1+2] +
         //    homCoord[2]*rhs2.xForm[4*2+2] + homCoord[3]*rhs2.xForm[4*3+2],
-        homCoord[ 0 ] * rhs2.xForm[ 2 ] + homCoord[ 1 ] * rhs2.xForm[ 6 ] +
-            homCoord[ 2 ] * rhs2.xForm[ 10 ] + homCoord[ 3 ] * rhs2.xForm[ 14 ],
+        homCoord[ 0 ] * rhs2.xForm[ 2 ] + homCoord[ 1 ] * rhs2.xForm[ 6 ] + homCoord[ 2 ] * rhs2.xForm[ 10 ] +
+            homCoord[ 3 ] * rhs2.xForm[ 14 ],
 
         //    homCoord[0]*rhs2.xForm[4*0+3] + homCoord[1]*rhs2.xForm[4*1+3] +
         //    homCoord[2]*rhs2.xForm[4*2+3] + homCoord[3]*rhs2.xForm[4*3+3]
-        homCoord[ 0 ] * rhs2.xForm[ 3 ] + homCoord[ 1 ] * rhs2.xForm[ 7 ] +
-            homCoord[ 2 ] * rhs2.xForm[ 11 ] + homCoord[ 3 ] * rhs2.xForm[ 15 ] );
+        homCoord[ 0 ] * rhs2.xForm[ 3 ] + homCoord[ 1 ] * rhs2.xForm[ 7 ] + homCoord[ 2 ] * rhs2.xForm[ 11 ] +
+            homCoord[ 3 ] * rhs2.xForm[ 15 ] );
     return *this;
 }
 
@@ -494,8 +492,8 @@ inline HomXform::HomXform( const int rotate[ 9 ], const int scale[ 3 ], const in
     xForm[ 15 ] = 1;
 }
 
-inline HomXform::HomXform( int i1, int i2, int i3, int i4, int i5, int i6, int i7, int i8, int i9,
-                           int i10, int i11, int i12, int i13, int i14, int i15, int i16 )
+inline HomXform::HomXform( int i1, int i2, int i3, int i4, int i5, int i6, int i7, int i8, int i9, int i10, int i11,
+                           int i12, int i13, int i14, int i15, int i16 )
 {
     xForm[ 0 ] = i1;
     xForm[ 1 ] = i2;
@@ -527,120 +525,120 @@ inline HomXform HomXform::operator*( const HomXform& rhs2 ) const
 {
     return HomXform(
         //  temp.XFORM(0,0)
-        XFORM( 0, 0 ) * rhs2.XFORM( 0, 0 ) + XFORM( 0, 1 ) * rhs2.XFORM( 1, 0 ) +
-            XFORM( 0, 2 ) * rhs2.XFORM( 2, 0 ) + XFORM( 0, 3 ) * rhs2.XFORM( 3, 0 ),
+        XFORM( 0, 0 ) * rhs2.XFORM( 0, 0 ) + XFORM( 0, 1 ) * rhs2.XFORM( 1, 0 ) + XFORM( 0, 2 ) * rhs2.XFORM( 2, 0 ) +
+            XFORM( 0, 3 ) * rhs2.XFORM( 3, 0 ),
         //  temp.XFORM(0,1)
-        XFORM( 0, 0 ) * rhs2.XFORM( 0, 1 ) + XFORM( 0, 1 ) * rhs2.XFORM( 1, 1 ) +
-            XFORM( 0, 2 ) * rhs2.XFORM( 2, 1 ) + XFORM( 0, 3 ) * rhs2.XFORM( 3, 1 ),
+        XFORM( 0, 0 ) * rhs2.XFORM( 0, 1 ) + XFORM( 0, 1 ) * rhs2.XFORM( 1, 1 ) + XFORM( 0, 2 ) * rhs2.XFORM( 2, 1 ) +
+            XFORM( 0, 3 ) * rhs2.XFORM( 3, 1 ),
         //  temp.XFORM(0,2)
-        XFORM( 0, 0 ) * rhs2.XFORM( 0, 2 ) + XFORM( 0, 1 ) * rhs2.XFORM( 1, 2 ) +
-            XFORM( 0, 2 ) * rhs2.XFORM( 2, 2 ) + XFORM( 0, 3 ) * rhs2.XFORM( 3, 2 ),
+        XFORM( 0, 0 ) * rhs2.XFORM( 0, 2 ) + XFORM( 0, 1 ) * rhs2.XFORM( 1, 2 ) + XFORM( 0, 2 ) * rhs2.XFORM( 2, 2 ) +
+            XFORM( 0, 3 ) * rhs2.XFORM( 3, 2 ),
         //  temp.XFORM(0,3)
-        XFORM( 0, 0 ) * rhs2.XFORM( 0, 3 ) + XFORM( 0, 1 ) * rhs2.XFORM( 1, 3 ) +
-            XFORM( 0, 2 ) * rhs2.XFORM( 2, 3 ) + XFORM( 0, 3 ) * rhs2.XFORM( 3, 3 ),
+        XFORM( 0, 0 ) * rhs2.XFORM( 0, 3 ) + XFORM( 0, 1 ) * rhs2.XFORM( 1, 3 ) + XFORM( 0, 2 ) * rhs2.XFORM( 2, 3 ) +
+            XFORM( 0, 3 ) * rhs2.XFORM( 3, 3 ),
 
         //  temp.XFORM(1,0)
-        XFORM( 1, 0 ) * rhs2.XFORM( 0, 0 ) + XFORM( 1, 1 ) * rhs2.XFORM( 1, 0 ) +
-            XFORM( 1, 2 ) * rhs2.XFORM( 2, 0 ) + XFORM( 1, 3 ) * rhs2.XFORM( 3, 0 ),
+        XFORM( 1, 0 ) * rhs2.XFORM( 0, 0 ) + XFORM( 1, 1 ) * rhs2.XFORM( 1, 0 ) + XFORM( 1, 2 ) * rhs2.XFORM( 2, 0 ) +
+            XFORM( 1, 3 ) * rhs2.XFORM( 3, 0 ),
         //  temp.XFORM(1,1)
-        XFORM( 1, 0 ) * rhs2.XFORM( 0, 1 ) + XFORM( 1, 1 ) * rhs2.XFORM( 1, 1 ) +
-            XFORM( 1, 2 ) * rhs2.XFORM( 2, 1 ) + XFORM( 1, 3 ) * rhs2.XFORM( 3, 1 ),
+        XFORM( 1, 0 ) * rhs2.XFORM( 0, 1 ) + XFORM( 1, 1 ) * rhs2.XFORM( 1, 1 ) + XFORM( 1, 2 ) * rhs2.XFORM( 2, 1 ) +
+            XFORM( 1, 3 ) * rhs2.XFORM( 3, 1 ),
         //  temp.XFORM(1,2)
-        XFORM( 1, 0 ) * rhs2.XFORM( 0, 2 ) + XFORM( 1, 1 ) * rhs2.XFORM( 1, 2 ) +
-            XFORM( 1, 2 ) * rhs2.XFORM( 2, 2 ) + XFORM( 1, 3 ) * rhs2.XFORM( 3, 2 ),
+        XFORM( 1, 0 ) * rhs2.XFORM( 0, 2 ) + XFORM( 1, 1 ) * rhs2.XFORM( 1, 2 ) + XFORM( 1, 2 ) * rhs2.XFORM( 2, 2 ) +
+            XFORM( 1, 3 ) * rhs2.XFORM( 3, 2 ),
         //  temp.XFORM(1,3)
-        XFORM( 1, 0 ) * rhs2.XFORM( 0, 3 ) + XFORM( 1, 1 ) * rhs2.XFORM( 1, 3 ) +
-            XFORM( 1, 2 ) * rhs2.XFORM( 2, 3 ) + XFORM( 1, 3 ) * rhs2.XFORM( 3, 3 ),
+        XFORM( 1, 0 ) * rhs2.XFORM( 0, 3 ) + XFORM( 1, 1 ) * rhs2.XFORM( 1, 3 ) + XFORM( 1, 2 ) * rhs2.XFORM( 2, 3 ) +
+            XFORM( 1, 3 ) * rhs2.XFORM( 3, 3 ),
 
         //  temp.XFORM(2,0)
-        XFORM( 2, 0 ) * rhs2.XFORM( 0, 0 ) + XFORM( 2, 1 ) * rhs2.XFORM( 1, 0 ) +
-            XFORM( 2, 2 ) * rhs2.XFORM( 2, 0 ) + XFORM( 2, 3 ) * rhs2.XFORM( 3, 0 ),
+        XFORM( 2, 0 ) * rhs2.XFORM( 0, 0 ) + XFORM( 2, 1 ) * rhs2.XFORM( 1, 0 ) + XFORM( 2, 2 ) * rhs2.XFORM( 2, 0 ) +
+            XFORM( 2, 3 ) * rhs2.XFORM( 3, 0 ),
         //  temp.XFORM(2,1)
-        XFORM( 2, 0 ) * rhs2.XFORM( 0, 1 ) + XFORM( 2, 1 ) * rhs2.XFORM( 1, 1 ) +
-            XFORM( 2, 2 ) * rhs2.XFORM( 2, 1 ) + XFORM( 2, 3 ) * rhs2.XFORM( 3, 1 ),
+        XFORM( 2, 0 ) * rhs2.XFORM( 0, 1 ) + XFORM( 2, 1 ) * rhs2.XFORM( 1, 1 ) + XFORM( 2, 2 ) * rhs2.XFORM( 2, 1 ) +
+            XFORM( 2, 3 ) * rhs2.XFORM( 3, 1 ),
         //  temp.XFORM(2,2)
-        XFORM( 2, 0 ) * rhs2.XFORM( 0, 2 ) + XFORM( 2, 1 ) * rhs2.XFORM( 1, 2 ) +
-            XFORM( 2, 2 ) * rhs2.XFORM( 2, 2 ) + XFORM( 2, 3 ) * rhs2.XFORM( 3, 2 ),
+        XFORM( 2, 0 ) * rhs2.XFORM( 0, 2 ) + XFORM( 2, 1 ) * rhs2.XFORM( 1, 2 ) + XFORM( 2, 2 ) * rhs2.XFORM( 2, 2 ) +
+            XFORM( 2, 3 ) * rhs2.XFORM( 3, 2 ),
         //  temp.XFORM(2,3)
-        XFORM( 2, 0 ) * rhs2.XFORM( 0, 3 ) + XFORM( 2, 1 ) * rhs2.XFORM( 1, 3 ) +
-            XFORM( 2, 2 ) * rhs2.XFORM( 2, 3 ) + XFORM( 2, 3 ) * rhs2.XFORM( 3, 3 ),
+        XFORM( 2, 0 ) * rhs2.XFORM( 0, 3 ) + XFORM( 2, 1 ) * rhs2.XFORM( 1, 3 ) + XFORM( 2, 2 ) * rhs2.XFORM( 2, 3 ) +
+            XFORM( 2, 3 ) * rhs2.XFORM( 3, 3 ),
 
         //  temp.XFORM(3,0)
         //  xForm[12]*rhs2.xForm[0] + xForm[13]*rhs2.xForm[4] + xForm[14]*rhs2.xForm[8] +
         //  xForm[15]*rhs2.xForm[12]
-        XFORM( 3, 0 ) * rhs2.XFORM( 0, 0 ) + XFORM( 3, 1 ) * rhs2.XFORM( 1, 0 ) +
-            XFORM( 3, 2 ) * rhs2.XFORM( 2, 0 ) + XFORM( 3, 3 ) * rhs2.XFORM( 3, 0 ),
+        XFORM( 3, 0 ) * rhs2.XFORM( 0, 0 ) + XFORM( 3, 1 ) * rhs2.XFORM( 1, 0 ) + XFORM( 3, 2 ) * rhs2.XFORM( 2, 0 ) +
+            XFORM( 3, 3 ) * rhs2.XFORM( 3, 0 ),
         //  temp.XFORM(3,1)
         //  xForm[12]*rhs2.xForm[1] + xForm[13]*rhs2.xForm[5] + xForm[14]*rhs2.xForm[9] +
         //  xForm[15]*rhs2.xForm[13]
-        XFORM( 3, 0 ) * rhs2.XFORM( 0, 1 ) + XFORM( 3, 1 ) * rhs2.XFORM( 1, 1 ) +
-            XFORM( 3, 2 ) * rhs2.XFORM( 2, 1 ) + XFORM( 3, 3 ) * rhs2.XFORM( 3, 1 ),
+        XFORM( 3, 0 ) * rhs2.XFORM( 0, 1 ) + XFORM( 3, 1 ) * rhs2.XFORM( 1, 1 ) + XFORM( 3, 2 ) * rhs2.XFORM( 2, 1 ) +
+            XFORM( 3, 3 ) * rhs2.XFORM( 3, 1 ),
         //  temp.XFORM(3,2)
         //  xForm[12]*rhs2.xForm[2] + xForm[13]*rhs2.xForm[6] + xForm[14]*rhs2.xForm[10] +
         //  xForm[15]*rhs2.xForm[14]
-        XFORM( 3, 0 ) * rhs2.XFORM( 0, 2 ) + XFORM( 3, 1 ) * rhs2.XFORM( 1, 2 ) +
-            XFORM( 3, 2 ) * rhs2.XFORM( 2, 2 ) + XFORM( 3, 3 ) * rhs2.XFORM( 3, 2 ),
+        XFORM( 3, 0 ) * rhs2.XFORM( 0, 2 ) + XFORM( 3, 1 ) * rhs2.XFORM( 1, 2 ) + XFORM( 3, 2 ) * rhs2.XFORM( 2, 2 ) +
+            XFORM( 3, 3 ) * rhs2.XFORM( 3, 2 ),
         //  temp.XFORM(3,3)
         //  xForm[12]*rhs2.xForm[3] + xForm[13]*rhs2.xForm[7] + xForm[14]*rhs2.xForm[11] +
         //  xForm[15]*rhs2.xForm[15]
-        XFORM( 3, 0 ) * rhs2.XFORM( 0, 3 ) + XFORM( 3, 1 ) * rhs2.XFORM( 1, 3 ) +
-            XFORM( 3, 2 ) * rhs2.XFORM( 2, 3 ) + XFORM( 3, 3 ) * rhs2.XFORM( 3, 3 ) );
+        XFORM( 3, 0 ) * rhs2.XFORM( 0, 3 ) + XFORM( 3, 1 ) * rhs2.XFORM( 1, 3 ) + XFORM( 3, 2 ) * rhs2.XFORM( 2, 3 ) +
+            XFORM( 3, 3 ) * rhs2.XFORM( 3, 3 ) );
 }
 
 inline HomXform& HomXform::operator*=( const HomXform& rhs2 )
 {
     *this = HomXform(
         //  temp.XFORM(0,0)
-        XFORM( 0, 0 ) * rhs2.XFORM( 0, 0 ) + XFORM( 0, 1 ) * rhs2.XFORM( 1, 0 ) +
-            XFORM( 0, 2 ) * rhs2.XFORM( 2, 0 ) + XFORM( 0, 3 ) * rhs2.XFORM( 3, 0 ),
+        XFORM( 0, 0 ) * rhs2.XFORM( 0, 0 ) + XFORM( 0, 1 ) * rhs2.XFORM( 1, 0 ) + XFORM( 0, 2 ) * rhs2.XFORM( 2, 0 ) +
+            XFORM( 0, 3 ) * rhs2.XFORM( 3, 0 ),
         //  temp.XFORM(0,1)
-        XFORM( 0, 0 ) * rhs2.XFORM( 0, 1 ) + XFORM( 0, 1 ) * rhs2.XFORM( 1, 1 ) +
-            XFORM( 0, 2 ) * rhs2.XFORM( 2, 1 ) + XFORM( 0, 3 ) * rhs2.XFORM( 3, 1 ),
+        XFORM( 0, 0 ) * rhs2.XFORM( 0, 1 ) + XFORM( 0, 1 ) * rhs2.XFORM( 1, 1 ) + XFORM( 0, 2 ) * rhs2.XFORM( 2, 1 ) +
+            XFORM( 0, 3 ) * rhs2.XFORM( 3, 1 ),
         //  temp.XFORM(0,2)
-        XFORM( 0, 0 ) * rhs2.XFORM( 0, 2 ) + XFORM( 0, 1 ) * rhs2.XFORM( 1, 2 ) +
-            XFORM( 0, 2 ) * rhs2.XFORM( 2, 2 ) + XFORM( 0, 3 ) * rhs2.XFORM( 3, 2 ),
+        XFORM( 0, 0 ) * rhs2.XFORM( 0, 2 ) + XFORM( 0, 1 ) * rhs2.XFORM( 1, 2 ) + XFORM( 0, 2 ) * rhs2.XFORM( 2, 2 ) +
+            XFORM( 0, 3 ) * rhs2.XFORM( 3, 2 ),
         //  temp.XFORM(0,3)
-        XFORM( 0, 0 ) * rhs2.XFORM( 0, 3 ) + XFORM( 0, 1 ) * rhs2.XFORM( 1, 3 ) +
-            XFORM( 0, 2 ) * rhs2.XFORM( 2, 3 ) + XFORM( 0, 3 ) * rhs2.XFORM( 3, 3 ),
+        XFORM( 0, 0 ) * rhs2.XFORM( 0, 3 ) + XFORM( 0, 1 ) * rhs2.XFORM( 1, 3 ) + XFORM( 0, 2 ) * rhs2.XFORM( 2, 3 ) +
+            XFORM( 0, 3 ) * rhs2.XFORM( 3, 3 ),
 
         //  temp.XFORM(1,0)
-        XFORM( 1, 0 ) * rhs2.XFORM( 0, 0 ) + XFORM( 1, 1 ) * rhs2.XFORM( 1, 0 ) +
-            XFORM( 1, 2 ) * rhs2.XFORM( 2, 0 ) + XFORM( 1, 3 ) * rhs2.XFORM( 3, 0 ),
+        XFORM( 1, 0 ) * rhs2.XFORM( 0, 0 ) + XFORM( 1, 1 ) * rhs2.XFORM( 1, 0 ) + XFORM( 1, 2 ) * rhs2.XFORM( 2, 0 ) +
+            XFORM( 1, 3 ) * rhs2.XFORM( 3, 0 ),
         //  temp.XFORM(1,1)
-        XFORM( 1, 0 ) * rhs2.XFORM( 0, 1 ) + XFORM( 1, 1 ) * rhs2.XFORM( 1, 1 ) +
-            XFORM( 1, 2 ) * rhs2.XFORM( 2, 1 ) + XFORM( 1, 3 ) * rhs2.XFORM( 3, 1 ),
+        XFORM( 1, 0 ) * rhs2.XFORM( 0, 1 ) + XFORM( 1, 1 ) * rhs2.XFORM( 1, 1 ) + XFORM( 1, 2 ) * rhs2.XFORM( 2, 1 ) +
+            XFORM( 1, 3 ) * rhs2.XFORM( 3, 1 ),
         //  temp.XFORM(1,2)
-        XFORM( 1, 0 ) * rhs2.XFORM( 0, 2 ) + XFORM( 1, 1 ) * rhs2.XFORM( 1, 2 ) +
-            XFORM( 1, 2 ) * rhs2.XFORM( 2, 2 ) + XFORM( 1, 3 ) * rhs2.XFORM( 3, 2 ),
+        XFORM( 1, 0 ) * rhs2.XFORM( 0, 2 ) + XFORM( 1, 1 ) * rhs2.XFORM( 1, 2 ) + XFORM( 1, 2 ) * rhs2.XFORM( 2, 2 ) +
+            XFORM( 1, 3 ) * rhs2.XFORM( 3, 2 ),
         //  temp.XFORM(1,3)
-        XFORM( 1, 0 ) * rhs2.XFORM( 0, 3 ) + XFORM( 1, 1 ) * rhs2.XFORM( 1, 3 ) +
-            XFORM( 1, 2 ) * rhs2.XFORM( 2, 3 ) + XFORM( 1, 3 ) * rhs2.XFORM( 3, 3 ),
+        XFORM( 1, 0 ) * rhs2.XFORM( 0, 3 ) + XFORM( 1, 1 ) * rhs2.XFORM( 1, 3 ) + XFORM( 1, 2 ) * rhs2.XFORM( 2, 3 ) +
+            XFORM( 1, 3 ) * rhs2.XFORM( 3, 3 ),
 
         //  temp.XFORM(2,0)
-        XFORM( 2, 0 ) * rhs2.XFORM( 0, 0 ) + XFORM( 2, 1 ) * rhs2.XFORM( 1, 0 ) +
-            XFORM( 2, 2 ) * rhs2.XFORM( 2, 0 ) + XFORM( 2, 3 ) * rhs2.XFORM( 3, 0 ),
+        XFORM( 2, 0 ) * rhs2.XFORM( 0, 0 ) + XFORM( 2, 1 ) * rhs2.XFORM( 1, 0 ) + XFORM( 2, 2 ) * rhs2.XFORM( 2, 0 ) +
+            XFORM( 2, 3 ) * rhs2.XFORM( 3, 0 ),
         //  temp.XFORM(2,1)
-        XFORM( 2, 0 ) * rhs2.XFORM( 0, 1 ) + XFORM( 2, 1 ) * rhs2.XFORM( 1, 1 ) +
-            XFORM( 2, 2 ) * rhs2.XFORM( 2, 1 ) + XFORM( 2, 3 ) * rhs2.XFORM( 3, 1 ),
+        XFORM( 2, 0 ) * rhs2.XFORM( 0, 1 ) + XFORM( 2, 1 ) * rhs2.XFORM( 1, 1 ) + XFORM( 2, 2 ) * rhs2.XFORM( 2, 1 ) +
+            XFORM( 2, 3 ) * rhs2.XFORM( 3, 1 ),
         //  temp.XFORM(2,2)
-        XFORM( 2, 0 ) * rhs2.XFORM( 0, 2 ) + XFORM( 2, 1 ) * rhs2.XFORM( 1, 2 ) +
-            XFORM( 2, 2 ) * rhs2.XFORM( 2, 2 ) + XFORM( 2, 3 ) * rhs2.XFORM( 3, 2 ),
+        XFORM( 2, 0 ) * rhs2.XFORM( 0, 2 ) + XFORM( 2, 1 ) * rhs2.XFORM( 1, 2 ) + XFORM( 2, 2 ) * rhs2.XFORM( 2, 2 ) +
+            XFORM( 2, 3 ) * rhs2.XFORM( 3, 2 ),
         //  temp.XFORM(2,3)
-        XFORM( 2, 0 ) * rhs2.XFORM( 0, 3 ) + XFORM( 2, 1 ) * rhs2.XFORM( 1, 3 ) +
-            XFORM( 2, 2 ) * rhs2.XFORM( 2, 3 ) + XFORM( 2, 3 ) * rhs2.XFORM( 3, 3 ),
+        XFORM( 2, 0 ) * rhs2.XFORM( 0, 3 ) + XFORM( 2, 1 ) * rhs2.XFORM( 1, 3 ) + XFORM( 2, 2 ) * rhs2.XFORM( 2, 3 ) +
+            XFORM( 2, 3 ) * rhs2.XFORM( 3, 3 ),
 
         //  temp.XFORM(3,0)
-        XFORM( 3, 0 ) * rhs2.XFORM( 0, 0 ) + XFORM( 3, 1 ) * rhs2.XFORM( 1, 0 ) +
-            XFORM( 3, 2 ) * rhs2.XFORM( 2, 0 ) + XFORM( 3, 3 ) * rhs2.XFORM( 3, 0 ),
+        XFORM( 3, 0 ) * rhs2.XFORM( 0, 0 ) + XFORM( 3, 1 ) * rhs2.XFORM( 1, 0 ) + XFORM( 3, 2 ) * rhs2.XFORM( 2, 0 ) +
+            XFORM( 3, 3 ) * rhs2.XFORM( 3, 0 ),
         //  temp.XFORM(3,1)
-        XFORM( 3, 0 ) * rhs2.XFORM( 0, 1 ) + XFORM( 3, 1 ) * rhs2.XFORM( 1, 1 ) +
-            XFORM( 3, 2 ) * rhs2.XFORM( 2, 1 ) + XFORM( 3, 3 ) * rhs2.XFORM( 3, 1 ),
+        XFORM( 3, 0 ) * rhs2.XFORM( 0, 1 ) + XFORM( 3, 1 ) * rhs2.XFORM( 1, 1 ) + XFORM( 3, 2 ) * rhs2.XFORM( 2, 1 ) +
+            XFORM( 3, 3 ) * rhs2.XFORM( 3, 1 ),
         //  temp.XFORM(3,2)
-        XFORM( 3, 0 ) * rhs2.XFORM( 0, 2 ) + XFORM( 3, 1 ) * rhs2.XFORM( 1, 2 ) +
-            XFORM( 3, 2 ) * rhs2.XFORM( 2, 2 ) + XFORM( 3, 3 ) * rhs2.XFORM( 3, 2 ),
+        XFORM( 3, 0 ) * rhs2.XFORM( 0, 2 ) + XFORM( 3, 1 ) * rhs2.XFORM( 1, 2 ) + XFORM( 3, 2 ) * rhs2.XFORM( 2, 2 ) +
+            XFORM( 3, 3 ) * rhs2.XFORM( 3, 2 ),
         //  temp.XFORM(3,3)
-        XFORM( 3, 0 ) * rhs2.XFORM( 0, 3 ) + XFORM( 3, 1 ) * rhs2.XFORM( 1, 3 ) +
-            XFORM( 3, 2 ) * rhs2.XFORM( 2, 3 ) + XFORM( 3, 3 ) * rhs2.XFORM( 3, 3 ) );
+        XFORM( 3, 0 ) * rhs2.XFORM( 0, 3 ) + XFORM( 3, 1 ) * rhs2.XFORM( 1, 3 ) + XFORM( 3, 2 ) * rhs2.XFORM( 2, 3 ) +
+            XFORM( 3, 3 ) * rhs2.XFORM( 3, 3 ) );
 
     return *this;
 }
@@ -657,26 +655,22 @@ inline int& HomXform::operator[]( const int& count )
 
 inline bool HomXform::operator==( const HomXform& rhs ) const
 {
-    return ( xForm[ 0 ] == rhs.xForm[ 0 ] && xForm[ 1 ] == rhs.xForm[ 1 ] &&
-             xForm[ 2 ] == rhs.xForm[ 2 ] && xForm[ 3 ] == rhs.xForm[ 3 ] &&
-             xForm[ 4 ] == rhs.xForm[ 4 ] && xForm[ 5 ] == rhs.xForm[ 5 ] &&
-             xForm[ 6 ] == rhs.xForm[ 6 ] && xForm[ 7 ] == rhs.xForm[ 7 ] &&
-             xForm[ 8 ] == rhs.xForm[ 8 ] && xForm[ 9 ] == rhs.xForm[ 9 ] &&
-             xForm[ 10 ] == rhs.xForm[ 10 ] && xForm[ 11 ] == rhs.xForm[ 11 ] &&
-             xForm[ 12 ] == rhs.xForm[ 12 ] && xForm[ 13 ] == rhs.xForm[ 13 ] &&
-             xForm[ 14 ] == rhs.xForm[ 14 ] && xForm[ 15 ] == rhs.xForm[ 15 ] );
+    return ( xForm[ 0 ] == rhs.xForm[ 0 ] && xForm[ 1 ] == rhs.xForm[ 1 ] && xForm[ 2 ] == rhs.xForm[ 2 ] &&
+             xForm[ 3 ] == rhs.xForm[ 3 ] && xForm[ 4 ] == rhs.xForm[ 4 ] && xForm[ 5 ] == rhs.xForm[ 5 ] &&
+             xForm[ 6 ] == rhs.xForm[ 6 ] && xForm[ 7 ] == rhs.xForm[ 7 ] && xForm[ 8 ] == rhs.xForm[ 8 ] &&
+             xForm[ 9 ] == rhs.xForm[ 9 ] && xForm[ 10 ] == rhs.xForm[ 10 ] && xForm[ 11 ] == rhs.xForm[ 11 ] &&
+             xForm[ 12 ] == rhs.xForm[ 12 ] && xForm[ 13 ] == rhs.xForm[ 13 ] && xForm[ 14 ] == rhs.xForm[ 14 ] &&
+             xForm[ 15 ] == rhs.xForm[ 15 ] );
 }
 
 inline bool HomXform::operator!=( const HomXform& rhs ) const
 {
-    return ( xForm[ 0 ] != rhs.xForm[ 0 ] || xForm[ 1 ] != rhs.xForm[ 1 ] ||
-             xForm[ 2 ] != rhs.xForm[ 2 ] || xForm[ 3 ] != rhs.xForm[ 3 ] ||
-             xForm[ 4 ] != rhs.xForm[ 4 ] || xForm[ 5 ] != rhs.xForm[ 5 ] ||
-             xForm[ 6 ] != rhs.xForm[ 6 ] || xForm[ 7 ] != rhs.xForm[ 7 ] ||
-             xForm[ 8 ] != rhs.xForm[ 8 ] || xForm[ 9 ] != rhs.xForm[ 9 ] ||
-             xForm[ 10 ] != rhs.xForm[ 10 ] || xForm[ 11 ] != rhs.xForm[ 11 ] ||
-             xForm[ 12 ] != rhs.xForm[ 12 ] || xForm[ 13 ] != rhs.xForm[ 13 ] ||
-             xForm[ 14 ] != rhs.xForm[ 14 ] || xForm[ 15 ] != rhs.xForm[ 15 ] );
+    return ( xForm[ 0 ] != rhs.xForm[ 0 ] || xForm[ 1 ] != rhs.xForm[ 1 ] || xForm[ 2 ] != rhs.xForm[ 2 ] ||
+             xForm[ 3 ] != rhs.xForm[ 3 ] || xForm[ 4 ] != rhs.xForm[ 4 ] || xForm[ 5 ] != rhs.xForm[ 5 ] ||
+             xForm[ 6 ] != rhs.xForm[ 6 ] || xForm[ 7 ] != rhs.xForm[ 7 ] || xForm[ 8 ] != rhs.xForm[ 8 ] ||
+             xForm[ 9 ] != rhs.xForm[ 9 ] || xForm[ 10 ] != rhs.xForm[ 10 ] || xForm[ 11 ] != rhs.xForm[ 11 ] ||
+             xForm[ 12 ] != rhs.xForm[ 12 ] || xForm[ 13 ] != rhs.xForm[ 13 ] || xForm[ 14 ] != rhs.xForm[ 14 ] ||
+             xForm[ 15 ] != rhs.xForm[ 15 ] );
 }
 
 inline HomXform HomXform::inverse( ) const
@@ -728,13 +722,9 @@ inline HomXform HomXform::inverse( ) const
         // row 2
         XFORM( 0, 2 ), XFORM( 1, 2 ), xForm[ 10 ], 0,
         // row 3
-        -( XFORM( 3, 0 ) * xForm[ 0 ] + XFORM( 3, 1 ) * XFORM( 0, 1 ) +
-           XFORM( 3, 2 ) * XFORM( 0, 2 ) ),
-        -( XFORM( 3, 0 ) * XFORM( 1, 0 ) + XFORM( 3, 1 ) * xForm[ 5 ] +
-           XFORM( 3, 2 ) * XFORM( 1, 2 ) ),
-        -( XFORM( 3, 0 ) * XFORM( 2, 0 ) + XFORM( 3, 1 ) * XFORM( 2, 1 ) +
-           XFORM( 3, 2 ) * xForm[ 10 ] ),
-        1 );
+        -( XFORM( 3, 0 ) * xForm[ 0 ] + XFORM( 3, 1 ) * XFORM( 0, 1 ) + XFORM( 3, 2 ) * XFORM( 0, 2 ) ),
+        -( XFORM( 3, 0 ) * XFORM( 1, 0 ) + XFORM( 3, 1 ) * xForm[ 5 ] + XFORM( 3, 2 ) * XFORM( 1, 2 ) ),
+        -( XFORM( 3, 0 ) * XFORM( 2, 0 ) + XFORM( 3, 1 ) * XFORM( 2, 1 ) + XFORM( 3, 2 ) * xForm[ 10 ] ), 1 );
 }
 
 }  // namespace moab

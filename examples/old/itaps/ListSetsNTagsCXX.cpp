@@ -49,9 +49,8 @@ int main( int argc, char* argv[] )
     // load the mesh
     if( read_par )
     {
-        const char* opt =
-            " moab:PARALLEL=READ_PART moab:PARTITION=PARALLEL_PARTITION moab:PARTITION_DISTRIBUTE "
-            "moab:PARALLEL_RESOLVE_SHARED_ENTS moab:DEBUG_PIO=2 moab:DEBUG_IO=2 moab:SETS=SETS ";
+        const char* opt = " moab:PARALLEL=READ_PART moab:PARTITION=PARALLEL_PARTITION moab:PARTITION_DISTRIBUTE "
+                          "moab:PARALLEL_RESOLVE_SHARED_ENTS moab:DEBUG_PIO=2 moab:DEBUG_IO=2 moab:SETS=SETS ";
         iMesh_load( mesh, root_set, filename, opt, &err, strlen( filename ), strlen( opt ) );
     }
     else

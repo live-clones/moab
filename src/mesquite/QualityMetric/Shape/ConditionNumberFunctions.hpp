@@ -45,8 +45,8 @@ Header file for the MBMesquite::ShapeQualityMetric class
 
 namespace MBMesquite
 {
-static inline bool condition_number_2d( const Vector3D temp_vec[], size_t e_ind, PatchData& pd,
-                                        double& fval, MsqError& err )
+static inline bool condition_number_2d( const Vector3D temp_vec[], size_t e_ind, PatchData& pd, double& fval,
+                                        MsqError& err )
 {
     // norm squared of J
     double term1 = temp_vec[ 0 ] % temp_vec[ 0 ] + temp_vec[ 1 ] % temp_vec[ 1 ];
@@ -121,12 +121,10 @@ static inline bool condition_number_2d( const Vector3D temp_vec[], size_t e_ind,
 
 //} //namespace
 
-static inline bool condition_number_3d( const Vector3D temp_vec[], PatchData& /*pd*/, double& fval,
-                                        MsqError& /*err*/ )
+static inline bool condition_number_3d( const Vector3D temp_vec[], PatchData& /*pd*/, double& fval, MsqError& /*err*/ )
 {
     // norm squared of J
-    double term1 = temp_vec[ 0 ] % temp_vec[ 0 ] + temp_vec[ 1 ] % temp_vec[ 1 ] +
-                   temp_vec[ 2 ] % temp_vec[ 2 ];
+    double term1 = temp_vec[ 0 ] % temp_vec[ 0 ] + temp_vec[ 1 ] % temp_vec[ 1 ] + temp_vec[ 2 ] % temp_vec[ 2 ];
     // norm squared of adjoint of J
     double term2 = ( temp_vec[ 0 ] * temp_vec[ 1 ] ) % ( temp_vec[ 0 ] * temp_vec[ 1 ] ) +
                    ( temp_vec[ 1 ] * temp_vec[ 2 ] ) % ( temp_vec[ 1 ] * temp_vec[ 2 ] ) +

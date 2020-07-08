@@ -137,8 +137,7 @@ void read_one_cell_var( bool rcbzoltan, bool no_mixed_elements )
     Interface& mb = moab;
 
     read_options = "PARALLEL=READ_PART;PARTITION_METHOD=TRIVIAL;NO_EDGES;VARIABLE=ke";
-    if( rcbzoltan )
-        read_options = "PARALLEL=READ_PART;PARTITION_METHOD=RCBZOLTAN;NO_EDGES;VARIABLE=ke";
+    if( rcbzoltan ) read_options = "PARALLEL=READ_PART;PARTITION_METHOD=RCBZOLTAN;NO_EDGES;VARIABLE=ke";
 
     if( no_mixed_elements ) read_options += ";NO_MIXED_ELEMENTS";
 
@@ -259,11 +258,9 @@ void read_mesh_parallel( bool rcbzoltan, bool no_mixed_elements )
     Core       moab;
     Interface& mb = moab;
 
-    read_options =
-        "PARALLEL=READ_PART;PARTITION_METHOD=TRIVIAL;PARALLEL_RESOLVE_SHARED_ENTS;VARIABLE=";
+    read_options = "PARALLEL=READ_PART;PARTITION_METHOD=TRIVIAL;PARALLEL_RESOLVE_SHARED_ENTS;VARIABLE=";
     if( rcbzoltan )
-        read_options =
-            "PARALLEL=READ_PART;PARTITION_METHOD=RCBZOLTAN;PARALLEL_RESOLVE_SHARED_ENTS;VARIABLE=";
+        read_options = "PARALLEL=READ_PART;PARTITION_METHOD=RCBZOLTAN;PARALLEL_RESOLVE_SHARED_ENTS;VARIABLE=";
 
     if( no_mixed_elements ) read_options += ";NO_MIXED_ELEMENTS";
 
@@ -386,8 +383,7 @@ void read_mesh_parallel( bool rcbzoltan, bool no_mixed_elements )
     std::cout << "proc: " << rank << " verts:" << verts_num << "\n";
 
     int total_verts_num;
-    MPI_Reduce( &verts_num, &total_verts_num, 1, MPI_INT, MPI_SUM, 0,
-                pcomm->proc_config( ).proc_comm( ) );
+    MPI_Reduce( &verts_num, &total_verts_num, 1, MPI_INT, MPI_SUM, 0, pcomm->proc_config( ).proc_comm( ) );
     if( 0 == rank )
     {
         std::cout << "total vertices: " << total_verts_num << "\n";
@@ -397,8 +393,7 @@ void read_mesh_parallel( bool rcbzoltan, bool no_mixed_elements )
     std::cout << "proc: " << rank << " edges:" << edges_num << "\n";
 
     int total_edges_num;
-    MPI_Reduce( &edges_num, &total_edges_num, 1, MPI_INT, MPI_SUM, 0,
-                pcomm->proc_config( ).proc_comm( ) );
+    MPI_Reduce( &edges_num, &total_edges_num, 1, MPI_INT, MPI_SUM, 0, pcomm->proc_config( ).proc_comm( ) );
     if( 0 == rank )
     {
         std::cout << "total edges: " << total_edges_num << "\n";
@@ -408,8 +403,7 @@ void read_mesh_parallel( bool rcbzoltan, bool no_mixed_elements )
     std::cout << "proc: " << rank << " cells:" << cells_num << "\n";
 
     int total_cells_num;
-    MPI_Reduce( &cells_num, &total_cells_num, 1, MPI_INT, MPI_SUM, 0,
-                pcomm->proc_config( ).proc_comm( ) );
+    MPI_Reduce( &cells_num, &total_cells_num, 1, MPI_INT, MPI_SUM, 0, pcomm->proc_config( ).proc_comm( ) );
     if( 0 == rank )
     {
         std::cout << "total cells: " << total_cells_num << "\n";
@@ -483,8 +477,8 @@ void gather_one_cell_var( int gather_set_rank )
 
         // Check ke0 tag values on 4 gather set cells: first pentagon, last pentagon,
         // first hexagon and last hexagon
-        EntityHandle cell_ents[] = { gather_set_cells[ 0 ], gather_set_cells[ 11 ],
-                                     gather_set_cells[ 12 ], gather_set_cells[ 641 ] };
+        EntityHandle cell_ents[] = { gather_set_cells[ 0 ], gather_set_cells[ 11 ], gather_set_cells[ 12 ],
+                                     gather_set_cells[ 641 ] };
         double       ke0_val[ 4 ];
         rval = mb.tag_get_data( ke_tag0, &cell_ents[ 0 ], 4, ke0_val );CHECK_ERR( rval );
 
@@ -519,8 +513,7 @@ void multiple_loads_of_same_file( bool no_mixed_elements )
     rval = mb.load_file( example.c_str( ), &file_set, read_options.c_str( ) );CHECK_ERR( rval );
 
     // Read variable ke at timestep 0, no mesh
-    read_options =
-        "PARALLEL=READ_PART;PARTITION;PARTITION_METHOD=TRIVIAL;NOMESH;VARIABLE=ke;TIMESTEP=0";
+    read_options = "PARALLEL=READ_PART;PARTITION;PARTITION_METHOD=TRIVIAL;NOMESH;VARIABLE=ke;TIMESTEP=0";
     if( no_mixed_elements ) read_options += ";NO_MIXED_ELEMENTS";
 
     rval = mb.load_file( example.c_str( ), &file_set, read_options.c_str( ) );CHECK_ERR( rval );

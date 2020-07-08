@@ -48,8 +48,7 @@ double getLon( CartVect p )
 // we project sphere points on a 2d map. We decide if a point is in interior of a loop
 // with the span angle test; it will work for any island except Antarctica
 
-bool interior_point( vector< double >& coords, int& startLoop, int& endLoop, double lat,
-                     double lon )
+bool interior_point( vector< double >& coords, int& startLoop, int& endLoop, double lat, double lon )
 {
     // compute oriented angle between point and edges in the loop
     // if angle ~ +/-2Pi, it is in the interior
@@ -133,8 +132,7 @@ int main( int argc, char** argv )
     // tag for continents
     Tag tag1;
     int defa = -1;
-    rval = mb->tag_get_handle( "continent", 1, MB_TYPE_INTEGER, tag1, MB_TAG_DENSE | MB_TAG_CREAT,
-                               &defa );MB_CHK_SET_ERR( rval, "Trouble creating continent tag" );
+    rval = mb->tag_get_handle( "continent", 1, MB_TYPE_INTEGER, tag1, MB_TAG_DENSE | MB_TAG_CREAT, &defa );MB_CHK_SET_ERR( rval, "Trouble creating continent tag" );
     EntityHandle islandSets[ 6 ];
     for( int loop_index = 0; loop_index < 6; loop_index++ )
     {
@@ -161,8 +159,7 @@ int main( int argc, char** argv )
             }
         }
 
-        rval = mb->add_entities( islandSets[ loop_index ], &interiorCells[ 0 ],
-                                 interiorCells.size( ) );MB_CHK_SET_ERR( rval, "Can't add entities to set" );
+        rval = mb->add_entities( islandSets[ loop_index ], &interiorCells[ 0 ], interiorCells.size( ) );MB_CHK_SET_ERR( rval, "Can't add entities to set" );
     }
 
     std::stringstream islandFile;

@@ -73,8 +73,8 @@ bool TShapeSizeB1::evaluate( const MsqMatrix< 3, 3 >& T, double& result, MsqErro
     return true;
 }
 
-bool TShapeSizeB1::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& result,
-                                       MsqMatrix< 2, 2 >& deriv_wrt_T, MsqError& err )
+bool TShapeSizeB1::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& result, MsqMatrix< 2, 2 >& deriv_wrt_T,
+                                       MsqError& err )
 {
     const double tau = det( T );
     if( invalid_determinant( tau ) )
@@ -95,8 +95,8 @@ bool TShapeSizeB1::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& resul
     return true;
 }
 
-bool TShapeSizeB1::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& result,
-                                       MsqMatrix< 3, 3 >& deriv_wrt_T, MsqError& err )
+bool TShapeSizeB1::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& result, MsqMatrix< 3, 3 >& deriv_wrt_T,
+                                       MsqError& err )
 {
     const double tau = det( T );
     if( invalid_determinant( tau ) )
@@ -120,8 +120,7 @@ bool TShapeSizeB1::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& resul
     return true;
 }
 
-bool TShapeSizeB1::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& result,
-                                       MsqMatrix< 2, 2 >& deriv_wrt_T,
+bool TShapeSizeB1::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& result, MsqMatrix< 2, 2 >& deriv_wrt_T,
                                        MsqMatrix< 2, 2 > second_wrt_T[ 3 ], MsqError& err )
 {
     const double tau = det( T );
@@ -147,8 +146,7 @@ bool TShapeSizeB1::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& resul
 
     return true;
 }
-bool TShapeSizeB1::evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result,
-                                       MsqMatrix< 3, 3 >& deriv_wrt_T,
+bool TShapeSizeB1::evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result, MsqMatrix< 3, 3 >& deriv_wrt_T,
                                        MsqMatrix< 3, 3 > second_wrt_T[ 6 ], MsqError& err )
 {
     const double tau = det( T );

@@ -66,18 +66,18 @@ int main( int argc, char** argv )
     assert( rcomm == comm );
 #endif
     if( 0 == global_rank )
-        cout << " global rank:" << global_rank << " color:" << color << " rank:" << rank << " of "
-             << nprocs << " processors\n";
+        cout << " global rank:" << global_rank << " color:" << color << " rank:" << rank << " of " << nprocs
+             << " processors\n";
 
     if( 1 == global_rank )
-        cout << " global rank:" << global_rank << " color:" << color << " rank:" << rank << " of "
-             << nprocs << " processors\n";
+        cout << " global rank:" << global_rank << " color:" << color << " rank:" << rank << " of " << nprocs
+             << " processors\n";
 
     MPI_Barrier( MPI_COMM_WORLD );
 
     if( 0 == global_rank )
-        cout << "Reading file " << test_file_name << "\n with options: " << options << "\n on "
-             << nprocs << " processors on " << nbComms << " communicator(s)\n";
+        cout << "Reading file " << test_file_name << "\n with options: " << options << "\n on " << nprocs
+             << " processors on " << nbComms << " communicator(s)\n";
 
     // Read the file with the specified options
     ErrorCode rval = mb->load_file( test_file_name.c_str( ), 0, options.c_str( ) );MB_CHK_ERR( rval );
@@ -88,8 +88,7 @@ int main( int argc, char** argv )
 
     // Filter shared entities with not not_owned, which means owned
     Range owned_entities;
-    rval =
-        pcomm->filter_pstatus( shared_ents, PSTATUS_NOT_OWNED, PSTATUS_NOT, -1, &owned_entities );MB_CHK_ERR( rval );
+    rval = pcomm->filter_pstatus( shared_ents, PSTATUS_NOT_OWNED, PSTATUS_NOT, -1, &owned_entities );MB_CHK_ERR( rval );
 
     unsigned int nums[ 4 ] = { 0 };  // to store the owned entities per dimension
     for( int i = 0; i < 4; i++ )
@@ -100,9 +99,8 @@ int main( int argc, char** argv )
     if( 0 == global_rank )
     {
         for( int i = 0; i < nprocs; i++ )
-            cout << " Shared, owned entities on proc " << i << ": " << rbuf[ 4 * i ] << " verts, "
-                 << rbuf[ 4 * i + 1 ] << " edges, " << rbuf[ 4 * i + 2 ] << " faces, "
-                 << rbuf[ 4 * i + 3 ] << " elements" << endl;
+            cout << " Shared, owned entities on proc " << i << ": " << rbuf[ 4 * i ] << " verts, " << rbuf[ 4 * i + 1 ]
+                 << " edges, " << rbuf[ 4 * i + 2 ] << " faces, " << rbuf[ 4 * i + 3 ] << " elements" << endl;
     }
 
     // Now exchange 1 layer of ghost elements, using vertices as bridge
@@ -117,8 +115,7 @@ int main( int argc, char** argv )
     shared_ents.clear( );
     owned_entities.clear( );
     rval = pcomm->get_shared_entities( -1, shared_ents );MB_CHK_ERR( rval );
-    rval =
-        pcomm->filter_pstatus( shared_ents, PSTATUS_NOT_OWNED, PSTATUS_NOT, -1, &owned_entities );MB_CHK_ERR( rval );
+    rval = pcomm->filter_pstatus( shared_ents, PSTATUS_NOT_OWNED, PSTATUS_NOT, -1, &owned_entities );MB_CHK_ERR( rval );
 
     // Find out how many shared entities of each dimension are owned on this processor
     for( int i = 0; i < 4; i++ )
@@ -131,9 +128,8 @@ int main( int argc, char** argv )
         cout << " \n\n After exchanging one ghost layer: \n";
         for( int i = 0; i < nprocs; i++ )
         {
-            cout << " Shared, owned entities on proc " << i << ": " << rbuf[ 4 * i ] << " verts, "
-                 << rbuf[ 4 * i + 1 ] << " edges, " << rbuf[ 4 * i + 2 ] << " faces, "
-                 << rbuf[ 4 * i + 3 ] << " elements" << endl;
+            cout << " Shared, owned entities on proc " << i << ": " << rbuf[ 4 * i ] << " verts, " << rbuf[ 4 * i + 1 ]
+                 << " edges, " << rbuf[ 4 * i + 2 ] << " faces, " << rbuf[ 4 * i + 3 ] << " elements" << endl;
         }
     }
 

@@ -68,11 +68,11 @@ class TargetReader : public TargetCalculator, private ExtraDataUser< TargetReade
 
     MESQUITE_EXPORT virtual ~TargetReader( );
 
-    MESQUITE_EXPORT virtual bool get_3D_target( PatchData& pd, size_t element, Sample sample,
-                                                MsqMatrix< 3, 3 >& W_out, MsqError& err );
+    MESQUITE_EXPORT virtual bool get_3D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 3, 3 >& W_out,
+                                                MsqError& err );
 
-    MESQUITE_EXPORT virtual bool get_2D_target( PatchData& pd, size_t element, Sample sample,
-                                                MsqMatrix< 2, 2 >& W_out, MsqError& err );
+    MESQUITE_EXPORT virtual bool get_2D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 2, 2 >& W_out,
+                                                MsqError& err );
 
     MESQUITE_EXPORT virtual bool get_surface_target( PatchData& pd, size_t element, Sample sample,
                                                      MsqMatrix< 3, 2 >& W_out, MsqError& err );
@@ -85,8 +85,8 @@ class TargetReader : public TargetCalculator, private ExtraDataUser< TargetReade
   private:
     virtual void notify_patch_destroyed( TargetReaderData& data );
     virtual void notify_new_patch( PatchData& pd, TargetReaderData& data );
-    virtual void notify_sub_patch( PatchData& pd, TargetReaderData& data, PatchData& subpatch,
-                                   const size_t* vert_map, const size_t* elem_map, MsqError& err );
+    virtual void notify_sub_patch( PatchData& pd, TargetReaderData& data, PatchData& subpatch, const size_t* vert_map,
+                                   const size_t* elem_map, MsqError& err );
 
     std::string tagBaseName;  //!< Base name for tags used to store targets
     bool        orient2D;  //!< 2D targets included orientation (3x2 rather than 2x2)

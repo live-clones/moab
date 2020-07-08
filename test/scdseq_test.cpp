@@ -32,12 +32,11 @@ void test_parallel_partitions( );
 
 ErrorCode test_parallel_partition( int* gdims, int nprocs, int part_method );
 
-ErrorCode check_vertex_sequence( const ScdBox* this_box, const int imin, const int jmin,
-                                 const int kmin, const int imax, const int jmax, const int kmax,
-                                 const EntityHandle this_start );
+ErrorCode check_vertex_sequence( const ScdBox* this_box, const int imin, const int jmin, const int kmin, const int imax,
+                                 const int jmax, const int kmax, const EntityHandle this_start );
 ErrorCode evaluate_vertex_box( ScdBox* this_box );
-ErrorCode check_element_sequence( const ScdBox* this_box, const HomCoord& min_params,
-                                  const HomCoord& max_params, const EntityHandle this_start );
+ErrorCode check_element_sequence( const ScdBox* this_box, const HomCoord& min_params, const HomCoord& max_params,
+                                  const EntityHandle this_start );
 ErrorCode evaluate_element_sequence( ScdBox* this_box );
 ErrorCode eseq_test1a( ScdInterface* scdi, HomCoord tmp_min, HomCoord tmp_max );
 ErrorCode eseq_test1b( ScdInterface* scdi, HomCoord tmp_min, HomCoord tmp_max );
@@ -47,15 +46,14 @@ ErrorCode eseq_test2b( ScdInterface* scdi );
 ErrorCode eseq_test2c( ScdInterface* scdi );
 ErrorCode eseq_test2d( ScdInterface* scdi );
 
-ErrorCode create_1d_3_sequences( ScdInterface* scdi, HomCoord tmp_min, HomCoord tmp_max,
-                                 ScdBox** vseq, ScdBox** eseq );
+ErrorCode create_1d_3_sequences( ScdInterface* scdi, HomCoord tmp_min, HomCoord tmp_max, ScdBox** vseq, ScdBox** eseq );
 
 ErrorCode create_2d_3_sequences( ScdInterface* scdi, ScdBox** vseq, ScdBox** eseq );
 
-ErrorCode create_2dtri_3_sequences( ScdInterface* scdi, const int int1, const int int2,
-                                    const int int3, ScdBox** vseq, ScdBox** eseq );
-ErrorCode create_3dtri_3_sequences( ScdInterface* scdi, const int int1, const int int2,
-                                    const int int3, const int int4, ScdBox** vseq, ScdBox** eseq );
+ErrorCode create_2dtri_3_sequences( ScdInterface* scdi, const int int1, const int int2, const int int3, ScdBox** vseq,
+                                    ScdBox** eseq );
+ErrorCode create_3dtri_3_sequences( ScdInterface* scdi, const int int1, const int int2, const int int3, const int int4,
+                                    ScdBox** vseq, ScdBox** eseq );
 ErrorCode access_adjacencies( ScdBox* box );
 
 void test_partition_methods( );
@@ -64,16 +62,14 @@ void test_partition_method( ScdParData::PartitionMethod pm );
 
 // first comes general-capability code used by various tests; main and test functions
 // come after these, starting with main
-ErrorCode check_vertex_sequence( const ScdBox* this_box, const int imin, const int jmin,
-                                 const int kmin, const int imax, const int jmax, const int kmax,
-                                 const EntityHandle this_start )
+ErrorCode check_vertex_sequence( const ScdBox* this_box, const int imin, const int jmin, const int kmin, const int imax,
+                                 const int jmax, const int kmax, const EntityHandle this_start )
 {
     ErrorCode result = MB_SUCCESS;
 
     // check data stored in sequence with that in arg list
-    if( imin != this_box->box_min( )[ 0 ] || jmin != this_box->box_min( )[ 1 ] ||
-        kmin != this_box->box_min( )[ 2 ] || imax != this_box->box_max( )[ 0 ] ||
-        jmax != this_box->box_max( )[ 1 ] || kmax != this_box->box_max( )[ 2 ] )
+    if( imin != this_box->box_min( )[ 0 ] || jmin != this_box->box_min( )[ 1 ] || kmin != this_box->box_min( )[ 2 ] ||
+        imax != this_box->box_max( )[ 0 ] || jmax != this_box->box_max( )[ 1 ] || kmax != this_box->box_max( )[ 2 ] )
     {
         std::cout << "min/max params not correct for a sequence." << std::endl;
         result = MB_FAILURE;
@@ -82,8 +78,7 @@ ErrorCode check_vertex_sequence( const ScdBox* this_box, const int imin, const i
     HomCoord ijk1 = this_box->box_min( ), ijk2 = this_box->box_max( ), dijk = this_box->box_size( );
     if( ijk2 - ijk1 + HomCoord( 1, 1, 1, 0 ) != dijk )
     {
-        std::cout << "min_params/max_params/param_extents functions returned inconsistent results"
-                  << std::endl;
+        std::cout << "min_params/max_params/param_extents functions returned inconsistent results" << std::endl;
         result = MB_FAILURE;
     }
 
@@ -96,28 +91,23 @@ ErrorCode check_vertex_sequence( const ScdBox* this_box, const int imin, const i
     return result;
 }
 
-ErrorCode check_element_sequence( const ScdBox* this_box, const HomCoord& min_params,
-                                  const HomCoord& max_params, const EntityHandle this_start )
+ErrorCode check_element_sequence( const ScdBox* this_box, const HomCoord& min_params, const HomCoord& max_params,
+                                  const EntityHandle this_start )
 {
     ErrorCode result = MB_SUCCESS;
 
     // check data stored in sequence with that in arg list
-    if( min_params.i( ) != this_box->box_min( )[ 0 ] ||
-        min_params.j( ) != this_box->box_min( )[ 1 ] ||
-        min_params.k( ) != this_box->box_min( )[ 2 ] ||
-        max_params.i( ) != this_box->box_max( )[ 0 ] ||
-        max_params.j( ) != this_box->box_max( )[ 1 ] ||
-        max_params.k( ) != this_box->box_max( )[ 2 ] )
+    if( min_params.i( ) != this_box->box_min( )[ 0 ] || min_params.j( ) != this_box->box_min( )[ 1 ] ||
+        min_params.k( ) != this_box->box_min( )[ 2 ] || max_params.i( ) != this_box->box_max( )[ 0 ] ||
+        max_params.j( ) != this_box->box_max( )[ 1 ] || max_params.k( ) != this_box->box_max( )[ 2 ] )
     {
         std::cout << "min/max params not correct for a sequence." << std::endl;
         result = MB_FAILURE;
     }
 
-    if( this_box->box_max( ) - this_box->box_min( ) + HomCoord( 1, 1, 1, 0 ) !=
-        this_box->box_size( ) )
+    if( this_box->box_max( ) - this_box->box_min( ) + HomCoord( 1, 1, 1, 0 ) != this_box->box_size( ) )
     {
-        std::cout << "min_params/max_params/param_extents functions returned inconsistent results"
-                  << std::endl;
+        std::cout << "min_params/max_params/param_extents functions returned inconsistent results" << std::endl;
         result = MB_FAILURE;
     }
 
@@ -155,26 +145,25 @@ ErrorCode evaluate_vertex_sequence( ScdBox* this_box )
             for( int k = ijk1[ 2 ]; k <= ijk2[ 2 ]; k++ )
             {
                 // compute what the vertex handle is supposed to be
-                EntityHandle this_handle = start_handle + ( i - ijk1[ 0 ] ) +
-                                           ( j - ijk1[ 1 ] ) * ( ijk2[ 0 ] - ijk1[ 0 ] + 1 ) +
-                                           ( k - ijk1[ 2 ] ) * ( ijk2[ 1 ] - ijk1[ 1 ] + 1 ) *
-                                               ( ijk2[ 0 ] - ijk1[ 0 ] + 1 );
+                EntityHandle this_handle =
+                    start_handle + ( i - ijk1[ 0 ] ) + ( j - ijk1[ 1 ] ) * ( ijk2[ 0 ] - ijk1[ 0 ] + 1 ) +
+                    ( k - ijk1[ 2 ] ) * ( ijk2[ 1 ] - ijk1[ 1 ] + 1 ) * ( ijk2[ 0 ] - ijk1[ 0 ] + 1 );
 
                 // get_vertex variants
                 tmp_handle = this_box->get_vertex( i, j, k );
 
                 if( this_box->get_vertex( i, j, k ) != this_handle )
                 {
-                    std::cout << "vertex seq: get_vertex(i, j, k) didn't work, i, j, k = " << i
-                              << ", " << j << ", " << k << "." << std::endl;
+                    std::cout << "vertex seq: get_vertex(i, j, k) didn't work, i, j, k = " << i << ", " << j << ", "
+                              << k << "." << std::endl;
                     result = MB_FAILURE;
                 }
 
                 tmp_handle2 = this_box->get_vertex( HomCoord( i, j, k ) );
                 if( tmp_handle2 != this_handle )
                 {
-                    std::cout << "vertex seq: get_vertex(HomCoord) didn't work, i, j, k = " << i
-                              << ", " << j << ", " << k << "." << std::endl;
+                    std::cout << "vertex seq: get_vertex(HomCoord) didn't work, i, j, k = " << i << ", " << j << ", "
+                              << k << "." << std::endl;
                     result = MB_FAILURE;
                 }
 
@@ -183,16 +172,15 @@ ErrorCode evaluate_vertex_sequence( ScdBox* this_box )
                 ErrorCode tmp_result = this_box->get_params( tmp_handle, itmp, jtmp, ktmp );
                 if( MB_SUCCESS != tmp_result || i != itmp || j != jtmp || k != ktmp )
                 {
-                    std::cout << "vertex seq: get_params didn't work, i, j, k = " << i << ", " << j
-                              << ", " << k << "; itmp, jtmp, ktmp = " << itmp << ", " << jtmp
-                              << ", " << ktmp << std::endl;
+                    std::cout << "vertex seq: get_params didn't work, i, j, k = " << i << ", " << j << ", " << k
+                              << "; itmp, jtmp, ktmp = " << itmp << ", " << jtmp << ", " << ktmp << std::endl;
                     result = MB_FAILURE;
                 }
 
                 if( !this_box->contains( i, j, k ) || !this_box->contains( HomCoord( i, j, k ) ) )
                 {
-                    std::cout << "vertex seq: contains didn't work, i, j, k = " << i << ", " << j
-                              << ", " << k << "." << std::endl;
+                    std::cout << "vertex seq: contains didn't work, i, j, k = " << i << ", " << j << ", " << k << "."
+                              << std::endl;
                     result = MB_FAILURE;
                 }
             }
@@ -226,11 +214,8 @@ ErrorCode evaluate_element_sequence( ScdBox* this_box )
                 tmp_handle2 = this_box->get_vertex( HomCoord( i, j, k ) );
                 if( tmp_handle2 != tmp_handle )
                 {
-                    std::cout
-                        << "element seq: get_vertex(HomCoord) and get_vertex(i,j,k) didn't return"
-                        << std::endl
-                        << "consistent results, i, j, k = " << i << ", " << j << ", " << k << "."
-                        << std::endl;
+                    std::cout << "element seq: get_vertex(HomCoord) and get_vertex(i,j,k) didn't return" << std::endl
+                              << "consistent results, i, j, k = " << i << ", " << j << ", " << k << "." << std::endl;
                     result = MB_FAILURE;
                 }
 
@@ -240,11 +225,8 @@ ErrorCode evaluate_element_sequence( ScdBox* this_box )
                 tmp_handle2 = this_box->get_element( HomCoord( i, j, k ) );
                 if( tmp_handle2 != tmp_handle )
                 {
-                    std::cout
-                        << "element seq: get_element(HomCoord) and get_element(i,j,k) didn't return"
-                        << std::endl
-                        << "consistent results, i, j, k = " << i << ", " << j << ", " << k << "."
-                        << std::endl;
+                    std::cout << "element seq: get_element(HomCoord) and get_element(i,j,k) didn't return" << std::endl
+                              << "consistent results, i, j, k = " << i << ", " << j << ", " << k << "." << std::endl;
                     result = MB_FAILURE;
                 }
 
@@ -254,16 +236,15 @@ ErrorCode evaluate_element_sequence( ScdBox* this_box )
                 ErrorCode tmp_result = this_box->get_params( tmp_handle, itmp, jtmp, ktmp );
                 if( MB_SUCCESS != tmp_result || i != itmp || j != jtmp || k != ktmp )
                 {
-                    std::cout << "element seq: get_params didn't work, i, j, k = " << i << ", " << j
-                              << ", " << k << "; itmp, jtmp, ktmp = " << itmp << ", " << jtmp
-                              << ", " << ktmp << std::endl;
+                    std::cout << "element seq: get_params didn't work, i, j, k = " << i << ", " << j << ", " << k
+                              << "; itmp, jtmp, ktmp = " << itmp << ", " << jtmp << ", " << ktmp << std::endl;
                     result = MB_FAILURE;
                 }
 
                 if( !this_box->contains( i, j, k ) || !this_box->contains( HomCoord( i, j, k ) ) )
                 {
-                    std::cout << "element seq: contains didn't work, i, j, k = " << i << ", " << j
-                              << ", " << k << "." << std::endl;
+                    std::cout << "element seq: contains didn't work, i, j, k = " << i << ", " << j << ", " << k << "."
+                              << std::endl;
                     result = MB_FAILURE;
                 }
             }
@@ -300,8 +281,7 @@ void test_vertex_seq( )
     ScdBox* dum_box = NULL;
 
     // make a 1d sequence
-    ErrorCode result = scdi->create_scd_sequence( HomCoord( -10, 0, 0 ), HomCoord( 10, 0, 0 ),
-                                                  MBVERTEX, 1, dum_box );CHECK_ERR( result );
+    ErrorCode result = scdi->create_scd_sequence( HomCoord( -10, 0, 0 ), HomCoord( 10, 0, 0 ), MBVERTEX, 1, dum_box );CHECK_ERR( result );
     if( !dum_box || dum_box->start_vertex( ) == 0 ) CHECK_ERR( MB_FAILURE );
 
     // check sequence data
@@ -312,8 +292,7 @@ void test_vertex_seq( )
 
     // make a 2d sequence
     dum_box = NULL;
-    result = scdi->create_scd_sequence( HomCoord( -10, -10, 0 ), HomCoord( 10, 10, 0 ), MBVERTEX, 1,
-                                        dum_box );CHECK_ERR( result );
+    result = scdi->create_scd_sequence( HomCoord( -10, -10, 0 ), HomCoord( 10, 10, 0 ), MBVERTEX, 1, dum_box );CHECK_ERR( result );
 
     // check sequence data
     result = check_vertex_sequence( dum_box, -10, -10, 0, 10, 10, 0, dum_box->start_vertex( ) );CHECK_ERR( result );
@@ -323,8 +302,7 @@ void test_vertex_seq( )
 
     // make a 3d sequence
     dum_box = NULL;
-    result = scdi->create_scd_sequence( HomCoord( -10, -10, -10 ), HomCoord( 10, 10, 10 ), MBVERTEX,
-                                        1, dum_box );CHECK_ERR( result );
+    result = scdi->create_scd_sequence( HomCoord( -10, -10, -10 ), HomCoord( 10, 10, 10 ), MBVERTEX, 1, dum_box );CHECK_ERR( result );
     if( !dum_box || dum_box->start_vertex( ) == 0 ) CHECK_ERR( MB_FAILURE );
 
     // check sequence data
@@ -481,14 +459,11 @@ ErrorCode eseq_test2b( ScdInterface* scdi )
     // whew; that's done; now check and evaluate
 
     // first check to make sure the parameter spaces tack onto one another
-    if( ebox[ 0 ]->box_max( ) !=
-            HomCoord( ebox[ 1 ]->box_min( ).i( ), ebox[ 1 ]->box_max( ).j( ), 0 ) ||
-        ebox[ 1 ]->box_max( ) !=
-            HomCoord( ebox[ 2 ]->box_min( ).i( ), ebox[ 2 ]->box_max( ).j( ), 0 ) ||
+    if( ebox[ 0 ]->box_max( ) != HomCoord( ebox[ 1 ]->box_min( ).i( ), ebox[ 1 ]->box_max( ).j( ), 0 ) ||
+        ebox[ 1 ]->box_max( ) != HomCoord( ebox[ 2 ]->box_min( ).i( ), ebox[ 2 ]->box_max( ).j( ), 0 ) ||
         // cheat on the i value of ebox0, since it's a periodic bdy (we don't check for that, so you
         // may get different values for that parameter)
-        ebox[ 2 ]->box_max( ) !=
-            HomCoord( ebox[ 2 ]->box_max( ).i( ), ebox[ 0 ]->box_max( ).j( ), 0 ) )
+        ebox[ 2 ]->box_max( ) != HomCoord( ebox[ 2 ]->box_max( ).i( ), ebox[ 0 ]->box_max( ).j( ), 0 ) )
         CHECK_ERR( MB_FAILURE );
 
     // check/evaluate element sequences
@@ -612,8 +587,7 @@ void test_periodic_seq( )
     rval = evaluate_element_sequence( new_box );CHECK_ERR( rval );
 }
 
-ErrorCode create_1d_3_sequences( ScdInterface* scdi, HomCoord tmp_min, HomCoord tmp_max,
-                                 ScdBox** vbox, ScdBox** ebox )
+ErrorCode create_1d_3_sequences( ScdInterface* scdi, HomCoord tmp_min, HomCoord tmp_max, ScdBox** vbox, ScdBox** ebox )
 {
     // first get 1d min/max by resetting j, k components
     tmp_min[ 1 ] = tmp_min[ 2 ] = tmp_max[ 1 ] = tmp_max[ 2 ] = 0;
@@ -621,60 +595,53 @@ ErrorCode create_1d_3_sequences( ScdInterface* scdi, HomCoord tmp_min, HomCoord 
     // split the sequence in three in i parameter, at 1/2, 1/3 and 1/6, such that the
     // total # vertices is the expected number from tmp_max - tmp_min)
     int      idiff = ( tmp_max[ 0 ] - tmp_min[ 0 ] + 1 ) / 6;
-    HomCoord vseq0_minmax[ 2 ] = {
-        HomCoord( tmp_min ), HomCoord( tmp_min[ 0 ] + 3 * idiff - 1, tmp_max[ 1 ], tmp_max[ 2 ] ) };
-    HomCoord vseq1_minmax[ 2 ] = {
-        HomCoord( tmp_min ), HomCoord( tmp_min[ 0 ] + 2 * idiff - 1, tmp_max[ 1 ], tmp_max[ 2 ] ) };
-    HomCoord vseq2_minmax[ 2 ] = {
-        HomCoord( tmp_min ), HomCoord( tmp_max[ 0 ] - 5 * idiff, tmp_max[ 1 ], tmp_max[ 2 ] ) };
+    HomCoord vseq0_minmax[ 2 ] = { HomCoord( tmp_min ),
+                                   HomCoord( tmp_min[ 0 ] + 3 * idiff - 1, tmp_max[ 1 ], tmp_max[ 2 ] ) };
+    HomCoord vseq1_minmax[ 2 ] = { HomCoord( tmp_min ),
+                                   HomCoord( tmp_min[ 0 ] + 2 * idiff - 1, tmp_max[ 1 ], tmp_max[ 2 ] ) };
+    HomCoord vseq2_minmax[ 2 ] = { HomCoord( tmp_min ),
+                                   HomCoord( tmp_max[ 0 ] - 5 * idiff, tmp_max[ 1 ], tmp_max[ 2 ] ) };
 
     // create three vertex sequences
     vbox[ 0 ] = vbox[ 1 ] = vbox[ 2 ] = NULL;
 
     // first vertex sequence
-    ErrorCode result =
-        scdi->create_scd_sequence( vseq0_minmax[ 0 ], vseq0_minmax[ 1 ], MBVERTEX, 1, vbox[ 0 ] );CHECK_ERR( result );
+    ErrorCode result = scdi->create_scd_sequence( vseq0_minmax[ 0 ], vseq0_minmax[ 1 ], MBVERTEX, 1, vbox[ 0 ] );CHECK_ERR( result );
 
     // second vertex sequence
-    result =
-        scdi->create_scd_sequence( vseq1_minmax[ 0 ], vseq1_minmax[ 1 ], MBVERTEX, 1, vbox[ 1 ] );CHECK_ERR( result );
+    result = scdi->create_scd_sequence( vseq1_minmax[ 0 ], vseq1_minmax[ 1 ], MBVERTEX, 1, vbox[ 1 ] );CHECK_ERR( result );
 
     // third vertex sequence
-    result =
-        scdi->create_scd_sequence( vseq2_minmax[ 0 ], vseq2_minmax[ 1 ], MBVERTEX, 1, vbox[ 2 ] );CHECK_ERR( result );
+    result = scdi->create_scd_sequence( vseq2_minmax[ 0 ], vseq2_minmax[ 1 ], MBVERTEX, 1, vbox[ 2 ] );CHECK_ERR( result );
 
     // now create the three element sequences
     ebox[ 0 ] = ebox[ 1 ] = ebox[ 2 ] = NULL;
 
     // create the first element sequence
-    result =
-        scdi->create_scd_sequence( vseq0_minmax[ 0 ], vseq0_minmax[ 1 ], MBEDGE, 1, ebox[ 0 ] );CHECK_ERR( result );
+    result = scdi->create_scd_sequence( vseq0_minmax[ 0 ], vseq0_minmax[ 1 ], MBEDGE, 1, ebox[ 0 ] );CHECK_ERR( result );
 
     // add first vertex seq to first element seq, forward orientation, unity transform
-    result =
-        ebox[ 0 ]->add_vbox( vbox[ 0 ], vseq0_minmax[ 0 ], vseq0_minmax[ 0 ], vseq0_minmax[ 1 ],
-                             vseq0_minmax[ 1 ], vseq0_minmax[ 0 ], vseq0_minmax[ 0 ] );CHECK_ERR( result );
+    result = ebox[ 0 ]->add_vbox( vbox[ 0 ], vseq0_minmax[ 0 ], vseq0_minmax[ 0 ], vseq0_minmax[ 1 ], vseq0_minmax[ 1 ],
+                                  vseq0_minmax[ 0 ], vseq0_minmax[ 0 ] );CHECK_ERR( result );
 
     // create the second element sequence; make it use the second vseq in reverse and start
     // with the end vertex of the first sequence; parameterize it such that it tacks onto the
     // end of the previous ebox
     result = scdi->create_scd_sequence(
         HomCoord( vseq0_minmax[ 1 ].i( ), 0, 0 ),
-        HomCoord( 1 + vseq0_minmax[ 1 ].i( ) + vseq1_minmax[ 1 ].i( ) - vseq1_minmax[ 0 ].i( ), 0,
-                  0 ),
-        MBEDGE, 1, ebox[ 1 ] );CHECK_ERR( result );
+        HomCoord( 1 + vseq0_minmax[ 1 ].i( ) + vseq1_minmax[ 1 ].i( ) - vseq1_minmax[ 0 ].i( ), 0, 0 ), MBEDGE, 1,
+        ebox[ 1 ] );CHECK_ERR( result );
 
     // add shared vertex from first vseq to this ebox; parameter space should be the same since
     // we're adding to that parameter space
-    result = ebox[ 1 ]->add_vbox(
-        vbox[ 0 ], vseq0_minmax[ 0 ], vseq0_minmax[ 0 ], vseq0_minmax[ 1 ], vseq0_minmax[ 1 ],
-        vseq0_minmax[ 0 ], vseq0_minmax[ 0 ], true, HomCoord( ebox[ 1 ]->box_min( ).i( ), 0, 0 ),
-        HomCoord( ebox[ 1 ]->box_min( ).i( ), 0, 0 ) );CHECK_ERR( result );
+    result =
+        ebox[ 1 ]->add_vbox( vbox[ 0 ], vseq0_minmax[ 0 ], vseq0_minmax[ 0 ], vseq0_minmax[ 1 ], vseq0_minmax[ 1 ],
+                             vseq0_minmax[ 0 ], vseq0_minmax[ 0 ], true, HomCoord( ebox[ 1 ]->box_min( ).i( ), 0, 0 ),
+                             HomCoord( ebox[ 1 ]->box_min( ).i( ), 0, 0 ) );CHECK_ERR( result );
 
     // add second vseq to this ebox, but reversed; parameter space should be such that the
     // last vertex in the second vseq occurs first, and so on
-    result = ebox[ 1 ]->add_vbox( vbox[ 1 ], vseq1_minmax[ 1 ],
-                                  ebox[ 1 ]->box_min( ) + HomCoord::getUnitv( 0 ),
+    result = ebox[ 1 ]->add_vbox( vbox[ 1 ], vseq1_minmax[ 1 ], ebox[ 1 ]->box_min( ) + HomCoord::getUnitv( 0 ),
                                   vseq1_minmax[ 0 ], ebox[ 1 ]->box_max( ), vseq1_minmax[ 1 ],
                                   ebox[ 1 ]->box_min( ) + HomCoord::getUnitv( 0 ) );CHECK_ERR( result );
 
@@ -683,21 +650,18 @@ ErrorCode create_1d_3_sequences( ScdInterface* scdi, HomCoord tmp_min, HomCoord 
     // end of the previous ebox
     result = scdi->create_scd_sequence(
         ebox[ 1 ]->box_max( ),
-        HomCoord( ebox[ 1 ]->box_max( ).i( ) + 1 + vseq2_minmax[ 1 ].i( ) - vseq2_minmax[ 0 ].i( ),
-                  0, 0 ),
-        MBEDGE, 1, ebox[ 2 ] );CHECK_ERR( result );
+        HomCoord( ebox[ 1 ]->box_max( ).i( ) + 1 + vseq2_minmax[ 1 ].i( ) - vseq2_minmax[ 0 ].i( ), 0, 0 ), MBEDGE, 1,
+        ebox[ 2 ] );CHECK_ERR( result );
 
     // add shared vertex from second vseq to this ebox; parameter space mapping such that we get
     // first vertex only of that vseq
     result = ebox[ 2 ]->add_vbox( vbox[ 1 ], vseq0_minmax[ 0 ], ebox[ 2 ]->box_min( ),
                                   vseq0_minmax[ 0 ] + HomCoord::getUnitv( 0 ),
-                                  ebox[ 2 ]->box_min( ) - HomCoord::getUnitv( 0 ),
-                                  vseq0_minmax[ 0 ], ebox[ 2 ]->box_min( ), true,
-                                  ebox[ 2 ]->box_min( ), ebox[ 2 ]->box_min( ) );CHECK_ERR( result );
+                                  ebox[ 2 ]->box_min( ) - HomCoord::getUnitv( 0 ), vseq0_minmax[ 0 ],
+                                  ebox[ 2 ]->box_min( ), true, ebox[ 2 ]->box_min( ), ebox[ 2 ]->box_min( ) );CHECK_ERR( result );
 
     // add third vseq to this ebox, forward orientation
-    result = ebox[ 2 ]->add_vbox( vbox[ 2 ], vseq2_minmax[ 0 ],
-                                  ebox[ 2 ]->box_min( ) + HomCoord::getUnitv( 0 ),
+    result = ebox[ 2 ]->add_vbox( vbox[ 2 ], vseq2_minmax[ 0 ], ebox[ 2 ]->box_min( ) + HomCoord::getUnitv( 0 ),
                                   vseq2_minmax[ 1 ], ebox[ 2 ]->box_max( ), vseq1_minmax[ 0 ],
                                   ebox[ 2 ]->box_min( ) + HomCoord::getUnitv( 0 ) );CHECK_ERR( result );
 
@@ -718,23 +682,19 @@ ErrorCode create_2d_3_sequences( ScdInterface* scdi, ScdBox** vbox, ScdBox** ebo
     vbox[ 0 ] = vbox[ 1 ] = vbox[ 2 ] = NULL;
 
     // first vertex sequence
-    ErrorCode result =
-        scdi->create_scd_sequence( vbox0_minmax[ 0 ], vbox0_minmax[ 1 ], MBVERTEX, 1, vbox[ 0 ] );CHECK_ERR( result );
+    ErrorCode result = scdi->create_scd_sequence( vbox0_minmax[ 0 ], vbox0_minmax[ 1 ], MBVERTEX, 1, vbox[ 0 ] );CHECK_ERR( result );
 
     // second vertex sequence
-    result =
-        scdi->create_scd_sequence( vbox1_minmax[ 0 ], vbox1_minmax[ 1 ], MBVERTEX, 1, vbox[ 1 ] );CHECK_ERR( result );
+    result = scdi->create_scd_sequence( vbox1_minmax[ 0 ], vbox1_minmax[ 1 ], MBVERTEX, 1, vbox[ 1 ] );CHECK_ERR( result );
 
     // third vertex sequence
-    result =
-        scdi->create_scd_sequence( vbox2_minmax[ 0 ], vbox2_minmax[ 1 ], MBVERTEX, 1, vbox[ 2 ] );CHECK_ERR( result );
+    result = scdi->create_scd_sequence( vbox2_minmax[ 0 ], vbox2_minmax[ 1 ], MBVERTEX, 1, vbox[ 2 ] );CHECK_ERR( result );
 
     // now create the three element sequences
     ebox[ 0 ] = ebox[ 1 ] = ebox[ 2 ] = NULL;
 
     // create the first element sequence
-    result =
-        scdi->create_scd_sequence( vbox0_minmax[ 0 ], vbox0_minmax[ 1 ], MBQUAD, 1, ebox[ 0 ] );CHECK_ERR( result );
+    result = scdi->create_scd_sequence( vbox0_minmax[ 0 ], vbox0_minmax[ 1 ], MBQUAD, 1, ebox[ 0 ] );CHECK_ERR( result );
 
     // add first vertex seq to first element seq, forward orientation, unity transform
     result = ebox[ 0 ]->add_vbox( vbox[ 0 ],
@@ -770,21 +730,19 @@ ErrorCode create_2d_3_sequences( ScdInterface* scdi, ScdBox** vbox, ScdBox** ebo
         HomCoord( vbox0_minmax[ 1 ].i( ), vbox0_minmax[ 0 ].j( ), 0 ) + HomCoord::getUnitv( 0 ),
         ebox[ 1 ]->box_min( ) + HomCoord::getUnitv( 0 ),
         // set bb such that it's the right side of the vbox, left of local ebox
-        true, ebox[ 1 ]->box_min( ),
-        HomCoord( ebox[ 1 ]->box_min( ).i( ), ebox[ 1 ]->box_max( ).j( ), 0 ) );CHECK_ERR( result );
+        true, ebox[ 1 ]->box_min( ), HomCoord( ebox[ 1 ]->box_min( ).i( ), ebox[ 1 ]->box_max( ).j( ), 0 ) );CHECK_ERR( result );
 
     // add second vbox to this ebox, with different orientation but all of it (no bb input)
-    result = ebox[ 1 ]->add_vbox(
-        vbox[ 1 ],
-        // p1: one right of top left of ebox1
-        vbox1_minmax[ 0 ],
-        HomCoord( ebox[ 1 ]->box_min( ).i( ) + 1, ebox[ 1 ]->box_max( ).j( ), 0 ),
-        // p2: one right from p1
-        vbox1_minmax[ 0 ] + HomCoord::getUnitv( 0 ),
-        HomCoord( ebox[ 1 ]->box_min( ).i( ) + 2, ebox[ 1 ]->box_max( ).j( ), 0 ),
-        // p3: one down from p1
-        vbox1_minmax[ 0 ] + HomCoord::getUnitv( 1 ),
-        HomCoord( ebox[ 1 ]->box_min( ).i( ) + 1, ebox[ 1 ]->box_max( ).j( ) - 1, 0 ) );CHECK_ERR( result );
+    result = ebox[ 1 ]->add_vbox( vbox[ 1 ],
+                                  // p1: one right of top left of ebox1
+                                  vbox1_minmax[ 0 ],
+                                  HomCoord( ebox[ 1 ]->box_min( ).i( ) + 1, ebox[ 1 ]->box_max( ).j( ), 0 ),
+                                  // p2: one right from p1
+                                  vbox1_minmax[ 0 ] + HomCoord::getUnitv( 0 ),
+                                  HomCoord( ebox[ 1 ]->box_min( ).i( ) + 2, ebox[ 1 ]->box_max( ).j( ), 0 ),
+                                  // p3: one down from p1
+                                  vbox1_minmax[ 0 ] + HomCoord::getUnitv( 1 ),
+                                  HomCoord( ebox[ 1 ]->box_min( ).i( ) + 1, ebox[ 1 ]->box_max( ).j( ) - 1, 0 ) );CHECK_ERR( result );
 
     // create the third element sequence; make it use the third vbox (middle) as well as the side of
     // the second sequence (left) and a side of the first sequence (right); parameterize it such
@@ -793,8 +751,7 @@ ErrorCode create_2d_3_sequences( ScdInterface* scdi, ScdBox** vbox, ScdBox** ebo
     result = scdi->create_scd_sequence(
         HomCoord( ebox[ 1 ]->box_max( ).i( ), ebox[ 1 ]->box_min( ).j( ), 0 ),
         // add one extra for each of left and right sides
-        HomCoord( ebox[ 1 ]->box_max( ).i( ) + 1 + vbox2_minmax[ 1 ].i( ) - vbox2_minmax[ 0 ].i( ) +
-                      1,
+        HomCoord( ebox[ 1 ]->box_max( ).i( ) + 1 + vbox2_minmax[ 1 ].i( ) - vbox2_minmax[ 0 ].i( ) + 1,
                   ebox[ 1 ]->box_max( ).j( ), 0 ),
         MBEDGE, 1, ebox[ 2 ] );CHECK_ERR( result );
 
@@ -805,14 +762,11 @@ ErrorCode create_2d_3_sequences( ScdInterface* scdi, ScdBox** vbox, ScdBox** ebo
         // p1: bottom left
         vbox1_minmax[ 1 ], ebox[ 2 ]->box_min( ),
         // p2: one right from p1
-        vbox1_minmax[ 1 ] + HomCoord::getUnitv( 0 ),
-        ebox[ 2 ]->box_min( ) + HomCoord::getUnitv( 0 ),
+        vbox1_minmax[ 1 ] + HomCoord::getUnitv( 0 ), ebox[ 2 ]->box_min( ) + HomCoord::getUnitv( 0 ),
         // p3: one up
-        vbox1_minmax[ 1 ] - HomCoord::getUnitv( 1 ),
-        ebox[ 2 ]->box_min( ) + HomCoord::getUnitv( 1 ),
+        vbox1_minmax[ 1 ] - HomCoord::getUnitv( 1 ), ebox[ 2 ]->box_min( ) + HomCoord::getUnitv( 1 ),
         // bb input such that we only get left side of ebox parameter space
-        true, ebox[ 2 ]->box_min( ),
-        HomCoord( ebox[ 2 ]->box_min( ).i( ), ebox[ 2 ]->box_max( ).j( ), 0 ) );CHECK_ERR( result );
+        true, ebox[ 2 ]->box_min( ), HomCoord( ebox[ 2 ]->box_min( ).i( ), ebox[ 2 ]->box_max( ).j( ), 0 ) );CHECK_ERR( result );
 
     // add shared side from first vbox to this ebox; parameter space mapping such that we get
     // a side only of that vbox
@@ -827,26 +781,24 @@ ErrorCode create_2d_3_sequences( ScdInterface* scdi, ScdBox** vbox, ScdBox** ebo
         vbox0_minmax[ 0 ] + HomCoord::getUnitv( 1 ),
         HomCoord( ebox[ 2 ]->box_max( ).i( ), ebox[ 2 ]->box_min( ).j( ) + 1, 0 ),
         // bb input such that we only get left side of ebox parameter space
-        true, HomCoord( ebox[ 2 ]->box_max( ).i( ), ebox[ 2 ]->box_min( ).j( ), 0 ),
-        ebox[ 2 ]->box_max( ) );CHECK_ERR( result );
+        true, HomCoord( ebox[ 2 ]->box_max( ).i( ), ebox[ 2 ]->box_min( ).j( ), 0 ), ebox[ 2 ]->box_max( ) );CHECK_ERR( result );
 
     // add third vbox to this ebox
-    result = ebox[ 2 ]->add_vbox(
-        vbox[ 2 ],
-        // p1: top right and left one
-        vbox2_minmax[ 0 ], ebox[ 2 ]->box_max( ) - HomCoord::getUnitv( 0 ),
-        // p2: one left of p1
-        vbox2_minmax[ 0 ] + HomCoord::getUnitv( 0 ),
-        ebox[ 2 ]->box_max( ) - HomCoord::getUnitv( 0 ) * 2,
-        // p3: one down from p1
-        vbox2_minmax[ 0 ] + HomCoord::getUnitv( 1 ),
-        ebox[ 2 ]->box_max( ) - HomCoord::getUnitv( 0 ) - HomCoord::getUnitv( 1 ) );CHECK_ERR( result );
+    result = ebox[ 2 ]->add_vbox( vbox[ 2 ],
+                                  // p1: top right and left one
+                                  vbox2_minmax[ 0 ], ebox[ 2 ]->box_max( ) - HomCoord::getUnitv( 0 ),
+                                  // p2: one left of p1
+                                  vbox2_minmax[ 0 ] + HomCoord::getUnitv( 0 ),
+                                  ebox[ 2 ]->box_max( ) - HomCoord::getUnitv( 0 ) * 2,
+                                  // p3: one down from p1
+                                  vbox2_minmax[ 0 ] + HomCoord::getUnitv( 1 ),
+                                  ebox[ 2 ]->box_max( ) - HomCoord::getUnitv( 0 ) - HomCoord::getUnitv( 1 ) );CHECK_ERR( result );
 
     return result;
 }
 
-ErrorCode create_2dtri_3_sequences( ScdInterface* scdi, const int int1, const int int2,
-                                    const int int3, ScdBox** vbox, ScdBox** ebox )
+ErrorCode create_2dtri_3_sequences( ScdInterface* scdi, const int int1, const int int2, const int int3, ScdBox** vbox,
+                                    ScdBox** ebox )
 {
     // create 3 rectangular sequences arranged such that the all share a common (tri-valent) corner;
     // orient each region such that its origin is at the tri-valent corner and the k direction is
@@ -867,16 +819,13 @@ ErrorCode create_2dtri_3_sequences( ScdInterface* scdi, const int int1, const in
     vbox[ 0 ] = vbox[ 1 ] = vbox[ 2 ] = NULL;
 
     // first vertex sequence
-    ErrorCode result =
-        scdi->create_scd_sequence( vbox0_minmax[ 0 ], vbox0_minmax[ 1 ], MBVERTEX, 1, vbox[ 0 ] );CHECK_ERR( result );
+    ErrorCode result = scdi->create_scd_sequence( vbox0_minmax[ 0 ], vbox0_minmax[ 1 ], MBVERTEX, 1, vbox[ 0 ] );CHECK_ERR( result );
 
     // second vertex sequence
-    result =
-        scdi->create_scd_sequence( vbox1_minmax[ 0 ], vbox1_minmax[ 1 ], MBVERTEX, 1, vbox[ 1 ] );CHECK_ERR( result );
+    result = scdi->create_scd_sequence( vbox1_minmax[ 0 ], vbox1_minmax[ 1 ], MBVERTEX, 1, vbox[ 1 ] );CHECK_ERR( result );
 
     // third vertex sequence
-    result =
-        scdi->create_scd_sequence( vbox2_minmax[ 0 ], vbox2_minmax[ 1 ], MBVERTEX, 1, vbox[ 2 ] );CHECK_ERR( result );
+    result = scdi->create_scd_sequence( vbox2_minmax[ 0 ], vbox2_minmax[ 1 ], MBVERTEX, 1, vbox[ 2 ] );CHECK_ERR( result );
 
     // now create the three element sequences
 
@@ -890,21 +839,19 @@ ErrorCode create_2dtri_3_sequences( ScdInterface* scdi, const int int1, const in
     ebox[ 0 ] = ebox[ 1 ] = ebox[ 2 ] = NULL;
 
     // create the first element sequence
-    result =
-        scdi->create_scd_sequence( ebox0_minmax[ 0 ], ebox0_minmax[ 1 ], MBQUAD, 1, ebox[ 0 ] );CHECK_ERR( result );
+    result = scdi->create_scd_sequence( ebox0_minmax[ 0 ], ebox0_minmax[ 1 ], MBQUAD, 1, ebox[ 0 ] );CHECK_ERR( result );
 
     // only need to add one vbox to this, unity transform
     result = ebox[ 0 ]->add_vbox( vbox[ 0 ],
                                   // trick: if I know it's going to be unity, just input
                                   // 3 sets of equivalent points
-                                  vbox0_minmax[ 0 ], vbox0_minmax[ 0 ], vbox0_minmax[ 0 ],
-                                  vbox0_minmax[ 0 ], vbox0_minmax[ 0 ], vbox0_minmax[ 0 ] );
+                                  vbox0_minmax[ 0 ], vbox0_minmax[ 0 ], vbox0_minmax[ 0 ], vbox0_minmax[ 0 ],
+                                  vbox0_minmax[ 0 ], vbox0_minmax[ 0 ] );
 
     CHECK_ERR( result );
 
     // create the second element sequence
-    result =
-        scdi->create_scd_sequence( ebox1_minmax[ 0 ], ebox1_minmax[ 1 ], MBQUAD, 1, ebox[ 1 ] );CHECK_ERR( result );
+    result = scdi->create_scd_sequence( ebox1_minmax[ 0 ], ebox1_minmax[ 1 ], MBQUAD, 1, ebox[ 1 ] );CHECK_ERR( result );
 
     // add shared side from first vbox to this ebox, with bb to get just the line
     result = ebox[ 1 ]->add_vbox(
@@ -916,69 +863,64 @@ ErrorCode create_2dtri_3_sequences( ScdInterface* scdi, const int int1, const in
         // p3: arbitrary
         vbox0_minmax[ 0 ], ebox0_minmax[ 0 ],
         // set bb such that it's the jmin side of vbox
-        true, ebox[ 1 ]->box_min( ),
-        HomCoord( ebox[ 1 ]->box_min( ).i( ), ebox[ 1 ]->box_max( ).j( ), 0 ) );CHECK_ERR( result );
+        true, ebox[ 1 ]->box_min( ), HomCoord( ebox[ 1 ]->box_min( ).i( ), ebox[ 1 ]->box_max( ).j( ), 0 ) );CHECK_ERR( result );
 
     // add second vbox to this ebox, with different orientation but all of it (no bb input)
-    result =
-        ebox[ 1 ]->add_vbox( vbox[ 1 ],
-                             // p1: origin/i+1 (vbox/ebox)
-                             vbox1_minmax[ 0 ], ebox1_minmax[ 0 ] + HomCoord::getUnitv( 0 ),
-                             // p2: j+1 from p1
-                             vbox1_minmax[ 0 ] + HomCoord::getUnitv( 1 ),
-                             ebox1_minmax[ 0 ] + HomCoord::getUnitv( 0 ) + HomCoord::getUnitv( 1 ),
-                             // p3: i+1 from p1
-                             vbox1_minmax[ 0 ] + HomCoord::getUnitv( 0 ),
-                             ebox[ 1 ]->box_min( ) + HomCoord::getUnitv( 0 ) * 2 );CHECK_ERR( result );
+    result = ebox[ 1 ]->add_vbox( vbox[ 1 ],
+                                  // p1: origin/i+1 (vbox/ebox)
+                                  vbox1_minmax[ 0 ], ebox1_minmax[ 0 ] + HomCoord::getUnitv( 0 ),
+                                  // p2: j+1 from p1
+                                  vbox1_minmax[ 0 ] + HomCoord::getUnitv( 1 ),
+                                  ebox1_minmax[ 0 ] + HomCoord::getUnitv( 0 ) + HomCoord::getUnitv( 1 ),
+                                  // p3: i+1 from p1
+                                  vbox1_minmax[ 0 ] + HomCoord::getUnitv( 0 ),
+                                  ebox[ 1 ]->box_min( ) + HomCoord::getUnitv( 0 ) * 2 );CHECK_ERR( result );
 
     // create the third element sequence
-    result =
-        scdi->create_scd_sequence( ebox2_minmax[ 0 ], ebox2_minmax[ 1 ], MBQUAD, 1, ebox[ 2 ] );CHECK_ERR( result );
+    result = scdi->create_scd_sequence( ebox2_minmax[ 0 ], ebox2_minmax[ 1 ], MBQUAD, 1, ebox[ 2 ] );CHECK_ERR( result );
 
     // add shared side from second vbox to this ebox
-    result = ebox[ 2 ]->add_vbox(
-        vbox[ 1 ],
-        // p1: origin/j+1 (vbox/ebox)
-        vbox1_minmax[ 0 ], ebox[ 2 ]->box_min( ) + HomCoord::getUnitv( 1 ),
-        // p2: i+1/j+2 (vbox/ebox)
-        vbox1_minmax[ 0 ] + HomCoord::getUnitv( 0 ),
-        ebox[ 2 ]->box_min( ) + HomCoord::getUnitv( 1 ) * 2,
-        // p3: arbitrary
-        vbox1_minmax[ 0 ], ebox[ 2 ]->box_min( ) + HomCoord::getUnitv( 1 ),
-        // bb input such that we only get one side of ebox parameter space
-        true, ebox[ 2 ]->box_min( ) + HomCoord::getUnitv( 1 ),
-        HomCoord( ebox[ 2 ]->box_min( ).i( ), ebox[ 2 ]->box_max( ).j( ), 0 ) );CHECK_ERR( result );
+    result = ebox[ 2 ]->add_vbox( vbox[ 1 ],
+                                  // p1: origin/j+1 (vbox/ebox)
+                                  vbox1_minmax[ 0 ], ebox[ 2 ]->box_min( ) + HomCoord::getUnitv( 1 ),
+                                  // p2: i+1/j+2 (vbox/ebox)
+                                  vbox1_minmax[ 0 ] + HomCoord::getUnitv( 0 ),
+                                  ebox[ 2 ]->box_min( ) + HomCoord::getUnitv( 1 ) * 2,
+                                  // p3: arbitrary
+                                  vbox1_minmax[ 0 ], ebox[ 2 ]->box_min( ) + HomCoord::getUnitv( 1 ),
+                                  // bb input such that we only get one side of ebox parameter space
+                                  true, ebox[ 2 ]->box_min( ) + HomCoord::getUnitv( 1 ),
+                                  HomCoord( ebox[ 2 ]->box_min( ).i( ), ebox[ 2 ]->box_max( ).j( ), 0 ) );CHECK_ERR( result );
 
     // add shared side from first vbox to this ebox
-    result = ebox[ 2 ]->add_vbox(
-        vbox[ 0 ],
-        // p1: origin/origin
-        vbox1_minmax[ 0 ], ebox2_minmax[ 0 ],
-        // p2: j+1/i+1
-        vbox1_minmax[ 0 ] + HomCoord::getUnitv( 1 ), ebox2_minmax[ 0 ] + HomCoord::getUnitv( 0 ),
-        // p3: arbitrary
-        vbox1_minmax[ 0 ], ebox2_minmax[ 0 ],
-        // bb input such that we only get one side of ebox parameter space
-        true, ebox2_minmax[ 0 ], HomCoord( ebox2_minmax[ 1 ].i( ), ebox2_minmax[ 0 ].j( ), 0 ) );CHECK_ERR( result );
+    result =
+        ebox[ 2 ]->add_vbox( vbox[ 0 ],
+                             // p1: origin/origin
+                             vbox1_minmax[ 0 ], ebox2_minmax[ 0 ],
+                             // p2: j+1/i+1
+                             vbox1_minmax[ 0 ] + HomCoord::getUnitv( 1 ), ebox2_minmax[ 0 ] + HomCoord::getUnitv( 0 ),
+                             // p3: arbitrary
+                             vbox1_minmax[ 0 ], ebox2_minmax[ 0 ],
+                             // bb input such that we only get one side of ebox parameter space
+                             true, ebox2_minmax[ 0 ], HomCoord( ebox2_minmax[ 1 ].i( ), ebox2_minmax[ 0 ].j( ), 0 ) );CHECK_ERR( result );
 
     // add third vbox to this ebox
-    result = ebox[ 2 ]->add_vbox(
-        vbox[ 2 ],
-        // p1: origin/i+1,j+1
-        vbox2_minmax[ 0 ],
-        ebox[ 2 ]->box_min( ) + HomCoord::getUnitv( 0 ) + HomCoord::getUnitv( 1 ),
-        // p2: i+1 from p1
-        vbox2_minmax[ 0 ] + HomCoord::getUnitv( 0 ),
-        ebox[ 2 ]->box_min( ) + HomCoord::getUnitv( 0 ) * 2 + HomCoord::getUnitv( 1 ),
-        // p3: j+1 from p1
-        vbox2_minmax[ 0 ] + HomCoord::getUnitv( 1 ),
-        ebox[ 2 ]->box_min( ) + HomCoord::getUnitv( 0 ) + HomCoord::getUnitv( 1 ) * 2 );CHECK_ERR( result );
+    result = ebox[ 2 ]->add_vbox( vbox[ 2 ],
+                                  // p1: origin/i+1,j+1
+                                  vbox2_minmax[ 0 ],
+                                  ebox[ 2 ]->box_min( ) + HomCoord::getUnitv( 0 ) + HomCoord::getUnitv( 1 ),
+                                  // p2: i+1 from p1
+                                  vbox2_minmax[ 0 ] + HomCoord::getUnitv( 0 ),
+                                  ebox[ 2 ]->box_min( ) + HomCoord::getUnitv( 0 ) * 2 + HomCoord::getUnitv( 1 ),
+                                  // p3: j+1 from p1
+                                  vbox2_minmax[ 0 ] + HomCoord::getUnitv( 1 ),
+                                  ebox[ 2 ]->box_min( ) + HomCoord::getUnitv( 0 ) + HomCoord::getUnitv( 1 ) * 2 );CHECK_ERR( result );
 
     return result;
 }
 
-ErrorCode create_3dtri_3_sequences( ScdInterface* scdi, const int int1, const int int2,
-                                    const int int3, const int int4, ScdBox** vbox, ScdBox** ebox )
+ErrorCode create_3dtri_3_sequences( ScdInterface* scdi, const int int1, const int int2, const int int3, const int int4,
+                                    ScdBox** vbox, ScdBox** ebox )
 {
     // create 3 brick sequences arranged such that the all share a common (tri-valent) edge;
     // orient each region similarly to the 2dtri_3_sequences test problem, swept into 3d in the
@@ -1000,16 +942,13 @@ ErrorCode create_3dtri_3_sequences( ScdInterface* scdi, const int int1, const in
     vbox[ 0 ] = vbox[ 1 ] = vbox[ 2 ] = NULL;
 
     // first vertex sequence
-    ErrorCode result =
-        scdi->create_scd_sequence( vbox0_minmax[ 0 ], vbox0_minmax[ 1 ], MBVERTEX, 1, vbox[ 0 ] );CHECK_ERR( result );
+    ErrorCode result = scdi->create_scd_sequence( vbox0_minmax[ 0 ], vbox0_minmax[ 1 ], MBVERTEX, 1, vbox[ 0 ] );CHECK_ERR( result );
 
     // second vertex sequence
-    result =
-        scdi->create_scd_sequence( vbox1_minmax[ 0 ], vbox1_minmax[ 1 ], MBVERTEX, 1, vbox[ 1 ] );CHECK_ERR( result );
+    result = scdi->create_scd_sequence( vbox1_minmax[ 0 ], vbox1_minmax[ 1 ], MBVERTEX, 1, vbox[ 1 ] );CHECK_ERR( result );
 
     // third vertex sequence
-    result =
-        scdi->create_scd_sequence( vbox2_minmax[ 0 ], vbox2_minmax[ 1 ], MBVERTEX, 1, vbox[ 2 ] );CHECK_ERR( result );
+    result = scdi->create_scd_sequence( vbox2_minmax[ 0 ], vbox2_minmax[ 1 ], MBVERTEX, 1, vbox[ 2 ] );CHECK_ERR( result );
 
     // now create the three element sequences
 
@@ -1029,8 +968,8 @@ ErrorCode create_3dtri_3_sequences( ScdInterface* scdi, const int int1, const in
     result = ebox[ 0 ]->add_vbox( vbox[ 0 ],
                                   // trick: if I know it's going to be unity, just input
                                   // 3 sets of equivalent points
-                                  vbox0_minmax[ 0 ], vbox0_minmax[ 0 ], vbox0_minmax[ 0 ],
-                                  vbox0_minmax[ 0 ], vbox0_minmax[ 0 ], vbox0_minmax[ 0 ] );
+                                  vbox0_minmax[ 0 ], vbox0_minmax[ 0 ], vbox0_minmax[ 0 ], vbox0_minmax[ 0 ],
+                                  vbox0_minmax[ 0 ], vbox0_minmax[ 0 ] );
 
     CHECK_ERR( result );
 
@@ -1048,20 +987,18 @@ ErrorCode create_3dtri_3_sequences( ScdInterface* scdi, const int int1, const in
         vbox0_minmax[ 0 ] + HomCoord::getUnitv( 2 ), ebox1_minmax[ 0 ] + HomCoord::getUnitv( 2 ),
         // set bb such that it's the jmin side of vbox
         true, ebox[ 1 ]->box_min( ),
-        HomCoord( ebox[ 1 ]->box_min( ).i( ), ebox[ 1 ]->box_max( ).j( ),
-                  ebox[ 1 ]->box_max( ).k( ) ) );CHECK_ERR( result );
+        HomCoord( ebox[ 1 ]->box_min( ).i( ), ebox[ 1 ]->box_max( ).j( ), ebox[ 1 ]->box_max( ).k( ) ) );CHECK_ERR( result );
 
     // add second vbox to this ebox, with different orientation but all of it (no bb input)
-    result =
-        ebox[ 1 ]->add_vbox( vbox[ 1 ],
-                             // p1: origin/i+1 (vbox/ebox)
-                             vbox1_minmax[ 0 ], ebox1_minmax[ 0 ] + HomCoord::getUnitv( 0 ),
-                             // p2: j+1 from p1
-                             vbox1_minmax[ 0 ] + HomCoord::getUnitv( 1 ),
-                             ebox1_minmax[ 0 ] + HomCoord::getUnitv( 0 ) + HomCoord::getUnitv( 1 ),
-                             // p3: i+1 from p1
-                             vbox1_minmax[ 0 ] + HomCoord::getUnitv( 0 ),
-                             ebox[ 1 ]->box_min( ) + HomCoord::getUnitv( 0 ) * 2 );CHECK_ERR( result );
+    result = ebox[ 1 ]->add_vbox( vbox[ 1 ],
+                                  // p1: origin/i+1 (vbox/ebox)
+                                  vbox1_minmax[ 0 ], ebox1_minmax[ 0 ] + HomCoord::getUnitv( 0 ),
+                                  // p2: j+1 from p1
+                                  vbox1_minmax[ 0 ] + HomCoord::getUnitv( 1 ),
+                                  ebox1_minmax[ 0 ] + HomCoord::getUnitv( 0 ) + HomCoord::getUnitv( 1 ),
+                                  // p3: i+1 from p1
+                                  vbox1_minmax[ 0 ] + HomCoord::getUnitv( 0 ),
+                                  ebox[ 1 ]->box_min( ) + HomCoord::getUnitv( 0 ) * 2 );CHECK_ERR( result );
 
     // create the third element sequence
     result = scdi->create_scd_sequence( ebox2_minmax[ 0 ], ebox2_minmax[ 1 ], MBHEX, 1, ebox[ 2 ] );CHECK_ERR( result );
@@ -1072,15 +1009,13 @@ ErrorCode create_3dtri_3_sequences( ScdInterface* scdi, const int int1, const in
         // p1: origin/j+1 (vbox/ebox)
         vbox1_minmax[ 0 ], ebox[ 2 ]->box_min( ) + HomCoord::getUnitv( 1 ),
         // p2: i+1/j+2 (vbox/ebox)
-        vbox1_minmax[ 0 ] + HomCoord::getUnitv( 0 ),
-        ebox[ 2 ]->box_min( ) + HomCoord::getUnitv( 1 ) * 2,
+        vbox1_minmax[ 0 ] + HomCoord::getUnitv( 0 ), ebox[ 2 ]->box_min( ) + HomCoord::getUnitv( 1 ) * 2,
         // p3: +k in both (not arbitrary, since interface is 2d)
         vbox1_minmax[ 0 ] + HomCoord::getUnitv( 2 ),
         ebox[ 2 ]->box_min( ) + HomCoord::getUnitv( 1 ) + HomCoord::getUnitv( 2 ),
         // bb input such that we only get one side of ebox parameter space
         true, ebox[ 2 ]->box_min( ) + HomCoord::getUnitv( 1 ),
-        HomCoord( ebox[ 2 ]->box_min( ).i( ), ebox[ 2 ]->box_max( ).j( ),
-                  ebox[ 2 ]->box_max( ).k( ) ) );CHECK_ERR( result );
+        HomCoord( ebox[ 2 ]->box_min( ).i( ), ebox[ 2 ]->box_max( ).j( ), ebox[ 2 ]->box_max( ).k( ) ) );CHECK_ERR( result );
 
     // add shared side from first vbox to this ebox
     result = ebox[ 2 ]->add_vbox(
@@ -1090,24 +1025,21 @@ ErrorCode create_3dtri_3_sequences( ScdInterface* scdi, const int int1, const in
         // p2: j+1/i+1
         vbox0_minmax[ 0 ] + HomCoord::getUnitv( 1 ), ebox2_minmax[ 0 ] + HomCoord::getUnitv( 0 ),
         // p3: +k in both (not arbitrary, since interface is 2d)
-        vbox0_minmax[ 0 ] + HomCoord::getUnitv( 2 ),
-        ebox[ 2 ]->box_min( ) + HomCoord::getUnitv( 2 ),
+        vbox0_minmax[ 0 ] + HomCoord::getUnitv( 2 ), ebox[ 2 ]->box_min( ) + HomCoord::getUnitv( 2 ),
         // bb input such that we only get one side of ebox parameter space
-        true, ebox2_minmax[ 0 ],
-        HomCoord( ebox2_minmax[ 1 ].i( ), ebox2_minmax[ 0 ].j( ), ebox2_minmax[ 1 ].k( ) ) );CHECK_ERR( result );
+        true, ebox2_minmax[ 0 ], HomCoord( ebox2_minmax[ 1 ].i( ), ebox2_minmax[ 0 ].j( ), ebox2_minmax[ 1 ].k( ) ) );CHECK_ERR( result );
 
     // add third vbox to this ebox
-    result = ebox[ 2 ]->add_vbox(
-        vbox[ 2 ],
-        // p1: origin/i+1,j+1
-        vbox2_minmax[ 0 ],
-        ebox[ 2 ]->box_min( ) + HomCoord::getUnitv( 0 ) + HomCoord::getUnitv( 1 ),
-        // p2: i+1 from p1
-        vbox2_minmax[ 0 ] + HomCoord::getUnitv( 0 ),
-        ebox[ 2 ]->box_min( ) + HomCoord::getUnitv( 0 ) * 2 + HomCoord::getUnitv( 1 ),
-        // p3: j+1 from p1
-        vbox2_minmax[ 0 ] + HomCoord::getUnitv( 1 ),
-        ebox[ 2 ]->box_min( ) + HomCoord::getUnitv( 0 ) + HomCoord::getUnitv( 1 ) * 2 );CHECK_ERR( result );
+    result = ebox[ 2 ]->add_vbox( vbox[ 2 ],
+                                  // p1: origin/i+1,j+1
+                                  vbox2_minmax[ 0 ],
+                                  ebox[ 2 ]->box_min( ) + HomCoord::getUnitv( 0 ) + HomCoord::getUnitv( 1 ),
+                                  // p2: i+1 from p1
+                                  vbox2_minmax[ 0 ] + HomCoord::getUnitv( 0 ),
+                                  ebox[ 2 ]->box_min( ) + HomCoord::getUnitv( 0 ) * 2 + HomCoord::getUnitv( 1 ),
+                                  // p3: j+1 from p1
+                                  vbox2_minmax[ 0 ] + HomCoord::getUnitv( 1 ),
+                                  ebox[ 2 ]->box_min( ) + HomCoord::getUnitv( 0 ) + HomCoord::getUnitv( 1 ) * 2 );CHECK_ERR( result );
 
     return result;
 }
@@ -1129,8 +1061,7 @@ ErrorCode access_adjacencies( ScdBox* box )
         // don't do 3rd direction for 2d box
         if( 2 == dir && is_2d ) continue;
 
-        rval = box->get_adj_edge_or_face( 1, box_min.i( ), box_min.j( ), box_min.k( ), dir,
-                                          dum_entity, true );
+        rval = box->get_adj_edge_or_face( 1, box_min.i( ), box_min.j( ), box_min.k( ), dir, dum_entity, true );
         if( MB_SUCCESS != rval ) return rval;
 
         // do a simple API call on that entity to make sure we can
@@ -1143,9 +1074,8 @@ ErrorCode access_adjacencies( ScdBox* box )
         // don't do 3rd direction for 2d box
         if( 2 == dir && is_2d ) continue;
 
-        rval = box->get_adj_edge_or_face(
-            1, box_min.i( ) + .5 * box_size.i( ), box_min.j( ) + .5 * box_size.j( ),
-            box_min.k( ) + .5 * box_size.k( ), dir, dum_entity, true );
+        rval = box->get_adj_edge_or_face( 1, box_min.i( ) + .5 * box_size.i( ), box_min.j( ) + .5 * box_size.j( ),
+                                          box_min.k( ) + .5 * box_size.k( ), dir, dum_entity, true );
         if( MB_SUCCESS != rval ) return rval;
 
         // do a simple API call on that entity to make sure we can
@@ -1159,11 +1089,10 @@ ErrorCode access_adjacencies( ScdBox* box )
         // don't do 3rd direction for 2d box
         if( 2 == dir && is_2d ) continue;
 
-        rval = box->get_adj_edge_or_face(
-            1, ( box_max.i( ) == box_min.i( ) ? box_max.i( ) : box_max.i( ) - 1 ),
-            ( box_max.j( ) == box_min.j( ) ? box_max.j( ) : box_max.j( ) - 1 ),
-            ( box_max.k( ) == box_min.k( ) ? box_max.k( ) : box_max.k( ) - 1 ), dir, dum_entity,
-            true );
+        rval = box->get_adj_edge_or_face( 1, ( box_max.i( ) == box_min.i( ) ? box_max.i( ) : box_max.i( ) - 1 ),
+                                          ( box_max.j( ) == box_min.j( ) ? box_max.j( ) : box_max.j( ) - 1 ),
+                                          ( box_max.k( ) == box_min.k( ) ? box_max.k( ) : box_max.k( ) - 1 ), dir,
+                                          dum_entity, true );
         if( MB_SUCCESS != rval ) return rval;
 
         // do a simple API call on that entity to make sure we can
@@ -1176,8 +1105,7 @@ ErrorCode access_adjacencies( ScdBox* box )
     // now faces; bottom:
     for( int dir = 0; dir < 3; dir++ )
     {
-        rval = box->get_adj_edge_or_face( 2, box_min.i( ), box_min.j( ), box_min.k( ), dir,
-                                          dum_entity, true );
+        rval = box->get_adj_edge_or_face( 2, box_min.i( ), box_min.j( ), box_min.k( ), dir, dum_entity, true );
         if( MB_SUCCESS != rval ) return rval;
 
         // do a simple API call on that entity to make sure we can
@@ -1190,9 +1118,8 @@ ErrorCode access_adjacencies( ScdBox* box )
         // don't do 3rd direction for 2d box
         if( 2 == dir && is_2d ) continue;
 
-        rval = box->get_adj_edge_or_face(
-            2, box_min.i( ) + .5 * box_size.i( ), box_min.j( ) + .5 * box_size.j( ),
-            box_min.k( ) + .5 * box_size.k( ), dir, dum_entity, true );
+        rval = box->get_adj_edge_or_face( 2, box_min.i( ) + .5 * box_size.i( ), box_min.j( ) + .5 * box_size.j( ),
+                                          box_min.k( ) + .5 * box_size.k( ), dir, dum_entity, true );
         if( MB_SUCCESS != rval ) return rval;
 
         // do a simple API call on that entity to make sure we can
@@ -1206,11 +1133,10 @@ ErrorCode access_adjacencies( ScdBox* box )
         // don't do 3rd direction for 2d box
         if( 2 == dir && is_2d ) continue;
 
-        rval = box->get_adj_edge_or_face(
-            2, ( box_max.i( ) == box_min.i( ) ? box_max.i( ) : box_max.i( ) - 1 ),
-            ( box_max.j( ) == box_min.j( ) ? box_max.j( ) : box_max.j( ) - 1 ),
-            ( box_max.k( ) == box_min.k( ) ? box_max.k( ) : box_max.k( ) - 1 ), dir, dum_entity,
-            true );
+        rval = box->get_adj_edge_or_face( 2, ( box_max.i( ) == box_min.i( ) ? box_max.i( ) : box_max.i( ) - 1 ),
+                                          ( box_max.j( ) == box_min.j( ) ? box_max.j( ) : box_max.j( ) - 1 ),
+                                          ( box_max.k( ) == box_min.k( ) ? box_max.k( ) : box_max.k( ) - 1 ), dir,
+                                          dum_entity, true );
         if( MB_SUCCESS != rval ) return rval;
 
         // do a simple API call on that entity to make sure we can
@@ -1264,8 +1190,8 @@ void test_parallel_partitions( )
 ErrorCode test_parallel_partition( int* gdims, int nprocs, int part_method )
 {
     ErrorCode rval;
-    int       pto, pfrom, across_bdy_a[ 3 ], across_bdy_b[ 3 ], rdims_a[ 6 ], rdims_b[ 6 ],
-        facedims_a[ 6 ], facedims_b[ 6 ], ldims[ 6 ], lper[ 3 ], pijk[ 3 ];
+    int pto, pfrom, across_bdy_a[ 3 ], across_bdy_b[ 3 ], rdims_a[ 6 ], rdims_b[ 6 ], facedims_a[ 6 ], facedims_b[ 6 ],
+        ldims[ 6 ], lper[ 3 ], pijk[ 3 ];
     ScdParData spd;
     for( int i = 0; i < 6; i++ )
         spd.gDims[ i ] = gdims[ i ];
@@ -1286,8 +1212,7 @@ ErrorCode test_parallel_partition( int* gdims, int nprocs, int part_method )
                 for( int i = -1; i <= 1; i++ )
                 {
                     int dijka[] = { i, j, k }, dijkb[] = { -i, -j, -k };
-                    rval = ScdInterface::get_neighbor( nprocs, p, spd, dijka, pto, rdims_a,
-                                                       facedims_a, across_bdy_a );
+                    rval = ScdInterface::get_neighbor( nprocs, p, spd, dijka, pto, rdims_a, facedims_a, across_bdy_a );
                     if( MB_SUCCESS != rval ) return rval;
                     if( -1 == pto ) continue;
 
@@ -1299,22 +1224,16 @@ ErrorCode test_parallel_partition( int* gdims, int nprocs, int part_method )
 
                     // non-negative value of pto; check corresponding input from that proc to this
 
-                    rval = ScdInterface::get_neighbor( nprocs, pto, spd, dijkb, pfrom, rdims_b,
-                                                       facedims_b, across_bdy_b );
+                    rval =
+                        ScdInterface::get_neighbor( nprocs, pto, spd, dijkb, pfrom, rdims_b, facedims_b, across_bdy_b );
                     if( MB_SUCCESS != rval ) return rval;
                     for( int ind = 0; ind < 3; ind++ )
-                        if( facedims_a[ ind ] < rdims_b[ ind ] ||
-                            facedims_b[ ind ] > rdims_b[ ind + 3 ] )
-                            fail = true;
+                        if( facedims_a[ ind ] < rdims_b[ ind ] || facedims_b[ ind ] > rdims_b[ ind + 3 ] ) fail = true;
                     for( int ind = 0; ind < 6; ind++ )
                     {
-                        if( facedims_a[ ind ] != facedims_b[ ind ] ||
-                            rdims_b[ ind ] != ldims[ ind ] )
-                            fail = true;
+                        if( facedims_a[ ind ] != facedims_b[ ind ] || rdims_b[ ind ] != ldims[ ind ] ) fail = true;
                     }
-                    if( across_bdy_a[ 0 ] != across_bdy_b[ 0 ] ||
-                        across_bdy_a[ 1 ] != across_bdy_b[ 1 ] )
-                        fail = true;
+                    if( across_bdy_a[ 0 ] != across_bdy_b[ 0 ] || across_bdy_a[ 1 ] != across_bdy_b[ 1 ] ) fail = true;
 #define PARRAY( a ) "(" << a[ 0 ] << "," << a[ 1 ] << "," << a[ 2 ] << ")"
 #define PARRAY3( a, b, c ) "(" << a << "," << b << "," << c << ")"
 #define PARRAY6( a ) PARRAY( a ) << "-" << PARRAY( ( a + 3 ) )
@@ -1323,13 +1242,13 @@ ErrorCode test_parallel_partition( int* gdims, int nprocs, int part_method )
                         fails++;
                         for( int l = 0; l < 3; l++ )
                             spd.pDims[ l ] = pijk[ l ];
-                        std::cerr << "partMeth = " << part_method << ", p/np = " << p << "/"
-                                  << nprocs << ", (i,j,k) = " << PARRAY3( i, j, k )
-                                  << ", ldims = " << PARRAY6( ldims ) << std::endl
+                        std::cerr << "partMeth = " << part_method << ", p/np = " << p << "/" << nprocs
+                                  << ", (i,j,k) = " << PARRAY3( i, j, k ) << ", ldims = " << PARRAY6( ldims )
+                                  << std::endl
                                   << "facedims_a = " << PARRAY6( facedims_a )
                                   << ", facedims_b = " << PARRAY6( facedims_b ) << std::endl
-                                  << "rdims_a = " << PARRAY6( rdims_a )
-                                  << ", rdims_b = " << PARRAY6( rdims_b ) << std::endl;
+                                  << "rdims_a = " << PARRAY6( rdims_a ) << ", rdims_b = " << PARRAY6( rdims_b )
+                                  << std::endl;
                         std::cerr << "ScdParData: " << spd << std::endl;
                     }
                 }  // i

@@ -347,8 +347,7 @@ inline double inner( const Vector3D lhs[], const Vector3D rhs[], int n )
     int    i;
     double dot = 0;
     for( i = 0; i < n; ++i )
-        dot += lhs[ i ].mCoords[ 0 ] * rhs[ i ].mCoords[ 0 ] +
-               lhs[ i ].mCoords[ 1 ] * rhs[ i ].mCoords[ 1 ] +
+        dot += lhs[ i ].mCoords[ 0 ] * rhs[ i ].mCoords[ 0 ] + lhs[ i ].mCoords[ 1 ] * rhs[ i ].mCoords[ 1 ] +
                lhs[ i ].mCoords[ 2 ] * rhs[ i ].mCoords[ 2 ];
     return dot;
 }
@@ -398,13 +397,11 @@ inline int Vector3D::within_tolerance_box( const Vector3D& compare_to, double to
 // Length functions
 inline double Vector3D::length_squared( ) const
 {
-    return ( mCoords[ 0 ] * mCoords[ 0 ] + mCoords[ 1 ] * mCoords[ 1 ] +
-             mCoords[ 2 ] * mCoords[ 2 ] );
+    return ( mCoords[ 0 ] * mCoords[ 0 ] + mCoords[ 1 ] * mCoords[ 1 ] + mCoords[ 2 ] * mCoords[ 2 ] );
 }
 inline double Vector3D::length( ) const
 {
-    return std::sqrt( mCoords[ 0 ] * mCoords[ 0 ] + mCoords[ 1 ] * mCoords[ 1 ] +
-                      mCoords[ 2 ] * mCoords[ 2 ] );
+    return std::sqrt( mCoords[ 0 ] * mCoords[ 0 ] + mCoords[ 1 ] * mCoords[ 1 ] + mCoords[ 2 ] * mCoords[ 2 ] );
 }
 
 inline double inner_product( const Vector3D* v1, const Vector3D* v2, size_t n )

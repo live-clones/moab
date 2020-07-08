@@ -42,8 +42,8 @@ class WriteVtk : public WriterIface
     //! writes out a file
     ErrorCode write_file( const char* file_name, const bool overwrite, const FileOptions& opts,
                           const EntityHandle* output_list, const int num_sets,
-                          const std::vector< std::string >& qa_list, const Tag* tag_list = NULL,
-                          int num_tags = 0, int export_dimension = 3 );
+                          const std::vector< std::string >& qa_list, const Tag* tag_list = NULL, int num_tags = 0,
+                          int export_dimension = 3 );
 
   private:
     //! Get entities to write, given set list passed to \ref write_file
@@ -59,24 +59,20 @@ class WriteVtk : public WriterIface
     ErrorCode write_elems( std::ostream& stream, const Range& nodes, const Range& elems );
 
     //! Write all tags on either the list of nodes or the list of elements
-    ErrorCode write_tags( std::ostream& stream, bool nodes, const Range& entities,
-                          const Tag* tag_list, int num_tags );
+    ErrorCode write_tags( std::ostream& stream, bool nodes, const Range& entities, const Tag* tag_list, int num_tags );
 
     //! Write the tad description for the passed tag and call the template
     //! \ref write_tag function to write the tag data.
-    ErrorCode write_tag( std::ostream& stream, Tag tag, const Range& entities,
-                         const Range& tagged_entities );
+    ErrorCode write_tag( std::ostream& stream, Tag tag, const Range& entities, const Range& tagged_entities );
 
     //! Write tag data
     template< typename T >
-    ErrorCode write_tag( std::ostream& stream, Tag tag, const Range& entities,
-                         const Range& tagged_entities, const int );
+    ErrorCode write_tag( std::ostream& stream, Tag tag, const Range& entities, const Range& tagged_entities,
+                         const int );
 
-    ErrorCode write_bit_tag( std::ostream& stream, Tag tag, const Range& entities,
-                             const Range& tagged_entities );
+    ErrorCode write_bit_tag( std::ostream& stream, Tag tag, const Range& entities, const Range& tagged_entities );
     //! Write a list of values
-    template< typename T >
-    void write_data( std::ostream& stream, const std::vector< T >& data, unsigned vals_per_tag );
+    template< typename T > void write_data( std::ostream& stream, const std::vector< T >& data, unsigned vals_per_tag );
 
     Interface*      mbImpl;
     WriteUtilIface* writeTool;

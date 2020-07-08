@@ -53,8 +53,7 @@ bool MsqLine::closest( const MsqLine& other, double& param ) const
     return true;
 }
 
-bool MsqCircle::three_point( const Vector3D& p1, const Vector3D& p2, const Vector3D& p3,
-                             MsqCircle& result )
+bool MsqCircle::three_point( const Vector3D& p1, const Vector3D& p2, const Vector3D& p3, MsqCircle& result )
 {
     Vector3D norm = ( p1 - p2 ) * ( p3 - p2 );
     if( norm.length_squared( ) < DBL_EPSILON ) return false;
@@ -65,14 +64,12 @@ bool MsqCircle::three_point( const Vector3D& p1, const Vector3D& p2, const Vecto
     if( !line1.closest( line2, t_xsect ) ) return false;
 
     Vector3D center = line1.point( t_xsect );
-    double   radius =
-        ( ( center - p1 ).length( ) + ( center - p2 ).length( ) + ( center - p3 ).length( ) ) / 3.0;
+    double   radius = ( ( center - p1 ).length( ) + ( center - p2 ).length( ) + ( center - p3 ).length( ) ) / 3.0;
     result = MsqCircle( center, norm, radius );
     return true;
 }
 
-bool MsqCircle::two_point( const Vector3D& center, const Vector3D& p1, const Vector3D& p2,
-                           MsqCircle& result )
+bool MsqCircle::two_point( const Vector3D& center, const Vector3D& p1, const Vector3D& p2, MsqCircle& result )
 {
     Vector3D norm = ( p1 - center ) * ( p2 - center );
     if( norm.length_squared( ) < DBL_EPSILON ) return false;
@@ -172,8 +169,7 @@ Vector3D MsqSphere::closest( const Vector3D& point ) const
     return center( ) + diff * radius( ) / len;
 }
 
-bool MsqSphere::closest( const Vector3D& point, Vector3D& point_on_sphere,
-                         Vector3D& normal_at_point ) const
+bool MsqSphere::closest( const Vector3D& point, Vector3D& point_on_sphere, Vector3D& normal_at_point ) const
 {
     normal_at_point = point - center( );
     double len = normal_at_point.length( );

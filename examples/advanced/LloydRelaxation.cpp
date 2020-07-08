@@ -33,8 +33,7 @@ using namespace std;
 
 string test_file_name = string( MESH_DIR ) + string( "/surfrandomtris-4part.h5m" );
 
-ErrorCode perform_lloyd_relaxation( Interface* mb, Range& verts, Range& cells, Tag fixed,
-                                    int num_its, int report_its );
+ErrorCode perform_lloyd_relaxation( Interface* mb, Range& verts, Range& cells, Tag fixed, int num_its, int report_its );
 
 int main( int argc, char** argv )
 {
@@ -75,8 +74,7 @@ int main( int argc, char** argv )
     // non-fixed so we only need to set the fixed tag for skin vertices
     Tag fixed;
     int def_val = 0;
-    rval = mb->tag_get_handle( "fixed", 1, MB_TYPE_INTEGER, fixed, MB_TAG_CREAT | MB_TAG_DENSE,
-                               &def_val );MB_CHK_ERR( rval );
+    rval = mb->tag_get_handle( "fixed", 1, MB_TYPE_INTEGER, fixed, MB_TAG_CREAT | MB_TAG_DENSE, &def_val );MB_CHK_ERR( rval );
 
     // Get all vertices and faces
     Range verts, faces, skin_verts;
@@ -117,8 +115,7 @@ int main( int argc, char** argv )
     return 0;
 }
 
-ErrorCode perform_lloyd_relaxation( Interface* mb, Range& verts, Range& faces, Tag fixed,
-                                    int num_its, int report_its )
+ErrorCode perform_lloyd_relaxation( Interface* mb, Range& verts, Range& faces, Tag fixed, int num_its, int report_its )
 {
     ErrorCode rval;
 
@@ -138,8 +135,7 @@ ErrorCode perform_lloyd_relaxation( Interface* mb, Range& verts, Range& faces, T
     rval = mb->get_coords( verts, &vcentroids[ 0 ] );MB_CHK_ERR( rval );
 
     Tag centroid;
-    rval =
-        mb->tag_get_handle( "centroid", 3, MB_TYPE_DOUBLE, centroid, MB_TAG_CREAT | MB_TAG_DENSE );MB_CHK_ERR( rval );
+    rval = mb->tag_get_handle( "centroid", 3, MB_TYPE_DOUBLE, centroid, MB_TAG_CREAT | MB_TAG_DENSE );MB_CHK_ERR( rval );
     rval = mb->tag_set_data( centroid, verts, &vcentroids[ 0 ] );MB_CHK_ERR( rval );
 
     // Filter verts down to owned ones and get fixed tag for them
@@ -170,8 +166,7 @@ ErrorCode perform_lloyd_relaxation( Interface* mb, Range& verts, Range& faces, T
 
     // Some declarations for later iterations
     vector< double > fcentroids( 3 * faces.size( ) );  // fcentroids for face centroids
-    vector< double > ctag(
-        3 * CN::MAX_NODES_PER_ELEMENT );  // Temporary coordinate storage for verts bounding a face
+    vector< double > ctag( 3 * CN::MAX_NODES_PER_ELEMENT );  // Temporary coordinate storage for verts bounding a face
     const EntityHandle*    conn;  // const ptr & size to face connectivity
     int                    nconn;
     Range::iterator        fit, vit;  // For iterating over faces, verts
@@ -210,8 +205,7 @@ ErrorCode perform_lloyd_relaxation( Interface* mb, Range& verts, Range& faces, T
             // vertex centroid = sum(cell centroids)/ncells
             adj_faces.clear( );
             rval = mb->get_adjacencies( &( *vit ), 1, 2, false, adj_faces );MB_CHK_ERR( rval );
-            rval =
-                mb->tag_get_data( centroid, &adj_faces[ 0 ], adj_faces.size( ), &fcentroids[ 0 ] );MB_CHK_ERR( rval );
+            rval = mb->tag_get_data( centroid, &adj_faces[ 0 ], adj_faces.size( ), &fcentroids[ 0 ] );MB_CHK_ERR( rval );
             double vnew[] = { 0.0, 0.0, 0.0 };
             for( f = 0; f < (int)adj_faces.size( ); f++ )
             {
@@ -245,8 +239,7 @@ ErrorCode perform_lloyd_relaxation( Interface* mb, Range& verts, Range& faces, T
             double global_max = mxdelta;
             int    myrank = 0;
 #ifdef MOAB_HAVE_MPI
-            if( nprocs > 1 )
-                MPI_Reduce( &mxdelta, &global_max, 1, MPI_DOUBLE, MPI_MAX, 0, pcomm->comm( ) );
+            if( nprocs > 1 ) MPI_Reduce( &mxdelta, &global_max, 1, MPI_DOUBLE, MPI_MAX, 0, pcomm->comm( ) );
             myrank = pcomm->rank( );
 #endif
             if( 1 == nprocs || 0 == myrank ) cout << "Max delta = " << global_max << endl;

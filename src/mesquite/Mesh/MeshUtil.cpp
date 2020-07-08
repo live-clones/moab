@@ -148,8 +148,7 @@ void MeshUtil::lambda_distribution( SimpleStats& results, MsqError& err )
     }
 }
 
-bool MeshUtil::meshes_are_different( Mesh& mesh1, Mesh& mesh2, MsqError& err, double tol,
-                                     bool do_print )
+bool MeshUtil::meshes_are_different( Mesh& mesh1, Mesh& mesh2, MsqError& err, double tol, bool do_print )
 {
     // MsqError& err = (do_print ? MsqPrintError(cout) : MsqError());
 
@@ -163,8 +162,7 @@ bool MeshUtil::meshes_are_different( Mesh& mesh1, Mesh& mesh2, MsqError& err, do
     MSQ_ERRZERO( err );
     mesh1.get_all_vertices( vertices1, err );
     MSQ_ERRZERO( err );
-    mesh1.elements_get_attached_vertices( arrptr( elements1 ), elements1.size( ), connectivity1,
-                                          offsets1, err );
+    mesh1.elements_get_attached_vertices( arrptr( elements1 ), elements1.size( ), connectivity1, offsets1, err );
     MSQ_ERRZERO( err );
     std::vector< EntityTopology > types1( elements1.size( ) );
     mesh1.elements_get_topologies( arrptr( elements1 ), arrptr( types1 ), elements1.size( ), err );
@@ -180,19 +178,17 @@ bool MeshUtil::meshes_are_different( Mesh& mesh1, Mesh& mesh2, MsqError& err, do
     MSQ_ERRZERO( err );
     mesh2.get_all_vertices( vertices2, err );
     MSQ_ERRZERO( err );
-    mesh2.elements_get_attached_vertices( arrptr( elements2 ), elements2.size( ), connectivity2,
-                                          offsets2, err );
+    mesh2.elements_get_attached_vertices( arrptr( elements2 ), elements2.size( ), connectivity2, offsets2, err );
     MSQ_ERRZERO( err );
     std::vector< EntityTopology > types2( elements2.size( ) );
     mesh2.elements_get_topologies( arrptr( elements2 ), arrptr( types2 ), elements2.size( ), err );
     MSQ_ERRZERO( err );
 
-#define MDRET( msg )                                                                       \
-    do                                                                                     \
-    {                                                                                      \
-        if( do_print )                                                                     \
-            std::cout << "MeshUtil::mesh_diff meshes are different: " << msg << std::endl; \
-        return true;                                                                       \
+#define MDRET( msg )                                                                                  \
+    do                                                                                                \
+    {                                                                                                 \
+        if( do_print ) std::cout << "MeshUtil::mesh_diff meshes are different: " << msg << std::endl; \
+        return true;                                                                                  \
     } while( 0 )
     if( elements1.size( ) != elements2.size( ) ) MDRET( "elements sizes differ" );
     if( vertices1.size( ) != vertices2.size( ) ) MDRET( "vertices sizes differ" );
@@ -217,8 +213,8 @@ bool MeshUtil::meshes_are_different( Mesh& mesh1, Mesh& mesh2, MsqError& err, do
         if( dist > 0.5 * ( v1 + v2 ) * tol )
         {
             std::ostringstream ost;
-            ost << "vertices coordinates differ more than tolerance [" << tol
-                << "], vert1= " << vert1 << " vert2= " << vert2;
+            ost << "vertices coordinates differ more than tolerance [" << tol << "], vert1= " << vert1
+                << " vert2= " << vert2;
             MDRET( ost.str( ) );
         }
     }
@@ -236,8 +232,8 @@ bool MeshUtil::meshes_are_different( Mesh& mesh1, Mesh& mesh2, MsqError& err, do
         if( dist > 0.5 * ( v1 + v2 ) * tol )
         {
             std::ostringstream ost;
-            ost << "connectivity coordinates differ more than tolerance [" << tol
-                << "], vert1= " << vert1 << " vert2= " << vert2;
+            ost << "connectivity coordinates differ more than tolerance [" << tol << "], vert1= " << vert1
+                << " vert2= " << vert2;
             MDRET( ost.str( ) );
         }
     }

@@ -63,8 +63,7 @@ void usage( )
 {
     std::cout << "main [-N] [filename] [-o <output_file>]" << std::endl;
     std::cout << "  -N : Use native representation instead of iGeom implementation\n" << std::endl;
-    std::cout << "  If no file name is specified, will use \"" << default_file_name << '"'
-              << std::endl;
+    std::cout << "  If no file name is specified, will use \"" << default_file_name << '"' << std::endl;
     exit( 1 );
 }
 
@@ -233,8 +232,7 @@ MeshDomain* get_itaps_domain( )
     iBase_EntityHandle sphere_vol;
     iGeom_createSphere( igeom, SPHERE_RADIUS, &sphere_vol, &ierr );
     CHKIGEOM;
-    iGeom_moveEnt( igeom, sphere_vol, SPHERE_CENTER[ 0 ], SPHERE_CENTER[ 1 ], SPHERE_CENTER[ 2 ],
-                   &ierr );
+    iGeom_moveEnt( igeom, sphere_vol, SPHERE_CENTER[ 0 ], SPHERE_CENTER[ 1 ], SPHERE_CENTER[ 2 ], &ierr );
     CHKIGEOM;
 
     iBase_EntityHandle  sphere_surf;
@@ -249,8 +247,8 @@ MeshDomain* get_itaps_domain( )
     }
 
     Vector3D bmin, bmax;
-    iGeom_getEntBoundBox( igeom, sphere_surf, &bmin[ 0 ], &bmin[ 1 ], &bmin[ 2 ], &bmax[ 0 ],
-                          &bmax[ 1 ], &bmax[ 2 ], &ierr );
+    iGeom_getEntBoundBox( igeom, sphere_surf, &bmin[ 0 ], &bmin[ 1 ], &bmin[ 2 ], &bmax[ 0 ], &bmax[ 1 ], &bmax[ 2 ],
+                          &ierr );
     CHKIGEOM;
     Vector3D center = 0.5 * ( bmin + bmax );
     Vector3D rad = 0.5 * ( bmax - bmin );

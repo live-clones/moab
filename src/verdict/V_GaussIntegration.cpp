@@ -89,8 +89,7 @@ void GaussIntegration::get_shape_func( double shape_function[], double dndy1_at_
 }
 
 void GaussIntegration::get_shape_func( double shape_function[], double dndy1_at_gauss_pts[],
-                                       double dndy2_at_gauss_pts[], double dndy3_at_gauss_pts[],
-                                       double gauss_weight[] )
+                                       double dndy2_at_gauss_pts[], double dndy3_at_gauss_pts[], double gauss_weight[] )
 {
     int i, j;
     for( i = 0; i < totalNumberGaussPts; i++ )
@@ -236,23 +235,18 @@ void GaussIntegration::calculate_shape_function_3d_hex( )
 
                         for( node_id = 0; node_id < numberNodes; node_id++ )
                         {
-                            get_signs_for_node_local_coord_hex( node_id, sign_node_y1, sign_node_y2,
-                                                                sign_node_y3 );
+                            get_signs_for_node_local_coord_hex( node_id, sign_node_y1, sign_node_y2, sign_node_y3 );
 
                             y1_term = 1 + sign_node_y1 * y1;
                             y2_term = 1 + sign_node_y2 * y2;
                             y3_term = 1 + sign_node_y3 * y3;
 
                             shapeFunction[ ife ][ node_id ] = 0.125 * y1_term * y2_term * y3_term;
-                            dndy1GaussPts[ ife ][ node_id ] =
-                                0.125 * sign_node_y1 * y2_term * y3_term;
-                            dndy2GaussPts[ ife ][ node_id ] =
-                                0.125 * sign_node_y2 * y1_term * y3_term;
-                            dndy3GaussPts[ ife ][ node_id ] =
-                                0.125 * sign_node_y3 * y1_term * y2_term;
+                            dndy1GaussPts[ ife ][ node_id ] = 0.125 * sign_node_y1 * y2_term * y3_term;
+                            dndy2GaussPts[ ife ][ node_id ] = 0.125 * sign_node_y2 * y1_term * y3_term;
+                            dndy3GaussPts[ ife ][ node_id ] = 0.125 * sign_node_y3 * y1_term * y2_term;
                         }
-                        totalGaussWeight[ ife ] =
-                            gaussWeight[ i ] * gaussWeight[ j ] * gaussWeight[ k ];
+                        totalGaussWeight[ ife ] = gaussWeight[ i ] * gaussWeight[ j ] * gaussWeight[ k ];
                         ife++;
                     }
                 }
@@ -271,14 +265,12 @@ void GaussIntegration::calculate_shape_function_3d_hex( )
 
                         for( node_id = 0; node_id < numberNodes; node_id++ )
                         {
-                            get_signs_for_node_local_coord_hex( node_id, sign_node_y1, sign_node_y2,
-                                                                sign_node_y3 );
+                            get_signs_for_node_local_coord_hex( node_id, sign_node_y1, sign_node_y2, sign_node_y3 );
 
                             y1_term = 1 + sign_node_y1 * y1;
                             y2_term = 1 + sign_node_y2 * y2;
                             y3_term = 1 + sign_node_y3 * y3;
-                            y123_temp =
-                                sign_node_y1 * y1 + sign_node_y2 * y2 + sign_node_y3 * y3 - 2.;
+                            y123_temp = sign_node_y1 * y1 + sign_node_y2 * y2 + sign_node_y3 * y3 - 2.;
 
                             switch( node_id )
                             {
@@ -290,8 +282,7 @@ void GaussIntegration::calculate_shape_function_3d_hex( )
                                 case 5:
                                 case 6:
                                 case 7: {
-                                    shapeFunction[ ife ][ node_id ] =
-                                        0.125 * y1_term * y2_term * y3_term * y123_temp;
+                                    shapeFunction[ ife ][ node_id ] = 0.125 * y1_term * y2_term * y3_term * y123_temp;
                                     dndy1GaussPts[ ife ][ node_id ] =
                                         0.125 * sign_node_y1 * y123_temp * y2_term * y3_term +
                                         0.125 * y1_term * y2_term * y3_term * sign_node_y1;
@@ -307,45 +298,35 @@ void GaussIntegration::calculate_shape_function_3d_hex( )
                                 case 10:
                                 case 16:
                                 case 18: {
-                                    shapeFunction[ ife ][ node_id ] =
-                                        0.25 * ( 1 - y1 * y1 ) * y2_term * y3_term;
+                                    shapeFunction[ ife ][ node_id ] = 0.25 * ( 1 - y1 * y1 ) * y2_term * y3_term;
                                     dndy1GaussPts[ ife ][ node_id ] = -0.5 * y1 * y2_term * y3_term;
-                                    dndy2GaussPts[ ife ][ node_id ] =
-                                        0.25 * ( 1 - y1 * y1 ) * sign_node_y2 * y3_term;
-                                    dndy3GaussPts[ ife ][ node_id ] =
-                                        0.25 * ( 1 - y1 * y1 ) * y2_term * sign_node_y3;
+                                    dndy2GaussPts[ ife ][ node_id ] = 0.25 * ( 1 - y1 * y1 ) * sign_node_y2 * y3_term;
+                                    dndy3GaussPts[ ife ][ node_id ] = 0.25 * ( 1 - y1 * y1 ) * y2_term * sign_node_y3;
                                     break;
                                 }
                                 case 9:
                                 case 11:
                                 case 17:
                                 case 19: {
-                                    shapeFunction[ ife ][ node_id ] =
-                                        0.25 * ( 1 - y2 * y2 ) * y1_term * y3_term;
-                                    dndy1GaussPts[ ife ][ node_id ] =
-                                        0.25 * ( 1 - y2 * y2 ) * sign_node_y1 * y3_term;
+                                    shapeFunction[ ife ][ node_id ] = 0.25 * ( 1 - y2 * y2 ) * y1_term * y3_term;
+                                    dndy1GaussPts[ ife ][ node_id ] = 0.25 * ( 1 - y2 * y2 ) * sign_node_y1 * y3_term;
                                     dndy2GaussPts[ ife ][ node_id ] = -0.5 * y2 * y1_term * y3_term;
-                                    dndy3GaussPts[ ife ][ node_id ] =
-                                        0.25 * ( 1 - y2 * y2 ) * y1_term * sign_node_y3;
+                                    dndy3GaussPts[ ife ][ node_id ] = 0.25 * ( 1 - y2 * y2 ) * y1_term * sign_node_y3;
                                     break;
                                 }
                                 case 12:
                                 case 13:
                                 case 14:
                                 case 15: {
-                                    shapeFunction[ ife ][ node_id ] =
-                                        0.25 * ( 1 - y3 * y3 ) * y1_term * y2_term;
-                                    dndy1GaussPts[ ife ][ node_id ] =
-                                        0.25 * ( 1 - y3 * y3 ) * sign_node_y1 * y2_term;
-                                    dndy2GaussPts[ ife ][ node_id ] =
-                                        0.25 * ( 1 - y3 * y3 ) * y1_term * sign_node_y2;
+                                    shapeFunction[ ife ][ node_id ] = 0.25 * ( 1 - y3 * y3 ) * y1_term * y2_term;
+                                    dndy1GaussPts[ ife ][ node_id ] = 0.25 * ( 1 - y3 * y3 ) * sign_node_y1 * y2_term;
+                                    dndy2GaussPts[ ife ][ node_id ] = 0.25 * ( 1 - y3 * y3 ) * y1_term * sign_node_y2;
                                     dndy3GaussPts[ ife ][ node_id ] = -0.5 * y3 * y1_term * y2_term;
                                     break;
                                 }
                             }
                         }
-                        totalGaussWeight[ ife ] =
-                            gaussWeight[ i ] * gaussWeight[ j ] * gaussWeight[ k ];
+                        totalGaussWeight[ ife ] = gaussWeight[ i ] * gaussWeight[ j ] * gaussWeight[ k ];
                         ife++;
                     }
                 }
@@ -461,27 +442,22 @@ void GaussIntegration::calculate_derivative_at_nodes_3d( double dndy1_at_nodes[]
             case 8:
                 for( node_id_2 = 0; node_id_2 < numberNodes; node_id_2++ )
                 {
-                    get_signs_for_node_local_coord_hex( node_id_2, sign_node_y1, sign_node_y2,
-                                                        sign_node_y3 );
+                    get_signs_for_node_local_coord_hex( node_id_2, sign_node_y1, sign_node_y2, sign_node_y3 );
                     y1_term = 1 + sign_node_y1 * y1;
                     y2_term = 1 + sign_node_y2 * y2;
                     y3_term = 1 + sign_node_y3 * y3;
 
-                    dndy1_at_nodes[ node_id ][ node_id_2 ] =
-                        0.125 * sign_node_y1 * y2_term * y3_term;
+                    dndy1_at_nodes[ node_id ][ node_id_2 ] = 0.125 * sign_node_y1 * y2_term * y3_term;
 
-                    dndy2_at_nodes[ node_id ][ node_id_2 ] =
-                        0.125 * sign_node_y2 * y1_term * y3_term;
+                    dndy2_at_nodes[ node_id ][ node_id_2 ] = 0.125 * sign_node_y2 * y1_term * y3_term;
 
-                    dndy3_at_nodes[ node_id ][ node_id_2 ] =
-                        0.125 * sign_node_y3 * y1_term * y2_term;
+                    dndy3_at_nodes[ node_id ][ node_id_2 ] = 0.125 * sign_node_y3 * y1_term * y2_term;
                 }
                 break;
             case 20:
                 for( node_id_2 = 0; node_id_2 < numberNodes; node_id_2++ )
                 {
-                    get_signs_for_node_local_coord_hex( node_id_2, sign_node_y1, sign_node_y2,
-                                                        sign_node_y3 );
+                    get_signs_for_node_local_coord_hex( node_id_2, sign_node_y1, sign_node_y2, sign_node_y3 );
 
                     y1_term = 1 + sign_node_y1 * y1;
                     y2_term = 1 + sign_node_y2 * y2;
@@ -513,31 +489,25 @@ void GaussIntegration::calculate_derivative_at_nodes_3d( double dndy1_at_nodes[]
                         case 16:
                         case 18: {
                             dndy1_at_nodes[ node_id ][ node_id_2 ] = -0.5 * y1 * y2_term * y3_term;
-                            dndy2_at_nodes[ node_id ][ node_id_2 ] =
-                                0.25 * ( 1 - y1 * y1 ) * sign_node_y2 * y3_term;
-                            dndy3_at_nodes[ node_id ][ node_id_2 ] =
-                                0.25 * ( 1 - y1 * y1 ) * y2_term * sign_node_y3;
+                            dndy2_at_nodes[ node_id ][ node_id_2 ] = 0.25 * ( 1 - y1 * y1 ) * sign_node_y2 * y3_term;
+                            dndy3_at_nodes[ node_id ][ node_id_2 ] = 0.25 * ( 1 - y1 * y1 ) * y2_term * sign_node_y3;
                             break;
                         }
                         case 9:
                         case 11:
                         case 17:
                         case 19: {
-                            dndy1_at_nodes[ node_id ][ node_id_2 ] =
-                                0.25 * ( 1 - y2 * y2 ) * sign_node_y1 * y3_term;
+                            dndy1_at_nodes[ node_id ][ node_id_2 ] = 0.25 * ( 1 - y2 * y2 ) * sign_node_y1 * y3_term;
                             dndy2_at_nodes[ node_id ][ node_id_2 ] = -0.5 * y2 * y1_term * y3_term;
-                            dndy3_at_nodes[ node_id ][ node_id_2 ] =
-                                0.25 * ( 1 - y2 * y2 ) * y1_term * sign_node_y3;
+                            dndy3_at_nodes[ node_id ][ node_id_2 ] = 0.25 * ( 1 - y2 * y2 ) * y1_term * sign_node_y3;
                             break;
                         }
                         case 12:
                         case 13:
                         case 14:
                         case 15: {
-                            dndy1_at_nodes[ node_id ][ node_id_2 ] =
-                                0.25 * ( 1 - y3 * y3 ) * sign_node_y1 * y2_term;
-                            dndy2_at_nodes[ node_id ][ node_id_2 ] =
-                                0.25 * ( 1 - y3 * y3 ) * y1_term * sign_node_y2;
+                            dndy1_at_nodes[ node_id ][ node_id_2 ] = 0.25 * ( 1 - y3 * y3 ) * sign_node_y1 * y2_term;
+                            dndy2_at_nodes[ node_id ][ node_id_2 ] = 0.25 * ( 1 - y3 * y3 ) * y1_term * sign_node_y2;
                             dndy3_at_nodes[ node_id ][ node_id_2 ] = -0.5 * y3 * y1_term * y2_term;
                             break;
                         }
@@ -548,8 +518,7 @@ void GaussIntegration::calculate_derivative_at_nodes_3d( double dndy1_at_nodes[]
     }
 }
 
-void GaussIntegration::get_signs_for_node_local_coord_hex( int node_id, double& sign_node_y1,
-                                                           double& sign_node_y2,
+void GaussIntegration::get_signs_for_node_local_coord_hex( int node_id, double& sign_node_y1, double& sign_node_y2,
                                                            double& sign_node_y3 )
 {
     switch( node_id )
@@ -733,8 +702,8 @@ void GaussIntegration::calculate_shape_function_2d_tri( )
     }
 }
 
-void GaussIntegration::calculate_derivative_at_nodes_2d_tri(
-    double dndy1_at_nodes[][ maxNumberNodes ], double dndy2_at_nodes[][ maxNumberNodes ] )
+void GaussIntegration::calculate_derivative_at_nodes_2d_tri( double dndy1_at_nodes[][ maxNumberNodes ],
+                                                             double dndy2_at_nodes[][ maxNumberNodes ] )
 {
     double y1 = 0., y2 = 0., y3;
     int    i;
@@ -942,9 +911,9 @@ void GaussIntegration::calculate_shape_function_3d_tet( )
     }
 }
 
-void GaussIntegration::calculate_derivative_at_nodes_3d_tet(
-    double dndy1_at_nodes[][ maxNumberNodes ], double dndy2_at_nodes[][ maxNumberNodes ],
-    double dndy3_at_nodes[][ maxNumberNodes ] )
+void GaussIntegration::calculate_derivative_at_nodes_3d_tet( double dndy1_at_nodes[][ maxNumberNodes ],
+                                                             double dndy2_at_nodes[][ maxNumberNodes ],
+                                                             double dndy3_at_nodes[][ maxNumberNodes ] )
 {
     double y1, y2, y3, y4;
     int    i;
@@ -1017,8 +986,7 @@ void GaussIntegration::calculate_derivative_at_nodes_3d_tet(
     }
 }
 
-void GaussIntegration::get_node_local_coord_tet( int node_id, double& y1, double& y2, double& y3,
-                                                 double& y4 )
+void GaussIntegration::get_node_local_coord_tet( int node_id, double& y1, double& y2, double& y3, double& y4 )
 {
     switch( node_id )
     {

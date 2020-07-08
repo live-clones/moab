@@ -142,14 +142,11 @@ class FakeTargetCalc : public TargetCalculator, public WeightCalculator
 
     ~FakeTargetCalc( ) {}
 
-    bool get_3D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 3, 3 >& W_out,
-                        MsqError& err );
+    bool get_3D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 3, 3 >& W_out, MsqError& err );
 
-    bool get_2D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 2, 2 >& W_out,
-                        MsqError& err );
+    bool get_2D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 2, 2 >& W_out, MsqError& err );
 
-    bool get_surface_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 3, 2 >& W_out,
-                             MsqError& err );
+    bool get_surface_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 3, 2 >& W_out, MsqError& err );
 
     double get_weight( PatchData& pd, size_t element, Sample sample, MsqError& err );
 
@@ -161,44 +158,36 @@ class FakeTargetCalc : public TargetCalculator, public WeightCalculator
     unsigned long make_value( Mesh::ElementHandle elem, Sample sample, unsigned idx );
 };
 
-bool FakeTargetCalc::get_3D_target( PatchData& pd, size_t elem, Sample sample,
-                                    MsqMatrix< 3, 3 >& W_out, MsqError& )
+bool FakeTargetCalc::get_3D_target( PatchData& pd, size_t elem, Sample sample, MsqMatrix< 3, 3 >& W_out, MsqError& )
 {
-    CPPUNIT_ASSERT_EQUAL(
-        3u, TopologyInfo::dimension( pd.element_by_index( elem ).get_element_type( ) ) );
+    CPPUNIT_ASSERT_EQUAL( 3u, TopologyInfo::dimension( pd.element_by_index( elem ).get_element_type( ) ) );
     unsigned i, j;
     for( i = 0; i < 3; ++i )
     {
         for( j = 0; j < i; ++j )
             W_out( i, j ) = 0.0;
         for( j = i; j < 3; ++j )
-            W_out( i, j ) =
-                make_value( pd.get_element_handles_array( )[ elem ], sample, 3 * i + j + 1 );
+            W_out( i, j ) = make_value( pd.get_element_handles_array( )[ elem ], sample, 3 * i + j + 1 );
     }
     return true;
 }
 
-bool FakeTargetCalc::get_surface_target( PatchData& pd, size_t elem, Sample sample,
-                                         MsqMatrix< 3, 2 >& W_out, MsqError& )
+bool FakeTargetCalc::get_surface_target( PatchData& pd, size_t elem, Sample sample, MsqMatrix< 3, 2 >& W_out,
+                                         MsqError& )
 {
-    CPPUNIT_ASSERT_EQUAL(
-        2u, TopologyInfo::dimension( pd.element_by_index( elem ).get_element_type( ) ) );
+    CPPUNIT_ASSERT_EQUAL( 2u, TopologyInfo::dimension( pd.element_by_index( elem ).get_element_type( ) ) );
     for( unsigned i = 0; i < 3; ++i )
         for( unsigned j = 0; j < 2; ++j )
-            W_out( i, j ) =
-                make_value( pd.get_element_handles_array( )[ elem ], sample, 2 * i + j );
+            W_out( i, j ) = make_value( pd.get_element_handles_array( )[ elem ], sample, 2 * i + j );
     return true;
 }
 
-bool FakeTargetCalc::get_2D_target( PatchData& pd, size_t elem, Sample sample,
-                                    MsqMatrix< 2, 2 >& W_out, MsqError& )
+bool FakeTargetCalc::get_2D_target( PatchData& pd, size_t elem, Sample sample, MsqMatrix< 2, 2 >& W_out, MsqError& )
 {
-    CPPUNIT_ASSERT_EQUAL(
-        2u, TopologyInfo::dimension( pd.element_by_index( elem ).get_element_type( ) ) );
+    CPPUNIT_ASSERT_EQUAL( 2u, TopologyInfo::dimension( pd.element_by_index( elem ).get_element_type( ) ) );
     for( unsigned i = 0; i < 2; ++i )
         for( unsigned j = 0; j < 2; ++j )
-            W_out( i, j ) = make_value( pd.get_element_handles_array( )[ elem ], sample,
-                                        ( 2 - i ) * ( 2 - j ) );
+            W_out( i, j ) = make_value( pd.get_element_handles_array( )[ elem ], sample, ( 2 - i ) * ( 2 - j ) );
     return true;
 }
 
@@ -236,8 +225,7 @@ void TargetReadWriteTest::read_write_3D_targets( )
     TargetReader reader( oriented );
     for( size_t i = 0; i < myPatch.num_elements( ); ++i )
     {
-        const unsigned d =
-            TopologyInfo::dimension( myPatch.element_by_index( i ).get_element_type( ) );
+        const unsigned d = TopologyInfo::dimension( myPatch.element_by_index( i ).get_element_type( ) );
         if( d != 3 ) continue;
 
         checked_something = true;
@@ -276,8 +264,7 @@ void TargetReadWriteTest::read_write_surface_targets( )
     TargetReader reader( oriented );
     for( size_t i = 0; i < myPatch.num_elements( ); ++i )
     {
-        const unsigned d =
-            TopologyInfo::dimension( myPatch.element_by_index( i ).get_element_type( ) );
+        const unsigned d = TopologyInfo::dimension( myPatch.element_by_index( i ).get_element_type( ) );
         if( d != 2 ) continue;
 
         checked_something = true;
@@ -316,8 +303,7 @@ void TargetReadWriteTest::read_write_2D_targets( )
     TargetReader reader( oriented );
     for( size_t i = 0; i < myPatch.num_elements( ); ++i )
     {
-        const unsigned d =
-            TopologyInfo::dimension( myPatch.element_by_index( i ).get_element_type( ) );
+        const unsigned d = TopologyInfo::dimension( myPatch.element_by_index( i ).get_element_type( ) );
         if( d != 2 ) continue;
 
         checked_something = true;

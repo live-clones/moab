@@ -53,8 +53,7 @@ class PMeanPTemplateTest : public CppUnit::TestFixture, public ObjectiveFunction
     void test_diagonal( double power );
     void test_Hessian( double power );
 
-    void check_result( PatchData& pd, double power, double value, Vector3D* gradient = 0,
-                       Matrix3D* Hessian = 0 );
+    void check_result( PatchData& pd, double power, double value, Vector3D* gradient = 0, Matrix3D* Hessian = 0 );
 
     CPPUNIT_TEST_SUITE( PMeanPTemplateTest );
 
@@ -407,8 +406,8 @@ class DistTestMetric : public VertexQM
         return 1;
     }
     bool evaluate( PatchData& pd, size_t vtx_idx, double& value, MsqError& err );
-    bool evaluate_with_indices( PatchData& pd, size_t vtx_idx, double& value,
-                                vector< size_t >& indices, MsqError& err );
+    bool evaluate_with_indices( PatchData& pd, size_t vtx_idx, double& value, vector< size_t >& indices,
+                                MsqError& err );
     // bool evaluate_with_gradient( PatchData& pd, size_t vtx_idx, double &value, vector<size_t>&
     // indices, vector<Vector3D>& grad, MsqError& err );
     bool falseEval;
@@ -428,8 +427,8 @@ bool DistTestMetric::evaluate( PatchData& pd, size_t vtx_idx, double& value, Msq
     return !falseEval;
 }
 
-bool DistTestMetric::evaluate_with_indices( PatchData& pd, size_t vtx_idx, double& value,
-                                            vector< size_t >& indices, MsqError& err )
+bool DistTestMetric::evaluate_with_indices( PatchData& pd, size_t vtx_idx, double& value, vector< size_t >& indices,
+                                            MsqError& err )
 {
     if( failEval )
     {
@@ -494,8 +493,7 @@ void PMeanPTemplateTest::test_diagonal( double power )
 
     DistTestMetric metric;
     PMeanPTemplate func( power, &metric );
-    rval = func.evaluate_with_Hessian_diagonal( ObjectiveFunction::CALCULATE, mPatch, value, grad,
-                                                Hess, err );
+    rval = func.evaluate_with_Hessian_diagonal( ObjectiveFunction::CALCULATE, mPatch, value, grad, Hess, err );
     CPPUNIT_ASSERT( !MSQ_CHKERR( err ) );
     CPPUNIT_ASSERT( rval );
     size_t n = mPatch.num_free_vertices( );
@@ -521,8 +519,7 @@ void PMeanPTemplateTest::test_Hessian( double power )
 
     DistTestMetric metric;
     PMeanPTemplate func( power, &metric );
-    rval =
-        func.evaluate_with_Hessian( ObjectiveFunction::CALCULATE, mPatch, value, grad, Hess, err );
+    rval = func.evaluate_with_Hessian( ObjectiveFunction::CALCULATE, mPatch, value, grad, Hess, err );
     CPPUNIT_ASSERT( !MSQ_CHKERR( err ) );
     CPPUNIT_ASSERT( rval );
     size_t n = mPatch.num_free_vertices( );
@@ -547,8 +544,8 @@ void PMeanPTemplateTest::test_Hessian( double power )
     if( !grad.empty( ) ) check_result( mPatch, power, value, arrptr( grad ), arrptr( Hessians ) );
 }
 
-void PMeanPTemplateTest::check_result( PatchData& pd, double power, double value,
-                                       Vector3D* gradient, Matrix3D* Hessian )
+void PMeanPTemplateTest::check_result( PatchData& pd, double power, double value, Vector3D* gradient,
+                                       Matrix3D* Hessian )
 {
     MsqPrintError      err( cout );
     double             mvalue, sum = 0;

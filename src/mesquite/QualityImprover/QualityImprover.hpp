@@ -79,8 +79,7 @@ class MESQUITE_EXPORT QualityImprover : public Instruction
 
     virtual PatchSet* get_patch_set( ) = 0;
 
-    virtual void initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
-                                   MsqError& err );
+    virtual void initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings, MsqError& err );
 
   protected:
     /*! The default constructor initialises a few member variables

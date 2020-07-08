@@ -152,8 +152,7 @@ int main( int argc, char* argv[] )
 
 // This function doesn't normally get called, but is here for debugging
 // and verifying that merge is working.
-void print_output( moab::ParallelComm* pc, moab::Core* mb, int myID, int /* numprocs */,
-                   bool perform )
+void print_output( moab::ParallelComm* pc, moab::Core* mb, int myID, int /* numprocs */, bool perform )
 {
     moab::Range ents, skin;
     int         o_ct = 0, no_ct = 0, tmp = 0, o_tot = 0, no_tot = 0;
@@ -199,8 +198,7 @@ void print_output( moab::ParallelComm* pc, moab::Core* mb, int myID, int /* nump
         {
             std::cout << "There are " << o_tot << " owned skin faces." << std::endl;
             std::cout << "There are " << no_tot << " not owned skin faces." << std::endl;
-            std::cout << "The difference (Global Skin Faces) is " << ( o_tot - no_tot ) << "."
-                      << std::endl;
+            std::cout << "The difference (Global Skin Faces) is " << ( o_tot - no_tot ) << "." << std::endl;
             std::cout << "------------------------------------------" << std::endl;
         }
     }

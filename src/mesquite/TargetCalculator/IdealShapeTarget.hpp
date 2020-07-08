@@ -50,8 +50,7 @@ class MESQUITE_EXPORT IdealShapeTarget : public TargetCalculator
      *\param sample  The sample point in the element.
      *\param W_out   The resulting target matrix.
      */
-    virtual bool get_3D_target( PatchData& pd, size_t element, Sample sample,
-                                MsqMatrix< 3, 3 >& W_out, MsqError& err );
+    virtual bool get_3D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 3, 3 >& W_out, MsqError& err );
 
     /**\brief Get a target matrix
      *
@@ -60,8 +59,8 @@ class MESQUITE_EXPORT IdealShapeTarget : public TargetCalculator
      *\param sample  The sample point in the element.
      *\param W_out   The resulting target matrix.
      */
-    virtual bool get_surface_target( PatchData& pd, size_t element, Sample sample,
-                                     MsqMatrix< 3, 2 >& W_out, MsqError& err );
+    virtual bool get_surface_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 3, 2 >& W_out,
+                                     MsqError& err );
 
     /**\brief Get a target matrix
      *
@@ -70,8 +69,7 @@ class MESQUITE_EXPORT IdealShapeTarget : public TargetCalculator
      *\param sample  The sample point in the element.
      *\param W_out   The resulting target matrix.
      */
-    virtual bool get_2D_target( PatchData& pd, size_t element, Sample sample,
-                                MsqMatrix< 2, 2 >& W_out, MsqError& err );
+    virtual bool get_2D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 2, 2 >& W_out, MsqError& err );
 
     virtual bool have_surface_orient( ) const;
 };

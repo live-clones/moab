@@ -21,33 +21,27 @@
 using namespace moab;
 
 // computes cell barycenters in Cartesian X,Y,Z coordinates
-void get_barycenters( moab::Interface* mb, moab::EntityHandle set, moab::Tag& planeTag,
-                      moab::Tag& barycenterTag );
+void get_barycenters( moab::Interface* mb, moab::EntityHandle set, moab::Tag& planeTag, moab::Tag& barycenterTag );
 
 // computes gnomonic plane for each cell of the Eulerian mesh
 void get_gnomonic_plane( moab::Interface* mb, moab::EntityHandle set, moab::Tag& planeTag );
 
 // computes coefficients (A,B,C) for linear reconstruction in gnomonic coordinates: rho(x,y) = Ax +
 // By + C
-void get_linear_reconstruction( moab::Interface* mb, moab::EntityHandle set, moab::Tag& rhoTag,
-                                moab::Tag& planeTag, moab::Tag& barycenterTag,
-                                moab::Tag& linearCoefTag );
+void get_linear_reconstruction( moab::Interface* mb, moab::EntityHandle set, moab::Tag& rhoTag, moab::Tag& planeTag,
+                                moab::Tag& barycenterTag, moab::Tag& linearCoefTag );
 
 // evaluates the integral of rho(x,y) over cell, should be equal to cell average rho
-void test_linear_reconstruction( moab::Interface* mb, moab::EntityHandle set, moab::Tag& rhoTag,
-                                 moab::Tag& planeTag, moab::Tag& barycenterTag,
-                                 moab::Tag& linearCoefTag );
+void test_linear_reconstruction( moab::Interface* mb, moab::EntityHandle set, moab::Tag& rhoTag, moab::Tag& planeTag,
+                                 moab::Tag& barycenterTag, moab::Tag& linearCoefTag );
 
 // set density function
-moab::ErrorCode add_field_value( moab::Interface* mb, moab::EntityHandle euler_set, int rank,
-                                 moab::Tag& tagTracer, moab::Tag& tagElem, moab::Tag& tagArea,
-                                 int field_type );
+moab::ErrorCode add_field_value( moab::Interface* mb, moab::EntityHandle euler_set, int rank, moab::Tag& tagTracer,
+                                 moab::Tag& tagElem, moab::Tag& tagArea, int field_type );
 
 // functions that implement gnomonic projection as in Homme (different from Moab implementation)
-int  gnomonic_projection_test( const moab::CartVect& pos, double R, int plane, double& c1,
-                               double& c2 );
-int  reverse_gnomonic_projection_test( const double& c1, const double& c2, double R, int plane,
-                                       moab::CartVect& pos );
+int  gnomonic_projection_test( const moab::CartVect& pos, double R, int plane, double& c1, double& c2 );
+int  reverse_gnomonic_projection_test( const double& c1, const double& c2, double R, int plane, moab::CartVect& pos );
 void decide_gnomonic_plane_test( const CartVect& pos, int& plane );
 
 double radius = 1.;  // in m:  6371220.
@@ -78,15 +72,13 @@ int main( int argc, char* argv[] )
 
     // Create tag for cell density
     moab::Tag rhoTag = 0;
-    rval = mb.tag_get_handle( "Density", 1, moab::MB_TYPE_DOUBLE, rhoTag,
-                              moab::MB_TAG_CREAT | moab::MB_TAG_DENSE );CHECK_ERR( rval );
+    rval = mb.tag_get_handle( "Density", 1, moab::MB_TYPE_DOUBLE, rhoTag, moab::MB_TAG_CREAT | moab::MB_TAG_DENSE );CHECK_ERR( rval );
     moab::Tag rhoNodeTag = 0;
     rval = mb.tag_get_handle( "DensityNode", 1, moab::MB_TYPE_DOUBLE, rhoNodeTag,
                               moab::MB_TAG_CREAT | moab::MB_TAG_DENSE );CHECK_ERR( rval );
     // Create tag for cell area
     moab::Tag areaTag = 0;
-    rval = mb.tag_get_handle( "Area", 1, moab::MB_TYPE_DOUBLE, areaTag,
-                              moab::MB_TAG_CREAT | moab::MB_TAG_DENSE );CHECK_ERR( rval );
+    rval = mb.tag_get_handle( "Area", 1, moab::MB_TYPE_DOUBLE, areaTag, moab::MB_TAG_CREAT | moab::MB_TAG_DENSE );CHECK_ERR( rval );
     // Create tag for cell barycenters in 3D Cartesian space
     moab::Tag barycenterTag = 0;
     rval = mb.tag_get_handle( "CellBarycenter", 3, moab::MB_TYPE_DOUBLE, barycenterTag,
@@ -164,8 +156,7 @@ void get_gnomonic_plane( moab::Interface* mb, moab::EntityHandle set, moab::Tag&
     return;
 }
 
-void get_barycenters( moab::Interface* mb, moab::EntityHandle set, moab::Tag& planeTag,
-                      moab::Tag& barycenterTag )
+void get_barycenters( moab::Interface* mb, moab::EntityHandle set, moab::Tag& planeTag, moab::Tag& barycenterTag )
 {
     // get all entities of dimension 2
     moab::Range cells;
@@ -202,9 +193,9 @@ void get_barycenters( moab::Interface* mb, moab::EntityHandle set, moab::Tag& pl
         for( int inode = 0; inode < num_nodes; inode++ )
         {
             // radius should be 1.0, but divide by it just in case for now
-            double   rad = sqrt( coords[ inode * 3 ] * coords[ inode * 3 ] +
-                               coords[ inode * 3 + 1 ] * coords[ inode * 3 + 1 ] +
-                               coords[ inode * 3 + 2 ] * coords[ inode * 3 + 2 ] );
+            double rad =
+                sqrt( coords[ inode * 3 ] * coords[ inode * 3 ] + coords[ inode * 3 + 1 ] * coords[ inode * 3 + 1 ] +
+                      coords[ inode * 3 + 2 ] * coords[ inode * 3 + 2 ] );
             CartVect xyzcoord( coords[ inode * 3 ] / rad, coords[ inode * 3 + 1 ] / rad,
                                coords[ inode * 3 + 2 ] / rad );
             moab::IntxUtils::gnomonic_projection( xyzcoord, R, plane, x[ inode ], y[ inode ] );
@@ -222,11 +213,11 @@ void get_barycenters( moab::Interface* mb, moab::EntityHandle set, moab::Tag& pl
             double r2 = sqrt( 1 + x[ inode2 ] * x[ inode2 ] + y[ inode2 ] * y[ inode2 ] );
             double hx = x[ inode2 ] - x[ inode ];
 
-            area += hx *
-                    ( y[ inode ] / ( r1 * ( 1 + x[ inode ] * x[ inode ] ) ) +
-                      4.0 * ymid / ( rm * ( 1 + xmid * xmid ) ) +
-                      y[ inode2 ] / ( r2 * ( 1 + x[ inode2 ] * x[ inode2 ] ) ) ) /
-                    6.0;
+            area +=
+                hx *
+                ( y[ inode ] / ( r1 * ( 1 + x[ inode ] * x[ inode ] ) ) + 4.0 * ymid / ( rm * ( 1 + xmid * xmid ) ) +
+                  y[ inode2 ] / ( r2 * ( 1 + x[ inode2 ] * x[ inode2 ] ) ) ) /
+                6.0;
 
             bary_x += hx *
                       ( x[ inode ] * y[ inode ] / ( r1 * ( 1 + x[ inode ] * x[ inode ] ) ) +
@@ -253,9 +244,8 @@ void get_barycenters( moab::Interface* mb, moab::EntityHandle set, moab::Tag& pl
     return;
 }
 
-void get_linear_reconstruction( moab::Interface* mb, moab::EntityHandle set, moab::Tag& rhoTag,
-                                moab::Tag& planeTag, moab::Tag& barycenterTag,
-                                moab::Tag& linearCoefTag )
+void get_linear_reconstruction( moab::Interface* mb, moab::EntityHandle set, moab::Tag& rhoTag, moab::Tag& planeTag,
+                                moab::Tag& barycenterTag, moab::Tag& linearCoefTag )
 {
     // get all entities of dimension 2
     Range     cells;
@@ -322,8 +312,7 @@ void get_linear_reconstruction( moab::Interface* mb, moab::EntityHandle set, moa
 
             if( adjacentCells[ i ] != icell )
             {
-                CartVect bary_xyz( cell_barys[ i * 3 ], cell_barys[ i * 3 + 1 ],
-                                   cell_barys[ i * 3 + 2 ] );
+                CartVect bary_xyz( cell_barys[ i * 3 ], cell_barys[ i * 3 + 1 ], cell_barys[ i * 3 + 2 ] );
                 moab::IntxUtils::gnomonic_projection( bary_xyz, R, plane, bary_x, bary_y );
                 // rc = gnomonic_projection_test(bary_xyz, R, plane, bary_x, bary_y);
 
@@ -340,18 +329,13 @@ void get_linear_reconstruction( moab::Interface* mb, moab::EntityHandle set, moa
         {
 
             // compute normal equations matrix
-            double N11 =
-                dx[ 1 ] * dx[ 1 ] + dx[ 2 ] * dx[ 2 ] + dx[ 3 ] * dx[ 3 ] + dx[ 0 ] * dx[ 0 ];
-            double N22 =
-                dy[ 1 ] * dy[ 1 ] + dy[ 2 ] * dy[ 2 ] + dy[ 3 ] * dy[ 3 ] + dy[ 0 ] * dy[ 0 ];
-            double N12 =
-                dx[ 1 ] * dy[ 1 ] + dx[ 2 ] * dy[ 2 ] + dx[ 3 ] * dy[ 3 ] + dx[ 0 ] * dy[ 0 ];
+            double N11 = dx[ 1 ] * dx[ 1 ] + dx[ 2 ] * dx[ 2 ] + dx[ 3 ] * dx[ 3 ] + dx[ 0 ] * dx[ 0 ];
+            double N22 = dy[ 1 ] * dy[ 1 ] + dy[ 2 ] * dy[ 2 ] + dy[ 3 ] * dy[ 3 ] + dy[ 0 ] * dy[ 0 ];
+            double N12 = dx[ 1 ] * dy[ 1 ] + dx[ 2 ] * dy[ 2 ] + dx[ 3 ] * dy[ 3 ] + dx[ 0 ] * dy[ 0 ];
 
             // rhs
-            double Rx =
-                dx[ 1 ] * dr[ 1 ] + dx[ 2 ] * dr[ 2 ] + dx[ 3 ] * dr[ 3 ] + dx[ 0 ] * dr[ 0 ];
-            double Ry =
-                dy[ 1 ] * dr[ 1 ] + dy[ 2 ] * dr[ 2 ] + dy[ 3 ] * dr[ 3 ] + dy[ 0 ] * dr[ 0 ];
+            double Rx = dx[ 1 ] * dr[ 1 ] + dx[ 2 ] * dr[ 2 ] + dx[ 3 ] * dr[ 3 ] + dx[ 0 ] * dr[ 0 ];
+            double Ry = dy[ 1 ] * dr[ 1 ] + dy[ 2 ] * dr[ 2 ] + dy[ 3 ] * dr[ 3 ] + dy[ 0 ] * dr[ 0 ];
 
             // determinant
             double Det = N11 * N22 - N12 * N12;
@@ -375,9 +359,8 @@ void get_linear_reconstruction( moab::Interface* mb, moab::EntityHandle set, moa
     return;
 }
 
-void test_linear_reconstruction( moab::Interface* mb, moab::EntityHandle set, moab::Tag& rhoTag,
-                                 moab::Tag& planeTag, moab::Tag& barycenterTag,
-                                 moab::Tag& linearCoefTag )
+void test_linear_reconstruction( moab::Interface* mb, moab::EntityHandle set, moab::Tag& rhoTag, moab::Tag& planeTag,
+                                 moab::Tag& barycenterTag, moab::Tag& linearCoefTag )
 {
     // get all entities of dimension 2
     Range     cells;
@@ -412,9 +395,9 @@ void test_linear_reconstruction( moab::Interface* mb, moab::EntityHandle set, mo
         std::vector< double > y( num_nodes );
         for( int inode = 0; inode < num_nodes; inode++ )
         {
-            double   rad = sqrt( coords[ inode * 3 ] * coords[ inode * 3 ] +
-                               coords[ inode * 3 + 1 ] * coords[ inode * 3 + 1 ] +
-                               coords[ inode * 3 + 2 ] * coords[ inode * 3 + 2 ] );
+            double rad =
+                sqrt( coords[ inode * 3 ] * coords[ inode * 3 ] + coords[ inode * 3 + 1 ] * coords[ inode * 3 + 1 ] +
+                      coords[ inode * 3 + 2 ] * coords[ inode * 3 + 2 ] );
             CartVect xyzcoord( coords[ inode * 3 ] / rad, coords[ inode * 3 + 1 ] / rad,
                                coords[ inode * 3 + 2 ] / rad );
             moab::IntxUtils::gnomonic_projection( xyzcoord, R, plane, x[ inode ], y[ inode ] );
@@ -435,11 +418,11 @@ void test_linear_reconstruction( moab::Interface* mb, moab::EntityHandle set, mo
             double r2 = sqrt( 1 + x[ inode2 ] * x[ inode2 ] + y[ inode2 ] * y[ inode2 ] );
             double hx = x[ inode2 ] - x[ inode ];
 
-            area += hx *
-                    ( y[ inode ] / ( r1 * ( 1 + x[ inode ] * x[ inode ] ) ) +
-                      4.0 * ymid / ( rm * ( 1 + xmid * xmid ) ) +
-                      y[ inode2 ] / ( r2 * ( 1 + x[ inode2 ] * x[ inode2 ] ) ) ) /
-                    6.0;
+            area +=
+                hx *
+                ( y[ inode ] / ( r1 * ( 1 + x[ inode ] * x[ inode ] ) ) + 4.0 * ymid / ( rm * ( 1 + xmid * xmid ) ) +
+                  y[ inode2 ] / ( r2 * ( 1 + x[ inode2 ] * x[ inode2 ] ) ) ) /
+                6.0;
 
             int_x += hx *
                      ( x[ inode ] * y[ inode ] / ( r1 * ( 1 + x[ inode ] * x[ inode ] ) ) +
@@ -468,20 +451,17 @@ void test_linear_reconstruction( moab::Interface* mb, moab::EntityHandle set, mo
         rval = mb->tag_get_data( rhoTag, &icell, 1, &cell_rho );CHECK_ERR( rval );
 
         // ave rho = \int rho^h(x,y) dV / area = (\int (Ax + By + C) dV) / area
-        double rho_test1 =
-            ( rho_coefs[ 0 ] * int_x + rho_coefs[ 1 ] * int_y + rho_coefs[ 2 ] * area ) / area;
+        double rho_test1 = ( rho_coefs[ 0 ] * int_x + rho_coefs[ 1 ] * int_y + rho_coefs[ 2 ] * area ) / area;
 
         // ave rho = A*bary_x + B*bary_y + C
         double rho_test2 = rho_coefs[ 0 ] * bary_x + rho_coefs[ 1 ] * bary_y + rho_coefs[ 2 ];
 
-        std::cout << cell_rho << "  " << rho_test1 << "  " << rho_test2 << "  "
-                  << cell_rho - rho_test1 << "\n";
+        std::cout << cell_rho << "  " << rho_test1 << "  " << rho_test2 << "  " << cell_rho - rho_test1 << "\n";
     }
     return;
 }
 
-int reverse_gnomonic_projection_test( const double& c1, const double& c2, double R, int plane,
-                                      CartVect& pos )
+int reverse_gnomonic_projection_test( const double& c1, const double& c2, double R, int plane, CartVect& pos )
 {
 
     double x = c1;
@@ -624,9 +604,8 @@ void decide_gnomonic_plane_test( const CartVect& pos, int& plane )
     return;
 }
 
-moab::ErrorCode add_field_value( moab::Interface* mb, moab::EntityHandle euler_set, int /*rank*/,
-                                 moab::Tag& tagTracer, moab::Tag& tagElem, moab::Tag& tagArea,
-                                 int field_type )
+moab::ErrorCode add_field_value( moab::Interface* mb, moab::EntityHandle euler_set, int /*rank*/, moab::Tag& tagTracer,
+                                 moab::Tag& tagElem, moab::Tag& tagArea, int field_type )
 {
 
     /*
@@ -707,8 +686,7 @@ moab::ErrorCode add_field_value( moab::Interface* mb, moab::EntityHandle euler_s
 
             moab::IntxUtils::SphereCoords sphCoord = moab::IntxUtils::cart_to_spherical( posi );
 
-            ptr_DP[ 0 ] =
-                IntxUtilsCSLAM::slotted_cylinder_field( sphCoord.lon, sphCoord.lat, params );
+            ptr_DP[ 0 ] = IntxUtilsCSLAM::slotted_cylinder_field( sphCoord.lon, sphCoord.lat, params );
             ;
 
             ptr_DP++;  // increment to the next node

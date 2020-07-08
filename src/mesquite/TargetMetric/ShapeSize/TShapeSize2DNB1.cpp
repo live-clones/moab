@@ -68,8 +68,8 @@ bool TShapeSize2DNB1::evaluate( const MsqMatrix< 2, 2 >& T, double& result, MsqE
     return true;
 }
 
-bool TShapeSize2DNB1::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& result,
-                                          MsqMatrix< 2, 2 >& deriv_wrt_T, MsqError& /*err*/ )
+bool TShapeSize2DNB1::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& result, MsqMatrix< 2, 2 >& deriv_wrt_T,
+                                          MsqError& /*err*/ )
 {
     double frob_sqr = sqr_Frobenius( T );
     double psi = sqrt( frob_sqr + 2.0 * det( T ) );
@@ -94,16 +94,14 @@ bool TShapeSize2DNB1::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& re
     }
     else
     {
-        std::cout << "Warning: Division by zero avoided in TShapeSize2DNB2::evaluate_with_grad()"
-                  << std::endl;
+        std::cout << "Warning: Division by zero avoided in TShapeSize2DNB2::evaluate_with_grad()" << std::endl;
     }
 
     return true;
 }
 
-bool TShapeSize2DNB1::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& result,
-                                          MsqMatrix< 2, 2 >& deriv_wrt_T,
-                                          MsqMatrix< 2, 2 >  second[ 3 ], MsqError& /*err*/ )
+bool TShapeSize2DNB1::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& result, MsqMatrix< 2, 2 >& deriv_wrt_T,
+                                          MsqMatrix< 2, 2 > second[ 3 ], MsqError& /*err*/ )
 {
     double frob_sqr = sqr_Frobenius( T );
     double psi = sqrt( frob_sqr + 2.0 * det( T ) );
@@ -128,8 +126,7 @@ bool TShapeSize2DNB1::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& re
     }
     else
     {
-        std::cout << "Warning: Division by zero avoided in TShapeSize2DNB2::evaluate_with_hess()"
-                  << std::endl;
+        std::cout << "Warning: Division by zero avoided in TShapeSize2DNB2::evaluate_with_hess()" << std::endl;
     }
 
     set_scaled_2nd_deriv_wrt_psi( second, -2.0, psi, T );

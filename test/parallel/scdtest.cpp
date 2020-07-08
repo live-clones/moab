@@ -205,8 +205,7 @@ void resolve_and_exchange( )
 
     // Set up partition sets. This is where MOAB is actually told what
     // entities each process owns:
-    error( mbint->get_entities_by_type_and_tag( 0, MBENTITYSET, &tag, NULL, 1,
-                                                mbpc->partition_sets( ) ) );
+    error( mbint->get_entities_by_type_and_tag( 0, MBENTITYSET, &tag, NULL, 1, mbpc->partition_sets( ) ) );
 
     // Finally, determine which entites are shared and exchange the
     // ghosted entities:

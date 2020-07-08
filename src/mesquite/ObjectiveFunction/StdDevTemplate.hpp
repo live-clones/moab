@@ -53,8 +53,7 @@ class StdDevTemplate : public VarianceTemplate
     virtual ~StdDevTemplate( ) {}
 
     MESQUITE_EXPORT
-    virtual bool evaluate( EvalType type, PatchData& pd, double& value_out, bool free,
-                           MsqError& err );
+    virtual bool evaluate( EvalType type, PatchData& pd, double& value_out, bool free, MsqError& err );
 
     MESQUITE_EXPORT
     virtual bool evaluate_with_gradient( EvalType type, PatchData& pd, double& value_out,
@@ -63,8 +62,7 @@ class StdDevTemplate : public VarianceTemplate
     MESQUITE_EXPORT
     virtual bool evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd, double& value_out,
                                                  std::vector< Vector3D >&    grad_out,
-                                                 std::vector< SymMatrix3D >& hess_diag_out,
-                                                 MsqError&                   err );
+                                                 std::vector< SymMatrix3D >& hess_diag_out, MsqError& err );
 
     MESQUITE_EXPORT
     virtual ObjectiveFunction* clone( ) const;

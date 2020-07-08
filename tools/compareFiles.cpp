@@ -65,8 +65,8 @@ int main( int argc, char* argv[] )
     Range cells;
     rval = mb->get_entities_by_dimension( 0, 2, cells );MB_CHK_SET_ERR( rval, "can't get cells" );
 
-    std::cout << inputfile1 << " has " << nodes.size( ) << " vertices " << edges.size( )
-              << " edges " << cells.size( ) << " cells\n";
+    std::cout << inputfile1 << " has " << nodes.size( ) << " vertices " << edges.size( ) << " edges " << cells.size( )
+              << " cells\n";
 
     // construct maps between global id and handles
     std::map< int, EntityHandle > vGidHandle;
@@ -108,8 +108,8 @@ int main( int argc, char* argv[] )
     Range cells2;
     rval = mb2->get_entities_by_dimension( 0, 2, cells2 );MB_CHK_SET_ERR( rval, "can't get cells2" );
 
-    std::cout << inputfile2 << " has " << nodes2.size( ) << " vertices " << edges2.size( )
-              << " edges " << cells2.size( ) << " cells\n";
+    std::cout << inputfile2 << " has " << nodes2.size( ) << " vertices " << edges2.size( ) << " edges "
+              << cells2.size( ) << " cells\n";
 
     // construct maps between global id and handles
     std::map< int, EntityHandle > vGidHandle2;
@@ -170,12 +170,12 @@ int main( int argc, char* argv[] )
     std::string new_tag_name = tag_name + "_2";
     Tag         newTag, newTagDiff;
     double      def_val = -1000;
-    rval = mb->tag_get_handle( new_tag_name.c_str( ), 1, MB_TYPE_DOUBLE, newTag,
-                               MB_TAG_CREAT | MB_TAG_DENSE, &def_val );MB_CHK_SET_ERR( rval, "can't define new tag" );
+    rval =
+        mb->tag_get_handle( new_tag_name.c_str( ), 1, MB_TYPE_DOUBLE, newTag, MB_TAG_CREAT | MB_TAG_DENSE, &def_val );MB_CHK_SET_ERR( rval, "can't define new tag" );
 
     std::string tag_name_diff = tag_name + "_diff";
-    rval = mb->tag_get_handle( tag_name_diff.c_str( ), 1, MB_TYPE_DOUBLE, newTagDiff,
-                               MB_TAG_CREAT | MB_TAG_DENSE, &def_val );MB_CHK_SET_ERR( rval, "can't define new tag diff" );
+    rval = mb->tag_get_handle( tag_name_diff.c_str( ), 1, MB_TYPE_DOUBLE, newTagDiff, MB_TAG_CREAT | MB_TAG_DENSE,
+                               &def_val );MB_CHK_SET_ERR( rval, "can't define new tag diff" );
     i = 0;
     for( Range::iterator c2it = cells2.begin( ); c2it != cells2.end( ); c2it++ )
     {

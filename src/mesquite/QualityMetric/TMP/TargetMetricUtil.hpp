@@ -59,25 +59,23 @@ class Matrix3D;
  *\param RZ   Output: Product of R and Z needed to calculate the 2D
  *            element matrix.
  */
-void surface_to_2d( const MsqMatrix< 3, 2 >& A, const MsqMatrix< 3, 2 >& W_32,
-                    MsqMatrix< 2, 2 >& W_22, MsqMatrix< 3, 2 >& RZ );
+void surface_to_2d( const MsqMatrix< 3, 2 >& A, const MsqMatrix< 3, 2 >& W_32, MsqMatrix< 2, 2 >& W_22,
+                    MsqMatrix< 3, 2 >& RZ );
 /*
 void surface_to_2d( const MsqMatrix<3,2>& A_in,
                     const MsqMatrix<3,2>& W_in,
                     MsqMatrix<2,2>& A_out,
                     MsqMatrix<2,2>& W_out );
 */
-void get_sample_pt_evaluations( PatchData& pd, std::vector< size_t >& handles, bool free,
-                                MsqError& err );
+void get_sample_pt_evaluations( PatchData& pd, std::vector< size_t >& handles, bool free, MsqError& err );
 
-void get_elem_sample_points( PatchData& pd, size_t elem, std::vector< size_t >& handles,
-                             MsqError& err );
+void get_elem_sample_points( PatchData& pd, size_t elem, std::vector< size_t >& handles, MsqError& err );
 
 /**\brief Calculate gradient from derivatives of mapping function terms
  *        and derivatives of target metric. */
 template< int DIM >
-inline void gradient( size_t num_free_verts, const MsqVector< DIM >* dNdxi,
-                      const MsqMatrix< 3, DIM >& dmdA, std::vector< Vector3D >& grad )
+inline void gradient( size_t num_free_verts, const MsqVector< DIM >* dNdxi, const MsqMatrix< 3, DIM >& dmdA,
+                      std::vector< Vector3D >& grad )
 {
     grad.clear( );
     grad.resize( num_free_verts, Vector3D( 0, 0, 0 ) );
@@ -88,8 +86,8 @@ inline void gradient( size_t num_free_verts, const MsqVector< DIM >* dNdxi,
 /**\brief Calculate Hessian from derivatives of mapping function terms
  *        and derivatives of target metric. */
 template< int DIM, typename MAT >
-inline void hessian( size_t num_free_verts, const MsqVector< DIM >* dNdxi,
-                     const MsqMatrix< DIM, DIM >* d2mdA2, MAT* hess )
+inline void hessian( size_t num_free_verts, const MsqVector< DIM >* dNdxi, const MsqMatrix< DIM, DIM >* d2mdA2,
+                     MAT* hess )
 {
     MsqMatrix< 1, DIM > tmp[ DIM ][ DIM ];
     size_t              h = 0;  // index of current Hessian block
@@ -170,8 +168,8 @@ inline void hessian( size_t num_free_verts, const MsqVector< DIM >* dNdxi,
 /**\brief Calculate Hessian from derivatives of mapping function terms
  *        and derivatives of target metric. */
 template< int DIM >
-inline void hessian_diagonal( size_t num_free_verts, const MsqVector< DIM >* dNdxi,
-                              const MsqMatrix< DIM, DIM >* d2mdA2, SymMatrix3D* diagonal )
+inline void hessian_diagonal( size_t num_free_verts, const MsqVector< DIM >* dNdxi, const MsqMatrix< DIM, DIM >* d2mdA2,
+                              SymMatrix3D* diagonal )
 {
     for( size_t i = 0; i < num_free_verts; ++i )
     {
@@ -196,11 +194,10 @@ template< int R, int C > inline void write_vect( char n, const MsqMatrix< R, C >
 }
 
 template< int D >
-inline void print_info( size_t elem, Sample sample, const MsqMatrix< 3, D >& A,
-                        const MsqMatrix< 3, D >& W, const MsqMatrix< D, D >& T )
+inline void print_info( size_t elem, Sample sample, const MsqMatrix< 3, D >& A, const MsqMatrix< 3, D >& W,
+                        const MsqMatrix< D, D >& T )
 {
-    std::cout << "Elem " << elem << " Dim " << sample.dimension << " Num " << sample.number << " :"
-              << std::endl;
+    std::cout << "Elem " << elem << " Dim " << sample.dimension << " Num " << sample.number << " :" << std::endl;
     write_vect< 3, D >( 'A', A );
     write_vect< 3, D >( 'W', W );
     write_vect< D, D >( 'T', T );

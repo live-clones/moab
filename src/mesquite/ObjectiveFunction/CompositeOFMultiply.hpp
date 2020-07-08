@@ -62,17 +62,14 @@ class CompositeOFMultiply : public ObjectiveFunction
     //! Do any preliminary global initialization, consistency checking,
     //! etc.
     MESQUITE_EXPORT
-    virtual void initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
-                                   MsqError& err );
+    virtual void initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings, MsqError& err );
 
     MESQUITE_EXPORT
-    virtual bool initialize_block_coordinate_descent( MeshDomainAssoc* mesh_and_domain,
-                                                      const Settings* settings, PatchSet* user_set,
-                                                      MsqError& err );
+    virtual bool initialize_block_coordinate_descent( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
+                                                      PatchSet* user_set, MsqError& err );
 
     MESQUITE_EXPORT
-    virtual bool evaluate( EvalType type, PatchData& pd, double& value_out, bool free,
-                           MsqError& err );
+    virtual bool evaluate( EvalType type, PatchData& pd, double& value_out, bool free, MsqError& err );
 
     MESQUITE_EXPORT
     virtual bool evaluate_with_gradient( EvalType type, PatchData& pd, double& value_out,
@@ -81,13 +78,11 @@ class CompositeOFMultiply : public ObjectiveFunction
     MESQUITE_EXPORT
     virtual bool evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd, double& value_out,
                                                  std::vector< Vector3D >&    grad_out,
-                                                 std::vector< SymMatrix3D >& hess_diag_out,
-                                                 MsqError&                   err );
+                                                 std::vector< SymMatrix3D >& hess_diag_out, MsqError& err );
 
     MESQUITE_EXPORT
     virtual bool evaluate_with_Hessian( EvalType type, PatchData& pd, double& value_out,
-                                        std::vector< Vector3D >& grad_out, MsqHessian& Hessian_out,
-                                        MsqError& err );
+                                        std::vector< Vector3D >& grad_out, MsqHessian& Hessian_out, MsqError& err );
 
     MESQUITE_EXPORT
     virtual ObjectiveFunction* clone( ) const;

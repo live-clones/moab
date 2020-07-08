@@ -47,8 +47,7 @@ std::string TPower2::get_name( ) const
 
 TPower2::~TPower2( ) {}
 
-template< unsigned DIM >
-inline bool TPower2::eval( const MsqMatrix< DIM, DIM >& T, double& result, MsqError& err )
+template< unsigned DIM > inline bool TPower2::eval( const MsqMatrix< DIM, DIM >& T, double& result, MsqError& err )
 {
     bool rval = mMetric->evaluate( T, result, err );
     MSQ_ERRZERO( err );
@@ -57,8 +56,8 @@ inline bool TPower2::eval( const MsqMatrix< DIM, DIM >& T, double& result, MsqEr
 }
 
 template< unsigned DIM >
-inline bool TPower2::grad( const MsqMatrix< DIM, DIM >& T, double& result,
-                           MsqMatrix< DIM, DIM >& deriv_wrt_T, MsqError& err )
+inline bool TPower2::grad( const MsqMatrix< DIM, DIM >& T, double& result, MsqMatrix< DIM, DIM >& deriv_wrt_T,
+                           MsqError& err )
 {
     bool rval = mMetric->evaluate_with_grad( T, result, deriv_wrt_T, err );
     MSQ_ERRZERO( err );
@@ -68,9 +67,8 @@ inline bool TPower2::grad( const MsqMatrix< DIM, DIM >& T, double& result,
 }
 
 template< unsigned DIM >
-inline bool TPower2::hess( const MsqMatrix< DIM, DIM >& T, double& result,
-                           MsqMatrix< DIM, DIM >& deriv_wrt_T, MsqMatrix< DIM, DIM >* second_wrt_T,
-                           MsqError& err )
+inline bool TPower2::hess( const MsqMatrix< DIM, DIM >& T, double& result, MsqMatrix< DIM, DIM >& deriv_wrt_T,
+                           MsqMatrix< DIM, DIM >* second_wrt_T, MsqError& err )
 {
     bool rval = mMetric->evaluate_with_hess( T, result, deriv_wrt_T, second_wrt_T, err );  //
     MSQ_ERRZERO( err );

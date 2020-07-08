@@ -54,8 +54,7 @@ template< unsigned DIM > static inline bool eval( const MsqMatrix< DIM, DIM >& T
 }
 
 template< unsigned DIM >
-static inline bool grad( const MsqMatrix< DIM, DIM >& T, double& result,
-                         MsqMatrix< DIM, DIM >& deriv )
+static inline bool grad( const MsqMatrix< DIM, DIM >& T, double& result, MsqMatrix< DIM, DIM >& deriv )
 {
     deriv = T;
     pluseq_scaled_I( deriv, -1 );
@@ -65,8 +64,8 @@ static inline bool grad( const MsqMatrix< DIM, DIM >& T, double& result,
 }
 
 template< unsigned DIM >
-static inline bool hess( const MsqMatrix< DIM, DIM >& T, double& result,
-                         MsqMatrix< DIM, DIM >& deriv, MsqMatrix< DIM, DIM >* second )
+static inline bool hess( const MsqMatrix< DIM, DIM >& T, double& result, MsqMatrix< DIM, DIM >& deriv,
+                         MsqMatrix< DIM, DIM >* second )
 {
     deriv = T;
     pluseq_scaled_I( deriv, -1 );

@@ -40,9 +40,8 @@ class Range;
 class OrientedBox
 {
   private:
-    void order_axes_by_length(
-        double ax1_len, double ax2_len,
-        double ax3_len );  //!< orders the box axes by the given lengths for each axis
+    void order_axes_by_length( double ax1_len, double ax2_len,
+                               double ax3_len );  //!< orders the box axes by the given lengths for each axis
 
   public:
     CartVect center;  //!< Box center
@@ -61,16 +60,14 @@ class OrientedBox
 
     inline double inner_radius( ) const;  //!< radius of inscribed sphere
     inline double outer_radius( ) const;  //!< radius of circumscribed sphere
-    inline double outer_radius_squared(
-        const double reps ) const;  //!< square of (radius+at least epsilon) of circumsphere
-    inline double inner_radius_squared(
-        const double reps ) const;  //!< square of (radius-epsilon) of inscribed sphere
-    inline double   volume( ) const;  //!< volume of box
+    inline double
+                  outer_radius_squared( const double reps ) const;  //!< square of (radius+at least epsilon) of circumsphere
+    inline double inner_radius_squared( const double reps ) const;  //!< square of (radius-epsilon) of inscribed sphere
+    inline double volume( ) const;  //!< volume of box
     inline CartVect dimensions( ) const;  //!< number of dimensions for which box is not flat
     inline double   area( ) const;  //!< largest side area
     inline CartVect axis( int index ) const;  //!< get unit vector in direction of axis
-    inline CartVect scaled_axis(
-        int index ) const;  //!< get vector in direction of axis, scaled to its true length
+    inline CartVect scaled_axis( int index ) const;  //!< get vector in direction of axis, scaled to its true length
 
     /** Test if point is contained in box */
     bool contained( const CartVect& point, double tolerance ) const;
@@ -91,12 +88,10 @@ class OrientedBox
     static ErrorCode tag_handle( Tag& handle_out, Interface* instance, const char* name );
 
     /**\brief Calculate an oriented box from a set of vertices */
-    static ErrorCode compute_from_vertices( OrientedBox& result, Interface* instance,
-                                            const Range& vertices );
+    static ErrorCode compute_from_vertices( OrientedBox& result, Interface* instance, const Range& vertices );
 
     /**\brief Calculate an oriented box from a set of 2D elements */
-    static ErrorCode compute_from_2d_cells( OrientedBox& result, Interface* instance,
-                                            const Range& elements );
+    static ErrorCode compute_from_2d_cells( OrientedBox& result, Interface* instance, const Range& elements );
 
     /** Structure to hold temporary accumulated triangle data for
      *  calculating box orientation.  See box_from_covariance_data
@@ -106,10 +101,7 @@ class OrientedBox
     struct CovarienceData
     {
         CovarienceData( ) : area( 0.0 ) {}
-        CovarienceData( const Matrix3& m, const CartVect& c, double a )
-            : matrix( m ), center( c ), area( a )
-        {
-        }
+        CovarienceData( const Matrix3& m, const CartVect& c, double a ) : matrix( m ), center( c ), area( a ) {}
         Matrix3  matrix;  //!< Running sum for covariance matrix
         CartVect center;  //!< Sum of triangle centroids weighted by 2*triangle area
         double   area;  //!< 2x the sum of the triangle areas
@@ -123,9 +115,8 @@ class OrientedBox
      *  the list  of vertices the box is to bound.
      */
     static ErrorCode compute_from_covariance_data( OrientedBox& result, Interface* moab_instance,
-                                                   const CovarienceData* orient_array,
-                                                   unsigned              orient_array_length,
-                                                   const Range&          vertices );
+                                                   const CovarienceData* orient_array, unsigned orient_array_length,
+                                                   const Range& vertices );
 
     /** Test for intersection of a ray (or line segment) with this box.
      *  Ray length limits are used to optimize Monte Carlo particle tracking.
@@ -156,8 +147,7 @@ class OrientedBox
      *  the list of points the box is to bound.
      */
     static ErrorCode compute_from_covariance_data( OrientedBox& result, Interface* moab_instance,
-                                                   CovarienceData& orientation_data,
-                                                   const Range&    vertices );
+                                                   CovarienceData& orientation_data, const Range& vertices );
 };
 
 std::ostream& operator<<( std::ostream&, const OrientedBox& );
@@ -223,8 +213,7 @@ CartVect OrientedBox::dimensions( ) const
 #if MB_ORIENTED_BOX_UNIT_VECTORS
     return 2.0 * length;
 #else
-    return 2.0 *
-           CartVect( axes.col( 0 ).length( ), axes.col( 1 ).length( ), axes.col( 2 ).length( ) );
+    return 2.0 * CartVect( axes.col( 0 ).length( ), axes.col( 1 ).length( ), axes.col( 2 ).length( ) );
 #endif
 }
 

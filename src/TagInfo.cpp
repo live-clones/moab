@@ -8,10 +8,9 @@
 namespace moab
 {
 
-TagInfo::TagInfo( const char* name, int size, DataType type, const void* default_value,
-                  int default_value_size )
-    : mDefaultValue( NULL ), mMeshValue( NULL ), mDefaultValueSize( default_value_size ),
-      mMeshValueSize( 0 ), mDataSize( size ), dataType( type )
+TagInfo::TagInfo( const char* name, int size, DataType type, const void* default_value, int default_value_size )
+    : mDefaultValue( NULL ), mMeshValue( NULL ), mDefaultValueSize( default_value_size ), mMeshValueSize( 0 ),
+      mDataSize( size ), dataType( type )
 {
     if( default_value )
     {
@@ -70,14 +69,12 @@ bool TagInfo::check_valid_sizes( const int* sizes, int num_sizes ) const
     return ( 0 == sum );
 }
 
-ErrorCode TagInfo::validate_lengths( Error* /* error_handler */, const int* lengths,
-                                     size_t num_lengths ) const
+ErrorCode TagInfo::validate_lengths( Error* /* error_handler */, const int* lengths, size_t num_lengths ) const
 {
     int bits = 0;
     if( variable_length( ) )
     {
-        if( !lengths )
-        { MB_SET_ERR( MB_VARIABLE_DATA_LENGTH, "No size specified for variable-length tag" ); }
+        if( !lengths ) { MB_SET_ERR( MB_VARIABLE_DATA_LENGTH, "No size specified for variable-length tag" ); }
         const unsigned type_size = size_from_data_type( get_data_type( ) );
         if( type_size == 1 ) return MB_SUCCESS;
         for( size_t i = 0; i < num_lengths; ++i )

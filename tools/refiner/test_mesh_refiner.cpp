@@ -62,17 +62,16 @@ int TestMeshRefiner( int argc, char* argv[] )
 #ifdef MOAB_HAVE_MPI
     if( nprocs > 1 )
     {
-        parallel_options
-            << "PARALLEL=READ_DELETE"
-            << ";"  // NB: You can use BCAST_DELETE or READ_DELETE here.
-            //<< "PARALLEL=BCAST_DELETE" << ";" // NB: You can use BCAST_DELETE or READ_DELETE here.
-            << "PARTITION=MATERIAL_SET"
-            << ";"
-            << "PARTITION_DISTRIBUTE"
-            << ";"
-            << "PARALLEL_RESOLVE_SHARED_ENTS"
-            << ";"
-            << "CPUTIME";
+        parallel_options << "PARALLEL=READ_DELETE"
+                         << ";"  // NB: You can use BCAST_DELETE or READ_DELETE here.
+                         //<< "PARALLEL=BCAST_DELETE" << ";" // NB: You can use BCAST_DELETE or READ_DELETE here.
+                         << "PARTITION=MATERIAL_SET"
+                         << ";"
+                         << "PARTITION_DISTRIBUTE"
+                         << ";"
+                         << "PARALLEL_RESOLVE_SHARED_ENTS"
+                         << ";"
+                         << "CPUTIME";
     }
 #endif
     ErrorCode rval = imesh->create_meshset( MESHSET_SET, set_handle );
@@ -123,8 +122,7 @@ int TestMeshRefiner( int argc, char* argv[] )
     gettimeofday( &tic, 0 );
     mref->refine( ents_to_refine );
     gettimeofday( &toc, 0 );
-    std::cout << "\nTime: "
-              << ( ( toc.tv_sec - tic.tv_sec ) * 1000 + ( toc.tv_usec - tic.tv_usec ) / 1000. )
+    std::cout << "\nTime: " << ( ( toc.tv_sec - tic.tv_sec ) * 1000 + ( toc.tv_usec - tic.tv_usec ) / 1000. )
               << " ms\n\n";
 #endif
 

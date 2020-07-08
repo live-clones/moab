@@ -52,8 +52,7 @@ void PMeanPTemplate::clear( )
     savePowSum = 0;
 }
 
-double PMeanPTemplate::get_value( double power_sum, size_t count, EvalType type,
-                                  size_t& global_count )
+double PMeanPTemplate::get_value( double power_sum, size_t count, EvalType type, size_t& global_count )
 {
     double result = 0;
     switch( type )
@@ -97,8 +96,7 @@ double PMeanPTemplate::get_value( double power_sum, size_t count, EvalType type,
     return global_count ? result / global_count : 0.0;
 }
 
-bool PMeanPTemplate::evaluate( EvalType type, PatchData& pd, double& value_out, bool free,
-                               MsqError& err )
+bool PMeanPTemplate::evaluate( EvalType type, PatchData& pd, double& value_out, bool free, MsqError& err )
 {
     QualityMetric* qm = get_quality_metric( );
     if( type == ObjectiveFunction::ACCUMULATE )
@@ -120,8 +118,7 @@ bool PMeanPTemplate::evaluate( EvalType type, PatchData& pd, double& value_out, 
 
     // get overall OF value, update member data, etc.
     size_t global_count = 0;
-    value_out =
-        qm->get_negate_flag( ) * get_value( working_sum, qmHandles.size( ), type, global_count );
+    value_out = qm->get_negate_flag( ) * get_value( working_sum, qmHandles.size( ), type, global_count );
     return true;
 }
 
@@ -160,8 +157,7 @@ bool PMeanPTemplate::evaluate_with_gradient( EvalType type, PatchData& pd, doubl
 
     // get overall OF value, update member data, etc.
     size_t global_count = 0;
-    value_out =
-        qm->get_negate_flag( ) * get_value( working_sum, qmHandles.size( ), type, global_count );
+    value_out = qm->get_negate_flag( ) * get_value( working_sum, qmHandles.size( ), type, global_count );
     if( global_count )
     {
         const double                      inv_n = 1.0 / global_count;
@@ -172,11 +168,9 @@ bool PMeanPTemplate::evaluate_with_gradient( EvalType type, PatchData& pd, doubl
     return true;
 }
 
-bool PMeanPTemplate::evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd,
-                                                     double&                     value_out,
+bool PMeanPTemplate::evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd, double& value_out,
                                                      std::vector< Vector3D >&    grad_out,
-                                                     std::vector< SymMatrix3D >& hess_diag_out,
-                                                     MsqError&                   err )
+                                                     std::vector< SymMatrix3D >& hess_diag_out, MsqError& err )
 {
     QualityMetric* qm = get_quality_metric( );
     qm->get_evaluations( pd, qmHandles, OF_FREE_EVALS_ONLY, err );
@@ -197,8 +191,7 @@ bool PMeanPTemplate::evaluate_with_Hessian_diagonal( EvalType type, PatchData& p
     const double                          f2 = f1 * ( mPower.value( ) - 1 );
     for( i = qmHandles.begin( ); i != qmHandles.end( ); ++i )
     {
-        bool result =
-            qm->evaluate_with_Hessian_diagonal( pd, *i, value, mIndices, mGradient, mDiag, err );
+        bool result = qm->evaluate_with_Hessian_diagonal( pd, *i, value, mIndices, mGradient, mDiag, err );
         if( MSQ_CHKERR( err ) || !result ) return false;
         if( fabs( value ) < DBL_EPSILON ) continue;
 
@@ -236,8 +229,7 @@ bool PMeanPTemplate::evaluate_with_Hessian_diagonal( EvalType type, PatchData& p
 
     // get overall OF value, update member data, etc.
     size_t global_count = 0;
-    value_out =
-        qm->get_negate_flag( ) * get_value( working_sum, qmHandles.size( ), type, global_count );
+    value_out = qm->get_negate_flag( ) * get_value( working_sum, qmHandles.size( ), type, global_count );
     if( global_count )
     {
         const double inv_n = 1.0 / global_count;
@@ -251,8 +243,7 @@ bool PMeanPTemplate::evaluate_with_Hessian_diagonal( EvalType type, PatchData& p
 }
 
 bool PMeanPTemplate::evaluate_with_Hessian( EvalType type, PatchData& pd, double& value_out,
-                                            std::vector< Vector3D >& grad_out,
-                                            MsqHessian& Hessian_out, MsqError& err )
+                                            std::vector< Vector3D >& grad_out, MsqHessian& Hessian_out, MsqError& err )
 {
     QualityMetric* qm = get_quality_metric( );
     qm->get_evaluations( pd, qmHandles, OF_FREE_EVALS_ONLY, err );
@@ -272,8 +263,7 @@ bool PMeanPTemplate::evaluate_with_Hessian( EvalType type, PatchData& pd, double
     Matrix3D                              m;
     for( i = qmHandles.begin( ); i != qmHandles.end( ); ++i )
     {
-        bool result =
-            qm->evaluate_with_Hessian( pd, *i, value, mIndices, mGradient, mHessian, err );
+        bool result = qm->evaluate_with_Hessian( pd, *i, value, mIndices, mGradient, mHessian, err );
         if( MSQ_CHKERR( err ) || !result ) return false;
         if( fabs( value ) < DBL_EPSILON ) continue;
 
@@ -325,8 +315,7 @@ bool PMeanPTemplate::evaluate_with_Hessian( EvalType type, PatchData& pd, double
 
     // get overall OF value, update member data, etc.
     size_t global_count = 0;
-    value_out =
-        qm->get_negate_flag( ) * get_value( working_sum, qmHandles.size( ), type, global_count );
+    value_out = qm->get_negate_flag( ) * get_value( working_sum, qmHandles.size( ), type, global_count );
     if( global_count )
     {
         const double                      inv_n = 1.0 / global_count;

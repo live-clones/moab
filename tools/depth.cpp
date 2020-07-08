@@ -91,14 +91,12 @@ int main( int argc, char* argv[] )
     int  init_val = -1;
     Tag  tag;
     bool created;
-    rval = mb.tag_get_handle( tagname, 1, MB_TYPE_INTEGER, tag, MB_TAG_DENSE | MB_TAG_CREAT,
-                              &init_val, &created );
+    rval = mb.tag_get_handle( tagname, 1, MB_TYPE_INTEGER, tag, MB_TAG_DENSE | MB_TAG_CREAT, &init_val, &created );
     if( !created )
     {
         rval = mb.tag_delete( tag );
         check( rval );
-        rval = mb.tag_get_handle( tagname, 1, MB_TYPE_INTEGER, tag, MB_TAG_DENSE | MB_TAG_CREAT,
-                                  &init_val, &created );
+        rval = mb.tag_get_handle( tagname, 1, MB_TYPE_INTEGER, tag, MB_TAG_DENSE | MB_TAG_CREAT, &init_val, &created );
         check( rval );
     }
 

@@ -54,11 +54,10 @@ class ReaderWriterSet
      *\param extensions   A null-terminated list of file extensions
      *\param name         File format identifier string.
      */
-    ErrorCode register_factory( reader_factory_t reader_fact, writer_factory_t writer_fact,
-                                const char* description, const char* const* extensions,
-                                const char* name );
-    ErrorCode register_factory( reader_factory_t reader_fact, writer_factory_t writer_fact,
-                                const char* description, const char* extension, const char* name );
+    ErrorCode register_factory( reader_factory_t reader_fact, writer_factory_t writer_fact, const char* description,
+                                const char* const* extensions, const char* name );
+    ErrorCode register_factory( reader_factory_t reader_fact, writer_factory_t writer_fact, const char* description,
+                                const char* extension, const char* name );
 
     /**
      * Create a reader object for the passed file name
@@ -101,8 +100,8 @@ class ReaderWriterSet
         friend class ReaderWriterSet;
 
       public:
-        Handler( reader_factory_t read_f, writer_factory_t write_f, const char* name,
-                 const char* desc, const char* const* ext, int num_ext );
+        Handler( reader_factory_t read_f, writer_factory_t write_f, const char* name, const char* desc,
+                 const char* const* ext, int num_ext );
 
         inline const std::string& name( ) const
         {

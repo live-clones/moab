@@ -41,10 +41,7 @@
 namespace MBMesquite
 {
 
-LInfTemplate::LInfTemplate( QualityMetric* qualitymetric )
-    : ObjectiveFunctionTemplate( qualitymetric )
-{
-}
+LInfTemplate::LInfTemplate( QualityMetric* qualitymetric ) : ObjectiveFunctionTemplate( qualitymetric ) {}
 
 // Michael:  need to clean up here
 LInfTemplate::~LInfTemplate( ) {}
@@ -56,14 +53,12 @@ ObjectiveFunction* LInfTemplate::clone( ) const
 
 void LInfTemplate::clear( ) {}
 
-bool LInfTemplate::evaluate( EvalType type, PatchData& pd, double& value_out, bool free,
-                             MsqError& err )
+bool LInfTemplate::evaluate( EvalType type, PatchData& pd, double& value_out, bool free, MsqError& err )
 {
     if( type != ObjectiveFunction::CALCULATE )
     {
         MSQ_SETERR( err )
-        ( "LInfTemplate does not support block coodinate descent algoritms",
-          MsqError::INVALID_STATE );
+        ( "LInfTemplate does not support block coodinate descent algoritms", MsqError::INVALID_STATE );
         return false;
     }
 

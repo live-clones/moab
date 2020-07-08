@@ -32,8 +32,8 @@ static void get_corners( CartVect corners[ 8 ] )
     corners[ 7 ] = CartVect( 1, 3, 2 );
 }
 
-const BSPTreePoly::Face* find_face( const BSPTreePoly& poly, const CartVect* coords,
-                                    int num_corners, const int* face_indices = 0 )
+const BSPTreePoly::Face* find_face( const BSPTreePoly& poly, const CartVect* coords, int num_corners,
+                                    const int* face_indices = 0 )
 {
     std::vector< const BSPTreePoly::Face* >::iterator i;
     std::vector< const BSPTreePoly::Face* >           faces;
@@ -56,8 +56,7 @@ const BSPTreePoly::Face* find_face( const BSPTreePoly& poly, const CartVect* coo
         int k;
         for( k = 1; k < num_corners; ++k )
         {
-            int corner =
-                face_indices ? face_indices[ ( j + k ) % num_corners ] : ( j + k ) % num_corners;
+            int corner = face_indices ? face_indices[ ( j + k ) % num_corners ] : ( j + k ) % num_corners;
             if( ( coords[ corner ] - corners[ k ] ).length_squared( ) > 1e-12 ) break;
         }
 

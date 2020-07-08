@@ -146,12 +146,9 @@ class LinearMappingFunctionTest : public CppUnit::TestFixture
 
     typedef void ( *map_func )( double*, double* );
 
-    void do_coeff_test( MappingFunction& mf, unsigned subdim, map_func mf2, unsigned count,
-                        double* xi );
-    void do_deriv_test( MappingFunction2D& mf, unsigned subdim, map_func mf2, unsigned count,
-                        double* xi );
-    void do_deriv_test( MappingFunction3D& mf, unsigned subdim, map_func mf2, unsigned count,
-                        double* xi );
+    void do_coeff_test( MappingFunction& mf, unsigned subdim, map_func mf2, unsigned count, double* xi );
+    void do_deriv_test( MappingFunction2D& mf, unsigned subdim, map_func mf2, unsigned count, double* xi );
+    void do_deriv_test( MappingFunction3D& mf, unsigned subdim, map_func mf2, unsigned count, double* xi );
     void do_ideal_test( MappingFunction2D& mf );
     void do_ideal_test( MappingFunction3D& mf );
 
@@ -834,8 +831,8 @@ static string dtostr( double i )
  *         Actual test imlplementation (common code for many tests)
  *******************************************************************************/
 
-void LinearMappingFunctionTest::do_coeff_test( MappingFunction& mf, unsigned subdim, map_func mf2,
-                                               unsigned count, double* xi )
+void LinearMappingFunctionTest::do_coeff_test( MappingFunction& mf, unsigned subdim, map_func mf2, unsigned count,
+                                               double* xi )
 {
     // make sure it fails if passed a nonlinear element
     MsqError err;
@@ -887,8 +884,8 @@ void LinearMappingFunctionTest::do_coeff_test( MappingFunction& mf, unsigned sub
     }
 }
 
-void LinearMappingFunctionTest::do_deriv_test( MappingFunction2D& mf, unsigned subdim, map_func mf2,
-                                               unsigned count, double* xi )
+void LinearMappingFunctionTest::do_deriv_test( MappingFunction2D& mf, unsigned subdim, map_func mf2, unsigned count,
+                                               double* xi )
 {
     // make sure it fails if passed a nonlinear element
     MsqError       err;
@@ -933,11 +930,9 @@ void LinearMappingFunctionTest::do_deriv_test( MappingFunction2D& mf, unsigned s
                 message.addDetail( string( "Coefficient number: " ) + itostr( j ) );
                 message.addDetail( string( "Xi:             " ) + xi_str );
                 message.addDetail( string( "Axis:           " ) + itostr( k ) );
-                message.addDetail( string( "Expected value: " ) +
-                                   dtostr( comp[ 2 * verts[ j ] + k ] ) );
+                message.addDetail( string( "Expected value: " ) + dtostr( comp[ 2 * verts[ j ] + k ] ) );
                 message.addDetail( string( "Actual value:   " ) + dtostr( derivs[ j ][ k ] ) );
-                ASSERT_MESSAGE( message, fabs( comp[ 2 * verts[ j ] + k ] - derivs[ j ][ k ] ) <
-                                             DBL_EPSILON );
+                ASSERT_MESSAGE( message, fabs( comp[ 2 * verts[ j ] + k ] - derivs[ j ][ k ] ) < DBL_EPSILON );
                 if( fabs( derivs[ j ][ k ] ) > DBL_EPSILON ) all_zero = false;
             }
 
@@ -958,8 +953,7 @@ void LinearMappingFunctionTest::do_deriv_test( MappingFunction2D& mf, unsigned s
                     message.addDetail( string( "Entity:              " ) + itostr( i ) );
                     message.addDetail( string( "Coefficient number:  " ) + itostr( j ) );
                     message.addDetail( string( "Axis:                " ) + itostr( k ) );
-                    message.addDetail( string( "Expected derivative: " ) +
-                                       dtostr( comp[ 2 * j + k ] ) );
+                    message.addDetail( string( "Expected derivative: " ) + dtostr( comp[ 2 * j + k ] ) );
                     ASSERT_MESSAGE( message, fabs( comp[ 2 * j + k ] ) < DBL_EPSILON );
                 }
             }
@@ -967,8 +961,8 @@ void LinearMappingFunctionTest::do_deriv_test( MappingFunction2D& mf, unsigned s
     }
 }
 
-void LinearMappingFunctionTest::do_deriv_test( MappingFunction3D& mf, unsigned subdim, map_func mf2,
-                                               unsigned count, double* xi )
+void LinearMappingFunctionTest::do_deriv_test( MappingFunction3D& mf, unsigned subdim, map_func mf2, unsigned count,
+                                               double* xi )
 {
     // make sure it fails if passed a nonlinear element
     MsqError       err;
@@ -1013,11 +1007,9 @@ void LinearMappingFunctionTest::do_deriv_test( MappingFunction3D& mf, unsigned s
                 message.addDetail( string( "Coefficient number: " ) + itostr( j ) );
                 message.addDetail( string( "Xi:             " ) + xi_str );
                 message.addDetail( string( "Axis:           " ) + itostr( k ) );
-                message.addDetail( string( "Expected value: " ) +
-                                   dtostr( comp[ 3 * verts[ j ] + k ] ) );
+                message.addDetail( string( "Expected value: " ) + dtostr( comp[ 3 * verts[ j ] + k ] ) );
                 message.addDetail( string( "Actual value:   " ) + dtostr( derivs[ j ][ k ] ) );
-                ASSERT_MESSAGE( message, fabs( comp[ 3 * verts[ j ] + k ] - derivs[ j ][ k ] ) <
-                                             DBL_EPSILON );
+                ASSERT_MESSAGE( message, fabs( comp[ 3 * verts[ j ] + k ] - derivs[ j ][ k ] ) < DBL_EPSILON );
                 if( fabs( derivs[ j ][ k ] ) > DBL_EPSILON ) all_zero = false;
             }
 
@@ -1038,8 +1030,7 @@ void LinearMappingFunctionTest::do_deriv_test( MappingFunction3D& mf, unsigned s
                     message.addDetail( string( "Entity:              " ) + itostr( i ) );
                     message.addDetail( string( "Coefficient number:  " ) + itostr( j ) );
                     message.addDetail( string( "Axis:                " ) + itostr( k ) );
-                    message.addDetail( string( "Expected derivative: " ) +
-                                       dtostr( comp[ 3 * j + k ] ) );
+                    message.addDetail( string( "Expected derivative: " ) + dtostr( comp[ 3 * j + k ] ) );
                     ASSERT_MESSAGE( message, fabs( comp[ 3 * j + k ] ) < DBL_EPSILON );
                 }
             }
@@ -1064,8 +1055,8 @@ void LinearMappingFunctionTest::do_ideal_test( MappingFunction2D& mf )
     CPPUNIT_ASSERT( verts );
 
     JacobianCalculator jc;
-    jc.get_Jacobian_2D( &mf, NodeSet( ), Sample( 2, 0 ), verts,
-                        TopologyInfo::corners( mf.element_topology( ) ), W_prime, err );
+    jc.get_Jacobian_2D( &mf, NodeSet( ), Sample( 2, 0 ), verts, TopologyInfo::corners( mf.element_topology( ) ),
+                        W_prime, err );
     ASSERT_NO_ERROR( err );
 
     // for this test that everything is in the xy-plane
@@ -1095,8 +1086,8 @@ void LinearMappingFunctionTest::do_ideal_test( MappingFunction3D& mf )
 
     JacobianCalculator jc;
     MsqMatrix< 3, 3 >  W_exp;
-    jc.get_Jacobian_3D( &mf, NodeSet( ), Sample( 3, 0 ), verts,
-                        TopologyInfo::corners( mf.element_topology( ) ), W_exp, err );
+    jc.get_Jacobian_3D( &mf, NodeSet( ), Sample( 3, 0 ), verts, TopologyInfo::corners( mf.element_topology( ) ), W_exp,
+                        err );
     ASSERT_NO_ERROR( err );
     W_exp /= MBMesquite::cbrt( det( W_exp ) );
 

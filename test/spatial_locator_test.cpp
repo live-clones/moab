@@ -130,8 +130,7 @@ void test_locator( SpatialLocator* sl )
     for( int i = 0; i < npoints; i++ )
     {
         // generate a small number of random point to test
-        double rx = (double)rand( ) * denom, ry = (double)rand( ) * denom,
-               rz = (double)rand( ) * denom;
+        double rx = (double)rand( ) * denom, ry = (double)rand( ) * denom, rz = (double)rand( ) * denom;
         test_pt = box.bMin + CartVect( rx * box_del[ 0 ], ry * box_del[ 1 ], rz * box_del[ 2 ] );
 
         // call spatial locator to locate points

@@ -39,9 +39,8 @@ class ReadDamsel : public ReaderIface
     static ReaderIface* factory( Interface* );
 
     //! Load an NC file
-    ErrorCode load_file( const char* file_name, const EntityHandle* file_set,
-                         const FileOptions& opts, const SubsetList* subset_list = 0,
-                         const Tag* file_id_tag = 0 );
+    ErrorCode load_file( const char* file_name, const EntityHandle* file_set, const FileOptions& opts,
+                         const SubsetList* subset_list = 0, const Tag* file_id_tag = 0 );
 
     //! Constructor
     ReadDamsel( Interface* impl = NULL );
@@ -49,9 +48,8 @@ class ReadDamsel : public ReaderIface
     //! Destructor
     virtual ~ReadDamsel( );
 
-    virtual ErrorCode read_tag_values( const char* file_name, const char* tag_name,
-                                       const FileOptions& opts, std::vector< int >& tag_values_out,
-                                       const SubsetList* subset_list = 0 );
+    virtual ErrorCode read_tag_values( const char* file_name, const char* tag_name, const FileOptions& opts,
+                                       std::vector< int >& tag_values_out, const SubsetList* subset_list = 0 );
 
   private:
     //! Get contents of the container (containing file-side handles) and translate to moab-side
@@ -70,20 +68,18 @@ class ReadDamsel : public ReaderIface
 
     ErrorCode process_ent_info( const damsel_entity_buf_type& einfo );
 
-    ErrorCode process_entity_tags( int count, damsel_container tag_container,
-                                   damsel_container app_cont, Range& these_ents );
+    ErrorCode process_entity_tags( int count, damsel_container tag_container, damsel_container app_cont,
+                                   Range& these_ents );
 
     ErrorCode process_coll_infos( std::vector< damsel_collection_buf_type >& coll_infos );
 
     //! Convert handles in a container into handle pairs, one pair per contiguous sequence of
     //! handles in the container
-    ErrorCode container_to_handle_pairs( damsel_container&             cont,
-                                         std::vector< damsel_handle >& handle_pairs );
+    ErrorCode container_to_handle_pairs( damsel_container& cont, std::vector< damsel_handle >& handle_pairs );
 
     //! Store MOAB handles starting from start_handle, corresponding to store handles in
     //! handle_pairs, into the entity map
-    ErrorCode insert_into_map( std::vector< damsel_handle >& handle_pairs,
-                               EntityHandle                  start_handle );
+    ErrorCode insert_into_map( std::vector< damsel_handle >& handle_pairs, EntityHandle start_handle );
 
     class subrange
     {

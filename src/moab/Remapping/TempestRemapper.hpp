@@ -43,8 +43,7 @@ class TempestRemapper : public Remapper
     TempestRemapper( moab::Interface* mbInt )
         : Remapper( mbInt ),
 #endif
-          meshValidate( false ), constructEdgeMap( false ), m_source_type( DEFAULT ),
-          m_target_type( DEFAULT )
+          meshValidate( false ), constructEdgeMap( false ), m_source_type( DEFAULT ), m_target_type( DEFAULT )
     {
     }
 
@@ -87,8 +86,7 @@ class TempestRemapper : public Remapper
     ///     Load a mesh from disk of given type and store it under the context specified by the
     ///     user.
     /// </summary>
-    moab::ErrorCode LoadMesh( Remapper::IntersectionContext ctx, std::string inputFilename,
-                              TempestMeshType type );
+    moab::ErrorCode LoadMesh( Remapper::IntersectionContext ctx, std::string inputFilename, TempestMeshType type );
 
     /// <summary>
     ///     Construct a source covering mesh such that it completely encompasses the target grid in
@@ -96,9 +94,8 @@ class TempestRemapper : public Remapper
     ///     intersection algorithm can the intersection mesh only locally without any process
     ///     communication.
     /// </summary>
-    moab::ErrorCode ConstructCoveringSet( double tolerance = 1e-8, double radius_src = 1.0,
-                                          double radius_tgt = 1.0, double boxeps = 0.1,
-                                          bool regional_mesh = false );
+    moab::ErrorCode ConstructCoveringSet( double tolerance = 1e-8, double radius_src = 1.0, double radius_tgt = 1.0,
+                                          double boxeps = 0.1, bool regional_mesh = false );
 
     /// <summary>
     ///     Compute the intersection mesh between the source and target grids that have been
@@ -202,9 +199,8 @@ class TempestRemapper : public Remapper
     ///     using the TempestRemap output interface. This information can then be used with the
     ///     "GenerateOfflineMap" tool in TempestRemap as needed.
     /// </summary>
-    moab::ErrorCode WriteTempestIntersectionMesh( std::string strOutputFileName,
-                                                  const bool fAllParallel, const bool fInputConcave,
-                                                  const bool fOutputConcave );
+    moab::ErrorCode WriteTempestIntersectionMesh( std::string strOutputFileName, const bool fAllParallel,
+                                                  const bool fInputConcave, const bool fOutputConcave );
 
     /// <summary>
     ///     Generate the necessary metadata and specifically the GLL node numbering for DoFs for a
@@ -213,16 +209,14 @@ class TempestRemapper : public Remapper
     ///     tool to compute processor-invariant Global DoF IDs at GLL nodes.
     /// </summary>
     moab::ErrorCode GenerateCSMeshMetadata( const int ntot_elements, moab::Range& entities,
-                                            moab::Range*      secondary_entities,
-                                            const std::string dofTagName, int nP );
+                                            moab::Range* secondary_entities, const std::string dofTagName, int nP );
 
     /// <summary>
     ///     Generate the necessary metadata for DoF node numbering in a given mesh.
     ///     Currently, only the functionality to generate numbering on CS grids is supported.
     /// </summary>
-    moab::ErrorCode GenerateMeshMetadata( Mesh& mesh, const int ntot_elements,
-                                          moab::Range& entities, moab::Range* secondary_entities,
-                                          const std::string dofTagName, int nP );
+    moab::ErrorCode GenerateMeshMetadata( Mesh& mesh, const int ntot_elements, moab::Range& entities,
+                                          moab::Range* secondary_entities, const std::string dofTagName, int nP );
 
     /// <summary>
     ///     Compute the local and global IDs for elements in source/target/coverage meshes.
@@ -231,7 +225,7 @@ class TempestRemapper : public Remapper
 
     ///	<summary>
     ///		Get all the ghosted overlap entities that were accumulated to enable conservation in
-    ///parallel
+    /// parallel
     ///	</summary>
     moab::ErrorCode GetOverlapAugmentedEntities( moab::Range& sharedGhostEntities );
 
@@ -248,11 +242,10 @@ class TempestRemapper : public Remapper
     // private methods
     moab::ErrorCode load_tempest_mesh_private( std::string inputFilename, Mesh** tempest_mesh );
 
-    moab::ErrorCode convert_mesh_to_tempest_private( Mesh* mesh, moab::EntityHandle meshset,
-                                                     moab::Range& entities, moab::Range* pverts );
+    moab::ErrorCode convert_mesh_to_tempest_private( Mesh* mesh, moab::EntityHandle meshset, moab::Range& entities,
+                                                     moab::Range* pverts );
 
-    moab::ErrorCode convert_tempest_mesh_private( TempestMeshType type, Mesh* mesh,
-                                                  moab::EntityHandle& meshset,
+    moab::ErrorCode convert_tempest_mesh_private( TempestMeshType type, Mesh* mesh, moab::EntityHandle& meshset,
                                                   moab::Range& entities, moab::Range* vertices );
 
     moab::ErrorCode augment_overlap_set( );
@@ -321,8 +314,7 @@ inline Mesh* TempestRemapper::GetMesh( Remapper::IntersectionContext ctx )
     }
 }
 
-inline void TempestRemapper::SetMesh( Remapper::IntersectionContext ctx, Mesh* mesh,
-                                      bool overwrite )
+inline void TempestRemapper::SetMesh( Remapper::IntersectionContext ctx, Mesh* mesh, bool overwrite )
 {
     switch( ctx )
     {
@@ -406,8 +398,7 @@ inline moab::Range& TempestRemapper::GetMeshEntities( Remapper::IntersectionCont
     }
 }
 
-inline const moab::Range&
-    TempestRemapper::GetMeshEntities( Remapper::IntersectionContext ctx ) const
+inline const moab::Range& TempestRemapper::GetMeshEntities( Remapper::IntersectionContext ctx ) const
 {
     switch( ctx )
     {
@@ -441,8 +432,7 @@ inline moab::Range& TempestRemapper::GetMeshVertices( Remapper::IntersectionCont
     }
 }
 
-inline const moab::Range&
-    TempestRemapper::GetMeshVertices( Remapper::IntersectionContext ctx ) const
+inline const moab::Range& TempestRemapper::GetMeshVertices( Remapper::IntersectionContext ctx ) const
 {
     switch( ctx )
     {
@@ -458,8 +448,7 @@ inline const moab::Range&
     }
 }
 
-inline void TempestRemapper::SetMeshType( Remapper::IntersectionContext    ctx,
-                                          TempestRemapper::TempestMeshType type )
+inline void TempestRemapper::SetMeshType( Remapper::IntersectionContext ctx, TempestRemapper::TempestMeshType type )
 {
     switch( ctx )
     {
@@ -478,8 +467,7 @@ inline void TempestRemapper::SetMeshType( Remapper::IntersectionContext    ctx,
     }
 }
 
-inline TempestRemapper::TempestMeshType
-    TempestRemapper::GetMeshType( Remapper::IntersectionContext ctx ) const
+inline TempestRemapper::TempestMeshType TempestRemapper::GetMeshType( Remapper::IntersectionContext ctx ) const
 {
     switch( ctx )
     {

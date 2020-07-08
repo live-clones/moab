@@ -56,8 +56,7 @@ WriterIface* WriteVtk::factory( Interface* iface )
 }
 
 WriteVtk::WriteVtk( Interface* impl )
-    : mbImpl( impl ), writeTool( 0 ), mStrict( DEFAULT_STRICT ), freeNodes( 0 ),
-      createOneNodeCells( false )
+    : mbImpl( impl ), writeTool( 0 ), mStrict( DEFAULT_STRICT ), freeNodes( 0 ), createOneNodeCells( false )
 {
     assert( impl != NULL );
     impl->query_interface( writeTool );
@@ -68,10 +67,10 @@ WriteVtk::~WriteVtk( )
     mbImpl->release_interface( writeTool );
 }
 
-ErrorCode WriteVtk::write_file( const char* file_name, const bool overwrite,
-                                const FileOptions& opts, const EntityHandle* output_list,
-                                const int num_sets, const std::vector< std::string >& /* qa_list */,
-                                const Tag* tag_list, int num_tags, int /* export_dimension */ )
+ErrorCode WriteVtk::write_file( const char* file_name, const bool overwrite, const FileOptions& opts,
+                                const EntityHandle* output_list, const int                  num_sets,
+                                const std::vector< std::string >& /* qa_list */, const Tag* tag_list, int num_tags,
+                                int /* export_dimension */ )
 {
     ErrorCode rval;
 
@@ -106,8 +105,7 @@ ErrorCode WriteVtk::write_file( const char* file_name, const bool overwrite,
     file.precision( precision );
 
     // Write file
-    if( ( rval = write_header( file ) ) != MB_SUCCESS ||
-        ( rval = write_nodes( file, nodes ) ) != MB_SUCCESS ||
+    if( ( rval = write_header( file ) ) != MB_SUCCESS || ( rval = write_nodes( file, nodes ) ) != MB_SUCCESS ||
         ( rval = write_elems( file, nodes, elems ) ) != MB_SUCCESS ||
         ( rval = write_tags( file, true, nodes, tag_list, num_tags ) ) != MB_SUCCESS ||
         ( rval = write_tags( file, false, elems, tag_list, num_tags ) ) != MB_SUCCESS )
@@ -120,8 +118,7 @@ ErrorCode WriteVtk::write_file( const char* file_name, const bool overwrite,
     return MB_SUCCESS;
 }
 
-ErrorCode WriteVtk::gather_mesh( const EntityHandle* set_list, int num_sets, Range& nodes,
-                                 Range& elems )
+ErrorCode WriteVtk::gather_mesh( const EntityHandle* set_list, int num_sets, Range& nodes, Range& elems )
 {
     ErrorCode rval;
     int       e;
@@ -144,10 +141,8 @@ ErrorCode WriteVtk::gather_mesh( const EntityHandle* set_list, int num_sets, Ran
         for( et++; et < MBENTITYSET; et++ )
         {
             if( VtkUtil::get_vtk_type( et, CN::VerticesPerEntity( et ) ) ) continue;
-            Range::iterator eit = elems.lower_bound( elems.begin( ), elems.end( ),
-                                                     CREATE_HANDLE( et, 0, e ) ),
-                            ep1it = elems.lower_bound( elems.begin( ), elems.end( ),
-                                                       CREATE_HANDLE( et + 1, 0, e ) );
+            Range::iterator eit = elems.lower_bound( elems.begin( ), elems.end( ), CREATE_HANDLE( et, 0, e ) ),
+                            ep1it = elems.lower_bound( elems.begin( ), elems.end( ), CREATE_HANDLE( et + 1, 0, e ) );
             elems.erase( eit, ep1it );
         }
     }
@@ -304,8 +299,8 @@ ErrorCode WriteVtk::write_elems( std::ostream& stream, const Range& nodes, const
             else
             {
                 MB_SET_ERR( MB_FAILURE, "Vtk file format does not support elements of type "
-                                            << CN::EntityTypeName( type ) << " (" << (int)type
-                                            << ") with " << conn_len << " nodes" );
+                                            << CN::EntityTypeName( type ) << " (" << (int)type << ") with " << conn_len
+                                            << " nodes" );
             }
         }
 
@@ -365,15 +360,14 @@ ErrorCode WriteVtk::write_elems( std::ostream& stream, const Range& nodes, const
 
     // Write element types
     stream << "CELL_TYPES " << vtk_types.size( ) << std::endl;
-    for( std::vector< unsigned >::const_iterator i = vtk_types.begin( ); i != vtk_types.end( );
-         ++i )
+    for( std::vector< unsigned >::const_iterator i = vtk_types.begin( ); i != vtk_types.end( ); ++i )
         stream << *i << std::endl;
 
     return MB_SUCCESS;
 }
 
-ErrorCode WriteVtk::write_tags( std::ostream& stream, bool nodes, const Range& entities,
-                                const Tag* tag_list, int num_tags )
+ErrorCode WriteVtk::write_tags( std::ostream& stream, bool nodes, const Range& entities, const Tag* tag_list,
+                                int num_tags )
 {
     ErrorCode rval;
 
@@ -458,8 +452,7 @@ ErrorCode WriteVtk::write_tags( std::ostream& stream, bool nodes, const Range& e
 }
 
 template< typename T >
-void WriteVtk::write_data( std::ostream& stream, const std::vector< T >& data,
-                           unsigned vals_per_tag )
+void WriteVtk::write_data( std::ostream& stream, const std::vector< T >& data, unsigned vals_per_tag )
 {
     typename std::vector< T >::const_iterator d = data.begin( );
     const unsigned long                       n = data.size( ) / vals_per_tag;
@@ -493,8 +486,7 @@ void WriteVtk::write_data( std::ostream& stream, const std::vector< T >& data,
 //}
 
 template< typename T >
-ErrorCode WriteVtk::write_tag( std::ostream& stream, Tag tag, const Range& entities,
-                               const Range& tagged, const int )
+ErrorCode WriteVtk::write_tag( std::ostream& stream, Tag tag, const Range& entities, const Range& tagged, const int )
 {
     ErrorCode rval;
     int       addFreeNodes = 0;
@@ -508,8 +500,7 @@ ErrorCode WriteVtk::write_tag( std::ostream& stream, Tag tag, const Range& entit
 
     std::string name;
     int         vals_per_tag;
-    if( MB_SUCCESS != mbImpl->tag_get_name( tag, name ) ||
-        MB_SUCCESS != mbImpl->tag_get_length( tag, vals_per_tag ) )
+    if( MB_SUCCESS != mbImpl->tag_get_name( tag, name ) || MB_SUCCESS != mbImpl->tag_get_length( tag, vals_per_tag ) )
         return MB_FAILURE;
 
     // Get a tag value for each entity. Do this by initializing the
@@ -520,8 +511,7 @@ ErrorCode WriteVtk::write_tag( std::ostream& stream, Tag tag, const Range& entit
     // If there is a default value for the tag, set the actual default value
     std::vector< T > def_value( vals_per_tag );
     rval = mbImpl->tag_get_default_value( tag, &( def_value[ 0 ] ) );
-    if( MB_SUCCESS == rval )
-        SysUtil::setmem( &( data[ 0 ] ), &( def_value[ 0 ] ), vals_per_tag * sizeof( T ), n );
+    if( MB_SUCCESS == rval ) SysUtil::setmem( &( data[ 0 ] ), &( def_value[ 0 ] ), vals_per_tag * sizeof( T ), n );
 
     Range::const_iterator               t = tagged.begin( );
     typename std::vector< T >::iterator d = data.begin( );
@@ -542,8 +532,7 @@ ErrorCode WriteVtk::write_tag( std::ostream& stream, Tag tag, const Range& entit
     return MB_SUCCESS;
 }
 
-ErrorCode WriteVtk::write_bit_tag( std::ostream& stream, Tag tag, const Range& entities,
-                                   const Range& tagged )
+ErrorCode WriteVtk::write_bit_tag( std::ostream& stream, Tag tag, const Range& entities, const Range& tagged )
 {
     ErrorCode           rval;
     const unsigned long n = entities.size( );
@@ -552,12 +541,10 @@ ErrorCode WriteVtk::write_bit_tag( std::ostream& stream, Tag tag, const Range& e
 
     std::string name;
     int         vals_per_tag;
-    if( MB_SUCCESS != mbImpl->tag_get_name( tag, name ) ||
-        MB_SUCCESS != mbImpl->tag_get_length( tag, vals_per_tag ) )
+    if( MB_SUCCESS != mbImpl->tag_get_name( tag, name ) || MB_SUCCESS != mbImpl->tag_get_length( tag, vals_per_tag ) )
         return MB_FAILURE;
 
-    if( vals_per_tag > 8 )
-    { MB_SET_ERR( MB_FAILURE, "Invalid tag size for bit tag \"" << name << "\"" ); }
+    if( vals_per_tag > 8 ) { MB_SET_ERR( MB_FAILURE, "Invalid tag size for bit tag \"" << name << "\"" ); }
 
     // Get a tag value for each entity.
     // Get bits for each entity and unpack into
@@ -568,8 +555,7 @@ ErrorCode WriteVtk::write_bit_tag( std::ostream& stream, Tag tag, const Range& e
     data.resize( n * vals_per_tag, 0 );
     Range::const_iterator                   t = tagged.begin( );
     std::vector< unsigned short >::iterator d = data.begin( );
-    for( Range::const_iterator i = entities.begin( ); i != entities.end( ) && t != tagged.end( );
-         ++i )
+    for( Range::const_iterator i = entities.begin( ); i != entities.end( ) && t != tagged.end( ); ++i )
     {
         if( *i == *t )
         {
@@ -593,15 +579,13 @@ ErrorCode WriteVtk::write_bit_tag( std::ostream& stream, Tag tag, const Range& e
     return MB_SUCCESS;
 }
 
-ErrorCode WriteVtk::write_tag( std::ostream& s, Tag tag, const Range& entities,
-                               const Range& tagged )
+ErrorCode WriteVtk::write_tag( std::ostream& s, Tag tag, const Range& entities, const Range& tagged )
 {
     // Get tag properties
     std::string name;
     DataType    type;
     int         vals_per_tag;
-    if( MB_SUCCESS != mbImpl->tag_get_name( tag, name ) ||
-        MB_SUCCESS != mbImpl->tag_get_length( tag, vals_per_tag ) ||
+    if( MB_SUCCESS != mbImpl->tag_get_name( tag, name ) || MB_SUCCESS != mbImpl->tag_get_length( tag, vals_per_tag ) ||
         MB_SUCCESS != mbImpl->tag_get_data_type( tag, type ) )
         return MB_FAILURE;
 
@@ -621,8 +605,7 @@ ErrorCode WriteVtk::write_tag( std::ostream& s, Tag tag, const Range& entities,
     else if( 9 == vals_per_tag )
         s << "TENSORS " << name << ' ' << VtkUtil::vtkTypeNames[ type ] << std::endl;
     else
-        s << "SCALARS " << name << ' ' << VtkUtil::vtkTypeNames[ type ] << ' ' << vals_per_tag
-          << std::endl
+        s << "SCALARS " << name << ' ' << VtkUtil::vtkTypeNames[ type ] << ' ' << vals_per_tag << std::endl
           << "LOOKUP_TABLE default" << std::endl;
 
     // Write the tag data

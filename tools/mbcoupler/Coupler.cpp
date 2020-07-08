@@ -44,10 +44,10 @@ bool debug = false;
 int  pack_tuples( TupleList* tl, void** ptr );
 void unpack_tuples( void* ptr, TupleList** tlp );
 
-Coupler::Coupler( Interface* impl, ParallelComm* pc, Range& local_elems, int coupler_id,
-                  bool init_tree, int max_ent_dim )
-    : mbImpl( impl ), myPc( pc ), myId( coupler_id ), numIts( 3 ), max_dim( max_ent_dim ),
-      _ntot( 0 ), spherical( false )
+Coupler::Coupler( Interface* impl, ParallelComm* pc, Range& local_elems, int coupler_id, bool init_tree,
+                  int max_ent_dim )
+    : mbImpl( impl ), myPc( pc ), myId( coupler_id ), numIts( 3 ), max_dim( max_ent_dim ), _ntot( 0 ),
+      spherical( false )
 {
     assert( NULL != impl && ( pc || !local_elems.empty( ) ) );
 
@@ -165,8 +165,8 @@ ErrorCode Coupler::initialize_tree( )
 #else
         {
             std::vector< double > allBoxes_tmp( 6 * myPc->proc_config( ).proc_size( ) );
-            mpi_err = MPI_Allgather( &allBoxes[ 6 * my_rank ], 6, MPI_DOUBLE, &allBoxes_tmp[ 0 ], 6,
-                                     MPI_DOUBLE, myPc->proc_config( ).proc_comm( ) );
+            mpi_err = MPI_Allgather( &allBoxes[ 6 * my_rank ], 6, MPI_DOUBLE, &allBoxes_tmp[ 0 ], 6, MPI_DOUBLE,
+                                     myPc->proc_config( ).proc_comm( ) );
             allBoxes = allBoxes_tmp;
         }
 #endif
@@ -182,16 +182,15 @@ ErrorCode Coupler::initialize_tree( )
     double       min[ 3 ] = { 0, 0, 0 }, max[ 3 ] = { 0, 0, 0 };
     unsigned int dep;
     myTree->get_info( localRoot, min, max, dep );
-    std::cout << "Proc " << my_rank << ": box min/max, tree depth = (" << min[ 0 ] << ","
-              << min[ 1 ] << "," << min[ 2 ] << "), (" << max[ 0 ] << "," << max[ 1 ] << ","
-              << max[ 2 ] << "), " << dep << std::endl;
+    std::cout << "Proc " << my_rank << ": box min/max, tree depth = (" << min[ 0 ] << "," << min[ 1 ] << "," << min[ 2 ]
+              << "), (" << max[ 0 ] << "," << max[ 1 ] << "," << max[ 2 ] << "), " << dep << std::endl;
 #endif
 
     return result;
 }
 
-ErrorCode Coupler::initialize_spectral_elements( EntityHandle rootSource, EntityHandle rootTarget,
-                                                 bool& specSou, bool& specTar )
+ErrorCode Coupler::initialize_spectral_elements( EntityHandle rootSource, EntityHandle rootTarget, bool& specSou,
+                                                 bool& specTar )
 {
     /*void * _spectralSource;
       void * _spectralTarget;*/
@@ -205,8 +204,7 @@ ErrorCode Coupler::initialize_spectral_elements( EntityHandle rootSource, Entity
         std::cout << "Can't find tag, no spectral set\n";
         return MB_SUCCESS;  // Nothing to do, no spectral elements
     }
-    rval = mbImpl->get_entities_by_type_and_tag( rootSource, moab::MBENTITYSET, &sem_tag, NULL, 1,
-                                                 spectral_sets );
+    rval = mbImpl->get_entities_by_type_and_tag( rootSource, moab::MBENTITYSET, &sem_tag, NULL, 1, spectral_sets );
     if( moab::MB_SUCCESS != rval || spectral_sets.empty( ) )
         std::cout << "Can't get sem set on source\n";
     else
@@ -227,8 +225,7 @@ ErrorCode Coupler::initialize_spectral_elements( EntityHandle rootSource, Entity
         specSou = true;
     }
     // Repeat for target source
-    rval = mbImpl->get_entities_by_type_and_tag( rootTarget, moab::MBENTITYSET, &sem_tag, NULL, 1,
-                                                 spectral_sets );
+    rval = mbImpl->get_entities_by_type_and_tag( rootTarget, moab::MBENTITYSET, &sem_tag, NULL, 1, spectral_sets );
     if( moab::MB_SUCCESS != rval || spectral_sets.empty( ) )
         std::cout << "Can't get sem set on target\n";
     else
@@ -272,8 +269,7 @@ ErrorCode Coupler::initialize_spectral_elements( EntityHandle rootSource, Entity
     return MB_SUCCESS;
 }
 
-ErrorCode Coupler::locate_points( Range& targ_ents, double rel_eps, double abs_eps, TupleList* tl,
-                                  bool store_local )
+ErrorCode Coupler::locate_points( Range& targ_ents, double rel_eps, double abs_eps, TupleList* tl, bool store_local )
 {
     // Get locations
     std::vector< double > locs( 3 * targ_ents.size( ) );
@@ -314,8 +310,8 @@ ErrorCode Coupler::locate_points( Range& targ_ents, double rel_eps, double abs_e
     return locate_points( &locs[ 0 ], targ_ents.size( ), rel_eps, abs_eps, tl, store_local );
 }
 
-ErrorCode Coupler::locate_points( double* xyz, unsigned int num_points, double rel_eps,
-                                  double abs_eps, TupleList* tl, bool store_local )
+ErrorCode Coupler::locate_points( double* xyz, unsigned int num_points, double rel_eps, double abs_eps, TupleList* tl,
+                                  bool store_local )
 {
     assert( tl || store_local );
 
@@ -354,8 +350,7 @@ ErrorCode Coupler::locate_points( double* xyz, unsigned int num_points, double r
         for( unsigned int j = 0; j < ( myPc ? myPc->proc_config( ).proc_size( ) : 0 ); j++ )
         {
             // Test if point is in proc's box
-            if( ( allBoxes[ 6 * j ] <= xyz[ i ] + abs_eps ) &&
-                ( xyz[ i ] <= allBoxes[ 6 * j + 3 ] + abs_eps ) &&
+            if( ( allBoxes[ 6 * j ] <= xyz[ i ] + abs_eps ) && ( xyz[ i ] <= allBoxes[ 6 * j + 3 ] + abs_eps ) &&
                 ( allBoxes[ 6 * j + 1 ] <= xyz[ i + 1 ] + abs_eps ) &&
                 ( xyz[ i + 1 ] <= allBoxes[ 6 * j + 4 ] + abs_eps ) &&
                 ( allBoxes[ 6 * j + 2 ] <= xyz[ i + 2 ] + abs_eps ) &&
@@ -368,8 +363,8 @@ ErrorCode Coupler::locate_points( double* xyz, unsigned int num_points, double r
         if( procs_to_send_to.empty( ) )
         {
 #ifdef VERBOSE
-            std::cout << " point index " << i / 3 << ": " << xyz[ i ] << " " << xyz[ i + 1 ] << " "
-                      << xyz[ i + 2 ] << " not found in any box\n";
+            std::cout << " point index " << i / 3 << ": " << xyz[ i ] << " " << xyz[ i + 1 ] << " " << xyz[ i + 2 ]
+                      << " not found in any box\n";
 #endif
             // try to find the closest box, and put it in that box, anyway
             double min_dist = 1.e+20;
@@ -377,8 +372,7 @@ ErrorCode Coupler::locate_points( double* xyz, unsigned int num_points, double r
             for( unsigned int j = 0; j < ( myPc ? myPc->proc_config( ).proc_size( ) : 0 ); j++ )
             {
                 BoundBox box( &allBoxes[ 6 * j ] );  // form back the box
-                double   distance =
-                    box.distance( &xyz[ i ] );  // will compute the distance in 3d, from the box
+                double   distance = box.distance( &xyz[ i ] );  // will compute the distance in 3d, from the box
                 if( distance < min_dist )
                 {
                     index = j;
@@ -394,8 +388,7 @@ ErrorCode Coupler::locate_points( double* xyz, unsigned int num_points, double r
 #ifdef VERBOSE
             std::cout << " point index " << i / 3 << " added to box for proc j:" << index << "\n";
 #endif
-            procs_to_send_to.push_back(
-                index );  // will send to just one proc, that has the closest box
+            procs_to_send_to.push_back( index );  // will send to just one proc, that has the closest box
         }
         // we finally decided to populate the tuple list for a list of processors
         for( size_t k = 0; k < procs_to_send_to.size( ); k++ )
@@ -420,8 +413,8 @@ ErrorCode Coupler::locate_points( double* xyz, unsigned int num_points, double r
     for( unsigned int i = 0; i < target_pts.get_n( ); i++ )
         if( target_pts.vi_rd[ 2 * i ] == (int)my_rank ) num_to_me++;
 #ifdef VERBOSE
-    printf( "rank: %u local points: %u, nb sent target pts: %u mappedPts: %u num to me: %d \n",
-            my_rank, num_points, target_pts.get_n( ), mappedPts->get_n( ), num_to_me );
+    printf( "rank: %u local points: %u, nb sent target pts: %u mappedPts: %u num to me: %d \n", my_rank, num_points,
+            target_pts.get_n( ), mappedPts->get_n( ), num_to_me );
 #endif
     // Perform scatter/gather, to gather points to source mesh procs
     if( myPc )
@@ -434,8 +427,8 @@ ErrorCode Coupler::locate_points( double* xyz, unsigned int num_points, double r
             if( target_pts.vi_rd[ 2 * i ] == (int)my_rank ) num_to_me++;
         }
 #ifdef VERBOSE
-        printf( "rank: %u after first gs nb received_pts: %u; num_from_me = %d\n", my_rank,
-                target_pts.get_n( ), num_to_me );
+        printf( "rank: %u after first gs nb received_pts: %u; num_from_me = %d\n", my_rank, target_pts.get_n( ),
+                num_to_me );
 #endif
         // After scatter/gather:
         // target_pts.set_n(# points local proc has to map);
@@ -457,17 +450,16 @@ ErrorCode Coupler::locate_points( double* xyz, unsigned int num_points, double r
         // Test target points against my elements
         for( unsigned i = 0; i < target_pts.get_n( ); i++ )
         {
-            result = test_local_box( target_pts.vr_wr + 3 * i, target_pts.vi_rd[ 2 * i ],
-                                     target_pts.vi_rd[ 2 * i + 1 ], i, point_located, rel_eps,
-                                     abs_eps, &source_pts );
+            result = test_local_box( target_pts.vr_wr + 3 * i, target_pts.vi_rd[ 2 * i ], target_pts.vi_rd[ 2 * i + 1 ],
+                                     i, point_located, rel_eps, abs_eps, &source_pts );
             if( MB_SUCCESS != result ) return result;
         }
 
         // No longer need target_pts
         target_pts.reset( );
 #ifdef VERBOSE
-        printf( "rank: %u nb sent source pts: %u, mappedPts now: %u\n", my_rank,
-                source_pts.get_n( ), mappedPts->get_n( ) );
+        printf( "rank: %u nb sent source pts: %u, mappedPts now: %u\n", my_rank, source_pts.get_n( ),
+                mappedPts->get_n( ) );
 #endif
         // Send target points back to target procs
         ( myPc->proc_config( ).crystal_router( ) )->gs_transfer( 1, source_pts, 0 );
@@ -529,16 +521,16 @@ ErrorCode Coupler::locate_points( double* xyz, unsigned int num_points, double r
         {
             missing_pts++;
 #ifdef VERBOSE
-            printf( "missing point at index i:  %d -> %15.10f %15.10f %15.10f\n", i, xyz[ 3 * i ],
-                    xyz[ 3 * i + 1 ], xyz[ 3 * i + 2 ] );
+            printf( "missing point at index i:  %d -> %15.10f %15.10f %15.10f\n", i, xyz[ 3 * i ], xyz[ 3 * i + 1 ],
+                    xyz[ 3 * i + 2 ] );
 #endif
         }
         else if( tl_tmp->vi_rd[ 3 * i ] == (int)my_rank )
             local_pts++;
     }
 #ifdef VERBOSE
-    printf( "rank: %u point location: wanted %u got %u locally, %u remote, missing %u\n", my_rank,
-            num_points, local_pts, num_points - missing_pts - local_pts, missing_pts );
+    printf( "rank: %u point location: wanted %u got %u locally, %u remote, missing %u\n", my_rank, num_points,
+            local_pts, num_points - missing_pts - local_pts, missing_pts );
 #endif
     assert( 0 == missing_pts );  // Will likely break on curved geometries
 
@@ -561,9 +553,8 @@ ErrorCode Coupler::locate_points( double* xyz, unsigned int num_points, double r
     return MB_SUCCESS;
 }
 
-ErrorCode Coupler::test_local_box( double* xyz, int from_proc, int remote_index, int /*index*/,
-                                   bool& point_located, double rel_eps, double abs_eps,
-                                   TupleList* tl )
+ErrorCode Coupler::test_local_box( double* xyz, int from_proc, int remote_index, int /*index*/, bool& point_located,
+                                   double rel_eps, double abs_eps, TupleList* tl )
 {
     std::vector< EntityHandle > entities;
     std::vector< CartVect >     nat_coords;
@@ -637,28 +628,25 @@ ErrorCode Coupler::test_local_box( double* xyz, int from_proc, int remote_index,
     return MB_SUCCESS;
 }
 
-ErrorCode Coupler::interpolate( Coupler::Method method, const std::string& interp_tag,
-                                double* interp_vals, TupleList* tl, bool normalize )
+ErrorCode Coupler::interpolate( Coupler::Method method, const std::string& interp_tag, double* interp_vals,
+                                TupleList* tl, bool normalize )
 {
     Tag       tag;
     ErrorCode result;
     if( _spectralSource )
     {
-        result = mbImpl->tag_get_handle( interp_tag.c_str( ), _ntot, MB_TYPE_DOUBLE, tag );MB_CHK_SET_ERR( result,
-                        "Failed to get handle for interpolation tag \"" << interp_tag << "\"" );
+        result = mbImpl->tag_get_handle( interp_tag.c_str( ), _ntot, MB_TYPE_DOUBLE, tag );MB_CHK_SET_ERR( result, "Failed to get handle for interpolation tag \"" << interp_tag << "\"" );
     }
     else
     {
-        result = mbImpl->tag_get_handle( interp_tag.c_str( ), 1, MB_TYPE_DOUBLE, tag );MB_CHK_SET_ERR( result,
-                        "Failed to get handle for interpolation tag \"" << interp_tag << "\"" );
+        result = mbImpl->tag_get_handle( interp_tag.c_str( ), 1, MB_TYPE_DOUBLE, tag );MB_CHK_SET_ERR( result, "Failed to get handle for interpolation tag \"" << interp_tag << "\"" );
     }
 
     return interpolate( method, tag, interp_vals, tl, normalize );
 }
 
-ErrorCode Coupler::interpolate( Coupler::Method* methods, Tag* tags, int* points_per_method,
-                                int num_methods, double* interp_vals, TupleList* tl,
-                                bool /* normalize */ )
+ErrorCode Coupler::interpolate( Coupler::Method* methods, Tag* tags, int* points_per_method, int num_methods,
+                                double* interp_vals, TupleList* tl, bool /* normalize */ )
 {
     // if (!((LINEAR_FE == method) || (CONSTANT == method)))
     // return MB_FAILURE;
@@ -713,8 +701,7 @@ ErrorCode Coupler::interpolate( Coupler::Method* methods, Tag* tags, int* points
             result = MB_FAILURE;
             if( LINEAR_FE == method || QUADRATIC_FE == method || SPHERICAL == method )
             {
-                result = interp_field( mappedPts->vul_rd[ mindex ],
-                                       CartVect( mappedPts->vr_wr + 3 * mindex ), tag,
+                result = interp_field( mappedPts->vul_rd[ mindex ], CartVect( mappedPts->vr_wr + 3 * mindex ), tag,
                                        tinterp.vr_wr[ i ] );
             }
             else if( CONSTANT == method )
@@ -838,8 +825,7 @@ ErrorCode Coupler::nat_param( double xyz[ 3 ], std::vector< EntityHandle >& enti
                 {
 #ifdef VERBOSE
                     std::cout << "point " << xyz[ 0 ] << " " << xyz[ 1 ] << " " << xyz[ 2 ]
-                              << " is not converging inside hex " << mbImpl->id_from_handle( eh )
-                              << "\n";
+                              << " is not converging inside hex " << mbImpl->id_from_handle( eh ) << "\n";
 #endif
                     continue;  // It is possible that the point is outside, so it will not converge
                 }
@@ -1112,8 +1098,8 @@ ErrorCode Coupler::constant_interp( EntityHandle elem, Tag tag, double& field )
 }
 
 // Normalize a field over the entire mesh represented by the root_set.
-ErrorCode Coupler::normalize_mesh( EntityHandle root_set, const char* norm_tag,
-                                   Coupler::IntegType integ_type, int num_integ_pts )
+ErrorCode Coupler::normalize_mesh( EntityHandle root_set, const char* norm_tag, Coupler::IntegType integ_type,
+                                   int num_integ_pts )
 {
     ErrorCode err;
 
@@ -1141,9 +1127,8 @@ ErrorCode Coupler::normalize_mesh( EntityHandle root_set, const char* norm_tag,
 }
 
 // Normalize a field over the subset of entities identified by the tags and values passed
-ErrorCode Coupler::normalize_subset( EntityHandle root_set, const char* norm_tag,
-                                     const char** tag_names, int num_tags, const char** tag_values,
-                                     Coupler::IntegType integ_type, int num_integ_pts )
+ErrorCode Coupler::normalize_subset( EntityHandle root_set, const char* norm_tag, const char** tag_names, int num_tags,
+                                     const char** tag_values, Coupler::IntegType integ_type, int num_integ_pts )
 {
     moab::ErrorCode    err;
     std::vector< Tag > tag_handles;
@@ -1153,18 +1138,15 @@ ErrorCode Coupler::normalize_subset( EntityHandle root_set, const char* norm_tag
     {
         // get tag handle & size
         Tag th;
-        err =
-            mbImpl->tag_get_handle( tag_names[ t ], 1, moab::MB_TYPE_DOUBLE, th, moab::MB_TAG_ANY );ERRORR( "Failed to get tag handle.", err );
+        err = mbImpl->tag_get_handle( tag_names[ t ], 1, moab::MB_TYPE_DOUBLE, th, moab::MB_TAG_ANY );ERRORR( "Failed to get tag handle.", err );
         tag_handles.push_back( th );
     }
 
-    return normalize_subset( root_set, norm_tag, &tag_handles[ 0 ], num_tags, tag_values,
-                             integ_type, num_integ_pts );
+    return normalize_subset( root_set, norm_tag, &tag_handles[ 0 ], num_tags, tag_values, integ_type, num_integ_pts );
 }
 
-ErrorCode Coupler::normalize_subset( EntityHandle root_set, const char* norm_tag, Tag* tag_handles,
-                                     int num_tags, const char** tag_values,
-                                     Coupler::IntegType integ_type, int num_integ_pts )
+ErrorCode Coupler::normalize_subset( EntityHandle root_set, const char* norm_tag, Tag* tag_handles, int num_tags,
+                                     const char** tag_values, Coupler::IntegType integ_type, int num_integ_pts )
 {
     ErrorCode err;
 
@@ -1173,8 +1155,7 @@ ErrorCode Coupler::normalize_subset( EntityHandle root_set, const char* norm_tag
     std::vector< std::vector< EntityHandle > > entity_sets;
     std::vector< std::vector< EntityHandle > > entity_groups;
 
-    err = get_matching_entities( root_set, tag_handles, tag_values, num_tags, &entity_sets,
-                                 &entity_groups );ERRORR( "Failed to get matching entities.", err );
+    err = get_matching_entities( root_set, tag_handles, tag_values, num_tags, &entity_sets, &entity_groups );ERRORR( "Failed to get matching entities.", err );
 
     // Call do_normalization() to continue common normalization processing
     err = do_normalization( norm_tag, entity_sets, entity_groups, integ_type, num_integ_pts );ERRORR( "Failure in do_normalization().", err );
@@ -1183,8 +1164,7 @@ ErrorCode Coupler::normalize_subset( EntityHandle root_set, const char* norm_tag
     return err;
 }
 
-ErrorCode Coupler::do_normalization( const char*                                 norm_tag,
-                                     std::vector< std::vector< EntityHandle > >& entity_sets,
+ErrorCode Coupler::do_normalization( const char* norm_tag, std::vector< std::vector< EntityHandle > >& entity_sets,
                                      std::vector< std::vector< EntityHandle > >& entity_groups,
                                      Coupler::IntegType integ_type, int num_integ_pts )
 {
@@ -1218,8 +1198,8 @@ ErrorCode Coupler::do_normalization( const char*                                
     if( nprocs > 1 )
     {
         // If parallel then send the values back to the master.
-        ierr = MPI_Reduce( &integ_vals[ 0 ], &sum_integ_vals[ 0 ], num_ent_grps, MPI_DOUBLE,
-                           MPI_SUM, MASTER_PROC, myPc->proc_config( ).proc_comm( ) );
+        ierr = MPI_Reduce( &integ_vals[ 0 ], &sum_integ_vals[ 0 ], num_ent_grps, MPI_DOUBLE, MPI_SUM, MASTER_PROC,
+                           myPc->proc_config( ).proc_comm( ) );
         ERRORMPI( "Transfer and reduction of integrated values failed.", ierr );
     }
     else
@@ -1253,8 +1233,8 @@ ErrorCode Coupler::do_normalization( const char*                                
     if( nprocs > 1 )
     {
         // If parallel then broadcast the normalization factors to the procs.
-        ierr = MPI_Bcast( &sum_integ_vals[ 0 ], num_ent_grps, MPI_DOUBLE, MASTER_PROC,
-                          myPc->proc_config( ).proc_comm( ) );
+        ierr =
+            MPI_Bcast( &sum_integ_vals[ 0 ], num_ent_grps, MPI_DOUBLE, MASTER_PROC, myPc->proc_config( ).proc_comm( ) );
         ERRORMPI( "Broadcast of normalization factors failed.", ierr );
     }
     // MASTER/SLAVE END   #########################################################
@@ -1273,11 +1253,9 @@ ErrorCode Coupler::do_normalization( const char*                                
 // Functions supporting the subset normalization function
 
 // Retrieve groups of entities matching tags and values if present
-ErrorCode
-    Coupler::get_matching_entities( EntityHandle root_set, const char** tag_names,
-                                    const char** tag_values, int num_tags,
-                                    std::vector< std::vector< EntityHandle > >* entity_sets,
-                                    std::vector< std::vector< EntityHandle > >* entity_groups )
+ErrorCode Coupler::get_matching_entities( EntityHandle root_set, const char** tag_names, const char** tag_values,
+                                          int num_tags, std::vector< std::vector< EntityHandle > >* entity_sets,
+                                          std::vector< std::vector< EntityHandle > >* entity_groups )
 {
     ErrorCode          err;
     std::vector< Tag > tag_handles;
@@ -1286,21 +1264,17 @@ ErrorCode
     {
         // Get tag handle & size
         Tag th;
-        err =
-            mbImpl->tag_get_handle( tag_names[ t ], 1, moab::MB_TYPE_DOUBLE, th, moab::MB_TAG_ANY );ERRORR( "Failed to get tag handle.", err );
+        err = mbImpl->tag_get_handle( tag_names[ t ], 1, moab::MB_TYPE_DOUBLE, th, moab::MB_TAG_ANY );ERRORR( "Failed to get tag handle.", err );
         tag_handles.push_back( th );
     }
 
-    return get_matching_entities( root_set, &tag_handles[ 0 ], tag_values, num_tags, entity_sets,
-                                  entity_groups );
+    return get_matching_entities( root_set, &tag_handles[ 0 ], tag_values, num_tags, entity_sets, entity_groups );
 }
 
 // Retrieve groups of entities matching tags and values if present
-ErrorCode
-    Coupler::get_matching_entities( EntityHandle root_set, Tag* tag_handles,
-                                    const char** tag_values, int num_tags,
-                                    std::vector< std::vector< EntityHandle > >* entity_sets,
-                                    std::vector< std::vector< EntityHandle > >* entity_groups )
+ErrorCode Coupler::get_matching_entities( EntityHandle root_set, Tag* tag_handles, const char** tag_values,
+                                          int num_tags, std::vector< std::vector< EntityHandle > >* entity_sets,
+                                          std::vector< std::vector< EntityHandle > >* entity_groups )
 {
     // SLAVE START ****************************************************************
 
@@ -1314,9 +1288,9 @@ ErrorCode
     ERRORMPI( "Getting rank failed.", ierr );
 
     Range ent_sets;
-    err = mbImpl->get_entities_by_type_and_tag( root_set, moab::MBENTITYSET, tag_handles,
-                                                (const void* const*)tag_values, num_tags, ent_sets,
-                                                Interface::INTERSECT, 0 );ERRORR( "Core::get_entities_by_type_and_tag failed.", err );
+    err =
+        mbImpl->get_entities_by_type_and_tag( root_set, moab::MBENTITYSET, tag_handles, (const void* const*)tag_values,
+                                              num_tags, ent_sets, Interface::INTERSECT, 0 );ERRORR( "Core::get_entities_by_type_and_tag failed.", err );
 
     TupleList* tag_list = NULL;
     err = create_tuples( ent_sets, tag_handles, num_tags, &tag_list );ERRORR( "Failed to create tuples from entity sets.", err );
@@ -1345,8 +1319,7 @@ ErrorCode
         int*  offsets = (int*)malloc( nprocs * sizeof( int ) );
         uint* all_tuples_buf = NULL;
 
-        MPI_Gather( &tuple_buf_len, 1, MPI_INT, recv_cnts, 1, MPI_INT, MASTER_PROC,
-                    myPc->proc_config( ).proc_comm( ) );
+        MPI_Gather( &tuple_buf_len, 1, MPI_INT, recv_cnts, 1, MPI_INT, MASTER_PROC, myPc->proc_config( ).proc_comm( ) );
         ERRORMPI( "Gathering buffer sizes failed.", err );
 
         // Allocate a buffer large enough for all the data
@@ -1364,8 +1337,8 @@ ErrorCode
         }
 
         // Send all buffers to the master proc for consolidation
-        MPI_Gatherv( (void*)tuple_buf, tuple_buf_len, MPI_INT, (void*)all_tuples_buf, recv_cnts,
-                     offsets, MPI_INT, MASTER_PROC, myPc->proc_config( ).proc_comm( ) );
+        MPI_Gatherv( (void*)tuple_buf, tuple_buf_len, MPI_INT, (void*)all_tuples_buf, recv_cnts, offsets, MPI_INT,
+                     MASTER_PROC, myPc->proc_config( ).proc_comm( ) );
         ERRORMPI( "Gathering tuple_lists failed.", err );
         free( tuple_buf );  // malloc'd in pack_tuples
 
@@ -1407,8 +1380,7 @@ ErrorCode
         // Allocate a buffer in the other procs
         if( rank != MASTER_PROC ) ctl_buf = (uint*)malloc( ctl_buf_sz * sizeof( uint ) );
 
-        ierr = MPI_Bcast( (void*)ctl_buf, ctl_buf_sz, MPI_INT, MASTER_PROC,
-                          myPc->proc_config( ).proc_comm( ) );
+        ierr = MPI_Bcast( (void*)ctl_buf, ctl_buf_sz, MPI_INT, MASTER_PROC, myPc->proc_config( ).proc_comm( ) );
         ERRORMPI( "Broadcasting tuple_list failed.", ierr );
 
         if( rank != MASTER_PROC ) unpack_tuples( ctl_buf, &cons_tuples );
@@ -1434,9 +1406,8 @@ ErrorCode
             vals[ j ] = (int*)&( cons_tuples->vi_rd[ ( i * mi ) + j ] );
 
         // Get entities recursively based on type and tag data
-        err = mbImpl->get_entities_by_type_and_tag( root_set, moab::MBENTITYSET, tag_handles,
-                                                    (const void* const*)vals, mi, ent_sets,
-                                                    Interface::INTERSECT, 0 );ERRORR( "Core::get_entities_by_type_and_tag failed.", err );
+        err = mbImpl->get_entities_by_type_and_tag( root_set, moab::MBENTITYSET, tag_handles, (const void* const*)vals,
+                                                    mi, ent_sets, Interface::INTERSECT, 0 );ERRORR( "Core::get_entities_by_type_and_tag failed.", err );
         if( debug ) std::cout << "ent_sets_size=" << ent_sets.size( ) << std::endl;
 
         // Free up the array of pointers
@@ -1499,8 +1470,7 @@ ErrorCode Coupler::create_tuples( Range& ent_sets, const char** tag_names, unsig
     {
         // Get tag handle & size
         Tag th;
-        err =
-            mbImpl->tag_get_handle( tag_names[ t ], 1, moab::MB_TYPE_DOUBLE, th, moab::MB_TAG_ANY );ERRORR( "Failed to get tag handle.", err );
+        err = mbImpl->tag_get_handle( tag_names[ t ], 1, moab::MB_TYPE_DOUBLE, th, moab::MB_TAG_ANY );ERRORR( "Failed to get tag handle.", err );
         tag_handles.push_back( th );
     }
 
@@ -1510,8 +1480,7 @@ ErrorCode Coupler::create_tuples( Range& ent_sets, const char** tag_names, unsig
 // Return a tuple_list containing  tag values for each Entity Set
 // The tuple_list will have a column for each tag and a row for each
 // Entity Set.  It is assumed all of the tags are integer tags.
-ErrorCode Coupler::create_tuples( Range& ent_sets, Tag* tag_handles, unsigned int num_tags,
-                                  TupleList** tuples )
+ErrorCode Coupler::create_tuples( Range& ent_sets, Tag* tag_handles, unsigned int num_tags, TupleList** tuples )
 {
     // ASSUMPTION: All tags are of type integer.  This may need to be expanded in future.
     ErrorCode err;
@@ -1546,8 +1515,7 @@ ErrorCode Coupler::create_tuples( Range& ent_sets, Tag* tag_handles, unsigned in
 }
 
 // Consolidate tuple_lists into one list with no duplicates
-ErrorCode Coupler::consolidate_tuples( TupleList** all_tuples, unsigned int num_tuples,
-                                       TupleList** unique_tuples )
+ErrorCode Coupler::consolidate_tuples( TupleList** all_tuples, unsigned int num_tuples, TupleList** unique_tuples )
 {
     int      total_rcv_tuples = 0;
     int      offset = 0, copysz = 0;
@@ -1607,8 +1575,8 @@ ErrorCode Coupler::consolidate_tuples( TupleList** all_tuples, unsigned int num_
     unsigned int end_idx = 0, last_idx = 1;
     while( last_idx < all_tuples_list->get_n( ) )
     {
-        if( memcmp( all_tuples_list->vi_rd + ( end_idx * num_tags ),
-                    all_tuples_list->vi_rd + ( last_idx * num_tags ), int_width ) == 0 )
+        if( memcmp( all_tuples_list->vi_rd + ( end_idx * num_tags ), all_tuples_list->vi_rd + ( last_idx * num_tags ),
+                    int_width ) == 0 )
         {
             // Values equal - skip
             last_idx += 1;
@@ -1618,8 +1586,8 @@ ErrorCode Coupler::consolidate_tuples( TupleList** all_tuples, unsigned int num_
             // Values different - copy
             // Move up the end index
             end_idx += 1;
-            memcpy( all_tuples_list->vi_wr + ( end_idx * num_tags ),
-                    all_tuples_list->vi_rd + ( last_idx * num_tags ), int_width );
+            memcpy( all_tuples_list->vi_wr + ( end_idx * num_tags ), all_tuples_list->vi_rd + ( last_idx * num_tags ),
+                    int_width );
             last_idx += 1;
         }
     }
@@ -1648,8 +1616,8 @@ ErrorCode Coupler::get_group_integ_vals( std::vector< std::vector< EntityHandle 
 
     // Get the tag handle for norm_tag
     Tag norm_hdl;
-    err = mbImpl->tag_get_handle( norm_tag, 1, moab::MB_TYPE_DOUBLE, norm_hdl,
-                                  moab::MB_TAG_SPARSE | moab::MB_TAG_CREAT );ERRORR( "Failed to get norm_tag handle.", err );
+    err =
+        mbImpl->tag_get_handle( norm_tag, 1, moab::MB_TYPE_DOUBLE, norm_hdl, moab::MB_TAG_SPARSE | moab::MB_TAG_CREAT );ERRORR( "Failed to get norm_tag handle.", err );
 
     // Check size of integ_vals vector
     if( integ_vals.size( ) != groups.size( ) ) integ_vals.resize( groups.size( ) );
@@ -1751,8 +1719,7 @@ ErrorCode Coupler::get_group_integ_vals( std::vector< std::vector< EntityHandle 
             }
             catch( moab::Element::Map::EvaluationError& )
             {
-                std::cerr << "Failed to get inverse evaluation of coordinate on Element::Map."
-                          << std::endl;
+                std::cerr << "Failed to get inverse evaluation of coordinate on Element::Map." << std::endl;
             }
 
             delete( elemMap );
@@ -1768,8 +1735,7 @@ ErrorCode Coupler::get_group_integ_vals( std::vector< std::vector< EntityHandle 
 
 // Apply a normalization factor to group of entities
 ErrorCode Coupler::apply_group_norm_factor( std::vector< std::vector< EntityHandle > >& entity_sets,
-                                            std::vector< double >& norm_factors,
-                                            const char*            norm_tag,
+                                            std::vector< double >& norm_factors, const char* norm_tag,
                                             Coupler::IntegType /*integ_type*/ )
 {
     ErrorCode err;
@@ -1840,9 +1806,8 @@ int pack_tuples( TupleList* tl, void** ptr )
 
     uint n = tl->get_n( );
 
-    int sz_buf =
-        1 + 4 * UINT_PER_UNSIGNED +
-        tl->get_n( ) * ( mi + ml * UINT_PER_LONG + mul * UINT_PER_LONG + mr * UINT_PER_REAL );
+    int sz_buf = 1 + 4 * UINT_PER_UNSIGNED +
+                 tl->get_n( ) * ( mi + ml * UINT_PER_LONG + mul * UINT_PER_LONG + mr * UINT_PER_REAL );
 
     uint* buf = (uint*)malloc( sz_buf * sizeof( uint ) );
     *ptr = (void*)buf;
@@ -1860,14 +1825,11 @@ int pack_tuples( TupleList* tl, void** ptr )
     // Copy vi_wr
     memcpy( buf, tl->vi_rd, tl->get_n( ) * mi * sizeof( sint ) ), buf += tl->get_n( ) * mi;
     // Copy vl_wr
-    memcpy( buf, tl->vl_rd, tl->get_n( ) * ml * sizeof( slong ) ),
-        buf += tl->get_n( ) * ml * UINT_PER_LONG;
+    memcpy( buf, tl->vl_rd, tl->get_n( ) * ml * sizeof( slong ) ), buf += tl->get_n( ) * ml * UINT_PER_LONG;
     // Copy vul_wr
-    memcpy( buf, tl->vul_rd, tl->get_n( ) * mul * sizeof( ulong ) ),
-        buf += tl->get_n( ) * mul * UINT_PER_LONG;
+    memcpy( buf, tl->vul_rd, tl->get_n( ) * mul * sizeof( ulong ) ), buf += tl->get_n( ) * mul * UINT_PER_LONG;
     // Copy vr_wr
-    memcpy( buf, tl->vr_rd, tl->get_n( ) * mr * sizeof( realType ) ),
-        buf += tl->get_n( ) * mr * UINT_PER_REAL;
+    memcpy( buf, tl->vr_rd, tl->get_n( ) * mr * sizeof( realType ) ), buf += tl->get_n( ) * mr * UINT_PER_REAL;
 
     return sz_buf;
 }
@@ -1904,27 +1866,22 @@ void unpack_tuples( void* ptr, TupleList** tlp )
     // Get vi_rd
     memcpy( tl->vi_wr, buf, tl->get_n( ) * mi * sizeof( sint ) ), buf += tl->get_n( ) * mi;
     // Get vl_rd
-    memcpy( tl->vl_wr, buf, tl->get_n( ) * ml * sizeof( slong ) ),
-        buf += tl->get_n( ) * ml * UINT_PER_LONG;
+    memcpy( tl->vl_wr, buf, tl->get_n( ) * ml * sizeof( slong ) ), buf += tl->get_n( ) * ml * UINT_PER_LONG;
     // Get vul_rd
-    memcpy( tl->vul_wr, buf, tl->get_n( ) * mul * sizeof( ulong ) ),
-        buf += tl->get_n( ) * mul * UINT_PER_LONG;
+    memcpy( tl->vul_wr, buf, tl->get_n( ) * mul * sizeof( ulong ) ), buf += tl->get_n( ) * mul * UINT_PER_LONG;
     // Get vr_rd
-    memcpy( tl->vr_wr, buf, tl->get_n( ) * mr * sizeof( realType ) ),
-        buf += tl->get_n( ) * mr * UINT_PER_REAL;
+    memcpy( tl->vr_wr, buf, tl->get_n( ) * mr * sizeof( realType ) ), buf += tl->get_n( ) * mr * UINT_PER_REAL;
 
     tl->disableWriteAccess( );
     return;
 }
 
-ErrorCode Coupler::get_gl_points_on_elements( Range& targ_elems, std::vector< double >& vpos,
-                                              int& numPointsOfInterest )
+ErrorCode Coupler::get_gl_points_on_elements( Range& targ_elems, std::vector< double >& vpos, int& numPointsOfInterest )
 {
     numPointsOfInterest = targ_elems.size( ) * _ntot;
     vpos.resize( 3 * numPointsOfInterest );
     int ielem = 0;
-    for( Range::iterator eit = targ_elems.begin( ); eit != targ_elems.end( );
-         ++eit, ielem += _ntot * 3 )
+    for( Range::iterator eit = targ_elems.begin( ); eit != targ_elems.end( ); ++eit, ielem += _ntot * 3 )
     {
         EntityHandle  eh = *eit;
         const double* xval;

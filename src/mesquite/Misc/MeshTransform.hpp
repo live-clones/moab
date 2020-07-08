@@ -55,8 +55,7 @@ namespace MBMesquite
 class MESQUITE_EXPORT MeshTransform : public Instruction
 {
   public:
-    MeshTransform( bool skip_fixed = false )
-        : mMat( 1, 0, 0, 0, 1, 0, 0, 0, 1 ), mVec( 0.0 ), skipFixed( skip_fixed )
+    MeshTransform( bool skip_fixed = false ) : mMat( 1, 0, 0, 0, 1, 0, 0, 0, 1 ), mVec( 0.0 ), skipFixed( skip_fixed )
     {
     }
     MeshTransform( Matrix3D& in_mat, Vector3D& in_vec, bool skip_fixed = false )
@@ -69,16 +68,14 @@ class MESQUITE_EXPORT MeshTransform : public Instruction
 
     // virtual functions from PatchDataUser...
     //! Loop over the mesh and perform the affine transformation
-    virtual double loop_over_mesh( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
-                                   MsqError& err );
+    virtual double loop_over_mesh( MeshDomainAssoc* mesh_and_domain, const Settings* settings, MsqError& err );
     //! Return the name of this PatchDataUser:  Mesh Transform
     virtual std::string get_name( ) const
     {
         return "Mesh Transform";
     }
 
-    virtual void initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
-                                   MsqError& err );
+    virtual void initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings, MsqError& err );
 
     void add_translation( const Vector3D& offset );
     void add_rotation( const Vector3D& axis, double radians );

@@ -24,8 +24,7 @@ using namespace moab;
 using namespace std;
 
 // Function to parse input parameters
-ErrorCode get_file_options( int argc, char** argv, string& filename, string& tagName,
-                            vector< int >& tagValues )
+ErrorCode get_file_options( int argc, char** argv, string& filename, string& tagName, vector< int >& tagValues )
 {
     // Get mesh filename
     if( argc > 1 )
@@ -68,8 +67,7 @@ int main( int argc, char** argv )
 
 #ifdef MOAB_HAVE_HDF5
     // This file is in the mesh files directory
-    rval = mb->load_file( filename.c_str( ), 0, 0, PARALLEL_PARTITION_TAG_NAME, tagvals.data( ),
-                          (int)tagvals.size( ) );MB_CHK_SET_ERR( rval, "Failed to read" );
+    rval = mb->load_file( filename.c_str( ), 0, 0, PARALLEL_PARTITION_TAG_NAME, tagvals.data( ), (int)tagvals.size( ) );MB_CHK_SET_ERR( rval, "Failed to read" );
 
     // If HANDLEID tag present, convert to long, and see what we read from file
     Tag handleid_tag;
@@ -82,8 +80,7 @@ int main( int argc, char** argv )
         vector< long > valsTag( verts.size( ) );
         rval = mb->tag_get_data( handleid_tag, verts, &valsTag[ 0 ] );
         if( MB_SUCCESS == rval )
-            cout << "First 2 long values recovered: " << valsTag[ 0 ] << " " << valsTag[ 1 ]
-                 << "\n";
+            cout << "First 2 long values recovered: " << valsTag[ 0 ] << " " << valsTag[ 1 ] << "\n";
     }
 
     rval = mb->write_file( "part.h5m" );MB_CHK_SET_ERR( rval, "Failed to write partial file" );

@@ -73,12 +73,10 @@ int main( int argc, char* argv[] )
         if( err ) return 1;
         EntityTopology type;
         mesh.elements_get_topologies( &elem, &type, 1, err );
-        std::copy( conn.begin( ) + TopologyInfo::corners( type ), conn.end( ),
-                   std::back_inserter( higher_order ) );
+        std::copy( conn.begin( ) + TopologyInfo::corners( type ), conn.end( ), std::back_inserter( higher_order ) );
     }
     std::sort( higher_order.begin( ), higher_order.end( ) );
-    higher_order.erase( std::unique( higher_order.begin( ), higher_order.end( ) ),
-                        higher_order.end( ) );
+    higher_order.erase( std::unique( higher_order.begin( ), higher_order.end( ) ), higher_order.end( ) );
 
     // build depth map for all vertices
     while( !next.empty( ) )
@@ -111,8 +109,7 @@ int main( int argc, char* argv[] )
             {
                 d_iter = depth.find( conn[ i ] );
 
-                if( d_iter == depth.end( ) || d_iter->second > min + 1 )
-                    depth[ conn[ i ] ] = min + 1;
+                if( d_iter == depth.end( ) || d_iter->second > min + 1 ) depth[ conn[ i ] ] = min + 1;
             }
         }
     }

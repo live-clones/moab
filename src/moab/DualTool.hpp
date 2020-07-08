@@ -113,8 +113,7 @@ class DualTool
     ErrorCode construct_hex_dual( Range& entities );
 
     //! get the dual entities; if non-null, only dual of entities passed in are returned
-    ErrorCode get_dual_entities( const int dim, EntityHandle* entities, const int num_entities,
-                                 Range& dual_ents );
+    ErrorCode get_dual_entities( const int dim, EntityHandle* entities, const int num_entities, Range& dual_ents );
 
     //! get the dual entities; if non-null, only dual of entities passed in are returned
     ErrorCode get_dual_entities( const int dim, EntityHandle* entities, const int num_entities,
@@ -142,8 +141,7 @@ class DualTool
 
     //! given a last_v (possibly zero) and this_v, find the next loop vertex on
     //! this dual surface
-    EntityHandle next_loop_vertex( const EntityHandle last_v, const EntityHandle this_v,
-                                   const EntityHandle dual_surf );
+    EntityHandle next_loop_vertex( const EntityHandle last_v, const EntityHandle this_v, const EntityHandle dual_surf );
 
     //! get/set the tag for dual surfaces
     Tag       dualSurface_tag( ) const;
@@ -180,8 +178,7 @@ class DualTool
     bool is_blind( const EntityHandle chord );
 
     //! set the dual surface or curve for an entity
-    ErrorCode set_dual_surface_or_curve( EntityHandle entity, const EntityHandle dual_hyperplane,
-                                         const int dimension );
+    ErrorCode set_dual_surface_or_curve( EntityHandle entity, const EntityHandle dual_hyperplane, const int dimension );
 
     //! effect atomic pillow operation
     ErrorCode atomic_pillow( EntityHandle odedge, EntityHandle& quad1, EntityHandle& quad2 );
@@ -200,20 +197,19 @@ class DualTool
 
     //! given the two 1-cells involved in the foc, get entities associated with
     //! the quads being opened/collapsed; see implementation for more details
-    ErrorCode foc_get_ents( EntityHandle ocl, EntityHandle ocr, EntityHandle* quads,
-                            EntityHandle* split_edges, EntityHandle* split_nodes, Range& hexes,
-                            EntityHandle* other_edges, EntityHandle* other_nodes );
+    ErrorCode foc_get_ents( EntityHandle ocl, EntityHandle ocr, EntityHandle* quads, EntityHandle* split_edges,
+                            EntityHandle* split_nodes, Range& hexes, EntityHandle* other_edges,
+                            EntityHandle* other_nodes );
 
     //! given a 1-cell and a chord, return the neighboring vertices on the
     //! chord, in the same order as the 1-cell's vertices
-    ErrorCode get_opposite_verts( const EntityHandle middle_edge, const EntityHandle chord,
-                                  EntityHandle* verts );
+    ErrorCode get_opposite_verts( const EntityHandle middle_edge, const EntityHandle chord, EntityHandle* verts );
 
     //! given a dual surface or curve, return the 2-cells, 1-cells, 0-cells, and
     //! loop 0/1-cells, if requested; any of those range pointers can be NULL,
     //! in which case that range isn't returned
-    ErrorCode get_dual_entities( const EntityHandle dual_ent, Range* dcells, Range* dedges,
-                                 Range* dverts, Range* dverts_loop, Range* dedges_loop );
+    ErrorCode get_dual_entities( const EntityHandle dual_ent, Range* dcells, Range* dedges, Range* dverts,
+                                 Range* dverts_loop, Range* dedges_loop );
 
     ErrorCode list_entities( const Range& entities ) const;
     ErrorCode list_entities( const EntityHandle* entities, const int num_entities ) const;
@@ -239,8 +235,7 @@ class DualTool
 
     //! traverse dual faces of input dimension, constructing
     //! dual hyperplanes of them in sets as it goes
-    ErrorCode construct_dual_hyperplanes( const int dim, EntityHandle* entities,
-                                          const int num_entities );
+    ErrorCode construct_dual_hyperplanes( const int dim, EntityHandle* entities, const int num_entities );
 
     //! order 1cells on a chord
     ErrorCode order_chord( EntityHandle chord_set );
@@ -260,18 +255,16 @@ class DualTool
 
     //! given an edge handle, return a list of dual vertices in radial order
     //! around the edge; also returns whether this edge is on the boundary
-    ErrorCode get_radial_dverts( const EntityHandle edge, std::vector< EntityHandle >& rad_verts,
-                                 bool& bdy_edge );
+    ErrorCode get_radial_dverts( const EntityHandle edge, std::vector< EntityHandle >& rad_verts, bool& bdy_edge );
 
-    ErrorCode construct_dual_vertex( EntityHandle entity, EntityHandle& dual_ent,
-                                     const bool extra = false, const bool add_graphics_pt = true );
+    ErrorCode construct_dual_vertex( EntityHandle entity, EntityHandle& dual_ent, const bool extra = false,
+                                     const bool add_graphics_pt = true );
 
     //! add a graphics point to an entity (on a tag)
     ErrorCode add_graphics_point( EntityHandle entity, double* avg_pos = NULL );
 
     //! get points defining facets of a 2cell
-    ErrorCode get_cell_points( EntityHandle dual_ent, std::vector< int >& npts,
-                               std::vector< GraphicsPoint >& points );
+    ErrorCode get_cell_points( EntityHandle dual_ent, std::vector< int >& npts, std::vector< GraphicsPoint >& points );
 
     //! if this_ent is an edge, is a dual entity, and has quads as
     //! its vertices' dual entities, return true, otherwise false
@@ -288,8 +281,7 @@ class DualTool
     ErrorCode delete_dual_entities( Range& entities );
 
     //! check sense of connect arrays, and reverse/rotate if necessary
-    ErrorCode fs_check_quad_sense( EntityHandle hex0, EntityHandle quad0,
-                                   std::vector< EntityHandle >* connects );
+    ErrorCode fs_check_quad_sense( EntityHandle hex0, EntityHandle quad0, std::vector< EntityHandle >* connects );
 
     //! get the three quads for a face shrink, the two hexes, and the connectivity
     //! of the three quads
@@ -303,8 +295,7 @@ class DualTool
     //! given connectivity of first 3 quads for reverse face shrink,
     //! get fourth (outer 4 verts to be shared by two inner hexes) and quads
     //! around the side of the structure
-    ErrorCode fsr_get_fourth_quad( std::vector< EntityHandle >* connects,
-                                   std::vector< EntityHandle >* side_quads );
+    ErrorCode fsr_get_fourth_quad( std::vector< EntityHandle >* connects, std::vector< EntityHandle >* side_quads );
 
     /*
         //! get pairs of entities to be merged as part of foc operation
@@ -318,26 +309,21 @@ class DualTool
     ErrorCode foc_delete_dual( EntityHandle* split_quads, EntityHandle* split_edges, Range& hexes );
 
     //! split a pair of quads and the edge(s) shared by them
-    ErrorCode split_pair_nonmanifold( EntityHandle* split_quads, EntityHandle* split_edges,
-                                      EntityHandle*                split_nodes,
-                                      std::vector< EntityHandle >* star_dp1,
-                                      std::vector< EntityHandle >* star_dp2,
-                                      EntityHandle* other_edges, EntityHandle* other_nodes,
-                                      EntityHandle* new_quads, EntityHandle* new_edges,
-                                      EntityHandle* new_nodes );
+    ErrorCode split_pair_nonmanifold( EntityHandle* split_quads, EntityHandle* split_edges, EntityHandle* split_nodes,
+                                      std::vector< EntityHandle >* star_dp1, std::vector< EntityHandle >* star_dp2,
+                                      EntityHandle* other_edges, EntityHandle* other_nodes, EntityHandle* new_quads,
+                                      EntityHandle* new_edges, EntityHandle* new_nodes );
 
     //! for foc's splitting two shared edges, there might be additional entities
     //! connected to the split node that also have to be updated
-    ErrorCode foc_get_addl_ents( std::vector< EntityHandle >* star_dp1,
-                                 std::vector< EntityHandle >* star_dp2, EntityHandle* split_edges,
-                                 EntityHandle split_node, Range* addl_ents );
+    ErrorCode foc_get_addl_ents( std::vector< EntityHandle >* star_dp1, std::vector< EntityHandle >* star_dp2,
+                                 EntityHandle* split_edges, EntityHandle split_node, Range* addl_ents );
 
     //! given the split quads and edges, get the face and hex stars around the
     //! edge(s), separated into halves, each of which goes with the new or old entities
     //! after the split
     ErrorCode foc_get_stars( EntityHandle* split_quads, EntityHandle* split_edges,
-                             std::vector< EntityHandle >* star_dp1,
-                             std::vector< EntityHandle >* star_dp2 );
+                             std::vector< EntityHandle >* star_dp1, std::vector< EntityHandle >* star_dp2 );
 
     void print_cell( EntityHandle cell );
 

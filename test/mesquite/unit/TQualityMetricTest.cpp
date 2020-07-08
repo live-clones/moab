@@ -159,10 +159,9 @@ void TQualityMetricTest::regression_inverse_mean_ratio_grad( )
     CPPUNIT_ASSERT_EQUAL( (size_t)1, sorted[ 1 ] );
     CPPUNIT_ASSERT_EQUAL( (size_t)2, sorted[ 2 ] );
 
-    const size_t idx_map[] = {
-        std::find( act_idx.begin( ), act_idx.end( ), exp_idx[ 0 ] ) - act_idx.begin( ),
-        std::find( act_idx.begin( ), act_idx.end( ), exp_idx[ 1 ] ) - act_idx.begin( ),
-        std::find( act_idx.begin( ), act_idx.end( ), exp_idx[ 2 ] ) - act_idx.begin( ) };
+    const size_t idx_map[] = { std::find( act_idx.begin( ), act_idx.end( ), exp_idx[ 0 ] ) - act_idx.begin( ),
+                               std::find( act_idx.begin( ), act_idx.end( ), exp_idx[ 1 ] ) - act_idx.begin( ),
+                               std::find( act_idx.begin( ), act_idx.end( ), exp_idx[ 2 ] ) - act_idx.begin( ) };
     CPPUNIT_ASSERT_VECTORS_EQUAL( exp_grad[ 0 ], act_grad[ idx_map[ 0 ] ], 1e-5 );
     CPPUNIT_ASSERT_VECTORS_EQUAL( exp_grad[ 1 ], act_grad[ idx_map[ 1 ] ], 1e-5 );
     CPPUNIT_ASSERT_VECTORS_EQUAL( exp_grad[ 2 ], act_grad[ idx_map[ 2 ] ], 1e-5 );
@@ -174,11 +173,10 @@ void TQualityMetricTest::regression_inverse_mean_ratio_hess( )
     TInverseMeanRatio tm;
     IdealShapeTarget  target;
     TQualityMetric    metric( &target, &tm );
-    const double      coords[] = { 4.158984727, 4.6570859130000004, 5, 4.51742825, 4.51742825,
-                              5,           4.3103448279999999, 5, 5 };
-    const bool        fixed[] = { false, false, true };
-    const size_t      indices[] = { 0, 1, 2 };
-    PatchData         pd;
+    const double coords[] = { 4.158984727, 4.6570859130000004, 5, 4.51742825, 4.51742825, 5, 4.3103448279999999, 5, 5 };
+    const bool   fixed[] = { false, false, true };
+    const size_t indices[] = { 0, 1, 2 };
+    PatchData    pd;
     pd.fill( 3, coords, 1, TRIANGLE, indices, fixed, err );
     pd.attach_settings( &settings );
     PlanarDomain dom( PlanarDomain::XY, coords[ 2 ] );
@@ -204,11 +202,9 @@ void TQualityMetricTest::regression_inverse_mean_ratio_hess( )
 
     // first make sure that non-TMP IMR metric works correctly
     bool exp_rval, act_rval;
-    exp_rval =
-        ref_metric.evaluate_with_Hessian( pd, hand1, exp_val, exp_idx, exp_grad, exp_hess, err );
+    exp_rval = ref_metric.evaluate_with_Hessian( pd, hand1, exp_val, exp_idx, exp_grad, exp_hess, err );
     ASSERT_NO_ERROR( err );
-    act_rval = ref_metric.QualityMetric::evaluate_with_Hessian( pd, hand1, act_val, act_idx,
-                                                                act_grad, act_hess, err );
+    act_rval = ref_metric.QualityMetric::evaluate_with_Hessian( pd, hand1, act_val, act_idx, act_grad, act_hess, err );
     CPPUNIT_ASSERT( exp_rval );
     CPPUNIT_ASSERT( act_rval );
     CPPUNIT_ASSERT_DOUBLES_EQUAL( exp_val, act_val, 1e-5 );

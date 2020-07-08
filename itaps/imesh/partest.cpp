@@ -35,8 +35,7 @@ int main( int argc, char* argv[] )
     const char* filename = STRINGIFY( MESHDIR ) "/64bricks_1khex.h5m";
     ;
 
-    iMeshP_loadAll( imesh, partn, root, filename, options, &ierr, strlen( filename ),
-                    strlen( options ) );
+    iMeshP_loadAll( imesh, partn, root, filename, options, &ierr, strlen( filename ), strlen( options ) );
     IMESH_ASSERT( ierr );
 
     iMesh_getNumEntSets( imesh, IMESH_NULL, 1, &num_sets, &ierr );

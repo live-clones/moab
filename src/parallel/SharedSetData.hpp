@@ -46,8 +46,7 @@ class SharedSetData
      * Get list of all process ranks with which this process the passed set.
      * Returns an empty list for non-shared sets.
      */
-    ErrorCode get_sharing_procs( EntityHandle             entity_set,
-                                 std::vector< unsigned >& ranks_out ) const;
+    ErrorCode get_sharing_procs( EntityHandle entity_set, std::vector< unsigned >& ranks_out ) const;
 
     /**\brief Get handles for all shared sets */
     ErrorCode get_shared_sets( Range& sets_out ) const;
@@ -56,8 +55,7 @@ class SharedSetData
     ErrorCode get_shared_sets( unsigned rank, Range& sets_out ) const;
 
     /**\brief Get owner and owner's handle for shared set */
-    ErrorCode get_owner( EntityHandle set, unsigned& rank_out,
-                         EntityHandle& remote_handle_out ) const;
+    ErrorCode get_owner( EntityHandle set, unsigned& rank_out, EntityHandle& remote_handle_out ) const;
 
     /**\brief Get owner of shared set */
     ErrorCode get_owner( EntityHandle set, unsigned& rank_out ) const
@@ -74,8 +72,7 @@ class SharedSetData
     }
 
     /**\brief Get local handle for shared set */
-    ErrorCode get_local_handle( unsigned owner_rank, EntityHandle remote_handle,
-                                EntityHandle& local_handle_out ) const;
+    ErrorCode get_local_handle( unsigned owner_rank, EntityHandle remote_handle, EntityHandle& local_handle_out ) const;
 
     ErrorCode set_owner( EntityHandle set, unsigned owner_rank, EntityHandle owner_handle );
 
@@ -111,8 +108,7 @@ class SharedSetData
         // Copied (more or less) from Boost
         template< typename T > static void hash_combine( size_t& seed, T val )
         {
-            seed ^= MOAB_UNORDERED_MAP_NS::hash< T >( ).operator( )( val ) + 0x9e3779b9 +
-                    ( seed << 6 ) + ( seed >> 2 );
+            seed ^= MOAB_UNORDERED_MAP_NS::hash< T >( ).operator( )( val ) + 0x9e3779b9 + ( seed << 6 ) + ( seed >> 2 );
         }
         template< typename IT > static size_t hash_range( IT it, IT last )
         {

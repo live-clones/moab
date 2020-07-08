@@ -116,8 +116,7 @@ struct BSPTreePoly::Edge
 
     BSPTreePoly::EdgeUse* use( BSPTreePoly::Face* face ) const
     {
-        return ( face == forwardPtr->facePtr ) ? forwardPtr
-                                               : ( face == reversePtr->facePtr ) ? reversePtr : 0;
+        return ( face == forwardPtr->facePtr ) ? forwardPtr : ( face == reversePtr->facePtr ) ? reversePtr : 0;
     }
     BSPTreePoly::Edge* next( BSPTreePoly::Face* about ) const
     {
@@ -138,8 +137,7 @@ struct BSPTreePoly::Edge
     }
     BSPTreePoly::Vertex* other( BSPTreePoly::Vertex* vtx ) const
     {
-        return vtx == startPtr->vtxPtr ? endPtr->vtxPtr
-                                       : vtx == endPtr->vtxPtr ? startPtr->vtxPtr : 0;
+        return vtx == startPtr->vtxPtr ? endPtr->vtxPtr : vtx == endPtr->vtxPtr ? startPtr->vtxPtr : 0;
     }
     BSPTreePoly::Vertex* common( BSPTreePoly::Edge* eother ) const
     {
@@ -202,8 +200,7 @@ void BSPTreePoly::reset_debug_ids( )
 
 static BSPTreePoly::Edge* split_edge( BSPTreePoly::Vertex*& new_vtx, BSPTreePoly::Edge* into_edge );
 
-BSPTreePoly::VertexUse::VertexUse( BSPTreePoly::Edge* edge, BSPTreePoly::Vertex* vtx )
-    : vtxPtr( vtx ), edgePtr( edge )
+BSPTreePoly::VertexUse::VertexUse( BSPTreePoly::Edge* edge, BSPTreePoly::Vertex* vtx ) : vtxPtr( vtx ), edgePtr( edge )
 {
     if( !vtx->usePtr )
     {
@@ -264,13 +261,9 @@ void BSPTreePoly::VertexUse::set_vertex( BSPTreePoly::Vertex*& vtx )
     }
 }
 
-BSPTreePoly::EdgeUse::EdgeUse( BSPTreePoly::Edge* edge )
-    : prevPtr( 0 ), nextPtr( 0 ), edgePtr( edge ), facePtr( 0 )
-{
-}
+BSPTreePoly::EdgeUse::EdgeUse( BSPTreePoly::Edge* edge ) : prevPtr( 0 ), nextPtr( 0 ), edgePtr( edge ), facePtr( 0 ) {}
 
-BSPTreePoly::EdgeUse::EdgeUse( BSPTreePoly::Edge* edge, BSPTreePoly::Face* face )
-    : edgePtr( edge ), facePtr( face )
+BSPTreePoly::EdgeUse::EdgeUse( BSPTreePoly::Edge* edge, BSPTreePoly::Face* face ) : edgePtr( edge ), facePtr( face )
 {
     assert( !face->usePtr );
     face->usePtr = prevPtr = nextPtr = this;
@@ -426,9 +419,8 @@ ErrorCode BSPTreePoly::set( const CartVect hex_corners[ 8 ] )
         edges[ i ]->id = start_id++;
 #endif
 
-    static const int face_conn[ 6 ][ 4 ] = { { 0, 5, -8, -4 },    { 1, 6, -9, -5 },
-                                             { 2, 7, -10, -6 },   { 3, 4, -11, -7 },
-                                             { -3, -2, -1, -12 }, { 8, 9, 10, 11 } };
+    static const int face_conn[ 6 ][ 4 ] = { { 0, 5, -8, -4 },  { 1, 6, -9, -5 },    { 2, 7, -10, -6 },
+                                             { 3, 4, -11, -7 }, { -3, -2, -1, -12 }, { 8, 9, 10, 11 } };
     for( int i = 0; i < 6; ++i )
     {
         faceList = new Face( faceList );

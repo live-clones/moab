@@ -12,8 +12,7 @@
 #include <algorithm>
 
 #ifdef IMESH_MAJOR_VERSION
-#define IMESH_VERSION_ATLEAST( MAJOR, MINOR ) \
-    1000 * IMESH_MAJOR_VERSION + IMESH_MINOR_VERSION <= 1000 * MAJOR + MINOR
+#define IMESH_VERSION_ATLEAST( MAJOR, MINOR ) 1000 * IMESH_MAJOR_VERSION + IMESH_MINOR_VERSION <= 1000 * MAJOR + MINOR
 #else
 #define IMESH_VERSION_ATLEAST( MAJOR, MINOR ) 0
 #endif
@@ -25,19 +24,19 @@ namespace MBMesquite
  *                          Mesh Definition
  ************************************************************************/
 
-MsqMOAB::MsqMOAB( moab::Core* mesh, moab::EntityHandle meshset, moab::EntityType type,
-                  MsqError& err, const moab::Tag* fixed_tag, const moab::Tag* slaved_tag )
-    : meshInstance( mesh ), inputSetType( moab::MBMAXTYPE ), inputSet( 0 ), byteTag( 0 ),
-      createdByteTag( false ), geometricDimension( 0 )
+MsqMOAB::MsqMOAB( moab::Core* mesh, moab::EntityHandle meshset, moab::EntityType type, MsqError& err,
+                  const moab::Tag* fixed_tag, const moab::Tag* slaved_tag )
+    : meshInstance( mesh ), inputSetType( moab::MBMAXTYPE ), inputSet( 0 ), byteTag( 0 ), createdByteTag( false ),
+      geometricDimension( 0 )
 {
     init_active_mesh( mesh, err, fixed_tag, slaved_tag );MSQ_ERRRTN( err );
     set_active_set( meshset, type, err );MSQ_ERRRTN( err );
 }
 
-MsqMOAB::MsqMOAB( moab::Core* mesh, moab::EntityType type, MsqError& err,
-                  const moab::Tag* fixed_tag, const moab::Tag* slaved_tag )
-    : meshInstance( mesh ), inputSetType( moab::MBMAXTYPE ), inputSet( 0 ), byteTag( 0 ),
-      createdByteTag( false ), geometricDimension( 0 )
+MsqMOAB::MsqMOAB( moab::Core* mesh, moab::EntityType type, MsqError& err, const moab::Tag* fixed_tag,
+                  const moab::Tag* slaved_tag )
+    : meshInstance( mesh ), inputSetType( moab::MBMAXTYPE ), inputSet( 0 ), byteTag( 0 ), createdByteTag( false ),
+      geometricDimension( 0 )
 {
     init_active_mesh( mesh, err, fixed_tag, slaved_tag );MSQ_ERRRTN( err );
 
@@ -65,8 +64,7 @@ moab::EntityHandle MsqMOAB::get_entity_set( ) const
     return inputSet;
 }
 
-moab::DataType MsqMOAB::check_valid_flag_tag( moab::Tag tag, const char* /*which_flag*/,
-                                              MsqError& err )
+moab::DataType MsqMOAB::check_valid_flag_tag( moab::Tag tag, const char* /*which_flag*/, MsqError& err )
 {
     moab::ErrorCode ierr;
     int             size;
@@ -94,8 +92,7 @@ void MsqMOAB::init_active_mesh( moab::Core* /*mesh*/, MsqError& err, const moab:
     if( mapsize < moab::MBMAXTYPE )
     {
         MSQ_SETERR( err )
-        ( "MsqMOAB needs to be updated for new iMesh element topologies.",
-          MsqError::INTERNAL_ERROR );
+        ( "MsqMOAB needs to be updated for new iMesh element topologies.", MsqError::INTERNAL_ERROR );
     }
 
     for( size_t i = 0; i <= moab::MBMAXTYPE; ++i )
@@ -136,9 +133,9 @@ void MsqMOAB::init_active_mesh( moab::Core* /*mesh*/, MsqError& err, const moab:
     if( moab::MB_SUCCESS != ierr )
     {
         int defval = 0;
-        ierr = meshInstance->tag_get_handle( VERTEX_BYTE_TAG_NAME, 1, moab::MB_TYPE_INTEGER,
-                                             byteTag, moab::MB_TAG_CREAT | moab::MB_TAG_DENSE,
-                                             &defval, &createdByteTag );  // MB_CHK_ERR_RET(ierr);
+        ierr = meshInstance->tag_get_handle( VERTEX_BYTE_TAG_NAME, 1, moab::MB_TYPE_INTEGER, byteTag,
+                                             moab::MB_TAG_CREAT | moab::MB_TAG_DENSE, &defval,
+                                             &createdByteTag );  // MB_CHK_ERR_RET(ierr);
     }
     else
     {
@@ -212,9 +209,8 @@ int MsqMOAB::get_geometric_dimension( MBMesquite::MsqError& /*err*/ )
 
 //************ Vertex Properties ********************
 
-void MsqMOAB::get_flag_data( moab::Tag tag, bool have_tag, moab::DataType type,
-                             const VertexHandle vert_array[], std::vector< bool >& flag_array,
-                             size_t num_vtx, MsqError& err )
+void MsqMOAB::get_flag_data( moab::Tag tag, bool have_tag, moab::DataType type, const VertexHandle vert_array[],
+                             std::vector< bool >& flag_array, size_t num_vtx, MsqError& err )
 {
     if( !num_vtx ) { return; }
 
@@ -271,23 +267,21 @@ void MsqMOAB::get_flag_data( moab::Tag tag, bool have_tag, moab::DataType type,
 // is fixed and cannot be moved.  Note that this is a read-only
 // property; this flag can't be modified by users of the
 // MBMesquite::Mesh interface.
-void MsqMOAB::vertices_get_fixed_flag( const VertexHandle   vert_array[],
-                                       std::vector< bool >& bool_array, size_t num_vtx,
+void MsqMOAB::vertices_get_fixed_flag( const VertexHandle vert_array[], std::vector< bool >& bool_array, size_t num_vtx,
                                        MsqError& err )
 {
     get_flag_data( fixedTag, haveFixedTag, fixedTagType, vert_array, bool_array, num_vtx, err );
 }
 
-void MsqMOAB::vertices_get_slaved_flag( const VertexHandle   vert_array[],
-                                        std::vector< bool >& bool_array, size_t num_vtx,
-                                        MsqError& err )
+void MsqMOAB::vertices_get_slaved_flag( const VertexHandle vert_array[], std::vector< bool >& bool_array,
+                                        size_t num_vtx, MsqError& err )
 {
     get_flag_data( slavedTag, haveSlavedTag, slavedTagType, vert_array, bool_array, num_vtx, err );
 }
 
 // Get vertex coordinates
-void MsqMOAB::vertices_get_coordinates( const MBMesquite::Mesh::VertexHandle vert_array[],
-                                        MsqVertex* coordinates, size_t num_vtx, MsqError& err )
+void MsqMOAB::vertices_get_coordinates( const MBMesquite::Mesh::VertexHandle vert_array[], MsqVertex* coordinates,
+                                        size_t num_vtx, MsqError& err )
 {
     if( !num_vtx ) { return; }
 
@@ -328,8 +322,7 @@ void MsqMOAB::vertices_get_coordinates( const MBMesquite::Mesh::VertexHandle ver
     err.set_error( MBMesquite::MsqError::NO_ERROR );
 }
 
-void MsqMOAB::vertex_set_coordinates( MBMesquite::Mesh::VertexHandle vertex, const Vector3D& coords,
-                                      MsqError& err )
+void MsqMOAB::vertex_set_coordinates( MBMesquite::Mesh::VertexHandle vertex, const Vector3D& coords, MsqError& err )
 {
     moab::ErrorCode ierr;
     err.set_error( MBMesquite::MsqError::UNKNOWN_ERROR );
@@ -343,8 +336,7 @@ void MsqMOAB::vertex_set_coordinates( MBMesquite::Mesh::VertexHandle vertex, con
 // flags.  This byte's value is neither set nor used by the mesh
 // implementation.  It is intended to be used by Mesquite algorithms.
 // Until a vertex's byte has been explicitly set, its value is 0.
-void MsqMOAB::vertex_set_byte( MBMesquite::Mesh::VertexHandle vertex, unsigned char byte,
-                               MsqError& err )
+void MsqMOAB::vertex_set_byte( MBMesquite::Mesh::VertexHandle vertex, unsigned char byte, MsqError& err )
 {
     moab::ErrorCode ierr;
     int             value = byte;
@@ -354,8 +346,8 @@ void MsqMOAB::vertex_set_byte( MBMesquite::Mesh::VertexHandle vertex, unsigned c
     err.set_error( MBMesquite::MsqError::NO_ERROR );
 }
 
-void MsqMOAB::vertices_set_byte( const VertexHandle* vert_array, const unsigned char* byte_array,
-                                 size_t array_size, MsqError& err )
+void MsqMOAB::vertices_set_byte( const VertexHandle* vert_array, const unsigned char* byte_array, size_t array_size,
+                                 MsqError& err )
 {
     if( !array_size ) { return; }
 
@@ -372,8 +364,7 @@ void MsqMOAB::vertices_set_byte( const VertexHandle* vert_array, const unsigned 
 // Retrieve the byte value for the specified vertex or vertices.
 // The byte value is 0 if it has not yet been set via one of the
 // *_set_byte() functions.
-void MsqMOAB::vertex_get_byte( MBMesquite::Mesh::VertexHandle vertex, unsigned char* byte,
-                               MsqError& err )
+void MsqMOAB::vertex_get_byte( MBMesquite::Mesh::VertexHandle vertex, unsigned char* byte, MsqError& err )
 {
     moab::ErrorCode ierr;
     int             value;
@@ -384,8 +375,8 @@ void MsqMOAB::vertex_get_byte( MBMesquite::Mesh::VertexHandle vertex, unsigned c
     err.set_error( MBMesquite::MsqError::NO_ERROR );
 }
 
-void MsqMOAB::vertices_get_byte( const VertexHandle* vert_array, unsigned char* byte_array,
-                                 size_t array_size, MsqError& err )
+void MsqMOAB::vertices_get_byte( const VertexHandle* vert_array, unsigned char* byte_array, size_t array_size,
+                                 MsqError& err )
 {
     if( !array_size ) { return; }
 
@@ -402,10 +393,9 @@ void MsqMOAB::vertices_get_byte( const VertexHandle* vert_array, unsigned char* 
 
 //**************** Topology *****************
 
-void MsqMOAB::get_adjacent_entities( const moab::EntityHandle* source, size_t num_source,
-                                     moab::EntityType             target_type,
-                                     std::vector< EntityHandle >& target,
-                                     std::vector< size_t >& offsets, MsqError& err )
+void MsqMOAB::get_adjacent_entities( const moab::EntityHandle* source, size_t num_source, moab::EntityType target_type,
+                                     std::vector< EntityHandle >& target, std::vector< size_t >& offsets,
+                                     MsqError& err )
 {
     if( num_source == 0 )
     {
@@ -461,27 +451,23 @@ void MsqMOAB::get_adjacent_entities( const moab::EntityHandle* source, size_t nu
 
             if( target_type == moab::MBVERTEX )
             {
-                ierr = meshInstance->get_adjacencies(
-                    &source[ is ], 1, 0, false, adjents,
-                    moab::Interface::INTERSECT );  // MB_CHK_ERR_RET(ierr);
+                ierr = meshInstance->get_adjacencies( &source[ is ], 1, 0, false, adjents,
+                                                      moab::Interface::INTERSECT );  // MB_CHK_ERR_RET(ierr);
             }
             else if( target_type == moab::MBEDGE )
             {
-                ierr = meshInstance->get_adjacencies(
-                    &source[ is ], 1, 1, true, adjents,
-                    moab::Interface::INTERSECT );  // MB_CHK_ERR_RET(ierr);
+                ierr = meshInstance->get_adjacencies( &source[ is ], 1, 1, true, adjents,
+                                                      moab::Interface::INTERSECT );  // MB_CHK_ERR_RET(ierr);
             }
             else if( target_type <= moab::MBPOLYGON )
             {
-                ierr = meshInstance->get_adjacencies(
-                    &source[ is ], 1, 2, true, adjents,
-                    moab::Interface::INTERSECT );  // MB_CHK_ERR_RET(ierr);
+                ierr = meshInstance->get_adjacencies( &source[ is ], 1, 2, true, adjents,
+                                                      moab::Interface::INTERSECT );  // MB_CHK_ERR_RET(ierr);
             }
             else if( target_type < moab::MBENTITYSET )
             {
-                ierr = meshInstance->get_adjacencies(
-                    &source[ is ], 1, 3, true, adjents,
-                    moab::Interface::INTERSECT );  // MB_CHK_ERR_RET(ierr);
+                ierr = meshInstance->get_adjacencies( &source[ is ], 1, 3, true, adjents,
+                                                      moab::Interface::INTERSECT );  // MB_CHK_ERR_RET(ierr);
             }
             else /* Either EntitySet or MBMaxType -- Failures */
             {
@@ -525,27 +511,23 @@ void MsqMOAB::get_adjacent_entities( const moab::EntityHandle* source, size_t nu
 
             if( target_type == moab::MBVERTEX )
             {
-                ierr = meshInstance->get_adjacencies(
-                    &source[ is ], 1, 0, false, adjents,
-                    moab::Interface::INTERSECT );  // MB_CHK_ERR_RET(ierr);
+                ierr = meshInstance->get_adjacencies( &source[ is ], 1, 0, false, adjents,
+                                                      moab::Interface::INTERSECT );  // MB_CHK_ERR_RET(ierr);
             }
             else if( target_type == moab::MBEDGE )
             {
-                ierr = meshInstance->get_adjacencies(
-                    &source[ is ], 1, 1, true, adjents,
-                    moab::Interface::INTERSECT );  // MB_CHK_ERR_RET(ierr);
+                ierr = meshInstance->get_adjacencies( &source[ is ], 1, 1, true, adjents,
+                                                      moab::Interface::INTERSECT );  // MB_CHK_ERR_RET(ierr);
             }
             else if( target_type <= moab::MBPOLYGON )
             {
-                ierr = meshInstance->get_adjacencies(
-                    &source[ is ], 1, 2, true, adjents,
-                    moab::Interface::INTERSECT );  // MB_CHK_ERR_RET(ierr);
+                ierr = meshInstance->get_adjacencies( &source[ is ], 1, 2, true, adjents,
+                                                      moab::Interface::INTERSECT );  // MB_CHK_ERR_RET(ierr);
             }
             else if( target_type < moab::MBENTITYSET )
             {
-                ierr = meshInstance->get_adjacencies(
-                    &source[ is ], 1, 3, true, adjents,
-                    moab::Interface::INTERSECT );  // MB_CHK_ERR_RET(ierr);
+                ierr = meshInstance->get_adjacencies( &source[ is ], 1, 3, true, adjents,
+                                                      moab::Interface::INTERSECT );  // MB_CHK_ERR_RET(ierr);
             }
             else /* Either EntitySet or MBMaxType -- Failures */
             {
@@ -580,27 +562,23 @@ void MsqMOAB::get_adjacent_entities( const moab::EntityHandle* source, size_t nu
 
             if( target_type == moab::MBVERTEX )
             {
-                ierr = meshInstance->get_adjacencies(
-                    &source[ is ], 1, 0, false, adjents,
-                    moab::Interface::INTERSECT );  // MB_CHK_ERR_RET(ierr);
+                ierr = meshInstance->get_adjacencies( &source[ is ], 1, 0, false, adjents,
+                                                      moab::Interface::INTERSECT );  // MB_CHK_ERR_RET(ierr);
             }
             else if( target_type == moab::MBEDGE )
             {
-                ierr = meshInstance->get_adjacencies(
-                    &source[ is ], 1, 1, true, adjents,
-                    moab::Interface::INTERSECT );  // MB_CHK_ERR_RET(ierr);
+                ierr = meshInstance->get_adjacencies( &source[ is ], 1, 1, true, adjents,
+                                                      moab::Interface::INTERSECT );  // MB_CHK_ERR_RET(ierr);
             }
             else if( target_type <= moab::MBPOLYGON )
             {
-                ierr = meshInstance->get_adjacencies(
-                    &source[ is ], 1, 2, true, adjents,
-                    moab::Interface::INTERSECT );  // MB_CHK_ERR_RET(ierr);
+                ierr = meshInstance->get_adjacencies( &source[ is ], 1, 2, true, adjents,
+                                                      moab::Interface::INTERSECT );  // MB_CHK_ERR_RET(ierr);
             }
             else if( target_type < moab::MBENTITYSET )
             {
-                ierr = meshInstance->get_adjacencies(
-                    &source[ is ], 1, 3, true, adjents,
-                    moab::Interface::INTERSECT );  // MB_CHK_ERR_RET(ierr);
+                ierr = meshInstance->get_adjacencies( &source[ is ], 1, 3, true, adjents,
+                                                      moab::Interface::INTERSECT );  // MB_CHK_ERR_RET(ierr);
             }
             else /* Either EntitySet or MBMaxType -- Failures */
             {
@@ -620,8 +598,7 @@ void MsqMOAB::get_adjacent_entities( const moab::EntityHandle* source, size_t nu
 
         num_adj = mArray.size( );
         target.resize( num_adj );
-        std::copy( mArray.begin( ), mArray.end( ),
-                   reinterpret_cast< moab::EntityHandle* >( arrptr( target ) ) );
+        std::copy( mArray.begin( ), mArray.end( ), reinterpret_cast< moab::EntityHandle* >( arrptr( target ) ) );
         mArray.clear( );
     }
 
@@ -640,8 +617,8 @@ void MsqMOAB::get_adjacent_entities( const moab::EntityHandle* source, size_t nu
 }
 
 void MsqMOAB::vertices_get_attached_elements( const VertexHandle* vertices, size_t num_vertex,
-                                              std::vector< ElementHandle >& elements,
-                                              std::vector< size_t >& offsets, MsqError& err )
+                                              std::vector< ElementHandle >& elements, std::vector< size_t >& offsets,
+                                              MsqError& err )
 {
     // moab::ErrorCode ierr;
     bool cont;
@@ -656,7 +633,7 @@ void MsqMOAB::vertices_get_attached_elements( const VertexHandle* vertices, size
     {
         std::vector< size_t >::iterator offset_iter = offsets.begin( );
         size_t                          read_idx, write_idx;
-        moab::EntityHandle* bh = reinterpret_cast< moab::EntityHandle* >( arrptr( elements ) );
+        moab::EntityHandle*             bh = reinterpret_cast< moab::EntityHandle* >( arrptr( elements ) );
 
         for( read_idx = write_idx = 0; read_idx < elements.size( ); ++read_idx )
         {
@@ -686,9 +663,8 @@ void MsqMOAB::vertices_get_attached_elements( const VertexHandle* vertices, size
  *\param offsets  - Indices into \ref vertex_handles, one per element
  */
 void MsqMOAB::elements_get_attached_vertices( const ElementHandle* elements, size_t num_elems,
-                                              std::vector< VertexHandle >& vertices,
-                                              std::vector< size_t >&       offsets,
-                                              MBMesquite::MsqError&        err )
+                                              std::vector< VertexHandle >& vertices, std::vector< size_t >& offsets,
+                                              MBMesquite::MsqError& err )
 {
     moab::ErrorCode ierr;
     assert( sizeof( moab::EntityHandle ) == sizeof( EntityHandle ) );
@@ -767,7 +743,7 @@ void MsqMOAB::get_all_elements( std::vector< ElementHandle >& elements, MsqError
 
         elements.resize( count );
 
-        moab::EntityHandle* ptr = reinterpret_cast< moab::EntityHandle* >( arrptr( elements ) );
+        moab::EntityHandle*               ptr = reinterpret_cast< moab::EntityHandle* >( arrptr( elements ) );
         std::vector< moab::EntityHandle > entities;
         ierr = meshInstance->get_entities_by_type( inputSet, inputSetType, entities, false );MB_CHK_ERR_RET( ierr );
         assert( entities.size( ) - count == 0 );
@@ -793,15 +769,13 @@ void MsqMOAB::get_all_vertices( std::vector< VertexHandle >& vertices, MsqError&
 
 // Returns the topologies of the given entities.  The "entity_topologies"
 // array must be at least "num_elements" in size.
-void MsqMOAB::elements_get_topologies( const ElementHandle* element_handle_array,
-                                       EntityTopology* element_topologies, size_t num_elements,
-                                       MsqError& err )
+void MsqMOAB::elements_get_topologies( const ElementHandle* element_handle_array, EntityTopology* element_topologies,
+                                       size_t num_elements, MsqError& err )
 {
     if( !num_elements ) { return; }
 
     assert( sizeof( ElementHandle ) == sizeof( moab::EntityHandle ) );
-    const moab::EntityHandle* arr =
-        reinterpret_cast< const moab::EntityHandle* >( element_handle_array );
+    const moab::EntityHandle* arr = reinterpret_cast< const moab::EntityHandle* >( element_handle_array );
 
     for( size_t i = 0; i < num_elements; ++i )
     {
@@ -814,8 +788,8 @@ void MsqMOAB::elements_get_topologies( const ElementHandle* element_handle_array
 //**************** Memory Management ****************
 // Tells the mesh that the client is finished with a given
 // entity handle.
-void MsqMOAB::release_entity_handles( const MBMesquite::Mesh::EntityHandle* /*handle_array*/,
-                                      size_t /*num_handles*/, MsqError& /*err*/ )
+void MsqMOAB::release_entity_handles( const MBMesquite::Mesh::EntityHandle* /*handle_array*/, size_t /*num_handles*/,
+                                      MsqError& /*err*/ )
 {
     // Do nothing
 }
@@ -828,8 +802,7 @@ void MsqMOAB::release_entity_handles( const MBMesquite::Mesh::EntityHandle* /*ha
 void MsqMOAB::release( ) {}
 
 //**************** Tags ****************
-TagHandle MsqMOAB::tag_create( const std::string& name, TagType type, unsigned length, const void*,
-                               MsqError& err )
+TagHandle MsqMOAB::tag_create( const std::string& name, TagType type, unsigned length, const void*, MsqError& err )
 {
     moab::DataType moab_type;
 
@@ -881,8 +854,8 @@ TagHandle MsqMOAB::tag_get( const std::string& name, MsqError& err )
     return static_cast< TagHandle >( handle );
 }
 
-void MsqMOAB::tag_properties( TagHandle handle, std::string& name_out, TagType& type_out,
-                              unsigned& length_out, MsqError& err )
+void MsqMOAB::tag_properties( TagHandle handle, std::string& name_out, TagType& type_out, unsigned& length_out,
+                              MsqError& err )
 {
     std::string     buffer;
     moab::ErrorCode ierr;
@@ -923,20 +896,20 @@ void MsqMOAB::tag_properties( TagHandle handle, std::string& name_out, TagType& 
     err.set_error( MBMesquite::MsqError::NO_ERROR );
 }
 
-void MsqMOAB::tag_set_element_data( TagHandle tag, size_t num_elems, const ElementHandle* array,
-                                    const void* data, MsqError& err )
+void MsqMOAB::tag_set_element_data( TagHandle tag, size_t num_elems, const ElementHandle* array, const void* data,
+                                    MsqError& err )
 {
     tag_set_data( tag, num_elems, array, data, err );
 }
 
-void MsqMOAB::tag_set_vertex_data( TagHandle tag, size_t num_elems, const VertexHandle* array,
-                                   const void* data, MsqError& err )
+void MsqMOAB::tag_set_vertex_data( TagHandle tag, size_t num_elems, const VertexHandle* array, const void* data,
+                                   MsqError& err )
 {
     tag_set_data( tag, num_elems, array, data, err );
 }
 
-void MsqMOAB::tag_set_data( TagHandle tag, size_t num_elems, const EntityHandle* array,
-                            const void* data, MsqError& err )
+void MsqMOAB::tag_set_data( TagHandle tag, size_t num_elems, const EntityHandle* array, const void* data,
+                            MsqError& err )
 {
     moab::ErrorCode ierr;
     int             size;
@@ -950,20 +923,19 @@ void MsqMOAB::tag_set_data( TagHandle tag, size_t num_elems, const EntityHandle*
     err.set_error( MBMesquite::MsqError::NO_ERROR );
 }
 
-void MsqMOAB::tag_get_element_data( TagHandle tag, size_t num_elems, const ElementHandle* array,
-                                    void* data, MsqError& err )
+void MsqMOAB::tag_get_element_data( TagHandle tag, size_t num_elems, const ElementHandle* array, void* data,
+                                    MsqError& err )
 {
     tag_get_data( tag, num_elems, array, data, err );
 }
 
-void MsqMOAB::tag_get_vertex_data( TagHandle tag, size_t num_verts, const VertexHandle* array,
-                                   void* data, MsqError& err )
+void MsqMOAB::tag_get_vertex_data( TagHandle tag, size_t num_verts, const VertexHandle* array, void* data,
+                                   MsqError& err )
 {
     tag_get_data( tag, num_verts, array, data, err );
 }
 
-void MsqMOAB::tag_get_data( TagHandle tag, size_t num_elems, const EntityHandle* array, void* data,
-                            MsqError& err )
+void MsqMOAB::tag_get_data( TagHandle tag, size_t num_elems, const EntityHandle* array, void* data, MsqError& err )
 {
     moab::ErrorCode ierr;
 

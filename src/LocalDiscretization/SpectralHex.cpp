@@ -66,16 +66,15 @@ CartVect SpectralHex::evaluate( const CartVect& params ) const
     CartVect result;
     for( d = 0; d < 3; d++ )
     {
-        result[ d ] =
-            tensor_i3( _ld[ 0 ].J, _ld[ 0 ].n, _ld[ 1 ].J, _ld[ 1 ].n, _ld[ 2 ].J, _ld[ 2 ].n,
-                       _xyz[ d ],  // this is the "field"
-                       _odwork );
+        result[ d ] = tensor_i3( _ld[ 0 ].J, _ld[ 0 ].n, _ld[ 1 ].J, _ld[ 1 ].n, _ld[ 2 ].J, _ld[ 2 ].n,
+                                 _xyz[ d ],  // this is the "field"
+                                 _odwork );
     }
     return result;
 }
 // replicate the functionality of hex_findpt
-bool SpectralHex::evaluate_reverse( CartVect const& xyz, CartVect& params, double iter_tol,
-                                    const double inside_tol, const CartVect& init ) const
+bool SpectralHex::evaluate_reverse( CartVect const& xyz, CartVect& params, double iter_tol, const double inside_tol,
+                                    const CartVect& init ) const
 {
     params = init;
 
@@ -117,8 +116,7 @@ Matrix3 SpectralHex::jacobian( const CartVect& params ) const
     J( 2, 2 ) = _data.jac[ 8 ];  // dz/dt
     return J;
 }
-void SpectralHex::evaluate_vector( const CartVect& params, const double* field, int num_tuples,
-                                   double* eval ) const
+void SpectralHex::evaluate_vector( const CartVect& params, const double* field, int num_tuples, double* eval ) const
 {
     // piece that we shouldn't want to cache
     int d;
@@ -127,11 +125,9 @@ void SpectralHex::evaluate_vector( const CartVect& params, const double* field, 
         lagrange_0( &_ld[ d ], params[ d ] );
     }
 
-    *eval = tensor_i3( _ld[ 0 ].J, _ld[ 0 ].n, _ld[ 1 ].J, _ld[ 1 ].n, _ld[ 2 ].J, _ld[ 2 ].n,
-                       field, _odwork );
+    *eval = tensor_i3( _ld[ 0 ].J, _ld[ 0 ].n, _ld[ 1 ].J, _ld[ 1 ].n, _ld[ 2 ].J, _ld[ 2 ].n, field, _odwork );
 }
-void SpectralHex::integrate_vector( const double* field_values, int num_tuples,
-                                    double* integral ) const
+void SpectralHex::integrate_vector( const double* field_values, int num_tuples, double* integral ) const
 {
     // set the position of GL points
     // set the positions of GL nodes, before evaluations

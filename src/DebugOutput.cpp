@@ -100,23 +100,19 @@ DebugOutput::DebugOutput( const char* pfx, DebugOutputStream* impl, int rank, un
     assert( impl->referenceCount > 1 );
 }
 DebugOutput::DebugOutput( const char* pfx, FILE* impl, unsigned verbosity )
-    : linePfx( pfx ), outputImpl( new FILEDebugStream( impl ) ), mpiRank( -1 ),
-      verbosityLimit( verbosity )
+    : linePfx( pfx ), outputImpl( new FILEDebugStream( impl ) ), mpiRank( -1 ), verbosityLimit( verbosity )
 {
 }
 DebugOutput::DebugOutput( const char* pfx, FILE* impl, int rank, unsigned verbosity )
-    : linePfx( pfx ), outputImpl( new FILEDebugStream( impl ) ), mpiRank( rank ),
-      verbosityLimit( verbosity )
+    : linePfx( pfx ), outputImpl( new FILEDebugStream( impl ) ), mpiRank( rank ), verbosityLimit( verbosity )
 {
 }
 DebugOutput::DebugOutput( const char* pfx, std::ostream& str, unsigned verbosity )
-    : linePfx( pfx ), outputImpl( new CxxDebugStream( str ) ), mpiRank( -1 ),
-      verbosityLimit( verbosity )
+    : linePfx( pfx ), outputImpl( new CxxDebugStream( str ) ), mpiRank( -1 ), verbosityLimit( verbosity )
 {
 }
 DebugOutput::DebugOutput( const char* pfx, std::ostream& str, int rank, unsigned verbosity )
-    : linePfx( pfx ), outputImpl( new CxxDebugStream( str ) ), mpiRank( rank ),
-      verbosityLimit( verbosity )
+    : linePfx( pfx ), outputImpl( new CxxDebugStream( str ) ), mpiRank( rank ), verbosityLimit( verbosity )
 {
 }
 
@@ -288,7 +284,7 @@ void DebugOutput::list_range_real( const char* pfx, const Range& range )
         return;
     }
 
-    char numbuf[ 48 ];  // unsigned 64 bit integer can't have more than 20 decimal digits
+    char                       numbuf[ 48 ];  // unsigned 64 bit integer can't have more than 20 decimal digits
     Range::const_pair_iterator i;
     EntityType                 type = MBMAXTYPE;
     for( i = range.const_pair_begin( ); i != range.const_pair_end( ); ++i )
@@ -324,7 +320,7 @@ void DebugOutput::list_ints_real( const char* pfx, const Range& range )
         lineBuffer.push_back( ' ' );
     }
 
-    char numbuf[ 48 ];  // unsigned 64 bit integer can't have more than 20 decimal digits
+    char                       numbuf[ 48 ];  // unsigned 64 bit integer can't have more than 20 decimal digits
     Range::const_pair_iterator i;
     for( i = range.const_pair_begin( ); i != range.const_pair_end( ); ++i )
     {

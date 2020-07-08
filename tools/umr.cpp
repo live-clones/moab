@@ -28,35 +28,31 @@ using namespace moab;
 
 static void print_usage( const char* name, std::ostream& stream )
 {
-    stream
-        << "Usage: " << name << " <options> <input_file> [<input_file2> ...]" << std::endl
-        << "Options: " << std::endl
-        << "\t-h             - Print this help text and exit." << std::endl
-        << "\t-d             - Dimension of the mesh." << std::endl
-        << "\t-n             - Exact or a maximum number of levels for the hierarchy. Default 1."
-        << std::endl
-        << "\t-L             - Degree of refinement for each level. Pass an array or a number. It "
-           "is mandatory to pass dimension and num_levels before to use this option. If this flag "
-           "is not used, a default of deg 2 refinement is used. "
-        << std::endl
-        << "\t-V             - Pass a desired volume (absolute) . This will generate a hierarchy "
-           "such that the maximum volume is reduced to the given amount approximately. The length "
-           "of the hierarchy can be constrained further if a maximum number of levels is passed. "
-           "It is mandatory to pass the dimension for this option. "
-        << std::endl
-        << "\t-q             - Prints out the maximum volume of the mesh and exits the program. "
-           "This option can be used as a guide to volume constrainted mesh hierarchy later. "
-        << std::endl
-        << "\t-t             - Print out the time taken to generate hierarchy." << std::endl
-        << "\t-s             - Print out the mesh sizes of each level of the generated hierarchy."
-        << std::endl
-        << "\t-o             - Specify true for output files for the mesh levels of the hierarchy."
-        << std::endl
+    stream << "Usage: " << name << " <options> <input_file> [<input_file2> ...]" << std::endl
+           << "Options: " << std::endl
+           << "\t-h             - Print this help text and exit." << std::endl
+           << "\t-d             - Dimension of the mesh." << std::endl
+           << "\t-n             - Exact or a maximum number of levels for the hierarchy. Default 1." << std::endl
+           << "\t-L             - Degree of refinement for each level. Pass an array or a number. It "
+              "is mandatory to pass dimension and num_levels before to use this option. If this flag "
+              "is not used, a default of deg 2 refinement is used. "
+           << std::endl
+           << "\t-V             - Pass a desired volume (absolute) . This will generate a hierarchy "
+              "such that the maximum volume is reduced to the given amount approximately. The length "
+              "of the hierarchy can be constrained further if a maximum number of levels is passed. "
+              "It is mandatory to pass the dimension for this option. "
+           << std::endl
+           << "\t-q             - Prints out the maximum volume of the mesh and exits the program. "
+              "This option can be used as a guide to volume constrainted mesh hierarchy later. "
+           << std::endl
+           << "\t-t             - Print out the time taken to generate hierarchy." << std::endl
+           << "\t-s             - Print out the mesh sizes of each level of the generated hierarchy." << std::endl
+           << "\t-o             - Specify true for output files for the mesh levels of the hierarchy." << std::endl
     //<< "\t-O option      - Specify read option." << std::endl
 #ifdef MOAB_HAVE_MPI
-        << "\t-p[0|1|2]      - Read in parallel[0], optionally also doing resolve_shared_ents (1) "
-           "and exchange_ghosts (2)"
-        << std::endl
+           << "\t-p[0|1|2]      - Read in parallel[0], optionally also doing resolve_shared_ents (1) "
+              "and exchange_ghosts (2)"
+           << std::endl
 #endif
         ;
     exit( USAGE_ERROR );
@@ -75,8 +71,8 @@ bool parse_id_list( const char* string, int dim, int nval, std::vector< int >& r
 
 bool make_opts_string( std::vector< std::string > options, std::string& opts );
 
-ErrorCode get_degree_seq( Core& mb, EntityHandle fileset, int dim, double desired_vol,
-                          int& num_levels, std::vector< int >& level_degs );
+ErrorCode get_degree_seq( Core& mb, EntityHandle fileset, int dim, double desired_vol, int& num_levels,
+                          std::vector< int >& level_degs );
 
 ErrorCode get_max_volume( Core& mb, EntityHandle fileset, int dim, double& vmax );
 
@@ -141,8 +137,7 @@ int main( int argc, char* argv[] )
                 case 'L':
                     if( dim != 0 && num_levels != 0 )
                     {
-                        parselevels =
-                            parse_id_list( argv[ i + 1 ], dim, num_levels, level_degrees );
+                        parselevels = parse_id_list( argv[ i + 1 ], dim, num_levels, level_degrees );
                         ++i;
                     }
                     else
@@ -227,8 +222,7 @@ int main( int argc, char* argv[] )
             }*/
     }
 
-    if( !make_opts_string( read_opts, read_options ) ||
-        !make_opts_string( write_opts, write_options ) )
+    if( !make_opts_string( read_opts, read_options ) || !make_opts_string( write_opts, write_options ) )
     {
 #ifdef MOAB_HAVE_MPI
         MPI_Finalize( );
@@ -299,14 +293,12 @@ int main( int argc, char* argv[] )
 
     if( print_times )
     {
-        std::cout << "Finished hierarchy generation in " << uref->timeall.tm_total << "  secs"
-                  << std::endl;
+        std::cout << "Finished hierarchy generation in " << uref->timeall.tm_total << "  secs" << std::endl;
         if( parallel )
         {
-            std::cout << "Time taken for refinement " << uref->timeall.tm_refine << "  secs"
+            std::cout << "Time taken for refinement " << uref->timeall.tm_refine << "  secs" << std::endl;
+            std::cout << "Time taken for resolving shared interface " << uref->timeall.tm_resolve << "  secs"
                       << std::endl;
-            std::cout << "Time taken for resolving shared interface " << uref->timeall.tm_resolve
-                      << "  secs" << std::endl;
         }
     }
     else
@@ -333,8 +325,7 @@ int main( int argc, char* argv[] )
         else
             std::cout << "Mesh size for level 0"
                       << "  :: nverts = " << ents[ 0 ].size( ) << ", nedges = " << ents[ 1 ].size( )
-                      << ", nfaces = " << ents[ 2 ].size( ) << ", ncells = " << ents[ 3 ].size( )
-                      << std::endl;
+                      << ", nfaces = " << ents[ 2 ].size( ) << ", ncells = " << ents[ 3 ].size( ) << std::endl;
 
         for( int l = 0; l < num_levels; l++ )
         {
@@ -354,18 +345,13 @@ int main( int argc, char* argv[] )
             {
                 double volume;
                 error = get_max_volume( *moab, lsets[ l + 1 ], dim, volume );MB_CHK_ERR( error );
-                std::cout << "Mesh size for level " << l + 1
-                          << "  :: nverts = " << ents[ 0 ].size( )
-                          << ", nedges = " << ents[ 1 ].size( )
-                          << ", nfaces = " << ents[ 2 ].size( )
-                          << ", ncells = " << ents[ 3 ].size( ) << " :: Vmax = " << volume
-                          << std::endl;
+                std::cout << "Mesh size for level " << l + 1 << "  :: nverts = " << ents[ 0 ].size( )
+                          << ", nedges = " << ents[ 1 ].size( ) << ", nfaces = " << ents[ 2 ].size( )
+                          << ", ncells = " << ents[ 3 ].size( ) << " :: Vmax = " << volume << std::endl;
             }
             else
-                std::cout << "Mesh size for level " << l + 1
-                          << "  :: nverts = " << ents[ 0 ].size( )
-                          << ", nedges = " << ents[ 1 ].size( )
-                          << ", nfaces = " << ents[ 2 ].size( )
+                std::cout << "Mesh size for level " << l + 1 << "  :: nverts = " << ents[ 0 ].size( )
+                          << ", nedges = " << ents[ 1 ].size( ) << ", nfaces = " << ents[ 2 ].size( )
                           << ", ncells = " << ents[ 3 ].size( ) << std::endl;
         }
     }
@@ -412,8 +398,8 @@ int main( int argc, char* argv[] )
     exit( SUCCESS );
 }
 
-ErrorCode get_degree_seq( Core& mb, EntityHandle fileset, int dim, double desired_vol,
-                          int& num_levels, std::vector< int >& level_degs )
+ErrorCode get_degree_seq( Core& mb, EntityHandle fileset, int dim, double desired_vol, int& num_levels,
+                          std::vector< int >& level_degs )
 {
     // Find max volume
     double    vmax_global;

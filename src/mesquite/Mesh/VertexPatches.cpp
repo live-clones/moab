@@ -44,8 +44,7 @@ namespace MBMesquite
 
 VertexPatches::~VertexPatches( ) {}
 
-void VertexPatches::get_patch_handles( std::vector< PatchHandle >& patch_handles_out,
-                                       MsqError&                   err )
+void VertexPatches::get_patch_handles( std::vector< PatchHandle >& patch_handles_out, MsqError& err )
 {
     // get all vertex handles
     get_mesh( )->get_all_vertices( patch_handles_out, err );MSQ_ERRRTN( err );
@@ -55,8 +54,7 @@ void VertexPatches::get_patch_handles( std::vector< PatchHandle >& patch_handles
     {
         // get fixed flags for vertices
         std::vector< unsigned char > flags( patch_handles_out.size( ) );
-        get_mesh( )->vertices_get_byte( arrptr( patch_handles_out ), arrptr( flags ),
-                                        patch_handles_out.size( ), err );MSQ_ERRRTN( err );
+        get_mesh( )->vertices_get_byte( arrptr( patch_handles_out ), arrptr( flags ), patch_handles_out.size( ), err );MSQ_ERRRTN( err );
 
         // remove fixed  and slaved vertices from list
         size_t write = 0;
@@ -67,8 +65,7 @@ void VertexPatches::get_patch_handles( std::vector< PatchHandle >& patch_handles
     }
 }
 
-void VertexPatches::get_patch( PatchHandle                         patch_handle,
-                               std::vector< Mesh::ElementHandle >& elem_handles_out,
+void VertexPatches::get_patch( PatchHandle patch_handle, std::vector< Mesh::ElementHandle >& elem_handles_out,
                                std::vector< Mesh::VertexHandle >& free_vertices_out, MsqError& err )
 {
     free_vertices_out.clear( );
@@ -96,20 +93,19 @@ void VertexPatches::get_patch( PatchHandle                         patch_handle,
 
         // Get vertices adjacent to elements
         free_vertices_out.clear( );
-        get_mesh( )->elements_get_attached_vertices(
-            arrptr( elem_handles_out ), elem_handles_out.size( ), free_vertices_out, junk, err );
+        get_mesh( )->elements_get_attached_vertices( arrptr( elem_handles_out ), elem_handles_out.size( ),
+                                                     free_vertices_out, junk, err );
         if( MSQ_CHKERR( err ) ) break;
 
         // remove duplicates from vertex list
         std::sort( free_vertices_out.begin( ), free_vertices_out.end( ) );
-        free_vertices_out.erase(
-            std::unique( free_vertices_out.begin( ), free_vertices_out.end( ) ),
-            free_vertices_out.end( ) );
+        free_vertices_out.erase( std::unique( free_vertices_out.begin( ), free_vertices_out.end( ) ),
+                                 free_vertices_out.end( ) );
 
         // Get elements adjacent to vertices
         elem_handles_out.clear( );
-        get_mesh( )->vertices_get_attached_elements(
-            arrptr( free_vertices_out ), free_vertices_out.size( ), elem_handles_out, junk, err );
+        get_mesh( )->vertices_get_attached_elements( arrptr( free_vertices_out ), free_vertices_out.size( ),
+                                                     elem_handles_out, junk, err );
         if( MSQ_CHKERR( err ) ) break;
 
         // Remove duplicates from element list

@@ -66,8 +66,7 @@ class ElemSampleQM : public QualityMetric
      * method returns only the subset corresponding to a single element.
      */
     MESQUITE_EXPORT virtual void get_element_evaluations( PatchData& pd, size_t elem_index,
-                                                          std::vector< size_t >& handles,
-                                                          MsqError&              err ) = 0;
+                                                          std::vector< size_t >& handles, MsqError& err ) = 0;
 
     /** Misc constants used in defining how element index, side dimension,
      *  and side number are packed into a single handle describing a logical

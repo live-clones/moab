@@ -343,8 +343,8 @@ ErrorCode test_adjacencies( Interface* mbImpl, NestedRefine* nr, Range all_ents 
     return MB_SUCCESS;
 }
 
-ErrorCode refine_entities( Interface* mb, ParallelComm* pc, EntityHandle fset, int* level_degrees,
-                           const int num_levels, bool output )
+ErrorCode refine_entities( Interface* mb, ParallelComm* pc, EntityHandle fset, int* level_degrees, const int num_levels,
+                           bool output )
 {
     ErrorCode error;
 
@@ -410,15 +410,12 @@ ErrorCode refine_entities( Interface* mb, ParallelComm* pc, EntityHandle fset, i
     bool opt = true;
     // bool opt = false;
     error = uref.generate_mesh_hierarchy( num_levels, level_degrees, set, opt );CHECK_ERR( error );
-    std::cout << "Finished hierarchy generation in " << uref.timeall.tm_total << "  secs"
-              << std::endl;
+    std::cout << "Finished hierarchy generation in " << uref.timeall.tm_total << "  secs" << std::endl;
 #ifdef MOAB_HAVE_MPI
     if( pc )
     {
-        std::cout << "Time taken for refinement " << uref.timeall.tm_refine << "  secs"
-                  << std::endl;
-        std::cout << "Time taken for resolving shared interface " << uref.timeall.tm_resolve
-                  << "  secs" << std::endl;
+        std::cout << "Time taken for refinement " << uref.timeall.tm_refine << "  secs" << std::endl;
+        std::cout << "Time taken for resolving shared interface " << uref.timeall.tm_resolve << "  secs" << std::endl;
     }
 #endif
 
@@ -426,8 +423,7 @@ ErrorCode refine_entities( Interface* mb, ParallelComm* pc, EntityHandle fset, i
 
     std::cout << std::endl;
     std::cout << "Mesh size for level 0  :: inverts = " << init_ents[ 0 ].size( )
-              << ", inedges = " << init_ents[ 1 ].size( )
-              << ", infaces = " << init_ents[ 2 ].size( )
+              << ", inedges = " << init_ents[ 1 ].size( ) << ", infaces = " << init_ents[ 2 ].size( )
               << ", incells = " << init_ents[ 3 ].size( ) << std::endl;
 
     Range prev_ents[ 4 ];
@@ -444,8 +440,7 @@ ErrorCode refine_entities( Interface* mb, ParallelComm* pc, EntityHandle fset, i
         for( int k = 0; k < 4; k++ )
             ents[ k ] = all_ents.subset_by_dimension( k );
 
-        if( ents[ 0 ].empty( ) || all_ents.empty( ) )
-            std::cout << "Something is not right" << std::endl;
+        if( ents[ 0 ].empty( ) || all_ents.empty( ) ) std::cout << "Something is not right" << std::endl;
 
         std::cout << std::endl;
         std::cout << "Mesh size for level " << l + 1 << "  :: nverts = " << ents[ 0 ].size( )
@@ -478,8 +473,7 @@ ErrorCode refine_entities( Interface* mb, ParallelComm* pc, EntityHandle fset, i
         {
             if( !prev_ents[ type + 1 ].empty( ) )
             {
-                for( Range::iterator e = prev_ents[ type + 1 ].begin( );
-                     e != prev_ents[ type + 1 ].end( ); e++ )
+                for( Range::iterator e = prev_ents[ type + 1 ].begin( ); e != prev_ents[ type + 1 ].end( ); e++ )
                 {
                     std::vector< EntityHandle > children;
                     error = uref.parent_to_child( *e, l, l + 1, children );CHECK_ERR( error );
@@ -551,8 +545,7 @@ ErrorCode refine_entities( Interface* mb, ParallelComm* pc, EntityHandle fset, i
     {
         if( !init_ents[ type + 1 ].empty( ) )
         {
-            for( Range::iterator e = init_ents[ type + 1 ].begin( );
-                 e != init_ents[ type + 1 ].end( ); e++ )
+            for( Range::iterator e = init_ents[ type + 1 ].begin( ); e != init_ents[ type + 1 ].end( ); e++ )
             {
                 std::vector< EntityHandle > children;
                 error = uref.parent_to_child( *e, 0, num_levels, children );CHECK_ERR( error );
@@ -684,8 +677,7 @@ ErrorCode create_single_entity( Interface* mbImpl, EntityType type )
     }
     else if( type == MBHEX )
     {
-        const double coords[] = { 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0,
-                                  0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1 };
+        const double coords[] = { 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1 };
         const size_t num_vtx = sizeof( coords ) / sizeof( double ) / 3;
 
         const int    conn[] = { 0, 1, 2, 3, 4, 5, 6, 7 };
@@ -741,8 +733,7 @@ ErrorCode create_mesh( Interface* mbImpl, EntityType type )
 
         const size_t num_vtx = sizeof( coords ) / sizeof( double ) / 3;
 
-        const int conn[] = { 0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 1,
-                             0, 5, 3, 0, 2, 5, 0, 4, 5, 0, 5, 1 };
+        const int conn[] = { 0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 1, 0, 5, 3, 0, 2, 5, 0, 4, 5, 0, 5, 1 };
 
         const size_t num_elems = sizeof( conn ) / sizeof( int ) / 3;
 
@@ -768,8 +759,7 @@ ErrorCode create_mesh( Interface* mbImpl, EntityType type )
 
         const size_t num_vtx = sizeof( coords ) / sizeof( double ) / 3;
 
-        const int conn[] = { 0, 1, 2, 3, 0, 3, 4, 5,  7, 8,  1,  0,
-                             6, 7, 0, 5, 0, 3, 9, 10, 0, 10, 11, 7 };
+        const int conn[] = { 0, 1, 2, 3, 0, 3, 4, 5, 7, 8, 1, 0, 6, 7, 0, 5, 0, 3, 9, 10, 0, 10, 11, 7 };
 
         const size_t num_elems = sizeof( conn ) / sizeof( int ) / 4;
 
@@ -871,9 +861,8 @@ ErrorCode create_simple_mesh( Interface* mbImpl, EntityType type )
     }
     else if( type == MBTRI )
     {
-        const double coords[] = { 0,  0,   0,   1,  0,   0,   2,  0,    0,   2.5, 1,
-                                  0,  1.5, 1,   0,  0.5, 1,   0,  -0.5, 1,   0,   -0.5,
-                                  -1, 0,   0.5, -1, 0,   1.5, -1, 0,    2.5, -1,  0 };
+        const double coords[] = { 0, 0,    0, 1, 0,    0,  2, 0,   0,  2.5, 1,   0,  1.5, 1,   0,  0.5, 1,
+                                  0, -0.5, 1, 0, -0.5, -1, 0, 0.5, -1, 0,   1.5, -1, 0,   2.5, -1, 0 };
 
         const size_t num_vtx = sizeof( coords ) / sizeof( double ) / 3;
 
@@ -899,15 +888,13 @@ ErrorCode create_simple_mesh( Interface* mbImpl, EntityType type )
     }
     else if( type == MBQUAD )
     {
-        const double coords[] = { 0, 0, 0, 1, 0, 0, 2, 0, 0, 3, 0, 0, 4, 0, 0, 5, 0, 0,
-                                  0, 1, 0, 1, 1, 0, 2, 1, 0, 3, 1, 0, 4, 1, 0, 5, 1, 0,
-                                  0, 2, 0, 1, 2, 0, 2, 2, 0, 3, 2, 0, 4, 2, 0, 5, 2, 0 };
+        const double coords[] = { 0, 0, 0, 1, 0, 0, 2, 0, 0, 3, 0, 0, 4, 0, 0, 5, 0, 0, 0, 1, 0, 1, 1, 0, 2, 1, 0,
+                                  3, 1, 0, 4, 1, 0, 5, 1, 0, 0, 2, 0, 1, 2, 0, 2, 2, 0, 3, 2, 0, 4, 2, 0, 5, 2, 0 };
 
         const size_t num_vtx = sizeof( coords ) / sizeof( double ) / 3;
 
-        const int conn[] = { 0,  1, 7,  6,  1,  2,  8,  7,  2,  3,  9,  8, 3,  4,
-                             10, 9, 4,  5,  11, 10, 6,  7,  13, 12, 7,  8, 14, 13,
-                             8,  9, 15, 14, 9,  10, 16, 15, 10, 11, 17, 16 };
+        const int conn[] = { 0, 1, 7,  6,  1, 2, 8,  7,  2, 3, 9,  8,  3, 4,  10, 9,  4,  5,  11, 10,
+                             6, 7, 13, 12, 7, 8, 14, 13, 8, 9, 15, 14, 9, 10, 16, 15, 10, 11, 17, 16 };
 
         const size_t num_elems = sizeof( conn ) / sizeof( int ) / 4;
 
@@ -953,9 +940,8 @@ ErrorCode create_simple_mesh( Interface* mbImpl, EntityType type )
     }
     else if( type == MBHEX )
     {
-        const double coords[] = { 0, 0, 0, 1, 0, 0, 2, 0, 0, 0, 1, 0, 1, 1, 0, 2, 1, 0,
-                                  0, 2, 0, 1, 2, 0, 2, 2, 0, 0, 0, 1, 1, 0, 1, 2, 0, 1,
-                                  0, 1, 1, 1, 1, 1, 2, 1, 1, 0, 2, 1, 1, 2, 1, 2, 2, 1 };
+        const double coords[] = { 0, 0, 0, 1, 0, 0, 2, 0, 0, 0, 1, 0, 1, 1, 0, 2, 1, 0, 0, 2, 0, 1, 2, 0, 2, 2, 0,
+                                  0, 0, 1, 1, 0, 1, 2, 0, 1, 0, 1, 1, 1, 1, 1, 2, 1, 1, 0, 2, 1, 1, 2, 1, 2, 2, 1 };
         const size_t num_vtx = sizeof( coords ) / sizeof( double ) / 3;
 
         const int    conn[] = { 0, 1, 4, 3, 9,  10, 13, 12, 1, 2, 5, 4, 10, 11, 14, 13,
@@ -980,8 +966,7 @@ ErrorCode create_simple_mesh( Interface* mbImpl, EntityType type )
     return MB_SUCCESS;
 }
 
-ErrorCode test_entities( int mesh_type, EntityType type, int* level_degrees, int num_levels,
-                         bool output )
+ErrorCode test_entities( int mesh_type, EntityType type, int* level_degrees, int num_levels, bool output )
 {
     ErrorCode  error;
     Core       mb;
@@ -1139,8 +1124,7 @@ ErrorCode test_mesh( const char* filename, int* level_degrees, int num_levels )
 
     if( procs > 1 )
     {
-        read_options =
-            "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_SHARED_ENTS";
+        read_options = "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_SHARED_ENTS";
 
         error = mbImpl->load_file( filename, &fileset, read_options.c_str( ) );CHECK_ERR( error );
 

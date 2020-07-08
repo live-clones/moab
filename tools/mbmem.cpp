@@ -47,8 +47,8 @@ enum Units
 Units UNITS = HUMAN;
 
 // The core functionality of this example
-static void print_memory_stats( moab::Interface& mb, bool per_type = true, bool per_tag = true,
-                                bool totals = true, bool sysstats = true );
+static void print_memory_stats( moab::Interface& mb, bool per_type = true, bool per_tag = true, bool totals = true,
+                                bool sysstats = true );
 
 // Generate a series of meshes for testing
 static void do_test_mode( );
@@ -84,8 +84,7 @@ int main( int argc, char* argv[] )
                 no_more_flags = true;
             else
             {
-                std::cerr << argv[ 0 ] << ": Invalid flag: \"" << argv[ i ] << "\"." << std::endl
-                          << std::endl;
+                std::cerr << argv[ 0 ] << ": Invalid flag: \"" << argv[ i ] << "\"." << std::endl << std::endl;
                 usage( argv[ 0 ] );
             }
         }
@@ -103,8 +102,7 @@ int main( int argc, char* argv[] )
 
     moab::Core       mbcore;
     moab::Interface& mb = mbcore;
-    for( std::vector< int >::iterator it = input_file_list.begin( ); it != input_file_list.end( );
-         ++it )
+    for( std::vector< int >::iterator it = input_file_list.begin( ); it != input_file_list.end( ); ++it )
     {
         rval = mb.load_file( argv[ *it ] );
 
@@ -144,8 +142,7 @@ static bool is_zero( const MemStats& stats );
 
 // populdate a MemStats structg by calling
 // moab::Interface::estimated_memory_use
-static void get_mem_stats( moab::Interface& mb, MemStats& data,
-                           moab::EntityType type = moab::MBMAXTYPE );
+static void get_mem_stats( moab::Interface& mb, MemStats& data, moab::EntityType type = moab::MBMAXTYPE );
 
 // Formatted string representation of memory size value
 static std::string memstr( unsigned long long val );
@@ -159,8 +156,7 @@ static std::string tag_storage_string( moab::Interface& mb, moab::Tag tag );
 // Center
 static std::string center( const char* str, size_t width );
 
-void print_memory_stats( moab::Interface& mb, bool per_type, bool per_tag, bool totals,
-                         bool sysstats )
+void print_memory_stats( moab::Interface& mb, bool per_type, bool per_tag, bool totals, bool sysstats )
 {
     moab::ErrorCode rval;
     const char      ANON_TAG_NAME[] = "(anonymous)";
@@ -178,10 +174,9 @@ void print_memory_stats( moab::Interface& mb, bool per_type, bool per_tag, bool 
     {
 
         std::cout.fill( ' ' );
-        std::cout << std::left << std::setw( TYPE_WIDTH ) << "Type" << ' '
-                  << center( "Total", MEM2_WIDTH ) << ' ' << center( "Entity", MEM2_WIDTH ) << ' '
-                  << center( "Adjacency", MEM2_WIDTH ) << ' ' << center( "Tag", MEM2_WIDTH ) << ' '
-                  << std::endl
+        std::cout << std::left << std::setw( TYPE_WIDTH ) << "Type" << ' ' << center( "Total", MEM2_WIDTH ) << ' '
+                  << center( "Entity", MEM2_WIDTH ) << ' ' << center( "Adjacency", MEM2_WIDTH ) << ' '
+                  << center( "Tag", MEM2_WIDTH ) << ' ' << std::endl
                   << std::setw( TYPE_WIDTH ) << " ";
         for( int i = 0; i < 4; ++i )
             std::cout << ' ' << std::left << std::setw( MEM_WIDTH ) << "Used" << ' ' << std::left
@@ -200,18 +195,15 @@ void print_memory_stats( moab::Interface& mb, bool per_type, bool per_tag, bool 
             get_mem_stats( mb, stats, t );
             if( is_zero( stats ) ) continue;  // skip types with no allocated memory
 
-            std::cout << std::left << std::setw( TYPE_WIDTH ) << moab::CN::EntityTypeName( t )
-                      << ' ' << std::right << std::setw( MEM_WIDTH )
-                      << memstr( stats.total_storage ) << ' ' << std::right
-                      << std::setw( MEM_WIDTH ) << memstr( stats.total_amortized ) << ' '
-                      << std::right << std::setw( MEM_WIDTH ) << memstr( stats.entity_storage )
-                      << ' ' << std::right << std::setw( MEM_WIDTH )
-                      << memstr( stats.entity_amortized ) << ' ' << std::right
-                      << std::setw( MEM_WIDTH ) << memstr( stats.adjacency_storage ) << ' '
-                      << std::right << std::setw( MEM_WIDTH ) << memstr( stats.adjacency_amortized )
-                      << ' ' << std::right << std::setw( MEM_WIDTH ) << memstr( stats.tag_storage )
-                      << ' ' << std::right << std::setw( MEM_WIDTH )
-                      << memstr( stats.tag_amortized ) << std::endl;
+            std::cout << std::left << std::setw( TYPE_WIDTH ) << moab::CN::EntityTypeName( t ) << ' ' << std::right
+                      << std::setw( MEM_WIDTH ) << memstr( stats.total_storage ) << ' ' << std::right
+                      << std::setw( MEM_WIDTH ) << memstr( stats.total_amortized ) << ' ' << std::right
+                      << std::setw( MEM_WIDTH ) << memstr( stats.entity_storage ) << ' ' << std::right
+                      << std::setw( MEM_WIDTH ) << memstr( stats.entity_amortized ) << ' ' << std::right
+                      << std::setw( MEM_WIDTH ) << memstr( stats.adjacency_storage ) << ' ' << std::right
+                      << std::setw( MEM_WIDTH ) << memstr( stats.adjacency_amortized ) << ' ' << std::right
+                      << std::setw( MEM_WIDTH ) << memstr( stats.tag_storage ) << ' ' << std::right
+                      << std::setw( MEM_WIDTH ) << memstr( stats.tag_amortized ) << std::endl;
         }
     }  // end per_type
 
@@ -237,15 +229,14 @@ void print_memory_stats( moab::Interface& mb, bool per_type, bool per_tag, bool 
         {
             std::cout.fill( ' ' );
             std::cout << std::endl
-                      << std::left << std::setw( maxlen ) << "Tag Name" << ' ' << std::left
-                      << std::setw( DTYPE_WIDTH ) << "Type" << ' ' << std::left
-                      << std::setw( STORAGE_WIDTH ) << "Storage" << ' ' << std::left
-                      << std::setw( MEM_WIDTH ) << "Used" << ' ' << std::left
-                      << std::setw( MEM_WIDTH ) << "Alloc" << std::endl;
+                      << std::left << std::setw( maxlen ) << "Tag Name" << ' ' << std::left << std::setw( DTYPE_WIDTH )
+                      << "Type" << ' ' << std::left << std::setw( STORAGE_WIDTH ) << "Storage" << ' ' << std::left
+                      << std::setw( MEM_WIDTH ) << "Used" << ' ' << std::left << std::setw( MEM_WIDTH ) << "Alloc"
+                      << std::endl;
             std::cout.fill( '-' );
             std::cout << std::setw( maxlen ) << '-' << ' ' << std::setw( DTYPE_WIDTH ) << '-' << ' '
-                      << std::setw( STORAGE_WIDTH ) << '-' << ' ' << std::setw( MEM_WIDTH ) << '-'
-                      << ' ' << std::setw( MEM_WIDTH ) << '-' << std::endl;
+                      << std::setw( STORAGE_WIDTH ) << '-' << ' ' << std::setw( MEM_WIDTH ) << '-' << ' '
+                      << std::setw( MEM_WIDTH ) << '-' << std::endl;
             std::cout.fill( ' ' );
         }
 
@@ -259,11 +250,11 @@ void print_memory_stats( moab::Interface& mb, bool per_type, bool per_tag, bool 
             unsigned long long occupied, allocated;
             mb.estimated_memory_use( 0, 0, 0, 0, 0, 0, 0, 0, &*ti, 1, &occupied, &allocated );
 
-            std::cout << std::left << std::setw( maxlen ) << name << ' ' << std::right
-                      << std::setw( DTYPE_WIDTH ) << tag_type_string( mb, *ti ) << ' ' << std::right
-                      << std::setw( STORAGE_WIDTH ) << tag_storage_string( mb, *ti ) << ' '
-                      << std::right << std::setw( MEM_WIDTH ) << memstr( occupied ) << ' '
-                      << std::right << std::setw( MEM_WIDTH ) << memstr( allocated ) << std::endl;
+            std::cout << std::left << std::setw( maxlen ) << name << ' ' << std::right << std::setw( DTYPE_WIDTH )
+                      << tag_type_string( mb, *ti ) << ' ' << std::right << std::setw( STORAGE_WIDTH )
+                      << tag_storage_string( mb, *ti ) << ' ' << std::right << std::setw( MEM_WIDTH )
+                      << memstr( occupied ) << ' ' << std::right << std::setw( MEM_WIDTH ) << memstr( allocated )
+                      << std::endl;
         }
     }  // end per_tag
 
@@ -273,14 +264,13 @@ void print_memory_stats( moab::Interface& mb, bool per_type, bool per_tag, bool 
         get_mem_stats( mb, stats );
         std::cout << std::endl
                   << "TOTAL: (Used/Allocated)" << std::endl
-                  << "memory:    " << memstr( stats.total_storage ) << "/"
-                  << memstr( stats.total_amortized ) << std::endl
-                  << "entity:    " << memstr( stats.entity_storage ) << "/"
-                  << memstr( stats.entity_amortized ) << std::endl
-                  << "adjacency: " << memstr( stats.adjacency_storage ) << "/"
-                  << memstr( stats.adjacency_amortized ) << std::endl
-                  << "tag:       " << memstr( stats.tag_storage ) << "/"
-                  << memstr( stats.tag_amortized ) << std::endl
+                  << "memory:    " << memstr( stats.total_storage ) << "/" << memstr( stats.total_amortized )
+                  << std::endl
+                  << "entity:    " << memstr( stats.entity_storage ) << "/" << memstr( stats.entity_amortized )
+                  << std::endl
+                  << "adjacency: " << memstr( stats.adjacency_storage ) << "/" << memstr( stats.adjacency_amortized )
+                  << std::endl
+                  << "tag:       " << memstr( stats.tag_storage ) << "/" << memstr( stats.tag_amortized ) << std::endl
                   << std::endl;
 
     }  // end totals
@@ -333,8 +323,7 @@ void print_memory_stats( moab::Interface& mb, bool per_type, bool per_tag, bool 
         {
 #ifndef _WIN32
             struct rusage sysdata;
-            if( getrusage( RUSAGE_SELF, &sysdata ) )
-            { std::cerr << "getrusage failed" << std::endl; }
+            if( getrusage( RUSAGE_SELF, &sysdata ) ) { std::cerr << "getrusage failed" << std::endl; }
             else
             {
                 rss = sysdata.ru_maxrss;
@@ -360,16 +349,14 @@ void get_mem_stats( moab::Interface& mb, MemStats& data, moab::EntityType type )
     {
         moab::Range range;
         mb.get_entities_by_type( 0, type, range );
-        mb.estimated_memory_use( range, &data.total_storage, &data.total_amortized,
-                                 &data.entity_storage, &data.entity_amortized,
-                                 &data.adjacency_storage, &data.adjacency_amortized, 0, 0,
+        mb.estimated_memory_use( range, &data.total_storage, &data.total_amortized, &data.entity_storage,
+                                 &data.entity_amortized, &data.adjacency_storage, &data.adjacency_amortized, 0, 0,
                                  &data.tag_storage, &data.tag_amortized );
     }
     else
     {
-        mb.estimated_memory_use( 0, 0, &data.total_storage, &data.total_amortized,
-                                 &data.entity_storage, &data.entity_amortized,
-                                 &data.adjacency_storage, &data.adjacency_amortized, 0, 0,
+        mb.estimated_memory_use( 0, 0, &data.total_storage, &data.total_amortized, &data.entity_storage,
+                                 &data.entity_amortized, &data.adjacency_storage, &data.adjacency_amortized, 0, 0,
                                  &data.tag_storage, &data.tag_amortized );
     }
 }
@@ -602,8 +589,7 @@ void do_test_mode( )
             mb.create_element( moab::MBQUAD, conn, 4, h );
         }
     }
-    std::cout << std::endl
-              << prefix << "Created another " << 100 * ( N - 3 ) << " quads" << std::endl;
+    std::cout << std::endl << prefix << "Created another " << 100 * ( N - 3 ) << " quads" << std::endl;
     print_memory_stats( mb, true, false, true, true );
 
     // set global ID
@@ -622,8 +608,7 @@ void do_test_mode( )
         mb.tag_set_data( tag, &*it, 1, &id );
         ++id;
     }
-    std::cout << std::endl
-              << prefix << "Set global ID tag on " << handles.size( ) << " vertices" << std::endl;
+    std::cout << std::endl << prefix << "Set global ID tag on " << handles.size( ) << " vertices" << std::endl;
     print_memory_stats( mb, true, true, true, true );
 
     handles.clear( );
@@ -634,13 +619,11 @@ void do_test_mode( )
         mb.tag_set_data( tag, &*it, 1, &id );
         ++id;
     }
-    std::cout << std::endl
-              << prefix << "Set global ID tag on " << handles.size( ) << " quads" << std::endl;
+    std::cout << std::endl << prefix << "Set global ID tag on " << handles.size( ) << " quads" << std::endl;
     print_memory_stats( mb, true, true, true, true );
 
     // create and set a sparse tag
-    mb.tag_get_handle( "mem_test_tag", 3, moab::MB_TYPE_DOUBLE, tag,
-                       moab::MB_TAG_SPARSE | moab::MB_TAG_CREAT );
+    mb.tag_get_handle( "mem_test_tag", 3, moab::MB_TYPE_DOUBLE, tag, moab::MB_TAG_SPARSE | moab::MB_TAG_CREAT );
     handles.clear( );
     mb.get_entities_by_type( 0, moab::MBVERTEX, handles );
     for( it = handles.begin( ); it != handles.end( ); ++it )
@@ -649,8 +632,7 @@ void do_test_mode( )
         mb.tag_set_data( tag, &*it, 1, coords );
     }
     std::cout << std::endl
-              << prefix << "Copied vertex coords to sparse tag for " << handles.size( )
-              << " vertices" << std::endl;
+              << prefix << "Copied vertex coords to sparse tag for " << handles.size( ) << " vertices" << std::endl;
     print_memory_stats( mb, true, true, true, true );
 
     // create and set bit tag
@@ -662,8 +644,7 @@ void do_test_mode( )
         char byte = '\001';
         mb.tag_set_data( tag, &*it, 1, &byte );
     }
-    std::cout << std::endl
-              << prefix << "Set 1-bit tag for " << handles.size( ) << " triangles" << std::endl;
+    std::cout << std::endl << prefix << "Set 1-bit tag for " << handles.size( ) << " triangles" << std::endl;
     print_memory_stats( mb, true, true, true, true );
 
     // create vertex to element adjacency data

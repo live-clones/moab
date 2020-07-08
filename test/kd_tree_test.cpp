@@ -20,8 +20,7 @@ const unsigned INTERVALS = 4;
 const unsigned DEPTH = 7;  // 3*log2(INTERVALS)+1
 const char*    TAG_NAME = "TEST_DATA";
 
-EntityHandle create_tree( AdaptiveKDTree& tool, unsigned depth, int intervals,
-                          Tag* tag_handle = 0 );
+EntityHandle create_tree( AdaptiveKDTree& tool, unsigned depth, int intervals, Tag* tag_handle = 0 );
 void         validate_tree( AdaptiveKDTree& tool, EntityHandle root, int depth, double intervals );
 
 void test_tree_create( );
@@ -93,8 +92,7 @@ EntityHandle create_tree( AdaptiveKDTree& tool, unsigned depth, int intervals, T
     if( !tag_handle ) return root;
 
     // define a tag to use to store integer values on tree leaves
-    err = tool.moab( )->tag_get_handle( TAG_NAME, 1, MB_TYPE_INTEGER, *tag_handle,
-                                        MB_TAG_DENSE | MB_TAG_EXCL );CHECK_ERR( err );
+    err = tool.moab( )->tag_get_handle( TAG_NAME, 1, MB_TYPE_INTEGER, *tag_handle, MB_TAG_DENSE | MB_TAG_EXCL );CHECK_ERR( err );
 
     // iterate over tree setting data
     int counter = 0;
@@ -109,8 +107,7 @@ EntityHandle create_tree( AdaptiveKDTree& tool, unsigned depth, int intervals, T
     return root;
 }
 
-void validate_tree( AdaptiveKDTree& tool, EntityHandle root, unsigned depth, int intervals,
-                    Tag data )
+void validate_tree( AdaptiveKDTree& tool, EntityHandle root, unsigned depth, int intervals, Tag data )
 {
     ErrorCode    err;
     const double VOL = 1.0;  // all leaves should be 1x1x1 boxes
@@ -363,10 +360,8 @@ void test_point_search( )
     }
 
     // compare leaf search to iterator search
-    rval = tool.point_search( right.array( ), leaf, 0.0, 0.0, NULL,
-                              const_cast< EntityHandle* >( &root ) );CHECK_ERR( rval );
-    rval = tool.point_search( right.array( ), iter, 0.0, 0.0, NULL,
-                              const_cast< EntityHandle* >( &root ) );CHECK_ERR( rval );
+    rval = tool.point_search( right.array( ), leaf, 0.0, 0.0, NULL, const_cast< EntityHandle* >( &root ) );CHECK_ERR( rval );
+    rval = tool.point_search( right.array( ), iter, 0.0, 0.0, NULL, const_cast< EntityHandle* >( &root ) );CHECK_ERR( rval );
     assert( iter.handle( ) == leaf );
 
     // iterator should be at 'last' leaf

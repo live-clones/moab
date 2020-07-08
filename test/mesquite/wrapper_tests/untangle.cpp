@@ -162,32 +162,21 @@ int main( int argc, char* argv[] )
 
     int result = 0;
 
-    result += uwt( skip_beta || skip_horse, UntangleWrapper::BETA,
-                   "quads/tangled/tangled_horse1.vtk", 0 );
-    result += uwt( skip_beta || skip_hole, UntangleWrapper::BETA,
-                   "quads/tangled/hole_in_square_tanglap.vtk", 0, true );
-    result += uwt( skip_beta || skip_invrt, UntangleWrapper::BETA,
-                   "quads/tangled/inverted-hole-2.vtk", 0 );
-    result += uwt( skip_beta || skip_shest, UntangleWrapper::BETA,
-                   "quads/untangled/shest_grid32.vtk", 0 );
+    result += uwt( skip_beta || skip_horse, UntangleWrapper::BETA, "quads/tangled/tangled_horse1.vtk", 0 );
+    result += uwt( skip_beta || skip_hole, UntangleWrapper::BETA, "quads/tangled/hole_in_square_tanglap.vtk", 0, true );
+    result += uwt( skip_beta || skip_invrt, UntangleWrapper::BETA, "quads/tangled/inverted-hole-2.vtk", 0 );
+    result += uwt( skip_beta || skip_shest, UntangleWrapper::BETA, "quads/untangled/shest_grid32.vtk", 0 );
 
-    result += uwt( skip_size || skip_horse, UntangleWrapper::SIZE,
-                   "quads/tangled/tangled_horse1.vtk", 0 );
-    result += uwt( skip_size || skip_hole, UntangleWrapper::SIZE,
-                   "quads/tangled/hole_in_square_tanglap.vtk", 6, true );
-    result += uwt( skip_size || skip_invrt, UntangleWrapper::SIZE,
-                   "quads/tangled/inverted-hole-2.vtk", 0 );
-    result += uwt( skip_size || skip_shest, UntangleWrapper::SIZE,
-                   "quads/untangled/shest_grid32.vtk", 0 );
+    result += uwt( skip_size || skip_horse, UntangleWrapper::SIZE, "quads/tangled/tangled_horse1.vtk", 0 );
+    result += uwt( skip_size || skip_hole, UntangleWrapper::SIZE, "quads/tangled/hole_in_square_tanglap.vtk", 6, true );
+    result += uwt( skip_size || skip_invrt, UntangleWrapper::SIZE, "quads/tangled/inverted-hole-2.vtk", 0 );
+    result += uwt( skip_size || skip_shest, UntangleWrapper::SIZE, "quads/untangled/shest_grid32.vtk", 0 );
 
-    result += uwt( skip_shape || skip_horse, UntangleWrapper::SHAPESIZE,
-                   "quads/tangled/tangled_horse1.vtk", 0 );
-    result += uwt( skip_shape || skip_hole, UntangleWrapper::SHAPESIZE,
-                   "quads/tangled/hole_in_square_tanglap.vtk", 0, true );
-    result += uwt( skip_shape || skip_invrt, UntangleWrapper::SHAPESIZE,
-                   "quads/tangled/inverted-hole-2.vtk", 8 );
-    result += uwt( skip_shape || skip_shest, UntangleWrapper::SHAPESIZE,
-                   "quads/untangled/shest_grid32.vtk", 0 );
+    result += uwt( skip_shape || skip_horse, UntangleWrapper::SHAPESIZE, "quads/tangled/tangled_horse1.vtk", 0 );
+    result +=
+        uwt( skip_shape || skip_hole, UntangleWrapper::SHAPESIZE, "quads/tangled/hole_in_square_tanglap.vtk", 0, true );
+    result += uwt( skip_shape || skip_invrt, UntangleWrapper::SHAPESIZE, "quads/tangled/inverted-hole-2.vtk", 8 );
+    result += uwt( skip_shape || skip_shest, UntangleWrapper::SHAPESIZE, "quads/untangled/shest_grid32.vtk", 0 );
 
     return result;
 }
@@ -209,16 +198,14 @@ const char* tostr( UntangleWrapper::UntangleMetric m )
     return 0;
 }
 
-int uwt( bool skip, UntangleWrapper::UntangleMetric metric, const char* input_file_base,
-         int expected, bool flip_domain )
+int uwt( bool skip, UntangleWrapper::UntangleMetric metric, const char* input_file_base, int expected,
+         bool flip_domain )
 {
     if( skip ) return 0;
 
-    if( !brief_output )
-        std::cout << std::endl << "**********************************************" << std::endl;
+    if( !brief_output ) std::cout << std::endl << "**********************************************" << std::endl;
     std::cout << "Running \"" << input_file_base << "\" for " << tostr( metric ) << std::endl;
-    if( !brief_output )
-        std::cout << "**********************************************" << std::endl << std::endl;
+    if( !brief_output ) std::cout << "**********************************************" << std::endl << std::endl;
 
     // get mesh
     MsqError    err;
@@ -280,22 +267,20 @@ int uwt( bool skip, UntangleWrapper::UntangleMetric metric, const char* input_fi
     if( err ) abort( );
     if( count < expected )
     {
-        std::cout << "WARNING: expected " << expected
-                  << " inverted elements but finished with only " << count << std::endl
+        std::cout << "WARNING: expected " << expected << " inverted elements but finished with only " << count
+                  << std::endl
                   << "Test needs to be updated?" << std::endl
                   << std::endl;
         return 0;
     }
     else if( count == expected )
     {
-        std::cout << "Completed with " << count << " inverted elements remaining" << std::endl
-                  << std::endl;
+        std::cout << "Completed with " << count << " inverted elements remaining" << std::endl << std::endl;
         return 0;
     }
     else
     {
-        std::cerr << "ERROR: expected " << expected << " inverted elements but finished with "
-                  << count << std::endl
+        std::cerr << "ERROR: expected " << expected << " inverted elements but finished with " << count << std::endl
                   << std::endl;
         return 1;
     }

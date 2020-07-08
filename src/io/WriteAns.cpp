@@ -50,8 +50,7 @@ WriterIface* WriteAns::factory( Interface* iface )
     return new WriteAns( iface );
 }
 
-WriteAns::WriteAns( Interface* impl )
-    : mbImpl( impl ), mCurrentMeshHandle( 0 ), mGlobalIdTag( 0 ), mMatSetIdTag( 0 )
+WriteAns::WriteAns( Interface* impl ) : mbImpl( impl ), mCurrentMeshHandle( 0 ), mGlobalIdTag( 0 ), mMatSetIdTag( 0 )
 {
     assert( impl != NULL );
 
@@ -60,14 +59,14 @@ WriteAns::WriteAns( Interface* impl )
     // initialize in case tag_get_handle fails below
     //! get and cache predefined tag handles
     const int negone = -1;
-    impl->tag_get_handle( MATERIAL_SET_TAG_NAME, 1, MB_TYPE_INTEGER, mMaterialSetTag,
-                          MB_TAG_SPARSE | MB_TAG_CREAT, &negone );
+    impl->tag_get_handle( MATERIAL_SET_TAG_NAME, 1, MB_TYPE_INTEGER, mMaterialSetTag, MB_TAG_SPARSE | MB_TAG_CREAT,
+                          &negone );
 
-    impl->tag_get_handle( DIRICHLET_SET_TAG_NAME, 1, MB_TYPE_INTEGER, mDirichletSetTag,
-                          MB_TAG_SPARSE | MB_TAG_CREAT, &negone );
+    impl->tag_get_handle( DIRICHLET_SET_TAG_NAME, 1, MB_TYPE_INTEGER, mDirichletSetTag, MB_TAG_SPARSE | MB_TAG_CREAT,
+                          &negone );
 
-    impl->tag_get_handle( NEUMANN_SET_TAG_NAME, 1, MB_TYPE_INTEGER, mNeumannSetTag,
-                          MB_TAG_SPARSE | MB_TAG_CREAT, &negone );
+    impl->tag_get_handle( NEUMANN_SET_TAG_NAME, 1, MB_TYPE_INTEGER, mNeumannSetTag, MB_TAG_SPARSE | MB_TAG_CREAT,
+                          &negone );
 }
 
 WriteAns::~WriteAns( )
@@ -75,11 +74,9 @@ WriteAns::~WriteAns( )
     // mbImpl->release_interface(mWriteIface);
 }
 
-ErrorCode WriteAns::write_file( const char* file_name,
-                                const bool /* overwrite (commented out to remove warning) */,
-                                const FileOptions&, const EntityHandle* ent_handles,
-                                const int num_sets, const std::vector< std::string >&, const Tag*,
-                                int, int )
+ErrorCode WriteAns::write_file( const char* file_name, const bool /* overwrite (commented out to remove warning) */,
+                                const FileOptions&, const EntityHandle* ent_handles, const int num_sets,
+                                const std::vector< std::string >&, const Tag*, int, int )
 {
     assert( 0 != mMaterialSetTag && 0 != mNeumannSetTag && 0 != mDirichletSetTag );
 
@@ -170,8 +167,7 @@ ErrorCode WriteAns::write_file( const char* file_name,
     // search for all node sets (Dirichlet Sets)
     Range node_mesh_sets;
     int   ns_id;
-    result = mbImpl->get_entities_by_type_and_tag( 0, MBENTITYSET, &mDirichletSetTag, NULL, 1,
-                                                   node_mesh_sets );
+    result = mbImpl->get_entities_by_type_and_tag( 0, MBENTITYSET, &mDirichletSetTag, NULL, 1, node_mesh_sets );
     if( result != MB_SUCCESS ) return result;
 
     for( Range::iterator ns_it = node_mesh_sets.begin( ); ns_it != node_mesh_sets.end( ); ++ns_it )
@@ -182,8 +178,8 @@ ErrorCode WriteAns::write_file( const char* file_name,
         result = mbImpl->get_entities_by_handle( *ns_it, node_vector, true );
         if( result != MB_SUCCESS ) return result;
         // for every nodeset found, cycle through nodes in set:
-        for( std::vector< EntityHandle >::iterator node_it = node_vector.begin( );
-             node_it != node_vector.end( ); ++node_it )
+        for( std::vector< EntityHandle >::iterator node_it = node_vector.begin( ); node_it != node_vector.end( );
+             ++node_it )
         {
             int ns_node_id = mbImpl->id_from_handle( *node_it );
             if( node_it == node_vector.begin( ) )
@@ -362,8 +358,7 @@ ErrorCode WriteAns::write_file( const char* file_name,
     // search for all side sets (Neumann)
     Range side_mesh_sets;
     int   ss_id;
-    result = mbImpl->get_entities_by_type_and_tag( 0, MBENTITYSET, &mNeumannSetTag, NULL, 1,
-                                                   side_mesh_sets );
+    result = mbImpl->get_entities_by_type_and_tag( 0, MBENTITYSET, &mNeumannSetTag, NULL, 1, side_mesh_sets );
     if( result != MB_SUCCESS ) return result;
     // cycle through all sets found
     for( Range::iterator ss_it = side_mesh_sets.begin( ); ss_it != side_mesh_sets.end( ); ++ss_it )
@@ -375,8 +370,8 @@ ErrorCode WriteAns::write_file( const char* file_name,
         if( result != MB_SUCCESS ) return result;
 
         // cycle through elements in current side set
-        for( std::vector< EntityHandle >::iterator elem_it = elem_vector.begin( );
-             elem_it != elem_vector.end( ); ++elem_it )
+        for( std::vector< EntityHandle >::iterator elem_it = elem_vector.begin( ); elem_it != elem_vector.end( );
+             ++elem_it )
         {
             EntityHandle elem_handle = *elem_it;
 
@@ -407,8 +402,7 @@ ErrorCode WriteAns::write_file( const char* file_name,
     // Gather all element blocks
     Range matset;
     int   mat_id;
-    result =
-        mbImpl->get_entities_by_type_and_tag( 0, MBENTITYSET, &mMaterialSetTag, NULL, 1, matset );
+    result = mbImpl->get_entities_by_type_and_tag( 0, MBENTITYSET, &mMaterialSetTag, NULL, 1, matset );
     if( result != MB_SUCCESS ) return result;
     // cycle through all elem blocks
     for( Range::iterator mat_it = matset.begin( ); mat_it != matset.end( ); ++mat_it )
@@ -420,8 +414,8 @@ ErrorCode WriteAns::write_file( const char* file_name,
         result = mbImpl->get_entities_by_handle( *mat_it, mat_vector, true );
         if( result != MB_SUCCESS ) return result;
         // cycle through elements in current mat set
-        for( std::vector< EntityHandle >::iterator elem_it = mat_vector.begin( );
-             elem_it != mat_vector.end( ); ++elem_it )
+        for( std::vector< EntityHandle >::iterator elem_it = mat_vector.begin( ); elem_it != mat_vector.end( );
+             ++elem_it )
         {
             EntityHandle elem_handle = *elem_it;
             int          elem_id = mbImpl->id_from_handle( elem_handle );

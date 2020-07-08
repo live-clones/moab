@@ -55,8 +55,7 @@ class MESQUITE_EXPORT WeightCalculator
     //!
     //! Do any preliminary global initialization, consistency checking,
     //! etc.  Default implementation does nothing.
-    virtual void initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
-                                   MsqError& err );
+    virtual void initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings, MsqError& err );
 
     /**\brief Get target metric weight
      *

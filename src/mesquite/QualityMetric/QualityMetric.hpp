@@ -133,8 +133,7 @@ class QualityMetric
      *\param handle The location in the patch (as passed back from get_evaluations).
      *\param value  The output metric value.
      */
-    MESQUITE_EXPORT virtual bool evaluate( PatchData& pd, size_t handle, double& value,
-                                           MsqError& err ) = 0;
+    MESQUITE_EXPORT virtual bool evaluate( PatchData& pd, size_t handle, double& value, MsqError& err ) = 0;
 
     /**\brief Get metric value at a logical location in the patch.
      *
@@ -146,8 +145,7 @@ class QualityMetric
      *               of, specified as vertex indices in the PatchData.
      */
     MESQUITE_EXPORT virtual bool evaluate_with_indices( PatchData& pd, size_t handle, double& value,
-                                                        std::vector< size_t >& indices,
-                                                        MsqError&              err ) = 0;
+                                                        std::vector< size_t >& indices, MsqError& err ) = 0;
 
     /**\brief Get metric value and gradient at a logical location in the patch.
      *
@@ -161,11 +159,9 @@ class QualityMetric
      *               coordinates of the free vertices passed back in
      *               the indices list.
      */
-    MESQUITE_EXPORT virtual bool evaluate_with_gradient( PatchData& pd, size_t handle,
-                                                         double&                  value,
+    MESQUITE_EXPORT virtual bool evaluate_with_gradient( PatchData& pd, size_t handle, double& value,
                                                          std::vector< size_t >&   indices,
-                                                         std::vector< Vector3D >& gradient,
-                                                         MsqError&                err );
+                                                         std::vector< Vector3D >& gradient, MsqError& err );
 
     /**\brief Get metric value and gradient at a logical location in the patch.
      *
@@ -181,10 +177,11 @@ class QualityMetric
      *\param Hessian_diagonal The 3x3 blocks along the diagonal of
      *               the Hessian matrix.
      */
-    MESQUITE_EXPORT virtual bool evaluate_with_Hessian_diagonal(
-        PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
-        std::vector< Vector3D >& gradient, std::vector< SymMatrix3D >& Hessian_diagonal,
-        MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate_with_Hessian_diagonal( PatchData& pd, size_t handle, double& value,
+                                                                 std::vector< size_t >&      indices,
+                                                                 std::vector< Vector3D >&    gradient,
+                                                                 std::vector< SymMatrix3D >& Hessian_diagonal,
+                                                                 MsqError&                   err );
 
     /**\brief Get metric value and deravitives at a logical location in the patch.
      *
@@ -207,8 +204,7 @@ class QualityMetric
     MESQUITE_EXPORT virtual bool evaluate_with_Hessian( PatchData& pd, size_t handle, double& value,
                                                         std::vector< size_t >&   indices,
                                                         std::vector< Vector3D >& gradient,
-                                                        std::vector< Matrix3D >& Hessian,
-                                                        MsqError&                err );
+                                                        std::vector< Matrix3D >& Hessian, MsqError& err );
 
     //! Escobar Barrier Function for Shape and Other Metrics
     // det = signed determinant of Jacobian Matrix at a Vertex
@@ -276,8 +272,8 @@ class QualityMetric
     //! takes an array of coefficients and an array of metrics (both of length num_value)
     //! and averages the contents using averaging method 'method'.
     MESQUITE_EXPORT
-    double weighted_average_metrics( const double coef[], const double metric_values[],
-                                     const int& num_values, MsqError& err );
+    double weighted_average_metrics( const double coef[], const double metric_values[], const int& num_values,
+                                     MsqError& err );
 
     /*!AveragingMethod allows you to set how the quality metric values
       attained at each sample point will be averaged together to produce
@@ -306,8 +302,8 @@ class QualityMetric
     //!
     //! Do any preliminary global initialization, consistency checking,
     //! etc.  Default implementation does nothing.
-    MESQUITE_EXPORT virtual void initialize_queue( MeshDomainAssoc* mesh_and_domain,
-                                                   const Settings* settings, MsqError& err );
+    MESQUITE_EXPORT virtual void initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
+                                                   MsqError& err );
 
   private:
     int feasible;

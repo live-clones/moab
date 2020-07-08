@@ -83,29 +83,26 @@ static inline bool iMesh_isError( ErrorCode code )
         if( type != ( TYPE ) ) ERROR( iBase_INVALID_TAG_HANDLE, "Invalid tag data type" ); \
     } while( false )
 
-#define CHKNONEMPTY( )                                                                    \
-    do                                                                                    \
-    {                                                                                     \
-        int count, result;                                                                \
-        iMesh_getNumOfType( instance, 0, iBase_ALL_TYPES, &count, &result );              \
-        CHKERR( result, "Couldn't get number of entities" );                              \
-        if( count == 0 )                                                                  \
-            ERROR( iBase_INVALID_ENTITY_HANDLE, "Invalid entity handle: mesh is empty" ); \
+#define CHKNONEMPTY( )                                                                                 \
+    do                                                                                                 \
+    {                                                                                                  \
+        int count, result;                                                                             \
+        iMesh_getNumOfType( instance, 0, iBase_ALL_TYPES, &count, &result );                           \
+        CHKERR( result, "Couldn't get number of entities" );                                           \
+        if( count == 0 ) ERROR( iBase_INVALID_ENTITY_HANDLE, "Invalid entity handle: mesh is empty" ); \
     } while( false )
 
 // Check the array size, and allocate the array if necessary.
 // Free the array upon leaving scope unless KEEP_ARRAY
 // is invoked.
-#define ALLOC_CHECK_ARRAY( array, this_size )                                                \
-    iMeshArrayManager array##_manager( instance, reinterpret_cast< void** >( array ),        \
-                                       *( array##_allocated ), *( array##_size ), this_size, \
-                                       sizeof( **array ), err );                             \
+#define ALLOC_CHECK_ARRAY( array, this_size )                                                                 \
+    iMeshArrayManager array##_manager( instance, reinterpret_cast< void** >( array ), *( array##_allocated ), \
+                                       *( array##_size ), this_size, sizeof( **array ), err );                \
     if( iBase_SUCCESS != *err ) return
 
-#define ALLOC_CHECK_TAG_ARRAY( array, this_size )                                               \
-    iMeshArrayManager array##_manager( instance, reinterpret_cast< void** >( array ),           \
-                                       *( array##_allocated ), *( array##_size ), this_size, 1, \
-                                       err );                                                   \
+#define ALLOC_CHECK_TAG_ARRAY( array, this_size )                                                             \
+    iMeshArrayManager array##_manager( instance, reinterpret_cast< void** >( array ), *( array##_allocated ), \
+                                       *( array##_size ), this_size, 1, err );                                \
     if( iBase_SUCCESS != *err ) return
 
 #define KEEP_ARRAY( array ) array##_manager.keep_array( )
@@ -122,26 +119,22 @@ class iMeshArrayManager
     void** arrayPtr;
 
   public:
-    iMeshArrayManager( iMesh_Instance instance, void** array_ptr, int& array_allocated_space,
-                       int& array_size, int count, int val_size, int* err )
+    iMeshArrayManager( iMesh_Instance instance, void** array_ptr, int& array_allocated_space, int& array_size,
+                       int count, int val_size, int* err )
         : arrayPtr( 0 )
     {
         if( !array_allocated_space || !*array_ptr )
         {
             *array_ptr = std::malloc( val_size * count );
             array_allocated_space = array_size = count;
-            if( !*array_ptr )
-            { ERROR( iBase_MEMORY_ALLOCATION_FAILED, "Couldn't allocate array." ); }
+            if( !*array_ptr ) { ERROR( iBase_MEMORY_ALLOCATION_FAILED, "Couldn't allocate array." ); }
             arrayPtr = array_ptr;
         }
         else
         {
             array_size = count;
             if( array_allocated_space < count )
-            {
-                ERROR( iBase_BAD_ARRAY_SIZE,
-                       "Allocated array not large enough to hold returned contents." );
-            }
+            { ERROR( iBase_BAD_ARRAY_SIZE, "Allocated array not large enough to hold returned contents." ); }
         }
         RETURN( iBase_SUCCESS );
     }
@@ -163,8 +156,7 @@ class iMeshArrayManager
 
 inline int compare_no_case( const char* str1, const char* str2, size_t n )
 {
-    for( size_t i = 1; i != n && *str1 && toupper( *str1 ) == toupper( *str2 );
-         ++i, ++str1, ++str2 )
+    for( size_t i = 1; i != n && *str1 && toupper( *str1 ) == toupper( *str2 ); ++i, ++str1, ++str2 )
         ;
     return toupper( *str2 ) - toupper( *str1 );
 }

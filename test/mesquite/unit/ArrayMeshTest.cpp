@@ -203,9 +203,8 @@ CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( ArrayMeshTest, "Unit" );
  Z = -2
 
 */
-const double        coords_2d[] = { 0, 2, 1, 2, 2, 2, 0, 1, 1, 1, 2, 1, 0, 0, 1, 0, 2, 0 };
-const double        coords_3d[] = { 0,  2, -2, 1,  2, -2, 2,  2, -2, 0,  1, -2, 1, 1,
-                             -2, 2, 1,  -2, 0, 0,  -2, 1, 0,  -2, 2, 0,  -2 };
+const double coords_2d[] = { 0, 2, 1, 2, 2, 2, 0, 1, 1, 1, 2, 1, 0, 0, 1, 0, 2, 0 };
+const double coords_3d[] = { 0, 2, -2, 1, 2, -2, 2, 2, -2, 0, 1, -2, 1, 1, -2, 2, 1, -2, 0, 0, -2, 1, 0, -2, 2, 0, -2 };
 const unsigned long conn_zero_based[] = { 3, 4, 1, 0, 4, 5, 2, 1, 6, 7, 4, 3, 7, 8, 5, 4 };
 const unsigned long conn_one_based[] = { 4, 5, 2, 1, 5, 6, 3, 2, 7, 8, 5, 4, 8, 9, 6, 5 };
 
@@ -240,18 +239,13 @@ void ArrayMeshTest::setUp( )
     memcpy( oneBased2Dcoords, coords_2d, 18 * sizeof( double ) );
     memcpy( mixedZeroBasedCoords, mixed_coords, 24 * sizeof( double ) );
     memcpy( mixedOneBasedCoords, mixed_coords, 24 * sizeof( double ) );
-    zeroBased3D =
-        new ArrayMesh( 3, 9, zeroBased3Dcoords, fixed, 4, QUADRILATERAL, conn_zero_based, false );
-    oneBased3D =
-        new ArrayMesh( 3, 9, oneBased3Dcoords, fixed, 4, QUADRILATERAL, conn_one_based, true );
-    zeroBased2D =
-        new ArrayMesh( 2, 9, zeroBased2Dcoords, fixed, 4, QUADRILATERAL, conn_zero_based, false );
-    oneBased2D =
-        new ArrayMesh( 2, 9, oneBased2Dcoords, fixed, 4, QUADRILATERAL, conn_one_based, true );
-    mixedZeroBased = new ArrayMesh( 3, 8, mixedZeroBasedCoords, fixed, 4, mixed_types,
-                                    mixed_conn_zero, conn_offsets_zero, false );
-    mixedOneBased = new ArrayMesh( 3, 8, mixedOneBasedCoords, fixed, 4, mixed_types, mixed_conn_one,
-                                   NULL, true );
+    zeroBased3D = new ArrayMesh( 3, 9, zeroBased3Dcoords, fixed, 4, QUADRILATERAL, conn_zero_based, false );
+    oneBased3D = new ArrayMesh( 3, 9, oneBased3Dcoords, fixed, 4, QUADRILATERAL, conn_one_based, true );
+    zeroBased2D = new ArrayMesh( 2, 9, zeroBased2Dcoords, fixed, 4, QUADRILATERAL, conn_zero_based, false );
+    oneBased2D = new ArrayMesh( 2, 9, oneBased2Dcoords, fixed, 4, QUADRILATERAL, conn_one_based, true );
+    mixedZeroBased =
+        new ArrayMesh( 3, 8, mixedZeroBasedCoords, fixed, 4, mixed_types, mixed_conn_zero, conn_offsets_zero, false );
+    mixedOneBased = new ArrayMesh( 3, 8, mixedOneBasedCoords, fixed, 4, mixed_types, mixed_conn_one, NULL, true );
 }
 
 void ArrayMeshTest::tearDown( )
@@ -473,26 +467,16 @@ void ArrayMeshTest::test_vertices_get_coordinates_two_d( )
     MsqVertex     coords[ 10 ];
     zeroBased2D->vertices_get_coordinates( (const Mesh::VertexHandle*)verts, coords, 10, err );
     CPPUNIT_ASSERT( !err );
-    CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( coords_2d[ 0 ], coords_2d[ 1 ], 0 ), coords[ 0 ],
-                                  DBL_EPSILON );
-    CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( coords_2d[ 2 ], coords_2d[ 3 ], 0 ), coords[ 1 ],
-                                  DBL_EPSILON );
-    CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( coords_2d[ 4 ], coords_2d[ 5 ], 0 ), coords[ 2 ],
-                                  DBL_EPSILON );
-    CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( coords_2d[ 6 ], coords_2d[ 7 ], 0 ), coords[ 3 ],
-                                  DBL_EPSILON );
-    CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( coords_2d[ 8 ], coords_2d[ 9 ], 0 ), coords[ 4 ],
-                                  DBL_EPSILON );
-    CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( coords_2d[ 10 ], coords_2d[ 11 ], 0 ), coords[ 5 ],
-                                  DBL_EPSILON );
-    CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( coords_2d[ 12 ], coords_2d[ 13 ], 0 ), coords[ 6 ],
-                                  DBL_EPSILON );
-    CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( coords_2d[ 14 ], coords_2d[ 15 ], 0 ), coords[ 7 ],
-                                  DBL_EPSILON );
-    CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( coords_2d[ 16 ], coords_2d[ 17 ], 0 ), coords[ 8 ],
-                                  DBL_EPSILON );
-    CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( coords_2d[ 8 ], coords_2d[ 9 ], 0 ), coords[ 9 ],
-                                  DBL_EPSILON );
+    CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( coords_2d[ 0 ], coords_2d[ 1 ], 0 ), coords[ 0 ], DBL_EPSILON );
+    CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( coords_2d[ 2 ], coords_2d[ 3 ], 0 ), coords[ 1 ], DBL_EPSILON );
+    CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( coords_2d[ 4 ], coords_2d[ 5 ], 0 ), coords[ 2 ], DBL_EPSILON );
+    CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( coords_2d[ 6 ], coords_2d[ 7 ], 0 ), coords[ 3 ], DBL_EPSILON );
+    CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( coords_2d[ 8 ], coords_2d[ 9 ], 0 ), coords[ 4 ], DBL_EPSILON );
+    CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( coords_2d[ 10 ], coords_2d[ 11 ], 0 ), coords[ 5 ], DBL_EPSILON );
+    CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( coords_2d[ 12 ], coords_2d[ 13 ], 0 ), coords[ 6 ], DBL_EPSILON );
+    CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( coords_2d[ 14 ], coords_2d[ 15 ], 0 ), coords[ 7 ], DBL_EPSILON );
+    CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( coords_2d[ 16 ], coords_2d[ 17 ], 0 ), coords[ 8 ], DBL_EPSILON );
+    CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( coords_2d[ 8 ], coords_2d[ 9 ], 0 ), coords[ 9 ], DBL_EPSILON );
 }
 
 void ArrayMeshTest::test_vertices_get_coordinates_one_based( )
@@ -595,8 +579,7 @@ void ArrayMeshTest::test_vertices_get_attached_elements( )
     const size_t                       verts[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
     std::vector< Mesh::ElementHandle > elems;
     std::vector< size_t >              offsets;
-    zeroBased3D->vertices_get_attached_elements( (const Mesh::VertexHandle*)verts, 9, elems,
-                                                 offsets, err );
+    zeroBased3D->vertices_get_attached_elements( (const Mesh::VertexHandle*)verts, 9, elems, offsets, err );
     CPPUNIT_ASSERT( !err );
 
     CPPUNIT_ASSERT_EQUAL( (size_t)16, elems.size( ) );
@@ -645,8 +628,7 @@ void ArrayMeshTest::test_vertices_get_attached_elements_one_based( )
     const size_t                       verts[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
     std::vector< Mesh::ElementHandle > elems;
     std::vector< size_t >              offsets;
-    oneBased3D->vertices_get_attached_elements( (const Mesh::VertexHandle*)verts, 9, elems, offsets,
-                                                err );
+    oneBased3D->vertices_get_attached_elements( (const Mesh::VertexHandle*)verts, 9, elems, offsets, err );
     CPPUNIT_ASSERT( !err );
 
     CPPUNIT_ASSERT_EQUAL( (size_t)16, elems.size( ) );
@@ -695,8 +677,7 @@ void ArrayMeshTest::test_elements_get_attached_vertices( )
     const size_t                      elems[] = { 3, 2, 1, 0 };
     std::vector< Mesh::VertexHandle > verts;
     std::vector< size_t >             offsets;
-    zeroBased3D->elements_get_attached_vertices( (const Mesh::ElementHandle*)elems, 4, verts,
-                                                 offsets, err );
+    zeroBased3D->elements_get_attached_vertices( (const Mesh::ElementHandle*)elems, 4, verts, offsets, err );
     CPPUNIT_ASSERT( !err );
     CPPUNIT_ASSERT_EQUAL( (size_t)16, verts.size( ) );
     CPPUNIT_ASSERT( offsets.size( ) == 4 || offsets.size( ) == 5 );
@@ -750,8 +731,7 @@ void ArrayMeshTest::test_vertices_get_attached_elements_mixed( )
     const size_t                       verts[] = { 0, 1, 2, 3, 4, 5, 6, 7 };
     std::vector< Mesh::ElementHandle > elems;
     std::vector< size_t >              offsets;
-    mixedZeroBased->vertices_get_attached_elements( (const Mesh::VertexHandle*)verts, 8, elems,
-                                                    offsets, err );
+    mixedZeroBased->vertices_get_attached_elements( (const Mesh::VertexHandle*)verts, 8, elems, offsets, err );
     CPPUNIT_ASSERT( !err );
 
     CPPUNIT_ASSERT_EQUAL( (size_t)14, elems.size( ) );
@@ -796,8 +776,7 @@ void ArrayMeshTest::test_vertices_get_attached_elements_mixed_one_based( )
     const size_t                       verts[] = { 1, 2, 3, 4, 5, 6, 7, 8 };
     std::vector< Mesh::ElementHandle > elems;
     std::vector< size_t >              offsets;
-    mixedOneBased->vertices_get_attached_elements( (const Mesh::VertexHandle*)verts, 8, elems,
-                                                   offsets, err );
+    mixedOneBased->vertices_get_attached_elements( (const Mesh::VertexHandle*)verts, 8, elems, offsets, err );
     CPPUNIT_ASSERT( !err );
 
     CPPUNIT_ASSERT_EQUAL( (size_t)14, elems.size( ) );
@@ -842,8 +821,7 @@ void ArrayMeshTest::test_elements_get_attached_vertices_mixed( )
     const size_t                      elems[] = { 3, 2, 1, 0 };
     std::vector< Mesh::VertexHandle > verts;
     std::vector< size_t >             offsets;
-    mixedZeroBased->elements_get_attached_vertices( (const Mesh::ElementHandle*)elems, 4, verts,
-                                                    offsets, err );
+    mixedZeroBased->elements_get_attached_vertices( (const Mesh::ElementHandle*)elems, 4, verts, offsets, err );
     CPPUNIT_ASSERT( !err );
     CPPUNIT_ASSERT_EQUAL( (size_t)14, verts.size( ) );
     CPPUNIT_ASSERT( offsets.size( ) == 4 || offsets.size( ) == 5 );
@@ -882,8 +860,7 @@ void ArrayMeshTest::test_elements_get_attached_vertices_mixed_one_based( )
     const size_t                      elems[] = { 3, 2, 1, 0 };
     std::vector< Mesh::VertexHandle > verts;
     std::vector< size_t >             offsets;
-    mixedOneBased->elements_get_attached_vertices( (const Mesh::ElementHandle*)elems, 4, verts,
-                                                   offsets, err );
+    mixedOneBased->elements_get_attached_vertices( (const Mesh::ElementHandle*)elems, 4, verts, offsets, err );
     CPPUNIT_ASSERT( !err );
     CPPUNIT_ASSERT_EQUAL( (size_t)14, verts.size( ) );
     CPPUNIT_ASSERT( offsets.size( ) == 4 || offsets.size( ) == 5 );
@@ -923,8 +900,7 @@ void ArrayMeshTest::test_elements_get_topologies_mixed( )
     const size_t   num_elem = sizeof( elems ) / sizeof( elems[ 0 ] );
     EntityTopology topo[ num_elem ];
     memset( topo, 0, sizeof( topo ) );
-    mixedZeroBased->elements_get_topologies( (const Mesh::ElementHandle*)elems, topo, num_elem,
-                                             err );
+    mixedZeroBased->elements_get_topologies( (const Mesh::ElementHandle*)elems, topo, num_elem, err );
     CPPUNIT_ASSERT( !err );
     for( size_t i = 0; i < num_elem; ++i )
         CPPUNIT_ASSERT_EQUAL( (int)mixed_types[ elems[ i ] ], (int)topo[ i ] );
@@ -933,7 +909,7 @@ void ArrayMeshTest::test_elements_get_topologies_mixed( )
 void ArrayMeshTest::test_tag_data( TagEntType type, TagStorage storage )
 {
     // Select what we're working with given 'type' parameter
-    ArrayMesh* const mesh = ( type == ONE_BASED_VERTEX ) ? oneBased3D : zeroBased3D;
+    ArrayMesh* const                  mesh = ( type == ONE_BASED_VERTEX ) ? oneBased3D : zeroBased3D;
     std::vector< Mesh::EntityHandle > entities;
     MsqError                          err;
     if( type == ELEMENT )
@@ -969,11 +945,9 @@ void ArrayMeshTest::test_tag_data( TagEntType type, TagStorage storage )
         tag = mesh->tag_create( name1, Mesh::DOUBLE, 3, 0, err );
         ASSERT_NO_ERROR( err );
         if( type == ELEMENT )
-            mesh->tag_set_element_data( tag, entities.size( ), arrptr( entities ), arrptr( values ),
-                                        err );
+            mesh->tag_set_element_data( tag, entities.size( ), arrptr( entities ), arrptr( values ), err );
         else
-            mesh->tag_set_vertex_data( tag, entities.size( ), arrptr( entities ), arrptr( values ),
-                                       err );
+            mesh->tag_set_vertex_data( tag, entities.size( ), arrptr( entities ), arrptr( values ), err );
         ASSERT_NO_ERROR( err );
     }
 
@@ -993,21 +967,17 @@ void ArrayMeshTest::test_tag_data( TagEntType type, TagStorage storage )
     // Check values returned from tag_get_*_data
     std::vector< double > values2( 3 * entities.size( ) );
     if( ELEMENT == type )
-        mesh->tag_get_element_data( tag, entities.size( ), arrptr( entities ), arrptr( values2 ),
-                                    err );
+        mesh->tag_get_element_data( tag, entities.size( ), arrptr( entities ), arrptr( values2 ), err );
     else
-        mesh->tag_get_vertex_data( tag, entities.size( ), arrptr( entities ), arrptr( values2 ),
-                                   err );
+        mesh->tag_get_vertex_data( tag, entities.size( ), arrptr( entities ), arrptr( values2 ), err );
     ASSERT_NO_ERROR( err );
     ASSERT_STD_VECTORS_EQUAL( values, values2 );
 
     // check that we get an error for other type, because no default
     if( ELEMENT != type )
-        mesh->tag_get_element_data( tag, entities.size( ), arrptr( entities ), arrptr( values2 ),
-                                    err );
+        mesh->tag_get_element_data( tag, entities.size( ), arrptr( entities ), arrptr( values2 ), err );
     else
-        mesh->tag_get_vertex_data( tag, entities.size( ), arrptr( entities ), arrptr( values2 ),
-                                   err );
+        mesh->tag_get_vertex_data( tag, entities.size( ), arrptr( entities ), arrptr( values2 ), err );
     CPPUNIT_ASSERT_EQUAL( MsqError::TAG_NOT_FOUND, err.error_code( ) );
     err.clear( );
 
@@ -1017,11 +987,9 @@ void ArrayMeshTest::test_tag_data( TagEntType type, TagStorage storage )
     for( std::vector< double >::iterator i = values5.begin( ); i != values5.end( ); ++i )
         *i = dval++;
     if( ELEMENT == type )
-        mesh->tag_set_element_data( tag, entities.size( ), arrptr( entities ), arrptr( values5 ),
-                                    err );
+        mesh->tag_set_element_data( tag, entities.size( ), arrptr( entities ), arrptr( values5 ), err );
     else
-        mesh->tag_set_vertex_data( tag, entities.size( ), arrptr( entities ), arrptr( values5 ),
-                                   err );
+        mesh->tag_set_vertex_data( tag, entities.size( ), arrptr( entities ), arrptr( values5 ), err );
     if( READONLY == storage )
     {
         CPPUNIT_ASSERT( err );
@@ -1036,11 +1004,9 @@ void ArrayMeshTest::test_tag_data( TagEntType type, TagStorage storage )
     if( READONLY != storage )
     {
         if( ELEMENT == type )
-            mesh->tag_get_element_data( tag, entities.size( ), arrptr( entities ),
-                                        arrptr( values2 ), err );
+            mesh->tag_get_element_data( tag, entities.size( ), arrptr( entities ), arrptr( values2 ), err );
         else
-            mesh->tag_get_vertex_data( tag, entities.size( ), arrptr( entities ), arrptr( values2 ),
-                                       err );
+            mesh->tag_get_vertex_data( tag, entities.size( ), arrptr( entities ), arrptr( values2 ), err );
         ASSERT_NO_ERROR( err );
         ASSERT_STD_VECTORS_EQUAL( values5, values2 );
 
@@ -1074,11 +1040,9 @@ void ArrayMeshTest::test_tag_data( TagEntType type, TagStorage storage )
     // should get default value for each entity
     std::vector< int > values3( 2 * entities.size( ) );
     if( ELEMENT == type )
-        mesh->tag_get_element_data( tag, entities.size( ), arrptr( entities ), arrptr( values3 ),
-                                    err );
+        mesh->tag_get_element_data( tag, entities.size( ), arrptr( entities ), arrptr( values3 ), err );
     else
-        mesh->tag_get_vertex_data( tag, entities.size( ), arrptr( entities ), arrptr( values3 ),
-                                   err );
+        mesh->tag_get_vertex_data( tag, entities.size( ), arrptr( entities ), arrptr( values3 ), err );
     ASSERT_NO_ERROR( err );
 
     // check that we got the default value for every entity
@@ -1092,11 +1056,9 @@ void ArrayMeshTest::test_tag_data( TagEntType type, TagStorage storage )
     for( size_t i = 0; i < values3.size( ); ++i )
         values[ i ] = i;
     if( ELEMENT == type )
-        mesh->tag_set_element_data( tag, entities.size( ), arrptr( entities ), arrptr( values3 ),
-                                    err );
+        mesh->tag_set_element_data( tag, entities.size( ), arrptr( entities ), arrptr( values3 ), err );
     else
-        mesh->tag_set_vertex_data( tag, entities.size( ), arrptr( entities ), arrptr( values3 ),
-                                   err );
+        mesh->tag_set_vertex_data( tag, entities.size( ), arrptr( entities ), arrptr( values3 ), err );
     if( OWNED != storage )
     {
         CPPUNIT_ASSERT( err );
@@ -1112,11 +1074,9 @@ void ArrayMeshTest::test_tag_data( TagEntType type, TagStorage storage )
     {
         std::vector< int > values4( values3.size( ) );
         if( ELEMENT == type )
-            mesh->tag_get_element_data( tag, entities.size( ), arrptr( entities ),
-                                        arrptr( values4 ), err );
+            mesh->tag_get_element_data( tag, entities.size( ), arrptr( entities ), arrptr( values4 ), err );
         else
-            mesh->tag_get_vertex_data( tag, entities.size( ), arrptr( entities ), arrptr( values4 ),
-                                       err );
+            mesh->tag_get_vertex_data( tag, entities.size( ), arrptr( entities ), arrptr( values4 ), err );
         ASSERT_NO_ERROR( err );
         ASSERT_STD_VECTORS_EQUAL( values3, values4 );
     }

@@ -25,22 +25,20 @@ class NCHelper
 {
   public:
     NCHelper( ReadNC* readNC, int fileId, const FileOptions& opts, EntityHandle fileSet )
-        : _readNC( readNC ), _fileId( fileId ), _opts( opts ), _fileSet( fileSet ), nTimeSteps( 0 ),
-          nLevels( 1 ), tDim( -1 ), levDim( -1 )
+        : _readNC( readNC ), _fileId( fileId ), _opts( opts ), _fileSet( fileSet ), nTimeSteps( 0 ), nLevels( 1 ),
+          tDim( -1 ), levDim( -1 )
     {
     }
     virtual ~NCHelper( ) {}
 
     //! Get appropriate helper instance for ReadNC class
-    static NCHelper* get_nc_helper( ReadNC* readNC, int fileId, const FileOptions& opts,
-                                    EntityHandle fileSet );
+    static NCHelper* get_nc_helper( ReadNC* readNC, int fileId, const FileOptions& opts, EntityHandle fileSet );
 
     //! Interfaces to be implemented in child classes
     virtual ErrorCode   init_mesh_vals( ) = 0;
     virtual ErrorCode   check_existing_mesh( ) = 0;
     virtual ErrorCode   create_mesh( Range& faces ) = 0;
-    virtual ErrorCode   read_variables( std::vector< std::string >& var_names,
-                                        std::vector< int >&         tstep_nums ) = 0;
+    virtual ErrorCode   read_variables( std::vector< std::string >& var_names, std::vector< int >& tstep_nums ) = 0;
     virtual std::string get_mesh_type_name( ) = 0;
 
     //! Create NC conventional tags
@@ -51,17 +49,13 @@ class NCHelper
 
   protected:
     //! Separate set and non-set variables (common to scd mesh and ucd mesh)
-    ErrorCode read_variables_setup( std::vector< std::string >&     var_names,
-                                    std::vector< int >&             tstep_nums,
-                                    std::vector< ReadNC::VarData >& vdatas,
-                                    std::vector< ReadNC::VarData >& vsetdatas );
+    ErrorCode read_variables_setup( std::vector< std::string >& var_names, std::vector< int >& tstep_nums,
+                                    std::vector< ReadNC::VarData >& vdatas, std::vector< ReadNC::VarData >& vsetdatas );
 
     //! Read set variables (common to scd mesh and ucd mesh)
-    ErrorCode read_variables_to_set( std::vector< ReadNC::VarData >& vdatas,
-                                     std::vector< int >&             tstep_nums );
+    ErrorCode read_variables_to_set( std::vector< ReadNC::VarData >& vdatas, std::vector< int >& tstep_nums );
 
-    ErrorCode read_coordinate( const char* var_name, int lmin, int lmax,
-                               std::vector< double >& cvals );
+    ErrorCode read_coordinate( const char* var_name, int lmin, int lmax, std::vector< double >& cvals );
 
     ErrorCode get_tag_to_set( ReadNC::VarData& var_data, int tstep_num, Tag& tagh );
 
@@ -72,8 +66,8 @@ class NCHelper
     //! and value, and ';' separating one name/data type/value from
     //! the next'. attLen stores the end position for each name/data
     //! type/ value.
-    ErrorCode create_attrib_string( const std::map< std::string, ReadNC::AttData >& attMap,
-                                    std::string& attString, std::vector< int >& attLen );
+    ErrorCode create_attrib_string( const std::map< std::string, ReadNC::AttData >& attMap, std::string& attString,
+                                    std::vector< int >& attLen );
 
     //! For a dimension that does not have a corresponding coordinate variable (e.g. ncol for
     //! HOMME), create a dummy variable with a sparse tag to store the dimension length
@@ -81,8 +75,7 @@ class NCHelper
 
   private:
     //! Used by read_variables_to_set()
-    ErrorCode read_variables_to_set_allocate( std::vector< ReadNC::VarData >& vdatas,
-                                              std::vector< int >&             tstep_nums );
+    ErrorCode read_variables_to_set_allocate( std::vector< ReadNC::VarData >& vdatas, std::vector< int >& tstep_nums );
 
   protected:
     //! Allow NCHelper to directly access members of ReadNC
@@ -114,8 +107,7 @@ class ScdNCHelper : public NCHelper
 {
   public:
     ScdNCHelper( ReadNC* readNC, int fileId, const FileOptions& opts, EntityHandle fileSet )
-        : NCHelper( readNC, fileId, opts, fileSet ), iDim( -1 ), jDim( -1 ), iCDim( -1 ),
-          jCDim( -1 )
+        : NCHelper( readNC, fileId, opts, fileSet ), iDim( -1 ), jDim( -1 ), iCDim( -1 ), jCDim( -1 )
     {
         for( unsigned int i = 0; i < 6; i++ )
         {
@@ -136,14 +128,12 @@ class ScdNCHelper : public NCHelper
     //! Implementation of NCHelper::create_mesh()
     virtual ErrorCode create_mesh( Range& faces );
     //! Implementation of NCHelper::read_variables()
-    virtual ErrorCode read_variables( std::vector< std::string >& var_names,
-                                      std::vector< int >&         tstep_nums );
+    virtual ErrorCode read_variables( std::vector< std::string >& var_names, std::vector< int >& tstep_nums );
 
     //! Read non-set variables for scd mesh
     ErrorCode read_scd_variables_to_nonset_allocate( std::vector< ReadNC::VarData >& vdatas,
                                                      std::vector< int >&             tstep_nums );
-    ErrorCode read_scd_variables_to_nonset( std::vector< ReadNC::VarData >& vdatas,
-                                            std::vector< int >&             tstep_nums );
+    ErrorCode read_scd_variables_to_nonset( std::vector< ReadNC::VarData >& vdatas, std::vector< int >& tstep_nums );
 
     //! Create COORDS tag for quads coordinate
     ErrorCode create_quad_coordinate_tag( );
@@ -195,24 +185,22 @@ class UcdNCHelper : public NCHelper
 {
   public:
     UcdNCHelper( ReadNC* readNC, int fileId, const FileOptions& opts, EntityHandle fileSet )
-        : NCHelper( readNC, fileId, opts, fileSet ), nCells( 0 ), nEdges( 0 ), nVertices( 0 ),
-          nLocalCells( 0 ), nLocalEdges( 0 ), nLocalVertices( 0 ), cDim( -1 ), eDim( -1 ),
-          vDim( -1 )
+        : NCHelper( readNC, fileId, opts, fileSet ), nCells( 0 ), nEdges( 0 ), nVertices( 0 ), nLocalCells( 0 ),
+          nLocalEdges( 0 ), nLocalVertices( 0 ), cDim( -1 ), eDim( -1 ), vDim( -1 )
     {
     }
     virtual ~UcdNCHelper( ) {}
 
   private:
     //! Implementation of NCHelper::read_variables()
-    virtual ErrorCode read_variables( std::vector< std::string >& var_names,
-                                      std::vector< int >&         tstep_nums );
+    virtual ErrorCode read_variables( std::vector< std::string >& var_names, std::vector< int >& tstep_nums );
 
     //! Read non-set variables for ucd mesh (implemented differently in child classes)
     virtual ErrorCode read_ucd_variables_to_nonset_allocate( std::vector< ReadNC::VarData >& vdatas,
-                                                             std::vector< int >& tstep_nums ) = 0;
+                                                             std::vector< int >&             tstep_nums ) = 0;
 #ifdef MOAB_HAVE_PNETCDF
     virtual ErrorCode read_ucd_variables_to_nonset_async( std::vector< ReadNC::VarData >& vdatas,
-                                                          std::vector< int >& tstep_nums ) = 0;
+                                                          std::vector< int >&             tstep_nums ) = 0;
 #else
     virtual ErrorCode read_ucd_variables_to_nonset( std::vector< ReadNC::VarData >& vdatas,
                                                     std::vector< int >&             tstep_nums ) = 0;
@@ -228,8 +216,7 @@ class UcdNCHelper : public NCHelper
         // For each subrange, we will transpose a matrix of size
         // subrange*nj*nk (subrange takes the role of ni)
         T* tmp_data = reinterpret_cast< T* >( dest );
-        for( Range::pair_iterator pair_iter = localGid.pair_begin( );
-             pair_iter != localGid.pair_end( ); ++pair_iter )
+        for( Range::pair_iterator pair_iter = localGid.pair_begin( ); pair_iter != localGid.pair_end( ); ++pair_iter )
         {
             std::size_t size_range = pair_iter->second - pair_iter->first + 1;
             std::size_t nik = size_range * nk, nij = size_range * nj;

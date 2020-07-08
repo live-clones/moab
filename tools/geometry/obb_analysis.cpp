@@ -41,15 +41,13 @@ class TriCounter : public OrientedBoxTreeTool::Op
     {
 
         int       numtris;
-        ErrorCode rval =
-            tool->get_moab_instance( )->get_number_entities_by_type( node, MBTRI, numtris );
+        ErrorCode rval = tool->get_moab_instance( )->get_number_entities_by_type( node, MBTRI, numtris );
         count += numtris;
         return rval;
     }
 };
 
-ErrorCode obbvis_create( GeomTopoTool& gtt, std::vector< int >& volumes, int grid,
-                         std::string& filename )
+ErrorCode obbvis_create( GeomTopoTool& gtt, std::vector< int >& volumes, int grid, std::string& filename )
 {
     OrientedBoxTreeTool& obbtool = *gtt.obb_tree( );
 
@@ -312,8 +310,7 @@ class TriStats : public OrientedBoxTreeTool::Op
         double avg = sum / (double)leaves;
         double stddev = std_dev( sqr, sum, leaves );
 
-        out << "Tris per leaf: Min " << min << ", Max " << max << ", avg " << avg << ", stddev "
-            << stddev << std::endl;
+        out << "Tris per leaf: Min " << min << ", Max " << max << ", avg " << avg << ", stddev " << stddev << std::endl;
 
         for( unsigned i = 0; i < ten_buckets_max; ++i )
         {
@@ -371,8 +368,8 @@ static std::string make_property_string( DagMC& dag, EntityHandle eh, std::vecto
 }
 */
 
-ErrorCode obbstat_write( GeomTopoTool& gtt, std::vector< int >& volumes,
-                         std::vector< std::string >& properties, std::ostream& out )
+ErrorCode obbstat_write( GeomTopoTool& gtt, std::vector< int >& volumes, std::vector< std::string >& properties,
+                         std::ostream& out )
 {
 
     ErrorCode            ret = MB_SUCCESS;

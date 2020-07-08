@@ -259,8 +259,7 @@ class TerminationCriterion
     };
 
     //! Constructor which does not take any arguements
-    MESQUITE_EXPORT TerminationCriterion( std::string    name = "",
-                                          InnerOuterType innerOuterType = TYPE_UNKNOWN );
+    MESQUITE_EXPORT TerminationCriterion( std::string name = "", InnerOuterType innerOuterType = TYPE_UNKNOWN );
 
     //! Destructor
     MESQUITE_EXPORT ~TerminationCriterion( ){ };
@@ -320,8 +319,7 @@ class TerminationCriterion
     }
 
     //! Clear any data accumulated during an outer iteration
-    void reset_outer( Mesh* ms, MeshDomain* dm, OFEvaluator& of, const Settings* settings,
-                      MsqError& err );
+    void reset_outer( Mesh* ms, MeshDomain* dm, OFEvaluator& of, const Settings* settings, MsqError& err );
 
     //! Clear any data accumulated during an inner iteration
     void reset_inner( PatchData& pd, OFEvaluator& of, MsqError& err );
@@ -339,8 +337,7 @@ class TerminationCriterion
     //! criteria during inner iteration.
     void accumulate_patch( PatchData& pd, MsqError& err );
 
-    void accumulate_outer( Mesh* ms, MeshDomain* dm, OFEvaluator& eval, const Settings* settings,
-                           MsqError& err );
+    void accumulate_outer( Mesh* ms, MeshDomain* dm, OFEvaluator& eval, const Settings* settings, MsqError& err );
 
     //! Check if termination criterion has been met
     MESQUITE_EXPORT bool terminate( );
@@ -352,14 +349,13 @@ class TerminationCriterion
     bool cull_vertices( PatchData& pd, OFEvaluator& obj_ptr, MsqError& err );
 
     //! experimental, first cut at culling for global patches - not finished
-    bool cull_vertices_global( PatchData& global_patch, Mesh* mesh, MeshDomain* domain,
-                               const Settings* settings, OFEvaluator& of_eval, MsqError& err );
+    bool cull_vertices_global( PatchData& global_patch, Mesh* mesh, MeshDomain* domain, const Settings* settings,
+                               OFEvaluator& of_eval, MsqError& err );
 
     //! Cleans up after the TerminationCriterion is finished.
     void cleanup( Mesh* ms, MeshDomain* domain, MsqError& err );
 
-    void initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
-                           MsqError& err );
+    void initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings, MsqError& err );
 
     friend class VertexMover;
 
@@ -411,8 +407,7 @@ class TerminationCriterion
     PatchDataVerticesMemento* previousVerticesMemento;  // if we want relative
     double                    vertexMovementAbsoluteEps;
     double                    vertexMovementRelativeEps;
-    double
-           vertexMovementAvgBeta;  //!< input beta value used to calculate \c vertexMovementAbsoluteAvg
+    double vertexMovementAvgBeta;  //!< input beta value used to calculate \c vertexMovementAbsoluteAvg
     double vertexMovementAbsoluteAvgEdge;  //!< calculated constant for \c
                                            //!< VERTEX_MOVEMENT_ABS_EDGE_LENGTH
     double maxSquaredInitialMovement;

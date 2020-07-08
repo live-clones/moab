@@ -54,8 +54,7 @@ class ScdElementData : public SequenceData
       public:
         friend class ScdElementData;
 
-        VertexDataRef( const HomCoord& min, const HomCoord& max, const HomXform& tmp_xform,
-                       ScdVertexData* this_seq );
+        VertexDataRef( const HomCoord& min, const HomCoord& max, const HomXform& tmp_xform, ScdVertexData* this_seq );
 
         bool contains( const HomCoord& coords ) const;
     };
@@ -84,8 +83,8 @@ class ScdElementData : public SequenceData
 
   public:
     //! constructor
-    ScdElementData( EntityHandle start_handle, const int imin, const int jmin, const int kmin,
-                    const int imax, const int jmax, const int kmax, int* is_periodic );
+    ScdElementData( EntityHandle start_handle, const int imin, const int jmin, const int kmin, const int imax,
+                    const int jmax, const int kmax, int* is_periodic );
 
     virtual ~ScdElementData( );
 
@@ -174,17 +173,16 @@ class ScdElementData : public SequenceData
     //! is input in bb_min and bb_max (allows partial sharing of vseq rather than the whole
     //! vseq); if it's false, the whole vseq is referenced and the eseq-local coordinates
     //! is computed from the transformed bounding box of the vseq
-    ErrorCode add_vsequence( ScdVertexData* vseq, const HomCoord& p1, const HomCoord& q1,
-                             const HomCoord& p2, const HomCoord& q2, const HomCoord& p3,
-                             const HomCoord& q3, bool bb_input = false,
+    ErrorCode add_vsequence( ScdVertexData* vseq, const HomCoord& p1, const HomCoord& q1, const HomCoord& p2,
+                             const HomCoord& q2, const HomCoord& p3, const HomCoord& q3, bool bb_input = false,
                              const HomCoord& bb_min = HomCoord::unitv[ 0 ],
                              const HomCoord& bb_max = HomCoord::unitv[ 0 ] );
 
     SequenceData* subset( EntityHandle start, EntityHandle end, const int* sequence_data_sizes,
                           const int* tag_data_sizes ) const;
 
-    static EntityID calc_num_entities( EntityHandle start_handle, int irange, int jrange,
-                                       int krange, int* is_periodic = NULL );
+    static EntityID calc_num_entities( EntityHandle start_handle, int irange, int jrange, int krange,
+                                       int* is_periodic = NULL );
 
     unsigned long get_memory_use( ) const;
 };
@@ -213,8 +211,7 @@ inline void ScdElementData::param_extents( int& di, int& dj, int& dk ) const
     dk = dIJK[ 2 ];
 }
 
-inline ErrorCode ScdElementData::get_params( const EntityHandle ehandle, int& i, int& j,
-                                             int& k ) const
+inline ErrorCode ScdElementData::get_params( const EntityHandle ehandle, int& i, int& j, int& k ) const
 {
     if( TYPE_FROM_HANDLE( ehandle ) != TYPE_FROM_HANDLE( start_handle( ) ) ) return MB_FAILURE;
 
@@ -230,8 +227,8 @@ inline ErrorCode ScdElementData::get_params( const EntityHandle ehandle, int& i,
     j += boxParams[ 0 ].j( );
     i += boxParams[ 0 ].i( );
 
-    return ( ehandle >= start_handle( ) && ehandle < start_handle( ) + size( ) && i >= i_min( ) &&
-             i <= i_max( ) && j >= j_min( ) && j <= j_max( ) && k >= k_min( ) && k <= k_max( ) )
+    return ( ehandle >= start_handle( ) && ehandle < start_handle( ) + size( ) && i >= i_min( ) && i <= i_max( ) &&
+             j >= j_min( ) && j <= j_max( ) && k >= k_min( ) && k <= k_max( ) )
                ? MB_SUCCESS
                : MB_FAILURE;
 }
@@ -240,28 +237,22 @@ inline bool ScdElementData::contains( const HomCoord& temp ) const
 {
     // upper bound is < instead of <= because element params max is one less
     // than vertex params max, except in case of 2d or 1d sequence
-    return ( ( dIJKm1[ 0 ] && temp.i( ) >= boxParams[ 0 ].i( ) &&
-               temp.i( ) < boxParams[ 0 ].i( ) + dIJKm1[ 0 ] ) &&
+    return ( ( dIJKm1[ 0 ] && temp.i( ) >= boxParams[ 0 ].i( ) && temp.i( ) < boxParams[ 0 ].i( ) + dIJKm1[ 0 ] ) &&
              ( ( !dIJKm1[ 1 ] && temp.j( ) == boxParams[ 1 ].j( ) ) ||
-               ( dIJKm1[ 1 ] && temp.j( ) >= boxParams[ 0 ].j( ) &&
-                 temp.j( ) < boxParams[ 0 ].j( ) + dIJKm1[ 1 ] ) ) &&
+               ( dIJKm1[ 1 ] && temp.j( ) >= boxParams[ 0 ].j( ) && temp.j( ) < boxParams[ 0 ].j( ) + dIJKm1[ 1 ] ) ) &&
              ( ( !dIJKm1[ 2 ] && temp.k( ) == boxParams[ 1 ].k( ) ) ||
-               ( dIJKm1[ 2 ] && temp.k( ) >= boxParams[ 0 ].k( ) &&
-                 temp.k( ) < boxParams[ 0 ].k( ) + dIJKm1[ 2 ] ) ) );
+               ( dIJKm1[ 2 ] && temp.k( ) >= boxParams[ 0 ].k( ) && temp.k( ) < boxParams[ 0 ].k( ) + dIJKm1[ 2 ] ) ) );
 }
 
 inline bool ScdElementData::contains_vertex( const HomCoord& temp ) const
 {
     // upper bound is < instead of <= because element params max is one less
     // than vertex params max, except in case of 2d or 1d sequence
-    return ( ( dIJK[ 0 ] && temp.i( ) >= boxParams[ 0 ].i( ) &&
-               temp.i( ) < boxParams[ 0 ].i( ) + dIJK[ 0 ] ) &&
+    return ( ( dIJK[ 0 ] && temp.i( ) >= boxParams[ 0 ].i( ) && temp.i( ) < boxParams[ 0 ].i( ) + dIJK[ 0 ] ) &&
              ( ( !dIJK[ 1 ] && temp.j( ) == boxParams[ 1 ].j( ) ) ||
-               ( dIJK[ 1 ] && temp.j( ) >= boxParams[ 0 ].j( ) &&
-                 temp.j( ) < boxParams[ 0 ].j( ) + dIJK[ 1 ] ) ) &&
+               ( dIJK[ 1 ] && temp.j( ) >= boxParams[ 0 ].j( ) && temp.j( ) < boxParams[ 0 ].j( ) + dIJK[ 1 ] ) ) &&
              ( ( !dIJK[ 2 ] && temp.k( ) == boxParams[ 1 ].k( ) ) ||
-               ( dIJK[ 2 ] && temp.k( ) >= boxParams[ 0 ].k( ) &&
-                 temp.k( ) < boxParams[ 0 ].k( ) + dIJK[ 2 ] ) ) );
+               ( dIJK[ 2 ] && temp.k( ) >= boxParams[ 0 ].k( ) && temp.k( ) < boxParams[ 0 ].k( ) + dIJK[ 2 ] ) ) );
 }
 
 inline bool ScdElementData::VertexDataRef::contains( const HomCoord& coords ) const
@@ -269,10 +260,8 @@ inline bool ScdElementData::VertexDataRef::contains( const HomCoord& coords ) co
     return ( minmax[ 0 ] <= coords && minmax[ 1 ] >= coords );
 }
 
-inline ScdElementData::VertexDataRef::VertexDataRef( const HomCoord& this_min,
-                                                     const HomCoord& this_max,
-                                                     const HomXform& tmp_xform,
-                                                     ScdVertexData*  this_seq )
+inline ScdElementData::VertexDataRef::VertexDataRef( const HomCoord& this_min, const HomCoord& this_max,
+                                                     const HomXform& tmp_xform, ScdVertexData* this_seq )
     : xform( tmp_xform ), invXform( tmp_xform.inverse( ) ), srcSeq( this_seq )
 {
     minmax[ 0 ] = HomCoord( this_min );
@@ -282,8 +271,7 @@ inline ScdElementData::VertexDataRef::VertexDataRef( const HomCoord& this_min,
 inline EntityHandle ScdElementData::get_vertex( const HomCoord& coords ) const
 {
     assert( boundary_complete( ) );
-    for( std::vector< VertexDataRef >::const_iterator it = vertexSeqRefs.begin( );
-         it != vertexSeqRefs.end( ); ++it )
+    for( std::vector< VertexDataRef >::const_iterator it = vertexSeqRefs.begin( ); it != vertexSeqRefs.end( ); ++it )
     {
         if( ( *it ).minmax[ 0 ] <= coords && ( *it ).minmax[ 1 ] >= coords )
         {
@@ -301,11 +289,10 @@ inline EntityHandle ScdElementData::get_vertex( const HomCoord& coords ) const
     return 0;
 }
 
-inline ErrorCode ScdElementData::add_vsequence( ScdVertexData* vseq, const HomCoord& p1,
-                                                const HomCoord& q1, const HomCoord& p2,
-                                                const HomCoord& q2, const HomCoord& p3,
-                                                const HomCoord& q3, bool bb_input,
-                                                const HomCoord& bb_min, const HomCoord& bb_max )
+inline ErrorCode ScdElementData::add_vsequence( ScdVertexData* vseq, const HomCoord& p1, const HomCoord& q1,
+                                                const HomCoord& p2, const HomCoord& q2, const HomCoord& p3,
+                                                const HomCoord& q3, bool bb_input, const HomCoord& bb_min,
+                                                const HomCoord& bb_max )
 {
     // compute the transform given the vseq-local parameters and the mapping to
     // this element sequence's parameters passed in minmax
@@ -328,16 +315,13 @@ inline ErrorCode ScdElementData::add_vsequence( ScdVertexData* vseq, const HomCo
     }
 
     // check against other vseq's to make sure they don't overlap
-    for( std::vector< VertexDataRef >::const_iterator vsit = vertexSeqRefs.begin( );
-         vsit != vertexSeqRefs.end( ); ++vsit )
-        if( ( *vsit ).contains( minmax[ 0 ] ) || ( *vsit ).contains( minmax[ 1 ] ) )
-            return MB_FAILURE;
+    for( std::vector< VertexDataRef >::const_iterator vsit = vertexSeqRefs.begin( ); vsit != vertexSeqRefs.end( );
+         ++vsit )
+        if( ( *vsit ).contains( minmax[ 0 ] ) || ( *vsit ).contains( minmax[ 1 ] ) ) return MB_FAILURE;
 
-    HomCoord tmp_min( std::min( minmax[ 0 ].i( ), minmax[ 1 ].i( ) ),
-                      std::min( minmax[ 0 ].j( ), minmax[ 1 ].j( ) ),
+    HomCoord tmp_min( std::min( minmax[ 0 ].i( ), minmax[ 1 ].i( ) ), std::min( minmax[ 0 ].j( ), minmax[ 1 ].j( ) ),
                       std::min( minmax[ 0 ].k( ), minmax[ 1 ].k( ) ) );
-    HomCoord tmp_max( std::max( minmax[ 0 ].i( ), minmax[ 1 ].i( ) ),
-                      std::max( minmax[ 0 ].j( ), minmax[ 1 ].j( ) ),
+    HomCoord tmp_max( std::max( minmax[ 0 ].i( ), minmax[ 1 ].i( ) ), std::max( minmax[ 0 ].j( ), minmax[ 1 ].j( ) ),
                       std::max( minmax[ 0 ].k( ), minmax[ 1 ].k( ) ) );
 
     // set up a new vertex sequence reference
@@ -349,9 +333,8 @@ inline ErrorCode ScdElementData::add_vsequence( ScdVertexData* vseq, const HomCo
     return MB_SUCCESS;
 }
 
-inline ErrorCode
-    ScdElementData::get_params_connectivity( const int i, const int j, const int k,
-                                             std::vector< EntityHandle >& connectivity ) const
+inline ErrorCode ScdElementData::get_params_connectivity( const int i, const int j, const int k,
+                                                          std::vector< EntityHandle >& connectivity ) const
 {
     if( contains( HomCoord( i, j, k ) ) == false ) return MB_FAILURE;
 

@@ -60,10 +60,7 @@ PatchSet* TrustRegion::get_patch_set( )
     return PatchSetUser::get_patch_set( );
 }
 
-TrustRegion::TrustRegion( ObjectiveFunction* of )
-    : VertexMover( of ), PatchSetUser( true ), mMemento( 0 )
-{
-}
+TrustRegion::TrustRegion( ObjectiveFunction* of ) : VertexMover( of ), PatchSetUser( true ), mMemento( 0 ) {}
 
 TrustRegion::~TrustRegion( )
 {

@@ -92,8 +92,7 @@ void usage( )
 
 typedef void ( *mesh_reader_t )( MeshImpl* mesh );
 
-bool run_smoother( mesh_reader_t input_mesh, mesh_reader_t reference_mesh, int exp, int n,
-                   TMetric* metric );
+bool run_smoother( mesh_reader_t input_mesh, mesh_reader_t reference_mesh, int exp, int n, TMetric* metric );
 
 void write_mesh( mesh_reader_t mesh, const char* filename );
 void write_mesh( MeshImpl* mesh, const char* filename );
@@ -397,8 +396,7 @@ void write_mesh( MeshImpl* mesh, const char* filename )
     if( WRITE_GNUPLOT )
     {
         string vfile = string( filename ) + ".eps";
-        MeshWriter::write_eps( mesh, vfile.c_str( ),
-                               MeshWriter::Projection( MeshWriter::X, MeshWriter::Y ), err );CHKERR( err )
+        MeshWriter::write_eps( mesh, vfile.c_str( ), MeshWriter::Projection( MeshWriter::X, MeshWriter::Y ), err );CHKERR( err )
         cout << "Wrote: \"" << vfile << '"' << endl;
     }
 }
@@ -410,8 +408,7 @@ void write_mesh( mesh_reader_t mesh_func, const char* filename )
     write_mesh( &mesh, filename );
 }
 
-bool run_smoother( mesh_reader_t input_mesh, mesh_reader_t reference_mesh, int exp, int n,
-                   TMetric* target_metric )
+bool run_smoother( mesh_reader_t input_mesh, mesh_reader_t reference_mesh, int exp, int n, TMetric* target_metric )
 {
     MsqError err;
     MeshImpl active, reference;

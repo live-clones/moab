@@ -13,23 +13,21 @@ class SpectralQuad
 {
   public:
     /** \brief Forward-evaluation of field at parametric coordinates */
-    static ErrorCode evalFcn( const double* params, const double* field, const int ndim,
-                              const int num_tuples, double* work, double* result );
+    static ErrorCode evalFcn( const double* params, const double* field, const int ndim, const int num_tuples,
+                              double* work, double* result );
 
     /** \brief Reverse-evaluation of parametric coordinates at physical space position */
-    static ErrorCode reverseEvalFcn( EvalFcn eval, JacobianFcn jacob, InsideFcn ins,
-                                     const double* posn, const double* verts, const int nverts,
-                                     const int ndim, const double iter_tol, const double inside_tol,
-                                     double* work, double* params, int* is_inside );
+    static ErrorCode reverseEvalFcn( EvalFcn eval, JacobianFcn jacob, InsideFcn ins, const double* posn,
+                                     const double* verts, const int nverts, const int ndim, const double iter_tol,
+                                     const double inside_tol, double* work, double* params, int* is_inside );
 
     /** \brief Evaluate the jacobian at a specified parametric position */
-    static ErrorCode jacobianFcn( const double* params, const double* verts, const int nverts,
-                                  const int ndim, double* work, double* result );
+    static ErrorCode jacobianFcn( const double* params, const double* verts, const int nverts, const int ndim,
+                                  double* work, double* result );
 
     /** \brief Forward-evaluation of field at parametric coordinates */
-    static ErrorCode integrateFcn( const double* field, const double* verts, const int nverts,
-                                   const int ndim, const int num_tuples, double* work,
-                                   double* result );
+    static ErrorCode integrateFcn( const double* field, const double* verts, const int nverts, const int ndim,
+                                   const int num_tuples, double* work, double* result );
 
     /** \brief Initialize this EvalSet */
     static ErrorCode initFcn( const double* verts, const int nverts, double*& work );
@@ -62,12 +60,11 @@ class SpectralQuad
     static double*       _odwork;  // work area
 
     // flag for initialization of data
-    static bool _init;
-    static double*
-        _glpoints;  // it is a space we can use to store gl positions for elements
-                    // on the fly; we do not have a tag yet for them, as in Nek5000 application
-                    // also, these positions might need to be moved on the sphere, for HOMME grids
-                    // do we project them or how do we move them on the sphere?
+    static bool    _init;
+    static double* _glpoints;  // it is a space we can use to store gl positions for elements
+                               // on the fly; we do not have a tag yet for them, as in Nek5000 application
+                               // also, these positions might need to be moved on the sphere, for HOMME grids
+                               // do we project them or how do we move them on the sphere?
 };  // class SpectralQuad
 
 }  // namespace moab

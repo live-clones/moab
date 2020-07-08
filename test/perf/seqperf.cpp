@@ -91,12 +91,9 @@ void forward_order_query_vertices( int percent );  //!< calculate mean of all ve
 void reverse_order_query_vertices( int percent );  //!< calculate mean of all vertex coordinates
 void random_order_query_vertices( int percent );  //!< calculate mean of all vertex coordinates
 
-void forward_order_query_elements(
-    int percent );  //!< check all element connectivity for valid vertex handles
-void reverse_order_query_elements(
-    int percent );  //!< check all element connectivity for valid vertex handles
-void random_order_query_elements(
-    int percent );  //!< check all element connectivity for valid vertex handles
+void forward_order_query_elements( int percent );  //!< check all element connectivity for valid vertex handles
+void reverse_order_query_elements( int percent );  //!< check all element connectivity for valid vertex handles
+void random_order_query_elements( int percent );  //!< check all element connectivity for valid vertex handles
 
 void forward_order_query_element_verts( int percent );  //!< calculate centroid
 void reverse_order_query_element_verts( int percent );  //!< calculate centroid
@@ -122,14 +119,11 @@ unsigned get_number_sequences( EntityType type );
 typedef void ( *naf_t )( );
 typedef void ( *iaf_t )( int );
 
-iaf_t query_verts[ 3 ] = { &forward_order_query_vertices, &reverse_order_query_vertices,
-                           &random_order_query_vertices };
+iaf_t query_verts[ 3 ] = { &forward_order_query_vertices, &reverse_order_query_vertices, &random_order_query_vertices };
 
-iaf_t query_elems[ 3 ] = { &forward_order_query_elements, &reverse_order_query_elements,
-                           &random_order_query_elements };
+iaf_t query_elems[ 3 ] = { &forward_order_query_elements, &reverse_order_query_elements, &random_order_query_elements };
 
-iaf_t query_elem_verts[ 3 ] = { &forward_order_query_element_verts,
-                                &reverse_order_query_element_verts,
+iaf_t query_elem_verts[ 3 ] = { &forward_order_query_element_verts, &reverse_order_query_element_verts,
                                 &random_order_query_element_verts };
 
 iaf_t delete_verts[ 3 ] = { &forward_order_delete_vertices, &reverse_order_delete_vertices,
@@ -156,22 +150,19 @@ inline void delete_elem( long index, int percent );
 //! print usage and exit
 void usage( )
 {
-    std::cerr << "Usage: seqperf [-i <intervals>] [-o <order>] [-d <percent>] [-b|-s] [-q <count>]"
+    std::cerr << "Usage: seqperf [-i <intervals>] [-o <order>] [-d <percent>] [-b|-s] [-q <count>]" << std::endl;
+    std::cerr << " -i specify size of cubic structured hex mesh in intervals.  Default: " << default_intervals
               << std::endl;
-    std::cerr << " -i specify size of cubic structured hex mesh in intervals.  Default: "
-              << default_intervals << std::endl;
     std::cerr << " -o one of \"forward\", \"reverse\", or \"random\".  May be specified multiple "
                  "times.  Default is all."
               << std::endl;
-    std::cerr
-        << " -d percent of entities to delete.  May be specified multiple times.  Default is {";
+    std::cerr << " -d percent of entities to delete.  May be specified multiple times.  Default is {";
     for( unsigned i = 0; i < ARRSIZE( default_delete ) - 1; ++i )
         std::cerr << default_delete[ i ] << ",";
     std::cerr << default_delete[ ARRSIZE( default_delete ) - 1 ] << "}" << std::endl;
     std::cerr << " -b block creation of mesh" << std::endl;
     std::cerr << " -s single entity mesh creation" << std::endl;
-    std::cerr << " -q number of times to repeat queries.  Default: " << default_query_count
-              << std::endl;
+    std::cerr << " -q number of times to repeat queries.  Default: " << default_query_count << std::endl;
     exit( 1 );
 }
 
@@ -233,14 +224,13 @@ void do_test( int create_mode,  //!< 0 == single, 1 == block
     }
     else
     {
-        std::cout << "Single Entity Creation (entities grouped in memory blocks of constant size)"
-                  << std::endl;
+        std::cout << "Single Entity Creation (entities grouped in memory blocks of constant size)" << std::endl;
         TIME( "  Creating initial vertices", create_vertices_single );
         TIME( "  Creating initial elements", create_elements_single );
     }
 
-    std::cout << order_strs[ order ] << " order with deletion of " << percent
-              << "% of vertices and elements" << std::endl;
+    std::cout << order_strs[ order ] << " order with deletion of " << percent << "% of vertices and elements"
+              << std::endl;
 
     TIME_DEL( "  Deleting elements", delete_elems[ order ], percent );
     TIME_DEL( "  Deleting vertices", delete_verts[ order ], percent );
@@ -249,11 +239,10 @@ void do_test( int create_mode,  //!< 0 == single, 1 == block
     int num_elem = 0;
     mb.get_number_entities_by_type( 0, MBVERTEX, num_vert );
     mb.get_number_entities_by_type( 0, MBHEX, num_elem );
-    std::cout << "  " << num_vert << " vertices and " << num_elem << " elements remaining"
-              << std::endl;
+    std::cout << "  " << num_vert << " vertices and " << num_elem << " elements remaining" << std::endl;
 #ifdef PRINT_SEQUENCE_COUNT
-    std::cout << "  " << get_number_sequences( MBVERTEX ) << " vertex sequences and "
-              << get_number_sequences( MBHEX ) << " element sequences." << std::endl;
+    std::cout << "  " << get_number_sequences( MBVERTEX ) << " vertex sequences and " << get_number_sequences( MBHEX )
+              << " element sequences." << std::endl;
 #endif
 
     TIME_QRY( "  Querying vertex coordinates", query_verts[ order ], percent );
@@ -372,8 +361,8 @@ int main( int argc, char* argv[] )
 
     // Echo input args
 
-    std::cout << numSideInt << "x" << numSideInt << "x" << numSideInt << " hex grid: " << numElem
-              << " elements and " << numVert << " vertices" << std::endl;
+    std::cout << numSideInt << "x" << numSideInt << "x" << numSideInt << " hex grid: " << numElem << " elements and "
+              << numVert << " vertices" << std::endl;
 
     // Run tests
 

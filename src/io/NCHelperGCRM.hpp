@@ -36,11 +36,11 @@ class NCHelperGCRM : public UcdNCHelper
 
     //! Implementation of UcdNCHelper::read_ucd_variables_to_nonset_allocate()
     virtual ErrorCode read_ucd_variables_to_nonset_allocate( std::vector< ReadNC::VarData >& vdatas,
-                                                             std::vector< int >& tstep_nums );
+                                                             std::vector< int >&             tstep_nums );
 #ifdef MOAB_HAVE_PNETCDF
     //! Implementation of UcdNCHelper::read_ucd_variables_to_nonset_async()
     virtual ErrorCode read_ucd_variables_to_nonset_async( std::vector< ReadNC::VarData >& vdatas,
-                                                          std::vector< int >& tstep_nums );
+                                                          std::vector< int >&             tstep_nums );
 #else
     //! Implementation of UcdNCHelper::read_ucd_variables_to_nonset()
     virtual ErrorCode read_ucd_variables_to_nonset( std::vector< ReadNC::VarData >& vdatas,
@@ -53,27 +53,23 @@ class NCHelperGCRM : public UcdNCHelper
 #endif
 
     //! Create local vertices
-    ErrorCode create_local_vertices( const std::vector< int >& vertices_on_local_cells,
-                                     EntityHandle&             start_vertex );
+    ErrorCode create_local_vertices( const std::vector< int >& vertices_on_local_cells, EntityHandle& start_vertex );
 
     //! Create local edges (optional)
     ErrorCode create_local_edges( EntityHandle start_vertex );
 
     //! Create local cells with padding (pentagons are padded to hexagons)
-    ErrorCode create_padded_local_cells( const std::vector< int >& vertices_on_local_cells,
-                                         EntityHandle start_vertex, Range& faces );
+    ErrorCode create_padded_local_cells( const std::vector< int >& vertices_on_local_cells, EntityHandle start_vertex,
+                                         Range& faces );
 
     //! Create gather set vertices
-    ErrorCode create_gather_set_vertices( EntityHandle  gather_set,
-                                          EntityHandle& gather_set_start_vertex );
+    ErrorCode create_gather_set_vertices( EntityHandle gather_set, EntityHandle& gather_set_start_vertex );
 
     //! Create gather set edges (optional)
-    ErrorCode create_gather_set_edges( EntityHandle gather_set,
-                                       EntityHandle gather_set_start_vertex );
+    ErrorCode create_gather_set_edges( EntityHandle gather_set, EntityHandle gather_set_start_vertex );
 
     //! Create gather set cells with padding (pentagons are padded to hexagons)
-    ErrorCode create_padded_gather_set_cells( EntityHandle gather_set,
-                                              EntityHandle gather_set_start_vertex );
+    ErrorCode create_padded_gather_set_cells( EntityHandle gather_set, EntityHandle gather_set_start_vertex );
 
   private:
     bool  createGatherSet;

@@ -48,12 +48,10 @@ using namespace MBMesquite;
 using namespace std;
 
 const double epsilon = 1e-6;
-#define ASSERT_VALUES_EQUAL( v1, v2, location, bits )                        \
-    ASSERT_MESSAGE( value_message( ( location ), ( bits ), ( v1 ), ( v2 ) ), \
-                    ( fabs( ( v1 ) - ( v2 ) ) < epsilon ) )
+#define ASSERT_VALUES_EQUAL( v1, v2, location, bits ) \
+    ASSERT_MESSAGE( value_message( ( location ), ( bits ), ( v1 ), ( v2 ) ), ( fabs( ( v1 ) - ( v2 ) ) < epsilon ) )
 
-static inline CppUnit::Message value_message( unsigned location, NodeSet bits, double v1,
-                                              double v2 )
+static inline CppUnit::Message value_message( unsigned location, NodeSet bits, double v1, double v2 )
 {
     CppUnit::Message m( "equality assertion failed" );
 
@@ -329,12 +327,9 @@ static double dN9dt( double, double s, double )
 
 typedef double ( *N_t )( double, double, double );
 static const N_t N[] = { &N0, &N1, &N2, &N3, &N4, &N5, &N6, &N7, &N8, &N9 };
-static const N_t dNdr[] = { &dN0dr, &dN1dr, &dN2dr, &dN3dr, &dN4dr,
-                            &dN5dr, &dN6dr, &dN7dr, &dN8dr, &dN9dr };
-static const N_t dNds[] = { &dN0ds, &dN1ds, &dN2ds, &dN3ds, &dN4ds,
-                            &dN5ds, &dN6ds, &dN7ds, &dN8ds, &dN9ds };
-static const N_t dNdt[] = { &dN0dt, &dN1dt, &dN2dt, &dN3dt, &dN4dt,
-                            &dN5dt, &dN6dt, &dN7dt, &dN8dt, &dN9dt };
+static const N_t dNdr[] = { &dN0dr, &dN1dr, &dN2dr, &dN3dr, &dN4dr, &dN5dr, &dN6dr, &dN7dr, &dN8dr, &dN9dr };
+static const N_t dNds[] = { &dN0ds, &dN1ds, &dN2ds, &dN3ds, &dN4ds, &dN5ds, &dN6ds, &dN7ds, &dN8ds, &dN9ds };
+static const N_t dNdt[] = { &dN0dt, &dN1dt, &dN2dt, &dN3dt, &dN4dt, &dN5dt, &dN6dt, &dN7dt, &dN8dt, &dN9dt };
 
 static const double rst_corner[][ 3 ] = { { 0, 0, 0 }, { 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 } };
 static const double rst_edge[][ 3 ] = { { 0.5, 0.0, 0.0 }, { 0.5, 0.5, 0.0 }, { 0.0, 0.5, 0.0 },
@@ -410,9 +405,8 @@ static void check_no_zeros( const MsqVector< 3 >* derivs, size_t num_vtx )
     }
 }
 
-static void compare_coefficients( const double* coeffs, const size_t* indices,
-                                  const double* expected_coeffs, size_t num_coeff, unsigned loc,
-                                  NodeSet bits )
+static void compare_coefficients( const double* coeffs, const size_t* indices, const double* expected_coeffs,
+                                  size_t num_coeff, unsigned loc, NodeSet bits )
 {
     // find the location in the returned list for each node
     size_t revidx[ 10 ];
@@ -445,8 +439,7 @@ static void compare_coefficients( const double* coeffs, const size_t* indices,
     ASSERT_VALUES_EQUAL( expected_coeffs[ 9 ], test_vals[ 9 ], loc, bits );
 }
 
-static void compare_derivatives( const size_t* vertices, size_t num_vtx,
-                                 const MsqVector< 3 >* derivs,
+static void compare_derivatives( const size_t* vertices, size_t num_vtx, const MsqVector< 3 >* derivs,
                                  const MsqVector< 3 >* expected_derivs, unsigned loc, NodeSet bits )
 {
     check_valid_indices( vertices, num_vtx );

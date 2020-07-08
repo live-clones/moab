@@ -53,8 +53,7 @@ class LInfTemplate : public ObjectiveFunctionTemplate
   public:
     MESQUITE_EXPORT LInfTemplate( QualityMetric* );
     MESQUITE_EXPORT virtual ~LInfTemplate( );
-    MESQUITE_EXPORT virtual bool evaluate( EvalType type, PatchData& pd, double& value_out,
-                                           bool free, MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate( EvalType type, PatchData& pd, double& value_out, bool free, MsqError& err );
     MESQUITE_EXPORT virtual ObjectiveFunction* clone( ) const;
     MESQUITE_EXPORT virtual void               clear( );
 

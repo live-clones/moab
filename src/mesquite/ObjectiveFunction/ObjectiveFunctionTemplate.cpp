@@ -45,14 +45,15 @@ namespace MBMesquite
 
 ObjectiveFunctionTemplate::~ObjectiveFunctionTemplate( ) {}
 
-void ObjectiveFunctionTemplate::initialize_queue( MeshDomainAssoc* mesh_and_domain,
-                                                  const Settings* settings, MsqError& err )
+void ObjectiveFunctionTemplate::initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
+                                                  MsqError& err )
 {
     qualityMetric->initialize_queue( mesh_and_domain, settings, err );MSQ_ERRRTN( err );
 }
 
-bool ObjectiveFunctionTemplate::initialize_block_coordinate_descent(
-    MeshDomainAssoc* mesh_and_domain, const Settings* settings, PatchSet*, MsqError& err )
+bool ObjectiveFunctionTemplate::initialize_block_coordinate_descent( MeshDomainAssoc* mesh_and_domain,
+                                                                     const Settings*  settings, PatchSet*,
+                                                                     MsqError&        err )
 {
     std::auto_ptr< PatchSet > patch_set;
     switch( get_quality_metric( )->get_metric_type( ) )

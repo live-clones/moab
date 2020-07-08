@@ -24,8 +24,8 @@
 namespace moab
 {
 
-EntityID ScdElementData::calc_num_entities( EntityHandle start_handle, int irange, int jrange,
-                                            int krange, int* is_periodic )
+EntityID ScdElementData::calc_num_entities( EntityHandle start_handle, int irange, int jrange, int krange,
+                                            int* is_periodic )
 {
     size_t result = 1;
     switch( CN::Dimension( TYPE_FROM_HANDLE( start_handle ) ) )
@@ -44,12 +44,10 @@ EntityID ScdElementData::calc_num_entities( EntityHandle start_handle, int irang
     return result;
 }
 
-ScdElementData::ScdElementData( EntityHandle shandle, const int imin, const int jmin,
-                                const int kmin, const int imax, const int jmax, const int kmax,
-                                int* is_p )
-    : SequenceData(
-          0, shandle,
-          shandle + calc_num_entities( shandle, imax - imin, jmax - jmin, kmax - kmin, is_p ) - 1 )
+ScdElementData::ScdElementData( EntityHandle shandle, const int imin, const int jmin, const int kmin, const int imax,
+                                const int jmax, const int kmax, int* is_p )
+    : SequenceData( 0, shandle,
+                    shandle + calc_num_entities( shandle, imax - imin, jmax - jmin, kmax - kmin, is_p ) - 1 )
 {
     // need to have meaningful parameters
     assert( imax >= imin && jmax >= jmin && kmax >= kmin );
@@ -82,8 +80,8 @@ bool ScdElementData::boundary_complete( ) const
 
     // pseudo code:
     // for each vertex sequence v:
-    for( std::vector< VertexDataRef >::const_iterator vseq = vertexSeqRefs.begin( );
-         vseq != vertexSeqRefs.end( ); ++vseq )
+    for( std::vector< VertexDataRef >::const_iterator vseq = vertexSeqRefs.begin( ); vseq != vertexSeqRefs.end( );
+         ++vseq )
     {
         //   test min corner mincorner:
         bool mincorner = true;
@@ -137,8 +135,8 @@ bool ScdElementData::boundary_complete( ) const
     //
     // if minlist.size = 1 & maxlist.size = 1 & minlist[0] = esequence.min &
     //         maxlist[0] = esequence.max+(1,1,1)
-    if( minlist.size( ) == 1 && maxlist.size( ) == 1 &&
-        minlist[ 0 ].minmax[ 0 ] == boxParams[ 0 ] && maxlist[ 0 ].minmax[ 1 ] == boxParams[ 1 ] )
+    if( minlist.size( ) == 1 && maxlist.size( ) == 1 && minlist[ 0 ].minmax[ 0 ] == boxParams[ 0 ] &&
+        maxlist[ 0 ].minmax[ 1 ] == boxParams[ 1 ] )
         //   complete
         return true;
     // else
@@ -146,8 +144,7 @@ bool ScdElementData::boundary_complete( ) const
     return false;
 }
 
-SequenceData* ScdElementData::subset( EntityHandle /*start*/, EntityHandle /*end*/,
-                                      const int* /*sequence_data_sizes*/,
+SequenceData* ScdElementData::subset( EntityHandle /*start*/, EntityHandle /*end*/, const int* /*sequence_data_sizes*/,
                                       const int* /*tag_data_sizes*/ ) const
 {
     return 0;

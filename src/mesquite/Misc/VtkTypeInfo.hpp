@@ -57,8 +57,7 @@ struct MESQUITE_EXPORT VtkTypeInfo
     /** Get VtkTypeInfo from VTK type number */
     static const VtkTypeInfo* find_type( unsigned vtk_type, MsqError& err );
     /** Get VtkTypeInfo from Mesquite type and number of nodes */
-    static const VtkTypeInfo* find_type( EntityTopology msq_type, unsigned num_nodes,
-                                         MsqError& err );
+    static const VtkTypeInfo* find_type( EntityTopology msq_type, unsigned num_nodes, MsqError& err );
 
     /** Reorder element connectivty list for writing to a VTK file
      *

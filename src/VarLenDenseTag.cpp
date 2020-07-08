@@ -35,16 +35,14 @@ inline static ErrorCode not_found( std::string /*name*/, EntityHandle /*h*/ )
     return MB_TAG_NOT_FOUND;
 }
 
-VarLenDenseTag::VarLenDenseTag( int index, const char* name, DataType type,
-                                const void* default_value, int default_value_size )
-    : TagInfo( name, MB_VARIABLE_LENGTH, type, default_value, default_value_size ),
-      mySequenceArray( index )
+VarLenDenseTag::VarLenDenseTag( int index, const char* name, DataType type, const void* default_value,
+                                int default_value_size )
+    : TagInfo( name, MB_VARIABLE_LENGTH, type, default_value, default_value_size ), mySequenceArray( index )
 {
 }
 
-VarLenDenseTag* VarLenDenseTag::create_tag( SequenceManager* seqman, Error* error, const char* name,
-                                            DataType type, const void* default_value,
-                                            int default_value_size )
+VarLenDenseTag* VarLenDenseTag::create_tag( SequenceManager* seqman, Error* error, const char* name, DataType type,
+                                            const void* default_value, int default_value_size )
 {
     int index;
     if( MB_SUCCESS != seqman->reserve_tag_array( error, MB_VARIABLE_LENGTH, index ) ) return NULL;
@@ -62,8 +60,7 @@ TagType VarLenDenseTag::get_storage_type( ) const
     return MB_TAG_DENSE;
 }
 
-ErrorCode VarLenDenseTag::release_all_data( SequenceManager* seqman, Error* error,
-                                            bool delete_pending )
+ErrorCode VarLenDenseTag::release_all_data( SequenceManager* seqman, Error* error, bool delete_pending )
 {
     Range all_ents;
     seqman->get_entities( all_ents );
@@ -77,8 +74,8 @@ ErrorCode VarLenDenseTag::release_all_data( SequenceManager* seqman, Error* erro
     return rval;
 }
 
-ErrorCode VarLenDenseTag::get_array( const SequenceManager* seqman, Error* /* error */,
-                                     EntityHandle h, const VarLenTag*& ptr, size_t& count ) const
+ErrorCode VarLenDenseTag::get_array( const SequenceManager* seqman, Error* /* error */, EntityHandle h,
+                                     const VarLenTag*& ptr, size_t& count ) const
 {
     const EntitySequence* seq = NULL;
     ErrorCode             rval = seqman->find( h, seq );
@@ -106,8 +103,8 @@ ErrorCode VarLenDenseTag::get_array( const SequenceManager* seqman, Error* /* er
     return MB_SUCCESS;
 }
 
-ErrorCode VarLenDenseTag::get_array( SequenceManager* seqman, Error* /* error */, EntityHandle h,
-                                     VarLenTag*& ptr, size_t& count, bool allocate )
+ErrorCode VarLenDenseTag::get_array( SequenceManager* seqman, Error* /* error */, EntityHandle h, VarLenTag*& ptr,
+                                     size_t& count, bool allocate )
 {
     EntitySequence* seq = NULL;
     ErrorCode       rval = seqman->find( h, seq );
@@ -132,10 +129,7 @@ ErrorCode VarLenDenseTag::get_array( SequenceManager* seqman, Error* /* error */
     {
         mem = seq->data( )->allocate_tag_array( mySequenceArray, sizeof( VarLenTag ) );
         if( !mem )
-        {
-            MB_SET_ERR( MB_MEMORY_ALLOCATION_FAILED,
-                        "Memory allocation for variable-length dense tag data failed" );
-        }
+        { MB_SET_ERR( MB_MEMORY_ALLOCATION_FAILED, "Memory allocation for variable-length dense tag data failed" ); }
 
         memset( mem, 0, sizeof( VarLenTag ) * seq->data( )->size( ) );
     }
@@ -147,29 +141,22 @@ ErrorCode VarLenDenseTag::get_array( SequenceManager* seqman, Error* /* error */
     return MB_SUCCESS;
 }
 
-ErrorCode VarLenDenseTag::get_data( const SequenceManager*, Error* /* error */, const EntityHandle*,
-                                    size_t, void* ) const
-{
-    MB_SET_ERR( MB_VARIABLE_DATA_LENGTH,
-                "No size specified for variable-length tag " << get_name( ) << " data" );
-}
-
-ErrorCode VarLenDenseTag::get_data( const SequenceManager*, Error* /* error */, const Range&,
+ErrorCode VarLenDenseTag::get_data( const SequenceManager*, Error* /* error */, const EntityHandle*, size_t,
                                     void* ) const
 {
-    MB_SET_ERR( MB_VARIABLE_DATA_LENGTH,
-                "No size specified for variable-length tag " << get_name( ) << " data" );
+    MB_SET_ERR( MB_VARIABLE_DATA_LENGTH, "No size specified for variable-length tag " << get_name( ) << " data" );
 }
 
-ErrorCode VarLenDenseTag::get_data( const SequenceManager* seqman, Error* /* error */,
-                                    const EntityHandle* entities, size_t num_entities,
-                                    const void** pointers, int* lengths ) const
+ErrorCode VarLenDenseTag::get_data( const SequenceManager*, Error* /* error */, const Range&, void* ) const
+{
+    MB_SET_ERR( MB_VARIABLE_DATA_LENGTH, "No size specified for variable-length tag " << get_name( ) << " data" );
+}
+
+ErrorCode VarLenDenseTag::get_data( const SequenceManager* seqman, Error* /* error */, const EntityHandle* entities,
+                                    size_t num_entities, const void** pointers, int* lengths ) const
 {
     if( !lengths )
-    {
-        MB_SET_ERR( MB_VARIABLE_DATA_LENGTH,
-                    "No size specified for variable-length tag " << get_name( ) << " data" );
-    }
+    { MB_SET_ERR( MB_VARIABLE_DATA_LENGTH, "No size specified for variable-length tag " << get_name( ) << " data" ); }
 
     ErrorCode                 result = MB_SUCCESS, rval;
     const EntityHandle* const end = entities + num_entities;
@@ -201,22 +188,17 @@ ErrorCode VarLenDenseTag::get_data( const SequenceManager* seqman, Error* /* err
     return result;
 }
 
-ErrorCode VarLenDenseTag::get_data( const SequenceManager* seqman, Error* /* error */,
-                                    const Range& entities, const void** pointers,
-                                    int* lengths ) const
+ErrorCode VarLenDenseTag::get_data( const SequenceManager* seqman, Error* /* error */, const Range& entities,
+                                    const void** pointers, int* lengths ) const
 {
     if( !lengths )
-    {
-        MB_SET_ERR( MB_VARIABLE_DATA_LENGTH,
-                    "No size specified for variable-length tag " << get_name( ) << " data" );
-    }
+    { MB_SET_ERR( MB_VARIABLE_DATA_LENGTH, "No size specified for variable-length tag " << get_name( ) << " data" ); }
 
     ErrorCode        rval;
     size_t           avail = 0;
     const VarLenTag* array = NULL;
 
-    for( Range::const_pair_iterator p = entities.const_pair_begin( );
-         p != entities.const_pair_end( ); ++p )
+    for( Range::const_pair_iterator p = entities.const_pair_begin( ); p != entities.const_pair_end( ); ++p )
     {
         EntityHandle start = p->first;
         while( start <= p->second )
@@ -266,23 +248,18 @@ ErrorCode VarLenDenseTag::get_data( const SequenceManager* seqman, Error* /* err
     return MB_SUCCESS;
 }
 
-ErrorCode VarLenDenseTag::set_data( SequenceManager*, Error* /* error */, const EntityHandle*,
-                                    size_t, const void* )
+ErrorCode VarLenDenseTag::set_data( SequenceManager*, Error* /* error */, const EntityHandle*, size_t, const void* )
 {
-    MB_SET_ERR( MB_VARIABLE_DATA_LENGTH,
-                "No size specified for variable-length tag " << get_name( ) << " data" );
+    MB_SET_ERR( MB_VARIABLE_DATA_LENGTH, "No size specified for variable-length tag " << get_name( ) << " data" );
 }
 
-ErrorCode VarLenDenseTag::set_data( SequenceManager*, Error* /* error */, const Range&,
-                                    const void* )
+ErrorCode VarLenDenseTag::set_data( SequenceManager*, Error* /* error */, const Range&, const void* )
 {
-    MB_SET_ERR( MB_VARIABLE_DATA_LENGTH,
-                "No size specified for variable-length tag " << get_name( ) << " data" );
+    MB_SET_ERR( MB_VARIABLE_DATA_LENGTH, "No size specified for variable-length tag " << get_name( ) << " data" );
 }
 
-ErrorCode VarLenDenseTag::set_data( SequenceManager*    seqman, Error* /* error */,
-                                    const EntityHandle* entities, size_t num_entities,
-                                    bool one_value, void const* const* pointers,
+ErrorCode VarLenDenseTag::set_data( SequenceManager* seqman, Error* /* error */, const EntityHandle* entities,
+                                    size_t num_entities, bool one_value, void const* const* pointers,
                                     const int* lengths )
 {
     ErrorCode rval = validate_lengths( NULL, lengths, one_value ? 1 : num_entities );MB_CHK_ERR( rval );
@@ -304,8 +281,7 @@ ErrorCode VarLenDenseTag::set_data( SequenceManager*    seqman, Error* /* error 
     return MB_SUCCESS;
 }
 
-ErrorCode VarLenDenseTag::set_data( SequenceManager* seqman, Error* /* error */,
-                                    const Range& entities, bool one_value,
+ErrorCode VarLenDenseTag::set_data( SequenceManager* seqman, Error* /* error */, const Range& entities, bool one_value,
                                     void const* const* pointers, const int* lengths )
 {
     ErrorCode rval = validate_lengths( NULL, lengths, one_value ? 1 : entities.size( ) );MB_CHK_ERR( rval );
@@ -314,8 +290,7 @@ ErrorCode VarLenDenseTag::set_data( SequenceManager* seqman, Error* /* error */,
     size_t       avail = 0;
     const size_t step = one_value ? 0 : 1;
 
-    for( Range::const_pair_iterator p = entities.const_pair_begin( );
-         p != entities.const_pair_end( ); ++p )
+    for( Range::const_pair_iterator p = entities.const_pair_begin( ); p != entities.const_pair_end( ); ++p )
     {
         EntityHandle start = p->first;
         while( start <= p->second )
@@ -337,23 +312,20 @@ ErrorCode VarLenDenseTag::set_data( SequenceManager* seqman, Error* /* error */,
     return MB_SUCCESS;
 }
 
-ErrorCode VarLenDenseTag::set_data( SequenceManager*    seqman, Error* /* error */,
-                                    const EntityHandle* entities, size_t num_entities,
-                                    void const* const* pointers, const int* lengths )
+ErrorCode VarLenDenseTag::set_data( SequenceManager* seqman, Error* /* error */, const EntityHandle* entities,
+                                    size_t num_entities, void const* const* pointers, const int* lengths )
 {
     return set_data( seqman, NULL, entities, num_entities, false, pointers, lengths );
 }
 
-ErrorCode VarLenDenseTag::set_data( SequenceManager* seqman, Error* /* error */,
-                                    const Range& entities, void const* const* pointers,
-                                    const int* lengths )
+ErrorCode VarLenDenseTag::set_data( SequenceManager* seqman, Error* /* error */, const Range& entities,
+                                    void const* const* pointers, const int* lengths )
 {
     return set_data( seqman, NULL, entities, false, pointers, lengths );
 }
 
-ErrorCode VarLenDenseTag::clear_data( SequenceManager*    seqman, Error* /* error */,
-                                      const EntityHandle* entities, size_t num_entities,
-                                      const void* value_ptr, int value_len )
+ErrorCode VarLenDenseTag::clear_data( SequenceManager* seqman, Error* /* error */, const EntityHandle* entities,
+                                      size_t num_entities, const void* value_ptr, int value_len )
 {
     if( !value_ptr || !value_len )
         return remove_data( seqman, NULL, entities, num_entities );
@@ -361,8 +333,8 @@ ErrorCode VarLenDenseTag::clear_data( SequenceManager*    seqman, Error* /* erro
         return set_data( seqman, NULL, entities, num_entities, true, &value_ptr, &value_len );
 }
 
-ErrorCode VarLenDenseTag::clear_data( SequenceManager* seqman, Error* /* error */,
-                                      const Range& entities, const void* value_ptr, int value_len )
+ErrorCode VarLenDenseTag::clear_data( SequenceManager* seqman, Error* /* error */, const Range& entities,
+                                      const void* value_ptr, int value_len )
 {
     if( !value_ptr || !value_len )
         return remove_data( seqman, NULL, entities );
@@ -370,8 +342,8 @@ ErrorCode VarLenDenseTag::clear_data( SequenceManager* seqman, Error* /* error *
         return set_data( seqman, NULL, entities, true, &value_ptr, &value_len );
 }
 
-ErrorCode VarLenDenseTag::remove_data( SequenceManager*    seqman, Error* /* error */,
-                                       const EntityHandle* entities, size_t num_entities )
+ErrorCode VarLenDenseTag::remove_data( SequenceManager* seqman, Error* /* error */, const EntityHandle* entities,
+                                       size_t num_entities )
 {
     const EntityHandle* const end = entities + num_entities;
     VarLenTag*                array = NULL;
@@ -388,15 +360,13 @@ ErrorCode VarLenDenseTag::remove_data( SequenceManager*    seqman, Error* /* err
     return MB_SUCCESS;
 }
 
-ErrorCode VarLenDenseTag::remove_data( SequenceManager* seqman, Error* /* error */,
-                                       const Range&     entities )
+ErrorCode VarLenDenseTag::remove_data( SequenceManager* seqman, Error* /* error */, const Range& entities )
 {
     VarLenTag* array = NULL;
     size_t     avail = 0;
     ErrorCode  rval;
 
-    for( Range::const_pair_iterator p = entities.const_pair_begin( );
-         p != entities.const_pair_end( ); ++p )
+    for( Range::const_pair_iterator p = entities.const_pair_begin( ); p != entities.const_pair_end( ); ++p )
     {
         EntityHandle start = p->first;
         while( start <= p->second )
@@ -423,15 +393,15 @@ ErrorCode VarLenDenseTag::remove_data( SequenceManager* seqman, Error* /* error 
     return MB_SUCCESS;
 }
 
-ErrorCode VarLenDenseTag::tag_iterate( SequenceManager*, Error* /* error */, Range::iterator&,
-                                       const Range::iterator&, void*&, bool )
+ErrorCode VarLenDenseTag::tag_iterate( SequenceManager*, Error* /* error */, Range::iterator&, const Range::iterator&,
+                                       void*&, bool )
 {
     MB_SET_ERR( MB_VARIABLE_DATA_LENGTH, "Cannot iterate over variable-length tag data" );
 }
 
 template< class Container >
-static inline ErrorCode get_tagged( const SequenceManager* seqman, int mySequenceArray,
-                                    EntityType type, Container& entities )
+static inline ErrorCode get_tagged( const SequenceManager* seqman, int mySequenceArray, EntityType type,
+                                    Container& entities )
 {
     typename Container::iterator        hint = entities.begin( );
     std::pair< EntityType, EntityType > range = type_range( type );
@@ -442,8 +412,7 @@ static inline ErrorCode get_tagged( const SequenceManager* seqman, int mySequenc
         const TypeSequenceManager& map = seqman->entity_map( t );
         for( i = map.begin( ); i != map.end( ); ++i )
         {
-            data = reinterpret_cast< const VarLenTag* >(
-                ( *i )->data( )->get_tag_data( mySequenceArray ) );
+            data = reinterpret_cast< const VarLenTag* >( ( *i )->data( )->get_tag_data( mySequenceArray ) );
             if( !data ) continue;
             end = data + ( *i )->end_handle( ) - ( *i )->data( )->start_handle( ) + 1;
             iter = data + ( *i )->start_handle( ) - ( *i )->data( )->start_handle( );
@@ -457,9 +426,8 @@ static inline ErrorCode get_tagged( const SequenceManager* seqman, int mySequenc
 }
 
 template< class Container >
-static inline ErrorCode get_tagged( const SequenceManager* seqman, int mySequenceArray,
-                                    Range::const_iterator begin, Range::const_iterator end,
-                                    Container& entities )
+static inline ErrorCode get_tagged( const SequenceManager* seqman, int mySequenceArray, Range::const_iterator begin,
+                                    Range::const_iterator end, Container& entities )
 {
     typename Container::iterator hint = entities.begin( );
     RangeSeqIntersectIter        iter( const_cast< SequenceManager* >( seqman ) );
@@ -467,8 +435,7 @@ static inline ErrorCode get_tagged( const SequenceManager* seqman, int mySequenc
     const VarLenTag*             data;
     for( ; MB_SUCCESS == rval; rval = iter.step( ) )
     {
-        data = reinterpret_cast< const VarLenTag* >(
-            iter.get_sequence( )->data( )->get_tag_data( mySequenceArray ) );
+        data = reinterpret_cast< const VarLenTag* >( iter.get_sequence( )->data( )->get_tag_data( mySequenceArray ) );
         if( !data ) continue;
 
         data += iter.get_start_handle( ) - iter.get_sequence( )->data( )->start_handle( );
@@ -485,14 +452,13 @@ static inline ErrorCode get_tagged( const SequenceManager* seqman, int mySequenc
 }
 
 template< class Container >
-static inline ErrorCode get_tagged( const SequenceManager* seqman, int mySequenceArray,
-                                    Container& entities, EntityType type, const Range* intersect )
+static inline ErrorCode get_tagged( const SequenceManager* seqman, int mySequenceArray, Container& entities,
+                                    EntityType type, const Range* intersect )
 {
     if( !intersect )
         return get_tagged< Container >( seqman, mySequenceArray, type, entities );
     else if( MBMAXTYPE == type )
-        return get_tagged< Container >( seqman, mySequenceArray, intersect->begin( ),
-                                        intersect->end( ), entities );
+        return get_tagged< Container >( seqman, mySequenceArray, intersect->begin( ), intersect->end( ), entities );
     else
     {
         std::pair< Range::iterator, Range::iterator > r = intersect->equal_range( type );
@@ -500,14 +466,14 @@ static inline ErrorCode get_tagged( const SequenceManager* seqman, int mySequenc
     }
 }
 
-ErrorCode VarLenDenseTag::get_tagged_entities( const SequenceManager* seqman, Range& entities,
-                                               EntityType type, const Range* intersect ) const
+ErrorCode VarLenDenseTag::get_tagged_entities( const SequenceManager* seqman, Range& entities, EntityType type,
+                                               const Range* intersect ) const
 {
     return get_tagged( seqman, mySequenceArray, entities, type, intersect );
 }
 
-ErrorCode VarLenDenseTag::num_tagged_entities( const SequenceManager* seqman, size_t& output_count,
-                                               EntityType type, const Range* intersect ) const
+ErrorCode VarLenDenseTag::num_tagged_entities( const SequenceManager* seqman, size_t& output_count, EntityType type,
+                                               const Range* intersect ) const
 {
     InsertCount counter( output_count );
     ErrorCode   rval = get_tagged( seqman, mySequenceArray, counter, type, intersect );
@@ -515,9 +481,8 @@ ErrorCode VarLenDenseTag::num_tagged_entities( const SequenceManager* seqman, si
     return rval;
 }
 
-ErrorCode VarLenDenseTag::find_entities_with_value( const SequenceManager* seqman, Error* error,
-                                                    Range& output_entities, const void* value,
-                                                    int value_bytes, EntityType type,
+ErrorCode VarLenDenseTag::find_entities_with_value( const SequenceManager* seqman, Error* error, Range& output_entities,
+                                                    const void* value, int value_bytes, EntityType type,
                                                     const Range* intersect_entities ) const
 {
     if( !intersect_entities )
@@ -535,8 +500,7 @@ ErrorCode VarLenDenseTag::find_entities_with_value( const SequenceManager* seqma
                     ByteArrayIterator start( ( *i )->data( )->start_handle( ), data, *this );
                     ByteArrayIterator end( ( *i )->end_handle( ) + 1, 0, 0 );
                     start += ( *i )->start_handle( ) - ( *i )->data( )->start_handle( );
-                    find_tag_varlen_values_equal( *this, value, value_bytes, start, end,
-                                                  output_entities );
+                    find_tag_varlen_values_equal( *this, value, value_bytes, start, end, output_entities );
                 }
             }
         }
@@ -568,8 +532,7 @@ ErrorCode VarLenDenseTag::find_entities_with_value( const SequenceManager* seqma
                 {
                     ByteArrayIterator istart( start, array, *this );
                     ByteArrayIterator iend( start + count, 0, 0 );
-                    find_tag_varlen_values_equal( *this, value, value_bytes, istart, iend,
-                                                  output_entities );
+                    find_tag_varlen_values_equal( *this, value, value_bytes, istart, iend, output_entities );
                 }
                 start += count;
             }
@@ -583,8 +546,7 @@ bool VarLenDenseTag::is_tagged( const SequenceManager* seqman, EntityHandle h ) 
 {
     const VarLenTag* ptr = NULL;  // Initialize to get rid of warning
     size_t           count;
-    return ( MB_SUCCESS == get_array( seqman, 0, h, ptr, count ) ) && ( NULL != ptr ) &&
-           ( NULL != ptr->data( ) );
+    return ( MB_SUCCESS == get_array( seqman, 0, h, ptr, count ) ) && ( NULL != ptr ) && ( NULL != ptr->data( ) );
 }
 
 ErrorCode VarLenDenseTag::get_memory_use( const SequenceManager* seqman, unsigned long& total,

@@ -68,16 +68,16 @@ void HigherOrderFactory::initialize_map( )
     // mMapInitialized = true;
 }
 
-ErrorCode HigherOrderFactory::convert( const EntityHandle meshset, const bool mid_edge_nodes,
-                                       const bool mid_face_nodes, const bool mid_volume_nodes )
+ErrorCode HigherOrderFactory::convert( const EntityHandle meshset, const bool mid_edge_nodes, const bool mid_face_nodes,
+                                       const bool mid_volume_nodes )
 {
     Range entities;
     mMB->get_entities_by_handle( meshset, entities, true );
     return convert( entities, mid_edge_nodes, mid_face_nodes, mid_volume_nodes );
 }
 
-ErrorCode HigherOrderFactory::convert( const Range& entities, const bool mid_edge_nodes,
-                                       const bool mid_face_nodes, const bool mid_volume_nodes )
+ErrorCode HigherOrderFactory::convert( const Range& entities, const bool mid_edge_nodes, const bool mid_face_nodes,
+                                       const bool mid_volume_nodes )
 
 {
 
@@ -101,8 +101,7 @@ ErrorCode HigherOrderFactory::convert( const Range& entities, const bool mid_edg
             ErrorCode       rval = seq_manager->find( h, seq );
             if( MB_SUCCESS != rval ) return rval;
 
-            if( seq->type( ) == MBVERTEX || seq->type( ) >= MBENTITYSET )
-                return MB_TYPE_OUT_OF_RANGE;
+            if( seq->type( ) == MBVERTEX || seq->type( ) >= MBENTITYSET ) return MB_TYPE_OUT_OF_RANGE;
 
             // make sequence is not structured mesh
             ElementSequence* elemseq = static_cast< ElementSequence* >( seq );
@@ -111,8 +110,7 @@ ErrorCode HigherOrderFactory::convert( const Range& entities, const bool mid_edg
             EntityHandle last = p_iter->second;
             if( last > seq->end_handle( ) ) last = seq->end_handle( );
 
-            rval = convert_sequence( elemseq, h, last, mid_edge_nodes, mid_face_nodes,
-                                     mid_volume_nodes );
+            rval = convert_sequence( elemseq, h, last, mid_edge_nodes, mid_face_nodes, mid_volume_nodes );
             if( MB_SUCCESS != rval ) return rval;
 
             h = last + 1;
@@ -122,9 +120,8 @@ ErrorCode HigherOrderFactory::convert( const Range& entities, const bool mid_edg
     return MB_SUCCESS;
 }
 
-ErrorCode HigherOrderFactory::convert_sequence( ElementSequence* seq, EntityHandle start,
-                                                EntityHandle end, bool mid_edge_nodes,
-                                                bool mid_face_nodes, bool mid_volume_nodes )
+ErrorCode HigherOrderFactory::convert_sequence( ElementSequence* seq, EntityHandle start, EntityHandle end,
+                                                bool mid_edge_nodes, bool mid_face_nodes, bool mid_volume_nodes )
 {
 
     ErrorCode status = MB_SUCCESS;
@@ -149,11 +146,9 @@ ErrorCode HigherOrderFactory::convert_sequence( ElementSequence* seq, EntityHand
 
     // calculate number of nodes in target configuration
     unsigned nodes_per_elem = CN::VerticesPerEntity( seq->type( ) );
-    if( mid_edge_nodes )
-        nodes_per_elem += ( seq->type( ) == MBEDGE ) ? 1 : CN::NumSubEntities( seq->type( ), 1 );
+    if( mid_edge_nodes ) nodes_per_elem += ( seq->type( ) == MBEDGE ) ? 1 : CN::NumSubEntities( seq->type( ), 1 );
     if( mid_face_nodes )
-        nodes_per_elem +=
-            ( CN::Dimension( seq->type( ) ) == 2 ) ? 1 : CN::NumSubEntities( seq->type( ), 2 );
+        nodes_per_elem += ( CN::Dimension( seq->type( ) ) == 2 ) ? 1 : CN::NumSubEntities( seq->type( ), 2 );
     if( mid_volume_nodes ) nodes_per_elem += 1;
 
     if( nodes_per_elem == seq->nodes_per_element( ) ) return MB_SUCCESS;
@@ -162,8 +157,7 @@ ErrorCode HigherOrderFactory::convert_sequence( ElementSequence* seq, EntityHand
     status = mMB->tag_get_handle( 0, 1, MB_TYPE_BIT, deletable_nodes, MB_TAG_CREAT | MB_TAG_BIT );
     if( MB_SUCCESS != status ) return status;
 
-    UnstructuredElemSeq* new_seq =
-        new UnstructuredElemSeq( start, end - start + 1, nodes_per_elem, end - start + 1 );
+    UnstructuredElemSeq* new_seq = new UnstructuredElemSeq( start, end - start + 1, nodes_per_elem, end - start + 1 );
 
     copy_corner_nodes( seq, new_seq );
 
@@ -281,8 +275,8 @@ ErrorCode HigherOrderFactory::add_mid_volume_nodes( ElementSequence* seq )
         for( int i = 0; i < num_corner_nodes; i++ )
         {
             seq_manager->find( element[ i ], eseq );
-            static_cast< VertexSequence* >( eseq )->get_coordinates(
-                element[ i ], tmp_coords[ 0 ], tmp_coords[ 1 ], tmp_coords[ 2 ] );
+            static_cast< VertexSequence* >( eseq )->get_coordinates( element[ i ], tmp_coords[ 0 ], tmp_coords[ 1 ],
+                                                                     tmp_coords[ 2 ] );
             sum_coords[ 0 ] += tmp_coords[ 0 ];
             sum_coords[ 1 ] += tmp_coords[ 1 ];
             sum_coords[ 2 ] += tmp_coords[ 2 ];
@@ -294,8 +288,7 @@ ErrorCode HigherOrderFactory::add_mid_volume_nodes( ElementSequence* seq )
         // create a new vertex at the centroid
         mMB->create_vertex( sum_coords, element[ new_node_index ] );
 
-        if( mHONodeAddedRemoved )
-            mHONodeAddedRemoved->node_added( element[ new_node_index ], curr_handle );
+        if( mHONodeAddedRemoved ) mHONodeAddedRemoved->node_added( element[ new_node_index ], curr_handle );
 
         curr_handle++;
     }
@@ -354,8 +347,7 @@ ErrorCode HigherOrderFactory::add_mid_face_nodes( ElementSequence* seq )
                 {
                     seq_manager->find( tmp_face_conn[ k ], tmp_sequence );
                     static_cast< VertexSequence* >( tmp_sequence )
-                        ->get_coordinates( tmp_face_conn[ k ], tmp_coords[ 0 ], tmp_coords[ 1 ],
-                                           tmp_coords[ 2 ] );
+                        ->get_coordinates( tmp_face_conn[ k ], tmp_coords[ 0 ], tmp_coords[ 1 ], tmp_coords[ 2 ] );
                     sum_coords[ 0 ] += tmp_coords[ 0 ];
                     sum_coords[ 1 ] += tmp_coords[ 1 ];
                     sum_coords[ 2 ] += tmp_coords[ 2 ];
@@ -369,8 +361,7 @@ ErrorCode HigherOrderFactory::add_mid_face_nodes( ElementSequence* seq )
             }
 
             if( mHONodeAddedRemoved )
-                mHONodeAddedRemoved->node_added( element[ i + num_edges + num_vertices ],
-                                                 curr_handle );
+                mHONodeAddedRemoved->node_added( element[ i + num_edges + num_vertices ], curr_handle );
         }
 
         curr_handle++;
@@ -424,15 +415,13 @@ ErrorCode HigherOrderFactory::add_mid_edge_nodes( ElementSequence* seq )
                 double          sum_coords[ 3 ] = { 0, 0, 0 };
                 seq_manager->find( tmp_edge_conn[ 0 ], tmp_sequence );
                 static_cast< VertexSequence* >( tmp_sequence )
-                    ->get_coordinates( tmp_edge_conn[ 0 ], tmp_coords[ 0 ], tmp_coords[ 1 ],
-                                       tmp_coords[ 2 ] );
+                    ->get_coordinates( tmp_edge_conn[ 0 ], tmp_coords[ 0 ], tmp_coords[ 1 ], tmp_coords[ 2 ] );
                 sum_coords[ 0 ] += tmp_coords[ 0 ];
                 sum_coords[ 1 ] += tmp_coords[ 1 ];
                 sum_coords[ 2 ] += tmp_coords[ 2 ];
                 seq_manager->find( tmp_edge_conn[ 1 ], tmp_sequence );
                 static_cast< VertexSequence* >( tmp_sequence )
-                    ->get_coordinates( tmp_edge_conn[ 1 ], tmp_coords[ 0 ], tmp_coords[ 1 ],
-                                       tmp_coords[ 2 ] );
+                    ->get_coordinates( tmp_edge_conn[ 1 ], tmp_coords[ 0 ], tmp_coords[ 1 ], tmp_coords[ 2 ] );
                 sum_coords[ 0 ] = ( sum_coords[ 0 ] + tmp_coords[ 0 ] ) / 2;
                 sum_coords[ 1 ] = ( sum_coords[ 1 ] + tmp_coords[ 1 ] ) / 2;
                 sum_coords[ 2 ] = ( sum_coords[ 2 ] + tmp_coords[ 2 ] ) / 2;
@@ -440,8 +429,7 @@ ErrorCode HigherOrderFactory::add_mid_edge_nodes( ElementSequence* seq )
                 mMB->create_vertex( sum_coords, element[ i + num_vertices ] );
             }
 
-            if( mHONodeAddedRemoved )
-                mHONodeAddedRemoved->node_added( element[ i + num_vertices ], curr_handle );
+            if( mHONodeAddedRemoved ) mHONodeAddedRemoved->node_added( element[ i + num_vertices ], curr_handle );
         }
 
         curr_handle++;
@@ -467,15 +455,13 @@ EntityHandle HigherOrderFactory::center_node_exist( EntityHandle corner1, Entity
 
     // these are the entities adjacent to both nodes
     adj_entities.clear( );
-    std::set_intersection( adj_corner1.begin( ), adj_corner1.end( ), adj_corner2.begin( ),
-                           adj_corner2.end( ),
+    std::set_intersection( adj_corner1.begin( ), adj_corner1.end( ), adj_corner2.begin( ), adj_corner2.end( ),
                            std::back_inserter< std::vector< EntityHandle > >( adj_entities ) );
 
     // iterate of the entities to find a mid node
     const EntityHandle* conn;
     int                 conn_size = 0;
-    for( std::vector< EntityHandle >::iterator iter = adj_entities.begin( );
-         iter != adj_entities.end( ); )
+    for( std::vector< EntityHandle >::iterator iter = adj_entities.begin( ); iter != adj_entities.end( ); )
     {
         EntityType this_type = TYPE_FROM_HANDLE( *iter );
         if( this_type == MBENTITYSET )
@@ -524,8 +510,8 @@ EntityHandle HigherOrderFactory::center_node_exist( EntityHandle                
     for( i = 1; i < num_nodes; i++ )
     {
         adj_entities.clear( );
-        std::set_intersection( adj_corner[ i - 1 ].begin( ), adj_corner[ i - 1 ].end( ),
-                               adj_corner[ i ].begin( ), adj_corner[ i ].end( ),
+        std::set_intersection( adj_corner[ i - 1 ].begin( ), adj_corner[ i - 1 ].end( ), adj_corner[ i ].begin( ),
+                               adj_corner[ i ].end( ),
                                std::back_inserter< std::vector< EntityHandle > >( adj_entities ) );
         adj_corner[ i ].swap( adj_entities );
     }
@@ -534,8 +520,7 @@ EntityHandle HigherOrderFactory::center_node_exist( EntityHandle                
     // iterate of the entities to find a mid node
     const EntityHandle* conn;
     int                 conn_size = 0;
-    for( std::vector< EntityHandle >::iterator iter = adj_entities.begin( );
-         iter != adj_entities.end( ); )
+    for( std::vector< EntityHandle >::iterator iter = adj_entities.begin( ); iter != adj_entities.end( ); )
     {
         EntityType this_type = TYPE_FROM_HANDLE( *iter );
         if( this_type == MBENTITYSET )
@@ -595,14 +580,12 @@ EntityHandle HigherOrderFactory::center_node_exist( EntityHandle                
     return 0;
 }
 
-bool HigherOrderFactory::add_center_node( EntityType this_type, EntityHandle* element_conn,
-                                          int conn_size, EntityHandle corner_node1,
-                                          EntityHandle corner_node2, EntityHandle center_node )
+bool HigherOrderFactory::add_center_node( EntityType this_type, EntityHandle* element_conn, int conn_size,
+                                          EntityHandle corner_node1, EntityHandle corner_node2,
+                                          EntityHandle center_node )
 {
-    int first_node =
-        std::find( element_conn, element_conn + conn_size, corner_node1 ) - element_conn;
-    int second_node =
-        std::find( element_conn, element_conn + conn_size, corner_node2 ) - element_conn;
+    int first_node = std::find( element_conn, element_conn + conn_size, corner_node1 ) - element_conn;
+    int second_node = std::find( element_conn, element_conn + conn_size, corner_node2 ) - element_conn;
     if( first_node == conn_size || second_node == conn_size )
         assert( "We should always find our nodes no matter what" == NULL );
     int high_node_index = mNodeMap[ this_type ][ first_node ][ second_node ];
@@ -642,8 +625,7 @@ ErrorCode HigherOrderFactory::copy_mid_face_nodes( ElementSequence* src, Element
     unsigned dst_offset = src_offset;
     if( src->has_mid_edge_nodes( ) ) src_offset += CN::NumSubEntities( src->type( ), 1 );
     if( dst->has_mid_edge_nodes( ) ) dst_offset += CN::NumSubEntities( dst->type( ), 1 );
-    unsigned num_faces =
-        ( CN::Dimension( src->type( ) ) == 2 ) ? 1 : CN::NumSubEntities( src->type( ), 2 );
+    unsigned num_faces = ( CN::Dimension( src->type( ) ) == 2 ) ? 1 : CN::NumSubEntities( src->type( ), 2 );
     return copy_nodes( src, dst, num_faces, src_offset, dst_offset );
 }
 
@@ -653,8 +635,7 @@ ErrorCode HigherOrderFactory::zero_mid_face_nodes( ElementSequence* dst )
 
     unsigned dst_offset = CN::VerticesPerEntity( dst->type( ) );
     if( dst->has_mid_edge_nodes( ) ) dst_offset += CN::NumSubEntities( dst->type( ), 1 );
-    unsigned num_faces =
-        ( CN::Dimension( dst->type( ) ) == 2 ) ? 1 : CN::NumSubEntities( dst->type( ), 2 );
+    unsigned num_faces = ( CN::Dimension( dst->type( ) ) == 2 ) ? 1 : CN::NumSubEntities( dst->type( ), 2 );
     return zero_nodes( dst, num_faces, dst_offset );
 }
 
@@ -681,9 +662,8 @@ ErrorCode HigherOrderFactory::zero_mid_volume_nodes( ElementSequence* dst )
     return zero_nodes( dst, 1, dst_offset );
 }
 
-ErrorCode HigherOrderFactory::copy_nodes( ElementSequence* src, ElementSequence* dst,
-                                          unsigned nodes_per_elem, unsigned src_offset,
-                                          unsigned dst_offset )
+ErrorCode HigherOrderFactory::copy_nodes( ElementSequence* src, ElementSequence* dst, unsigned nodes_per_elem,
+                                          unsigned src_offset, unsigned dst_offset )
 {
     if( src->type( ) != dst->type( ) ) return MB_FAILURE;
 
@@ -693,8 +673,7 @@ ErrorCode HigherOrderFactory::copy_nodes( ElementSequence* src, ElementSequence*
     EntityHandle* dst_conn = dst->get_connectivity_array( );
     if( !src_conn || !dst_conn ) return MB_FAILURE;
 
-    if( dst->start_handle( ) < src->start_handle( ) || dst->end_handle( ) > src->end_handle( ) )
-        return MB_FAILURE;
+    if( dst->start_handle( ) < src->start_handle( ) || dst->end_handle( ) > src->end_handle( ) ) return MB_FAILURE;
 
     src_conn += ( dst->start_handle( ) - src->start_handle( ) ) * src_stride;
     EntityID count = dst->size( );
@@ -709,8 +688,7 @@ ErrorCode HigherOrderFactory::copy_nodes( ElementSequence* src, ElementSequence*
     return MB_SUCCESS;
 }
 
-ErrorCode HigherOrderFactory::zero_nodes( ElementSequence* dst, unsigned nodes_per_elem,
-                                          unsigned offset )
+ErrorCode HigherOrderFactory::zero_nodes( ElementSequence* dst, unsigned nodes_per_elem, unsigned offset )
 {
     unsigned      dst_stride = dst->nodes_per_element( );
     EntityHandle* dst_conn = dst->get_connectivity_array( );
@@ -726,8 +704,8 @@ ErrorCode HigherOrderFactory::zero_nodes( ElementSequence* dst, unsigned nodes_p
     return MB_SUCCESS;
 }
 
-ErrorCode HigherOrderFactory::remove_mid_edge_nodes( ElementSequence* seq, EntityHandle start,
-                                                     EntityHandle end, Tag deletable_nodes )
+ErrorCode HigherOrderFactory::remove_mid_edge_nodes( ElementSequence* seq, EntityHandle start, EntityHandle end,
+                                                     Tag deletable_nodes )
 {
     int count;
     int offset;
@@ -745,8 +723,8 @@ ErrorCode HigherOrderFactory::remove_mid_edge_nodes( ElementSequence* seq, Entit
     return remove_ho_nodes( seq, start, end, count, offset, deletable_nodes );
 }
 
-ErrorCode HigherOrderFactory::remove_mid_face_nodes( ElementSequence* seq, EntityHandle start,
-                                                     EntityHandle end, Tag deletable_nodes )
+ErrorCode HigherOrderFactory::remove_mid_face_nodes( ElementSequence* seq, EntityHandle start, EntityHandle end,
+                                                     Tag deletable_nodes )
 {
     int count;
     if( CN::Dimension( seq->type( ) ) == 2 )
@@ -759,8 +737,8 @@ ErrorCode HigherOrderFactory::remove_mid_face_nodes( ElementSequence* seq, Entit
     return remove_ho_nodes( seq, start, end, count, offset, deletable_nodes );
 }
 
-ErrorCode HigherOrderFactory::remove_mid_volume_nodes( ElementSequence* seq, EntityHandle start,
-                                                       EntityHandle end, Tag deletable_nodes )
+ErrorCode HigherOrderFactory::remove_mid_volume_nodes( ElementSequence* seq, EntityHandle start, EntityHandle end,
+                                                       Tag deletable_nodes )
 {
     int offset = CN::VerticesPerEntity( seq->type( ) );
     if( seq->has_mid_edge_nodes( ) ) offset += CN::NumSubEntities( seq->type( ), 1 );
@@ -787,9 +765,8 @@ ErrorCode HigherOrderFactory::remove_mid_volume_nodes( ElementSequence* seq, Ent
  * version 2.1 of the License, or (at your option) any later version.
  *
  */
-ErrorCode HigherOrderFactory::remove_ho_nodes( ElementSequence* seq, EntityHandle start,
-                                               EntityHandle end, int nodes_per_elem,
-                                               int elem_conn_offset, Tag deletable_nodes )
+ErrorCode HigherOrderFactory::remove_ho_nodes( ElementSequence* seq, EntityHandle start, EntityHandle end,
+                                               int nodes_per_elem, int elem_conn_offset, Tag deletable_nodes )
 {
     if( start < seq->start_handle( ) || end > seq->end_handle( ) ) return MB_ENTITY_NOT_FOUND;
     EntityHandle* array = seq->get_connectivity_array( );
@@ -817,8 +794,7 @@ ErrorCode HigherOrderFactory::remove_ho_nodes( ElementSequence* seq, EntityHandl
     return MB_SUCCESS;
 }
 
-bool HigherOrderFactory::tag_for_deletion( EntityHandle parent_handle, int conn_index,
-                                           ElementSequence* seq )
+bool HigherOrderFactory::tag_for_deletion( EntityHandle parent_handle, int conn_index, ElementSequence* seq )
 {
     // get type of this sequence
     EntityType this_type = seq->type( );
@@ -864,10 +840,10 @@ bool HigherOrderFactory::tag_for_deletion( EntityHandle parent_handle, int conn_
             a_fact->get_adjacencies( connectivity[ 0 ], adj_list_1 );
 
             // remove meshsets
-            adj_list_1.erase( std::remove_if( adj_list_1.begin( ), adj_list_1.end( ),
-                                              std::bind( std::greater< EntityHandle >( ),
-                                                         std::placeholders::_1, low_meshset ) ),
-                              adj_list_1.end( ) );
+            adj_list_1.erase(
+                std::remove_if( adj_list_1.begin( ), adj_list_1.end( ),
+                                std::bind( std::greater< EntityHandle >( ), std::placeholders::_1, low_meshset ) ),
+                adj_list_1.end( ) );
             // std::bind2nd(std::greater<EntityHandle>(),low_meshset)), adj_list_1.end());
             // https://stackoverflow.com/questions/32739018/a-replacement-for-stdbind2nd
 
@@ -878,18 +854,17 @@ bool HigherOrderFactory::tag_for_deletion( EntityHandle parent_handle, int conn_
                 a_fact->get_adjacencies( connectivity[ i ], adj_list_2 );
 
                 // remove meshsets
-                adj_list_2.erase( std::remove_if( adj_list_2.begin( ), adj_list_2.end( ),
-                                                  std::bind( std::greater< EntityHandle >( ),
-                                                             std::placeholders::_1, low_meshset ) ),
-                                  adj_list_2.end( ) );
+                adj_list_2.erase(
+                    std::remove_if( adj_list_2.begin( ), adj_list_2.end( ),
+                                    std::bind( std::greater< EntityHandle >( ), std::placeholders::_1, low_meshset ) ),
+                    adj_list_2.end( ) );
                 // std::bind2nd(std::greater<EntityHandle>(),low_meshset)), adj_list_2.end());
                 // https://stackoverflow.com/questions/32739018/a-replacement-for-stdbind2nd
 
                 // intersect the 2 lists
                 adj_entities.clear( );
-                std::set_intersection(
-                    adj_list_1.begin( ), adj_list_1.end( ), adj_list_2.begin( ), adj_list_2.end( ),
-                    std::back_inserter< std::vector< EntityHandle > >( adj_entities ) );
+                std::set_intersection( adj_list_1.begin( ), adj_list_1.end( ), adj_list_2.begin( ), adj_list_2.end( ),
+                                       std::back_inserter< std::vector< EntityHandle > >( adj_entities ) );
                 adj_list_1.clear( );
                 adj_list_1 = adj_entities;
             }
@@ -899,8 +874,7 @@ bool HigherOrderFactory::tag_for_deletion( EntityHandle parent_handle, int conn_
             // see if node is in other elements, not in this sequence...if so, delete it
             for( i = 0; i < adj_entities.size( ); i++ )
             {
-                if( adj_entities[ i ] >= seq->start_handle( ) &&
-                    adj_entities[ i ] <= seq->end_handle( ) )
+                if( adj_entities[ i ] >= seq->start_handle( ) && adj_entities[ i ] <= seq->end_handle( ) )
                 {
                     delete_node = false;
                     break;

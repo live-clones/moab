@@ -42,8 +42,8 @@ int main( int argc, char* argv[] )
     return result;
 }
 
-static void print_ent_desc( const char* name, const char* subname, MHDF_EntDesc* data,
-                            const char* vals_label, const char* extra_label, MHDF_FileDesc* all )
+static void print_ent_desc( const char* name, const char* subname, MHDF_EntDesc* data, const char* vals_label,
+                            const char* extra_label, MHDF_FileDesc* all )
 {
     int i, len = 10;
 
@@ -64,8 +64,7 @@ static void print_ent_desc( const char* name, const char* subname, MHDF_EntDesc*
 
     if( !data->num_dense_tags ) return;
 
-    printf( "      %-*s: \"%s\"", len, "dense tags",
-            all->tags[ data->dense_tag_indices[ 0 ] ].name );
+    printf( "      %-*s: \"%s\"", len, "dense tags", all->tags[ data->dense_tag_indices[ 0 ] ].name );
     for( i = 1; i < data->num_dense_tags; ++i )
         printf( ", \"%s\"", all->tags[ data->dense_tag_indices[ i ] ].name );
     printf( "\n" );
@@ -236,8 +235,7 @@ static void print_tag_desc( MHDF_TagDesc* data, MHDF_FileDesc* all )
     }
     else if( data->num_dense_indices )
     {
-        printf( "      %-*s: %s", width, "tables",
-                ent_desc_name( all, data->dense_elem_indices[ 0 ] ) );
+        printf( "      %-*s: %s", width, "tables", ent_desc_name( all, data->dense_elem_indices[ 0 ] ) );
         for( i = 1; i < data->num_dense_indices; ++i )
             printf( ", %s", ent_desc_name( all, data->dense_elem_indices[ i ] ) );
     }
@@ -264,24 +262,19 @@ static int print_file_summary( MHDF_FileDesc* data )
 
     printf( "   Number partitions: %d\n", data->numEntSets[ 0 ] );
     for( i = 0; i < data->numEntSets[ 0 ]; i++ )
-        printf( " set id %d value %d \n", data->defTagsEntSets[ 0 ][ i ],
-                data->defTagsVals[ 0 ][ i ] );
+        printf( " set id %d value %d \n", data->defTagsEntSets[ 0 ][ i ], data->defTagsVals[ 0 ][ i ] );
     printf( "\n   Number material sets: %d\n", data->numEntSets[ 1 ] );
     for( i = 0; i < data->numEntSets[ 1 ]; i++ )
-        printf( " set id %d value %d \n", data->defTagsEntSets[ 1 ][ i ],
-                data->defTagsVals[ 1 ][ i ] );
+        printf( " set id %d value %d \n", data->defTagsEntSets[ 1 ][ i ], data->defTagsVals[ 1 ][ i ] );
     printf( "\n   Number neumann sets: %d\n", data->numEntSets[ 2 ] );
     for( i = 0; i < data->numEntSets[ 2 ]; i++ )
-        printf( " set id %d value %d \n", data->defTagsEntSets[ 2 ][ i ],
-                data->defTagsVals[ 2 ][ i ] );
+        printf( " set id %d value %d \n", data->defTagsEntSets[ 2 ][ i ], data->defTagsVals[ 2 ][ i ] );
     printf( "\n   Number dirichlet sets: %d\n", data->numEntSets[ 3 ] );
     for( i = 0; i < data->numEntSets[ 3 ]; i++ )
-        printf( " set id %d value %d \n", data->defTagsEntSets[ 3 ][ i ],
-                data->defTagsVals[ 3 ][ i ] );
+        printf( " set id %d value %d \n", data->defTagsEntSets[ 3 ][ i ], data->defTagsVals[ 3 ][ i ] );
     printf( "\n   Number geometry sets: %d\n", data->numEntSets[ 4 ] );
     for( i = 0; i < data->numEntSets[ 4 ]; i++ )
-        printf( " set id %d value %d \n", data->defTagsEntSets[ 4 ][ i ],
-                data->defTagsVals[ 4 ][ i ] );
+        printf( " set id %d value %d \n", data->defTagsEntSets[ 4 ][ i ], data->defTagsVals[ 4 ][ i ] );
 
     return 0;
 }

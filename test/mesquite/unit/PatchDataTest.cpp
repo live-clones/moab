@@ -470,8 +470,7 @@ void PatchDataTest::check_sub_patch( unsigned vtx, unsigned layers, PatchData& p
     {
         std::vector< size_t > vtx_list;
         pd.element_by_index( i ).get_node_indices( vtx_list );
-        if( std::find( vtx_list.begin( ), vtx_list.end( ), vtx ) != vtx_list.end( ) )
-            seen.insert( i );
+        if( std::find( vtx_list.begin( ), vtx_list.end( ), vtx ) != vtx_list.end( ) ) seen.insert( i );
     }
 
     // if 1 layer, then should match element count
@@ -524,9 +523,8 @@ void PatchDataTest::test_patch_contents( bool reorder )
     size_t         conn[] = { 3, 5,  4, 7, 7,  4,  11, 14, 5, 0,  8, 11, 5, 8,  13, 3, 9,
                       6, 10, 5, 3, 13, 12, 7,  14, 1, 10, 0, 5,  7, 12, 9,  3 };
     size_t         conn_len[ NUM_ELEMENT ] = { 4, 4, 3, 3, 4, 4, 4, 3, 4 };
-    EntityTopology types[ NUM_ELEMENT ] = { QUADRILATERAL, QUADRILATERAL, TRIANGLE,
-                                            TRIANGLE,      QUADRILATERAL, QUADRILATERAL,
-                                            QUADRILATERAL, TRIANGLE,      QUADRILATERAL };
+    EntityTopology types[ NUM_ELEMENT ] = { QUADRILATERAL, QUADRILATERAL, TRIANGLE, TRIANGLE,     QUADRILATERAL,
+                                            QUADRILATERAL, QUADRILATERAL, TRIANGLE, QUADRILATERAL };
     // mark vertices along X and Y axis as fixed
     bool fixed[ NUM_VERTEX ] = { false, true, true,  false, false, false, true, false,
                                  false, true, false, true,  true,  false, false };
@@ -637,8 +635,7 @@ void PatchDataTest::test_update_slave_node_coords( )
     // with a) two mid-edge nodes marked as slave vertices and
     // b) with all mid-edge nodes moved away from the center
     // of their corresponding edge.
-    const double   coords[] = { 0,   0,    0,    1,   0,   0,   0,    1,   0,
-                              0.5, -0.1, -0.1, 0.6, 0.6, 0.1, -0.1, 0.5, 0.0 };
+    const double   coords[] = { 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -0.1, -0.1, 0.6, 0.6, 0.1, -0.1, 0.5, 0.0 };
     const size_t   init_conn[] = { 0, 1, 2, 3, 4, 5 };
     const bool     fixed[] = { false, false, false, false, true, false };
     PatchData      pd;
@@ -713,21 +710,19 @@ void PatchDataTest::test_update_slave_node_coords( )
 // input mesh definition
 const int    NUM_VTX = 40, NUM_ELEM = 9, NUM_CORNER = 16;
 const double input_coords[ 3 * NUM_VTX ] = {
-    -3.0, 3.0,  0, -1.0, 3.0,  0, 1.0,  3.0,  0, 3.0,  3.0,  0, -3.0, 1.0,  0, -1.0, 1.0,  0,
-    1.0,  1.0,  0, 3.0,  1.0,  0, -3.0, -1.0, 0, -1.0, -1.0, 0, 1.0,  -1.0, 0, 3.0,  -1.0, 0,
-    -3.0, -3.0, 0, -1.0, -3.0, 0, 1.0,  -3.0, 0, 3.0,  -3.0, 0, -2.0, 3.0,  0, 0.0,  3.0,  0,
-    2.0,  3.0,  0, -3.0, 2.0,  0, -1.0, 2.0,  0, 1.0,  2.0,  0, 3.0,  2.0,  0, -2.0, 1.0,  0,
-    0.0,  1.0,  0, 2.0,  1.0,  0, -3.0, 0.0,  0, -1.0, 0.0,  0, 1.0,  0.0,  0, 3.0,  0.0,  0,
-    -2.0, -1.0, 0, 0.0,  -1.0, 0, 2.0,  -1.0, 0, -3.0, -2.0, 0, -1.0, -2.0, 0, 1.0,  -2.0, 0,
-    3.0,  -2.0, 0, -2.0, -3.0, 0, 0.0,  -3.0, 0, 2.0,  -3.0, 0 };
-const bool fixed[ NUM_VTX ] = {
-    true, true,  true,  true, true,  false, false, true,  true,  false, false, true,  true,
-    true, true,  true,  true, true,  true,  true,  false, false, true,  false, false, false,
-    true, false, false, true, false, false, false, true,  false, false, true };
-const size_t input_conn[ 8 * NUM_ELEM ] = {
-    1, 0, 4,  5,  16, 19, 23, 20, 2,  1, 5,  6,  17, 20, 24, 21, 3,  2,  6,  7,  18, 21, 25, 22,
-    5, 4, 8,  9,  23, 26, 30, 27, 6,  5, 9,  10, 24, 27, 31, 28, 7,  6,  10, 11, 25, 28, 32, 29,
-    9, 8, 12, 13, 30, 33, 37, 34, 10, 9, 13, 14, 31, 34, 38, 35, 11, 10, 14, 15, 32, 35, 39, 36 };
+    -3.0, 3.0,  0, -1.0, 3.0,  0, 1.0,  3.0,  0, 3.0, 3.0,  0, -3.0, 1.0,  0, -1.0, 1.0,  0, 1.0,  1.0,  0,
+    3.0,  1.0,  0, -3.0, -1.0, 0, -1.0, -1.0, 0, 1.0, -1.0, 0, 3.0,  -1.0, 0, -3.0, -3.0, 0, -1.0, -3.0, 0,
+    1.0,  -3.0, 0, 3.0,  -3.0, 0, -2.0, 3.0,  0, 0.0, 3.0,  0, 2.0,  3.0,  0, -3.0, 2.0,  0, -1.0, 2.0,  0,
+    1.0,  2.0,  0, 3.0,  2.0,  0, -2.0, 1.0,  0, 0.0, 1.0,  0, 2.0,  1.0,  0, -3.0, 0.0,  0, -1.0, 0.0,  0,
+    1.0,  0.0,  0, 3.0,  0.0,  0, -2.0, -1.0, 0, 0.0, -1.0, 0, 2.0,  -1.0, 0, -3.0, -2.0, 0, -1.0, -2.0, 0,
+    1.0,  -2.0, 0, 3.0,  -2.0, 0, -2.0, -3.0, 0, 0.0, -3.0, 0, 2.0,  -3.0, 0 };
+const bool fixed[ NUM_VTX ] = { true, true,  true,  true, true,  false, false, true,  true,  false, false, true,  true,
+                                true, true,  true,  true, true,  true,  true,  false, false, true,  false, false, false,
+                                true, false, false, true, false, false, false, true,  false, false, true };
+const size_t input_conn[ 8 * NUM_ELEM ] = { 1,  0,  4,  5,  16, 19, 23, 20, 2,  1,  5,  6,  17, 20, 24, 21, 3,  2,
+                                            6,  7,  18, 21, 25, 22, 5,  4,  8,  9,  23, 26, 30, 27, 6,  5,  9,  10,
+                                            24, 27, 31, 28, 7,  6,  10, 11, 25, 28, 32, 29, 9,  8,  12, 13, 30, 33,
+                                            37, 34, 10, 9,  13, 14, 31, 34, 38, 35, 11, 10, 14, 15, 32, 35, 39, 36 };
 
 const size_t         node_per_elem[ NUM_ELEM ] = { 8, 8, 8, 8, 8, 8, 8, 8, 8 };
 const EntityTopology elem_types[ NUM_ELEM ] = { QUADRILATERAL, QUADRILATERAL, QUADRILATERAL,
@@ -833,8 +828,8 @@ void PatchDataTest::get_quad8_mesh( Mesh*& mesh_out )
     static std::vector< int >           fixed_flags( fixed, fixed + NUM_VTX );
     static std::vector< double >        coords( input_coords, input_coords + 3 * NUM_VTX );
     static std::vector< unsigned long > conn( input_conn, input_conn + 8 * NUM_ELEM );
-    mesh_out = new ArrayMesh( 3, NUM_VTX, arrptr( coords ), arrptr( fixed_flags ), NUM_ELEM,
-                              QUADRILATERAL, arrptr( conn ), false, 8 );
+    mesh_out = new ArrayMesh( 3, NUM_VTX, arrptr( coords ), arrptr( fixed_flags ), NUM_ELEM, QUADRILATERAL,
+                              arrptr( conn ), false, 8 );
 }
 
 void PatchDataTest::get_quad8_mesh_and_domain( Mesh*& mesh_out, MeshDomain*& domain_out )
@@ -843,8 +838,7 @@ void PatchDataTest::get_quad8_mesh_and_domain( Mesh*& mesh_out, MeshDomain*& dom
 
     get_quad8_mesh( mesh_out );
     DomainClassifier geom;
-    Vector3D    corners[ 4 ] = { Vector3D( -3, 3, 0 ), Vector3D( 3, 3, 0 ), Vector3D( -3, -3, 0 ),
-                              Vector3D( 3, -3, 0 ) };
+    Vector3D corners[ 4 ] = { Vector3D( -3, 3, 0 ), Vector3D( 3, 3, 0 ), Vector3D( -3, -3, 0 ), Vector3D( 3, -3, 0 ) };
     MeshDomain* geomarr[] = { new PointDomain( corners[ 0 ] ),
                               new PointDomain( corners[ 1 ] ),
                               new PointDomain( corners[ 2 ] ),
@@ -931,8 +925,7 @@ void PatchDataTest::test_fixed_by_geom_dim( unsigned dim )
     delete domain;
 }
 
-void PatchDataTest::get_higher_order_vertices( Mesh*                                 mesh,
-                                               std::map< Mesh::VertexHandle, bool >& ho_verts,
+void PatchDataTest::get_higher_order_vertices( Mesh* mesh, std::map< Mesh::VertexHandle, bool >& ho_verts,
                                                bool initial_value, bool non_fixed_only )
 {
     // get mesh data
@@ -955,8 +948,7 @@ void PatchDataTest::get_higher_order_vertices( Mesh*                            
 
     // for each element, add ho nodes
     for( size_t i = 0; i < elems.size( ); ++i )
-        for( size_t j = offsets[ i ] + TopologyInfo::corners( types[ i ] ); j < offsets[ i + 1 ];
-             ++j )
+        for( size_t j = offsets[ i ] + TopologyInfo::corners( types[ i ] ); j < offsets[ i + 1 ]; ++j )
             ho_verts[ verts[ j ] ] = initial_value;
 
     if( non_fixed_only )
@@ -978,9 +970,8 @@ void PatchDataTest::get_higher_order_vertices( Mesh*                            
     }
 }
 
-void PatchDataTest::check_higher_order_vertices_slaved(
-    Mesh* mesh, Settings::HigherOrderSlaveMode mode,
-    const std::map< Mesh::VertexHandle, bool >& expected )
+void PatchDataTest::check_higher_order_vertices_slaved( Mesh* mesh, Settings::HigherOrderSlaveMode mode,
+                                                        const std::map< Mesh::VertexHandle, bool >& expected )
 {
     MsqPrintError err( std::cerr );
 
@@ -1076,21 +1067,16 @@ class HoSlavedMesh : public MeshDecorator
 {
   public:
     typedef std::map< Mesh::VertexHandle, bool > SMap;
-    HoSlavedMesh( Mesh* real_mesh, SMap& slaved )
-        : MeshDecorator( real_mesh ), slavedVerts( slaved )
-    {
-    }
+    HoSlavedMesh( Mesh* real_mesh, SMap& slaved ) : MeshDecorator( real_mesh ), slavedVerts( slaved ) {}
 
-    virtual void vertices_get_slaved_flag( const VertexHandle   vert_array[],
-                                           std::vector< bool >& slaved_flag_array, size_t num_vtx,
-                                           MsqError& err );
+    virtual void vertices_get_slaved_flag( const VertexHandle vert_array[], std::vector< bool >& slaved_flag_array,
+                                           size_t num_vtx, MsqError& err );
 
   private:
     SMap slavedVerts;
 };
-void HoSlavedMesh::vertices_get_slaved_flag( const VertexHandle   vert_array[],
-                                             std::vector< bool >& slaved_flag_array, size_t num_vtx,
-                                             MsqError& err )
+void HoSlavedMesh::vertices_get_slaved_flag( const VertexHandle vert_array[], std::vector< bool >& slaved_flag_array,
+                                             size_t num_vtx, MsqError& err )
 {
     slaved_flag_array.resize( num_vtx );
     for( size_t i = 0; i < num_vtx; ++i )

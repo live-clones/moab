@@ -120,8 +120,7 @@ class NonGradient : public VertexMover, public PatchSetUser
     {
         mScaleDiameter = newScaleDiameter;
     }
-    void   getRowSum( int numRow, int numCol, std::vector< double >& matrix,
-                      std::vector< double >& rowSum );
+    void   getRowSum( int numRow, int numCol, std::vector< double >& matrix, std::vector< double >& rowSum );
     bool   testRowSum( int numRow, int numCol, double* matrix, double* rowSum );
     double evaluate( double localArray[], PatchData& pd, MsqError& err );
     //! edgeLenght is a length scale for the initial polytope.
@@ -154,8 +153,7 @@ class NonGradient : public VertexMover, public PatchSetUser
     double mTolerance;  //          ---------------------------------- < mTolerance
     int    mMaxNumEval;  //          |heightMax|+|heightMin|+mThreshold
                       //      or numEval >= mMaxNumEval
-    double amotry( std::vector< double >&, std::vector< double >&, double*, int, double, PatchData&,
-                   MsqError& err );
+    double amotry( std::vector< double >&, std::vector< double >&, double*, int, double, PatchData&, MsqError& err );
     int    mNonGradDebug;
     bool   mUseExactPenaltyFunction;
     double mScaleDiameter;

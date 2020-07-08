@@ -61,8 +61,8 @@ bool TShapeSize2DB2::evaluate( const MsqMatrix< 2, 2 >& T, double& result, MsqEr
     return true;
 }
 
-bool TShapeSize2DB2::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& result,
-                                         MsqMatrix< 2, 2 >& deriv_wrt_T, MsqError& err )
+bool TShapeSize2DB2::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& result, MsqMatrix< 2, 2 >& deriv_wrt_T,
+                                         MsqError& err )
 {
     const double d = det( T );
     if( invalid_determinant( d ) )
@@ -86,8 +86,7 @@ bool TShapeSize2DB2::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& res
     }
     else
     {
-        std::cout << "Warning: Division by zero avoided in TShapeSize2DB2::evaluate_with_grad()"
-                  << std::endl;
+        std::cout << "Warning: Division by zero avoided in TShapeSize2DB2::evaluate_with_grad()" << std::endl;
     }
 
     // deriv of mu wrt T
@@ -98,8 +97,7 @@ bool TShapeSize2DB2::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& res
     return true;
 }
 
-bool TShapeSize2DB2::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& result,
-                                         MsqMatrix< 2, 2 >& deriv_wrt_T,
+bool TShapeSize2DB2::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& result, MsqMatrix< 2, 2 >& deriv_wrt_T,
                                          MsqMatrix< 2, 2 > second[ 3 ], MsqError& err )
 {
     const double d = det( T );
@@ -124,8 +122,7 @@ bool TShapeSize2DB2::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& res
     }
     else
     {
-        std::cout << "Warning: Division by zero avoided in TShapeSize2DB2::evaluate_with_hess()"
-                  << std::endl;
+        std::cout << "Warning: Division by zero avoided in TShapeSize2DB2::evaluate_with_hess()" << std::endl;
     }
 
     // deriv of mu wrt T

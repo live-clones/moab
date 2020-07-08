@@ -78,11 +78,10 @@ int main( )
     // conn are actual entity handles. This only works because MOAB
     // guarantees that entities (such as our vertexes) created at once
     // have adjacent entity handles.
-    moab::EntityHandle conn[ NUMHEX ][ 8 ] = {
-        { 0, 1, 4, 3, 9, 10, 13, 12 },      { 1, 2, 5, 4, 10, 11, 14, 13 },
-        { 3, 4, 7, 6, 12, 13, 16, 15 },     { 4, 5, 8, 7, 13, 14, 17, 16 },
-        { 9, 10, 13, 12, 18, 19, 22, 21 },  { 10, 11, 14, 13, 19, 20, 23, 22 },
-        { 12, 13, 16, 15, 21, 22, 25, 24 }, { 13, 14, 17, 16, 22, 23, 26, 25 } };
+    moab::EntityHandle conn[ NUMHEX ][ 8 ] = { { 0, 1, 4, 3, 9, 10, 13, 12 },      { 1, 2, 5, 4, 10, 11, 14, 13 },
+                                               { 3, 4, 7, 6, 12, 13, 16, 15 },     { 4, 5, 8, 7, 13, 14, 17, 16 },
+                                               { 9, 10, 13, 12, 18, 19, 22, 21 },  { 10, 11, 14, 13, 19, 20, 23, 22 },
+                                               { 12, 13, 16, 15, 21, 22, 25, 24 }, { 13, 14, 17, 16, 22, 23, 26, 25 } };
 
     // Lets get the handle for the first vertex. Note that we can use
     // the square brackets operator on ranges just like vectors or

@@ -48,10 +48,7 @@ namespace MBMesquite
 class MESQUITE_EXPORT SphericalDomain : public MBMesquite::MeshDomain
 {
   public:
-    SphericalDomain( const Vector3D& p_center, double p_radius )
-        : mCenter( p_center ), mRadius( p_radius )
-    {
-    }
+    SphericalDomain( const Vector3D& p_center, double p_radius ) : mCenter( p_center ), mRadius( p_radius ) {}
 
     SphericalDomain( ) {}
 
@@ -65,8 +62,8 @@ class MESQUITE_EXPORT SphericalDomain : public MBMesquite::MeshDomain
 
     void fit_vertices( Mesh* mesh, MsqError& err, double epsilon = 0.0 );
 
-    void fit_vertices( Mesh* mesh, const Mesh::VertexHandle* vertex_array,
-                       size_t vertex_array_length, MsqError& err, double epsilon = 0.0 );
+    void fit_vertices( Mesh* mesh, const Mesh::VertexHandle* vertex_array, size_t vertex_array_length, MsqError& err,
+                       double epsilon = 0.0 );
 
     virtual void snap_to( Mesh::VertexHandle entity_handle, Vector3D& coordinate ) const;
 
@@ -74,14 +71,14 @@ class MESQUITE_EXPORT SphericalDomain : public MBMesquite::MeshDomain
 
     virtual void element_normal_at( Mesh::ElementHandle entity_handle, Vector3D& coordinate ) const;
 
-    virtual void vertex_normal_at( const Mesh::VertexHandle* handle, Vector3D coords[],
-                                   unsigned count, MsqError& err ) const;
+    virtual void vertex_normal_at( const Mesh::VertexHandle* handle, Vector3D coords[], unsigned count,
+                                   MsqError& err ) const;
 
-    virtual void closest_point( Mesh::VertexHandle handle, const Vector3D& position,
-                                Vector3D& closest, Vector3D& normal, MsqError& err ) const;
+    virtual void closest_point( Mesh::VertexHandle handle, const Vector3D& position, Vector3D& closest,
+                                Vector3D& normal, MsqError& err ) const;
 
-    virtual void domain_DoF( const Mesh::VertexHandle* handle_array, unsigned short* dof_array,
-                             size_t num_vertices, MsqError& err ) const;
+    virtual void domain_DoF( const Mesh::VertexHandle* handle_array, unsigned short* dof_array, size_t num_vertices,
+                             MsqError& err ) const;
 
     Vector3D center( ) const
     {

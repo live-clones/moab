@@ -175,9 +175,8 @@ namespace GeomUtil
 
        N. Platis and T. Theoharis, "Fast Ray-Tetrahedron Intersection using Plücker
        Coordinates", Journal of Graphics Tools, Vol. 8, Part 4, Pages 37-48 (2003). */
-    bool plucker_ray_tri_intersect( const CartVect vertices[ 3 ], const CartVect& origin,
-                                    const CartVect& direction, double& dist_out,
-                                    const double* nonneg_ray_len, const double* neg_ray_len,
+    bool plucker_ray_tri_intersect( const CartVect vertices[ 3 ], const CartVect& origin, const CartVect& direction,
+                                    double& dist_out, const double* nonneg_ray_len, const double* neg_ray_len,
                                     const int* orientation, intersection_type* type )
     {
 
@@ -202,8 +201,7 @@ namespace GeomUtil
             // If the orientation is not specified, all plucker_coords must be the same sign or
             // zero.
         }
-        else if( ( 0.0 < plucker_coord0 && 0.0 > plucker_coord1 ) ||
-                 ( 0.0 > plucker_coord0 && 0.0 < plucker_coord1 ) )
+        else if( ( 0.0 < plucker_coord0 && 0.0 > plucker_coord1 ) || ( 0.0 > plucker_coord0 && 0.0 < plucker_coord1 ) )
         {
             EXIT_EARLY
         }
@@ -219,10 +217,8 @@ namespace GeomUtil
             // If the orientation is not specified, all plucker_coords must be the same sign or
             // zero.
         }
-        else if( ( 0.0 < plucker_coord1 && 0.0 > plucker_coord2 ) ||
-                 ( 0.0 > plucker_coord1 && 0.0 < plucker_coord2 ) ||
-                 ( 0.0 < plucker_coord0 && 0.0 > plucker_coord2 ) ||
-                 ( 0.0 > plucker_coord0 && 0.0 < plucker_coord2 ) )
+        else if( ( 0.0 < plucker_coord1 && 0.0 > plucker_coord2 ) || ( 0.0 > plucker_coord1 && 0.0 < plucker_coord2 ) ||
+                 ( 0.0 < plucker_coord0 && 0.0 > plucker_coord2 ) || ( 0.0 > plucker_coord0 && 0.0 < plucker_coord2 ) )
         {
             EXIT_EARLY
         }
@@ -251,8 +247,7 @@ namespace GeomUtil
         const double dist = ( intersection[ idx ] - origin[ idx ] ) / direction[ idx ];
 
         // is the intersection within distance limits?
-        if( ( nonneg_ray_len &&
-              *nonneg_ray_len < dist ) ||  // intersection is beyond positive limit
+        if( ( nonneg_ray_len && *nonneg_ray_len < dist ) ||  // intersection is beyond positive limit
             ( neg_ray_len && *neg_ray_len >= dist ) ||  // intersection is behind negative limit
             ( !neg_ray_len && 0 > dist ) )
         {  // Unless a neg_ray_len is used, don't return negative distances
@@ -262,15 +257,15 @@ namespace GeomUtil
         dist_out = dist;
 
         if( type )
-            *type = type_list[ ( ( 0.0 == plucker_coord2 ) << 2 ) +
-                               ( ( 0.0 == plucker_coord1 ) << 1 ) + ( 0.0 == plucker_coord0 ) ];
+            *type = type_list[ ( ( 0.0 == plucker_coord2 ) << 2 ) + ( ( 0.0 == plucker_coord1 ) << 1 ) +
+                               ( 0.0 == plucker_coord0 ) ];
 
         return true;
     }
 
     /* Implementation copied from cgmMC ray_tri_contact (overlap.C) */
-    bool ray_tri_intersect( const CartVect vertices[ 3 ], const CartVect& b, const CartVect& v,
-                            double& t_out, const double* ray_length )
+    bool ray_tri_intersect( const CartVect vertices[ 3 ], const CartVect& b, const CartVect& v, double& t_out,
+                            const double* ray_length )
     {
         const CartVect p0 = vertices[ 0 ] - vertices[ 1 ];  // abc
         const CartVect p1 = vertices[ 0 ] - vertices[ 2 ];  // def
@@ -314,9 +309,8 @@ namespace GeomUtil
         return true;
     }
 
-    bool ray_box_intersect( const CartVect& box_min, const CartVect& box_max,
-                            const CartVect& ray_pt, const CartVect& ray_dir, double& t_enter,
-                            double& t_exit )
+    bool ray_box_intersect( const CartVect& box_min, const CartVect& box_max, const CartVect& ray_pt,
+                            const CartVect& ray_dir, double& t_enter, double& t_exit )
     {
         const double epsilon = 1e-12;
         double       t1, t2;
@@ -389,8 +383,7 @@ namespace GeomUtil
      * 2) normal of triangle
      * 3) crossprod of triangle edge with {x,y,z}-direction
      */
-    bool box_tri_overlap( const CartVect vertices[ 3 ], const CartVect& box_center,
-                          const CartVect& box_dims )
+    bool box_tri_overlap( const CartVect vertices[ 3 ], const CartVect& box_center, const CartVect& box_dims )
     {
         // translate everything such that box is centered at origin
         const CartVect v0( vertices[ 0 ] - box_center );
@@ -398,18 +391,12 @@ namespace GeomUtil
         const CartVect v2( vertices[ 2 ] - box_center );
 
         // do case 1) tests
-        if( v0[ 0 ] > box_dims[ 0 ] && v1[ 0 ] > box_dims[ 0 ] && v2[ 0 ] > box_dims[ 0 ] )
-            return false;
-        if( v0[ 1 ] > box_dims[ 1 ] && v1[ 1 ] > box_dims[ 1 ] && v2[ 1 ] > box_dims[ 1 ] )
-            return false;
-        if( v0[ 2 ] > box_dims[ 2 ] && v1[ 2 ] > box_dims[ 2 ] && v2[ 2 ] > box_dims[ 2 ] )
-            return false;
-        if( v0[ 0 ] < -box_dims[ 0 ] && v1[ 0 ] < -box_dims[ 0 ] && v2[ 0 ] < -box_dims[ 0 ] )
-            return false;
-        if( v0[ 1 ] < -box_dims[ 1 ] && v1[ 1 ] < -box_dims[ 1 ] && v2[ 1 ] < -box_dims[ 1 ] )
-            return false;
-        if( v0[ 2 ] < -box_dims[ 2 ] && v1[ 2 ] < -box_dims[ 2 ] && v2[ 2 ] < -box_dims[ 2 ] )
-            return false;
+        if( v0[ 0 ] > box_dims[ 0 ] && v1[ 0 ] > box_dims[ 0 ] && v2[ 0 ] > box_dims[ 0 ] ) return false;
+        if( v0[ 1 ] > box_dims[ 1 ] && v1[ 1 ] > box_dims[ 1 ] && v2[ 1 ] > box_dims[ 1 ] ) return false;
+        if( v0[ 2 ] > box_dims[ 2 ] && v1[ 2 ] > box_dims[ 2 ] && v2[ 2 ] > box_dims[ 2 ] ) return false;
+        if( v0[ 0 ] < -box_dims[ 0 ] && v1[ 0 ] < -box_dims[ 0 ] && v2[ 0 ] < -box_dims[ 0 ] ) return false;
+        if( v0[ 1 ] < -box_dims[ 1 ] && v1[ 1 ] < -box_dims[ 1 ] && v2[ 1 ] < -box_dims[ 1 ] ) return false;
+        if( v0[ 2 ] < -box_dims[ 2 ] && v1[ 2 ] < -box_dims[ 2 ] && v2[ 2 ] < -box_dims[ 2 ] ) return false;
 
         // compute triangle edge vectors
         const CartVect e0( vertices[ 1 ] - vertices[ 0 ] );
@@ -488,8 +475,8 @@ namespace GeomUtil
         return box_tri_overlap( triangle_corners, box_center, box_hf_dim + CartVect( tolerance ) );
     }
 
-    bool box_elem_overlap( const CartVect* elem_corners, EntityType elem_type,
-                           const CartVect& center, const CartVect& dims, int nodecount )
+    bool box_elem_overlap( const CartVect* elem_corners, EntityType elem_type, const CartVect& center,
+                           const CartVect& dims, int nodecount )
     {
 
         switch( elem_type )
@@ -520,8 +507,7 @@ namespace GeomUtil
         }
     }
 
-    static inline CartVect quad_norm( const CartVect& v1, const CartVect& v2, const CartVect& v3,
-                                      const CartVect& v4 )
+    static inline CartVect quad_norm( const CartVect& v1, const CartVect& v2, const CartVect& v3, const CartVect& v4 )
     {
         return ( -v1 + v2 + v3 - v4 ) * ( -v1 - v2 + v3 + v4 );
     }
@@ -531,8 +517,8 @@ namespace GeomUtil
         return ( v2 - v1 ) * ( v3 - v1 );
     }
 
-    bool box_linear_elem_overlap( const CartVect* elem_corners, EntityType type,
-                                  const CartVect& box_center, const CartVect& box_halfdims )
+    bool box_linear_elem_overlap( const CartVect* elem_corners, EntityType type, const CartVect& box_center,
+                                  const CartVect& box_halfdims )
     {
         CartVect       corners[ 8 ];
         const unsigned num_corner = CN::VerticesPerEntity( type );
@@ -542,8 +528,7 @@ namespace GeomUtil
         return box_linear_elem_overlap( corners, type, box_halfdims );
     }
 
-    bool box_linear_elem_overlap( const CartVect* elem_corners, EntityType type,
-                                  const CartVect& dims )
+    bool box_linear_elem_overlap( const CartVect* elem_corners, EntityType type, const CartVect& dims )
     {
         // Do Separating Axis Theorem:
         // If the element and the box overlap, then the 1D projections
@@ -595,8 +580,7 @@ namespace GeomUtil
         // If all points less than min_x of box, then
         // not_less[0] == 0, and therefore
         // the following product is zero.
-        if( not_greater[ 0 ] * not_greater[ 1 ] * not_greater[ 2 ] * not_less[ 0 ] * not_less[ 1 ] *
-                not_less[ 2 ] ==
+        if( not_greater[ 0 ] * not_greater[ 1 ] * not_greater[ 2 ] * not_less[ 0 ] * not_less[ 1 ] * not_less[ 2 ] ==
             0 )
             return false;
 
@@ -618,13 +602,11 @@ namespace GeomUtil
             cross[ 0 ] = elem_corners[ indices[ 0 ] ][ 2 ] - elem_corners[ indices[ 1 ] ][ 2 ];
             cross[ 1 ] = elem_corners[ indices[ 1 ] ][ 1 ] - elem_corners[ indices[ 0 ] ][ 1 ];
             // skip if parallel
-            if( ( cross[ 0 ] * cross[ 0 ] + cross[ 1 ] * cross[ 1 ] ) >=
-                std::numeric_limits< double >::epsilon( ) )
+            if( ( cross[ 0 ] * cross[ 0 ] + cross[ 1 ] * cross[ 1 ] ) >= std::numeric_limits< double >::epsilon( ) )
             {
                 dot = fabs( cross[ 0 ] * dims[ 1 ] ) + fabs( cross[ 1 ] * dims[ 2 ] );
                 not_less[ 0 ] = not_greater[ 0 ] = num_corner - 1;
-                for( i = ( indices[ 0 ] + 1 ) % num_corner; i != indices[ 0 ];
-                     i = ( i + 1 ) % num_corner )
+                for( i = ( indices[ 0 ] + 1 ) % num_corner; i != indices[ 0 ]; i = ( i + 1 ) % num_corner )
                 {  // for each element corner
                     tmp = cross[ 0 ] * elem_corners[ i ][ 1 ] + cross[ 1 ] * elem_corners[ i ][ 2 ];
                     not_less[ 0 ] -= ( tmp < -dot );
@@ -641,13 +623,11 @@ namespace GeomUtil
             cross[ 0 ] = elem_corners[ indices[ 0 ] ][ 0 ] - elem_corners[ indices[ 1 ] ][ 0 ];
             cross[ 1 ] = elem_corners[ indices[ 1 ] ][ 2 ] - elem_corners[ indices[ 0 ] ][ 2 ];
             // skip if parallel
-            if( ( cross[ 0 ] * cross[ 0 ] + cross[ 1 ] * cross[ 1 ] ) >=
-                std::numeric_limits< double >::epsilon( ) )
+            if( ( cross[ 0 ] * cross[ 0 ] + cross[ 1 ] * cross[ 1 ] ) >= std::numeric_limits< double >::epsilon( ) )
             {
                 dot = fabs( cross[ 0 ] * dims[ 2 ] ) + fabs( cross[ 1 ] * dims[ 0 ] );
                 not_less[ 0 ] = not_greater[ 0 ] = num_corner - 1;
-                for( i = ( indices[ 0 ] + 1 ) % num_corner; i != indices[ 0 ];
-                     i = ( i + 1 ) % num_corner )
+                for( i = ( indices[ 0 ] + 1 ) % num_corner; i != indices[ 0 ]; i = ( i + 1 ) % num_corner )
                 {  // for each element corner
                     tmp = cross[ 0 ] * elem_corners[ i ][ 2 ] + cross[ 1 ] * elem_corners[ i ][ 0 ];
                     not_less[ 0 ] -= ( tmp < -dot );
@@ -664,13 +644,11 @@ namespace GeomUtil
             cross[ 0 ] = elem_corners[ indices[ 0 ] ][ 1 ] - elem_corners[ indices[ 1 ] ][ 1 ];
             cross[ 1 ] = elem_corners[ indices[ 1 ] ][ 0 ] - elem_corners[ indices[ 0 ] ][ 0 ];
             // skip if parallel
-            if( ( cross[ 0 ] * cross[ 0 ] + cross[ 1 ] * cross[ 1 ] ) >=
-                std::numeric_limits< double >::epsilon( ) )
+            if( ( cross[ 0 ] * cross[ 0 ] + cross[ 1 ] * cross[ 1 ] ) >= std::numeric_limits< double >::epsilon( ) )
             {
                 dot = fabs( cross[ 0 ] * dims[ 0 ] ) + fabs( cross[ 1 ] * dims[ 1 ] );
                 not_less[ 0 ] = not_greater[ 0 ] = num_corner - 1;
-                for( i = ( indices[ 0 ] + 1 ) % num_corner; i != indices[ 0 ];
-                     i = ( i + 1 ) % num_corner )
+                for( i = ( indices[ 0 ] + 1 ) % num_corner; i != indices[ 0 ]; i = ( i + 1 ) % num_corner )
                 {  // for each element corner
                     tmp = cross[ 0 ] * elem_corners[ i ][ 0 ] + cross[ 1 ] * elem_corners[ i ][ 1 ];
                     not_less[ 0 ] -= ( tmp < -dot );
@@ -719,8 +697,7 @@ namespace GeomUtil
         return true;
     }
 
-    bool box_hex_overlap( const CartVect* elem_corners, const CartVect& center,
-                          const CartVect& dims )
+    bool box_hex_overlap( const CartVect* elem_corners, const CartVect& center, const CartVect& dims )
     {
         // Do Separating Axis Theorem:
         // If the element and the box overlap, then the 1D projections
@@ -773,15 +750,13 @@ namespace GeomUtil
         // If all points less than min_x of box, then
         // not_less[0] == 0, and therefore
         // the following product is zero.
-        if( not_greater[ 0 ] * not_greater[ 1 ] * not_greater[ 2 ] * not_less[ 0 ] * not_less[ 1 ] *
-                not_less[ 2 ] ==
+        if( not_greater[ 0 ] * not_greater[ 1 ] * not_greater[ 2 ] * not_less[ 0 ] * not_less[ 1 ] * not_less[ 2 ] ==
             0 )
             return false;
 
         // Test edge-edge crossproducts
-        const unsigned edges[ 12 ][ 2 ] = { { 0, 1 }, { 0, 4 }, { 0, 3 }, { 2, 3 },
-                                            { 2, 1 }, { 2, 6 }, { 5, 6 }, { 5, 1 },
-                                            { 5, 4 }, { 7, 4 }, { 7, 3 }, { 7, 6 } };
+        const unsigned edges[ 12 ][ 2 ] = { { 0, 1 }, { 0, 4 }, { 0, 3 }, { 2, 3 }, { 2, 1 }, { 2, 6 },
+                                            { 5, 6 }, { 5, 1 }, { 5, 4 }, { 7, 4 }, { 7, 3 }, { 7, 6 } };
 
         // Edge directions for box are principal axis, so
         // for each element edge, check along the cross-product
@@ -799,8 +774,7 @@ namespace GeomUtil
             cross[ 0 ] = v0[ 2 ] - v1[ 2 ];
             cross[ 1 ] = v1[ 1 ] - v0[ 1 ];
             // skip if parallel
-            if( ( cross[ 0 ] * cross[ 0 ] + cross[ 1 ] * cross[ 1 ] ) >=
-                std::numeric_limits< double >::epsilon( ) )
+            if( ( cross[ 0 ] * cross[ 0 ] + cross[ 1 ] * cross[ 1 ] ) >= std::numeric_limits< double >::epsilon( ) )
             {
                 dot = fabs( cross[ 0 ] * dims[ 1 ] ) + fabs( cross[ 1 ] * dims[ 2 ] );
                 not_less[ 0 ] = not_greater[ 0 ] = 7;
@@ -821,8 +795,7 @@ namespace GeomUtil
             cross[ 0 ] = v0[ 0 ] - v1[ 0 ];
             cross[ 1 ] = v1[ 2 ] - v0[ 2 ];
             // skip if parallel
-            if( ( cross[ 0 ] * cross[ 0 ] + cross[ 1 ] * cross[ 1 ] ) >=
-                std::numeric_limits< double >::epsilon( ) )
+            if( ( cross[ 0 ] * cross[ 0 ] + cross[ 1 ] * cross[ 1 ] ) >= std::numeric_limits< double >::epsilon( ) )
             {
                 dot = fabs( cross[ 0 ] * dims[ 2 ] ) + fabs( cross[ 1 ] * dims[ 0 ] );
                 not_less[ 0 ] = not_greater[ 0 ] = 7;
@@ -843,8 +816,7 @@ namespace GeomUtil
             cross[ 0 ] = v0[ 1 ] - v1[ 1 ];
             cross[ 1 ] = v1[ 0 ] - v0[ 0 ];
             // skip if parallel
-            if( ( cross[ 0 ] * cross[ 0 ] + cross[ 1 ] * cross[ 1 ] ) >=
-                std::numeric_limits< double >::epsilon( ) )
+            if( ( cross[ 0 ] * cross[ 0 ] + cross[ 1 ] * cross[ 1 ] ) >= std::numeric_limits< double >::epsilon( ) )
             {
                 dot = fabs( cross[ 0 ] * dims[ 0 ] ) + fabs( cross[ 1 ] * dims[ 1 ] );
                 not_less[ 0 ] = not_greater[ 0 ] = 7;
@@ -864,8 +836,8 @@ namespace GeomUtil
                                            { 2, 6, 7, 3 }, { 3, 7, 4, 0 }, { 7, 4, 5, 6 } };
         for( f = 0; f < 6; ++f )
         {
-            norm = quad_norm( corners[ faces[ f ][ 0 ] ], corners[ faces[ f ][ 1 ] ],
-                              corners[ faces[ f ][ 2 ] ], corners[ faces[ f ][ 3 ] ] );
+            norm = quad_norm( corners[ faces[ f ][ 0 ] ], corners[ faces[ f ][ 1 ] ], corners[ faces[ f ][ 2 ] ],
+                              corners[ faces[ f ][ 3 ] ] );
 
             dot = dot_abs( norm, dims );
 
@@ -885,9 +857,8 @@ namespace GeomUtil
         return true;
     }
 
-    static inline bool box_tet_overlap_edge( const CartVect& dims, const CartVect& edge,
-                                             const CartVect& ve, const CartVect& v1,
-                                             const CartVect& v2 )
+    static inline bool box_tet_overlap_edge( const CartVect& dims, const CartVect& edge, const CartVect& ve,
+                                             const CartVect& v1, const CartVect& v2 )
     {
         double dot, dot1, dot2, dot3, min, max;
 
@@ -939,8 +910,8 @@ namespace GeomUtil
         // 3) The normals of the faces of the element
 
         // Translate problem such that box center is at origin.
-        const CartVect corners[ 4 ] = { corners_in[ 0 ] - center, corners_in[ 1 ] - center,
-                                        corners_in[ 2 ] - center, corners_in[ 3 ] - center };
+        const CartVect corners[ 4 ] = { corners_in[ 0 ] - center, corners_in[ 1 ] - center, corners_in[ 2 ] - center,
+                                        corners_in[ 3 ] - center };
 
         // 0) Check if any vertex is within the box
         if( fabs( corners[ 0 ][ 0 ] ) <= dims[ 0 ] && fabs( corners[ 0 ][ 1 ] ) <= dims[ 1 ] &&
@@ -958,25 +929,25 @@ namespace GeomUtil
 
         // 1) Check for overlap on each principal axis (box face normal)
         // X
-        if( corners[ 0 ][ 0 ] < -dims[ 0 ] && corners[ 1 ][ 0 ] < -dims[ 0 ] &&
-            corners[ 2 ][ 0 ] < -dims[ 0 ] && corners[ 3 ][ 0 ] < -dims[ 0 ] )
+        if( corners[ 0 ][ 0 ] < -dims[ 0 ] && corners[ 1 ][ 0 ] < -dims[ 0 ] && corners[ 2 ][ 0 ] < -dims[ 0 ] &&
+            corners[ 3 ][ 0 ] < -dims[ 0 ] )
             return false;
-        if( corners[ 0 ][ 0 ] > dims[ 0 ] && corners[ 1 ][ 0 ] > dims[ 0 ] &&
-            corners[ 2 ][ 0 ] > dims[ 0 ] && corners[ 3 ][ 0 ] > dims[ 0 ] )
+        if( corners[ 0 ][ 0 ] > dims[ 0 ] && corners[ 1 ][ 0 ] > dims[ 0 ] && corners[ 2 ][ 0 ] > dims[ 0 ] &&
+            corners[ 3 ][ 0 ] > dims[ 0 ] )
             return false;
         // Y
-        if( corners[ 0 ][ 1 ] < -dims[ 1 ] && corners[ 1 ][ 1 ] < -dims[ 1 ] &&
-            corners[ 2 ][ 1 ] < -dims[ 1 ] && corners[ 3 ][ 1 ] < -dims[ 1 ] )
+        if( corners[ 0 ][ 1 ] < -dims[ 1 ] && corners[ 1 ][ 1 ] < -dims[ 1 ] && corners[ 2 ][ 1 ] < -dims[ 1 ] &&
+            corners[ 3 ][ 1 ] < -dims[ 1 ] )
             return false;
-        if( corners[ 0 ][ 1 ] > dims[ 1 ] && corners[ 1 ][ 1 ] > dims[ 1 ] &&
-            corners[ 2 ][ 1 ] > dims[ 1 ] && corners[ 3 ][ 1 ] > dims[ 1 ] )
+        if( corners[ 0 ][ 1 ] > dims[ 1 ] && corners[ 1 ][ 1 ] > dims[ 1 ] && corners[ 2 ][ 1 ] > dims[ 1 ] &&
+            corners[ 3 ][ 1 ] > dims[ 1 ] )
             return false;
         // Z
-        if( corners[ 0 ][ 2 ] < -dims[ 2 ] && corners[ 1 ][ 2 ] < -dims[ 2 ] &&
-            corners[ 2 ][ 2 ] < -dims[ 2 ] && corners[ 3 ][ 2 ] < -dims[ 2 ] )
+        if( corners[ 0 ][ 2 ] < -dims[ 2 ] && corners[ 1 ][ 2 ] < -dims[ 2 ] && corners[ 2 ][ 2 ] < -dims[ 2 ] &&
+            corners[ 3 ][ 2 ] < -dims[ 2 ] )
             return false;
-        if( corners[ 0 ][ 2 ] > dims[ 2 ] && corners[ 1 ][ 2 ] > dims[ 2 ] &&
-            corners[ 2 ][ 2 ] > dims[ 2 ] && corners[ 3 ][ 2 ] > dims[ 2 ] )
+        if( corners[ 0 ][ 2 ] > dims[ 2 ] && corners[ 1 ][ 2 ] > dims[ 2 ] && corners[ 2 ][ 2 ] > dims[ 2 ] &&
+            corners[ 3 ][ 2 ] > dims[ 2 ] )
             return false;
 
         // 3) test element face normals
@@ -1049,8 +1020,7 @@ namespace GeomUtil
     // Worst case is either 61 flops and 5 compares or 53 flops and 6 compares,
     // depending on relative costs.  For all paths that do not return one of the
     // corner vertices, exactly one of the flops is a divide.
-    void closest_location_on_tri( const CartVect& location, const CartVect* vertices,
-                                  CartVect& closest_out )
+    void closest_location_on_tri( const CartVect& location, const CartVect* vertices, CartVect& closest_out )
     {  // ops      comparisons
         const CartVect sv( vertices[ 1 ] - vertices[ 0 ] );  // +3 = 3
         const CartVect tv( vertices[ 2 ] - vertices[ 0 ] );  // +3 = 6
@@ -1195,8 +1165,8 @@ namespace GeomUtil
         }
     }
 
-    void closest_location_on_tri( const CartVect& location, const CartVect* vertices,
-                                  double tolerance, CartVect& closest_out, int& closest_topo )
+    void closest_location_on_tri( const CartVect& location, const CartVect* vertices, double tolerance,
+                                  CartVect& closest_out, int& closest_topo )
     {
         const double tsqr = tolerance * tolerance;
         int          i;
@@ -1231,8 +1201,8 @@ namespace GeomUtil
     }
 
     // We assume polygon is *convex*, but *not* planar.
-    void closest_location_on_polygon( const CartVect& location, const CartVect* vertices,
-                                      int num_vertices, CartVect& closest_out )
+    void closest_location_on_polygon( const CartVect& location, const CartVect* vertices, int num_vertices,
+                                      CartVect& closest_out )
     {
         const int n = num_vertices;
         CartVect  d, p, v;
@@ -1300,19 +1270,15 @@ namespace GeomUtil
         closest_out = ( location - ( norm % location + D ) * norm ) / ( norm % norm );
     }
 
-    void closest_location_on_box( const CartVect& min, const CartVect& max, const CartVect& point,
-                                  CartVect& closest )
+    void closest_location_on_box( const CartVect& min, const CartVect& max, const CartVect& point, CartVect& closest )
     {
-        closest[ 0 ] =
-            point[ 0 ] < min[ 0 ] ? min[ 0 ] : point[ 0 ] > max[ 0 ] ? max[ 0 ] : point[ 0 ];
-        closest[ 1 ] =
-            point[ 1 ] < min[ 1 ] ? min[ 1 ] : point[ 1 ] > max[ 1 ] ? max[ 1 ] : point[ 1 ];
-        closest[ 2 ] =
-            point[ 2 ] < min[ 2 ] ? min[ 2 ] : point[ 2 ] > max[ 2 ] ? max[ 2 ] : point[ 2 ];
+        closest[ 0 ] = point[ 0 ] < min[ 0 ] ? min[ 0 ] : point[ 0 ] > max[ 0 ] ? max[ 0 ] : point[ 0 ];
+        closest[ 1 ] = point[ 1 ] < min[ 1 ] ? min[ 1 ] : point[ 1 ] > max[ 1 ] ? max[ 1 ] : point[ 1 ];
+        closest[ 2 ] = point[ 2 ] < min[ 2 ] ? min[ 2 ] : point[ 2 ] > max[ 2 ] ? max[ 2 ] : point[ 2 ];
     }
 
-    bool box_point_overlap( const CartVect& box_min_corner, const CartVect& box_max_corner,
-                            const CartVect& point, double tolerance )
+    bool box_point_overlap( const CartVect& box_min_corner, const CartVect& box_max_corner, const CartVect& point,
+                            double tolerance )
     {
         CartVect closest;
         closest_location_on_box( box_min_corner, box_max_corner, point, closest );
@@ -1320,8 +1286,8 @@ namespace GeomUtil
         return closest % closest < tolerance * tolerance;
     }
 
-    bool boxes_overlap( const CartVect& box_min1, const CartVect& box_max1,
-                        const CartVect& box_min2, const CartVect& box_max2, double tolerance )
+    bool boxes_overlap( const CartVect& box_min1, const CartVect& box_max1, const CartVect& box_min2,
+                        const CartVect& box_max2, double tolerance )
     {
 
         for( int k = 0; k < 3; k++ )
@@ -1335,8 +1301,7 @@ namespace GeomUtil
     }
 
     // see if boxes formed by 2 lists of "CartVect"s overlap
-    bool bounding_boxes_overlap( const CartVect* list1, int num1, const CartVect* list2, int num2,
-                                 double tolerance )
+    bool bounding_boxes_overlap( const CartVect* list1, int num1, const CartVect* list2, int num2, double tolerance )
     {
         assert( num1 >= 1 && num2 >= 1 );
         CartVect box_min1 = list1[ 0 ], box_max1 = list1[ 0 ];
@@ -1364,8 +1329,7 @@ namespace GeomUtil
     }
 
     // see if boxes formed by 2 lists of 2d coordinates overlap (num1>=3, num2>=3, do not check)
-    bool bounding_boxes_overlap_2d( const double* list1, int num1, const double* list2, int num2,
-                                    double tolerance )
+    bool bounding_boxes_overlap_2d( const double* list1, int num1, const double* list2, int num2, double tolerance )
     {
         /*
          * box1:
@@ -1458,9 +1422,8 @@ namespace GeomUtil
         static const double corner_xi[ 8 ][ 3 ];
     };
 
-    const double LinearHexMap::corner_xi[ 8 ][ 3 ] = { { -1, -1, -1 }, { 1, -1, -1 }, { 1, 1, -1 },
-                                                       { -1, 1, -1 },  { -1, -1, 1 }, { 1, -1, 1 },
-                                                       { 1, 1, 1 },    { -1, 1, 1 } };
+    const double LinearHexMap::corner_xi[ 8 ][ 3 ] = { { -1, -1, -1 }, { 1, -1, -1 }, { 1, 1, -1 }, { -1, 1, -1 },
+                                                       { -1, -1, 1 },  { 1, -1, 1 },  { 1, 1, 1 },  { -1, 1, 1 } };
     CartVect     LinearHexMap::center_xi( ) const
     {
         return CartVect( 0.0 );
@@ -1471,8 +1434,7 @@ namespace GeomUtil
         CartVect x( 0.0 );
         for( unsigned i = 0; i < 8; ++i )
         {
-            const double N_i = ( 1 + xi[ 0 ] * corner_xi[ i ][ 0 ] ) *
-                               ( 1 + xi[ 1 ] * corner_xi[ i ][ 1 ] ) *
+            const double N_i = ( 1 + xi[ 0 ] * corner_xi[ i ][ 0 ] ) * ( 1 + xi[ 1 ] * corner_xi[ i ][ 1 ] ) *
                                ( 1 + xi[ 2 ] * corner_xi[ i ][ 2 ] );
             x += N_i * corners[ i ];
         }
@@ -1504,8 +1466,7 @@ namespace GeomUtil
         return J *= 0.125;
     }
 
-    bool nat_coords_trilinear_hex( const CartVect* corner_coords, const CartVect& x, CartVect& xi,
-                                   double tol )
+    bool nat_coords_trilinear_hex( const CartVect* corner_coords, const CartVect& x, CartVect& xi, double tol )
     {
         return LinearHexMap( corner_coords ).solve_inverse( x, xi, tol );
     }

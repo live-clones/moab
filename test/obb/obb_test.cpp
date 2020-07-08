@@ -38,10 +38,9 @@ void initialize_default_files( )
     size_t                 num_tests;
     std::vector< RayTest > tests;
     std::string            file = STRINGIFY( MESHDIR ) "/3k-tri-sphere.vtk";
-    RayTest                set1[] = {
-        { "triangle interior ", 1, CartVect( 0, 0, 0 ), CartVect( 99.8792, -5, 0.121729 ) },
-        { "triangle edge ", 2, CartVect( 0, 0, 0 ), CartVect( 4.99167, 0, 99.7502 ) },
-        { "triangle node ", 6, CartVect( 0, 0, 0 ), CartVect( 0, 0, 100 ) } };
+    RayTest set1[] = { { "triangle interior ", 1, CartVect( 0, 0, 0 ), CartVect( 99.8792, -5, 0.121729 ) },
+                       { "triangle edge ", 2, CartVect( 0, 0, 0 ), CartVect( 4.99167, 0, 99.7502 ) },
+                       { "triangle node ", 6, CartVect( 0, 0, 0 ), CartVect( 0, 0, 100 ) } };
 
     num_tests = sizeof( set1 ) / sizeof( set1[ 0 ] );
     tests.insert( tests.begin( ), &set1[ 0 ], &set1[ num_tests ] );
@@ -54,16 +53,15 @@ void initialize_default_files( )
     file = STRINGIFY( MESHDIR ) "/3k-tri-cube.vtk";
 #endif
 
-    RayTest set2[] = {
-        { "interior triangle interior ", 1, CartVect( 0, 0, 0 ), CartVect( 0, 0, 5 ) },
-        { "interior triangle edge ", 2, CartVect( 0, 0, 0 ), CartVect( -0.25, -0.05, 5 ) },
-        { "interior triangle node ", 5, CartVect( 0, 0, 0 ), CartVect( -0.3, -0.3, 5 ) },
-        { "edge triangle interior ", 1, CartVect( 0, 0, 0 ), CartVect( 5, 2.9, 2.9 ) },
-        { "edge triangle edge ", 2, CartVect( 0, 0, 0 ), CartVect( 5, 5, 2.9 ) },
-        { "edge triangle node ", 6, CartVect( 0, 0, 0 ), CartVect( 5, 5, 3 ) },
-        { "corner triangle interior ", 1, CartVect( 0, 0, 0 ), CartVect( 5, 4.9, 4.9 ) },
-        { "corner triangle edge ", 2, CartVect( 0, 0, 0 ), CartVect( 5, 5, 4.9 ) },
-        { "corner triangle node ", 3, CartVect( 0, 0, 0 ), CartVect( 5, 5, 5 ) } };
+    RayTest set2[] = { { "interior triangle interior ", 1, CartVect( 0, 0, 0 ), CartVect( 0, 0, 5 ) },
+                       { "interior triangle edge ", 2, CartVect( 0, 0, 0 ), CartVect( -0.25, -0.05, 5 ) },
+                       { "interior triangle node ", 5, CartVect( 0, 0, 0 ), CartVect( -0.3, -0.3, 5 ) },
+                       { "edge triangle interior ", 1, CartVect( 0, 0, 0 ), CartVect( 5, 2.9, 2.9 ) },
+                       { "edge triangle edge ", 2, CartVect( 0, 0, 0 ), CartVect( 5, 5, 2.9 ) },
+                       { "edge triangle node ", 6, CartVect( 0, 0, 0 ), CartVect( 5, 5, 3 ) },
+                       { "corner triangle interior ", 1, CartVect( 0, 0, 0 ), CartVect( 5, 4.9, 4.9 ) },
+                       { "corner triangle edge ", 2, CartVect( 0, 0, 0 ), CartVect( 5, 5, 4.9 ) },
+                       { "corner triangle node ", 3, CartVect( 0, 0, 0 ), CartVect( 5, 5, 5 ) } };
 
     num_tests = sizeof( set2 ) / sizeof( set2[ 0 ] );
     tests.insert( tests.begin( ), &set2[ 0 ], &set2[ num_tests ] );
@@ -98,8 +96,7 @@ static void usage( const char* error, const char* opt )
             << " -c  write box geometry to Cubit journal file." << std::endl
             << " -k  write leaf contents to vtk files." << std::endl
             << " -K  write contents of leaf boxes intersected by rays to vtk file." << std::endl
-            << " -o <name> Save file containing tree and triangles.  Mesh tag \"OBB_ROOT\"."
-            << std::endl
+            << " -o <name> Save file containing tree and triangles.  Mesh tag \"OBB_ROOT\"." << std::endl
             << " -t <real> specify tolerance" << std::endl
             << " -n <int>  specify max entities per leaf node " << std::endl
             << " -l <int>  specify max tree levels" << std::endl
@@ -264,8 +261,7 @@ int main( int argc, char* argv[] )
                       << "best_split_ratio:       " << settings.best_split_ratio << std::endl
                       << "tolerance:              " << tolerance << std::endl
                       << "set type:               "
-                      << ( ( settings.set_options & MESHSET_ORDERED ) ? "ordered" : "set" )
-                      << std::endl
+                      << ( ( settings.set_options & MESHSET_ORDERED ) ? "ordered" : "set" ) << std::endl
                       << std::endl;
     }
 
@@ -278,8 +274,7 @@ int main( int argc, char* argv[] )
     if( file_names.empty( ) )
     {
         std::cerr << "No file(s) specified." << std::endl;
-        for( ray_test_itr file = default_files_tests.begin( ); file != default_files_tests.end( );
-             file++ )
+        for( ray_test_itr file = default_files_tests.begin( ); file != default_files_tests.end( ); file++ )
         {
             std::cerr << "Using default file \"" << file->first << '"' << std::endl;
             file_names.push_back( file->first.c_str( ) );
@@ -308,8 +303,8 @@ int main( int argc, char* argv[] )
 static void parse_ray( int& i, int argc, char* argv[] )
 {
     CartVect point, direction;
-    if( 6 != sscanf( get_option( i, argc, argv ), "%lf:%lf:%lf:%lf:%lf:%lf", &point[ 0 ],
-                     &point[ 1 ], &point[ 2 ], &direction[ 0 ], &direction[ 1 ], &direction[ 2 ] ) )
+    if( 6 != sscanf( get_option( i, argc, argv ), "%lf:%lf:%lf:%lf:%lf:%lf", &point[ 0 ], &point[ 1 ], &point[ 2 ],
+                     &direction[ 0 ], &direction[ 1 ], &direction[ 2 ] ) )
         usage( "Expected ray specified as <x>:<y>:<z>:<i>:<j>:<k>", 0 );
     direction.normalize( );
     rays.push_back( point );
@@ -361,26 +356,23 @@ class TreeValidator : public OrientedBoxTreeTool::Op
     int                      surface_depth;
     EntityHandle             surface_handle;
 
-    TreeValidator( Interface* instance_ptr, OrientedBoxTreeTool* tool_ptr, bool print_errors,
-                   std::ostream& str, double tol, bool surfs, OrientedBoxTreeTool::Settings s )
-        : instance( instance_ptr ), tool( tool_ptr ), printing( print_errors ), epsilon( tol ),
-          surfaces( surfs ), stream( str ), settings( s ), entity_count( 0 ), loose_box_count( 0 ),
-          child_outside_count( 0 ), entity_outside_count( 0 ), num_entities_outside( 0 ),
-          non_ortho_count( 0 ), error_count( 0 ), empty_leaf_count( 0 ),
-          non_empty_non_leaf_count( 0 ), entity_invalid_count( 0 ), unsorted_axis_count( 0 ),
-          non_unit_count( 0 ), duplicate_entity_count( 0 ), bad_outer_radius_count( 0 ),
-          missing_surface_count( 0 ), multiple_surface_count( 0 ), surface_depth( -1 ),
-          surface_handle( 0 )
+    TreeValidator( Interface* instance_ptr, OrientedBoxTreeTool* tool_ptr, bool print_errors, std::ostream& str,
+                   double tol, bool surfs, OrientedBoxTreeTool::Settings s )
+        : instance( instance_ptr ), tool( tool_ptr ), printing( print_errors ), epsilon( tol ), surfaces( surfs ),
+          stream( str ), settings( s ), entity_count( 0 ), loose_box_count( 0 ), child_outside_count( 0 ),
+          entity_outside_count( 0 ), num_entities_outside( 0 ), non_ortho_count( 0 ), error_count( 0 ),
+          empty_leaf_count( 0 ), non_empty_non_leaf_count( 0 ), entity_invalid_count( 0 ), unsorted_axis_count( 0 ),
+          non_unit_count( 0 ), duplicate_entity_count( 0 ), bad_outer_radius_count( 0 ), missing_surface_count( 0 ),
+          multiple_surface_count( 0 ), surface_depth( -1 ), surface_handle( 0 )
     {
     }
 
     bool is_valid( ) const
     {
-        return 0 == loose_box_count + child_outside_count + entity_outside_count +
-                        num_entities_outside + non_ortho_count + error_count + empty_leaf_count +
-                        non_empty_non_leaf_count + entity_invalid_count + unsorted_axis_count +
-                        non_unit_count + duplicate_entity_count + bad_outer_radius_count +
-                        missing_surface_count + multiple_surface_count;
+        return 0 == loose_box_count + child_outside_count + entity_outside_count + num_entities_outside +
+                        non_ortho_count + error_count + empty_leaf_count + non_empty_non_leaf_count +
+                        entity_invalid_count + unsorted_axis_count + non_unit_count + duplicate_entity_count +
+                        bad_outer_radius_count + missing_surface_count + multiple_surface_count;
     }
 
     virtual ErrorCode visit( EntityHandle node, int depth, bool& descend );
@@ -398,8 +390,7 @@ ErrorCode TreeValidator::visit( EntityHandle node, int depth, bool& descend )
 
     Range contents;
     rval = instance->get_entities_by_handle( node, contents );
-    if( MB_SUCCESS != rval )
-        return error( node, "Error getting contents of tree node.  Corrupt tree?" );
+    if( MB_SUCCESS != rval ) return error( node, "Error getting contents of tree node.  Corrupt tree?" );
     entity_count += contents.size( );
 
     if( surfaces )
@@ -437,8 +428,7 @@ ErrorCode TreeValidator::visit( EntityHandle node, int depth, bool& descend )
 
     OrientedBox box;
     rval = tool->box( node, box );
-    if( MB_SUCCESS != rval )
-        return error( node, "Error getting oriented box from tree node.  Corrupt tree?" );
+    if( MB_SUCCESS != rval ) return error( node, "Error getting oriented box from tree node.  Corrupt tree?" );
 
     if( children.empty( ) && contents.empty( ) )
     {
@@ -458,8 +448,8 @@ ErrorCode TreeValidator::visit( EntityHandle node, int depth, bool& descend )
     }
 
     double dot_epsilon = epsilon * ( box.axis( 0 ) + box.axis( 1 ) + box.axis( 2 ) ).length( );
-    if( box.axis( 0 ) % box.axis( 1 ) > dot_epsilon ||
-        box.axis( 0 ) % box.axis( 2 ) > dot_epsilon || box.axis( 1 ) % box.axis( 2 ) > dot_epsilon )
+    if( box.axis( 0 ) % box.axis( 1 ) > dot_epsilon || box.axis( 0 ) % box.axis( 2 ) > dot_epsilon ||
+        box.axis( 1 ) % box.axis( 2 ) > dot_epsilon )
     {
         ++non_ortho_count;
         print( node, "Box axes are not orthogonal" );
@@ -472,8 +462,7 @@ ErrorCode TreeValidator::visit( EntityHandle node, int depth, bool& descend )
             OrientedBox other_box;
             rval = tool->box( children[ i ], other_box );
             if( MB_SUCCESS != rval )
-                return error( children[ i ],
-                              " Error getting oriented box from tree node.  Corrupt tree?" );
+                return error( children[ i ], " Error getting oriented box from tree node.  Corrupt tree?" );
             //      else if (!box.contained( other_box, epsilon )) {
             //        ++child_outside_count;
             //        print( children[i], "Parent box does not contain child box." );
@@ -489,8 +478,7 @@ ErrorCode TreeValidator::visit( EntityHandle node, int depth, bool& descend )
                     char string[ 64 ];
                     sprintf( string, "child/parent volume ratio is %f", vol_ratio );
                     print( children[ i ], string );
-                    sprintf( string, "   child/parent area ratio is %f",
-                             other_box.area( ) / box.area( ) );
+                    sprintf( string, "   child/parent area ratio is %f", other_box.area( ) / box.area( ) );
                     print( children[ i ], string );
                 }
             }
@@ -590,8 +578,7 @@ ErrorCode TreeValidator::visit( EntityHandle node, int depth, bool& descend )
     }
 #endif
 
-    if( depth + 1 < settings.max_depth &&
-        contents.size( ) > (unsigned)( 4 * settings.max_leaf_entities ) )
+    if( depth + 1 < settings.max_depth && contents.size( ) > (unsigned)( 4 * settings.max_leaf_entities ) )
     {
         char string[ 64 ];
         sprintf( string, "leaf at depth %d with %u entities", depth, (unsigned)contents.size( ) );
@@ -623,8 +610,7 @@ ErrorCode TreeValidator::visit( EntityHandle node, int depth, bool& descend )
         ++entity_outside_count;
         num_entities_outside += num_outside;
         if( printing )
-            stream << instance->id_from_handle( node ) << ": " << num_outside
-                   << " elements outside box." << std::endl;
+            stream << instance->id_from_handle( node ) << ": " << num_outside << " elements outside box." << std::endl;
     }
     else if( !all_boundaries && !contents.empty( ) )
     {
@@ -638,10 +624,7 @@ ErrorCode TreeValidator::visit( EntityHandle node, int depth, bool& descend )
 class CubitWriter : public OrientedBoxTreeTool::Op
 {
   public:
-    CubitWriter( FILE* file_ptr, OrientedBoxTreeTool* tool_ptr )
-        : file( file_ptr ), tool( tool_ptr )
-    {
-    }
+    CubitWriter( FILE* file_ptr, OrientedBoxTreeTool* tool_ptr ) : file( file_ptr ), tool( tool_ptr ) {}
 
     ErrorCode visit( EntityHandle node, int depth, bool& descend );
     ErrorCode leaf( EntityHandle )
@@ -671,8 +654,8 @@ ErrorCode CubitWriter::visit( EntityHandle node, int, bool& descend )
                                   box.length[ 1 ] * sign[ j ] * box.axis( 1 ) +
                                   box.length[ 2 ] * sign[ k ] * box.axis( 2 );
 #else
-                CartVect corner = box.center + sign[ i ] * box.axis( 0 ) +
-                                  sign[ j ] * box.axis( 1 ) + sign[ k ] * box.axis( 2 );
+                CartVect corner =
+                    box.center + sign[ i ] * box.axis( 0 ) + sign[ j ] * box.axis( 1 ) + sign[ k ] * box.axis( 2 );
 #endif
                 fprintf( file, "create vertex %f %f %f\n", corner[ 0 ], corner[ 1 ], corner[ 2 ] );
             }
@@ -695,10 +678,7 @@ ErrorCode CubitWriter::visit( EntityHandle node, int, bool& descend )
 class VtkWriter : public OrientedBoxTreeTool::Op
 {
   public:
-    VtkWriter( std::string base_name, Interface* interface )
-        : baseName( base_name ), instance( interface )
-    {
-    }
+    VtkWriter( std::string base_name, Interface* interface ) : baseName( base_name ), instance( interface ) {}
 
     ErrorCode visit( EntityHandle node, int depth, bool& descend );
 
@@ -733,11 +713,10 @@ ErrorCode VtkWriter::visit( EntityHandle node, int, bool& descend )
     return instance->write_mesh( file_name.c_str( ), &node, 1 );
 }
 
-static bool do_ray_fire_test( OrientedBoxTreeTool& tool, EntityHandle root_set,
-                              const char* filename, bool have_surface_tree );
+static bool do_ray_fire_test( OrientedBoxTreeTool& tool, EntityHandle root_set, const char* filename,
+                              bool have_surface_tree );
 
-static bool do_closest_point_test( OrientedBoxTreeTool& tool, EntityHandle root_set,
-                                   bool have_surface_tree );
+static bool do_closest_point_test( OrientedBoxTreeTool& tool, EntityHandle root_set, bool have_surface_tree );
 
 static ErrorCode save_tree( Interface* instance, const char* filename, EntityHandle tree_root );
 
@@ -769,8 +748,7 @@ static bool do_file( const char* filename )
         {
             int         dim = 2;
             const void* tagvalues[] = { &dim };
-            rval = iface->get_entities_by_type_and_tag( 0, MBENTITYSET, &surftag, tagvalues, 1,
-                                                        surfaces );
+            rval = iface->get_entities_by_type_and_tag( 0, MBENTITYSET, &surftag, tagvalues, 1, surfaces );
             if( MB_SUCCESS != rval && MB_ENTITY_NOT_FOUND != rval ) return false;
         }
         else if( MB_TAG_NOT_FOUND != rval )
@@ -798,13 +776,11 @@ static bool do_file( const char* filename )
 
         if( entities.empty( ) )
         {
-            if( verbosity )
-                std::cout << "File \"" << filename << "\" contains no 2D elements" << std::endl;
+            if( verbosity ) std::cout << "File \"" << filename << "\" contains no 2D elements" << std::endl;
             return false;
         }
 
-        if( verbosity )
-            std::cout << "Building tree from " << entities.size( ) << " 2D elements" << std::endl;
+        if( verbosity ) std::cout << "Building tree from " << entities.size( ) << " 2D elements" << std::endl;
 
         rval = tool.build( entities, root, &settings );
         if( MB_SUCCESS != rval )
@@ -816,8 +792,7 @@ static bool do_file( const char* filename )
     else
     {
 
-        if( verbosity )
-            std::cout << "Building tree from " << surfaces.size( ) << " surfaces" << std::endl;
+        if( verbosity ) std::cout << "Building tree from " << surfaces.size( ) << " surfaces" << std::endl;
 
         // Build subtree for each surface, get list of all entities to use later
         Range        surf_trees, surf_tris;
@@ -874,8 +849,7 @@ static bool do_file( const char* filename )
     {
         VtkWriter op( filename, iface );
         if( verbosity )
-            std::cout << "Writing leaf contents as : " << filename
-                      << ".xxx.vtk where 'xxx' is the set id" << std::endl;
+            std::cout << "Writing leaf contents as : " << filename << ".xxx.vtk where 'xxx' is the set id" << std::endl;
         tool.preorder_traverse( root, op );
     }
 
@@ -890,8 +864,7 @@ static bool do_file( const char* filename )
             print_errors = true;
         case 2:
             rval = tool.stats( root, std::cout );
-            if( MB_SUCCESS != rval )
-                std::cout << "****** Failed to get tree statistics ******" << std::endl;
+            if( MB_SUCCESS != rval ) std::cout << "****** Failed to get tree statistics ******" << std::endl;
         case 1:
         case 0:;
     }
@@ -913,54 +886,39 @@ static bool do_file( const char* filename )
         if( result )
             std::cout << std::endl << "No errors detected." << std::endl;
         else
-            std::cout << std::endl
-                      << "*********************** ERROR SUMMARY **********************"
-                      << std::endl;
+            std::cout << std::endl << "*********************** ERROR SUMMARY **********************" << std::endl;
         if( op.child_outside_count )
-            std::cout << "* " << op.child_outside_count << " child boxes not contained in parent."
-                      << std::endl;
+            std::cout << "* " << op.child_outside_count << " child boxes not contained in parent." << std::endl;
         if( op.entity_outside_count )
-            std::cout << "* " << op.entity_outside_count
-                      << " nodes containing entities outside of box." << std::endl;
+            std::cout << "* " << op.entity_outside_count << " nodes containing entities outside of box." << std::endl;
         if( op.num_entities_outside )
             std::cout << "* " << op.num_entities_outside << " entities outside boxes." << std::endl;
-        if( op.empty_leaf_count )
-            std::cout << "* " << op.empty_leaf_count << " empty leaf nodes." << std::endl;
+        if( op.empty_leaf_count ) std::cout << "* " << op.empty_leaf_count << " empty leaf nodes." << std::endl;
         if( op.non_empty_non_leaf_count )
-            std::cout << "* " << op.non_empty_non_leaf_count
-                      << " non-leaf nodes containing entities." << std::endl;
+            std::cout << "* " << op.non_empty_non_leaf_count << " non-leaf nodes containing entities." << std::endl;
         if( op.duplicate_entity_count )
-            std::cout << "* " << op.duplicate_entity_count << " duplicate entities in leaves."
-                      << std::endl;
+            std::cout << "* " << op.duplicate_entity_count << " duplicate entities in leaves." << std::endl;
         if( op.missing_surface_count )
-            std::cout << "* " << op.missing_surface_count << " leaves outside surface subtrees."
-                      << std::endl;
+            std::cout << "* " << op.missing_surface_count << " leaves outside surface subtrees." << std::endl;
         if( op.multiple_surface_count )
-            std::cout << "* " << op.multiple_surface_count
-                      << " surfaces within other surface subtrees." << std::endl;
+            std::cout << "* " << op.multiple_surface_count << " surfaces within other surface subtrees." << std::endl;
         if( op.non_ortho_count )
-            std::cout << "* " << op.non_ortho_count << " boxes with non-orthononal axes."
-                      << std::endl;
-        if( op.non_unit_count )
-            std::cout << "* " << op.non_unit_count << " boxes with non-unit axes." << std::endl;
+            std::cout << "* " << op.non_ortho_count << " boxes with non-orthononal axes." << std::endl;
+        if( op.non_unit_count ) std::cout << "* " << op.non_unit_count << " boxes with non-unit axes." << std::endl;
         if( op.bad_outer_radius_count )
-            std::cout << "* " << op.bad_outer_radius_count << " boxes incorrect outer radius."
-                      << std::endl;
+            std::cout << "* " << op.bad_outer_radius_count << " boxes incorrect outer radius." << std::endl;
         if( op.unsorted_axis_count )
-            std::cout << "* " << op.unsorted_axis_count << " boxes axes in unsorted order."
-                      << std::endl;
+            std::cout << "* " << op.unsorted_axis_count << " boxes axes in unsorted order." << std::endl;
         if( op.loose_box_count )
-            std::cout << "* " << op.loose_box_count
-                      << " boxes that do not fit the contained entities tightly." << std::endl;
-        if( op.error_count + op.entity_invalid_count )
-            std::cout << "* " << op.error_count + op.entity_invalid_count
-                      << " other errors while traversing tree." << std::endl;
-        if( missing )
-            std::cout << "* tree built from " << entities.size( ) << " entities contains "
-                      << op.entity_count << " entities." << std::endl;
-        if( !result )
-            std::cout << "************************************************************"
+            std::cout << "* " << op.loose_box_count << " boxes that do not fit the contained entities tightly."
                       << std::endl;
+        if( op.error_count + op.entity_invalid_count )
+            std::cout << "* " << op.error_count + op.entity_invalid_count << " other errors while traversing tree."
+                      << std::endl;
+        if( missing )
+            std::cout << "* tree built from " << entities.size( ) << " entities contains " << op.entity_count
+                      << " entities." << std::endl;
+        if( !result ) std::cout << "************************************************************" << std::endl;
     }
 
     if( result && save_file_name )
@@ -993,8 +951,7 @@ static bool do_file( const char* filename )
     return result;
 }
 
-static void count_non_tol( std::vector< double > intersections, int& non_tol_count,
-                           double& non_tol_dist )
+static void count_non_tol( std::vector< double > intersections, int& non_tol_count, double& non_tol_dist )
 {
 
     for( size_t i = 0; i < intersections.size( ); ++i )
@@ -1007,9 +964,8 @@ static void count_non_tol( std::vector< double > intersections, int& non_tol_cou
     }
 }
 
-static bool check_ray_intersect_tris( OrientedBoxTreeTool& tool, EntityHandle root_set,
-                                      RayTest& test, int& non_tol_count, double& non_tol_dist,
-                                      OrientedBoxTreeTool::TrvStats& stats )
+static bool check_ray_intersect_tris( OrientedBoxTreeTool& tool, EntityHandle root_set, RayTest& test,
+                                      int& non_tol_count, double& non_tol_dist, OrientedBoxTreeTool::TrvStats& stats )
 {
     ErrorCode rval;
     bool      result = true;
@@ -1019,13 +975,11 @@ static bool check_ray_intersect_tris( OrientedBoxTreeTool& tool, EntityHandle ro
 
     std::vector< double >       intersections;
     std::vector< EntityHandle > facets;
-    rval = tool.ray_intersect_triangles( intersections, facets, root_set, tolerance,
-                                         test.point.array( ), test.direction.array( ), 0, &stats );
+    rval = tool.ray_intersect_triangles( intersections, facets, root_set, tolerance, test.point.array( ),
+                                         test.direction.array( ), 0, &stats );
     if( MB_SUCCESS != rval )
     {
-        if( verbosity )
-            std::cout << "  Call to OrientedBoxTreeTool::ray_intersect_triangles failed."
-                      << std::endl;
+        if( verbosity ) std::cout << "  Call to OrientedBoxTreeTool::ray_intersect_triangles failed." << std::endl;
         result = false;
     }
     else
@@ -1034,9 +988,8 @@ static bool check_ray_intersect_tris( OrientedBoxTreeTool& tool, EntityHandle ro
         if( intersections.size( ) != test.expected_hits )
         {
             if( verbosity > 2 )
-                std::cout << "  Expected " << test.expected_hits << " and got "
-                          << intersections.size( ) << " hits for ray fire of " << test.description
-                          << std::endl;
+                std::cout << "  Expected " << test.expected_hits << " and got " << intersections.size( )
+                          << " hits for ray fire of " << test.description << std::endl;
             if( verbosity > 3 )
             {
                 for( unsigned j = 0; j < intersections.size( ); ++j )
@@ -1051,9 +1004,8 @@ static bool check_ray_intersect_tris( OrientedBoxTreeTool& tool, EntityHandle ro
     return result;
 }
 
-static bool check_ray_intersect_sets( OrientedBoxTreeTool& tool, EntityHandle root_set,
-                                      RayTest& test, int& non_tol_count, double& non_tol_dist,
-                                      OrientedBoxTreeTool::TrvStats& stats )
+static bool check_ray_intersect_sets( OrientedBoxTreeTool& tool, EntityHandle root_set, RayTest& test,
+                                      int& non_tol_count, double& non_tol_dist, OrientedBoxTreeTool::TrvStats& stats )
 {
 
     ErrorCode rval;
@@ -1070,14 +1022,12 @@ static bool check_ray_intersect_sets( OrientedBoxTreeTool& tool, EntityHandle ro
 
     OrientedBoxTreeTool::IntersectSearchWindow search_win;
     OrientedBoxTreeTool::IntRegCtxt            int_reg_ctxt;
-    rval = tool.ray_intersect_sets( intersections, surfs, facets, root_set, tolerance,
-                                    test.point.array( ), test.direction.array( ), search_win,
-                                    int_reg_ctxt, &stats );
+    rval = tool.ray_intersect_sets( intersections, surfs, facets, root_set, tolerance, test.point.array( ),
+                                    test.direction.array( ), search_win, int_reg_ctxt, &stats );
 
     if( MB_SUCCESS != rval )
     {
-        if( verbosity )
-            std::cout << "  Call to OrientedBoxTreeTool::ray_intersect_sets failed." << std::endl;
+        if( verbosity ) std::cout << "  Call to OrientedBoxTreeTool::ray_intersect_sets failed." << std::endl;
         result = false;
     }
     else
@@ -1085,9 +1035,7 @@ static bool check_ray_intersect_sets( OrientedBoxTreeTool& tool, EntityHandle ro
 
         if( surfs.size( ) != intersections.size( ) )
         {
-            if( verbosity )
-                std::cout << "  ray_intersect_sets did not return sets for all intersections."
-                          << std::endl;
+            if( verbosity ) std::cout << "  ray_intersect_sets did not return sets for all intersections." << std::endl;
             result = false;
         }
 
@@ -1105,8 +1053,8 @@ static bool check_ray_intersect_sets( OrientedBoxTreeTool& tool, EntityHandle ro
     return result;
 }
 
-static bool do_ray_fire_test( OrientedBoxTreeTool& tool, EntityHandle root_set,
-                              const char* filename, bool haveSurfTree )
+static bool do_ray_fire_test( OrientedBoxTreeTool& tool, EntityHandle root_set, const char* filename,
+                              bool haveSurfTree )
 {
     if( verbosity > 1 ) std::cout << "beginning ray fire tests" << std::endl;
 
@@ -1124,15 +1072,13 @@ static bool do_ray_fire_test( OrientedBoxTreeTool& tool, EntityHandle root_set,
     CartVect               origin( 0., 0., 0. );
     CartVect               unitDiag( 1., 1., 1. );
     std::vector< RayTest > tests;
-    RayTest                default_tests[] = {
-        { "large axis through box", 2, box.center - 1.2 * box.scaled_axis( 2 ), box.axis( 2 ) },
-        { "small axis through box", 2, box.center - 1.2 * box.scaled_axis( 0 ), box.axis( 0 ) },
-        { "parallel miss", 0, box.center + 2.0 * box.scaled_axis( 1 ), box.axis( 2 ) },
-        { "skew miss", 0, box.center + box.dimensions( ), box.dimensions( ) * box.axis( 2 ) } };
+    RayTest default_tests[] = { { "large axis through box", 2, box.center - 1.2 * box.scaled_axis( 2 ), box.axis( 2 ) },
+                                { "small axis through box", 2, box.center - 1.2 * box.scaled_axis( 0 ), box.axis( 0 ) },
+                                { "parallel miss", 0, box.center + 2.0 * box.scaled_axis( 1 ), box.axis( 2 ) },
+                                { "skew miss", 0, box.center + box.dimensions( ), box.dimensions( ) * box.axis( 2 ) } };
     const size_t num_def_test = sizeof( default_tests ) / sizeof( default_tests[ 0 ] );
     tests.insert( tests.begin( ), &default_tests[ 0 ], &default_tests[ 0 ] + num_def_test );
-    tests.insert( tests.end( ), default_files_tests[ filename ].begin( ),
-                  default_files_tests[ filename ].end( ) );
+    tests.insert( tests.end( ), default_files_tests[ filename ].begin( ), default_files_tests[ filename ].end( ) );
 
     OrientedBoxTreeTool::TrvStats stats;
 
@@ -1143,16 +1089,14 @@ static bool do_ray_fire_test( OrientedBoxTreeTool& tool, EntityHandle root_set,
         tests[ i ].direction.normalize( );
         if( verbosity > 2 )
         {
-            std::cout << ( 0 == i ? "** Common tests\n"
-                                  : ( num_def_test == i ? "** File-specific tests\n" : "" ) );
-            std::cout << "  " << tests[ i ].description << " " << tests[ i ].point << " "
-                      << tests[ i ].direction << std::endl;
+            std::cout << ( 0 == i ? "** Common tests\n" : ( num_def_test == i ? "** File-specific tests\n" : "" ) );
+            std::cout << "  " << tests[ i ].description << " " << tests[ i ].point << " " << tests[ i ].direction
+                      << std::endl;
         }
 
         int    rit_non_tol_count = 0;
         double rit_non_tol_dist = std::numeric_limits< double >::max( );
-        if( !check_ray_intersect_tris( tool, root_set, tests[ i ], rit_non_tol_count,
-                                       rit_non_tol_dist, stats ) )
+        if( !check_ray_intersect_tris( tool, root_set, tests[ i ], rit_non_tol_count, rit_non_tol_dist, stats ) )
         {
             result = false;
             continue;
@@ -1162,8 +1106,7 @@ static bool do_ray_fire_test( OrientedBoxTreeTool& tool, EntityHandle root_set,
 
         int    ris_non_tol_count = 0;
         double ris_non_tol_dist = std::numeric_limits< double >::max( );
-        if( !check_ray_intersect_sets( tool, root_set, tests[ i ], ris_non_tol_count,
-                                       ris_non_tol_dist, stats ) )
+        if( !check_ray_intersect_sets( tool, root_set, tests[ i ], ris_non_tol_count, ris_non_tol_dist, stats ) )
         {
             result = false;
             continue;
@@ -1181,14 +1124,11 @@ static bool do_ray_fire_test( OrientedBoxTreeTool& tool, EntityHandle root_set,
         else if( rit_non_tol_count && !ris_non_tol_count )
         {
             if( verbosity )
-                std::cout
-                    << "  ray_intersect_sets missed intersection found by ray_intersect_triangles"
-                    << std::endl;
+                std::cout << "  ray_intersect_sets missed intersection found by ray_intersect_triangles" << std::endl;
             result = false;
             continue;
         }
-        else if( rit_non_tol_count && ris_non_tol_count &&
-                 fabs( rit_non_tol_dist - ris_non_tol_dist ) > tolerance )
+        else if( rit_non_tol_count && ris_non_tol_count && fabs( rit_non_tol_dist - ris_non_tol_dist ) > tolerance )
         {
             if( verbosity )
                 std::cout << "  ray_intersect_sets and ray_intersect_triangles did not find same "
@@ -1209,8 +1149,8 @@ static bool do_ray_fire_test( OrientedBoxTreeTool& tool, EntityHandle root_set,
             Range                       leaves;
             std::vector< double >       intersections;
             std::vector< EntityHandle > intersection_facets;
-            rval = tool.ray_intersect_boxes( leaves, root_set, tolerance, rays[ i ].array( ),
-                                             rays[ i + 1 ].array( ), 0, &stats );
+            rval = tool.ray_intersect_boxes( leaves, root_set, tolerance, rays[ i ].array( ), rays[ i + 1 ].array( ), 0,
+                                             &stats );
             if( MB_SUCCESS != rval )
             {
                 std::cout << "FAILED" << std::endl;
@@ -1234,9 +1174,8 @@ static bool do_ray_fire_test( OrientedBoxTreeTool& tool, EntityHandle root_set,
                 if( verbosity ) std::cout << "(Wrote " << name << ") ";
             }
 
-            rval =
-                tool.ray_intersect_triangles( intersections, intersection_facets, leaves, tolerance,
-                                              rays[ i ].array( ), rays[ i + 1 ].array( ), 0 );
+            rval = tool.ray_intersect_triangles( intersections, intersection_facets, leaves, tolerance,
+                                                 rays[ i ].array( ), rays[ i + 1 ].array( ), 0 );
             if( MB_SUCCESS != rval )
             {
                 std::cout << "FAILED" << std::endl;
@@ -1271,15 +1210,12 @@ static bool do_ray_fire_test( OrientedBoxTreeTool& tool, EntityHandle root_set,
 
             OrientedBoxTreeTool::IntersectSearchWindow search_win;
             OrientedBoxTreeTool::IntRegCtxt            int_reg_ctxt;
-            rval = tool.ray_intersect_sets( intersections, surfaces, facets, root_set, tolerance,
-                                            rays[ i ].array( ), rays[ i + 1 ].array( ), search_win,
-                                            int_reg_ctxt, &stats );
+            rval = tool.ray_intersect_sets( intersections, surfaces, facets, root_set, tolerance, rays[ i ].array( ),
+                                            rays[ i + 1 ].array( ), search_win, int_reg_ctxt, &stats );
 
             if( MB_SUCCESS != rval )
             {
-                if( verbosity )
-                    std::cout << "  Call to OrientedBoxTreeTool::ray_intersect_sets failed."
-                              << std::endl;
+                if( verbosity ) std::cout << "  Call to OrientedBoxTreeTool::ray_intersect_sets failed." << std::endl;
                 result = false;
                 continue;
             }
@@ -1294,8 +1230,7 @@ static bool do_ray_fire_test( OrientedBoxTreeTool& tool, EntityHandle root_set,
                 name += num;
                 name += ".vtk";
 
-                tool.get_moab_instance( )->write_mesh( name.c_str( ), &surfaces[ 0 ],
-                                                       surfaces.size( ) );
+                tool.get_moab_instance( )->write_mesh( name.c_str( ), &surfaces[ 0 ], surfaces.size( ) );
                 if( verbosity ) std::cout << "(Wrote " << name << ") ";
             }
 
@@ -1314,8 +1249,7 @@ static bool do_ray_fire_test( OrientedBoxTreeTool& tool, EntityHandle root_set,
 
             Tag                idtag = tool.get_moab_instance( )->globalId_tag( );
             std::vector< int > ids( surfaces.size( ) );
-            rval = tool.get_moab_instance( )->tag_get_data( idtag, &surfaces[ 0 ], surfaces.size( ),
-                                                            &ids[ 0 ] );
+            rval = tool.get_moab_instance( )->tag_get_data( idtag, &surfaces[ 0 ], surfaces.size( ), &ids[ 0 ] );
             if( MB_SUCCESS != rval )
             {
                 std::cout << "NO GLOBAL_ID TAG ON SURFACE." << std::endl;
@@ -1358,8 +1292,7 @@ static ErrorCode save_tree( Interface* instance, const char* filename, EntityHan
     ErrorCode rval;
     Tag       tag;
 
-    rval = instance->tag_get_handle( "OBB_ROOT", 1, MB_TYPE_HANDLE, tag,
-                                     MB_TAG_SPARSE | MB_TAG_CREAT );
+    rval = instance->tag_get_handle( "OBB_ROOT", 1, MB_TYPE_HANDLE, tag, MB_TAG_SPARSE | MB_TAG_CREAT );
     if( MB_SUCCESS != rval ) return rval;
 
     const EntityHandle root = 0;
@@ -1382,8 +1315,8 @@ static ErrorCode tri_coords( Interface* moab, EntityHandle tri, CartVect coords[
     return rval;
 }
 
-static ErrorCode closest_point_in_triangles( Interface* moab, const CartVect& to_pos,
-                                             CartVect& result_pos, EntityHandle& result_tri )
+static ErrorCode closest_point_in_triangles( Interface* moab, const CartVect& to_pos, CartVect& result_pos,
+                                             EntityHandle& result_tri )
 {
     ErrorCode rval;
 
@@ -1430,8 +1363,7 @@ static bool tri_in_set( Interface* moab, EntityHandle set, EntityHandle tri )
     return i != tris.end( );
 }
 
-static bool do_closest_point_test( OrientedBoxTreeTool& tool, EntityHandle root_set,
-                                   bool have_surface_tree )
+static bool do_closest_point_test( OrientedBoxTreeTool& tool, EntityHandle root_set, bool have_surface_tree )
 {
     if( verbosity > 1 ) std::cout << "beginning closest point tests" << std::endl;
 
@@ -1463,8 +1395,7 @@ static bool do_closest_point_test( OrientedBoxTreeTool& tool, EntityHandle root_
     // test each point
     for( int i = 0; i < num_pts; ++i )
     {
-        if( verbosity >= 3 )
-            std::cout << "Evaluating closest point to " << points[ i ] << std::endl;
+        if( verbosity >= 3 ) std::cout << "Evaluating closest point to " << points[ i ] << std::endl;
 
         CartVect     n_result, t_result;
         EntityHandle n_tri = 0, t_tri;
@@ -1479,13 +1410,11 @@ static bool do_closest_point_test( OrientedBoxTreeTool& tool, EntityHandle root_
         }
 
         // find closest point using tree
-        rval = tool.closest_to_location( points[ i ].array( ), root_set, t_result.array( ), t_tri,
-                                         set_ptr, &stats );
+        rval = tool.closest_to_location( points[ i ].array( ), root_set, t_result.array( ), t_tri, set_ptr, &stats );
         if( MB_SUCCESS != rval )
         {
             if( verbosity )
-                std::cout << "OrientedBoxTreeTool:: closest_to_location( " << points[ i ]
-                          << " ) FAILED!" << std::endl;
+                std::cout << "OrientedBoxTreeTool:: closest_to_location( " << points[ i ] << " ) FAILED!" << std::endl;
             result = false;
             continue;
         }
@@ -1494,8 +1423,8 @@ static bool do_closest_point_test( OrientedBoxTreeTool& tool, EntityHandle root_
         if( diff.length( ) > tolerance )
         {
             if( verbosity )
-                std::cout << "Closest point to " << points[ i ] << " INCORRECT! (" << t_result
-                          << " != " << n_result << ")" << std::endl;
+                std::cout << "Closest point to " << points[ i ] << " INCORRECT! (" << t_result << " != " << n_result
+                          << ")" << std::endl;
             result = false;
             continue;
         }
@@ -1517,8 +1446,8 @@ static bool do_closest_point_test( OrientedBoxTreeTool& tool, EntityHandle root_
             if( ( diff1 % diff1 ) > tolerance )
             {
                 if( verbosity )
-                    std::cout << "Triangle closest to " << points[ i ] << " INCORRECT! (" << t_tri
-                              << " != " << n_tri << ")" << std::endl;
+                    std::cout << "Triangle closest to " << points[ i ] << " INCORRECT! (" << t_tri << " != " << n_tri
+                              << ")" << std::endl;
                 result = false;
                 continue;
             }
@@ -1526,8 +1455,7 @@ static bool do_closest_point_test( OrientedBoxTreeTool& tool, EntityHandle root_
 
         if( set_ptr && !tri_in_set( moab, *set_ptr, t_tri ) )
         {
-            if( verbosity )
-                std::cout << "Surface closest to " << points[ i ] << " INCORRECT!" << std::endl;
+            if( verbosity ) std::cout << "Surface closest to " << points[ i ] << " INCORRECT!" << std::endl;
             result = false;
             continue;
         }

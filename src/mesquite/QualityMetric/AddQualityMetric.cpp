@@ -41,8 +41,7 @@ namespace MBMesquite
 AddQualityMetric::AddQualityMetric( QualityMetric* qm1, QualityMetric* qm2, MsqError& err )
     : metric1( *qm1 ), metric2( *qm2 )
 {
-    if( qm1->get_metric_type( ) != qm2->get_metric_type( ) ||
-        qm1->get_negate_flag( ) != qm2->get_negate_flag( ) )
+    if( qm1->get_metric_type( ) != qm2->get_metric_type( ) || qm1->get_negate_flag( ) != qm2->get_negate_flag( ) )
     { MSQ_SETERR( err )( "Incompatible metrics", MsqError::INVALID_ARG ); }
 }
 
@@ -63,13 +62,11 @@ int AddQualityMetric::get_negate_flag( ) const
     return metric1.get_negate_flag( );
 }
 
-void AddQualityMetric::get_evaluations( PatchData& pd, std::vector< size_t >& handles,
-                                        bool free_only, MsqError& err )
+void AddQualityMetric::get_evaluations( PatchData& pd, std::vector< size_t >& handles, bool free_only, MsqError& err )
 {
     metric1.get_evaluations( pd, handles, free_only, err );MSQ_ERRRTN( err );
     metric2.get_evaluations( pd, mHandles, free_only, err );MSQ_ERRRTN( err );
-    if( handles != mHandles )
-    { MSQ_SETERR( err )( "Incompatible metrics", MsqError::INVALID_STATE ); }
+    if( handles != mHandles ) { MSQ_SETERR( err )( "Incompatible metrics", MsqError::INVALID_STATE ); }
 }
 
 bool AddQualityMetric::evaluate( PatchData& pd, size_t handle, double& value, MsqError& err )
@@ -105,8 +102,8 @@ bool AddQualityMetric::evaluate_with_indices( PatchData& pd, size_t handle, doub
 }
 
 bool AddQualityMetric::evaluate_with_gradient( PatchData& pd, size_t handle, double& value,
-                                               std::vector< size_t >&   indices,
-                                               std::vector< Vector3D >& gradient, MsqError& err )
+                                               std::vector< size_t >& indices, std::vector< Vector3D >& gradient,
+                                               MsqError& err )
 {
     std::vector< size_t >::iterator i;
     size_t                          j;
@@ -143,8 +140,7 @@ bool AddQualityMetric::evaluate_with_gradient( PatchData& pd, size_t handle, dou
 }
 
 bool AddQualityMetric::evaluate_with_Hessian( PatchData& pd, size_t handle, double& value,
-                                              std::vector< size_t >&   indices,
-                                              std::vector< Vector3D >& gradient,
+                                              std::vector< size_t >& indices, std::vector< Vector3D >& gradient,
                                               std::vector< Matrix3D >& Hessian, MsqError& err )
 {
     std::vector< size_t >::iterator i;

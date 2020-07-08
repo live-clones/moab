@@ -62,20 +62,19 @@ const double DEF_SUC_EPS = 1e-4;
   norm termination criteria.  The default value is 1.e-6.*/
 ShapeImprovementWrapper::ShapeImprovementWrapper( MsqError&, double cpu_time, double grad_norm,
                                                   int parallel_iterations )
-    : maxTime( cpu_time ), gradNorm( grad_norm ), untBeta( DEF_UNT_BETA ),
-      successiveEps( DEF_SUC_EPS ), parallelIterations( parallel_iterations )
+    : maxTime( cpu_time ), gradNorm( grad_norm ), untBeta( DEF_UNT_BETA ), successiveEps( DEF_SUC_EPS ),
+      parallelIterations( parallel_iterations )
 {
 }
 
-ShapeImprovementWrapper::ShapeImprovementWrapper( double cpu_time, double grad_norm,
-                                                  int parallel_iterations )
-    : maxTime( cpu_time ), gradNorm( grad_norm ), untBeta( DEF_UNT_BETA ),
-      successiveEps( DEF_SUC_EPS ), parallelIterations( parallel_iterations )
+ShapeImprovementWrapper::ShapeImprovementWrapper( double cpu_time, double grad_norm, int parallel_iterations )
+    : maxTime( cpu_time ), gradNorm( grad_norm ), untBeta( DEF_UNT_BETA ), successiveEps( DEF_SUC_EPS ),
+      parallelIterations( parallel_iterations )
 {
 }
 
-void ShapeImprovementWrapper::run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh,
-                                           Settings* settings, QualityAssessor* qa, MsqError& err )
+void ShapeImprovementWrapper::run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh, Settings* settings,
+                                           QualityAssessor* qa, MsqError& err )
 {
     // Define an untangler
     UntangleBetaQualityMetric untangle_metric( untBeta );
@@ -119,8 +118,7 @@ void ShapeImprovementWrapper::run_wrapper( MeshDomainAssoc* mesh_and_domain, Par
         double remaining = maxTime - totalTimer.since_birth( );
         if( remaining <= 0.0 )
         {
-            MSQ_DBGOUT( 2 ) << "Optimization is terminating without perfoming shape improvement."
-                            << std::endl;
+            MSQ_DBGOUT( 2 ) << "Optimization is terminating without perfoming shape improvement." << std::endl;
             remaining = 0.0;
         }
         term_inner.add_cpu_time( remaining );

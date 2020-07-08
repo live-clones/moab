@@ -61,12 +61,10 @@ typedef std::vector< Mesh::ElementHandle > elem_vec_t;
 
 // Assume mesh is on a sphere of radius 10 with an axis equal to Z.
 // Return elements near poles and elements near equator.
-void find_z10_extreme_elements( Mesh& mesh, elem_vec_t& polar_elems, elem_vec_t& equatorial_elems,
-                                MsqError& err );
+void find_z10_extreme_elements( Mesh& mesh, elem_vec_t& polar_elems, elem_vec_t& equatorial_elems, MsqError& err );
 
 // Get areas of quads and tris
-void elem_areas( Mesh& mesh, const elem_vec_t& elems, double& min, double& mean, double& max,
-                 MsqError& err );
+void elem_areas( Mesh& mesh, const elem_vec_t& elems, double& min, double& mean, double& max, MsqError& err );
 
 int main( int argc, char* argv[] )
 {
@@ -139,26 +137,20 @@ int main( int argc, char* argv[] )
     std::printf( "\n\n" );
     std::printf( "AREAS:      Initial     Final       Difference  Change\n" );
     std::printf( "Polar:\n" );
-    std::printf( "  Minimum:  %10f  %10f  %10f  %10f%%\n", pol_min, pol2_min,
-                 fabs( pol_min - pol2_min ), pol_min_pct );
-    std::printf( "  Average:  %10f  %10f  %10f  %10f%%\n", pol_mean, pol2_mean,
-                 fabs( pol_mean - pol2_mean ), pol_mean_pct );
-    std::printf( "  Maximum:  %10f  %10f  %10f  %10f%%\n", pol_max, pol2_max,
-                 fabs( pol_max - pol2_max ), pol_max_pct );
+    std::printf( "  Minimum:  %10f  %10f  %10f  %10f%%\n", pol_min, pol2_min, fabs( pol_min - pol2_min ), pol_min_pct );
+    std::printf( "  Average:  %10f  %10f  %10f  %10f%%\n", pol_mean, pol2_mean, fabs( pol_mean - pol2_mean ),
+                 pol_mean_pct );
+    std::printf( "  Maximum:  %10f  %10f  %10f  %10f%%\n", pol_max, pol2_max, fabs( pol_max - pol2_max ), pol_max_pct );
     std::printf( "Equatorial:\n" );
-    std::printf( "  Minimum:  %10f  %10f  %10f  %10f%%\n", eq_min, eq2_min,
-                 fabs( eq_min - eq2_min ), eq_min_pct );
-    std::printf( "  Average:  %10f  %10f  %10f  %10f%%\n", eq_mean, eq2_mean,
-                 fabs( eq_mean - eq2_mean ), eq_mean_pct );
-    std::printf( "  Maximum:  %10f  %10f  %10f  %10f%%\n", eq_max, eq2_max,
-                 fabs( eq_max - eq2_max ), eq_max_pct );
+    std::printf( "  Minimum:  %10f  %10f  %10f  %10f%%\n", eq_min, eq2_min, fabs( eq_min - eq2_min ), eq_min_pct );
+    std::printf( "  Average:  %10f  %10f  %10f  %10f%%\n", eq_mean, eq2_mean, fabs( eq_mean - eq2_mean ), eq_mean_pct );
+    std::printf( "  Maximum:  %10f  %10f  %10f  %10f%%\n", eq_max, eq2_max, fabs( eq_max - eq2_max ), eq_max_pct );
 
     bool success = pol_min_pct < 6.0 && pol_max_pct < 6.5 && eq_min_pct < 25.0 && eq_max_pct < 6.5;
     return !success;
 }
 
-void find_z10_extreme_elements( Mesh& mesh, elem_vec_t& polar_elems, elem_vec_t& equatorial_elems,
-                                MsqError& err )
+void find_z10_extreme_elements( Mesh& mesh, elem_vec_t& polar_elems, elem_vec_t& equatorial_elems, MsqError& err )
 {
     elem_vec_t elems;
     mesh.get_all_elements( elems, err );MSQ_ERRRTN( err );
@@ -191,8 +183,7 @@ void find_z10_extreme_elements( Mesh& mesh, elem_vec_t& polar_elems, elem_vec_t&
     }
 }
 
-void elem_areas( Mesh& mesh, const elem_vec_t& elems, double& min, double& mean, double& max,
-                 MsqError& err )
+void elem_areas( Mesh& mesh, const elem_vec_t& elems, double& min, double& mean, double& max, MsqError& err )
 {
     min = HUGE_VAL;
     max = -1;

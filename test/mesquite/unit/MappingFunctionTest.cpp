@@ -95,8 +95,8 @@ void MappingFunctionTest::test_jacobian_2d( )
             int n = ( d == 2 ) ? 1 : 3;
             for( int s = 0; s < n; ++s )
             {
-                tri.MappingFunction2D::jacobian( pd, 0, NodeSet( ), Sample( d, s ), indices_act,
-                                                 coeff_act, num_act, J_act, err );
+                tri.MappingFunction2D::jacobian( pd, 0, NodeSet( ), Sample( d, s ), indices_act, coeff_act, num_act,
+                                                 J_act, err );
                 ASSERT_NO_ERROR( err );
                 CPPUNIT_ASSERT( num_act <= 3 );
                 CPPUNIT_ASSERT( num_act > 0 );
@@ -113,8 +113,7 @@ void MappingFunctionTest::test_jacobian_2d( )
                     CPPUNIT_ASSERT( k < num_act );  // found
                     ASSERT_MATRICES_EQUAL( coeff_exp[ j ], coeff_act[ k ], 1e-10 );
 
-                    J_exp += MsqVector< 3 >( pd.vertex_by_index( idx ).to_array( ) ) *
-                             transpose( coeff_exp[ j ] );
+                    J_exp += MsqVector< 3 >( pd.vertex_by_index( idx ).to_array( ) ) * transpose( coeff_exp[ j ] );
                 }
 
                 ASSERT_MATRICES_EQUAL( J_exp, J_act, 1e-6 );
@@ -129,8 +128,7 @@ void MappingFunctionTest::test_jacobian_3d( )
     PatchData    pd;
     const size_t conn[ 4 ] = { 0, 1, 2, 3 };
     const bool   fixed[ 4 ] = { false, false, false, false };
-    const double coords[ 4 ][ 3 ] = {
-        { 0.5, 0.5, 0.0 }, { 2.0, 0.2, 0.0 }, { 0.7, 0.8, 0.0 }, { 0.6, 1.1, 13. } };
+    const double coords[ 4 ][ 3 ] = { { 0.5, 0.5, 0.0 }, { 2.0, 0.2, 0.0 }, { 0.7, 0.8, 0.0 }, { 0.6, 1.1, 13. } };
 
     size_t            indices_exp[ 4 ], indices_act[ 4 ], num_exp, num_act;
     MsqVector< 3 >    coeff_exp[ 4 ], coeff_act[ 4 ];
@@ -157,8 +155,8 @@ void MappingFunctionTest::test_jacobian_3d( )
             int n = ( d == 3 ) ? 1 : ( d == 1 ) ? 6 : 4;
             for( int s = 0; s < n; ++s )
             {
-                tet.MappingFunction3D::jacobian( pd, 0, NodeSet( ), Sample( d, s ), indices_act,
-                                                 coeff_act, num_act, J_act, err );
+                tet.MappingFunction3D::jacobian( pd, 0, NodeSet( ), Sample( d, s ), indices_act, coeff_act, num_act,
+                                                 J_act, err );
                 ASSERT_NO_ERROR( err );
                 CPPUNIT_ASSERT( num_act <= 4 );
                 CPPUNIT_ASSERT( num_act > 0 );
@@ -175,8 +173,7 @@ void MappingFunctionTest::test_jacobian_3d( )
                     CPPUNIT_ASSERT( k < num_act );  // found
                     ASSERT_MATRICES_EQUAL( coeff_exp[ j ], coeff_act[ k ], 1e-10 );
 
-                    J_exp += MsqVector< 3 >( pd.vertex_by_index( idx ).to_array( ) ) *
-                             transpose( coeff_exp[ j ] );
+                    J_exp += MsqVector< 3 >( pd.vertex_by_index( idx ).to_array( ) ) * transpose( coeff_exp[ j ] );
                 }
 
                 ASSERT_MATRICES_EQUAL( J_exp, J_act, 1e-6 );

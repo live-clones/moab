@@ -65,8 +65,7 @@ int main( )
 
     // Create the mesh:
     moab::ScdBox* scdbox = NULL;
-    rval = scdint->construct_box( moab::HomCoord( 0, 0, 0 ), moab::HomCoord( NI, NJ, 0 ), NULL, 0,
-                                  scdbox );MB_CHK_SET_ERR( rval, "scdint->construct_box failed" );
+    rval = scdint->construct_box( moab::HomCoord( 0, 0, 0 ), moab::HomCoord( NI, NJ, 0 ), NULL, 0, scdbox );MB_CHK_SET_ERR( rval, "scdint->construct_box failed" );
 
     // MOAB knows to make quads instead of hexes because the last start
     // and end indexes are the same (0). Note that it is still a "3D"
@@ -120,8 +119,8 @@ int main( )
 
     moab::Tag vel_tag;
     double    vel_default_value[ 2 ] = { 0.0, 0.0 };
-    rval = mbint.tag_get_handle( "velocity", 2, moab::MB_TYPE_DOUBLE, vel_tag,
-                                 moab::MB_TAG_DENSE | moab::MB_TAG_CREAT, vel_default_value );MB_CHK_SET_ERR( rval, "mbint.tag_get_handle(velocity) failed" );
+    rval = mbint.tag_get_handle( "velocity", 2, moab::MB_TYPE_DOUBLE, vel_tag, moab::MB_TAG_DENSE | moab::MB_TAG_CREAT,
+                                 vel_default_value );MB_CHK_SET_ERR( rval, "mbint.tag_get_handle(velocity) failed" );
 
     // Note that when we created each tag, we specified two flags:
     //

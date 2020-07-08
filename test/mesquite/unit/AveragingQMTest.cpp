@@ -120,18 +120,18 @@ class AveragingQMTest : public CppUnit::TestFixture
 
     void check_average_gradient_fails( QualityMetric::AveragingMethod scheme );
 
-    void check_pmean_hessian_diagonals( QualityMetric::AveragingMethod scheme, double inner_power,
-                                        double outer_power, bool scale );
+    void check_pmean_hessian_diagonals( QualityMetric::AveragingMethod scheme, double inner_power, double outer_power,
+                                        bool scale );
 
     void check_hessian_diagonal_fails( QualityMetric::AveragingMethod scheme );
 
-    void check_pmean_hessian( QualityMetric::AveragingMethod scheme, double inner_power,
-                              double outer_power, bool scale );
+    void check_pmean_hessian( QualityMetric::AveragingMethod scheme, double inner_power, double outer_power,
+                              bool scale );
 
     void check_hessian_fails( QualityMetric::AveragingMethod scheme );
 
-    void check_average_and_weights( const double* vals, unsigned n,
-                                    QualityMetric::AveragingMethod method, const double* weights );
+    void check_average_and_weights( const double* vals, unsigned n, QualityMetric::AveragingMethod method,
+                                    const double* weights );
 
   public:
     void test_average_metrics_liner( );
@@ -490,9 +490,8 @@ void AveragingQMTest::test_average_metrics_sum_of_ratios_squared( )
     CPPUNIT_ASSERT_DOUBLES_EQUAL( exp, act, 1e-8 );
 }
 
-void AveragingQMTest::check_average_and_weights( const double* vals, unsigned n,
-                                                 QualityMetric::AveragingMethod method,
-                                                 const double*                  weights )
+void AveragingQMTest::check_average_and_weights( const double* vals, unsigned n, QualityMetric::AveragingMethod method,
+                                                 const double* weights )
 {
     MsqPrintError err( std::cout );
     AveragingQM   aqm( method );
@@ -514,8 +513,7 @@ void AveragingQMTest::check_average_and_weights( const double* vals, unsigned n,
 
 void AveragingQMTest::test_average_and_weights_linear( )
 {
-    std::vector< double > weights1( LEN_LIST_1, 1.0 / LEN_LIST_1 ),
-        weights2( LEN_LIST_2, 1.0 / LEN_LIST_2 );
+    std::vector< double > weights1( LEN_LIST_1, 1.0 / LEN_LIST_1 ), weights2( LEN_LIST_2, 1.0 / LEN_LIST_2 );
     check_average_and_weights( VAL_LIST_1, LEN_LIST_1, QualityMetric::LINEAR, arrptr( weights1 ) );
     check_average_and_weights( VAL_LIST_2, LEN_LIST_2, QualityMetric::LINEAR, arrptr( weights2 ) );
 }
@@ -600,8 +598,7 @@ void AveragingQMTest::test_average_and_weights_harmonic( )
         tmp = h / VAL_LIST_1[ i ];
         weights1[ i ] = tmp * tmp / LEN_LIST_1;
     }
-    check_average_and_weights( VAL_LIST_1, LEN_LIST_1, QualityMetric::HARMONIC,
-                               arrptr( weights1 ) );
+    check_average_and_weights( VAL_LIST_1, LEN_LIST_1, QualityMetric::HARMONIC, arrptr( weights1 ) );
 
     h = pmean( VAL_LIST_2, LEN_LIST_2, -1.0 );
     for( i = 0; i < LEN_LIST_2; ++i )
@@ -609,8 +606,7 @@ void AveragingQMTest::test_average_and_weights_harmonic( )
         tmp = h / VAL_LIST_2[ i ];
         weights2[ i ] = tmp * tmp / LEN_LIST_2;
     }
-    check_average_and_weights( VAL_LIST_2, LEN_LIST_2, QualityMetric::HARMONIC,
-                               arrptr( weights2 ) );
+    check_average_and_weights( VAL_LIST_2, LEN_LIST_2, QualityMetric::HARMONIC, arrptr( weights2 ) );
 }
 
 void AveragingQMTest::test_average_and_weights_geometric( )
@@ -624,16 +620,14 @@ void AveragingQMTest::test_average_and_weights_geometric( )
     {
         weights1[ i ] = g / VAL_LIST_1[ i ] / LEN_LIST_1;
     }
-    check_average_and_weights( VAL_LIST_1, LEN_LIST_1, QualityMetric::GEOMETRIC,
-                               arrptr( weights1 ) );
+    check_average_and_weights( VAL_LIST_1, LEN_LIST_1, QualityMetric::GEOMETRIC, arrptr( weights1 ) );
 
     g = geometric_mean( VAL_LIST_2, LEN_LIST_2 );
     for( i = 0; i < LEN_LIST_2; ++i )
     {
         weights2[ i ] = g / VAL_LIST_2[ i ] / LEN_LIST_2;
     }
-    check_average_and_weights( VAL_LIST_2, LEN_LIST_2, QualityMetric::GEOMETRIC,
-                               arrptr( weights2 ) );
+    check_average_and_weights( VAL_LIST_2, LEN_LIST_2, QualityMetric::GEOMETRIC, arrptr( weights2 ) );
 }
 
 void AveragingQMTest::test_average_and_weights_sum( )
@@ -650,13 +644,11 @@ void AveragingQMTest::test_average_and_weights_sum_squared( )
 
     for( i = 0; i < LEN_LIST_1; ++i )
         weights1[ i ] = 2 * VAL_LIST_1[ i ];
-    check_average_and_weights( VAL_LIST_1, LEN_LIST_1, QualityMetric::SUM_SQUARED,
-                               arrptr( weights1 ) );
+    check_average_and_weights( VAL_LIST_1, LEN_LIST_1, QualityMetric::SUM_SQUARED, arrptr( weights1 ) );
 
     for( i = 0; i < LEN_LIST_2; ++i )
         weights2[ i ] = 2 * VAL_LIST_2[ i ];
-    check_average_and_weights( VAL_LIST_2, LEN_LIST_2, QualityMetric::SUM_SQUARED,
-                               arrptr( weights2 ) );
+    check_average_and_weights( VAL_LIST_2, LEN_LIST_2, QualityMetric::SUM_SQUARED, arrptr( weights2 ) );
 }
 
 void AveragingQMTest::check_average_and_weights_fails( QualityMetric::AveragingMethod scheme )
@@ -704,8 +696,7 @@ void AveragingQMTest::check_average_gradients( QualityMetric::AveragingMethod sc
     double a1 = aqm.average_metric_and_weights( vals1, 4, err );
     ASSERT_NO_ERROR( err );
 
-    double a2 =
-        aqm.average_corner_gradients( QUADRILATERAL, fixed, 4, vals2, grads, vtxgrads, err );
+    double a2 = aqm.average_corner_gradients( QUADRILATERAL, fixed, 4, vals2, grads, vtxgrads, err );
     ASSERT_NO_ERROR( err );
 
     CPPUNIT_ASSERT_DOUBLES_EQUAL( a1, a2, 1e-8 );
@@ -799,9 +790,8 @@ void AveragingQMTest::test_average_corner_gradients_sum_of_ratios_squared( )
     check_average_gradient_fails( QualityMetric::SUM_OF_RATIOS_SQUARED );
 }
 
-static double pmean_of_triangle_corner_hessians( double inner_power, double outer_power,
-                                                 const double* v, const Vector3D* cg,
-                                                 const Matrix3D* ch, Vector3D* tg, Matrix3D* th,
+static double pmean_of_triangle_corner_hessians( double inner_power, double outer_power, const double* v,
+                                                 const Vector3D* cg, const Matrix3D* ch, Vector3D* tg, Matrix3D* th,
                                                  bool scale )
 {
     Matrix3D op;
@@ -858,9 +848,8 @@ static double pmean_of_triangle_corner_hessians( double inner_power, double oute
     return m;
 }
 
-void AveragingQMTest::check_pmean_hessian_diagonals( QualityMetric::AveragingMethod scheme,
-                                                     double inner_power, double outer_power,
-                                                     bool scale )
+void AveragingQMTest::check_pmean_hessian_diagonals( QualityMetric::AveragingMethod scheme, double inner_power,
+                                                     double outer_power, bool scale )
 {
     MsqPrintError err( std::cout );
     AveragingQM   aqm( scheme );
@@ -871,11 +860,10 @@ void AveragingQMTest::check_pmean_hessian_diagonals( QualityMetric::AveragingMet
     const Vector3D grads[ 9 ] = { Vector3D( 0, 1, 1 ), Vector3D( 0, 2, 2 ), Vector3D( 0, 3, 3 ),
                                   Vector3D( 0, 4, 4 ), Vector3D( 0, 5, 5 ), Vector3D( 0, 6, 6 ),
                                   Vector3D( 0, 7, 7 ), Vector3D( 0, 8, 8 ), Vector3D( 0, 9, 9 ) };
-    Matrix3D hesss[ 18 ] = { Matrix3D( 1.0 ), Matrix3D( 2.0 ),  Matrix3D( -1. ), Matrix3D( 0.5 ),
-                             Matrix3D( 6.0 ), Matrix3D( 1.1 ),  Matrix3D( 1.2 ), Matrix3D( 0.3 ),
-                             Matrix3D( 0.0 ), Matrix3D( 22. ),  Matrix3D( -2. ), Matrix3D( 4.3 ),
-                             Matrix3D( 0.8 ), Matrix3D( 1, 7 ), Matrix3D( -.2 ), Matrix3D( 0.5 ),
-                             Matrix3D( 7.0 ), Matrix3D( 1.5 ) };
+    Matrix3D       hesss[ 18 ] = { Matrix3D( 1.0 ), Matrix3D( 2.0 ), Matrix3D( -1. ), Matrix3D( 0.5 ),  Matrix3D( 6.0 ),
+                             Matrix3D( 1.1 ), Matrix3D( 1.2 ), Matrix3D( 0.3 ), Matrix3D( 0.0 ),  Matrix3D( 22. ),
+                             Matrix3D( -2. ), Matrix3D( 4.3 ), Matrix3D( 0.8 ), Matrix3D( 1, 7 ), Matrix3D( -.2 ),
+                             Matrix3D( 0.5 ), Matrix3D( 7.0 ), Matrix3D( 1.5 ) };
     // change some values so we catch transpositional errors
     for( unsigned i = 0; i < sizeof( hesss ) / sizeof( hesss[ 0 ] ); ++i )
         hesss[ i ][ 2 ][ 2 ] = 0.0;
@@ -884,13 +872,12 @@ void AveragingQMTest::check_pmean_hessian_diagonals( QualityMetric::AveragingMet
     Vector3D aqm_grad[ 3 ], exp_grad[ 3 ];
     Matrix3D exp_hess[ 6 ];
     double   aqm_avg, exp_avg;
-    exp_avg = pmean_of_triangle_corner_hessians( inner_power, outer_power, vals, grads, hesss,
-                                                 exp_grad, exp_hess, scale );
+    exp_avg =
+        pmean_of_triangle_corner_hessians( inner_power, outer_power, vals, grads, hesss, exp_grad, exp_hess, scale );
 
     // Test calculation of diagonal from full corner hessian data.
     SymMatrix3D aqm_hess[ 3 ] = { 1, 2, 3 };
-    aqm_avg = aqm.average_corner_hessian_diagonals( TRIANGLE, fixed, 3, vals, grads, hesss,
-                                                    aqm_grad, aqm_hess, err );
+    aqm_avg = aqm.average_corner_hessian_diagonals( TRIANGLE, fixed, 3, vals, grads, hesss, aqm_grad, aqm_hess, err );
     ASSERT_NO_ERROR( err );
 
     CPPUNIT_ASSERT_DOUBLES_EQUAL( exp_avg, aqm_avg, 1e-6 );
@@ -907,8 +894,7 @@ void AveragingQMTest::check_pmean_hessian_diagonals( QualityMetric::AveragingMet
     SymMatrix3D diags[ 9 ] = { hesss[ 0 ].upper( ),  hesss[ 3 ].upper( ),  hesss[ 5 ].upper( ),
                                hesss[ 6 ].upper( ),  hesss[ 9 ].upper( ),  hesss[ 11 ].upper( ),
                                hesss[ 12 ].upper( ), hesss[ 15 ].upper( ), hesss[ 17 ].upper( ) };
-    aqm_avg = aqm.average_corner_hessian_diagonals( TRIANGLE, fixed, 3, vals, grads, diags,
-                                                    aqm_grad, aqm_hess, err );
+    aqm_avg = aqm.average_corner_hessian_diagonals( TRIANGLE, fixed, 3, vals, grads, diags, aqm_grad, aqm_hess, err );
     ASSERT_NO_ERROR( err );
 
     CPPUNIT_ASSERT_DOUBLES_EQUAL( exp_avg, aqm_avg, 1e-6 );
@@ -926,14 +912,12 @@ void AveragingQMTest::check_hessian_diagonal_fails( QualityMetric::AveragingMeth
 {
     // define corner values, gradients and Hessians for a triangle
     double         vals[] = { 1, 2, 0.5 };
-    const Vector3D grads[ 9 ] = { Vector3D( 1.0 ), Vector3D( 2.0 ), Vector3D( 3.0 ),
-                                  Vector3D( 4.0 ), Vector3D( 5.0 ), Vector3D( 6.0 ),
-                                  Vector3D( 7.0 ), Vector3D( 8.0 ), Vector3D( 9.0 ) };
-    const Matrix3D hesss[ 18 ] = {
-        Matrix3D( 1.0 ), Matrix3D( 2.0 ), Matrix3D( -1. ), Matrix3D( 0.5 ),  Matrix3D( 6.0 ),
-        Matrix3D( 1.1 ), Matrix3D( 1.2 ), Matrix3D( 0.3 ), Matrix3D( 0.0 ),  Matrix3D( 22. ),
-        Matrix3D( -2. ), Matrix3D( 4.3 ), Matrix3D( 0.8 ), Matrix3D( 1, 7 ), Matrix3D( -.2 ),
-        Matrix3D( 0.5 ), Matrix3D( 7.0 ), Matrix3D( 1.5 ) };
+    const Vector3D grads[ 9 ] = { Vector3D( 1.0 ), Vector3D( 2.0 ), Vector3D( 3.0 ), Vector3D( 4.0 ), Vector3D( 5.0 ),
+                                  Vector3D( 6.0 ), Vector3D( 7.0 ), Vector3D( 8.0 ), Vector3D( 9.0 ) };
+    const Matrix3D hesss[ 18 ] = { Matrix3D( 1.0 ), Matrix3D( 2.0 ), Matrix3D( -1. ), Matrix3D( 0.5 ),  Matrix3D( 6.0 ),
+                                   Matrix3D( 1.1 ), Matrix3D( 1.2 ), Matrix3D( 0.3 ), Matrix3D( 0.0 ),  Matrix3D( 22. ),
+                                   Matrix3D( -2. ), Matrix3D( 4.3 ), Matrix3D( 0.8 ), Matrix3D( 1, 7 ), Matrix3D( -.2 ),
+                                   Matrix3D( 0.5 ), Matrix3D( 7.0 ), Matrix3D( 1.5 ) };
 
     Vector3D    vtx_grad[ 3 ];
     SymMatrix3D vtx_hess[ 6 ];
@@ -941,16 +925,14 @@ void AveragingQMTest::check_hessian_diagonal_fails( QualityMetric::AveragingMeth
     AveragingQM aqm( scheme );
     uint32_t    fixed = 0x4;  // mark third vertex as fixed
 
-    aqm.average_corner_hessian_diagonals( TRIANGLE, fixed, 3, vals, grads, hesss, vtx_grad,
-                                          vtx_hess, err );
+    aqm.average_corner_hessian_diagonals( TRIANGLE, fixed, 3, vals, grads, hesss, vtx_grad, vtx_hess, err );
     CPPUNIT_ASSERT( err );
 
     const SymMatrix3D diags[ 9 ] = { SymMatrix3D( 1.0 ), SymMatrix3D( 0.5 ), SymMatrix3D( 1.0 ),
                                      SymMatrix3D( 1.2 ), SymMatrix3D( 22. ), SymMatrix3D( 4.3 ),
                                      SymMatrix3D( 0.8 ), SymMatrix3D( 0.5 ), SymMatrix3D( 1.5 ) };
 
-    aqm.average_corner_hessian_diagonals( TRIANGLE, fixed, 3, vals, grads, diags, vtx_grad,
-                                          vtx_hess, err );
+    aqm.average_corner_hessian_diagonals( TRIANGLE, fixed, 3, vals, grads, diags, vtx_grad, vtx_hess, err );
     CPPUNIT_ASSERT( err );
 }
 
@@ -1019,19 +1001,18 @@ void AveragingQMTest::test_average_corner_hessian_diagonals_sum_of_ratios_square
     check_hessian_diagonal_fails( QualityMetric::SUM_OF_RATIOS_SQUARED );
 }
 
-void AveragingQMTest::check_pmean_hessian( QualityMetric::AveragingMethod scheme,
-                                           double inner_power, double outer_power, bool scale )
+void AveragingQMTest::check_pmean_hessian( QualityMetric::AveragingMethod scheme, double inner_power,
+                                           double outer_power, bool scale )
 {
     // define corner values, gradients and Hessians for a triangle
     double         vals[] = { 1, 2, 0.5 };
     const Vector3D grads[ 9 ] = { Vector3D( 0, 1, 1 ), Vector3D( 0, 2, 2 ), Vector3D( 0, 3, 3 ),
                                   Vector3D( 0, 4, 4 ), Vector3D( 0, 5, 5 ), Vector3D( 0, 6, 6 ),
                                   Vector3D( 0, 7, 7 ), Vector3D( 0, 8, 8 ), Vector3D( 0, 9, 9 ) };
-    Matrix3D hesss[ 18 ] = { Matrix3D( 1.0 ), Matrix3D( 2.0 ),  Matrix3D( -1. ), Matrix3D( 0.5 ),
-                             Matrix3D( 6.0 ), Matrix3D( 1.1 ),  Matrix3D( 1.2 ), Matrix3D( 0.3 ),
-                             Matrix3D( 0.0 ), Matrix3D( 22. ),  Matrix3D( -2. ), Matrix3D( 4.3 ),
-                             Matrix3D( 0.8 ), Matrix3D( 1, 7 ), Matrix3D( -.2 ), Matrix3D( 0.5 ),
-                             Matrix3D( 7.0 ), Matrix3D( 1.5 ) };
+    Matrix3D       hesss[ 18 ] = { Matrix3D( 1.0 ), Matrix3D( 2.0 ), Matrix3D( -1. ), Matrix3D( 0.5 ),  Matrix3D( 6.0 ),
+                             Matrix3D( 1.1 ), Matrix3D( 1.2 ), Matrix3D( 0.3 ), Matrix3D( 0.0 ),  Matrix3D( 22. ),
+                             Matrix3D( -2. ), Matrix3D( 4.3 ), Matrix3D( 0.8 ), Matrix3D( 1, 7 ), Matrix3D( -.2 ),
+                             Matrix3D( 0.5 ), Matrix3D( 7.0 ), Matrix3D( 1.5 ) };
     // change some values so we catch transpositional errors
     for( unsigned i = 0; i < sizeof( hesss ) / sizeof( hesss[ 0 ] ); ++i )
         hesss[ i ][ 2 ][ 2 ] = 0.0;
@@ -1044,11 +1025,10 @@ void AveragingQMTest::check_pmean_hessian( QualityMetric::AveragingMethod scheme
     uint32_t      fixed = 0x4;  // mark third vertex as fixed
     double        aqm_avg, exp_avg;
 
-    exp_avg = pmean_of_triangle_corner_hessians( inner_power, outer_power, vals, grads, hesss,
-                                                 exp_grad, exp_hess, scale );
+    exp_avg =
+        pmean_of_triangle_corner_hessians( inner_power, outer_power, vals, grads, hesss, exp_grad, exp_hess, scale );
 
-    aqm_avg = aqm.average_corner_hessians( TRIANGLE, fixed, 3, vals, grads, hesss, aqm_grad,
-                                           aqm_hess, err );
+    aqm_avg = aqm.average_corner_hessians( TRIANGLE, fixed, 3, vals, grads, hesss, aqm_grad, aqm_hess, err );
     ASSERT_NO_ERROR( err );
 
     CPPUNIT_ASSERT_DOUBLES_EQUAL( exp_avg, aqm_avg, 1e-6 );
@@ -1067,14 +1047,12 @@ void AveragingQMTest::check_hessian_fails( QualityMetric::AveragingMethod scheme
 {
     // define corner values, gradients and Hessians for a triangle
     double         vals[] = { 1, 2, 0.5 };
-    const Vector3D grads[ 9 ] = { Vector3D( 1.0 ), Vector3D( 2.0 ), Vector3D( 3.0 ),
-                                  Vector3D( 4.0 ), Vector3D( 5.0 ), Vector3D( 6.0 ),
-                                  Vector3D( 7.0 ), Vector3D( 8.0 ), Vector3D( 9.0 ) };
-    const Matrix3D hesss[ 18 ] = {
-        Matrix3D( 1.0 ), Matrix3D( 2.0 ), Matrix3D( -1. ), Matrix3D( 0.5 ),  Matrix3D( 6.0 ),
-        Matrix3D( 1.1 ), Matrix3D( 1.2 ), Matrix3D( 0.3 ), Matrix3D( 0.0 ),  Matrix3D( 22. ),
-        Matrix3D( -2. ), Matrix3D( 4.3 ), Matrix3D( 0.8 ), Matrix3D( 1, 7 ), Matrix3D( -.2 ),
-        Matrix3D( 0.5 ), Matrix3D( 7.0 ), Matrix3D( 1.5 ) };
+    const Vector3D grads[ 9 ] = { Vector3D( 1.0 ), Vector3D( 2.0 ), Vector3D( 3.0 ), Vector3D( 4.0 ), Vector3D( 5.0 ),
+                                  Vector3D( 6.0 ), Vector3D( 7.0 ), Vector3D( 8.0 ), Vector3D( 9.0 ) };
+    const Matrix3D hesss[ 18 ] = { Matrix3D( 1.0 ), Matrix3D( 2.0 ), Matrix3D( -1. ), Matrix3D( 0.5 ),  Matrix3D( 6.0 ),
+                                   Matrix3D( 1.1 ), Matrix3D( 1.2 ), Matrix3D( 0.3 ), Matrix3D( 0.0 ),  Matrix3D( 22. ),
+                                   Matrix3D( -2. ), Matrix3D( 4.3 ), Matrix3D( 0.8 ), Matrix3D( 1, 7 ), Matrix3D( -.2 ),
+                                   Matrix3D( 0.5 ), Matrix3D( 7.0 ), Matrix3D( 1.5 ) };
 
     Vector3D    vtx_grad[ 3 ];
     Matrix3D    vtx_hess[ 6 ];

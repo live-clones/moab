@@ -131,23 +131,22 @@ class RefinerTagManager
     Interface*                           input_mesh;
     Interface*                           output_mesh;
     Tag                                  tag_ipstatus;  // Handle for PARALLEL_STATUS on mesh_in
-    Tag                tag_ipsprocs;  // Handle for PARALLEL_SHARED_PROCS on mesh_in
-    Tag                tag_ipsproc;  // Handle for PARALLEL_SHARED_PROC on mesh_in
-    Tag                tag_ipshands;  // Handle for PARALLEL_SHARED_HANDLES on mesh_in
-    Tag                tag_ipshand;  // Handle for PARALLEL_SHARED_HANDLE on mesh_in
-    Tag                tag_igid;  // Handle for global IDs on mesh_in
-    Tag                tag_opstatus;  // Handle for PARALLEL_STATUS on mesh_out
-    Tag                tag_opsprocs;  // Handle for PARALLEL_SHARED_PROCS on mesh_out
-    Tag                tag_opsproc;  // Handle for PARALLEL_SHARED_PROC on mesh_out
-    Tag                tag_opshands;  // Handle for PARALLEL_SHARED_HANDLES on mesh_out
-    Tag                tag_opshand;  // Handle for PARALLEL_SHARED_HANDLE on mesh_out
-    Tag                tag_ogid;  // Handle for global IDs on mesh_out
-    int                rank;
-    std::vector< int > shared_procs_in;  // Used to hold procs sharing an input vert.
-    std::vector< int > shared_procs_out;  // Used to hold procs sharing an output entity.
-    ProcessSet         current_shared_procs;  // Holds process list as it is being accumulated
-    ProcessSet
-                        current_element_procs;  // The list of processes which should share an output element.
+    Tag                                  tag_ipsprocs;  // Handle for PARALLEL_SHARED_PROCS on mesh_in
+    Tag                                  tag_ipsproc;  // Handle for PARALLEL_SHARED_PROC on mesh_in
+    Tag                                  tag_ipshands;  // Handle for PARALLEL_SHARED_HANDLES on mesh_in
+    Tag                                  tag_ipshand;  // Handle for PARALLEL_SHARED_HANDLE on mesh_in
+    Tag                                  tag_igid;  // Handle for global IDs on mesh_in
+    Tag                                  tag_opstatus;  // Handle for PARALLEL_STATUS on mesh_out
+    Tag                                  tag_opsprocs;  // Handle for PARALLEL_SHARED_PROCS on mesh_out
+    Tag                                  tag_opsproc;  // Handle for PARALLEL_SHARED_PROC on mesh_out
+    Tag                                  tag_opshands;  // Handle for PARALLEL_SHARED_HANDLES on mesh_out
+    Tag                                  tag_opshand;  // Handle for PARALLEL_SHARED_HANDLE on mesh_out
+    Tag                                  tag_ogid;  // Handle for global IDs on mesh_out
+    int                                  rank;
+    std::vector< int >                   shared_procs_in;  // Used to hold procs sharing an input vert.
+    std::vector< int >                   shared_procs_out;  // Used to hold procs sharing an output entity.
+    ProcessSet                           current_shared_procs;  // Holds process list as it is being accumulated
+    ProcessSet          current_element_procs;  // The list of processes which should share an output element.
     std::vector< char > element_tag_data;  // Holds tag data for per-element tags
 };
 

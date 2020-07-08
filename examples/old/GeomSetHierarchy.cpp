@@ -42,8 +42,7 @@ int main( int argc, char** argv )
     {
         // get parents at this dimension
         chsets.clear( );
-        rval = mb->get_entities_by_type_and_tag( 0, MBENTITYSET, &geom_tag, &dim_ptr, 1, chsets, 1,
-                                                 false );
+        rval = mb->get_entities_by_type_and_tag( 0, MBENTITYSET, &geom_tag, &dim_ptr, 1, chsets, 1, false );
         assert( moab::MB_SUCCESS == rval );
 
         // for each child, get parents and do something with them
@@ -59,8 +58,7 @@ int main( int argc, char** argv )
             assert( moab::MB_SUCCESS == rval );
 
             // print # parents
-            std::cout << ent_names[ dim ] << " " << chgid << " has " << psets.size( ) << " parents."
-                      << std::endl;
+            std::cout << ent_names[ dim ] << " " << chgid << " has " << psets.size( ) << " parents." << std::endl;
 
             if( 2 == dim )
             {
@@ -70,8 +68,8 @@ int main( int argc, char** argv )
                     assert( moab::MB_SUCCESS == rval );
                     rval = gt.get_sense( *ch_it, *p_it, sense );
                     if( moab::MB_SUCCESS != rval ) continue;
-                    std::cout << ent_names[ dim + 1 ] << " " << pgid << ", " << ent_names[ dim ]
-                              << " " << chgid << " sense is: ";
+                    std::cout << ent_names[ dim + 1 ] << " " << pgid << ", " << ent_names[ dim ] << " " << chgid
+                              << " sense is: ";
                     if( 1 == sense )
                         std::cout << "FORWARD" << std::endl;
                     else
@@ -88,8 +86,8 @@ int main( int argc, char** argv )
                 {
                     rval = mb->tag_get_data( gid_tag, &sense_ents[ i ], 1, &pgid );
                     assert( moab::MB_SUCCESS == rval );
-                    std::cout << ent_names[ dim + 1 ] << " " << pgid << ", " << ent_names[ dim ]
-                              << " " << chgid << " sense is: ";
+                    std::cout << ent_names[ dim + 1 ] << " " << pgid << ", " << ent_names[ dim ] << " " << chgid
+                              << " sense is: ";
                     if( -1 == senses[ i ] )
                         std::cout << "REVERSED" << std::endl;
                     else if( 0 == senses[ i ] )

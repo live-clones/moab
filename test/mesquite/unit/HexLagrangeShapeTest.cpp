@@ -87,8 +87,7 @@ static bool test_value( MsqVector< 3 > v1, MsqVector< 3 > v2 )
     return length( v1 - v2 ) < epsilon;
 }
 
-static inline CppUnit::Message value_message( unsigned location, MsqVector< 3 > v1,
-                                              MsqVector< 3 > v2 )
+static inline CppUnit::Message value_message( unsigned location, MsqVector< 3 > v1, MsqVector< 3 > v2 )
 {
     CppUnit::Message m( "equality assertion failed" );
 
@@ -247,9 +246,8 @@ const int C[][ 3 ] = {
     { 2, 2, 2 }  //  26
 };
 
-const double corners[ 8 ][ 3 ] = { { min_xi, min_xi, min_xi }, { max_xi, min_xi, min_xi },
-                                   { max_xi, max_xi, min_xi }, { min_xi, max_xi, min_xi },
-                                   { min_xi, min_xi, max_xi }, { max_xi, min_xi, max_xi },
+const double corners[ 8 ][ 3 ] = { { min_xi, min_xi, min_xi }, { max_xi, min_xi, min_xi }, { max_xi, max_xi, min_xi },
+                                   { min_xi, max_xi, min_xi }, { min_xi, min_xi, max_xi }, { max_xi, min_xi, max_xi },
                                    { max_xi, max_xi, max_xi }, { min_xi, max_xi, max_xi } };
 
 static MsqVector< 3 > XI_corner( int i )
@@ -290,12 +288,9 @@ static MsqVector< 3 > dN( int i, MsqVector< 3 > xi )
 {
     MsqVector< 3 > result;
     const int*     c = C[ i ];
-    result[ XI ] =
-        dl[ c[ XI ] ]( xi[ XI ] ) * l[ c[ ETA ] ]( xi[ ETA ] ) * l[ c[ ZETA ] ]( xi[ ZETA ] );
-    result[ ETA ] =
-        l[ c[ XI ] ]( xi[ XI ] ) * dl[ c[ ETA ] ]( xi[ ETA ] ) * l[ c[ ZETA ] ]( xi[ ZETA ] );
-    result[ ZETA ] =
-        l[ c[ XI ] ]( xi[ XI ] ) * l[ c[ ETA ] ]( xi[ ETA ] ) * dl[ c[ ZETA ] ]( xi[ ZETA ] );
+    result[ XI ] = dl[ c[ XI ] ]( xi[ XI ] ) * l[ c[ ETA ] ]( xi[ ETA ] ) * l[ c[ ZETA ] ]( xi[ ZETA ] );
+    result[ ETA ] = l[ c[ XI ] ]( xi[ XI ] ) * dl[ c[ ETA ] ]( xi[ ETA ] ) * l[ c[ ZETA ] ]( xi[ ZETA ] );
+    result[ ZETA ] = l[ c[ XI ] ]( xi[ XI ] ) * l[ c[ ETA ] ]( xi[ ETA ] ) * dl[ c[ ZETA ] ]( xi[ ZETA ] );
     return result;
 }
 
@@ -320,9 +315,8 @@ static void check_valid_indices( const size_t* vertices, size_t num_vtx )
     size_t vertcopy[ 27 ];
     std::copy( vertices, vertices + num_vtx, vertcopy );
     std::sort( vertcopy, vertcopy + num_vtx );
-    CPPUNIT_ASSERT( vertcopy[ num_vtx - 1 ] <=
-                    26 );  // max value less than 27
-                           // make sure there are no duplicates in the list
+    CPPUNIT_ASSERT( vertcopy[ num_vtx - 1 ] <= 26 );  // max value less than 27
+                                                      // make sure there are no duplicates in the list
     const size_t* iter = std::unique( vertcopy, vertcopy + num_vtx );
     CPPUNIT_ASSERT( iter == vertcopy + num_vtx );
 }
@@ -377,9 +371,8 @@ static void compare_coefficients( const double* coeffs, const size_t* indices, s
     ASSERT_VALUES_EQUAL( expected_coeffs[ 26 ], test_vals[ 26 ], loc );
 }
 
-static void compare_derivatives( const size_t* vertices, size_t num_vtx,
-                                 const MsqVector< 3 >* actual, const MsqVector< 3 >* expected,
-                                 unsigned loc )
+static void compare_derivatives( const size_t* vertices, size_t num_vtx, const MsqVector< 3 >* actual,
+                                 const MsqVector< 3 >* expected, unsigned loc )
 {
     check_valid_indices( vertices, num_vtx );
     check_no_zeros( actual, num_vtx );

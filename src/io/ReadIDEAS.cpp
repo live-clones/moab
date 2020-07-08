@@ -28,19 +28,16 @@ ReadIDEAS::ReadIDEAS( Interface* impl ) : MBI( impl )
 }
 
 ErrorCode ReadIDEAS::read_tag_values( const char* /* file_name */, const char* /* tag_name */,
-                                      const FileOptions& /* opts */,
-                                      std::vector< int >& /* tag_values_out */,
+                                      const FileOptions& /* opts */, std::vector< int >& /* tag_values_out */,
                                       const SubsetList* /* subset_list */ )
 {
     return MB_NOT_IMPLEMENTED;
 }
 
-ErrorCode ReadIDEAS::load_file( const char* fname, const EntityHandle*,
-                                const FileOptions& /*options*/,
+ErrorCode ReadIDEAS::load_file( const char* fname, const EntityHandle*, const FileOptions& /*options*/,
                                 const ReaderIface::SubsetList* subset_list, const Tag* file_id_tag )
 {
-    if( subset_list )
-    { MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "Reading subset of files not supported for IDEAS" ); }
+    if( subset_list ) { MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "Reading subset of files not supported for IDEAS" ); }
 
     file.open( fname );
     if( !file.good( ) ) { MB_SET_ERR( MB_FILE_DOES_NOT_EXIST, "Failed to open file: " << fname ); }
@@ -175,8 +172,7 @@ ErrorCode ReadIDEAS::create_vertices( EntityHandle& first_vertex, const Tag* fil
         // Get the id out of the 1st line. Check the assumption that node ids are
         // sequential and begin with 1.
         if( node_id != std::strtol( line1, &ctmp1, 10 ) )
-            MB_SET_ERR( MB_FAILURE,
-                        "node_id " << node_id << " line2:" << line2 << " ctmp1:" << ctmp1 );
+            MB_SET_ERR( MB_FAILURE, "node_id " << node_id << " line2:" << line2 << " ctmp1:" << ctmp1 );
         else
             ++node_id;
 
@@ -209,11 +205,9 @@ ErrorCode ReadIDEAS::create_elements( EntityHandle vstart, const Tag* file_id_ta
     EntityHandle handle;
 
     Tag mat_tag, phys_tag, id_tag;
-    rval = MBI->tag_get_handle( MAT_PROP_TABLE_TAG, 1, MB_TYPE_INTEGER, mat_tag,
-                                MB_TAG_DENSE | MB_TAG_CREAT );
+    rval = MBI->tag_get_handle( MAT_PROP_TABLE_TAG, 1, MB_TYPE_INTEGER, mat_tag, MB_TAG_DENSE | MB_TAG_CREAT );
     if( MB_SUCCESS != rval && MB_ALREADY_ALLOCATED != rval ) return rval;
-    rval = MBI->tag_get_handle( PHYS_PROP_TABLE_TAG, 1, MB_TYPE_INTEGER, phys_tag,
-                                MB_TAG_DENSE | MB_TAG_CREAT );
+    rval = MBI->tag_get_handle( PHYS_PROP_TABLE_TAG, 1, MB_TYPE_INTEGER, phys_tag, MB_TAG_DENSE | MB_TAG_CREAT );
     if( MB_SUCCESS != rval && MB_ALREADY_ALLOCATED != rval ) return rval;
     id_tag = MBI->globalId_tag( );
 
@@ -274,8 +268,7 @@ ErrorCode ReadIDEAS::create_elements( EntityHandle vstart, const Tag* file_id_ta
         Range             phys_sets;
         EntityHandle      phys_set;
         const void* const phys_set_id_val[] = { &phys_table };
-        rval = MBI->get_entities_by_type_and_tag( 0, MBENTITYSET, &phys_tag, phys_set_id_val, 1,
-                                                  phys_sets );MB_CHK_SET_ERR( rval, "can't get phys sets" );
+        rval = MBI->get_entities_by_type_and_tag( 0, MBENTITYSET, &phys_tag, phys_set_id_val, 1, phys_sets );MB_CHK_SET_ERR( rval, "can't get phys sets" );
         if( phys_sets.empty( ) )
         {
             rval = MBI->create_meshset( MESHSET_SET, phys_set );MB_CHK_SET_ERR( rval, "can't create phys set" );
@@ -295,8 +288,7 @@ ErrorCode ReadIDEAS::create_elements( EntityHandle vstart, const Tag* file_id_ta
         Range             mat_sets;
         EntityHandle      mat_set;
         const void* const mat_set_id_val[] = { &mat_table };
-        rval = MBI->get_entities_by_type_and_tag( 0, MBENTITYSET, &mat_tag, mat_set_id_val, 1,
-                                                  mat_sets );
+        rval = MBI->get_entities_by_type_and_tag( 0, MBENTITYSET, &mat_tag, mat_set_id_val, 1, mat_sets );
         if( MB_SUCCESS != rval ) return rval;
         if( mat_sets.empty( ) )
         {

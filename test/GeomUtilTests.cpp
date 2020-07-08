@@ -12,16 +12,14 @@ const double TOL = 1e-6;
 #define ASSERT_DOUBLES_EQUAL( A, B ) CHECK_REAL_EQUAL( A, B, TOL )
 #define ASSERT( B ) CHECK( B )
 
-void assert_vectors_equal( const CartVect& a, const CartVect& b, const char* sa, const char* sb,
-                           int lineno )
+void assert_vectors_equal( const CartVect& a, const CartVect& b, const char* sa, const char* sb, int lineno )
 {
-    if( fabs( a[ 0 ] - b[ 0 ] ) > TOL || fabs( a[ 1 ] - b[ 1 ] ) > TOL ||
-        fabs( a[ 2 ] - b[ 2 ] ) > TOL )
+    if( fabs( a[ 0 ] - b[ 0 ] ) > TOL || fabs( a[ 1 ] - b[ 1 ] ) > TOL || fabs( a[ 2 ] - b[ 2 ] ) > TOL )
     {
         std::cerr << "Assertion failed at line " << lineno << std::endl
                   << "\t" << sa << " == " << sb << std::endl
-                  << "\t[" << a[ 0 ] << ", " << a[ 1 ] << ", " << a[ 2 ] << "] == [" << b[ 0 ]
-                  << ", " << b[ 1 ] << ", " << b[ 2 ] << "]" << std::endl;
+                  << "\t[" << a[ 0 ] << ", " << a[ 1 ] << ", " << a[ 2 ] << "] == [" << b[ 0 ] << ", " << b[ 1 ] << ", "
+                  << b[ 2 ] << "]" << std::endl;
         FLAG_ERROR;
     }
 }
@@ -108,16 +106,14 @@ void test_box_plane_overlap( )
 class ElemOverlapTest
 {
   public:
-    virtual bool operator( )( const CartVect* coords, const CartVect& box_center,
-                              const CartVect& box_dims ) const = 0;
+    virtual bool operator( )( const CartVect* coords, const CartVect& box_center, const CartVect& box_dims ) const = 0;
 };
 class LinearElemOverlapTest : public ElemOverlapTest
 {
   public:
     const EntityType type;
     LinearElemOverlapTest( EntityType t ) : type( t ) {}
-    bool operator( )( const CartVect* coords, const CartVect& box_center,
-                      const CartVect& box_dims ) const
+    bool operator( )( const CartVect* coords, const CartVect& box_center, const CartVect& box_dims ) const
     {
         return box_linear_elem_overlap( coords, type, box_center, box_dims );
     }
@@ -126,12 +122,8 @@ class TypeElemOverlapTest : public ElemOverlapTest
 {
   public:
     bool ( *func )( const CartVect*, const CartVect&, const CartVect& );
-    TypeElemOverlapTest( bool ( *f )( const CartVect*, const CartVect&, const CartVect& ) )
-        : func( f )
-    {
-    }
-    bool operator( )( const CartVect* coords, const CartVect& box_center,
-                      const CartVect& box_dims ) const
+    TypeElemOverlapTest( bool ( *f )( const CartVect*, const CartVect&, const CartVect& ) ) : func( f ) {}
+    bool operator( )( const CartVect* coords, const CartVect& box_center, const CartVect& box_dims ) const
     {
         return ( *func )( coords, box_center, box_dims );
     }
@@ -769,8 +761,7 @@ void test_ray_tri_intersect( )
     double t;
 
     // define a triangle
-    const CartVect tri[ 3 ] = { CartVect( 1.0, 0.0, 0.0 ), CartVect( 0.0, 1.0, 0.0 ),
-                                CartVect( 0.0, 0.0, 1.0 ) };
+    const CartVect tri[ 3 ] = { CartVect( 1.0, 0.0, 0.0 ), CartVect( 0.0, 1.0, 0.0 ), CartVect( 0.0, 0.0, 1.0 ) };
 
     // try a ray through the center of the triangle
     xsect = ray_tri_intersect( tri, CartVect( 0.0, 0.0, 0.0 ), CartVect( 1.0, 1.0, 1.0 ), t );
@@ -800,63 +791,56 @@ void test_plucker_ray_tri_intersect( )
     double t;
 
     // define a triangle
-    const CartVect tri[ 3 ] = { CartVect( 1.0, 0.0, 0.0 ), CartVect( 0.0, 1.0, 0.0 ),
-                                CartVect( 0.0, 0.0, 1.0 ) };
+    const CartVect tri[ 3 ] = { CartVect( 1.0, 0.0, 0.0 ), CartVect( 0.0, 1.0, 0.0 ), CartVect( 0.0, 0.0, 1.0 ) };
 
     // try a ray through the center of the triangle
-    xsect =
-        plucker_ray_tri_intersect( tri, CartVect( 0.0, 0.0, 0.0 ), CartVect( 1.0, 1.0, 1.0 ), t );
+    xsect = plucker_ray_tri_intersect( tri, CartVect( 0.0, 0.0, 0.0 ), CartVect( 1.0, 1.0, 1.0 ), t );
     ASSERT( xsect );
     ASSERT_DOUBLES_EQUAL( 1.0 / 3.0, t );
 
     // try a same ray, but move base point above triangle
-    xsect =
-        plucker_ray_tri_intersect( tri, CartVect( 1.0, 1.0, 1.0 ), CartVect( 1.0, 1.0, 1.0 ), t );
+    xsect = plucker_ray_tri_intersect( tri, CartVect( 1.0, 1.0, 1.0 ), CartVect( 1.0, 1.0, 1.0 ), t );
     ASSERT( !xsect );
 
     // try a same ray the other direction with base point below triangle
-    xsect = plucker_ray_tri_intersect( tri, CartVect( 0.0, 0.0, 0.0 ), CartVect( -1.0, -1.0, -1.0 ),
-                                       t );
+    xsect = plucker_ray_tri_intersect( tri, CartVect( 0.0, 0.0, 0.0 ), CartVect( -1.0, -1.0, -1.0 ), t );
     ASSERT( !xsect );
 
     // try a ray that passes above the triangle
-    xsect =
-        plucker_ray_tri_intersect( tri, CartVect( 1.0, 1.0, 1.0 ), CartVect( -1.0, -1.0, 1.0 ), t );
+    xsect = plucker_ray_tri_intersect( tri, CartVect( 1.0, 1.0, 1.0 ), CartVect( -1.0, -1.0, 1.0 ), t );
     ASSERT( !xsect );
 
     // try a skew ray
-    xsect =
-        plucker_ray_tri_intersect( tri, CartVect( 0.0, 0.0, 0.0 ), CartVect( 1.0, 1.0, -0.1 ), t );
+    xsect = plucker_ray_tri_intersect( tri, CartVect( 0.0, 0.0, 0.0 ), CartVect( 1.0, 1.0, -0.1 ), t );
     ASSERT( !xsect );
 
     // try a ray that intersects with wrong orientation
     const int orientation = -1.0;
-    xsect = plucker_ray_tri_intersect( tri, CartVect( 0.0, 0.0, 0.0 ), CartVect( 1.0, 1.0, 1.0 ), t,
-                                       NULL, NULL, &orientation );
+    xsect = plucker_ray_tri_intersect( tri, CartVect( 0.0, 0.0, 0.0 ), CartVect( 1.0, 1.0, 1.0 ), t, NULL, NULL,
+                                       &orientation );
     ASSERT( !xsect );
 
     // try a ray that intersects beyond the nonneg_ray_len
     const double nonneg_ray_len = 0.25;
-    xsect = plucker_ray_tri_intersect( tri, CartVect( 0.0, 0.0, 0.0 ), CartVect( 1.0, 1.0, 1.0 ), t,
-                                       &nonneg_ray_len );
+    xsect = plucker_ray_tri_intersect( tri, CartVect( 0.0, 0.0, 0.0 ), CartVect( 1.0, 1.0, 1.0 ), t, &nonneg_ray_len );
     ASSERT( !xsect );
 
     // try a ray that intersects behind the origin
     const double neg_ray_len = -2.0;
-    xsect = plucker_ray_tri_intersect( tri, CartVect( 0.0, 0.0, 0.0 ), CartVect( -1.0, -1.0, -1.0 ),
-                                       t, NULL, &neg_ray_len );
+    xsect = plucker_ray_tri_intersect( tri, CartVect( 0.0, 0.0, 0.0 ), CartVect( -1.0, -1.0, -1.0 ), t, NULL,
+                                       &neg_ray_len );
     ASSERT( xsect );
 
     // try a ray that intersects a node
     intersection_type int_type;
-    xsect = plucker_ray_tri_intersect( tri, CartVect( 0.0, 0.0, 0.0 ), CartVect( 1.0, 0.0, 0.0 ), t,
-                                       NULL, NULL, NULL, &int_type );
+    xsect = plucker_ray_tri_intersect( tri, CartVect( 0.0, 0.0, 0.0 ), CartVect( 1.0, 0.0, 0.0 ), t, NULL, NULL, NULL,
+                                       &int_type );
     ASSERT( xsect );
     ASSERT( NODE0 == int_type );
 
     // try a ray that intersects an edge
-    xsect = plucker_ray_tri_intersect( tri, CartVect( 0.0, 0.0, 0.0 ), CartVect( 1.0, 1.0, 0.0 ), t,
-                                       NULL, NULL, NULL, &int_type );
+    xsect = plucker_ray_tri_intersect( tri, CartVect( 0.0, 0.0, 0.0 ), CartVect( 1.0, 1.0, 0.0 ), t, NULL, NULL, NULL,
+                                       &int_type );
     ASSERT( xsect );
     ASSERT( EDGE0 == int_type );
 }
@@ -866,8 +850,7 @@ void test_closest_location_on_tri( )
     CartVect result, input;
 
     // define a triangle
-    const CartVect tri[ 3 ] = { CartVect( 1.0, 0.0, 0.0 ), CartVect( 0.0, 1.0, 0.0 ),
-                                CartVect( 0.0, 0.0, 1.0 ) };
+    const CartVect tri[ 3 ] = { CartVect( 1.0, 0.0, 0.0 ), CartVect( 0.0, 1.0, 0.0 ), CartVect( 0.0, 0.0, 1.0 ) };
 
     // try point at triangle centroid
     input = CartVect( 1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0 );
@@ -926,8 +909,8 @@ void test_closest_location_on_tri( )
     ASSERT_VECTORS_EQUAL( result, 0.5 * input );
 
     // define an equilateral triangle in the xy-plane
-    const CartVect tri_xy[ 3 ] = { CartVect( 0.0, sqrt( 3.0 ) / 2.0, 0.0 ),
-                                   CartVect( 0.5, 0.0, 0.0 ), CartVect( -0.5, 0.0, 0.0 ) };
+    const CartVect tri_xy[ 3 ] = { CartVect( 0.0, sqrt( 3.0 ) / 2.0, 0.0 ), CartVect( 0.5, 0.0, 0.0 ),
+                                   CartVect( -0.5, 0.0, 0.0 ) };
 
     // for each vertex, test point that is
     // - outside triangle
@@ -953,8 +936,8 @@ void test_closest_location_on_polygon( )
     CartVect result, input;
 
     // define a unit square in xy plane
-    const CartVect quad[ 4 ] = { CartVect( 0.0, 0.0, 0.0 ), CartVect( 1.0, 0.0, 0.0 ),
-                                 CartVect( 1.0, 1.0, 0.0 ), CartVect( 0.0, 1.0, 0.0 ) };
+    const CartVect quad[ 4 ] = { CartVect( 0.0, 0.0, 0.0 ), CartVect( 1.0, 0.0, 0.0 ), CartVect( 1.0, 1.0, 0.0 ),
+                                 CartVect( 0.0, 1.0, 0.0 ) };
 
     // test input in center of square
     closest_location_on_polygon( CartVect( 0.5, 0.5, 0.0 ), quad, 4, result );

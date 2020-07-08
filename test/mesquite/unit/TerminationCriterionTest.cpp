@@ -68,15 +68,15 @@ class DummyOF : public ObjectiveFunction
     {
     }
 
-    bool initialize_block_coordinate_descent( MeshDomainAssoc* domain, const Settings* settings,
-                                              PatchSet* user_set, MsqError& err );
+    bool initialize_block_coordinate_descent( MeshDomainAssoc* domain, const Settings* settings, PatchSet* user_set,
+                                              MsqError& err );
 
     void initialize_queue( MeshDomainAssoc*, const Settings*, MsqError& ) {}
 
     bool evaluate( EvalType type, PatchData& pd, double& value_out, bool free, MsqError& err );
 
-    bool evaluate_with_gradient( EvalType type, PatchData& pd, double& value_out,
-                                 std::vector< Vector3D >& grad_out, MsqError& err );
+    bool evaluate_with_gradient( EvalType type, PatchData& pd, double& value_out, std::vector< Vector3D >& grad_out,
+                                 MsqError& err );
 
     ObjectiveFunction* clone( ) const
     {
@@ -517,8 +517,7 @@ static bool limit_absolute_sucessive( double, double prev_value, double curr_val
 {
     return ( prev_value - curr_value ) <= epsilon;
 }
-static bool limit_relative_sucessive( double init_value, double prev_value, double curr_value,
-                                      double epsilon )
+static bool limit_relative_sucessive( double init_value, double prev_value, double curr_value, double epsilon )
 {
     return ( prev_value - curr_value ) <= epsilon * ( init_value - curr_value );
 }
@@ -594,8 +593,7 @@ void TerminationCriterionTest::test_vertex_bound( )
     double maxcoord = 0.0;
     for( size_t i = 0; i < pd.num_nodes( ); ++i )
         for( int d = 0; d < 3; ++d )
-            if( fabs( pd.vertex_by_index( i )[ d ] ) > maxcoord )
-                maxcoord = fabs( pd.vertex_by_index( i )[ d ] );
+            if( fabs( pd.vertex_by_index( i )[ d ] ) > maxcoord ) maxcoord = fabs( pd.vertex_by_index( i )[ d ] );
     // add a little bit for rounding error
     maxcoord += 1e-5;
 
@@ -740,8 +738,8 @@ void TCTFauxOptimizer::optimize_vertex_positions( PatchData& pd, MsqError& err )
                 if( visited.find( all[ i ] ) == visited.end( ) )
                 {
                     std::ostringstream str;
-                    str << "Did not visit vertex " << i << " (handle " << all[ i ] << ") in pass "
-                        << numPasses << std::endl;
+                    str << "Did not visit vertex " << i << " (handle " << all[ i ] << ") in pass " << numPasses
+                        << std::endl;
                     CPPUNIT_FAIL( str.str( ) );
                 }
             }
@@ -848,8 +846,7 @@ void TerminationCriterionTest::test_abs_vtx_movement_culling( )
     CPPUNIT_ASSERT( smoother.num_passes( ) > 1 );
 }
 
-bool DummyOF::initialize_block_coordinate_descent( MeshDomainAssoc*, const Settings*, PatchSet*,
-                                                   MsqError& err )
+bool DummyOF::initialize_block_coordinate_descent( MeshDomainAssoc*, const Settings*, PatchSet*, MsqError& err )
 {
     MSQ_SETERR( err )( MsqError::NOT_IMPLEMENTED );
     return false;
@@ -861,8 +858,8 @@ bool DummyOF::evaluate( EvalType, PatchData&, double& value, bool, MsqError& )
     return mValid;
 }
 
-bool DummyOF::evaluate_with_gradient( EvalType, PatchData& pd, double& value_out,
-                                      std::vector< Vector3D >& grad_out, MsqError& )
+bool DummyOF::evaluate_with_gradient( EvalType, PatchData& pd, double& value_out, std::vector< Vector3D >& grad_out,
+                                      MsqError& )
 {
     value_out = mValue;
     grad_out.clear( );

@@ -131,8 +131,7 @@ class LineDomainArg : public CLArgs::DoubleListArgI
     std::vector< int >&         dimList;
 
   public:
-    LineDomainArg( std::vector< MeshDomain* >& domlist, std::vector< int >& dims )
-        : domList( domlist ), dimList( dims )
+    LineDomainArg( std::vector< MeshDomain* >& domlist, std::vector< int >& dims ) : domList( domlist ), dimList( dims )
     {
     }
     virtual bool value( const std::vector< double >& list );
@@ -212,8 +211,7 @@ const char* CONE_VALUES[] = { "rad", "h", "i", "j", "k", "x", "y", "z" };
 
 void add_domain_args( CLArgs& args )
 {
-    args.toggle_flag( SKIN_FLAG, "Mark boundary vertices as fixed (default if no domain specified)",
-                      &skin_mesh );
+    args.toggle_flag( SKIN_FLAG, "Mark boundary vertices as fixed (default if no domain specified)", &skin_mesh );
     args.double_list_flag( SPHERE_FLAG, "Spherical domain as center and radius", &sphere_arg );
     args.limit_list_flag( SPHERE_FLAG, 4, SPHERE_VALUES );
     args.limit_list_flag( SPHERE_FLAG, 1, SPHERE_VALUES );
@@ -223,16 +221,14 @@ void add_domain_args( CLArgs& args )
     args.double_list_flag( CYLINDER_FLAG, "Cylindrical radius, axis, and point", &cylinder_arg );
     args.limit_list_flag( CYLINDER_FLAG, 4, CYLINDER_VALUES );
     args.limit_list_flag( CYLINDER_FLAG, 7, CYLINDER_VALUES );
-    args.double_list_flag( CONE_FLAG, "Conic domain as base radius, height, axis, and base center",
-                           &conic_arg );
+    args.double_list_flag( CONE_FLAG, "Conic domain as base radius, height, axis, and base center", &conic_arg );
     args.limit_list_flag( CONE_FLAG, 2, CONE_VALUES );
     args.limit_list_flag( CONE_FLAG, 5, CONE_VALUES );
     args.limit_list_flag( CONE_FLAG, 8, CONE_VALUES );
     args.double_list_flag( LINE_FLAG, "Linear domain as direction and point", &line_arg );
     args.limit_list_flag( LINE_FLAG, 3, CYLINDER_VALUES + 1 );
     args.limit_list_flag( LINE_FLAG, 6, CYLINDER_VALUES + 1 );
-    args.double_list_flag( CIRCLE_FLAG, "Circular domain as radius, normal, and center",
-                           &circle_arg );
+    args.double_list_flag( CIRCLE_FLAG, "Circular domain as radius, normal, and center", &circle_arg );
     args.limit_list_flag( CIRCLE_FLAG, 4, CYLINDER_VALUES );
     args.limit_list_flag( CIRCLE_FLAG, 7, CYLINDER_VALUES );
     args.double_list_flag( POINT_FLAG, "Point domain", &point_arg );
@@ -260,15 +256,13 @@ MeshDomain* process_domain_args( MeshImpl* mesh )
             DomainClassifier* result = new DomainClassifier( );
             if( max_domain_dim < max_elem_dim )
             {
-                DomainClassifier::classify_skin_geometrically(
-                    *result, mesh, 1e-4, arrptr( domains ), arrptr( domain_dims ), domains.size( ),
-                    err );
+                DomainClassifier::classify_skin_geometrically( *result, mesh, 1e-4, arrptr( domains ),
+                                                               arrptr( domain_dims ), domains.size( ), err );
             }
             else
             {
-                DomainClassifier::classify_geometrically( *result, mesh, 1e-4, arrptr( domains ),
-                                                          arrptr( domain_dims ), domains.size( ),
-                                                          err );
+                DomainClassifier::classify_geometrically( *result, mesh, 1e-4, arrptr( domains ), arrptr( domain_dims ),
+                                                          domains.size( ), err );
             }
             rval = result;
         }

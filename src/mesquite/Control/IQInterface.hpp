@@ -71,8 +71,8 @@ class MESQUITE_EXPORT IQInterface : public Settings
     }
 
   protected:
-    virtual void run_common( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh,
-                             Settings* settings, MsqError& err ) = 0;
+    virtual void run_common( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh, Settings* settings,
+                             MsqError& err ) = 0;
 };
 
 }  // namespace MBMesquite

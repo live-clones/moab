@@ -61,8 +61,8 @@ class WriteAns : public WriterIface
     //! writes out a file
     ErrorCode write_file( const char* file_name, const bool overwrite, const FileOptions& opts,
                           const EntityHandle* output_list, const int num_sets,
-                          const std::vector< std::string >& qa_list, const Tag* tag_list = NULL,
-                          int num_tags = 0, int export_dimension = 3 );
+                          const std::vector< std::string >& qa_list, const Tag* tag_list = NULL, int num_tags = 0,
+                          int export_dimension = 3 );
 
     //! struct used to hold data for each block to be output; used by
     //! initialize_file to initialize the file header for increased speed
@@ -118,8 +118,7 @@ class WriteAns : public WriterIface
         Range        nodes;
 
         MeshInfo( )
-            : num_dim( 0 ), num_nodes( 0 ), num_elements( 0 ), num_matsets( 0 ), num_dirsets( 0 ),
-              num_neusets( 0 )
+            : num_dim( 0 ), num_nodes( 0 ), num_elements( 0 ), num_matsets( 0 ), num_dirsets( 0 ), num_neusets( 0 )
         {
         }
     };
@@ -143,8 +142,7 @@ class WriteAns : public WriterIface
     Tag mGlobalIdTag;
     Tag mMatSetIdTag;
 
-    ErrorCode write_nodes( const int num_nodes, const Range& nodes, const int dimension,
-                           const char* file_name );
+    ErrorCode write_nodes( const int num_nodes, const Range& nodes, const int dimension, const char* file_name );
 };
 
 }  // namespace moab

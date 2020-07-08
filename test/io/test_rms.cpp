@@ -18,8 +18,8 @@
 
 using namespace moab;
 
-int compare_coords( double* xval, double* yval, double* zval, double* nodex, double* nodey,
-                    double* nodez, const int num_nodes );
+int compare_coords( double* xval, double* yval, double* zval, double* nodex, double* nodey, double* nodez,
+                    const int num_nodes );
 int compare_connect( int* connect1, int* connect2, const int num_comps );
 
 #include <iostream>
@@ -80,14 +80,12 @@ int main( )
         std::cout << "entity_type() function failed." << std::endl;
 
     int entity_topo = elem_rms1.entity_topology( );
-    if( entity_topo != TSTT_TETRAHEDRON )
-        std::cout << "entity_topology() function failed." << std::endl;
+    if( entity_topo != TSTT_TETRAHEDRON ) std::cout << "entity_topology() function failed." << std::endl;
 
     int num_ents1 = node_rms.num_entities( );
     int num_ents2 = elem_rms1.num_entities( );
     if( num_ents1 != NUM_NODES || num_ents2 != 2 )
-        std::cout << "num_entities() function failed for"
-                  << ( num_ents1 != NUM_NODES ? "(nodes)" : "" )
+        std::cout << "num_entities() function failed for" << ( num_ents1 != NUM_NODES ? "(nodes)" : "" )
                   << ( num_ents2 != 2 ? "(elems)" : "" ) << std::endl;
 
     int vpe = elem_rms1.vertices_per_element( );
@@ -114,8 +112,7 @@ int main( )
     node_rms.node_y( 1, NUM_NODES, &yvalp, &num_nodes );
     node_rms.node_z( 1, NUM_NODES, &zvalp, &num_nodes );
     int result = compare_coords( xval, yval, zval, nodex, nodey, nodez, NUM_NODES );
-    if( result != 0 )
-        std::cout << "node_[xyz] didn't work; result = " << result << "." << std::endl;
+    if( result != 0 ) std::cout << "node_[xyz] didn't work; result = " << result << "." << std::endl;
 
     // set_node_x, set_node_y, set_node_z
     int i;
@@ -132,8 +129,7 @@ int main( )
     node_rms.node_y( 1, NUM_NODES, &yvalp, &num_nodes );
     node_rms.node_z( 1, NUM_NODES, &zvalp, &num_nodes );
     result = compare_coords( xval, yval, zval, nodex, nodey, nodez, NUM_NODES );
-    if( result != 0 )
-        std::cout << "node_[xyz] didn't work; result = " << result << "." << std::endl;
+    if( result != 0 ) std::cout << "node_[xyz] didn't work; result = " << result << "." << std::endl;
 
     // ELEMENTS
     // elem_connectivity
@@ -160,22 +156,16 @@ int main( )
     // RMESHSET FIND FUNCTIONS
     // find the rmeshsets for a node, and an element in each set
     MB_RMBSet *new_rms1, *new_rms2, *new_rms3;
-    new_rms1 = MB_RMBSet::find_rmeshset( TSTT_VERTEX, TSTT_LAST_TOPOLOGY,
-                                         reinterpret_cast< const void* >( 2 ) );
-    new_rms2 = MB_RMBSet::find_rmeshset( TSTT_REGION, TSTT_TETRAHEDRON,
-                                         reinterpret_cast< const void* >( 2 ) );
-    new_rms3 = MB_RMBSet::find_rmeshset( TSTT_REGION, TSTT_TETRAHEDRON,
-                                         reinterpret_cast< const void* >( 4 ) );
+    new_rms1 = MB_RMBSet::find_rmeshset( TSTT_VERTEX, TSTT_LAST_TOPOLOGY, reinterpret_cast< const void* >( 2 ) );
+    new_rms2 = MB_RMBSet::find_rmeshset( TSTT_REGION, TSTT_TETRAHEDRON, reinterpret_cast< const void* >( 2 ) );
+    new_rms3 = MB_RMBSet::find_rmeshset( TSTT_REGION, TSTT_TETRAHEDRON, reinterpret_cast< const void* >( 4 ) );
     if( new_rms1 != &node_rms || new_rms2 != &elem_rms1 || new_rms3 != &elem_rms2 )
         std::cout << "find_rmeshset() function failed." << std::endl;
 
     // now test NULL returns
-    new_rms1 = MB_RMBSet::find_rmeshset( TSTT_VERTEX, TSTT_LAST_TOPOLOGY,
-                                         reinterpret_cast< const void* >( 10 ) );
-    new_rms2 = MB_RMBSet::find_rmeshset( TSTT_REGION, TSTT_TETRAHEDRON,
-                                         reinterpret_cast< const void* >( 0 ) );
-    new_rms3 = MB_RMBSet::find_rmeshset( TSTT_REGION, TSTT_TETRAHEDRON,
-                                         reinterpret_cast< const void* >( 5 ) );
+    new_rms1 = MB_RMBSet::find_rmeshset( TSTT_VERTEX, TSTT_LAST_TOPOLOGY, reinterpret_cast< const void* >( 10 ) );
+    new_rms2 = MB_RMBSet::find_rmeshset( TSTT_REGION, TSTT_TETRAHEDRON, reinterpret_cast< const void* >( 0 ) );
+    new_rms3 = MB_RMBSet::find_rmeshset( TSTT_REGION, TSTT_TETRAHEDRON, reinterpret_cast< const void* >( 5 ) );
     if( NULL != new_rms1 || NULL != new_rms2 || NULL != new_rms3 )
         std::cout << "find_rmeshset() for NULL RETURN failed." << std::endl;
 
@@ -184,8 +174,7 @@ int main( )
     result1 = node_rms.is_in_rmeshset( reinterpret_cast< const void* >( 6 ) );
     result2 = elem_rms1.is_in_rmeshset( reinterpret_cast< const void* >( 2 ) );
     result3 = elem_rms2.is_in_rmeshset( reinterpret_cast< const void* >( 4 ) );
-    if( false == result1 || false == result2 || false == result3 )
-        std::cout << "is_in_rmeshset() failed." << std::endl;
+    if( false == result1 || false == result2 || false == result3 ) std::cout << "is_in_rmeshset() failed." << std::endl;
 
     // test is_in_rmeshset
     result1 = node_rms.is_in_rmeshset( reinterpret_cast< const void* >( 10 ) );
@@ -197,14 +186,13 @@ int main( )
     return 1;
 }
 
-int compare_coords( double* xval, double* yval, double* zval, double* nodex, double* nodey,
-                    double* nodez, const int num_nodes )
+int compare_coords( double* xval, double* yval, double* zval, double* nodex, double* nodey, double* nodez,
+                    const int num_nodes )
 {
     int i, result = 0;
     for( i = 0; i < num_nodes; i++ )
     {
-        if( xval[ i ] != nodex[ i ] || yval[ i ] != nodey[ i ] || zval[ i ] != nodez[ i ] )
-            result++;
+        if( xval[ i ] != nodex[ i ] || yval[ i ] != nodey[ i ] || zval[ i ] != nodez[ i ] ) result++;
         xval[ i ] = yval[ i ] = zval[ i ] = -2.0;
     }
     return result;

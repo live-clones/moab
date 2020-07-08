@@ -44,8 +44,7 @@ ObjectiveFunction* StdDevTemplate::clone( ) const
     return new StdDevTemplate( *this );
 }
 
-bool StdDevTemplate::evaluate( EvalType type, PatchData& pd, double& value_out, bool free,
-                               MsqError& err )
+bool StdDevTemplate::evaluate( EvalType type, PatchData& pd, double& value_out, bool free, MsqError& err )
 {
     bool result = VarianceTemplate::evaluate( type, pd, value_out, free, err );
     if( MSQ_CHKERR( err ) || !result ) return false;
@@ -72,14 +71,11 @@ bool StdDevTemplate::evaluate_with_gradient( EvalType type, PatchData& pd, doubl
     return true;
 }
 
-bool StdDevTemplate::evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd,
-                                                     double&                     value_out,
+bool StdDevTemplate::evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd, double& value_out,
                                                      std::vector< Vector3D >&    grad_out,
-                                                     std::vector< SymMatrix3D >& hess_diag_out,
-                                                     MsqError&                   err )
+                                                     std::vector< SymMatrix3D >& hess_diag_out, MsqError& err )
 {
-    bool result = VarianceTemplate::evaluate_with_Hessian_diagonal( type, pd, value_out, grad_out,
-                                                                    hess_diag_out, err );
+    bool result = VarianceTemplate::evaluate_with_Hessian_diagonal( type, pd, value_out, grad_out, hess_diag_out, err );
     if( MSQ_CHKERR( err ) || !result ) return false;
 
     const double neg = get_quality_metric( )->get_negate_flag( );

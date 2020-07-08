@@ -317,8 +317,7 @@ void lobatto_to_legendre( const realType* z, const realType* w, int n, realType*
    inner index of output J is the basis function index (row-major format)
    provide work array with space for 4*n reals
  */
-void lagrange_weights( const realType* z, unsigned n, const realType* x, unsigned m, realType* J,
-                       realType* work )
+void lagrange_weights( const realType* z, unsigned n, const realType* x, unsigned m, realType* J, realType* work )
 {
     unsigned  i, j;
     realType *w = work, *d = w + n, *u = d + n, *v = u + n;
@@ -352,8 +351,8 @@ void lagrange_weights( const realType* z, unsigned n, const realType* x, unsigne
    inner index of outputs J,D is the basis function index (row-major format)
    provide work array with space for 6*n reals
  */
-void lagrange_weights_deriv( const realType* z, unsigned n, const realType* x, unsigned m,
-                             realType* J, realType* D, realType* work )
+void lagrange_weights_deriv( const realType* z, unsigned n, const realType* x, unsigned m, realType* J, realType* D,
+                             realType* work )
 {
     unsigned  i, j;
     realType *w = work, *d = w + n, *u = d + n, *v = u + n, *up = v + n, *vp = up + n;
@@ -378,8 +377,7 @@ void lagrange_weights_deriv( const realType* z, unsigned n, const realType* x, u
         for( j = n - 1; j; --j )
             v[ j - 1 ] = d[ j ] * v[ j ], vp[ j - 1 ] = d[ j ] * vp[ j ] + v[ j ];
         for( j = 0; j < n; ++j )
-            *J++ = w[ j ] * u[ j ] * v[ j ],
-            *D++ = w[ j ] * ( up[ j ] * v[ j ] + u[ j ] * vp[ j ] );
+            *J++ = w[ j ] * u[ j ] * v[ j ], *D++ = w[ j ] * ( up[ j ] * v[ j ] + u[ j ] * vp[ j ] );
     }
 }
 
@@ -427,11 +425,9 @@ void lagrange_1( lagrange_data* p, realType x )
     for( i = 0; i < n; ++i )
         p->d[ i ] = x - p->z[ i ];
     for( i = 0; i < n - 1; ++i )
-        p->u0[ i + 1 ] = p->d[ i ] * p->u0[ i ],
-                     p->u1[ i + 1 ] = p->d[ i ] * p->u1[ i ] + p->u0[ i ];
+        p->u0[ i + 1 ] = p->d[ i ] * p->u0[ i ], p->u1[ i + 1 ] = p->d[ i ] * p->u1[ i ] + p->u0[ i ];
     for( i = n - 1; i; --i )
-        p->v0[ i - 1 ] = p->d[ i ] * p->v0[ i ],
-                     p->v1[ i - 1 ] = p->d[ i ] * p->v1[ i ] + p->v0[ i ];
+        p->v0[ i - 1 ] = p->d[ i ] * p->v0[ i ], p->v1[ i - 1 ] = p->d[ i ] * p->v1[ i ] + p->v0[ i ];
     for( i = 0; i < n; ++i )
         p->J[ i ] = p->w[ i ] * p->u0[ i ] * p->v0[ i ],
                 p->D[ i ] = p->w[ i ] * ( p->u1[ i ] * p->v0[ i ] + p->u0[ i ] * p->v1[ i ] );
@@ -443,18 +439,16 @@ void lagrange_2( lagrange_data* p, realType x )
     for( i = 0; i < n; ++i )
         p->d[ i ] = x - p->z[ i ];
     for( i = 0; i < n - 1; ++i )
-        p->u0[ i + 1 ] = p->d[ i ] * p->u0[ i ],
-                     p->u1[ i + 1 ] = p->d[ i ] * p->u1[ i ] + p->u0[ i ],
+        p->u0[ i + 1 ] = p->d[ i ] * p->u0[ i ], p->u1[ i + 1 ] = p->d[ i ] * p->u1[ i ] + p->u0[ i ],
                      p->u2[ i + 1 ] = p->d[ i ] * p->u2[ i ] + 2 * p->u1[ i ];
     for( i = n - 1; i; --i )
-        p->v0[ i - 1 ] = p->d[ i ] * p->v0[ i ],
-                     p->v1[ i - 1 ] = p->d[ i ] * p->v1[ i ] + p->v0[ i ],
+        p->v0[ i - 1 ] = p->d[ i ] * p->v0[ i ], p->v1[ i - 1 ] = p->d[ i ] * p->v1[ i ] + p->v0[ i ],
                      p->v2[ i - 1 ] = p->d[ i ] * p->v2[ i ] + 2 * p->v1[ i ];
     for( i = 0; i < n; ++i )
         p->J[ i ] = p->w[ i ] * p->u0[ i ] * p->v0[ i ],
                 p->D[ i ] = p->w[ i ] * ( p->u1[ i ] * p->v0[ i ] + p->u0[ i ] * p->v1[ i ] ),
-                p->D2[ i ] = p->w[ i ] * ( p->u2[ i ] * p->v0[ i ] + 2 * p->u1[ i ] * p->v1[ i ] +
-                                           p->u0[ i ] * p->v2[ i ] );
+                p->D2[ i ] =
+                    p->w[ i ] * ( p->u2[ i ] * p->v0[ i ] + 2 * p->u1[ i ] * p->v1[ i ] + p->u0[ i ] * p->v2[ i ] );
 }
 
 void lagrange_2u( lagrange_data* p )
@@ -465,8 +459,7 @@ void lagrange_2u( lagrange_data* p )
     for( i = n - 1; i; --i )
         p->v2[ i - 1 ] = p->d[ i ] * p->v2[ i ] + 2 * p->v1[ i ];
     for( i = 0; i < n; ++i )
-        p->D2[ i ] = p->w[ i ] * ( p->u2[ i ] * p->v0[ i ] + 2 * p->u1[ i ] * p->v1[ i ] +
-                                   p->u0[ i ] * p->v2[ i ] );
+        p->D2[ i ] = p->w[ i ] * ( p->u2[ i ] * p->v0[ i ] + 2 * p->u1[ i ] * p->v1[ i ] + p->u0[ i ] * p->v2[ i ] );
 }
 
 void lagrange_setup( lagrange_data* p, const realType* z, unsigned n )

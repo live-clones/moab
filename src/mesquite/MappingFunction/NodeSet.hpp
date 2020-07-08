@@ -66,8 +66,7 @@ class MESQUITE_EXPORT NodeSet
     //! Maximum number of mid-volume nodes
     static const BitSet NUM_REGION_BITS = 1;
     //! Maximum number of mid-face nodes
-    static const BitSet NUM_FACE_BITS =
-        NUM_TOTAL_BITS - ( NUM_CORNER_BITS + NUM_EDGE_BITS + NUM_REGION_BITS );
+    static const BitSet NUM_FACE_BITS = NUM_TOTAL_BITS - ( NUM_CORNER_BITS + NUM_EDGE_BITS + NUM_REGION_BITS );
 
     //! LSB of corner node storage
     static const BitSet CORNER_OFFSET = 0;
@@ -85,8 +84,7 @@ class MESQUITE_EXPORT NodeSet
     //! Mid-region mask
     static const BitSet REGION_MASK = ~( ( ~0u ) >> NUM_REGION_BITS );
     //! Bit mask for all mid-edge nodes
-    static const BitSet EDGE_MASK = ( MID_NODE_MASK
-                                      << ( NUM_TOTAL_BITS - EDGE_OFFSET - NUM_EDGE_BITS ) ) >>
+    static const BitSet EDGE_MASK = ( MID_NODE_MASK << ( NUM_TOTAL_BITS - EDGE_OFFSET - NUM_EDGE_BITS ) ) >>
                                     ( NUM_TOTAL_BITS - EDGE_OFFSET - NUM_EDGE_BITS );
     //! Bit mask for all mid-face nodes
     static const BitSet FACE_MASK = ~( CORNER_MASK | EDGE_MASK | REGION_MASK );
@@ -309,8 +307,7 @@ class MESQUITE_EXPORT NodeSet
     //! Test if two mid-edge nodes are both present
     bool both_edge_nodes( unsigned num1, unsigned num2 ) const
     {
-        BitSet b =
-            ( 1 << mid_edge_node_position( num1 ) ) | ( 1 << mid_edge_node_position( num2 ) );
+        BitSet b = ( 1 << mid_edge_node_position( num1 ) ) | ( 1 << mid_edge_node_position( num2 ) );
         return ( bits & b ) == b;
     }
     //! Get mark/flag for mid-face node

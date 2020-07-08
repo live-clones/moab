@@ -56,15 +56,13 @@ ErrorCode get_vartag_data( moab::Interface* mbCore, Tag tag, moab::Range& sets, 
     return moab::MB_SUCCESS;
 }
 
-void ReadFileMetaData( std::string&                          metaFilename,
-                       std::map< std::string, std::string >& metadataVals )
+void ReadFileMetaData( std::string& metaFilename, std::map< std::string, std::string >& metadataVals )
 {
     std::ifstream metafile;
     std::string   line;
 
     metafile.open( metaFilename.c_str( ) );
-    metadataVals[ "Title" ] =
-        "MOAB-TempestRemap (MBTR) Offline Regridding Weight Converter (h5mtoscrip)";
+    metadataVals[ "Title" ] = "MOAB-TempestRemap (MBTR) Offline Regridding Weight Converter (h5mtoscrip)";
     std::string key, value;
     while( std::getline( metafile, line ) )
     {
@@ -95,10 +93,8 @@ int main( int argc, char* argv[] )
     opts.addOpt< std::string >( "weights,w", "h5m remapping weights filename", &h5mfilename );
     opts.addOpt< std::string >( "scrip,s", "Output SCRIP map filename", &scripfile );
     opts.addOpt< int >( "dim,d", "Dimension of entities to use for partitioning", &dimension );
-    opts.addOpt< void >( "mesh,m", "Only convert the mesh and exclude the remap weight details",
-                         &noMap );
-    opts.addOpt< void >( "coords,c", "Write the center and vertex coordinates in lat/lon format",
-                         &writeXYCoords );
+    opts.addOpt< void >( "mesh,m", "Only convert the mesh and exclude the remap weight details", &noMap );
+    opts.addOpt< void >( "coords,c", "Write the center and vertex coordinates in lat/lon format", &writeXYCoords );
 
     opts.parseCommandLine( argc, argv );
 
@@ -127,8 +123,7 @@ int main( int argc, char* argv[] )
 
         // Open an output file
         NcFile ncMap( scripfile.c_str( ), NcFile::Replace, NULL, 0, NcFile::Offset64Bits );
-        if( !ncMap.is_valid( ) )
-        { _EXCEPTION1( "Unable to open output map file \"%s\"", scripfile.c_str( ) ); }
+        if( !ncMap.is_valid( ) ) { _EXCEPTION1( "Unable to open output map file \"%s\"", scripfile.c_str( ) ); }
 
         {
             // NetCDF-SCRIP Global Attributes
@@ -142,8 +137,7 @@ int main( int argc, char* argv[] )
                 "Converted with MOAB:h5mtoscrip with --w=" + h5mfilename + " and --s=" + scripfile;
 
             // Add global attributes
-            std::map< std::string, std::string >::const_iterator iterAttributes =
-                mapAttributes.begin( );
+            std::map< std::string, std::string >::const_iterator iterAttributes = mapAttributes.begin( );
             for( ; iterAttributes != mapAttributes.end( ); iterAttributes++ )
             {
 
@@ -156,13 +150,12 @@ int main( int argc, char* argv[] )
         Tag globalIDTag, materialSetTag;
         globalIDTag = mbCore->globalId_tag( );
         // materialSetTag = mbCore->material_tag();
-        rval = mbCore->tag_get_handle( "MATERIAL_SET", 1, MB_TYPE_INTEGER, materialSetTag,
-                                       MB_TAG_SPARSE );MB_CHK_ERR( rval );
+        rval = mbCore->tag_get_handle( "MATERIAL_SET", 1, MB_TYPE_INTEGER, materialSetTag, MB_TAG_SPARSE );MB_CHK_ERR( rval );
 
         // Get sets entities, by type
         moab::Range meshsets;
-        rval = mbCore->get_entities_by_type_and_tag( 0, MBENTITYSET, &globalIDTag, NULL, 1,
-                                                     meshsets, moab::Interface::UNION, true );MB_CHK_ERR( rval );
+        rval = mbCore->get_entities_by_type_and_tag( 0, MBENTITYSET, &globalIDTag, NULL, 1, meshsets,
+                                                     moab::Interface::UNION, true );MB_CHK_ERR( rval );
 
         moab::EntityHandle rootset = 0;
         ///////////////////////////////////////////////////////////////////////////
@@ -189,8 +182,7 @@ int main( int argc, char* argv[] )
         ///////////////////////////////////////////////////////////////////////////
         Tag smatMetadataTag;
         int smat_metadata_glb[ 13 ];
-        rval = mbCore->tag_get_handle( "SMAT_DATA", 13, MB_TYPE_INTEGER, smatMetadataTag,
-                                       MB_TAG_SPARSE );MB_CHK_ERR( rval );
+        rval = mbCore->tag_get_handle( "SMAT_DATA", 13, MB_TYPE_INTEGER, smatMetadataTag, MB_TAG_SPARSE );MB_CHK_ERR( rval );
         rval = mbCore->tag_get_data( smatMetadataTag, &rootset, 1, smat_metadata_glb );MB_CHK_ERR( rval );
         // std::cout << "Number of mesh sets is " << meshsets.size() << std::endl;
 
@@ -274,8 +266,7 @@ int main( int argc, char* argv[] )
             // src_gids[i], src_areas[i]);
             assert( i < srcID_size );
             assert( src_gids[ i ] < nDofA );
-            if( src_areas[ i ] > src_glob_areas[ src_gids[ i ] ] )
-                src_glob_areas[ src_gids[ i ] ] = src_areas[ i ];
+            if( src_areas[ i ] > src_glob_areas[ src_gids[ i ] ] ) src_glob_areas[ src_gids[ i ] ] = src_areas[ i ];
         }
         for( int i = 0; i < tgtArea_size; ++i )
         {
@@ -283,8 +274,7 @@ int main( int argc, char* argv[] )
             // tgt_gids[i], tgt_areas[i]);
             assert( i < tgtID_size );
             assert( tgt_gids[ i ] < nDofB );
-            if( tgt_areas[ i ] > tgt_glob_areas[ tgt_gids[ i ] ] )
-                tgt_glob_areas[ tgt_gids[ i ] ] = tgt_areas[ i ];
+            if( tgt_areas[ i ] > tgt_glob_areas[ tgt_gids[ i ] ] ) tgt_glob_areas[ tgt_gids[ i ] ] = tgt_areas[ i ];
         }
 
         // Write output dimensions entries
@@ -364,8 +354,7 @@ int main( int argc, char* argv[] )
             int                   srccenter_size;
             rval = get_vartag_data( mbCore, srcCenterLat, sets, srccenter_size, src_centerlat );MB_CHK_SET_ERR( rval, "Getting source mesh areas failed" );
             rval = get_vartag_data( mbCore, srcCenterLon, sets, srccenter_size, src_centerlon );MB_CHK_SET_ERR( rval, "Getting target mesh areas failed" );
-            std::vector< double > src_glob_centerlat( nDofA, 0.0 ),
-                src_glob_centerlon( nDofA, 0.0 );
+            std::vector< double > src_glob_centerlat( nDofA, 0.0 ), src_glob_centerlon( nDofA, 0.0 );
 
             for( int i = 0; i < srccenter_size; ++i )
             {
@@ -380,8 +369,7 @@ int main( int argc, char* argv[] )
             int                   tgtcenter_size;
             rval = get_vartag_data( mbCore, tgtCenterLat, sets, tgtcenter_size, tgt_centerlat );MB_CHK_SET_ERR( rval, "Getting source mesh areas failed" );
             rval = get_vartag_data( mbCore, tgtCenterLon, sets, tgtcenter_size, tgt_centerlon );MB_CHK_SET_ERR( rval, "Getting target mesh areas failed" );
-            std::vector< double > tgt_glob_centerlat( nDofB, 0.0 ),
-                tgt_glob_centerlon( nDofB, 0.0 );
+            std::vector< double > tgt_glob_centerlat( nDofB, 0.0 ), tgt_glob_centerlon( nDofB, 0.0 );
             for( int i = 0; i < tgtcenter_size; ++i )
             {
                 assert( i < tgtID_size );
@@ -401,8 +389,7 @@ int main( int argc, char* argv[] )
             tgt_centerlat.clear( );
             tgt_centerlon.clear( );
 
-            DataArray2D< double > src_glob_vertexlat( nDofA, nva ),
-                src_glob_vertexlon( nDofA, nva );
+            DataArray2D< double > src_glob_vertexlat( nDofA, nva ), src_glob_vertexlon( nDofA, nva );
             if( nva > 1 )
             {
                 std::vector< double > src_vertexlat, src_vertexlon;
@@ -422,8 +409,7 @@ int main( int argc, char* argv[] )
                 }
             }
 
-            DataArray2D< double > tgt_glob_vertexlat( nDofB, nvb ),
-                tgt_glob_vertexlon( nDofB, nvb );
+            DataArray2D< double > tgt_glob_vertexlat( nDofB, nvb ), tgt_glob_vertexlon( nDofB, nvb );
             if( nvb > 1 )
             {
                 std::vector< double > tgt_vertexlat, tgt_vertexlon;
@@ -478,8 +464,8 @@ int main( int argc, char* argv[] )
 #ifdef VERBOSE
             if( fabs( mapMatrix( mat_rows[ innz ], mat_cols[ innz ] ) ) > 1e-12 )
             {
-                printf( "Adding to existing loc: (%d, %d) = %12.8f\n", mat_rows[ innz ],
-                        mat_cols[ innz ], mapMatrix( mat_rows[ innz ], mat_cols[ innz ] ) );
+                printf( "Adding to existing loc: (%d, %d) = %12.8f\n", mat_rows[ innz ], mat_cols[ innz ],
+                        mapMatrix( mat_rows[ innz ], mat_cols[ innz ] ) );
             }
 #endif
             mapMatrix( mat_rows[ innz ], mat_cols[ innz ] ) += mat_vals[ innz ];
@@ -525,8 +511,7 @@ int main( int argc, char* argv[] )
             {
                 // std::cout << i << " - mat_vals = " << mat_vals[i] << " dFracA = " << mat_vals[i]
                 // / src_glob_areas[vecCol[i]] * tgt_glob_areas[vecRow[i]] << std::endl;
-                dFracA[ vecCol[ i ] ] +=
-                    vecS[ i ] / src_glob_areas[ vecCol[ i ] ] * tgt_glob_areas[ vecRow[ i ] ];
+                dFracA[ vecCol[ i ] ] += vecS[ i ] / src_glob_areas[ vecCol[ i ] ] * tgt_glob_areas[ vecRow[ i ] ];
                 dFracB[ vecRow[ i ] ] += vecS[ i ];
             }
 

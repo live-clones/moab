@@ -41,10 +41,7 @@ using std::vector;
 
 using namespace MBMesquite;
 
-VertexConditionNumberQualityMetric::VertexConditionNumberQualityMetric( )
-    : AveragingQM( QualityMetric::LINEAR )
-{
-}
+VertexConditionNumberQualityMetric::VertexConditionNumberQualityMetric( ) : AveragingQM( QualityMetric::LINEAR ) {}
 
 std::string VertexConditionNumberQualityMetric::get_name( ) const
 {
@@ -56,8 +53,7 @@ int VertexConditionNumberQualityMetric::get_negate_flag( ) const
     return 1;
 }
 
-bool VertexConditionNumberQualityMetric::evaluate( PatchData& pd, size_t this_vert, double& fval,
-                                                   MsqError& err )
+bool VertexConditionNumberQualityMetric::evaluate( PatchData& pd, size_t this_vert, double& fval, MsqError& err )
 {
     // pd.generate_vertex_to_element_data();
     bool return_flag;
@@ -125,8 +121,8 @@ bool VertexConditionNumberQualityMetric::evaluate( PatchData& pd, size_t this_ve
                 temp_vec[ 4 ] = vertices[ other_vertices[ 2 ] ] - vertices[ this_vert ];
                 // transform to equilateral tet
                 temp_vec[ 1 ] = ( ( 2 * temp_vec[ 3 ] ) - temp_vec[ 0 ] ) / MSQ_SQRT_THREE;
-                temp_vec[ 2 ] = ( ( 3 * temp_vec[ 4 ] ) - temp_vec[ 0 ] - temp_vec[ 3 ] ) /
-                                ( MSQ_SQRT_THREE * MSQ_SQRT_TWO );
+                temp_vec[ 2 ] =
+                    ( ( 3 * temp_vec[ 4 ] ) - temp_vec[ 0 ] - temp_vec[ 3 ] ) / ( MSQ_SQRT_THREE * MSQ_SQRT_TWO );
                 return_flag = condition_number_3d( temp_vec, pd, met_vals[ i ], err );
                 MSQ_ERRZERO( err );
                 if( !return_flag ) return return_flag;
@@ -141,8 +137,7 @@ bool VertexConditionNumberQualityMetric::evaluate( PatchData& pd, size_t this_ve
                 break;
             default:
                 MSQ_SETERR( err )
-                ( MsqError::UNSUPPORTED_ELEMENT,
-                  "Element type (%d) not uspported in VertexConditionNumberQM.\n",
+                ( MsqError::UNSUPPORTED_ELEMENT, "Element type (%d) not uspported in VertexConditionNumberQM.\n",
                   (int)( elems[ v_to_e_array[ i ] ].get_element_type( ) ) );
                 fval = MSQ_MAX_CAP;
                 return false;
@@ -155,10 +150,8 @@ bool VertexConditionNumberQualityMetric::evaluate( PatchData& pd, size_t this_ve
     return true;
 }
 
-bool VertexConditionNumberQualityMetric::evaluate_with_indices( PatchData& pd, size_t this_vert,
-                                                                double&                value,
-                                                                std::vector< size_t >& indices,
-                                                                MsqError&              err )
+bool VertexConditionNumberQualityMetric::evaluate_with_indices( PatchData& pd, size_t this_vert, double& value,
+                                                                std::vector< size_t >& indices, MsqError& err )
 {
     bool rval = evaluate( pd, this_vert, value, err );
     MSQ_ERRFALSE( err );
@@ -183,8 +176,7 @@ bool VertexConditionNumberQualityMetric::evaluate_with_indices( PatchData& pd, s
         MSQ_ERRZERO( err );
         for( unsigned j = 0; j < other_vertices.size( ); ++j )
         {
-            if( other_vertices[ j ] < pd.num_free_vertices( ) )
-                indices.push_back( other_vertices[ j ] );
+            if( other_vertices[ j ] < pd.num_free_vertices( ) ) indices.push_back( other_vertices[ j ] );
         }
     }
 

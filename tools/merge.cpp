@@ -11,8 +11,7 @@
 
 using namespace moab;
 
-const char BRIEF_DESC[] =
-    "Merges mesh files or entities in a mesh file. Use available options as desired.";
+const char         BRIEF_DESC[] = "Merges mesh files or entities in a mesh file. Use available options as desired.";
 std::ostringstream LONG_DESC;
 
 int main( int argc, char* argv[] )
@@ -38,27 +37,23 @@ int main( int argc, char* argv[] )
                  "all the skins available"
               << " in the mesh file and merges the nodes to obtain a conformal mesh. Options to "
                  "merge all duplicate nodes"
-              << " and merging based on a specific tag on the nodes are also supported."
-              << std::endl;
+              << " and merging based on a specific tag on the nodes are also supported." << std::endl;
 
     ProgOptions opts( LONG_DESC.str( ), BRIEF_DESC );
 
     opts.addOpt< void >( "all,a", "merge all including interior.", &fall );
-    opts.addOpt< std::string >(
-        "mergetag name,t", "merge based on nodes that have a specific tag name assigned", &mtag );
+    opts.addOpt< std::string >( "mergetag name,t", "merge based on nodes that have a specific tag name assigned",
+                                &mtag );
     opts.addOpt< double >( "mergetolerance,e", "merge tolerance, default is 1e-4", &merge_tol );
-    opts.addOpt< void >(
-        "simple,s", "simple merge, merge based on skins provided as in the input mesh (Default)",
-        &fsimple );
+    opts.addOpt< void >( "simple,s", "simple merge, merge based on skins provided as in the input mesh (Default)",
+                         &fsimple );
     opts.addRequiredArg< std::string >( "input_file", "Input file to be merged", &input_file );
-    opts.addRequiredArg< std::string >( "output_file", "Output mesh file name with extension",
-                                        &output_file );
+    opts.addRequiredArg< std::string >( "output_file", "Output mesh file name with extension", &output_file );
 #ifdef MOAB_HAVE_MPI
-    opts.addOpt< void >(
-        "file,f",
-        "files based merge using skin for individual meshes. Input file is a file containing names"
-        "of mesh files to be merged (each on a different line). Only works with parallel build",
-        &ffile );
+    opts.addOpt< void >( "file,f",
+                         "files based merge using skin for individual meshes. Input file is a file containing names"
+                         "of mesh files to be merged (each on a different line). Only works with parallel build",
+                         &ffile );
 #endif
     opts.parseCommandLine( argc, argv );
 

@@ -69,13 +69,11 @@ class ReadSTL : public ReaderIface
 
     //! Generic file loading code for both binary and ASCII readers.
     //! Calls reader-specific read_triangles function to do actual I/O.
-    ErrorCode load_file( const char* file_name, const EntityHandle* file_set,
-                         const FileOptions& opts, const SubsetList* subset_list = 0,
-                         const Tag* file_id_tag = 0 );
+    ErrorCode load_file( const char* file_name, const EntityHandle* file_set, const FileOptions& opts,
+                         const SubsetList* subset_list = 0, const Tag* file_id_tag = 0 );
 
     ErrorCode read_tag_values( const char* file_name, const char* tag_name, const FileOptions& opts,
-                               std::vector< int >& tag_values_out,
-                               const SubsetList*   subset_list = 0 );
+                               std::vector< int >& tag_values_out, const SubsetList* subset_list = 0 );
 
     //! Constructor
     ReadSTL( Interface* impl = NULL );
@@ -108,8 +106,7 @@ class ReadSTL : public ReaderIface
     ErrorCode ascii_read_triangles( const char* file_name, std::vector< Triangle >& tris_out );
 
     // I/O specific part of reader - read binary file
-    ErrorCode binary_read_triangles( const char* file_name, ByteOrder byte_order,
-                                     std::vector< Triangle >& tris_out );
+    ErrorCode binary_read_triangles( const char* file_name, ByteOrder byte_order, std::vector< Triangle >& tris_out );
 
     ReadUtilIface* readMeshIface;
 

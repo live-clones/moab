@@ -40,8 +40,7 @@ template< typename _Tree, typename _Boxes > class Point_search
     // private functionality
   private:
     // TODO: deprecate this
-    template< typename Point_map, typename List >
-    void resolve_boxes( const Point_map& query_points, List& list )
+    template< typename Point_map, typename List > void resolve_boxes( const Point_map& query_points, List& list )
     {
         /*
      typedef typename std::vector< bool> Bitmask;
@@ -76,8 +75,7 @@ template< typename _Tree, typename _Boxes > class Point_search
     // public functionality
   public:
     template< typename Point_map, typename Entities, typename Communicator >
-    Error locate_points( Point_map& query_points, Entities& entities, Communicator& comm,
-                         double tol )
+    Error locate_points( Point_map& query_points, Entities& entities, Communicator& comm, double tol )
     {
         /*TODO: implement a parallel location algorithm here
         original algorithm:
@@ -116,8 +114,7 @@ template< typename _Tree, typename _Boxes > class Point_search
     }
 
     template< typename Points, typename Entities >
-    Error bruteforce_locate_points( const Points& query_points, Entities& entities,
-                                    double tol ) const
+    Error bruteforce_locate_points( const Points& query_points, Entities& entities, double tol ) const
     {
         // TODO: this could be faster with caching, but of course this is
         // really just for testing

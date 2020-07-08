@@ -166,19 +166,17 @@ class GQT_IntRegCtxt : public OrientedBoxTreeTool::IntRegCtxt
     bool in_neighborhoods( const EntityHandle tri );
 
   public:
-    GQT_IntRegCtxt( OrientedBoxTreeTool* obbtool, const double ray_point[ 3 ],
-                    const double ray_dir[ 3 ], double tolerance, int min_tolerance_intersections,
-                    const EntityHandle* root_set, const EntityHandle* geom_volume,
-                    const Tag* sense_tag, const int* desired_orient,
+    GQT_IntRegCtxt( OrientedBoxTreeTool* obbtool, const double ray_point[ 3 ], const double ray_dir[ 3 ],
+                    double tolerance, int min_tolerance_intersections, const EntityHandle* root_set,
+                    const EntityHandle* geom_volume, const Tag* sense_tag, const int* desired_orient,
                     const std::vector< EntityHandle >* prev_facets )
         : tool( obbtool ), ray_origin( ray_point ), ray_direction( ray_dir ), tol( tolerance ),
-          minTolInt( min_tolerance_intersections ), rootSet( root_set ), geomVol( geom_volume ),
-          senseTag( sense_tag ), desiredOrient( desired_orient ), prevFacets( prev_facets ){
+          minTolInt( min_tolerance_intersections ), rootSet( root_set ), geomVol( geom_volume ), senseTag( sense_tag ),
+          desiredOrient( desired_orient ), prevFacets( prev_facets ){
 
-                                                                  };
+                                           };
 
-    virtual ErrorCode register_intersection( EntityHandle set, EntityHandle triangle,
-                                             double distance,
+    virtual ErrorCode register_intersection( EntityHandle set, EntityHandle triangle, double distance,
                                              OrientedBoxTreeTool::IntersectSearchWindow&,
                                              GeomUtil::intersection_type int_type );
 
@@ -199,18 +197,14 @@ ErrorCode GQT_IntRegCtxt::update_orient( EntityHandle set, int* surfTriOrient )
     if( geomVol && senseTag && desiredOrient && surfTriOrient )
     {
         if( 1 != *desiredOrient && -1 != *desiredOrient )
-        {
-            std::cerr << "error: desired orientation must be 1 (forward) or -1 (reverse)"
-                      << std::endl;
-        }
+        { std::cerr << "error: desired orientation must be 1 (forward) or -1 (reverse)" << std::endl; }
         EntityHandle vols[ 2 ];
         rval = tool->get_moab_instance( )->tag_get_data( *senseTag, &set, 1, vols );
         assert( MB_SUCCESS == rval );
         if( MB_SUCCESS != rval ) return rval;
         if( vols[ 0 ] == vols[ 1 ] )
         {
-            std::cerr << "error: surface has positive and negative sense wrt same volume"
-                      << std::endl;
+            std::cerr << "error: surface has positive and negative sense wrt same volume" << std::endl;
             return MB_FAILURE;
         }
         // surfTriOrient will be used by plucker_ray_tri_intersect to avoid
@@ -232,8 +226,8 @@ ErrorCode GQT_IntRegCtxt::update_orient( EntityHandle set, int* surfTriOrient )
 
 bool GQT_IntRegCtxt::in_prevFacets( const EntityHandle tri )
 {
-    return ( prevFacets && ( ( *prevFacets ).end( ) !=
-                             find( ( *prevFacets ).begin( ), ( *prevFacets ).end( ), tri ) ) );
+    return ( prevFacets &&
+             ( ( *prevFacets ).end( ) != find( ( *prevFacets ).begin( ), ( *prevFacets ).end( ), tri ) ) );
 }
 
 bool GQT_IntRegCtxt::in_neighborhoods( const EntityHandle tri )
@@ -241,8 +235,7 @@ bool GQT_IntRegCtxt::in_neighborhoods( const EntityHandle tri )
     bool same_neighborhood = false;
     for( unsigned i = 0; i < neighborhoods.size( ); ++i )
     {
-        if( neighborhoods[ i ].end( ) !=
-            find( neighborhoods[ i ].begin( ), neighborhoods[ i ].end( ), tri ) )
+        if( neighborhoods[ i ].end( ) != find( neighborhoods[ i ].begin( ), neighborhoods[ i ].end( ), tri ) )
         {
             same_neighborhood = true;
             continue;
@@ -266,8 +259,7 @@ bool GQT_IntRegCtxt::in_neighborhoods( const EntityHandle tri )
 bool GQT_IntRegCtxt::edge_node_piercing_intersect( const EntityHandle tri, const CartVect& ray_dir,
                                                    const GeomUtil::intersection_type  int_type,
                                                    const std::vector< EntityHandle >& close_tris,
-                                                   const std::vector< int >&          close_senses,
-                                                   const Interface*                   MBI,
+                                                   const std::vector< int >& close_senses, const Interface* MBI,
                                                    std::vector< EntityHandle >* neighborhood_tris )
 {
 
@@ -314,8 +306,7 @@ bool GQT_IntRegCtxt::edge_node_piercing_intersect( const EntityHandle tri, const
         }
         // edge intersection
     }
-    else if( GeomUtil::EDGE0 == int_type || GeomUtil::EDGE1 == int_type ||
-             GeomUtil::EDGE2 == int_type )
+    else if( GeomUtil::EDGE0 == int_type || GeomUtil::EDGE1 == int_type || GeomUtil::EDGE2 == int_type )
     {
 
         // get the endpoints of the edge
@@ -358,9 +349,7 @@ bool GQT_IntRegCtxt::edge_node_piercing_intersect( const EntityHandle tri, const
         // In a 2-manifold each edge is adjacent to exactly 2 tris
         if( 2 != adj_tris.size( ) )
         {
-            std::cerr
-                << "error: edge of a manifold must be topologically adjacent to exactly 2 tris"
-                << std::endl;
+            std::cerr << "error: edge of a manifold must be topologically adjacent to exactly 2 tris" << std::endl;
             MBI->list_entities( endpts, 2 );
             return true;
         }
@@ -411,10 +400,9 @@ bool GQT_IntRegCtxt::edge_node_piercing_intersect( const EntityHandle tri, const
     return true;
 }
 
-ErrorCode
-    GQT_IntRegCtxt::register_intersection( EntityHandle set, EntityHandle t, double int_dist,
-                                           OrientedBoxTreeTool::IntersectSearchWindow& search_win,
-                                           GeomUtil::intersection_type                 int_type )
+ErrorCode GQT_IntRegCtxt::register_intersection( EntityHandle set, EntityHandle t, double int_dist,
+                                                 OrientedBoxTreeTool::IntersectSearchWindow& search_win,
+                                                 GeomUtil::intersection_type                 int_type )
 {
     ErrorCode rval;
 
@@ -438,8 +426,8 @@ ErrorCode
         // get triangles in the proximity of the intersection
         std::vector< EntityHandle > close_tris;
         std::vector< int >          close_senses;
-        rval = tool->get_close_tris( ray_origin + int_dist * ray_direction, tol, rootSet, geomVol,
-                                     senseTag, close_tris, close_senses );
+        rval = tool->get_close_tris( ray_origin + int_dist * ray_direction, tol, rootSet, geomVol, senseTag, close_tris,
+                                     close_senses );
 
         if( MB_SUCCESS != rval ) return rval;
 
@@ -469,8 +457,7 @@ void GQT_IntRegCtxt::append_intersection( EntityHandle set, EntityHandle facet, 
     return;
 }
 
-void GQT_IntRegCtxt::set_intersection( int len_idx, EntityHandle set, EntityHandle facet,
-                                       double dist )
+void GQT_IntRegCtxt::set_intersection( int len_idx, EntityHandle set, EntityHandle facet, double dist )
 {
     intersections[ len_idx ] = dist;
     sets[ len_idx ] = set;
@@ -483,9 +470,8 @@ void GQT_IntRegCtxt::set_intersection( int len_idx, EntityHandle set, EntityHand
    variables not used: min_tol_int, tol
    1) keep the closest nonneg intersection and one negative intersection, if closer
 */
-void GQT_IntRegCtxt::add_mode1_intersection(
-    EntityHandle set, EntityHandle facet, double dist,
-    OrientedBoxTreeTool::IntersectSearchWindow& search_win )
+void GQT_IntRegCtxt::add_mode1_intersection( EntityHandle set, EntityHandle facet, double dist,
+                                             OrientedBoxTreeTool::IntersectSearchWindow& search_win )
 {
     if( 2 != intersections.size( ) )
     {
@@ -526,8 +512,7 @@ void GQT_IntRegCtxt::add_intersection( EntityHandle set, EntityHandle facet, dou
 
     // Mode 1, detected by non-null neg_ray_len pointer
     // keep the closest nonneg intersection and one negative intersection, if closer
-    if( search_win.second && search_win.first )
-    { return add_mode1_intersection( set, facet, dist, search_win ); }
+    if( search_win.second && search_win.first ) { return add_mode1_intersection( set, facet, dist, search_win ); }
 
     // ---------------------------------------------------------------------------
     /*   Mode 2: Used if neg_ray_len is not specified
@@ -605,13 +590,12 @@ void GQT_IntRegCtxt::add_intersection( EntityHandle set, EntityHandle facet, dou
     }
 }
 
-GeomQueryTool::GeomQueryTool( Interface* impl, bool find_geomsets, EntityHandle modelRootSet,
-                              bool p_rootSets_vector, bool restore_rootSets, bool trace_counting,
-                              double overlap_thickness, double numerical_precision )
+GeomQueryTool::GeomQueryTool( Interface* impl, bool find_geomsets, EntityHandle modelRootSet, bool p_rootSets_vector,
+                              bool restore_rootSets, bool trace_counting, double overlap_thickness,
+                              double numerical_precision )
     : owns_gtt( true )
 {
-    geomTopoTool =
-        new GeomTopoTool( impl, find_geomsets, modelRootSet, p_rootSets_vector, restore_rootSets );
+    geomTopoTool = new GeomTopoTool( impl, find_geomsets, modelRootSet, p_rootSets_vector, restore_rootSets );
 
     senseTag = geomTopoTool->get_sense_tag( );
 
@@ -627,8 +611,8 @@ GeomQueryTool::GeomQueryTool( Interface* impl, bool find_geomsets, EntityHandle 
     n_ray_fire_calls = 0;
 }
 
-GeomQueryTool::GeomQueryTool( GeomTopoTool* geomtopotool, bool trace_counting,
-                              double overlap_thickness, double numerical_precision )
+GeomQueryTool::GeomQueryTool( GeomTopoTool* geomtopotool, bool trace_counting, double overlap_thickness,
+                              double numerical_precision )
     : owns_gtt( false )
 {
 
@@ -710,11 +694,9 @@ void GeomQueryTool::RayHistory::add_entity( EntityHandle ent )
     prev_facets.push_back( ent );
 }
 
-ErrorCode GeomQueryTool::ray_fire( const EntityHandle volume, const double point[ 3 ],
-                                   const double dir[ 3 ], EntityHandle& next_surf,
-                                   double& next_surf_dist, RayHistory* history,
-                                   double user_dist_limit, int ray_orientation,
-                                   OrientedBoxTreeTool::TrvStats* stats )
+ErrorCode GeomQueryTool::ray_fire( const EntityHandle volume, const double point[ 3 ], const double dir[ 3 ],
+                                   EntityHandle& next_surf, double& next_surf_dist, RayHistory* history,
+                                   double user_dist_limit, int ray_orientation, OrientedBoxTreeTool::TrvStats* stats )
 {
 
     // take some stats that are independent of nps
@@ -722,18 +704,14 @@ ErrorCode GeomQueryTool::ray_fire( const EntityHandle volume, const double point
     {
         ++n_ray_fire_calls;
         if( 0 == n_ray_fire_calls % 10000000 )
-        {
-            std::cout << "n_ray_fires=" << n_ray_fire_calls << " n_pt_in_vols=" << n_pt_in_vol_calls
-                      << std::endl;
-        }
+        { std::cout << "n_ray_fires=" << n_ray_fire_calls << " n_pt_in_vols=" << n_pt_in_vol_calls << std::endl; }
     }
 
     if( debug )
     {
         std::cout << "ray_fire:"
-                  << " xyz=" << point[ 0 ] << " " << point[ 1 ] << " " << point[ 2 ]
-                  << " uvw=" << dir[ 0 ] << " " << dir[ 1 ] << " " << dir[ 2 ]
-                  << " entity_handle=" << volume << std::endl;
+                  << " xyz=" << point[ 0 ] << " " << point[ 1 ] << " " << point[ 2 ] << " uvw=" << dir[ 0 ] << " "
+                  << dir[ 1 ] << " " << dir[ 2 ] << " entity_handle=" << volume << std::endl;
     }
 
     const double huge_val = std::numeric_limits< double >::max( );
@@ -762,21 +740,19 @@ ErrorCode GeomQueryTool::ray_fire( const EntityHandle volume, const double point
     // the nonneg_ray_len should not be less than -neg_ray_len, or an overlap
     // may be missed due to optimization within ray_intersect_sets
     if( nonneg_ray_len < -neg_ray_len ) nonneg_ray_len = -neg_ray_len;
-    if( 0 > nonneg_ray_len || 0 <= neg_ray_len )
-    { MB_SET_ERR( MB_FAILURE, "Incorrect ray length provided" ); }
+    if( 0 > nonneg_ray_len || 0 <= neg_ray_len ) { MB_SET_ERR( MB_FAILURE, "Incorrect ray length provided" ); }
 
     // min_tolerance_intersections is passed but not used in this call
     const int min_tolerance_intersections = 0;
 
     // numericalPrecision is used for box.intersect_ray and find triangles in the
     // neighborhood of edge/node intersections.
-    GQT_IntRegCtxt int_reg_ctxt( geomTopoTool->obb_tree( ), point, dir, numericalPrecision,
-                                 min_tolerance_intersections, &root, &volume, &senseTag,
-                                 &ray_orientation, history ? &( history->prev_facets ) : NULL );
+    GQT_IntRegCtxt int_reg_ctxt( geomTopoTool->obb_tree( ), point, dir, numericalPrecision, min_tolerance_intersections,
+                                 &root, &volume, &senseTag, &ray_orientation,
+                                 history ? &( history->prev_facets ) : NULL );
 
     OrientedBoxTreeTool::IntersectSearchWindow search_win( &nonneg_ray_len, &neg_ray_len );
-    rval = geomTopoTool->obb_tree( )->ray_intersect_sets( dists, surfs, facets, root,
-                                                          numericalPrecision, point, dir,
+    rval = geomTopoTool->obb_tree( )->ray_intersect_sets( dists, surfs, facets, root, numericalPrecision, point, dir,
                                                           search_win, int_reg_ctxt, stats );
 
     MB_CHK_SET_ERR( rval, "Ray query failed" );
@@ -797,8 +773,7 @@ ErrorCode GeomQueryTool::ray_fire( const EntityHandle volume, const double point
     // intersections are ONLY indicated by nonzero surfs[] and facets[].
     if( 2 != dists.size( ) || 2 != facets.size( ) )
     { MB_SET_ERR( MB_FAILURE, "Incorrect number of facets/distances" ); }
-    if( 0.0 < dists[ 0 ] || 0.0 > dists[ 1 ] )
-    { MB_SET_ERR( MB_FAILURE, "Invalid intersection distance signs" ); }
+    if( 0.0 < dists[ 0 ] || 0.0 > dists[ 1 ] ) { MB_SET_ERR( MB_FAILURE, "Invalid intersection distance signs" ); }
 
     // If both negative and nonnegative RTIs are returned, the negative RTI must
     // closer to the origin.
@@ -814,8 +789,7 @@ ErrorCode GeomQueryTool::ray_fire( const EntityHandle volume, const double point
         std::vector< EntityHandle > vols;
         EntityHandle                nx_vol;
         rval = MBI->get_parent_meshsets( surfs[ 0 ], vols );MB_CHK_SET_ERR( rval, "Failed to get the parent meshsets" );
-        if( 2 != vols.size( ) )
-        { MB_SET_ERR( MB_FAILURE, "Invaid number of parent volumes found" ); }
+        if( 2 != vols.size( ) ) { MB_SET_ERR( MB_FAILURE, "Invaid number of parent volumes found" ); }
         if( vols.front( ) == volume ) { nx_vol = vols.back( ); }
         else
         {
@@ -851,8 +825,7 @@ ErrorCode GeomQueryTool::ray_fire( const EntityHandle volume, const double point
     {
         if( 0 > dists[ exit_idx ] )
         { std::cout << "          OVERLAP track length=" << dists[ exit_idx ] << std::endl; }
-        std::cout << "          next_surf = "
-                  << next_surf  // todo: use geomtopotool to get id by entity handle
+        std::cout << "          next_surf = " << next_surf  // todo: use geomtopotool to get id by entity handle
                   << ", dist = " << next_surf_dist << " new_pt=";
         for( int i = 0; i < 3; ++i )
         {
@@ -864,9 +837,8 @@ ErrorCode GeomQueryTool::ray_fire( const EntityHandle volume, const double point
     return MB_SUCCESS;
 }
 
-ErrorCode GeomQueryTool::point_in_volume( const EntityHandle volume, const double xyz[ 3 ],
-                                          int& result, const double* uvw,
-                                          const RayHistory* history )
+ErrorCode GeomQueryTool::point_in_volume( const EntityHandle volume, const double xyz[ 3 ], int& result,
+                                          const double* uvw, const RayHistory* history )
 {
     // take some stats that are independent of nps
     if( counting ) ++n_pt_in_vol_calls;
@@ -938,9 +910,8 @@ ErrorCode GeomQueryTool::point_in_volume( const EntityHandle volume, const doubl
                                  history ? &( history->prev_facets ) : NULL );
 
     OrientedBoxTreeTool::IntersectSearchWindow search_win( &ray_length, (double*)NULL );
-    rval = geomTopoTool->obb_tree( )->ray_intersect_sets( dists, surfs, facets, root,
-                                                          numericalPrecision, xyz, ray_direction,
-                                                          search_win, int_reg_ctxt );MB_CHK_SET_ERR( rval, "Ray fire query failed" );
+    rval = geomTopoTool->obb_tree( )->ray_intersect_sets( dists, surfs, facets, root, numericalPrecision, xyz,
+                                                          ray_direction, search_win, int_reg_ctxt );MB_CHK_SET_ERR( rval, "Ray fire query failed" );
 
     // determine orientation of all intersections
     // 1 for entering, 0 for leaving, -1 for tangent
@@ -1012,8 +983,8 @@ ErrorCode GeomQueryTool::point_in_volume( const EntityHandle volume, const doubl
     }
 
     if( debug )
-        std::cout << "pt_in_vol: result=" << result << " xyz=" << xyz[ 0 ] << " " << xyz[ 1 ] << " "
-                  << xyz[ 2 ] << " uvw=" << u << " " << v << " " << w << " vol_id=" << volume
+        std::cout << "pt_in_vol: result=" << result << " xyz=" << xyz[ 0 ] << " " << xyz[ 1 ] << " " << xyz[ 2 ]
+                  << " uvw=" << u << " " << v << " " << w << " vol_id=" << volume
                   << std::endl;  // todo: use geomtopotool to get id by entity handle
 
     return MB_SUCCESS;
@@ -1050,9 +1021,8 @@ ErrorCode GeomQueryTool::point_in_box( EntityHandle volume, const double point[ 
     return rval;
 }
 
-ErrorCode GeomQueryTool::test_volume_boundary( const EntityHandle volume,
-                                               const EntityHandle surface, const double xyz[ 3 ],
-                                               const double uvw[ 3 ], int& result,
+ErrorCode GeomQueryTool::test_volume_boundary( const EntityHandle volume, const EntityHandle surface,
+                                               const double xyz[ 3 ], const double uvw[ 3 ], int& result,
                                                const RayHistory* history )
 {
     ErrorCode rval;
@@ -1061,8 +1031,7 @@ ErrorCode GeomQueryTool::test_volume_boundary( const EntityHandle volume,
     if( history && history->prev_facets.size( ) )
     {
         // the current facet is already available
-        rval = boundary_case( volume, dir, uvw[ 0 ], uvw[ 1 ], uvw[ 2 ],
-                              history->prev_facets.back( ), surface );MB_CHK_SET_ERR( rval, "Failed to resolve the boundary case" );
+        rval = boundary_case( volume, dir, uvw[ 0 ], uvw[ 1 ], uvw[ 2 ], history->prev_facets.back( ), surface );MB_CHK_SET_ERR( rval, "Failed to resolve the boundary case" );
     }
     else
     {
@@ -1076,8 +1045,7 @@ ErrorCode GeomQueryTool::test_volume_boundary( const EntityHandle volume,
         const CartVect point( xyz );
         CartVect       nearest;
         EntityHandle   facet_out;
-        rval = geomTopoTool->obb_tree( )->closest_to_location( point.array( ), root,
-                                                               nearest.array( ), facet_out );MB_CHK_SET_ERR( rval, "Failed to find the closest point to location" );
+        rval = geomTopoTool->obb_tree( )->closest_to_location( point.array( ), root, nearest.array( ), facet_out );MB_CHK_SET_ERR( rval, "Failed to find the closest point to location" );
 
         rval = boundary_case( volume, dir, uvw[ 0 ], uvw[ 1 ], uvw[ 2 ], facet_out, surface );MB_CHK_SET_ERR( rval, "Failed to resolve the boundary case" );
     }
@@ -1088,8 +1056,7 @@ ErrorCode GeomQueryTool::test_volume_boundary( const EntityHandle volume,
 }
 
 // use spherical area test to determine inside/outside of a polyhedron.
-ErrorCode GeomQueryTool::point_in_volume_slow( EntityHandle volume, const double xyz[ 3 ],
-                                               int& result )
+ErrorCode GeomQueryTool::point_in_volume_slow( EntityHandle volume, const double xyz[ 3 ], int& result )
 {
     ErrorCode                   rval;
     Range                       faces;
@@ -1126,8 +1093,7 @@ ErrorCode GeomQueryTool::point_in_volume_slow( EntityHandle volume, const double
     return MB_SUCCESS;
 }
 
-ErrorCode GeomQueryTool::find_volume( const double xyz[ 3 ], EntityHandle& volume,
-                                      const double* dir )
+ErrorCode GeomQueryTool::find_volume( const double xyz[ 3 ], EntityHandle& volume, const double* dir )
 {
     ErrorCode rval;
     volume = 0;
@@ -1184,9 +1150,9 @@ ErrorCode GeomQueryTool::find_volume( const double xyz[ 3 ], EntityHandle& volum
 
     FindVolumeIntRegCtxt                       find_vol_reg_ctxt;
     OrientedBoxTreeTool::IntersectSearchWindow search_win( &pos_ray_len, &neg_ray_len );
-    rval = geomTopoTool->obb_tree( )->ray_intersect_sets(
-        dists, surfs, facets, global_surf_tree_root, numericalPrecision, xyz, uvw.array( ),
-        search_win, find_vol_reg_ctxt );MB_CHK_SET_ERR( rval, "Failed in global tree ray fire" );
+    rval =
+        geomTopoTool->obb_tree( )->ray_intersect_sets( dists, surfs, facets, global_surf_tree_root, numericalPrecision,
+                                                       xyz, uvw.array( ), search_win, find_vol_reg_ctxt );MB_CHK_SET_ERR( rval, "Failed in global tree ray fire" );
 
     // if there was no intersection, no volume is found
     if( surfs.size( ) == 0 || surfs[ 0 ] == 0 )
@@ -1236,8 +1202,7 @@ ErrorCode GeomQueryTool::find_volume( const double xyz[ 3 ], EntityHandle& volum
     return MB_SUCCESS;
 }
 
-ErrorCode GeomQueryTool::find_volume_slow( const double xyz[ 3 ], EntityHandle& volume,
-                                           const double* dir )
+ErrorCode GeomQueryTool::find_volume_slow( const double xyz[ 3 ], EntityHandle& volume, const double* dir )
 {
     ErrorCode rval;
     volume = 0;
@@ -1260,8 +1225,8 @@ ErrorCode GeomQueryTool::find_volume_slow( const double xyz[ 3 ], EntityHandle& 
 }
 
 // detemine distance to nearest surface
-ErrorCode GeomQueryTool::closest_to_location( EntityHandle volume, const double coords[ 3 ],
-                                              double& result, EntityHandle* closest_surface )
+ErrorCode GeomQueryTool::closest_to_location( EntityHandle volume, const double coords[ 3 ], double& result,
+                                              EntityHandle* closest_surface )
 {
     // Get OBB Tree for volume
     EntityHandle root;
@@ -1272,8 +1237,8 @@ ErrorCode GeomQueryTool::closest_to_location( EntityHandle volume, const double 
     CartVect       nearest;
     EntityHandle   facet_out;
 
-    rval = geomTopoTool->obb_tree( )->closest_to_location( point.array( ), root, nearest.array( ),
-                                                           facet_out, closest_surface );MB_CHK_SET_ERR( rval, "Failed to get the closest intersection to location" );
+    rval = geomTopoTool->obb_tree( )->closest_to_location( point.array( ), root, nearest.array( ), facet_out,
+                                                           closest_surface );MB_CHK_SET_ERR( rval, "Failed to get the closest intersection to location" );
     // calculate distance between point and nearest facet
     result = ( point - nearest ).length( );
 
@@ -1299,8 +1264,7 @@ ErrorCode GeomQueryTool::measure_volume( EntityHandle volume, double& result )
 
     // get surface senses
     std::vector< int > senses( surfaces.size( ) );
-    rval =
-        geomTopoTool->get_surface_senses( volume, surfaces.size( ), &surfaces[ 0 ], &senses[ 0 ] );MB_CHK_SET_ERR( rval, "Failed to retrieve surface-volume sense data. Cannot calculate volume" );
+    rval = geomTopoTool->get_surface_senses( volume, surfaces.size( ), &surfaces[ 0 ], &senses[ 0 ] );MB_CHK_SET_ERR( rval, "Failed to retrieve surface-volume sense data. Cannot calculate volume" );
 
     for( unsigned i = 0; i < surfaces.size( ); ++i )
     {
@@ -1313,10 +1277,8 @@ ErrorCode GeomQueryTool::measure_volume( EntityHandle volume, double& result )
 
         if( !triangles.all_of_type( MBTRI ) )
         {
-            std::cout << "WARNING: Surface "
-                      << surfaces[ i ]  // todo: use geomtopotool to get id by entity handle
-                      << " contains non-triangle elements. Volume calculation may be incorrect."
-                      << std::endl;
+            std::cout << "WARNING: Surface " << surfaces[ i ]  // todo: use geomtopotool to get id by entity handle
+                      << " contains non-triangle elements. Volume calculation may be incorrect." << std::endl;
             triangles.clear( );
             rval = MBI->get_entities_by_type( surfaces[ i ], MBTRI, triangles );MB_CHK_SET_ERR( rval, "Failed to get the surface triangles" );
         }
@@ -1329,10 +1291,8 @@ ErrorCode GeomQueryTool::measure_volume( EntityHandle volume, double& result )
         for( Range::iterator j = triangles.begin( ); j != triangles.end( ); ++j )
         {
             rval = MBI->get_connectivity( *j, conn, len, true );MB_CHK_SET_ERR( rval, "Failed to get the connectivity of the current triangle" );
-            if( 3 != len )
-            { MB_SET_ERR( MB_FAILURE, "Incorrect connectivity length for triangle" ); }
-            rval = MBI->get_coords( conn, 3, coords[ 0 ].array( ) );MB_CHK_SET_ERR( rval,
-                            "Failed to get the coordinates of the current triangle's vertices" );
+            if( 3 != len ) { MB_SET_ERR( MB_FAILURE, "Incorrect connectivity length for triangle" ); }
+            rval = MBI->get_coords( conn, 3, coords[ 0 ].array( ) );MB_CHK_SET_ERR( rval, "Failed to get the coordinates of the current triangle's vertices" );
 
             coords[ 1 ] -= coords[ 0 ];
             coords[ 2 ] -= coords[ 0 ];
@@ -1353,10 +1313,8 @@ ErrorCode GeomQueryTool::measure_area( EntityHandle surface, double& result )
     ErrorCode rval = MBI->get_entities_by_dimension( surface, 2, triangles );MB_CHK_SET_ERR( rval, "Failed to get the surface entities" );
     if( !triangles.all_of_type( MBTRI ) )
     {
-        std::cout << "WARNING: Surface "
-                  << surface  // todo: use geomtopotool to get id by entity handle
-                  << " contains non-triangle elements. Area calculation may be incorrect."
-                  << std::endl;
+        std::cout << "WARNING: Surface " << surface  // todo: use geomtopotool to get id by entity handle
+                  << " contains non-triangle elements. Area calculation may be incorrect." << std::endl;
         triangles.clear( );
         rval = MBI->get_entities_by_type( surface, MBTRI, triangles );MB_CHK_SET_ERR( rval, "Failed to the surface's triangle entities" );
     }
@@ -1393,8 +1351,7 @@ ErrorCode GeomQueryTool::get_normal( EntityHandle surf, const double in_pt[ 3 ],
     // if no history or history empty, use nearby facets
     if( !history || ( history->prev_facets.size( ) == 0 ) )
     {
-        rval = geomTopoTool->obb_tree( )->closest_to_location( in_pt, root, numericalPrecision,
-                                                               facets );MB_CHK_SET_ERR( rval, "Failed to get closest intersection to location" );
+        rval = geomTopoTool->obb_tree( )->closest_to_location( in_pt, root, numericalPrecision, facets );MB_CHK_SET_ERR( rval, "Failed to get closest intersection to location" );
     }
     // otherwise use most recent facet in history
     else
@@ -1430,8 +1387,8 @@ ErrorCode GeomQueryTool::get_normal( EntityHandle surf, const double in_pt[ 3 ],
 // result= 1 -> inside volume or entering volume
 // result= 0 -> outside volume or leaving volume
 // result=-1 -> on boundary with null or tangent uvw
-ErrorCode GeomQueryTool::boundary_case( EntityHandle volume, int& result, double u, double v,
-                                        double w, EntityHandle facet, EntityHandle surface )
+ErrorCode GeomQueryTool::boundary_case( EntityHandle volume, int& result, double u, double v, double w,
+                                        EntityHandle facet, EntityHandle surface )
 {
     ErrorCode rval;
 

@@ -188,8 +188,7 @@ class MsqMeshEntityTest : public CppUnit::TestFixture
         MsqPrintError  err( cout );
         MsqMeshEntity* tri = oneTriPatch.get_element_array( err );
         CPPUNIT_ASSERT( !err );
-        CPPUNIT_ASSERT( fabs( tri->compute_unsigned_area( oneTriPatch, err ) -
-                              ( sqrt( 3.0 ) / 4.0 ) ) < tolEps );
+        CPPUNIT_ASSERT( fabs( tri->compute_unsigned_area( oneTriPatch, err ) - ( sqrt( 3.0 ) / 4.0 ) ) < tolEps );
         MsqMeshEntity* quad = oneQuadPatch.get_element_array( err );
         CPPUNIT_ASSERT( !err );
         CPPUNIT_ASSERT( fabs( quad->compute_unsigned_area( oneQuadPatch, err ) - 1.0 ) < tolEps );
@@ -231,8 +230,7 @@ void MsqMeshEntityTest::test_unsigned_area_poly( )
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.25, a, 1e-8 );
 }
 
-void MsqMeshEntityTest::test_unsigned_area_common( EntityTopology type, const double* coords,
-                                                   double expected )
+void MsqMeshEntityTest::test_unsigned_area_common( EntityTopology type, const double* coords, double expected )
 {
     MsqError  err;
     PatchData pd;
@@ -272,16 +270,13 @@ void MsqMeshEntityTest::test_unsigned_area_pri( )
 
 void MsqMeshEntityTest::test_unsigned_area_hex( )
 {
-    const double coords[] = { 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0,
-                              0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1 };
+    const double coords[] = { 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1 };
     test_unsigned_area_common( HEXAHEDRON, coords, 1.0 );
 
-    const double coords2[] = { 0, 0, 0, 2, 0, 0, 2, 2, 0, 0, 2, 0,
-                               0, 0, 2, 2, 0, 2, 2, 2, 2, 0, 2, 2 };
+    const double coords2[] = { 0, 0, 0, 2, 0, 0, 2, 2, 0, 0, 2, 0, 0, 0, 2, 2, 0, 2, 2, 2, 2, 0, 2, 2 };
     test_unsigned_area_common( HEXAHEDRON, coords2, 8.0 );
 
-    const double pyr_coords[] = { -1, -1, 0, 1, -1, 0, 1, 1, 0, -1, 1, 0,
-                                  0,  0,  1, 0, 0,  1, 0, 0, 1, 0,  0, 1 };
+    const double pyr_coords[] = { -1, -1, 0, 1, -1, 0, 1, 1, 0, -1, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1 };
     test_unsigned_area_common( HEXAHEDRON, pyr_coords, 4.0 / 3.0 );
 }
 
@@ -347,8 +342,7 @@ void MsqMeshEntityTest::test_all_nodes( )
 
 void MsqMeshEntityTest::test_check_element_orientation_linear( )
 {
-    const EntityTopology types[] = { TRIANGLE, QUADRILATERAL, TETRAHEDRON,
-                                     PYRAMID,  PRISM,         HEXAHEDRON };
+    const EntityTopology types[] = { TRIANGLE, QUADRILATERAL, TETRAHEDRON, PYRAMID, PRISM, HEXAHEDRON };
     const int            num_types = sizeof( types ) / sizeof( types[ 0 ] );
 
     for( int i = 0; i < num_types; ++i )
@@ -365,9 +359,8 @@ void MsqMeshEntityTest::test_check_element_orientation_quadratic( )
         unsigned       nodes;
     };
 
-    const ElemType types[] = {
-        { TRIANGLE, 6 }, { QUADRILATERAL, 8 }, { QUADRILATERAL, 9 }, { TETRAHEDRON, 10 } };
-    const int num_types = sizeof( types ) / sizeof( types[ 0 ] );
+    const ElemType types[] = { { TRIANGLE, 6 }, { QUADRILATERAL, 8 }, { QUADRILATERAL, 9 }, { TETRAHEDRON, 10 } };
+    const int      num_types = sizeof( types ) / sizeof( types[ 0 ] );
 
     for( int i = 0; i < num_types; ++i )
     {
@@ -449,8 +442,8 @@ void MsqMeshEntityTest::test_check_element_orientation( EntityTopology type, int
         elem.check_element_orientation( pd, inverted, tested, err );
         ASSERT_NO_ERROR( err );
         std::ostringstream str;
-        str << TopologyInfo::short_name( type ) << nodes << " Vertex " << i << " (Dimension " << dim
-            << " Index " << num << ")";
+        str << TopologyInfo::short_name( type ) << nodes << " Vertex " << i << " (Dimension " << dim << " Index " << num
+            << ")";
         CppUnit::Message m( "MsqMeshEntity failed to detect inverted element" );
         m.addDetail( str.str( ) );
         ASSERT_MESSAGE( m, inverted > 0 );

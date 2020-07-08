@@ -75,8 +75,7 @@ class SpectralMeshTool
      * \param local_gids If non-null, will insert all fine vertices into this range
      */
     template< class T >
-    ErrorCode create_spectral_elems( const T* conn, int num_fine_elems, int dim,
-                                     Range& output_range, int start_idx = 0,
+    ErrorCode create_spectral_elems( const T* conn, int num_fine_elems, int dim, Range& output_range, int start_idx = 0,
                                      Range* local_gids = NULL );
 
     /** \brief Set spectral order for this instance

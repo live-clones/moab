@@ -41,8 +41,7 @@ void print_error( moab::Interface& mb, moab::ErrorCode err )
 // Given an entity set and a point, find the hex contained in the
 // entity set which in turn contains the specified point.  Returns
 // 0 if point is not in any hexahedron.
-moab::EntityHandle hex_containing_point( moab::Interface& mb, moab::EntityHandle set,
-                                         const double point[ 3 ] );
+moab::EntityHandle hex_containing_point( moab::Interface& mb, moab::EntityHandle set, const double point[ 3 ] );
 
 // Print hex containing point.
 void print_hex( moab::Interface& mb, moab::EntityHandle hex );
@@ -101,8 +100,7 @@ int main( )
     return 0;
 }
 
-moab::EntityHandle hex_containing_point( moab::Interface& mb, moab::EntityHandle set,
-                                         const double point[ 3 ] )
+moab::EntityHandle hex_containing_point( moab::Interface& mb, moab::EntityHandle set, const double point[ 3 ] )
 {
     moab::ErrorCode           rval;
     moab::CartVect            pt( point );  // input location
@@ -145,7 +143,7 @@ void print_hex( moab::Interface& mb, moab::EntityHandle hex )
     std::cout << " Point is in hex " << id << " with corners: " << std::endl;
     for( int i = 0; i < 8; ++i )
     {
-        std::cout << " (" << coords[ 3 * i ] << ", " << coords[ 3 * i + 1 ] << ", "
-                  << coords[ 3 * i + 2 ] << ")" << std::endl;
+        std::cout << " (" << coords[ 3 * i ] << ", " << coords[ 3 * i + 1 ] << ", " << coords[ 3 * i + 2 ] << ")"
+                  << std::endl;
     }
 }

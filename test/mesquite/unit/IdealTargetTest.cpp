@@ -67,11 +67,9 @@ class IdealTargetTest : public CppUnit::TestFixture
     void test_hex_center( );
 
   private:
-    void get_calc_target( EntityTopology type, Sample sample, MsqMatrix< 3, 3 >&,
-                          MsqMatrix< 2, 2 >& );
+    void get_calc_target( EntityTopology type, Sample sample, MsqMatrix< 3, 3 >&, MsqMatrix< 2, 2 >& );
 
-    void get_ideal_target( EntityTopology type, Sample sample, MsqMatrix< 3, 3 >&,
-                           MsqMatrix< 2, 2 >& );
+    void get_ideal_target( EntityTopology type, Sample sample, MsqMatrix< 3, 3 >&, MsqMatrix< 2, 2 >& );
 
     void do_test( EntityTopology type, Sample location );
 

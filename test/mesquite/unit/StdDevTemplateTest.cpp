@@ -450,8 +450,7 @@ void StdDevTemplateTest::test_hessian_fails( )
 
     OFTestQM       metric( &value, 1 );
     StdDevTemplate func( &metric );
-    rval = func.evaluate_with_Hessian( ObjectiveFunction::CALCULATE, patch( ), value, grad, Hess,
-                                       err );
+    rval = func.evaluate_with_Hessian( ObjectiveFunction::CALCULATE, patch( ), value, grad, Hess, err );
     CPPUNIT_ASSERT( err );
 }
 
@@ -467,7 +466,6 @@ void StdDevTemplateTest::test_hessian_fails_sqr( )
 
     OFTestQM         metric( &value, 1 );
     VarianceTemplate func( &metric );
-    rval = func.evaluate_with_Hessian( ObjectiveFunction::CALCULATE, patch( ), value, grad, Hess,
-                                       err );
+    rval = func.evaluate_with_Hessian( ObjectiveFunction::CALCULATE, patch( ), value, grad, Hess, err );
     CPPUNIT_ASSERT( err );
 }

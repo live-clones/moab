@@ -56,10 +56,7 @@ class MeshUtil
     PatchData* get_global_patch( MsqError& err );
 
   public:
-    MeshUtil( Mesh* mesh, Settings* settings = 0 )
-        : myMesh( mesh ), mySettings( settings ), globalPatch( 0 )
-    {
-    }
+    MeshUtil( Mesh* mesh, Settings* settings = 0 ) : myMesh( mesh ), mySettings( settings ), globalPatch( 0 ) {}
 
     ~MeshUtil( );
 

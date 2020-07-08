@@ -64,9 +64,8 @@ namespace element_utility
       public:
         // Natural coordinates
         template< typename Moab, typename Entity_handle, typename Points, typename Point >
-        std::pair< bool, Point > operator( )( const Moab& /* moab */, const Entity_handle& /* h */,
-                                              const Points& v, const Point& p,
-                                              const double tol = 1.e-6 ) const
+        std::pair< bool, Point > operator( )( const Moab& /* moab */, const Entity_handle& /* h */, const Points& v,
+                                              const Point& p, const double tol = 1.e-6 ) const
         {
             Point result( 3, 0.0 );
             bool  point_found = solve_inverse( p, result, v, tol ) && is_contained( result, tol );
@@ -112,8 +111,7 @@ namespace element_utility
         }
 
         template< typename Point, typename Points >
-        bool solve_inverse( const Point& x, Point& xi, const Points& points,
-                            const double tol = 1.e-6 ) const
+        bool solve_inverse( const Point& x, Point& xi, const Points& points, const double tol = 1.e-6 ) const
         {
             const double error_tol_sqr = tol * tol;
             Point        delta( 3, 0.0 );
@@ -128,16 +126,14 @@ namespace element_utility
             ss << "Hex: ";
             for( int i = 0; i < 8; ++i )
             {
-                ss << points[ i ][ 0 ] << ", " << points[ i ][ 1 ] << ", " << points[ i ][ 2 ]
-                   << std::endl;
+                ss << points[ i ][ 0 ] << ", " << points[ i ][ 1 ] << ", " << points[ i ][ 2 ] << std::endl;
             }
             ss << std::endl;
 #endif
             while( normsq( delta ) > error_tol_sqr )
             {
 #ifdef QUADRATIC_HEX_DEBUG
-                ss << "Iter #: " << num_iterations << " Err: " << sqrt( normsq( delta ) )
-                   << " Iterate: ";
+                ss << "Iter #: " << num_iterations << " Err: " << sqrt( normsq( delta ) ) << " Iterate: ";
                 ss << xi[ 0 ] << ", " << xi[ 1 ] << ", " << xi[ 2 ] << std::endl;
 #endif
                 if( ++num_iterations >= 5 ) { return false; }
@@ -173,8 +169,7 @@ namespace element_utility
             }
             for( unsigned i = 0; i < 27; ++i )
             {
-                const double sh = SH( reference_points( i, 0 ), p[ 0 ] ) *
-                                  SH( reference_points( i, 1 ), p[ 1 ] ) *
+                const double sh = SH( reference_points( i, 0 ), p[ 0 ] ) * SH( reference_points( i, 1 ), p[ 1 ] ) *
                                   SH( reference_points( i, 2 ), p[ 2 ] );
                 result += sh * points[ i ];
             }
@@ -190,8 +185,7 @@ namespace element_utility
             double x = 0.0;
             for( int i = 0; i < 27; i++ )
             {
-                const double sh = SH( reference_points( i, 0 ), p[ 0 ] ) *
-                                  SH( reference_points( i, 1 ), p[ 1 ] ) *
+                const double sh = SH( reference_points( i, 0 ), p[ 0 ] ) * SH( reference_points( i, 1 ), p[ 1 ] ) *
                                   SH( reference_points( i, 2 ), p[ 2 ] );
                 x += sh * field[ i ];
             }
@@ -210,8 +204,7 @@ namespace element_utility
             J = Matrix( 0.0 );
             for( int i = 0; i < 27; i++ )
             {
-                const double sh[ 3 ] = { SH( reference_points( i, 0 ), p[ 0 ] ),
-                                         SH( reference_points( i, 1 ), p[ 1 ] ),
+                const double sh[ 3 ] = { SH( reference_points( i, 0 ), p[ 0 ] ), SH( reference_points( i, 1 ), p[ 1 ] ),
                                          SH( reference_points( i, 2 ), p[ 2 ] ) };
                 const double dsh[ 3 ] = { DSH( reference_points( i, 0 ), p[ 0 ] ),
                                           DSH( reference_points( i, 1 ), p[ 1 ] ),

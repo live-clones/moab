@@ -45,8 +45,7 @@ std::string AWShape2DB1::get_name( ) const
 
 AWShape2DB1::~AWShape2DB1( ) {}
 
-bool AWShape2DB1::evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result,
-                            MsqError& err )
+bool AWShape2DB1::evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result, MsqError& err )
 {
     const double alpha = det( A );
     const double omega = det( W );

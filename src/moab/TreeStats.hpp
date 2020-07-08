@@ -70,8 +70,7 @@ class TreeStats
     unsigned int numTraversals;  // number of tree traversals since last reset
     unsigned int constructLeafObjectTests;  // during construction, number of tests of objects (e.g.
                                             // elements)
-    unsigned int
-                 traversalLeafObjectTests;  // during traversals, number of tests of objects (e.g. elements)
+    unsigned int traversalLeafObjectTests;  // during traversals, number of tests of objects (e.g. elements)
     unsigned int boxElemTests;  // during construction, number of calls to
                                 // GeomUtil::box_elem_overlap (KD tree only)
 
@@ -170,17 +169,15 @@ inline void TreeStats::print( ) const
 
 inline void TreeStats::output_all_stats( const bool with_endl ) const
 {
-    std::cout << initTime << " " << numNodes << " " << numLeaves << " " << maxDepth << " "
-              << avgObjPerLeaf << " " << minObjPerLeaf << " " << maxObjPerLeaf << " "
-              << constructLeafObjectTests << " " << boxElemTests << " " << nodesVisited << " "
-              << leavesVisited << " " << numTraversals << " " << traversalLeafObjectTests << " ";
+    std::cout << initTime << " " << numNodes << " " << numLeaves << " " << maxDepth << " " << avgObjPerLeaf << " "
+              << minObjPerLeaf << " " << maxObjPerLeaf << " " << constructLeafObjectTests << " " << boxElemTests << " "
+              << nodesVisited << " " << leavesVisited << " " << numTraversals << " " << traversalLeafObjectTests << " ";
     if( with_endl ) std::cout << std::endl;
 }
 
 inline void TreeStats::output_trav_stats( const bool with_endl ) const
 {
-    std::cout << nodesVisited << " " << leavesVisited << " " << numTraversals << " "
-              << traversalLeafObjectTests << " ";
+    std::cout << nodesVisited << " " << leavesVisited << " " << numTraversals << " " << traversalLeafObjectTests << " ";
     if( with_endl ) std::cout << std::endl;
 }
 }  // namespace moab

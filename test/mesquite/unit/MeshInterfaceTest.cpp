@@ -93,8 +93,7 @@ class MeshInterfaceTest : public CppUnit::TestFixture
         // Get mesh data
         mMesh->get_all_elements( mElements, mErr );
         CPPUNIT_ASSERT( !mErr );
-        mMesh->elements_get_attached_vertices( arrptr( mElements ), mElements.size( ),
-                                               mConnectivity, mOffsets, mErr );
+        mMesh->elements_get_attached_vertices( arrptr( mElements ), mElements.size( ), mConnectivity, mOffsets, mErr );
         CPPUNIT_ASSERT( !mErr );
 
         // Construct list of vertices w/out duplicates from
@@ -169,8 +168,8 @@ class MeshInterfaceTest : public CppUnit::TestFixture
 
     void test_vertex_is_fixed( )
     {
-        size_t nbVert = mVertices.size( );
-        bool   correct_fixed[ 9 ] = { false, false, false, true, true, true, true, true, true };
+        size_t              nbVert = mVertices.size( );
+        bool                correct_fixed[ 9 ] = { false, false, false, true, true, true, true, true, true };
         std::vector< bool > fixed;
         mMesh->vertices_get_fixed_flag( arrptr( mVertices ), fixed, 9, mErr );
         CPPUNIT_ASSERT( !mErr );
@@ -225,8 +224,7 @@ class MeshInterfaceTest : public CppUnit::TestFixture
 
         std::vector< MBMesquite::Mesh::ElementHandle > elements;
         std::vector< size_t >                          offsets;
-        mMesh->vertices_get_attached_elements( arrptr( mVertices ), mVertices.size( ), elements,
-                                               offsets, mErr );
+        mMesh->vertices_get_attached_elements( arrptr( mVertices ), mVertices.size( ), elements, offsets, mErr );
         CPPUNIT_ASSERT( !mErr );
         CPPUNIT_ASSERT_EQUAL( offsets.size( ), mVertices.size( ) + 1 );
 
@@ -362,8 +360,7 @@ class MeshInterfaceTest : public CppUnit::TestFixture
 
         // Creates same list from the mesh implementation
         std::vector< MBMesquite::MsqVertex > tri_coords( 3 );
-        mMesh->vertices_get_coordinates( &mConnectivity[ mOffsets[ tri_index ] ],
-                                         arrptr( tri_coords ), 3, mErr );
+        mMesh->vertices_get_coordinates( &mConnectivity[ mOffsets[ tri_index ] ], arrptr( tri_coords ), 3, mErr );
         CPPUNIT_ASSERT( !mErr );
 
         // Makes sure both list contain the same elements (not necessarily in the same order).
@@ -371,11 +368,9 @@ class MeshInterfaceTest : public CppUnit::TestFixture
         std::vector< MBMesquite::MsqVertex >::iterator tri_iter;
         for( tri_iter = tri_coords.begin( ); tri_iter != tri_coords.end( ); ++tri_iter )
         {
-            for( correct_iter = correct_coords.begin( ); correct_iter != correct_coords.end( );
-                 ++correct_iter )
+            for( correct_iter = correct_coords.begin( ); correct_iter != correct_coords.end( ); ++correct_iter )
             {
-                if( Mesquite::Vector3D::distance_between( *tri_iter, *correct_iter ) < 10e-4 )
-                    break;
+                if( Mesquite::Vector3D::distance_between( *tri_iter, *correct_iter ) < 10e-4 ) break;
             }
 
             // check if a match was found

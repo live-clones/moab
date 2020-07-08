@@ -79,28 +79,23 @@ CompositeOFAdd::~CompositeOFAdd( )
     }
 }
 
-void CompositeOFAdd::initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
-                                       MsqError& err )
+void CompositeOFAdd::initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings, MsqError& err )
 {
     objFunc1->initialize_queue( mesh_and_domain, settings, err );MSQ_ERRRTN( err );
     objFunc2->initialize_queue( mesh_and_domain, settings, err );MSQ_ERRRTN( err );
 }
 
-bool CompositeOFAdd::initialize_block_coordinate_descent( MeshDomainAssoc* mesh_and_domain,
-                                                          const Settings*  settings,
+bool CompositeOFAdd::initialize_block_coordinate_descent( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
                                                           PatchSet* user_set, MsqError& err )
 {
     bool rval1, rval2;
-    rval1 =
-        objFunc1->initialize_block_coordinate_descent( mesh_and_domain, settings, user_set, err );
+    rval1 = objFunc1->initialize_block_coordinate_descent( mesh_and_domain, settings, user_set, err );
     MSQ_ERRZERO( err );
-    rval2 =
-        objFunc2->initialize_block_coordinate_descent( mesh_and_domain, settings, user_set, err );
+    rval2 = objFunc2->initialize_block_coordinate_descent( mesh_and_domain, settings, user_set, err );
     return !MSQ_CHKERR( err ) && rval1 && rval2;
 }
 
-bool CompositeOFAdd::evaluate( EvalType type, PatchData& pd, double& value_out, bool free,
-                               MsqError& err )
+bool CompositeOFAdd::evaluate( EvalType type, PatchData& pd, double& value_out, bool free, MsqError& err )
 {
     double value_2;
     bool   ok;
@@ -139,20 +134,16 @@ bool CompositeOFAdd::evaluate_with_gradient( EvalType type, PatchData& pd, doubl
     return true;
 }
 
-bool CompositeOFAdd::evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd,
-                                                     double&                     value_out,
+bool CompositeOFAdd::evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd, double& value_out,
                                                      std::vector< Vector3D >&    grad_out,
-                                                     std::vector< SymMatrix3D >& diag_out,
-                                                     MsqError&                   err )
+                                                     std::vector< SymMatrix3D >& diag_out, MsqError& err )
 {
     double value_2;
     bool   valid;
 
-    valid =
-        objFunc1->evaluate_with_Hessian_diagonal( type, pd, value_out, grad_out, diag_out, err );
+    valid = objFunc1->evaluate_with_Hessian_diagonal( type, pd, value_out, grad_out, diag_out, err );
     if( MSQ_CHKERR( err ) || !valid ) return false;
-    valid =
-        objFunc2->evaluate_with_Hessian_diagonal( type, pd, value_2, mGradient, mDiagonal, err );
+    valid = objFunc2->evaluate_with_Hessian_diagonal( type, pd, value_2, mGradient, mDiagonal, err );
     if( MSQ_CHKERR( err ) || !valid ) return false;
 
     for( size_t i = 0; i < pd.num_free_vertices( ); ++i )
@@ -166,8 +157,7 @@ bool CompositeOFAdd::evaluate_with_Hessian_diagonal( EvalType type, PatchData& p
 }
 
 bool CompositeOFAdd::evaluate_with_Hessian( EvalType type, PatchData& pd, double& value_out,
-                                            std::vector< Vector3D >& grad_out,
-                                            MsqHessian& Hessian_out, MsqError& err )
+                                            std::vector< Vector3D >& grad_out, MsqHessian& Hessian_out, MsqError& err )
 {
     double value_2;
     bool   ok;

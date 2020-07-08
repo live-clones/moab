@@ -221,8 +221,7 @@ void ConjugateGradient::optimize_vertex_positions( PatchData& pd, MsqError& err 
             {
                 grad_norm = Linf( arrptr( fNewGrad ), num_vert );
                 MSQ_PRINT( 2 )
-                ( "\nCG's VALUE = %f,  iter. = %i,  grad_norm = %f,  alp = %f", f, i, grad_norm,
-                  alp );
+                ( "\nCG's VALUE = %f,  iter. = %i,  grad_norm = %f,  alp = %f", f, i, grad_norm, alp );
                 MSQ_PRINT( 2 )( "\n   TIME %f", c_timer.since_birth( ) );
             }
             double s11 = 0;
@@ -384,11 +383,10 @@ double ConjugateGradient::get_step( PatchData& pd, double f0, int& j, MsqError& 
             MSQ_ERRZERO( err );
 
             // get new objective function value
-            if( !objFunc.evaluate( pd, fnew, err ) )
-                MSQ_SETERR( err )
-                ( "Non-convex feasiblility region found while "
-                  "computing new f.",
-                  MsqError::INVALID_MESH );
+            if( !objFunc.evaluate( pd, fnew, err ) ) MSQ_SETERR( err )
+            ( "Non-convex feasiblility region found while "
+              "computing new f.",
+              MsqError::INVALID_MESH );
             if( fnew < f ) { f = fnew; }
             else
             {

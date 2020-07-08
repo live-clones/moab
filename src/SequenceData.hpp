@@ -123,8 +123,7 @@ class SequenceData
      *\param sequence_data_sizes Bytes-per-entity for sequence-specific data.
      *\NOTE Does not copy tag data.
      */
-    SequenceData* subset( EntityHandle start, EntityHandle end,
-                          const int* sequence_data_sizes ) const;
+    SequenceData* subset( EntityHandle start, EntityHandle end, const int* sequence_data_sizes ) const;
 
     /**\brief SequenceManager data */
     TypeSequenceManager::SequenceDataPtr seqManData;
@@ -145,8 +144,7 @@ class SequenceData
     void increase_tag_count( unsigned by_this_many );
 
     void* create_data( int index, int bytes_per_ent, const void* initial_val = 0 );
-    void  copy_data_subset( int index, int size_per_ent, const void* source, size_t offset,
-                            size_t count );
+    void  copy_data_subset( int index, int size_per_ent, const void* source, size_t offset, size_t count );
 
     const int    numSequenceData;
     unsigned     numTagData;
@@ -155,8 +153,7 @@ class SequenceData
 };
 
 inline SequenceData::SequenceData( int num_sequence_arrays, EntityHandle start, EntityHandle end )
-    : numSequenceData( num_sequence_arrays ), numTagData( 0 ), startHandle( start ),
-      endHandle( end )
+    : numSequenceData( num_sequence_arrays ), numTagData( 0 ), startHandle( start ), endHandle( end )
 {
     const size_t sz = sizeof( void* ) * ( num_sequence_arrays + 1 );
     void**       data = (void**)malloc( sz );

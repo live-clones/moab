@@ -17,16 +17,15 @@
 
 using namespace moab;
 
-#define CHKERR( a )                                                                     \
-    do                                                                                  \
-    {                                                                                   \
-        ErrorCode val = ( a );                                                          \
-        if( MB_SUCCESS != val )                                                         \
-        {                                                                               \
-            std::cerr << "Error code  " << val << " at " << __FILE__ << ":" << __LINE__ \
-                      << std::endl;                                                     \
-            return val;                                                                 \
-        }                                                                               \
+#define CHKERR( a )                                                                                   \
+    do                                                                                                \
+    {                                                                                                 \
+        ErrorCode val = ( a );                                                                        \
+        if( MB_SUCCESS != val )                                                                       \
+        {                                                                                             \
+            std::cerr << "Error code  " << val << " at " << __FILE__ << ":" << __LINE__ << std::endl; \
+            return val;                                                                               \
+        }                                                                                             \
     } while( false )
 
 #define PCHECK( A ) \
@@ -49,8 +48,8 @@ int is_any_proc_error( int is_my_error )
     return err || result;
 }
 
-int run_test( ErrorCode ( *func )( const char*, const char* ), const char* func_name,
-              const std::string file_name, const char* option )
+int run_test( ErrorCode ( *func )( const char*, const char* ), const char* func_name, const std::string file_name,
+              const char* option )
 {
     ErrorCode result = ( *func )( file_name.c_str( ), option );
     int       is_err = is_any_proc_error( ( MB_SUCCESS != result ) );

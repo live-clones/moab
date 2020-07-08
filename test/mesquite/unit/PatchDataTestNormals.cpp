@@ -53,8 +53,7 @@ void PatchDataTestNormals::setUp( )
     // Make six quads corresponding to the six faces
     // of a cube inscribed in the sphere
     const double T = 1.0 / sqrt( 3.0 );
-    double       ucoords[] = { T, -T, -T, T, T, -T, -T, T, -T, -T, -T, -T,
-                         T, -T, T,  T, T, T,  -T, T, T,  -T, -T, T };
+    double       ucoords[] = { T, -T, -T, T, T, -T, -T, T, -T, -T, -T, -T, T, -T, T, T, T, T, -T, T, T, -T, -T, T };
     size_t       uconn[] = {
         3, 2, 1, 0,  // -Z face
         4, 5, 6, 7,  // +Z face
@@ -83,7 +82,7 @@ void PatchDataTestNormals::setUp( )
         1, 2, 6, 5,  // +Y face
         2, 3, 7, 6,  // -X face
         3, 0, 4, 7,  // -Y face
-                     // upper cube side faces
+        // upper cube side faces
         4, 5, 9, 8,  // +X face
         5, 6, 10, 9,  // +Y face
         6, 7, 11, 10,  // -X face
@@ -206,9 +205,8 @@ void PatchDataTestNormals::test_get_corner_normals_bounded_domain( )
 void PatchDataTestNormals::test_get_element_normals_infinite_domain( )
 {
     MsqPrintError err( cout );
-    Vector3D      expected_normals[] = { Vector3D( 0, 0, -1 ), Vector3D( 0, 0, 1 ),
-                                    Vector3D( 1, 0, 0 ),  Vector3D( 0, 1, 0 ),
-                                    Vector3D( -1, 0, 0 ), Vector3D( 0, -1, 0 ) };
+    Vector3D      expected_normals[] = { Vector3D( 0, 0, -1 ), Vector3D( 0, 0, 1 ),  Vector3D( 1, 0, 0 ),
+                                    Vector3D( 0, 1, 0 ),  Vector3D( -1, 0, 0 ), Vector3D( 0, -1, 0 ) };
 
     CPPUNIT_ASSERT( unboundedMesh.num_elements( ) == 6u );
     for( size_t i = 0; i < 6u; ++i )
@@ -223,7 +221,7 @@ void PatchDataTestNormals::test_get_element_normals_infinite_domain( )
 void PatchDataTestNormals::test_get_element_normals_bounded_domain( )
 {
     MsqPrintError err( cout );
-    Vector3D expected_normals[] = { Vector3D( 1, 0, 0 ),  Vector3D( 0, 1, 0 ), Vector3D( -1, 0, 0 ),
+    Vector3D      expected_normals[] = { Vector3D( 1, 0, 0 ),  Vector3D( 0, 1, 0 ), Vector3D( -1, 0, 0 ),
                                     Vector3D( 0, -1, 0 ), Vector3D( 1, 0, 0 ), Vector3D( 0, 1, 0 ),
                                     Vector3D( -1, 0, 0 ), Vector3D( 0, -1, 0 ) };
 

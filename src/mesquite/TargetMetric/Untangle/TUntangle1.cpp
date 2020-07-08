@@ -46,8 +46,7 @@ std::string TUntangle1::get_name( ) const
     return "Untangle1";
 }
 
-template< unsigned DIM >
-inline bool TUntangle1::eval( const MsqMatrix< DIM, DIM >& T, double& result )
+template< unsigned DIM > inline bool TUntangle1::eval( const MsqMatrix< DIM, DIM >& T, double& result )
 {
     double tau = det( T );
     result = 0.5 * ( sqrt( tau * tau + mFactor ) - tau );
@@ -55,8 +54,7 @@ inline bool TUntangle1::eval( const MsqMatrix< DIM, DIM >& T, double& result )
 }
 
 template< unsigned DIM >
-inline bool TUntangle1::grad( const MsqMatrix< DIM, DIM >& T, double& result,
-                              MsqMatrix< DIM, DIM >& deriv_wrt_T )
+inline bool TUntangle1::grad( const MsqMatrix< DIM, DIM >& T, double& result, MsqMatrix< DIM, DIM >& deriv_wrt_T )
 {
     double tau = det( T );
     double g = sqrt( tau * tau + mFactor );
@@ -76,8 +74,7 @@ inline bool TUntangle1::grad( const MsqMatrix< DIM, DIM >& T, double& result,
 }
 
 template< unsigned DIM >
-inline bool TUntangle1::hess( const MsqMatrix< DIM, DIM >& T, double& result,
-                              MsqMatrix< DIM, DIM >& deriv_wrt_T,
+inline bool TUntangle1::hess( const MsqMatrix< DIM, DIM >& T, double& result, MsqMatrix< DIM, DIM >& deriv_wrt_T,
                               MsqMatrix< DIM, DIM >* second_wrt_T )
 {
     const MsqMatrix< DIM, DIM > adjt = transpose_adj( T );

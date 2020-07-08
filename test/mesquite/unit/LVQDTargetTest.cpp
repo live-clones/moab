@@ -67,14 +67,13 @@ class LVQDTargetTest : public CppUnit::TestFixture
     PatchData pd2D, pd3D;
 
     // Use LVQDTargetCalculator to calculate the product of the passed values.
-    MsqMatrix< 3, 2 > target( const double* L, const MsqMatrix< 3, 2 >* V,
-                              const MsqMatrix< 2, 2 >* Q, const MsqMatrix< 2, 2 >* D );
-    // Use LVQDTargetCalculator to calculate the product of the passed values.
-    MsqMatrix< 2, 2 > target( const double* L, const MsqMatrix< 2, 2 >* Q,
+    MsqMatrix< 3, 2 > target( const double* L, const MsqMatrix< 3, 2 >* V, const MsqMatrix< 2, 2 >* Q,
                               const MsqMatrix< 2, 2 >* D );
     // Use LVQDTargetCalculator to calculate the product of the passed values.
-    MsqMatrix< 3, 3 > target( const double* L, const MsqMatrix< 3, 3 >* V,
-                              const MsqMatrix< 3, 3 >* Q, const MsqMatrix< 3, 3 >* D );
+    MsqMatrix< 2, 2 > target( const double* L, const MsqMatrix< 2, 2 >* Q, const MsqMatrix< 2, 2 >* D );
+    // Use LVQDTargetCalculator to calculate the product of the passed values.
+    MsqMatrix< 3, 3 > target( const double* L, const MsqMatrix< 3, 3 >* V, const MsqMatrix< 3, 3 >* Q,
+                              const MsqMatrix< 3, 3 >* D );
 
   public:
     void setUp( );
@@ -102,18 +101,15 @@ class LVQDTargetTest : public CppUnit::TestFixture
 
       public:
         ConstantTarget( MsqMatrix< 3, 3 > val3D, MsqMatrix< 3, 2 > val2D )
-            : target3D( val3D ), targetSurf( val2D ), have3D( true ), haveSurf( true ),
-              have2D( false )
+            : target3D( val3D ), targetSurf( val2D ), have3D( true ), haveSurf( true ), have2D( false )
         {
         }
         ConstantTarget( MsqMatrix< 3, 3 > val3D, MsqMatrix< 2, 2 > val2D )
-            : target3D( val3D ), target2D( val2D ), have3D( true ), haveSurf( false ),
-              have2D( true )
+            : target3D( val3D ), target2D( val2D ), have3D( true ), haveSurf( false ), have2D( true )
         {
         }
         ConstantTarget( double C, bool surf )
-            : target3D( C ), targetSurf( C ), target2D( C ), have3D( true ), haveSurf( surf ),
-              have2D( !surf )
+            : target3D( C ), targetSurf( C ), target2D( C ), have3D( true ), haveSurf( surf ), have2D( !surf )
         {
         }
         ConstantTarget( MsqMatrix< 3, 3 > val3D )
@@ -129,24 +125,21 @@ class LVQDTargetTest : public CppUnit::TestFixture
         {
         }
 
-        virtual bool get_3D_target( PatchData&, size_t, Sample, MsqMatrix< 3, 3 >& result,
-                                    MsqError& err )
+        virtual bool get_3D_target( PatchData&, size_t, Sample, MsqMatrix< 3, 3 >& result, MsqError& err )
         {
             CPPUNIT_ASSERT( have3D );
             result = target3D;
             return have3D;
         }
 
-        virtual bool get_surface_target( PatchData&, size_t, Sample, MsqMatrix< 3, 2 >& result,
-                                         MsqError& err )
+        virtual bool get_surface_target( PatchData&, size_t, Sample, MsqMatrix< 3, 2 >& result, MsqError& err )
         {
             CPPUNIT_ASSERT( haveSurf );
             result = targetSurf;
             return haveSurf;
         }
 
-        virtual bool get_2D_target( PatchData&, size_t, Sample, MsqMatrix< 2, 2 >& result,
-                                    MsqError& err )
+        virtual bool get_2D_target( PatchData&, size_t, Sample, MsqMatrix< 2, 2 >& result, MsqError& err )
         {
             CPPUNIT_ASSERT( have2D );
             result = target2D;
@@ -167,10 +160,7 @@ class LVQDTargetTest : public CppUnit::TestFixture
         bool surfOrient;
 
       public:
-        TargetError( bool flag_error = true, bool orient = false )
-            : flagError( flag_error ), surfOrient( orient )
-        {
-        }
+        TargetError( bool flag_error = true, bool orient = false ) : flagError( flag_error ), surfOrient( orient ) {}
 
         bool get_3D_target( PatchData&, size_t, Sample, MsqMatrix< 3, 3 >&, MsqError& err )
         {
@@ -211,8 +201,7 @@ void LVQDTargetTest::setUp( )
 
     const double rc45 = sqrt( cos45 );
     const double skew_2D_45[ 4 ] = { 1 / rc45, rc45, 0, rc45 };
-    const double skew_3D_45[ 9 ] = {
-        1, cos45, cos45, 0, cos45, 1 - cos45, 0, 0, sqrt( MSQ_SQRT_TWO - 1 ) };
+    const double skew_3D_45[ 9 ] = { 1, cos45, cos45, 0, cos45, 1 - cos45, 0, 0, sqrt( MSQ_SQRT_TWO - 1 ) };
 
     const double aspect_2D_2x[ 4 ] = { MSQ_SQRT_TWO, 0, 0, MSQ_SQRT_TWO / 2 };
     const double r6 = MBMesquite::cbrt( 1.0 / 6.0 );
@@ -240,15 +229,14 @@ void LVQDTargetTest::setUp( )
     ASSERT_NO_ERROR( err );
 };
 
-MsqMatrix< 3, 2 > LVQDTargetTest::target( const double* L, const MsqMatrix< 3, 2 >* V,
-                                          const MsqMatrix< 2, 2 >* Q, const MsqMatrix< 2, 2 >* D )
+MsqMatrix< 3, 2 > LVQDTargetTest::target( const double* L, const MsqMatrix< 3, 2 >* V, const MsqMatrix< 2, 2 >* Q,
+                                          const MsqMatrix< 2, 2 >* D )
 {
     ConstantTarget       W_size( L ? *L : 1.0, true );
     ConstantTarget       W_orient( V ? *V : I32 );
     ConstantTarget       W_skew( Q ? *Q : I22 );
     ConstantTarget       W_aspect( D ? *D : I22 );
-    LVQDTargetCalculator LVQD( L ? &W_size : NULL, V ? &W_orient : NULL, Q ? &W_skew : NULL,
-                               D ? &W_aspect : NULL );
+    LVQDTargetCalculator LVQD( L ? &W_size : NULL, V ? &W_orient : NULL, Q ? &W_skew : NULL, D ? &W_aspect : NULL );
     MsqError             err;
     MsqMatrix< 3, 2 >    W;
     bool                 v;
@@ -269,8 +257,7 @@ MsqMatrix< 3, 2 > LVQDTargetTest::target( const double* L, const MsqMatrix< 3, 2
     return W;
 }
 
-MsqMatrix< 2, 2 > LVQDTargetTest::target( const double* L, const MsqMatrix< 2, 2 >* Q,
-                                          const MsqMatrix< 2, 2 >* D )
+MsqMatrix< 2, 2 > LVQDTargetTest::target( const double* L, const MsqMatrix< 2, 2 >* Q, const MsqMatrix< 2, 2 >* D )
 {
     ConstantTarget       W_size( L ? *L : 1.0, false );
     ConstantTarget       W_skew( Q ? *Q : I22 );
@@ -284,15 +271,14 @@ MsqMatrix< 2, 2 > LVQDTargetTest::target( const double* L, const MsqMatrix< 2, 2
     return W;
 }
 
-MsqMatrix< 3, 3 > LVQDTargetTest::target( const double* L, const MsqMatrix< 3, 3 >* V,
-                                          const MsqMatrix< 3, 3 >* Q, const MsqMatrix< 3, 3 >* D )
+MsqMatrix< 3, 3 > LVQDTargetTest::target( const double* L, const MsqMatrix< 3, 3 >* V, const MsqMatrix< 3, 3 >* Q,
+                                          const MsqMatrix< 3, 3 >* D )
 {
     ConstantTarget       W_size( L ? *L : 1.0, true );
     ConstantTarget       W_orient( V ? *V : I33 );
     ConstantTarget       W_skew( Q ? *Q : I33 );
     ConstantTarget       W_aspect( D ? *D : I33 );
-    LVQDTargetCalculator LVQD( L ? &W_size : NULL, V ? &W_orient : NULL, Q ? &W_skew : NULL,
-                               D ? &W_aspect : NULL );
+    LVQDTargetCalculator LVQD( L ? &W_size : NULL, V ? &W_orient : NULL, Q ? &W_skew : NULL, D ? &W_aspect : NULL );
     MsqError             err;
     MsqMatrix< 3, 3 >    W;
     bool                 v = LVQD.get_3D_target( pd3D, 0, Sample( 0, 0 ), W, err );
@@ -355,8 +341,7 @@ void LVQDTargetTest::test_LVQD_product_surface( )
     ASSERT_MATRICES_EQUAL( s * V2D_Z45, target( &s, &V2D_Z45, &I22, &I22 ), 1e-8 );
     ASSERT_MATRICES_EQUAL( V2D_Z45 * Q2D_45, target( &o, &V2D_Z45, &Q2D_45, &I22 ), 1e-8 );
     ASSERT_MATRICES_EQUAL( V2D_Z45 * D2D_21, target( &o, &V2D_Z45, &I22, &D2D_21 ), 1e-8 );
-    ASSERT_MATRICES_EQUAL( s * V2D_Z45 * Q2D_45 * D2D_21, target( &s, &V2D_Z45, &Q2D_45, &D2D_21 ),
-                           1e-8 );
+    ASSERT_MATRICES_EQUAL( s * V2D_Z45 * Q2D_45 * D2D_21, target( &s, &V2D_Z45, &Q2D_45, &D2D_21 ), 1e-8 );
 }
 
 void LVQDTargetTest::test_LVQD_product_3D( )
@@ -369,6 +354,5 @@ void LVQDTargetTest::test_LVQD_product_3D( )
     ASSERT_MATRICES_EQUAL( s * V3D_Z45, target( &s, &V3D_Z45, &I33, &I33 ), 1e-8 );
     ASSERT_MATRICES_EQUAL( V3D_Z45 * Q3D_45, target( &o, &V3D_Z45, &Q3D_45, &I33 ), 1e-8 );
     ASSERT_MATRICES_EQUAL( V3D_Z45 * D3D_123, target( &o, &V3D_Z45, &I33, &D3D_123 ), 1e-8 );
-    ASSERT_MATRICES_EQUAL( s * V3D_Z45 * Q3D_45 * D3D_123,
-                           target( &s, &V3D_Z45, &Q3D_45, &D3D_123 ), 1e-8 );
+    ASSERT_MATRICES_EQUAL( s * V3D_Z45 * Q3D_45 * D3D_123, target( &s, &V3D_Z45, &Q3D_45, &D3D_123 ), 1e-8 );
 }

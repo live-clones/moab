@@ -180,8 +180,7 @@ TargetCalculatorTest::TargetCalculatorTest( )
 
     const double rc45 = sqrt( cos45 );
     const double skew_2D_45[ 4 ] = { 1 / rc45, rc45, 0, rc45 };
-    const double skew_3D_45[ 9 ] = {
-        1, cos45, cos45, 0, cos45, 1 - cos45, 0, 0, sqrt( MSQ_SQRT_TWO - 1 ) };
+    const double skew_3D_45[ 9 ] = { 1, cos45, cos45, 0, cos45, 1 - cos45, 0, 0, sqrt( MSQ_SQRT_TWO - 1 ) };
 
     const double aspect_2D_2x[ 4 ] = { MSQ_SQRT_TWO, 0, 0, MSQ_SQRT_TWO / 2 };
     const double r6 = MBMesquite::cbrt( 1.0 / 6.0 );
@@ -199,8 +198,7 @@ TargetCalculatorTest::TargetCalculatorTest( )
     D2D_21 = MsqMatrix< 2, 2 >( aspect_2D_2x );
 }
 
-template< unsigned R, unsigned C >
-inline void TargetCalculatorTest::check_valid_V( MsqMatrix< R, C > V )
+template< unsigned R, unsigned C > inline void TargetCalculatorTest::check_valid_V( MsqMatrix< R, C > V )
 {
     // check that it is a rotation
     MsqMatrix< C, C > I( 1.0 );
@@ -222,8 +220,7 @@ template< unsigned D > inline void TargetCalculatorTest::check_valid_Q( MsqMatri
 
     // columns must be of equal length
     CPPUNIT_ASSERT_DOUBLES_EQUAL( length( Q.column( 0 ) ), length( Q.column( 1 ) ), EPSBIG );
-    if( D == 3 )
-    { CPPUNIT_ASSERT_DOUBLES_EQUAL( length( Q.column( 0 ) ), length( Q.column( 2 ) ), EPSBIG ); }
+    if( D == 3 ) { CPPUNIT_ASSERT_DOUBLES_EQUAL( length( Q.column( 0 ) ), length( Q.column( 2 ) ), EPSBIG ); }
 
     // diagonal elements must be greater than zero
     CPPUNIT_ASSERT( Q( 0, 0 ) - EPS >= 0.0 );
@@ -231,8 +228,7 @@ template< unsigned D > inline void TargetCalculatorTest::check_valid_Q( MsqMatri
     if( D == 3 ) { CPPUNIT_ASSERT( Q( 2, 2 ) - EPS >= 0.0 ); }
 }
 
-template< unsigned D >
-inline void TargetCalculatorTest::check_valid_delta( MsqMatrix< D, D > delta )
+template< unsigned D > inline void TargetCalculatorTest::check_valid_delta( MsqMatrix< D, D > delta )
 {
     // must have unit determinant
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.0, det( delta ), EPS );
@@ -1125,10 +1121,10 @@ void TargetCalculatorTest::test_new_aspect_2D( )
 
 void TargetCalculatorTest::test_jacobian_3D( )
 {
-    MsqError         err;
-    PatchData        pd;
-    LinearHexahedron map;
-    const Vector3D   hex_coords[] = { Vector3D( 0, 0, 0 ), Vector3D( 2, 0, 0 ), Vector3D( 3, 2, 0 ),
+    MsqError              err;
+    PatchData             pd;
+    LinearHexahedron      map;
+    const Vector3D        hex_coords[] = { Vector3D( 0, 0, 0 ), Vector3D( 2, 0, 0 ), Vector3D( 3, 2, 0 ),
                                     Vector3D( 1, 2, 0 ), Vector3D( 1, 0, 1 ), Vector3D( 3, 0, 2 ),
                                     Vector3D( 3, 2, 2 ), Vector3D( 2, 2, 2 ) };
     const MsqVector< 3 >* coords = reinterpret_cast< const MsqVector< 3 >* >( hex_coords );
@@ -1154,10 +1150,10 @@ void TargetCalculatorTest::test_jacobian_3D( )
 
 void TargetCalculatorTest::test_jacobian_2D( )
 {
-    MsqError       err;
-    PatchData      pd;
-    LinearTriangle map;
-    const Vector3D tri_coords[] = { Vector3D( 0, 0, 0 ), Vector3D( 2, 0, 0 ), Vector3D( 0, 0, 1 ) };
+    MsqError              err;
+    PatchData             pd;
+    LinearTriangle        map;
+    const Vector3D        tri_coords[] = { Vector3D( 0, 0, 0 ), Vector3D( 2, 0, 0 ), Vector3D( 0, 0, 1 ) };
     const MsqVector< 3 >* coords = reinterpret_cast< const MsqVector< 3 >* >( tri_coords );
 
     Sample    pts[] = { Sample( 0, 0 ), Sample( 1, 1 ), Sample( 2, 0 ) };
@@ -1186,9 +1182,8 @@ class DummyRefMesh : public ReferenceMeshInterface
   public:
     DummyRefMesh( const Vector3D* coords, int num_verts ) : mCoords( coords, coords + num_verts ) {}
 
-    void get_reference_vertex_coordinates( const Mesh::VertexHandle* handles,
-                                           const size_t num_vertices, Vector3D* coords,
-                                           MsqError& err )
+    void get_reference_vertex_coordinates( const Mesh::VertexHandle* handles, const size_t num_vertices,
+                                           Vector3D* coords, MsqError& err )
     {
         const size_t* indices = reinterpret_cast< const size_t* >( handles );
         for( size_t i = 0; i < num_vertices; ++i )
@@ -1244,8 +1239,7 @@ void TargetCalculatorTest::test_get_refmesh_Jacobian_2D( )
     const Vector3D tri_coords[] = { Vector3D( 0, 0, 0 ), Vector3D( 3, 0, 1 ), Vector3D( 1, 0, 3 ) };
     DummyRefMesh   ref_mesh( tri_coords, 3 );
 
-    const Vector3D right_coords[] = { Vector3D( 0, 0, 0 ), Vector3D( 5, 0, 0 ),
-                                      Vector3D( 5, 1, 0 ) };
+    const Vector3D right_coords[] = { Vector3D( 0, 0, 0 ), Vector3D( 5, 0, 0 ), Vector3D( 5, 1, 0 ) };
     size_t         conn[] = { 0, 1, 2 };
     bool           fixed[ 3 ];
     std::fill( fixed, fixed + sizeof( fixed ) / sizeof( fixed[ 0 ] ), false );

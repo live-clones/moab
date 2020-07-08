@@ -293,26 +293,17 @@ void GeomPrimTest::test_plane_closest_to_point( )
     const Vector3D p1( 1, 2, 3 ), p2( -1, -5, 0 ), p3( 0.5, 0.5, 100 );
     const Vector3D p1xy( p1[ 0 ], p1[ 1 ], offset );
 
-    CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( p1[ 0 ], p1[ 1 ], offset ), xyplane.closest( p1 ),
-                                  1e-6 );
-    CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( p2[ 0 ], p2[ 1 ], offset ), xyplane.closest( p2 ),
-                                  1e-6 );
-    CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( p3[ 0 ], p3[ 1 ], offset ), xyplane.closest( p3 ),
-                                  1e-6 );
+    CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( p1[ 0 ], p1[ 1 ], offset ), xyplane.closest( p1 ), 1e-6 );
+    CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( p2[ 0 ], p2[ 1 ], offset ), xyplane.closest( p2 ), 1e-6 );
+    CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( p3[ 0 ], p3[ 1 ], offset ), xyplane.closest( p3 ), 1e-6 );
 
-    CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( p1[ 0 ], offset, p1[ 2 ] ), xzplane.closest( p1 ),
-                                  1e-6 );
-    CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( p2[ 0 ], offset, p2[ 2 ] ), xzplane.closest( p2 ),
-                                  1e-6 );
-    CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( p3[ 0 ], offset, p3[ 2 ] ), xzplane.closest( p3 ),
-                                  1e-6 );
+    CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( p1[ 0 ], offset, p1[ 2 ] ), xzplane.closest( p1 ), 1e-6 );
+    CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( p2[ 0 ], offset, p2[ 2 ] ), xzplane.closest( p2 ), 1e-6 );
+    CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( p3[ 0 ], offset, p3[ 2 ] ), xzplane.closest( p3 ), 1e-6 );
 
-    CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( offset, p1[ 1 ], p1[ 2 ] ), yzplane.closest( p1 ),
-                                  1e-6 );
-    CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( offset, p2[ 1 ], p2[ 2 ] ), yzplane.closest( p2 ),
-                                  1e-6 );
-    CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( offset, p3[ 1 ], p3[ 2 ] ), yzplane.closest( p3 ),
-                                  1e-6 );
+    CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( offset, p1[ 1 ], p1[ 2 ] ), yzplane.closest( p1 ), 1e-6 );
+    CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( offset, p2[ 1 ], p2[ 2 ] ), yzplane.closest( p2 ), 1e-6 );
+    CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( offset, p3[ 1 ], p3[ 2 ] ), yzplane.closest( p3 ), 1e-6 );
 }
 
 void GeomPrimTest::test_plane_intersect_plane( )
@@ -403,8 +394,7 @@ void GeomPrimTest::test_sphere_intersect_plane( )
     const MsqPlane tangent( Vector3D( 0, 1, 0 ), 1.0 );
     CPPUNIT_ASSERT( sphere.intersect( tangent, result ) );
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.0, result.radius( ), 1e-6 );
-    CPPUNIT_ASSERT_VECTORS_EQUAL( sphere.center( ) - Vector3D( 0, sphere.radius( ), 0 ),
-                                  result.center( ), 1e-6 );
+    CPPUNIT_ASSERT_VECTORS_EQUAL( sphere.center( ) - Vector3D( 0, sphere.radius( ), 0 ), result.center( ), 1e-6 );
 
     const MsqPlane xyz0( Vector3D( 1, 1, 1 ), 0.0 );
     CPPUNIT_ASSERT( sphere.intersect( xyz0, result ) );
@@ -413,8 +403,7 @@ void GeomPrimTest::test_sphere_intersect_plane( )
     else
         CPPUNIT_ASSERT_VECTORS_EQUAL( -xyz0.normal( ), result.normal( ), 1e-6 );
     CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( 0, 0, 0 ), result.center( ), 1e-6 );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( sqrt( sphere.radius( ) * sphere.radius( ) - 3 ), result.radius( ),
-                                  1e-6 );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( sqrt( sphere.radius( ) * sphere.radius( ) - 3 ), result.radius( ), 1e-6 );
 }
 
 void GeomPrimTest::test_sphere_intersect_sphere( )

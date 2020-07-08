@@ -72,8 +72,7 @@ QualityImprover::~QualityImprover( )
     delete defaultInnerCriterion;
 }
 
-void QualityImprover::initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
-                                        MsqError& err )
+void QualityImprover::initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings, MsqError& err )
 {
     innerTerminationCriterion->initialize_queue( mesh_and_domain, settings, err );MSQ_ERRRTN( err );
     outerTerminationCriterion->initialize_queue( mesh_and_domain, settings, err );MSQ_ERRRTN( err );

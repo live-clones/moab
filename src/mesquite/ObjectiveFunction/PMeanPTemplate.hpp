@@ -70,10 +70,9 @@ class PMeanPTemplate : public ObjectiveFunctionTemplate
      */
     MESQUITE_EXPORT
     PMeanPTemplate( const PMeanPTemplate& copy )
-        : ObjectiveFunctionTemplate( copy ), mPower( copy.mPower ),
-          mPowerMinus1( copy.mPowerMinus1 ), mPowerMinus2( copy.mPowerMinus2 ),
-          mCount( copy.mCount ), mPowSum( copy.mPowSum ), saveCount( copy.saveCount ),
-          savePowSum( copy.savePowSum )
+        : ObjectiveFunctionTemplate( copy ), mPower( copy.mPower ), mPowerMinus1( copy.mPowerMinus1 ),
+          mPowerMinus2( copy.mPowerMinus2 ), mCount( copy.mCount ), mPowSum( copy.mPowSum ),
+          saveCount( copy.saveCount ), savePowSum( copy.savePowSum )
     {
     }
 
@@ -95,8 +94,7 @@ class PMeanPTemplate : public ObjectiveFunctionTemplate
     }
 
     MESQUITE_EXPORT
-    virtual bool evaluate( EvalType type, PatchData& pd, double& value_out, bool free,
-                           MsqError& err );
+    virtual bool evaluate( EvalType type, PatchData& pd, double& value_out, bool free, MsqError& err );
 
     MESQUITE_EXPORT
     virtual bool evaluate_with_gradient( EvalType type, PatchData& pd, double& value_out,
@@ -105,13 +103,11 @@ class PMeanPTemplate : public ObjectiveFunctionTemplate
     MESQUITE_EXPORT
     virtual bool evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd, double& value_out,
                                                  std::vector< Vector3D >&    grad_out,
-                                                 std::vector< SymMatrix3D >& hess_diag_out,
-                                                 MsqError&                   err );
+                                                 std::vector< SymMatrix3D >& hess_diag_out, MsqError& err );
 
     MESQUITE_EXPORT
     virtual bool evaluate_with_Hessian( EvalType type, PatchData& pd, double& value_out,
-                                        std::vector< Vector3D >& grad_out, MsqHessian& Hessian_out,
-                                        MsqError& err );
+                                        std::vector< Vector3D >& grad_out, MsqHessian& Hessian_out, MsqError& err );
 
     MESQUITE_EXPORT
     virtual ObjectiveFunction* clone( ) const;

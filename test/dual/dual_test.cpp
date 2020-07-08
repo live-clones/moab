@@ -22,8 +22,7 @@ int main( int argc, char* argv[] )
     if( argc <= 2 )
     {
         std::cout << "Usage: dual_test <mesh_file_name> <out file>" << std::endl;
-        std::cout << "using default input : " << default_input << " and output " << default_output
-                  << "\n";
+        std::cout << "using default input : " << default_input << " and output " << default_output << "\n";
     }
     else
     {
@@ -83,15 +82,13 @@ int main( int argc, char* argv[] )
     if( MB_SUCCESS != result )
         std::cout << "Problem getting dual faces." << std::endl;
     else
-        std::cout << "Found " << dual_faces.size( ) << "/" << num_edges << " dual faces."
-                  << std::endl;
+        std::cout << "Found " << dual_faces.size( ) << "/" << num_edges << " dual faces." << std::endl;
 
     result = dt.get_dual_entities( 0, 0, 3, dual_cells );
     if( MB_SUCCESS != result )
         std::cout << "Problem getting dual cells." << std::endl;
     else
-        std::cout << "Found " << dual_cells.size( ) << "/" << all_verts.size( ) << " dual cells."
-                  << std::endl;
+        std::cout << "Found " << dual_cells.size( ) << "/" << all_verts.size( ) << " dual cells." << std::endl;
 
     // print information about dual hyperplanes, if any
     Tag   hp_tag;
@@ -104,8 +101,7 @@ int main( int argc, char* argv[] )
         {
             result = gMB->get_entities_by_type_and_tag( 0, MBENTITYSET, &hp_tag, NULL, 1, hp_sets );
             if( MB_SUCCESS == result && !hp_sets.empty( ) )
-                std::cout << "Found " << hp_sets.size( ) << " 1d dual hyperplanes (chords)."
-                          << std::endl;
+                std::cout << "Found " << hp_sets.size( ) << " 1d dual hyperplanes (chords)." << std::endl;
         }
     }
 
@@ -118,8 +114,7 @@ int main( int argc, char* argv[] )
             hp_sets.clear( );
             result = gMB->get_entities_by_type_and_tag( 0, MBENTITYSET, &hp_tag, NULL, 1, hp_sets );
             if( MB_SUCCESS == result && !hp_sets.empty( ) )
-                std::cout << "Found " << hp_sets.size( ) << " 2d dual hyperplanes (sheets)."
-                          << std::endl;
+                std::cout << "Found " << hp_sets.size( ) << " 2d dual hyperplanes (sheets)." << std::endl;
         }
     }
 

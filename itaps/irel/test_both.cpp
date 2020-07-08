@@ -20,15 +20,15 @@ void test_both( )
     int             err;
     iRel_PairHandle pair;
 
-    iRel_createPair( rel, geom, iRel_ENTITY, iRel_IGEOM_IFACE, iRel_ACTIVE, mesh, iRel_BOTH,
-                     iRel_IMESH_IFACE, iRel_ACTIVE, &pair, &err );CHECK_ERR( err );
+    iRel_createPair( rel, geom, iRel_ENTITY, iRel_IGEOM_IFACE, iRel_ACTIVE, mesh, iRel_BOTH, iRel_IMESH_IFACE,
+                     iRel_ACTIVE, &pair, &err );CHECK_ERR( err );
 
     iRel_setEntSetRelation( rel, pair, geom_ent, mesh_set, &err );CHECK_ERR( err );
 
     iBase_EntityHandle* related_ents = NULL;
     int                 related_ents_alloc = 0, related_ents_size;
-    iRel_getEntArrEntArrRelation( rel, pair, mesh_ents, 4, 1, &related_ents, &related_ents_alloc,
-                                  &related_ents_size, &err );CHECK_ERR( err );
+    iRel_getEntArrEntArrRelation( rel, pair, mesh_ents, 4, 1, &related_ents, &related_ents_alloc, &related_ents_size,
+                                  &err );CHECK_ERR( err );
 
     for( int i = 0; i < related_ents_size; i++ )
         CHECK_EQUAL( related_ents[ i ], geom_ent );
@@ -41,8 +41,8 @@ void test_change_to_both( )
     int             err;
     iRel_PairHandle pair;
 
-    iRel_createPair( rel, geom, iRel_ENTITY, iRel_IGEOM_IFACE, iRel_ACTIVE, mesh, iRel_SET,
-                     iRel_IMESH_IFACE, iRel_ACTIVE, &pair, &err );CHECK_ERR( err );
+    iRel_createPair( rel, geom, iRel_ENTITY, iRel_IGEOM_IFACE, iRel_ACTIVE, mesh, iRel_SET, iRel_IMESH_IFACE,
+                     iRel_ACTIVE, &pair, &err );CHECK_ERR( err );
 
     iRel_setEntSetRelation( rel, pair, geom_ent, mesh_set, &err );CHECK_ERR( err );
 
@@ -50,8 +50,8 @@ void test_change_to_both( )
 
     iBase_EntityHandle* related_ents = NULL;
     int                 related_ents_alloc = 0, related_ents_size;
-    iRel_getEntArrEntArrRelation( rel, pair, mesh_ents, 4, 1, &related_ents, &related_ents_alloc,
-                                  &related_ents_size, &err );CHECK_ERR( err );
+    iRel_getEntArrEntArrRelation( rel, pair, mesh_ents, 4, 1, &related_ents, &related_ents_alloc, &related_ents_size,
+                                  &err );CHECK_ERR( err );
 
     for( int i = 0; i < related_ents_size; i++ )
         CHECK_EQUAL( related_ents[ i ], geom_ent );
@@ -64,8 +64,8 @@ void test_change_to_set( )
     int             err;
     iRel_PairHandle pair;
 
-    iRel_createPair( rel, geom, iRel_ENTITY, iRel_IGEOM_IFACE, iRel_ACTIVE, mesh, iRel_BOTH,
-                     iRel_IMESH_IFACE, iRel_ACTIVE, &pair, &err );CHECK_ERR( err );
+    iRel_createPair( rel, geom, iRel_ENTITY, iRel_IGEOM_IFACE, iRel_ACTIVE, mesh, iRel_BOTH, iRel_IMESH_IFACE,
+                     iRel_ACTIVE, &pair, &err );CHECK_ERR( err );
 
     iRel_setEntSetRelation( rel, pair, geom_ent, mesh_set, &err );CHECK_ERR( err );
 
@@ -96,8 +96,8 @@ int main( )
 
     iBase_EntityHandle* mesh_ents_ptr = mesh_ents;
     int                 mesh_ents_alloc = 4, mesh_ents_size;
-    iMesh_createVtxArr( mesh, 4, iBase_INTERLEAVED, coords, 12, &mesh_ents_ptr, &mesh_ents_alloc,
-                        &mesh_ents_size, &err );
+    iMesh_createVtxArr( mesh, 4, iBase_INTERLEAVED, coords, 12, &mesh_ents_ptr, &mesh_ents_alloc, &mesh_ents_size,
+                        &err );
 
     iMesh_createEntSet( mesh, false, &mesh_set, &err );
     iMesh_addEntArrToSet( mesh, mesh_ents, mesh_ents_size, mesh_set, &err );

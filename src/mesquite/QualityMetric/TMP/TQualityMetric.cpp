@@ -63,8 +63,8 @@ std::string TQualityMetric::get_name( ) const
     return targetMetric->get_name( );
 }
 
-bool TQualityMetric::evaluate_internal( PatchData& pd, size_t p_handle, double& value,
-                                        size_t* indices, size_t& num_indices, MsqError& err )
+bool TQualityMetric::evaluate_internal( PatchData& pd, size_t p_handle, double& value, size_t* indices,
+                                        size_t& num_indices, MsqError& err )
 {
     const Sample   s = ElemSampleQM::sample( p_handle );
     const size_t   e = ElemSampleQM::elem( p_handle );
@@ -101,8 +101,8 @@ bool TQualityMetric::evaluate_internal( PatchData& pd, size_t p_handle, double& 
     {
         MsqMatrix< 2, 2 > W, A;
         MsqMatrix< 3, 2 > S_a_transpose_Theta;
-        rval = evaluate_surface_common( pd, s, e, bits, indices, num_indices, mDerivs2D, W, A,
-                                        S_a_transpose_Theta, err );
+        rval =
+            evaluate_surface_common( pd, s, e, bits, indices, num_indices, mDerivs2D, W, A, S_a_transpose_Theta, err );
         if( MSQ_CHKERR( err ) || !rval ) return false;
         const MsqMatrix< 2, 2 > Winv = inverse( W );
         const MsqMatrix< 2, 2 > T = A * Winv;
@@ -123,8 +123,8 @@ bool TQualityMetric::evaluate_internal( PatchData& pd, size_t p_handle, double& 
 }
 
 bool TQualityMetric::evaluate_with_gradient( PatchData& pd, size_t p_handle, double& value,
-                                             std::vector< size_t >&   indices,
-                                             std::vector< Vector3D >& grad, MsqError& err )
+                                             std::vector< size_t >& indices, std::vector< Vector3D >& grad,
+                                             MsqError& err )
 {
     const Sample   s = ElemSampleQM::sample( p_handle );
     const size_t   e = ElemSampleQM::elem( p_handle );
@@ -163,8 +163,7 @@ bool TQualityMetric::evaluate_with_gradient( PatchData& pd, size_t p_handle, dou
     {
         MsqMatrix< 2, 2 > W, A, dmdT;
         MsqMatrix< 3, 2 > S_a_transpose_Theta;
-        rval = evaluate_surface_common( pd, s, e, bits, mIndices, num_idx, mDerivs2D, W, A,
-                                        S_a_transpose_Theta, err );
+        rval = evaluate_surface_common( pd, s, e, bits, mIndices, num_idx, mDerivs2D, W, A, S_a_transpose_Theta, err );
         if( MSQ_CHKERR( err ) || !rval ) return false;
         const MsqMatrix< 2, 2 > Winv = inverse( W );
         const MsqMatrix< 2, 2 > T = A * Winv;
@@ -192,8 +191,7 @@ bool TQualityMetric::evaluate_with_gradient( PatchData& pd, size_t p_handle, dou
 }
 
 bool TQualityMetric::evaluate_with_Hessian( PatchData& pd, size_t p_handle, double& value,
-                                            std::vector< size_t >&   indices,
-                                            std::vector< Vector3D >& grad,
+                                            std::vector< size_t >& indices, std::vector< Vector3D >& grad,
                                             std::vector< Matrix3D >& Hessian, MsqError& err )
 {
     const Sample   s = ElemSampleQM::sample( p_handle );
@@ -238,13 +236,11 @@ bool TQualityMetric::evaluate_with_Hessian( PatchData& pd, size_t p_handle, doub
 #ifdef NUMERICAL_2D_HESSIAN
         // return finite difference approximation for now
 
-        return QualityMetric::evaluate_with_Hessian( pd, p_handle, value, indices, grad, Hessian,
-                                                     err );
+        return QualityMetric::evaluate_with_Hessian( pd, p_handle, value, indices, grad, Hessian, err );
 #else
         MsqMatrix< 2, 2 > W, A, dmdT, d2mdT2[ 3 ];
         MsqMatrix< 3, 2 > M;
-        rval =
-            evaluate_surface_common( pd, s, e, bits, mIndices, num_idx, mDerivs2D, W, A, M, err );
+        rval = evaluate_surface_common( pd, s, e, bits, mIndices, num_idx, mDerivs2D, W, A, M, err );
         if( MSQ_CHKERR( err ) || !rval ) return false;
         const MsqMatrix< 2, 2 > Winv = inverse( W );
         const MsqMatrix< 2, 2 > T = A * Winv;
@@ -285,10 +281,8 @@ bool TQualityMetric::evaluate_with_Hessian( PatchData& pd, size_t p_handle, doub
 }
 
 bool TQualityMetric::evaluate_with_Hessian_diagonal( PatchData& pd, size_t p_handle, double& value,
-                                                     std::vector< size_t >&      indices,
-                                                     std::vector< Vector3D >&    grad,
-                                                     std::vector< SymMatrix3D >& diagonal,
-                                                     MsqError&                   err )
+                                                     std::vector< size_t >& indices, std::vector< Vector3D >& grad,
+                                                     std::vector< SymMatrix3D >& diagonal, MsqError& err )
 {
     const Sample   s = ElemSampleQM::sample( p_handle );
     const size_t   e = ElemSampleQM::elem( p_handle );
@@ -331,13 +325,11 @@ bool TQualityMetric::evaluate_with_Hessian_diagonal( PatchData& pd, size_t p_han
     {
 #ifdef NUMERICAL_2D_HESSIAN
         // use finite diference approximation for now
-        return QualityMetric::evaluate_with_Hessian_diagonal( pd, p_handle, value, indices, grad,
-                                                              diagonal, err );
+        return QualityMetric::evaluate_with_Hessian_diagonal( pd, p_handle, value, indices, grad, diagonal, err );
 #else
         MsqMatrix< 2, 2 > W, A, dmdT, d2mdT2[ 3 ];
         MsqMatrix< 3, 2 > M;
-        rval =
-            evaluate_surface_common( pd, s, e, bits, mIndices, num_idx, mDerivs2D, W, A, M, err );
+        rval = evaluate_surface_common( pd, s, e, bits, mIndices, num_idx, mDerivs2D, W, A, M, err );
         if( MSQ_CHKERR( err ) || !rval ) return false;
         const MsqMatrix< 2, 2 > Winv = inverse( W );
         const MsqMatrix< 2, 2 > T = A * Winv;

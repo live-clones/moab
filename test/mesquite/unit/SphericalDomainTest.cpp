@@ -56,8 +56,7 @@ class SphericalDomainTest : public CppUnit::TestFixture
     void test_domain_DoF( );
 
   private:
-    void check_closest_pt( const SphericalDomain& dom, const Vector3D& input_pt,
-                           const Vector3D& output_pt );
+    void check_closest_pt( const SphericalDomain& dom, const Vector3D& input_pt, const Vector3D& output_pt );
 
     void check_normal( const SphericalDomain& dom, const Vector3D& point, const Vector3D& normal );
 };
@@ -74,8 +73,7 @@ void SphericalDomainTest::check_closest_pt( const SphericalDomain& dom, const Ve
     vi *= dom.radius( ) / vi.length( );
     CPPUNIT_ASSERT_VECTORS_EQUAL( vo, vi, 1e-6 );
 }
-void SphericalDomainTest::check_normal( const SphericalDomain& dom, const Vector3D& point,
-                                        const Vector3D& normal )
+void SphericalDomainTest::check_normal( const SphericalDomain& dom, const Vector3D& point, const Vector3D& normal )
 {
     Vector3D vi = point - dom.center( );
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.0, normal.length( ), 1e-6 );
@@ -146,8 +144,7 @@ void SphericalDomainTest::test_snap_to( )
     SphericalDomain dom( cen, rad );
 
     const int num_pts = 5;
-    double    points[ num_pts ][ 3 ] = {
-        { 0, 0, 0 }, { 10, 11, 8 }, { 1, 2, 3 }, { -5, 1, 1 }, { -1, 0, -2 } };
+    double    points[ num_pts ][ 3 ] = { { 0, 0, 0 }, { 10, 11, 8 }, { 1, 2, 3 }, { -5, 1, 1 }, { -1, 0, -2 } };
     for( int i = 0; i < num_pts; ++i )
     {
         Vector3D v( points[ i ] );
@@ -163,8 +160,7 @@ void SphericalDomainTest::test_normal_at( )
     SphericalDomain dom( cen, rad );
 
     const int num_pts = 5;
-    double    points[ num_pts ][ 3 ] = {
-        { 0, 0, 0 }, { 10, 11, 8 }, { 1, 2, 3 }, { -5, 1, 1 }, { -1, 0, -2 } };
+    double    points[ num_pts ][ 3 ] = { { 0, 0, 0 }, { 10, 11, 8 }, { 1, 2, 3 }, { -5, 1, 1 }, { -1, 0, -2 } };
     for( int i = 0; i < num_pts; ++i )
     {
         Vector3D v( points[ i ] );
@@ -185,8 +181,7 @@ void SphericalDomainTest::test_closest_point( )
     MsqPrintError   err( std::cout );
 
     const int num_pts = 5;
-    double    points[ num_pts ][ 3 ] = {
-        { 0, 0, 0 }, { 10, 11, 8 }, { 1, 2, 3 }, { -5, 1, 1 }, { -1, 0, -2 } };
+    double    points[ num_pts ][ 3 ] = { { 0, 0, 0 }, { 10, 11, 8 }, { 1, 2, 3 }, { -5, 1, 1 }, { -1, 0, -2 } };
     for( int i = 0; i < num_pts; ++i )
     {
         Vector3D p( points[ i ] ), c, n;

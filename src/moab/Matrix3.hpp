@@ -97,23 +97,21 @@ extern "C" {
 // Computes all eigenvalues and, optionally, eigenvectors of a
 // real symmetric matrix A. If eigenvectors are desired, it uses a
 // divide and conquer algorithm.
-void MOAB_dsyevd( char* jobz, char* uplo, int* n, double a[], int* lda, double w[], double work[],
-                  int* lwork, int iwork[], int* liwork, int* info );
+void MOAB_dsyevd( char* jobz, char* uplo, int* n, double a[], int* lda, double w[], double work[], int* lwork,
+                  int iwork[], int* liwork, int* info );
 
 // Computes selected eigenvalues and, optionally, eigenvectors
 // of a real symmetric matrix A.  Eigenvalues and eigenvectors can be
 // selected by specifying either a range of values or a range of
 // indices for the desired eigenvalues.
-void MOAB_dsyevr( char* jobz, char* range, char* uplo, int* n, double* a, int* lda, double* vl,
-                  double* vu, int* il, int* iu, double* abstol, int* m, double* w, double* z,
-                  int* ldz, int* isuppz, double* work, int* lwork, int* iwork, int* liwork,
-                  int* info );
+void MOAB_dsyevr( char* jobz, char* range, char* uplo, int* n, double* a, int* lda, double* vl, double* vu, int* il,
+                  int* iu, double* abstol, int* m, double* w, double* z, int* ldz, int* isuppz, double* work,
+                  int* lwork, int* iwork, int* liwork, int* info );
 
 // Computes for an N-by-N real nonsymmetric matrix A, the
 // eigenvalues and, optionally, the left and/or right eigenvectors.
-void MOAB_dgeev( char* jobvl, char* jobvr, int* n, double* a, int* lda, double* wr, double* wi,
-                 double* vl, int* ldvl, double* vr, int* ldvr, double* work, int* lwork,
-                 int* info );
+void MOAB_dgeev( char* jobvl, char* jobvr, int* n, double* a, int* lda, double* wr, double* wi, double* vl, int* ldvl,
+                 double* vr, int* ldvr, double* work, int* lwork, int* info );
 
 // Computes an LU factorization of a general M-by-N matrix A
 // using partial pivoting with row interchanges.
@@ -154,16 +152,14 @@ namespace Matrix
         return inverse( d, det );
     }
 
-    template< typename Vector, typename Matrix >
-    inline Vector vector_matrix( const Vector& v, const Matrix& m )
+    template< typename Vector, typename Matrix > inline Vector vector_matrix( const Vector& v, const Matrix& m )
     {
         return Vector( v[ 0 ] * m( 0, 0 ) + v[ 1 ] * m( 1, 0 ) + v[ 2 ] * m( 2, 0 ),
                        v[ 0 ] * m( 0, 1 ) + v[ 1 ] * m( 1, 1 ) + v[ 2 ] * m( 2, 1 ),
                        v[ 0 ] * m( 0, 2 ) + v[ 1 ] * m( 1, 2 ) + v[ 2 ] * m( 2, 2 ) );
     }
 
-    template< typename Vector, typename Matrix >
-    inline Vector matrix_vector( const Matrix& m, const Vector& v )
+    template< typename Vector, typename Matrix > inline Vector matrix_vector( const Matrix& m, const Vector& v )
     {
         Vector res = v;
         res[ 0 ] = v[ 0 ] * m( 0, 0 ) + v[ 1 ] * m( 0, 1 ) + v[ 2 ] * m( 0, 2 );
@@ -243,8 +239,8 @@ class Matrix3
 #endif
     }
 
-    inline Matrix3( double v00, double v01, double v02, double v10, double v11, double v12,
-                    double v20, double v21, double v22 )
+    inline Matrix3( double v00, double v01, double v02, double v10, double v11, double v12, double v20, double v21,
+                    double v22 )
     {
 #ifndef MOAB_HAVE_LAPACK
         _mat << v00, v01, v02, v10, v11, v12, v20, v21, v22;
@@ -278,14 +274,10 @@ class Matrix3
     {
 #ifndef MOAB_HAVE_LAPACK
         if( isRow )
-        {
-            _mat << row0[ 0 ], row0[ 1 ], row0[ 2 ], row1[ 0 ], row1[ 1 ], row1[ 2 ], row2[ 0 ],
-                row2[ 1 ], row2[ 2 ];
-        }
+        { _mat << row0[ 0 ], row0[ 1 ], row0[ 2 ], row1[ 0 ], row1[ 1 ], row1[ 2 ], row2[ 0 ], row2[ 1 ], row2[ 2 ]; }
         else
         {
-            _mat << row0[ 0 ], row1[ 0 ], row2[ 0 ], row0[ 1 ], row1[ 1 ], row2[ 1 ], row0[ 2 ],
-                row1[ 2 ], row2[ 2 ];
+            _mat << row0[ 0 ], row1[ 0 ], row2[ 0 ], row0[ 1 ], row1[ 1 ], row2[ 1 ], row0[ 2 ], row1[ 2 ], row2[ 2 ];
         }
 #else
         MOAB_DMEMZERO( _mat, Matrix3::size );
@@ -541,8 +533,7 @@ class Matrix3
 #endif
     }
 
-    template< typename Vector >
-    inline ErrorCode eigen_decomposition( Vector& evals, Matrix3& evecs )
+    template< typename Vector > inline ErrorCode eigen_decomposition( Vector& evals, Matrix3& evecs )
     {
         const bool bisSymmetric = this->is_symmetric( );
 #ifndef MOAB_HAVE_LAPACK
@@ -560,9 +551,7 @@ class Matrix3
         }
         else
         {
-            MB_CHK_SET_ERR(
-                MB_FAILURE,
-                "Unsymmetric matrix implementation with Eigen3 is currently not provided." );
+            MB_CHK_SET_ERR( MB_FAILURE, "Unsymmetric matrix implementation with Eigen3 is currently not provided." );
             // Eigen::EigenSolver<Eigen::Matrix3d> eigensolver(this->_mat, true);
             // if (eigensolver.info() != Eigen::Success)
             //   return MB_FAILURE;
@@ -582,8 +571,8 @@ class Matrix3
             int                   N = 3, LWORK = 102, NL = 1, NR = N;
             std::vector< double > devmat;
             devmat.assign( _mat, _mat + size );
-            MOAB_dgeev( &dgeev_opts[ 0 ], &dgeev_opts[ 1 ], &N, &devmat[ 0 ], &N, devreal, devimag,
-                        dlevecs, &NL, drevecs, &NR, dwork, &LWORK, &info );
+            MOAB_dgeev( &dgeev_opts[ 0 ], &dgeev_opts[ 1 ], &N, &devmat[ 0 ], &N, devreal, devimag, dlevecs, &NL,
+                        drevecs, &NR, dwork, &LWORK, &info );
             // The result eigenvalues are ordered as high-->low
             evals[ 0 ] = devreal[ 2 ];
             evals[ 1 ] = devreal[ 1 ];
@@ -620,18 +609,17 @@ class Matrix3
                 double query_work_size = 0;
                 int    query_iwork_size = 0;
                 // Make an empty call to find the optimal work vector size
-                MOAB_dsyevd( &dgeev_opts[ 0 ], &dgeev_opts[ 1 ], &N, NULL, &N, NULL,
-                             &query_work_size, &_lwork, &query_iwork_size, &_liwork, &info );
+                MOAB_dsyevd( &dgeev_opts[ 0 ], &dgeev_opts[ 1 ], &N, NULL, &N, NULL, &query_work_size, &_lwork,
+                             &query_iwork_size, &_liwork, &info );
                 lwork = (int)query_work_size;
                 dwork.resize( lwork );
                 liwork = query_iwork_size;
                 iwork.resize( liwork );
-                std::cout << "DSYEVD: Optimal work vector: dsize = " << lwork
-                          << ", and isize = " << liwork << ".\n";
+                std::cout << "DSYEVD: Optimal work vector: dsize = " << lwork << ", and isize = " << liwork << ".\n";
             }
 
-            MOAB_dsyevd( &dgeev_opts[ 0 ], &dgeev_opts[ 1 ], &N, &devmat[ 0 ], &N, devreal,
-                         &dwork[ 0 ], &lwork, &iwork[ 0 ], &liwork, &info );
+            MOAB_dsyevd( &dgeev_opts[ 0 ], &dgeev_opts[ 1 ], &N, &devmat[ 0 ], &N, devreal, &dwork[ 0 ], &lwork,
+                         &iwork[ 0 ], &liwork, &info );
             for( int i = 0; i < 9; ++i )
                 drevecs[ i ] = devmat[ i ];
             // The result eigenvalues are ordered as low-->high, but vectors are in rows of A.
@@ -963,13 +951,11 @@ class Matrix3
     inline void print( std::ostream& s ) const
     {
 #ifndef MOAB_HAVE_LAPACK
-        s << "| " << _mat( 0 ) << " " << _mat( 1 ) << " " << _mat( 2 ) << " | " << _mat( 3 ) << " "
-          << _mat( 4 ) << " " << _mat( 5 ) << " | " << _mat( 6 ) << " " << _mat( 7 ) << " "
-          << _mat( 8 ) << " |";
+        s << "| " << _mat( 0 ) << " " << _mat( 1 ) << " " << _mat( 2 ) << " | " << _mat( 3 ) << " " << _mat( 4 ) << " "
+          << _mat( 5 ) << " | " << _mat( 6 ) << " " << _mat( 7 ) << " " << _mat( 8 ) << " |";
 #else
-        s << "| " << _mat[ 0 ] << " " << _mat[ 1 ] << " " << _mat[ 2 ] << " | " << _mat[ 3 ] << " "
-          << _mat[ 4 ] << " " << _mat[ 5 ] << " | " << _mat[ 6 ] << " " << _mat[ 7 ] << " "
-          << _mat[ 8 ] << " |";
+        s << "| " << _mat[ 0 ] << " " << _mat[ 1 ] << " " << _mat[ 2 ] << " | " << _mat[ 3 ] << " " << _mat[ 4 ] << " "
+          << _mat[ 5 ] << " | " << _mat[ 6 ] << " " << _mat[ 7 ] << " " << _mat[ 8 ] << " |";
 #endif
     }
 
@@ -977,9 +963,8 @@ class Matrix3
 
 template< typename Vector > inline Matrix3 outer_product( const Vector& u, const Vector& v )
 {
-    return Matrix3( u[ 0 ] * v[ 0 ], u[ 0 ] * v[ 1 ], u[ 0 ] * v[ 2 ], u[ 1 ] * v[ 0 ],
-                    u[ 1 ] * v[ 1 ], u[ 1 ] * v[ 2 ], u[ 2 ] * v[ 0 ], u[ 2 ] * v[ 1 ],
-                    u[ 2 ] * v[ 2 ] );
+    return Matrix3( u[ 0 ] * v[ 0 ], u[ 0 ] * v[ 1 ], u[ 0 ] * v[ 2 ], u[ 1 ] * v[ 0 ], u[ 1 ] * v[ 1 ],
+                    u[ 1 ] * v[ 2 ], u[ 2 ] * v[ 0 ], u[ 2 ] * v[ 1 ], u[ 2 ] * v[ 2 ] );
 }
 
 inline Matrix3 operator+( const Matrix3& a, const Matrix3& b )
@@ -1015,14 +1000,12 @@ inline Matrix3 operator*( const Matrix3& a, const Matrix3& b )
 #endif
 }
 
-template< typename T >
-inline std::vector< T > operator*( const Matrix3& m, const std::vector< T >& v )
+template< typename T > inline std::vector< T > operator*( const Matrix3& m, const std::vector< T >& v )
 {
     return moab::Matrix::matrix_vector( m, v );
 }
 
-template< typename T >
-inline std::vector< T > operator*( const std::vector< T >& v, const Matrix3& m )
+template< typename T > inline std::vector< T > operator*( const std::vector< T >& v, const Matrix3& m )
 {
     return moab::Matrix::vector_matrix( v, m );
 }
@@ -1047,9 +1030,8 @@ inline CartVect operator*( const CartVect& v, const Matrix3& m )
 #define MOAB_MATRIX3_OPERATORLESS
 inline std::ostream& operator<<( std::ostream& s, const moab::Matrix3& m )
 {
-    return s << "| " << m( 0, 0 ) << " " << m( 0, 1 ) << " " << m( 0, 2 ) << " | " << m( 1, 0 )
-             << " " << m( 1, 1 ) << " " << m( 1, 2 ) << " | " << m( 2, 0 ) << " " << m( 2, 1 )
-             << " " << m( 2, 2 ) << " |";
+    return s << "| " << m( 0, 0 ) << " " << m( 0, 1 ) << " " << m( 0, 2 ) << " | " << m( 1, 0 ) << " " << m( 1, 1 )
+             << " " << m( 1, 2 ) << " | " << m( 2, 0 ) << " " << m( 2, 1 ) << " " << m( 2, 2 ) << " |";
 }
 #endif  // MOAB_MATRIX3_OPERATORLESS
 #endif  // MOAB_MATRIX3_HPP

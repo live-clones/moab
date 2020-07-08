@@ -14,14 +14,13 @@ ReaderIface* ReadNC::factory( Interface* iface )
 }
 
 ReadNC::ReadNC( Interface* impl )
-    : mbImpl( impl ), fileId( -1 ), mGlobalIdTag( 0 ), mpFileIdTag( NULL ), dbgOut( stderr ),
-      isParallel( false ), partMethod( ScdParData::ALLJORKORI ), scdi( NULL ),
+    : mbImpl( impl ), fileId( -1 ), mGlobalIdTag( 0 ), mpFileIdTag( NULL ), dbgOut( stderr ), isParallel( false ),
+      partMethod( ScdParData::ALLJORKORI ), scdi( NULL ),
 #ifdef MOAB_HAVE_MPI
       myPcomm( NULL ),
 #endif
-      noMesh( false ), noVars( false ), spectralMesh( false ), noMixedElements( false ),
-      noEdges( false ), gatherSetRank( -1 ), tStepBase( -1 ), trivialPartitionShift( 0 ),
-      myHelper( NULL )
+      noMesh( false ), noVars( false ), spectralMesh( false ), noMixedElements( false ), noEdges( false ),
+      gatherSetRank( -1 ), tStepBase( -1 ), trivialPartitionShift( 0 ), myHelper( NULL )
 {
     assert( impl != NULL );
     impl->query_interface( readMeshIface );
@@ -33,10 +32,8 @@ ReadNC::~ReadNC( )
     if( myHelper != NULL ) delete myHelper;
 }
 
-ErrorCode ReadNC::load_file( const char* file_name, const EntityHandle* file_set,
-                             const FileOptions& opts,
-                             const ReaderIface::SubsetList* /*subset_list*/,
-                             const Tag* file_id_tag )
+ErrorCode ReadNC::load_file( const char* file_name, const EntityHandle* file_set, const FileOptions& opts,
+                             const ReaderIface::SubsetList* /*subset_list*/, const Tag* file_id_tag )
 {
     // See if opts has variable(s) specified
     std::vector< std::string > var_names;
@@ -58,8 +55,7 @@ ErrorCode ReadNC::load_file( const char* file_name, const EntityHandle* file_set
 
 #ifdef MOAB_HAVE_PNETCDF
     if( isParallel )
-        success = NCFUNC( open )( myPcomm->proc_config( ).proc_comm( ), file_name, 0, MPI_INFO_NULL,
-                                  &fileId );
+        success = NCFUNC( open )( myPcomm->proc_config( ).proc_comm( ), file_name, 0, MPI_INFO_NULL, &fileId );
     else
         success = NCFUNC( open )( MPI_COMM_SELF, file_name, 0, MPI_INFO_NULL, &fileId );
 #else
@@ -72,8 +68,7 @@ ErrorCode ReadNC::load_file( const char* file_name, const EntityHandle* file_set
 
     // Make sure there's a file set to put things in
     EntityHandle tmp_set;
-    if( noMesh && !file_set )
-    { MB_SET_ERR( MB_FAILURE, "NOMESH option requires non-NULL file set on input" ); }
+    if( noMesh && !file_set ) { MB_SET_ERR( MB_FAILURE, "NOMESH option requires non-NULL file set on input" ); }
     else if( !file_set || ( file_set && *file_set == 0 ) )
     {
         rval = mbImpl->create_meshset( MESHSET_SET, tmp_set );MB_CHK_SET_ERR( rval, "Trouble creating file set" );
@@ -156,8 +151,7 @@ ErrorCode ReadNC::load_file( const char* file_name, const EntityHandle* file_set
             std::vector< std::string > non_dim_var_names;
             for( unsigned int i = 0; i < var_names.size( ); i++ )
             {
-                if( std::find( dimNames.begin( ), dimNames.end( ), var_names[ i ] ) ==
-                    dimNames.end( ) )
+                if( std::find( dimNames.begin( ), dimNames.end( ), var_names[ i ] ) == dimNames.end( ) )
                     non_dim_var_names.push_back( var_names[ i ] );
             }
 
@@ -260,16 +254,13 @@ ErrorCode ReadNC::parse_options( const FileOptions& opts, std::vector< std::stri
     }
 
     rval = opts.get_int_option( "GATHER_SET", 0, gatherSetRank );
-    if( MB_TYPE_OUT_OF_RANGE == rval )
-    { MB_SET_ERR( rval, "Invalid value for GATHER_SET option" ); }
+    if( MB_TYPE_OUT_OF_RANGE == rval ) { MB_SET_ERR( rval, "Invalid value for GATHER_SET option" ); }
 
     rval = opts.get_int_option( "TIMESTEPBASE", 0, tStepBase );
-    if( MB_TYPE_OUT_OF_RANGE == rval )
-    { MB_SET_ERR( rval, "Invalid value for TIMESTEPBASE option" ); }
+    if( MB_TYPE_OUT_OF_RANGE == rval ) { MB_SET_ERR( rval, "Invalid value for TIMESTEPBASE option" ); }
 
     rval = opts.get_int_option( "TRIVIAL_PARTITION_SHIFT", 1, trivialPartitionShift );
-    if( MB_TYPE_OUT_OF_RANGE == rval )
-    { MB_SET_ERR( rval, "Invalid value for TRIVIAL_PARTITION_SHIFT option" ); }
+    if( MB_TYPE_OUT_OF_RANGE == rval ) { MB_SET_ERR( rval, "Invalid value for TRIVIAL_PARTITION_SHIFT option" ); }
 
 #ifdef MOAB_HAVE_MPI
     isParallel = ( opts.match_option( "PARALLEL", "READ_PART" ) != MB_ENTITY_NOT_FOUND );
@@ -282,8 +273,7 @@ ErrorCode ReadNC::parse_options( const FileOptions& opts, std::vector< std::stri
 
     int pcomm_no = 0;
     rval = opts.get_int_option( "PARALLEL_COMM", pcomm_no );
-    if( MB_TYPE_OUT_OF_RANGE == rval )
-    { MB_SET_ERR( rval, "Invalid value for PARALLEL_COMM option" ); }
+    if( MB_TYPE_OUT_OF_RANGE == rval ) { MB_SET_ERR( rval, "Invalid value for PARALLEL_COMM option" ); }
     myPcomm = ParallelComm::get_pcomm( mbImpl, pcomm_no );
     if( 0 == myPcomm ) { myPcomm = new ParallelComm( mbImpl, MPI_COMM_WORLD ); }
     const int rank = myPcomm->proc_config( ).proc_rank( );
@@ -326,8 +316,7 @@ ErrorCode ReadNC::read_header( )
     return MB_SUCCESS;
 }
 
-ErrorCode ReadNC::get_attributes( int var_id, int num_atts, std::map< std::string, AttData >& atts,
-                                  const char* prefix )
+ErrorCode ReadNC::get_attributes( int var_id, int num_atts, std::map< std::string, AttData >& atts, const char* prefix )
 {
     char dum_name[ 120 ];
 
@@ -340,20 +329,17 @@ ErrorCode ReadNC::get_attributes( int var_id, int num_atts, std::map< std::strin
         AttData& data = atts[ std::string( dum_name ) ];
         data.attName = std::string( dum_name );
         success = NCFUNC( inq_att )( fileId, var_id, dum_name, &data.attDataType, &data.attLen );
-        if( success )
-            MB_SET_ERR( MB_FAILURE, "Trouble getting info for attribute " << data.attName );
+        if( success ) MB_SET_ERR( MB_FAILURE, "Trouble getting info for attribute " << data.attName );
         data.attVarId = var_id;
 
-        dbgOut.tprintf( 2, "%sAttribute %s: length=%u, varId=%d, type=%d\n",
-                        ( prefix ? prefix : "" ), data.attName.c_str( ), (unsigned int)data.attLen,
-                        data.attVarId, data.attDataType );
+        dbgOut.tprintf( 2, "%sAttribute %s: length=%u, varId=%d, type=%d\n", ( prefix ? prefix : "" ),
+                        data.attName.c_str( ), (unsigned int)data.attLen, data.attVarId, data.attDataType );
     }
 
     return MB_SUCCESS;
 }
 
-ErrorCode ReadNC::get_dimensions( int file_id, std::vector< std::string >& dim_names,
-                                  std::vector< int >& dim_lens )
+ErrorCode ReadNC::get_dimensions( int file_id, std::vector< std::string >& dim_names, std::vector< int >& dim_lens )
 {
     // Get the number of dimensions
     int num_dims;
@@ -362,9 +348,8 @@ ErrorCode ReadNC::get_dimensions( int file_id, std::vector< std::string >& dim_n
 
     if( num_dims > NC_MAX_DIMS )
     {
-        MB_SET_ERR( MB_FAILURE, "ReadNC: File contains "
-                                    << num_dims << " dims but NetCDF library supports only "
-                                    << NC_MAX_DIMS );
+        MB_SET_ERR( MB_FAILURE,
+                    "ReadNC: File contains " << num_dims << " dims but NetCDF library supports only " << NC_MAX_DIMS );
     }
 
     char      dim_name[ NC_MAX_NAME + 1 ];
@@ -389,8 +374,7 @@ ErrorCode ReadNC::get_dimensions( int file_id, std::vector< std::string >& dim_n
 ErrorCode ReadNC::get_variables( )
 {
     // First cache the number of time steps
-    std::vector< std::string >::iterator vit =
-        std::find( dimNames.begin( ), dimNames.end( ), "time" );
+    std::vector< std::string >::iterator vit = std::find( dimNames.begin( ), dimNames.end( ), "time" );
     if( vit == dimNames.end( ) ) vit = std::find( dimNames.begin( ), dimNames.end( ), "t" );
 
     int ntimes = 0;
@@ -404,9 +388,8 @@ ErrorCode ReadNC::get_variables( )
 
     if( num_vars > NC_MAX_VARS )
     {
-        MB_SET_ERR( MB_FAILURE, "ReadNC: File contains "
-                                    << num_vars << " vars but NetCDF library supports only "
-                                    << NC_MAX_VARS );
+        MB_SET_ERR( MB_FAILURE,
+                    "ReadNC: File contains " << num_vars << " vars but NetCDF library supports only " << NC_MAX_VARS );
     }
 
     char var_name[ NC_MAX_NAME + 1 ];
@@ -424,30 +407,23 @@ ErrorCode ReadNC::get_variables( )
 
         // Get the data type
         success = NCFUNC( inq_vartype )( fileId, i, &data.varDataType );
-        if( success )
-            MB_SET_ERR( MB_FAILURE, "Trouble getting data type for variable " << data.varName );
+        if( success ) MB_SET_ERR( MB_FAILURE, "Trouble getting data type for variable " << data.varName );
 
         // Get the number of dimensions, then the dimensions
         success = NCFUNC( inq_varndims )( fileId, i, &var_ndims );
-        if( success )
-            MB_SET_ERR( MB_FAILURE,
-                        "Trouble getting number of dims for variable " << data.varName );
+        if( success ) MB_SET_ERR( MB_FAILURE, "Trouble getting number of dims for variable " << data.varName );
         data.varDims.resize( var_ndims );
 
         success = NCFUNC( inq_vardimid )( fileId, i, &data.varDims[ 0 ] );
-        if( success )
-            MB_SET_ERR( MB_FAILURE, "Trouble getting dimensions for variable " << data.varName );
+        if( success ) MB_SET_ERR( MB_FAILURE, "Trouble getting dimensions for variable " << data.varName );
 
         // Finally, get the number of attributes, then the attributes
         success = NCFUNC( inq_varnatts )( fileId, i, &data.numAtts );
-        if( success )
-            MB_SET_ERR( MB_FAILURE,
-                        "Trouble getting number of dims for variable " << data.varName );
+        if( success ) MB_SET_ERR( MB_FAILURE, "Trouble getting number of dims for variable " << data.varName );
 
         // Print debug info here so attribute info comes afterwards
-        dbgOut.tprintf( 2, "Variable %s: Id=%d, numAtts=%d, datatype=%d, num_dims=%u\n",
-                        data.varName.c_str( ), data.varId, data.numAtts, data.varDataType,
-                        (unsigned int)data.varDims.size( ) );
+        dbgOut.tprintf( 2, "Variable %s: Id=%d, numAtts=%d, datatype=%d, num_dims=%u\n", data.varName.c_str( ),
+                        data.varId, data.numAtts, data.varDataType, (unsigned int)data.varDims.size( ) );
 
         ErrorCode rval = get_attributes( i, data.numAtts, data.varAtts, "   " );MB_CHK_SET_ERR( rval, "Trouble getting attributes for variable " << data.varName );
     }
@@ -455,8 +431,8 @@ ErrorCode ReadNC::get_variables( )
     return MB_SUCCESS;
 }
 
-ErrorCode ReadNC::read_tag_values( const char*, const char*, const FileOptions&,
-                                   std::vector< int >&, const SubsetList* )
+ErrorCode ReadNC::read_tag_values( const char*, const char*, const FileOptions&, std::vector< int >&,
+                                   const SubsetList* )
 {
     return MB_FAILURE;
 }

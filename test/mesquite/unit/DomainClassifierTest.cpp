@@ -81,22 +81,18 @@ CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( DomainClassifierTest, "DomainClassifierTe
 static void print_domain( int i, DomainClassifier::DomainSet& set )
 {
     if( PointDomain* pd = dynamic_cast< PointDomain* >( set.domain ) )
-        printf( "%d: PointDomain( %f %f %f ) @ %p\n", i, pd->geom( )[ 0 ], pd->geom( )[ 1 ],
-                pd->geom( )[ 2 ], pd );
+        printf( "%d: PointDomain( %f %f %f ) @ %p\n", i, pd->geom( )[ 0 ], pd->geom( )[ 1 ], pd->geom( )[ 2 ], pd );
     else if( LineDomain* ld = dynamic_cast< LineDomain* >( set.domain ) )
     {
-        if( fabs( ld->geom( ).direction( )[ 0 ] ) < 1e-6 &&
-            fabs( ld->geom( ).direction( )[ 1 ] ) < 1e-6 )
-            printf( "%d: LineDomain( x = %f, y = %f ) @ %p\n", i, ld->geom( ).point( )[ 0 ],
-                    ld->geom( ).point( )[ 1 ], ld );
-        else if( fabs( ld->geom( ).direction( )[ 1 ] ) < 1e-6 &&
-                 fabs( ld->geom( ).direction( )[ 2 ] ) < 1e-6 )
-            printf( "%d: LineDomain( y = %f, z = %f ) @ %p\n", i, ld->geom( ).point( )[ 1 ],
-                    ld->geom( ).point( )[ 2 ], ld );
-        else if( fabs( ld->geom( ).direction( )[ 0 ] ) < 1e-6 &&
-                 fabs( ld->geom( ).direction( )[ 2 ] ) < 1e-6 )
-            printf( "%d: LineDomain( x = %f, z = %f ) @ %p\n", i, ld->geom( ).point( )[ 0 ],
-                    ld->geom( ).point( )[ 2 ], ld );
+        if( fabs( ld->geom( ).direction( )[ 0 ] ) < 1e-6 && fabs( ld->geom( ).direction( )[ 1 ] ) < 1e-6 )
+            printf( "%d: LineDomain( x = %f, y = %f ) @ %p\n", i, ld->geom( ).point( )[ 0 ], ld->geom( ).point( )[ 1 ],
+                    ld );
+        else if( fabs( ld->geom( ).direction( )[ 1 ] ) < 1e-6 && fabs( ld->geom( ).direction( )[ 2 ] ) < 1e-6 )
+            printf( "%d: LineDomain( y = %f, z = %f ) @ %p\n", i, ld->geom( ).point( )[ 1 ], ld->geom( ).point( )[ 2 ],
+                    ld );
+        else if( fabs( ld->geom( ).direction( )[ 0 ] ) < 1e-6 && fabs( ld->geom( ).direction( )[ 2 ] ) < 1e-6 )
+            printf( "%d: LineDomain( x = %f, z = %f ) @ %p\n", i, ld->geom( ).point( )[ 0 ], ld->geom( ).point( )[ 2 ],
+                    ld );
         else
             printf( "%d: LineDomain( ? ) @ %p\n", i, ld );
     }
@@ -338,9 +334,8 @@ void DomainClassifierTest::setUp( )
     ldom[ 9 ] = new LineDomain( Vector3D( 3, 0, 0 ), Vector3D( 0, 0, 1 ) );  // x=3,y=0
     ldom[ 10 ] = new LineDomain( Vector3D( 0, 3, 0 ), Vector3D( 0, 0, 1 ) );  // x=0,y=3
     ldom[ 11 ] = new LineDomain( Vector3D( 3, 3, 0 ), Vector3D( 0, 0, 1 ) );  // x=3,y=3
-    size_t ldidx[ 12 ][ 2 ] = { { 1, 2 },   { 13, 14 }, { 49, 50 }, { 61, 62 },
-                                { 4, 8 },   { 7, 11 },  { 52, 56 }, { 55, 59 },
-                                { 16, 32 }, { 19, 35 }, { 28, 44 }, { 31, 47 } };
+    size_t ldidx[ 12 ][ 2 ] = { { 1, 2 },   { 13, 14 }, { 49, 50 }, { 61, 62 }, { 4, 8 },   { 7, 11 },
+                                { 52, 56 }, { 55, 59 }, { 16, 32 }, { 19, 35 }, { 28, 44 }, { 31, 47 } };
     for( unsigned i = 0; i < 12; ++i )
     {
         Mesh::VertexHandle v[ 2 ];
@@ -457,8 +452,7 @@ void DomainClassifierTest::test_classify_by_handle( )
 {
     MsqPrintError    err( std::cerr );
     DomainClassifier domain;
-    DomainClassifier::classify_by_handle( domain, &myMesh, arrptr( myDomains ), myDomains.size( ),
-                                          err );
+    DomainClassifier::classify_by_handle( domain, &myMesh, arrptr( myDomains ), myDomains.size( ), err );
     CPPUNIT_ASSERT( !err );
 
     check_domain( domain );
@@ -468,8 +462,7 @@ void DomainClassifierTest::test_valid_classification( )
 {
     MsqPrintError    err( std::cerr );
     DomainClassifier domain;
-    DomainClassifier::classify_by_handle( domain, &myMesh, arrptr( myDomains ), myDomains.size( ),
-                                          err );
+    DomainClassifier::classify_by_handle( domain, &myMesh, arrptr( myDomains ), myDomains.size( ), err );
     CPPUNIT_ASSERT( !err );
 
     domain.test_valid_classification( &myMesh, err );
@@ -493,14 +486,14 @@ void DomainClassifierTest::test_classify_by_tag( )
         std::vector< int > elm_data( myDomains[ i ].elements.size( ), i );
         if( !vtx_data.empty( ) )
         {
-            myMesh.tag_set_vertex_data( tag, vtx_data.size( ), &( myDomains[ i ].vertices[ 0 ] ),
-                                        arrptr( vtx_data ), err );
+            myMesh.tag_set_vertex_data( tag, vtx_data.size( ), &( myDomains[ i ].vertices[ 0 ] ), arrptr( vtx_data ),
+                                        err );
             CPPUNIT_ASSERT( !err );
         }
         if( !elm_data.empty( ) )
         {
-            myMesh.tag_set_element_data( tag, elm_data.size( ), &( myDomains[ i ].elements[ 0 ] ),
-                                         arrptr( elm_data ), err );
+            myMesh.tag_set_element_data( tag, elm_data.size( ), &( myDomains[ i ].elements[ 0 ] ), arrptr( elm_data ),
+                                         err );
             CPPUNIT_ASSERT( !err );
         }
 
@@ -509,8 +502,8 @@ void DomainClassifierTest::test_classify_by_tag( )
     }
 
     DomainClassifier domain;
-    DomainClassifier::classify_by_tag( domain, &myMesh, "domain", arrptr( dom_list ),
-                                       arrptr( id_list ), myDomains.size( ), err );
+    DomainClassifier::classify_by_tag( domain, &myMesh, "domain", arrptr( dom_list ), arrptr( id_list ),
+                                       myDomains.size( ), err );
     CPPUNIT_ASSERT( !err );
 
     check_domain( domain );
@@ -526,8 +519,8 @@ void DomainClassifierTest::test_classify_skin( )
         arr[ i ] = myDomains[ i ].domain;
 
     DomainClassifier domain;
-    DomainClassifier::classify_skin_geometrically( domain, &myMesh, 1e-6, arrptr( arr ),
-                                                   arrptr( domainDims ), arr.size( ), err );
+    DomainClassifier::classify_skin_geometrically( domain, &myMesh, 1e-6, arrptr( arr ), arrptr( domainDims ),
+                                                   arr.size( ), err );
     CPPUNIT_ASSERT( !err );
 
     check_domain( domain );
@@ -543,8 +536,8 @@ void DomainClassifierTest::test_classify_by_geometry( )
         arr[ i ] = myDomains[ i ].domain;
 
     DomainClassifier domain;
-    DomainClassifier::classify_geometrically( domain, &myMesh, 1e-6, arrptr( arr ),
-                                              arrptr( domainDims ), arr.size( ), err );
+    DomainClassifier::classify_geometrically( domain, &myMesh, 1e-6, arrptr( arr ), arrptr( domainDims ), arr.size( ),
+                                              err );
     CPPUNIT_ASSERT( !err );
 
     check_domain( domain );

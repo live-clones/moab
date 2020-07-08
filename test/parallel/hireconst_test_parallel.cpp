@@ -33,12 +33,11 @@ std::string read_options;
 #ifdef MOAB_HAVE_HDF5
 #undef MOAB_HAVE_HDF5
 #endif
-ErrorCode load_meshset_hirec( const char* infile, Interface* mbimpl, EntityHandle& meshset,
-                              ParallelComm*& pc, const int degree = 0, const int dim = 2 );
+ErrorCode load_meshset_hirec( const char* infile, Interface* mbimpl, EntityHandle& meshset, ParallelComm*& pc,
+                              const int degree = 0, const int dim = 2 );
 ErrorCode test_mesh( const char* infile, const int degree, const bool interp, const int dim );
 
-void compute_linear_coords( const int nvpe, double* elemcoords, double* naturals,
-                            double* linearcoords );
+void compute_linear_coords( const int nvpe, double* elemcoords, double* naturals, double* linearcoords );
 
 void usage( )
 {
@@ -68,8 +67,8 @@ int main( int argc, char* argv[] )
     if( argc == 1 )
     {
         usage( );
-        std::cout << "Using default arguments: ./hireconst_test_parallel " << infile
-                  << " -degree 3 -interp 0 -dim 2" << std::endl;
+        std::cout << "Using default arguments: ./hireconst_test_parallel " << infile << " -degree 3 -interp 0 -dim 2"
+                  << std::endl;
     }
     else
     {
@@ -110,14 +109,10 @@ int main( int argc, char* argv[] )
 #ifdef MOAB_HAVE_MPI
 
             if( 0 == rank )
-            {
-                std::cout << "Dimension of input mesh should be provided, positive and less than 3"
-                          << std::endl;
-            }
+            { std::cout << "Dimension of input mesh should be provided, positive and less than 3" << std::endl; }
 
 #else
-            std::cout << "Dimension of input mesh should be provided, positive and less than 3"
-                      << std::endl;
+            std::cout << "Dimension of input mesh should be provided, positive and less than 3" << std::endl;
 #endif
             return 0;
         }
@@ -145,8 +140,7 @@ int main( int argc, char* argv[] )
         {
             std::cout << "Testing on " << infile << " with dimension " << dim << "\n";
             std::string opts = interp ? "interpolation" : "least square fitting";
-            std::cout << "High order reconstruction with degree " << degree << " " << opts
-                      << std::endl;
+            std::cout << "High order reconstruction with degree " << degree << " " << opts << std::endl;
         }
 
 #else
@@ -163,8 +157,8 @@ int main( int argc, char* argv[] )
 #endif
 }
 
-ErrorCode load_meshset_hirec( const char* infile, Interface* mbimpl, EntityHandle& meshset,
-                              ParallelComm*& pc, const int degree, const int dim )
+ErrorCode load_meshset_hirec( const char* infile, Interface* mbimpl, EntityHandle& meshset, ParallelComm*& pc,
+                              const int degree, const int dim )
 {
     ErrorCode error;
     error = mbimpl->create_meshset( moab::MESHSET_SET, meshset );MB_CHK_ERR( error );
@@ -180,8 +174,7 @@ ErrorCode load_meshset_hirec( const char* infile, Interface* mbimpl, EntityHandl
 
     if( nprocs > 1 )
     {
-        int nghlayers =
-            degree > 0 ? HiReconstruction::estimate_num_ghost_layers( degree, true ) : 0;
+        int         nghlayers = degree > 0 ? HiReconstruction::estimate_num_ghost_layers( degree, true ) : 0;
         std::string part_method = "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;";
 #ifndef MOAB_HAVE_HDF5
         part_method = "PARALLEL=BCAST_DELETE;PARTITION=TRIVIAL;";
@@ -190,8 +183,7 @@ ErrorCode load_meshset_hirec( const char* infile, Interface* mbimpl, EntityHandl
         if( nghlayers )
         {
             // get ghost layers
-            if( dim == 2 )
-            { read_options = part_method + ";PARALLEL_RESOLVE_SHARED_ENTS;PARALLEL_GHOSTS=2.0."; }
+            if( dim == 2 ) { read_options = part_method + ";PARALLEL_RESOLVE_SHARED_ENTS;PARALLEL_GHOSTS=2.0."; }
             else if( dim == 1 )
             {
                 read_options = part_method + ";PARALLEL_RESOLVE_SHARED_ENTS;PARALLEL_GHOSTS=1.0.";
@@ -290,15 +282,13 @@ ErrorCode test_mesh( const char* infile, const int degree, const bool interp, co
         double                w = 1.0 / (double)nvpe;
         std::vector< double > naturalcoords2fit( nvpe, w );
         CartVect              newcoords, linearcoords;
-        error = hirec.hiproj_walf_in_element( *ielem, nvpe, 1, &( naturalcoords2fit[ 0 ] ),
-                                              newcoords.array( ) );
+        error = hirec.hiproj_walf_in_element( *ielem, nvpe, 1, &( naturalcoords2fit[ 0 ] ), newcoords.array( ) );
 
         if( MB_FAILURE == error ) { continue; }
 
         std::vector< double > coords( 3 * nvpe );
         error = mbimpl->get_coords( conn, nvpe, &( coords[ 0 ] ) );MB_CHK_ERR( error );
-        compute_linear_coords( nvpe, &( coords[ 0 ] ), &( naturalcoords2fit[ 0 ] ),
-                               linearcoords.array( ) );
+        compute_linear_coords( nvpe, &( coords[ 0 ] ), &( naturalcoords2fit[ 0 ] ), linearcoords.array( ) );
         CartVect nlcoords = newcoords - linearcoords;
         mxdist = std::max( mxdist, nlcoords.length( ) );
         /*#ifdef MOAB_HAVE_MPI
@@ -315,8 +305,7 @@ ErrorCode test_mesh( const char* infile, const int degree, const bool interp, co
     return error;
 }
 
-void compute_linear_coords( const int nvpe, double* elemcoords, double* naturals,
-                            double* linearcoords )
+void compute_linear_coords( const int nvpe, double* elemcoords, double* naturals, double* linearcoords )
 {
     assert( elemcoords && linearcoords );
 

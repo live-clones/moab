@@ -69,8 +69,8 @@ int main( int argc, char* argv[] )
 
     if( numV != 9 || numE != 12 || numF != 4 )
     {
-        std::cout << " wrong number of shared entities on proc " << rank << " v:" << numV
-                  << " e:" << numE << " f:" << numF << "\n";
+        std::cout << " wrong number of shared entities on proc " << rank << " v:" << numV << " e:" << numE
+                  << " f:" << numF << "\n";
         delete pc;
         delete mb;
         MPI_Finalize( );

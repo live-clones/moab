@@ -90,8 +90,7 @@ ErrorCode manufacture_lagrange_mesh_on_sphere( Interface* mb, EntityHandle euler
     // the LOC tag, should be provided by the user?
     Tag         tagh = 0;
     std::string tag_name( "DP" );
-    rval = mb->tag_get_handle( tag_name.c_str( ), 3, MB_TYPE_DOUBLE, tagh,
-                               MB_TAG_DENSE | MB_TAG_CREAT );CHECK_ERR( rval );
+    rval = mb->tag_get_handle( tag_name.c_str( ), 3, MB_TYPE_DOUBLE, tagh, MB_TAG_DENSE | MB_TAG_CREAT );CHECK_ERR( rval );
     void* data;  // pointer to the LOC in memory, for each vertex
     int   count;
 
@@ -115,11 +114,9 @@ ErrorCode manufacture_lagrange_mesh_on_sphere( Interface* mb, EntityHandle euler
         // do some mumbo jumbo, as in python script
         moab::IntxUtils::SphereCoords sphCoord = moab::IntxUtils::cart_to_spherical( posi );
         double                        lat1 = sphCoord.lat - 2 * M_PI * t / T;  // 0.1/5
-        double                        uu =
-            3 * radius / T * pow( sin( lat1 ), 2 ) * sin( 2 * sphCoord.lon ) * cos( M_PI * t / T );
+        double uu = 3 * radius / T * pow( sin( lat1 ), 2 ) * sin( 2 * sphCoord.lon ) * cos( M_PI * t / T );
         uu += 2 * M_PI * cos( sphCoord.lon ) / T;
-        double vv =
-            3 * radius / T * ( sin( 2 * lat1 ) ) * cos( sphCoord.lon ) * cos( M_PI * t / T );
+        double vv = 3 * radius / T * ( sin( 2 * lat1 ) ) * cos( sphCoord.lon ) * cos( M_PI * t / T );
         double vx = -uu * sin( sphCoord.lon ) - vv * sin( sphCoord.lat ) * cos( sphCoord.lon );
         double vy = -uu * cos( sphCoord.lon ) - vv * sin( sphCoord.lat ) * sin( sphCoord.lon );
         double vz = vv * cos( sphCoord.lat );
@@ -181,8 +178,7 @@ void test_intx_in_parallel_elem_based( )
     // set pcomm
     worker.set_parallel_comm( pcomm );
 
-    rval = worker.FindMaxEdges(
-        euler_set, euler_set );  // use euler set for both, it is just finding max_edges_1 and 2
+    rval = worker.FindMaxEdges( euler_set, euler_set );  // use euler set for both, it is just finding max_edges_1 and 2
     // we need to make sure the covering set is bigger than the euler mesh
     EntityHandle covering_lagr_set;
     rval = mb.create_meshset( MESHSET_SET, covering_lagr_set );CHECK_ERR( rval );
@@ -205,8 +201,7 @@ void test_intx_in_parallel_elem_based( )
     rval = mb.write_file( outf.str( ).c_str( ), 0, 0, &outputSet, 1 );
     double intx_area = areaAdaptor.area_on_sphere( &mb, outputSet, radius );
     double arrival_area = areaAdaptor.area_on_sphere( &mb, euler_set, radius );
-    std::cout << "On rank : " << rank << " arrival area: " << arrival_area
-              << "  intersection area:" << intx_area
+    std::cout << "On rank : " << rank << " arrival area: " << arrival_area << "  intersection area:" << intx_area
               << " rel error: " << fabs( ( intx_area - arrival_area ) / arrival_area ) << "\n";CHECK_ERR( rval );
 }
 
@@ -281,7 +276,6 @@ void test_intx_mpas( )
     IntxAreaUtils areaAdaptor;
     double        intx_area = areaAdaptor.area_on_sphere( &mb, outputSet, radius );
     double        arrival_area = areaAdaptor.area_on_sphere( &mb, euler_set, radius );
-    std::cout << "On rank : " << rank << " arrival area: " << arrival_area
-              << "  intersection area:" << intx_area
+    std::cout << "On rank : " << rank << " arrival area: " << arrival_area << "  intersection area:" << intx_area
               << " rel error: " << fabs( ( intx_area - arrival_area ) / arrival_area ) << "\n";CHECK_ERR( rval );
 }

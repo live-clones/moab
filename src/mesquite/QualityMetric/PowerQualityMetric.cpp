@@ -37,10 +37,7 @@
 
 using namespace MBMesquite;
 
-PowerQualityMetric::PowerQualityMetric( QualityMetric* qm, double pow_factor )
-    : mMetric( *qm ), mPower( pow_factor )
-{
-}
+PowerQualityMetric::PowerQualityMetric( QualityMetric* qm, double pow_factor ) : mMetric( *qm ), mPower( pow_factor ) {}
 
 PowerQualityMetric::~PowerQualityMetric( ) {}
 
@@ -54,8 +51,7 @@ int PowerQualityMetric::get_negate_flag( ) const
     return mPower.value( ) < 0 ? mMetric.get_negate_flag( ) : -mMetric.get_negate_flag( );
 }
 
-void PowerQualityMetric::get_evaluations( PatchData& pd, std::vector< size_t >& handles,
-                                          bool free_only, MsqError& err )
+void PowerQualityMetric::get_evaluations( PatchData& pd, std::vector< size_t >& handles, bool free_only, MsqError& err )
 {
     mMetric.get_evaluations( pd, handles, free_only, err );MSQ_CHKERR( err );
 }
@@ -76,8 +72,8 @@ bool PowerQualityMetric::evaluate_with_indices( PatchData& pd, size_t handle, do
 }
 
 bool PowerQualityMetric::evaluate_with_gradient( PatchData& pd, size_t handle, double& value,
-                                                 std::vector< size_t >&   indices,
-                                                 std::vector< Vector3D >& gradient, MsqError& err )
+                                                 std::vector< size_t >& indices, std::vector< Vector3D >& gradient,
+                                                 MsqError& err )
 {
     bool         rval = mMetric.evaluate_with_gradient( pd, handle, value, indices, gradient, err );
     const double v = mPower.raise( value );
@@ -89,12 +85,11 @@ bool PowerQualityMetric::evaluate_with_gradient( PatchData& pd, size_t handle, d
 }
 
 bool PowerQualityMetric::evaluate_with_Hessian( PatchData& pd, size_t handle, double& value,
-                                                std::vector< size_t >&   indices,
-                                                std::vector< Vector3D >& gradient,
+                                                std::vector< size_t >& indices, std::vector< Vector3D >& gradient,
                                                 std::vector< Matrix3D >& Hessian, MsqError& err )
 {
     indices.clear( );
-    bool rval = mMetric.evaluate_with_Hessian( pd, handle, value, indices, gradient, Hessian, err );
+    bool         rval = mMetric.evaluate_with_Hessian( pd, handle, value, indices, gradient, Hessian, err );
     const double v = mPower.raise( value );
     const double g = fabs( value ) > DBL_EPSILON ? mPower.value( ) * v / value : 0.0;
     const double h = fabs( value ) > DBL_EPSILON ? g * ( mPower.value( ) - 1 ) / value : 0.0;

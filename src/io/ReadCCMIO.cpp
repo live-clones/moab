@@ -77,11 +77,10 @@ static char const kUnitsName[] = "Units";
 static int const  kVertOffset = 2;
 static int const  kCellInc = 4;
 
-#define CHK_SET_CCMERR( ccm_err_code, ccm_err_msg )                           \
-    {                                                                         \
-        if( kCCMIONoErr != ccm_err_code && kCCMIONoFileErr != ccm_err_code && \
-            kCCMIONoNodeErr != ccm_err_code )                                 \
-            MB_SET_ERR( MB_FAILURE, ccm_err_msg );                            \
+#define CHK_SET_CCMERR( ccm_err_code, ccm_err_msg )                                                             \
+    {                                                                                                           \
+        if( kCCMIONoErr != ccm_err_code && kCCMIONoFileErr != ccm_err_code && kCCMIONoNodeErr != ccm_err_code ) \
+            MB_SET_ERR( MB_FAILURE, ccm_err_msg );                                                              \
     }
 
 ReaderIface* ReadCCMIO::factory( Interface* iface )
@@ -90,10 +89,9 @@ ReaderIface* ReadCCMIO::factory( Interface* iface )
 }
 
 ReadCCMIO::ReadCCMIO( Interface* impl )
-    : mMaterialIdTag( 0 ), mMaterialTypeTag( 0 ), mRadiationTag( 0 ), mPorosityIdTag( 0 ),
-      mSpinIdTag( 0 ), mGroupIdTag( 0 ), mColorIdxTag( 0 ), mProcessorIdTag( 0 ),
-      mLightMaterialTag( 0 ), mFreeSurfaceMaterialTag( 0 ), mThicknessTag( 0 ),
-      mProstarRegionNumberTag( 0 ), mBoundaryTypeTag( 0 ), mCreatingProgramTag( 0 ), mbImpl( impl ),
+    : mMaterialIdTag( 0 ), mMaterialTypeTag( 0 ), mRadiationTag( 0 ), mPorosityIdTag( 0 ), mSpinIdTag( 0 ),
+      mGroupIdTag( 0 ), mColorIdxTag( 0 ), mProcessorIdTag( 0 ), mLightMaterialTag( 0 ), mFreeSurfaceMaterialTag( 0 ),
+      mThicknessTag( 0 ), mProstarRegionNumberTag( 0 ), mBoundaryTypeTag( 0 ), mCreatingProgramTag( 0 ), mbImpl( impl ),
       hasSolution( false )
 {
     assert( impl != NULL );
@@ -110,9 +108,8 @@ ReadCCMIO::ReadCCMIO( Interface* impl )
 
     //! Get and cache predefined tag handles
     const int negone = -1;
-    ErrorCode result =
-        impl->tag_get_handle( MATERIAL_SET_TAG_NAME, 1, MB_TYPE_INTEGER, mMaterialSetTag,
-                              MB_TAG_CREAT | MB_TAG_SPARSE, &negone );MB_CHK_SET_ERR_RET( result, "Failed to get MATERIAL_SET tag" );
+    ErrorCode result = impl->tag_get_handle( MATERIAL_SET_TAG_NAME, 1, MB_TYPE_INTEGER, mMaterialSetTag,
+                                             MB_TAG_CREAT | MB_TAG_SPARSE, &negone );MB_CHK_SET_ERR_RET( result, "Failed to get MATERIAL_SET tag" );
 
     result = impl->tag_get_handle( DIRICHLET_SET_TAG_NAME, 1, MB_TYPE_INTEGER, mDirichletSetTag,
                                    MB_TAG_CREAT | MB_TAG_SPARSE, &negone );MB_CHK_SET_ERR_RET( result, "Failed to get DIRICHLET_SET tag" );
@@ -126,8 +123,8 @@ ReadCCMIO::ReadCCMIO( Interface* impl )
 
     mGlobalIdTag = impl->globalId_tag( );
 
-    result = impl->tag_get_handle( NAME_TAG_NAME, NAME_TAG_SIZE, MB_TYPE_OPAQUE, mNameTag,
-                                   MB_TAG_CREAT | MB_TAG_SPARSE );MB_CHK_SET_ERR_RET( result, "Failed to get NAME tag" );
+    result =
+        impl->tag_get_handle( NAME_TAG_NAME, NAME_TAG_SIZE, MB_TYPE_OPAQUE, mNameTag, MB_TAG_CREAT | MB_TAG_SPARSE );MB_CHK_SET_ERR_RET( result, "Failed to get NAME tag" );
 }
 
 ReadCCMIO::~ReadCCMIO( )
@@ -135,19 +132,14 @@ ReadCCMIO::~ReadCCMIO( )
     mbImpl->release_interface( readMeshIface );
 }
 
-ErrorCode ReadCCMIO::load_file( const char* file_name, const EntityHandle* file_set,
-                                const FileOptions& /* opts */,
-                                const ReaderIface::SubsetList* subset_list,
-                                const Tag* /* file_id_tag */ )
+ErrorCode ReadCCMIO::load_file( const char* file_name, const EntityHandle* file_set, const FileOptions& /* opts */,
+                                const ReaderIface::SubsetList* subset_list, const Tag* /* file_id_tag */ )
 {
     CCMIOID    rootID, problemID, stateID, processorID, verticesID, topologyID, solutionID;
     CCMIOError error = kCCMIONoErr;
 
     if( subset_list )
-    {
-        MB_SET_ERR( MB_UNSUPPORTED_OPERATION,
-                    "Reading subset of files not supported for CCMOI data" );
-    }
+    { MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "Reading subset of files not supported for CCMOI data" ); }
 
     CCMIOOpenFile( &error, file_name, kCCMIORead, &rootID );
     CHK_SET_CCMERR( error, "Problem opening file" );
@@ -158,8 +150,7 @@ ErrorCode ReadCCMIO::load_file( const char* file_name, const EntityHandle* file_
     // Get processors
     std::vector< CCMIOSize_t > procs;
     bool                       has_solution = false;
-    rval = get_processors( stateID, processorID, verticesID, topologyID, solutionID, procs,
-                           has_solution );MB_CHK_SET_ERR( rval, "Failed to get processors" );
+    rval = get_processors( stateID, processorID, verticesID, topologyID, solutionID, procs, has_solution );MB_CHK_SET_ERR( rval, "Failed to get processors" );
 
     std::vector< CCMIOSize_t >::iterator vit;
     Range                                new_ents, *new_ents_ptr = NULL;
@@ -167,8 +158,7 @@ ErrorCode ReadCCMIO::load_file( const char* file_name, const EntityHandle* file_
 
     for( vit = procs.begin( ); vit != procs.end( ); ++vit )
     {
-        rval = read_processor( stateID, problemID, processorID, verticesID, topologyID, *vit,
-                               new_ents_ptr );MB_CHK_SET_ERR( rval, "Failed to read processors" );
+        rval = read_processor( stateID, problemID, processorID, verticesID, topologyID, *vit, new_ents_ptr );MB_CHK_SET_ERR( rval, "Failed to read processors" );
     }
 
     // Load some meta-data
@@ -194,16 +184,15 @@ ErrorCode ReadCCMIO::get_state( CCMIOID rootID, CCMIOID& problemID, CCMIOID& sta
         CCMIOSize_t i = CCMIOSIZEC( 0 );
         CCMIOError  tmp_error = kCCMIONoErr;
         CCMIONextEntity( &tmp_error, rootID, kCCMIOState, &i, &stateID );
-        if( kCCMIONoErr == tmp_error )
-            CCMIONextEntity( &error, rootID, kCCMIOProblemDescription, &i, &problemID );
+        if( kCCMIONoErr == tmp_error ) CCMIONextEntity( &error, rootID, kCCMIOProblemDescription, &i, &problemID );
     }
     CHK_SET_CCMERR( error, "Couldn't find state" );
 
     return MB_SUCCESS;
 }
 
-ErrorCode ReadCCMIO::load_metadata( CCMIOID rootID, CCMIOID problemID, CCMIOID /* stateID */,
-                                    CCMIOID processorID, const EntityHandle* file_set )
+ErrorCode ReadCCMIO::load_metadata( CCMIOID rootID, CCMIOID problemID, CCMIOID /* stateID */, CCMIOID processorID,
+                                    const EntityHandle* file_set )
 {
     // Read the simulation title.
     CCMIOError error = kCCMIONoErr;
@@ -298,8 +287,7 @@ ErrorCode ReadCCMIO::load_matset_data( CCMIOID problemID )
     return MB_SUCCESS;
 }
 
-ErrorCode ReadCCMIO::get_int_option( const char* opt_str, EntityHandle seth, Tag& tag,
-                                     CCMIOID node )
+ErrorCode ReadCCMIO::get_int_option( const char* opt_str, EntityHandle seth, Tag& tag, CCMIOID node )
 {
     int       idum;
     ErrorCode rval;
@@ -307,8 +295,7 @@ ErrorCode ReadCCMIO::get_int_option( const char* opt_str, EntityHandle seth, Tag
     {
         if( !tag )
         {
-            rval = mbImpl->tag_get_handle( opt_str, 1, MB_TYPE_INTEGER, tag,
-                                           MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_SET_ERR( rval, "Failed to get tag handle" );
+            rval = mbImpl->tag_get_handle( opt_str, 1, MB_TYPE_INTEGER, tag, MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_SET_ERR( rval, "Failed to get tag handle" );
         }
 
         rval = mbImpl->tag_set_data( tag, &seth, 1, &idum );MB_CHK_SET_ERR( rval, "Failed to set tag data" );
@@ -317,8 +304,7 @@ ErrorCode ReadCCMIO::get_int_option( const char* opt_str, EntityHandle seth, Tag
     return MB_SUCCESS;
 }
 
-ErrorCode ReadCCMIO::get_dbl_option( const char* opt_str, EntityHandle seth, Tag& tag,
-                                     CCMIOID node )
+ErrorCode ReadCCMIO::get_dbl_option( const char* opt_str, EntityHandle seth, Tag& tag, CCMIOID node )
 {
     float fdum;
     if( kCCMIONoErr == CCMIOReadOptf( NULL, node, opt_str, &fdum ) )
@@ -326,8 +312,7 @@ ErrorCode ReadCCMIO::get_dbl_option( const char* opt_str, EntityHandle seth, Tag
         ErrorCode rval;
         if( !tag )
         {
-            rval = mbImpl->tag_get_handle( opt_str, 1, MB_TYPE_DOUBLE, tag,
-                                           MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_SET_ERR( rval, "Failed to get tag handle" );
+            rval = mbImpl->tag_get_handle( opt_str, 1, MB_TYPE_DOUBLE, tag, MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_SET_ERR( rval, "Failed to get tag handle" );
         }
 
         double dum_dbl = fdum;
@@ -350,8 +335,8 @@ ErrorCode ReadCCMIO::get_str_option( const char* opt_str, EntityHandle seth, Tag
     ErrorCode rval = MB_SUCCESS;
     if( !tag )
     {
-        rval = mbImpl->tag_get_handle( other_tag_name ? other_tag_name : opt_str, NAME_TAG_SIZE,
-                                       MB_TYPE_OPAQUE, tag, MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_SET_ERR( rval, "Failed to get tag handle" );
+        rval = mbImpl->tag_get_handle( other_tag_name ? other_tag_name : opt_str, NAME_TAG_SIZE, MB_TYPE_OPAQUE, tag,
+                                       MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_SET_ERR( rval, "Failed to get tag handle" );
     }
 
     if( opt_string.size( ) > NAME_TAG_SIZE )
@@ -399,9 +384,8 @@ ErrorCode ReadCCMIO::load_neuset_data( CCMIOID problemID )
     return MB_SUCCESS;
 }
 
-ErrorCode ReadCCMIO::read_processor( CCMIOID /* stateID */, CCMIOID problemID, CCMIOID processorID,
-                                     CCMIOID verticesID, CCMIOID topologyID, CCMIOSize_t proc,
-                                     Range* new_ents )
+ErrorCode ReadCCMIO::read_processor( CCMIOID /* stateID */, CCMIOID problemID, CCMIOID processorID, CCMIOID verticesID,
+                                     CCMIOID topologyID, CCMIOSize_t proc, Range* new_ents )
 {
     ErrorCode rval;
 
@@ -415,9 +399,8 @@ ErrorCode ReadCCMIO::read_processor( CCMIOID /* stateID */, CCMIOID problemID, C
     return rval;
 }
 
-ErrorCode ReadCCMIO::read_cells( CCMIOSize_t /* proc */, CCMIOID   problemID,
-                                 CCMIOID /* verticesID */, CCMIOID topologyID, TupleList& vert_map,
-                                 Range* new_ents )
+ErrorCode ReadCCMIO::read_cells( CCMIOSize_t /* proc */, CCMIOID problemID, CCMIOID /* verticesID */,
+                                 CCMIOID topologyID, TupleList& vert_map, Range* new_ents )
 {
     // Read the faces.
     // face_map fields: s:forward/reverse, i: cell id, ul: face handle, r: none
@@ -461,8 +444,7 @@ ErrorCode ReadCCMIO::read_cells( CCMIOSize_t /* proc */, CCMIOID   problemID,
     return MB_SUCCESS;
 }
 
-ErrorCode ReadCCMIO::read_topology_types( CCMIOID&              topologyID,
-                                          std::map< int, int >& cell_topo_types )
+ErrorCode ReadCCMIO::read_topology_types( CCMIOID& topologyID, std::map< int, int >& cell_topo_types )
 {
     CCMIOError  error = kCCMIONoErr;
     CCMIOID     cellID, mapID;
@@ -484,8 +466,7 @@ ErrorCode ReadCCMIO::read_topology_types( CCMIOID&              topologyID,
     CHK_SET_CCMERR( error, "Failed to get the map node" );
 
     // Now read the map
-    CCMIOReadMap( &error, mapID, &dum_ints[ 0 ], CCMIOINDEXC( kCCMIOStart ),
-                  CCMIOINDEXC( kCCMIOEnd ) );
+    CCMIOReadMap( &error, mapID, &dum_ints[ 0 ], CCMIOINDEXC( kCCMIOStart ), CCMIOINDEXC( kCCMIOEnd ) );
     CHK_SET_CCMERR( error, "Failed to get cell ids" );
     int i;
     for( i = 0; i < num_cells; i++ )
@@ -493,8 +474,8 @@ ErrorCode ReadCCMIO::read_topology_types( CCMIOID&              topologyID,
 
     // Now read the cell topo types for real, reusing cell_topo_types
     std::vector< int > topo_types( num_cells );
-    CCMIOReadOpt1i( &error, cellID, "CellTopologyType", &topo_types[ 0 ],
-                    CCMIOINDEXC( kCCMIOStart ), CCMIOINDEXC( kCCMIOEnd ) );
+    CCMIOReadOpt1i( &error, cellID, "CellTopologyType", &topo_types[ 0 ], CCMIOINDEXC( kCCMIOStart ),
+                    CCMIOINDEXC( kCCMIOEnd ) );
     CHK_SET_CCMERR( error, "Failed to get cell topo types" );
     for( i = 0; i < num_cells; i++ )
         cell_topo_types[ dum_ints[ i ] ] = topo_types[ i ];
@@ -519,19 +500,15 @@ ErrorCode ReadCCMIO::read_gids_and_types( CCMIOID /* problemID */, CCMIOID topol
 
     // Read the gid map and set global ids
     std::vector< int > cell_gids( num_cells );
-    CCMIOReadCells( &error, cellsID, &mapID, NULL, CCMIOINDEXC( kCCMIOStart ),
-                    CCMIOINDEXC( kCCMIOEnd ) );
+    CCMIOReadCells( &error, cellsID, &mapID, NULL, CCMIOINDEXC( kCCMIOStart ), CCMIOINDEXC( kCCMIOEnd ) );
     CHK_SET_CCMERR( error, "Couldn't read cells" );
-    CCMIOReadMap( &error, mapID, &cell_gids[ 0 ], CCMIOINDEXC( kCCMIOStart ),
-                  CCMIOINDEXC( kCCMIOEnd ) );
+    CCMIOReadMap( &error, mapID, &cell_gids[ 0 ], CCMIOINDEXC( kCCMIOStart ), CCMIOINDEXC( kCCMIOEnd ) );
     CHK_SET_CCMERR( error, "Couldn't read cell id map" );
 
-    ErrorCode rval =
-        mbImpl->tag_set_data( mGlobalIdTag, &cells[ 0 ], cells.size( ), &cell_gids[ 0 ] );MB_CHK_SET_ERR( rval, "Couldn't set gids tag" );
+    ErrorCode rval = mbImpl->tag_set_data( mGlobalIdTag, &cells[ 0 ], cells.size( ), &cell_gids[ 0 ] );MB_CHK_SET_ERR( rval, "Couldn't set gids tag" );
 
     // Now read cell material types; reuse cell_gids
-    CCMIOReadCells( &error, cellsID, NULL, &cell_gids[ 0 ], CCMIOINDEXC( kCCMIOStart ),
-                    CCMIOINDEXC( kCCMIOEnd ) );
+    CCMIOReadCells( &error, cellsID, NULL, &cell_gids[ 0 ], CCMIOINDEXC( kCCMIOStart ), CCMIOINDEXC( kCCMIOEnd ) );
     CHK_SET_CCMERR( error, "Trouble reading cell types" );
 
     // Create the matsets
@@ -539,8 +516,7 @@ ErrorCode ReadCCMIO::read_gids_and_types( CCMIOID /* problemID */, CCMIOID topol
     for( int i = 0; i < num_cells; i++ )
         matset_ents[ cell_gids[ i ] ].insert( cells[ i ] );
 
-    for( std::map< int, Range >::iterator mit = matset_ents.begin( ); mit != matset_ents.end( );
-         ++mit )
+    for( std::map< int, Range >::iterator mit = matset_ents.begin( ); mit != matset_ents.end( ); ++mit )
     {
         EntityHandle matset;
         rval = mbImpl->create_meshset( MESHSET_SET, matset );MB_CHK_SET_ERR( rval, "Couldn't create material set" );
@@ -556,8 +532,7 @@ ErrorCode ReadCCMIO::construct_cells( TupleList& face_map,
 #ifndef TUPLE_LIST
                                       SenseList& sense_map,
 #endif
-                                      TupleList& /* vert_map */,
-                                      std::map< int, int >&        cell_topo_types,
+                                      TupleList& /* vert_map */, std::map< int, int >& cell_topo_types,
                                       std::vector< EntityHandle >& new_cells )
 {
     std::vector< EntityHandle > facehs;
@@ -587,8 +562,7 @@ ErrorCode ReadCCMIO::construct_cells( TupleList& face_map,
     std::map< int, std::vector< EntityHandle > >::iterator fmit;
     std::map< int, std::vector< int > >::iterator          smit;
     std::map< int, int >::iterator                         typeit;
-    for( fmit = face_map.begin( ), smit = sense_map.begin( ); fmit != face_map.end( );
-         ++fmit, ++smit )
+    for( fmit = face_map.begin( ), smit = sense_map.begin( ); fmit != face_map.end( ); ++fmit, ++smit )
     {
         // Pull out face handles bounding the same cell
         facehs.clear( );
@@ -678,9 +652,8 @@ ErrorCode ReadCCMIO::ccmio_to_moab_type( int ccm_type, EntityType& moab_type, bo
     return MB_SUCCESS;
 }
 
-ErrorCode ReadCCMIO::create_cell_from_faces( std::vector< EntityHandle >& facehs,
-                                             std::vector< int >& senses, EntityType  this_type,
-                                             bool /* has_mid_nodes */, EntityHandle& cell )
+ErrorCode ReadCCMIO::create_cell_from_faces( std::vector< EntityHandle >& facehs, std::vector< int >& senses,
+                                             EntityType this_type, bool /* has_mid_nodes */, EntityHandle& cell )
 {
     ErrorCode rval;
 
@@ -704,8 +677,7 @@ ErrorCode ReadCCMIO::create_cell_from_faces( std::vector< EntityHandle >& facehs
     // Preset this to maxtype, so we get an affirmative choice in loop
     this_type = MBMAXTYPE;
 
-    if( ( MBTET == input_type || MBMAXTYPE == input_type ) && same_type && face_type == MBTRI &&
-        facehs.size( ) == 4 )
+    if( ( MBTET == input_type || MBMAXTYPE == input_type ) && same_type && face_type == MBTRI && facehs.size( ) == 4 )
     {
         // Try to get proper connectivity for tet
 
@@ -719,8 +691,7 @@ ErrorCode ReadCCMIO::create_cell_from_faces( std::vector< EntityHandle >& facehs
         int                 conn_size;
         rval = mbImpl->get_connectivity( facehs[ 1 ], conn, conn_size, true, &storage );MB_CHK_SET_ERR( rval, "Couldn't get connectivity" );
         int i = 0;
-        while( std::find( verts.begin( ), verts.end( ), conn[ i ] ) != verts.end( ) &&
-               i < conn_size )
+        while( std::find( verts.begin( ), verts.end( ), conn[ i ] ) != verts.end( ) && i < conn_size )
             i++;
 
         // If i is not at the end of the verts, found the apex; otherwise fall back to polyhedron
@@ -730,8 +701,8 @@ ErrorCode ReadCCMIO::create_cell_from_faces( std::vector< EntityHandle >& facehs
             verts.push_back( conn[ i ] );
         }
     }
-    else if( ( MBHEX == input_type || MBMAXTYPE == input_type ) && same_type &&
-             MBQUAD == face_type && facehs.size( ) == 6 )
+    else if( ( MBHEX == input_type || MBMAXTYPE == input_type ) && same_type && MBQUAD == face_type &&
+             facehs.size( ) == 6 )
     {
         // Build hex from quads
         // Algorithm:
@@ -753,8 +724,7 @@ ErrorCode ReadCCMIO::create_cell_from_faces( std::vector< EntityHandle >& facehs
         // Get q1, which shares 2 vertices with q0
         std::copy( facehs.begin( ), facehs.end( ), range_inserter( tmp_faces ) );
         rval = mbImpl->get_adjacencies( &verts[ 0 ], 2, 2, false, tmp_faces );
-        if( MB_SUCCESS != rval || tmp_faces.size( ) != 2 )
-            MB_SET_ERR( MB_FAILURE, "Couldn't get adj face" );
+        if( MB_SUCCESS != rval || tmp_faces.size( ) != 2 ) MB_SET_ERR( MB_FAILURE, "Couldn't get adj face" );
         tmp_faces.erase( facehs[ 0 ] );
         EntityHandle q1 = *tmp_faces.begin( );
         // Get other 2 verts of q1
@@ -764,8 +734,7 @@ ErrorCode ReadCCMIO::create_cell_from_faces( std::vector< EntityHandle >& facehs
         // Get q2
         std::copy( facehs.begin( ), facehs.end( ), range_inserter( tmp_faces ) );
         rval = mbImpl->get_adjacencies( tmp_verts, 2, false, tmp_faces );
-        if( MB_SUCCESS != rval || tmp_faces.size( ) != 2 )
-            MB_SET_ERR( MB_FAILURE, "Couldn't get adj face" );
+        if( MB_SUCCESS != rval || tmp_faces.size( ) != 2 ) MB_SET_ERR( MB_FAILURE, "Couldn't get adj face" );
         tmp_faces.erase( q1 );
         EntityHandle q2 = *tmp_faces.begin( );
         // Get verts in q2
@@ -778,8 +747,7 @@ ErrorCode ReadCCMIO::create_cell_from_faces( std::vector< EntityHandle >& facehs
         if( v0 && v1 )
         {
             // Offset of v0 in q2, then rotate and flip
-            unsigned int ioff =
-                std::find( storage.begin( ), storage.end( ), v0 ) - storage.begin( );
+            unsigned int ioff = std::find( storage.begin( ), storage.end( ), v0 ) - storage.begin( );
             if( 4 == ioff ) MB_SET_ERR( MB_FAILURE, "Trouble finding offset" );
 
             if( storage[ ( ioff + 1 ) % 4 ] != v1 )
@@ -787,8 +755,7 @@ ErrorCode ReadCCMIO::create_cell_from_faces( std::vector< EntityHandle >& facehs
                 std::reverse( storage.begin( ), storage.end( ) );
                 ioff = std::find( storage.begin( ), storage.end( ), v0 ) - storage.begin( );
             }
-            if( 0 != ioff )
-                std::rotate( storage.begin( ), storage.begin( ) + ioff, storage.end( ) );
+            if( 0 != ioff ) std::rotate( storage.begin( ), storage.begin( ) + ioff, storage.end( ) );
 
             // Copy into verts, and make hex
             std::copy( storage.begin( ), storage.end( ), std::back_inserter( verts ) );
@@ -823,8 +790,7 @@ ErrorCode ReadCCMIO::create_cell_from_faces( std::vector< EntityHandle >& facehs
             Range tmp_faces, tmp_verts;
             std::copy( facehs.begin( ), facehs.end( ), range_inserter( tmp_faces ) );
             rval = mbImpl->get_adjacencies( &verts[ 0 ], 2, 2, false, tmp_faces );
-            if( MB_SUCCESS != rval || tmp_faces.size( ) != 2 )
-                MB_SET_ERR( MB_FAILURE, "Couldn't get adj face" );
+            if( MB_SUCCESS != rval || tmp_faces.size( ) != 2 ) MB_SET_ERR( MB_FAILURE, "Couldn't get adj face" );
             tmp_faces.erase( tris[ 0 ] );
             EntityHandle q1 = *tmp_faces.begin( );
             // Get verts in q1
@@ -842,8 +808,7 @@ ErrorCode ReadCCMIO::create_cell_from_faces( std::vector< EntityHandle >& facehs
 
                 index = std::find( facehs.begin( ), facehs.end( ), tris[ 1 ] ) - facehs.begin( );
                 if( senses[ index ] < 0 ) std::reverse( storage.begin( ), storage.end( ) );
-                unsigned int ioff =
-                    std::find( storage.begin( ), storage.end( ), v0 ) - storage.begin( );
+                unsigned int ioff = std::find( storage.begin( ), storage.end( ), v0 ) - storage.begin( );
                 if( 3 == ioff ) MB_SET_ERR( MB_FAILURE, "Trouble finding offset" );
                 for( unsigned int i = 0; i < 3; i++ )
                     verts.push_back( storage[ ( ioff + i ) % 3 ] );
@@ -880,9 +845,8 @@ ErrorCode ReadCCMIO::create_cell_from_faces( std::vector< EntityHandle >& facehs
     }
 
     if( MBMAXTYPE != input_type && input_type != this_type && this_type != MBMAXTYPE )
-        std::cerr << "Warning: types disagree (cell_topo_type = "
-                  << CN::EntityTypeName( input_type ) << ", faces indicate type "
-                  << CN::EntityTypeName( this_type ) << std::endl;
+        std::cerr << "Warning: types disagree (cell_topo_type = " << CN::EntityTypeName( input_type )
+                  << ", faces indicate type " << CN::EntityTypeName( this_type ) << std::endl;
 
     if( MBMAXTYPE != input_type && this_type == MBMAXTYPE && input_type != MBPOLYHEDRON )
         std::cerr << "Warning: couldn't find proper connectivity for specified topo_type = "
@@ -918,8 +882,7 @@ ErrorCode ReadCCMIO::read_all_faces( CCMIOID topologyID, TupleList& vert_map, Tu
     int         nbdy_faces = 0;
     CCMIOSize_t nf;
     error = kCCMIONoErr;
-    while( kCCMIONoErr ==
-           CCMIONextEntity( NULL, topologyID, kCCMIOBoundaryFaces, &index, &faceID ) )
+    while( kCCMIONoErr == CCMIONextEntity( NULL, topologyID, kCCMIOBoundaryFaces, &index, &faceID ) )
     {
         CCMIOEntitySize( &error, faceID, &nf, NULL );
         nbdy_faces += nf;
@@ -933,8 +896,7 @@ ErrorCode ReadCCMIO::read_all_faces( CCMIOID topologyID, TupleList& vert_map, Tu
 
     // Get multiple blocks of bdy faces
     index = CCMIOSIZEC( 0 );
-    while( kCCMIONoErr ==
-           CCMIONextEntity( NULL, topologyID, kCCMIOBoundaryFaces, &index, &faceID ) )
+    while( kCCMIONoErr == CCMIONextEntity( NULL, topologyID, kCCMIOBoundaryFaces, &index, &faceID ) )
     {
         rval = read_faces( faceID, kCCMIOBoundaryFaces, vert_map, face_map,
 #ifndef TUPLE_LIST
@@ -956,8 +918,7 @@ ErrorCode ReadCCMIO::read_all_faces( CCMIOID topologyID, TupleList& vert_map, Tu
     return rval;
 }
 
-ErrorCode ReadCCMIO::read_faces( CCMIOID faceID, CCMIOEntity bdy_or_int, TupleList& vert_map,
-                                 TupleList& face_map,
+ErrorCode ReadCCMIO::read_faces( CCMIOID faceID, CCMIOEntity bdy_or_int, TupleList& vert_map, TupleList& face_map,
 #ifndef TUPLE_LIST
                                  SenseList& sense_map,
 #endif
@@ -974,8 +935,8 @@ ErrorCode ReadCCMIO::read_faces( CCMIOID faceID, CCMIOEntity bdy_or_int, TupleLi
     // Get the size of the face connectivity array (not really a straight connect
     // array, has n, connect(n), ...)
     CCMIOSize_t farray_size = CCMIOSIZEC( 0 );
-    CCMIOReadFaces( &error, faceID, bdy_or_int, NULL, &farray_size, NULL,
-                    CCMIOINDEXC( kCCMIOStart ), CCMIOINDEXC( kCCMIOEnd ) );
+    CCMIOReadFaces( &error, faceID, bdy_or_int, NULL, &farray_size, NULL, CCMIOINDEXC( kCCMIOStart ),
+                    CCMIOINDEXC( kCCMIOEnd ) );
     CHK_SET_CCMERR( error, "Trouble reading face connectivity length" );
 
     // Allocate vectors for holding farray and cells for each face; use new for finer
@@ -998,8 +959,7 @@ ErrorCode ReadCCMIO::read_faces( CCMIOID faceID, CCMIOEntity bdy_or_int, TupleLi
         face_cells = new int[ num_sides * num_faces ];
     else
         face_cells = farray;
-    CCMIOReadFaceCells( &error, faceID, bdy_or_int, face_cells, CCMIOINDEXC( kCCMIOStart ),
-                        CCMIOINDEXC( kCCMIOEnd ) );
+    CCMIOReadFaceCells( &error, faceID, bdy_or_int, face_cells, CCMIOINDEXC( kCCMIOStart ), CCMIOINDEXC( kCCMIOEnd ) );
     CHK_SET_CCMERR( error, "Trouble reading face cells" );
 
     int* tmp_ptr = face_cells;
@@ -1024,8 +984,7 @@ ErrorCode ReadCCMIO::read_faces( CCMIOID faceID, CCMIOEntity bdy_or_int, TupleLi
     CCMIOReadMap( &error, mapID, face_cells, CCMIOINDEXC( kCCMIOStart ), CCMIOINDEXC( kCCMIOEnd ) );
     CHK_SET_CCMERR( error, "Trouble reading face gids" );
 
-    rval =
-        mbImpl->tag_set_data( mGlobalIdTag, &face_handles[ 0 ], face_handles.size( ), face_cells );MB_CHK_SET_ERR( rval, "Couldn't set face global ids" );
+    rval = mbImpl->tag_set_data( mGlobalIdTag, &face_handles[ 0 ], face_handles.size( ), face_cells );MB_CHK_SET_ERR( rval, "Couldn't set face global ids" );
 
     // Make a neumann set for these faces if they're all in a boundary face set
     if( kCCMIOBoundaryFaces == bdy_or_int )
@@ -1054,8 +1013,8 @@ ErrorCode ReadCCMIO::read_faces( CCMIOID faceID, CCMIOEntity bdy_or_int, TupleLi
     return MB_SUCCESS;
 }
 
-ErrorCode ReadCCMIO::make_faces( int* farray, TupleList& vert_map,
-                                 std::vector< EntityHandle >& new_faces, int num_faces )
+ErrorCode ReadCCMIO::make_faces( int* farray, TupleList& vert_map, std::vector< EntityHandle >& new_faces,
+                                 int num_faces )
 {
     std::vector< EntityHandle > verts;
     ErrorCode                   tmp_rval = MB_SUCCESS, rval = MB_SUCCESS;
@@ -1085,7 +1044,7 @@ ErrorCode ReadCCMIO::make_faces( int* farray, TupleList& vert_map,
         if( MB_SUCCESS == tmp_rval )
         {
             // Make face
-            EntityType ftype = ( 3 == num_verts ? MBTRI : ( 4 == num_verts ? MBQUAD : MBPOLYGON ) );
+            EntityType   ftype = ( 3 == num_verts ? MBTRI : ( 4 == num_verts ? MBQUAD : MBPOLYGON ) );
             EntityHandle faceh;
             tmp_rval = mbImpl->create_element( ftype, &verts[ 0 ], num_verts, faceh );
             if( faceh ) new_faces.push_back( faceh );
@@ -1097,9 +1056,8 @@ ErrorCode ReadCCMIO::make_faces( int* farray, TupleList& vert_map,
     return rval;
 }
 
-ErrorCode ReadCCMIO::read_vertices( CCMIOSize_t /* proc */, CCMIOID /* processorID */,
-                                    CCMIOID verticesID, CCMIOID /* topologyID */, Range* verts,
-                                    TupleList& vert_map )
+ErrorCode ReadCCMIO::read_vertices( CCMIOSize_t /* proc */, CCMIOID /* processorID */, CCMIOID verticesID,
+                                    CCMIOID /* topologyID */, Range* verts, TupleList& vert_map )
 {
     CCMIOError error = kCCMIONoErr;
 
@@ -1111,8 +1069,7 @@ ErrorCode ReadCCMIO::read_vertices( CCMIOSize_t /* proc */, CCMIOID /* processor
     // Get # dimensions
     CCMIOSize_t dims;
     float       scale;
-    CCMIOReadVerticesf( &error, verticesID, &dims, NULL, NULL, NULL, CCMIOINDEXC( 0 ),
-                        CCMIOINDEXC( 1 ) );
+    CCMIOReadVerticesf( &error, verticesID, &dims, NULL, NULL, NULL, CCMIOINDEXC( 0 ), CCMIOINDEXC( 1 ) );
     CHK_SET_CCMERR( error, "Couldn't get number of dimensions" );
 
     // Allocate vertex space
@@ -1123,8 +1080,8 @@ ErrorCode ReadCCMIO::read_vertices( CCMIOSize_t /* proc */, CCMIOID /* processor
     // Read vertex coords
     CCMIOID               mapID;
     std::vector< double > tmp_coords( GETINT32( dims ) * GETINT32( nverts ) );
-    CCMIOReadVerticesd( &error, verticesID, &dims, &scale, &mapID, &tmp_coords[ 0 ],
-                        CCMIOINDEXC( 0 ), CCMIOINDEXC( 0 + nverts ) );
+    CCMIOReadVerticesd( &error, verticesID, &dims, &scale, &mapID, &tmp_coords[ 0 ], CCMIOINDEXC( 0 ),
+                        CCMIOINDEXC( 0 + nverts ) );
     CHK_SET_CCMERR( error, "Trouble reading vertex coordinates" );
 
     // Copy interleaved coords into moab blocked coordinate space
@@ -1178,17 +1135,15 @@ ErrorCode ReadCCMIO::read_vertices( CCMIOSize_t /* proc */, CCMIOID /* processor
     return MB_SUCCESS;
 }
 
-ErrorCode ReadCCMIO::get_processors( CCMIOID stateID, CCMIOID& processorID, CCMIOID& verticesID,
-                                     CCMIOID& topologyID, CCMIOID& solutionID,
-                                     std::vector< CCMIOSize_t >& procs, bool& /* has_solution */ )
+ErrorCode ReadCCMIO::get_processors( CCMIOID stateID, CCMIOID& processorID, CCMIOID& verticesID, CCMIOID& topologyID,
+                                     CCMIOID& solutionID, std::vector< CCMIOSize_t >& procs, bool& /* has_solution */ )
 {
     CCMIOSize_t proc = CCMIOSIZEC( 0 );
     CCMIOError  error = kCCMIONoErr;
 
     CCMIONextEntity( &error, stateID, kCCMIOProcessor, &proc, &processorID );
     CHK_SET_CCMERR( error, "CCMIONextEntity() failed" );
-    if( CCMIOReadProcessor( NULL, processorID, &verticesID, &topologyID, NULL, &solutionID ) !=
-        kCCMIONoErr )
+    if( CCMIOReadProcessor( NULL, processorID, &verticesID, &topologyID, NULL, &solutionID ) != kCCMIONoErr )
     {
         // Maybe no solution; try again
         CCMIOReadProcessor( &error, processorID, &verticesID, &topologyID, NULL, NULL );
@@ -1202,8 +1157,7 @@ ErrorCode ReadCCMIO::get_processors( CCMIOID stateID, CCMIOID& processorID, CCMI
 }
 
 ErrorCode ReadCCMIO::read_tag_values( const char* /* file_name */, const char* /* tag_name */,
-                                      const FileOptions& /* opts */,
-                                      std::vector< int >& /* tag_values_out */,
+                                      const FileOptions& /* opts */, std::vector< int >& /* tag_values_out */,
                                       const SubsetList* /* subset_list */ )
 {
     return MB_FAILURE;

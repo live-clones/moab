@@ -60,8 +60,8 @@ bool TShape3DB2::evaluate( const MsqMatrix< 3, 3 >& T, double& result, MsqError&
     return true;
 }
 
-bool TShape3DB2::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& result,
-                                     MsqMatrix< 3, 3 >& wrt_T, MsqError& err )
+bool TShape3DB2::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& result, MsqMatrix< 3, 3 >& wrt_T,
+                                     MsqError& err )
 {
     double f = sqr_Frobenius( T );
     double g = sqr_Frobenius( adj( T ) );
@@ -82,9 +82,8 @@ bool TShape3DB2::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& result,
     return true;
 }
 
-bool TShape3DB2::evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result,
-                                     MsqMatrix< 3, 3 >& wrt_T, MsqMatrix< 3, 3 > second[ 6 ],
-                                     MsqError& err )
+bool TShape3DB2::evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result, MsqMatrix< 3, 3 >& wrt_T,
+                                     MsqMatrix< 3, 3 > second[ 6 ], MsqError& err )
 {
     double f = sqr_Frobenius( T );
     double g = sqr_Frobenius( adj( T ) );

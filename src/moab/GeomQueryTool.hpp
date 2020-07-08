@@ -110,12 +110,11 @@ class GeomQueryTool
     // Constructors
 
     GeomQueryTool( Interface* impl, bool find_geoments = false, EntityHandle modelRootSet = 0,
-                   bool p_rootSets_vector = true, bool restore_rootSets = true,
-                   bool trace_counting = false, double overlap_thickness = 0.,
-                   double numerical_precision = 0.001 );
-
-    GeomQueryTool( GeomTopoTool* geomtopotool, bool trace_counting = false,
+                   bool p_rootSets_vector = true, bool restore_rootSets = true, bool trace_counting = false,
                    double overlap_thickness = 0., double numerical_precision = 0.001 );
+
+    GeomQueryTool( GeomTopoTool* geomtopotool, bool trace_counting = false, double overlap_thickness = 0.,
+                   double numerical_precision = 0.001 );
 
     // Destructor
     ~GeomQueryTool( );
@@ -161,10 +160,9 @@ class GeomQueryTool
      *              ray-firing query.  See OrientedBoxTreeTool.hpp for details.
      *
      */
-    ErrorCode ray_fire( const EntityHandle volume, const double ray_start[ 3 ],
-                        const double ray_dir[ 3 ], EntityHandle& next_surf, double& next_surf_dist,
-                        RayHistory* history = NULL, double dist_limit = 0, int ray_orientation = 1,
-                        OrientedBoxTreeTool::TrvStats* stats = NULL );
+    ErrorCode ray_fire( const EntityHandle volume, const double ray_start[ 3 ], const double ray_dir[ 3 ],
+                        EntityHandle& next_surf, double& next_surf_dist, RayHistory* history = NULL,
+                        double dist_limit = 0, int ray_orientation = 1, OrientedBoxTreeTool::TrvStats* stats = NULL );
 
     /**\brief Test if a point is inside or outside a volume
      *
@@ -181,8 +179,8 @@ class GeomQueryTool
      * @param history Optional RayHistory object to pass to underlying ray fire query.
      *        The history is not modified by this call.
      */
-    ErrorCode point_in_volume( const EntityHandle volume, const double xyz[ 3 ], int& result,
-                               const double* uvw = NULL, const RayHistory* history = NULL );
+    ErrorCode point_in_volume( const EntityHandle volume, const double xyz[ 3 ], int& result, const double* uvw = NULL,
+                               const RayHistory* history = NULL );
 
     /**\brief Robust test if a point is inside or outside a volume using unit sphere area method
      *
@@ -215,8 +213,7 @@ class GeomQueryTool
      *        consistent results when a ray direction is known.  If NULL or {0,0,0} is
      *        given, a random direction will be used.
      */
-    ErrorCode find_volume_slow( const double xyz[ 3 ], EntityHandle& volume,
-                                const double* dir = NULL );
+    ErrorCode find_volume_slow( const double xyz[ 3 ], EntityHandle& volume, const double* dir = NULL );
 
     /**\brief Test if a point is inside or outsize a volume's axis-aligned bounding box
      *
@@ -245,9 +242,8 @@ class GeomQueryTool
      * a history, the facet nearest to xyz will be looked up.  The history should always be provided
      * if available, as it avoids the computational expense of a nearest-facet query.
      */
-    ErrorCode test_volume_boundary( const EntityHandle volume, const EntityHandle surface,
-                                    const double xyz[ 3 ], const double uvw[ 3 ], int& result,
-                                    const RayHistory* history = NULL );
+    ErrorCode test_volume_boundary( const EntityHandle volume, const EntityHandle surface, const double xyz[ 3 ],
+                                    const double uvw[ 3 ], int& result, const RayHistory* history = NULL );
 
     /**\brief Find the distance to the point on the boundary of the volume closest to the test point
      *
@@ -288,8 +284,8 @@ class GeomQueryTool
      * Called by point_in_volume when the point is with tolerance of the boundary. Compares the
      * ray direction with the surface normal to determine a volume membership.
      */
-    ErrorCode boundary_case( EntityHandle volume, int& result, double u, double v, double w,
-                             EntityHandle facet, EntityHandle surface );
+    ErrorCode boundary_case( EntityHandle volume, int& result, double u, double v, double w, EntityHandle facet,
+                             EntityHandle surface );
 
     /** get the solid angle projected by a facet on a unit sphere around a point
      *  - used by point_in_volume_slow

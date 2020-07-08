@@ -17,8 +17,7 @@ namespace moab
 
 // Constructor
 /*Get Merge Data and tolerance*/
-ParallelMergeMesh::ParallelMergeMesh( ParallelComm* pc, const double epsilon )
-    : myPcomm( pc ), myEps( epsilon )
+ParallelMergeMesh::ParallelMergeMesh( ParallelComm* pc, const double epsilon ) : myPcomm( pc ), myEps( epsilon )
 {
     myMB = pc->get_moab( );
     mySkinEnts.resize( 4 );
@@ -95,8 +94,7 @@ ErrorCode ParallelMergeMesh::PerformMerge( EntityHandle levelset, bool skip_loca
 }
 
 // Sets mySkinEnts with all of the skin entities on the processor
-ErrorCode ParallelMergeMesh::PopulateMySkinEnts( const EntityHandle meshset, int dim,
-                                                 bool skip_local_merge )
+ErrorCode ParallelMergeMesh::PopulateMySkinEnts( const EntityHandle meshset, int dim, bool skip_local_merge )
 {
     /*Merge Mesh Locally*/
     // Get all dim dimensional entities
@@ -198,16 +196,13 @@ ErrorCode ParallelMergeMesh::PopulateMyTup( double* gbox )
         zDup = false;
         // Figure out which x,y,z partition the element is in.
         xPart = static_cast< int >( floor( ( x[ count ] - gbox[ 0 ] ) / lengths[ 0 ] ) );
-        xPart = ( xPart < parts[ 0 ] ? xPart
-                                     : parts[ 0 ] - 1 );  // Make sure it stays within the bounds
+        xPart = ( xPart < parts[ 0 ] ? xPart : parts[ 0 ] - 1 );  // Make sure it stays within the bounds
 
         yPart = static_cast< int >( floor( ( y[ count ] - gbox[ 1 ] ) / lengths[ 1 ] ) );
-        yPart = ( yPart < parts[ 1 ] ? yPart
-                                     : parts[ 1 ] - 1 );  // Make sure it stays within the bounds
+        yPart = ( yPart < parts[ 1 ] ? yPart : parts[ 1 ] - 1 );  // Make sure it stays within the bounds
 
         zPart = static_cast< int >( floor( ( z[ count ] - gbox[ 2 ] ) / lengths[ 2 ] ) );
-        zPart = ( zPart < parts[ 2 ] ? zPart
-                                     : parts[ 2 ] - 1 );  // Make sure it stays within the bounds
+        zPart = ( zPart < parts[ 2 ] ? zPart : parts[ 2 ] - 1 );  // Make sure it stays within the bounds
 
         // Figure out the partition with the addition of Epsilon
         xEps = static_cast< int >( floor( ( x[ count ] - gbox[ 0 ] + myEps ) / lengths[ 0 ] ) );
@@ -355,8 +350,7 @@ ErrorCode ParallelMergeMesh::PartitionGlobalBox( double* gbox, double* lengths, 
 }
 
 // Partition a side based on the length ratios
-int ParallelMergeMesh::PartitionSide( double sideLen, double restLen, unsigned numProcs,
-                                      bool altRatio )
+int ParallelMergeMesh::PartitionSide( double sideLen, double restLen, unsigned numProcs, bool altRatio )
 {
     // If theres only 1 processor, then just return 1
     if( numProcs == 1 ) { return 1; }
@@ -438,8 +432,7 @@ ErrorCode ParallelMergeMesh::PopulateMyMatches( )
     while( ( i + 1 ) < myTup.get_n( ) )
     {
         // Proximity Comparison
-        double xi = myTup.vr_rd[ tup_r ], yi = myTup.vr_rd[ tup_r + 1 ],
-               zi = myTup.vr_rd[ tup_r + 2 ];
+        double xi = myTup.vr_rd[ tup_r ], yi = myTup.vr_rd[ tup_r + 1 ], zi = myTup.vr_rd[ tup_r + 2 ];
 
         bool done = false;
         while( !done )
@@ -447,15 +440,13 @@ ErrorCode ParallelMergeMesh::PopulateMyMatches( )
             j++;
             tup_r += tup_mr;
             if( j >= myTup.get_n( ) ) { break; }
-            CartVect cv( myTup.vr_rd[ tup_r ] - xi, myTup.vr_rd[ tup_r + 1 ] - yi,
-                         myTup.vr_rd[ tup_r + 2 ] - zi );
+            CartVect cv( myTup.vr_rd[ tup_r ] - xi, myTup.vr_rd[ tup_r + 1 ] - yi, myTup.vr_rd[ tup_r + 2 ] - zi );
             if( cv.length_squared( ) > eps2 ) { done = true; }
         }
         // Allocate the tuple list before adding matches
         while( myMatches.get_n( ) + ( j - i ) * ( j - i - 1 ) >= myMatches.get_max( ) )
         {
-            myMatches.resize(
-                myMatches.get_max( ) ? myMatches.get_max( ) + myMatches.get_max( ) / 2 + 1 : 2 );
+            myMatches.resize( myMatches.get_max( ) ? myMatches.get_max( ) + myMatches.get_max( ) / 2 + 1 : 2 );
         }
 
         // We now know that tuples [i to j) exclusive match.
@@ -520,16 +511,14 @@ ErrorCode ParallelMergeMesh::TagSharedElements( int dim )
     ErrorCode rval;
 
     // get the entities in the partition sets
-    for( Range::iterator rit = myPcomm->partitionSets.begin( );
-         rit != myPcomm->partitionSets.end( ); ++rit )
+    for( Range::iterator rit = myPcomm->partitionSets.begin( ); rit != myPcomm->partitionSets.end( ); ++rit )
     {
         Range tmp_ents;
         rval = myMB->get_entities_by_handle( *rit, tmp_ents, true );
         if( MB_SUCCESS != rval ) { return rval; }
         proc_ents.merge( tmp_ents );
     }
-    if( myMB->dimension_from_handle( *proc_ents.rbegin( ) ) !=
-        myMB->dimension_from_handle( *proc_ents.begin( ) ) )
+    if( myMB->dimension_from_handle( *proc_ents.rbegin( ) ) != myMB->dimension_from_handle( *proc_ents.begin( ) ) )
     {
         Range::iterator lower = proc_ents.lower_bound( CN::TypeDimensionMap[ 0 ].first ),
                         upper = proc_ents.upper_bound( CN::TypeDimensionMap[ dim - 1 ].second );
@@ -651,8 +640,8 @@ void ParallelMergeMesh::SwapTuples( TupleList& tup, unsigned long a, unsigned lo
 
 // Perform the sorting of a tuple by real
 // To sort an entire tuple_list, call (tup,0,tup.n,epsilon)
-void ParallelMergeMesh::PerformRealSort( TupleList& tup, unsigned long left, unsigned long right,
-                                         double eps, uint tup_mr )
+void ParallelMergeMesh::PerformRealSort( TupleList& tup, unsigned long left, unsigned long right, double eps,
+                                         uint tup_mr )
 {
     // If list size is only 1 or 0 return
     if( left + 1 >= right ) { return; }
@@ -682,8 +671,8 @@ void ParallelMergeMesh::PerformRealSort( TupleList& tup, unsigned long left, uns
 }
 
 // Note, this takes the actual tup.vr[] index (aka i*tup.mr)
-bool ParallelMergeMesh::TupleGreaterThan( TupleList& tup, unsigned long vrI, unsigned long vrJ,
-                                          double eps, uint tup_mr )
+bool ParallelMergeMesh::TupleGreaterThan( TupleList& tup, unsigned long vrI, unsigned long vrJ, double eps,
+                                          uint tup_mr )
 {
     unsigned check = 0;
     while( check < tup_mr )

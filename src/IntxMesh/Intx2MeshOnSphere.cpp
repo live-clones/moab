@@ -62,8 +62,7 @@ double Intx2MeshOnSphere::setup_tgt_cell( EntityHandle tgt, int& nsTgt )
     }
 
     for( int j = 1; j < nsTgt - 1; j++ )
-        cellArea += IntxUtils::area2D( &tgtCoords2D[ 0 ], &tgtCoords2D[ 2 * j ],
-                                       &tgtCoords2D[ 2 * j + 2 ] );
+        cellArea += IntxUtils::area2D( &tgtCoords2D[ 0 ], &tgtCoords2D[ 2 * j ], &tgtCoords2D[ 2 * j + 2 ] );
 
     // take target coords in order and compute area in plane
     return cellArea;
@@ -72,9 +71,10 @@ double Intx2MeshOnSphere::setup_tgt_cell( EntityHandle tgt, int& nsTgt )
 /* the elements are convex for sure, then do a gnomonic projection of both,
  *  compute intersection in the plane, then go back to the sphere for the points
  *  */
-ErrorCode Intx2MeshOnSphere::computeIntersectionBetweenTgtAndSrc(
-    EntityHandle tgt, EntityHandle src, double* P, int& nP, double& area, int markb[ MAXEDGES ],
-    int markr[ MAXEDGES ], int& nsBlue, int& nsTgt, bool check_boxes_first )
+ErrorCode Intx2MeshOnSphere::computeIntersectionBetweenTgtAndSrc( EntityHandle tgt, EntityHandle src, double* P,
+                                                                  int& nP, double& area, int markb[ MAXEDGES ],
+                                                                  int markr[ MAXEDGES ], int& nsBlue, int& nsTgt,
+                                                                  bool check_boxes_first )
 {
     // the area will be used from now on, to see how well we fill the target cell with polygons
     // the points will be at most 40; they will describe a convex patch, after the points will be
@@ -97,8 +97,7 @@ ErrorCode Intx2MeshOnSphere::computeIntersectionBetweenTgtAndSrc(
         // make sure the target is setup already
         setup_tgt_cell( tgt, nsTgt );  // we do not need area here
         // use here gnomonic plane (plane) to see where source is
-        bool overlap3d =
-            GeomUtil::bounding_boxes_overlap( tgtCoords, nsTgt, srcCoords, nsBlue, box_error );
+        bool     overlap3d = GeomUtil::bounding_boxes_overlap( tgtCoords, nsTgt, srcCoords, nsBlue, box_error );
         int      planeb;
         CartVect mid3 = ( srcCoords[ 0 ] + srcCoords[ 1 ] + srcCoords[ 2 ] ) / 3;
         IntxUtils::decide_gnomonic_plane( mid3, planeb );
@@ -110,13 +109,11 @@ ErrorCode Intx2MeshOnSphere::computeIntersectionBetweenTgtAndSrc(
         {
             for( int j = 0; j < nsBlue; j++ )
             {
-                rval = IntxUtils::gnomonic_projection(
-                    srcCoords[ j ], Rsrc, plane, srcCoords2D[ 2 * j ], srcCoords2D[ 2 * j + 1 ] );MB_CHK_ERR( rval );
+                rval = IntxUtils::gnomonic_projection( srcCoords[ j ], Rsrc, plane, srcCoords2D[ 2 * j ],
+                                                       srcCoords2D[ 2 * j + 1 ] );MB_CHK_ERR( rval );
             }
-            bool overlap2d = GeomUtil::bounding_boxes_overlap_2d( srcCoords2D, nsBlue, tgtCoords2D,
-                                                                  nsTgt, box_error );
-            if( !overlap2d )
-                return MB_SUCCESS;  // we are sure they are not overlapping in 2d , either
+            bool overlap2d = GeomUtil::bounding_boxes_overlap_2d( srcCoords2D, nsBlue, tgtCoords2D, nsTgt, box_error );
+            if( !overlap2d ) return MB_SUCCESS;  // we are sure they are not overlapping in 2d , either
         }
     }
 #ifdef ENABLE_DEBUG
@@ -159,12 +156,11 @@ ErrorCode Intx2MeshOnSphere::computeIntersectionBetweenTgtAndSrc(
     }
 #endif
 
-    rval = IntxUtils::EdgeIntersections2( srcCoords2D, nsBlue, tgtCoords2D, nsTgt, markb, markr, P,
-                                          nP );MB_CHK_ERR( rval );
+    rval = IntxUtils::EdgeIntersections2( srcCoords2D, nsBlue, tgtCoords2D, nsTgt, markb, markr, P, nP );MB_CHK_ERR( rval );
 
     int side[ MAXEDGES ] = { 0 };  // this refers to what side? source or tgt?
-    int extraPoints = IntxUtils::borderPointsOfXinY2( srcCoords2D, nsBlue, tgtCoords2D, nsTgt,
-                                                      &( P[ 2 * nP ] ), side, epsilon_area );
+    int extraPoints =
+        IntxUtils::borderPointsOfXinY2( srcCoords2D, nsBlue, tgtCoords2D, nsTgt, &( P[ 2 * nP ] ), side, epsilon_area );
     if( extraPoints >= 1 )
     {
         for( int k = 0; k < nsBlue; k++ )
@@ -186,8 +182,8 @@ ErrorCode Intx2MeshOnSphere::computeIntersectionBetweenTgtAndSrc(
     }
     nP += extraPoints;
 
-    extraPoints = IntxUtils::borderPointsOfXinY2( tgtCoords2D, nsTgt, srcCoords2D, nsBlue,
-                                                  &( P[ 2 * nP ] ), side, epsilon_area );
+    extraPoints =
+        IntxUtils::borderPointsOfXinY2( tgtCoords2D, nsTgt, srcCoords2D, nsBlue, &( P[ 2 * nP ] ), side, epsilon_area );
     if( extraPoints >= 1 )
     {
         for( int k = 0; k < nsTgt; k++ )
@@ -224,8 +220,8 @@ ErrorCode Intx2MeshOnSphere::computeIntersectionBetweenTgtAndSrc(
             double orientedArea = IntxUtils::area2D( &P[ 2 * k ], &P[ 2 * k1 ], &P[ 2 * k2 ] );
             if( orientedArea < 0 )
             {
-                std::cout << " oriented area is negative: " << orientedArea << " k:" << k
-                          << " target, src:" << tgt << " " << src << " \n";
+                std::cout << " oriented area is negative: " << orientedArea << " k:" << k << " target, src:" << tgt
+                          << " " << src << " \n";
             }
         }
 #endif
@@ -239,16 +235,15 @@ ErrorCode Intx2MeshOnSphere::computeIntersectionBetweenTgtAndSrc(
 // also, we could just create new vertices every time, and merge only in the end;
 // could be too expensive, and the tolerance for merging could be an
 // interesting topic
-ErrorCode Intx2MeshOnSphere::findNodes( EntityHandle tgt, int nsTgt, EntityHandle src, int nsBlue,
-                                        double* iP, int nP )
+ErrorCode Intx2MeshOnSphere::findNodes( EntityHandle tgt, int nsTgt, EntityHandle src, int nsBlue, double* iP, int nP )
 {
 #ifdef ENABLE_DEBUG
     // first of all, check against target and source vertices
     //
     if( dbg_1 )
     {
-        std::cout << "tgt, src, nP, P " << mb->id_from_handle( tgt ) << " "
-                  << mb->id_from_handle( src ) << " " << nP << "\n";
+        std::cout << "tgt, src, nP, P " << mb->id_from_handle( tgt ) << " " << mb->id_from_handle( src ) << " " << nP
+                  << "\n";
         for( int n = 0; n < nP; n++ )
             std::cout << " \t" << iP[ 2 * n ] << "\t" << iP[ 2 * n + 1 ] << "\n";
     }
@@ -296,10 +291,9 @@ ErrorCode Intx2MeshOnSphere::findNodes( EntityHandle tgt, int nsTgt, EntityHandl
 #endif
 #ifdef ENABLE_DEBUG
                 if( dbg_1 )
-                    std::cout << "  target node j:" << j
-                              << " id:" << mb->id_from_handle( tgtConn[ j ] )
-                              << " 2d coords:" << tgtCoords2D[ 2 * j ] << "  "
-                              << tgtCoords2D[ 2 * j + 1 ] << " d2: " << d2 << " \n";
+                    std::cout << "  target node j:" << j << " id:" << mb->id_from_handle( tgtConn[ j ] )
+                              << " 2d coords:" << tgtCoords2D[ 2 * j ] << "  " << tgtCoords2D[ 2 * j + 1 ]
+                              << " d2: " << d2 << " \n";
 #endif
             }
         }
@@ -319,8 +313,8 @@ ErrorCode Intx2MeshOnSphere::findNodes( EntityHandle tgt, int nsTgt, EntityHandl
 #endif
 #ifdef ENABLE_DEBUG
                 if( dbg_1 )
-                    std::cout << "  source node " << j << " " << mb->id_from_handle( srcConn[ j ] )
-                              << " d2:" << d2 << " \n";
+                    std::cout << "  source node " << j << " " << mb->id_from_handle( srcConn[ j ] ) << " d2:" << d2
+                              << " \n";
 #endif
             }
         }
@@ -334,8 +328,7 @@ ErrorCode Intx2MeshOnSphere::findNodes( EntityHandle tgt, int nsTgt, EntityHandl
             for( j = 0; j < nsTgt; j++ )
             {
                 int    j1 = ( j + 1 ) % nsTgt;
-                double area =
-                    fabs( IntxUtils::area2D( &tgtCoords2D[ 2 * j ], &tgtCoords2D[ 2 * j1 ], pp ) );
+                double area = fabs( IntxUtils::area2D( &tgtCoords2D[ 2 * j ], &tgtCoords2D[ 2 * j1 ], pp ) );
                 // how to check if pp is between redCoords2D[j] and redCoords2D[j1] ?
                 // they should form a straight line; the sign should be -1
                 double checkx = IntxUtils::dist2( &tgtCoords2D[ 2 * j ], pp ) +
@@ -353,11 +346,10 @@ ErrorCode Intx2MeshOnSphere::findNodes( EntityHandle tgt, int nsTgt, EntityHandl
                 // found the edge; now find if there is a point in the list here
                 // std::vector<EntityHandle> * expts = extraNodesMap[tgtEdges[j]];
                 int indx = TgtEdges.index( adjTgtEdges[ index_min ] );
-                if( indx <
-                    0 )  // CID 181166 (#1 of 1): Argument cannot be negative (NEGATIVE_RETURNS)
+                if( indx < 0 )  // CID 181166 (#1 of 1): Argument cannot be negative (NEGATIVE_RETURNS)
                 {
-                    std::cerr << " error in adjacent target edge: "
-                              << mb->id_from_handle( adjTgtEdges[ index_min ] ) << "\n";
+                    std::cerr << " error in adjacent target edge: " << mb->id_from_handle( adjTgtEdges[ index_min ] )
+                              << "\n";
                     return MB_FAILURE;
                 }
                 std::vector< EntityHandle >* expts = extraNodesVec[ indx ];
@@ -408,8 +400,8 @@ ErrorCode Intx2MeshOnSphere::findNodes( EntityHandle tgt, int nsTgt, EntityHandl
             {
                 std::cout << tgtCoords2D[ 2 * j1 ] << " " << tgtCoords2D[ 2 * j1 + 1 ] << "\n";
             }
-            std::cout << " a point pp is not on a target quad " << *pp << " " << pp[ 1 ]
-                      << " target quad " << mb->id_from_handle( tgt ) << " \n";
+            std::cout << " a point pp is not on a target quad " << *pp << " " << pp[ 1 ] << " target quad "
+                      << mb->id_from_handle( tgt ) << " \n";
             return MB_FAILURE;
         }
     }
@@ -468,12 +460,11 @@ ErrorCode Intx2MeshOnSphere::findNodes( EntityHandle tgt, int nsTgt, EntityHandl
         {
             int    k1 = ( k + 1 ) % nP;
             int    k2 = ( k1 + 1 ) % nP;
-            double orientedArea = area_spherical_triangle_lHuiller(
-                &coords[ 3 * k ], &coords[ 3 * k1 ], &coords[ 3 * k2 ], Rdest );
+            double orientedArea =
+                area_spherical_triangle_lHuiller( &coords[ 3 * k ], &coords[ 3 * k1 ], &coords[ 3 * k2 ], Rdest );
             if( orientedArea < 0 )
             {
-                std::cout << " np before 1 , 2, current " << npBefore1 << " " << npBefore2 << " "
-                          << nP << "\n";
+                std::cout << " np before 1 , 2, current " << npBefore1 << " " << npBefore2 << " " << nP << "\n";
                 for( int i = 0; i < nP; i++ )
                 {
                     int    nexti = ( i + 1 ) % nP;
@@ -482,8 +473,7 @@ ErrorCode Intx2MeshOnSphere::findNodes( EntityHandle tgt, int nsTgt, EntityHandl
                 }
                 std::cout << " old verts: " << oldNodes << " other intx:" << otherIntx << "\n";
 
-                std::cout << "rank:" << my_rank
-                          << " oriented area in 3d is negative: " << orientedArea << " k:" << k
+                std::cout << "rank:" << my_rank << " oriented area in 3d is negative: " << orientedArea << " k:" << k
                           << " target, src:" << tgt << " " << src << " \n";
             }
         }
@@ -562,8 +552,7 @@ ErrorCode Intx2MeshOnSphere::update_tracer_data( EntityHandle out_set, Tag& tagE
                 remote_cells_with_tracers->vul_wr[ i ] =
                     remote_cells->vul_wr[ i ];  // this is the corresponding target cell (arrival)
                 for( int k = 0; k < numTracers; k++ )
-                    remote_cells_with_tracers->vr_wr[ numTracers * i + k ] =
-                        0;  // initialize tracers to be transported
+                    remote_cells_with_tracers->vr_wr[ numTracers * i + k ] = 0;  // initialize tracers to be transported
                 remote_cells_with_tracers->inc_n( );
             }
         }
@@ -586,8 +575,7 @@ ErrorCode Intx2MeshOnSphere::update_tracer_data( EntityHandle out_set, Tag& tagE
         rval = mb->tag_get_data( srcParentTag, &poly, 1, &srcIndex );MB_CHK_SET_ERR( rval, "can't get source tag" );
 
         EntityHandle src =
-            rs1[ srcIndex -
-                 1 ];  // big assumption, it should work for meshes where global id is the same
+            rs1[ srcIndex - 1 ];  // big assumption, it should work for meshes where global id is the same
         // as element handle (ordered from 1 to number of elements); should be OK for Homme meshes
         rval = mb->tag_get_data( tgtParentTag, &poly, 1, &tgtIndex );MB_CHK_SET_ERR( rval, "can't get target tag" );
         // EntityHandle target = rs2[tgtIndex];
@@ -605,8 +593,7 @@ ErrorCode Intx2MeshOnSphere::update_tracer_data( EntityHandle out_set, Tag& tagE
         if( 0 == tgtArr || MB_TAG_NOT_FOUND == rval )
         {
 #ifdef MOAB_HAVE_MPI
-            if( !remote_cells_with_tracers )
-                MB_CHK_SET_ERR( MB_FAILURE, "no remote cells, failure\n" );
+            if( !remote_cells_with_tracers ) MB_CHK_SET_ERR( MB_FAILURE, "no remote cells, failure\n" );
             // maybe the element is remote, from another processor
             int global_id_src;
             rval = mb->tag_get_data( gid, &src, 1, &global_id_src );MB_CHK_SET_ERR( rval, "can't get arrival target for corresponding source gid" );
@@ -622,11 +609,9 @@ ErrorCode Intx2MeshOnSphere::update_tracer_data( EntityHandle out_set, Tag& tagE
         else if( MB_SUCCESS == rval )
         {
             int arrTgtIndex = rs2.index( tgtArr );
-            if( -1 == arrTgtIndex )
-                MB_CHK_SET_ERR( MB_FAILURE, "can't find the target arrival index" );
+            if( -1 == arrTgtIndex ) MB_CHK_SET_ERR( MB_FAILURE, "can't find the target arrival index" );
             for( int k = 0; k < numTracers; k++ )
-                newValues[ numTracers * arrTgtIndex + k ] +=
-                    currentVals[ ( tgtIndex - 1 ) * numTracers + k ] * areap;
+                newValues[ numTracers * arrTgtIndex + k ] += currentVals[ ( tgtIndex - 1 ) * numTracers + k ] * areap;
         }
 
         else
@@ -639,22 +624,18 @@ ErrorCode Intx2MeshOnSphere::update_tracer_data( EntityHandle out_set, Tag& tagE
     {
         // so this means that some cells will be sent back with tracer info to the procs they were
         // sent from
-        ( parcomm->proc_config( ).crystal_router( ) )
-            ->gs_transfer( 1, *remote_cells_with_tracers, 0 );
+        ( parcomm->proc_config( ).crystal_router( ) )->gs_transfer( 1, *remote_cells_with_tracers, 0 );
         // now, look at the global id, find the proper "tgt" cell with that index and update its
         // mass
         // remote_cells->print("remote cells after routing");
         int n = remote_cells_with_tracers->get_n( );
         for( int j = 0; j < n; j++ )
         {
-            EntityHandle tgtCell =
-                remote_cells_with_tracers->vul_rd[ j ];  // entity handle sent back
-            int arrTgtIndex = rs2.index( tgtCell );
-            if( -1 == arrTgtIndex )
-                MB_CHK_SET_ERR( MB_FAILURE, "can't find the target arrival index" );
+            EntityHandle tgtCell = remote_cells_with_tracers->vul_rd[ j ];  // entity handle sent back
+            int          arrTgtIndex = rs2.index( tgtCell );
+            if( -1 == arrTgtIndex ) MB_CHK_SET_ERR( MB_FAILURE, "can't find the target arrival index" );
             for( int k = 0; k < numTracers; k++ )
-                newValues[ arrTgtIndex * numTracers + k ] +=
-                    remote_cells_with_tracers->vr_rd[ j * numTracers + k ];
+                newValues[ arrTgtIndex * numTracers + k ] += remote_cells_with_tracers->vr_rd[ j * numTracers + k ];
         }
     }
 #endif /* MOAB_HAVE_MPI */
@@ -682,19 +663,18 @@ ErrorCode Intx2MeshOnSphere::update_tracer_data( EntityHandle out_set, Tag& tagE
 #ifdef MOAB_HAVE_MPI
     std::vector< double > total_mass( numTracers, 0. );
     double                total_intx_area = 0;
-    int mpi_err = MPI_Reduce( &total_mass_local[ 0 ], &total_mass[ 0 ], numTracers, MPI_DOUBLE,
-                              MPI_SUM, 0, MPI_COMM_WORLD );
+    int                   mpi_err =
+        MPI_Reduce( &total_mass_local[ 0 ], &total_mass[ 0 ], numTracers, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD );
     if( MPI_SUCCESS != mpi_err ) return MB_FAILURE;
     // now reduce total area
-    mpi_err =
-        MPI_Reduce( &check_intx_area, &total_intx_area, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD );
+    mpi_err = MPI_Reduce( &check_intx_area, &total_intx_area, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD );
     if( MPI_SUCCESS != mpi_err ) return MB_FAILURE;
     if( my_rank == 0 )
     {
         for( int k = 0; k < numTracers; k++ )
             std::cout << "total mass now tracer k=" << k + 1 << " " << total_mass[ k ] << "\n";
-        std::cout << "check: total intersection area: (4 * M_PI * R^2): " << 4 * M_PI * Rsrc * Rsrc
-                  << " " << total_intx_area << "\n";
+        std::cout << "check: total intersection area: (4 * M_PI * R^2): " << 4 * M_PI * Rsrc * Rsrc << " "
+                  << total_intx_area << "\n";
     }
 
     if( remote_cells_with_tracers )
@@ -705,15 +685,14 @@ ErrorCode Intx2MeshOnSphere::update_tracer_data( EntityHandle out_set, Tag& tagE
 #else
     for( int k = 0; k < numTracers; k++ )
         std::cout << "total mass now tracer k=" << k + 1 << " " << total_mass_local[ k ] << "\n";
-    std::cout << "check: total intersection area: (4 * M_PI * R^2): " << 4 * M_PI * Rsrc * Rsrc
-              << " " << check_intx_area << "\n";
+    std::cout << "check: total intersection area: (4 * M_PI * R^2): " << 4 * M_PI * Rsrc * Rsrc << " "
+              << check_intx_area << "\n";
 #endif
     return MB_SUCCESS;
 }
 
 #ifdef MOAB_HAVE_MPI
-ErrorCode Intx2MeshOnSphere::build_processor_euler_boxes( EntityHandle euler_set,
-                                                          Range&       local_verts )
+ErrorCode Intx2MeshOnSphere::build_processor_euler_boxes( EntityHandle euler_set, Range& local_verts )
 {
     localEnts.clear( );
     ErrorCode rval = mb->get_entities_by_dimension( euler_set, 2, localEnts );MB_CHK_SET_ERR( rval, "can't get local ents" );
@@ -825,8 +804,8 @@ ErrorCode Intx2MeshOnSphere::build_processor_euler_boxes( EntityHandle euler_set
 #else
     {
         std::vector< double > allBoxes_tmp( 24 * parcomm->proc_config( ).proc_size( ) );
-        mpi_err = MPI_Allgather( &allBoxes[ 24 * my_rank ], 6, MPI_DOUBLE, &allBoxes_tmp[ 0 ], 24,
-                                 MPI_DOUBLE, parcomm->proc_config( ).proc_comm( ) );
+        mpi_err = MPI_Allgather( &allBoxes[ 24 * my_rank ], 6, MPI_DOUBLE, &allBoxes_tmp[ 0 ], 24, MPI_DOUBLE,
+                                 parcomm->proc_config( ).proc_comm( ) );
         allBoxes = allBoxes_tmp;
     }
 #endif
@@ -835,15 +814,15 @@ ErrorCode Intx2MeshOnSphere::build_processor_euler_boxes( EntityHandle euler_set
 #ifdef VERBOSE
     if( my_rank == 0 )
     {
-        std::cout << " maximum number of vertices per cell are " << max_edges_1
-                  << " on first mesh and " << max_edges_2 << " on second mesh \n";
+        std::cout << " maximum number of vertices per cell are " << max_edges_1 << " on first mesh and " << max_edges_2
+                  << " on second mesh \n";
         for( int i = 0; i < numprocs; i++ )
         {
             std::cout << "task: " << i << " \n";
             for( int pl = 1; pl <= 6; pl++ )
             {
-                std::cout << "  plane " << pl << " min: \t" << allBoxes[ 24 * i + 4 * ( pl - 1 ) ]
-                          << " \t" << allBoxes[ 24 * i + 4 * ( pl - 1 ) + 1 ] << "\n";
+                std::cout << "  plane " << pl << " min: \t" << allBoxes[ 24 * i + 4 * ( pl - 1 ) ] << " \t"
+                          << allBoxes[ 24 * i + 4 * ( pl - 1 ) + 1 ] << "\n";
                 std::cout << " \t  max: \t" << allBoxes[ 24 * i + 4 * ( pl - 1 ) + 2 ] << " \t"
                           << allBoxes[ 24 * i + 4 * ( pl - 1 ) + 3 ] << "\n";
             }
@@ -858,8 +837,7 @@ ErrorCode Intx2MeshOnSphere::build_processor_euler_boxes( EntityHandle euler_set
 // will distribute the mesh to other procs, so that on each task, the covering set covers the local
 // bounding box this means it will cover the second (local) mesh set; So the covering set will cover
 // completely the second local mesh set (in intersection)
-ErrorCode Intx2MeshOnSphere::construct_covering_set( EntityHandle& initial_distributed_set,
-                                                     EntityHandle& covering_set )
+ErrorCode Intx2MeshOnSphere::construct_covering_set( EntityHandle& initial_distributed_set, EntityHandle& covering_set )
 {
     assert( parcomm != NULL );
     if( 1 == parcomm->proc_config( ).proc_size( ) )
@@ -871,13 +849,13 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set( EntityHandle& initial_distr
     // primary element came from, in the joint communicator ; this will be forwarded by coverage
     // mesh needed for tag migrate later on
     int       defaultInt = -1;  // no processor, so it was not migrated from somewhere else
-    ErrorCode rval = mb->tag_get_handle( "orig_sending_processor", 1, MB_TYPE_INTEGER,
-                                         orgSendProcTag, MB_TAG_DENSE | MB_TAG_CREAT, &defaultInt );MB_CHK_SET_ERR( rval, "can't create original sending processor tag" );
+    ErrorCode rval = mb->tag_get_handle( "orig_sending_processor", 1, MB_TYPE_INTEGER, orgSendProcTag,
+                                         MB_TAG_DENSE | MB_TAG_CREAT, &defaultInt );MB_CHK_SET_ERR( rval, "can't create original sending processor tag" );
 
     // mark on the coverage mesh where this element came from
     Tag sendProcTag;  /// for coverage mesh, will store the sender
-    rval = mb->tag_get_handle( "sending_processor", 1, MB_TYPE_INTEGER, sendProcTag,
-                               MB_TAG_DENSE | MB_TAG_CREAT, &defaultInt );MB_CHK_SET_ERR( rval, "can't create sending processor tag" );
+    rval = mb->tag_get_handle( "sending_processor", 1, MB_TYPE_INTEGER, sendProcTag, MB_TAG_DENSE | MB_TAG_CREAT,
+                               &defaultInt );MB_CHK_SET_ERR( rval, "can't create sending processor tag" );
 
     // this information needs to be forwarded to coverage mesh, if this mesh was already migrated
     // from somewhere else
@@ -934,8 +912,8 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set( EntityHandle& initial_distr
     local_int_array[ 0 ] = orig_sender;
     local_int_array[ 1 ] = size_gdofs_tag;
     // now reduce over all processors
-    int mpi_err = MPI_Allreduce( local_int_array, global_int_array, 2, MPI_INT, MPI_MAX,
-                                 parcomm->proc_config( ).proc_comm( ) );
+    int mpi_err =
+        MPI_Allreduce( local_int_array, global_int_array, 2, MPI_INT, MPI_MAX, parcomm->proc_config( ).proc_comm( ) );
     if( MPI_SUCCESS != mpi_err ) return MB_FAILURE;
     orig_sender = global_int_array[ 0 ];
     size_gdofs_tag = global_int_array[ 1 ];
@@ -986,8 +964,7 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set( EntityHandle& initial_distr
         rval = mb->get_connectivity( q, conn, num_nodes );MB_CHK_SET_ERR( rval, "can't get connectivity on cell" );
 
         // first decide what planes need to consider
-        std::set< int >
-                              planes;  // if this list contains more than 3 planes, we have a very bad mesh!!!
+        std::set< int >       planes;  // if this list contains more than 3 planes, we have a very bad mesh!!!
         std::vector< double > elco( 3 * num_nodes );
         for( int i = 0; i < num_nodes; i++ )
         {
@@ -1020,11 +997,9 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set( EntityHandle& initial_distr
             }
             // now decide if processor p should be interested in this cell, by looking at plane pl
             // 2d box this is one of the few size n loops;
-            for( int p = 0; p < numprocs;
-                 p++ )  // each cell q can be sent to more than one processor
+            for( int p = 0; p < numprocs; p++ )  // each cell q can be sent to more than one processor
             {
-                double procMin1 =
-                    allBoxes[ 24 * p + 4 * ( pl - 1 ) ];  // these were determined before
+                double procMin1 = allBoxes[ 24 * p + 4 * ( pl - 1 ) ];  // these were determined before
                 //
                 if( procMin1 >= DBL_MAX )  // the processor has no targets on this plane
                     continue;
@@ -1032,8 +1007,7 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set( EntityHandle& initial_distr
                 double procMax1 = allBoxes[ 24 * p + 4 * ( pl - 1 ) + 2 ];
                 double procMax2 = allBoxes[ 24 * p + 4 * ( pl - 1 ) + 3 ];
                 // test overlap of 2d boxes
-                if( procMin1 > qmax[ 0 ] + box_error || procMin2 > qmax[ 1 ] + box_error )
-                    continue;  //
+                if( procMin1 > qmax[ 0 ] + box_error || procMin2 > qmax[ 1 ] + box_error ) continue;  //
                 if( qmin[ 0 ] > procMax1 + box_error || qmin[ 1 ] > procMax2 + box_error ) continue;
                 // good to be inserted
                 Rto[ p ].insert( q );
@@ -1053,14 +1027,12 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set( EntityHandle& initial_distr
     // merge the list of vertices to be sent
     for( int p = 0; p < numprocs; p++ )
     {
-        if( p == (int)my_rank )
-            continue;  // do not "send" it to current task, because it is already here
+        if( p == (int)my_rank ) continue;  // do not "send" it to current task, because it is already here
         Range& range_to_P = Rto[ p ];
         // add the vertices to it
         if( range_to_P.empty( ) ) continue;  // nothing to send to proc p
 #ifdef VERBOSE
-        std::cout << " proc : " << my_rank << " to proc " << p << " send " << range_to_P.size( )
-                  << " cells "
+        std::cout << " proc : " << my_rank << " to proc " << p << " send " << range_to_P.size( ) << " cells "
                   << " psize: " << range_to_P.psize( ) << "\n";
 #endif
         Range vertsToP;
@@ -1076,8 +1048,8 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set( EntityHandle& initial_distr
     TLv.enableWriteAccess( );
 
     // add also GLOBAL_DOFS info, if found on the mesh cell; it should be found only on HOMME cells!
-    int sizeTuple = 2 + max_edges_1 + migrated_mesh +
-                    size_gdofs_tag;  // max edges could be up to MAXEDGES :) for polygons
+    int sizeTuple =
+        2 + max_edges_1 + migrated_mesh + size_gdofs_tag;  // max edges could be up to MAXEDGES :) for polygons
     TLq.initialize( sizeTuple, 0, 0, 0,
                     numq );  // to proc, elem GLOBAL ID, connectivity[max_edges] (global ID v), plus
                              // original sender if set (migrated mesh case)
@@ -1088,8 +1060,7 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set( EntityHandle& initial_distr
 
     TLq.enableWriteAccess( );
 #ifdef VERBOSE
-    std::cout << "from proc " << my_rank << " send " << numv << " vertices and " << numq
-              << " elements\n";
+    std::cout << "from proc " << my_rank << " send " << numv << " vertices and " << numq << " elements\n";
 #endif
 
     for( int to_proc = 0; to_proc < numprocs; to_proc++ )
@@ -1105,10 +1076,8 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set( EntityHandle& initial_distr
             assert( -1 != index );
             int n = TLv.get_n( );  // current size of tuple list
             TLv.vi_wr[ 2 * n ] = to_proc;  // send to processor
-            TLv.vi_wr[ 2 * n + 1 ] =
-                gids[ index ];  // global id needs index in the second_mesh_verts range
-            TLv.vr_wr[ 3 * n ] =
-                coords_mesh[ 3 * index ];  // departure position, of the node local_verts[i]
+            TLv.vi_wr[ 2 * n + 1 ] = gids[ index ];  // global id needs index in the second_mesh_verts range
+            TLv.vr_wr[ 3 * n ] = coords_mesh[ 3 * index ];  // departure position, of the node local_verts[i]
             TLv.vr_wr[ 3 * n + 1 ] = coords_mesh[ 3 * index + 1 ];
             TLv.vr_wr[ 3 * n + 2 ] = coords_mesh[ 3 * index + 2 ];
             TLv.inc_n( );  // increment tuple list size
@@ -1129,8 +1098,7 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set( EntityHandle& initial_distr
             rval = mb->get_connectivity( q, conn4, num_nodes );MB_CHK_SET_ERR( rval, "can't get connectivity for cell" );
             if( num_nodes > max_edges_1 )
             {
-                mb->list_entities( &q, 1 );MB_CHK_SET_ERR( MB_FAILURE, "too many nodes in a cell (" << num_nodes << ","
-                                                                         << max_edges_1 << ")" );
+                mb->list_entities( &q, 1 );MB_CHK_SET_ERR( MB_FAILURE, "too many nodes in a cell (" << num_nodes << "," << max_edges_1 << ")" );
             }
             for( int i = 0; i < num_nodes; i++ )
             {
@@ -1148,10 +1116,8 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set( EntityHandle& initial_distr
             // is the mesh migrated before or not?
             if( migrated_mesh )
             {
-                rval = mb->tag_get_data( orgSendProcTag, &q, 1, &orig_sender );MB_CHK_SET_ERR( rval,
-                                "can't get original sender for polygon, in migrate scenario" );
-                TLq.vi_wr[ sizeTuple * n + currentIndexIntTuple ] =
-                    orig_sender;  // should be different than -1
+                rval = mb->tag_get_data( orgSendProcTag, &q, 1, &orig_sender );MB_CHK_SET_ERR( rval, "can't get original sender for polygon, in migrate scenario" );
+                TLq.vi_wr[ sizeTuple * n + currentIndexIntTuple ] = orig_sender;  // should be different than -1
                 currentIndexIntTuple++;
             }
             // GLOBAL_DOFS info, if available
@@ -1197,13 +1163,11 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set( EntityHandle& initial_distr
     {
         int globalId = TLv.vi_rd[ 2 * i + 1 ];
         if( globalID_to_vertex_handle.find( globalId ) ==
-            globalID_to_vertex_handle
-                .end( ) )  // we do not have locally this vertex (yet)
-                           // so we have to create it, and add to the inverse map
+            globalID_to_vertex_handle.end( ) )  // we do not have locally this vertex (yet)
+                                                // so we have to create it, and add to the inverse map
         {
             EntityHandle new_vert;
-            double       dp_pos[ 3 ] = { TLv.vr_wr[ 3 * i ], TLv.vr_wr[ 3 * i + 1 ],
-                                   TLv.vr_wr[ 3 * i + 2 ] };
+            double       dp_pos[ 3 ] = { TLv.vr_wr[ 3 * i ], TLv.vr_wr[ 3 * i + 1 ], TLv.vr_wr[ 3 * i + 2 ] };
             rval = mb->create_vertex( dp_pos, new_vert );MB_CHK_SET_ERR( rval, "can't create new vertex " );
             globalID_to_vertex_handle[ globalId ] = new_vert;  // now add it to the map
             // set the GLOBAL ID tag on the new vertex
@@ -1224,8 +1188,7 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set( EntityHandle& initial_distr
         int          gid_el;
         rval = mb->tag_get_data( gid, &q, 1, &gid_el );MB_CHK_SET_ERR( rval, "can't get global id of cell " );
         assert( gid_el >= 0 );
-        globalID_to_eh[ gid_el ] =
-            q;  // do we need this? yes, now we do; parent tags are now using it heavily
+        globalID_to_eh[ gid_el ] = q;  // do we need this? yes, now we do; parent tags are now using it heavily
         rval = mb->tag_set_data( sendProcTag, &q, 1, &my_rank );MB_CHK_SET_ERR( rval, "can't set sender for cell" );
     }
 
@@ -1253,8 +1216,7 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set( EntityHandle& initial_distr
                                     // number of vertices than max_edges)
             else
             {
-                assert( globalID_to_vertex_handle.find( vgid ) !=
-                        globalID_to_vertex_handle.end( ) );
+                assert( globalID_to_vertex_handle.find( vgid ) != globalID_to_vertex_handle.end( ) );
                 new_conn[ j ] = globalID_to_vertex_handle[ vgid ];
                 nnodes = j + 1;  // nodes are at the beginning, and are variable number
             }

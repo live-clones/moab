@@ -43,8 +43,8 @@ namespace element_utility
 
       public:
         template< typename Moab, typename Entity_handle, typename Point >
-        std::pair< bool, Point > operator( )( Moab& moab, const Entity_handle& eh,
-                                              const Point& point, const double tol )
+        std::pair< bool, Point > operator( )( Moab& moab, const Entity_handle& eh, const Point& point,
+                                              const double tol )
         {
             typedef std::vector< moab::CartVect > Points;
             Points                                points;
@@ -68,8 +68,7 @@ namespace element_utility
 
       public:
         template< typename Moab, typename Entity_handle, typename Point >
-        std::pair< bool, Point > operator( )( Moab& moab, const Entity_handle& eh,
-                                              const Point& point )
+        std::pair< bool, Point > operator( )( Moab& moab, const Entity_handle& eh, const Point& point )
         {
             // get entity
             typedef std::vector< moab::CartVect > Points;

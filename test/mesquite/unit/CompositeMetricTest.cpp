@@ -57,8 +57,7 @@ class CompositeMetricTestBase : public CppUnit::TestFixture
     virtual bool        evaluate( PatchData&, size_t, double&, MsqError& ) = 0;
 
   public:
-    CompositeMetricTestBase( )
-        : tester( QualityMetricTester::ALL_FE_EXCEPT_SEPTAHEDRON ), mMetric( 0 )
+    CompositeMetricTestBase( ) : tester( QualityMetricTester::ALL_FE_EXCEPT_SEPTAHEDRON ), mMetric( 0 )
     {
         tester.ideal_pyramid_base_equals_height( true );
     }
@@ -359,8 +358,7 @@ template< int POWER > class PowerQualityMetricTest : public CompositeMetricTestB
 };
 
 template< int POWER >
-bool PowerQualityMetricTest< POWER >::evaluate( PatchData& pd, size_t h, double& val,
-                                                MsqError& err )
+bool PowerQualityMetricTest< POWER >::evaluate( PatchData& pd, size_t h, double& val, MsqError& err )
 {
     bool rval = m1.evaluate( pd, h, val, err );
     MSQ_ERRFALSE( err );
@@ -458,8 +456,7 @@ template< int SCALE > class ScalarMultiplyMetricTest : public CompositeMetricTes
 };
 
 template< int SCALE >
-bool ScalarMultiplyMetricTest< SCALE >::evaluate( PatchData& pd, size_t h, double& val,
-                                                  MsqError& err )
+bool ScalarMultiplyMetricTest< SCALE >::evaluate( PatchData& pd, size_t h, double& val, MsqError& err )
 {
     bool rval = m1.evaluate( pd, h, val, err );
     MSQ_ERRFALSE( err );

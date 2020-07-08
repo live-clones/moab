@@ -41,8 +41,8 @@ HypreParVector::HypreParVector( moab::ParallelComm* p_comm ) : pcomm( p_comm )
     initialized = size = gsize = rstart = rend = 0;
 }
 
-HypreParVector::HypreParVector( moab::ParallelComm* p_comm, HYPRE_Int glob_size,
-                                HYPRE_Int p_irstart, HYPRE_Int p_irend )
+HypreParVector::HypreParVector( moab::ParallelComm* p_comm, HYPRE_Int glob_size, HYPRE_Int p_irstart,
+                                HYPRE_Int p_irend )
     : rstart( p_irstart ), rend( p_irend ), pcomm( p_comm )
 {
     HYPRE_IJVectorCreate( pcomm->comm( ), rstart, rend, &x );
@@ -150,8 +150,7 @@ HypreParVector& HypreParVector::operator=( const HypreParVector& y )
 
 HYPRE_Int HypreParVector::resize( HYPRE_Int /*glob_size*/, HYPRE_Int p_irstart, HYPRE_Int p_irend )
 {
-    if( initialized || x != NULL )
-        MB_SET_ERR_RET_VAL( "Vector is already initialized and partitioned", -1 );
+    if( initialized || x != NULL ) MB_SET_ERR_RET_VAL( "Vector is already initialized and partitioned", -1 );
 
     HYPRE_IJVectorCreate( this->pcomm->comm( ), p_irstart, p_irend, &x );
     HYPRE_IJVectorSetObjectType( x, HYPRE_PARCSR );
@@ -176,20 +175,17 @@ HYPRE_Int HypreParVector::AddData( HYPRE_Complex* p_data, HYPRE_Int* p_col )
     return HYPRE_IJVectorAddToValues( x, size, p_col, p_data );
 }
 
-HYPRE_Int HypreParVector::GetValues( const int ndata, const HYPRE_Int* indices,
-                                     HYPRE_Complex* const _data ) const
+HYPRE_Int HypreParVector::GetValues( const int ndata, const HYPRE_Int* indices, HYPRE_Complex* const _data ) const
 {
     return HYPRE_IJVectorGetValues( x, ndata, indices, _data );
 }
 
-HYPRE_Int HypreParVector::SetValues( const int ndata, const HYPRE_Int* indices,
-                                     const HYPRE_Complex* const _data )
+HYPRE_Int HypreParVector::SetValues( const int ndata, const HYPRE_Int* indices, const HYPRE_Complex* const _data )
 {
     return HYPRE_IJVectorSetValues( x, ndata, indices, _data );
 }
 
-HYPRE_Int HypreParVector::AddValues( const int ndata, const HYPRE_Int* indices,
-                                     const HYPRE_Complex* const _data )
+HYPRE_Int HypreParVector::AddValues( const int ndata, const HYPRE_Int* indices, const HYPRE_Complex* const _data )
 {
     return HYPRE_IJVectorAddToValues( x, ndata, indices, _data );
 }

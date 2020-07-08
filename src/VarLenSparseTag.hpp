@@ -45,8 +45,7 @@ namespace moab
 class VarLenSparseTag : public TagInfo
 {
   public:
-    VarLenSparseTag( const char* name, DataType type, const void* default_value,
-                     int default_value_bytes );
+    VarLenSparseTag( const char* name, DataType type, const void* default_value, int default_value_bytes );
 
     ~VarLenSparseTag( );
 
@@ -65,8 +64,7 @@ class VarLenSparseTag : public TagInfo
      *
      *\param seqman    Pointer to mesh entity database
      */
-    virtual ErrorCode release_all_data( SequenceManager* seqman, Error* error_handler,
-                                        bool delete_pending );
+    virtual ErrorCode release_all_data( SequenceManager* seqman, Error* error_handler, bool delete_pending );
 
     /**\brief Get tag value for passed entities
      *
@@ -79,27 +77,26 @@ class VarLenSparseTag : public TagInfo
      *\param data Pointer to memory in which to store consecutive tag values,
      *            one for each passed entity.
      */
-    virtual ErrorCode get_data( const SequenceManager* seqman, Error* error_handler,
-                                const EntityHandle* entities, size_t num_entities,
+    virtual ErrorCode get_data( const SequenceManager* seqman, Error* error_handler, const EntityHandle* entities,
+                                size_t num_entities, void* data ) const;
+
+    /**\brief Get tag value for passed entities
+     *
+     * Get tag values for specified entities.
+     *
+     *\Note Will fail for variable-length data.
+     *\param seqman Pointer to mesh entity database
+     *\param entities Entity handles for which to retrieve tag data
+     *\param data Pointer to memory in which to store consecutive tag values,
+     *            one for each passed entity.
+     */
+    virtual ErrorCode get_data( const SequenceManager* seqman, Error* error_handler, const Range& entities,
                                 void* data ) const;
 
     /**\brief Get tag value for passed entities
      *
      * Get tag values for specified entities.
      *
-     *\Note Will fail for variable-length data.
-     *\param seqman Pointer to mesh entity database
-     *\param entities Entity handles for which to retrieve tag data
-     *\param data Pointer to memory in which to store consecutive tag values,
-     *            one for each passed entity.
-     */
-    virtual ErrorCode get_data( const SequenceManager* seqman, Error* error_handler,
-                                const Range& entities, void* data ) const;
-
-    /**\brief Get tag value for passed entities
-     *
-     * Get tag values for specified entities.
-     *
      *\param seqman    Pointer to mesh entity database
      *\param entities  Entity handles for which to retrieve tag data
      *\param num_entities Length of \c entities array
@@ -109,9 +106,8 @@ class VarLenSparseTag : public TagInfo
      *                length of the tag value for the corresponding
      *                entity.
      */
-    virtual ErrorCode get_data( const SequenceManager* seqman, Error* error_handler,
-                                const EntityHandle* entities, size_t num_entities,
-                                const void** data_ptrs, int* data_lengths ) const;
+    virtual ErrorCode get_data( const SequenceManager* seqman, Error* error_handler, const EntityHandle* entities,
+                                size_t num_entities, const void** data_ptrs, int* data_lengths ) const;
 
     /**\brief Get tag value for passed entities
      *
@@ -125,9 +121,8 @@ class VarLenSparseTag : public TagInfo
      *                length of the tag value for the corresponding
      *                entity.
      */
-    virtual ErrorCode get_data( const SequenceManager* seqman, Error* error_handler,
-                                const Range& entities, const void** data_ptrs,
-                                int* data_lengths ) const;
+    virtual ErrorCode get_data( const SequenceManager* seqman, Error* error_handler, const Range& entities,
+                                const void** data_ptrs, int* data_lengths ) const;
 
     /**\brief Set tag value for passed entities
      *
@@ -139,25 +134,24 @@ class VarLenSparseTag : public TagInfo
      *\param data Pointer to memory holding consecutive tag values,
      *            one for each passed entity.
      */
-    virtual ErrorCode set_data( SequenceManager* seqman, Error* error_handler,
-                                const EntityHandle* entities, size_t num_entities,
+    virtual ErrorCode set_data( SequenceManager* seqman, Error* error_handler, const EntityHandle* entities,
+                                size_t num_entities, const void* data );
+
+    /**\brief Set tag value for passed entities
+     *
+     * Store tag data or update stored tag values
+     *\Note Will fail for variable-length data.
+     *\param seqman Pointer to mesh entity database
+     *\param entities Entity handles for which to store tag data
+     *\param data Pointer to memory holding consecutive tag values,
+     *            one for each passed entity.
+     */
+    virtual ErrorCode set_data( SequenceManager* seqman, Error* error_handler, const Range& entities,
                                 const void* data );
 
     /**\brief Set tag value for passed entities
      *
      * Store tag data or update stored tag values
-     *\Note Will fail for variable-length data.
-     *\param seqman Pointer to mesh entity database
-     *\param entities Entity handles for which to store tag data
-     *\param data Pointer to memory holding consecutive tag values,
-     *            one for each passed entity.
-     */
-    virtual ErrorCode set_data( SequenceManager* seqman, Error* error_handler,
-                                const Range& entities, const void* data );
-
-    /**\brief Set tag value for passed entities
-     *
-     * Store tag data or update stored tag values
      *
      *\param seqman    Pointer to mesh entity database
      *\param entities  Entity handles for which to store tag data
@@ -169,29 +163,27 @@ class VarLenSparseTag : public TagInfo
      *                entity.  Array is required for variable-length
      *                tags and is ignored for fixed-length tags.
      */
-    virtual ErrorCode set_data( SequenceManager* seqman, Error* error_handler,
-                                const EntityHandle* entities, size_t num_entities,
+    virtual ErrorCode set_data( SequenceManager* seqman, Error* error_handler, const EntityHandle* entities,
+                                size_t num_entities, void const* const* data_ptrs, const int* data_lengths );
+
+    /**\brief Set tag value for passed entities
+     *
+     * Store tag data or update stored tag values
+     *
+     *\param seqman    Pointer to mesh entity database
+     *\param entities  Entity handles for which to store tag data
+     *\param data_ptrs Array of pointers to tag values, one pointer
+     *                 for each passed entity.
+     *\param data_lengths One value for each entity specifying the
+     *                length of the tag value for the corresponding
+     *                entity.  Array is required for variable-length
+     *                tags and is ignored for fixed-length tags.
+     */
+    virtual ErrorCode set_data( SequenceManager* seqman, Error* error_handler, const Range& entities,
                                 void const* const* data_ptrs, const int* data_lengths );
 
     /**\brief Set tag value for passed entities
      *
-     * Store tag data or update stored tag values
-     *
-     *\param seqman    Pointer to mesh entity database
-     *\param entities  Entity handles for which to store tag data
-     *\param data_ptrs Array of pointers to tag values, one pointer
-     *                 for each passed entity.
-     *\param data_lengths One value for each entity specifying the
-     *                length of the tag value for the corresponding
-     *                entity.  Array is required for variable-length
-     *                tags and is ignored for fixed-length tags.
-     */
-    virtual ErrorCode set_data( SequenceManager* seqman, Error* error_handler,
-                                const Range& entities, void const* const* data_ptrs,
-                                const int* data_lengths );
-
-    /**\brief Set tag value for passed entities
-     *
      * Store tag data or update stored tag values.
      *
      *\param seqman    Pointer to mesh entity database
@@ -203,25 +195,24 @@ class VarLenSparseTag : public TagInfo
      *                 fixed-length tags.  Required for variable-
      *                 length tags.
      */
-    virtual ErrorCode clear_data( SequenceManager* seqman, Error* error_handler,
-                                  const EntityHandle* entities, size_t num_entities,
+    virtual ErrorCode clear_data( SequenceManager* seqman, Error* error_handler, const EntityHandle* entities,
+                                  size_t num_entities, const void* value_ptr, int value_len = 0 );
+
+    /**\brief Set tag value for passed entities
+     *
+     * Store tag data or update stored tag values.
+     *
+     *\param seqman    Pointer to mesh entity database
+     *\param entities  Entity handles for which to store tag data
+     *\param value_ptr Pointer to a single tag value which is to be
+     *                 stored for each of the passed entities.
+     *\param value_len Length of tag value in bytes.  Ignored for
+     *                 fixed-length tags.  Required for variable-
+     *                 length tags.
+     */
+    virtual ErrorCode clear_data( SequenceManager* seqman, Error* error_handler, const Range& entities,
                                   const void* value_ptr, int value_len = 0 );
 
-    /**\brief Set tag value for passed entities
-     *
-     * Store tag data or update stored tag values.
-     *
-     *\param seqman    Pointer to mesh entity database
-     *\param entities  Entity handles for which to store tag data
-     *\param value_ptr Pointer to a single tag value which is to be
-     *                 stored for each of the passed entities.
-     *\param value_len Length of tag value in bytes.  Ignored for
-     *                 fixed-length tags.  Required for variable-
-     *                 length tags.
-     */
-    virtual ErrorCode clear_data( SequenceManager* seqman, Error* error_handler,
-                                  const Range& entities, const void* value_ptr, int value_len = 0 );
-
     /**\brief Remove/clear tag data for entities
      *
      * Remove tag values from entities.
@@ -230,8 +221,8 @@ class VarLenSparseTag : public TagInfo
      *\param entities  Entity handles for which to store tag data
      *\param num_entities Length of \c entities array
      */
-    virtual ErrorCode remove_data( SequenceManager* seqman, Error* error_handler,
-                                   const EntityHandle* entities, size_t num_entities );
+    virtual ErrorCode remove_data( SequenceManager* seqman, Error* error_handler, const EntityHandle* entities,
+                                   size_t num_entities );
 
     /**\brief Remove/clear tag data for entities
      *
@@ -240,8 +231,7 @@ class VarLenSparseTag : public TagInfo
      *\param seqman    Pointer to mesh entity database
      *\param entities  Entity handles for which to store tag data
      */
-    virtual ErrorCode remove_data( SequenceManager* seqman, Error* error_handler,
-                                   const Range& entities );
+    virtual ErrorCode remove_data( SequenceManager* seqman, Error* error_handler, const Range& entities );
 
     /**\brief Access tag data via direct pointer into contiguous blocks
      *
@@ -265,9 +255,8 @@ class VarLenSparseTag : public TagInfo
      *      even though MOAB would normally not explicitly store tag values
      *      for such entities.
      */
-    virtual ErrorCode tag_iterate( SequenceManager* seqman, Error* error_handler,
-                                   Range::iterator& iter, const Range::iterator& end,
-                                   void*& data_ptr, bool allocate = true );
+    virtual ErrorCode tag_iterate( SequenceManager* seqman, Error* error_handler, Range::iterator& iter,
+                                   const Range::iterator& end, void*& data_ptr, bool allocate = true );
 
     /**\brief Get all tagged entities
      *
@@ -283,8 +272,7 @@ class VarLenSparseTag : public TagInfo
      *                search is restricted to entities in this list.
      */
     virtual ErrorCode get_tagged_entities( const SequenceManager* seqman, Range& output_entities,
-                                           EntityType   type = MBMAXTYPE,
-                                           const Range* intersect = 0 ) const;
+                                           EntityType type = MBMAXTYPE, const Range* intersect = 0 ) const;
 
     /**\brief Count all tagged entities
      *
@@ -300,8 +288,7 @@ class VarLenSparseTag : public TagInfo
      *                search is restricted to entities in this list.
      */
     virtual ErrorCode num_tagged_entities( const SequenceManager* seqman, size_t& output_count,
-                                           EntityType   type = MBMAXTYPE,
-                                           const Range* intersect = 0 ) const;
+                                           EntityType type = MBMAXTYPE, const Range* intersect = 0 ) const;
 
     /**\brief Get all tagged entities with tag value
      *
@@ -317,8 +304,8 @@ class VarLenSparseTag : public TagInfo
      *                search is restricted to entities in this list.
      */
     virtual ErrorCode find_entities_with_value( const SequenceManager* seqman, Error* error_handler,
-                                                Range& output_entities, const void* value,
-                                                int value_bytes = 0, EntityType type = MBMAXTYPE,
+                                                Range& output_entities, const void* value, int value_bytes = 0,
+                                                EntityType   type = MBMAXTYPE,
                                                 const Range* intersect_entities = 0 ) const;
 
     /**\brief Check if entity is tagged */
@@ -348,8 +335,8 @@ class VarLenSparseTag : public TagInfo
     VarLenSparseTag& operator=( const VarLenSparseTag& );
 
     //! get the variable-length data for an entity id
-    inline ErrorCode get_data_ptr( Error* error_handler, EntityHandle entity_handle,
-                                   const void*& data, int& size ) const;
+    inline ErrorCode get_data_ptr( Error* error_handler, EntityHandle entity_handle, const void*& data,
+                                   int& size ) const;
 
     MapType mData;
 };

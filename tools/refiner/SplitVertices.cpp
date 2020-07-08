@@ -24,16 +24,13 @@ EntitySource::EntitySource( int nc, RefinerTagManager* tag_mgr )
 EntitySource::~EntitySource( ) {}
 
 bool EntitySource::create_element( EntityType etyp, int nconn, const EntityHandle* elem_verts,
-                                   EntityHandle&                elem_handle,
-                                   std::map< ProcessSet, int >& proc_partition_counts )
+                                   EntityHandle& elem_handle, std::map< ProcessSet, int >& proc_partition_counts )
 {
     // Get the global IDs of the input vertices
     // int stat;
     proc_partition_counts[ this->tag_manager->get_element_procs( ) ]++;
-    if( this->mesh_out->create_element( etyp, elem_verts, nconn, elem_handle ) != MB_SUCCESS )
-    { return false; }
-    this->push_back( EntitySourceRecord( this->num_corners, elem_handle,
-                                         this->tag_manager->get_element_procs( ) ) );
+    if( this->mesh_out->create_element( etyp, elem_verts, nconn, elem_handle ) != MB_SUCCESS ) { return false; }
+    this->push_back( EntitySourceRecord( this->num_corners, elem_handle, this->tag_manager->get_element_procs( ) ) );
     this->tag_manager->set_sharing( elem_handle, this->tag_manager->get_element_procs( ) );
     return true;
 }

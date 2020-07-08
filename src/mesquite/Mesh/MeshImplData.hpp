@@ -68,8 +68,8 @@ class MeshImplData
 
     /** Copy internal representation into CSR rep
      *  Does not include mid-nodes. */
-    void copy_mesh( size_t* vertex_handle_array, size_t* element_hanlde_array,
-                    size_t* element_conn_offsets, size_t* element_conn_indices );
+    void copy_mesh( size_t* vertex_handle_array, size_t* element_hanlde_array, size_t* element_conn_offsets,
+                    size_t* element_conn_indices );
 
     /** Get all vertices, including mid-nodes */
     void all_vertices( std::vector< size_t >& list, MsqError& err ) const;
@@ -144,18 +144,14 @@ class MeshImplData
      *  connectivity and adjacency data, and re-initialize with
      *  passed data.
      */
-    void reset_element( size_t index, const std::vector< long >& vertices, EntityTopology topology,
-                        MsqError& err );
-    void reset_element( size_t index, const std::vector< size_t >& vertices,
-                        EntityTopology topology, MsqError& err );
+    void reset_element( size_t index, const std::vector< long >& vertices, EntityTopology topology, MsqError& err );
+    void reset_element( size_t index, const std::vector< size_t >& vertices, EntityTopology topology, MsqError& err );
 
     /** Add a new vertex */
     size_t add_vertex( const Vector3D& coords, bool fixed, MsqError& err );
     /** Add a new element */
-    size_t add_element( const std::vector< long >& vertices, EntityTopology topology,
-                        MsqError& err );
-    size_t add_element( const std::vector< size_t >& vertices, EntityTopology topology,
-                        MsqError& err );
+    size_t add_element( const std::vector< long >& vertices, EntityTopology topology, MsqError& err );
+    size_t add_element( const std::vector< size_t >& vertices, EntityTopology topology, MsqError& err );
 
     /** Delete a vertex - may not be referenced by any element */
     void delete_vertex( size_t index, MsqError& err );
@@ -164,8 +160,8 @@ class MeshImplData
 
     /** Get all mid-nodes and their adjacent corner vertices */
     void copy_higher_order( std::vector< size_t >& mid_nodes, std::vector< size_t >& vertices,
-                            std::vector< size_t >& vertex_indices,
-                            std::vector< size_t >& index_offsets, MsqError& err );
+                            std::vector< size_t >& vertex_indices, std::vector< size_t >& index_offsets,
+                            MsqError& err );
 
     /** \brief Get elements adjacent to ALL of the passed nodes.
      *
@@ -173,8 +169,8 @@ class MeshImplData
      * adjacency lists of the specified vertices.
      */
     void get_adjacent_elements( std::vector< size_t >::const_iterator nodes,
-                                std::vector< size_t >::const_iterator nodes_end,
-                                std::vector< size_t >& elems_out, MsqError& err );
+                                std::vector< size_t >::const_iterator nodes_end, std::vector< size_t >& elems_out,
+                                MsqError& err );
 
     /**\brief Skin mesh
      *
@@ -203,12 +199,10 @@ class MeshImplData
     void clear_element( size_t index, MsqError& err );
 
     /** Set cleared element */
-    void set_element( size_t index, const std::vector< long >& vertices, EntityTopology topology,
-                      MsqError& err );
+    void set_element( size_t index, const std::vector< long >& vertices, EntityTopology topology, MsqError& err );
 
     /** Set cleared element */
-    void set_element( size_t index, const std::vector< size_t >& vertices, EntityTopology topology,
-                      MsqError& err );
+    void set_element( size_t index, const std::vector< size_t >& vertices, EntityTopology topology, MsqError& err );
 
     /** Struct holding a vertex */
     struct Vertex

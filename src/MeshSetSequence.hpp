@@ -33,13 +33,11 @@ class SequenceManager;
 class MeshSetSequence : public EntitySequence
 {
   public:
-    MeshSetSequence( EntityHandle start, EntityID count, const unsigned* flags,
-                     SequenceData* data );
+    MeshSetSequence( EntityHandle start, EntityID count, const unsigned* flags, SequenceData* data );
 
     MeshSetSequence( EntityHandle start, EntityID count, unsigned flags, SequenceData* data );
 
-    MeshSetSequence( EntityHandle start, EntityID count, const unsigned* flags,
-                     EntityID sequence_size );
+    MeshSetSequence( EntityHandle start, EntityID count, const unsigned* flags, EntityID sequence_size );
 
     MeshSetSequence( EntityHandle start, EntityID count, unsigned flags, EntityID sequence_size );
 
@@ -57,44 +55,38 @@ class MeshSetSequence : public EntitySequence
     ErrorCode push_back( EntityID count, const unsigned* flags );
     ErrorCode push_front( EntityID count, const unsigned* flags );
 
-    void          get_const_memory_use( unsigned long& bytes_per_entity,
-                                        unsigned long& size_of_sequence ) const;
+    void          get_const_memory_use( unsigned long& bytes_per_entity, unsigned long& size_of_sequence ) const;
     unsigned long get_per_entity_memory_use( EntityHandle first, EntityHandle last ) const;
 
     inline MeshSet*       get_set( EntityHandle h );
     inline const MeshSet* get_set( EntityHandle h ) const;
 
     ErrorCode get_entities( EntityHandle set, std::vector< EntityHandle >& entities ) const;
-    ErrorCode get_entities( SequenceManager const* seqman, EntityHandle set, Range& entities,
-                            bool recursive ) const;
+    ErrorCode get_entities( SequenceManager const* seqman, EntityHandle set, Range& entities, bool recursive ) const;
     ErrorCode get_dimension( SequenceManager const* seqman, EntityHandle set, int dim,
                              std::vector< EntityHandle >& entities, bool recursive ) const;
-    ErrorCode get_dimension( SequenceManager const* seqman, EntityHandle set, int dim,
-                             Range& entities, bool recursive ) const;
+    ErrorCode get_dimension( SequenceManager const* seqman, EntityHandle set, int dim, Range& entities,
+                             bool recursive ) const;
     ErrorCode get_type( SequenceManager const* seqman, EntityHandle set, EntityType type,
                         std::vector< EntityHandle >& entities, bool recursive ) const;
-    ErrorCode get_type( SequenceManager const* seqman, EntityHandle set, EntityType type,
-                        Range& entities, bool recursive ) const;
+    ErrorCode get_type( SequenceManager const* seqman, EntityHandle set, EntityType type, Range& entities,
+                        bool recursive ) const;
 
-    ErrorCode num_entities( SequenceManager const* seqman, EntityHandle set, int& count,
-                            bool recursive ) const;
+    ErrorCode num_entities( SequenceManager const* seqman, EntityHandle set, int& count, bool recursive ) const;
     ErrorCode num_dimension( SequenceManager const* seqman, EntityHandle set, int dim, int& count,
                              bool recursive ) const;
-    ErrorCode num_type( SequenceManager const* seqman, EntityHandle set, EntityType type,
-                        int& count, bool recursive ) const;
+    ErrorCode num_type( SequenceManager const* seqman, EntityHandle set, EntityType type, int& count,
+                        bool recursive ) const;
 
-    ErrorCode get_parents( SequenceManager const* seqman, EntityHandle of,
-                           std::vector< EntityHandle >& parents, int num_hops ) const;
-    ErrorCode get_children( SequenceManager const* seqman, EntityHandle of,
-                            std::vector< EntityHandle >& children, int num_hops ) const;
-    ErrorCode get_contained_sets( SequenceManager const* seqman, EntityHandle of,
-                                  std::vector< EntityHandle >& contents, int num_hops ) const;
-    ErrorCode num_parents( SequenceManager const* seqman, EntityHandle of, int& number,
+    ErrorCode get_parents( SequenceManager const* seqman, EntityHandle of, std::vector< EntityHandle >& parents,
                            int num_hops ) const;
-    ErrorCode num_children( SequenceManager const* seqman, EntityHandle of, int& number,
+    ErrorCode get_children( SequenceManager const* seqman, EntityHandle of, std::vector< EntityHandle >& children,
                             int num_hops ) const;
-    ErrorCode num_contained_sets( SequenceManager const* seqman, EntityHandle of, int& number,
+    ErrorCode get_contained_sets( SequenceManager const* seqman, EntityHandle of, std::vector< EntityHandle >& contents,
                                   int num_hops ) const;
+    ErrorCode num_parents( SequenceManager const* seqman, EntityHandle of, int& number, int num_hops ) const;
+    ErrorCode num_children( SequenceManager const* seqman, EntityHandle of, int& number, int num_hops ) const;
+    ErrorCode num_contained_sets( SequenceManager const* seqman, EntityHandle of, int& number, int num_hops ) const;
 
   private:
     enum SearchType
@@ -104,10 +96,7 @@ class MeshSetSequence : public EntitySequence
         CONTAINED
     };
 
-    MeshSetSequence( MeshSetSequence& split_from, EntityHandle split_at )
-        : EntitySequence( split_from, split_at )
-    {
-    }
+    MeshSetSequence( MeshSetSequence& split_from, EntityHandle split_at ) : EntitySequence( split_from, split_at ) {}
 
     void initialize( const unsigned* set_flags );
 
@@ -115,11 +104,9 @@ class MeshSetSequence : public EntitySequence
                                          std::vector< EntityHandle >& results, int num_hops,
                                          SearchType link_type ) const;
 
-    static ErrorCode recursive_get_sets( EntityHandle                   start_set,
-                                         SequenceManager const*         set_sequences,
-                                         std::vector< const MeshSet* >* sets_out = 0,
-                                         Range*                         set_handles_out = 0,
-                                         std::vector< EntityHandle >*   set_handle_vect_out = 0 );
+    static ErrorCode recursive_get_sets( EntityHandle start_set, SequenceManager const* set_sequences,
+                                         std::vector< const MeshSet* >* sets_out = 0, Range* set_handles_out = 0,
+                                         std::vector< EntityHandle >* set_handle_vect_out = 0 );
     static ErrorCode recursive_get_sets( EntityHandle start_set, SequenceManager* set_sequences,
                                          std::vector< MeshSet* >& sets_out );
 
@@ -157,8 +144,7 @@ inline MeshSet* MeshSetSequence::get_set( EntityHandle h )
 }
 inline const MeshSet* MeshSetSequence::get_set( EntityHandle h ) const
 {
-    return reinterpret_cast< const MeshSet* >( array( ) +
-                                               SET_SIZE * ( h - data( )->start_handle( ) ) );
+    return reinterpret_cast< const MeshSet* >( array( ) + SET_SIZE * ( h - data( )->start_handle( ) ) );
 }
 
 }  // namespace moab

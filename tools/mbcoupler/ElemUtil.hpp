@@ -16,23 +16,20 @@ namespace moab
 namespace ElemUtil
 {
 
-    bool nat_coords_trilinear_hex( const CartVect* hex_corners, const CartVect& x, CartVect& xi,
-                                   double tol );
+    bool nat_coords_trilinear_hex( const CartVect* hex_corners, const CartVect& x, CartVect& xi, double tol );
     bool point_in_trilinear_hex( const CartVect* hex_corners, const CartVect& xyz, double etol );
 
-    bool point_in_trilinear_hex( const CartVect* hex_corners, const CartVect& xyz,
-                                 const CartVect& box_min, const CartVect& box_max, double etol );
+    bool point_in_trilinear_hex( const CartVect* hex_corners, const CartVect& xyz, const CartVect& box_min,
+                                 const CartVect& box_max, double etol );
 
     // wrapper to hex_findpt
-    void nat_coords_trilinear_hex2( const CartVect* hex_corners, const CartVect& x, CartVect& xi,
-                                    double til );
+    void nat_coords_trilinear_hex2( const CartVect* hex_corners, const CartVect& x, CartVect& xi, double til );
 
     void hex_findpt( double* xm[ 3 ], int n, CartVect xyz, CartVect& rst, double& dist );
 
     void hex_eval( double* field, int n, CartVect rst, double& value );
 
-    bool integrate_trilinear_hex( const CartVect* hex_corners, double* corner_fields,
-                                  double& field_val, int num_pts );
+    bool integrate_trilinear_hex( const CartVect* hex_corners, double* corner_fields, double& field_val, int num_pts );
 
 }  // namespace ElemUtil
 
@@ -67,8 +64,7 @@ namespace Element
         virtual CartVect evaluate( const CartVect& xi ) const = 0;
         /**\brief Evaluate the inverse map (calculate \f$\vec \xi = F^-1($\vec x)\f$ to given
          * tolerance)*/
-        virtual CartVect ievaluate( const CartVect& x, double tol = 1e-6,
-                                    const CartVect& x0 = CartVect( 0.0 ) ) const;
+        virtual CartVect ievaluate( const CartVect& x, double tol = 1e-6, const CartVect& x0 = CartVect( 0.0 ) ) const;
         /**\brief decide if within the natural param space, with a tolerance*/
         virtual bool inside_nat_space( const CartVect& xi, double& tol ) const = 0;
         /* FIX: should evaluate and ievaluate return both the value and the Jacobian (first jet)? */
@@ -96,8 +92,7 @@ namespace Element
         };
 
         /**\brief Evaluate a scalar field at a point given field values at the vertices. */
-        virtual double evaluate_scalar_field( const CartVect& xi,
-                                              const double*   field_vertex_values ) const = 0;
+        virtual double evaluate_scalar_field( const CartVect& xi, const double* field_vertex_values ) const = 0;
         /**\brief Integrate a scalar field over the element given field values at the vertices. */
         virtual double integrate_scalar_field( const double* field_vertex_values ) const = 0;
 
@@ -119,8 +114,7 @@ namespace Element
         class EvaluationError
         {
           public:
-            EvaluationError( const CartVect& x, const std::vector< CartVect >& verts )
-                : p( x ), vertices( verts )
+            EvaluationError( const CartVect& x, const std::vector< CartVect >& verts ) : p( x ), vertices( verts )
             {
 #ifndef NDEBUG
                 std::cout << "p:" << p << "\n vertices.size() " << vertices.size( ) << "\n";
@@ -158,8 +152,7 @@ namespace Element
         virtual bool inside_nat_space( const CartVect& xi, double& tol ) const;
 
         virtual Matrix3 jacobian( const CartVect& xi ) const;
-        virtual double  evaluate_scalar_field( const CartVect& xi,
-                                               const double*   field_vertex_values ) const;
+        virtual double  evaluate_scalar_field( const CartVect& xi, const double* field_vertex_values ) const;
         virtual double  integrate_scalar_field( const double* field_vertex_values ) const;
 
       protected:
@@ -184,8 +177,7 @@ namespace Element
         virtual bool inside_nat_space( const CartVect& xi, double& tol ) const;
 
         virtual Matrix3 jacobian( const CartVect& xi ) const;
-        virtual double  evaluate_scalar_field( const CartVect& xi,
-                                               const double*   field_vertex_values ) const;
+        virtual double  evaluate_scalar_field( const CartVect& xi, const double* field_vertex_values ) const;
         virtual double  integrate_scalar_field( const double* field_vertex_values ) const;
 
       protected:
@@ -213,8 +205,7 @@ namespace Element
         {
             return this->vertex[ 0 ] + this->T * xi;
         };
-        virtual CartVect ievaluate( const CartVect& x, double tol = 1e-6,
-                                    const CartVect& x0 = CartVect( 0.0 ) ) const;
+        virtual CartVect ievaluate( const CartVect& x, double tol = 1e-6, const CartVect& x0 = CartVect( 0.0 ) ) const;
         virtual Matrix3  jacobian( const CartVect& ) const
         {
             return this->T;
@@ -232,8 +223,7 @@ namespace Element
             return this->det_T_inverse;
         };
         //
-        virtual double evaluate_scalar_field( const CartVect& xi,
-                                              const double*   field_vertex_values ) const;
+        virtual double evaluate_scalar_field( const CartVect& xi, const double* field_vertex_values ) const;
         virtual double integrate_scalar_field( const double* field_vertex_values ) const;
         //
         /* Override set_vertices so we can precompute the matrices effecting the mapping to and from
@@ -260,12 +250,11 @@ namespace Element
         virtual ~SpectralHex( );
         void             set_gl_points( double* x, double* y, double* z );
         virtual CartVect evaluate( const CartVect& xi ) const;
-        virtual CartVect ievaluate( const CartVect& x, double tol = 1e-6,
-                                    const CartVect& x0 = CartVect( 0.0 ) ) const;
+        virtual CartVect ievaluate( const CartVect& x, double tol = 1e-6, const CartVect& x0 = CartVect( 0.0 ) ) const;
         virtual Matrix3  jacobian( const CartVect& xi ) const;
-        double evaluate_scalar_field( const CartVect& xi, const double* field_vertex_values ) const;
-        double integrate_scalar_field( const double* field_vertex_values ) const;
-        bool   inside_nat_space( const CartVect& xi, double& tol ) const;
+        double           evaluate_scalar_field( const CartVect& xi, const double* field_vertex_values ) const;
+        double           integrate_scalar_field( const double* field_vertex_values ) const;
+        bool             inside_nat_space( const CartVect& xi, double& tol ) const;
 
         // to compute the values that need to be cached for each element of order n
         void Init( int order );
@@ -300,8 +289,7 @@ namespace Element
         virtual bool inside_nat_space( const CartVect& xi, double& tol ) const;
 
         virtual Matrix3 jacobian( const CartVect& xi ) const;
-        virtual double  evaluate_scalar_field( const CartVect& xi,
-                                               const double*   field_vertex_values ) const;
+        virtual double  evaluate_scalar_field( const CartVect& xi, const double* field_vertex_values ) const;
         virtual double  integrate_scalar_field( const double* field_vertex_values ) const;
 
       protected:
@@ -324,12 +312,11 @@ namespace Element
         SphericalQuad( const std::vector< CartVect >& vertices );
         virtual ~SphericalQuad( ){ };
         virtual bool inside_box( const CartVect& pos, double& tol ) const;
-        CartVect     ievaluate( const CartVect& x, double tol = 1e-6,
-                                const CartVect& x0 = CartVect( 0.0 ) ) const;
+        CartVect     ievaluate( const CartVect& x, double tol = 1e-6, const CartVect& x0 = CartVect( 0.0 ) ) const;
 
       protected:
         CartVect v1;
-        Matrix3 transf;  // so will have a lot of stuff, including the transf to a coordinate system
+        Matrix3  transf;  // so will have a lot of stuff, including the transf to a coordinate system
         // double tangent_plane; // at first vertex; normal to the plane is first vertex
 
     };  // class SphericalQuad
@@ -350,8 +337,7 @@ namespace Element
         {
             return this->vertex[ 0 ] + this->T * xi;
         };
-        virtual CartVect ievaluate( const CartVect& x, double tol = 1e-6,
-                                    const CartVect& x0 = CartVect( 0.0 ) ) const;
+        virtual CartVect ievaluate( const CartVect& x, double tol = 1e-6, const CartVect& x0 = CartVect( 0.0 ) ) const;
         virtual Matrix3  jacobian( const CartVect& ) const
         {
             return this->T;
@@ -374,8 +360,7 @@ namespace Element
         virtual void set_vertices( const std::vector< CartVect >& v );
         virtual bool inside_nat_space( const CartVect& xi, double& tol ) const;
 
-        virtual double evaluate_scalar_field( const CartVect& xi,
-                                              const double*   field_vertex_values ) const;
+        virtual double evaluate_scalar_field( const CartVect& xi, const double* field_vertex_values ) const;
         virtual double integrate_scalar_field( const double* field_vertex_values ) const;
 
       protected:
@@ -397,12 +382,11 @@ namespace Element
         SphericalTri( const std::vector< CartVect >& vertices );
         virtual ~SphericalTri( ){ };
         virtual bool inside_box( const CartVect& pos, double& tol ) const;
-        CartVect     ievaluate( const CartVect& x, double tol = 1e-6,
-                                const CartVect& x0 = CartVect( 0.0 ) ) const;
+        CartVect     ievaluate( const CartVect& x, double tol = 1e-6, const CartVect& x0 = CartVect( 0.0 ) ) const;
 
       protected:
         CartVect v1;
-        Matrix3 transf;  // so will have a lot of stuff, including the transf to a coordinate system
+        Matrix3  transf;  // so will have a lot of stuff, including the transf to a coordinate system
         // double tangent_plane; // at first vertex; normal to the plane is first vertex
 
     };  // class SphericalTri
@@ -419,8 +403,7 @@ namespace Element
         virtual bool inside_nat_space( const CartVect& xi, double& tol ) const;
 
         virtual Matrix3 jacobian( const CartVect& xi ) const;
-        virtual double  evaluate_scalar_field( const CartVect& xi,
-                                               const double*   field_vertex_values ) const;
+        virtual double  evaluate_scalar_field( const CartVect& xi, const double* field_vertex_values ) const;
         virtual double  integrate_scalar_field( const double* field_vertex_values ) const;
 
       protected:
@@ -443,16 +426,15 @@ namespace Element
         SpectralQuad( int order );
         SpectralQuad( );
         virtual ~SpectralQuad( );
-        void set_gl_points( double* x, double* y, double* z );
+        void             set_gl_points( double* x, double* y, double* z );
+        virtual CartVect evaluate( const CartVect& xi ) const;  // a 2d, so 3rd component is 0, always
         virtual CartVect
-                         evaluate( const CartVect& xi ) const;  // a 2d, so 3rd component is 0, always
-        virtual CartVect ievaluate(
-            const CartVect& x, double tol = 1e-6,
-            const CartVect& x0 = CartVect( 0.0 ) ) const;  // a 2d, so 3rd component is 0, always
+                        ievaluate( const CartVect& x, double tol = 1e-6,
+                                   const CartVect& x0 = CartVect( 0.0 ) ) const;  // a 2d, so 3rd component is 0, always
         virtual Matrix3 jacobian( const CartVect& xi ) const;
-        double evaluate_scalar_field( const CartVect& xi, const double* field_vertex_values ) const;
-        double integrate_scalar_field( const double* field_vertex_values ) const;
-        bool   inside_nat_space( const CartVect& xi, double& tol ) const;
+        double          evaluate_scalar_field( const CartVect& xi, const double* field_vertex_values ) const;
+        double          integrate_scalar_field( const double* field_vertex_values ) const;
+        bool            inside_nat_space( const CartVect& xi, double& tol ) const;
 
         // to compute the values that need to be cached for each element of order n
         void Init( int order );

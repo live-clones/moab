@@ -46,12 +46,10 @@
 using namespace MBMesquite;
 using namespace std;
 const double epsilon = 1e-6;
-#define ASSERT_VALUES_EQUAL( v1, v2, location, bits )                        \
-    ASSERT_MESSAGE( value_message( ( location ), ( bits ), ( v1 ), ( v2 ) ), \
-                    ( fabs( ( v1 ) - ( v2 ) ) < epsilon ) )
+#define ASSERT_VALUES_EQUAL( v1, v2, location, bits ) \
+    ASSERT_MESSAGE( value_message( ( location ), ( bits ), ( v1 ), ( v2 ) ), ( fabs( ( v1 ) - ( v2 ) ) < epsilon ) )
 
-static inline CppUnit::Message value_message( unsigned location, NodeSet bits, double v1,
-                                              double v2 )
+static inline CppUnit::Message value_message( unsigned location, NodeSet bits, double v1, double v2 )
 {
     CppUnit::Message m( "equality assertion failed" );
 
@@ -265,9 +263,8 @@ static void check_no_zeros( const MsqVector< 2 >* derivs, size_t num_vtx )
     }
 }
 
-static void compare_coefficients( const double* coeffs, const size_t* indices,
-                                  const double* expected_coeffs, size_t num_coeff, unsigned loc,
-                                  NodeSet bits )
+static void compare_coefficients( const double* coeffs, const size_t* indices, const double* expected_coeffs,
+                                  size_t num_coeff, unsigned loc, NodeSet bits )
 {
     // find the location in the returned list for each node
     size_t revidx[ 6 ];
@@ -293,9 +290,8 @@ static void compare_coefficients( const double* coeffs, const size_t* indices,
     ASSERT_VALUES_EQUAL( expected_coeffs[ 5 ], test_vals[ 5 ], loc, bits );
 }
 
-static void compare_derivatives( const size_t* vertices, size_t num_vtx,
-                                 const MsqVector< 2 >* derivs, const double* expected_derivs,
-                                 unsigned loc, NodeSet bits )
+static void compare_derivatives( const size_t* vertices, size_t num_vtx, const MsqVector< 2 >* derivs,
+                                 const double* expected_derivs, unsigned loc, NodeSet bits )
 {
     check_valid_indices( vertices, num_vtx );
     check_no_zeros( derivs, num_vtx );

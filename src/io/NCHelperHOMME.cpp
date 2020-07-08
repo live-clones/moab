@@ -8,17 +8,15 @@
 namespace moab
 {
 
-NCHelperHOMME::NCHelperHOMME( ReadNC* readNC, int fileId, const FileOptions& opts,
-                              EntityHandle fileSet )
-    : UcdNCHelper( readNC, fileId, opts, fileSet ), _spectralOrder( -1 ), connectId( -1 ),
-      isConnFile( false )
+NCHelperHOMME::NCHelperHOMME( ReadNC* readNC, int fileId, const FileOptions& opts, EntityHandle fileSet )
+    : UcdNCHelper( readNC, fileId, opts, fileSet ), _spectralOrder( -1 ), connectId( -1 ), isConnFile( false )
 {
     // Calculate spectral order
     std::map< std::string, ReadNC::AttData >::iterator attIt = readNC->globalAtts.find( "np" );
     if( attIt != readNC->globalAtts.end( ) )
     {
-        int success = NCFUNC( get_att_int )( readNC->fileId, attIt->second.attVarId,
-                                             attIt->second.attName.c_str( ), &_spectralOrder );
+        int success = NCFUNC( get_att_int )( readNC->fileId, attIt->second.attVarId, attIt->second.attName.c_str( ),
+                                             &_spectralOrder );
         if( 0 == success ) _spectralOrder--;  // Spectral order is one less than np
     }
     else
@@ -36,15 +34,14 @@ bool NCHelperHOMME::can_read_file( ReadNC* readNC, int fileId )
     if( readNC->globalAtts.find( "np" ) != readNC->globalAtts.end( ) )
     {
         // Make sure it is CAM grid
-        std::map< std::string, ReadNC::AttData >::iterator attIt =
-            readNC->globalAtts.find( "source" );
+        std::map< std::string, ReadNC::AttData >::iterator attIt = readNC->globalAtts.find( "source" );
         if( attIt == readNC->globalAtts.end( ) ) return false;
         unsigned int sz = attIt->second.attLen;
         std::string  att_data;
         att_data.resize( sz + 1 );
         att_data[ sz ] = '\000';
-        int success = NCFUNC( get_att_text )( fileId, attIt->second.attVarId,
-                                              attIt->second.attName.c_str( ), &att_data[ 0 ] );
+        int success =
+            NCFUNC( get_att_text )( fileId, attIt->second.attVarId, attIt->second.attName.c_str( ), &att_data[ 0 ] );
         if( success ) return false;
         if( att_data.find( "CAM" ) == std::string::npos ) return false;
 
@@ -55,12 +52,9 @@ bool NCHelperHOMME::can_read_file( ReadNC* readNC, int fileId )
         // If dimension names "ncol" AND "ncorners" AND "ncells" exist, then it should be the HOMME
         // connectivity file In this case, the mesh can still be created
         std::vector< std::string >& dimNames = readNC->dimNames;
-        if( ( std::find( dimNames.begin( ), dimNames.end( ), std::string( "ncol" ) ) !=
-              dimNames.end( ) ) &&
-            ( std::find( dimNames.begin( ), dimNames.end( ), std::string( "ncorners" ) ) !=
-              dimNames.end( ) ) &&
-            ( std::find( dimNames.begin( ), dimNames.end( ), std::string( "ncells" ) ) !=
-              dimNames.end( ) ) )
+        if( ( std::find( dimNames.begin( ), dimNames.end( ), std::string( "ncol" ) ) != dimNames.end( ) ) &&
+            ( std::find( dimNames.begin( ), dimNames.end( ), std::string( "ncorners" ) ) != dimNames.end( ) ) &&
+            ( std::find( dimNames.begin( ), dimNames.end( ), std::string( "ncells" ) ) != dimNames.end( ) ) )
             return true;
     }
 
@@ -118,8 +112,7 @@ ErrorCode NCHelperHOMME::init_mesh_vals( )
     {
         if( ( vit = std::find( dimNames.begin( ), dimNames.end( ), "lev" ) ) != dimNames.end( ) )
             idx = vit - dimNames.begin( );
-        else if( ( vit = std::find( dimNames.begin( ), dimNames.end( ), "ilev" ) ) !=
-                 dimNames.end( ) )
+        else if( ( vit = std::find( dimNames.begin( ), dimNames.end( ), "ilev" ) ) != dimNames.end( ) )
             idx = vit - dimNames.begin( );
         else
         {
@@ -131,8 +124,7 @@ ErrorCode NCHelperHOMME::init_mesh_vals( )
 
     // Store lon values in xVertVals
     std::map< std::string, ReadNC::VarData >::iterator vmit;
-    if( ( vmit = varInfo.find( "lon" ) ) != varInfo.end( ) &&
-        ( *vmit ).second.varDims.size( ) == 1 )
+    if( ( vmit = varInfo.find( "lon" ) ) != varInfo.end( ) && ( *vmit ).second.varDims.size( ) == 1 )
     {
         rval = read_coordinate( "lon", 0, nVertices - 1, xVertVals );MB_CHK_SET_ERR( rval, "Trouble reading 'lon' variable" );
     }
@@ -142,8 +134,7 @@ ErrorCode NCHelperHOMME::init_mesh_vals( )
     }
 
     // Store lat values in yVertVals
-    if( ( vmit = varInfo.find( "lat" ) ) != varInfo.end( ) &&
-        ( *vmit ).second.varDims.size( ) == 1 )
+    if( ( vmit = varInfo.find( "lat" ) ) != varInfo.end( ) && ( *vmit ).second.varDims.size( ) == 1 )
     {
         rval = read_coordinate( "lat", 0, nVertices - 1, yVertVals );MB_CHK_SET_ERR( rval, "Trouble reading 'lat' variable" );
     }
@@ -159,19 +150,16 @@ ErrorCode NCHelperHOMME::init_mesh_vals( )
     }
     else
     {
-        if( ( vmit = varInfo.find( "lev" ) ) != varInfo.end( ) &&
-            ( *vmit ).second.varDims.size( ) == 1 )
+        if( ( vmit = varInfo.find( "lev" ) ) != varInfo.end( ) && ( *vmit ).second.varDims.size( ) == 1 )
         {
             rval = read_coordinate( "lev", 0, nLevels - 1, levVals );MB_CHK_SET_ERR( rval, "Trouble reading 'lev' variable" );
 
             // Decide whether down is positive
             char posval[ 10 ] = { 0 };
-            int  success =
-                NCFUNC( get_att_text )( _fileId, ( *vmit ).second.varId, "positive", posval );
+            int  success = NCFUNC( get_att_text )( _fileId, ( *vmit ).second.varId, "positive", posval );
             if( 0 == success && !strcmp( posval, "down" ) )
             {
-                for( std::vector< double >::iterator dvit = levVals.begin( );
-                     dvit != levVals.end( ); ++dvit )
+                for( std::vector< double >::iterator dvit = levVals.begin( ); dvit != levVals.end( ); ++dvit )
                     ( *dvit ) *= -1.0;
             }
         }
@@ -188,13 +176,11 @@ ErrorCode NCHelperHOMME::init_mesh_vals( )
     }
     else
     {
-        if( ( vmit = varInfo.find( "time" ) ) != varInfo.end( ) &&
-            ( *vmit ).second.varDims.size( ) == 1 )
+        if( ( vmit = varInfo.find( "time" ) ) != varInfo.end( ) && ( *vmit ).second.varDims.size( ) == 1 )
         {
             rval = read_coordinate( "time", 0, nTimeSteps - 1, tVals );MB_CHK_SET_ERR( rval, "Trouble reading 'time' variable" );
         }
-        else if( ( vmit = varInfo.find( "t" ) ) != varInfo.end( ) &&
-                 ( *vmit ).second.varDims.size( ) == 1 )
+        else if( ( vmit = varInfo.find( "t" ) ) != varInfo.end( ) && ( *vmit ).second.varDims.size( ) == 1 )
         {
             rval = read_coordinate( "t", 0, nTimeSteps - 1, tVals );MB_CHK_SET_ERR( rval, "Trouble reading 't' variable" );
         }
@@ -220,8 +206,7 @@ ErrorCode NCHelperHOMME::init_mesh_vals( )
         }
 
         // Default numLev is 0
-        if( std::find( vd.varDims.begin( ), vd.varDims.end( ), levDim ) != vd.varDims.end( ) )
-            vd.numLev = nLevels;
+        if( std::find( vd.varDims.begin( ), vd.varDims.end( ), levDim ) != vd.varDims.end( ) ) vd.numLev = nLevels;
     }
 
     // Hack: create dummy variables for dimensions (like ncol) with no corresponding coordinate
@@ -322,12 +307,11 @@ ErrorCode NCHelperHOMME::create_mesh( Range& faces )
         if( isParallel )
         {
             ParallelComm*& myPcomm = _readNC->myPcomm;
-            success = NCFUNC( open )( myPcomm->proc_config( ).proc_comm( ), conn_fname.c_str( ), 0,
-                                      MPI_INFO_NULL, &connectId );
+            success = NCFUNC( open )( myPcomm->proc_config( ).proc_comm( ), conn_fname.c_str( ), 0, MPI_INFO_NULL,
+                                      &connectId );
         }
         else
-            success =
-                NCFUNC( open )( MPI_COMM_SELF, conn_fname.c_str( ), 0, MPI_INFO_NULL, &connectId );
+            success = NCFUNC( open )( MPI_COMM_SELF, conn_fname.c_str( ), 0, MPI_INFO_NULL, &connectId );
 #endif
 #else
         success = NCFUNC( open )( conn_fname.c_str( ), 0, &connectId );
@@ -345,11 +329,9 @@ ErrorCode NCHelperHOMME::create_mesh( Range& faces )
     int                                  start_idx = 0;
     std::vector< std::string >::iterator vit;
     int                                  idx = 0;
-    if( ( vit = std::find( conn_names.begin( ), conn_names.end( ), "ncells" ) ) !=
-        conn_names.end( ) )
+    if( ( vit = std::find( conn_names.begin( ), conn_names.end( ), "ncells" ) ) != conn_names.end( ) )
         idx = vit - conn_names.begin( );
-    else if( ( vit = std::find( conn_names.begin( ), conn_names.end( ), "ncenters" ) ) !=
-             conn_names.end( ) )
+    else if( ( vit = std::find( conn_names.begin( ), conn_names.end( ), "ncenters" ) ) != conn_names.end( ) )
         idx = vit - conn_names.begin( );
     else
     {
@@ -371,8 +353,7 @@ ErrorCode NCHelperHOMME::create_mesh( Range& faces )
     NCDF_SIZE          tmp_starts[ 2 ] = { 0, 0 };
     NCDF_SIZE          tmp_counts[ 2 ] = { 4, static_cast< NCDF_SIZE >( num_quads ) };
     std::vector< int > tmp_conn( 4 * num_quads ), tmp_conn2( 4 * num_quads );
-    success =
-        NCFUNCAG( _vara_int )( connectId, cornerVarId, tmp_starts, tmp_counts, &tmp_conn2[ 0 ] );
+    success = NCFUNCAG( _vara_int )( connectId, cornerVarId, tmp_starts, tmp_counts, &tmp_conn2[ 0 ] );
     if( success ) MB_SET_ERR( MB_FAILURE, "Failed to get temporary connectivity" );
     if( isConnFile )
     {
@@ -399,8 +380,7 @@ ErrorCode NCHelperHOMME::create_mesh( Range& faces )
 
     // Shift rank to obtain a rotated trivial partition
     int shifted_rank = rank;
-    if( procs >= 2 && trivialPartitionShift > 0 )
-        shifted_rank = ( rank + trivialPartitionShift ) % procs;
+    if( procs >= 2 && trivialPartitionShift > 0 ) shifted_rank = ( rank + trivialPartitionShift ) % procs;
 
     // Compute the number of local quads, accounting for coarse or fine representation
     // spectral_unit is the # fine quads per coarse quad, or spectralOrder^2
@@ -441,22 +421,19 @@ ErrorCode NCHelperHOMME::create_mesh( Range& faces )
     }
     else
     {
-        rval = smt.create_spectral_elems( &tmp_conn[ 0 ], num_fine_quads, 2, tmp_range, start_idx,
-                                          &localGidVerts );MB_CHK_SET_ERR( rval, "Failed to create spectral elements" );
+        rval = smt.create_spectral_elems( &tmp_conn[ 0 ], num_fine_quads, 2, tmp_range, start_idx, &localGidVerts );MB_CHK_SET_ERR( rval, "Failed to create spectral elements" );
         int count, v_per_e;
-        rval = mbImpl->connect_iterate( tmp_range.begin( ), tmp_range.end( ), conn_arr, v_per_e,
-                                        count );MB_CHK_SET_ERR( rval, "Failed to get connectivity of spectral elements" );
-        rval = mbImpl->tag_iterate( smt.spectral_vertices_tag( true ), tmp_range.begin( ),
-                                    tmp_range.end( ), count, (void*&)sv_ptr );MB_CHK_SET_ERR( rval, "Failed to get fine connectivity of spectral elements" );
+        rval = mbImpl->connect_iterate( tmp_range.begin( ), tmp_range.end( ), conn_arr, v_per_e, count );MB_CHK_SET_ERR( rval, "Failed to get connectivity of spectral elements" );
+        rval = mbImpl->tag_iterate( smt.spectral_vertices_tag( true ), tmp_range.begin( ), tmp_range.end( ), count,
+                                    (void*&)sv_ptr );MB_CHK_SET_ERR( rval, "Failed to get fine connectivity of spectral elements" );
     }
 
     // Create vertices
     nLocalVertices = localGidVerts.size( );
     std::vector< double* > arrays;
-    rval = _readNC->readMeshIface->get_node_coords(
-        3, nLocalVertices, 0, start_vertex, arrays,
-        // Might have to create gather mesh later
-        ( create_gathers ? nLocalVertices + nVertices : nLocalVertices ) );MB_CHK_SET_ERR( rval, "Failed to create local vertices" );
+    rval = _readNC->readMeshIface->get_node_coords( 3, nLocalVertices, 0, start_vertex, arrays,
+                                                    // Might have to create gather mesh later
+                                                    ( create_gathers ? nLocalVertices + nVertices : nLocalVertices ) );MB_CHK_SET_ERR( rval, "Failed to create local vertices" );
 
     // Set vertex coordinates
     Range::iterator rit;
@@ -497,8 +474,7 @@ ErrorCode NCHelperHOMME::create_mesh( Range& faces )
     // Duplicate global id data, which will be used to resolve sharing
     if( mpFileIdTag )
     {
-        rval = mbImpl->tag_iterate( *mpFileIdTag, vert_range.begin( ), vert_range.end( ), count,
-                                    data );MB_CHK_SET_ERR( rval, "Failed to iterate file id tag on local vertices" );
+        rval = mbImpl->tag_iterate( *mpFileIdTag, vert_range.begin( ), vert_range.end( ), count, data );MB_CHK_SET_ERR( rval, "Failed to iterate file id tag on local vertices" );
         assert( count == nLocalVertices );
         int bytes_per_tag = 4;
         rval = mbImpl->tag_get_bytes( *mpFileIdTag, bytes_per_tag );MB_CHK_SET_ERR( rval, "Can't get number of bytes for file id tag" );
@@ -542,8 +518,7 @@ ErrorCode NCHelperHOMME::create_mesh( Range& faces )
 
     // Mark the set with the spectral order
     Tag sporder;
-    rval = mbImpl->tag_get_handle( "SPECTRAL_ORDER", 1, MB_TYPE_INTEGER, sporder,
-                                   MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_SET_ERR( rval, "Trouble creating SPECTRAL_ORDER tag" );
+    rval = mbImpl->tag_get_handle( "SPECTRAL_ORDER", 1, MB_TYPE_INTEGER, sporder, MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_SET_ERR( rval, "Trouble creating SPECTRAL_ORDER tag" );
     rval = mbImpl->tag_set_data( sporder, &_fileSet, 1, &_spectralOrder );MB_CHK_SET_ERR( rval, "Trouble setting data to SPECTRAL_ORDER tag" );
 
     if( create_gathers )
@@ -573,8 +548,8 @@ ErrorCode NCHelperHOMME::create_mesh( Range& faces )
 
         // Get ptr to gid memory for vertices
         Range gather_set_verts_range( start_vertex, start_vertex + nVertices - 1 );
-        rval = mbImpl->tag_iterate( mGlobalIdTag, gather_set_verts_range.begin( ),
-                                    gather_set_verts_range.end( ), count, data );MB_CHK_SET_ERR( rval, "Failed to iterate global id tag on gather set vertices" );
+        rval = mbImpl->tag_iterate( mGlobalIdTag, gather_set_verts_range.begin( ), gather_set_verts_range.end( ), count,
+                                    data );MB_CHK_SET_ERR( rval, "Failed to iterate global id tag on gather set vertices" );
         assert( count == nVertices );
         gid_data = (int*)data;
         for( int j = 1; j <= nVertices; j++ )
@@ -582,8 +557,8 @@ ErrorCode NCHelperHOMME::create_mesh( Range& faces )
         // Set the file id tag too, it should be bigger something not interfering with global id
         if( mpFileIdTag )
         {
-            rval = mbImpl->tag_iterate( *mpFileIdTag, gather_set_verts_range.begin( ),
-                                        gather_set_verts_range.end( ), count, data );MB_CHK_SET_ERR( rval, "Failed to iterate file id tag on gather set vertices" );
+            rval = mbImpl->tag_iterate( *mpFileIdTag, gather_set_verts_range.begin( ), gather_set_verts_range.end( ),
+                                        count, data );MB_CHK_SET_ERR( rval, "Failed to iterate file id tag on gather set vertices" );
             assert( count == nVertices );
             int bytes_per_tag = 4;
             rval = mbImpl->tag_get_bytes( *mpFileIdTag, bytes_per_tag );MB_CHK_SET_ERR( rval, "Can't get number of bytes for file id tag" );
@@ -607,23 +582,20 @@ ErrorCode NCHelperHOMME::create_mesh( Range& faces )
         Range gather_set_quads_range;
         // Don't need to specify allocation number here, because we know enough quads were created
         // before
-        rval = _readNC->readMeshIface->get_element_connect( num_quads, 4, MBQUAD, 0, start_quad,
-                                                            conn_arr );MB_CHK_SET_ERR( rval, "Failed to create gather set quads" );
+        rval = _readNC->readMeshIface->get_element_connect( num_quads, 4, MBQUAD, 0, start_quad, conn_arr );MB_CHK_SET_ERR( rval, "Failed to create gather set quads" );
         gather_set_quads_range.insert( start_quad, start_quad + num_quads - 1 );
         int* tmp_conn_end = ( &tmp_conn[ 4 * num_quads - 1 ] ) + 1;
         std::copy( &tmp_conn[ 0 ], tmp_conn_end, conn_arr );
         for( i = 0; i != 4 * num_quads; i++ )
-            conn_arr[ i ] +=
-                start_vertex - 1;  // Connectivity array is shifted by where the gather verts start
+            conn_arr[ i ] += start_vertex - 1;  // Connectivity array is shifted by where the gather verts start
         rval = mbImpl->add_entities( gather_set, gather_set_quads_range );MB_CHK_SET_ERR( rval, "Failed to add quads to the gather set" );
     }
 
     return MB_SUCCESS;
 }
 
-ErrorCode
-    NCHelperHOMME::read_ucd_variables_to_nonset_allocate( std::vector< ReadNC::VarData >& vdatas,
-                                                          std::vector< int >& tstep_nums )
+ErrorCode NCHelperHOMME::read_ucd_variables_to_nonset_allocate( std::vector< ReadNC::VarData >& vdatas,
+                                                                std::vector< int >&             tstep_nums )
 {
     Interface*&         mbImpl = _readNC->mbImpl;
     std::vector< int >& dimLens = _readNC->dimLens;
@@ -634,8 +606,7 @@ ErrorCode
     // Get vertices
     Range     verts;
     ErrorCode rval = mbImpl->get_entities_by_dimension( _fileSet, 0, verts );MB_CHK_SET_ERR( rval, "Trouble getting vertices in current file set" );
-    assert( "Should only have a single vertex subrange, since they were read in one shot" &&
-            verts.psize( ) == 1 );
+    assert( "Should only have a single vertex subrange, since they were read in one shot" && verts.psize( ) == 1 );
 
     for( unsigned int i = 0; i < vdatas.size( ); i++ )
     {
@@ -669,8 +640,7 @@ ErrorCode
                 range = &verts;
                 break;
             default:
-                MB_SET_ERR( MB_FAILURE, "Unexpected entity location type for variable "
-                                            << vdatas[ i ].varName );
+                MB_SET_ERR( MB_FAILURE, "Unexpected entity location type for variable " << vdatas[ i ].varName );
         }
 
         // Get variable size
@@ -680,27 +650,21 @@ ErrorCode
 
         for( unsigned int t = 0; t < tstep_nums.size( ); t++ )
         {
-            dbgOut.tprintf( 2, "Reading variable %s, time step %d\n", vdatas[ i ].varName.c_str( ),
-                            tstep_nums[ t ] );
+            dbgOut.tprintf( 2, "Reading variable %s, time step %d\n", vdatas[ i ].varName.c_str( ), tstep_nums[ t ] );
 
             if( tstep_nums[ t ] >= dimLens[ tDim ] )
-            {
-                MB_SET_ERR( MB_INDEX_OUT_OF_RANGE,
-                            "Wrong value for timestep number " << tstep_nums[ t ] );
-            }
+            { MB_SET_ERR( MB_INDEX_OUT_OF_RANGE, "Wrong value for timestep number " << tstep_nums[ t ] ); }
 
             // Get the tag to read into
             if( !vdatas[ i ].varTags[ t ] )
             {
-                rval = get_tag_to_nonset( vdatas[ i ], tstep_nums[ t ], vdatas[ i ].varTags[ t ],
-                                          vdatas[ i ].numLev );MB_CHK_SET_ERR( rval, "Trouble getting tag for variable " << vdatas[ i ].varName );
+                rval = get_tag_to_nonset( vdatas[ i ], tstep_nums[ t ], vdatas[ i ].varTags[ t ], vdatas[ i ].numLev );MB_CHK_SET_ERR( rval, "Trouble getting tag for variable " << vdatas[ i ].varName );
             }
 
             // Get ptr to tag space
             void* data;
             int   count;
-            rval = mbImpl->tag_iterate( vdatas[ i ].varTags[ t ], range->begin( ), range->end( ),
-                                        count, data );MB_CHK_SET_ERR( rval, "Failed to iterate tag for variable " << vdatas[ i ].varName );
+            rval = mbImpl->tag_iterate( vdatas[ i ].varTags[ t ], range->begin( ), range->end( ), count, data );MB_CHK_SET_ERR( rval, "Failed to iterate tag for variable " << vdatas[ i ].varName );
             assert( (unsigned)count == range->size( ) );
             vdatas[ i ].varDatas[ t ] = data;
         }
@@ -711,7 +675,7 @@ ErrorCode
 
 #ifdef MOAB_HAVE_PNETCDF
 ErrorCode NCHelperHOMME::read_ucd_variables_to_nonset_async( std::vector< ReadNC::VarData >& vdatas,
-                                                             std::vector< int >& tstep_nums )
+                                                             std::vector< int >&             tstep_nums )
 {
     DebugOutput& dbgOut = _readNC->dbgOut;
 
@@ -770,20 +734,18 @@ ErrorCode NCHelperHOMME::read_ucd_variables_to_nonset_async( std::vector< ReadNC
                         // Wait outside this loop
                         success = NCFUNCREQG( _vara_double )(
                             _fileId, vdatas[ i ].varId, &( vdatas[ i ].readStarts[ 0 ] ),
-                            &( vdatas[ i ].readCounts[ 0 ] ),
-                            &( tmpdoubledata[ indexInDoubleArray ] ), &requests[ idxReq++ ] );
+                            &( vdatas[ i ].readCounts[ 0 ] ), &( tmpdoubledata[ indexInDoubleArray ] ),
+                            &requests[ idxReq++ ] );
                         if( success )
                             MB_SET_ERR( MB_FAILURE,
-                                        "Failed to read double data in a loop for variable "
-                                            << vdatas[ i ].varName );
+                                        "Failed to read double data in a loop for variable " << vdatas[ i ].varName );
                         // We need to increment the index in double array for the
                         // next subrange
                         indexInDoubleArray += ( endh - starth + 1 ) * 1 * vdatas[ i ].numLev;
                     }
                     assert( ic == localGidVerts.psize( ) );
 
-                    success =
-                        ncmpi_wait_all( _fileId, requests.size( ), &requests[ 0 ], &statuss[ 0 ] );
+                    success = ncmpi_wait_all( _fileId, requests.size( ), &requests[ 0 ], &statuss[ 0 ] );
                     if( success ) MB_SET_ERR( MB_FAILURE, "Failed on wait_all" );
 
                     if( vdatas[ i ].numLev > 1 )
@@ -798,8 +760,7 @@ ErrorCode NCHelperHOMME::read_ucd_variables_to_nonset_async( std::vector< ReadNC
                     break;
                 }
                 default:
-                    MB_SET_ERR( MB_FAILURE,
-                                "Unexpected data type for variable " << vdatas[ i ].varName );
+                    MB_SET_ERR( MB_FAILURE, "Unexpected data type for variable " << vdatas[ i ].varName );
             }
         }
     }
@@ -867,12 +828,10 @@ ErrorCode NCHelperHOMME::read_ucd_variables_to_nonset( std::vector< ReadNC::VarD
 
                         success = NCFUNCAG( _vara_double )(
                             _fileId, vdatas[ i ].varId, &( vdatas[ i ].readStarts[ 0 ] ),
-                            &( vdatas[ i ].readCounts[ 0 ] ),
-                            &( tmpdoubledata[ indexInDoubleArray ] ) );
+                            &( vdatas[ i ].readCounts[ 0 ] ), &( tmpdoubledata[ indexInDoubleArray ] ) );
                         if( success )
                             MB_SET_ERR( MB_FAILURE,
-                                        "Failed to read double data in a loop for variable "
-                                            << vdatas[ i ].varName );
+                                        "Failed to read double data in a loop for variable " << vdatas[ i ].varName );
                         // We need to increment the index in double array for the
                         // next subrange
                         indexInDoubleArray += ( endh - starth + 1 ) * 1 * vdatas[ i ].numLev;
@@ -891,8 +850,7 @@ ErrorCode NCHelperHOMME::read_ucd_variables_to_nonset( std::vector< ReadNC::VarD
                     break;
                 }
                 default:
-                    MB_SET_ERR( MB_FAILURE,
-                                "Unexpected data type for variable " << vdatas[ i ].varName );
+                    MB_SET_ERR( MB_FAILURE, "Unexpected data type for variable " << vdatas[ i ].varName );
             }
         }
     }

@@ -44,8 +44,7 @@ class ReorderTool
      *                     tag value will be zero for entities that were not
      *                     re-ordered.
      */
-    ErrorCode handle_order_from_int_tag( Tag ordering_tag, int ordering_tag_skip_value,
-                                         Tag& new_handle_tag_out );
+    ErrorCode handle_order_from_int_tag( Tag ordering_tag, int ordering_tag_skip_value, Tag& new_handle_tag_out );
 
     /**\brief Calculate new handle order by tag value.
      *
@@ -143,8 +142,7 @@ class ReorderTool
     /**\brief Get new handles corresponding to old handles
      *\param tag Tag containing old->new mapping
      */
-    ErrorCode get_reordered_handles( Tag tag, const Range& old_handles,
-                                     std::vector< EntityHandle >& new_handles );
+    ErrorCode get_reordered_handles( Tag tag, const Range& old_handles, std::vector< EntityHandle >& new_handles );
 
     /**\brief Get new handles corresponding to old handles
      *\param tag Tag containing old->new mapping
@@ -155,14 +153,13 @@ class ReorderTool
     /**\brief Get new handles corresponding to old handles
      *\param tag Tag containing old->new mapping
      */
-    ErrorCode get_reordered_handles( Tag tag, const EntityHandle* old_handles,
-                                     EntityHandle* new_handles, size_t num_handles );
+    ErrorCode get_reordered_handles( Tag tag, const EntityHandle* old_handles, EntityHandle* new_handles,
+                                     size_t num_handles );
 
     /**\brief Remove any non-ordered handles and return new handles for remaining
      *\param tag Tag containing old->new mapping
      */
-    ErrorCode get_new_handles( Tag tag, Range& old_handles,
-                               std::vector< EntityHandle >& newhandles );
+    ErrorCode get_new_handles( Tag tag, Range& old_handles, std::vector< EntityHandle >& newhandles );
 
     /**\brief convert from input for \c handle_order_from_sets_and_adj to
      *        \c input for handle_order_from_int_tag

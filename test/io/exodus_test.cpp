@@ -44,8 +44,7 @@ void read_file( Interface& moab, const char* input_file );
 // of the sub-entity it is on.
 void check_ho_element( Interface& moab, EntityHandle entity, int mid_nodes[ 4 ] );
 
-void test_read_side( int sideset_id, EntityType sideset_type, int sideset_nodes_per_elem,
-                     bool shell_side = false );
+void test_read_side( int sideset_id, EntityType sideset_type, int sideset_nodes_per_elem, bool shell_side = false );
 
 // Validate elements of specified type.
 // Looks for a block containing the specified entity type
@@ -411,15 +410,13 @@ void mb_write_mesh_test( )
     int       id = 100;
     Tag       tag_handle;
     const int negone = -1;
-    result =
-        MB->tag_get_handle( MATERIAL_SET_TAG_NAME, 1, MB_TYPE_INTEGER, tag_handle, 0, &negone );CHECK_ERR( result );
+    result = MB->tag_get_handle( MATERIAL_SET_TAG_NAME, 1, MB_TYPE_INTEGER, tag_handle, 0, &negone );CHECK_ERR( result );
     result = MB->tag_set_data( tag_handle, &block_ms, 1, &id );CHECK_ERR( result );
     id = 101;
     result = MB->tag_set_data( tag_handle, &block_of_shells, 1, &id );CHECK_ERR( result );
 
     // set dimension tag on this to ensure shells get output; reuse id variable
-    result =
-        MB->tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, tag_handle, 0, &negone );CHECK_ERR( result );
+    result = MB->tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, tag_handle, 0, &negone );CHECK_ERR( result );
     id = 3;
     result = MB->tag_set_data( tag_handle, &block_of_shells, 1, &id );CHECK_ERR( result );
 
@@ -525,10 +522,8 @@ void mb_write_mesh_test( )
             temp_vec.push_back( *it );
         k++;
     }
-    result = MB->add_entities( meshset_a, ( temp_vec.empty( ) ) ? NULL : &temp_vec[ 0 ],
-                               temp_vec.size( ) );CHECK_ERR( result );
-    result = MB->add_entities( block_of_shells, ( temp_vec.empty( ) ) ? NULL : &temp_vec[ 0 ],
-                               temp_vec.size( ) );CHECK_ERR( result );
+    result = MB->add_entities( meshset_a, ( temp_vec.empty( ) ) ? NULL : &temp_vec[ 0 ], temp_vec.size( ) );CHECK_ERR( result );
+    result = MB->add_entities( block_of_shells, ( temp_vec.empty( ) ) ? NULL : &temp_vec[ 0 ], temp_vec.size( ) );CHECK_ERR( result );
 
     // put these quads into a different meshset_b and tag them with a reverse sense tag
     EntityHandle meshset_b;
@@ -536,8 +531,7 @@ void mb_write_mesh_test( )
 
     result = MB->add_entities( meshset_b, &meshset_a, 1 );CHECK_ERR( result );
 
-    result =
-        MB->tag_get_handle( "SENSE", 1, MB_TYPE_INTEGER, tag_handle, MB_TAG_SPARSE | MB_TAG_CREAT );CHECK_ERR( result );
+    result = MB->tag_get_handle( "SENSE", 1, MB_TYPE_INTEGER, tag_handle, MB_TAG_SPARSE | MB_TAG_CREAT );CHECK_ERR( result );
 
     int reverse_value = -1;
     result = MB->tag_set_data( tag_handle, &meshset_b, 1, &reverse_value );CHECK_ERR( result );
@@ -611,8 +605,7 @@ void mb_write_mesh_test( )
 
     // tag the meshset so it's a nodeset, with id 119
     id = 119;
-    result =
-        MB->tag_get_handle( DIRICHLET_SET_TAG_NAME, 1, MB_TYPE_INTEGER, tag_handle, 0, &negone );CHECK_ERR( result );
+    result = MB->tag_get_handle( DIRICHLET_SET_TAG_NAME, 1, MB_TYPE_INTEGER, tag_handle, 0, &negone );CHECK_ERR( result );
 
     result = MB->tag_set_data( tag_handle, &nodeset_ms, 1, &id );CHECK_ERR( result );
 
@@ -944,8 +937,7 @@ void test_read_side( int id, EntityType sideset_type, int sideset_nodes_per_elem
     }
 }
 
-void test_read_ids_common( const char* file_name, const char* tag_name, const int* expected_vals,
-                           int num_expected )
+void test_read_ids_common( const char* file_name, const char* tag_name, const int* expected_vals, int num_expected )
 {
     Core     mb;
     ReadNCDF reader( &mb );
@@ -963,15 +955,13 @@ void test_read_ids_common( const char* file_name, const char* tag_name, const in
 void test_read_block_ids( )
 {
     const int expected[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 };
-    test_read_ids_common( ho_file, MATERIAL_SET_TAG_NAME, expected,
-                          sizeof( expected ) / sizeof( expected[ 0 ] ) );
+    test_read_ids_common( ho_file, MATERIAL_SET_TAG_NAME, expected, sizeof( expected ) / sizeof( expected[ 0 ] ) );
 }
 
 void test_read_sideset_ids( )
 {
     const int expected[] = { 1, 2, 3, 4 };
-    test_read_ids_common( ho_file, NEUMANN_SET_TAG_NAME, expected,
-                          sizeof( expected ) / sizeof( expected[ 0 ] ) );
+    test_read_ids_common( ho_file, NEUMANN_SET_TAG_NAME, expected, sizeof( expected ) / sizeof( expected[ 0 ] ) );
 }
 
 void test_read_nodeset_ids( )

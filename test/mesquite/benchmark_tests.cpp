@@ -75,15 +75,13 @@ using std::endl;
 
 using namespace MBMesquite;
 
-std::string shape_improv_file_name_1 =
-    TestDir + "/3D/vtk/hexes/untangled/1000hex-block-internal-bias.vtk";
+std::string shape_improv_file_name_1 = TestDir + "/3D/vtk/hexes/untangled/1000hex-block-internal-bias.vtk";
 std::string shape_improv_file_name_2 = TestDir + "/3D/vtk/tets/untangled/tire.vtk";
 std::string laplacian_file_name_1 = TestDir + "/2D/vtk/quads/untangled/square_quad_10_rand.vtk";
 std::string laplacian_file_name_2 = TestDir + "/2D/vtk//quads/untangled/shashkov_quad.vtk";
 std::string untangle_file_name_1 = TestDir + "/2D/vtk/quads/tangled/tangled_horse1.vtk";
 std::string untangle_file_name_2 = TestDir + "/2D/vtk/quads/untangled//shest_grid32.vtk";
-std::string size_adapt_shape_file_name_1 =
-    TestDir + "/2D/vtk/quads/untangled/bias-sphere-quads.vtk";
+std::string size_adapt_shape_file_name_1 = TestDir + "/2D/vtk/quads/untangled/bias-sphere-quads.vtk";
 std::string min_edge_length_file_name_1 = TestDir + "/2D/vtk/quads/untangled/quads_4by2_bad.vtk";
 std::string min_edge_length_file_name_2 = TestDir + "/2D/vtk/quads/untangled/shashkov_quad.vtk";
 std::string deforming_domain_file_name_1 = TestDir + "/3D/vtk/hexes/untangled/sph-10-zsquare.vtk";
@@ -97,12 +95,10 @@ typedef std::vector< Mesh::ElementHandle > elem_vec_t;
 
 // Assume mesh is on a sphere of radius 10 with an axis equal to Z.
 // Return elements near poles and elements near equator.
-void find_z10_extreme_elements( Mesh& mesh, elem_vec_t& polar_elems, elem_vec_t& equatorial_elems,
-                                MsqError& err );
+void find_z10_extreme_elements( Mesh& mesh, elem_vec_t& polar_elems, elem_vec_t& equatorial_elems, MsqError& err );
 
 // Get areas of quads and tris
-void elem_areas( Mesh& mesh, const elem_vec_t& elems, double& min, double& mean, double& max,
-                 MsqError& err );
+void elem_areas( Mesh& mesh, const elem_vec_t& elems, double& min, double& mean, double& max, MsqError& err );
 
 void         classify_boundary( Mesh* mesh, Mesh::VertexHandle corners_out[ 4 ],
                                 std::vector< Mesh::VertexHandle > curves_out[ 4 ], MsqError& err );
@@ -112,9 +108,7 @@ const double HD = 4.5;
 
 int main( int, char*[] )
 {
-    std::cout << std::endl
-              << "********* Wrappers Timing Tests **********" << std::endl
-              << std::endl;
+    std::cout << std::endl << "********* Wrappers Timing Tests **********" << std::endl << std::endl;
 
     MBMesquite::MsqPrintError err( cout );
     MBMesquite::MeshImpl      mesh;
@@ -129,8 +123,7 @@ int main( int, char*[] )
     if( err ) return 1;
     double si_s_secs = t.since_birth( );
     std::cout << std::endl
-              << "ShapeImprover small file optimization completed in " << si_s_secs << " seconds"
-              << std::endl;
+              << "ShapeImprover small file optimization completed in " << si_s_secs << " seconds" << std::endl;
 
     mesh.clear( );
     mesh.read_vtk( shape_improv_file_name_2.c_str( ), err );
@@ -140,8 +133,7 @@ int main( int, char*[] )
     if( err ) return 1;
     double si_l_secs = t.since_birth( );
     std::cout << std::endl
-              << "ShapeImprover large file optimization completed in " << si_l_secs << " seconds"
-              << std::endl;
+              << "ShapeImprover large file optimization completed in " << si_l_secs << " seconds" << std::endl;
 
     // #################### Begin LaplacianWrapper tests ###################
 
@@ -161,8 +153,7 @@ int main( int, char*[] )
     if( err ) return 1;
     double lp_s_secs = t.since_birth( );
     std::cout << std::endl
-              << "LaplacianWrapper small file optimization completed in " << lp_s_secs << " seconds"
-              << std::endl;
+              << "LaplacianWrapper small file optimization completed in " << lp_s_secs << " seconds" << std::endl;
 
     Vector3D                 pnt2( 0, 0, 0 );
     MBMesquite::PlanarDomain msq_geom2( s_norm, pnt2 );
@@ -177,8 +168,7 @@ int main( int, char*[] )
     if( err ) return 1;
     double lp_l1_secs = t.since_birth( );
     std::cout << std::endl
-              << "LaplacianWrapper large file (term crit=0.001) completed in " << lp_l1_secs
-              << " seconds" << std::endl;
+              << "LaplacianWrapper large file (term crit=0.001) completed in " << lp_l1_secs << " seconds" << std::endl;
 
     mesh.clear( );
     mesh.read_vtk( laplacian_file_name_2.c_str( ), err );
@@ -190,8 +180,7 @@ int main( int, char*[] )
     if( err ) return 1;
     double lp_l2_secs = t.since_birth( );
     std::cout << std::endl
-              << "LaplacianWrapper large file (term crit=0.1) completed in " << lp_l2_secs
-              << " seconds" << std::endl;
+              << "LaplacianWrapper large file (term crit=0.1) completed in " << lp_l2_secs << " seconds" << std::endl;
 
     // #################### Begin UntangleWrapper::BETA tests ###################
 
@@ -219,8 +208,7 @@ int main( int, char*[] )
 
     double unb_s_secs = t.since_birth( );
     std::cout << std::endl
-              << "UntangleWrapper::BETA small file optimization completed in " << unb_s_secs
-              << " seconds" << std::endl;
+              << "UntangleWrapper::BETA small file optimization completed in " << unb_s_secs << " seconds" << std::endl;
 
     mesh.clear( );
     mesh.read_vtk( untangle_file_name_2.c_str( ), err );
@@ -243,8 +231,8 @@ int main( int, char*[] )
 
     double unb_l1_secs = t.since_birth( );
     std::cout << std::endl
-              << "UntangleWrapper::BETA large file (term crit=0.005) completed in " << unb_l1_secs
-              << " seconds" << std::endl;
+              << "UntangleWrapper::BETA large file (term crit=0.005) completed in " << unb_l1_secs << " seconds"
+              << std::endl;
 
     mesh.clear( );
     mesh.read_vtk( untangle_file_name_2.c_str( ), err );
@@ -268,8 +256,8 @@ int main( int, char*[] )
 
     double unb_l2_secs = t.since_birth( );
     std::cout << std::endl
-              << "UntangleWrapper::BETA large file (term crit=0.1) completed in " << unb_l2_secs
-              << " seconds" << std::endl;
+              << "UntangleWrapper::BETA large file (term crit=0.1) completed in " << unb_l2_secs << " seconds"
+              << std::endl;
 
     // #################### Begin UntangleWrapper::SIZE tests ###################
 
@@ -295,8 +283,7 @@ int main( int, char*[] )
     if( err ) return 1;
     double uns_s_secs = t.since_birth( );
     std::cout << std::endl
-              << "UntangleWrapper::SIZE small file optimization completed in " << uns_s_secs
-              << " seconds" << std::endl;
+              << "UntangleWrapper::SIZE small file optimization completed in " << uns_s_secs << " seconds" << std::endl;
 
     mesh.clear( );
     mesh.read_vtk( untangle_file_name_2.c_str( ), err );
@@ -320,8 +307,8 @@ int main( int, char*[] )
 
     double uns_l1_secs = t.since_birth( );
     std::cout << std::endl
-              << "UntangleWrappe::SIZE large file (term crit=0.005) completed in " << uns_l1_secs
-              << " seconds" << std::endl;
+              << "UntangleWrappe::SIZE large file (term crit=0.005) completed in " << uns_l1_secs << " seconds"
+              << std::endl;
 
     mesh.clear( );
     mesh.read_vtk( untangle_file_name_2.c_str( ), err );
@@ -340,8 +327,8 @@ int main( int, char*[] )
 
     double uns_l2_secs = t.since_birth( );
     std::cout << std::endl
-              << "UntangleWrappe::SIZE large file (term crit=0.1) completed in " << uns_l2_secs
-              << " seconds" << std::endl;
+              << "UntangleWrappe::SIZE large file (term crit=0.1) completed in " << uns_l2_secs << " seconds"
+              << std::endl;
 
     // #################### Begin UntangleWrapper::SHAPESIZE tests ###################
 
@@ -367,8 +354,8 @@ int main( int, char*[] )
 
     double unss_s_secs = t.since_birth( );
     std::cout << std::endl
-              << "UntangleWrapper::SHAPESIZE small file optimization completed in " << unss_s_secs
-              << " seconds" << std::endl;
+              << "UntangleWrapper::SHAPESIZE small file optimization completed in " << unss_s_secs << " seconds"
+              << std::endl;
 
     mesh.clear( );
     mesh.read_vtk( untangle_file_name_2.c_str( ), err );
@@ -391,8 +378,8 @@ int main( int, char*[] )
 
     double unss_l_secs = t.since_birth( );
     std::cout << std::endl
-              << "UntangleWrapper::SHAPESIZE large file optimization completed in " << unss_l_secs
-              << " seconds" << std::endl;
+              << "UntangleWrapper::SHAPESIZE large file optimization completed in " << unss_l_secs << " seconds"
+              << std::endl;
 
     // #################### Begin SizeAdaptShapeWrapper tests ###################
 
@@ -420,8 +407,7 @@ int main( int, char*[] )
     if( err ) return 1;
     double sas1_secs = t.since_birth( );
     std::cout << std::endl
-              << "SizeAdaptShapeWrapper (term crit=0.01) completed in " << sas1_secs << " seconds"
-              << std::endl;
+              << "SizeAdaptShapeWrapper (term crit=0.01) completed in " << sas1_secs << " seconds" << std::endl;
 
     mesh.clear( );
     mesh.read_vtk( size_adapt_shape_file_name_1.c_str( ), err );
@@ -432,8 +418,7 @@ int main( int, char*[] )
     if( err ) return 1;
     double sas2_secs = t.since_birth( );
     std::cout << std::endl
-              << "SizeAdaptShapeWrapper (term crit=0.1) completed in " << sas2_secs << " seconds"
-              << std::endl;
+              << "SizeAdaptShapeWrapper (term crit=0.1) completed in " << sas2_secs << " seconds" << std::endl;
 
     // #################### Begin PaverMinEdgeLengthWrapper tests ###################
 
@@ -448,8 +433,8 @@ int main( int, char*[] )
     if( err ) return 1;
     double mel_s_secs = t.since_birth( );
     std::cout << std::endl
-              << "PaverMinEdgeLengthWrapper small file optimization completed in " << mel_s_secs
-              << " seconds" << std::endl;
+              << "PaverMinEdgeLengthWrapper small file optimization completed in " << mel_s_secs << " seconds"
+              << std::endl;
 
     mesh.clear( );
     mesh.read_vtk( min_edge_length_file_name_2.c_str( ), err );
@@ -459,8 +444,8 @@ int main( int, char*[] )
     if( err ) return 1;
     double mel1_l_secs = t.since_birth( );
     std::cout << std::endl
-              << "PaverMinEdgeLengthWrapper large file (term crit=0.005) completed in "
-              << mel1_l_secs << " seconds" << std::endl;
+              << "PaverMinEdgeLengthWrapper large file (term crit=0.005) completed in " << mel1_l_secs << " seconds"
+              << std::endl;
 
     mesh.clear( );
     mesh.read_vtk( min_edge_length_file_name_2.c_str( ), err );
@@ -469,8 +454,8 @@ int main( int, char*[] )
     if( err ) return 1;
     double mel2_l_secs = t.since_birth( );
     std::cout << std::endl
-              << "PaverMinEdgeLengthWrapper large file (term crit=0.1) completed in " << mel2_l_secs
-              << " seconds" << std::endl;
+              << "PaverMinEdgeLengthWrapper large file (term crit=0.1) completed in " << mel2_l_secs << " seconds"
+              << std::endl;
 
     // #################### Begin DeformingDomainWrapper tests ###################
 
@@ -485,8 +470,7 @@ int main( int, char*[] )
     if( MSQ_CHKERR( err ) ) return 1;
 
     // new, "deformed" domain will be an 2HDx2HD planar square
-    const double corner_coords[][ 3 ] = {
-        { -HD, -HD, Z }, { HD, -HD, Z }, { HD, HD, Z }, { -HD, HD, Z } };
+    const double corner_coords[][ 3 ] = { { -HD, -HD, Z }, { HD, -HD, Z }, { HD, HD, Z }, { -HD, HD, Z } };
     LineDomain   lines[ 4 ] = { LineDomain( Vector3D( corner_coords[ 0 ] ), Vector3D( 1, 0, 0 ) ),
                               LineDomain( Vector3D( corner_coords[ 1 ] ), Vector3D( 0, 1, 0 ) ),
                               LineDomain( Vector3D( corner_coords[ 2 ] ), Vector3D( -1, 0, 0 ) ),
@@ -497,8 +481,7 @@ int main( int, char*[] )
     DeformingCurveSmoother curve_tool;
     for( int i = 0; i < 4; ++i )
     {
-        curve_tool.store_initial_mesh( &mesh, &curves[ i ][ 0 ], curves[ i ].size( ), &lines[ i ],
-                                       err );
+        curve_tool.store_initial_mesh( &mesh, &curves[ i ][ 0 ], curves[ i ].size( ), &lines[ i ], err );
         if( MSQ_CHKERR( err ) ) return 1;
     }
     DeformingDomainWrapper dd_wrapper;
@@ -533,8 +516,7 @@ int main( int, char*[] )
     if( MSQ_CHKERR( err ) ) return 1;
     double dd_secs = t.since_birth( );
     std::cout << std::endl
-              << "DeformingDomainWrapper file (term crit=0.01) completed in " << dd_secs
-              << " seconds" << std::endl;
+              << "DeformingDomainWrapper file (term crit=0.01) completed in " << dd_secs << " seconds" << std::endl;
 
     // Do it all again for the next test
     mesh.clear( );
@@ -547,21 +529,18 @@ int main( int, char*[] )
     if( MSQ_CHKERR( err ) ) return 1;
 
     // new, "deformed" domain will be an 2HDx2HD planar square
-    const double corner_coords2[][ 3 ] = {
-        { -HD, -HD, Z }, { HD, -HD, Z }, { HD, HD, Z }, { -HD, HD, Z } };
-    LineDomain lines2[ 4 ] = {
-        LineDomain( Vector3D( corner_coords2[ 0 ] ), Vector3D( 1, 0, 0 ) ),
-        LineDomain( Vector3D( corner_coords2[ 1 ] ), Vector3D( 0, 1, 0 ) ),
-        LineDomain( Vector3D( corner_coords2[ 2 ] ), Vector3D( -1, 0, 0 ) ),
-        LineDomain( Vector3D( corner_coords2[ 3 ] ), Vector3D( 0, -1, 0 ) ) };
+    const double corner_coords2[][ 3 ] = { { -HD, -HD, Z }, { HD, -HD, Z }, { HD, HD, Z }, { -HD, HD, Z } };
+    LineDomain   lines2[ 4 ] = { LineDomain( Vector3D( corner_coords2[ 0 ] ), Vector3D( 1, 0, 0 ) ),
+                               LineDomain( Vector3D( corner_coords2[ 1 ] ), Vector3D( 0, 1, 0 ) ),
+                               LineDomain( Vector3D( corner_coords2[ 2 ] ), Vector3D( -1, 0, 0 ) ),
+                               LineDomain( Vector3D( corner_coords2[ 3 ] ), Vector3D( 0, -1, 0 ) ) };
     PlanarDomain surface2( PlanarDomain::XY, Z );
 
     // save initial mesh state
     DeformingCurveSmoother curve_tool2;
     for( int i = 0; i < 4; ++i )
     {
-        curve_tool2.store_initial_mesh( &mesh, &curves2[ i ][ 0 ], curves2[ i ].size( ),
-                                        &lines2[ i ], err );
+        curve_tool2.store_initial_mesh( &mesh, &curves2[ i ][ 0 ], curves2[ i ].size( ), &lines2[ i ], err );
         if( MSQ_CHKERR( err ) ) return 1;
     }
     DeformingDomainWrapper dd_wrapper2;
@@ -597,59 +576,46 @@ int main( int, char*[] )
     if( MSQ_CHKERR( err ) ) return 1;
     double dd_secs2 = t.since_birth( );
     std::cout << std::endl
-              << "DeformingDomainWrapper file (term crit=0.1) completed in " << dd_secs2
-              << " seconds" << std::endl;
+              << "DeformingDomainWrapper file (term crit=0.1) completed in " << dd_secs2 << " seconds" << std::endl;
 
     // Timing Summary
-    std::cout << std::endl
-              << "********* Wrappers Timing Summary **********" << std::endl
+    std::cout << std::endl << "********* Wrappers Timing Summary **********" << std::endl << std::endl;
+    std::cout << "ShapeImprover small file optimization completed in " << si_s_secs << " seconds" << std::endl;
+    std::cout << "ShapeImprover large file optimization completed in " << si_l_secs << " seconds" << std::endl;
+    std::cout << "LaplacianWrapper small file optimization completed in " << lp_s_secs << " seconds" << std::endl;
+    std::cout << "LaplacianWrapper large file optimization (term crit=0.001) in " << lp_l1_secs << " seconds"
               << std::endl;
-    std::cout << "ShapeImprover small file optimization completed in " << si_s_secs << " seconds"
+    std::cout << "LaplacianWrapper large file optimization (term crit=0.1) in " << lp_l2_secs << " seconds"
               << std::endl;
-    std::cout << "ShapeImprover large file optimization completed in " << si_l_secs << " seconds"
+    std::cout << "UntangleWrapper::BETA small file optimization completed in " << unb_s_secs << " seconds" << std::endl;
+    std::cout << "UntangleWrapper::BETA large file (term crit=0.005) completed in " << unb_l1_secs << " seconds"
               << std::endl;
-    std::cout << "LaplacianWrapper small file optimization completed in " << lp_s_secs << " seconds"
+    std::cout << "UntangleWrapper::BETA large file (term crit=0.1) completed in " << unb_l2_secs << " seconds"
               << std::endl;
-    std::cout << "LaplacianWrapper large file optimization (term crit=0.001) in " << lp_l1_secs
-              << " seconds" << std::endl;
-    std::cout << "LaplacianWrapper large file optimization (term crit=0.1) in " << lp_l2_secs
-              << " seconds" << std::endl;
-    std::cout << "UntangleWrapper::BETA small file optimization completed in " << unb_s_secs
-              << " seconds" << std::endl;
-    std::cout << "UntangleWrapper::BETA large file (term crit=0.005) completed in " << unb_l1_secs
-              << " seconds" << std::endl;
-    std::cout << "UntangleWrapper::BETA large file (term crit=0.1) completed in " << unb_l2_secs
-              << " seconds" << std::endl;
-    std::cout << "UntangleWrapper::SIZE small file optimization completed in " << uns_s_secs
-              << " seconds" << std::endl;
-    std::cout << "UntangleWrapper::SIZE large file (term crit=0.005) completed in " << uns_l1_secs
-              << " seconds" << std::endl;
-    std::cout << "UntangleWrapper::SIZE large file (term crit=0.1) completed in " << uns_l2_secs
-              << " seconds" << std::endl;
-    std::cout << "UntangleWrapper::SHAPESIZE small file optimization completed in " << unss_s_secs
-              << " seconds" << std::endl;
-    std::cout << "UntangleWrapper::SHAPESIZE large file optimization completed in " << unss_l_secs
-              << " seconds" << std::endl;
-    std::cout << "SizeAdaptShapeWrapper (term crit=0.01) completed in " << sas1_secs << " seconds"
+    std::cout << "UntangleWrapper::SIZE small file optimization completed in " << uns_s_secs << " seconds" << std::endl;
+    std::cout << "UntangleWrapper::SIZE large file (term crit=0.005) completed in " << uns_l1_secs << " seconds"
               << std::endl;
-    std::cout << "SizeAdaptShapeWrapper (term crit=0.1) completed in " << sas2_secs << " seconds"
+    std::cout << "UntangleWrapper::SIZE large file (term crit=0.1) completed in " << uns_l2_secs << " seconds"
               << std::endl;
-    std::cout << "PaverMinEdgeLengthWrapper small file optimization completed in " << mel_s_secs
-              << " seconds" << std::endl;
-    std::cout << "PaverMinEdgeLengthWrapper large file (term crit=0.005) completed in "
-              << mel1_l_secs << " seconds" << std::endl;
-    std::cout << "PaverMinEdgeLengthWrapper large file (term crit=0.1) completed in " << mel2_l_secs
-              << " seconds" << std::endl;
-    std::cout << "DeformingDomainWrapper file (term crit=0.01) completed in " << dd_secs
-              << " seconds" << std::endl;
-    std::cout << "DeformingDomainWrapper file (term crit=0.1) completed in " << dd_secs2
-              << " seconds" << std::endl;
+    std::cout << "UntangleWrapper::SHAPESIZE small file optimization completed in " << unss_s_secs << " seconds"
+              << std::endl;
+    std::cout << "UntangleWrapper::SHAPESIZE large file optimization completed in " << unss_l_secs << " seconds"
+              << std::endl;
+    std::cout << "SizeAdaptShapeWrapper (term crit=0.01) completed in " << sas1_secs << " seconds" << std::endl;
+    std::cout << "SizeAdaptShapeWrapper (term crit=0.1) completed in " << sas2_secs << " seconds" << std::endl;
+    std::cout << "PaverMinEdgeLengthWrapper small file optimization completed in " << mel_s_secs << " seconds"
+              << std::endl;
+    std::cout << "PaverMinEdgeLengthWrapper large file (term crit=0.005) completed in " << mel1_l_secs << " seconds"
+              << std::endl;
+    std::cout << "PaverMinEdgeLengthWrapper large file (term crit=0.1) completed in " << mel2_l_secs << " seconds"
+              << std::endl;
+    std::cout << "DeformingDomainWrapper file (term crit=0.01) completed in " << dd_secs << " seconds" << std::endl;
+    std::cout << "DeformingDomainWrapper file (term crit=0.1) completed in " << dd_secs2 << " seconds" << std::endl;
 
     return 0;
 }
 
-void find_z10_extreme_elements( Mesh& mesh, elem_vec_t& polar_elems, elem_vec_t& equatorial_elems,
-                                MsqError& err )
+void find_z10_extreme_elements( Mesh& mesh, elem_vec_t& polar_elems, elem_vec_t& equatorial_elems, MsqError& err )
 {
     elem_vec_t elems;
     mesh.get_all_elements( elems, err );MSQ_ERRRTN( err );
@@ -682,8 +648,7 @@ void find_z10_extreme_elements( Mesh& mesh, elem_vec_t& polar_elems, elem_vec_t&
     }
 }
 
-void elem_areas( Mesh& mesh, const elem_vec_t& elems, double& min, double& mean, double& max,
-                 MsqError& err )
+void elem_areas( Mesh& mesh, const elem_vec_t& elems, double& min, double& mean, double& max, MsqError& err )
 {
     min = HUGE_VAL;
     max = -1;

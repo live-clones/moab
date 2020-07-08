@@ -48,12 +48,10 @@ class ExoIIUtil : public ExoIIInterface
     //! get the element type of the entity; this entity can either be a meshset,
     //! in which case it will be assumed to be a material set meshset, or an
     //! individual entity.
-    virtual ExoIIElementType get_element_type( EntityHandle entity, Tag mid_nodes_tag,
-                                               Tag        geom_dimension_tag,
+    virtual ExoIIElementType get_element_type( EntityHandle entity, Tag mid_nodes_tag, Tag geom_dimension_tag,
                                                EntityType indiv_entity_type = MBMAXTYPE )
     {
-        return static_get_element_type( mMB, entity, mid_nodes_tag, geom_dimension_tag,
-                                        indiv_entity_type );
+        return static_get_element_type( mMB, entity, mid_nodes_tag, geom_dimension_tag, indiv_entity_type );
     }
 
     virtual void has_mid_nodes( ExoIIElementType elem_type, int* array )
@@ -87,16 +85,16 @@ class ExoIIUtil : public ExoIIInterface
     //! meshset, and indiv_entity_type is input, that type is used to start the search for
     //! the connectivity tag which determines how many vertices per entity are defined for that
     //! meshset
-    static ExoIIElementType
-        static_get_element_type( Interface* mdbImpl, const EntityHandle entity,
-                                 const Tag mid_nodes_tag, const Tag geom_dimension_tag,
-                                 const EntityType indiv_entity_type = MBMAXTYPE );
+    static ExoIIElementType static_get_element_type( Interface* mdbImpl, const EntityHandle entity,
+                                                     const Tag mid_nodes_tag, const Tag geom_dimension_tag,
+                                                     const EntityType indiv_entity_type = MBMAXTYPE );
 
     //! given the number of vertices in an entity, and optionally the entity type and
     //! geometric dimension, return the corresponding exodusII element type; dimension defaults
     //! to 3 following TSTT convention
-    static ExoIIElementType get_element_type_from_num_verts(
-        const int num_verts, const EntityType entity_type = MBMAXTYPE, const int dimension = 3 );
+    static ExoIIElementType get_element_type_from_num_verts( const int        num_verts,
+                                                             const EntityType entity_type = MBMAXTYPE,
+                                                             const int        dimension = 3 );
 
     //! the MB entity type used for each element type
     static const EntityType ExoIIElementMBEntity[];

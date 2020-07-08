@@ -201,19 +201,18 @@ void iMesh_tagIterate( iMesh_Instance instance,
  * storage.
  *
  */
-void iMesh_connectIterate(
-    iMesh_Instance instance,
-    /**< [in] iMesh instance */
-    iBase_EntityArrIterator entArr_iterator,
-    /**< [in] Iterator being queried */
-    iBase_EntityHandle** connect,
-    /**< [out] Pointer to pointer that will be set to connectivity data memory */
-    int* verts_per_entity,
-    /**< [out] Number of vertices per entity in this subrange */
-    int* count,
-    /**< [out] Number of contiguous entities in this subrange */
-    int* err
-    /**< [out] Returned Error status (see iBase_ErrorType) */
+void iMesh_connectIterate( iMesh_Instance instance,
+                           /**< [in] iMesh instance */
+                           iBase_EntityArrIterator entArr_iterator,
+                           /**< [in] Iterator being queried */
+                           iBase_EntityHandle** connect,
+                           /**< [out] Pointer to pointer that will be set to connectivity data memory */
+                           int* verts_per_entity,
+                           /**< [out] Number of vertices per entity in this subrange */
+                           int* count,
+                           /**< [out] Number of contiguous entities in this subrange */
+                           int* err
+                           /**< [out] Returned Error status (see iBase_ErrorType) */
 );
 
 /**\brief Access coordinates data via direct pointer into contiguous blocks

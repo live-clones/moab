@@ -28,8 +28,7 @@ ReaderIface* ReadDamsel::factory( Interface* iface )
 }
 
 ReadDamsel::ReadDamsel( Interface* impl )
-    : mbImpl( impl ), readMeshIface( NULL ), nativeParallel( false ), myPcomm( NULL ),
-      mGlobalIdTag( 0 ), dU( )
+    : mbImpl( impl ), readMeshIface( NULL ), nativeParallel( false ), myPcomm( NULL ), mGlobalIdTag( 0 ), dU( )
 {
     init( );
 }
@@ -66,10 +65,8 @@ ErrorCode ReadDamsel::parse_options( const FileOptions& opts, bool& parallel )
 // Partition collection is a *flat* collection of handles for entities and other collections that
 // will be represented on a part
 
-ErrorCode ReadDamsel::load_file( const char* filename, const EntityHandle* file_set,
-                                 const FileOptions&             opts,
-                                 const ReaderIface::SubsetList* subset_list,
-                                 const Tag*                     file_id_tag )
+ErrorCode ReadDamsel::load_file( const char* filename, const EntityHandle* file_set, const FileOptions& opts,
+                                 const ReaderIface::SubsetList* subset_list, const Tag* file_id_tag )
 {
     ErrorCode rval;
 
@@ -80,8 +77,8 @@ ErrorCode ReadDamsel::load_file( const char* filename, const EntityHandle* file_
     dU.dmslLib = DMSLlib_init( );
 
     // Create a damsel model
-    dU.dmslModel = DMSLmodel_create( sizeof( EntityHandle ) == 8 ? DAMSEL_HANDLE_TYPE_HANDLE64
-                                                                 : DAMSEL_HANDLE_TYPE_HANDLE32 );
+    dU.dmslModel =
+        DMSLmodel_create( sizeof( EntityHandle ) == 8 ? DAMSEL_HANDLE_TYPE_HANDLE64 : DAMSEL_HANDLE_TYPE_HANDLE32 );
 
     // Model attach - need model id from make model, filename
 #ifdef MOAB_HAVE_MPI
@@ -243,9 +240,8 @@ ErrorCode ReadDamsel::load_file( const char* filename, const EntityHandle* file_
     return MB_SUCCESS;
 }
 
-ErrorCode ReadDamsel::read_tag_values( const char* file_name, const char* tag_name,
-                                       const FileOptions& opts, std::vector< int >& tag_values_out,
-                                       const SubsetList* subset_list )
+ErrorCode ReadDamsel::read_tag_values( const char* file_name, const char* tag_name, const FileOptions& opts,
+                                       std::vector< int >& tag_values_out, const SubsetList* subset_list )
 {
     return MB_FAILURE;
 }
@@ -254,8 +250,7 @@ ErrorCode ReadDamsel::process_tags( std::vector< damsel_tag_buf_type >& tag_info
 {
     Tag       tagh;
     ErrorCode rval = MB_SUCCESS, tmp_rval;
-    for( std::vector< damsel_tag_buf_type >::iterator tit = tag_infos.begin( );
-         tit != tag_infos.end( ); ++tit )
+    for( std::vector< damsel_tag_buf_type >::iterator tit = tag_infos.begin( ); tit != tag_infos.end( ); ++tit )
     {
         if( DamselUtil::dtom_data_type[ ( *tit ).tag_datatype ] == MB_TYPE_OPAQUE )
         {
@@ -263,9 +258,8 @@ ErrorCode ReadDamsel::process_tags( std::vector< damsel_tag_buf_type >& tag_info
             continue;
         }
 
-        tmp_rval = mbImpl->tag_get_handle( ( *tit ).name, 1,
-                                           DamselUtil::dtom_data_type[ ( *tit ).tag_datatype ],
-                                           tagh, MB_TAG_CREAT | MB_TAG_DENSE );
+        tmp_rval = mbImpl->tag_get_handle( ( *tit ).name, 1, DamselUtil::dtom_data_type[ ( *tit ).tag_datatype ], tagh,
+                                           MB_TAG_CREAT | MB_TAG_DENSE );
         if( MB_SUCCESS != tmp_rval )
             rval = tmp_rval;
         else
@@ -321,18 +315,17 @@ ErrorCode ReadDamsel::process_ent_info( const damsel_entity_buf_type& einfo )
     // Check that there's only one contiguous run of file-side handles, fail if there isn't
 #ifndef NDEBUG
     Range fside_handles;
-    rval = DamselUtil::container_to_range(
-        dU.dmslModel, const_cast< damsel_container& >( einfo.entity_container ), fside_handles );
-    if( MB_SUCCESS != rval || fside_handles.size( ) != einfo.count || fside_handles.psize( ) != 1 )
-        return MB_FAILURE;
+    rval = DamselUtil::container_to_range( dU.dmslModel, const_cast< damsel_container& >( einfo.entity_container ),
+                                           fside_handles );
+    if( MB_SUCCESS != rval || fside_handles.size( ) != einfo.count || fside_handles.psize( ) != 1 ) return MB_FAILURE;
 #endif
 
     if( einfo.entity_type != DAMSEL_ENTITY_TYPE_VERTEX )
     {
         // Create the moab entities
-        rval = readMeshIface->get_element_connect(
-            einfo.count, einfo.vertices_per_entity,
-            DamselUtil::dtom_entity_type[ einfo.entity_type ], 0, start_handle, connect );MB_CHK_ERR( rval );
+        rval = readMeshIface->get_element_connect( einfo.count, einfo.vertices_per_entity,
+                                                   DamselUtil::dtom_entity_type[ einfo.entity_type ], 0, start_handle,
+                                                   connect );MB_CHK_ERR( rval );
         these_ents.insert( start_handle, start_handle + einfo.count - 1 );
 
         // Create an app-side sequence and map to file-side container
@@ -341,8 +334,7 @@ ErrorCode ReadDamsel::process_ent_info( const damsel_entity_buf_type& einfo )
         CHK_DMSL_ERR( err, "Error returned mapping entity handles" );
 
         // Map connectivity
-        assert( DMSLcontainer_count( einfo.vertex_container ) ==
-                (int)( einfo.vertices_per_entity * einfo.count ) );
+        assert( DMSLcontainer_count( einfo.vertex_container ) == (int)( einfo.vertices_per_entity * einfo.count ) );
         rval = get_contents( dU.dmslModel, einfo.vertex_container, connect );MB_CHK_SET_ERR( rval, "Error returned mapping connectivity" );
     }
     else
@@ -359,8 +351,7 @@ ErrorCode ReadDamsel::process_ent_info( const damsel_entity_buf_type& einfo )
         // Should have one vertex per entity
         assert( einfo.vertices_per_entity == 1 );
         std::vector< double* > coord_arrays;
-        rval =
-            readMeshIface->get_node_coords( num_ctags, einfo.count, 0, start_handle, coord_arrays );MB_CHK_ERR( rval );
+        rval = readMeshIface->get_node_coords( num_ctags, einfo.count, 0, start_handle, coord_arrays );MB_CHK_ERR( rval );
 
         these_ents.insert( start_handle, start_handle + einfo.count - 1 );
 
@@ -372,35 +363,31 @@ ErrorCode ReadDamsel::process_ent_info( const damsel_entity_buf_type& einfo )
         // Map the coords storage
         if( xcoord_dtag != 0 )
         {
-            err = DMSLmodel_map_tag( coord_arrays[ 0 ], app_cont,
-                                     (damsel_handle_ptr)&dU.xcoordsTag.mTagh );
+            err = DMSLmodel_map_tag( coord_arrays[ 0 ], app_cont, (damsel_handle_ptr)&dU.xcoordsTag.mTagh );
             CHK_DMSL_ERR( err, "Trouble mapping x coordinate tag" );
         }
         if( ycoord_dtag != 0 )
         {
-            err = DMSLmodel_map_tag( coord_arrays[ 1 ], app_cont,
-                                     (damsel_handle_ptr)&dU.ycoordsTag.mTagh );
+            err = DMSLmodel_map_tag( coord_arrays[ 1 ], app_cont, (damsel_handle_ptr)&dU.ycoordsTag.mTagh );
             CHK_DMSL_ERR( err, "Trouble mapping y coordinate tag" );
         }
         if( zcoord_dtag != 0 )
         {
-            err = DMSLmodel_map_tag( coord_arrays[ 2 ], app_cont,
-                                     (damsel_handle_ptr)&dU.zcoordsTag.mTagh );
+            err = DMSLmodel_map_tag( coord_arrays[ 2 ], app_cont, (damsel_handle_ptr)&dU.zcoordsTag.mTagh );
             CHK_DMSL_ERR( err, "Trouble mapping z coordinate tag" );
         }
     }
 
     // Save mapping from moab entity to einfo
-    dmHandleRMap.insert( DMSLcontainer_handle_at_position( einfo.entity_container, 0 ),
-                         start_handle, einfo.count );
+    dmHandleRMap.insert( DMSLcontainer_handle_at_position( einfo.entity_container, 0 ), start_handle, einfo.count );
 
     rval = process_entity_tags( einfo.tag_count, einfo.tag_handle_container, app_cont, these_ents );
 
     return rval;
 }
 
-ErrorCode ReadDamsel::process_entity_tags( int count, damsel_container tag_container,
-                                           damsel_container app_cont, Range& these_ents )
+ErrorCode ReadDamsel::process_entity_tags( int count, damsel_container tag_container, damsel_container app_cont,
+                                           Range& these_ents )
 {
     // Process tags on these entities
     ErrorCode rval = MB_SUCCESS;
@@ -409,8 +396,8 @@ ErrorCode ReadDamsel::process_entity_tags( int count, damsel_container tag_conta
         damsel_handle dtagh = DMSLcontainer_handle_at_position( tag_container, i );
 
         // Don't do conventional tags here
-        std::vector< DamselUtil::tinfo >::iterator vit = std::find_if(
-            dU.tagMap.begin( ), dU.tagMap.end( ), DamselUtil::DtagP< DamselUtil::tinfo >( dtagh ) );
+        std::vector< DamselUtil::tinfo >::iterator vit =
+            std::find_if( dU.tagMap.begin( ), dU.tagMap.end( ), DamselUtil::DtagP< DamselUtil::tinfo >( dtagh ) );
 
         if( ( *vit ).tagType == MB_TAG_ANY )
             continue;
@@ -421,8 +408,7 @@ ErrorCode ReadDamsel::process_entity_tags( int count, damsel_container tag_conta
         assert( tagh );
         void* tag_data;
         int   ecount = these_ents.size( );
-        rval =
-            mbImpl->tag_iterate( tagh, these_ents.begin( ), these_ents.end( ), ecount, tag_data );MB_CHK_SET_ERR( rval, "Problem getting tag iterator" );
+        rval = mbImpl->tag_iterate( tagh, these_ents.begin( ), these_ents.end( ), ecount, tag_data );MB_CHK_SET_ERR( rval, "Problem getting tag iterator" );
         assert( ecount == (int)these_ents.size( ) );
         damsel_err_t err = DMSLmodel_map_tag( tag_data, app_cont, (damsel_handle_ptr)&tagh );
         CHK_DMSL_ERR( err, "Problem calling DMSLmodel_map_tag" );
@@ -445,8 +431,7 @@ ErrorCode ReadDamsel::get_contents( damsel_model m, damsel_container c, Range& e
             while( count )
             {
                 // Get start in rangemap
-                RangeMap< damsel_handle, EntityHandle, 0 >::iterator beg =
-                    dmHandleRMap.lower_bound( start );
+                RangeMap< damsel_handle, EntityHandle, 0 >::iterator beg = dmHandleRMap.lower_bound( start );
                 if( beg == dmHandleRMap.end( ) ) return MB_SUCCESS;
                 unsigned long diff = std::max( ( *beg ).begin - start, (damsel_handle)0 );
                 unsigned long num = std::min( count - diff, ( size_t )( *beg ).count );
@@ -504,13 +489,11 @@ ErrorCode ReadDamsel::get_contents( damsel_model m, damsel_container c, EntityHa
             while( count )
             {
                 // Get start in rangemap
-                RangeMap< damsel_handle, EntityHandle, 0 >::iterator beg =
-                    dmHandleRMap.lower_bound( start );
+                RangeMap< damsel_handle, EntityHandle, 0 >::iterator beg = dmHandleRMap.lower_bound( start );
                 if( beg == dmHandleRMap.end( ) ) return MB_SUCCESS;
                 unsigned int diff = std::max( ( *beg ).begin - start, (damsel_handle)0 );
                 unsigned int num = std::min( count - diff, ( size_t )( *beg ).count );
-                for( EntityHandle hdl = ( *beg ).begin + diff;
-                     hdl <= (int)( *beg ).begin + diff + num - 1; hdl++ )
+                for( EntityHandle hdl = ( *beg ).begin + diff; hdl <= (int)( *beg ).begin + diff + num - 1; hdl++ )
                     ents[ ind++ ] = hdl;
                 count -= ( diff + num );
                 ++beg;

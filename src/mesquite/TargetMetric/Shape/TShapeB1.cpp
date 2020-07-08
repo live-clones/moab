@@ -58,8 +58,8 @@ bool TShapeB1::evaluate( const MsqMatrix< 2, 2 >& T, double& result, MsqError& e
     return true;
 }
 
-bool TShapeB1::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& result,
-                                   MsqMatrix< 2, 2 >& deriv_wrt_T, MsqError& err )
+bool TShapeB1::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& result, MsqMatrix< 2, 2 >& deriv_wrt_T,
+                                   MsqError& err )
 {
     const double d = det( T );
     if( invalid_determinant( d ) )
@@ -86,8 +86,7 @@ bool TShapeB1::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& result,
                                \frac{\partial \tau}{\partial T} \right)
       - \frac{|T|^2}{2 \tau^3} \frac{\partial^2 \tau}{\partial T^2} \f$
   */
-bool TShapeB1::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& result,
-                                   MsqMatrix< 2, 2 >& deriv_wrt_T,
+bool TShapeB1::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& result, MsqMatrix< 2, 2 >& deriv_wrt_T,
                                    MsqMatrix< 2, 2 > second_wrt_T[ 3 ], MsqError& err )
 {
     const double d = det( T );
@@ -129,8 +128,7 @@ bool TShapeB1::evaluate( const MsqMatrix< 3, 3 >& T, double& result, MsqError& e
     return true;
 }
 
-bool TShapeB1::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& result,
-                                   MsqMatrix< 3, 3 >& wrt_T, MsqError& err )
+bool TShapeB1::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& result, MsqMatrix< 3, 3 >& wrt_T, MsqError& err )
 {
     double d = det( T );
     if( invalid_determinant( d ) )
@@ -149,8 +147,7 @@ bool TShapeB1::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& result,
     return true;
 }
 
-bool TShapeB1::evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result,
-                                   MsqMatrix< 3, 3 >& deriv_wrt_T,
+bool TShapeB1::evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result, MsqMatrix< 3, 3 >& deriv_wrt_T,
                                    MsqMatrix< 3, 3 > second_wrt_T[ 6 ], MsqError& err )
 {
     double d = det( T );

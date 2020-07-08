@@ -13,9 +13,9 @@ class AssocPair
   public:
     friend class Lasso;
 
-    AssocPair( iRel_Instance instance, iBase_Instance iface0, iRel_RelationType ent_or_set0,
-               iRel_IfaceType type0, iRel_RelationStatus status0, iBase_Instance iface1,
-               iRel_RelationType ent_or_set1, iRel_IfaceType type1, iRel_RelationStatus status1 );
+    AssocPair( iRel_Instance instance, iBase_Instance iface0, iRel_RelationType ent_or_set0, iRel_IfaceType type0,
+               iRel_RelationStatus status0, iBase_Instance iface1, iRel_RelationType ent_or_set1, iRel_IfaceType type1,
+               iRel_RelationStatus status1 );
 
     ~AssocPair( );
 
@@ -32,34 +32,28 @@ class AssocPair
 
     bool contains( iBase_Instance iface );
 
-    int get_all_entities( int iface_no, int dimension, iBase_EntityHandle** entities,
-                          int* entities_alloc, int* entities_size );
+    int get_all_entities( int iface_no, int dimension, iBase_EntityHandle** entities, int* entities_alloc,
+                          int* entities_size );
 
     int get_all_sets( int iface_no, iBase_EntitySetHandle** sets, int* sets_alloc, int* sets_size );
 
-    int get_entities( int iface_no, int dimension, iBase_EntitySetHandle set_handle,
-                      iBase_EntityHandle** entities, int* entities_alloc, int* entities_size );
+    int get_entities( int iface_no, int dimension, iBase_EntitySetHandle set_handle, iBase_EntityHandle** entities,
+                      int* entities_alloc, int* entities_size );
 
-    int get_ents_dims( int iface_no, iBase_EntityHandle* entities, int entities_size,
-                       int** ent_types, int* ent_types_alloc, int* ent_types_size );
+    int get_ents_dims( int iface_no, iBase_EntityHandle* entities, int entities_size, int** ent_types,
+                       int* ent_types_alloc, int* ent_types_size );
 
     int set_relation( iBase_EntityHandle ent1, iBase_EntityHandle ent2 );
     int set_relation( iBase_EntitySetHandle set1, iBase_EntityHandle ent2 );
     int set_relation( iBase_EntityHandle ent1, iBase_EntitySetHandle set2 );
     int set_relation( iBase_EntitySetHandle set1, iBase_EntitySetHandle set2 );
 
-    int get_relation( int iface_no, iBase_EntityHandle* entities, int num_entities,
-                      iBase_EntityHandle* tag_values );
-    int get_relation( int iface_no, iBase_EntitySetHandle* sets, int num_sets,
-                      iBase_EntityHandle* tag_values );
-    int get_relation( int iface_no, iBase_EntityHandle* entities, int num_entities,
-                      iBase_EntitySetHandle* tag_values );
-    int get_relation( int iface_no, iBase_EntitySetHandle* sets, int num_sets,
-                      iBase_EntitySetHandle* tag_values );
-    int get_relation( int iface_no, iBase_EntityHandle* entities, int num_entities,
-                      iBase_EntityIterator* tag_values );
-    int get_relation( int iface_no, iBase_EntitySetHandle* sets, int num_sets,
-                      iBase_EntityIterator* tag_values );
+    int get_relation( int iface_no, iBase_EntityHandle* entities, int num_entities, iBase_EntityHandle* tag_values );
+    int get_relation( int iface_no, iBase_EntitySetHandle* sets, int num_sets, iBase_EntityHandle* tag_values );
+    int get_relation( int iface_no, iBase_EntityHandle* entities, int num_entities, iBase_EntitySetHandle* tag_values );
+    int get_relation( int iface_no, iBase_EntitySetHandle* sets, int num_sets, iBase_EntitySetHandle* tag_values );
+    int get_relation( int iface_no, iBase_EntityHandle* entities, int num_entities, iBase_EntityIterator* tag_values );
+    int get_relation( int iface_no, iBase_EntitySetHandle* sets, int num_sets, iBase_EntityIterator* tag_values );
 
     int rmv_relation( int iface_no, iBase_EntityHandle* entities, int num_entities );
     int rmv_relation( int iface_no, iBase_EntitySetHandle* sets, int num_sets );
@@ -73,10 +67,8 @@ class AssocPair
   private:
     AssocPair( );
 
-    int populate_recursive( int iface_no, iBase_EntitySetHandle set,
-                            iBase_EntityHandle related_ent );
-    int populate_recursive( int iface_no, iBase_EntitySetHandle set,
-                            iBase_EntitySetHandle related_set );
+    int populate_recursive( int iface_no, iBase_EntitySetHandle set, iBase_EntityHandle related_ent );
+    int populate_recursive( int iface_no, iBase_EntitySetHandle set, iBase_EntitySetHandle related_set );
 
     int unpopulate_recursive( int iface_no, iBase_EntitySetHandle set );
 

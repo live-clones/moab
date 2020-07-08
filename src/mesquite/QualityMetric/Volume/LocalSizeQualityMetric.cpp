@@ -38,8 +38,7 @@
 using namespace MBMesquite;
 
 //! Calculate the area of the triangle formed by the three vertices.
-static inline double compute_corner_area( PatchData& pd, size_t vert_1, size_t vert_2,
-                                          size_t vert_3, MsqError& err )
+static inline double compute_corner_area( PatchData& pd, size_t vert_1, size_t vert_2, size_t vert_3, MsqError& err )
 {
     const MsqVertex* verts = pd.get_vertex_array( err );
     Vector3D         vec_1 = verts[ vert_2 ] - verts[ vert_1 ];
@@ -49,8 +48,8 @@ static inline double compute_corner_area( PatchData& pd, size_t vert_1, size_t v
 }
 
 //! Calculate the volume of the tetrahedron formed by the four vertices.
-static inline double compute_corner_volume( PatchData& pd, size_t vert_1, size_t vert_2,
-                                            size_t vert_3, size_t vert_4, MsqError& err )
+static inline double compute_corner_volume( PatchData& pd, size_t vert_1, size_t vert_2, size_t vert_3, size_t vert_4,
+                                            MsqError& err )
 {
     const MsqVertex* verts = pd.get_vertex_array( err );
     Vector3D         vec_1 = verts[ vert_2 ] - verts[ vert_1 ];
@@ -79,8 +78,7 @@ int LocalSizeQualityMetric::get_negate_flag( ) const
   volume of all the element corners connected to this vertex.  For
   vertices attached to pyramid elements, this metric is undefined.
 */
-bool LocalSizeQualityMetric::evaluate( PatchData& pd, size_t this_vert, double& fval,
-                                       MsqError& err )
+bool LocalSizeQualityMetric::evaluate( PatchData& pd, size_t this_vert, double& fval, MsqError& err )
 {
     fval = 0.0;
     // get the element array
@@ -122,15 +120,13 @@ bool LocalSizeQualityMetric::evaluate( PatchData& pd, size_t this_vert, double& 
         {
                 // if a surface element, compute the corner area
             case 2:
-                met_vals[ i ] = compute_corner_area( pd, this_vert, other_vertices[ 0 ],
-                                                     other_vertices[ 1 ], err );
+                met_vals[ i ] = compute_corner_area( pd, this_vert, other_vertices[ 0 ], other_vertices[ 1 ], err );
                 MSQ_ERRZERO( err );
                 break;
                 // if a volume element, compute the corner volume
             case 3:
-                met_vals[ i ] =
-                    compute_corner_volume( pd, this_vert, other_vertices[ 0 ], other_vertices[ 1 ],
-                                           other_vertices[ 2 ], err );
+                met_vals[ i ] = compute_corner_volume( pd, this_vert, other_vertices[ 0 ], other_vertices[ 1 ],
+                                                       other_vertices[ 2 ], err );
                 MSQ_ERRZERO( err );
                 break;
             default:

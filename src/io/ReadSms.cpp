@@ -53,8 +53,7 @@ ReaderIface* ReadSms::factory( Interface* iface )
     return new ReadSms( iface );
 }
 
-ReadSms::ReadSms( Interface* impl )
-    : mdbImpl( impl ), globalId( 0 ), paramCoords( 0 ), geomDimension( 0 ), setId( 0 )
+ReadSms::ReadSms( Interface* impl ) : mdbImpl( impl ), globalId( 0 ), paramCoords( 0 ), geomDimension( 0 ), setId( 0 )
 {
     mdbImpl->query_interface( readMeshIface );
 }
@@ -69,19 +68,16 @@ ReadSms::~ReadSms( )
 }
 
 ErrorCode ReadSms::read_tag_values( const char* /* file_name */, const char* /* tag_name */,
-                                    const FileOptions& /* opts */,
-                                    std::vector< int >& /* tag_values_out */,
+                                    const FileOptions& /* opts */, std::vector< int >& /* tag_values_out */,
                                     const SubsetList* /* subset_list */ )
 {
     return MB_NOT_IMPLEMENTED;
 }
 
-ErrorCode ReadSms::load_file( const char* filename, const EntityHandle* /* file_set */,
-                              const FileOptions& /* opts */,
+ErrorCode ReadSms::load_file( const char* filename, const EntityHandle* /* file_set */, const FileOptions& /* opts */,
                               const ReaderIface::SubsetList* subset_list, const Tag* file_id_tag )
 {
-    if( subset_list )
-    { MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "Reading subset of files not supported for Sms" ); }
+    if( subset_list ) { MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "Reading subset of files not supported for Sms" ); }
 
     setId = 1;
 
@@ -102,8 +98,8 @@ ErrorCode ReadSms::load_file_impl( FILE* file_ptr, const Tag* file_id_tag )
 
     globalId = mdbImpl->globalId_tag( );
 
-    ErrorCode result = mdbImpl->tag_get_handle( "PARAMETER_COORDS", 3, MB_TYPE_DOUBLE, paramCoords,
-                                                MB_TAG_DENSE | MB_TAG_CREAT );
+    ErrorCode result =
+        mdbImpl->tag_get_handle( "PARAMETER_COORDS", 3, MB_TYPE_DOUBLE, paramCoords, MB_TAG_DENSE | MB_TAG_CREAT );
     CHECK( "Failed to create param coords tag." );
 
     int negone = -1;
@@ -127,8 +123,7 @@ ErrorCode ReadSms::load_file_impl( FILE* file_ptr, const Tag* file_id_tag )
     int nregions, nfaces, nedges, nvertices, npoints;
     n = fscanf( file_ptr, "%d %d %d %d %d", &nregions, &nfaces, &nedges, &nvertices, &npoints );
     CHECKN( 5 );
-    if( nregions < 0 || nfaces < 0 || nedges < 0 || nvertices < 0 || npoints < 0 )
-        return MB_FILE_WRITE_ERROR;
+    if( nregions < 0 || nfaces < 0 || nedges < 0 || nvertices < 0 || npoints < 0 ) return MB_FILE_WRITE_ERROR;
 
     // Create the vertices
     std::vector< double* > coord_arrays;
@@ -152,8 +147,8 @@ ErrorCode ReadSms::load_file_impl( FILE* file_ptr, const Tag* file_id_tag )
         CHECKN( 1 );
         if( !gent_id ) continue;
 
-        n = fscanf( file_ptr, "%d %d %lf %lf %lf", &gent_type, &num_connections,
-                    coord_arrays[ 0 ] + i, coord_arrays[ 1 ] + i, coord_arrays[ 2 ] + i );
+        n = fscanf( file_ptr, "%d %d %lf %lf %lf", &gent_type, &num_connections, coord_arrays[ 0 ] + i,
+                    coord_arrays[ 1 ] + i, coord_arrays[ 2 ] + i );
         CHECKN( 5 );
 
         result = get_set( gentities, gent_type, gent_id, geomDimension, this_gent, file_id_tag );MB_CHK_ERR( result );
@@ -204,8 +199,7 @@ ErrorCode ReadSms::load_file_impl( FILE* file_ptr, const Tag* file_id_tag )
         CHECKN( 1 );
         if( !gent_id ) continue;
 
-        n = fscanf( file_ptr, "%d %d %d %d %d", &gent_type, &vert1, &vert2, &num_connections,
-                    &num_pts );
+        n = fscanf( file_ptr, "%d %d %d %d %d", &gent_type, &vert1, &vert2, &num_connections, &num_pts );
         CHECKN( 5 );
         if( vert1 < 1 || vert1 > nvertices ) return MB_FILE_WRITE_ERROR;
         if( vert2 < 1 || vert2 > nvertices ) return MB_FILE_WRITE_ERROR;
@@ -294,8 +288,8 @@ ErrorCode ReadSms::load_file_impl( FILE* file_ptr, const Tag* file_id_tag )
             shverts.clear( );
         }
 
-        result = mdbImpl->create_element( ( EntityType )( MBTRI + num_bounding - 3 ),
-                                          &bound_verts[ 0 ], bound_verts.size( ), new_faces[ i ] );
+        result = mdbImpl->create_element( ( EntityType )( MBTRI + num_bounding - 3 ), &bound_verts[ 0 ],
+                                          bound_verts.size( ), new_faces[ i ] );
         CHECK( "Failed to create edge." );
 
         result = mdbImpl->add_entities( this_gent, &new_faces[ i ], 1 );
@@ -362,13 +356,12 @@ ErrorCode ReadSms::load_file_impl( FILE* file_ptr, const Tag* file_id_tag )
         }
 
         EntityType etype;
-        result = readMeshIface->get_ordered_vertices( &bound_ents[ 0 ], sense, num_bounding, 3,
-                                                      &bound_verts[ 0 ], etype );
+        result =
+            readMeshIface->get_ordered_vertices( &bound_ents[ 0 ], sense, num_bounding, 3, &bound_verts[ 0 ], etype );
         CHECK( "Failed in get_ordered_vertices." );
 
         // Make the element
-        result = mdbImpl->create_element( etype, &bound_verts[ 0 ], CN::VerticesPerEntity( etype ),
-                                          new_handle );
+        result = mdbImpl->create_element( etype, &bound_verts[ 0 ], CN::VerticesPerEntity( etype ), new_handle );
         CHECK( "Failed to create region." );
 
         result = mdbImpl->add_entities( this_gent, &new_handle, 1 );
@@ -411,8 +404,7 @@ ErrorCode ReadSms::get_set( std::vector< EntityHandle >* sets, int set_dim, int 
 
             if( file_id_tag )
             {
-                result =
-                    mdbImpl->tag_set_data( *file_id_tag, &sets[ set_dim ][ set_id ], 1, &setId );
+                result = mdbImpl->tag_set_data( *file_id_tag, &sets[ set_dim ][ set_id ], 1, &setId );
                 ++setId;
             }
         }
@@ -429,8 +421,7 @@ ErrorCode ReadSms::read_parallel_info( FILE* file_ptr )
 
     // Read partition info
     int nparts, part_id, num_ifaces, num_corner_ents;
-    int num_read =
-        fscanf( file_ptr, "%d %d %d %d", &nparts, &part_id, &num_ifaces, &num_corner_ents );
+    int num_read = fscanf( file_ptr, "%d %d %d %d", &nparts, &part_id, &num_ifaces, &num_corner_ents );
     if( !num_read ) return MB_FAILURE;
 
     // Read interfaces
@@ -439,8 +430,7 @@ ErrorCode ReadSms::read_parallel_info( FILE* file_ptr )
     std::vector< int >* iface_corners = NULL;
     for( int i = 0; i < num_ifaces; i++ )
     {
-        num_read = fscanf( file_ptr, "%d %d %d %d", &iface_id, &iface_dim, &iface_own,
-                           &num_iface_corners );
+        num_read = fscanf( file_ptr, "%d %d %d %d", &iface_id, &iface_dim, &iface_own, &num_iface_corners );
         if( !num_read ) return MB_FAILURE;
 
         // result = get_set(sets, iface_dim, iface_id, dim_tag, iface_own, this_iface);

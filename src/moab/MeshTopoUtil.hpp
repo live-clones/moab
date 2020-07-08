@@ -44,8 +44,7 @@ class MeshTopoUtil
     ErrorCode get_average_position( const EntityHandle entity, double* avg_position );
 
     //! given a set of entities, get their average position (avg vertex locations)
-    ErrorCode get_average_position( const EntityHandle* entities, const int num_entities,
-                                    double* avg_position );
+    ErrorCode get_average_position( const EntityHandle* entities, const int num_entities, double* avg_position );
 
     //! get (target_dim)-dimensional manifold entities connected to star_entity; that is,
     //! the entities with <= 1 connected (target_dim+2)-dimensional adjacent entities;
@@ -57,9 +56,8 @@ class MeshTopoUtil
     //! that entity, ordered by connection through next higher dimension entities;
     //! if any of the star entities is in only entity of next higher dimension,
     //! on_boundary is returned true
-    ErrorCode star_entities( const EntityHandle           star_center,
-                             std::vector< EntityHandle >& star_entities, bool& bdy_entity,
-                             const EntityHandle           starting_star_entity = 0,
+    ErrorCode star_entities( const EntityHandle star_center, std::vector< EntityHandle >& star_entities,
+                             bool& bdy_entity, const EntityHandle starting_star_entity = 0,
                              std::vector< EntityHandle >* star_entities_dp1 = NULL,
                              Range*                       star_entities_candidates_dp1 = NULL );
 
@@ -67,27 +65,26 @@ class MeshTopoUtil
     //! each star is on a (d+2)-manifold containing the d-dimensional entity; each star
     //! is either open or closed, and also defines a (d+2)-star whose entities are bounded by
     //! (d+1)-entities on the star and on the (d+2)-manifold
-    ErrorCode
-        star_entities_nonmanifold( const EntityHandle                          star_entity,
-                                   std::vector< std::vector< EntityHandle > >& stars,
-                                   std::vector< bool >*                        bdy_flags = NULL,
-                                   std::vector< std::vector< EntityHandle > >* dp2_stars = NULL );
+    ErrorCode star_entities_nonmanifold( const EntityHandle                          star_entity,
+                                         std::vector< std::vector< EntityHandle > >& stars,
+                                         std::vector< bool >*                        bdy_flags = NULL,
+                                         std::vector< std::vector< EntityHandle > >* dp2_stars = NULL );
 
     //! given a star_center, a last_entity (whose dimension should be 1 greater than center)
     //! and last_dp1 (dimension 2 higher than center), returns the next star entity across
     //! last_dp1, and the next dp1 entity sharing next_entity; if star_candidates is non-empty,
     //! star must come from those
     ErrorCode star_next_entity( const EntityHandle star_center, const EntityHandle last_entity,
-                                const EntityHandle last_dp1, Range* star_candidates_dp1,
-                                EntityHandle& next_entity, EntityHandle& next_dp1 );
+                                const EntityHandle last_dp1, Range* star_candidates_dp1, EntityHandle& next_entity,
+                                EntityHandle& next_dp1 );
 
     //! get "bridge" or "2nd order" adjacencies, going through dimension bridge_dim
-    ErrorCode get_bridge_adjacencies( Range& from_entities, int bridge_dim, int to_dim,
-                                      Range& to_ents, int num_layers = 1 );
+    ErrorCode get_bridge_adjacencies( Range& from_entities, int bridge_dim, int to_dim, Range& to_ents,
+                                      int num_layers = 1 );
 
     //! get "bridge" or "2nd order" adjacencies, going through dimension bridge_dim
-    ErrorCode get_bridge_adjacencies( const EntityHandle from_entity, const int bridge_dim,
-                                      const int to_dim, Range& to_adjs );
+    ErrorCode get_bridge_adjacencies( const EntityHandle from_entity, const int bridge_dim, const int to_dim,
+                                      Range& to_adjs );
 
     //! return a common entity of the specified dimension, or 0 if there isn't one
     EntityHandle common_entity( const EntityHandle ent1, const EntityHandle ent2, const int dim );
@@ -99,8 +96,7 @@ class MeshTopoUtil
     //! \param parent The parent element
     //! \param child The child element
     //! \param opposite_element The index of the opposite element
-    ErrorCode opposite_entity( const EntityHandle parent, const EntityHandle child,
-                               EntityHandle& opposite_element );
+    ErrorCode opposite_entity( const EntityHandle parent, const EntityHandle child, EntityHandle& opposite_element );
 
     //! split entity which is non-manifold, that is, which has > 2 connected entities
     //! of next higher dimension; assumes that there are >= 2 connected regions of
@@ -132,9 +128,8 @@ class MeshTopoUtil
                        remains on the boundary (i.e. not adj to any entity of higher
                        dimension).  Dimension of gowith_ents must be the same as entities.
     */
-    ErrorCode split_entities_manifold( EntityHandle* entities, const int num_entities,
-                                       EntityHandle* new_entities, Range* fill_entities,
-                                       EntityHandle* gowith_ents = NULL );
+    ErrorCode split_entities_manifold( EntityHandle* entities, const int num_entities, EntityHandle* new_entities,
+                                       Range* fill_entities, EntityHandle* gowith_ents = NULL );
 
     //! return whether entity is equivalent to any other of same type and same vertices;
     //! if equivalent entity is found, it's returned in equiv_ents and return value is true,

@@ -38,10 +38,7 @@
 namespace MBMesquite
 {
 
-ElementPMeanP::ElementPMeanP( double p, ElemSampleQM* metric )
-    : PMeanPMetric( p ), mMetric( metric )
-{
-}
+ElementPMeanP::ElementPMeanP( double p, ElemSampleQM* metric ) : PMeanPMetric( p ), mMetric( metric ) {}
 
 ElementPMeanP::~ElementPMeanP( ) {}
 
@@ -68,8 +65,7 @@ bool ElementPMeanP::evaluate( PatchData& pd, size_t handle, double& value, MsqEr
     return !MSQ_CHKERR( err ) && result;
 }
 
-bool ElementPMeanP::evaluate_with_gradient( PatchData& pd, size_t handle, double& value,
-                                            std::vector< size_t >&   indices,
+bool ElementPMeanP::evaluate_with_gradient( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
                                             std::vector< Vector3D >& gradient, MsqError& err )
 {
     ElemSampleQM* qm = get_quality_metric( );
@@ -80,10 +76,9 @@ bool ElementPMeanP::evaluate_with_gradient( PatchData& pd, size_t handle, double
     return !MSQ_CHKERR( err ) && result;
 }
 
-bool ElementPMeanP::evaluate_with_Hessian( PatchData& pd, size_t handle, double& value,
-                                           std::vector< size_t >&   indices,
-                                           std::vector< Vector3D >& gradient,
-                                           std::vector< Matrix3D >& Hessian, MsqError& err )
+bool ElementPMeanP::evaluate_with_Hessian( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
+                                           std::vector< Vector3D >& gradient, std::vector< Matrix3D >& Hessian,
+                                           MsqError& err )
 {
     ElemSampleQM* qm = get_quality_metric( );
     mHandles.clear( );
@@ -94,17 +89,14 @@ bool ElementPMeanP::evaluate_with_Hessian( PatchData& pd, size_t handle, double&
 }
 
 bool ElementPMeanP::evaluate_with_Hessian_diagonal( PatchData& pd, size_t handle, double& value,
-                                                    std::vector< size_t >&      indices,
-                                                    std::vector< Vector3D >&    gradient,
-                                                    std::vector< SymMatrix3D >& diagonal,
-                                                    MsqError&                   err )
+                                                    std::vector< size_t >& indices, std::vector< Vector3D >& gradient,
+                                                    std::vector< SymMatrix3D >& diagonal, MsqError& err )
 {
     ElemSampleQM* qm = get_quality_metric( );
     mHandles.clear( );
     qm->get_element_evaluations( pd, handle, mHandles, err );
     MSQ_ERRFALSE( err );
-    bool result =
-        average_with_Hessian_diagonal( pd, qm, mHandles, value, indices, gradient, diagonal, err );
+    bool result = average_with_Hessian_diagonal( pd, qm, mHandles, value, indices, gradient, diagonal, err );
     return !MSQ_CHKERR( err ) && result;
 }
 

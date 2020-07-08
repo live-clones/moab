@@ -82,8 +82,7 @@ int main( int argc, char* argv[] )
     int fail = MPI_Init( &argc, &argv );
     if( fail ) return 1;
 #else
-    argv[ 0 ] =
-        argv[ argc - argc ];  // To remove the warnings in serial mode about unused variables
+    argv[ 0 ] = argv[ argc - argc ];  // To remove the warnings in serial mode about unused variables
 #endif
 
     result += RUN_TEST( test_eul_read_write_T );
@@ -190,16 +189,14 @@ void test_eul_check_T( )
             filename = "test_eul_T.nc";
 
 #ifdef MOAB_HAVE_PNETCDF
-        success =
-            NCFUNC( open )( MPI_COMM_SELF, filename.c_str( ), NC_NOWRITE, MPI_INFO_NULL, &ncid );
+        success = NCFUNC( open )( MPI_COMM_SELF, filename.c_str( ), NC_NOWRITE, MPI_INFO_NULL, &ncid );
 #else
         success = NCFUNC( open )( filename.c_str( ), NC_NOWRITE, &ncid );
 #endif
         CHECK_EQUAL( 0, success );
 
 #ifdef MOAB_HAVE_PNETCDF
-        success = NCFUNC( open )( MPI_COMM_SELF, example_eul.c_str( ), NC_NOWRITE, MPI_INFO_NULL,
-                                  &ncid_ref );
+        success = NCFUNC( open )( MPI_COMM_SELF, example_eul.c_str( ), NC_NOWRITE, MPI_INFO_NULL, &ncid_ref );
 #else
         success = NCFUNC( open )( example_eul.c_str( ), NC_NOWRITE, &ncid_ref );
 #endif
@@ -351,16 +348,14 @@ void test_fv_check_T( )
             filename = "test_fv_T.nc";
 
 #ifdef MOAB_HAVE_PNETCDF
-        success =
-            NCFUNC( open )( MPI_COMM_SELF, filename.c_str( ), NC_NOWRITE, MPI_INFO_NULL, &ncid );
+        success = NCFUNC( open )( MPI_COMM_SELF, filename.c_str( ), NC_NOWRITE, MPI_INFO_NULL, &ncid );
 #else
         success = NCFUNC( open )( filename.c_str( ), NC_NOWRITE, &ncid );
 #endif
         CHECK_EQUAL( 0, success );
 
 #ifdef MOAB_HAVE_PNETCDF
-        success = NCFUNC( open )( MPI_COMM_SELF, example_fv.c_str( ), NC_NOWRITE, MPI_INFO_NULL,
-                                  &ncid_ref );
+        success = NCFUNC( open )( MPI_COMM_SELF, example_fv.c_str( ), NC_NOWRITE, MPI_INFO_NULL, &ncid_ref );
 #else
         success = NCFUNC( open )( example_fv.c_str( ), NC_NOWRITE, &ncid_ref );
 #endif
@@ -496,16 +491,14 @@ void test_homme_check_T( )
             filename = "test_homme_T.nc";
 
 #ifdef MOAB_HAVE_PNETCDF
-        success =
-            NCFUNC( open )( MPI_COMM_SELF, filename.c_str( ), NC_NOWRITE, MPI_INFO_NULL, &ncid );
+        success = NCFUNC( open )( MPI_COMM_SELF, filename.c_str( ), NC_NOWRITE, MPI_INFO_NULL, &ncid );
 #else
         success = NCFUNC( open )( filename.c_str( ), NC_NOWRITE, &ncid );
 #endif
         CHECK_EQUAL( 0, success );
 
 #ifdef MOAB_HAVE_PNETCDF
-        success = NCFUNC( open )( MPI_COMM_SELF, example_homme.c_str( ), NC_NOWRITE, MPI_INFO_NULL,
-                                  &ncid_ref );
+        success = NCFUNC( open )( MPI_COMM_SELF, example_homme.c_str( ), NC_NOWRITE, MPI_INFO_NULL, &ncid_ref );
 #else
         success = NCFUNC( open )( example_homme.c_str( ), NC_NOWRITE, &ncid_ref );
 #endif
@@ -659,16 +652,14 @@ void test_mpas_check_vars( )
             filename = "test_mpas_vars.nc";
 
 #ifdef MOAB_HAVE_PNETCDF
-        success =
-            NCFUNC( open )( MPI_COMM_SELF, filename.c_str( ), NC_NOWRITE, MPI_INFO_NULL, &ncid );
+        success = NCFUNC( open )( MPI_COMM_SELF, filename.c_str( ), NC_NOWRITE, MPI_INFO_NULL, &ncid );
 #else
         success = NCFUNC( open )( filename.c_str( ), NC_NOWRITE, &ncid );
 #endif
         CHECK_EQUAL( 0, success );
 
 #ifdef MOAB_HAVE_PNETCDF
-        success = NCFUNC( open )( MPI_COMM_SELF, example_mpas.c_str( ), NC_NOWRITE, MPI_INFO_NULL,
-                                  &ncid_ref );
+        success = NCFUNC( open )( MPI_COMM_SELF, example_mpas.c_str( ), NC_NOWRITE, MPI_INFO_NULL, &ncid_ref );
 #else
         success = NCFUNC( open )( example_mpas.c_str( ), NC_NOWRITE, &ncid_ref );
 #endif
@@ -724,8 +715,7 @@ void test_mpas_check_vars( )
 
         // Read vertex variable vorticity from reference file
         double vorticity_vals_ref[ size1 ];
-        success = NCFUNC( get_vara_double )( ncid_ref, vorticity_id_ref, start, count,
-                                             vorticity_vals_ref );
+        success = NCFUNC( get_vara_double )( ncid_ref, vorticity_id_ref, start, count, vorticity_vals_ref );
         CHECK_EQUAL( 0, success );
 
         // Read edge variable u from output file
@@ -852,16 +842,14 @@ void test_gcrm_check_vars( )
             filename = "test_gcrm_vars.nc";
 
 #ifdef MOAB_HAVE_PNETCDF
-        success =
-            NCFUNC( open )( MPI_COMM_SELF, filename.c_str( ), NC_NOWRITE, MPI_INFO_NULL, &ncid );
+        success = NCFUNC( open )( MPI_COMM_SELF, filename.c_str( ), NC_NOWRITE, MPI_INFO_NULL, &ncid );
 #else
         success = NCFUNC( open )( filename.c_str( ), NC_NOWRITE, &ncid );
 #endif
         CHECK_EQUAL( 0, success );
 
 #ifdef MOAB_HAVE_PNETCDF
-        success = NCFUNC( open )( MPI_COMM_SELF, example_gcrm.c_str( ), NC_NOWRITE, MPI_INFO_NULL,
-                                  &ncid_ref );
+        success = NCFUNC( open )( MPI_COMM_SELF, example_gcrm.c_str( ), NC_NOWRITE, MPI_INFO_NULL, &ncid_ref );
 #else
         success = NCFUNC( open )( example_gcrm.c_str( ), NC_NOWRITE, &ncid_ref );
 #endif
@@ -947,8 +935,7 @@ void test_gcrm_check_vars( )
 
         // Read cell variable vorticity from reference file
         double vorticity_vals_ref[ size3 ];
-        success = NCFUNC( get_vara_double )( ncid_ref, vorticity_id_ref, start, count,
-                                             vorticity_vals_ref );
+        success = NCFUNC( get_vara_double )( ncid_ref, vorticity_id_ref, start, count, vorticity_vals_ref );
         CHECK_EQUAL( 0, success );
 
         // Read cell variable pressure from output file
@@ -958,8 +945,7 @@ void test_gcrm_check_vars( )
 
         // Read cell variable pressure from reference file
         double pressure_vals_ref[ size3 ];
-        success =
-            NCFUNC( get_vara_double )( ncid_ref, pressure_id_ref, start, count, pressure_vals_ref );
+        success = NCFUNC( get_vara_double )( ncid_ref, pressure_id_ref, start, count, pressure_vals_ref );
         CHECK_EQUAL( 0, success );
 
 #ifdef MOAB_HAVE_PNETCDF
@@ -1062,16 +1048,14 @@ void test_eul_check_timestep( )
             filename = "test_eul_T2.nc";
 
 #ifdef MOAB_HAVE_PNETCDF
-        success =
-            NCFUNC( open )( MPI_COMM_SELF, filename.c_str( ), NC_NOWRITE, MPI_INFO_NULL, &ncid );
+        success = NCFUNC( open )( MPI_COMM_SELF, filename.c_str( ), NC_NOWRITE, MPI_INFO_NULL, &ncid );
 #else
         success = NCFUNC( open )( filename.c_str( ), NC_NOWRITE, &ncid );
 #endif
         CHECK_EQUAL( 0, success );
 
 #ifdef MOAB_HAVE_PNETCDF
-        success = NCFUNC( open )( MPI_COMM_SELF, example_eul.c_str( ), NC_NOWRITE, MPI_INFO_NULL,
-                                  &ncid_ref );
+        success = NCFUNC( open )( MPI_COMM_SELF, example_eul.c_str( ), NC_NOWRITE, MPI_INFO_NULL, &ncid_ref );
 #else
         success = NCFUNC( open )( example_eul.c_str( ), NC_NOWRITE, &ncid_ref );
 #endif
@@ -1224,16 +1208,14 @@ void test_eul_check_append( )
             filename = "test_eul_append.nc";
 
 #ifdef MOAB_HAVE_PNETCDF
-        success =
-            NCFUNC( open )( MPI_COMM_SELF, filename.c_str( ), NC_NOWRITE, MPI_INFO_NULL, &ncid );
+        success = NCFUNC( open )( MPI_COMM_SELF, filename.c_str( ), NC_NOWRITE, MPI_INFO_NULL, &ncid );
 #else
         success = NCFUNC( open )( filename.c_str( ), NC_NOWRITE, &ncid );
 #endif
         CHECK_EQUAL( 0, success );
 
 #ifdef MOAB_HAVE_PNETCDF
-        success = NCFUNC( open )( MPI_COMM_SELF, example_eul.c_str( ), NC_NOWRITE, MPI_INFO_NULL,
-                                  &ncid_ref );
+        success = NCFUNC( open )( MPI_COMM_SELF, example_eul.c_str( ), NC_NOWRITE, MPI_INFO_NULL, &ncid_ref );
 #else
         success = NCFUNC( open )( example_eul.c_str( ), NC_NOWRITE, &ncid_ref );
 #endif
@@ -1414,16 +1396,14 @@ void test_eul_check_across_files( )
             filename = "test_eul_across_files.nc";
 
 #ifdef MOAB_HAVE_PNETCDF
-        success =
-            NCFUNC( open )( MPI_COMM_SELF, filename.c_str( ), NC_NOWRITE, MPI_INFO_NULL, &ncid );
+        success = NCFUNC( open )( MPI_COMM_SELF, filename.c_str( ), NC_NOWRITE, MPI_INFO_NULL, &ncid );
 #else
         success = NCFUNC( open )( filename.c_str( ), NC_NOWRITE, &ncid );
 #endif
         CHECK_EQUAL( 0, success );
 
 #ifdef MOAB_HAVE_PNETCDF
-        success = NCFUNC( open )( MPI_COMM_SELF, example_eul.c_str( ), NC_NOWRITE, MPI_INFO_NULL,
-                                  &ncid_ref );
+        success = NCFUNC( open )( MPI_COMM_SELF, example_eul.c_str( ), NC_NOWRITE, MPI_INFO_NULL, &ncid_ref );
 #else
         success = NCFUNC( open )( example_eul.c_str( ), NC_NOWRITE, &ncid_ref );
 #endif
@@ -1547,16 +1527,14 @@ void test_eul_check_ghosting( )
             filename = "test_eul_ghosting.nc";
 
 #ifdef MOAB_HAVE_PNETCDF
-        success =
-            NCFUNC( open )( MPI_COMM_SELF, filename.c_str( ), NC_NOWRITE, MPI_INFO_NULL, &ncid );
+        success = NCFUNC( open )( MPI_COMM_SELF, filename.c_str( ), NC_NOWRITE, MPI_INFO_NULL, &ncid );
 #else
         success = NCFUNC( open )( filename.c_str( ), NC_NOWRITE, &ncid );
 #endif
         CHECK_EQUAL( 0, success );
 
 #ifdef MOAB_HAVE_PNETCDF
-        success = NCFUNC( open )( MPI_COMM_SELF, example_eul.c_str( ), NC_NOWRITE, MPI_INFO_NULL,
-                                  &ncid_ref );
+        success = NCFUNC( open )( MPI_COMM_SELF, example_eul.c_str( ), NC_NOWRITE, MPI_INFO_NULL, &ncid_ref );
 #else
         success = NCFUNC( open )( example_eul.c_str( ), NC_NOWRITE, &ncid_ref );
 #endif

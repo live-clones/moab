@@ -101,25 +101,21 @@ class FauxMetric : public ElemSampleQM
     void get_evaluations( PatchData& pd, std::vector< size_t >& h, bool free, MsqError& );
     void get_element_evaluations( PatchData&, size_t, std::vector< size_t >&, MsqError& );
     bool evaluate( PatchData& pd, size_t h, double& v, MsqError& err );
-    bool evaluate_with_indices( PatchData& pd, size_t h, double& v, std::vector< size_t >& indices,
-                                MsqError& err );
+    bool evaluate_with_indices( PatchData& pd, size_t h, double& v, std::vector< size_t >& indices, MsqError& err );
     bool evaluate_with_gradient( PatchData& pd, size_t h, double& v, std::vector< size_t >& indices,
                                  std::vector< Vector3D >& grads, MsqError& err );
     bool evaluate_with_Hessian( PatchData& pd, size_t h, double& v, std::vector< size_t >& indices,
-                                std::vector< Vector3D >& grad, std::vector< Matrix3D >& Hess,
-                                MsqError& err );
+                                std::vector< Vector3D >& grad, std::vector< Matrix3D >& Hess, MsqError& err );
 };
 
-void FauxMetric::get_evaluations( PatchData& pd, std::vector< size_t >& h, bool free,
-                                  MsqError& err )
+void FauxMetric::get_evaluations( PatchData& pd, std::vector< size_t >& h, bool free, MsqError& err )
 {
     h.clear( );
     for( size_t i = 0; i < pd.num_elements( ); ++i )
         get_element_evaluations( pd, i, h, err );
 }
 
-void FauxMetric::get_element_evaluations( PatchData& pd, size_t h, std::vector< size_t >& list,
-                                          MsqError& )
+void FauxMetric::get_element_evaluations( PatchData& pd, size_t h, std::vector< size_t >& list, MsqError& )
 {
     MsqMeshEntity& elem = pd.element_by_index( h );
     for( unsigned i = 0; i < elem.corner_count( ); ++i )
@@ -136,8 +132,8 @@ bool FauxMetric::evaluate( PatchData& pd, size_t h, double& v, MsqError& )
     return true;
 }
 
-bool FauxMetric::evaluate_with_indices( PatchData& pd, size_t h, double& v,
-                                        std::vector< size_t >& indices, MsqError& err )
+bool FauxMetric::evaluate_with_indices( PatchData& pd, size_t h, double& v, std::vector< size_t >& indices,
+                                        MsqError& err )
 {
     evaluate( pd, h, v, err );
     indices.resize( 3 );
@@ -152,8 +148,7 @@ bool FauxMetric::evaluate_with_indices( PatchData& pd, size_t h, double& v,
     return true;
 }
 
-bool FauxMetric::evaluate_with_gradient( PatchData& pd, size_t h, double& v,
-                                         std::vector< size_t >&   indices,
+bool FauxMetric::evaluate_with_gradient( PatchData& pd, size_t h, double& v, std::vector< size_t >& indices,
                                          std::vector< Vector3D >& grads, MsqError& err )
 {
     evaluate_with_indices( pd, h, v, indices, err );
@@ -163,18 +158,15 @@ bool FauxMetric::evaluate_with_gradient( PatchData& pd, size_t h, double& v,
     return true;
 }
 
-bool FauxMetric::evaluate_with_Hessian( PatchData& pd, size_t h, double& v,
-                                        std::vector< size_t >&   indices,
-                                        std::vector< Vector3D >& grad,
-                                        std::vector< Matrix3D >& hess, MsqError& err )
+bool FauxMetric::evaluate_with_Hessian( PatchData& pd, size_t h, double& v, std::vector< size_t >& indices,
+                                        std::vector< Vector3D >& grad, std::vector< Matrix3D >& hess, MsqError& err )
 {
     evaluate_with_gradient( pd, h, v, indices, grad, err );
     hess.clear( );
     for( unsigned r = 0; r < indices.size( ); ++r )
         for( unsigned c = r; c < indices.size( ); ++c )
-            hess.push_back( Matrix3D( indices[ r ], indices[ c ], indices[ r ] + indices[ c ],
-                                      indices[ r ], 1.0, indices[ r ] + indices[ c ],
-                                      2 * indices[ r ], 2 * indices[ c ], indices[ c ] ) );
+            hess.push_back( Matrix3D( indices[ r ], indices[ c ], indices[ r ] + indices[ c ], indices[ r ], 1.0,
+                                      indices[ r ] + indices[ c ], 2 * indices[ r ], 2 * indices[ c ], indices[ c ] ) );
     return true;
 }
 
@@ -526,10 +518,8 @@ void PMeanPMetricTest::test_hessian( )
             else
             {
                 unsigned idx = indices3.size( ) * c - c * ( c + 1 ) / 2 + r;
-                CPPUNIT_ASSERT_MATRICES_EQUAL( transpose( expected1[ H_idx ] ), hess3[ idx ],
-                                               1e-5 );
-                CPPUNIT_ASSERT_MATRICES_EQUAL( transpose( expected2[ H_idx ] ), hess4[ idx ],
-                                               1e-5 );
+                CPPUNIT_ASSERT_MATRICES_EQUAL( transpose( expected1[ H_idx ] ), hess3[ idx ], 1e-5 );
+                CPPUNIT_ASSERT_MATRICES_EQUAL( transpose( expected2[ H_idx ] ), hess4[ idx ], 1e-5 );
             }
         }
     }

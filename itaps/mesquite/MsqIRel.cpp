@@ -106,8 +106,8 @@ void MsqIRel::element_normal_at( Mesh::ElementHandle handle, Vector3D& coordinat
     MsqIRel::vertex_normal_at( handle, coordinate );
 }
 
-void MsqIRel::vertex_normal_at( const Mesh::VertexHandle* handle, Vector3D coordinates[],
-                                unsigned count, MsqError& err ) const
+void MsqIRel::vertex_normal_at( const Mesh::VertexHandle* handle, Vector3D coordinates[], unsigned count,
+                                MsqError& err ) const
 {
     int                ierr, dim;
     iBase_EntityHandle geom;
@@ -136,8 +136,8 @@ void MsqIRel::vertex_normal_at( const Mesh::VertexHandle* handle, Vector3D coord
     }
 }
 
-void MsqIRel::domain_DoF( const Mesh::VertexHandle* handle_array, unsigned short* dof_array,
-                          size_t count, MsqError& err ) const
+void MsqIRel::domain_DoF( const Mesh::VertexHandle* handle_array, unsigned short* dof_array, size_t count,
+                          MsqError& err ) const
 {
     int ierr;
 
@@ -150,8 +150,8 @@ void MsqIRel::domain_DoF( const Mesh::VertexHandle* handle_array, unsigned short
     }
 }
 
-void MsqIRel::closest_point( Mesh::VertexHandle handle, const Vector3D& position, Vector3D& closest,
-                             Vector3D& p_normal, MsqError& err ) const
+void MsqIRel::closest_point( Mesh::VertexHandle handle, const Vector3D& position, Vector3D& closest, Vector3D& p_normal,
+                             MsqError& err ) const
 {
     int                ierr, dim;
     iBase_EntityHandle geom;
@@ -177,13 +177,12 @@ void MsqIRel::closest_point( Mesh::VertexHandle handle, const Vector3D& position
     }
 }
 
-int MsqIRel::geom_from_mesh( Mesh::EntityHandle mesh_ent_handle, iBase_EntityHandle& geom_handle,
-                             int& geom_dim ) const
+int MsqIRel::geom_from_mesh( Mesh::EntityHandle mesh_ent_handle, iBase_EntityHandle& geom_handle, int& geom_dim ) const
 {
     // get geometric entity
     int ierr;
-    iRel_getEntEntRelation( relateIface, relateInstance, (iBase_EntityHandle)mesh_ent_handle, true,
-                            &geom_handle, &ierr );
+    iRel_getEntEntRelation( relateIface, relateInstance, (iBase_EntityHandle)mesh_ent_handle, true, &geom_handle,
+                            &ierr );
     if( iBase_SUCCESS != ierr ) return ierr;
 
     // get dimension of geometric entities
@@ -194,8 +193,8 @@ int MsqIRel::geom_from_mesh( Mesh::EntityHandle mesh_ent_handle, iBase_EntityHan
     return iBase_SUCCESS;
 }
 
-int MsqIRel::geom_from_mesh( const Mesh::EntityHandle* handles, iBase_EntityHandle* geom_handles,
-                             unsigned short* dims, size_t count ) const
+int MsqIRel::geom_from_mesh( const Mesh::EntityHandle* handles, iBase_EntityHandle* geom_handles, unsigned short* dims,
+                             size_t count ) const
 {
     int ierr, dim;
     for( size_t i = 0; i < count; ++i )

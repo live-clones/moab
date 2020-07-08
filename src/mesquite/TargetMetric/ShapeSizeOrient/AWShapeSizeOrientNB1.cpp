@@ -46,16 +46,15 @@ std::string AWShapeSizeOrientNB1::get_name( ) const
 AWShapeSizeOrientNB1::~AWShapeSizeOrientNB1( ) {}
 
 template< unsigned DIM >
-static inline bool eval( const MsqMatrix< DIM, DIM >& A, const MsqMatrix< DIM, DIM >& W,
-                         double& result )
+static inline bool eval( const MsqMatrix< DIM, DIM >& A, const MsqMatrix< DIM, DIM >& W, double& result )
 {
     result = sqr_Frobenius( A - W );
     return true;
 }
 
 template< unsigned DIM >
-static inline bool grad( const MsqMatrix< DIM, DIM >& A, const MsqMatrix< DIM, DIM >& W,
-                         double& result, MsqMatrix< DIM, DIM >& deriv )
+static inline bool grad( const MsqMatrix< DIM, DIM >& A, const MsqMatrix< DIM, DIM >& W, double& result,
+                         MsqMatrix< DIM, DIM >& deriv )
 {
     deriv = A - W;
     result = sqr_Frobenius( deriv );
@@ -64,9 +63,8 @@ static inline bool grad( const MsqMatrix< DIM, DIM >& A, const MsqMatrix< DIM, D
 }
 
 template< unsigned DIM >
-static inline bool hess( const MsqMatrix< DIM, DIM >& A, const MsqMatrix< DIM, DIM >& W,
-                         double& result, MsqMatrix< DIM, DIM >& deriv,
-                         MsqMatrix< DIM, DIM >* second )
+static inline bool hess( const MsqMatrix< DIM, DIM >& A, const MsqMatrix< DIM, DIM >& W, double& result,
+                         MsqMatrix< DIM, DIM >& deriv, MsqMatrix< DIM, DIM >* second )
 {
     deriv = A - W;
     result = sqr_Frobenius( deriv );

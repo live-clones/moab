@@ -67,8 +67,7 @@ class TMetricNonBarrier2D : public TMetric
      *
      * This method always returns an error for 2D-only metrics
      */
-    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 3, 3 >& T, double& result,
-                                           MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 3, 3 >& T, double& result, MsqError& err );
 };
 
 class TMetricNonBarrier3D : public TMetric
@@ -80,8 +79,7 @@ class TMetricNonBarrier3D : public TMetric
      *
      * This method always returns an error for 3D-only metrics
      */
-    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 2, 2 >& T, double& result,
-                                           MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 2, 2 >& T, double& result, MsqError& err );
 };
 
 }  // namespace MBMesquite

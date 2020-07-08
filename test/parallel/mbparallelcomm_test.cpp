@@ -51,9 +51,9 @@ ErrorCode create_linear_mesh( Interface* mbImpl, int N, int M, int& nshared );
 
 ErrorCode create_scd_mesh( Interface* mbImpl, int IJK, int& nshared );
 
-ErrorCode read_file( Interface* mbImpl, std::vector< std::string >& filenames, const char* tag_name,
-                     int tag_val, int distrib, int parallel_option, int resolve_shared,
-                     int with_ghosts, int use_mpio, bool print_parallel );
+ErrorCode read_file( Interface* mbImpl, std::vector< std::string >& filenames, const char* tag_name, int tag_val,
+                     int distrib, int parallel_option, int resolve_shared, int with_ghosts, int use_mpio,
+                     bool print_parallel );
 
 ErrorCode test_packing( Interface* mbImpl, const char* filename );
 
@@ -94,9 +94,9 @@ int main( int argc, char** argv )
         return 1;
     }
 
-    int         npos = 1, tag_val, distrib, with_ghosts = 1, resolve_shared = 1, use_mpio = 0;
-    bool        print_parallel = false;
-    const char* tag_name;
+    int                        npos = 1, tag_val, distrib, with_ghosts = 1, resolve_shared = 1, use_mpio = 0;
+    bool                       print_parallel = false;
+    const char*                tag_name;
     std::vector< std::string > filenames;
     int                        parallel_option = 0;
     int                        num_files;
@@ -139,9 +139,8 @@ int main( int argc, char** argv )
                 if( npos < argc ) with_ghosts = strtol( argv[ npos++ ], NULL, 0 );
                 if( npos < argc ) use_mpio = strtol( argv[ npos++ ], NULL, 0 );
 
-                tmp_result =
-                    read_file( mbImpl, filenames, tag_name, tag_val, distrib, parallel_option,
-                               resolve_shared, with_ghosts, use_mpio, print_parallel );
+                tmp_result = read_file( mbImpl, filenames, tag_name, tag_val, distrib, parallel_option, resolve_shared,
+                                        with_ghosts, use_mpio, print_parallel );
                 if( MB_SUCCESS != tmp_result )
                 {
                     result = tmp_result;
@@ -171,9 +170,8 @@ int main( int argc, char** argv )
                 resolve_shared = 1;
                 while( npos < argc )
                     filenames.push_back( std::string( argv[ npos++ ] ) );
-                tmp_result =
-                    read_file( mbImpl, filenames, tag_name, tag_val, distrib, parallel_option,
-                               resolve_shared, with_ghosts, use_mpio, print_parallel );
+                tmp_result = read_file( mbImpl, filenames, tag_name, tag_val, distrib, parallel_option, resolve_shared,
+                                        with_ghosts, use_mpio, print_parallel );
                 if( MB_SUCCESS != tmp_result )
                 {
                     result = tmp_result;
@@ -271,23 +269,22 @@ ErrorCode report_nsets( Interface* mbImpl )
     }
     std::cout << "Proc " << rank << ": Total of " << nsets << " entity sets." << std::endl;
 
-#define PRINTSETS( a, b, c, p )                                                       \
-    if( a )                                                                           \
-    {                                                                                 \
-        result = mbImpl->get_entities_by_type_and_tag( 0, MBENTITYSET, &a, p, 1, b ); \
-        if( !b.empty( ) )                                                             \
-        {                                                                             \
-            std::vector< int > ids( b.size( ) );                                      \
-            result = mbImpl->tag_get_data( gidtag, b, &ids[ 0 ] );                    \
-            if( MB_SUCCESS == result )                                                \
-            {                                                                         \
-                std::cout << "Proc " << rank << ": " << c << " (total " << b.size( )  \
-                          << "): " << ids[ 0 ];                                       \
-                for( unsigned int i = 1; i < b.size( ); i++ )                         \
-                    std::cout << ", " << ids[ i ];                                    \
-                std::cout << std::endl;                                               \
-            }                                                                         \
-        }                                                                             \
+#define PRINTSETS( a, b, c, p )                                                                            \
+    if( a )                                                                                                \
+    {                                                                                                      \
+        result = mbImpl->get_entities_by_type_and_tag( 0, MBENTITYSET, &a, p, 1, b );                      \
+        if( !b.empty( ) )                                                                                  \
+        {                                                                                                  \
+            std::vector< int > ids( b.size( ) );                                                           \
+            result = mbImpl->tag_get_data( gidtag, b, &ids[ 0 ] );                                         \
+            if( MB_SUCCESS == result )                                                                     \
+            {                                                                                              \
+                std::cout << "Proc " << rank << ": " << c << " (total " << b.size( ) << "): " << ids[ 0 ]; \
+                for( unsigned int i = 1; i < b.size( ); i++ )                                              \
+                    std::cout << ", " << ids[ i ];                                                         \
+                std::cout << std::endl;                                                                    \
+            }                                                                                              \
+        }                                                                                                  \
     }
 
     PRINTSETS( mtag, matsets, "material sets", NULL );
@@ -324,9 +321,9 @@ ErrorCode report_nsets( Interface* mbImpl )
     return MB_SUCCESS;
 }
 
-ErrorCode read_file( Interface* mbImpl, std::vector< std::string >& filenames, const char* tag_name,
-                     int tag_val, int distrib, int parallel_option, int resolve_shared,
-                     int with_ghosts, int use_mpio, bool print_parallel )
+ErrorCode read_file( Interface* mbImpl, std::vector< std::string >& filenames, const char* tag_name, int tag_val,
+                     int distrib, int parallel_option, int resolve_shared, int with_ghosts, int use_mpio,
+                     bool print_parallel )
 {
     std::ostringstream options;
     switch( parallel_option )
@@ -441,8 +438,7 @@ ErrorCode test_packing( Interface* mbImpl, const char* filename )
     std::vector< unsigned int >                L2p;
 
     buff.reset_ptr( );
-    result = pcomm->unpack_buffer( buff.buff_ptr, false, -1, -1, L1hloc, L1hrem, L1p, L2hloc,
-                                   L2hrem, L2p, new_ents );
+    result = pcomm->unpack_buffer( buff.buff_ptr, false, -1, -1, L1hloc, L1hrem, L1p, L2hloc, L2hrem, L2p, new_ents );
     RRA( "Unpacking buffer (non-stored handles) failed." );
 
     return MB_SUCCESS;
@@ -458,8 +454,8 @@ ErrorCode report_iface_ents( Interface* mbImpl, std::vector< ParallelComm* >& pc
     for( unsigned int p = 0; p < pcs.size( ); p++ )
     {
         // get entities owned by this partition
-        for( Range::iterator rit = pcs[ p ]->partition_sets( ).begin( );
-             rit != pcs[ p ]->partition_sets( ).end( ); ++rit )
+        for( Range::iterator rit = pcs[ p ]->partition_sets( ).begin( ); rit != pcs[ p ]->partition_sets( ).end( );
+             ++rit )
         {
             tmp_result = mbImpl->get_entities_by_dimension( *rit, 3, part_ents, true );
             if( MB_SUCCESS != tmp_result ) result = tmp_result;
@@ -471,8 +467,8 @@ ErrorCode report_iface_ents( Interface* mbImpl, std::vector< ParallelComm* >& pc
 
             if( MB_SUCCESS != tmp_result )
             {
-                std::cerr << "get_iface_entities returned error on proc "
-                          << pcs[ p ]->proc_config( ).proc_rank( ) << "; message: " << std::endl;
+                std::cerr << "get_iface_entities returned error on proc " << pcs[ p ]->proc_config( ).proc_rank( )
+                          << "; message: " << std::endl;
                 std::string last_error;
                 result = mbImpl->get_last_error( last_error );
                 if( last_error.empty( ) )
@@ -502,18 +498,15 @@ ErrorCode report_iface_ents( Interface* mbImpl, std::vector< ParallelComm* >& pc
     tot_verts -= part_verts.size( );
 
     // report # iface entities
-    result =
-        mbImpl->get_adjacencies( iface_ents[ 4 ], 0, false, iface_ents[ 5 ], Interface::UNION );
+    result = mbImpl->get_adjacencies( iface_ents[ 4 ], 0, false, iface_ents[ 5 ], Interface::UNION );
 
     int rank;
     MPI_Comm_rank( MPI_COMM_WORLD, &rank );
 
     std::cerr << "Proc " << rank << " iface entities: " << std::endl;
     for( int i = 0; i < 4; i++ )
-        std::cerr << "    " << iface_ents[ i ].size( ) << " " << i << "d iface entities."
-                  << std::endl;
-    std::cerr << "    (" << iface_ents[ 5 ].size( ) << " verts adj to other iface ents)"
-              << std::endl;
+        std::cerr << "    " << iface_ents[ i ].size( ) << " " << i << "d iface entities." << std::endl;
+    std::cerr << "    (" << iface_ents[ 5 ].size( ) << " verts adj to other iface ents)" << std::endl;
     if( iface_ents[ 0 ].size( ) != iface_ents[ 5 ].size( ) )
         std::cerr << "WARNING: number of interface vertices don't agree with "
                   << "vertex adjacencies on interface entities." << std::endl;

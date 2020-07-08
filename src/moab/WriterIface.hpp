@@ -58,11 +58,10 @@ class WriterIface
      *                      from Interface should be used.
      *\author Jason Kraftcheck
      */
-    virtual ErrorCode write_file( const char* file_name, const bool overwrite,
-                                  const FileOptions& opts, const EntityHandle* meshset_list,
-                                  const int num_sets, const std::vector< std::string >& qa_records,
-                                  const Tag* tag_list = NULL, int num_tags = 0,
-                                  int requested_output_dimension = 3 ) = 0;
+    virtual ErrorCode write_file( const char* file_name, const bool overwrite, const FileOptions& opts,
+                                  const EntityHandle* meshset_list, const int num_sets,
+                                  const std::vector< std::string >& qa_records, const Tag* tag_list = NULL,
+                                  int num_tags = 0, int requested_output_dimension = 3 ) = 0;
 };
 
 }  // namespace moab

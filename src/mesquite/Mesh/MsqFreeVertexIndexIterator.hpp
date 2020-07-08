@@ -95,9 +95,7 @@ inline bool MsqFreeVertexIndexIterator::next( )
     ++iterCurrentIndex;
     while( iterCurrentIndex < iterOriginator.num_free_vertices( ) )
     {
-        if( !iterOriginator.vertex_by_index( iterCurrentIndex )
-                 .is_flag_set( MsqVertex::MSQ_CULLED ) )
-            return true;
+        if( !iterOriginator.vertex_by_index( iterCurrentIndex ).is_flag_set( MsqVertex::MSQ_CULLED ) ) return true;
         ++iterCurrentIndex;
     }
     return false;

@@ -45,10 +45,8 @@ C_FUNC_DEF double v_edge_length( int /*num_nodes*/, double coordinates[][ 3 ] )
   for an edge, there is only one metric, edge length.
 */
 
-C_FUNC_DEF void edge_quality( int num_nodes, double coordinates[][ 3 ],
-                              unsigned int           metrics_request_flag,
+C_FUNC_DEF void edge_quality( int num_nodes, double coordinates[][ 3 ], unsigned int metrics_request_flag,
                               struct EdgeMetricVals* metric_vals )
 {
-    if( metrics_request_flag & V_EDGE_LENGTH )
-        metric_vals->length = v_edge_length( num_nodes, coordinates );
+    if( metrics_request_flag & V_EDGE_LENGTH ) metric_vals->length = v_edge_length( num_nodes, coordinates );
 }

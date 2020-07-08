@@ -57,10 +57,7 @@ class EdgeLengthMetricTest : public CppUnit::TestFixture
     QualityMetricTester tester;
 
   public:
-    EdgeLengthMetricTest( )
-        : mMetric( 0.0 ), tester( QualityMetricTester::ALL_FE_EXCEPT_SEPTAHEDRON )
-    {
-    }
+    EdgeLengthMetricTest( ) : mMetric( 0.0 ), tester( QualityMetricTester::ALL_FE_EXCEPT_SEPTAHEDRON ) {}
 
     void test_supported_types( )
     {

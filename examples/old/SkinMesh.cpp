@@ -40,8 +40,7 @@ MBErrorCode skin_tris( MBInterface* mb, MBRange tris, MBRange& skin_edges )
     if( MB_SUCCESS != rval ) return rval;
     if( 0 != n_edges )
     {
-        std::cerr << "skin_tris: failed because " << n_edges << " edges exist in the MOAB instance"
-                  << std::endl;
+        std::cerr << "skin_tris: failed because " << n_edges << " edges exist in the MOAB instance" << std::endl;
         return MB_FAILURE;
     }
 

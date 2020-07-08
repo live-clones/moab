@@ -28,8 +28,7 @@ namespace moab
 using namespace std;
 
 FileTokenizer::FileTokenizer( FILE* file_ptr, ReadUtilIface* )
-    : filePtr( file_ptr ), nextToken( buffer ), bufferEnd( buffer ), lineNumber( 1 ),
-      lastChar( '\0' )
+    : filePtr( file_ptr ), nextToken( buffer ), bufferEnd( buffer ), lineNumber( 1 ), lastChar( '\0' )
 {
 }
 
@@ -134,8 +133,7 @@ bool FileTokenizer::get_double_internal( double& result )
     // will accept hex values, on others (e.g. Sun) it will not.  Force
     // failure on hex numbers for consistency.
     if( token[ 0 ] && token[ 1 ] && token[ 0 ] == '0' && toupper( token[ 1 ] ) == 'X' )
-        MB_SET_ERR_RET_VAL( "Syntax error at line " << line_number( ) << ": expected number, got \""
-                                                    << token << "\"",
+        MB_SET_ERR_RET_VAL( "Syntax error at line " << line_number( ) << ": expected number, got \"" << token << "\"",
                             false );
 
     // Parse token as double
@@ -145,8 +143,7 @@ bool FileTokenizer::get_double_internal( double& result )
     // not the NULL character terminating the string,
     // then parse failed.
     if( *token_end )
-        MB_SET_ERR_RET_VAL( "Syntax error at line " << line_number( ) << ": expected number, got \""
-                                                    << token << "\"",
+        MB_SET_ERR_RET_VAL( "Syntax error at line " << line_number( ) << ": expected number, got \"" << token << "\"",
                             false );
 
     return true;
@@ -175,8 +172,7 @@ bool FileTokenizer::get_long_int_internal( long& result )
     // not the NULL character terminating the string,
     // then parse failed.
     if( *token_end )
-        MB_SET_ERR_RET_VAL( "Syntax error at line " << line_number( ) << ": expected number, got \""
-                                                    << token << "\"",
+        MB_SET_ERR_RET_VAL( "Syntax error at line " << line_number( ) << ": expected number, got \"" << token << "\"",
                             false );
 
     return true;
@@ -188,8 +184,7 @@ bool FileTokenizer::get_byte_internal( unsigned char& result )
     if( !get_long_int_internal( i ) ) return false;
 
     result = (unsigned char)i;
-    if( i != (long)result )
-        MB_SET_ERR_RET_VAL( "Numeric overflow at line " << line_number( ), false );
+    if( i != (long)result ) MB_SET_ERR_RET_VAL( "Numeric overflow at line " << line_number( ), false );
 
     return true;
 }
@@ -200,8 +195,7 @@ bool FileTokenizer::get_short_int_internal( short& result )
     if( !get_long_int_internal( i ) ) return false;
 
     result = (short)i;
-    if( i != (long)result )
-        MB_SET_ERR_RET_VAL( "Numeric overflow at line " << line_number( ), false );
+    if( i != (long)result ) MB_SET_ERR_RET_VAL( "Numeric overflow at line " << line_number( ), false );
 
     return true;
 }
@@ -212,8 +206,7 @@ bool FileTokenizer::get_integer_internal( int& result )
     if( !get_long_int_internal( i ) ) return false;
 
     result = (int)i;
-    if( i != (long)result )
-        MB_SET_ERR_RET_VAL( "Numeric overflow at line " << line_number( ), false );
+    if( i != (long)result ) MB_SET_ERR_RET_VAL( "Numeric overflow at line " << line_number( ), false );
 
     return true;
 }
@@ -225,8 +218,7 @@ bool FileTokenizer::get_boolean_internal( bool& result )
     if( !token ) return false;
 
     if( token[ 1 ] || ( token[ 0 ] != '0' && token[ 0 ] != '1' ) )
-        MB_SET_ERR_RET_VAL( "Syntax error at line " << line_number( ) << ": expected 0 or 1, got \""
-                                                    << token << "\"",
+        MB_SET_ERR_RET_VAL( "Syntax error at line " << line_number( ) << ": expected 0 or 1, got \"" << token << "\"",
                             false );
 
     result = token[ 0 ] == '1';
@@ -337,8 +329,8 @@ bool FileTokenizer::match_token( const char* str, bool print_error )
 
     // Construct error message
     if( print_error )
-        MB_SET_ERR_CONT( "Syntax error at line " << line_number( ) << ": expected \"" << str
-                                                 << "\", got \"" << token << "\"" );
+        MB_SET_ERR_CONT( "Syntax error at line " << line_number( ) << ": expected \"" << str << "\", got \"" << token
+                                                 << "\"" );
 
     return false;
 }
@@ -408,8 +400,7 @@ bool FileTokenizer::get_newline( bool report_error )
 
         // If the current character is not a space, the we've failed.
         if( !isspace( *nextToken ) )
-            if( report_error )
-                MB_SET_ERR_RET_VAL( "Expected newline at line " << line_number( ), false );
+            if( report_error ) MB_SET_ERR_RET_VAL( "Expected newline at line " << line_number( ), false );
 
         // If the current space character is a newline,
         // increment the line number count.

@@ -17,8 +17,7 @@
     if( ierr != 0 ) std::cout << "iMesh Assert: \n";
 #define IMESH_NULL 0
 
-extern "C" void update_tracer( iMesh_Instance instance, iBase_EntitySetHandle imesh_euler_set,
-                               int* ierr );
+extern "C" void update_tracer( iMesh_Instance instance, iBase_EntitySetHandle imesh_euler_set, int* ierr );
 
 int main( int argc, char* argv[] )
 {
@@ -48,14 +47,12 @@ int main( int argc, char* argv[] )
     const char* filename = "HN16DP.h5m";  // the file should have the dp tag already
 
     if( 0 == rank ) std::cout << "Load in parallel the file: " << filename << std::endl;
-    iMeshP_loadAll( imesh, partn, root, filename, options, &ierr, strlen( filename ),
-                    strlen( options ) );
+    iMeshP_loadAll( imesh, partn, root, filename, options, &ierr, strlen( filename ), strlen( options ) );
     IMESH_ASSERT( ierr );
 
     iMesh_getNumEntSets( imesh, IMESH_NULL, 1, &num_sets, &ierr );
     IMESH_ASSERT( ierr );
-    std::cout << "There's " << num_sets << " entity sets here on process rank " << rank
-              << std::endl;
+    std::cout << "There's " << num_sets << " entity sets here on process rank " << rank << std::endl;
 
     iBase_EntitySetHandle euler_set;
 
@@ -66,8 +63,7 @@ int main( int argc, char* argv[] )
     int                 ents_alloc = 0;
     int                 ents_size = 0;
 
-    iMesh_getEntities( imesh, root, iBase_FACE, iMesh_ALL_TOPOLOGIES, &cells, &ents_alloc,
-                       &ents_size, &ierr );
+    iMesh_getEntities( imesh, root, iBase_FACE, iMesh_ALL_TOPOLOGIES, &cells, &ents_alloc, &ents_size, &ierr );
     IMESH_ASSERT( ierr );
 
     iMesh_addEntArrToSet( imesh, cells, ents_size, euler_set, &ierr );

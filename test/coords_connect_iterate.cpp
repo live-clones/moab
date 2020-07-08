@@ -162,8 +162,7 @@ void test_scd_invalid( )
     // should be able to get vertices used by this box
     Range verts;
     rval = mb.get_adjacencies( hexes, 0, false, verts, Interface::UNION );CHECK_ERR( rval );
-    CHECK_EQUAL( (int)verts.size( ),
-                 (int)( ( NUM_DIMS + 1 ) * ( NUM_DIMS + 1 ) * ( NUM_DIMS + 1 ) ) );
+    CHECK_EQUAL( (int)verts.size( ), (int)( ( NUM_DIMS + 1 ) * ( NUM_DIMS + 1 ) * ( NUM_DIMS + 1 ) ) );
 
     // should NOT be able to get connect iterator
     EntityHandle* connect;

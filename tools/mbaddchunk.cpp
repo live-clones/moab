@@ -60,8 +60,8 @@ int main( int argc, char* argv[] )
     Range cells;
     rval = mb->get_entities_by_dimension( 0, 2, cells );MB_CHK_SET_ERR( rval, "can't get cells" );
 
-    std::cout << " it has " << nodes.size( ) << " vertices " << edges.size( ) << " edges "
-              << cells.size( ) << " cells\n";
+    std::cout << " it has " << nodes.size( ) << " vertices " << edges.size( ) << " edges " << cells.size( )
+              << " cells\n";
 
     // construct maps between global id and handles
     std::map< int, EntityHandle > vGidHandle;
@@ -108,10 +108,8 @@ int main( int argc, char* argv[] )
         }
         Tag pTag, cTag;
         int def_val = -1;
-        rval = mb->tag_get_handle( "ProcID", 1, MB_TYPE_INTEGER, pTag, MB_TAG_CREAT | MB_TAG_DENSE,
-                                   &def_val );MB_CHK_SET_ERR( rval, "can't define processor tag" );
-        rval = mb->tag_get_handle( "ChunkID", 1, MB_TYPE_INTEGER, cTag, MB_TAG_CREAT | MB_TAG_DENSE,
-                                   &def_val );MB_CHK_SET_ERR( rval, "can't define chunk tag" );
+        rval = mb->tag_get_handle( "ProcID", 1, MB_TYPE_INTEGER, pTag, MB_TAG_CREAT | MB_TAG_DENSE, &def_val );MB_CHK_SET_ERR( rval, "can't define processor tag" );
+        rval = mb->tag_get_handle( "ChunkID", 1, MB_TYPE_INTEGER, cTag, MB_TAG_CREAT | MB_TAG_DENSE, &def_val );MB_CHK_SET_ERR( rval, "can't define chunk tag" );
 
         int proc, lcid, ncols;
         while( inFile >> proc )
@@ -145,11 +143,11 @@ int main( int argc, char* argv[] )
         Tag         pTag, cTag;
         int         def_val = -1;
         std::string procTagName = gsmapfile + "_proc";
-        rval = mb->tag_get_handle( procTagName.c_str( ), 1, MB_TYPE_INTEGER, pTag,
-                                   MB_TAG_CREAT | MB_TAG_DENSE, &def_val );MB_CHK_SET_ERR( rval, "can't define processor tag" );
+        rval =
+            mb->tag_get_handle( procTagName.c_str( ), 1, MB_TYPE_INTEGER, pTag, MB_TAG_CREAT | MB_TAG_DENSE, &def_val );MB_CHK_SET_ERR( rval, "can't define processor tag" );
         std::string segTagName = gsmapfile + "_seg";
-        rval = mb->tag_get_handle( segTagName.c_str( ), 1, MB_TYPE_INTEGER, cTag,
-                                   MB_TAG_CREAT | MB_TAG_DENSE, &def_val );MB_CHK_SET_ERR( rval, "can't define segment tag" );
+        rval =
+            mb->tag_get_handle( segTagName.c_str( ), 1, MB_TYPE_INTEGER, cTag, MB_TAG_CREAT | MB_TAG_DENSE, &def_val );MB_CHK_SET_ERR( rval, "can't define segment tag" );
 
         int compid, ngseg, gsize;
         inFile >> compid >> ngseg >> gsize;

@@ -36,8 +36,7 @@ namespace MBMesquite
 
 CylinderDomain::~CylinderDomain( ) {}
 
-void CylinderDomain::evaluate( Mesh::VertexHandle, const Vector3D& point, Vector3D& closest,
-                               Vector3D& normal ) const
+void CylinderDomain::evaluate( Mesh::VertexHandle, const Vector3D& point, Vector3D& closest, Vector3D& normal ) const
 {
     const double   EPSILON = std::numeric_limits< double >::epsilon( );
     double         t = mAxis % ( point - mCenter );
@@ -81,21 +80,19 @@ void CylinderDomain::element_normal_at( Mesh::ElementHandle h, Vector3D& v ) con
     CylinderDomain::evaluate( h, p, l, v );
 }
 
-void CylinderDomain::vertex_normal_at( const Mesh::VertexHandle* h, Vector3D coords[],
-                                       unsigned count, MsqError& ) const
+void CylinderDomain::vertex_normal_at( const Mesh::VertexHandle* h, Vector3D coords[], unsigned count, MsqError& ) const
 {
     for( unsigned i = 0; i < count; ++i )
         vertex_normal_at( h[ i ], coords[ i ] );
 }
 
-void CylinderDomain::closest_point( Mesh::VertexHandle handle, const Vector3D& position,
-                                    Vector3D& closest, Vector3D& normal, MsqError& ) const
+void CylinderDomain::closest_point( Mesh::VertexHandle handle, const Vector3D& position, Vector3D& closest,
+                                    Vector3D& normal, MsqError& ) const
 {
     evaluate( handle, position, closest, normal );
 }
 
-void CylinderDomain::domain_DoF( const Mesh::VertexHandle*, unsigned short* dof_array, size_t count,
-                                 MsqError& ) const
+void CylinderDomain::domain_DoF( const Mesh::VertexHandle*, unsigned short* dof_array, size_t count, MsqError& ) const
 {
     std::fill( dof_array, dof_array + count, (unsigned short)2 );
 }

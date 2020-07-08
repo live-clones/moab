@@ -78,8 +78,7 @@
 /**\def MB_DLL_HIDDEN
  *\brief Declare a function or class to be internal to a shared library.
  */
-#if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__ || defined __MINGW64__ || \
-    defined                                                                  _WIN32
+#if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__ || defined __MINGW64__ || defined _WIN32
 #if !defined IS_BUILDING_MB || !defined MB_EXPORTS
 #define MB_DLL_EXPORT __dllspec( dllexport )
 #elif !defined MB_WIN_DLL

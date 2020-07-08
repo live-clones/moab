@@ -30,21 +30,20 @@ void regression_svn1960( );
    referencing a SequnceData with the range [1,22000]
  */
 void make_basic_sequence( TypeSequenceManager& seq );
-void make_basic_sequence( TypeSequenceManager& seq, EntitySequence*& seq3to7,
-                          EntitySequence*& seq100to111, EntitySequence*& seq1001 );
+void make_basic_sequence( TypeSequenceManager& seq, EntitySequence*& seq3to7, EntitySequence*& seq100to111,
+                          EntitySequence*& seq1001 );
 
 /* Compare expected sequence contents to actual contents.
  * Also does some consistency checks.
  */
-bool seqman_equal( const EntityHandle pair_array[][ 2 ], unsigned num_pairs,
-                   const TypeSequenceManager& seqman );
+bool seqman_equal( const EntityHandle pair_array[][ 2 ], unsigned num_pairs, const TypeSequenceManager& seqman );
 
 /*
  * Insert a sequence into a sequence manager.  Delete passed
  * sequence (and optionally SequenceData) if insertion fails.
  */
-ErrorCode insert_seq( TypeSequenceManager& seqman, EntityHandle start_handle, EntityID count,
-                      SequenceData* data, bool del_data = false );
+ErrorCode insert_seq( TypeSequenceManager& seqman, EntityHandle start_handle, EntityID count, SequenceData* data,
+                      bool del_data = false );
 
 int main( )
 {
@@ -91,8 +90,7 @@ class DumSeq : public EntitySequence
     {
     }
     DumSeq( SequenceData* data2, int vals_per_ent = 0 )
-        : EntitySequence( data2->start_handle( ), data2->size( ), data2 ),
-          valsPerEnt( vals_per_ent )
+        : EntitySequence( data2->start_handle( ), data2->size( ), data2 ), valsPerEnt( vals_per_ent )
     {
     }
 
@@ -134,8 +132,8 @@ void make_basic_sequence( TypeSequenceManager& seqman )
     make_basic_sequence( seqman, s, t, u );
 }
 
-ErrorCode insert_seq( TypeSequenceManager& seqman, EntityHandle start_handle, EntityID count,
-                      SequenceData* data, bool del_data )
+ErrorCode insert_seq( TypeSequenceManager& seqman, EntityHandle start_handle, EntityID count, SequenceData* data,
+                      bool del_data )
 {
     EntitySequence* seq = new DumSeq( start_handle, count, data );
     ErrorCode       rval = seqman.insert_sequence( seq );
@@ -314,8 +312,7 @@ void test_find( )
     CHECK_EQUAL( NULL, seq );
 }
 
-bool seqman_equal( const EntityHandle pair_array[][ 2 ], unsigned num_pairs,
-                   const TypeSequenceManager& seqman )
+bool seqman_equal( const EntityHandle pair_array[][ 2 ], unsigned num_pairs, const TypeSequenceManager& seqman )
 {
     unsigned                            i;
     TypeSequenceManager::const_iterator j = seqman.begin( );
@@ -334,8 +331,7 @@ bool seqman_equal( const EntityHandle pair_array[][ 2 ], unsigned num_pairs,
             return false;
         }
 
-        if( seq && seq->data( ) != ( *j )->data( ) &&
-            seq->data( )->end_handle( ) >= ( *j )->data( )->start_handle( ) )
+        if( seq && seq->data( ) != ( *j )->data( ) && seq->data( )->end_handle( ) >= ( *j )->data( )->start_handle( ) )
         {
             printf( "SequenceData [%lu,%lu] overlaps SequenceData [%lu,%lu]\n",
                     (unsigned long)ID_FROM_HANDLE( seq->data( )->start_handle( ) ),
@@ -348,21 +344,16 @@ bool seqman_equal( const EntityHandle pair_array[][ 2 ], unsigned num_pairs,
         seq = *j;
         if( seq->start_handle( ) > seq->end_handle( ) )
         {
-            printf( "Inverted sequence [%lu,%lu]\n",
-                    (unsigned long)ID_FROM_HANDLE( seq->start_handle( ) ),
+            printf( "Inverted sequence [%lu,%lu]\n", (unsigned long)ID_FROM_HANDLE( seq->start_handle( ) ),
                     (unsigned long)ID_FROM_HANDLE( seq->end_handle( ) ) );
             return false;
         }
 
-        if( pair_array[ i ][ 0 ] != seq->start_handle( ) ||
-            pair_array[ i ][ 1 ] != seq->end_handle( ) )
-            break;
+        if( pair_array[ i ][ 0 ] != seq->start_handle( ) || pair_array[ i ][ 1 ] != seq->end_handle( ) ) break;
 
-        if( seq->data( )->start_handle( ) > seq->start_handle( ) ||
-            seq->data( )->end_handle( ) < seq->end_handle( ) )
+        if( seq->data( )->start_handle( ) > seq->start_handle( ) || seq->data( )->end_handle( ) < seq->end_handle( ) )
         {
-            printf( "Sequence [%lu,%lu] has data [%lu,%lu]\n",
-                    (unsigned long)ID_FROM_HANDLE( seq->start_handle( ) ),
+            printf( "Sequence [%lu,%lu] has data [%lu,%lu]\n", (unsigned long)ID_FROM_HANDLE( seq->start_handle( ) ),
                     (unsigned long)ID_FROM_HANDLE( seq->end_handle( ) ),
                     (unsigned long)ID_FROM_HANDLE( seq->data( )->start_handle( ) ),
                     (unsigned long)ID_FROM_HANDLE( seq->data( )->end_handle( ) ) );
@@ -373,8 +364,7 @@ bool seqman_equal( const EntityHandle pair_array[][ 2 ], unsigned num_pairs,
     if( i == num_pairs && j == seqman.end( ) ) return true;
 
     if( i < num_pairs )
-        printf( "Sequence Mismatch: Expected: [%lu,%lu], got ",
-                (unsigned long)ID_FROM_HANDLE( pair_array[ i ][ 0 ] ),
+        printf( "Sequence Mismatch: Expected: [%lu,%lu], got ", (unsigned long)ID_FROM_HANDLE( pair_array[ i ][ 0 ] ),
                 (unsigned long)ID_FROM_HANDLE( pair_array[ i ][ 1 ] ) );
     else
         printf( "Sequence Mismatch: Expected END, got " );
@@ -422,26 +412,22 @@ void test_insert_sequence_merge( )
 
     // insert sequence in middle
     CHECK_ERR( insert_seq( seqman, 150, 11, data ) );
-    EntityHandle exp3[][ 2 ] = { { 1, 1 },     { 3, 7 },       { 100, 111 },
-                                 { 150, 160 }, { 1001, 1001 }, { 1003, 1003 } };
+    EntityHandle exp3[][ 2 ] = { { 1, 1 }, { 3, 7 }, { 100, 111 }, { 150, 160 }, { 1001, 1001 }, { 1003, 1003 } };
     CHECK( seqman_equal( exp3, 6, seqman ) );
 
     // merge sequence with predecessor
     CHECK_ERR( insert_seq( seqman, 8, 13, data ) );
-    EntityHandle exp4[][ 2 ] = { { 1, 1 },     { 3, 20 },      { 100, 111 },
-                                 { 150, 160 }, { 1001, 1001 }, { 1003, 1003 } };
+    EntityHandle exp4[][ 2 ] = { { 1, 1 }, { 3, 20 }, { 100, 111 }, { 150, 160 }, { 1001, 1001 }, { 1003, 1003 } };
     CHECK( seqman_equal( exp4, 6, seqman ) );
 
     // merge sequence with following one
     CHECK_ERR( insert_seq( seqman, 87, 13, data ) );
-    EntityHandle exp5[][ 2 ] = { { 1, 1 },     { 3, 20 },      { 87, 111 },
-                                 { 150, 160 }, { 1001, 1001 }, { 1003, 1003 } };
+    EntityHandle exp5[][ 2 ] = { { 1, 1 }, { 3, 20 }, { 87, 111 }, { 150, 160 }, { 1001, 1001 }, { 1003, 1003 } };
     CHECK( seqman_equal( exp5, 6, seqman ) );
 
     // merge sequence with two adjacent ones
     CHECK_ERR( insert_seq( seqman, 2, 1, data ) );
-    EntityHandle exp6[][ 2 ] = {
-        { 1, 20 }, { 87, 111 }, { 150, 160 }, { 1001, 1001 }, { 1003, 1003 } };
+    EntityHandle exp6[][ 2 ] = { { 1, 20 }, { 87, 111 }, { 150, 160 }, { 1001, 1001 }, { 1003, 1003 } };
     CHECK( seqman_equal( exp6, 5, seqman ) );
 
     // try to insert a sequence that overlaps on the end
@@ -533,14 +519,12 @@ void test_insert_sequence_nomerge( )
 
     // Test is entirely outside existing data
     CHECK_ERR( insert_seq( seqman, 2000, 2, new SequenceData( 0, 2000, 2001 ), true ) );
-    EntityHandle exp3[][ 2 ] = {
-        { 3, 7 }, { 200, 299 }, { 400, 499 }, { 600, 699 }, { 2000, 2001 } };
+    EntityHandle exp3[][ 2 ] = { { 3, 7 }, { 200, 299 }, { 400, 499 }, { 600, 699 }, { 2000, 2001 } };
     CHECK( seqman_equal( exp3, 5, seqman ) );
 
     // Test abutts end of existing data
     CHECK_ERR( insert_seq( seqman, 1000, 6, new SequenceData( 0, 1000, 1005 ), true ) );
-    EntityHandle exp4[][ 2 ] = { { 3, 7 },     { 200, 299 },   { 400, 499 },
-                                 { 600, 699 }, { 1000, 1005 }, { 2000, 2001 } };
+    EntityHandle exp4[][ 2 ] = { { 3, 7 }, { 200, 299 }, { 400, 499 }, { 600, 699 }, { 1000, 1005 }, { 2000, 2001 } };
     CHECK( seqman_equal( exp4, 6, seqman ) );
 
     // Test abutts beginning of existing data
@@ -667,8 +651,7 @@ void test_replace_subsequence( )
         delete data;
         return;
     }
-    EntityHandle exp3[][ 2 ] = {
-        { 101, 105 }, { 106, 200 }, { 301, 600 }, { 701, 749 }, { 750, 800 } };
+    EntityHandle exp3[][ 2 ] = { { 101, 105 }, { 106, 200 }, { 301, 600 }, { 701, 749 }, { 750, 800 } };
     CHECK( seqman_equal( exp3, 5, seqman ) );
 
     // split at middle of sequence
@@ -1073,8 +1056,7 @@ void regression_svn1952( )
     SequenceData* result_data;
     EntityID      result_size;
     EntityHandle  result_handle;
-    result_handle =
-        seqman.find_free_sequence( 1686, 4000, 2 * last_handle, result_data, result_size );
+    result_handle = seqman.find_free_sequence( 1686, 4000, 2 * last_handle, result_data, result_size );
     CHECK( result_handle > last_handle || result_handle + result_size <= 41673 );
     CHECK( result_handle + result_size <= 2 * last_handle );
 }
@@ -1103,8 +1085,7 @@ void regression_svn1958( )
     SequenceData* result_data;
     EntityID      result_size;
     EntityHandle  result_handle;
-    result_handle =
-        seqman.find_free_sequence( data_start - 1, 1, 100000, result_data, result_size );
+    result_handle = seqman.find_free_sequence( data_start - 1, 1, 100000, result_data, result_size );
     CHECK( result_handle > data_end || result_handle + result_size <= data_start );
 }
 
@@ -1128,7 +1109,6 @@ void regression_svn1960( )
     SequenceData* result_data;
     EntityID      result_size;
     EntityHandle  result_handle;
-    result_handle =
-        seqman.find_free_sequence( data_start - 2, 1, 100000, result_data, result_size );
+    result_handle = seqman.find_free_sequence( data_start - 2, 1, 100000, result_data, result_size );
     CHECK( result_handle + result_size <= data_start );
 }

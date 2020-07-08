@@ -87,8 +87,7 @@ ErrorCode MeshGeneration::BrickInstance( MeshGeneration::BrickOpts& opts )
 
     int NX = ( q * M * A * blockSize + 1 );
     int NY = ( q * N * B * blockSize + 1 );
-    int nex =
-        M * A * blockSize;  // Number of elements in x direction, used for global id on element
+    int nex = M * A * blockSize;  // Number of elements in x direction, used for global id on element
     int ney = N * B * blockSize;  // Number of elements in y direction ...
     // int NZ = (K * C * blockSize + 1); // Not used
     int  blockSize1 = q * blockSize + 1;  // Used for vertices
@@ -114,13 +113,13 @@ ErrorCode MeshGeneration::BrickInstance( MeshGeneration::BrickOpts& opts )
     Tag new_id_tag;
     if( !parmerge )
     {
-        rval = mb->tag_get_handle( "HANDLEID", sizeof( long ), MB_TYPE_OPAQUE, new_id_tag,
-                                   MB_TAG_CREAT | MB_TAG_DENSE );MB_CHK_SET_ERR( rval, "Can't get handle id tag" );
+        rval =
+            mb->tag_get_handle( "HANDLEID", sizeof( long ), MB_TYPE_OPAQUE, new_id_tag, MB_TAG_CREAT | MB_TAG_DENSE );MB_CHK_SET_ERR( rval, "Can't get handle id tag" );
     }
     Tag part_tag;
     int dum_id = -1;
-    rval = mb->tag_get_handle( "PARALLEL_PARTITION", 1, MB_TYPE_INTEGER, part_tag,
-                               MB_TAG_CREAT | MB_TAG_SPARSE, &dum_id );MB_CHK_SET_ERR( rval, "Can't get parallel partition tag" );
+    rval =
+        mb->tag_get_handle( "PARALLEL_PARTITION", 1, MB_TYPE_INTEGER, part_tag, MB_TAG_CREAT | MB_TAG_SPARSE, &dum_id );MB_CHK_SET_ERR( rval, "Can't get parallel partition tag" );
 
     Range wsets;  // write only part sets
     Range localVerts;
@@ -157,11 +156,9 @@ ErrorCode MeshGeneration::BrickInstance( MeshGeneration::BrickOpts& opts )
                             arrays[ 0 ][ ix ] = ( x + ii ) * dx;
                             arrays[ 1 ][ ix ] = ( y + jj ) * dy;
                             arrays[ 2 ][ ix ] = ( z + kk ) * dz;
-                            gids[ ix ] =
-                                1 + ( x + ii ) + ( y + jj ) * NX + ( z + kk ) * ( NX * NY );
+                            gids[ ix ] = 1 + ( x + ii ) + ( y + jj ) * NX + ( z + kk ) * ( NX * NY );
                             if( !parmerge )
-                                lgids[ ix ] = 1 + ( x + ii ) + ( y + jj ) * NX +
-                                              (long)( z + kk ) * ( NX * NY );
+                                lgids[ ix ] = 1 + ( x + ii ) + ( y + jj ) * NX + (long)( z + kk ) * ( NX * NY );
                             // Set int tags, some nice values?
 
                             ix++;
@@ -212,14 +209,11 @@ ErrorCode MeshGeneration::BrickInstance( MeshGeneration::BrickOpts& opts )
                     {
                         for( int ii = 0; ii < blockSize; ii++ )
                         {
-                            EntityHandle corner =
-                                startv + q * ii + q * jj * ystride + q * kk * zstride;
+                            EntityHandle corner = startv + q * ii + q * jj * ystride + q * kk * zstride;
                             // These could overflow for large numbers
-                            gids[ ie ] = 1 + ( ( xe + ii ) + ( ye + jj ) * nex +
-                                               ( ze + kk ) * ( nex * ney ) ) *
+                            gids[ ie ] = 1 + ( ( xe + ii ) + ( ye + jj ) * nex + ( ze + kk ) * ( nex * ney ) ) *
                                                  factor;  // 6 more for tetra
-                            lgids[ ie ] = 1 + ( ( xe + ii ) + ( ye + jj ) * nex +
-                                                (long)( ze + kk ) * ( nex * ney ) ) *
+                            lgids[ ie ] = 1 + ( ( xe + ii ) + ( ye + jj ) * nex + (long)( ze + kk ) * ( nex * ney ) ) *
                                                   factor;  // 6 more for tetra
                             // EntityHandle eh = starte + ie;
 
@@ -371,8 +365,7 @@ ErrorCode MeshGeneration::BrickInstance( MeshGeneration::BrickOpts& opts )
                 {
                     rval = mb->tag_set_data( new_id_tag, cells, &lgids[ 0 ] );MB_CHK_SET_ERR( rval, "Can't set new ids to elements" );
                 }
-                int part_num =
-                    a + m * A + ( b + n * B ) * ( M * A ) + ( c + k * C ) * ( M * A * N * B );
+                int part_num = a + m * A + ( b + n * B ) * ( M * A ) + ( c + k * C ) * ( M * A * N * B );
                 rval = mb->tag_set_data( part_tag, &part_set, 1, &part_num );MB_CHK_SET_ERR( rval, "Can't set part tag on set" );
                 wsets.insert( part_set );
             }
@@ -398,8 +391,7 @@ ErrorCode MeshGeneration::BrickInstance( MeshGeneration::BrickOpts& opts )
 
     if( 0 == rank )
     {
-        std::cout << "generate local mesh: " << ( clock( ) - tt ) / (double)CLOCKS_PER_SEC
-                  << " seconds" << endl;
+        std::cout << "generate local mesh: " << ( clock( ) - tt ) / (double)CLOCKS_PER_SEC << " seconds" << endl;
         tt = clock( );
         std::cout << "number of elements on rank 0: " << all3dcells.size( ) << endl;
         std::cout << "Total number of elements " << all3dcells.size( ) * size << endl;
@@ -420,8 +412,7 @@ ErrorCode MeshGeneration::BrickInstance( MeshGeneration::BrickOpts& opts )
 
         if( 0 == rank )
         {
-            std::cout << "merge locally: " << ( clock( ) - tt ) / (double)CLOCKS_PER_SEC
-                      << " seconds" << endl;
+            std::cout << "merge locally: " << ( clock( ) - tt ) / (double)CLOCKS_PER_SEC << " seconds" << endl;
             tt = clock( );
         }
     }
@@ -452,8 +443,8 @@ ErrorCode MeshGeneration::BrickInstance( MeshGeneration::BrickOpts& opts )
             rval = pm.merge( );MB_CHK_SET_ERR( rval, "Can't resolve shared ents" );
             if( 0 == rank )
             {
-                std::cout << "parallel mesh merge: " << ( clock( ) - tt ) / (double)CLOCKS_PER_SEC
-                          << " seconds" << endl;
+                std::cout << "parallel mesh merge: " << ( clock( ) - tt ) / (double)CLOCKS_PER_SEC << " seconds"
+                          << endl;
                 tt = clock( );
             }
         }
@@ -463,8 +454,8 @@ ErrorCode MeshGeneration::BrickInstance( MeshGeneration::BrickOpts& opts )
 
             if( 0 == rank )
             {
-                std::cout << "resolve shared entities: "
-                          << ( clock( ) - tt ) / (double)CLOCKS_PER_SEC << " seconds" << endl;
+                std::cout << "resolve shared entities: " << ( clock( ) - tt ) / (double)CLOCKS_PER_SEC << " seconds"
+                          << endl;
                 tt = clock( );
             }
         }
@@ -498,8 +489,7 @@ ErrorCode MeshGeneration::BrickInstance( MeshGeneration::BrickOpts& opts )
                                              true );MB_CHK_ERR( rval );  // bool store_remote_handles
             if( 0 == rank )
             {
-                std::cout << "exchange  " << GL
-                          << " ghost layer(s) :" << ( clock( ) - tt ) / (double)CLOCKS_PER_SEC
+                std::cout << "exchange  " << GL << " ghost layer(s) :" << ( clock( ) - tt ) / (double)CLOCKS_PER_SEC
                           << " seconds" << endl;
                 tt = clock( );
             }

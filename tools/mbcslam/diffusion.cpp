@@ -58,8 +58,7 @@ bool   velocity = false;
 int    field_type = 1;  // 1 quasi smooth, 2 - smooth, 3 non-smooth,
 
 using namespace moab;
-ErrorCode add_field_value( Interface* mb, EntityHandle euler_set, int rank, Tag& tagTracer,
-                           Tag& tagElem, Tag& tagArea )
+ErrorCode add_field_value( Interface* mb, EntityHandle euler_set, int rank, Tag& tagTracer, Tag& tagElem, Tag& tagArea )
 {
     /*
      * get all plys first, then vertices, then move them on the surface of the sphere
@@ -141,8 +140,7 @@ ErrorCode add_field_value( Interface* mb, EntityHandle euler_set, int rank, Tag&
 
             moab::IntxUtils::SphereCoords sphCoord = moab::IntxUtils::cart_to_spherical( posi );
 
-            ptr_DP[ 0 ] =
-                IntxUtilsCSLAM::slotted_cylinder_field( sphCoord.lon, sphCoord.lat, params );
+            ptr_DP[ 0 ] = IntxUtilsCSLAM::slotted_cylinder_field( sphCoord.lon, sphCoord.lat, params );
             ;
 
             ptr_DP++;  // increment to the next node
@@ -189,7 +187,7 @@ ErrorCode add_field_value( Interface* mb, EntityHandle euler_set, int rank, Tag&
         }
     }
     double total_mass = 0.;
-    int mpi_err = MPI_Reduce( &local_mass, &total_mass, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD );
+    int    mpi_err = MPI_Reduce( &local_mass, &total_mass, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD );
     if( MPI_SUCCESS != mpi_err ) return MB_FAILURE;
 
     if( rank == 0 ) std::cout << "initial total mass:" << total_mass << "\n";
@@ -198,8 +196,7 @@ ErrorCode add_field_value( Interface* mb, EntityHandle euler_set, int rank, Tag&
     return MB_SUCCESS;
 }
 
-ErrorCode compute_velocity_case1( Interface* mb, EntityHandle euler_set, Tag& tagh, int rank,
-                                  int tStep )
+ErrorCode compute_velocity_case1( Interface* mb, EntityHandle euler_set, Tag& tagh, int rank, int tStep )
 {
     Range     polygons;
     ErrorCode rval = mb->get_entities_by_dimension( euler_set, 2, polygons );
@@ -242,9 +239,9 @@ ErrorCode compute_velocity_case1( Interface* mb, EntityHandle euler_set, Tag& ta
     return MB_SUCCESS;
 }
 
-ErrorCode compute_tracer_case1( Interface* mb, Intx2MeshOnSphere& worker, EntityHandle euler_set,
-                                EntityHandle lagr_set, EntityHandle out_set, Tag& tagElem,
-                                Tag& tagArea, int rank, int tStep, Range& connecVerts )
+ErrorCode compute_tracer_case1( Interface* mb, Intx2MeshOnSphere& worker, EntityHandle euler_set, EntityHandle lagr_set,
+                                EntityHandle out_set, Tag& tagElem, Tag& tagArea, int rank, int tStep,
+                                Range& connecVerts )
 {
     ErrorCode    rval;
     EntityHandle dum = 0;
@@ -311,8 +308,7 @@ ErrorCode compute_tracer_case1( Interface* mb, Intx2MeshOnSphere& worker, Entity
         std::stringstream resTrace;
         resTrace << "Tracer"
                  << "_" << tStep - 1 << ".h5m";
-        rval = mb->write_file( resTrace.str( ).c_str( ), 0, "PARALLEL=WRITE_PART", &euler_set, 1,
-                               &tagElem, 1 );MB_CHK_ERR( rval );
+        rval = mb->write_file( resTrace.str( ).c_str( ), 0, "PARALLEL=WRITE_PART", &euler_set, 1, &tagElem, 1 );MB_CHK_ERR( rval );
     }
     rval = worker.update_tracer_data( out_set, tagElem, tagArea );MB_CHK_ERR( rval );
 
@@ -321,8 +317,7 @@ ErrorCode compute_tracer_case1( Interface* mb, Intx2MeshOnSphere& worker, Entity
         std::stringstream resTrace;
         resTrace << "Tracer"
                  << "_" << tStep << ".h5m";
-        rval = mb->write_file( resTrace.str( ).c_str( ), 0, "PARALLEL=WRITE_PART", &euler_set, 1,
-                               &tagElem, 1 );
+        rval = mb->write_file( resTrace.str( ).c_str( ), 0, "PARALLEL=WRITE_PART", &euler_set, 1, &tagElem, 1 );
     }
 
     if( writeFiles )  // so if write
@@ -373,8 +368,7 @@ int main( int argc, char** argv )
     std::string fileN = TestDir + "/mbcslam/fine4.h5m";
     const char* filename_mesh1 = fileN.c_str( );
 
-    opts.addOpt< double >( "gtolerance,g",
-                           "geometric absolute tolerance (used for point concidence on the sphere)",
+    opts.addOpt< double >( "gtolerance,g", "geometric absolute tolerance (used for point concidence on the sphere)",
                            &gtol );
 
     std::string input_file;
@@ -382,22 +376,17 @@ int main( int argc, char** argv )
     std::string extra_read_opts;
     opts.addOpt< std::string >( "extra_read_options,O", "extra read options ", &extra_read_opts );
     // int field_type;
-    opts.addOpt< int >(
-        "field_type,f",
-        "field type--  1: quasi-smooth; 2: smooth; 3: slotted cylinders (non-smooth)",
-        &field_type );
+    opts.addOpt< int >( "field_type,f", "field type--  1: quasi-smooth; 2: smooth; 3: slotted cylinders (non-smooth)",
+                        &field_type );
 
     opts.addOpt< int >( "num_steps,n", "number of  steps ", &numSteps );
 
     // bool reorder = false;
-    opts.addOpt< void >( "write_debug_files,w", "write debugging files during simulation ",
-                         &writeFiles );
+    opts.addOpt< void >( "write_debug_files,w", "write debugging files during simulation ", &writeFiles );
 
-    opts.addOpt< void >( "write_velocity_files,v", "Reorder mesh to group entities by partition",
-                         &velocity );
+    opts.addOpt< void >( "write_velocity_files,v", "Reorder mesh to group entities by partition", &velocity );
 
-    opts.addOpt< void >( "write_result_in_parallel,p", "write tracer result files",
-                         &parallelWrite );
+    opts.addOpt< void >( "write_result_in_parallel,p", "write tracer result files", &parallelWrite );
 
     opts.parseCommandLine( argc, argv );
 
@@ -422,8 +411,8 @@ int main( int argc, char** argv )
 
     if( 0 == rank )
     {
-        std::cout << " case 1: use -gtol " << gtol << " -R " << radius << " -input "
-                  << filename_mesh1 << " -f " << field_type << " numSteps: " << numSteps << "\n";
+        std::cout << " case 1: use -gtol " << gtol << " -R " << radius << " -input " << filename_mesh1 << " -f "
+                  << field_type << " numSteps: " << numSteps << "\n";
         std::cout << " write debug results: " << ( writeFiles ? "yes" : "no" ) << "\n";
         std::cout << " write tracer in parallel: " << ( parallelWrite ? "yes" : "no" ) << "\n";
         std::cout << " output velocity: " << ( velocity ? "yes" : "no" ) << "\n";
@@ -432,21 +421,18 @@ int main( int argc, char** argv )
     // tagTracer is the value at nodes
     Tag         tagTracer = 0;
     std::string tag_name( "Tracer" );
-    rval = mb.tag_get_handle( tag_name.c_str( ), 1, MB_TYPE_DOUBLE, tagTracer,
-                              MB_TAG_DENSE | MB_TAG_CREAT );MB_CHK_ERR( rval );
+    rval = mb.tag_get_handle( tag_name.c_str( ), 1, MB_TYPE_DOUBLE, tagTracer, MB_TAG_DENSE | MB_TAG_CREAT );MB_CHK_ERR( rval );
 
     // tagElem is the average computed at each element, from nodal values
     Tag         tagElem = 0;
     std::string tag_name2( "TracerAverage" );
-    rval = mb.tag_get_handle( tag_name2.c_str( ), 1, MB_TYPE_DOUBLE, tagElem,
-                              MB_TAG_DENSE | MB_TAG_CREAT );MB_CHK_ERR( rval );
+    rval = mb.tag_get_handle( tag_name2.c_str( ), 1, MB_TYPE_DOUBLE, tagElem, MB_TAG_DENSE | MB_TAG_CREAT );MB_CHK_ERR( rval );
 
     // area of the euler element is fixed, store it; it is used to recompute the averages at each
     // time step
     Tag         tagArea = 0;
     std::string tag_name4( "Area" );
-    rval = mb.tag_get_handle( tag_name4.c_str( ), 1, MB_TYPE_DOUBLE, tagArea,
-                              MB_TAG_DENSE | MB_TAG_CREAT );MB_CHK_ERR( rval );
+    rval = mb.tag_get_handle( tag_name4.c_str( ), 1, MB_TYPE_DOUBLE, tagArea, MB_TAG_DENSE | MB_TAG_CREAT );MB_CHK_ERR( rval );
 
     // add a field value, quasi smooth first
     rval = add_field_value( &mb, euler_set, rank, tagTracer, tagElem, tagArea );MB_CHK_ERR( rval );
@@ -459,8 +445,7 @@ int main( int argc, char** argv )
 
     Tag         tagh = 0;
     std::string tag_name3( "Case1" );
-    rval = mb.tag_get_handle( tag_name3.c_str( ), 3, MB_TYPE_DOUBLE, tagh,
-                              MB_TAG_DENSE | MB_TAG_CREAT );MB_CHK_ERR( rval );
+    rval = mb.tag_get_handle( tag_name3.c_str( ), 3, MB_TYPE_DOUBLE, tagh, MB_TAG_DENSE | MB_TAG_CREAT );MB_CHK_ERR( rval );
 
     EntityHandle out_set, lagr_set;
     rval = mb.create_meshset( MESHSET_SET, out_set );MB_CHK_ERR( rval );
@@ -496,8 +481,8 @@ int main( int argc, char** argv )
 
         // this is to actually compute concentrations at time step i, using the
         //  current concentrations
-        rval = compute_tracer_case1( &mb, worker, euler_set, lagr_set, out_set, tagElem, tagArea,
-                                     rank, i, local_verts );MB_CHK_ERR( rval );
+        rval =
+            compute_tracer_case1( &mb, worker, euler_set, lagr_set, out_set, tagElem, tagArea, rank, i, local_verts );MB_CHK_ERR( rval );
     }
 
     // final vals and 1-norm

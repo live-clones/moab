@@ -51,8 +51,8 @@ static bool init_pd( PatchData& pd )
 }
 
 /** Internal helper function for test_eval_type */
-double ObjectiveFunctionTests::evaluate_internal( ObjectiveFunction::EvalType type,
-                                                  OFTestMode test_mode, ObjectiveFunction* of )
+double ObjectiveFunctionTests::evaluate_internal( ObjectiveFunction::EvalType type, OFTestMode test_mode,
+                                                  ObjectiveFunction* of )
 {
     MsqPrintError         err( cout );
     vector< Vector3D >    grad;
@@ -258,9 +258,8 @@ void ObjectiveFunctionTests::test_eval_type( ObjectiveFunction::EvalType type, O
     }
 }
 
-void ObjectiveFunctionTests::test_value( const double* input_values, unsigned num_input_values,
-                                         double expected_value, OFTestMode test_mode,
-                                         ObjectiveFunctionTemplate* of )
+void ObjectiveFunctionTests::test_value( const double* input_values, unsigned num_input_values, double expected_value,
+                                         OFTestMode test_mode, ObjectiveFunctionTemplate* of )
 {
     OFTestQM metric( input_values, num_input_values );
     of->set_quality_metric( &metric );
@@ -340,14 +339,12 @@ void ObjectiveFunctionTests::test_negate_flag( OFTestMode test_mode, ObjectiveFu
                 rval = of->evaluate_with_gradient( type, patch( ), value[ i ], grad[ i ], err );
                 break;
             case DIAG:
-                rval = of->evaluate_with_Hessian_diagonal( type, patch( ), value[ i ], grad[ i ],
-                                                           diag[ i ], err );
+                rval = of->evaluate_with_Hessian_diagonal( type, patch( ), value[ i ], grad[ i ], diag[ i ], err );
                 break;
             case HESS:
                 hess[ i ].initialize( patch( ), err );
                 ASSERT_NO_ERROR( err );
-                rval = of->evaluate_with_Hessian( type, patch( ), value[ i ], grad[ i ], hess[ i ],
-                                                  err );
+                rval = of->evaluate_with_Hessian( type, patch( ), value[ i ], grad[ i ], hess[ i ], err );
                 break;
             default:
                 CPPUNIT_ASSERT_MESSAGE( "Invalid enum value in test code", false );
@@ -365,8 +362,8 @@ void ObjectiveFunctionTests::test_negate_flag( OFTestMode test_mode, ObjectiveFu
             for( size_t r = 0; r < hess[ 0 ].size( ); ++r )
                 for( size_t c = r; c < hess[ 0 ].size( ); ++c )
                     if( hess[ 0 ].get_block( r, c ) )
-                        CPPUNIT_ASSERT_MATRICES_EQUAL( -*hess[ 0 ].get_block( r, c ),
-                                                       *hess[ 1 ].get_block( r, c ), 1e-6 );
+                        CPPUNIT_ASSERT_MATRICES_EQUAL( -*hess[ 0 ].get_block( r, c ), *hess[ 1 ].get_block( r, c ),
+                                                       1e-6 );
         case DIAG:
             // NOTE: When case HESS: falls through to here, diag[0] and diag[1]
             // will be empty, making this a no-op.
@@ -398,8 +395,7 @@ void ObjectiveFunctionTests::compare_numerical_gradient( ObjectiveFunction* of )
     CPPUNIT_ASSERT( valid );
     CPPUNIT_ASSERT_EQUAL( pd.num_free_vertices( ), ana_grad.size( ) );
 
-    valid = of->ObjectiveFunction::evaluate_with_gradient( ObjectiveFunction::CALCULATE, pd,
-                                                           num_val, num_grad, err );
+    valid = of->ObjectiveFunction::evaluate_with_gradient( ObjectiveFunction::CALCULATE, pd, num_val, num_grad, err );
     ASSERT_NO_ERROR( err );
     CPPUNIT_ASSERT( valid );
     CPPUNIT_ASSERT_EQUAL( pd.num_free_vertices( ), num_grad.size( ) );
@@ -430,8 +426,7 @@ void ObjectiveFunctionTests::compare_hessian_gradient( ObjectiveFunction* of )
 
     hess.initialize( pd, err );
     ASSERT_NO_ERROR( err );
-    valid = of->evaluate_with_Hessian( ObjectiveFunction::CALCULATE, pd, hess_val, hess_grad, hess,
-                                       err );
+    valid = of->evaluate_with_Hessian( ObjectiveFunction::CALCULATE, pd, hess_val, hess_grad, hess, err );
     ASSERT_NO_ERROR( err );
     CPPUNIT_ASSERT( valid );
     CPPUNIT_ASSERT_EQUAL( pd.num_free_vertices( ), hess_grad.size( ) );
@@ -460,8 +455,7 @@ void ObjectiveFunctionTests::compare_diagonal_gradient( ObjectiveFunction* of )
     CPPUNIT_ASSERT( valid );
     CPPUNIT_ASSERT_EQUAL( pd.num_free_vertices( ), grad.size( ) );
 
-    valid = of->evaluate_with_Hessian_diagonal( ObjectiveFunction::CALCULATE, pd, hess_val,
-                                                hess_grad, hess, err );
+    valid = of->evaluate_with_Hessian_diagonal( ObjectiveFunction::CALCULATE, pd, hess_val, hess_grad, hess, err );
     ASSERT_NO_ERROR( err );
     CPPUNIT_ASSERT( valid );
     CPPUNIT_ASSERT_EQUAL( pd.num_free_vertices( ), hess_grad.size( ) );
@@ -486,8 +480,7 @@ void ObjectiveFunctionTests::compare_hessian_diagonal( ObjectiveFunction* of )
     double                     diag_val, hess_val;
     bool                       valid;
 
-    valid = of->evaluate_with_Hessian_diagonal( ObjectiveFunction::CALCULATE, pd, diag_val,
-                                                diag_grad, diag, err );
+    valid = of->evaluate_with_Hessian_diagonal( ObjectiveFunction::CALCULATE, pd, diag_val, diag_grad, diag, err );
     ASSERT_NO_ERROR( err );
     CPPUNIT_ASSERT( valid );
     CPPUNIT_ASSERT_EQUAL( pd.num_free_vertices( ), diag_grad.size( ) );
@@ -495,8 +488,7 @@ void ObjectiveFunctionTests::compare_hessian_diagonal( ObjectiveFunction* of )
 
     hess.initialize( pd, err );
     ASSERT_NO_ERROR( err );
-    valid = of->evaluate_with_Hessian( ObjectiveFunction::CALCULATE, pd, hess_val, hess_grad, hess,
-                                       err );
+    valid = of->evaluate_with_Hessian( ObjectiveFunction::CALCULATE, pd, hess_val, hess_grad, hess, err );
     ASSERT_NO_ERROR( err );
     CPPUNIT_ASSERT( valid );
     CPPUNIT_ASSERT_EQUAL( pd.num_free_vertices( ), hess_grad.size( ) );
@@ -536,11 +528,9 @@ void ObjectiveFunctionTests::compare_numerical_hessian( ObjectiveFunction* of, b
     double value;
     bool   valid;
     if( diagonal_only )
-        valid = of->evaluate_with_Hessian_diagonal( ObjectiveFunction::CALCULATE, pd, value, grad,
-                                                    diag, err );
+        valid = of->evaluate_with_Hessian_diagonal( ObjectiveFunction::CALCULATE, pd, value, grad, diag, err );
     else
-        valid =
-            of->evaluate_with_Hessian( ObjectiveFunction::CALCULATE, pd, value, grad, hess, err );
+        valid = of->evaluate_with_Hessian( ObjectiveFunction::CALCULATE, pd, value, grad, hess, err );
     ASSERT_NO_ERROR( err );
     CPPUNIT_ASSERT( valid );
 
@@ -649,24 +639,23 @@ class OFTestBadQM : public QualityMetric
         return false;
     }
 
-    virtual bool evaluate_with_indices( PatchData&, size_t h, double&, vector< size_t >&,
-                                        MsqError& err )
+    virtual bool evaluate_with_indices( PatchData&, size_t h, double&, vector< size_t >&, MsqError& err )
     {
         CPPUNIT_ASSERT_EQUAL( HANDLE_VAL, h );
         if( mError ) MSQ_SETERR( err )( MsqError::INVALID_STATE );
         return false;
     }
 
-    virtual bool evaluate_with_gradient( PatchData&, size_t h, double&, vector< size_t >&,
-                                         vector< Vector3D >&, MsqError& err )
+    virtual bool evaluate_with_gradient( PatchData&, size_t h, double&, vector< size_t >&, vector< Vector3D >&,
+                                         MsqError& err )
     {
         CPPUNIT_ASSERT_EQUAL( HANDLE_VAL, h );
         if( mError ) MSQ_SETERR( err )( MsqError::INVALID_STATE );
         return false;
     }
 
-    virtual bool evaluate_with_Hessian( PatchData&, size_t h, double&, vector< size_t >&,
-                                        vector< Vector3D >&, vector< Matrix3D >&, MsqError& err )
+    virtual bool evaluate_with_Hessian( PatchData&, size_t h, double&, vector< size_t >&, vector< Vector3D >&,
+                                        vector< Matrix3D >&, MsqError& err )
     {
         CPPUNIT_ASSERT_EQUAL( HANDLE_VAL, h );
         if( mError ) MSQ_SETERR( err )( MsqError::INVALID_STATE );
@@ -677,8 +666,7 @@ class OFTestBadQM : public QualityMetric
     bool mError;
 };
 
-void ObjectiveFunctionTests::test_handles_invalid_qm( OFTestMode                 test_mode,
-                                                      ObjectiveFunctionTemplate* of )
+void ObjectiveFunctionTests::test_handles_invalid_qm( OFTestMode test_mode, ObjectiveFunctionTemplate* of )
 {
     OFTestBadQM metric( false );
     of->set_quality_metric( &metric );
@@ -693,22 +681,19 @@ void ObjectiveFunctionTests::test_handles_invalid_qm( OFTestMode                
     switch( test_mode )
     {
         case EVAL:
-            valid = of->evaluate( ObjectiveFunction::CALCULATE, patch( ), result,
-                                  OF_FREE_EVALS_ONLY, err );
+            valid = of->evaluate( ObjectiveFunction::CALCULATE, patch( ), result, OF_FREE_EVALS_ONLY, err );
             break;
         case GRAD:
-            valid = of->evaluate_with_gradient( ObjectiveFunction::CALCULATE, patch( ), result,
-                                                grad, err );
+            valid = of->evaluate_with_gradient( ObjectiveFunction::CALCULATE, patch( ), result, grad, err );
             break;
         case DIAG:
-            valid = of->evaluate_with_Hessian_diagonal( ObjectiveFunction::CALCULATE, patch( ),
-                                                        result, grad, diag, err );
+            valid =
+                of->evaluate_with_Hessian_diagonal( ObjectiveFunction::CALCULATE, patch( ), result, grad, diag, err );
             break;
         case HESS:
             hess.initialize( patch( ), err );
             ASSERT_NO_ERROR( err );
-            valid = of->evaluate_with_Hessian( ObjectiveFunction::CALCULATE, patch( ), result, grad,
-                                               hess, err );
+            valid = of->evaluate_with_Hessian( ObjectiveFunction::CALCULATE, patch( ), result, grad, hess, err );
             break;
         default:
             CPPUNIT_ASSERT( false );
@@ -718,8 +703,7 @@ void ObjectiveFunctionTests::test_handles_invalid_qm( OFTestMode                
     CPPUNIT_ASSERT( !valid );
 }
 
-void ObjectiveFunctionTests::test_handles_qm_error( OFTestMode                 test_mode,
-                                                    ObjectiveFunctionTemplate* of )
+void ObjectiveFunctionTests::test_handles_qm_error( OFTestMode test_mode, ObjectiveFunctionTemplate* of )
 
 {
     OFTestBadQM metric( true );
@@ -735,22 +719,19 @@ void ObjectiveFunctionTests::test_handles_qm_error( OFTestMode                 t
     switch( test_mode )
     {
         case EVAL:
-            valid = of->evaluate( ObjectiveFunction::CALCULATE, patch( ), result,
-                                  OF_FREE_EVALS_ONLY, err );
+            valid = of->evaluate( ObjectiveFunction::CALCULATE, patch( ), result, OF_FREE_EVALS_ONLY, err );
             break;
         case GRAD:
-            valid = of->evaluate_with_gradient( ObjectiveFunction::CALCULATE, patch( ), result,
-                                                grad, err );
+            valid = of->evaluate_with_gradient( ObjectiveFunction::CALCULATE, patch( ), result, grad, err );
             break;
         case DIAG:
-            valid = of->evaluate_with_Hessian_diagonal( ObjectiveFunction::CALCULATE, patch( ),
-                                                        result, grad, diag, err );
+            valid =
+                of->evaluate_with_Hessian_diagonal( ObjectiveFunction::CALCULATE, patch( ), result, grad, diag, err );
             break;
         case HESS:
             hess.initialize( patch( ), err );
             ASSERT_NO_ERROR( err );
-            valid = of->evaluate_with_Hessian( ObjectiveFunction::CALCULATE, patch( ), result, grad,
-                                               hess, err );
+            valid = of->evaluate_with_Hessian( ObjectiveFunction::CALCULATE, patch( ), result, grad, hess, err );
             break;
         default:
             CPPUNIT_ASSERT( false );

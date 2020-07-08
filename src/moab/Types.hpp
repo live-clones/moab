@@ -70,8 +70,7 @@ enum TagType
     MB_TAG_SPARSE = 1 << 0, /**< Storage optimized for tags on a few entities */
     MB_TAG_DENSE = 1 << 1, /**< Storage optimized for tags on most entities of a type */
     MB_TAG_MESH = 1 << 2, /**< Storage for tags on no entities, only the root set/whole mesh. */
-    MB_TAG_BYTES =
-        1 << 3, /**< Size is in number of bytes rather than number of values of \c DataType */
+    MB_TAG_BYTES = 1 << 3, /**< Size is in number of bytes rather than number of values of \c DataType */
     MB_TAG_VARLEN = 1 << 4, /**< Create variable-length tag */
     MB_TAG_CREAT = 1 << 5, /**< Create tag if it does not already exist */
     MB_TAG_EXCL = 1 << 6, /**< Fail if TAG_CREATE and tag already exists */

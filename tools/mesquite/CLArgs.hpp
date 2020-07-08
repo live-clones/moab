@@ -162,10 +162,7 @@ class CLArgs
             return mValue;
         }  //!< get value
         /**\brief Initialize with default value */
-        ArgListTemplate( const std::vector< T >& initial_value )
-            : mValue( initial_value ), haveDefault( true )
-        {
-        }
+        ArgListTemplate( const std::vector< T >& initial_value ) : mValue( initial_value ), haveDefault( true ) {}
         /**\brief Initialize without default value */
         ArgListTemplate( ) : haveDefault( false ) {}
         /**\brief Get string representation of default value, or empty string of no default value */
@@ -226,8 +223,7 @@ class CLArgs
         {
             initialize( keyword_list, list_length );
         }
-        KeyWordArg( const char* default_val, const char* keyword_list[], int list_length )
-            : StringArg( default_val )
+        KeyWordArg( const char* default_val, const char* keyword_list[], int list_length ) : StringArg( default_val )
         {
             initialize( keyword_list, list_length );
         }
@@ -256,10 +252,7 @@ class CLArgs
 
       public:
         IntRangeArg( const int* min = 0, const int* max = 0 ) : mRange( min, max ) {}
-        IntRangeArg( int default_val, const int* min, const int* max )
-            : IntArg( default_val ), mRange( min, max )
-        {
-        }
+        IntRangeArg( int default_val, const int* min, const int* max ) : IntArg( default_val ), mRange( min, max ) {}
         bool       value( const int& val );
         const int& value( ) const
         {
@@ -313,8 +306,7 @@ class CLArgs
             : mRange( min, max, inclusive )
         {
         }
-        DoubleRangeArg( double default_val, const double* min = 0, const double* max = 0,
-                        bool inclusive = true )
+        DoubleRangeArg( double default_val, const double* min = 0, const double* max = 0, bool inclusive = true )
             : DoubleArg( default_val ), mRange( min, max, inclusive )
         {
         }
@@ -527,8 +519,7 @@ class CLArgs
      *\param error_stream  stream to which to write error messages.
      *\return true if all arguments were accepted.  false otherwise.
      */
-    bool parse_options( int argc, char* argv[], std::vector< std::string >& args_out,
-                        std::ostream& error_stream );
+    bool parse_options( int argc, char* argv[], std::vector< std::string >& args_out, std::ostream& error_stream );
 
     /**\brief Write help
      *

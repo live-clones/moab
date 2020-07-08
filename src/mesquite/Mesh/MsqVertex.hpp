@@ -52,9 +52,7 @@ class MESQUITE_EXPORT MsqVertex : public Vector3D
 {
   public:
     //! Construct vertex using three doubles.
-    MsqVertex( double p_x, double p_y, double p_z ) : Vector3D( p_x, p_y, p_z ), vertexBitFlags( 0 )
-    {
-    }
+    MsqVertex( double p_x, double p_y, double p_z ) : Vector3D( p_x, p_y, p_z ), vertexBitFlags( 0 ) {}
 
     //! Construct vertex using Vector3D.
     MsqVertex( const Vector3D& vec ) : Vector3D( vec ), vertexBitFlags( 0 ) {}
@@ -83,12 +81,10 @@ class MESQUITE_EXPORT MsqVertex : public Vector3D
     //!               so they have to be 2-based (2,4,8,16,32, ...)
     enum FlagMaskID
     {
-        MSQ_HARD_FIXED =
-            1 << 0,  //!< vertex is always fixed. This can only be set on and never off.
+        MSQ_HARD_FIXED = 1 << 0,  //!< vertex is always fixed. This can only be set on and never off.
         MSQ_DEPENDENT = 1 << 1,  //!< higher-order node w/ position determined by mapping function
         MSQ_CULLED = 1 << 2,  //!< vertex is fixed. This flag can be set on and off.
-        MSQ_PATCH_FIXED =
-            1 << 3,  //!< vertex is fixed only because it is on patch boundary (not by app request)
+        MSQ_PATCH_FIXED = 1 << 3,  //!< vertex is fixed only because it is on patch boundary (not by app request)
         MSQ_MARK = 1 << 4,  //!< arbitrary mark for use by code - clear before using
         MSQ_FIXED = ( MSQ_HARD_FIXED | MSQ_CULLED | MSQ_PATCH_FIXED )
     };

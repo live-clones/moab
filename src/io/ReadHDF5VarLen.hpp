@@ -41,8 +41,7 @@ class ReadHDF5VarLen
     /**\brief Test if passed file_id is value pointed to by ranged_iter,
      *        and if so, incremenet ranged_iter
      */
-    static bool is_ranged( EntityHandle file_id, Range::const_iterator& ranged_iter,
-                           Range::const_iterator ranged_end );
+    static bool is_ranged( EntityHandle file_id, Range::const_iterator& ranged_iter, Range::const_iterator ranged_end );
 
   protected:
     /**\brief Store data list for a single entity
@@ -59,8 +58,7 @@ class ReadHDF5VarLen
      *\param num_data Number of values for the entity
      *\param ranged   For set contents, true if in ranged format.
      */
-    virtual ErrorCode store_data( EntityHandle file_id, void* data, long num_data,
-                                  bool ranged ) = 0;
+    virtual ErrorCode store_data( EntityHandle file_id, void* data, long num_data, bool ranged ) = 0;
 
   public:
     /**\brief Constructor
@@ -84,10 +82,9 @@ class ReadHDF5VarLen
      *                        argument to \c storedata should be passed
      *                        as \c true.
      */
-    ErrorCode read_data( ReadHDF5Dataset& data_set, const Range& offsets, EntityHandle start_offset,
-                         hid_t data_type, const Range& file_ids,
-                         const std::vector< unsigned >& vals_per_ent,
-                         const Range&                   ranged_file_ids );
+    ErrorCode read_data( ReadHDF5Dataset& data_set, const Range& offsets, EntityHandle start_offset, hid_t data_type,
+                         const Range& file_ids, const std::vector< unsigned >& vals_per_ent,
+                         const Range& ranged_file_ids );
 
     /**\brief Read set description table or offset vector for
      *        var-len tags or old-format poly(gon|hedra) connectivity.
@@ -124,13 +121,11 @@ class ReadHDF5VarLen
                                std::vector<unsigned> counts_out[],
                                Range* ranged_file_ids = 0 );
    */
-    ErrorCode read_offsets( ReadHDF5Dataset& data_set, const Range& file_ids,
-                            EntityHandle start_file_id, EntityHandle nudge, Range& offsets_out,
-                            std::vector< unsigned >& counts_out );
+    ErrorCode read_offsets( ReadHDF5Dataset& data_set, const Range& file_ids, EntityHandle start_file_id,
+                            EntityHandle nudge, Range& offsets_out, std::vector< unsigned >& counts_out );
 
-    ErrorCode read( ReadHDF5Dataset& offset_data, ReadHDF5Dataset& value_data,
-                    const Range& file_ids, EntityHandle start_file_id, hid_t data_type,
-                    const Range* ranged = 0 )
+    ErrorCode read( ReadHDF5Dataset& offset_data, ReadHDF5Dataset& value_data, const Range& file_ids,
+                    EntityHandle start_file_id, hid_t data_type, const Range* ranged = 0 )
     {
         ErrorCode               rval;
         const EntityHandle      nudge = 1;
@@ -139,8 +134,7 @@ class ReadHDF5VarLen
         rval = read_offsets( offset_data, file_ids, start_file_id, nudge, offsets, counts );
         if( MB_SUCCESS != rval ) return rval;
         Range empty;
-        rval = read_data( value_data, offsets, nudge, data_type, file_ids, counts,
-                          ranged ? *ranged : empty );
+        rval = read_data( value_data, offsets, nudge, data_type, file_ids, counts, ranged ? *ranged : empty );
         return rval;
     }
 };

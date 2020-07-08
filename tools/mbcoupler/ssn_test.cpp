@@ -31,14 +31,14 @@ using namespace moab;
 bool debug = true;
 
 // Forward declarations
-void get_file_options( int argc, char** argv, std::vector< const char* >& filenames,
-                       std::string& norm_tag, std::vector< const char* >& tag_names,
-                       std::vector< const char* >& tag_values, std::string& file_opts, int* err );
+void get_file_options( int argc, char** argv, std::vector< const char* >& filenames, std::string& norm_tag,
+                       std::vector< const char* >& tag_names, std::vector< const char* >& tag_values,
+                       std::string& file_opts, int* err );
 
 void print_tuples( TupleList* tlp );
 
-int print_vertex_fields( Interface* mbi, std::vector< std::vector< EntityHandle > >& groups,
-                         Tag& norm_hdl, Coupler::IntegType integ_type );
+int print_vertex_fields( Interface* mbi, std::vector< std::vector< EntityHandle > >& groups, Tag& norm_hdl,
+                         Coupler::IntegType integ_type );
 
 double const_field( double x, double y, double z );
 double field_1( double x, double y, double z );
@@ -64,8 +64,7 @@ int main( int argc, char** argv )
     if( argc < 3 )
     {
         std::cerr << "Usage: ";
-        std::cerr << argv[ 0 ]
-                  << " <nfiles> <fname1> ... <fnamen> <norm_tag> <tag_select_opts> <file_opts>"
+        std::cerr << argv[ 0 ] << " <nfiles> <fname1> ... <fnamen> <norm_tag> <tag_select_opts> <file_opts>"
                   << std::endl;
         std::cerr << "nfiles          : number of mesh files" << std::endl;
         std::cerr << "fname1...fnamen : mesh files" << std::endl;
@@ -115,13 +114,12 @@ int main( int argc, char** argv )
     // Print out the input parameters
     std::cout << "    Input Parameters - " << std::endl;
     std::cout << "      Filenames: ";
-    for( std::vector< const char* >::iterator it = filenames.begin( ); it != filenames.end( );
-         ++it )
+    for( std::vector< const char* >::iterator it = filenames.begin( ); it != filenames.end( ); ++it )
         std::cout << *it << " ";
     std::cout << std::endl;
     std::cout << "      Norm Tag: " << normTag << std::endl;
-    std::cout << "      Selection Data: NumNames=" << tagNames.size( )
-              << " NumValues=" << tagValues.size( ) << std::endl;
+    std::cout << "      Selection Data: NumNames=" << tagNames.size( ) << " NumValues=" << tagValues.size( )
+              << std::endl;
     std::cout << "                      TagNames             TagValues           " << std::endl;
     std::cout << "                      -------------------- --------------------" << std::endl;
     std::vector< const char* >::iterator nameIt = tagNames.begin( );
@@ -158,8 +156,7 @@ int main( int argc, char** argv )
         result = mbi->create_meshset( MESHSET_SET, roots[ i ] );
 
         MB_CHK_SET_ERR( result, "Creating root set failed" );
-        result =
-            rps[ i ]->load_file( filenames[ i ], &roots[ i ], FileOptions( fileOpts.c_str( ) ) );MB_CHK_SET_ERR( result, "load_file failed" );
+        result = rps[ i ]->load_file( filenames[ i ], &roots[ i ], FileOptions( fileOpts.c_str( ) ) );MB_CHK_SET_ERR( result, "load_file failed" );
     }
 
     // Initialize the debug object for Range printing
@@ -210,9 +207,9 @@ int main( int argc, char** argv )
     {
 
         Range entsets1, entsets2;
-        result = mbi->get_entities_by_type_and_tag(
-            roots[ 0 ], MBENTITYSET, &tagHandles[ 0 ], (const void* const*)&tagValues[ 0 ],
-            tagHandles.size( ), entsets1, Interface::INTERSECT );  // recursive is false
+        result = mbi->get_entities_by_type_and_tag( roots[ 0 ], MBENTITYSET, &tagHandles[ 0 ],
+                                                    (const void* const*)&tagValues[ 0 ], tagHandles.size( ), entsets1,
+                                                    Interface::INTERSECT );  // recursive is false
         MB_CHK_SET_ERR( result, "sets: get_entities_by_type_and_tag failed on Mesh 1." );
 
         // Create tuple_list for each mesh's
@@ -223,15 +220,14 @@ int main( int argc, char** argv )
         std::cout << "   create_tuples returned" << std::endl;
         print_tuples( m1TagTuples );
 
-        result = mbi->get_entities_by_type_and_tag(
-            roots[ 1 ], MBENTITYSET, &tagHandles[ 0 ], (const void* const*)&tagValues[ 0 ],
-            tagHandles.size( ), entsets2, Interface::INTERSECT );  // recursive is false
+        result = mbi->get_entities_by_type_and_tag( roots[ 1 ], MBENTITYSET, &tagHandles[ 0 ],
+                                                    (const void* const*)&tagValues[ 0 ], tagHandles.size( ), entsets2,
+                                                    Interface::INTERSECT );  // recursive is false
         MB_CHK_SET_ERR( result, "sets: get_entities_by_type_and_tag failed on Mesh 2." );
 
         std::cout << "Creating tuples for mesh 2..." << std::endl;
         TupleList* m2TagTuples = NULL;
-        err = mbc.create_tuples( entsets2, (Tag*)( &tagHandles[ 0 ] ), tagHandles.size( ),
-                                 &m2TagTuples );MB_CHK_SET_ERR( (ErrorCode)err, "create_tuples failed" );
+        err = mbc.create_tuples( entsets2, (Tag*)( &tagHandles[ 0 ] ), tagHandles.size( ), &m2TagTuples );MB_CHK_SET_ERR( (ErrorCode)err, "create_tuples failed" );
 
         std::cout << "   create_tuples returned" << std::endl;
         print_tuples( m2TagTuples );
@@ -260,11 +256,10 @@ int main( int argc, char** argv )
 
     // Get matching entities for Mesh 1
     std::cout << "Get matching entities for mesh 1..." << std::endl;
-    err = mbc.get_matching_entities( roots[ 0 ], &tagHandles[ 0 ], &tagValues[ 0 ],
-                                     tagHandles.size( ), &m1EntitySets, &m1EntityGroups );MB_CHK_SET_ERR( (ErrorCode)err, "get_matching_entities failed" );
+    err = mbc.get_matching_entities( roots[ 0 ], &tagHandles[ 0 ], &tagValues[ 0 ], tagHandles.size( ), &m1EntitySets,
+                                     &m1EntityGroups );MB_CHK_SET_ERR( (ErrorCode)err, "get_matching_entities failed" );
 
-    std::cout << "    get_matching_entities returned " << m1EntityGroups.size( ) << " entity groups"
-              << std::endl;
+    std::cout << "    get_matching_entities returned " << m1EntityGroups.size( ) << " entity groups" << std::endl;
 
     // Print out the data in the vector of vectors
     std::vector< std::vector< EntityHandle > >::iterator iter_esi;
@@ -274,8 +269,7 @@ int main( int argc, char** argv )
     Range                                                entSetRg;
     int                                                  icnt;
     for( iter_egi = m1EntityGroups.begin( ), iter_esi = m1EntitySets.begin( ), icnt = 1;
-         ( iter_egi != m1EntityGroups.end( ) ) && ( iter_esi != m1EntitySets.end( ) );
-         ++iter_egi, ++iter_esi, icnt++ )
+         ( iter_egi != m1EntityGroups.end( ) ) && ( iter_esi != m1EntitySets.end( ) ); ++iter_egi, ++iter_esi, icnt++ )
     {
         std::cout << "      EntityGroup(" << icnt << ") = ";
         std::cout.flush( );
@@ -296,14 +290,12 @@ int main( int argc, char** argv )
 
     // Get matching entities for Mesh 2
     std::cout << "Get matching entities for mesh 2..." << std::endl;
-    err = mbc.get_matching_entities( roots[ 1 ], &tagHandles[ 0 ], &tagValues[ 0 ],
-                                     tagHandles.size( ), &m2EntitySets, &m2EntityGroups );MB_CHK_SET_ERR( (ErrorCode)err, "get_matching_entities failed" );
+    err = mbc.get_matching_entities( roots[ 1 ], &tagHandles[ 0 ], &tagValues[ 0 ], tagHandles.size( ), &m2EntitySets,
+                                     &m2EntityGroups );MB_CHK_SET_ERR( (ErrorCode)err, "get_matching_entities failed" );
 
-    std::cout << "    get_matching_entities returned " << m2EntityGroups.size( ) << " entity groups"
-              << std::endl;
+    std::cout << "    get_matching_entities returned " << m2EntityGroups.size( ) << " entity groups" << std::endl;
     for( iter_egi = m2EntityGroups.begin( ), iter_esi = m2EntitySets.begin( ), icnt = 1;
-         ( iter_egi != m2EntityGroups.end( ) ) && ( iter_esi != m2EntitySets.end( ) );
-         ++iter_egi, ++iter_esi, icnt++ )
+         ( iter_egi != m2EntityGroups.end( ) ) && ( iter_esi != m2EntitySets.end( ) ); ++iter_egi, ++iter_esi, icnt++ )
     {
         std::cout << "      EntityGroup(" << icnt << ") = ";
         std::cout.flush( );
@@ -364,8 +356,7 @@ int main( int argc, char** argv )
                 test_tuple.vul_wr[ i * num_ulongs + j ] = (int)( ( j + 1 ) * ( i + 1 ) );
 
             for( j = 0; j < num_reals; j++ )
-                test_tuple.vr_wr[ i * num_reals + j ] =
-                    (int)( ( j + 1 ) * ( i + 1 ) + ( j * 0.01 ) );
+                test_tuple.vr_wr[ i * num_reals + j ] = (int)( ( j + 1 ) * ( i + 1 ) + ( j * 0.01 ) );
         }
         std::cout << "    print of test_tuples after filling with data..." << std::endl;
         print_tuples( &test_tuple );
@@ -518,8 +509,8 @@ int main( int argc, char** argv )
     std::cout << "********** Test normalize_subset **********" << std::endl;
     // Now call the Coupler::normalize_subset routine and see if we get an error.
     std::cout << "Running Coupler::normalize_subset() on mesh 1" << std::endl;
-    err = mbc.normalize_subset( (EntityHandle)roots[ 0 ], normTag.c_str( ), &tagNames[ 0 ],
-                                numTagNames, &tagValues[ 0 ], Coupler::VOLUME, 4 );MB_CHK_SET_ERR( (ErrorCode)err, "Failure in call to Coupler::normalize_subset() on mesh 1" );
+    err = mbc.normalize_subset( (EntityHandle)roots[ 0 ], normTag.c_str( ), &tagNames[ 0 ], numTagNames,
+                                &tagValues[ 0 ], Coupler::VOLUME, 4 );MB_CHK_SET_ERR( (ErrorCode)err, "Failure in call to Coupler::normalize_subset() on mesh 1" );
 
     // Print the normFactor on each EntitySet after the above call.
     // Mesh 1 values
@@ -537,8 +528,8 @@ int main( int argc, char** argv )
     std::cout << std::endl;
 
     std::cout << "Running Coupler::normalize_subset() on mesh 2" << std::endl;
-    err = mbc.normalize_subset( (EntityHandle)roots[ 1 ], normTag.c_str( ), &tagNames[ 0 ],
-                                numTagNames, &tagValues[ 0 ], Coupler::VOLUME, 4 );MB_CHK_SET_ERR( (ErrorCode)err, "Failure in call to Coupler::normalize_subset() on mesh 2" );
+    err = mbc.normalize_subset( (EntityHandle)roots[ 1 ], normTag.c_str( ), &tagNames[ 0 ], numTagNames,
+                                &tagValues[ 0 ], Coupler::VOLUME, 4 );MB_CHK_SET_ERR( (ErrorCode)err, "Failure in call to Coupler::normalize_subset() on mesh 2" );
 
     // Mesh 2 values
     std::cout << "Mesh 2 norm factors per EntitySet...";
@@ -564,8 +555,7 @@ int main( int argc, char** argv )
 ErrorCode integrate_scalar_field_test( )
 {
     // ******************************
-    std::cout << "********** Test moab::Element::Map::integrate_scalar_field **********"
-              << std::endl;
+    std::cout << "********** Test moab::Element::Map::integrate_scalar_field **********" << std::endl;
     // Create a simple hex centered at 0,0,0 with sides of length 2.
     std::vector< CartVect > biunit_cube( 8 );
     biunit_cube[ 0 ] = CartVect( -1, -1, -1 );
@@ -591,20 +581,15 @@ ErrorCode integrate_scalar_field_test( )
     double bcf[ 8 ], bf1[ 8 ], bf2[ 8 ], bf3[ 8 ], zcf[ 8 ], zf1[ 8 ], zf2[ 8 ], zf3[ 8 ];
     for( int i = 0; i < 8; i++ )
     {
-        bcf[ i ] =
-            const_field( biunit_cube[ i ][ 0 ], biunit_cube[ i ][ 1 ], biunit_cube[ i ][ 2 ] );
+        bcf[ i ] = const_field( biunit_cube[ i ][ 0 ], biunit_cube[ i ][ 1 ], biunit_cube[ i ][ 2 ] );
         bf1[ i ] = field_1( biunit_cube[ i ][ 0 ], biunit_cube[ i ][ 1 ], biunit_cube[ i ][ 2 ] );
         bf2[ i ] = field_2( biunit_cube[ i ][ 0 ], biunit_cube[ i ][ 1 ], biunit_cube[ i ][ 2 ] );
         bf3[ i ] = field_3( biunit_cube[ i ][ 0 ], biunit_cube[ i ][ 1 ], biunit_cube[ i ][ 2 ] );
 
-        zcf[ i ] = const_field( zerobase_cube[ i ][ 0 ], zerobase_cube[ i ][ 1 ],
-                                zerobase_cube[ i ][ 2 ] );
-        zf1[ i ] =
-            field_1( zerobase_cube[ i ][ 0 ], zerobase_cube[ i ][ 1 ], zerobase_cube[ i ][ 2 ] );
-        zf2[ i ] =
-            field_2( zerobase_cube[ i ][ 0 ], zerobase_cube[ i ][ 1 ], zerobase_cube[ i ][ 2 ] );
-        zf3[ i ] =
-            field_3( zerobase_cube[ i ][ 0 ], zerobase_cube[ i ][ 1 ], zerobase_cube[ i ][ 2 ] );
+        zcf[ i ] = const_field( zerobase_cube[ i ][ 0 ], zerobase_cube[ i ][ 1 ], zerobase_cube[ i ][ 2 ] );
+        zf1[ i ] = field_1( zerobase_cube[ i ][ 0 ], zerobase_cube[ i ][ 1 ], zerobase_cube[ i ][ 2 ] );
+        zf2[ i ] = field_2( zerobase_cube[ i ][ 0 ], zerobase_cube[ i ][ 1 ], zerobase_cube[ i ][ 2 ] );
+        zf3[ i ] = field_3( zerobase_cube[ i ][ 0 ], zerobase_cube[ i ][ 1 ], zerobase_cube[ i ][ 2 ] );
     }
 
     std::cout << "Integrated values:" << std::endl;
@@ -622,31 +607,25 @@ ErrorCode integrate_scalar_field_test( )
 
         field_const1 = biunit_hexMap.integrate_scalar_field( bcf );
         field_const2 = zerobase_hexMap.integrate_scalar_field( zcf );
-        std::cout << "    binunit_cube, const_field(num_pts=" << ipoints
-                  << "): field_val=" << field_const1 << std::endl;
-        std::cout << "    zerobase_cube, const_field(num_pts=" << ipoints
-                  << "): field_val=" << field_const2 << std::endl;
+        std::cout << "    binunit_cube, const_field(num_pts=" << ipoints << "): field_val=" << field_const1
+                  << std::endl;
+        std::cout << "    zerobase_cube, const_field(num_pts=" << ipoints << "): field_val=" << field_const2
+                  << std::endl;
 
         field_linear1 = biunit_hexMap.integrate_scalar_field( bf1 );
         field_linear2 = zerobase_hexMap.integrate_scalar_field( zf1 );
-        std::cout << "    binunit_cube, field_1(num_pts=" << ipoints
-                  << "): field_val=" << field_linear1 << std::endl;
-        std::cout << "    zerobase_cube, field_1(num_pts=" << ipoints
-                  << "): field_val=" << field_linear2 << std::endl;
+        std::cout << "    binunit_cube, field_1(num_pts=" << ipoints << "): field_val=" << field_linear1 << std::endl;
+        std::cout << "    zerobase_cube, field_1(num_pts=" << ipoints << "): field_val=" << field_linear2 << std::endl;
 
         field_quad1 = biunit_hexMap.integrate_scalar_field( bf2 );
         field_quad2 = zerobase_hexMap.integrate_scalar_field( zf2 );
-        std::cout << "    binunit_cube, field_2(num_pts=" << ipoints
-                  << "): field_val=" << field_quad1 << std::endl;
-        std::cout << "    zerobase_cube, field_2(num_pts=" << ipoints
-                  << "): field_val=" << field_quad2 << std::endl;
+        std::cout << "    binunit_cube, field_2(num_pts=" << ipoints << "): field_val=" << field_quad1 << std::endl;
+        std::cout << "    zerobase_cube, field_2(num_pts=" << ipoints << "): field_val=" << field_quad2 << std::endl;
 
         field_cubic1 = biunit_hexMap.integrate_scalar_field( bf3 );
         field_cubic2 = zerobase_hexMap.integrate_scalar_field( zf3 );
-        std::cout << "    binunit_cube, field_3(num_pts=" << ipoints
-                  << "): field_val=" << field_cubic1 << std::endl;
-        std::cout << "    zerobase_cube, field_3(num_pts=" << ipoints
-                  << "): field_val=" << field_cubic2 << std::endl;
+        std::cout << "    binunit_cube, field_3(num_pts=" << ipoints << "): field_val=" << field_cubic1 << std::endl;
+        std::cout << "    zerobase_cube, field_3(num_pts=" << ipoints << "): field_val=" << field_cubic2 << std::endl;
     }
     catch( moab::Element::Map::ArgError )
     {
@@ -654,16 +633,15 @@ ErrorCode integrate_scalar_field_test( )
     }
     catch( moab::Element::Map::EvaluationError )
     {
-        MB_CHK_SET_ERR( MB_FAILURE,
-                        "Failed to get inverse evaluation of coordinate on Element::Map." );
+        MB_CHK_SET_ERR( MB_FAILURE, "Failed to get inverse evaluation of coordinate on Element::Map." );
     }
     return MB_SUCCESS;
 }
 
 // Function to parse input parameters
-void get_file_options( int argc, char** argv, std::vector< const char* >& filenames,
-                       std::string& normTag, std::vector< const char* >& tagNames,
-                       std::vector< const char* >& tagValues, std::string& fileOpts, int* err )
+void get_file_options( int argc, char** argv, std::vector< const char* >& filenames, std::string& normTag,
+                       std::vector< const char* >& tagNames, std::vector< const char* >& tagValues,
+                       std::string& fileOpts, int* err )
 {
     int npos = 1;
 
@@ -715,8 +693,7 @@ void get_file_options( int argc, char** argv, std::vector< const char* >& filena
                 if( end_vals_seen )
                 {
                     // ERROR we should not have a value after none are seen
-                    std::cerr << "Incorrect parameters:  new value seen after end of values"
-                              << std::endl;
+                    std::cerr << "Incorrect parameters:  new value seen after end of values" << std::endl;
                     *err = 1;
                     return;
                 }
@@ -823,8 +800,8 @@ void print_tuples( TupleList* tlp )
 }
 
 // Function to print vertex field values
-int print_vertex_fields( Interface* mbi, std::vector< std::vector< EntityHandle > >& groups,
-                         Tag& norm_hdl, Coupler::IntegType integ_type )
+int print_vertex_fields( Interface* mbi, std::vector< std::vector< EntityHandle > >& groups, Tag& norm_hdl,
+                         Coupler::IntegType integ_type )
 {
     int                                   err = 0;
     ErrorCode                             result;
@@ -921,9 +898,8 @@ int pack_tuples( TupleList* tl, void** ptr )
 
     uint n = tl->get_n( );
 
-    int sz_buf =
-        1 + 4 * UINT_PER_UNSIGNED +
-        tl->get_n( ) * ( mi + ml * UINT_PER_LONG + mul * UINT_PER_LONG + mr * UINT_PER_REAL );
+    int sz_buf = 1 + 4 * UINT_PER_UNSIGNED +
+                 tl->get_n( ) * ( mi + ml * UINT_PER_LONG + mul * UINT_PER_LONG + mr * UINT_PER_REAL );
 
     uint* buf = (uint*)malloc( sz_buf * sizeof( uint ) );
     *ptr = (void*)buf;
@@ -941,14 +917,11 @@ int pack_tuples( TupleList* tl, void** ptr )
     // copy vi_rd
     memcpy( buf, tl->vi_rd, tl->get_n( ) * mi * sizeof( sint ) ), buf += tl->get_n( ) * mi;
     // copy vl_rd
-    memcpy( buf, tl->vl_rd, tl->get_n( ) * ml * sizeof( slong ) ),
-        buf += tl->get_n( ) * ml * UINT_PER_LONG;
+    memcpy( buf, tl->vl_rd, tl->get_n( ) * ml * sizeof( slong ) ), buf += tl->get_n( ) * ml * UINT_PER_LONG;
     // copy vul_rd
-    memcpy( buf, tl->vul_rd, tl->get_n( ) * mul * sizeof( Ulong ) ),
-        buf += tl->get_n( ) * mul * UINT_PER_ULONG;
+    memcpy( buf, tl->vul_rd, tl->get_n( ) * mul * sizeof( Ulong ) ), buf += tl->get_n( ) * mul * UINT_PER_ULONG;
     // copy vr_rd
-    memcpy( buf, tl->vr_rd, tl->get_n( ) * mr * sizeof( realType ) ),
-        buf += tl->get_n( ) * mr * UINT_PER_REAL;
+    memcpy( buf, tl->vr_rd, tl->get_n( ) * mr * sizeof( realType ) ), buf += tl->get_n( ) * mr * UINT_PER_REAL;
 
     return sz_buf;
 }
@@ -985,14 +958,11 @@ void unpack_tuples( void* ptr, TupleList** tlp )
     // get vi_wr
     memcpy( tl->vi_wr, buf, tl->get_n( ) * mi * sizeof( sint ) ), buf += tl->get_n( ) * mi;
     // get vl_wr
-    memcpy( tl->vl_wr, buf, tl->get_n( ) * ml * sizeof( slong ) ),
-        buf += tl->get_n( ) * ml * UINT_PER_LONG;
+    memcpy( tl->vl_wr, buf, tl->get_n( ) * ml * sizeof( slong ) ), buf += tl->get_n( ) * ml * UINT_PER_LONG;
     // get vul_wr
-    memcpy( tl->vul_wr, buf, tl->get_n( ) * mul * sizeof( Ulong ) ),
-        buf += tl->get_n( ) * mul * UINT_PER_ULONG;
+    memcpy( tl->vul_wr, buf, tl->get_n( ) * mul * sizeof( Ulong ) ), buf += tl->get_n( ) * mul * UINT_PER_ULONG;
     // get vr_wr
-    memcpy( tl->vr_wr, buf, tl->get_n( ) * mr * sizeof( realType ) ),
-        buf += tl->get_n( ) * mr * UINT_PER_REAL;
+    memcpy( tl->vr_wr, buf, tl->get_n( ) * mr * sizeof( realType ) ), buf += tl->get_n( ) * mr * UINT_PER_REAL;
 
     tl->disableWriteAccess( );
 

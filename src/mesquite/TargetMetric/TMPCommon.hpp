@@ -46,20 +46,19 @@ namespace MBMesquite
  * member functions in terms of those macros.
  */
 
-#define TMP_T_TEMPL_IMPL_DIM( N, D )                                                          \
-    bool N::evaluate( const MsqMatrix< D, D >& T, double& r, MsqError& )                      \
-    {                                                                                         \
-        return eval( T, r );                                                                  \
-    }                                                                                         \
-    bool N::evaluate_with_grad( const MsqMatrix< D, D >& T, double& r, MsqMatrix< D, D >& d1, \
-                                MsqError& )                                                   \
-    {                                                                                         \
-        return grad( T, r, d1 );                                                              \
-    }                                                                                         \
-    bool N::evaluate_with_hess( const MsqMatrix< D, D >& T, double& r, MsqMatrix< D, D >& d1, \
-                                MsqMatrix< D, D >* d2, MsqError& )                            \
-    {                                                                                         \
-        return hess( T, r, d1, d2 );                                                          \
+#define TMP_T_TEMPL_IMPL_DIM( N, D )                                                                                 \
+    bool N::evaluate( const MsqMatrix< D, D >& T, double& r, MsqError& )                                             \
+    {                                                                                                                \
+        return eval( T, r );                                                                                         \
+    }                                                                                                                \
+    bool N::evaluate_with_grad( const MsqMatrix< D, D >& T, double& r, MsqMatrix< D, D >& d1, MsqError& )            \
+    {                                                                                                                \
+        return grad( T, r, d1 );                                                                                     \
+    }                                                                                                                \
+    bool N::evaluate_with_hess( const MsqMatrix< D, D >& T, double& r, MsqMatrix< D, D >& d1, MsqMatrix< D, D >* d2, \
+                                MsqError& )                                                                          \
+    {                                                                                                                \
+        return hess( T, r, d1, d2 );                                                                                 \
     }
 
 #define TMP_T_TEMPL_IMPL_COMMON( N ) \
@@ -80,20 +79,19 @@ namespace MBMesquite
  * a function of some other metric.
  */
 
-#define TMP_T_TEMPL_IMPL_ERR_DIM( N, D )                                                      \
-    bool N::evaluate( const MsqMatrix< D, D >& T, double& r, MsqError& err )                  \
-    {                                                                                         \
-        return eval( T, r, err );                                                             \
-    }                                                                                         \
-    bool N::evaluate_with_grad( const MsqMatrix< D, D >& T, double& r, MsqMatrix< D, D >& d1, \
-                                MsqError& err )                                               \
-    {                                                                                         \
-        return grad( T, r, d1, err );                                                         \
-    }                                                                                         \
-    bool N::evaluate_with_hess( const MsqMatrix< D, D >& T, double& r, MsqMatrix< D, D >& d1, \
-                                MsqMatrix< D, D >* d2, MsqError& err )                        \
-    {                                                                                         \
-        return hess( T, r, d1, d2, err );                                                     \
+#define TMP_T_TEMPL_IMPL_ERR_DIM( N, D )                                                                             \
+    bool N::evaluate( const MsqMatrix< D, D >& T, double& r, MsqError& err )                                         \
+    {                                                                                                                \
+        return eval( T, r, err );                                                                                    \
+    }                                                                                                                \
+    bool N::evaluate_with_grad( const MsqMatrix< D, D >& T, double& r, MsqMatrix< D, D >& d1, MsqError& err )        \
+    {                                                                                                                \
+        return grad( T, r, d1, err );                                                                                \
+    }                                                                                                                \
+    bool N::evaluate_with_hess( const MsqMatrix< D, D >& T, double& r, MsqMatrix< D, D >& d1, MsqMatrix< D, D >* d2, \
+                                MsqError& err )                                                                      \
+    {                                                                                                                \
+        return hess( T, r, d1, d2, err );                                                                            \
     }
 
 #define TMP_T_TEMPL_IMPL_COMMON_ERR( N ) \
@@ -109,21 +107,20 @@ namespace MBMesquite
  * member functions in terms of those macros.
  */
 
-#define TMP_AW_TEMPL_IMPL_DIM( N, D )                                                              \
-    bool N::evaluate( const MsqMatrix< D, D >& A, const MsqMatrix< D, D >& W, double& r,           \
-                      MsqError& )                                                                  \
-    {                                                                                              \
-        return eval( A, W, r );                                                                    \
-    }                                                                                              \
-    bool N::evaluate_with_grad( const MsqMatrix< D, D >& A, const MsqMatrix< D, D >& W, double& r, \
-                                MsqMatrix< D, D >& d1, MsqError& )                                 \
-    {                                                                                              \
-        return grad( A, W, r, d1 );                                                                \
-    }                                                                                              \
-    bool N::evaluate_with_hess( const MsqMatrix< D, D >& A, const MsqMatrix< D, D >& W, double& r, \
-                                MsqMatrix< D, D >& d1, MsqMatrix< D, D >* d2, MsqError& )          \
-    {                                                                                              \
-        return hess( A, W, r, d1, d2 );                                                            \
+#define TMP_AW_TEMPL_IMPL_DIM( N, D )                                                                \
+    bool N::evaluate( const MsqMatrix< D, D >& A, const MsqMatrix< D, D >& W, double& r, MsqError& ) \
+    {                                                                                                \
+        return eval( A, W, r );                                                                      \
+    }                                                                                                \
+    bool N::evaluate_with_grad( const MsqMatrix< D, D >& A, const MsqMatrix< D, D >& W, double& r,   \
+                                MsqMatrix< D, D >& d1, MsqError& )                                   \
+    {                                                                                                \
+        return grad( A, W, r, d1 );                                                                  \
+    }                                                                                                \
+    bool N::evaluate_with_hess( const MsqMatrix< D, D >& A, const MsqMatrix< D, D >& W, double& r,   \
+                                MsqMatrix< D, D >& d1, MsqMatrix< D, D >* d2, MsqError& )            \
+    {                                                                                                \
+        return hess( A, W, r, d1, d2 );                                                              \
     }
 
 #define TMP_AW_TEMPL_IMPL_COMMON( N ) \
@@ -134,16 +131,15 @@ namespace MBMesquite
  * \brief Like TMP_AW_TEMPL_IMPL_COMMON, except no implementation of 2nd derivs
  */
 
-#define TMP_AW_TEMPL_IMPL_NO2ND_DIM( N, D )                                                        \
-    bool N::evaluate( const MsqMatrix< D, D >& A, const MsqMatrix< D, D >& W, double& r,           \
-                      MsqError& )                                                                  \
-    {                                                                                              \
-        return eval( A, W, r );                                                                    \
-    }                                                                                              \
-    bool N::evaluate_with_grad( const MsqMatrix< D, D >& A, const MsqMatrix< D, D >& W, double& r, \
-                                MsqMatrix< D, D >& d1, MsqError& )                                 \
-    {                                                                                              \
-        return grad( A, W, r, d1 );                                                                \
+#define TMP_AW_TEMPL_IMPL_NO2ND_DIM( N, D )                                                          \
+    bool N::evaluate( const MsqMatrix< D, D >& A, const MsqMatrix< D, D >& W, double& r, MsqError& ) \
+    {                                                                                                \
+        return eval( A, W, r );                                                                      \
+    }                                                                                                \
+    bool N::evaluate_with_grad( const MsqMatrix< D, D >& A, const MsqMatrix< D, D >& W, double& r,   \
+                                MsqMatrix< D, D >& d1, MsqError& )                                   \
+    {                                                                                                \
+        return grad( A, W, r, d1 );                                                                  \
     }
 
 #define TMP_AW_TEMPL_IMPL_COMMON_NO2ND( N ) \

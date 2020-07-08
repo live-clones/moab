@@ -338,8 +338,8 @@ int main( int argc, char* argv[] )
     std::cout << std::endl;
 
     std::cout << "        " << std::setw( 8 ) << clock_to_string( load_time ) << std::setw( 8 )
-              << clock_to_string( build_time ) << std::setw( 8 ) << clock_to_string( stat_time )
-              << std::setw( 8 ) << clock_to_string( write_time );
+              << clock_to_string( build_time ) << std::setw( 8 ) << clock_to_string( stat_time ) << std::setw( 8 )
+              << clock_to_string( write_time );
     if( tag_elems ) std::cout << std::setw( 8 ) << clock_to_string( tag_time );
     if( tree_file ) std::cout << std::setw( 8 ) << clock_to_string( block_time );
     std::cout << std::endl;
@@ -523,8 +523,7 @@ void tag_vertices( Interface* moab )
         {
             CartVect coords;
             moab->get_coords( &*i, 1, coords.array( ) );
-            if( GeomUtil::box_point_overlap( CartVect( iter.box_min( ) ),
-                                             CartVect( iter.box_max( ) ), coords, 1e-7 ) )
+            if( GeomUtil::box_point_overlap( CartVect( iter.box_min( ) ), CartVect( iter.box_max( ) ), coords, 1e-7 ) )
                 moab->tag_set_data( tag, &*i, 1, &tag_val );
         }
     } while( MB_SUCCESS == iter.step( ) );

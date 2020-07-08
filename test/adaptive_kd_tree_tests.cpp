@@ -16,12 +16,11 @@ using namespace moab;
 #endif
 
 /* Utility method - compare two range boxes */
-bool box_equal( const AdaptiveKDTreeIter& iter, double x_min, double y_min, double z_min,
-                double x_max, double y_max, double z_max )
+bool box_equal( const AdaptiveKDTreeIter& iter, double x_min, double y_min, double z_min, double x_max, double y_max,
+                double z_max )
 {
-    return iter.box_min( )[ 0 ] == x_min && iter.box_min( )[ 1 ] == y_min &&
-           iter.box_min( )[ 2 ] == z_min && iter.box_max( )[ 0 ] == x_max &&
-           iter.box_max( )[ 1 ] == y_max && iter.box_max( )[ 2 ] == z_max;
+    return iter.box_min( )[ 0 ] == x_min && iter.box_min( )[ 1 ] == y_min && iter.box_min( )[ 2 ] == z_min &&
+           iter.box_max( )[ 0 ] == x_max && iter.box_max( )[ 1 ] == y_max && iter.box_max( )[ 2 ] == z_max;
 }
 
 void build_triangles( Interface* moab, Range& tris, int num_vert, const double* coords, int num_tri,
@@ -45,8 +44,7 @@ void build_triangles( Interface* moab, Range& tris, int num_vert, const double* 
 /* Utility method - build a 2x2x2 box composed of two triagles on a side */
 void build_triangle_box_small( Interface* moab, Range& tris )
 {
-    const double coords[] = { -1, -1, -1, 1, -1, -1, 1, 1, -1, -1, 1, -1,
-                              -1, -1, 1,  1, -1, 1,  1, 1, 1,  -1, 1, 1 };
+    const double coords[] = { -1, -1, -1, 1, -1, -1, 1, 1, -1, -1, 1, -1, -1, -1, 1, 1, -1, 1, 1, 1, 1, -1, 1, 1 };
 
     const unsigned conn[] = { 0, 1, 5, 0, 5, 4, 2, 6, 7, 2, 7, 3, 1, 2, 6, 1, 6, 5,
                               0, 3, 4, 3, 7, 4, 0, 1, 3, 1, 2, 3, 4, 5, 6, 4, 6, 7 };
@@ -59,54 +57,47 @@ void build_triangle_box_small( Interface* moab, Range& tris )
    quad is split diagonally to form two triangles. */
 void build_triangle_box_large( Interface* moab, Range& tris )
 {
-    const double coords[] = {
-        // corners
-        -3, -3, -3, 3, -3, -3, 3, 3, -3, -3, 3, -3, -3, -3, 3, 3, -3, 3, 3, 3, 3, -3, 3, 3,
+    const double   coords[] = { // corners
+                              -3, -3, -3, 3, -3, -3, 3, 3, -3, -3, 3, -3, -3, -3, 3, 3, -3, 3, 3, 3, 3, -3, 3, 3,
 
-        // edges
-        -1, -3, -3, 1, -3, -3, 3, -1, -3, 3, 1, -3, 1, 3, -3, -1, 3, -3, -3, 1, -3, -3, -1, -3,
+                              // edges
+                              -1, -3, -3, 1, -3, -3, 3, -1, -3, 3, 1, -3, 1, 3, -3, -1, 3, -3, -3, 1, -3, -3, -1, -3,
 
-        -1, -3, 3, 1, -3, 3, 3, -1, 3, 3, 1, 3, 1, 3, 3, -1, 3, 3, -3, 1, 3, -3, -1, 3,
+                              -1, -3, 3, 1, -3, 3, 3, -1, 3, 3, 1, 3, 1, 3, 3, -1, 3, 3, -3, 1, 3, -3, -1, 3,
 
-        -3, -3, -1, -3, -3, 1, 3, -3, -1, 3, -3, 1, 3, 3, -1, 3, 3, 1, -3, 3, -1, -3, 3, 1,
+                              -3, -3, -1, -3, -3, 1, 3, -3, -1, 3, -3, 1, 3, 3, -1, 3, 3, 1, -3, 3, -1, -3, 3, 1,
 
-        // faces
-        -1, -3, -1, 1, -3, -1, 1, -3, 1, -1, -3, 1,
+                              // faces
+                              -1, -3, -1, 1, -3, -1, 1, -3, 1, -1, -3, 1,
 
-        3, -1, -1, 3, 1, -1, 3, 1, 1, 3, -1, 1,
+                              3, -1, -1, 3, 1, -1, 3, 1, 1, 3, -1, 1,
 
-        1, 3, -1, -1, 3, -1, -1, 3, 1, 1, 3, 1,
+                              1, 3, -1, -1, 3, -1, -1, 3, 1, 1, 3, 1,
 
-        -3, 1, -1, -3, -1, -1, -3, -1, 1, -3, 1, 1,
+                              -3, 1, -1, -3, -1, -1, -3, -1, 1, -3, 1, 1,
 
-        -1, -1, -3, 1, -1, -3, 1, 1, -3, -1, 1, -3,
+                              -1, -1, -3, 1, -1, -3, 1, 1, -3, -1, 1, -3,
 
-        -1, -1, 3, 1, -1, 3, 1, 1, 3, -1, 1, 3 };
+                              -1, -1, 3, 1, -1, 3, 1, 1, 3, -1, 1, 3 };
     const unsigned conn[] = {
         // face 0
-        0, 8, 24, 8, 32, 24, 8, 33, 32, 8, 9, 33, 9, 1, 33, 1, 26, 33, 24, 35, 25, 24, 32, 35, 32,
-        33, 35, 33, 34, 35, 33, 27, 34, 33, 26, 27, 35, 4, 25, 35, 16, 4, 35, 17, 16, 35, 34, 17,
-        27, 17, 34, 27, 5, 17,
+        0, 8, 24, 8, 32, 24, 8, 33, 32, 8, 9, 33, 9, 1, 33, 1, 26, 33, 24, 35, 25, 24, 32, 35, 32, 33, 35, 33, 34, 35,
+        33, 27, 34, 33, 26, 27, 35, 4, 25, 35, 16, 4, 35, 17, 16, 35, 34, 17, 27, 17, 34, 27, 5, 17,
         // face 1
-        36, 26, 1, 36, 1, 10, 36, 10, 11, 36, 11, 37, 11, 28, 37, 11, 2, 28, 36, 27, 26, 36, 39, 27,
-        36, 38, 39, 36, 37, 38, 37, 28, 38, 28, 29, 38, 18, 5, 27, 18, 27, 39, 18, 39, 38,
-        18, 38, 19, 6, 19, 38, 6, 38, 29,
+        36, 26, 1, 36, 1, 10, 36, 10, 11, 36, 11, 37, 11, 28, 37, 11, 2, 28, 36, 27, 26, 36, 39, 27, 36, 38, 39, 36, 37,
+        38, 37, 28, 38, 28, 29, 38, 18, 5, 27, 18, 27, 39, 18, 39, 38, 18, 38, 19, 6, 19, 38, 6, 38, 29,
         // face 2
-        12, 28, 2, 12, 40, 28, 12, 41, 40, 12, 13, 41, 3, 41, 13, 3, 30, 41, 43, 29, 28, 43, 28, 40,
-        43, 40, 41, 43, 41, 42, 41, 31, 42, 41, 30, 31, 43, 6, 29, 43, 20, 6, 43, 21, 20, 43, 42,
-        21, 21, 42, 31, 21, 31, 7,
+        12, 28, 2, 12, 40, 28, 12, 41, 40, 12, 13, 41, 3, 41, 13, 3, 30, 41, 43, 29, 28, 43, 28, 40, 43, 40, 41, 43, 41,
+        42, 41, 31, 42, 41, 30, 31, 43, 6, 29, 43, 20, 6, 43, 21, 20, 43, 42, 21, 21, 42, 31, 21, 31, 7,
         // face 3
-        44, 30, 3, 44, 3, 14, 44, 14, 15, 44, 15, 45, 15, 24, 45, 15, 0, 24, 44, 31, 30, 44, 47, 31,
-        44, 46, 47, 44, 45, 46, 46, 45, 24, 46, 24, 25, 31, 22, 7, 31, 47, 22, 46, 22, 47, 46, 23,
-        22, 46, 4, 23, 46, 25, 4,
+        44, 30, 3, 44, 3, 14, 44, 14, 15, 44, 15, 45, 15, 24, 45, 15, 0, 24, 44, 31, 30, 44, 47, 31, 44, 46, 47, 44, 45,
+        46, 46, 45, 24, 46, 24, 25, 31, 22, 7, 31, 47, 22, 46, 22, 47, 46, 23, 22, 46, 4, 23, 46, 25, 4,
         // face 4
-        8, 15, 0, 8, 48, 15, 8, 49, 48, 8, 9, 49, 1, 49, 9, 1, 10, 49, 51, 14, 15, 51, 15, 48, 51,
-        48, 49, 51, 49, 50, 11, 50, 49, 11, 49, 10, 51, 3, 14, 51, 13, 3, 51, 12, 13, 51, 50, 12,
-        11, 12, 50, 11, 2, 12,
+        8, 15, 0, 8, 48, 15, 8, 49, 48, 8, 9, 49, 1, 49, 9, 1, 10, 49, 51, 14, 15, 51, 15, 48, 51, 48, 49, 51, 49, 50,
+        11, 50, 49, 11, 49, 10, 51, 3, 14, 51, 13, 3, 51, 12, 13, 51, 50, 12, 11, 12, 50, 11, 2, 12,
         // face 5
-        4, 52, 16, 4, 23, 52, 22, 52, 23, 22, 55, 52, 22, 21, 55, 22, 7, 21, 17, 16, 52, 17, 52, 53,
-        54, 53, 52, 54, 52, 55, 54, 55, 21, 54, 21, 20, 18, 5, 17, 18, 17, 53, 18, 53, 54, 18, 54,
-        19, 6, 19, 54, 6, 54, 20 };
+        4, 52, 16, 4, 23, 52, 22, 52, 23, 22, 55, 52, 22, 21, 55, 22, 7, 21, 17, 16, 52, 17, 52, 53, 54, 53, 52, 54, 52,
+        55, 54, 55, 21, 54, 21, 20, 18, 5, 17, 18, 17, 53, 18, 53, 54, 18, 54, 19, 6, 19, 54, 6, 54, 20 };
 
     build_triangles( moab, tris, 56, coords, 108, conn );
 }
@@ -115,14 +106,12 @@ void build_triangle_box_large( Interface* moab, Range& tris )
 void build_triangle_octahedron( Interface* moab, Range& tris )
 {
     const double   coords[] = { 1, 0, 0, 0, 1, 0, -1, 0, 0, 0, -1, 0, 0, 0, 1, 0, 0, -1 };
-    const unsigned conn[] = { 0, 1, 4, 1, 2, 4, 2, 3, 4, 3, 0, 4,
-                              1, 0, 5, 2, 1, 5, 3, 2, 5, 0, 3, 5 };
+    const unsigned conn[] = { 0, 1, 4, 1, 2, 4, 2, 3, 4, 3, 0, 4, 1, 0, 5, 2, 1, 5, 3, 2, 5, 0, 3, 5 };
 
     build_triangles( moab, tris, 6, coords, 8, conn );
 }
 
-void test_valid_tree( AdaptiveKDTree* tool, EntityHandle root, FileOptions& options,
-                      const Range& expected_tris )
+void test_valid_tree( AdaptiveKDTree* tool, EntityHandle root, FileOptions& options, const Range& expected_tris )
 {
     Range              all_tris;
     ErrorCode          rval;
@@ -160,8 +149,7 @@ void test_valid_tree( AdaptiveKDTree* tool, EntityHandle root, FileOptions& opti
 }
 
 /* utility method - check that all tris share a vertex */
-void check_common_vertex( Interface* moab, const EntityHandle* tris, unsigned num_tri,
-                          CartVect point )
+void check_common_vertex( Interface* moab, const EntityHandle* tris, unsigned num_tri, CartVect point )
 {
     for( unsigned i = 0; i < num_tri; ++i )
         CHECK( MBTRI == moab->type_from_handle( tris[ i ] ) );
@@ -194,8 +182,7 @@ void check_common_vertex( Interface* moab, const EntityHandle* tris, unsigned nu
 }
 
 /* utility method - check that all tris share a vertex */
-void check_point_in_triangles( Interface* moab, const EntityHandle* tris, unsigned num_tris,
-                               CartVect point )
+void check_point_in_triangles( Interface* moab, const EntityHandle* tris, unsigned num_tris, CartVect point )
 {
     ErrorCode           rval;
     CartVect            tri_coords[ 3 ], tript;
@@ -637,9 +624,8 @@ void test_closest_triangle( )
     }
 
     // test location on each face
-    const CartVect facepts[] = { CartVect( -1.0, 0.5, 0.5 ), CartVect( 1.0, 0.5, 0.5 ),
-                                 CartVect( 0.5, -1.0, 0.5 ), CartVect( 0.5, 1.0, 0.5 ),
-                                 CartVect( 0.5, 0.5, -1.0 ), CartVect( 0.5, 0.5, 1.0 ) };
+    const CartVect facepts[] = { CartVect( -1.0, 0.5, 0.5 ), CartVect( 1.0, 0.5, 0.5 ),  CartVect( 0.5, -1.0, 0.5 ),
+                                 CartVect( 0.5, 1.0, 0.5 ),  CartVect( 0.5, 0.5, -1.0 ), CartVect( 0.5, 0.5, 1.0 ) };
     for( unsigned i = 0; i < 6; ++i )
     {
         CartVect point;
@@ -696,9 +682,8 @@ void test_closest_triangle( )
     }
 
     // test location on each face
-    const CartVect facepts2[] = { CartVect( -3.0, 0.5, 0.5 ), CartVect( 3.0, 0.5, 0.5 ),
-                                  CartVect( 0.5, -3.0, 0.5 ), CartVect( 0.5, 3.0, 0.5 ),
-                                  CartVect( 0.5, 0.5, -3.0 ), CartVect( 0.5, 0.5, 3.0 ) };
+    const CartVect facepts2[] = { CartVect( -3.0, 0.5, 0.5 ), CartVect( 3.0, 0.5, 0.5 ),  CartVect( 0.5, -3.0, 0.5 ),
+                                  CartVect( 0.5, 3.0, 0.5 ),  CartVect( 0.5, 0.5, -3.0 ), CartVect( 0.5, 0.5, 3.0 ) };
     for( unsigned i = 0; i < 6; ++i )
     {
         CartVect point;
@@ -843,8 +828,7 @@ void test_ray_intersect_triangles( )
     // test ray ending within box, parallel to X axis
     tris.clear( );
     dists.clear( );
-    rval =
-        tool.ray_intersect_triangles( root, 1e-6, dir.array( ), pt.array( ), tris, dists, 0, 2.0 );
+    rval = tool.ray_intersect_triangles( root, 1e-6, dir.array( ), pt.array( ), tris, dists, 0, 2.0 );
     CHECK( MB_SUCCESS == rval );
     CHECK( tris.size( ) == 1 );
     CHECK( dists.size( ) == tris.size( ) );

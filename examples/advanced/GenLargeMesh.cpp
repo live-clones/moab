@@ -107,28 +107,18 @@ int main( int argc, char** argv )
 
     ProgOptions opts;
 
-    opts.addOpt< int >( string( "blockSize,b" ), string( "Block size of mesh (default=4)" ),
-                        &bopts.blockSize );
-    opts.addOpt< int >( string( "xproc,M" ), string( "Number of processors in x dir (default=1)" ),
-                        &bopts.M );
-    opts.addOpt< int >( string( "yproc,N" ), string( "Number of processors in y dir (default=1)" ),
-                        &bopts.N );
-    opts.addOpt< int >( string( "zproc,K" ), string( "Number of processors in z dir (default=1)" ),
-                        &bopts.K );
+    opts.addOpt< int >( string( "blockSize,b" ), string( "Block size of mesh (default=4)" ), &bopts.blockSize );
+    opts.addOpt< int >( string( "xproc,M" ), string( "Number of processors in x dir (default=1)" ), &bopts.M );
+    opts.addOpt< int >( string( "yproc,N" ), string( "Number of processors in y dir (default=1)" ), &bopts.N );
+    opts.addOpt< int >( string( "zproc,K" ), string( "Number of processors in z dir (default=1)" ), &bopts.K );
 
-    opts.addOpt< int >( string( "xblocks,A" ),
-                        string( "Number of blocks on a task in x dir (default=2)" ), &bopts.A );
-    opts.addOpt< int >( string( "yblocks,B" ),
-                        string( "Number of blocks on a task in y dir (default=2)" ), &bopts.B );
-    opts.addOpt< int >( string( "zblocks,C" ),
-                        string( "Number of blocks on a task in x dir (default=2)" ), &bopts.C );
+    opts.addOpt< int >( string( "xblocks,A" ), string( "Number of blocks on a task in x dir (default=2)" ), &bopts.A );
+    opts.addOpt< int >( string( "yblocks,B" ), string( "Number of blocks on a task in y dir (default=2)" ), &bopts.B );
+    opts.addOpt< int >( string( "zblocks,C" ), string( "Number of blocks on a task in x dir (default=2)" ), &bopts.C );
 
-    opts.addOpt< double >( string( "xsize,x" ), string( "Total size in x direction (default=1.)" ),
-                           &bopts.xsize );
-    opts.addOpt< double >( string( "ysize,y" ), string( "Total size in y direction (default=1.)" ),
-                           &bopts.ysize );
-    opts.addOpt< double >( string( "zsize,z" ), string( "Total size in z direction (default=1.)" ),
-                           &bopts.zsize );
+    opts.addOpt< double >( string( "xsize,x" ), string( "Total size in x direction (default=1.)" ), &bopts.xsize );
+    opts.addOpt< double >( string( "ysize,y" ), string( "Total size in y direction (default=1.)" ), &bopts.ysize );
+    opts.addOpt< double >( string( "zsize,z" ), string( "Total size in z direction (default=1.)" ), &bopts.zsize );
 
     opts.addOpt< void >( "newMerge,w", "use new merging method", &bopts.newMergeMethod );
 
@@ -140,8 +130,7 @@ int main( int argc, char** argv )
 
     opts.addOpt< void >( "faces_edges,f", "create all faces and edges", &bopts.adjEnts );
 
-    opts.addOpt< int >( string( "ghost_layers,g" ), string( "Number of ghost layers (default=0)" ),
-                        &bopts.GL );
+    opts.addOpt< int >( string( "ghost_layers,g" ), string( "Number of ghost layers (default=0)" ), &bopts.GL );
 
     vector< string > intTagNames;
     string           firstIntTag;
@@ -152,8 +141,7 @@ int main( int argc, char** argv )
     opts.addOpt< string >( "double_tag_cell,d", "add double tag on cells", &firstDoubleTag );
 
     string outFileName = "GenLargeMesh.h5m";
-    opts.addOpt< string >( "outFile,o",
-                           "Specify the output file name string (default GenLargeMesh.h5m)",
+    opts.addOpt< string >( "outFile,o", "Specify the output file name string (default GenLargeMesh.h5m)",
                            &outFileName );
 
 #ifdef MOAB_HAVE_HDF5_PARALLEL
@@ -161,12 +149,10 @@ int main( int argc, char** argv )
     opts.addOpt< void >( "readback,r", "read back the generated mesh", &readb );
 
     bool readAndGhost = false;
-    opts.addOpt< void >( "readAndGhost,G", "read back the generated mesh and ghost one layer",
-                         &readAndGhost );
+    opts.addOpt< void >( "readAndGhost,G", "read back the generated mesh and ghost one layer", &readAndGhost );
 #endif
 
-    opts.addOpt< void >( "parallel_merge,p", "use parallel mesh merge, not vertex ID based merge",
-                         &bopts.parmerge );
+    opts.addOpt< void >( "parallel_merge,p", "use parallel mesh merge, not vertex ID based merge", &bopts.parmerge );
 
     opts.addOpt< void >( "no_save,n", "do not save the file", &nosave );
 
@@ -211,8 +197,7 @@ int main( int argc, char** argv )
 
     if( 0 == rank )
     {
-        cout << "generate local mesh: " << ( clock( ) - tt ) / (double)CLOCKS_PER_SEC << " seconds"
-             << endl;
+        cout << "generate local mesh: " << ( clock( ) - tt ) / (double)CLOCKS_PER_SEC << " seconds" << endl;
         tt = clock( );
         cout << "number of elements on rank 0: " << all3dcells.size( ) << endl;
         cout << "Total number of elements " << all3dcells.size( ) * size << endl;
@@ -225,16 +210,15 @@ int main( int argc, char** argv )
     if( !nosave )
     {
 #ifdef MOAB_HAVE_HDF5_PARALLEL
-        rval = mb->write_file( outFileName.c_str( ), 0, ";;PARALLEL=WRITE_PART;CPUTIME;", &fileset,
-                               1 );MB_CHK_SET_ERR( rval, "Can't write in parallel" );
+        rval = mb->write_file( outFileName.c_str( ), 0, ";;PARALLEL=WRITE_PART;CPUTIME;", &fileset, 1 );MB_CHK_SET_ERR( rval, "Can't write in parallel" );
 #else
         // should be a vtk file, actually, maybe make sure of that
         rval = mb->write_file( outFileName.c_str( ), 0, "", &fileset, 1 );MB_CHK_SET_ERR( rval, "Can't write in serial" );
 #endif
         if( 0 == rank )
         {
-            cout << "write file " << outFileName << " in "
-                 << ( clock( ) - tt ) / (double)CLOCKS_PER_SEC << " seconds" << endl;
+            cout << "write file " << outFileName << " in " << ( clock( ) - tt ) / (double)CLOCKS_PER_SEC << " seconds"
+                 << endl;
             tt = clock( );
         }
     }
@@ -256,8 +240,7 @@ int main( int argc, char** argv )
         if( 0 == rank )
         {
             cout << "read back file " << outFileName << " with options: \n"
-                 << read_opts << " in " << ( clock( ) - tt ) / (double)CLOCKS_PER_SEC << " seconds"
-                 << endl;
+                 << read_opts << " in " << ( clock( ) - tt ) / (double)CLOCKS_PER_SEC << " seconds" << endl;
             tt = clock( );
         }
         moab::Range nverts, ncells;
@@ -274,10 +257,7 @@ int main( int argc, char** argv )
             rval = pcomm2->filter_pstatus( ncells, PSTATUS_GHOST, PSTATUS_NOT );MB_CHK_SET_ERR( rval, "Can't filter ghost cells" );
         }
         if( nverts.size( ) != nLocalVerts && ncells.size( ) != nLocalCells )
-        {
-            MB_SET_ERR( MB_FAILURE,
-                        "Reading back the output file led to inconsistent number of entities." );
-        }
+        { MB_SET_ERR( MB_FAILURE, "Reading back the output file led to inconsistent number of entities." ); }
 
         // delete the mesh that we already have in-memory
         mb2.delete_mesh( );

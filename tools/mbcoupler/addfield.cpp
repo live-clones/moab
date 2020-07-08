@@ -35,8 +35,7 @@ void putElementField( Interface* mbi, const char* tagname, double factor )
 
     const double defVal = 0.;
     Tag          fieldTag;
-    ErrorCode    rval = mbi->tag_get_handle( tagname, 1, MB_TYPE_DOUBLE, fieldTag,
-                                          MB_TAG_DENSE | MB_TAG_CREAT, &defVal );
+    ErrorCode rval = mbi->tag_get_handle( tagname, 1, MB_TYPE_DOUBLE, fieldTag, MB_TAG_DENSE | MB_TAG_CREAT, &defVal );
     assert( MB_SUCCESS == rval );
 #ifdef NDEBUG
     if( MB_SUCCESS == rval ) {};  // Line to avoid compiler warning about unused variable
@@ -67,8 +66,8 @@ void putSpectralElementField( Interface* mbi, int dim, int np, const char* tagna
     const int ndofperE = np * np;
     double*   defDouble = new double[ ndofperE ];
     Tag       fieldTag;
-    ErrorCode rval = mbi->tag_get_handle( tagname, ndofperE, MB_TYPE_DOUBLE, fieldTag,
-                                          MB_TAG_DENSE | MB_TAG_CREAT, &defDouble );
+    ErrorCode rval =
+        mbi->tag_get_handle( tagname, ndofperE, MB_TYPE_DOUBLE, fieldTag, MB_TAG_DENSE | MB_TAG_CREAT, &defDouble );
     std::cout << "rval = " << rval << std::endl;
     assert( MB_SUCCESS == rval || rval == MB_ALREADY_ALLOCATED );
 #ifdef NDEBUG
@@ -106,8 +105,7 @@ void putVertexField( Interface* mbi, const char* tagname, double factor )
 
     const double defVal = 0.;
     Tag          fieldTag;
-    mbi->tag_get_handle( tagname, 1, MB_TYPE_DOUBLE, fieldTag, MB_TAG_DENSE | MB_TAG_CREAT,
-                         &defVal );
+    mbi->tag_get_handle( tagname, 1, MB_TYPE_DOUBLE, fieldTag, MB_TAG_DENSE | MB_TAG_CREAT, &defVal );
 
     int numVerts = verts.size( );
     for( int i = 0; i < numVerts; i++ )

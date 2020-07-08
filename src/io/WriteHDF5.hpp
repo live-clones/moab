@@ -61,8 +61,8 @@ class WriteHDF5 : public WriterIface
      */
     ErrorCode write_file( const char* filename, const bool overwrite, const FileOptions& opts,
                           const EntityHandle* export_sets, const int export_set_count,
-                          const std::vector< std::string >& qa_records, const Tag* tag_list = NULL,
-                          int num_tags = 0, int user_dimension = 3 );
+                          const std::vector< std::string >& qa_records, const Tag* tag_list = NULL, int num_tags = 0,
+                          int user_dimension = 3 );
 
     /** The type to use for entity IDs w/in the file.
      *
@@ -209,9 +209,8 @@ class WriteHDF5 : public WriterIface
      *  for parallel version.
      */
     virtual ErrorCode parallel_create_file( const char* filename, bool overwrite,
-                                            const std::vector< std::string >& qa_records,
-                                            const FileOptions& opts, const Tag* tag_list,
-                                            int num_tags, int dimension = 3, double* times = 0 );
+                                            const std::vector< std::string >& qa_records, const FileOptions& opts,
+                                            const Tag* tag_list, int num_tags, int dimension = 3, double* times = 0 );
     virtual ErrorCode write_finished( );
     virtual void      debug_barrier_line( int lineno );
 
@@ -232,8 +231,7 @@ class WriteHDF5 : public WriterIface
      *                   tag values must be stored for all entities in the
      *                   ExportSet for dense-formatted data.
      */
-    bool check_dense_format_tag( const ExportSet& ents, const Range& all_tagged,
-                                 bool prefer_dense );
+    bool check_dense_format_tag( const ExportSet& ents, const Range& all_tagged, bool prefer_dense );
 
     /** Helper function for create-file
      *
@@ -261,12 +259,12 @@ class WriteHDF5 : public WriterIface
      *
      * Calculate total length of set contents and child tables.
      */
-    ErrorCode count_set_size( const Range& sets, long& contents_length_out,
-                              long& children_length_out, long& parents_length_out );
+    ErrorCode count_set_size( const Range& sets, long& contents_length_out, long& children_length_out,
+                              long& parents_length_out );
 
     //! Get information about a meshset
-    ErrorCode get_set_info( EntityHandle set, long& num_entities, long& num_children,
-                            long& num_parents, unsigned long& flags );
+    ErrorCode get_set_info( EntityHandle set, long& num_entities, long& num_children, long& num_parents,
+                            unsigned long& flags );
 
     /** Helper function for create-file
      *
@@ -399,8 +397,7 @@ class WriteHDF5 : public WriterIface
      *\param var_len_total For variable-length tags, the total number of values
      *                     in the data table.
      */
-    ErrorCode create_tag( const TagDesc& tag_data, unsigned long num_entities,
-                          unsigned long var_len_total );
+    ErrorCode create_tag( const TagDesc& tag_data, unsigned long num_entities, unsigned long var_len_total );
 
     /**\brief add entities to idMap */
     ErrorCode assign_ids( const Range& entities, wid_t first_id );
@@ -441,13 +438,13 @@ class WriteHDF5 : public WriterIface
 
     ErrorCode range_to_id_list( const Range& input_range, wid_t* array );
     //! Get IDs for entities
-    ErrorCode vector_to_id_list( const std::vector< EntityHandle >& input,
-                                 std::vector< wid_t >& output, bool remove_non_written = false );
+    ErrorCode vector_to_id_list( const std::vector< EntityHandle >& input, std::vector< wid_t >& output,
+                                 bool remove_non_written = false );
     //! Get IDs for entities
     ErrorCode vector_to_id_list( const EntityHandle* input, wid_t* output, size_t num_entities );
     //! Get IDs for entities
-    ErrorCode vector_to_id_list( const EntityHandle* input, size_t input_len, wid_t* output,
-                                 size_t& output_len, bool remove_non_written );
+    ErrorCode vector_to_id_list( const EntityHandle* input, size_t input_len, wid_t* output, size_t& output_len,
+                                 bool remove_non_written );
 
     /** When writing tags containing EntityHandles to file, need to convert tag
      *  data from EntityHandles to file IDs.  This function does that.
@@ -475,22 +472,20 @@ class WriteHDF5 : public WriterIface
 
     //! get sum of lengths of tag values (as number of type) for
     //! variable length tag data.
-    ErrorCode get_tag_data_length( const TagDesc& tag_info, const Range& range,
-                                   unsigned long& result );
+    ErrorCode get_tag_data_length( const TagDesc& tag_info, const Range& range, unsigned long& result );
 
   private:
     //! Do the actual work of write_file.  Separated from write_file
     //! for easier resource cleanup.
     ErrorCode write_file_impl( const char* filename, const bool overwrite, const FileOptions& opts,
                                const EntityHandle* export_sets, const int export_set_count,
-                               const std::vector< std::string >& qa_records, const Tag* tag_list,
-                               int num_tags, int user_dimension = 3 );
+                               const std::vector< std::string >& qa_records, const Tag* tag_list, int num_tags,
+                               int user_dimension = 3 );
 
     ErrorCode init( );
 
-    ErrorCode serial_create_file( const char* filename, bool overwrite,
-                                  const std::vector< std::string >& qa_records, const Tag* tag_list,
-                                  int num_tags, int dimension = 3 );
+    ErrorCode serial_create_file( const char* filename, bool overwrite, const std::vector< std::string >& qa_records,
+                                  const Tag* tag_list, int num_tags, int dimension = 3 );
 
     /** Get all mesh to export from given list of sets.
      *
@@ -549,9 +544,8 @@ class WriteHDF5 : public WriterIface
      *                  either \c ranged or \c null_stripped.  Values are
      *                  in handle order.
      */
-    ErrorCode write_set_data( const WriteUtilIface::EntityListType which_data, const hid_t handle,
-                              IODebugTrack& track, Range* ranged = 0, Range* null_stripped = 0,
-                              std::vector< long >* set_sizes = 0 );
+    ErrorCode write_set_data( const WriteUtilIface::EntityListType which_data, const hid_t handle, IODebugTrack& track,
+                              Range* ranged = 0, Range* null_stripped = 0, std::vector< long >* set_sizes = 0 );
 
     /** Write adjacency info for passed set of elements
      *
@@ -570,8 +564,8 @@ class WriteHDF5 : public WriterIface
     ErrorCode write_tag( const TagDesc& tag_data, double* times );
 
     //! Get element connectivity
-    ErrorCode get_connectivity( Range::const_iterator begin, Range::const_iterator end,
-                                int nodes_per_element, wid_t* id_data_out );
+    ErrorCode get_connectivity( Range::const_iterator begin, Range::const_iterator end, int nodes_per_element,
+                                wid_t* id_data_out );
 
     //! Get size data for tag
     //!\param tag       MOAB tag ID
@@ -589,40 +583,37 @@ class WriteHDF5 : public WriterIface
     //!\param hdf_type  Output: Handle to HDF5 type object.  Caller is
     //!                         responsible for releasing this object
     //!                         (calling H5Tclose).
-    ErrorCode get_tag_size( Tag tag, DataType& moab_type, int& num_bytes, int& elem_size,
-                            int& file_size, mhdf_TagDataType& file_type, hid_t& hdf_type );
+    ErrorCode get_tag_size( Tag tag, DataType& moab_type, int& num_bytes, int& elem_size, int& file_size,
+                            mhdf_TagDataType& file_type, hid_t& hdf_type );
 
     //! Write ID table for sparse tag
-    ErrorCode write_sparse_ids( const TagDesc& tag_data, const Range& range, hid_t table_handle,
-                                size_t table_size, const char* name = 0 );
+    ErrorCode write_sparse_ids( const TagDesc& tag_data, const Range& range, hid_t table_handle, size_t table_size,
+                                const char* name = 0 );
 
     //! Write fixed-length tag data in sparse format
-    ErrorCode write_sparse_tag( const TagDesc& tag_data, const std::string& tag_name,
-                                DataType tag_data_type, hid_t hdf5_data_type, int hdf5_type_size );
+    ErrorCode write_sparse_tag( const TagDesc& tag_data, const std::string& tag_name, DataType tag_data_type,
+                                hid_t hdf5_data_type, int hdf5_type_size );
 
     //! Write end index data_set for a variable-length tag
-    ErrorCode write_var_len_indices( const TagDesc& tag_data, const Range& range, hid_t idx_table,
-                                     size_t table_size, int type_size, const char* name = 0 );
+    ErrorCode write_var_len_indices( const TagDesc& tag_data, const Range& range, hid_t idx_table, size_t table_size,
+                                     int type_size, const char* name = 0 );
 
     //! Write tag value data_set for a variable-length tag
-    ErrorCode write_var_len_data( const TagDesc& tag_data, const Range& range, hid_t table,
-                                  size_t table_size, bool handle_tag, hid_t hdf_type, int type_size,
-                                  const char* name = 0 );
+    ErrorCode write_var_len_data( const TagDesc& tag_data, const Range& range, hid_t table, size_t table_size,
+                                  bool handle_tag, hid_t hdf_type, int type_size, const char* name = 0 );
 
     //! Write varialbe-length tag data
-    ErrorCode write_var_len_tag( const TagDesc& tag_info, const std::string& tag_name,
-                                 DataType tag_data_type, hid_t hdf5_type, int hdf5_type_size );
+    ErrorCode write_var_len_tag( const TagDesc& tag_info, const std::string& tag_name, DataType tag_data_type,
+                                 hid_t hdf5_type, int hdf5_type_size );
 
     //! Write dense-formatted tag data
-    ErrorCode write_dense_tag( const TagDesc& tag_data, const ExportSet& elem_data,
-                               const std::string& tag_name, DataType tag_data_type,
-                               hid_t hdf5_data_type, int hdf5_type_size );
+    ErrorCode write_dense_tag( const TagDesc& tag_data, const ExportSet& elem_data, const std::string& tag_name,
+                               DataType tag_data_type, hid_t hdf5_data_type, int hdf5_type_size );
 
     //! Write data for fixed-size tag
-    ErrorCode write_tag_values( Tag tag_id, hid_t data_table, unsigned long data_offset,
-                                const Range& range, DataType tag_data_type, hid_t hdf5_data_type,
-                                int hdf5_type_size, unsigned long max_num_ents,
-                                IODebugTrack& debug_track );
+    ErrorCode write_tag_values( Tag tag_id, hid_t data_table, unsigned long data_offset, const Range& range,
+                                DataType tag_data_type, hid_t hdf5_data_type, int hdf5_type_size,
+                                unsigned long max_num_ents, IODebugTrack& debug_track );
 
   protected:
     enum TimingValues

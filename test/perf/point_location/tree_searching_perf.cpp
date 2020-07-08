@@ -18,8 +18,7 @@
 
 using namespace moab;
 
-ErrorCode test_locator( SpatialLocator& sl, int npoints, double& cpu_time,
-                        double& percent_outside );
+ErrorCode test_locator( SpatialLocator& sl, int npoints, double& cpu_time, double& percent_outside );
 ErrorCode create_hex_mesh( Interface& mb, Range& elems, int n, int dim );
 
 int main( int argc, char** argv )
@@ -36,14 +35,10 @@ int main( int argc, char** argv )
     int dints = 1, dleafs = 1, ddeps = 1, csints = 0;
 
     ProgOptions po;
-    po.addOpt< int >(
-        "candidateplaneset,c",
-        "Candidate plane set (0=SUBDIVISION,1=SUBDIV_SNAP,2=VERTEX_MEDIAN,3=VERTEX_SAMPLE",
-        &csints );
-    po.addOpt< int >( "ints,i", "Number of doublings of intervals on each side of scd mesh",
-                      &dints );
-    po.addOpt< int >( "leaf,l", "Number of doublings of maximum number of elements per leaf",
-                      &dleafs );
+    po.addOpt< int >( "candidateplaneset,c",
+                      "Candidate plane set (0=SUBDIVISION,1=SUBDIV_SNAP,2=VERTEX_MEDIAN,3=VERTEX_SAMPLE", &csints );
+    po.addOpt< int >( "ints,i", "Number of doublings of intervals on each side of scd mesh", &dints );
+    po.addOpt< int >( "leaf,l", "Number of doublings of maximum number of elements per leaf", &dleafs );
     po.addOpt< int >( "max_depth,m", "Number of 5-intervals on maximum depth of tree", &ddeps );
     po.addOpt< int >( "npoints,n", "Number of query points", &npoints );
     po.addOpt< int >( "dim,d", "Dimension of the mesh", &dim );
@@ -99,8 +94,7 @@ int main( int argc, char** argv )
         {
 
             // iteration: tree max elems/leaf
-            for( std::vector< int >::iterator leafs_it = leafs.begin( ); leafs_it != leafs.end( );
-                 ++leafs_it )
+            for( std::vector< int >::iterator leafs_it = leafs.begin( ); leafs_it != leafs.end( ); ++leafs_it )
             {
 
                 // iteration: tree type
@@ -130,9 +124,8 @@ int main( int argc, char** argv )
                     rval = test_locator( sl, npoints, cpu_time, perc_outside );
                     if( MB_SUCCESS != rval ) return rval;
 
-                    std::cout << ( tree_tp == 0 ? "BVH" : "KD" ) << " " << *leafs_it << " "
-                              << *dep_it << " " << *int_it << " "
-                              << ( *int_it ) * ( *int_it ) * ( *int_it ) << " " << cpu_time << " "
+                    std::cout << ( tree_tp == 0 ? "BVH" : "KD" ) << " " << *leafs_it << " " << *dep_it << " " << *int_it
+                              << " " << ( *int_it ) * ( *int_it ) * ( *int_it ) << " " << cpu_time << " "
                               << perc_outside << " ";
 
                     tree->tree_stats( ).output_all_stats( );
@@ -166,17 +159,15 @@ ErrorCode test_locator( SpatialLocator& sl, int npoints, double& cpu_time, doubl
     for( int i = 0; i < npoints; i++ )
     {
         // generate a small number of random point to test
-        double rx = (double)rand( ) * denom, ry = (double)rand( ) * denom,
-               rz = (double)rand( ) * denom;
-        test_pts[ i ] =
-            box.bMin + CartVect( rx * box_del[ 0 ], ry * box_del[ 1 ], rz * box_del[ 2 ] );
+        double rx = (double)rand( ) * denom, ry = (double)rand( ) * denom, rz = (double)rand( ) * denom;
+        test_pts[ i ] = box.bMin + CartVect( rx * box_del[ 0 ], ry * box_del[ 1 ], rz * box_del[ 2 ] );
     }
 
     CpuTimer ct;
 
     // call spatial locator to locate points
-    ErrorCode rval = sl.locate_points( test_pts[ 0 ].array( ), npoints, &ents[ 0 ],
-                                       test_res[ 0 ].array( ), &is_in[ 0 ] );
+    ErrorCode rval =
+        sl.locate_points( test_pts[ 0 ].array( ), npoints, &ents[ 0 ], test_res[ 0 ].array( ), &is_in[ 0 ] );
     if( MB_SUCCESS != rval )
     {
         delete[] is_in;

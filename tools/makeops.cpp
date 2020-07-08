@@ -29,9 +29,8 @@ enum OperationType
     UNDEFINED
 };
 
-const char* OperationNames[] = { "atomic_pillow", "face_open_collapse", "face_shrink",
-                                 "chord_push",    "triple_chord_push",  "triple_hex_push",
-                                 "undefined" };
+const char* OperationNames[] = { "atomic_pillow",     "face_open_collapse", "face_shrink", "chord_push",
+                                 "triple_chord_push", "triple_hex_push",    "undefined" };
 
 int main( int argc, char** argv )
 {
@@ -43,8 +42,7 @@ int main( int argc, char** argv )
 
     if( argc < 2 )
     {
-        std::cout << "Usage: " << argv[ 0 ]
-                  << " [-h5m] [-vtk] {-ap | -foc | -fs | -cp | -tcp | -thp}" << std::endl;
+        std::cout << "Usage: " << argv[ 0 ] << " [-h5m] [-vtk] {-ap | -foc | -fs | -cp | -tcp | -thp}" << std::endl;
         return 1;
     }
 
@@ -74,8 +72,7 @@ int main( int argc, char** argv )
 
     ErrorCode result = MB_SUCCESS, tmp_result = MB_FAILURE;
 
-    for( std::vector< OperationType >::iterator vit = op_types.begin( ); vit != op_types.end( );
-         ++vit )
+    for( std::vector< OperationType >::iterator vit = op_types.begin( ); vit != op_types.end( ); ++vit )
     {
         if( *vit == ATOMIC_PILLOW ) { tmp_result = make_atomic_pillow( ); }
         else if( *vit == FACE_OPEN_COLLAPSE )
@@ -170,14 +167,12 @@ ErrorCode make_face_shrink( )
 {
     // make face shrink configuration
     // make all vertices
-    double vtx_coord[] = { 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0,
-                           1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0,
-                           1.0, 1.0, 2.0, 1.0, 0.0, 2.0, 0.0, 0.0, 2.0, 0.0, 1.0, 2.0,
-                           .75, .75, 1.0, .75, .25, 1.0, .25, .25, 1.0, .25, .75, 1.0 };
+    double vtx_coord[] = { 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0,
+                           0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 2.0, 1.0, 0.0, 2.0, 0.0, 0.0,
+                           2.0, 0.0, 1.0, 2.0, .75, .75, 1.0, .75, .25, 1.0, .25, .25, 1.0, .25, .75, 1.0 };
 
-    int connect[] = { 3, 7, 11, 15, 0,  4,  8,  12, 0,  4,  8,  12, 1, 5,  9,  13,
-                      1, 5, 9,  13, 2,  6,  10, 14, 2,  6,  10, 14, 3, 7,  11, 15,
-                      0, 3, 2,  1,  12, 15, 14, 13, 12, 15, 14, 13, 8, 11, 10, 9 };
+    int connect[] = { 3, 7, 11, 15, 0, 4, 8,  12, 0, 4, 8, 12, 1,  5,  9,  13, 1,  5,  9,  13, 2, 6,  10, 14,
+                      2, 6, 10, 14, 3, 7, 11, 15, 0, 3, 2, 1,  12, 15, 14, 13, 12, 15, 14, 13, 8, 11, 10, 9 };
 
     ErrorCode    result;
     EntityHandle vtx_handles[ 16 ];
@@ -213,11 +208,11 @@ ErrorCode make_chord_push( )
     // make chord push configuration
     // make all vertices
     double vtx_coord[] = { // first layer
-                           0.0, 0.0, 0.5, 0.0, 1.0, 0.0, -1.0, 0.5, 0.0, -1.0, -0.5, 0.0, 0.0, -1.0,
-                           0.0, 1.0, -0.5, 0.0, 1.0, 0.5, 0.0,
+                           0.0, 0.0, 0.5, 0.0, 1.0, 0.0, -1.0, 0.5, 0.0, -1.0, -0.5, 0.0, 0.0, -1.0, 0.0, 1.0, -0.5,
+                           0.0, 1.0, 0.5, 0.0,
                            // second layer
-                           0.0, 0.0, -1.5, 0.0, 1.0, -1.0, -1.0, 0.5, -1.0, -1.0, -0.5, -1.0, 0.0,
-                           -1.0, -1.0, 1.0, -0.5, -1.0, 1.0, 0.5, -1.0,
+                           0.0, 0.0, -1.5, 0.0, 1.0, -1.0, -1.0, 0.5, -1.0, -1.0, -0.5, -1.0, 0.0, -1.0, -1.0, 1.0,
+                           -0.5, -1.0, 1.0, 0.5, -1.0,
                            // 2 extra vertices for chord push
                            0.0, -.333, 0.05, 0.0, -.667, 0.10 };
 
@@ -340,11 +335,11 @@ ErrorCode make_triple_chord_push( )
     // make chord push configuration
     // make all vertices
     double vtx_coord[] = { // first layer
-                           0.0, 0.0, 0.5, 0.0, 1.0, 0.0, -1.0, 0.5, 0.0, -1.0, -0.5, 0.0, 0.0, -1.0,
-                           0.0, 1.0, -0.5, 0.0, 1.0, 0.5, 0.0,
+                           0.0, 0.0, 0.5, 0.0, 1.0, 0.0, -1.0, 0.5, 0.0, -1.0, -0.5, 0.0, 0.0, -1.0, 0.0, 1.0, -0.5,
+                           0.0, 1.0, 0.5, 0.0,
                            // second layer
-                           0.0, 0.0, -1.5, 0.0, 1.0, -1.0, -1.0, 0.5, -1.0, -1.0, -0.5, -1.0, 0.0,
-                           -1.0, -1.0, 1.0, -0.5, -1.0, 1.0, 0.5, -1.0,
+                           0.0, 0.0, -1.5, 0.0, 1.0, -1.0, -1.0, 0.5, -1.0, -1.0, -0.5, -1.0, 0.0, -1.0, -1.0, 1.0,
+                           -0.5, -1.0, 1.0, 0.5, -1.0,
                            // 2 extra vertices in middle
                            0.0, 0.0, -0.25, 0.0, 0.0, 0.0 };
 

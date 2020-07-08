@@ -27,8 +27,7 @@
 namespace moab
 {
 
-VarLenSparseTag::VarLenSparseTag( const char* name, DataType type, const void* default_value,
-                                  int default_value_bytes )
+VarLenSparseTag::VarLenSparseTag( const char* name, DataType type, const void* default_value, int default_value_bytes )
     : TagInfo( name, MB_VARIABLE_LENGTH, type, default_value, default_value_bytes )
 {
 }
@@ -49,8 +48,8 @@ ErrorCode VarLenSparseTag::release_all_data( SequenceManager*, Error*, bool )
     return MB_SUCCESS;
 }
 
-ErrorCode VarLenSparseTag::get_data_ptr( Error* /* error */, EntityHandle entity_handle,
-                                         const void*& ptr, int& length ) const
+ErrorCode VarLenSparseTag::get_data_ptr( Error* /* error */, EntityHandle entity_handle, const void*& ptr,
+                                         int& length ) const
 {
     MapType::const_iterator iter = mData.find( entity_handle );
 
@@ -70,29 +69,23 @@ ErrorCode VarLenSparseTag::get_data_ptr( Error* /* error */, EntityHandle entity
     return MB_SUCCESS;
 }
 
-ErrorCode VarLenSparseTag::get_data( const SequenceManager*, Error* /* error */,
-                                     const EntityHandle*, size_t, void* ) const
+ErrorCode VarLenSparseTag::get_data( const SequenceManager*, Error* /* error */, const EntityHandle*, size_t,
+                                     void* ) const
 {
-    MB_SET_ERR( MB_VARIABLE_DATA_LENGTH,
-                "No size specified for variable-length tag " << get_name( ) << " data" );
+    MB_SET_ERR( MB_VARIABLE_DATA_LENGTH, "No size specified for variable-length tag " << get_name( ) << " data" );
 }
 
-ErrorCode VarLenSparseTag::get_data( const SequenceManager*, Error* /* error */,
-                                     const Range& /*entities*/, void* /* data */ ) const
+ErrorCode VarLenSparseTag::get_data( const SequenceManager*, Error* /* error */, const Range& /*entities*/,
+                                     void* /* data */ ) const
 {
-    MB_SET_ERR( MB_VARIABLE_DATA_LENGTH,
-                "No size specified for variable-length tag " << get_name( ) << " data" );
+    MB_SET_ERR( MB_VARIABLE_DATA_LENGTH, "No size specified for variable-length tag " << get_name( ) << " data" );
 }
 
-ErrorCode VarLenSparseTag::get_data( const SequenceManager*, Error* /* error */,
-                                     const EntityHandle* entities, size_t num_entities,
-                                     const void** pointers, int* lengths ) const
+ErrorCode VarLenSparseTag::get_data( const SequenceManager*, Error* /* error */, const EntityHandle* entities,
+                                     size_t num_entities, const void** pointers, int* lengths ) const
 {
     if( !lengths )
-    {
-        MB_SET_ERR( MB_VARIABLE_DATA_LENGTH,
-                    "No size specified for variable-length tag " << get_name( ) << " data" );
-    }
+    { MB_SET_ERR( MB_VARIABLE_DATA_LENGTH, "No size specified for variable-length tag " << get_name( ) << " data" ); }
 
     ErrorCode rval;
     for( size_t i = 0; i < num_entities; ++i )
@@ -104,15 +97,11 @@ ErrorCode VarLenSparseTag::get_data( const SequenceManager*, Error* /* error */,
     return MB_SUCCESS;
 }
 
-ErrorCode VarLenSparseTag::get_data( const SequenceManager*, Error* /* error */,
-                                     const Range& entities, const void** pointers,
-                                     int* lengths ) const
+ErrorCode VarLenSparseTag::get_data( const SequenceManager*, Error* /* error */, const Range& entities,
+                                     const void** pointers, int* lengths ) const
 {
     if( !lengths )
-    {
-        MB_SET_ERR( MB_VARIABLE_DATA_LENGTH,
-                    "No size specified for variable-length tag " << get_name( ) << " data" );
-    }
+    { MB_SET_ERR( MB_VARIABLE_DATA_LENGTH, "No size specified for variable-length tag " << get_name( ) << " data" ); }
 
     ErrorCode             rval;
     Range::const_iterator i;
@@ -129,20 +118,17 @@ ErrorCode VarLenSparseTag::set_data( SequenceManager* /* seqman */, Error* /* er
                                      const EntityHandle* /* entities */, size_t /* num_entities */,
                                      const void* /* data */ )
 {
-    MB_SET_ERR( MB_VARIABLE_DATA_LENGTH,
-                "No size specified for variable-length tag " << get_name( ) << " data" );
+    MB_SET_ERR( MB_VARIABLE_DATA_LENGTH, "No size specified for variable-length tag " << get_name( ) << " data" );
 }
 
-ErrorCode VarLenSparseTag::set_data( SequenceManager* /* seqman */, Error* /* error */,
-                                     const Range& /* entities */, const void* /* data */ )
+ErrorCode VarLenSparseTag::set_data( SequenceManager* /* seqman */, Error* /* error */, const Range& /* entities */,
+                                     const void* /* data */ )
 {
-    MB_SET_ERR( MB_VARIABLE_DATA_LENGTH,
-                "No size specified for variable-length tag " << get_name( ) << " data" );
+    MB_SET_ERR( MB_VARIABLE_DATA_LENGTH, "No size specified for variable-length tag " << get_name( ) << " data" );
 }
 
-ErrorCode VarLenSparseTag::set_data( SequenceManager*    seqman, Error* /* error */,
-                                     const EntityHandle* entities, size_t num_entities,
-                                     void const* const* pointers, const int* lengths )
+ErrorCode VarLenSparseTag::set_data( SequenceManager* seqman, Error* /* error */, const EntityHandle* entities,
+                                     size_t num_entities, void const* const* pointers, const int* lengths )
 {
     ErrorCode rval = validate_lengths( NULL, lengths, num_entities );MB_CHK_ERR( rval );
 
@@ -166,9 +152,8 @@ ErrorCode VarLenSparseTag::set_data( SequenceManager*    seqman, Error* /* error
     return MB_SUCCESS;
 }
 
-ErrorCode VarLenSparseTag::set_data( SequenceManager* seqman, Error* /* error */,
-                                     const Range& entities, void const* const* pointers,
-                                     const int* lengths )
+ErrorCode VarLenSparseTag::set_data( SequenceManager* seqman, Error* /* error */, const Range& entities,
+                                     void const* const* pointers, const int* lengths )
 {
     ErrorCode rval = validate_lengths( NULL, lengths, entities.size( ) );MB_CHK_ERR( rval );
 
@@ -193,9 +178,8 @@ ErrorCode VarLenSparseTag::set_data( SequenceManager* seqman, Error* /* error */
     return MB_SUCCESS;
 }
 
-ErrorCode VarLenSparseTag::clear_data( SequenceManager*    seqman, Error* /* error */,
-                                       const EntityHandle* entities, size_t num_entities,
-                                       const void* value_ptr, int value_len )
+ErrorCode VarLenSparseTag::clear_data( SequenceManager* seqman, Error* /* error */, const EntityHandle* entities,
+                                       size_t num_entities, const void* value_ptr, int value_len )
 {
     if( 0 == value_len )
     {
@@ -213,8 +197,8 @@ ErrorCode VarLenSparseTag::clear_data( SequenceManager*    seqman, Error* /* err
     return MB_SUCCESS;
 }
 
-ErrorCode VarLenSparseTag::clear_data( SequenceManager* seqman, Error* /* error */,
-                                       const Range& entities, const void* value_ptr, int value_len )
+ErrorCode VarLenSparseTag::clear_data( SequenceManager* seqman, Error* /* error */, const Range& entities,
+                                       const void* value_ptr, int value_len )
 {
     if( 0 == value_len )
     {
@@ -233,8 +217,8 @@ ErrorCode VarLenSparseTag::clear_data( SequenceManager* seqman, Error* /* error 
     return MB_SUCCESS;
 }
 
-ErrorCode VarLenSparseTag::remove_data( SequenceManager*, Error* /* error */,
-                                        const EntityHandle* entities, size_t num_entities )
+ErrorCode VarLenSparseTag::remove_data( SequenceManager*, Error* /* error */, const EntityHandle* entities,
+                                        size_t num_entities )
 {
     ErrorCode result = MB_SUCCESS;
     for( size_t i = 0; i < num_entities; ++i )
@@ -252,8 +236,7 @@ ErrorCode VarLenSparseTag::remove_data( SequenceManager*, Error* /* error */,
     return result;
 }
 
-ErrorCode VarLenSparseTag::remove_data( SequenceManager*, Error* /* error */,
-                                        const Range& entities )
+ErrorCode VarLenSparseTag::remove_data( SequenceManager*, Error* /* error */, const Range& entities )
 {
     ErrorCode result = MB_SUCCESS;
     for( Range::iterator i = entities.begin( ); i != entities.end( ); ++i )
@@ -271,15 +254,14 @@ ErrorCode VarLenSparseTag::remove_data( SequenceManager*, Error* /* error */,
     return result;
 }
 
-ErrorCode VarLenSparseTag::tag_iterate( SequenceManager*, Error* /* error */, Range::iterator&,
-                                        const Range::iterator&, void*&, bool )
+ErrorCode VarLenSparseTag::tag_iterate( SequenceManager*, Error* /* error */, Range::iterator&, const Range::iterator&,
+                                        void*&, bool )
 {
     MB_SET_ERR( MB_VARIABLE_DATA_LENGTH, "Cannot iterate over variable-length tag data" );
 }
 
 template< class Container >
-static inline void get_tagged( const VarLenSparseTag::MapType& mData, EntityType type,
-                               Container& output_range )
+static inline void get_tagged( const VarLenSparseTag::MapType& mData, EntityType type, Container& output_range )
 {
     VarLenSparseTag::MapType::const_iterator iter;
     typename Container::iterator             hint = output_range.begin( );
@@ -292,8 +274,7 @@ static inline void get_tagged( const VarLenSparseTag::MapType& mData, EntityType
     {
 #ifdef MOAB_HAVE_UNORDERED_MAP
         for( iter = mData.begin( ); iter != mData.end( ); ++iter )
-            if( TYPE_FROM_HANDLE( iter->first ) == type )
-                hint = output_range.insert( hint, iter->first );
+            if( TYPE_FROM_HANDLE( iter->first ) == type ) hint = output_range.insert( hint, iter->first );
 #else
         iter = mData.lower_bound( FIRST_HANDLE( type ) );
         VarLenSparseTag::MapType::const_iterator end = mData.lower_bound( LAST_HANDLE( type ) + 1 );
@@ -313,8 +294,8 @@ static inline void get_tagged( const VarLenSparseTag::MapType& mData, Range::con
 }
 
 template< class Container >
-static inline void get_tagged( const VarLenSparseTag::MapType& mData, Container& entities,
-                               EntityType type, const Range* intersect )
+static inline void get_tagged( const VarLenSparseTag::MapType& mData, Container& entities, EntityType type,
+                               const Range* intersect )
 {
     if( !intersect )
         get_tagged< Container >( mData, type, entities );
@@ -328,16 +309,16 @@ static inline void get_tagged( const VarLenSparseTag::MapType& mData, Container&
 }
 
 //! Gets all entity handles that match a type and tag
-ErrorCode VarLenSparseTag::get_tagged_entities( const SequenceManager*, Range& entities,
-                                                EntityType type, const Range* intersect ) const
+ErrorCode VarLenSparseTag::get_tagged_entities( const SequenceManager*, Range& entities, EntityType type,
+                                                const Range* intersect ) const
 {
     get_tagged( mData, entities, type, intersect );
     return MB_SUCCESS;
 }
 
 //! Gets all entity handles that match a type and tag
-ErrorCode VarLenSparseTag::num_tagged_entities( const SequenceManager*, size_t& output_count,
-                                                EntityType type, const Range* intersect ) const
+ErrorCode VarLenSparseTag::num_tagged_entities( const SequenceManager*, size_t& output_count, EntityType type,
+                                                const Range* intersect ) const
 {
     InsertCount counter( output_count );
     get_tagged( mData, counter, type, intersect );
@@ -371,26 +352,22 @@ ErrorCode VarLenSparseTag::find_entities_with_value(
             r = intersect_entities->equal_range( type );
         }
 
-        find_map_varlen_values_equal( *this, value, get_size( ), r.first, r.second, mData,
-                                      output_entities );
+        find_map_varlen_values_equal( *this, value, get_size( ), r.first, r.second, mData, output_entities );
     }
     else if( type == MBMAXTYPE )
     {
-        find_tag_varlen_values_equal( *this, value, get_size( ), mData.begin( ), mData.end( ),
-                                      output_entities );
+        find_tag_varlen_values_equal( *this, value, get_size( ), mData.begin( ), mData.end( ), output_entities );
     }
     else
     {
         Range tmp;
         seqman->get_entities( type, tmp );
-        find_map_varlen_values_equal( *this, value, get_size( ), tmp.begin( ), tmp.end( ), mData,
-                                      output_entities );
+        find_map_varlen_values_equal( *this, value, get_size( ), tmp.begin( ), tmp.end( ), mData, output_entities );
     }
 #else
     if( intersect_entities )
     {
-        for( Range::const_pair_iterator p = intersect_entities->begin( );
-             p != intersect_entities->end( ); ++p )
+        for( Range::const_pair_iterator p = intersect_entities->begin( ); p != intersect_entities->end( ); ++p )
         {
             iter = mData.lower_bound( p->first );
             end = mData.upper_bound( p->second );

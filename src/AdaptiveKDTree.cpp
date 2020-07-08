@@ -34,8 +34,8 @@ const char* AdaptiveKDTree::treeName = "AKDTree";
 #define MB_AD_KD_TREE_USE_TWO_DOUBLE_TAG
 
 AdaptiveKDTree::AdaptiveKDTree( Interface* iface )
-    : Tree( iface ), planeTag( 0 ), axisTag( 0 ), splitsPerDir( 3 ), planeSet( SUBDIVISION_SNAP ),
-      spherical( false ), radius( 1.0 )
+    : Tree( iface ), planeTag( 0 ), axisTag( 0 ), splitsPerDir( 3 ), planeSet( SUBDIVISION_SNAP ), spherical( false ),
+      radius( 1.0 )
 {
     boxTagName = treeName;
 
@@ -43,10 +43,10 @@ AdaptiveKDTree::AdaptiveKDTree( Interface* iface )
     if( MB_SUCCESS != rval ) throw rval;
 }
 
-AdaptiveKDTree::AdaptiveKDTree( Interface* iface, const Range& entities,
-                                EntityHandle* tree_root_set, FileOptions* opts )
-    : Tree( iface ), planeTag( 0 ), axisTag( 0 ), splitsPerDir( 3 ), planeSet( SUBDIVISION_SNAP ),
-      spherical( false ), radius( 1.0 )
+AdaptiveKDTree::AdaptiveKDTree( Interface* iface, const Range& entities, EntityHandle* tree_root_set,
+                                FileOptions* opts )
+    : Tree( iface ), planeTag( 0 ), axisTag( 0 ), splitsPerDir( 3 ), planeSet( SUBDIVISION_SNAP ), spherical( false ),
+      radius( 1.0 )
 {
     boxTagName = treeName;
 
@@ -75,8 +75,7 @@ AdaptiveKDTree::~AdaptiveKDTree( )
     }
 }
 
-ErrorCode AdaptiveKDTree::build_tree( const Range& entities, EntityHandle* tree_root_set,
-                                      FileOptions* options )
+ErrorCode AdaptiveKDTree::build_tree( const Range& entities, EntityHandle* tree_root_set, FileOptions* options )
 {
     ErrorCode rval;
     CpuTimer  cp;
@@ -103,8 +102,7 @@ ErrorCode AdaptiveKDTree::build_tree( const Range& entities, EntityHandle* tree_
     if( MB_SUCCESS != rval ) return rval;
 
     AdaptiveKDTreeIter iter;
-    iter.initialize( this, *tree_root_set, box.bMin.array( ), box.bMax.array( ),
-                     AdaptiveKDTreeIter::LEFT );
+    iter.initialize( this, *tree_root_set, box.bMin.array( ), box.bMax.array( ), AdaptiveKDTreeIter::LEFT );
 
     std::vector< double >       tmp_data;
     std::vector< EntityHandle > tmp_data2;
@@ -123,21 +121,20 @@ ErrorCode AdaptiveKDTree::build_tree( const Range& entities, EntityHandle* tree_
             switch( planeSet )
             {
                 case AdaptiveKDTree::SUBDIVISION:
-                    rval = best_subdivision_plane( splitsPerDir, iter, best_left, best_right,
-                                                   best_both, best_plane, minWidth );
+                    rval = best_subdivision_plane( splitsPerDir, iter, best_left, best_right, best_both, best_plane,
+                                                   minWidth );
                     break;
                 case AdaptiveKDTree::SUBDIVISION_SNAP:
-                    rval = best_subdivision_snap_plane( splitsPerDir, iter, best_left, best_right,
-                                                        best_both, best_plane, tmp_data, minWidth );
+                    rval = best_subdivision_snap_plane( splitsPerDir, iter, best_left, best_right, best_both,
+                                                        best_plane, tmp_data, minWidth );
                     break;
                 case AdaptiveKDTree::VERTEX_MEDIAN:
-                    rval = best_vertex_median_plane( splitsPerDir, iter, best_left, best_right,
-                                                     best_both, best_plane, tmp_data, minWidth );
+                    rval = best_vertex_median_plane( splitsPerDir, iter, best_left, best_right, best_both, best_plane,
+                                                     tmp_data, minWidth );
                     break;
                 case AdaptiveKDTree::VERTEX_SAMPLE:
-                    rval = best_vertex_sample_plane( splitsPerDir, iter, best_left, best_right,
-                                                     best_both, best_plane, tmp_data, tmp_data2,
-                                                     minWidth );
+                    rval = best_vertex_sample_plane( splitsPerDir, iter, best_left, best_right, best_both, best_plane,
+                                                     tmp_data, tmp_data2, minWidth );
                     break;
                 default:
                     rval = MB_FAILURE;
@@ -207,17 +204,15 @@ ErrorCode AdaptiveKDTree::parse_options( FileOptions& opts )
     return MB_SUCCESS;
 }
 
-ErrorCode AdaptiveKDTree::make_tag( Interface* iface, std::string name, TagType storage,
-                                    DataType type, int count, void* default_val, Tag& tag_handle,
-                                    std::vector< Tag >& created_tags )
+ErrorCode AdaptiveKDTree::make_tag( Interface* iface, std::string name, TagType storage, DataType type, int count,
+                                    void* default_val, Tag& tag_handle, std::vector< Tag >& created_tags )
 {
-    ErrorCode rval = iface->tag_get_handle( name.c_str( ), count, type, tag_handle,
-                                            MB_TAG_CREAT | storage, default_val );
+    ErrorCode rval =
+        iface->tag_get_handle( name.c_str( ), count, type, tag_handle, MB_TAG_CREAT | storage, default_val );
 
     if( MB_SUCCESS == rval )
     {
-        if( std::find( created_tags.begin( ), created_tags.end( ), tag_handle ) ==
-            created_tags.end( ) )
+        if( std::find( created_tags.begin( ), created_tags.end( ), tag_handle ) == created_tags.end( ) )
             created_tags.push_back( tag_handle );
     }
     else
@@ -251,13 +246,11 @@ ErrorCode AdaptiveKDTree::init( )
 #elif defined( MB_AD_KD_TREE_USE_TWO_DOUBLE_TAG )
     // create tag to hold two doubles, one for location and one for axis
     std::string double_tag_name = std::string( treeName ) + std::string( "_coord_norm" );
-    ErrorCode   rval =
-        make_tag( moab( ), double_tag_name, MB_TAG_DENSE, MB_TYPE_DOUBLE, 2, 0, planeTag, ctl );
+    ErrorCode   rval = make_tag( moab( ), double_tag_name, MB_TAG_DENSE, MB_TYPE_DOUBLE, 2, 0, planeTag, ctl );
     if( MB_SUCCESS != rval ) return rval;
 #else
     // create opaque tag to hold struct Plane
-    ErrorCode rval = make_tag( moab( ), tagname, MB_TAG_DENSE, MB_TYPE_OPAQUE, sizeof( Plane ), 0,
-                               planeTag, ctl );
+    ErrorCode rval = make_tag( moab( ), tagname, MB_TAG_DENSE, MB_TYPE_OPAQUE, sizeof( Plane ), 0, planeTag, ctl );
     if( MB_SUCCESS != rval ) return rval;
 
 #ifdef MOAB_HAVE_HDF5
@@ -265,8 +258,7 @@ ErrorCode AdaptiveKDTree::init( )
     Tag         type_tag;
     std::string type_tag_name = "__hdf5_tag_type_";
     type_tag_name += boxTagName;
-    rval = make_tag( moab( ), type_tag_name, MB_TAG_MESH, MB_TYPE_OPAQUE, sizeof( hid_t ), 0,
-                     type_tag, ctl );
+    rval = make_tag( moab( ), type_tag_name, MB_TAG_MESH, MB_TYPE_OPAQUE, sizeof( hid_t ), 0, type_tag, ctl );
     if( MB_SUCCESS != rval ) return rval;
     // create HDF5 type object describing struct Plane
     Plane p;
@@ -333,14 +325,13 @@ ErrorCode AdaptiveKDTree::get_last_iterator( EntityHandle root, AdaptiveKDTreeIt
     return iter.initialize( this, root, box, box + 3, AdaptiveKDTreeIter::RIGHT );
 }
 
-ErrorCode AdaptiveKDTree::get_sub_tree_iterator( EntityHandle root, const double min[ 3 ],
-                                                 const double max[ 3 ], AdaptiveKDTreeIter& result )
+ErrorCode AdaptiveKDTree::get_sub_tree_iterator( EntityHandle root, const double min[ 3 ], const double max[ 3 ],
+                                                 AdaptiveKDTreeIter& result )
 {
     return result.initialize( this, root, min, max, AdaptiveKDTreeIter::LEFT );
 }
 
-ErrorCode AdaptiveKDTree::split_leaf( AdaptiveKDTreeIter& leaf, Plane plane, EntityHandle& left,
-                                      EntityHandle& right )
+ErrorCode AdaptiveKDTree::split_leaf( AdaptiveKDTreeIter& leaf, Plane plane, EntityHandle& left, EntityHandle& right )
 {
     ErrorCode rval;
 
@@ -373,8 +364,8 @@ ErrorCode AdaptiveKDTree::split_leaf( AdaptiveKDTreeIter& leaf, Plane plane )
     return split_leaf( leaf, plane, left, right );
 }
 
-ErrorCode AdaptiveKDTree::split_leaf( AdaptiveKDTreeIter& leaf, Plane plane,
-                                      const Range& left_entities, const Range& right_entities )
+ErrorCode AdaptiveKDTree::split_leaf( AdaptiveKDTreeIter& leaf, Plane plane, const Range& left_entities,
+                                      const Range& right_entities )
 {
     EntityHandle left, right, parent = leaf.handle( );
     ErrorCode    rval = split_leaf( leaf, plane, left, right );
@@ -401,8 +392,7 @@ ErrorCode AdaptiveKDTree::split_leaf( AdaptiveKDTreeIter& leaf, Plane plane,
     if( MB_SUCCESS != rval ) return rval;
 
     if( MB_SUCCESS == moab( )->add_entities( left, &left_entities[ 0 ], left_entities.size( ) ) &&
-        MB_SUCCESS ==
-            moab( )->add_entities( right, &right_entities[ 0 ], right_entities.size( ) ) &&
+        MB_SUCCESS == moab( )->add_entities( right, &right_entities[ 0 ], right_entities.size( ) ) &&
         MB_SUCCESS == moab( )->clear_meshset( &parent, 1 ) )
         return MB_SUCCESS;
 
@@ -469,9 +459,8 @@ ErrorCode AdaptiveKDTree::merge_leaf( AdaptiveKDTreeIter& iter )
     return MB_SUCCESS;
 }
 
-ErrorCode AdaptiveKDTreeIter::initialize( AdaptiveKDTree* ttool, EntityHandle root,
-                                          const double bmin[ 3 ], const double bmax[ 3 ],
-                                          Direction direction )
+ErrorCode AdaptiveKDTreeIter::initialize( AdaptiveKDTree* ttool, EntityHandle root, const double bmin[ 3 ],
+                                          const double bmax[ 3 ], Direction direction )
 {
     mStack.clear( );
     treeTool = ttool;
@@ -494,8 +483,7 @@ ErrorCode AdaptiveKDTreeIter::step_to_first_leaf( Direction direction )
     for( ;; )
     {
         childVect.clear( );
-        treeTool->treeStats
-            .nodesVisited++;  // not sure whether this is the visit or the push_back below
+        treeTool->treeStats.nodesVisited++;  // not sure whether this is the visit or the push_back below
         rval = treeTool->moab( )->get_child_meshsets( mStack.back( ).entity, childVect );
         if( MB_SUCCESS != rval ) return rval;
         if( childVect.empty( ) )
@@ -572,8 +560,7 @@ ErrorCode AdaptiveKDTreeIter::step( Direction direction )
 }
 
 ErrorCode AdaptiveKDTreeIter::get_neighbors( AdaptiveKDTree::Axis norm, bool neg,
-                                             std::vector< AdaptiveKDTreeIter >& results,
-                                             double                             epsilon ) const
+                                             std::vector< AdaptiveKDTreeIter >& results, double epsilon ) const
 {
     StackObj              node, parent;
     ErrorCode             rval;
@@ -662,8 +649,7 @@ ErrorCode AdaptiveKDTreeIter::get_neighbors( AdaptiveKDTree::Axis norm, bool neg
                 if( plane.coord - this->mBox[ BMAX ][ plane.norm ] <= epsilon )
                 {
                     list.push_back( iter );
-                    list.back( ).mStack.push_back(
-                        StackObj( iter.childVect[ 1 ], iter.mBox[ BMIN ][ plane.norm ] ) );
+                    list.back( ).mStack.push_back( StackObj( iter.childVect[ 1 ], iter.mBox[ BMIN ][ plane.norm ] ) );
                     list.back( ).mBox[ BMIN ][ plane.norm ] = plane.coord;
                 }
                 // continue with left child
@@ -728,8 +714,7 @@ bool AdaptiveKDTreeIter::is_sibling( const AdaptiveKDTreeIter& other_leaf ) cons
 {
     const size_t s = mStack.size( );
     return ( s > 1 ) && ( s == other_leaf.mStack.size( ) ) &&
-           ( other_leaf.mStack[ s - 2 ].entity == mStack[ s - 2 ].entity ) &&
-           other_leaf.handle( ) != handle( );
+           ( other_leaf.mStack[ s - 2 ].entity == mStack[ s - 2 ].entity ) && other_leaf.handle( ) != handle( );
 }
 
 bool AdaptiveKDTreeIter::is_sibling( EntityHandle other_leaf ) const
@@ -761,20 +746,17 @@ bool AdaptiveKDTreeIter::sibling_is_forward( ) const
     return childVect[ 0 ] == handle( );
 }
 
-bool AdaptiveKDTreeIter::intersect_ray( const double ray_point[ 3 ], const double ray_vect[ 3 ],
-                                        double& t_enter, double& t_exit ) const
+bool AdaptiveKDTreeIter::intersect_ray( const double ray_point[ 3 ], const double ray_vect[ 3 ], double& t_enter,
+                                        double& t_exit ) const
 {
     treeTool->treeStats.traversalLeafObjectTests++;
-    return GeomUtil::ray_box_intersect( CartVect( box_min( ) ), CartVect( box_max( ) ),
-                                        CartVect( ray_point ), CartVect( ray_vect ), t_enter,
-                                        t_exit );
+    return GeomUtil::ray_box_intersect( CartVect( box_min( ) ), CartVect( box_max( ) ), CartVect( ray_point ),
+                                        CartVect( ray_vect ), t_enter, t_exit );
 }
 
-ErrorCode AdaptiveKDTree::intersect_children_with_elems( const Range&          elems,
-                                                         AdaptiveKDTree::Plane plane, double eps,
-                                                         CartVect box_min, CartVect box_max,
-                                                         Range& left_tris, Range& right_tris,
-                                                         Range& both_tris, double& metric_value )
+ErrorCode AdaptiveKDTree::intersect_children_with_elems( const Range& elems, AdaptiveKDTree::Plane plane, double eps,
+                                                         CartVect box_min, CartVect box_max, Range& left_tris,
+                                                         Range& right_tris, Range& both_tris, double& metric_value )
 {
     left_tris.clear( );
     right_tris.clear( );
@@ -856,10 +838,10 @@ ErrorCode AdaptiveKDTree::intersect_children_with_elems( const Range&          e
             while( !lo && !ro && tol <= max_tol )
             {
                 tree_stats( ).boxElemTests += 2;
-                lo = GeomUtil::box_elem_overlap( coords, TYPE_FROM_HANDLE( *i ), left_cen,
-                                                 left_dim + CartVect( tol ), count );
-                ro = GeomUtil::box_elem_overlap( coords, TYPE_FROM_HANDLE( *i ), right_cen,
-                                                 right_dim + CartVect( tol ), count );
+                lo = GeomUtil::box_elem_overlap( coords, TYPE_FROM_HANDLE( *i ), left_cen, left_dim + CartVect( tol ),
+                                                 count );
+                ro = GeomUtil::box_elem_overlap( coords, TYPE_FROM_HANDLE( *i ), right_cen, right_dim + CartVect( tol ),
+                                                 count );
 
                 tol *= 10.0;
             }
@@ -924,20 +906,16 @@ ErrorCode AdaptiveKDTree::intersect_children_with_elems( const Range&          e
     }
 
     CartVect box_dim = box_max - box_min;
-    double   area_left = left_dim[ 0 ] * left_dim[ 1 ] + left_dim[ 1 ] * left_dim[ 2 ] +
-                       left_dim[ 2 ] * left_dim[ 0 ];
-    double area_right = right_dim[ 0 ] * right_dim[ 1 ] + right_dim[ 1 ] * right_dim[ 2 ] +
-                        right_dim[ 2 ] * right_dim[ 0 ];
-    double area_both =
-        box_dim[ 0 ] * box_dim[ 1 ] + box_dim[ 1 ] * box_dim[ 2 ] + box_dim[ 2 ] * box_dim[ 0 ];
-    metric_value = ( area_left * left_tris.size( ) + area_right * right_tris.size( ) ) / area_both +
-                   both_tris.size( );
+    double   area_left = left_dim[ 0 ] * left_dim[ 1 ] + left_dim[ 1 ] * left_dim[ 2 ] + left_dim[ 2 ] * left_dim[ 0 ];
+    double   area_right =
+        right_dim[ 0 ] * right_dim[ 1 ] + right_dim[ 1 ] * right_dim[ 2 ] + right_dim[ 2 ] * right_dim[ 0 ];
+    double area_both = box_dim[ 0 ] * box_dim[ 1 ] + box_dim[ 1 ] * box_dim[ 2 ] + box_dim[ 2 ] * box_dim[ 0 ];
+    metric_value = ( area_left * left_tris.size( ) + area_right * right_tris.size( ) ) / area_both + both_tris.size( );
     return MB_SUCCESS;
 }
 
-ErrorCode AdaptiveKDTree::best_subdivision_plane( int num_planes, const AdaptiveKDTreeIter& iter,
-                                                  Range& best_left, Range& best_right,
-                                                  Range&                 best_both,
+ErrorCode AdaptiveKDTree::best_subdivision_plane( int num_planes, const AdaptiveKDTreeIter& iter, Range& best_left,
+                                                  Range& best_right, Range& best_both,
                                                   AdaptiveKDTree::Plane& best_plane, double eps )
 {
     double metric_val = std::numeric_limits< unsigned >::max( );
@@ -955,17 +933,14 @@ ErrorCode AdaptiveKDTree::best_subdivision_plane( int num_planes, const Adaptive
     for( int axis = 0; axis < 3; ++axis )
     {
         int plane_count = num_planes;
-        if( ( num_planes + 1 ) * eps >= diff[ axis ] )
-            plane_count = (int)( diff[ axis ] / eps ) - 1;
+        if( ( num_planes + 1 ) * eps >= diff[ axis ] ) plane_count = (int)( diff[ axis ] / eps ) - 1;
 
         for( int p = 1; p <= plane_count; ++p )
         {
-            AdaptiveKDTree::Plane plane = {
-                box_min[ axis ] + ( p / ( 1.0 + plane_count ) ) * diff[ axis ], axis };
-            Range  left, right, both;
-            double val;
-            r = intersect_children_with_elems( entities, plane, eps, box_min, box_max, left, right,
-                                               both, val );
+            AdaptiveKDTree::Plane plane = { box_min[ axis ] + ( p / ( 1.0 + plane_count ) ) * diff[ axis ], axis };
+            Range                 left, right, both;
+            double                val;
+            r = intersect_children_with_elems( entities, plane, eps, box_min, box_max, left, right, both, val );
             if( MB_SUCCESS != r ) return r;
             const size_t sdiff = p_count - both.size( );
             if( left.size( ) == sdiff || right.size( ) == sdiff ) continue;
@@ -983,10 +958,8 @@ ErrorCode AdaptiveKDTree::best_subdivision_plane( int num_planes, const Adaptive
     return MB_SUCCESS;
 }
 
-ErrorCode AdaptiveKDTree::best_subdivision_snap_plane( int                       num_planes,
-                                                       const AdaptiveKDTreeIter& iter,
-                                                       Range& best_left, Range& best_right,
-                                                       Range&                 best_both,
+ErrorCode AdaptiveKDTree::best_subdivision_snap_plane( int num_planes, const AdaptiveKDTreeIter& iter, Range& best_left,
+                                                       Range& best_right, Range& best_both,
                                                        AdaptiveKDTree::Plane& best_plane,
                                                        std::vector< double >& tmp_data, double eps )
 {
@@ -1004,8 +977,7 @@ ErrorCode AdaptiveKDTree::best_subdivision_snap_plane( int                      
 
     unsigned int nverts = vertices.size( );
     tmp_data.resize( 3 * nverts );
-    r = iter.tool( )->moab( )->get_coords( vertices, &tmp_data[ 0 ], &tmp_data[ nverts ],
-                                           &tmp_data[ 2 * nverts ] );
+    r = iter.tool( )->moab( )->get_coords( vertices, &tmp_data[ 0 ], &tmp_data[ nverts ], &tmp_data[ 2 * nverts ] );
     if( MB_SUCCESS != r ) return r;
 
     // calculate bounding box of vertices
@@ -1037,8 +1009,7 @@ ErrorCode AdaptiveKDTree::best_subdivision_snap_plane( int                      
         int plane_count = num_planes;
 
         // if num_planes results in width < eps, reset the plane count
-        if( ( num_planes + 1 ) * eps >= diff[ axis ] )
-            plane_count = (int)( diff[ axis ] / eps ) - 1;
+        if( ( num_planes + 1 ) * eps >= diff[ axis ] ) plane_count = (int)( diff[ axis ] / eps ) - 1;
 
         for( int p = 1; p <= plane_count; ++p )
         {
@@ -1052,15 +1023,13 @@ ErrorCode AdaptiveKDTree::best_subdivision_snap_plane( int                      
             for( unsigned i = 1; i < nverts; ++i )
                 if( fabs( coord - tmp_data[ istrt + i ] ) < fabs( coord - closest_coord ) )
                     closest_coord = tmp_data[ istrt + i ];
-            if( closest_coord - box_min[ axis ] <= eps || box_max[ axis ] - closest_coord <= eps )
-                continue;
+            if( closest_coord - box_min[ axis ] <= eps || box_max[ axis ] - closest_coord <= eps ) continue;
 
             // seprate elems into left/right/both, and compute separating metric
             AdaptiveKDTree::Plane plane = { closest_coord, axis };
             Range                 left, right, both;
             double                val;
-            r = intersect_children_with_elems( entities, plane, eps, box_min, box_max, left, right,
-                                               both, val );
+            r = intersect_children_with_elems( entities, plane, eps, box_min, box_max, left, right, both, val );
             if( MB_SUCCESS != r ) return r;
             const size_t d = p_count - both.size( );
             if( left.size( ) == d || right.size( ) == d ) continue;
@@ -1078,11 +1047,10 @@ ErrorCode AdaptiveKDTree::best_subdivision_snap_plane( int                      
     return MB_SUCCESS;
 }
 
-ErrorCode AdaptiveKDTree::best_vertex_median_plane( int num_planes, const AdaptiveKDTreeIter& iter,
-                                                    Range& best_left, Range& best_right,
-                                                    Range&                 best_both,
-                                                    AdaptiveKDTree::Plane& best_plane,
-                                                    std::vector< double >& coords, double eps )
+ErrorCode AdaptiveKDTree::best_vertex_median_plane( int num_planes, const AdaptiveKDTreeIter& iter, Range& best_left,
+                                                    Range& best_right, Range& best_both,
+                                                    AdaptiveKDTree::Plane& best_plane, std::vector< double >& coords,
+                                                    double eps )
 {
     double metric_val = std::numeric_limits< unsigned >::max( );
 
@@ -1110,10 +1078,9 @@ ErrorCode AdaptiveKDTree::best_vertex_median_plane( int num_planes, const Adapti
         std::sort( coords.begin( ), coords.end( ) );
         std::vector< double >::iterator citer;
         citer = std::upper_bound( coords.begin( ), coords.end( ), box_min[ axis ] + eps );
-        const size_t count =
-            std::upper_bound( citer, coords.end( ), box_max[ axis ] - eps ) - citer;
-        size_t step;
-        int    np = num_planes;
+        const size_t count = std::upper_bound( citer, coords.end( ), box_max[ axis ] - eps ) - citer;
+        size_t       step;
+        int          np = num_planes;
         if( count < 2 * (size_t)num_planes )
         {
             step = 1;
@@ -1131,8 +1098,7 @@ ErrorCode AdaptiveKDTree::best_vertex_median_plane( int num_planes, const Adapti
             AdaptiveKDTree::Plane plane = { *citer, axis };
             Range                 left, right, both;
             double                val;
-            r = intersect_children_with_elems( entities, plane, eps, box_min, box_max, left, right,
-                                               both, val );
+            r = intersect_children_with_elems( entities, plane, eps, box_min, box_max, left, right, both, val );
             if( MB_SUCCESS != r ) return r;
             const size_t diff = p_count - both.size( );
             if( left.size( ) == diff || right.size( ) == diff ) continue;
@@ -1150,10 +1116,10 @@ ErrorCode AdaptiveKDTree::best_vertex_median_plane( int num_planes, const Adapti
     return MB_SUCCESS;
 }
 
-ErrorCode AdaptiveKDTree::best_vertex_sample_plane(
-    int num_planes, const AdaptiveKDTreeIter& iter, Range& best_left, Range& best_right,
-    Range& best_both, AdaptiveKDTree::Plane& best_plane, std::vector< double >& coords,
-    std::vector< EntityHandle >& indices, double eps )
+ErrorCode AdaptiveKDTree::best_vertex_sample_plane( int num_planes, const AdaptiveKDTreeIter& iter, Range& best_left,
+                                                    Range& best_right, Range& best_both,
+                                                    AdaptiveKDTree::Plane& best_plane, std::vector< double >& coords,
+                                                    std::vector< EntityHandle >& indices, double eps )
 {
     const size_t random_elem_threshold = 20 * num_planes;
     double       metric_val = std::numeric_limits< unsigned >::max( );
@@ -1172,8 +1138,7 @@ ErrorCode AdaptiveKDTree::best_vertex_sample_plane(
     coords.resize( 3 * num_planes );
     if( p_count < random_elem_threshold )
     {
-        r = iter.tool( )->moab( )->get_adjacencies( entities, 0, false, vertices,
-                                                    Interface::UNION );
+        r = iter.tool( )->moab( )->get_adjacencies( entities, 0, false, vertices, Interface::UNION );
         if( MB_SUCCESS != r ) return r;
     }
     else
@@ -1188,8 +1153,8 @@ ErrorCode AdaptiveKDTree::best_vertex_sample_plane(
             rnd %= p_count;
             indices[ j ] = entities[ rnd ];
         }
-        r = iter.tool( )->moab( )->get_adjacencies( &indices[ 0 ], random_elem_threshold, 0, false,
-                                                    vertices, Interface::UNION );
+        r = iter.tool( )->moab( )->get_adjacencies( &indices[ 0 ], random_elem_threshold, 0, false, vertices,
+                                                    Interface::UNION );
         if( MB_SUCCESS != r ) return r;
     }
 
@@ -1205,15 +1170,13 @@ ErrorCode AdaptiveKDTree::best_vertex_sample_plane(
 
         size_t num_valid_coords = 0;
         for( size_t i = 0; i < coords.size( ); ++i )
-            if( coords[ i ] > box_min[ axis ] + eps && coords[ i ] < box_max[ axis ] - eps )
-                ++num_valid_coords;
+            if( coords[ i ] > box_min[ axis ] + eps && coords[ i ] < box_max[ axis ] - eps ) ++num_valid_coords;
 
         if( 2 * (size_t)num_planes > num_valid_coords )
         {
             indices.clear( );
             for( size_t i = 0; i < coords.size( ); ++i )
-                if( coords[ i ] > box_min[ axis ] + eps && coords[ i ] < box_max[ axis ] - eps )
-                    indices.push_back( i );
+                if( coords[ i ] > box_min[ axis ] + eps && coords[ i ] < box_max[ axis ] - eps ) indices.push_back( i );
         }
         else
         {
@@ -1229,8 +1192,7 @@ ErrorCode AdaptiveKDTree::best_vertex_sample_plane(
                     for( int i = num_rand; i > 1; --i )
                         rnd *= rand( );
                     rnd %= coords.size( );
-                } while( coords[ rnd ] <= box_min[ axis ] + eps ||
-                         coords[ rnd ] >= box_max[ axis ] - eps );
+                } while( coords[ rnd ] <= box_min[ axis ] + eps || coords[ rnd ] >= box_max[ axis ] - eps );
                 indices[ j ] = rnd;
             }
         }
@@ -1241,8 +1203,7 @@ ErrorCode AdaptiveKDTree::best_vertex_sample_plane(
             AdaptiveKDTree::Plane plane = { coords[ indices[ p ] ], axis };
             Range                 left, right, both;
             double                val;
-            r = intersect_children_with_elems( entities, plane, eps, box_min, box_max, left, right,
-                                               both, val );
+            r = intersect_children_with_elems( entities, plane, eps, box_min, box_max, left, right, both, val );
             if( MB_SUCCESS != r ) return r;
             const size_t diff = p_count - both.size( );
             if( left.size( ) == diff || right.size( ) == diff ) continue;
@@ -1260,9 +1221,8 @@ ErrorCode AdaptiveKDTree::best_vertex_sample_plane(
     return MB_SUCCESS;
 }
 
-ErrorCode AdaptiveKDTree::point_search( const double* point, EntityHandle& leaf_out,
-                                        const double iter_tol, const double inside_tol,
-                                        bool* multiple_leaves, EntityHandle* start_node,
+ErrorCode AdaptiveKDTree::point_search( const double* point, EntityHandle& leaf_out, const double iter_tol,
+                                        const double inside_tol, bool* multiple_leaves, EntityHandle* start_node,
                                         CartVect* params )
 {
     std::vector< EntityHandle > children;
@@ -1302,9 +1262,8 @@ ErrorCode AdaptiveKDTree::point_search( const double* point, EntityHandle& leaf_
     treeStats.leavesVisited++;
     if( myEval && params )
     {
-        rval =
-            myEval->find_containing_entity( node, point, iter_tol, inside_tol, leaf_out,
-                                            params->array( ), &treeStats.traversalLeafObjectTests );
+        rval = myEval->find_containing_entity( node, point, iter_tol, inside_tol, leaf_out, params->array( ),
+                                               &treeStats.traversalLeafObjectTests );
         if( MB_SUCCESS != rval ) return rval;
     }
     else
@@ -1313,9 +1272,8 @@ ErrorCode AdaptiveKDTree::point_search( const double* point, EntityHandle& leaf_
     return MB_SUCCESS;
 }
 
-ErrorCode AdaptiveKDTree::point_search( const double* point, AdaptiveKDTreeIter& leaf_it,
-                                        const double iter_tol, const double /*inside_tol*/,
-                                        bool* multiple_leaves, EntityHandle* start_node )
+ErrorCode AdaptiveKDTree::point_search( const double* point, AdaptiveKDTreeIter& leaf_it, const double iter_tol,
+                                        const double /*inside_tol*/, bool* multiple_leaves, EntityHandle* start_node )
 {
     ErrorCode rval;
     treeStats.numTraversals++;
@@ -1336,8 +1294,7 @@ ErrorCode AdaptiveKDTree::point_search( const double* point, AdaptiveKDTreeIter&
     // initialize iterator at tree root
     leaf_it.treeTool = this;
     leaf_it.mStack.clear( );
-    leaf_it.mStack.push_back(
-        AdaptiveKDTreeIter::StackObj( ( start_node ? *start_node : myRoot ), 0 ) );
+    leaf_it.mStack.push_back( AdaptiveKDTreeIter::StackObj( ( start_node ? *start_node : myRoot ), 0 ) );
 
     // loop until we reach a leaf
     AdaptiveKDTree::Plane plane;
@@ -1364,8 +1321,8 @@ ErrorCode AdaptiveKDTree::point_search( const double* point, AdaptiveKDTreeIter&
         // step iterator to appropriate child
         // idx: 0->left, 1->right
         const int idx = ( point[ plane.norm ] > plane.coord );
-        leaf_it.mStack.push_back( AdaptiveKDTreeIter::StackObj(
-            leaf_it.childVect[ idx ], leaf_it.mBox[ 1 - idx ][ plane.norm ] ) );
+        leaf_it.mStack.push_back(
+            AdaptiveKDTreeIter::StackObj( leaf_it.childVect[ idx ], leaf_it.mBox[ 1 - idx ][ plane.norm ] ) );
         leaf_it.mBox[ 1 - idx ][ plane.norm ] = plane.coord;
     }
 
@@ -1379,11 +1336,9 @@ struct NodeDistance
 };
 
 ErrorCode AdaptiveKDTree::distance_search( const double from_point[ 3 ], const double distance,
-                                           std::vector< EntityHandle >& result_list,
-                                           const double iter_tol, const double inside_tol,
-                                           std::vector< double >*   result_dists,
-                                           std::vector< CartVect >* result_params,
-                                           EntityHandle*            tree_root )
+                                           std::vector< EntityHandle >& result_list, const double iter_tol,
+                                           const double inside_tol, std::vector< double >* result_dists,
+                                           std::vector< CartVect >* result_params, EntityHandle* tree_root )
 {
     treeStats.numTraversals++;
     const double                dist_sqr = distance * distance;
@@ -1449,9 +1404,8 @@ ErrorCode AdaptiveKDTree::distance_search( const double from_point[ 3 ], const d
             {
                 EntityHandle ent;
                 CartVect     params;
-                rval = myEval->find_containing_entity( node.handle, from_point, iter_tol,
-                                                       inside_tol, ent, params.array( ),
-                                                       &treeStats.traversalLeafObjectTests );
+                rval = myEval->find_containing_entity( node.handle, from_point, iter_tol, inside_tol, ent,
+                                                       params.array( ), &treeStats.traversalLeafObjectTests );
                 if( MB_SUCCESS != rval )
                     return rval;
                 else if( ent )
@@ -1517,15 +1471,15 @@ ErrorCode AdaptiveKDTree::distance_search( const double from_point[ 3 ], const d
     // separate loops to avoid if test inside loop
 
     result_list.reserve( result_list_nodes.size( ) );
-    for( std::vector< NodeDistance >::iterator vit = result_list_nodes.begin( );
-         vit != result_list_nodes.end( ); ++vit )
+    for( std::vector< NodeDistance >::iterator vit = result_list_nodes.begin( ); vit != result_list_nodes.end( );
+         ++vit )
         result_list.push_back( ( *vit ).handle );
 
     if( result_dists && distance > 0.0 )
     {
         result_dists->reserve( result_list_nodes.size( ) );
-        for( std::vector< NodeDistance >::iterator vit = result_list_nodes.begin( );
-             vit != result_list_nodes.end( ); ++vit )
+        for( std::vector< NodeDistance >::iterator vit = result_list_nodes.begin( ); vit != result_list_nodes.end( );
+             ++vit )
             result_dists->push_back( ( *vit ).dist.length( ) );
     }
 
@@ -1533,8 +1487,7 @@ ErrorCode AdaptiveKDTree::distance_search( const double from_point[ 3 ], const d
 }
 
 static ErrorCode closest_to_triangles( Interface* moab, const Range& tris, const CartVect& from,
-                                       double& shortest_dist_sqr, CartVect& closest_pt,
-                                       EntityHandle& closest_tri )
+                                       double& shortest_dist_sqr, CartVect& closest_pt, EntityHandle& closest_tri )
 {
     ErrorCode           rval;
     CartVect            pos, diff, verts[ 3 ];
@@ -1564,9 +1517,8 @@ static ErrorCode closest_to_triangles( Interface* moab, const Range& tris, const
     return MB_SUCCESS;
 }
 
-static ErrorCode closest_to_triangles( Interface* moab, EntityHandle set_handle,
-                                       const CartVect& from, double& shortest_dist_sqr,
-                                       CartVect& closest_pt, EntityHandle& closest_tri )
+static ErrorCode closest_to_triangles( Interface* moab, EntityHandle set_handle, const CartVect& from,
+                                       double& shortest_dist_sqr, CartVect& closest_pt, EntityHandle& closest_tri )
 {
     ErrorCode rval;
     Range     tris;
@@ -1577,8 +1529,8 @@ static ErrorCode closest_to_triangles( Interface* moab, EntityHandle set_handle,
     return closest_to_triangles( moab, tris, from, shortest_dist_sqr, closest_pt, closest_tri );
 }
 
-ErrorCode AdaptiveKDTree::find_close_triangle( EntityHandle root, const double from[ 3 ],
-                                               double pt[ 3 ], EntityHandle& triangle )
+ErrorCode AdaptiveKDTree::find_close_triangle( EntityHandle root, const double from[ 3 ], double pt[ 3 ],
+                                               EntityHandle& triangle )
 {
     ErrorCode                   rval;
     Range                       tris;
@@ -1625,8 +1577,7 @@ ErrorCode AdaptiveKDTree::find_close_triangle( EntityHandle root, const double f
         {
             double   dist_sqr = HUGE_VAL;
             CartVect point( pt );
-            rval =
-                closest_to_triangles( moab( ), tris, CartVect( from ), dist_sqr, point, triangle );
+            rval = closest_to_triangles( moab( ), tris, CartVect( from ), dist_sqr, point, triangle );
             point.get( pt );
             return rval;
         }
@@ -1747,8 +1698,7 @@ ErrorCode AdaptiveKDTree::find_close_triangle( EntityHandle root, const double f
 */
 
 ErrorCode AdaptiveKDTree::closest_triangle( EntityHandle tree_root, const double from_coords[ 3 ],
-                                            double        closest_point_out[ 3 ],
-                                            EntityHandle& triangle_out )
+                                            double closest_point_out[ 3 ], EntityHandle& triangle_out )
 {
     ErrorCode                   rval;
     double                      shortest_dist_sqr = HUGE_VAL;
@@ -1767,16 +1717,14 @@ ErrorCode AdaptiveKDTree::closest_triangle( EntityHandle tree_root, const double
     // the same distance from the input point as the current closest
     // point is.
     CartVect diff = closest_pt - from;
-    rval = distance_search( from_coords, sqrt( diff % diff ), leaves, 1.0e-10, 1.0e-6, NULL, NULL,
-                            &tree_root );
+    rval = distance_search( from_coords, sqrt( diff % diff ), leaves, 1.0e-10, 1.0e-6, NULL, NULL, &tree_root );
     if( MB_SUCCESS != rval ) return rval;
 
     // Check any close leaves to see if they contain triangles that
     // are as close to or closer than the current closest triangle(s).
     for( unsigned i = 0; i < leaves.size( ); ++i )
     {
-        rval = closest_to_triangles( moab( ), leaves[ i ], from, shortest_dist_sqr, closest_pt,
-                                     triangle_out );
+        rval = closest_to_triangles( moab( ), leaves[ i ], from, shortest_dist_sqr, closest_pt, triangle_out );
         if( MB_SUCCESS != rval ) return rval;
     }
 
@@ -1785,8 +1733,7 @@ ErrorCode AdaptiveKDTree::closest_triangle( EntityHandle tree_root, const double
     return MB_SUCCESS;
 }
 
-ErrorCode AdaptiveKDTree::sphere_intersect_triangles( EntityHandle tree_root,
-                                                      const double center[ 3 ], double radius,
+ErrorCode AdaptiveKDTree::sphere_intersect_triangles( EntityHandle tree_root, const double center[ 3 ], double radius,
                                                       std::vector< EntityHandle >& triangles )
 {
     ErrorCode                   rval;
@@ -1834,12 +1781,9 @@ struct NodeSeg
     double       beg, end;
 };
 
-ErrorCode AdaptiveKDTree::ray_intersect_triangles( EntityHandle root, const double tol,
-                                                   const double                 ray_dir_in[ 3 ],
-                                                   const double                 ray_pt_in[ 3 ],
-                                                   std::vector< EntityHandle >& tris_out,
-                                                   std::vector< double >& dists_out, int max_ints,
-                                                   double ray_end )
+ErrorCode AdaptiveKDTree::ray_intersect_triangles( EntityHandle root, const double tol, const double ray_dir_in[ 3 ],
+                                                   const double ray_pt_in[ 3 ], std::vector< EntityHandle >& tris_out,
+                                                   std::vector< double >& dists_out, int max_ints, double ray_end )
 {
     ErrorCode rval;
     double    ray_beg = 0.0;
@@ -1852,8 +1796,7 @@ ErrorCode AdaptiveKDTree::ray_intersect_triangles( EntityHandle root, const doub
     rval = get_bounding_box( box );
     if( MB_SUCCESS == rval )
     {
-        if( !GeomUtil::segment_box_intersect( box.bMin - tvec, box.bMax + tvec, ray_pt, ray_dir,
-                                              ray_beg, ray_end ) )
+        if( !GeomUtil::segment_box_intersect( box.bMin - tvec, box.bMax + tvec, ray_pt, ray_dir, ray_beg, ray_end ) )
             return MB_SUCCESS;  // ray misses entire tree.
     }
 
@@ -1903,8 +1846,7 @@ ErrorCode AdaptiveKDTree::ray_intersect_triangles( EntityHandle root, const doub
                 {
                     if( !max_ints )
                     {
-                        if( std::find( tris_out.begin( ), tris_out.end( ), *iter ) ==
-                            tris_out.end( ) )
+                        if( std::find( tris_out.begin( ), tris_out.end( ), *iter ) == tris_out.end( ) )
                         {
                             tris_out.push_back( *iter );
                             dists_out.push_back( tri_t );
@@ -1912,8 +1854,7 @@ ErrorCode AdaptiveKDTree::ray_intersect_triangles( EntityHandle root, const doub
                     }
                     else if( tri_t < ray_end )
                     {
-                        if( std::find( tris_out.begin( ), tris_out.end( ), *iter ) ==
-                            tris_out.end( ) )
+                        if( std::find( tris_out.begin( ), tris_out.end( ), *iter ) == tris_out.end( ) )
                         {
                             if( tris_out.size( ) < (unsigned)max_ints )
                             {
@@ -1949,12 +1890,10 @@ ErrorCode AdaptiveKDTree::ray_intersect_triangles( EntityHandle root, const doub
         // the true plane, and also the difference between that value and the
         // intersection with either of the +/- tol planes.
         const double inv_dir = 1.0 / ray_dir[ plane.norm ];  // only do division once
-        const double t =
-            ( plane.coord - ray_pt[ plane.norm ] ) * inv_dir;  // intersection with plane
-        const double diff =
-            tol * inv_dir;  // t adjustment for +tol plane
-                            // const double t0 = t - diff; // intersection with -tol plane
-                            // const double t1 = t + diff; // intersection with +tol plane
+        const double t = ( plane.coord - ray_pt[ plane.norm ] ) * inv_dir;  // intersection with plane
+        const double diff = tol * inv_dir;  // t adjustment for +tol plane
+                                            // const double t0 = t - diff; // intersection with -tol plane
+                                            // const double t1 = t + diff; // intersection with +tol plane
 
         // The index of the child tree node (0 or 1) that is on the
         // side of the plane to which the ray direction points.  That is,
@@ -2019,8 +1958,7 @@ ErrorCode AdaptiveKDTree::ray_intersect_triangles( EntityHandle root, const doub
     return MB_SUCCESS;
 }
 
-ErrorCode AdaptiveKDTree::compute_depth( EntityHandle root, unsigned int& min_depth,
-                                         unsigned int& max_depth )
+ErrorCode AdaptiveKDTree::compute_depth( EntityHandle root, unsigned int& min_depth, unsigned int& max_depth )
 {
     AdaptiveKDTreeIter iter;
     get_tree_iterator( root, iter );
@@ -2046,8 +1984,7 @@ ErrorCode AdaptiveKDTree::compute_depth( EntityHandle root, unsigned int& min_de
     return MB_SUCCESS;
 }
 
-ErrorCode AdaptiveKDTree::get_info( EntityHandle root, double bmin[ 3 ], double bmax[ 3 ],
-                                    unsigned int& dep )
+ErrorCode AdaptiveKDTree::get_info( EntityHandle root, double bmin[ 3 ], double bmax[ 3 ], unsigned int& dep )
 {
     BoundBox  box;
     ErrorCode result = get_bounding_box( box, &root );
@@ -2098,16 +2035,15 @@ template< typename T > struct SimpleStat
     }
     double dev( ) const
     {
-        return ( count > 1 ? sqrt( ( count * (double)sqr - (double)sum * (double)sum ) /
-                                   ( (double)count * ( count - 1 ) ) )
-                           : 0.0 );
+        return ( count > 1
+                     ? sqrt( ( count * (double)sqr - (double)sum * (double)sum ) / ( (double)count * ( count - 1 ) ) )
+                     : 0.0 );
     }
 };
 
 template< typename T >
 SimpleStat< T >::SimpleStat( )
-    : min( std::numeric_limits< T >::max( ) ), max( std::numeric_limits< T >::min( ) ), sum( 0 ),
-      sqr( 0 ), count( 0 )
+    : min( std::numeric_limits< T >::max( ) ), max( std::numeric_limits< T >::min( ) ), sum( 0 ), sqr( 0 ), count( 0 )
 {
 }
 
@@ -2136,11 +2072,10 @@ ErrorCode AdaptiveKDTree::print( )
     all.merge( elem2d );
     all.merge( elem3d );
     tree_sets.insert( myRoot );
-    unsigned long long set_used, set_amortized, set_store_used, set_store_amortized, set_tag_used,
-        set_tag_amortized, elem_used, elem_amortized;
-    moab( )->estimated_memory_use( tree_sets, &set_used, &set_amortized, &set_store_used,
-                                   &set_store_amortized, 0, 0, 0, 0, &set_tag_used,
-                                   &set_tag_amortized );
+    unsigned long long set_used, set_amortized, set_store_used, set_store_amortized, set_tag_used, set_tag_amortized,
+        elem_used, elem_amortized;
+    moab( )->estimated_memory_use( tree_sets, &set_used, &set_amortized, &set_store_used, &set_store_amortized, 0, 0, 0,
+                                   0, &set_tag_used, &set_tag_amortized );
     moab( )->estimated_memory_use( all, &elem_used, &elem_amortized );
 
     int num_2d = 0, num_3d = 0;
@@ -2151,11 +2086,9 @@ ErrorCode AdaptiveKDTree::print( )
     BoundBox  box;
     ErrorCode rval = get_bounding_box( box, &myRoot );
     if( MB_SUCCESS != rval || box == BoundBox( ) ) throw rval;
-    double diff[ 3 ] = { box.bMax[ 0 ] - box.bMin[ 0 ], box.bMax[ 1 ] - box.bMin[ 1 ],
-                         box.bMax[ 2 ] - box.bMin[ 2 ] };
+    double diff[ 3 ] = { box.bMax[ 0 ] - box.bMin[ 0 ], box.bMax[ 1 ] - box.bMin[ 1 ], box.bMax[ 2 ] - box.bMin[ 2 ] };
     double tree_vol = diff[ 0 ] * diff[ 1 ] * diff[ 2 ];
-    double tree_surf_area =
-        2 * ( diff[ 0 ] * diff[ 1 ] + diff[ 1 ] * diff[ 2 ] + diff[ 2 ] * diff[ 0 ] );
+    double tree_surf_area = 2 * ( diff[ 0 ] * diff[ 1 ] + diff[ 1 ] * diff[ 2 ] + diff[ 2 ] * diff[ 0 ] );
 
     SimpleStat< unsigned > depth, size;
     SimpleStat< double >   vol, surf;
@@ -2177,8 +2110,7 @@ ErrorCode AdaptiveKDTree::print( )
         double leaf_vol = dims[ 0 ] * dims[ 1 ] * dims[ 2 ];
         vol.add( leaf_vol );
 
-        double area =
-            2.0 * ( dims[ 0 ] * dims[ 1 ] + dims[ 1 ] * dims[ 2 ] + dims[ 2 ] * dims[ 0 ] );
+        double area = 2.0 * ( dims[ 0 ] * dims[ 1 ] + dims[ 1 ] * dims[ 2 ] + dims[ 2 ] * dims[ 0 ] );
         surf.add( area );
 
     } while( MB_SUCCESS == iter.step( ) );
@@ -2192,24 +2124,20 @@ ErrorCode AdaptiveKDTree::print( )
     printf( "surface ratio:    %0.2f%%\n", 100 * ( surf.sum / tree_surf_area ) );
     printf( "\nmemory:           used  amortized\n" );
     printf( "            ---------- ----------\n" );
-    printf( "elements    %10s %10s\n", mem_to_string( elem_used ).c_str( ),
-            mem_to_string( elem_amortized ).c_str( ) );
-    printf( "sets (total)%10s %10s\n", mem_to_string( set_used ).c_str( ),
-            mem_to_string( set_amortized ).c_str( ) );
+    printf( "elements    %10s %10s\n", mem_to_string( elem_used ).c_str( ), mem_to_string( elem_amortized ).c_str( ) );
+    printf( "sets (total)%10s %10s\n", mem_to_string( set_used ).c_str( ), mem_to_string( set_amortized ).c_str( ) );
     printf( "sets        %10s %10s\n", mem_to_string( set_store_used ).c_str( ),
             mem_to_string( set_store_amortized ).c_str( ) );
     printf( "set tags    %10s %10s\n", mem_to_string( set_tag_used ).c_str( ),
             mem_to_string( set_tag_amortized ).c_str( ) );
     printf( "\nleaf stats:        min        avg        rms        max    std.dev\n" );
     printf( "            ---------- ---------- ---------- ---------- ----------\n" );
-    printf( "depth       %10u %10.1f %10.1f %10u %10.2f\n", depth.min, depth.avg( ), depth.rms( ),
-            depth.max, depth.dev( ) );
-    printf( "triangles   %10u %10.1f %10.1f %10u %10.2f\n", size.min, size.avg( ), size.rms( ),
-            size.max, size.dev( ) );
-    printf( "volume      %10.2g %10.2g %10.2g %10.2g %10.2g\n", vol.min, vol.avg( ), vol.rms( ),
-            vol.max, vol.dev( ) );
-    printf( "surf. area  %10.2g %10.2g %10.2g %10.2g %10.2g\n", surf.min, surf.avg( ), surf.rms( ),
-            surf.max, surf.dev( ) );
+    printf( "depth       %10u %10.1f %10.1f %10u %10.2f\n", depth.min, depth.avg( ), depth.rms( ), depth.max,
+            depth.dev( ) );
+    printf( "triangles   %10u %10.1f %10.1f %10u %10.2f\n", size.min, size.avg( ), size.rms( ), size.max, size.dev( ) );
+    printf( "volume      %10.2g %10.2g %10.2g %10.2g %10.2g\n", vol.min, vol.avg( ), vol.rms( ), vol.max, vol.dev( ) );
+    printf( "surf. area  %10.2g %10.2g %10.2g %10.2g %10.2g\n", surf.min, surf.avg( ), surf.rms( ), surf.max,
+            surf.dev( ) );
     printf( "------------------------------------------------------------------\n" );
 
     return MB_SUCCESS;

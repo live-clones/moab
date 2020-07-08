@@ -52,8 +52,8 @@ int main( int argc, char** argv )
             const EntityHandle* connect;
             int                 num_connect;
             rval = mb->get_connectivity( *it, connect, num_connect );MB_CHK_ERR( rval );
-            cout << CN::EntityTypeName( mb->type_from_handle( *it ) ) << " "
-                 << mb->id_from_handle( *it ) << " vertex connectivity is: ";
+            cout << CN::EntityTypeName( mb->type_from_handle( *it ) ) << " " << mb->id_from_handle( *it )
+                 << " vertex connectivity is: ";
             for( int i = 0; i < num_connect; i++ )
                 cout << mb->id_from_handle( connect[ i ] ) << " ";
             cout << endl;

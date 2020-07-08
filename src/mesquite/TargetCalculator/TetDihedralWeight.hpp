@@ -47,10 +47,7 @@ class ReferenceMesh;
 class TetDihedralWeight : public WeightCalculator
 {
   public:
-    TetDihedralWeight( double cutoff = 135, double a = 0.4395 )
-        : refMesh( 0 ), mCutoff( cutoff ), mA( a )
-    {
-    }
+    TetDihedralWeight( double cutoff = 135, double a = 0.4395 ) : refMesh( 0 ), mCutoff( cutoff ), mA( a ) {}
 
     TetDihedralWeight( ReferenceMesh* mesh, double cutoff = 135, double a = 0.4395 )
         : refMesh( mesh ), mCutoff( cutoff ), mA( a )

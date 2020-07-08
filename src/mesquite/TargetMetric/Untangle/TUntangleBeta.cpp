@@ -44,8 +44,7 @@ std::string TUntangleBeta::get_name( ) const
     return "untangle beta";
 }
 
-template< unsigned DIM >
-inline bool TUntangleBeta::eval( const MsqMatrix< DIM, DIM >& T, double& result )
+template< unsigned DIM > inline bool TUntangleBeta::eval( const MsqMatrix< DIM, DIM >& T, double& result )
 {
     double tau = det( T );
     double d = tau - mGamma;
@@ -55,8 +54,7 @@ inline bool TUntangleBeta::eval( const MsqMatrix< DIM, DIM >& T, double& result 
 }
 
 template< unsigned DIM >
-inline bool TUntangleBeta::grad( const MsqMatrix< DIM, DIM >& T, double& result,
-                                 MsqMatrix< DIM, DIM >& deriv_wrt_T )
+inline bool TUntangleBeta::grad( const MsqMatrix< DIM, DIM >& T, double& result, MsqMatrix< DIM, DIM >& deriv_wrt_T )
 {
     double tau = det( T );
     if( tau < mGamma )
@@ -74,8 +72,7 @@ inline bool TUntangleBeta::grad( const MsqMatrix< DIM, DIM >& T, double& result,
 }
 
 template< unsigned DIM >
-inline bool TUntangleBeta::hess( const MsqMatrix< DIM, DIM >& T, double& result,
-                                 MsqMatrix< DIM, DIM >& deriv_wrt_T,
+inline bool TUntangleBeta::hess( const MsqMatrix< DIM, DIM >& T, double& result, MsqMatrix< DIM, DIM >& deriv_wrt_T,
                                  MsqMatrix< DIM, DIM >* second_wrt_T )
 {
     double tau = det( T );

@@ -89,8 +89,8 @@ class NumericalTestOF : public ObjectiveFunctionTemplate
 {
   public:
     NumericalTestOF( bool should_fail, bool should_return_false, bool constant_func )
-        : changed( false ), fail( should_fail ), return_false( should_return_false ),
-          constant( constant_func ), linearGrad( 1, 2, 3 )
+        : changed( false ), fail( should_fail ), return_false( should_return_false ), constant( constant_func ),
+          linearGrad( 1, 2, 3 )
     {
     }
 
@@ -114,8 +114,7 @@ class NumericalTestOF : public ObjectiveFunctionTemplate
     const Vector3D linearGrad;
 };
 
-bool NumericalTestOF::evaluate( EvalType type, PatchData& pd, double& val, bool free,
-                                MsqError& err )
+bool NumericalTestOF::evaluate( EvalType type, PatchData& pd, double& val, bool free, MsqError& err )
 {
     if( fail )
     {
@@ -129,8 +128,7 @@ bool NumericalTestOF::evaluate( EvalType type, PatchData& pd, double& val, bool 
         return false;
     }
 
-    if( type != ObjectiveFunction::CALCULATE && type != ObjectiveFunction::TEMPORARY )
-        changed = true;
+    if( type != ObjectiveFunction::CALCULATE && type != ObjectiveFunction::TEMPORARY ) changed = true;
 
     if( constant )
     {
@@ -167,8 +165,7 @@ void NumericalOFTest::test_gradient_values( bool constant )
     double             value;
     vector< Vector3D > gradient;
 
-    bool rval =
-        func.evaluate_with_gradient( ObjectiveFunction::CALCULATE, pd, value, gradient, err );
+    bool rval = func.evaluate_with_gradient( ObjectiveFunction::CALCULATE, pd, value, gradient, err );
     ASSERT_NO_ERROR( err );
     CPPUNIT_ASSERT( rval );
 
@@ -196,8 +193,7 @@ void NumericalOFTest::test_handles_eval_false( )
     double             value;
     vector< Vector3D > gradient;
 
-    bool rval =
-        func.evaluate_with_gradient( ObjectiveFunction::CALCULATE, pd, value, gradient, err );
+    bool rval = func.evaluate_with_gradient( ObjectiveFunction::CALCULATE, pd, value, gradient, err );
     ASSERT_NO_ERROR( err );
     CPPUNIT_ASSERT( !rval );
 }

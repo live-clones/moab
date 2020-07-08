@@ -56,8 +56,7 @@
 namespace MBMesquite
 {
 
-const DeformingDomainWrapper::MeshCharacteristic DEFAULT_METRIC_TYPE =
-    DeformingDomainWrapper::SHAPE;
+const DeformingDomainWrapper::MeshCharacteristic DEFAULT_METRIC_TYPE = DeformingDomainWrapper::SHAPE;
 
 const bool                           DEFAULT_CULLING = true;
 const double                         DEFAULT_CPU_TIME = 0.0;
@@ -89,14 +88,14 @@ void DeformingDomainWrapper::set_vertex_movement_limit_factor( double f )
     movementFactor = f;
 }
 
-void DeformingDomainWrapper::run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh,
-                                          Settings* settings, QualityAssessor* qa, MsqError& err )
+void DeformingDomainWrapper::run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh, Settings* settings,
+                                          QualityAssessor* qa, MsqError& err )
 {
     if( movementFactor <= 0 )
     {
         MSQ_SETERR( err )
-        ( MsqError::INVALID_STATE,
-          "Optimization will not terminate with non-positive movement factor %f", movementFactor );
+        ( MsqError::INVALID_STATE, "Optimization will not terminate with non-positive movement factor %f",
+          movementFactor );
         return;
     }
 
@@ -169,15 +168,14 @@ void DeformingDomainWrapper::move_to_domain( Mesh* mesh, MeshDomain* geom, MsqEr
     }
 }
 
-DeformingCurveSmoother::DeformingCurveSmoother( )
-    : metricType( DEFAULT_CURVE_TYPE ), initFractTag( DEFAULT_CURVE_TAG )
+DeformingCurveSmoother::DeformingCurveSmoother( ) : metricType( DEFAULT_CURVE_TYPE ), initFractTag( DEFAULT_CURVE_TAG )
 {
 }
 
 DeformingCurveSmoother::~DeformingCurveSmoother( ) {}
 
-void DeformingCurveSmoother::store_initial_mesh( Mesh* mesh, const Mesh::VertexHandle* verts,
-                                                 int nverts, CurveDomain*, MsqError& err )
+void DeformingCurveSmoother::store_initial_mesh( Mesh* mesh, const Mesh::VertexHandle* verts, int nverts, CurveDomain*,
+                                                 MsqError& err )
 {
     if( nverts < 2 )
     {
@@ -219,8 +217,8 @@ void DeformingCurveSmoother::store_initial_mesh( Mesh* mesh, const Mesh::VertexH
     mesh->tag_set_vertex_data( tag, nverts - 2, verts + 1, &vals[ 0 ], err );MSQ_ERRRTN( err );
 }
 
-void DeformingCurveSmoother::smooth_curve( Mesh* mesh, const Mesh::VertexHandle* verts, int nverts,
-                                           CurveDomain* geom, Scheme, MsqError& err )
+void DeformingCurveSmoother::smooth_curve( Mesh* mesh, const Mesh::VertexHandle* verts, int nverts, CurveDomain* geom,
+                                           Scheme, MsqError& err )
 {
     if( nverts < 2 )
     {
@@ -241,8 +239,7 @@ void DeformingCurveSmoother::smooth_curve( Mesh* mesh, const Mesh::VertexHandle*
         if( ( coords[ i ] - coords2 ).length_squared( ) > DBL_EPSILON )
         {
             MSQ_SETERR( err )
-            ( "Curve end vertices do not line on curve.  Move ends to curve end points first",
-              MsqError::INVALID_MESH );
+            ( "Curve end vertices do not line on curve.  Move ends to curve end points first", MsqError::INVALID_MESH );
             return;
         }
     }
@@ -274,8 +271,7 @@ void DeformingCurveSmoother::smooth_curve( Mesh* mesh, const Mesh::VertexHandle*
     for( int i = 1; i < nverts - 1; ++i )
     {
         frac_sum += vals[ i - 1 ];
-        geom->position_from_length( coords[ 0 ].to_array( ), total * frac_sum,
-                                    coords[ 1 ].to_array( ), err );MSQ_ERRRTN( err );
+        geom->position_from_length( coords[ 0 ].to_array( ), total * frac_sum, coords[ 1 ].to_array( ), err );MSQ_ERRRTN( err );
         mesh->vertex_set_coordinates( verts[ i ], coords[ 1 ], err );MSQ_ERRRTN( err );
     }
 }
@@ -292,8 +288,7 @@ TagHandle DeformingCurveSmoother::get_tag( Mesh* mesh, MsqError& err )
     if( type != Mesh::DOUBLE || len != 1 )
     {
         MSQ_SETERR( err )
-        ( MsqError::INVALID_MESH, "Tag \"%s\" exists but is not 1 double value per vertex.",
-          initFractTag.c_str( ) );
+        ( MsqError::INVALID_MESH, "Tag \"%s\" exists but is not 1 double value per vertex.", initFractTag.c_str( ) );
     }
     return h;
 }

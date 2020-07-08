@@ -63,8 +63,7 @@ class FauxObjectiveFunction : public ObjectiveFunction
     {
         --instanceCount;
     }
-    bool initialize_block_coordinate_descent( MeshDomainAssoc*, const Settings*, PatchSet*,
-                                              MsqError& )
+    bool initialize_block_coordinate_descent( MeshDomainAssoc*, const Settings*, PatchSet*, MsqError& )
     {
         CPPUNIT_ASSERT_MESSAGE( "This shouldn't ever get called", false );
         return false;
@@ -152,8 +151,8 @@ class CompositeOFTest : public CppUnit::TestFixture, public ObjectiveFunctionTes
 
   public:
     CompositeOFTest( )
-        : OF1( 1.0 ), OF2( 3.0 ), OF3( -7.0 ), OF4( M_PI ), invalidOF( 1.0, true, false ),
-          errorOF( 1.0, false, true ), LP1( 1, &metric ), LP2( 2, &metric )
+        : OF1( 1.0 ), OF2( 3.0 ), OF3( -7.0 ), OF4( M_PI ), invalidOF( 1.0, true, false ), errorOF( 1.0, false, true ),
+          LP1( 1, &metric ), LP2( 2, &metric )
     {
     }
 
@@ -193,8 +192,7 @@ class CompositeOFTest : public CppUnit::TestFixture, public ObjectiveFunctionTes
     void test_scalar_multiply_error( );
 
     void test_evaluate( double expected_value, ObjectiveFunction& of );
-    void get_hessians( MsqHessian& LP1_hess, MsqHessian& LP2_hess, ObjectiveFunction& OF,
-                       MsqHessian& OF_hess );
+    void get_hessians( MsqHessian& LP1_hess, MsqHessian& LP2_hess, ObjectiveFunction& OF, MsqHessian& OF_hess );
     void test_composite_clone( ObjectiveFunction& of );
     void test_invalid_eval( ObjectiveFunction& of );
     void test_eval_fails( ObjectiveFunction& of );
@@ -270,8 +268,8 @@ void CompositeOFTest::test_scalar_multiply_gradient( )
     compare_numerical_gradient( &OF );
 }
 
-void CompositeOFTest::get_hessians( MsqHessian& LP1_hess, MsqHessian& LP2_hess,
-                                    ObjectiveFunction& OF, MsqHessian& OF_hess )
+void CompositeOFTest::get_hessians( MsqHessian& LP1_hess, MsqHessian& LP2_hess, ObjectiveFunction& OF,
+                                    MsqHessian& OF_hess )
 {
     MsqPrintError err( cout );
     PatchData     pd;
@@ -288,12 +286,10 @@ void CompositeOFTest::get_hessians( MsqHessian& LP1_hess, MsqHessian& LP2_hess,
     std::vector< Vector3D > grad;
     bool                    rval;
     double                  value;
-    rval =
-        LP1.evaluate_with_Hessian( ObjectiveFunction::CALCULATE, pd, value, grad, LP1_hess, err );
+    rval = LP1.evaluate_with_Hessian( ObjectiveFunction::CALCULATE, pd, value, grad, LP1_hess, err );
     ASSERT_NO_ERROR( err );
     CPPUNIT_ASSERT( rval );
-    rval =
-        LP2.evaluate_with_Hessian( ObjectiveFunction::CALCULATE, pd, value, grad, LP2_hess, err );
+    rval = LP2.evaluate_with_Hessian( ObjectiveFunction::CALCULATE, pd, value, grad, LP2_hess, err );
     ASSERT_NO_ERROR( err );
     CPPUNIT_ASSERT( rval );
     rval = OF.evaluate_with_Hessian( ObjectiveFunction::CALCULATE, pd, value, grad, OF_hess, err );
@@ -320,16 +316,13 @@ void CompositeOFTest::test_multiply_hess_diagonal( )
     std::vector< Vector3D > grad1, grad2, grad;
     bool                    rval;
     double                  value1, value2, value;
-    rval = LP1.evaluate_with_Hessian_diagonal( ObjectiveFunction::CALCULATE, pd, value1, grad1,
-                                               hess1, err );
+    rval = LP1.evaluate_with_Hessian_diagonal( ObjectiveFunction::CALCULATE, pd, value1, grad1, hess1, err );
     ASSERT_NO_ERROR( err );
     CPPUNIT_ASSERT( rval );
-    rval = LP2.evaluate_with_Hessian_diagonal( ObjectiveFunction::CALCULATE, pd, value2, grad2,
-                                               hess2, err );
+    rval = LP2.evaluate_with_Hessian_diagonal( ObjectiveFunction::CALCULATE, pd, value2, grad2, hess2, err );
     ASSERT_NO_ERROR( err );
     CPPUNIT_ASSERT( rval );
-    rval = OF.evaluate_with_Hessian_diagonal( ObjectiveFunction::CALCULATE, pd, value, grad, hess,
-                                              err );
+    rval = OF.evaluate_with_Hessian_diagonal( ObjectiveFunction::CALCULATE, pd, value, grad, hess, err );
     ASSERT_NO_ERROR( err );
     CPPUNIT_ASSERT( rval );
 

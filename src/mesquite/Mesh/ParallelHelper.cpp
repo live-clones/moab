@@ -80,28 +80,26 @@ static const char* mpi_err_string( int error_code )
     return buffer;
 }
 
-#define CHECK_MPI( RVAL, ERR )                                            \
-    do                                                                    \
-    {                                                                     \
-        if( MPI_SUCCESS != ( RVAL ) )                                     \
-        {                                                                 \
-            MSQ_SETERR( err )                                             \
-            ( MsqError::UNKNOWN_ERROR, "MPI Error %d: %s", (int)( RVAL ), \
-              mpi_err_string( ( RVAL ) ) );                               \
-            return;                                                       \
-        }                                                                 \
+#define CHECK_MPI( RVAL, ERR )                                                                          \
+    do                                                                                                  \
+    {                                                                                                   \
+        if( MPI_SUCCESS != ( RVAL ) )                                                                   \
+        {                                                                                               \
+            MSQ_SETERR( err )                                                                           \
+            ( MsqError::UNKNOWN_ERROR, "MPI Error %d: %s", (int)( RVAL ), mpi_err_string( ( RVAL ) ) ); \
+            return;                                                                                     \
+        }                                                                                               \
     } while( false )
 
-#define CHECK_MPI_RZERO( RVAL, ERR )                                      \
-    do                                                                    \
-    {                                                                     \
-        if( MPI_SUCCESS != ( RVAL ) )                                     \
-        {                                                                 \
-            MSQ_SETERR( err )                                             \
-            ( MsqError::UNKNOWN_ERROR, "MPI Error %d: %s", (int)( RVAL ), \
-              mpi_err_string( ( RVAL ) ) );                               \
-            return 0;                                                     \
-        }                                                                 \
+#define CHECK_MPI_RZERO( RVAL, ERR )                                                                    \
+    do                                                                                                  \
+    {                                                                                                   \
+        if( MPI_SUCCESS != ( RVAL ) )                                                                   \
+        {                                                                                               \
+            MSQ_SETERR( err )                                                                           \
+            ( MsqError::UNKNOWN_ERROR, "MPI Error %d: %s", (int)( RVAL ), mpi_err_string( ( RVAL ) ) ); \
+            return 0;                                                                                   \
+        }                                                                                               \
     } while( false )
 
 static bool vertex_map_insert( VertexIdMap& map, size_t glob_id, int proc_id, int value )
@@ -188,8 +186,7 @@ static double generate_random_number( int generate_random_numbers, int proc_id, 
 {
     int gid;
 
-    if( sizeof( size_t ) == sizeof( unsigned long long ) )
-    { gid = hash6432shift( (unsigned long long)glob_id ); }
+    if( sizeof( size_t ) == sizeof( unsigned long long ) ) { gid = hash6432shift( (unsigned long long)glob_id ); }
     else
     {
         gid = (int)glob_id;
@@ -388,8 +385,7 @@ void ParallelHelperImpl::smoothing_init( MsqError& err )
         {
             if( app_fixed[ i ] & MsqVertex::MSQ_CULLED ) { ++ncull; }
         }
-        std::cout << "P[" << rank << "] smoothing_init ncull= " << ncull
-                  << " num_vertex= " << num_vertex << std::endl;
+        std::cout << "P[" << rank << "] smoothing_init ncull= " << ncull << " num_vertex= " << num_vertex << std::endl;
     }
 
     /* only interested in fixed flag from vertex byte? Clear others. */
@@ -424,11 +420,9 @@ void ParallelHelperImpl::smoothing_init( MsqError& err )
     /* get the array that contains the adjacent vertices for each mesh element */
     std::vector< MBMesquite::Mesh::VertexHandle > adj_vertices;
     std::vector< size_t >                         vtx_offsets;
-    mesh->elements_get_attached_vertices( ARRPTR( elements ), num_elems, adj_vertices, vtx_offsets,
-                                          err );
+    mesh->elements_get_attached_vertices( ARRPTR( elements ), num_elems, adj_vertices, vtx_offsets, err );
     std::vector< int > adj_vertices_lid( adj_vertices.size( ) );
-    mesh->tag_get_vertex_data( lid_tag, adj_vertices.size( ), ARRPTR( adj_vertices ),
-                               ARRPTR( adj_vertices_lid ), err );
+    mesh->tag_get_vertex_data( lid_tag, adj_vertices.size( ), ARRPTR( adj_vertices ), ARRPTR( adj_vertices_lid ), err );
 
     if( 0 ) printf( "[%d] gotten adjacent elements for %d elements\n", rank, num_elems );
 
@@ -467,8 +461,7 @@ void ParallelHelperImpl::smoothing_init( MsqError& err )
                 incident_vtx = adj_vertices_lid[ j ];
                 /* obviously the vertex does not need to be marked if it was already marked or if it
                  * is app_fixed*/
-                if( vtx_in_partition_boundary[ incident_vtx ] <= 0 &&
-                    app_fixed[ incident_vtx ] == 0 )
+                if( vtx_in_partition_boundary[ incident_vtx ] <= 0 && app_fixed[ incident_vtx ] == 0 )
                 {
                     /* mark and count the vertex */
                     if( proc_owner[ incident_vtx ] != rank )
@@ -493,8 +486,7 @@ void ParallelHelperImpl::smoothing_init( MsqError& err )
                 incident_vtx = adj_vertices_lid[ j ];
                 /* obviously the vertex is not marked if it was already marked or if it is
                  * app_fixed*/
-                if( vtx_in_partition_boundary[ incident_vtx ] == 0 &&
-                    app_fixed[ incident_vtx ] == 0 )
+                if( vtx_in_partition_boundary[ incident_vtx ] == 0 && app_fixed[ incident_vtx ] == 0 )
                 { vtx_in_partition_boundary[ incident_vtx ] = -1; }
             }
         }
@@ -515,8 +507,7 @@ void ParallelHelperImpl::smoothing_init( MsqError& err )
         fflush( NULL );
     }
 
-    num_vtx_partition_boundary =
-        num_vtx_partition_boundary_local + num_vtx_partition_boundary_remote;
+    num_vtx_partition_boundary = num_vtx_partition_boundary_local + num_vtx_partition_boundary_remote;
 
     /********************************************************************
    COLLECT THE PARTITION BOUNDARY VERTICES AND THE UNUSED GHOST VERTICES
@@ -569,8 +560,7 @@ void ParallelHelperImpl::smoothing_init( MsqError& err )
 
     /* create our own 'very pseudo random' numbers */
     for( i = 0; i < num_vtx_partition_boundary; i++ )
-        part_rand_number[ i ] =
-            generate_random_number( generate_random_numbers, part_proc_owner[ i ], part_gid[ i ] );
+        part_rand_number[ i ] = generate_random_number( generate_random_numbers, part_proc_owner[ i ], part_gid[ i ] );
 
     /* count the number of unused ghost vertices */
     unghost_num_vtx = 0;
@@ -613,8 +603,8 @@ void ParallelHelperImpl::smoothing_init( MsqError& err )
     if( unghost_num_vtx )
     {
         /* sort the unused ghost vertices by processor */
-        my_quicksort( ARRPTR( unghost_proc_owner ), ARRPTR( unghost_gid ),
-                      &( unghost_vertices[ 0 ] ), 0, unghost_num_vtx - 1 );
+        my_quicksort( ARRPTR( unghost_proc_owner ), ARRPTR( unghost_gid ), &( unghost_vertices[ 0 ] ), 0,
+                      unghost_num_vtx - 1 );
 
         /* count the number of processors we have unused ghost data from that we want to get updated
          */
@@ -636,8 +626,7 @@ void ParallelHelperImpl::smoothing_init( MsqError& err )
             {
                 unghost_procs[ j ] = unghost_proc_owner[ i ];
                 unghost_procs_offset[ j ] = i;
-                unghost_procs_num_vtx[ j - 1 ] =
-                    unghost_procs_offset[ j ] - unghost_procs_offset[ j - 1 ];
+                unghost_procs_num_vtx[ j - 1 ] = unghost_procs_offset[ j ] - unghost_procs_offset[ j - 1 ];
                 assert( unghost_procs_num_vtx[ j - 1 ] > 0 );
                 j++;
             }
@@ -667,8 +656,8 @@ void ParallelHelperImpl::smoothing_init( MsqError& err )
     }
     /* temporary used for the initial gather in which each proc tells the root from how many procs
      * it wants unused ghost data updates */
-    rval = MPI_Gather( &unghost_num_procs, 1, MPI_INT, ARRPTR( num_sends_of_unghost ), 1, MPI_INT,
-                       0, (MPI_Comm)communicator );
+    rval = MPI_Gather( &unghost_num_procs, 1, MPI_INT, ARRPTR( num_sends_of_unghost ), 1, MPI_INT, 0,
+                       (MPI_Comm)communicator );
     CHECK_MPI( rval, err );
 
     /* now each processor tells the root node from which processors they want unused ghost nodes
@@ -701,8 +690,8 @@ void ParallelHelperImpl::smoothing_init( MsqError& err )
         for( i = 0; i < procs_num; i++ )
         {
             MPI_Status status;
-            rval = MPI_Recv( unghost_procs_array, procs_max, MPI_INT, MPI_ANY_SOURCE,
-                             GHOST_NODE_INFO, (MPI_Comm)communicator, &status );
+            rval = MPI_Recv( unghost_procs_array, procs_max, MPI_INT, MPI_ANY_SOURCE, GHOST_NODE_INFO,
+                             (MPI_Comm)communicator, &status );
             CHECK_MPI( rval, err );
             int count;
             MPI_Get_count( &status, MPI_INT, &count );
@@ -717,8 +706,8 @@ void ParallelHelperImpl::smoothing_init( MsqError& err )
     {
         if( unghost_num_vtx )
         {
-            rval = MPI_Send( ARRPTR( unghost_procs ), unghost_num_procs, MPI_INT, 0,
-                             GHOST_NODE_INFO, (MPI_Comm)communicator );
+            rval = MPI_Send( ARRPTR( unghost_procs ), unghost_num_procs, MPI_INT, 0, GHOST_NODE_INFO,
+                             (MPI_Comm)communicator );
             CHECK_MPI( rval, err );
         }
     }
@@ -726,8 +715,8 @@ void ParallelHelperImpl::smoothing_init( MsqError& err )
     /* now the root node knows for each processor on how many other processors they have ghost nodes
      * (which need updating) */
     /* the scatter distributes this information to each processor */
-    rval = MPI_Scatter( ARRPTR( num_sends_of_unghost ), 1, MPI_INT, &update_num_procs, 1, MPI_INT,
-                        0, (MPI_Comm)communicator );
+    rval = MPI_Scatter( ARRPTR( num_sends_of_unghost ), 1, MPI_INT, &update_num_procs, 1, MPI_INT, 0,
+                        (MPI_Comm)communicator );
     CHECK_MPI( rval, err );
 
     // if (rank == 0) delete [] num_sends_of_unghost;
@@ -741,9 +730,8 @@ void ParallelHelperImpl::smoothing_init( MsqError& err )
     std::vector< MPI_Request > requests_unghost( unghost_num_procs );
     for( j = 0; j < unghost_num_procs; j++ )
     {
-        rval = MPI_Isend( &( unghost_procs_num_vtx[ j ] ), 1, MPI_INT, unghost_procs[ j ],
-                          GHOST_NODE_VERTICES_WANTED, (MPI_Comm)communicator,
-                          &( requests_unghost[ j ] ) );
+        rval = MPI_Isend( &( unghost_procs_num_vtx[ j ] ), 1, MPI_INT, unghost_procs[ j ], GHOST_NODE_VERTICES_WANTED,
+                          (MPI_Comm)communicator, &( requests_unghost[ j ] ) );
         CHECK_MPI( rval, err );
     }
 
@@ -752,9 +740,8 @@ void ParallelHelperImpl::smoothing_init( MsqError& err )
     update_procs_num_vtx.resize( update_num_procs );
     for( j = 0; j < update_num_procs; j++ )
     {
-        rval = MPI_Irecv( &( update_procs_num_vtx[ j ] ), 1, MPI_INT, MPI_ANY_SOURCE,
-                          GHOST_NODE_VERTICES_WANTED, (MPI_Comm)communicator,
-                          &( requests_updates[ j ] ) );
+        rval = MPI_Irecv( &( update_procs_num_vtx[ j ] ), 1, MPI_INT, MPI_ANY_SOURCE, GHOST_NODE_VERTICES_WANTED,
+                          (MPI_Comm)communicator, &( requests_updates[ j ] ) );
         CHECK_MPI( rval, err );
     }
 
@@ -787,20 +774,18 @@ void ParallelHelperImpl::smoothing_init( MsqError& err )
     /* tell each processor which vertices we want from them */
     for( j = 0; j < unghost_num_procs; j++ )
     {
-        rval =
-            MPI_Isend( &( unghost_gid[ unghost_procs_offset[ j ] ] ), unghost_procs_num_vtx[ j ],
-                       sizeof( size_t ) == 4 ? MPI_INT : MPI_DOUBLE, unghost_procs[ j ],
-                       GHOST_NODE_VERTEX_GIDS, (MPI_Comm)communicator, &( requests_unghost[ j ] ) );
+        rval = MPI_Isend( &( unghost_gid[ unghost_procs_offset[ j ] ] ), unghost_procs_num_vtx[ j ],
+                          sizeof( size_t ) == 4 ? MPI_INT : MPI_DOUBLE, unghost_procs[ j ], GHOST_NODE_VERTEX_GIDS,
+                          (MPI_Comm)communicator, &( requests_unghost[ j ] ) );
         CHECK_MPI( rval, err );
     }
 
     /* receive from each processor the info which vertices they want from us */
     for( j = 0; j < update_num_procs; j++ )
     {
-        rval =
-            MPI_Irecv( &( update_gid[ update_procs_offset[ j ] ] ), update_procs_num_vtx[ j ],
-                       sizeof( size_t ) == 4 ? MPI_INT : MPI_DOUBLE, update_procs[ j ],
-                       GHOST_NODE_VERTEX_GIDS, (MPI_Comm)communicator, &( requests_updates[ j ] ) );
+        rval = MPI_Irecv( &( update_gid[ update_procs_offset[ j ] ] ), update_procs_num_vtx[ j ],
+                          sizeof( size_t ) == 4 ? MPI_INT : MPI_DOUBLE, update_procs[ j ], GHOST_NODE_VERTEX_GIDS,
+                          (MPI_Comm)communicator, &( requests_updates[ j ] ) );
         CHECK_MPI( rval, err );
     }
 
@@ -849,10 +834,10 @@ void ParallelHelperImpl::smoothing_init( MsqError& err )
     std::vector< MBMesquite::Mesh::VertexHandle >  adj_adj_vertices;
     std::vector< size_t >                          elem_offsets;
     std::vector< size_t >                          adj_vtx_offsets;
-    mesh->vertices_get_attached_elements( ARRPTR( part_vertices ), num_vtx_partition_boundary_local,
-                                          adj_elements, elem_offsets, err );
-    mesh->elements_get_attached_vertices( ARRPTR( adj_elements ), adj_elements.size( ),
-                                          adj_adj_vertices, adj_vtx_offsets, err );
+    mesh->vertices_get_attached_elements( ARRPTR( part_vertices ), num_vtx_partition_boundary_local, adj_elements,
+                                          elem_offsets, err );
+    mesh->elements_get_attached_vertices( ARRPTR( adj_elements ), adj_elements.size( ), adj_adj_vertices,
+                                          adj_vtx_offsets, err );
     // delete adj_elements; adj_elements = 0;
     std::vector< int > adj_adj_vertices_lid( adj_adj_vertices.size( ) );
     mesh->tag_get_vertex_data( lid_tag, adj_adj_vertices.size( ), ARRPTR( adj_adj_vertices ),
@@ -877,16 +862,16 @@ void ParallelHelperImpl::smoothing_init( MsqError& err )
                     /* then map it into our domain */
                     incident_vtx = vtx_partition_boundary_map_inverse[ incident_vtx ];
                     /* is this vertex already in our neighbour list ? */
-                    if( std::find( vtx_off_proc_list[ i ].begin( ), vtx_off_proc_list[ i ].end( ),
-                                   incident_vtx ) == vtx_off_proc_list[ i ].end( ) )
+                    if( std::find( vtx_off_proc_list[ i ].begin( ), vtx_off_proc_list[ i ].end( ), incident_vtx ) ==
+                        vtx_off_proc_list[ i ].end( ) )
                     {
                         /* if the vertex is not in the list yet ... add it */
                         vtx_off_proc_list[ i ].push_back( incident_vtx );
                         /* is the processor of this vertex already in the processor list */
                         incident_vtx = part_proc_owner[ incident_vtx ];
                         /* check by scanning the list for this processor */
-                        if( std::find( neighbourProc.begin( ), neighbourProc.end( ),
-                                       incident_vtx ) == neighbourProc.end( ) )
+                        if( std::find( neighbourProc.begin( ), neighbourProc.end( ), incident_vtx ) ==
+                            neighbourProc.end( ) )
                         {
                             /* the processor is not in the list yet ... add it */
                             neighbourProc.push_back( incident_vtx );
@@ -972,8 +957,7 @@ void ParallelHelperImpl::smoothing_init( MsqError& err )
     in_independent_set.resize( num_vtx_partition_boundary_local );
 }
 
-void ParallelHelperImpl::compute_first_independent_set(
-    std::vector< Mesh::VertexHandle >& fixed_vertices )
+void ParallelHelperImpl::compute_first_independent_set( std::vector< Mesh::VertexHandle >& fixed_vertices )
 {
     if( nprocs == 1 ) return;
 
@@ -1017,15 +1001,14 @@ void ParallelHelperImpl::compute_first_independent_set(
         }
         else
         {
-            fixed_vertices.push_back(
-                part_vertices[ i ] );  // fix vertices *not* in the independent set
+            fixed_vertices.push_back( part_vertices[ i ] );  // fix vertices *not* in the independent set
         }
     }
 
     if( 0 )
     {
-        printf( "[%d]i%d after first we smoothed %d of %d\n", rank, iteration,
-                num_already_smoothed_vertices, num_vtx_partition_boundary_local );
+        printf( "[%d]i%d after first we smoothed %d of %d\n", rank, iteration, num_already_smoothed_vertices,
+                num_vtx_partition_boundary_local );
         fflush( NULL );
     }
 
@@ -1077,9 +1060,7 @@ bool ParallelHelperImpl::compute_next_independent_set( )
     if( global_work_remains && ( iteration < 20 ) )
     {
         iteration++;
-        if( 0 )
-            printf( "[%d] work remains %d after %d iterations\n", rank, global_work_remains,
-                    iteration );
+        if( 0 ) printf( "[%d] work remains %d after %d iterations\n", rank, global_work_remains, iteration );
         compute_independent_set( );
         next_vtx_partition_boundary = 0;
         return true;
@@ -1087,16 +1068,12 @@ bool ParallelHelperImpl::compute_next_independent_set( )
     else
     {
         if( global_work_remains )
-        {
-            printf( "WARNING: global work remains %d after %d iterations\n", global_work_remains,
-                    iteration );
-        }
+        { printf( "WARNING: global work remains %d after %d iterations\n", global_work_remains, iteration ); }
         return false;
     }
 }
 
-bool ParallelHelperImpl::get_next_partition_boundary_vertex(
-    MBMesquite::Mesh::VertexHandle& vertex_handle )
+bool ParallelHelperImpl::get_next_partition_boundary_vertex( MBMesquite::Mesh::VertexHandle& vertex_handle )
 {
     while( next_vtx_partition_boundary < num_vtx_partition_boundary_local )
     {
@@ -1113,8 +1090,8 @@ bool ParallelHelperImpl::get_next_partition_boundary_vertex(
     }
     if( 0 )
     {
-        printf( "[%d]i%d after next we smoothed %d of %d\n", rank, iteration,
-                num_already_smoothed_vertices, num_vtx_partition_boundary_local );
+        printf( "[%d]i%d after next we smoothed %d of %d\n", rank, iteration, num_already_smoothed_vertices,
+                num_vtx_partition_boundary_local );
         fflush( NULL );
     }
     return false;
@@ -1150,9 +1127,9 @@ void ParallelHelperImpl::communicate_next_independent_set( MsqError& err )
                               ( total_num_vertices_to_recv - num_already_recv_vertices );
         if( 0 )
         {
-            printf( "[%d]i%d %d - %d + %d  - %d = %d \n", rank, iteration,
-                    total_num_vertices_to_smooth, num_already_smoothed_vertices,
-                    total_num_vertices_to_recv, num_already_recv_vertices, global_work_remains );
+            printf( "[%d]i%d %d - %d + %d  - %d = %d \n", rank, iteration, total_num_vertices_to_smooth,
+                    num_already_smoothed_vertices, total_num_vertices_to_recv, num_already_recv_vertices,
+                    global_work_remains );
             fflush( NULL );
         }
     }
@@ -1163,8 +1140,7 @@ void ParallelHelperImpl::communicate_next_independent_set( MsqError& err )
         {
             if( part_smoothed_flag[ i ] == 0 ) { work_remains++; }
         }
-        int rval = MPI_Allreduce( &work_remains, &global_work_remains, 1, MPI_INT, MPI_SUM,
-                                  (MPI_Comm)communicator );
+        int rval = MPI_Allreduce( &work_remains, &global_work_remains, 1, MPI_INT, MPI_SUM, (MPI_Comm)communicator );
         CHECK_MPI( rval, err );
     }
 }
@@ -1190,8 +1166,7 @@ void ParallelHelperImpl::smoothing_close( MsqError& err )
         std::vector< unsigned char > app_fixed( num_vertex );
         mesh->vertices_get_byte( ARRPTR( vertices ), ARRPTR( app_fixed ), num_vertex, err );MSQ_ERRRTN( err );
         std::vector< int > proc_owner( num_vertex );
-        mesh->vertices_get_processor_id( ARRPTR( vertices ), ARRPTR( proc_owner ), num_vertex,
-                                         err );MSQ_ERRRTN( err );
+        mesh->vertices_get_processor_id( ARRPTR( vertices ), ARRPTR( proc_owner ), num_vertex, err );MSQ_ERRRTN( err );
 
         if( 0 )
         {
@@ -1200,8 +1175,7 @@ void ParallelHelperImpl::smoothing_close( MsqError& err )
             {
                 if( app_fixed[ i ] & MsqVertex::MSQ_CULLED ) { ++ncull; }
             }
-            std::cout << "P[" << rank << "] ncull= " << ncull << " num_vertex= " << num_vertex
-                      << std::endl;
+            std::cout << "P[" << rank << "] ncull= " << ncull << " num_vertex= " << num_vertex << std::endl;
         }
 
         /* only interested in fixed flag from vertex byte? Clear others. */
@@ -1245,9 +1219,8 @@ void ParallelHelperImpl::smoothing_close( MsqError& err )
         /* send each processor the unused ghost node updates that they requested */
         for( j = 0; j < update_num_procs; j++ )
         {
-            rval = MPI_Isend( &( update_updates[ update_procs_offset[ j ] * 3 ] ),
-                              update_procs_num_vtx[ j ] * 3, MPI_DOUBLE, update_procs[ j ],
-                              GHOST_NODE_VERTEX_UPDATES, (MPI_Comm)communicator,
+            rval = MPI_Isend( &( update_updates[ update_procs_offset[ j ] * 3 ] ), update_procs_num_vtx[ j ] * 3,
+                              MPI_DOUBLE, update_procs[ j ], GHOST_NODE_VERTEX_UPDATES, (MPI_Comm)communicator,
                               &( update_requests[ j ] ) );
             //      printf("[%d] sending %d of %d from %d with offset %d \n", rank,
             //      update_procs_num_vtx[j], update_num_vtx, update_procs[j],
@@ -1268,9 +1241,8 @@ void ParallelHelperImpl::smoothing_close( MsqError& err )
         std::vector< double > unghost_updates( unghost_num_vtx * 3 );
         for( j = 0; j < unghost_num_procs; j++ )
         {
-            rval = MPI_Irecv( &( unghost_updates[ unghost_procs_offset[ j ] * 3 ] ),
-                              unghost_procs_num_vtx[ j ] * 3, MPI_DOUBLE, unghost_procs[ j ],
-                              GHOST_NODE_VERTEX_UPDATES, (MPI_Comm)communicator,
+            rval = MPI_Irecv( &( unghost_updates[ unghost_procs_offset[ j ] * 3 ] ), unghost_procs_num_vtx[ j ] * 3,
+                              MPI_DOUBLE, unghost_procs[ j ], GHOST_NODE_VERTEX_UPDATES, (MPI_Comm)communicator,
                               &( unghost_requests[ j ] ) );
             //      printf("[%d] receiving %d of %d from %d with offset %d \n", rank,
             //      unghost_procs_num_vtx[j], unghost_num_vtx, unghost_procs[j],
@@ -1369,9 +1341,8 @@ int ParallelHelperImpl::comm_smoothed_vtx_tnb( MsqError& err )
         /* did loop end without finding the processor */
         if( j == (long)neighbourProc.size( ) )
         {
-            printf(
-                "[%d]i%d WARNING: did not find exportProc[%d] = %d in list of %lu processors.\n",
-                rank, iteration, i, exportProc[ i ], (unsigned long)neighbourProc.size( ) );
+            printf( "[%d]i%d WARNING: did not find exportProc[%d] = %d in list of %lu processors.\n", rank, iteration,
+                    i, exportProc[ i ], (unsigned long)neighbourProc.size( ) );
         }
     }
 
@@ -1387,34 +1358,31 @@ int ParallelHelperImpl::comm_smoothed_vtx_tnb( MsqError& err )
         /* send the vertex count to this processor */
         if( 0 )
         {
-            printf( "[%d]i%d Announce send %d vertices from proc %d\n", rank, iteration,
-                    numVtxPerProcSend[ j ], neighbourProc[ j ] );
+            printf( "[%d]i%d Announce send %d vertices from proc %d\n", rank, iteration, numVtxPerProcSend[ j ],
+                    neighbourProc[ j ] );
             fflush( NULL );
         }
-        rval =
-            MPI_Isend( &( numVtxPerProcSend[ j ] ), 1, MPI_INT, neighbourProc[ j ],
-                       VERTEX_HEADER + iteration, (MPI_Comm)communicator, &( requests_send[ j ] ) );
+        rval = MPI_Isend( &( numVtxPerProcSend[ j ] ), 1, MPI_INT, neighbourProc[ j ], VERTEX_HEADER + iteration,
+                          (MPI_Comm)communicator, &( requests_send[ j ] ) );
         CHECK_MPI_RZERO( rval, err );
         num_neighbourProcSend++;
 
         /* recv the vertex count for this processor */
         if( 0 )
         {
-            printf( "[%d]i%d Listen  recv %d vertices from proc %d\n", rank, iteration,
-                    numVtxPerProcRecv[ j ], neighbourProc[ j ] );
+            printf( "[%d]i%d Listen  recv %d vertices from proc %d\n", rank, iteration, numVtxPerProcRecv[ j ],
+                    neighbourProc[ j ] );
             fflush( NULL );
         }
-        rval =
-            MPI_Irecv( &( numVtxPerProcRecv[ j ] ), 1, MPI_INT, neighbourProc[ j ],
-                       VERTEX_HEADER + iteration, (MPI_Comm)communicator, &( requests_recv[ j ] ) );
+        rval = MPI_Irecv( &( numVtxPerProcRecv[ j ] ), 1, MPI_INT, neighbourProc[ j ], VERTEX_HEADER + iteration,
+                          (MPI_Comm)communicator, &( requests_recv[ j ] ) );
         CHECK_MPI_RZERO( rval, err );
         num_neighbourProcRecv++;
     }
 
     /* set up memory for the outgoing vertex data blocks */
 
-    std::vector< VertexPack >  vertex_pack_export( num_exportVtx +
-                                                  10 ); /* add 10 to have enough memory */
+    std::vector< VertexPack >  vertex_pack_export( num_exportVtx + 10 ); /* add 10 to have enough memory */
     std::vector< VertexPack* > packed_vertices_export( neighbourProc.size( ) );
     if( neighbourProc.size( ) ) packed_vertices_export[ 0 ] = ARRPTR( vertex_pack_export );
     for( i = 1; i < (long)neighbourProc.size( ); i++ )
@@ -1435,12 +1403,10 @@ int ParallelHelperImpl::comm_smoothed_vtx_tnb( MsqError& err )
         {
             if( exportProc[ i ] == neighbourProc[ j ] )
             {
-                VertexPack* packing_vertex =
-                    packed_vertices_export[ j ] + numVtxPerProcSendPACKED[ j ];
+                VertexPack* packing_vertex = packed_vertices_export[ j ] + numVtxPerProcSendPACKED[ j ];
                 numVtxPerProcSendPACKED[ j ]++;
                 MBMesquite::MsqVertex coordinates;
-                mesh->vertices_get_coordinates( &part_vertices[ exportVtxLIDs[ i ] ], &coordinates,
-                                                1, err );
+                mesh->vertices_get_coordinates( &part_vertices[ exportVtxLIDs[ i ] ], &coordinates, 1, err );
                 MSQ_ERRZERO( err );
                 packing_vertex->x = coordinates[ 0 ];
                 packing_vertex->y = coordinates[ 1 ];
@@ -1470,8 +1436,7 @@ int ParallelHelperImpl::comm_smoothed_vtx_tnb( MsqError& err )
 
     /* set up memory for the incoming vertex data blocks */
 
-    std::vector< VertexPack >  vertex_pack_import( numVtxImport +
-                                                  10 ); /* add 10 to have enough memory */
+    std::vector< VertexPack >  vertex_pack_import( numVtxImport + 10 ); /* add 10 to have enough memory */
     std::vector< VertexPack* > packed_vertices_import( neighbourProc.size( ) );
     if( neighbourProc.size( ) ) packed_vertices_import[ 0 ] = ARRPTR( vertex_pack_import );
     for( i = 1; i < (long)neighbourProc.size( ); i++ )
@@ -1490,13 +1455,13 @@ int ParallelHelperImpl::comm_smoothed_vtx_tnb( MsqError& err )
         {
             if( 0 )
             {
-                printf( "[%d]i%d Will recv %d vertices from proc %d\n", rank, iteration,
-                        numVtxPerProcRecv[ i ], neighbourProc[ i ] );
+                printf( "[%d]i%d Will recv %d vertices from proc %d\n", rank, iteration, numVtxPerProcRecv[ i ],
+                        neighbourProc[ i ] );
                 fflush( NULL );
             }
-            rval = MPI_Irecv( packed_vertices_import[ i ], 4 * numVtxPerProcRecv[ i ],
-                              MPI_DOUBLE_PRECISION, neighbourProc[ i ], VERTEX_BLOCK + iteration,
-                              (MPI_Comm)communicator, &( requests_recv[ i ] ) );
+            rval = MPI_Irecv( packed_vertices_import[ i ], 4 * numVtxPerProcRecv[ i ], MPI_DOUBLE_PRECISION,
+                              neighbourProc[ i ], VERTEX_BLOCK + iteration, (MPI_Comm)communicator,
+                              &( requests_recv[ i ] ) );
             CHECK_MPI_RZERO( rval, err );
             num_neighbourProcRecv++;
         }
@@ -1508,13 +1473,13 @@ int ParallelHelperImpl::comm_smoothed_vtx_tnb( MsqError& err )
         {
             if( 0 )
             {
-                printf( "[%d]i%d Will send %d vertices to proc %d\n", rank, iteration,
-                        numVtxPerProcSend[ i ], neighbourProc[ i ] );
+                printf( "[%d]i%d Will send %d vertices to proc %d\n", rank, iteration, numVtxPerProcSend[ i ],
+                        neighbourProc[ i ] );
                 fflush( NULL );
             }
-            rval = MPI_Isend( packed_vertices_export[ i ], 4 * numVtxPerProcSend[ i ],
-                              MPI_DOUBLE_PRECISION, neighbourProc[ i ], VERTEX_BLOCK + iteration,
-                              (MPI_Comm)communicator, &( requests_send[ i ] ) );
+            rval = MPI_Isend( packed_vertices_export[ i ], 4 * numVtxPerProcSend[ i ], MPI_DOUBLE_PRECISION,
+                              neighbourProc[ i ], VERTEX_BLOCK + iteration, (MPI_Comm)communicator,
+                              &( requests_send[ i ] ) );
             CHECK_MPI_RZERO( rval, err );
         }
         else
@@ -1533,13 +1498,11 @@ int ParallelHelperImpl::comm_smoothed_vtx_tnb( MsqError& err )
         /* unpack all vertices */
         for( i = 0; i < numVtxPerProcRecv[ k ]; i++ )
         {
-            local_id = vertex_map_find( vid_map, packed_vertices_import[ k ][ i ].glob_id,
-                                        neighbourProc[ k ] );
+            local_id = vertex_map_find( vid_map, packed_vertices_import[ k ][ i ].glob_id, neighbourProc[ k ] );
             if( local_id )
             {
                 MBMesquite::Vector3D coordinates;
-                coordinates.set( packed_vertices_import[ k ][ i ].x,
-                                 packed_vertices_import[ k ][ i ].y,
+                coordinates.set( packed_vertices_import[ k ][ i ].x, packed_vertices_import[ k ][ i ].y,
                                  packed_vertices_import[ k ][ i ].z );
                 mesh->vertex_set_coordinates( part_vertices[ local_id ], coordinates, err );
                 MSQ_ERRZERO( err );
@@ -1597,9 +1560,8 @@ int ParallelHelperImpl::comm_smoothed_vtx_tnb_no_all( MsqError& err )
         /* did loop end without finding the processor */
         if( j == (long)neighbourProc.size( ) )
         {
-            printf(
-                "[%d]i%d WARNING: did not find exportProc[%d] = %d in list of %lu processors.\n",
-                rank, iteration, i, exportProc[ i ], (unsigned long)neighbourProc.size( ) );
+            printf( "[%d]i%d WARNING: did not find exportProc[%d] = %d in list of %lu processors.\n", rank, iteration,
+                    i, exportProc[ i ], (unsigned long)neighbourProc.size( ) );
         }
     }
 
@@ -1617,13 +1579,12 @@ int ParallelHelperImpl::comm_smoothed_vtx_tnb_no_all( MsqError& err )
             /* send the vertex count to this processor */
             if( 0 )
             {
-                printf( "[%d]i%d Announce send %d vertices to proc %d\n", rank, iteration,
-                        numVtxPerProcSend[ j ], neighbourProc[ j ] );
+                printf( "[%d]i%d Announce send %d vertices to proc %d\n", rank, iteration, numVtxPerProcSend[ j ],
+                        neighbourProc[ j ] );
                 fflush( NULL );
             }
-            rval = MPI_Isend( &( numVtxPerProcSend[ j ] ), 1, MPI_INT, neighbourProc[ j ],
-                              VERTEX_HEADER + iteration, (MPI_Comm)communicator,
-                              &( requests_send[ j ] ) );
+            rval = MPI_Isend( &( numVtxPerProcSend[ j ] ), 1, MPI_INT, neighbourProc[ j ], VERTEX_HEADER + iteration,
+                              (MPI_Comm)communicator, &( requests_send[ j ] ) );
             CHECK_MPI_RZERO( rval, err );
             num_neighbourProcSend++;
         }
@@ -1636,13 +1597,11 @@ int ParallelHelperImpl::comm_smoothed_vtx_tnb_no_all( MsqError& err )
             /* recv the vertex count for this processor */
             if( 0 )
             {
-                printf( "[%d]i%d Listen recv xx vertices from proc %d\n", rank, iteration,
-                        neighbourProc[ j ] );
+                printf( "[%d]i%d Listen recv xx vertices from proc %d\n", rank, iteration, neighbourProc[ j ] );
                 fflush( NULL );
             }
-            rval = MPI_Irecv( &( numVtxPerProcRecv[ j ] ), 1, MPI_INT, neighbourProc[ j ],
-                              VERTEX_HEADER + iteration, (MPI_Comm)communicator,
-                              &( requests_recv[ j ] ) );
+            rval = MPI_Irecv( &( numVtxPerProcRecv[ j ] ), 1, MPI_INT, neighbourProc[ j ], VERTEX_HEADER + iteration,
+                              (MPI_Comm)communicator, &( requests_recv[ j ] ) );
             CHECK_MPI_RZERO( rval, err );
             num_neighbourProcRecv++;
         }
@@ -1654,8 +1613,7 @@ int ParallelHelperImpl::comm_smoothed_vtx_tnb_no_all( MsqError& err )
 
     /* set up memory for the outgoing vertex data blocks */
 
-    std::vector< VertexPack >  vertex_pack_export( num_exportVtx +
-                                                  10 ); /* add 10 to have enough memory */
+    std::vector< VertexPack >  vertex_pack_export( num_exportVtx + 10 ); /* add 10 to have enough memory */
     std::vector< VertexPack* > packed_vertices_export( neighbourProc.size( ) );
     if( neighbourProc.size( ) ) packed_vertices_export[ 0 ] = ARRPTR( vertex_pack_export );
     for( i = 1; i < (long)neighbourProc.size( ); i++ )
@@ -1672,21 +1630,18 @@ int ParallelHelperImpl::comm_smoothed_vtx_tnb_no_all( MsqError& err )
         {
             if( exportProc[ i ] == neighbourProc[ j ] )
             {
-                VertexPack* packing_vertex =
-                    packed_vertices_export[ j ] + numVtxPerProcSendPACKED[ j ];
+                VertexPack* packing_vertex = packed_vertices_export[ j ] + numVtxPerProcSendPACKED[ j ];
                 numVtxPerProcSendPACKED[ j ]++;
                 MBMesquite::MsqVertex coordinates;
-                mesh->vertices_get_coordinates( &part_vertices[ exportVtxLIDs[ i ] ], &coordinates,
-                                                1, err );
+                mesh->vertices_get_coordinates( &part_vertices[ exportVtxLIDs[ i ] ], &coordinates, 1, err );
                 MSQ_ERRZERO( err );
                 packing_vertex->x = coordinates[ 0 ];
                 packing_vertex->y = coordinates[ 1 ];
                 packing_vertex->z = coordinates[ 2 ];
                 packing_vertex->glob_id = exportVtxGIDs[ i ];
                 if( 0 )
-                    printf( "[%d]i%d vertex %lu packed %g %g %g\n", rank, iteration,
-                            (unsigned long)exportVtxGIDs[ i ], packing_vertex->x, packing_vertex->y,
-                            packing_vertex->z );
+                    printf( "[%d]i%d vertex %lu packed %g %g %g\n", rank, iteration, (unsigned long)exportVtxGIDs[ i ],
+                            packing_vertex->x, packing_vertex->y, packing_vertex->z );
             }
         }
     }
@@ -1713,8 +1668,7 @@ int ParallelHelperImpl::comm_smoothed_vtx_tnb_no_all( MsqError& err )
 
     /* set up memory for the incoming vertex data blocks */
 
-    std::vector< VertexPack >  vertex_pack_import( numVtxImport +
-                                                  10 ); /* add 10 to have enough memory */
+    std::vector< VertexPack >  vertex_pack_import( numVtxImport + 10 ); /* add 10 to have enough memory */
     std::vector< VertexPack* > packed_vertices_import( neighbourProc.size( ) );
     if( neighbourProc.size( ) ) packed_vertices_import[ 0 ] = ARRPTR( vertex_pack_import );
     for( i = 1; i < (long)neighbourProc.size( ); i++ )
@@ -1731,15 +1685,15 @@ int ParallelHelperImpl::comm_smoothed_vtx_tnb_no_all( MsqError& err )
     {
         if( 0 )
         {
-            printf( "[%d]i%d Will recv %d vertices from proc %d\n", rank, iteration,
-                    numVtxPerProcRecv[ i ], neighbourProc[ i ] );
+            printf( "[%d]i%d Will recv %d vertices from proc %d\n", rank, iteration, numVtxPerProcRecv[ i ],
+                    neighbourProc[ i ] );
             fflush( NULL );
         }
         if( numVtxPerProcRecv[ i ] )
         {
-            rval = MPI_Irecv( packed_vertices_import[ i ], 4 * numVtxPerProcRecv[ i ],
-                              MPI_DOUBLE_PRECISION, neighbourProc[ i ], VERTEX_BLOCK + iteration,
-                              (MPI_Comm)communicator, &( requests_recv[ i ] ) );
+            rval = MPI_Irecv( packed_vertices_import[ i ], 4 * numVtxPerProcRecv[ i ], MPI_DOUBLE_PRECISION,
+                              neighbourProc[ i ], VERTEX_BLOCK + iteration, (MPI_Comm)communicator,
+                              &( requests_recv[ i ] ) );
             CHECK_MPI_RZERO( rval, err );
             num_neighbourProcRecv++;
         }
@@ -1749,15 +1703,15 @@ int ParallelHelperImpl::comm_smoothed_vtx_tnb_no_all( MsqError& err )
         }
         if( 0 )
         {
-            printf( "[%d]i%d Will send %d vertices to proc %d\n", rank, iteration,
-                    numVtxPerProcSend[ i ], neighbourProc[ i ] );
+            printf( "[%d]i%d Will send %d vertices to proc %d\n", rank, iteration, numVtxPerProcSend[ i ],
+                    neighbourProc[ i ] );
             fflush( NULL );
         }
         if( numVtxPerProcSend[ i ] )
         {
-            rval = MPI_Isend( packed_vertices_export[ i ], 4 * numVtxPerProcSend[ i ],
-                              MPI_DOUBLE_PRECISION, neighbourProc[ i ], VERTEX_BLOCK + iteration,
-                              (MPI_Comm)communicator, &( requests_send[ i ] ) );
+            rval = MPI_Isend( packed_vertices_export[ i ], 4 * numVtxPerProcSend[ i ], MPI_DOUBLE_PRECISION,
+                              neighbourProc[ i ], VERTEX_BLOCK + iteration, (MPI_Comm)communicator,
+                              &( requests_send[ i ] ) );
             CHECK_MPI_RZERO( rval, err );
         }
         else
@@ -1776,13 +1730,11 @@ int ParallelHelperImpl::comm_smoothed_vtx_tnb_no_all( MsqError& err )
         /* unpack all vertices */
         for( i = 0; i < numVtxPerProcRecv[ k ]; i++ )
         {
-            local_id = vertex_map_find( vid_map, packed_vertices_import[ k ][ i ].glob_id,
-                                        neighbourProc[ k ] );
+            local_id = vertex_map_find( vid_map, packed_vertices_import[ k ][ i ].glob_id, neighbourProc[ k ] );
             if( local_id )
             {
                 MBMesquite::Vector3D coordinates;
-                coordinates.set( packed_vertices_import[ k ][ i ].x,
-                                 packed_vertices_import[ k ][ i ].y,
+                coordinates.set( packed_vertices_import[ k ][ i ].x, packed_vertices_import[ k ][ i ].y,
                                  packed_vertices_import[ k ][ i ].z );
                 if( 0 )
                     printf( "[%d]i%d vertex %d becomes %g %g %g\n", rank, iteration, local_id,
@@ -1852,16 +1804,15 @@ int ParallelHelperImpl::comm_smoothed_vtx_nb( MsqError& err )
 
     for( j = 0; j < (long)neighbourProc.size( ); j++ )
     {
-        rval = MPI_Send( &( numVtxPerProcSend[ j ] ), 1, MPI_INT, neighbourProc[ j ],
-                         VERTEX_HEADER + iteration, (MPI_Comm)communicator );
+        rval = MPI_Send( &( numVtxPerProcSend[ j ] ), 1, MPI_INT, neighbourProc[ j ], VERTEX_HEADER + iteration,
+                         (MPI_Comm)communicator );
         CHECK_MPI_RZERO( rval, err );
         //    printf("[%d]i%d Announcing %d vertices to proc
         //    %d\n",rank,iteration,numVtxPerProcSend[j],neighbourProc[j]); fflush(NULL);
     }
 
     /* place vertex data going to the same processor into consecutive memory space */
-    std::vector< VertexPack >  vertex_pack_export( num_exportVtx +
-                                                  10 ); /* add 10 to have enough memory */
+    std::vector< VertexPack >  vertex_pack_export( num_exportVtx + 10 ); /* add 10 to have enough memory */
     std::vector< VertexPack* > packed_vertices_export( neighbourProc.size( ) );
     if( neighbourProc.size( ) ) packed_vertices_export[ 0 ] = ARRPTR( vertex_pack_export );
     for( i = 1; i < (long)neighbourProc.size( ); i++ )
@@ -1876,12 +1827,10 @@ int ParallelHelperImpl::comm_smoothed_vtx_nb( MsqError& err )
         {
             if( exportProc[ i ] == neighbourProc[ j ] )
             {
-                VertexPack* packing_vertex =
-                    packed_vertices_export[ j ] + numVtxPerProcSendPACKED[ j ];
+                VertexPack* packing_vertex = packed_vertices_export[ j ] + numVtxPerProcSendPACKED[ j ];
                 numVtxPerProcSendPACKED[ j ]++;
                 MBMesquite::MsqVertex coordinates;
-                mesh->vertices_get_coordinates( &part_vertices[ exportVtxLIDs[ i ] ], &coordinates,
-                                                1, err );
+                mesh->vertices_get_coordinates( &part_vertices[ exportVtxLIDs[ i ] ], &coordinates, 1, err );
                 MSQ_ERRZERO( err );
                 packing_vertex->x = coordinates[ 0 ];
                 packing_vertex->y = coordinates[ 1 ];
@@ -1912,8 +1861,7 @@ int ParallelHelperImpl::comm_smoothed_vtx_nb( MsqError& err )
                          1, /* one data item */
                          MPI_INT, /* of type int */
                          MPI_ANY_SOURCE, /* receive from any sender */
-                         VERTEX_HEADER +
-                             iteration, /* receive only VERTEX HEADERs from this iteration */
+                         VERTEX_HEADER + iteration, /* receive only VERTEX HEADERs from this iteration */
                          (MPI_Comm)communicator, /* default communicator */
                          &status ); /* info about the received message */
         CHECK_MPI_RZERO( rval, err );
@@ -1941,8 +1889,7 @@ int ParallelHelperImpl::comm_smoothed_vtx_nb( MsqError& err )
         }
         /* assert loop did not end without finding processor */
         assert( i != (long)neighbourProc.size( ) );
-        if( 0 )
-            printf( "[%d]i%d Will receive %d vertices from proc %d\n", rank, iteration, num, proc );
+        if( 0 ) printf( "[%d]i%d Will receive %d vertices from proc %d\n", rank, iteration, num, proc );
         fflush( NULL );
     }
 
@@ -1952,8 +1899,8 @@ int ParallelHelperImpl::comm_smoothed_vtx_nb( MsqError& err )
     for( i = 0, k = 0; i < (long)neighbourProc.size( ); i++ )
     {
         if( 0 )
-            printf( "[%d]i%d Will receive %d vertices from proc %d\n", rank, iteration,
-                    numVtxPerProcRecv[ i ], neighbourProc[ i ] );
+            printf( "[%d]i%d Will receive %d vertices from proc %d\n", rank, iteration, numVtxPerProcRecv[ i ],
+                    neighbourProc[ i ] );
         fflush( NULL );
         if( numVtxPerProcRecv[ i ] )
         {
@@ -1964,23 +1911,20 @@ int ParallelHelperImpl::comm_smoothed_vtx_nb( MsqError& err )
     }
 
     /* set up memory for the incoming vertex data blocks */
-    std::vector< VertexPack >  vertex_pack_import( numVtxImport +
-                                                  10 ); /* add 10 to have enough memory */
+    std::vector< VertexPack >  vertex_pack_import( numVtxImport + 10 ); /* add 10 to have enough memory */
     std::vector< VertexPack* > packed_vertices_import( num_neighbourProcRecv );
     if( neighbourProc.size( ) ) packed_vertices_import[ 0 ] = ARRPTR( vertex_pack_import );
     for( i = 1; i < num_neighbourProcRecv; i++ )
     {
-        packed_vertices_import[ i ] =
-            packed_vertices_import[ i - 1 ] + numVtxPerProcRecvRecv[ i - 1 ];
+        packed_vertices_import[ i ] = packed_vertices_import[ i - 1 ] + numVtxPerProcRecvRecv[ i - 1 ];
     }
 
     /* receive from all processors that have something for us */
     std::vector< MPI_Request > request( num_neighbourProcRecv );
     for( j = 0; j < num_neighbourProcRecv; j++ )
     {
-        rval = MPI_Irecv( packed_vertices_import[ j ], 4 * numVtxPerProcRecvRecv[ j ],
-                          MPI_DOUBLE_PRECISION, neighbourProcRecv[ j ], VERTEX_BLOCK + iteration,
-                          (MPI_Comm)communicator, &( request[ j ] ) );
+        rval = MPI_Irecv( packed_vertices_import[ j ], 4 * numVtxPerProcRecvRecv[ j ], MPI_DOUBLE_PRECISION,
+                          neighbourProcRecv[ j ], VERTEX_BLOCK + iteration, (MPI_Comm)communicator, &( request[ j ] ) );
         CHECK_MPI_RZERO( rval, err );
         if( 0 )
         {
@@ -1997,14 +1941,14 @@ int ParallelHelperImpl::comm_smoothed_vtx_nb( MsqError& err )
     {
         if( numVtxPerProcSend[ j ] )
         {
-            rval = MPI_Isend( packed_vertices_export[ j ], 4 * numVtxPerProcSend[ j ],
-                              MPI_DOUBLE_PRECISION, neighbourProc[ j ], VERTEX_BLOCK + iteration,
-                              (MPI_Comm)communicator, &( requests_send[ j ] ) );
+            rval = MPI_Isend( packed_vertices_export[ j ], 4 * numVtxPerProcSend[ j ], MPI_DOUBLE_PRECISION,
+                              neighbourProc[ j ], VERTEX_BLOCK + iteration, (MPI_Comm)communicator,
+                              &( requests_send[ j ] ) );
             CHECK_MPI_RZERO( rval, err );
             if( 0 )
             {
-                printf( "[%d]i%d Scheduling send of %d vertices to proc %d\n", rank, iteration,
-                        numVtxPerProcSend[ j ], neighbourProc[ j ] );
+                printf( "[%d]i%d Scheduling send of %d vertices to proc %d\n", rank, iteration, numVtxPerProcSend[ j ],
+                        neighbourProc[ j ] );
                 fflush( NULL );
             }
         }
@@ -2032,23 +1976,20 @@ int ParallelHelperImpl::comm_smoothed_vtx_nb( MsqError& err )
         fflush( NULL );
         for( i = 0; i < numVtxPerProcRecvRecv[ k ]; i++ )
         {
-            local_id = vertex_map_find( vid_map, packed_vertices_import[ k ][ i ].glob_id,
-                                        neighbourProcRecv[ k ] );
+            local_id = vertex_map_find( vid_map, packed_vertices_import[ k ][ i ].glob_id, neighbourProcRecv[ k ] );
             if( local_id )
             {
                 MBMesquite::Vector3D coordinates;
-                coordinates.set( packed_vertices_import[ k ][ i ].x,
-                                 packed_vertices_import[ k ][ i ].y,
+                coordinates.set( packed_vertices_import[ k ][ i ].x, packed_vertices_import[ k ][ i ].y,
                                  packed_vertices_import[ k ][ i ].z );
                 mesh->vertex_set_coordinates( part_vertices[ local_id ], coordinates, err );
                 MSQ_ERRZERO( err );
                 assert( part_smoothed_flag[ local_id ] == 0 );
                 part_smoothed_flag[ local_id ] = 1;
                 if( 0 )
-                    printf( "[%d]i%d updating vertex with global_id %d to %g %g %g \n", rank,
-                            iteration, (int)( packed_vertices_import[ k ][ i ].glob_id ),
-                            packed_vertices_import[ k ][ i ].x, packed_vertices_import[ k ][ i ].y,
-                            packed_vertices_import[ k ][ i ].z );
+                    printf( "[%d]i%d updating vertex with global_id %d to %g %g %g \n", rank, iteration,
+                            (int)( packed_vertices_import[ k ][ i ].glob_id ), packed_vertices_import[ k ][ i ].x,
+                            packed_vertices_import[ k ][ i ].y, packed_vertices_import[ k ][ i ].z );
             }
             else
             {
@@ -2103,8 +2044,8 @@ int ParallelHelperImpl::comm_smoothed_vtx_nb_no_all( MsqError& err )
         {
             assert( neighbourProcSendRemain[ j ] >= numVtxPerProcSend[ j ] );
             neighbourProcSendRemain[ j ] -= numVtxPerProcSend[ j ];
-            rval = MPI_Send( &( numVtxPerProcSend[ j ] ), 1, MPI_INT, neighbourProc[ j ],
-                             VERTEX_HEADER + iteration, (MPI_Comm)communicator );
+            rval = MPI_Send( &( numVtxPerProcSend[ j ] ), 1, MPI_INT, neighbourProc[ j ], VERTEX_HEADER + iteration,
+                             (MPI_Comm)communicator );
             CHECK_MPI_RZERO( rval, err );
             //    printf("[%d]i%d Announcing %d vertices to proc
             //    %d\n",rank,iteration,numVtxPerProcSend[j],neighbourProc[j]); fflush(NULL);
@@ -2116,8 +2057,7 @@ int ParallelHelperImpl::comm_smoothed_vtx_nb_no_all( MsqError& err )
     }
 
     /* place vertex data going to the same processor into consecutive memory space */
-    std::vector< VertexPack >  vertex_pack_export( num_exportVtx +
-                                                  10 ); /* add 10 to have enough memory */
+    std::vector< VertexPack >  vertex_pack_export( num_exportVtx + 10 ); /* add 10 to have enough memory */
     std::vector< VertexPack* > packed_vertices_export( neighbourProc.size( ) );
     if( neighbourProc.size( ) ) packed_vertices_export[ 0 ] = ARRPTR( vertex_pack_export );
     for( i = 1; i < (long)neighbourProc.size( ); i++ )
@@ -2132,12 +2072,10 @@ int ParallelHelperImpl::comm_smoothed_vtx_nb_no_all( MsqError& err )
         {
             if( exportProc[ i ] == neighbourProc[ j ] )
             {
-                VertexPack* packing_vertex =
-                    packed_vertices_export[ j ] + numVtxPerProcSendPACKED[ j ];
+                VertexPack* packing_vertex = packed_vertices_export[ j ] + numVtxPerProcSendPACKED[ j ];
                 numVtxPerProcSendPACKED[ j ]++;
                 MBMesquite::MsqVertex coordinates;
-                mesh->vertices_get_coordinates( &part_vertices[ exportVtxLIDs[ i ] ], &coordinates,
-                                                1, err );
+                mesh->vertices_get_coordinates( &part_vertices[ exportVtxLIDs[ i ] ], &coordinates, 1, err );
                 MSQ_ERRZERO( err );
                 packing_vertex->x = coordinates[ 0 ];
                 packing_vertex->y = coordinates[ 1 ];
@@ -2169,8 +2107,7 @@ int ParallelHelperImpl::comm_smoothed_vtx_nb_no_all( MsqError& err )
                          1, /* one data item */
                          MPI_INT, /* of type int */
                          MPI_ANY_SOURCE, /* receive from any sender */
-                         VERTEX_HEADER +
-                             iteration, /* receive only VERTEX HEADERs from this iteration */
+                         VERTEX_HEADER + iteration, /* receive only VERTEX HEADERs from this iteration */
                          (MPI_Comm)communicator, /* default communicator */
                          &status ); /* info about the received message */
         CHECK_MPI_RZERO( rval, err );
@@ -2200,8 +2137,7 @@ int ParallelHelperImpl::comm_smoothed_vtx_nb_no_all( MsqError& err )
         }
         /* assert loop did not end without finding processor */
         assert( i != (long)neighbourProc.size( ) );
-        if( 0 )
-            printf( "[%d]i%d Will receive %d vertices from proc %d\n", rank, iteration, num, proc );
+        if( 0 ) printf( "[%d]i%d Will receive %d vertices from proc %d\n", rank, iteration, num, proc );
         fflush( NULL );
     }
 
@@ -2211,8 +2147,8 @@ int ParallelHelperImpl::comm_smoothed_vtx_nb_no_all( MsqError& err )
     for( i = 0, k = 0; i < (long)neighbourProc.size( ); i++ )
     {
         if( 0 )
-            printf( "[%d]i%d Will receive %d vertices from proc %d\n", rank, iteration,
-                    numVtxPerProcRecv[ i ], neighbourProc[ i ] );
+            printf( "[%d]i%d Will receive %d vertices from proc %d\n", rank, iteration, numVtxPerProcRecv[ i ],
+                    neighbourProc[ i ] );
         fflush( NULL );
         if( numVtxPerProcRecv[ i ] )
         {
@@ -2223,23 +2159,20 @@ int ParallelHelperImpl::comm_smoothed_vtx_nb_no_all( MsqError& err )
     }
 
     /* set up memory for the incoming vertex data blocks */
-    std::vector< VertexPack >  vertex_pack_import( numVtxImport +
-                                                  10 ); /* add 10 to have enough memory */
+    std::vector< VertexPack >  vertex_pack_import( numVtxImport + 10 ); /* add 10 to have enough memory */
     std::vector< VertexPack* > packed_vertices_import( num_neighbourProcRecv );
     if( neighbourProc.size( ) ) packed_vertices_import[ 0 ] = ARRPTR( vertex_pack_import );
     for( i = 1; i < num_neighbourProcRecv; i++ )
     {
-        packed_vertices_import[ i ] =
-            packed_vertices_import[ i - 1 ] + numVtxPerProcRecvRecv[ i - 1 ];
+        packed_vertices_import[ i ] = packed_vertices_import[ i - 1 ] + numVtxPerProcRecvRecv[ i - 1 ];
     }
 
     /* receive from all processors that have something for us */
     std::vector< MPI_Request > request( num_neighbourProcRecv );
     for( j = 0; j < num_neighbourProcRecv; j++ )
     {
-        rval = MPI_Irecv( packed_vertices_import[ j ], 4 * numVtxPerProcRecvRecv[ j ],
-                          MPI_DOUBLE_PRECISION, neighbourProcRecv[ j ], VERTEX_BLOCK + iteration,
-                          (MPI_Comm)communicator, &( request[ j ] ) );
+        rval = MPI_Irecv( packed_vertices_import[ j ], 4 * numVtxPerProcRecvRecv[ j ], MPI_DOUBLE_PRECISION,
+                          neighbourProcRecv[ j ], VERTEX_BLOCK + iteration, (MPI_Comm)communicator, &( request[ j ] ) );
         CHECK_MPI_RZERO( rval, err );
         if( 0 )
         {
@@ -2256,14 +2189,14 @@ int ParallelHelperImpl::comm_smoothed_vtx_nb_no_all( MsqError& err )
     {
         if( numVtxPerProcSend[ j ] )
         {
-            rval = MPI_Isend( packed_vertices_export[ j ], 4 * numVtxPerProcSend[ j ],
-                              MPI_DOUBLE_PRECISION, neighbourProc[ j ], VERTEX_BLOCK + iteration,
-                              (MPI_Comm)communicator, &( requests_send[ j ] ) );
+            rval = MPI_Isend( packed_vertices_export[ j ], 4 * numVtxPerProcSend[ j ], MPI_DOUBLE_PRECISION,
+                              neighbourProc[ j ], VERTEX_BLOCK + iteration, (MPI_Comm)communicator,
+                              &( requests_send[ j ] ) );
             CHECK_MPI_RZERO( rval, err );
             if( 0 )
             {
-                printf( "[%d]i%d Scheduling send of %d vertices to proc %d\n", rank, iteration,
-                        numVtxPerProcSend[ j ], neighbourProc[ j ] );
+                printf( "[%d]i%d Scheduling send of %d vertices to proc %d\n", rank, iteration, numVtxPerProcSend[ j ],
+                        neighbourProc[ j ] );
                 fflush( NULL );
             }
         }
@@ -2291,23 +2224,20 @@ int ParallelHelperImpl::comm_smoothed_vtx_nb_no_all( MsqError& err )
         fflush( NULL );
         for( i = 0; i < numVtxPerProcRecvRecv[ k ]; i++ )
         {
-            local_id = vertex_map_find( vid_map, packed_vertices_import[ k ][ i ].glob_id,
-                                        neighbourProcRecv[ k ] );
+            local_id = vertex_map_find( vid_map, packed_vertices_import[ k ][ i ].glob_id, neighbourProcRecv[ k ] );
             if( local_id )
             {
                 MBMesquite::Vector3D coordinates;
-                coordinates.set( packed_vertices_import[ k ][ i ].x,
-                                 packed_vertices_import[ k ][ i ].y,
+                coordinates.set( packed_vertices_import[ k ][ i ].x, packed_vertices_import[ k ][ i ].y,
                                  packed_vertices_import[ k ][ i ].z );
                 mesh->vertex_set_coordinates( part_vertices[ local_id ], coordinates, err );
                 MSQ_ERRZERO( err );
                 assert( part_smoothed_flag[ local_id ] == 0 );
                 part_smoothed_flag[ local_id ] = 1;
                 if( 0 )
-                    printf( "[%d]i%d updating vertex with global_id %d to %g %g %g \n", rank,
-                            iteration, (int)( packed_vertices_import[ k ][ i ].glob_id ),
-                            packed_vertices_import[ k ][ i ].x, packed_vertices_import[ k ][ i ].y,
-                            packed_vertices_import[ k ][ i ].z );
+                    printf( "[%d]i%d updating vertex with global_id %d to %g %g %g \n", rank, iteration,
+                            (int)( packed_vertices_import[ k ][ i ].glob_id ), packed_vertices_import[ k ][ i ].x,
+                            packed_vertices_import[ k ][ i ].y, packed_vertices_import[ k ][ i ].z );
             }
             else
             {
@@ -2376,8 +2306,7 @@ int ParallelHelperImpl::comm_smoothed_vtx_b( MsqError& err )
                 packing_vertex = packed_vertices[ j ] + numVtxPackedPerProc[ j ];
                 numVtxPackedPerProc[ j ]++;
                 MBMesquite::MsqVertex coordinates;
-                mesh->vertices_get_coordinates( &part_vertices[ exportVtxLIDs[ i ] ], &coordinates,
-                                                1, err );
+                mesh->vertices_get_coordinates( &part_vertices[ exportVtxLIDs[ i ] ], &coordinates, 1, err );
                 MSQ_ERRZERO( err );
                 packing_vertex->x = coordinates[ 0 ];
                 packing_vertex->y = coordinates[ 1 ];
@@ -2397,8 +2326,8 @@ int ParallelHelperImpl::comm_smoothed_vtx_b( MsqError& err )
         //    printf("[%d]i%dp%d Announcing %d vertices to proc
         //    %d\n",rank,iteration,pass,numVtxPerProc[j],neighbourProc[j]); fflush(NULL);
 
-        rval = MPI_Send( &( numVtxPerProc[ j ] ), 1, MPI_INT, neighbourProc[ j ],
-                         VERTEX_HEADER + iteration, (MPI_Comm)communicator );
+        rval = MPI_Send( &( numVtxPerProc[ j ] ), 1, MPI_INT, neighbourProc[ j ], VERTEX_HEADER + iteration,
+                         (MPI_Comm)communicator );
         CHECK_MPI_RZERO( rval, err );
         // printf("[%d]i%dp%d Sending %d vertices to proc
         // %d\n",rank,iteration,pass,numVtxPerProc[j],neighbourProc[j]); fflush(NULL);
@@ -2407,8 +2336,8 @@ int ParallelHelperImpl::comm_smoothed_vtx_b( MsqError& err )
 
         if( numVtxPerProc[ j ] )
         {
-            rval = MPI_Send( packed_vertices[ j ], 4 * numVtxPerProc[ j ], MPI_DOUBLE_PRECISION,
-                             neighbourProc[ j ], VERTEX_BLOCK + iteration, (MPI_Comm)communicator );
+            rval = MPI_Send( packed_vertices[ j ], 4 * numVtxPerProc[ j ], MPI_DOUBLE_PRECISION, neighbourProc[ j ],
+                             VERTEX_BLOCK + iteration, (MPI_Comm)communicator );
             CHECK_MPI_RZERO( rval, err );
             // printf("[%d]i%dp%d Sent %d vertices to proc
             // %d\n",rank,iteration,pass,numVtxPerProc[j],neighbourProc[j]); fflush(NULL);
@@ -2499,9 +2428,9 @@ int ParallelHelperImpl::comm_smoothed_vtx_b( MsqError& err )
                     assert( part_smoothed_flag[ local_id ] == 0 );
                     part_smoothed_flag[ local_id ] = 1;
                     if( 0 )
-                        printf( "[%d]i%d updating vertex with global_id %d to %g %g %g \n", rank,
-                                iteration, (int)( vertex_pack[ i ].glob_id ), vertex_pack[ i ].x,
-                                vertex_pack[ i ].y, vertex_pack[ i ].z );
+                        printf( "[%d]i%d updating vertex with global_id %d to %g %g %g \n", rank, iteration,
+                                (int)( vertex_pack[ i ].glob_id ), vertex_pack[ i ].x, vertex_pack[ i ].y,
+                                vertex_pack[ i ].z );
                 }
                 else
                 {
@@ -2563,8 +2492,7 @@ int ParallelHelperImpl::comm_smoothed_vtx_b_no_all( MsqError& err )
                 packing_vertex = packed_vertices[ j ] + numVtxPackedPerProc[ j ];
                 numVtxPackedPerProc[ j ]++;
                 MBMesquite::MsqVertex coordinates;
-                mesh->vertices_get_coordinates( &part_vertices[ exportVtxLIDs[ i ] ], &coordinates,
-                                                1, err );
+                mesh->vertices_get_coordinates( &part_vertices[ exportVtxLIDs[ i ] ], &coordinates, 1, err );
                 MSQ_ERRZERO( err );
                 packing_vertex->x = coordinates[ 0 ];
                 packing_vertex->y = coordinates[ 1 ];
@@ -2589,8 +2517,8 @@ int ParallelHelperImpl::comm_smoothed_vtx_b_no_all( MsqError& err )
             // printf("[%d]i%dp%d Announcing %d vertices to proc
             // %d\n",rank,iteration,pass,numVtxPerProc[j],neighbourProc[j]); fflush(NULL);
 
-            rval = MPI_Send( &( numVtxPerProc[ j ] ), 1, MPI_INT, neighbourProc[ j ],
-                             VERTEX_HEADER + iteration, (MPI_Comm)communicator );
+            rval = MPI_Send( &( numVtxPerProc[ j ] ), 1, MPI_INT, neighbourProc[ j ], VERTEX_HEADER + iteration,
+                             (MPI_Comm)communicator );
             CHECK_MPI_RZERO( rval, err );
 
             // printf("[%d]i%dp%d Sending %d vertices to proc
@@ -2600,9 +2528,8 @@ int ParallelHelperImpl::comm_smoothed_vtx_b_no_all( MsqError& err )
 
             if( numVtxPerProc[ j ] )
             {
-                rval = MPI_Send( packed_vertices[ j ], 4 * numVtxPerProc[ j ], MPI_DOUBLE_PRECISION,
-                                 neighbourProc[ j ], VERTEX_BLOCK + iteration,
-                                 (MPI_Comm)communicator );
+                rval = MPI_Send( packed_vertices[ j ], 4 * numVtxPerProc[ j ], MPI_DOUBLE_PRECISION, neighbourProc[ j ],
+                                 VERTEX_BLOCK + iteration, (MPI_Comm)communicator );
                 CHECK_MPI_RZERO( rval, err );
 
                 // printf("[%d]i%dp%d Sent %d vertices to proc
@@ -2705,9 +2632,9 @@ int ParallelHelperImpl::comm_smoothed_vtx_b_no_all( MsqError& err )
                     assert( part_smoothed_flag[ local_id ] == 0 );
                     part_smoothed_flag[ local_id ] = 1;
                     if( 0 && rank == 1 )
-                        printf( "[%d]i%d updating vertex with global_id %d to %g %g %g \n", rank,
-                                iteration, (int)( vertex_pack[ i ].glob_id ), vertex_pack[ i ].x,
-                                vertex_pack[ i ].y, vertex_pack[ i ].z );
+                        printf( "[%d]i%d updating vertex with global_id %d to %g %g %g \n", rank, iteration,
+                                (int)( vertex_pack[ i ].glob_id ), vertex_pack[ i ].x, vertex_pack[ i ].y,
+                                vertex_pack[ i ].z );
                 }
                 else
                 {
@@ -2800,8 +2727,7 @@ void ParallelHelperImpl::compute_independent_set( )
                         incident_vtx = vtx_off_proc_list[ i ][ j ];
                         /* if this neighbour has not yet been smoothed or covered mark it as covered
                          */
-                        if( part_smoothed_flag[ incident_vtx ] == 0 )
-                        { part_smoothed_flag[ incident_vtx ] = 2; }
+                        if( part_smoothed_flag[ incident_vtx ] == 0 ) { part_smoothed_flag[ incident_vtx ] = 2; }
                     }
                     k = num_exportVtx;
                     /* then loop over the neighbors it has on other processors */
@@ -2812,8 +2738,7 @@ void ParallelHelperImpl::compute_independent_set( )
                         done = false;
                         for( l = k; l < num_exportVtx && !done; l++ )
                         {
-                            if( exportProc[ l ] == part_proc_owner[ incident_vtx ] )
-                            { done = true; }
+                            if( exportProc[ l ] == part_proc_owner[ incident_vtx ] ) { done = true; }
                         }
                         /* if it's not on the list add it */
                         if( !done )
@@ -2835,8 +2760,8 @@ void ParallelHelperImpl::compute_independent_set( )
         for( i = 0; i < num_vtx_partition_boundary_local; i++ )
             if( in_independent_set[ i ] ) in_set++;
         ;
-        printf( "[%d]i%d independent set has %d of %d vertices sent out %d times\n", rank,
-                iteration, in_set, num_vtx_partition_boundary_local, num_exportVtx );
+        printf( "[%d]i%d independent set has %d of %d vertices sent out %d times\n", rank, iteration, in_set,
+                num_vtx_partition_boundary_local, num_exportVtx );
         fflush( NULL );
     }
 
@@ -2855,8 +2780,7 @@ int ParallelHelperImpl::get_nprocs( ) const
     return nprocs;
 }
 
-bool ParallelHelperImpl::is_our_element( MBMesquite::Mesh::ElementHandle element_handle,
-                                         MsqError&                       err ) const
+bool ParallelHelperImpl::is_our_element( MBMesquite::Mesh::ElementHandle element_handle, MsqError& err ) const
 {
     int                               i;
     std::vector< Mesh::VertexHandle > pvertices;
@@ -2873,16 +2797,14 @@ bool ParallelHelperImpl::is_our_element( MBMesquite::Mesh::ElementHandle element
     return ( max_proc_id == rank );
 }
 
-bool ParallelHelperImpl::is_our_vertex( MBMesquite::Mesh::VertexHandle vertex_handle,
-                                        MsqError&                      err ) const
+bool ParallelHelperImpl::is_our_vertex( MBMesquite::Mesh::VertexHandle vertex_handle, MsqError& err ) const
 {
     int proc_id;
     mesh->vertices_get_processor_id( &vertex_handle, &proc_id, 1, err );
     return !MSQ_CHKERR( err ) && ( proc_id == rank );
 }
 
-void ParallelHelperImpl::communicate_min_max_to_all( double* minimum, double* maximum,
-                                                     MsqError& err ) const
+void ParallelHelperImpl::communicate_min_max_to_all( double* minimum, double* maximum, MsqError& err ) const
 {
     double d_min[ 2 ];
     double d_min_recv[ 2 ];
@@ -2894,8 +2816,7 @@ void ParallelHelperImpl::communicate_min_max_to_all( double* minimum, double* ma
     *minimum = d_min_recv[ 1 ];
 }
 
-void ParallelHelperImpl::communicate_min_max_to_zero( double* minimum, double* maximum,
-                                                      MsqError& err ) const
+void ParallelHelperImpl::communicate_min_max_to_zero( double* minimum, double* maximum, MsqError& err ) const
 {
     double d_min[ 2 ];
     double d_min_recv[ 2 ];
@@ -2910,11 +2831,9 @@ void ParallelHelperImpl::communicate_min_max_to_zero( double* minimum, double* m
     }
 }
 
-void ParallelHelperImpl::communicate_sums_to_zero( size_t* freeElementCount,
-                                                   int* invertedElementCount, size_t* elementCount,
-                                                   int* invertedSampleCount, size_t* sampleCount,
-                                                   long unsigned int* count,
-                                                   long unsigned int* invalid, double* sum,
+void ParallelHelperImpl::communicate_sums_to_zero( size_t* freeElementCount, int* invertedElementCount,
+                                                   size_t* elementCount, int* invertedSampleCount, size_t* sampleCount,
+                                                   long unsigned int* count, long unsigned int* invalid, double* sum,
                                                    double* sqrSum, MsqError& err ) const
 {
     double d_sum[ 9 ];
@@ -2955,12 +2874,11 @@ void ParallelHelperImpl::communicate_power_sum_to_zero( double* pMean, MsqError&
     if( rank == 0 ) *pMean = result;
 }
 
-void ParallelHelperImpl::communicate_histogram_to_zero( std::vector< int >& histogram,
-                                                        MsqError&           err ) const
+void ParallelHelperImpl::communicate_histogram_to_zero( std::vector< int >& histogram, MsqError& err ) const
 {
     std::vector< int > histogram_recv( histogram.size( ) );
-    int rval = MPI_Reduce( &( histogram[ 0 ] ), &( histogram_recv[ 0 ] ), histogram.size( ),
-                           MPI_INT, MPI_SUM, 0, (MPI_Comm)communicator );
+    int rval = MPI_Reduce( &( histogram[ 0 ] ), &( histogram_recv[ 0 ] ), histogram.size( ), MPI_INT, MPI_SUM, 0,
+                           (MPI_Comm)communicator );
     CHECK_MPI( rval, err );
     if( rank == 0 ) { histogram.swap( histogram_recv ); }
 }

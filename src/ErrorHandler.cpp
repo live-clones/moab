@@ -56,8 +56,8 @@ void MBErrorHandler_GetLastError( std::string& error )
     error = lastError;
 }
 
-void MBTraceBackErrorHandler( int line, const char* func, const char* file, const char* dir,
-                              const char* err_msg, ErrorType err_type )
+void MBTraceBackErrorHandler( int line, const char* func, const char* file, const char* dir, const char* err_msg,
+                              ErrorType err_type )
 {
     if( NULL == errorOutput ) return;
 
@@ -65,16 +65,14 @@ void MBTraceBackErrorHandler( int line, const char* func, const char* file, cons
     // from processor 0 For a per-processor relevant error, set rank of current processor to 0, so
     // that it is always printed
     int rank = 0;
-    if( MB_ERROR_TYPE_NEW_GLOBAL == err_type && errorOutput->have_rank( ) )
-        rank = errorOutput->get_rank( );
+    if( MB_ERROR_TYPE_NEW_GLOBAL == err_type && errorOutput->have_rank( ) ) rank = errorOutput->get_rank( );
 
     if( 0 == rank )
     {
         // Print the error message for a new error
         if( MB_ERROR_TYPE_EXISTING != err_type && NULL != err_msg )
         {
-            errorOutput->print(
-                "--------------------- Error Message ------------------------------------\n" );
+            errorOutput->print( "--------------------- Error Message ------------------------------------\n" );
             errorOutput->printf( "%s!\n", err_msg );
             lastError = err_msg;
         }
@@ -91,8 +89,8 @@ void MBTraceBackErrorHandler( int line, const char* func, const char* file, cons
     }
 }
 
-ErrorCode MBError( int line, const char* func, const char* file, const char* dir,
-                   ErrorCode err_code, const char* err_msg, ErrorType err_type )
+ErrorCode MBError( int line, const char* func, const char* file, const char* dir, ErrorCode err_code,
+                   const char* err_msg, ErrorType err_type )
 {
     // When this routine is called to handle an existing error (instead of creating a new one),
     // we need to check if the returned non-success result from a function might be a non-error

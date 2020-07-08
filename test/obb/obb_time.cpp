@@ -28,8 +28,7 @@ static void usage( )
     exit( 1 );
 }
 
-void generate_ray( const CartVect& sphere_center, double sphere_radius, CartVect& point,
-                   CartVect& dir )
+void generate_ray( const CartVect& sphere_center, double sphere_radius, CartVect& point, CartVect& dir )
 {
     const int H = RAND_MAX / 2;
     point[ 0 ] = (double)rand( ) / H - 1;
@@ -211,13 +210,13 @@ int main( int argc, char* argv[] )
 
             OrientedBoxTreeTool::IntersectSearchWindow search_win;
             OrientedBoxTreeTool::IntRegCtxt            int_reg_ctxt;
-            rval = tool.ray_intersect_sets( intersections, sets, facets, root, 1e-6, point.array( ),
-                                            dir.array( ), search_win, int_reg_ctxt, stats );
+            rval = tool.ray_intersect_sets( intersections, sets, facets, root, 1e-6, point.array( ), dir.array( ),
+                                            search_win, int_reg_ctxt, stats );
         }
         else
         {
-            rval = tool.ray_intersect_triangles( intersections, facets, root, 1e-6, point.array( ),
-                                                 dir.array( ), 0, stats );
+            rval = tool.ray_intersect_triangles( intersections, facets, root, 1e-6, point.array( ), dir.array( ), 0,
+                                                 stats );
         }
         if( MB_SUCCESS != rval )
         {
@@ -227,8 +226,7 @@ int main( int argc, char* argv[] )
 
         if( !intersections.empty( ) ) { ++xsct; }
 
-        if( randrays.size( ) < cached &&
-            ( !intersections.empty( ) || !num_xsct || xsct >= num_xsct ) )
+        if( randrays.size( ) < cached && ( !intersections.empty( ) || !num_xsct || xsct >= num_xsct ) )
         {
             randrays.push_back( point );
             randrays.push_back( dir );

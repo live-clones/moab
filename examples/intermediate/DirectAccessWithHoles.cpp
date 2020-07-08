@@ -62,10 +62,8 @@ int main( int argc, char** argv )
 
     // Parse options
     ProgOptions opts;
-    opts.addOpt< int >( string( "nquads,n" ),
-                        string( "Number of quads in the mesh (default = 1000" ), &nquads );
-    opts.addOpt< int >( string( "holes,H" ),
-                        string( "Number of holes in the element handle space (default = 1" ),
+    opts.addOpt< int >( string( "nquads,n" ), string( "Number of quads in the mesh (default = 1000" ), &nquads );
+    opts.addOpt< int >( string( "holes,H" ), string( "Number of holes in the element handle space (default = 1" ),
                         &nholes );
     opts.parseCommandLine( argc, argv );
     if( nholes >= nquads )
@@ -86,13 +84,10 @@ int main( int argc, char** argv )
     // Create tag1 (element-based avg), tag2 (vertex-based avg), tag3 (# connected verts)
     Tag tag1, tag2, tag3;
     rval = mbImpl->tag_get_handle( "tag1", 3, MB_TYPE_DOUBLE, tag1, MB_TAG_DENSE | MB_TAG_CREAT );MB_CHK_SET_ERR( rval, "Trouble creating tag1" );
-    double def_val[ 3 ] = { 0.0, 0.0,
-                            0.0 };  // Need a default value for tag2 because we sum into it
-    rval = mbImpl->tag_get_handle( "tag2", 3, MB_TYPE_DOUBLE, tag2, MB_TAG_DENSE | MB_TAG_CREAT,
-                                   def_val );MB_CHK_SET_ERR( rval, "Trouble creating tag2" );
+    double def_val[ 3 ] = { 0.0, 0.0, 0.0 };  // Need a default value for tag2 because we sum into it
+    rval = mbImpl->tag_get_handle( "tag2", 3, MB_TYPE_DOUBLE, tag2, MB_TAG_DENSE | MB_TAG_CREAT, def_val );MB_CHK_SET_ERR( rval, "Trouble creating tag2" );
     int def_val_int = 0;  // Need a default value for tag3 because we increment it
-    rval = mbImpl->tag_get_handle( "tag3", 1, MB_TYPE_INTEGER, tag3, MB_TAG_DENSE | MB_TAG_CREAT,
-                                   &def_val_int );MB_CHK_SET_ERR( rval, "Trouble creating tag3" );
+    rval = mbImpl->tag_get_handle( "tag3", 1, MB_TYPE_INTEGER, tag3, MB_TAG_DENSE | MB_TAG_CREAT, &def_val_int );MB_CHK_SET_ERR( rval, "Trouble creating tag3" );
 
     // Get connectivity, coordinate, tag, and adjacency iterators
     EntityHandle* conn_ptr;
@@ -110,8 +105,7 @@ int main( int argc, char** argv )
     // Get coordinates iterator, just need this once because we know verts handle space doesn't have
     // holes
     rval = mbImpl->coords_iterate( verts.begin( ), verts.end( ), x_ptr, y_ptr, z_ptr, count );MB_CHK_SET_ERR( rval, "Error in coords_iterate" );
-    assert( count ==
-            (int)verts.size( ) );  // Should end up with just one contiguous chunk of vertices
+    assert( count == (int)verts.size( ) );  // Should end up with just one contiguous chunk of vertices
 
     // Iterate through elements, computing midpoint based on vertex positions, set on element-based
     // tag1 Control loop by iterator over elem range
@@ -127,12 +121,10 @@ int main( int argc, char** argv )
         // Iterate over elements in this chunk
         for( int i = 0; i < count; i++ )
         {
-            tag1_ptr[ 0 ] = tag1_ptr[ 1 ] = tag1_ptr[ 2 ] =
-                0.0;  // Initialize position for this element
+            tag1_ptr[ 0 ] = tag1_ptr[ 1 ] = tag1_ptr[ 2 ] = 0.0;  // Initialize position for this element
             for( int j = 0; j < vpere; j++ )
             {  // Loop over vertices in this element
-                int v_index =
-                    conn_ptr[ j ] - first_vert;  // vert index is just the offset from first vertex
+                int v_index = conn_ptr[ j ] - first_vert;  // vert index is just the offset from first vertex
                 tag1_ptr[ 0 ] += x_ptr[ v_index ];
                 tag1_ptr[ 1 ] += y_ptr[ v_index ];  // Sum vertex positions into tag1...
                 tag1_ptr[ 2 ] += z_ptr[ v_index ];
@@ -185,8 +177,7 @@ int main( int argc, char** argv )
         for( int v = 0; v < count; v++ )
         {
             const vector< EntityHandle >* avec = *( adjs_ptr + v );
-            for( vector< EntityHandle >::const_iterator ait = avec->begin( ); ait != avec->end( );
-                 ++ait )
+            for( vector< EntityHandle >::const_iterator ait = avec->begin( ); ait != avec->end( ); ++ait )
             {
                 // Get chunk that this element resides in; upper_bound points to the first element
                 // strictly > key, so get that and decrement (would work the same as lower_bound
@@ -196,8 +187,7 @@ int main( int argc, char** argv )
                 // Index of *ait in that chunk
                 int        a_ind = *ait - ( *mit ).first;
                 tag_struct ts = ( *mit ).second;
-                ts.avg_ptr[ 3 * a_ind + 0 ] +=
-                    x_ptr[ v ];  // Tag on each element is 3 doubles, x/y/z
+                ts.avg_ptr[ 3 * a_ind + 0 ] += x_ptr[ v ];  // Tag on each element is 3 doubles, x/y/z
                 ts.avg_ptr[ 3 * a_ind + 1 ] += y_ptr[ v ];
                 ts.avg_ptr[ 3 * a_ind + 2 ] += z_ptr[ v ];
                 ts.nv_ptr[ a_ind ]++;  // Increment the vertex count
@@ -223,8 +213,7 @@ int main( int argc, char** argv )
         {
             for( int j = 0; j < 3; j++ )
                 tag2_ptr[ 3 * i + j ] /= (double)tag3_ptr[ i ];  // Normalize by # verts
-            if( tag1_ptr[ 3 * i ] != tag2_ptr[ 3 * i ] ||
-                tag1_ptr[ 3 * i + 1 ] != tag2_ptr[ 3 * i + 1 ] ||
+            if( tag1_ptr[ 3 * i ] != tag2_ptr[ 3 * i ] || tag1_ptr[ 3 * i + 1 ] != tag2_ptr[ 3 * i + 1 ] ||
                 tag1_ptr[ 3 * i + 2 ] != tag2_ptr[ 3 * i + 2 ] )
                 cout << "Tag1, tag2 disagree for element " << *e_it + i << endl;
         }
@@ -256,20 +245,17 @@ ErrorCode create_mesh_with_holes( Interface* mbImpl, int nquads, int nholes )
         coords[ 0 ][ 2 * i ] = coords[ 0 ][ 2 * i + 1 ] = (double)i;  // x values are all i
         coords[ 1 ][ 2 * i ] = 0.0;
         coords[ 1 ][ 2 * i + 1 ] = 1.0;  // y coords
-        coords[ 2 ][ 2 * i ] = coords[ 2 ][ 2 * i + 1 ] =
-            (double)0.0;  // z values, all zero (2d mesh)
+        coords[ 2 ][ 2 * i ] = coords[ 2 ][ 2 * i + 1 ] = (double)0.0;  // z values, all zero (2d mesh)
         EntityHandle quad_v = start_vert + 2 * i;
         for( int j = 0; j < 4; j++ )
-            connect[ 4 * i + j ] =
-                quad_v + j;  // Connectivity of each quad is a sequence starting from quad_v
+            connect[ 4 * i + j ] = quad_v + j;  // Connectivity of each quad is a sequence starting from quad_v
     }
     // Last two vertices
     // Cppcheck warning (false positive): variable coords is assigned a value that is never used
     coords[ 0 ][ 2 * nquads ] = coords[ 0 ][ 2 * nquads + 1 ] = (double)nquads;
     coords[ 1 ][ 2 * nquads ] = 0.0;
     coords[ 1 ][ 2 * nquads + 1 ] = 1.0;  // y coords
-    coords[ 2 ][ 2 * nquads ] = coords[ 2 ][ 2 * nquads + 1 ] =
-        (double)0.0;  // z values, all zero (2d mesh)
+    coords[ 2 ][ 2 * nquads ] = coords[ 2 ][ 2 * nquads + 1 ] = (double)0.0;  // z values, all zero (2d mesh)
 
     // Now delete nholes elements, spaced approximately equally through mesh, so contiguous size is
     // about nquads/(nholes + 1) reinterpret start_elem as the next element to be deleted

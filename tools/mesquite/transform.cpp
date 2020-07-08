@@ -72,20 +72,17 @@ int main( int argc, char* argv[] )
                  "in a mesh read from a VTK file." );
 
     const char* ROTATE_VALS[] = { "a", "i", "j", "k" };
-    args.double_list_flag(
-        ROTATE_FLAG, "Specify a rotation as an angle in degrees counter-clockwise about a vector",
-        &rotate_arg );
+    args.double_list_flag( ROTATE_FLAG, "Specify a rotation as an angle in degrees counter-clockwise about a vector",
+                           &rotate_arg );
     args.limit_list_flag( ROTATE_FLAG, 4, ROTATE_VALS );
 
     const char* SCALE_VALS[] = { "s", "sx", "sy", "sz" };
-    args.double_list_flag( SCALE_FLAG, "Specify factor(s) by which to scale mesh about origin",
-                           &scale_arg );
+    args.double_list_flag( SCALE_FLAG, "Specify factor(s) by which to scale mesh about origin", &scale_arg );
     args.limit_list_flag( SCALE_FLAG, 1, SCALE_VALS );
     args.limit_list_flag( SCALE_FLAG, 3, SCALE_VALS + 1 );
 
     const char* TRANSLATE_VALS[] = { "dx", "dy", "dz" };
-    args.double_list_flag( TRANSLATE_FLAG, "Specify translation of vertex coordinates.",
-                           &translate_arg );
+    args.double_list_flag( TRANSLATE_FLAG, "Specify translation of vertex coordinates.", &translate_arg );
     args.limit_list_flag( TRANSLATE_FLAG, 3, TRANSLATE_VALS );
 
     args.toggle_flag( 'f', "Do not move fixed vertices.", &freeonly );
@@ -117,8 +114,7 @@ int main( int argc, char* argv[] )
         mesh.mark_skin_fixed( err, false );
         if( err )
         {
-            std::cerr << err << std::endl
-                      << "Failed to skin mesh from file: " << input_file << std::endl;
+            std::cerr << err << std::endl << "Failed to skin mesh from file: " << input_file << std::endl;
             return 1;
         }
     }

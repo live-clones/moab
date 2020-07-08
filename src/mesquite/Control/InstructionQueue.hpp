@@ -139,8 +139,7 @@ class InstructionQueue : public IQInterface
      *\param domain The domain of the mesh -- may be NULL if no domain.
      */
     MESQUITE_EXPORT
-    virtual void run_common( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh,
-                             Settings* settings, MsqError& err );
+    virtual void run_common( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh, Settings* settings, MsqError& err );
 
     MESQUITE_EXPORT
     void clear( );

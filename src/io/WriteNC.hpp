@@ -91,8 +91,8 @@ class WriteNC : public WriterIface
     //! Writes out a file
     ErrorCode write_file( const char* file_name, const bool overwrite, const FileOptions& opts,
                           const EntityHandle* output_list, const int num_sets,
-                          const std::vector< std::string >& qa_list, const Tag* tag_list = NULL,
-                          int num_tags = 0, int export_dimension = 3 );
+                          const std::vector< std::string >& qa_list, const Tag* tag_list = NULL, int num_tags = 0,
+                          int export_dimension = 3 );
 
   private:
     //! ENTLOCNSEDGE for north/south edge
@@ -122,29 +122,21 @@ class WriteNC : public WriterIface
     class VarData
     {
       public:
-        VarData( )
-            : varId( -1 ), numAtts( -1 ), entLoc( ENTLOCSET ), numLev( 0 ), sz( 0 ),
-              has_tsteps( false )
-        {
-        }
-        int     varId;
-        int     numAtts;
-        nc_type varDataType;
-        std::vector< int >
-                                         varDims;  // The dimension indices making up this multi-dimensional variable
+        VarData( ) : varId( -1 ), numAtts( -1 ), entLoc( ENTLOCSET ), numLev( 0 ), sz( 0 ), has_tsteps( false ) {}
+        int                              varId;
+        int                              numAtts;
+        nc_type                          varDataType;
+        std::vector< int >               varDims;  // The dimension indices making up this multi-dimensional variable
         std::map< std::string, AttData > varAtts;
         std::string                      varName;
-        std::vector< Tag > varTags;  // Tags created for this variable, e.g. one tag per timestep
-        std::vector< void* >
-            memoryHogs;  // These will point to the real data; fill before writing the data
-        std::vector< NCDF_SIZE >
-            writeStarts;  // Starting index for writing data values along each dimension
-        std::vector< NCDF_SIZE >
-             writeCounts;  // Number of data values to be written along each dimension
-        int  entLoc;
-        int  numLev;
-        int  sz;
-        bool has_tsteps;  // Indicate whether timestep numbers are appended to tag names
+        std::vector< Tag >               varTags;  // Tags created for this variable, e.g. one tag per timestep
+        std::vector< void* >             memoryHogs;  // These will point to the real data; fill before writing the data
+        std::vector< NCDF_SIZE >         writeStarts;  // Starting index for writing data values along each dimension
+        std::vector< NCDF_SIZE >         writeCounts;  // Number of data values to be written along each dimension
+        int                              entLoc;
+        int                              numLev;
+        int                              sz;
+        bool                             has_tsteps;  // Indicate whether timestep numbers are appended to tag names
     };
 
     //! This info will be reconstructed from metadata stored on conventional fileSet tags
@@ -167,16 +159,15 @@ class WriteNC : public WriterIface
     std::map< std::string, VarData > varInfo;
 
     ErrorCode parse_options( const FileOptions& opts, std::vector< std::string >& var_names,
-                             std::vector< std::string >& desired_names,
-                             std::vector< int >& tstep_nums, std::vector< double >& tstep_vals );
+                             std::vector< std::string >& desired_names, std::vector< int >& tstep_nums,
+                             std::vector< double >& tstep_vals );
     /*
      * Map out the header, from tags on file set; it is the inverse process from
      * ErrorCode NCHelper::create_conventional_tags
      */
     ErrorCode process_conventional_tags( EntityHandle fileSet );
 
-    ErrorCode process_concatenated_attribute( const void* attPtr, int attSz,
-                                              std::vector< int >&               attLen,
+    ErrorCode process_concatenated_attribute( const void* attPtr, int attSz, std::vector< int >& attLen,
                                               std::map< std::string, AttData >& attributes );
 
     //! Interface instance

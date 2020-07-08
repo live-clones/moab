@@ -88,8 +88,8 @@ int SparseTagSuperCollection::tag_size( const TagId tag_id ) const
     return coll ? coll->tag_size( ) : 0;
 }
 
-ErrorCode SparseTagSuperCollection::set_data( TagId tag_handle, const EntityHandle* handles,
-                                              int num_handles, const void* data )
+ErrorCode SparseTagSuperCollection::set_data( TagId tag_handle, const EntityHandle* handles, int num_handles,
+                                              const void* data )
 {
     SparseTagCollection* coll = get_collection( tag_handle );
     if( !coll ) return MB_TAG_NOT_FOUND;
@@ -109,9 +109,8 @@ ErrorCode SparseTagSuperCollection::set_data( TagId tag_handle, const EntityHand
     return result;
 }
 
-ErrorCode SparseTagSuperCollection::set_data( TagId tag_handle, const EntityHandle* handles,
-                                              int num_handles, void const* const* data_ptrs,
-                                              const int* lengths, bool one_value )
+ErrorCode SparseTagSuperCollection::set_data( TagId tag_handle, const EntityHandle* handles, int num_handles,
+                                              void const* const* data_ptrs, const int* lengths, bool one_value )
 {
     SparseTagCollection* coll = get_collection( tag_handle );
     if( !coll ) return MB_TAG_NOT_FOUND;
@@ -142,8 +141,7 @@ ErrorCode SparseTagSuperCollection::set_data( TagId tag_handle, const EntityHand
     return result;
 }
 
-ErrorCode SparseTagSuperCollection::set_data( TagId tag_handle, const Range& handles,
-                                              const void* data )
+ErrorCode SparseTagSuperCollection::set_data( TagId tag_handle, const Range& handles, const void* data )
 {
     SparseTagCollection* coll = get_collection( tag_handle );
     if( !coll ) return MB_TAG_NOT_FOUND;
@@ -162,9 +160,8 @@ ErrorCode SparseTagSuperCollection::set_data( TagId tag_handle, const Range& han
     return result;
 }
 
-ErrorCode SparseTagSuperCollection::set_data( TagId tag_handle, const Range& handles,
-                                              void const* const* data_ptrs, const int* lengths,
-                                              bool one_value )
+ErrorCode SparseTagSuperCollection::set_data( TagId tag_handle, const Range& handles, void const* const* data_ptrs,
+                                              const int* lengths, bool one_value )
 {
     SparseTagCollection* coll = get_collection( tag_handle );
     if( !coll ) return MB_TAG_NOT_FOUND;
@@ -185,8 +182,7 @@ ErrorCode SparseTagSuperCollection::set_data( TagId tag_handle, const Range& han
 
     ErrorCode          rval, result = MB_SUCCESS;
     void const* const* ptr = data_ptrs;
-    for( Range::const_iterator i = handles.begin( ); i != handles.end( );
-         ++i, ptr += step, lengths += length_step )
+    for( Range::const_iterator i = handles.begin( ); i != handles.end( ); ++i, ptr += step, lengths += length_step )
     {
         rval = coll->set_data( *i, *ptr, *lengths );
         if( MB_SUCCESS != rval ) result = rval;
@@ -195,9 +191,8 @@ ErrorCode SparseTagSuperCollection::set_data( TagId tag_handle, const Range& han
     return result;
 }
 
-ErrorCode SparseTagSuperCollection::tag_iterate( TagId tag_handle, Range::iterator& iter,
-                                                 const Range::iterator& end, void*& data_ptr_out,
-                                                 const void* default_value )
+ErrorCode SparseTagSuperCollection::tag_iterate( TagId tag_handle, Range::iterator& iter, const Range::iterator& end,
+                                                 void*& data_ptr_out, const void* default_value )
 
 {
     // Note: We are asked to returning a block of contiguous storage
@@ -244,9 +239,8 @@ ErrorCode SparseTagSuperCollection::tag_iterate( TagId tag_handle, Range::iterat
     return MB_SUCCESS;
 }
 
-ErrorCode SparseTagSuperCollection::get_data( TagId tag_handle, const EntityHandle* handles,
-                                              int num_handles, void* data,
-                                              const void* default_value ) const
+ErrorCode SparseTagSuperCollection::get_data( TagId tag_handle, const EntityHandle* handles, int num_handles,
+                                              void* data, const void* default_value ) const
 {
     SparseTagCollection* coll = get_collection( tag_handle );
     if( !coll ) return MB_TAG_NOT_FOUND;
@@ -272,10 +266,9 @@ ErrorCode SparseTagSuperCollection::get_data( TagId tag_handle, const EntityHand
     return MB_SUCCESS;
 }
 
-ErrorCode SparseTagSuperCollection::get_data( TagId tag_handle, const EntityHandle* handles,
-                                              int num_handles, const void** data, int* lengths,
-                                              const void* default_value,
-                                              int         default_val_length ) const
+ErrorCode SparseTagSuperCollection::get_data( TagId tag_handle, const EntityHandle* handles, int num_handles,
+                                              const void** data, int* lengths, const void* default_value,
+                                              int default_val_length ) const
 {
     SparseTagCollection* coll = get_collection( tag_handle );
     if( !coll ) return MB_TAG_NOT_FOUND;
@@ -340,10 +333,8 @@ ErrorCode SparseTagSuperCollection::get_data( TagId tag_handle, const Range& han
     return MB_SUCCESS;
 }
 
-ErrorCode SparseTagSuperCollection::get_data( TagId tag_handle, const Range& handles,
-                                              const void** data, int* lengths,
-                                              const void* default_value,
-                                              int         default_val_length ) const
+ErrorCode SparseTagSuperCollection::get_data( TagId tag_handle, const Range& handles, const void** data, int* lengths,
+                                              const void* default_value, int default_val_length ) const
 {
     SparseTagCollection* coll = get_collection( tag_handle );
     if( !coll ) return MB_TAG_NOT_FOUND;
@@ -359,8 +350,7 @@ ErrorCode SparseTagSuperCollection::get_data( TagId tag_handle, const Range& han
     }
 
     ErrorCode rval, result = MB_SUCCESS;
-    for( Range::const_iterator i = handles.begin( ); i != handles.end( );
-         ++i, ++data, lengths += length_step )
+    for( Range::const_iterator i = handles.begin( ); i != handles.end( ); ++i, ++data, lengths += length_step )
     {
         void* ptr;
         rval = coll->get_data( *i, ptr, *lengths );
@@ -381,8 +371,7 @@ ErrorCode SparseTagSuperCollection::get_data( TagId tag_handle, const Range& han
     return result;
 }
 
-ErrorCode SparseTagSuperCollection::remove_data( const TagId        tag_handle,
-                                                 const EntityHandle entity_handle )
+ErrorCode SparseTagSuperCollection::remove_data( const TagId tag_handle, const EntityHandle entity_handle )
 {
     SparseTagCollection* coll = get_collection( tag_handle );
     return coll ? coll->remove_data( entity_handle ) : MB_TAG_NOT_FOUND;
@@ -396,16 +385,15 @@ ErrorCode SparseTagSuperCollection::get_entities( const TagId tag_handle, Range&
 }
 
 //! gets all entity handles that match a type and tag
-ErrorCode SparseTagSuperCollection::get_entities( const TagId tag_handle, const EntityType type,
-                                                  Range& entities )
+ErrorCode SparseTagSuperCollection::get_entities( const TagId tag_handle, const EntityType type, Range& entities )
 {
     SparseTagCollection* coll = get_collection( tag_handle );
     return coll ? coll->get_entities( type, entities ) : MB_TAG_NOT_FOUND;
 }
 
 //! gets all entity handles that match a type and tag
-ErrorCode SparseTagSuperCollection::get_entities( const Range& range, const TagId tag_handle,
-                                                  const EntityType type, Range& entities )
+ErrorCode SparseTagSuperCollection::get_entities( const Range& range, const TagId tag_handle, const EntityType type,
+                                                  Range& entities )
 {
     SparseTagCollection* coll = get_collection( tag_handle );
     if( !coll ) return MB_TAG_NOT_FOUND;
@@ -419,8 +407,7 @@ ErrorCode SparseTagSuperCollection::get_entities( const Range& range, const TagI
     return result;
 }
 
-ErrorCode SparseTagSuperCollection::get_tags( const EntityHandle  entity,
-                                              std::vector< Tag >& all_tags )
+ErrorCode SparseTagSuperCollection::get_tags( const EntityHandle entity, std::vector< Tag >& all_tags )
 {
     for( TagId id = 0; id < mDataTags.size( ); ++id )
         if( mDataTags[ id ] && mDataTags[ id ]->contains( entity ) )
@@ -430,9 +417,9 @@ ErrorCode SparseTagSuperCollection::get_tags( const EntityHandle  entity,
 }
 
 //! gets all entity handles that match a type and tag
-ErrorCode SparseTagSuperCollection::get_entities_with_tag_value(
-    const TagId tag_handle, const TagInfo& tag_info, const EntityType type, Range& entities,
-    const void* tag_value, int value_size )
+ErrorCode SparseTagSuperCollection::get_entities_with_tag_value( const TagId tag_handle, const TagInfo& tag_info,
+                                                                 const EntityType type, Range& entities,
+                                                                 const void* tag_value, int value_size )
 {
     SparseTagCollection* coll = get_collection( tag_handle );
     if( !coll ) return MB_TAG_NOT_FOUND;
@@ -441,16 +428,16 @@ ErrorCode SparseTagSuperCollection::get_entities_with_tag_value(
 }
 
 //! gets all entity handles that match a type and tag
-ErrorCode SparseTagSuperCollection::get_entities_with_tag_value(
-    const Range& range, const TagId tag_handle, const TagInfo& tag_info, const EntityType type,
-    Range& entities, const void* tag_value, int value_size )
+ErrorCode SparseTagSuperCollection::get_entities_with_tag_value( const Range& range, const TagId tag_handle,
+                                                                 const TagInfo& tag_info, const EntityType type,
+                                                                 Range& entities, const void* tag_value,
+                                                                 int value_size )
 {
     SparseTagCollection* coll = get_collection( tag_handle );
     if( !coll ) return MB_TAG_NOT_FOUND;
 
     Range     dum_range;
-    ErrorCode result =
-        coll->get_entities_with_tag_value( tag_info, type, dum_range, tag_value, value_size );
+    ErrorCode result = coll->get_entities_with_tag_value( tag_info, type, dum_range, tag_value, value_size );
 
     // do this the hard way to preserve order in the vector
     std::set_intersection( range.begin( ), range.end( ), dum_range.begin( ), dum_range.end( ),
@@ -460,8 +447,8 @@ ErrorCode SparseTagSuperCollection::get_entities_with_tag_value(
 }
 
 //! gets all entity handles that match a type and tag
-ErrorCode SparseTagSuperCollection::get_number_entities( const TagId      tag_handle,
-                                                         const EntityType type, int& num_entities )
+ErrorCode SparseTagSuperCollection::get_number_entities( const TagId tag_handle, const EntityType type,
+                                                         int& num_entities )
 {
     SparseTagCollection* coll = get_collection( tag_handle );
     return coll ? coll->get_number_entities( type, num_entities ) : MB_TAG_NOT_FOUND;
@@ -477,8 +464,7 @@ ErrorCode SparseTagSuperCollection::get_number_entities( const Range& range, con
     return result;
 }
 
-ErrorCode SparseTagSuperCollection::get_memory_use( TagId tag_id, unsigned long& total,
-                                                    unsigned long& per_entity )
+ErrorCode SparseTagSuperCollection::get_memory_use( TagId tag_id, unsigned long& total, unsigned long& per_entity )
 {
     SparseTagCollection* coll = get_collection( tag_id );
     if( !coll ) return MB_TAG_NOT_FOUND;

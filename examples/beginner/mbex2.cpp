@@ -61,8 +61,8 @@ int main( )
     double                coord[ 3 ];
     moab::Range::iterator iter;
 
-    std::cout << std::setw( 6 ) << "Handle" << std::setw( 10 ) << "X" << std::setw( 10 ) << "Y"
-              << std::setw( 10 ) << "Z" << std::endl;
+    std::cout << std::setw( 6 ) << "Handle" << std::setw( 10 ) << "X" << std::setw( 10 ) << "Y" << std::setw( 10 )
+              << "Z" << std::endl;
 
     for( iter = connectivity.begin( ); iter != connectivity.end( ); ++iter )
     {
@@ -70,8 +70,8 @@ int main( )
 
         // Print the entity handle followed by the x, y, z coordinate of
         // the vertex:
-        std::cout << std::setw( 6 ) << *iter << std::setw( 10 ) << coord[ 0 ] << std::setw( 10 )
-                  << coord[ 1 ] << std::setw( 10 ) << coord[ 2 ] << std::endl;
+        std::cout << std::setw( 6 ) << *iter << std::setw( 10 ) << coord[ 0 ] << std::setw( 10 ) << coord[ 1 ]
+                  << std::setw( 10 ) << coord[ 2 ] << std::endl;
     }
 
     // ***********************

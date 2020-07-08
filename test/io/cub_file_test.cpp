@@ -255,8 +255,7 @@ void test_vertices( )
     }
 }
 
-void test_element( const std::string& filename, EntityType type, int num_elem, int node_per_elem,
-                   const int* conn_list )
+void test_element( const std::string& filename, EntityType type, int num_elem, int node_per_elem, const int* conn_list )
 {
     ErrorCode  rval;
     Core       mb_impl;
@@ -297,17 +296,16 @@ void test_element( const std::string& filename, EntityType type, int num_elem, i
 
 void test_edges( )
 {
-    const int edge_conn[] = {
-        1,  3,  // 1
-        3,  2,  2,  5,  5,  4,  4,  7,  7,  6,  6,  8,  8,  1,  3,  9,  9,  8,  // 10
-        5,  9,  9,  7,  10, 12, 12, 11, 11, 14, 14, 13, 13, 16, 16, 15, 15, 17, 17, 10,  // 20
-        12, 18, 18, 17, 14, 18, 18, 16, 6,  19, 19, 13, 1,  20, 20, 11, 19, 21, 21, 8,  // 30
-        14, 21, 21, 20, 4,  22, 22, 15, 22, 23, 23, 7,  16, 23, 23, 19, 2,  24, 24, 10,  // 40
-        24, 25, 25, 5,  17, 25, 25, 22, 20, 26, 26, 3,  12, 26, 26, 24, 28, 30, 30, 29,  // 50
-        29, 31, 31, 2,  1,  32, 32, 28, 30, 33, 33, 32, 31, 33, 33, 3,  34, 36, 36, 35,  // 60
-        35, 37, 37, 11, 10, 38, 38, 34, 36, 39, 39, 38, 37, 39, 39, 12, 28, 40, 40, 35,  // 70
-        20, 41, 41, 32, 37, 41, 41, 40, 29, 42, 42, 34, 42, 43, 43, 31, 38, 43, 43, 24,  // 80
-        40, 44, 44, 30, 36, 44, 44, 42 };
+    const int edge_conn[] = { 1,  3,  // 1
+                              3,  2,  2,  5,  5,  4,  4,  7,  7,  6,  6,  8,  8,  1,  3,  9,  9,  8,  // 10
+                              5,  9,  9,  7,  10, 12, 12, 11, 11, 14, 14, 13, 13, 16, 16, 15, 15, 17, 17, 10,  // 20
+                              12, 18, 18, 17, 14, 18, 18, 16, 6,  19, 19, 13, 1,  20, 20, 11, 19, 21, 21, 8,  // 30
+                              14, 21, 21, 20, 4,  22, 22, 15, 22, 23, 23, 7,  16, 23, 23, 19, 2,  24, 24, 10,  // 40
+                              24, 25, 25, 5,  17, 25, 25, 22, 20, 26, 26, 3,  12, 26, 26, 24, 28, 30, 30, 29,  // 50
+                              29, 31, 31, 2,  1,  32, 32, 28, 30, 33, 33, 32, 31, 33, 33, 3,  34, 36, 36, 35,  // 60
+                              35, 37, 37, 11, 10, 38, 38, 34, 36, 39, 39, 38, 37, 39, 39, 12, 28, 40, 40, 35,  // 70
+                              20, 41, 41, 32, 37, 41, 41, 40, 29, 42, 42, 34, 42, 43, 43, 31, 38, 43, 43, 24,  // 80
+                              40, 44, 44, 30, 36, 44, 44, 42 };
     test_element( input_file_1, MBEDGE, 84, 2, edge_conn );
 }
 
@@ -330,18 +328,16 @@ void test_quads( )
 
 void test_hexes( )
 {
-    const int hex_conn[] = {
-        6,  19, 23, 7,  8,  21, 27, 9,  19, 13, 16, 23, 21, 14, 18, 27, 7,  23, 22, 4,  9,  27,
-        25, 5,  23, 16, 15, 22, 27, 18, 17, 25, 8,  21, 27, 9,  1,  20, 26, 3,  21, 14, 18, 27,
-        20, 11, 12, 26, 9,  27, 25, 5,  3,  26, 24, 2,  27, 18, 17, 25, 26, 12, 10, 24, 1,  20,
-        26, 3,  32, 41, 45, 33, 20, 11, 12, 26, 41, 37, 39, 45, 3,  26, 24, 2,  33, 45, 43, 31,
-        26, 12, 10, 24, 45, 39, 38, 43, 32, 41, 45, 33, 28, 40, 44, 30, 41, 37, 39, 45, 40, 35,
-        36, 44, 33, 45, 43, 31, 30, 44, 42, 29, 45, 39, 38, 43, 44, 36, 34, 42 };
+    const int hex_conn[] = { 6,  19, 23, 7,  8,  21, 27, 9,  19, 13, 16, 23, 21, 14, 18, 27, 7,  23, 22, 4,  9,  27,
+                             25, 5,  23, 16, 15, 22, 27, 18, 17, 25, 8,  21, 27, 9,  1,  20, 26, 3,  21, 14, 18, 27,
+                             20, 11, 12, 26, 9,  27, 25, 5,  3,  26, 24, 2,  27, 18, 17, 25, 26, 12, 10, 24, 1,  20,
+                             26, 3,  32, 41, 45, 33, 20, 11, 12, 26, 41, 37, 39, 45, 3,  26, 24, 2,  33, 45, 43, 31,
+                             26, 12, 10, 24, 45, 39, 38, 43, 32, 41, 45, 33, 28, 40, 44, 30, 41, 37, 39, 45, 40, 35,
+                             36, 44, 33, 45, 43, 31, 30, 44, 42, 29, 45, 39, 38, 43, 44, 36, 34, 42 };
     test_element( input_file_1, MBHEX, 16, 8, hex_conn );
 }
 
-template< int L >
-std::vector< int > find_parents( const int parent_conn[][ L ], int num_parent, int id )
+template< int L > std::vector< int > find_parents( const int parent_conn[][ L ], int num_parent, int id )
 {
     std::vector< int > results;
     for( int i = 0; i < num_parent; ++i )
@@ -413,39 +409,34 @@ void test_geometric_topology( )
     const int volume_surfs[ 2 ][ 6 ] = { { 1, 2, 3, 4, 5, 6 }, { 7, 8, 9, 6, 11, 12 } };
     // List of global IDs of curves in geometric surfaces, indexed by ID-1
     // Curve IDs of zero indicates that corresponding surface doesn't exist.
-    const int surf_curves[ 12 ][ 4 ] = { { 1, 2, 3, 4 },     { 5, 6, 7, 8 },    { 9, 6, 10, 4 },
-                                         { 11, 7, 9, 3 },    { 12, 8, 11, 2 },  { 10, 5, 12, 1 },
-                                         { 13, 14, 1, 16 },  { 17, 18, 5, 20 }, { 10, 18, 22, 16 },
-                                         { 0, 0, 0, 0 },  // no surf 10
+    const int surf_curves[ 12 ][ 4 ] = { { 1, 2, 3, 4 },     { 5, 6, 7, 8 },    { 9, 6, 10, 4 },   { 11, 7, 9, 3 },
+                                         { 12, 8, 11, 2 },   { 10, 5, 12, 1 },  { 13, 14, 1, 16 }, { 17, 18, 5, 20 },
+                                         { 10, 18, 22, 16 }, { 0, 0, 0, 0 },  // no surf 10
                                          { 24, 20, 12, 14 }, { 22, 17, 24, 13 } };
     // List of global IDs of vertices in geometric curves, indexed by ID-1
     // Vertex IDs of zero indicates that corresponding curve doesn't exist.
-    const int curve_verts[ 24 ][ 2 ] = {
-        { 1, 2 },  { 2, 3 },   { 3, 4 },  { 4, 1 }, { 5, 6 },  // 5
-        { 6, 7 },  { 7, 8 },   { 8, 5 },  { 4, 7 }, { 1, 6 },  // 10
-        { 3, 8 },  { 2, 5 },   { 9, 10 },  // 13
-        { 10, 2 }, { 0, 0 },  // no curve 15
-        { 1, 9 },  { 13, 14 }, { 14, 6 }, { 0, 0 },  // no curve 19
-        { 5, 13 }, { 0, 0 },  // no curve 21
-        { 9, 14 }, { 0, 0 },  // no curve 23
-        { 10, 13 } };
+    const int curve_verts[ 24 ][ 2 ] = { { 1, 2 },  { 2, 3 },   { 3, 4 },  { 4, 1 }, { 5, 6 },  // 5
+                                         { 6, 7 },  { 7, 8 },   { 8, 5 },  { 4, 7 }, { 1, 6 },  // 10
+                                         { 3, 8 },  { 2, 5 },   { 9, 10 },  // 13
+                                         { 10, 2 }, { 0, 0 },  // no curve 15
+                                         { 1, 9 },  { 13, 14 }, { 14, 6 }, { 0, 0 },  // no curve 19
+                                         { 5, 13 }, { 0, 0 },  // no curve 21
+                                         { 9, 14 }, { 0, 0 },  // no curve 23
+                                         { 10, 13 } };
 
     // check all vertices
     for( unsigned i = 0; i < ( sizeof( vertex_ids ) / sizeof( vertex_ids[ 0 ] ) ); ++i )
-        check_geometric_set( mb, 0, vertex_ids[ i ], 0, 0,
-                             find_parents< 2 >( curve_verts, 24, vertex_ids[ i ] ) );
+        check_geometric_set( mb, 0, vertex_ids[ i ], 0, 0, find_parents< 2 >( curve_verts, 24, vertex_ids[ i ] ) );
 
     // check all curves
     for( int i = 1; i <= 24; ++i )
         if( curve_verts[ i - 1 ][ 0 ] )
-            check_geometric_set( mb, 1, i, curve_verts[ i - 1 ], 2,
-                                 find_parents< 4 >( surf_curves, 12, i ) );
+            check_geometric_set( mb, 1, i, curve_verts[ i - 1 ], 2, find_parents< 4 >( surf_curves, 12, i ) );
 
     // check all surfs
     for( int i = 1; i <= 12; ++i )
         if( surf_curves[ i - 1 ][ 0 ] )
-            check_geometric_set( mb, 2, i, surf_curves[ i - 1 ], 4,
-                                 find_parents< 6 >( volume_surfs, 2, i ) );
+            check_geometric_set( mb, 2, i, surf_curves[ i - 1 ], 4, find_parents< 6 >( volume_surfs, 2, i ) );
 
     // check all volumes
     std::vector< int > empty;
@@ -586,8 +577,7 @@ void test_blocks( )
 //\param set_surfs One list for each id in "ids" containing the
 //                 ids of the geometric surfaces expected to be
 //                 contained in the boundary condition set.
-void test_bc_sets( const char* tag_name, unsigned count, const int* ids,
-                   const std::vector< int > set_surfs[] )
+void test_bc_sets( const char* tag_name, unsigned count, const int* ids, const std::vector< int > set_surfs[] )
 {
     ErrorCode  rval;
     Core       mb_impl;
@@ -707,9 +697,7 @@ static EntityHandle find_side( Interface& moab, EntityHandle entity, int side_di
 
         // check reverse direction
         for( j = 1; j < sub_ent_corners; ++j )
-            if( conn[ sub_ent_indices[ j ] ] !=
-                sub_conn[ ( n + sub_ent_corners - j ) % sub_ent_corners ] )
-                break;
+            if( conn[ sub_ent_indices[ j ] ] != sub_conn[ ( n + sub_ent_corners - j ) % sub_ent_corners ] ) break;
         if( j == sub_ent_corners ) return adj[ i ];
     }
 

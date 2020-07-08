@@ -48,14 +48,12 @@ static void usage( bool err = true )
         s << "  -s        Use range-based sets for tree nodes" << std::endl
           << "  -S        Use vector-based sets for tree nodes" << std::endl
           << "  -d <int>  Specify maximum depth for tree. Default: " << st.max_depth << std::endl
-          << "  -n <int>  Specify maximum entities per leaf. Default: " << st.max_leaf_entities
-          << std::endl
+          << "  -n <int>  Specify maximum entities per leaf. Default: " << st.max_leaf_entities << std::endl
           << "  -m <real> Specify worst split ratio. Default: " << st.worst_split_ratio << std::endl
           << "  -M <real> Specify best split ratio. Default: " << st.best_split_ratio << std::endl
           << "  -t        Tag triangles will tree cell number." << std::endl
           << "  -T        Write tree boxes to file." << std::endl
-          << "  -N        Specify mesh tag containing tree root. Default: \"" << TREE_TAG << '"'
-          << std::endl
+          << "  -N        Specify mesh tag containing tree root. Default: \"" << TREE_TAG << '"' << std::endl
           << std::endl;
     }
     exit( err );
@@ -127,8 +125,7 @@ static double parsedouble( int& i, int argc, char* argv[] )
     double result = strtod( argv[ i ], &end );
     if( result < 0 || *end )
     {
-        std::cerr << "Expected positive real number following '" << argv[ i - 1 ] << "'"
-                  << std::endl;
+        std::cerr << "Expected positive real number following '" << argv[ i - 1 ] << "'" << std::endl;
         usage( );
     }
 
@@ -142,7 +139,7 @@ int main( int argc, char* argv[] )
     const char*                   tree_file = 0;
     OrientedBoxTreeTool::Settings settings;
     bool                          tag_tris = false;
-    clock_t load_time, build_time, stat_time, tag_time, write_time, block_time;
+    clock_t                       load_time, build_time, stat_time, tag_time, write_time, block_time;
 
     for( int i = 1; i < argc; ++i )
     {
@@ -261,8 +258,8 @@ int main( int argc, char* argv[] )
     std::cout << std::endl;
 
     std::cout << "        " << std::setw( 8 ) << clock_to_string( load_time ) << std::setw( 8 )
-              << clock_to_string( build_time ) << std::setw( 8 ) << clock_to_string( stat_time )
-              << std::setw( 8 ) << clock_to_string( write_time );
+              << clock_to_string( build_time ) << std::setw( 8 ) << clock_to_string( stat_time ) << std::setw( 8 )
+              << clock_to_string( write_time );
     if( tag_tris ) std::cout << std::setw( 8 ) << clock_to_string( tag_time );
     if( tree_file ) std::cout << std::setw( 8 ) << clock_to_string( block_time );
     std::cout << std::endl;
@@ -321,8 +318,7 @@ EntityHandle build_tree( Interface* interface, OrientedBoxTreeTool::Settings set
 
     // store tree root
     Tag roottag;
-    rval = interface->tag_get_handle( root_tag, 1, MB_TYPE_HANDLE, roottag,
-                                      MB_TAG_CREAT | MB_TAG_SPARSE );
+    rval = interface->tag_get_handle( root_tag, 1, MB_TYPE_HANDLE, roottag, MB_TAG_CREAT | MB_TAG_SPARSE );
     if( MB_SUCCESS != rval )
     {
         std::cout << "Failed to create root tag: \"" << root_tag << '"' << std::endl;
@@ -399,15 +395,13 @@ template< typename T > struct SimpleStat
     }
     double dev( ) const
     {
-        return sqrt( ( count * (double)sqr - (double)sum * (double)sum ) /
-                     ( (double)count * ( count - 1 ) ) );
+        return sqrt( ( count * (double)sqr - (double)sum * (double)sum ) / ( (double)count * ( count - 1 ) ) );
     }
 };
 
 template< typename T >
 SimpleStat< T >::SimpleStat( )
-    : min( std::numeric_limits< T >::max( ) ), max( std::numeric_limits< T >::min( ) ), sum( 0 ),
-      sqr( 0 ), count( 0 )
+    : min( std::numeric_limits< T >::max( ) ), max( std::numeric_limits< T >::min( ) ), sum( 0 ), sqr( 0 ), count( 0 )
 {
 }
 
@@ -427,17 +421,15 @@ void print_stats( Interface* interface )
     Range tree_sets, triangles, verts;
     // interface->get_child_meshsets( root, tree_sets, 0 );
     interface->get_entities_by_type( 0, MBENTITYSET, tree_sets );
-    tree_sets.erase( tree_sets.begin( ),
-                     Range::lower_bound( tree_sets.begin( ), tree_sets.end( ), root ) );
+    tree_sets.erase( tree_sets.begin( ), Range::lower_bound( tree_sets.begin( ), tree_sets.end( ), root ) );
     interface->get_entities_by_type( 0, MBTRI, triangles );
     interface->get_entities_by_type( 0, MBVERTEX, verts );
     triangles.merge( verts );
     tree_sets.insert( root );
-    unsigned long long set_used, set_amortized, set_store_used, set_store_amortized, set_tag_used,
-        set_tag_amortized, tri_used, tri_amortized;
-    interface->estimated_memory_use( tree_sets, &set_used, &set_amortized, &set_store_used,
-                                     &set_store_amortized, 0, 0, 0, 0, &set_tag_used,
-                                     &set_tag_amortized );
+    unsigned long long set_used, set_amortized, set_store_used, set_store_amortized, set_tag_used, set_tag_amortized,
+        tri_used, tri_amortized;
+    interface->estimated_memory_use( tree_sets, &set_used, &set_amortized, &set_store_used, &set_store_amortized, 0, 0,
+                                     0, 0, &set_tag_used, &set_tag_amortized );
     interface->estimated_memory_use( triangles, &tri_used, &tri_amortized );
 
     int num_tri = 0;
@@ -451,16 +443,13 @@ void print_stats( Interface* interface )
     printf( "------------------------------------------------------------------\n" );
     printf( "\nmemory:           used  amortized\n" );
     printf( "            ---------- ----------\n" );
-    printf( "triangles   %10s %10s\n", mem_to_string( tri_used ).c_str( ),
-            mem_to_string( tri_amortized ).c_str( ) );
-    printf( "sets (total)%10s %10s\n", mem_to_string( set_used ).c_str( ),
-            mem_to_string( set_amortized ).c_str( ) );
+    printf( "triangles   %10s %10s\n", mem_to_string( tri_used ).c_str( ), mem_to_string( tri_amortized ).c_str( ) );
+    printf( "sets (total)%10s %10s\n", mem_to_string( set_used ).c_str( ), mem_to_string( set_amortized ).c_str( ) );
     printf( "sets        %10s %10s\n", mem_to_string( set_store_used ).c_str( ),
             mem_to_string( set_store_amortized ).c_str( ) );
     printf( "set tags    %10s %10s\n", mem_to_string( set_tag_used ).c_str( ),
             mem_to_string( set_tag_amortized ).c_str( ) );
-    printf( "total real  %10s %10s\n", mem_to_string( real_rss ).c_str( ),
-            mem_to_string( real_vsize ).c_str( ) );
+    printf( "total real  %10s %10s\n", mem_to_string( real_rss ).c_str( ), mem_to_string( real_vsize ).c_str( ) );
     printf( "------------------------------------------------------------------\n" );
 }
 
@@ -588,10 +577,7 @@ class LeafHexer : public OrientedBoxTreeTool::Op
     std::vector< int >          mTagData;
 
   public:
-    LeafHexer( OrientedBoxTreeTool* tool, Interface* mb2, Tag tag )
-        : mTool( tool ), mOut( mb2 ), mTag( tag )
-    {
-    }
+    LeafHexer( OrientedBoxTreeTool* tool, Interface* mb2, Tag tag ) : mTool( tool ), mOut( mb2 ), mTag( tag ) {}
 
     ErrorCode visit( EntityHandle, int, bool& descent )
     {

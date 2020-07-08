@@ -69,8 +69,7 @@ int EdgeLengthRangeQualityMetric::get_negate_flag( ) const
               ( | highVal - l_j | - (highVal - l_j) )^2.
 */
 bool EdgeLengthRangeQualityMetric::evaluate_common( PatchData& pd, size_t this_vert, double& fval,
-                                                    std::vector< size_t >& adj_verts,
-                                                    MsqError&              err )
+                                                    std::vector< size_t >& adj_verts, MsqError& err )
 {
     fval = 0.0;
     Vector3D edg;
@@ -112,18 +111,15 @@ bool EdgeLengthRangeQualityMetric::evaluate_common( PatchData& pd, size_t this_v
     return !MSQ_CHKERR( err );
 }
 
-bool EdgeLengthRangeQualityMetric::evaluate( PatchData& pd, size_t vertex, double& value,
-                                             MsqError& err )
+bool EdgeLengthRangeQualityMetric::evaluate( PatchData& pd, size_t vertex, double& value, MsqError& err )
 {
     std::vector< size_t > verts;
     bool                  rval = evaluate_common( pd, vertex, value, verts, err );
     return !MSQ_CHKERR( err ) && rval;
 }
 
-bool EdgeLengthRangeQualityMetric::evaluate_with_indices( PatchData& pd, size_t vertex,
-                                                          double&                value,
-                                                          std::vector< size_t >& indices,
-                                                          MsqError&              err )
+bool EdgeLengthRangeQualityMetric::evaluate_with_indices( PatchData& pd, size_t vertex, double& value,
+                                                          std::vector< size_t >& indices, MsqError& err )
 {
     indices.clear( );
     bool rval = evaluate_common( pd, vertex, value, indices, err );

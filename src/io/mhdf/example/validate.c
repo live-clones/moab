@@ -38,8 +38,7 @@ static int id_contained( long file_id, const long* ranges, int num_range );
 static int ids_contained( const long* ids, int num_ids, const long* ranges, int num_ranges );
 
 /* Like ids_contained, both input lists are in ranged format */
-static int ranges_contained( const long* id_ranges, int num_id_ranges, const long* ranges,
-                             int num_ranges );
+static int ranges_contained( const long* id_ranges, int num_id_ranges, const long* ranges, int num_ranges );
 
 /* Search for a string in a null-terminated list of strings */
 static int string_contained( const char* str, const char* const* const list );
@@ -69,16 +68,14 @@ static int merge_ranges( long* ranges, int nranges );
    min_len is non-zero, it will be considered an error if the data for any entity
    contains less than that number of values.  It is considered an error if any
    index in the list is past the end of a dataset containing max_value entries. */
-static int check_valid_end_indices( const long* indices, long num_idx, int min_len, long start_id,
-                                    long max_value, const char* typestr, const char* name );
+static int check_valid_end_indices( const long* indices, long num_idx, int min_len, long start_id, long max_value,
+                                    const char* typestr, const char* name );
 
 /* Do check_valid_connectivity for an element group with constant connectivity length */
-static int check_valid_elem_conn( int idx, mhdf_FileHandle file, struct mhdf_FileDesc* desc,
-                                  int conn_dim );
+static int check_valid_elem_conn( int idx, mhdf_FileHandle file, struct mhdf_FileDesc* desc, int conn_dim );
 
 /* Do check_valid_connectivity for an element group with old-format variable-length connectivity */
-static int check_valid_poly_conn( int idx, mhdf_FileHandle file, struct mhdf_FileDesc* desc,
-                                  int conn_dim );
+static int check_valid_poly_conn( int idx, mhdf_FileHandle file, struct mhdf_FileDesc* desc, int conn_dim );
 
 /* Do check_valid_tags for a fixed-length tag */
 static int check_valid_tag( int tag_idx, mhdf_FileHandle file, struct mhdf_FileDesc* desc );
@@ -87,17 +84,16 @@ static int check_valid_tag( int tag_idx, mhdf_FileHandle file, struct mhdf_FileD
 static int check_valid_var_len_tag( int tag_idx, mhdf_FileHandle file, struct mhdf_FileDesc* desc );
 
 /* Do check_valid_adjacencies for the adjacency list of a single entity group */
-static int check_valid_adj_list( long start_id, long count, const long* data, long data_len,
-                                 const long* valid_ranges, long num_valid_ranges,
-                                 const char* name );
+static int check_valid_adj_list( long start_id, long count, const long* data, long data_len, const long* valid_ranges,
+                                 long num_valid_ranges, const char* name );
 
 /* Do subset of check_valid_sets for either set parent or set child data */
-static int check_valid_parents_children( long start_id, long count, hid_t meta_handle,
-                                         hid_t data_handle, long data_len, int parents );
+static int check_valid_parents_children( long start_id, long count, hid_t meta_handle, hid_t data_handle, long data_len,
+                                         int parents );
 
 /* Do subset of check_valid_sets for set contents */
-static int check_valid_set_contents( struct mhdf_FileDesc* desc, long start_id, long count,
-                                     hid_t meta_handle, hid_t data_handle, long data_len );
+static int check_valid_set_contents( struct mhdf_FileDesc* desc, long start_id, long count, hid_t meta_handle,
+                                     hid_t data_handle, long data_len );
 
 /* Comparison routines for use with qsort */
 
@@ -202,9 +198,8 @@ int check_valid_file_ids( struct mhdf_FileDesc* desc )
         {
             printf( "Conflicting group IDs for \"%s\" [%ld,%ld] and \"%s\" [%ld,%ld]\n",
                     desc_name( desc, sorted[ i - 1 ] ), sorted[ i - 1 ]->start_id,
-                    sorted[ i - 1 ]->start_id + sorted[ i - 1 ]->count - 1,
-                    desc_name( desc, sorted[ i ] ), sorted[ i ]->start_id,
-                    sorted[ i ]->start_id + sorted[ i ]->count - 1 );
+                    sorted[ i - 1 ]->start_id + sorted[ i - 1 ]->count - 1, desc_name( desc, sorted[ i ] ),
+                    sorted[ i ]->start_id, sorted[ i ]->start_id + sorted[ i ]->count - 1 );
             ++err;
         }
     }
@@ -278,8 +273,7 @@ static int ids_contained( const long* ids, int num_ids, const long* ranges, int 
     return 1;
 }
 
-static int ranges_contained( const long* id_ranges, int num_id_ranges, const long* ranges,
-                             int num_ranges )
+static int ranges_contained( const long* id_ranges, int num_id_ranges, const long* ranges, int num_ranges )
 {
     int         i;
     long        start, count, avail;
@@ -316,12 +310,10 @@ static long* get_dim_ranges( struct mhdf_FileDesc* desc, int dim, int* num_range
     long*             ranges = 0;
     int               i, j;
     const char* const types1D[] = { mhdf_EDGE_TYPE_NAME, 0 };
-    const char* const types2D[] = { mhdf_TRI_TYPE_NAME, mhdf_QUAD_TYPE_NAME, mhdf_POLYGON_TYPE_NAME,
-                                    0 };
-    const char* const types3D[] = { mhdf_TET_TYPE_NAME,         mhdf_PYRAMID_TYPE_NAME,
-                                    mhdf_PRISM_TYPE_NAME,       mdhf_KNIFE_TYPE_NAME,
-                                    mdhf_HEX_TYPE_NAME,         mhdf_POLYHEDRON_TYPE_NAME,
-                                    mhdf_SEPTAHEDRON_TYPE_NAME, 0 };
+    const char* const types2D[] = { mhdf_TRI_TYPE_NAME, mhdf_QUAD_TYPE_NAME, mhdf_POLYGON_TYPE_NAME, 0 };
+    const char* const types3D[] = {
+        mhdf_TET_TYPE_NAME, mhdf_PYRAMID_TYPE_NAME,    mhdf_PRISM_TYPE_NAME,       mdhf_KNIFE_TYPE_NAME,
+        mdhf_HEX_TYPE_NAME, mhdf_POLYHEDRON_TYPE_NAME, mhdf_SEPTAHEDRON_TYPE_NAME, 0 };
 
     char const* const* typelist;
     switch( dim )
@@ -342,8 +334,8 @@ static long* get_dim_ranges( struct mhdf_FileDesc* desc, int dim, int* num_range
             typelist = types3D;
             break;
         default:
-            fprintf( stderr, "Internal error at %s:%d: request for entities of dimesion %d\n",
-                     __FILE__, __LINE__, dim );
+            fprintf( stderr, "Internal error at %s:%d: request for entities of dimesion %d\n", __FILE__, __LINE__,
+                     dim );
             abort( );
     }
 
@@ -376,8 +368,8 @@ int check_valid_elem_conn( int idx, mhdf_FileHandle file, struct mhdf_FileDesc* 
     handle = mhdf_openConnectivitySimple( file, desc->elems[ idx ].handle, &status );
     if( mhdf_isError( &status ) )
     {
-        fprintf( stderr, "Internal error opening connectivity for %s: %s\n",
-                 desc->elems[ idx ].handle, mhdf_message( &status ) );
+        fprintf( stderr, "Internal error opening connectivity for %s: %s\n", desc->elems[ idx ].handle,
+                 mhdf_message( &status ) );
         free( ranges );
         return 1;
     }
@@ -386,8 +378,8 @@ int check_valid_elem_conn( int idx, mhdf_FileHandle file, struct mhdf_FileDesc* 
     mhdf_readConnectivity( handle, 0, count, H5T_NATIVE_LONG, buffer, &status );
     if( mhdf_isError( &status ) )
     {
-        fprintf( stderr, "Internal error reading connectivity for %s: %s\n",
-                 desc->elems[ idx ].handle, mhdf_message( &status ) );
+        fprintf( stderr, "Internal error reading connectivity for %s: %s\n", desc->elems[ idx ].handle,
+                 mhdf_message( &status ) );
         free( ranges );
         free( buffer );
         mhdf_closeData( file, handle, &status );
@@ -411,15 +403,14 @@ int check_valid_elem_conn( int idx, mhdf_FileHandle file, struct mhdf_FileDesc* 
 
     if( invalid )
     {
-        printf( "%ld elements with invalid connectivity in %s\n", invalid,
-                desc->elems[ idx ].handle );
+        printf( "%ld elements with invalid connectivity in %s\n", invalid, desc->elems[ idx ].handle );
         return 1;
     }
     return 0;
 }
 
-static int check_valid_end_indices( const long* indices, long num_idx, int min_len, long start_id,
-                                    long max_value, const char* typestr, const char* name )
+static int check_valid_end_indices( const long* indices, long num_idx, int min_len, long start_id, long max_value,
+                                    const char* typestr, const char* name )
 {
     long i, invalid = 0, prev = -1;
 
@@ -436,11 +427,11 @@ static int check_valid_end_indices( const long* indices, long num_idx, int min_l
             if( verbose )
             {
                 if( start_id > 0 )
-                    printf( "Invalid end index %ld for %s %ld (ID %ld).  Prev index is %ld\n",
-                            indices[ i ], name, i, i + start_id, prev );
+                    printf( "Invalid end index %ld for %s %ld (ID %ld).  Prev index is %ld\n", indices[ i ], name, i,
+                            i + start_id, prev );
                 else
-                    printf( "Invalid end index %ld for entry %ld in %s %s.  Prev index is %ld\n",
-                            indices[ i ], i, name, typestr, prev );
+                    printf( "Invalid end index %ld for entry %ld in %s %s.  Prev index is %ld\n", indices[ i ], i, name,
+                            typestr, prev );
             }
             ++invalid;
         }
@@ -449,11 +440,9 @@ static int check_valid_end_indices( const long* indices, long num_idx, int min_l
             if( verbose )
             {
                 if( start_id > 0 )
-                    printf( "%s %ld (ID %ld) has only %ld values\n", name, i, start_id,
-                            indices[ i ] - prev );
+                    printf( "%s %ld (ID %ld) has only %ld values\n", name, i, start_id, indices[ i ] - prev );
                 else
-                    printf( "Entry %ld in %s %s has only %ld values\n", i, name, typestr,
-                            indices[ i ] - prev );
+                    printf( "Entry %ld in %s %s has only %ld values\n", i, name, typestr, indices[ i ] - prev );
             }
             ++invalid;
         }
@@ -462,11 +451,9 @@ static int check_valid_end_indices( const long* indices, long num_idx, int min_l
             if( verbose )
             {
                 if( start_id > 0 )
-                    printf( "%s %ld (ID %ld) end index exceeds upper bound of %ld\n", name, i,
-                            start_id, max_value );
+                    printf( "%s %ld (ID %ld) end index exceeds upper bound of %ld\n", name, i, start_id, max_value );
                 else
-                    printf( "Entry %ld in %s %s end index exceeds uppper bound of %ld\n", i, name,
-                            typestr, max_value );
+                    printf( "Entry %ld in %s %s end index exceeds uppper bound of %ld\n", i, name, typestr, max_value );
             }
             ++invalid;
         }
@@ -491,12 +478,11 @@ int check_valid_poly_conn( int idx, mhdf_FileHandle file, struct mhdf_FileDesc* 
     else
         min_conn_len = 3;
 
-    mhdf_openPolyConnectivity( file, desc->elems[ idx ].handle, &num_poly, &num_conn, &first_id,
-                               handles, &status );
+    mhdf_openPolyConnectivity( file, desc->elems[ idx ].handle, &num_poly, &num_conn, &first_id, handles, &status );
     if( mhdf_isError( &status ) )
     {
-        fprintf( stderr, "Internal error opening connectivity for %s: %s\n",
-                 desc->elems[ idx ].handle, mhdf_message( &status ) );
+        fprintf( stderr, "Internal error opening connectivity for %s: %s\n", desc->elems[ idx ].handle,
+                 mhdf_message( &status ) );
         return 1;
     }
 
@@ -504,8 +490,8 @@ int check_valid_poly_conn( int idx, mhdf_FileHandle file, struct mhdf_FileDesc* 
     mhdf_readPolyConnIndices( handles[ 0 ], 0, num_poly, H5T_NATIVE_LONG, indices, &status );
     if( mhdf_isError( &status ) )
     {
-        fprintf( stderr, "Internal error reading poly indices for %s: %s\n",
-                 desc->elems[ idx ].handle, mhdf_message( &status ) );
+        fprintf( stderr, "Internal error reading poly indices for %s: %s\n", desc->elems[ idx ].handle,
+                 mhdf_message( &status ) );
         free( indices );
         mhdf_closeData( file, handles[ 0 ], &status );
         mhdf_closeData( file, handles[ 1 ], &status );
@@ -513,8 +499,8 @@ int check_valid_poly_conn( int idx, mhdf_FileHandle file, struct mhdf_FileDesc* 
     }
     mhdf_closeData( file, handles[ 0 ], &status );
 
-    invalid = check_valid_end_indices( indices, num_poly, min_conn_len, first_id, num_conn,
-                                       "Connectivity", desc->elems[ idx ].handle );
+    invalid = check_valid_end_indices( indices, num_poly, min_conn_len, first_id, num_conn, "Connectivity",
+                                       desc->elems[ idx ].handle );
     if( invalid )
     {
         free( indices );
@@ -528,8 +514,8 @@ int check_valid_poly_conn( int idx, mhdf_FileHandle file, struct mhdf_FileDesc* 
     mhdf_readPolyConnIDs( handles[ 1 ], 0, num_conn, H5T_NATIVE_LONG, buffer, &status );
     if( mhdf_isError( &status ) )
     {
-        fprintf( stderr, "Internal error reading connectivity for %s: %s\n",
-                 desc->elems[ idx ].handle, mhdf_message( &status ) );
+        fprintf( stderr, "Internal error reading connectivity for %s: %s\n", desc->elems[ idx ].handle,
+                 mhdf_message( &status ) );
         free( ranges );
         free( indices );
         free( buffer );
@@ -559,8 +545,7 @@ int check_valid_poly_conn( int idx, mhdf_FileHandle file, struct mhdf_FileDesc* 
 
     if( invalid )
     {
-        printf( "%ld elements with invalid connectivity in %s\n", invalid,
-                desc->elems[ idx ].handle );
+        printf( "%ld elements with invalid connectivity in %s\n", invalid, desc->elems[ idx ].handle );
         return 1;
     }
     return 0;
@@ -592,8 +577,8 @@ int check_valid_adjacencies( mhdf_FileHandle file, struct mhdf_FileDesc* desc )
         handle = mhdf_openAdjacency( file, desc->elems[ i ].handle, &count, &status );
         if( mhdf_isError( &status ) )
         {
-            fprintf( stderr, "Internal error openening adjacency list for %s: %s\n",
-                     desc->elems[ i ].handle, mhdf_message( &status ) );
+            fprintf( stderr, "Internal error openening adjacency list for %s: %s\n", desc->elems[ i ].handle,
+                     mhdf_message( &status ) );
             free( ranges );
             return 1;
         }
@@ -602,17 +587,16 @@ int check_valid_adjacencies( mhdf_FileHandle file, struct mhdf_FileDesc* desc )
         mhdf_readAdjacency( handle, 0, count, H5T_NATIVE_LONG, buffer, &status );
         if( mhdf_isError( &status ) )
         {
-            fprintf( stderr, "Internal error reading adjacency list for %s: %s\n",
-                     desc->elems[ i ].handle, mhdf_message( &status ) );
+            fprintf( stderr, "Internal error reading adjacency list for %s: %s\n", desc->elems[ i ].handle,
+                     mhdf_message( &status ) );
             free( ranges );
             mhdf_closeData( file, handle, &status );
             return 1;
         }
         mhdf_closeData( file, handle, &status );
 
-        invalid +=
-            check_valid_adj_list( desc->elems[ i ].desc.start_id, desc->elems[ i ].desc.count,
-                                  buffer, count, ranges, num_ranges, desc->elems[ i ].handle );
+        invalid += check_valid_adj_list( desc->elems[ i ].desc.start_id, desc->elems[ i ].desc.count, buffer, count,
+                                         ranges, num_ranges, desc->elems[ i ].handle );
         free( buffer );
     }
 
@@ -620,8 +604,8 @@ int check_valid_adjacencies( mhdf_FileHandle file, struct mhdf_FileDesc* desc )
     return invalid;
 }
 
-static int check_valid_adj_list( long start_id, long count, const long* data, long data_len,
-                                 const long* valid_ranges, long num_valid_ranges, const char* name )
+static int check_valid_adj_list( long start_id, long count, const long* data, long data_len, const long* valid_ranges,
+                                 long num_valid_ranges, const char* name )
 {
     long              i, n, id, invalid_id = 0, invalid_vals = 0;
     const long*       iter = data;
@@ -644,9 +628,8 @@ static int check_valid_adj_list( long start_id, long count, const long* data, lo
         if( id < start_id || ( id - start_id ) >= count )
         {
             if( verbose )
-                printf(
-                    "Entry %ld in %s adjacency data has ID %ld outside of group range [%ld,%ld].\n",
-                    i, name, id, start_id, start_id + count - 1 );
+                printf( "Entry %ld in %s adjacency data has ID %ld outside of group range [%ld,%ld].\n", i, name, id,
+                        start_id, start_id + count - 1 );
             ++invalid_id;
         }
 
@@ -654,8 +637,7 @@ static int check_valid_adj_list( long start_id, long count, const long* data, lo
         ++iter;
         if( n < 1 )
         {
-            printf( "Entry %ld in %s adjacency data (ID %ld) has %ld adjacency entries.\n", i, name,
-                    id, n );
+            printf( "Entry %ld in %s adjacency data (ID %ld) has %ld adjacency entries.\n", i, name, id, n );
             result = 1;
             if( n < 0 ) break; /* data is corrupt.  don't proceed further */
         }
@@ -683,14 +665,12 @@ static int check_valid_adj_list( long start_id, long count, const long* data, lo
 
     if( invalid_id )
     {
-        printf( "%ld entries in %s adjacency data were for entities not in %s\n", invalid_id, name,
-                name );
+        printf( "%ld entries in %s adjacency data were for entities not in %s\n", invalid_id, name, name );
         result = 1;
     }
     if( invalid_vals )
     {
-        printf( "%ld entries in %s adjacency data contained invalid adjacent entity ids\n",
-                invalid_id, name );
+        printf( "%ld entries in %s adjacency data contained invalid adjacent entity ids\n", invalid_id, name );
         result = 1;
     }
     return result;
@@ -708,8 +688,7 @@ int check_valid_sets( mhdf_FileHandle file, struct mhdf_FileDesc* desc )
     meta = mhdf_openSetMeta( file, &count, &start_id, &status );
     if( mhdf_isError( &status ) )
     {
-        fprintf( stderr, "Internal error opening set description table: %s\n",
-                 mhdf_message( &status ) );
+        fprintf( stderr, "Internal error opening set description table: %s\n", mhdf_message( &status ) );
         return 1;
     }
 
@@ -717,10 +696,7 @@ int check_valid_sets( mhdf_FileHandle file, struct mhdf_FileDesc* desc )
     {
         handle = mhdf_openSetData( file, &data_len, &status );
         if( mhdf_isError( &status ) )
-        {
-            fprintf( stderr, "Internal error opening set contents table: %s\n",
-                     mhdf_message( &status ) );
-        }
+        { fprintf( stderr, "Internal error opening set contents table: %s\n", mhdf_message( &status ) ); }
         else
         {
             result += check_valid_set_contents( desc, start_id, count, meta, handle, data_len );
@@ -733,8 +709,7 @@ int check_valid_sets( mhdf_FileHandle file, struct mhdf_FileDesc* desc )
         handle = mhdf_openSetChildren( file, &data_len, &status );
         if( mhdf_isError( &status ) )
         {
-            fprintf( stderr, "Internal error opening set child table: %s\n",
-                     mhdf_message( &status ) );
+            fprintf( stderr, "Internal error opening set child table: %s\n", mhdf_message( &status ) );
             mhdf_closeData( file, meta, &status );
         }
         else
@@ -749,8 +724,7 @@ int check_valid_sets( mhdf_FileHandle file, struct mhdf_FileDesc* desc )
         handle = mhdf_openSetParents( file, &data_len, &status );
         if( mhdf_isError( &status ) )
         {
-            fprintf( stderr, "Internal error opening set child table: %s\n",
-                     mhdf_message( &status ) );
+            fprintf( stderr, "Internal error opening set child table: %s\n", mhdf_message( &status ) );
             mhdf_closeData( file, meta, &status );
         }
         else
@@ -782,8 +756,8 @@ static int ranges_contain_duplicates( long* ranges, long nranges )
     return 0;
 }
 
-static int check_valid_parents_children( long start_id, long count, hid_t meta_handle,
-                                         hid_t data_handle, long data_len, int parents )
+static int check_valid_parents_children( long start_id, long count, hid_t meta_handle, hid_t data_handle, long data_len,
+                                         int parents )
 {
     mhdf_Status status;
     long *      indices, *contents;
@@ -804,8 +778,7 @@ static int check_valid_parents_children( long start_id, long count, hid_t meta_h
         mhdf_readSetChildEndIndices( meta_handle, 0, count, H5T_NATIVE_LONG, indices, &status );
     if( mhdf_isError( &status ) )
     {
-        fprintf( stderr, "Internal error reading set %s end indices: %s\n", name,
-                 mhdf_message( &status ) );
+        fprintf( stderr, "Internal error reading set %s end indices: %s\n", name, mhdf_message( &status ) );
         free( indices );
         return 1;
     }
@@ -840,9 +813,7 @@ static int check_valid_parents_children( long start_id, long count, hid_t meta_h
         }
         else if( contains_duplicates( contents + start, n ) )
         {
-            if( verbose )
-                printf( "Set %ld (ID %ld) %s list contains duplicate IDs.\n", i, start_id + i,
-                        name );
+            if( verbose ) printf( "Set %ld (ID %ld) %s list contains duplicate IDs.\n", i, start_id + i, name );
             ++invalid_dup;
         }
     }
@@ -894,7 +865,7 @@ static long* all_id_ranges( struct mhdf_FileDesc* desc, int include_null, int* n
 {
     int                  i, num_ranges = 0;
     struct mhdf_EntDesc* group;
-    long* ranges = malloc( 2 * sizeof( long ) * ( desc->num_elem_desc + 2 + !!include_null ) );
+    long*                ranges = malloc( 2 * sizeof( long ) * ( desc->num_elem_desc + 2 + !!include_null ) );
     if( include_null )
     {
         num_ranges = 1;
@@ -910,8 +881,7 @@ static long* all_id_ranges( struct mhdf_FileDesc* desc, int include_null, int* n
         else
             group = &desc->elems[ i ].desc;
 
-        if( num_ranges &&
-            ranges[ 2 * num_ranges - 2 ] + ranges[ 2 * num_ranges - 1 ] == group->start_id )
+        if( num_ranges && ranges[ 2 * num_ranges - 2 ] + ranges[ 2 * num_ranges - 1 ] == group->start_id )
         { ranges[ 2 * num_ranges - 1 ] += group->count; }
         else
         {
@@ -925,8 +895,8 @@ static long* all_id_ranges( struct mhdf_FileDesc* desc, int include_null, int* n
     return ranges;
 }
 
-static int check_valid_set_contents( struct mhdf_FileDesc* desc, long start_id, long count,
-                                     hid_t meta_handle, hid_t data_handle, long data_len )
+static int check_valid_set_contents( struct mhdf_FileDesc* desc, long start_id, long count, hid_t meta_handle,
+                                     hid_t data_handle, long data_len )
 {
     mhdf_Status status;
     long *      indices, *contents;
@@ -941,8 +911,7 @@ static int check_valid_set_contents( struct mhdf_FileDesc* desc, long start_id, 
     mhdf_readSetContentEndIndices( meta_handle, 0, count, H5T_NATIVE_LONG, indices, &status );
     if( mhdf_isError( &status ) )
     {
-        fprintf( stderr, "Internal error reading set content end indices: %s\n",
-                 mhdf_message( &status ) );
+        fprintf( stderr, "Internal error reading set content end indices: %s\n", mhdf_message( &status ) );
         free( indices );
         return 1;
     }
@@ -1004,8 +973,7 @@ static int check_valid_set_contents( struct mhdf_FileDesc* desc, long start_id, 
         }
         if( !tmpresult )
         {
-            if( verbose )
-                printf( "Set %ld (ID %ld) has invalid content IDs.\n", i + 1, start_id + i );
+            if( verbose ) printf( "Set %ld (ID %ld) has invalid content IDs.\n", i + 1, start_id + i );
             ++invalid_handle;
             continue;
         }
@@ -1019,8 +987,7 @@ static int check_valid_set_contents( struct mhdf_FileDesc* desc, long start_id, 
         if( tmpresult )
         {
             if( verbose )
-                printf( "Set %ld (ID %ld) is not ordered but contains duplicate handles.\n", i + 1,
-                        start_id + i );
+                printf( "Set %ld (ID %ld) is not ordered but contains duplicate handles.\n", i + 1, start_id + i );
             ++invalid_dup;
         }
     }
@@ -1092,8 +1059,8 @@ static int check_valid_tag( int tag_idx, mhdf_FileHandle file, struct mhdf_FileD
         mhdf_readSparseTagEntities( handles[ 0 ], 0, count, H5T_NATIVE_LONG, ids, &status );
         if( mhdf_isError( &status ) )
         {
-            fprintf( stderr, "Internal error reading sparse entities for tag \"%s\": %s\n",
-                     tag->name, mhdf_message( &status ) );
+            fprintf( stderr, "Internal error reading sparse entities for tag \"%s\": %s\n", tag->name,
+                     mhdf_message( &status ) );
             mhdf_closeData( file, handles[ 0 ], &status );
             mhdf_closeData( file, handles[ 1 ], &status );
             free( ids );
@@ -1110,8 +1077,7 @@ static int check_valid_tag( int tag_idx, mhdf_FileHandle file, struct mhdf_FileD
         else if( contains_duplicates( ids, count ) )
         {
             ++result;
-            printf( "Sparse data for tag \"%s\" has duplicate values for one or more entities\n",
-                    tag->name );
+            printf( "Sparse data for tag \"%s\" has duplicate values for one or more entities\n", tag->name );
         }
         free( ranges );
 
@@ -1182,8 +1148,8 @@ static int check_valid_tag( int tag_idx, mhdf_FileHandle file, struct mhdf_FileD
         mhdf_readTagValues( handles[ 1 ], 0, count, h5type, ids, &status );
         if( mhdf_isError( &status ) )
         {
-            fprintf( stderr, "Internal error reading sparse values for handle tag \"%s\": %s\n",
-                     tag->name, mhdf_message( &status ) );
+            fprintf( stderr, "Internal error reading sparse values for handle tag \"%s\": %s\n", tag->name,
+                     mhdf_message( &status ) );
             mhdf_closeData( file, handles[ 1 ], &status );
             free( ids );
             free( ranges );
@@ -1195,9 +1161,7 @@ static int check_valid_tag( int tag_idx, mhdf_FileHandle file, struct mhdf_FileD
         if( !ids_contained( ids, tag->size * count, ranges, nranges ) )
         {
             ++result;
-            printf(
-                "Sparse data for one or more entities with handle tag \"%s\" has invalid ID(s).\n",
-                tag->name );
+            printf( "Sparse data for one or more entities with handle tag \"%s\" has invalid ID(s).\n", tag->name );
         }
         free( ids );
     }
@@ -1223,8 +1187,8 @@ static int check_valid_tag( int tag_idx, mhdf_FileHandle file, struct mhdf_FileD
         handles[ 0 ] = mhdf_openDenseTagData( file, tag->name, name, &count, &status );
         if( mhdf_isError( &status ) )
         {
-            fprintf( stderr, "Internal dense values for handle tag \"%s\" on \"%s\": %s\n",
-                     tag->name, name, mhdf_message( &status ) );
+            fprintf( stderr, "Internal dense values for handle tag \"%s\" on \"%s\": %s\n", tag->name, name,
+                     mhdf_message( &status ) );
             ++result;
             continue;
         }
@@ -1233,9 +1197,8 @@ static int check_valid_tag( int tag_idx, mhdf_FileHandle file, struct mhdf_FileD
         mhdf_readTagValues( handles[ 0 ], 0, count, h5type, ids, &status );
         if( mhdf_isError( &status ) )
         {
-            fprintf( stderr,
-                     "Internal error reading dense values for handle tag \"%s\" on \"%s\": %s\n",
-                     tag->name, name, mhdf_message( &status ) );
+            fprintf( stderr, "Internal error reading dense values for handle tag \"%s\" on \"%s\": %s\n", tag->name,
+                     name, mhdf_message( &status ) );
             mhdf_closeData( file, handles[ 0 ], &status );
             free( ids );
             ++result;
@@ -1288,8 +1251,8 @@ static int check_valid_var_len_tag( int tag_idx, mhdf_FileHandle file, struct mh
         mhdf_readSparseTagEntities( handles[ 0 ], 0, count, H5T_NATIVE_LONG, ids, &status );
         if( mhdf_isError( &status ) )
         {
-            fprintf( stderr, "Internal error reading sparse entities for tag \"%s\": %s\n",
-                     tag->name, mhdf_message( &status ) );
+            fprintf( stderr, "Internal error reading sparse entities for tag \"%s\": %s\n", tag->name,
+                     mhdf_message( &status ) );
             mhdf_closeData( file, handles[ 0 ], &status );
             mhdf_closeData( file, handles[ 1 ], &status );
             mhdf_closeData( file, handles[ 2 ], &status );
@@ -1307,16 +1270,15 @@ static int check_valid_var_len_tag( int tag_idx, mhdf_FileHandle file, struct mh
         else if( contains_duplicates( ids, count ) )
         {
             ++result;
-            printf( "Sparse data for tag \"%s\" has duplicate values for one or more entities\n",
-                    tag->name );
+            printf( "Sparse data for tag \"%s\" has duplicate values for one or more entities\n", tag->name );
         }
         free( ranges );
 
         mhdf_readSparseTagIndices( handles[ 2 ], 0, count, H5T_NATIVE_LONG, ids, &status );
         if( mhdf_isError( &status ) )
         {
-            fprintf( stderr, "Internal error reading indices for variable length tag \"%s\": %s\n",
-                     tag->name, mhdf_message( &status ) );
+            fprintf( stderr, "Internal error reading indices for variable length tag \"%s\": %s\n", tag->name,
+                     mhdf_message( &status ) );
             mhdf_closeData( file, handles[ 1 ], &status );
             mhdf_closeData( file, handles[ 2 ], &status );
             free( ids );
@@ -1324,8 +1286,7 @@ static int check_valid_var_len_tag( int tag_idx, mhdf_FileHandle file, struct mh
         }
         mhdf_closeData( file, handles[ 2 ], &status );
 
-        if( check_valid_end_indices( ids, count, 1, 0, num_val, "Variable-length tag", tag->name ) )
-            ++result;
+        if( check_valid_end_indices( ids, count, 1, 0, num_val, "Variable-length tag", tag->name ) ) ++result;
         free( ids );
     }
 
@@ -1336,14 +1297,12 @@ static int check_valid_var_len_tag( int tag_idx, mhdf_FileHandle file, struct mh
     }
 
     ranges = all_id_ranges( desc, 1, &nranges );
-    if( tag->default_value &&
-        !ids_contained( tag->default_value, tag->default_value_size, ranges, nranges ) )
+    if( tag->default_value && !ids_contained( tag->default_value, tag->default_value_size, ranges, nranges ) )
     {
         ++result;
         printf( "Handle tag \"%s\" has invalid ID(s) in its default value.\n", tag->name );
     }
-    if( tag->global_value &&
-        !ids_contained( tag->global_value, tag->global_value_size, ranges, nranges ) )
+    if( tag->global_value && !ids_contained( tag->global_value, tag->global_value_size, ranges, nranges ) )
     {
         ++result;
         printf( "Handle tag \"%s\" has invalid ID(s) in its global/mesh value.\n", tag->name );
@@ -1355,9 +1314,8 @@ static int check_valid_var_len_tag( int tag_idx, mhdf_FileHandle file, struct mh
         mhdf_readTagValues( handles[ 1 ], 0, num_val, H5T_NATIVE_LONG, ids, &status );
         if( mhdf_isError( &status ) )
         {
-            fprintf( stderr,
-                     "Internal error reading values for variable-length handle tag \"%s\": %s\n",
-                     tag->name, mhdf_message( &status ) );
+            fprintf( stderr, "Internal error reading values for variable-length handle tag \"%s\": %s\n", tag->name,
+                     mhdf_message( &status ) );
             mhdf_closeData( file, handles[ 1 ], &status );
             free( ids );
             free( ranges );

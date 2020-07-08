@@ -5,14 +5,14 @@
 namespace moab
 {
 
-UnstructuredElemSeq::UnstructuredElemSeq( EntityHandle shandle, EntityID entity_count,
-                                          unsigned nodes_per_entity, SequenceData* dat )
+UnstructuredElemSeq::UnstructuredElemSeq( EntityHandle shandle, EntityID entity_count, unsigned nodes_per_entity,
+                                          SequenceData* dat )
     : ElementSequence( shandle, entity_count, nodes_per_entity, dat )
 {
 }
 
-UnstructuredElemSeq::UnstructuredElemSeq( EntityHandle shandle, EntityID entity_count,
-                                          unsigned nodes_per_entity, EntityID data_size )
+UnstructuredElemSeq::UnstructuredElemSeq( EntityHandle shandle, EntityID entity_count, unsigned nodes_per_entity,
+                                          EntityID data_size )
     : ElementSequence( shandle, entity_count, nodes_per_entity,
                        new SequenceData( 1, shandle, shandle + data_size - 1 ) )
 {
@@ -39,16 +39,14 @@ SequenceData* UnstructuredElemSeq::create_data_subset( EntityHandle start, Entit
     return data( )->subset( start, end, &esize );
 }
 
-void UnstructuredElemSeq::get_const_memory_use( unsigned long& bytes_per_entity,
-                                                unsigned long& size_of_sequence ) const
+void UnstructuredElemSeq::get_const_memory_use( unsigned long& bytes_per_entity, unsigned long& size_of_sequence ) const
 {
     bytes_per_entity = nodes_per_element( ) * sizeof( EntityHandle );
     size_of_sequence = sizeof( *this );
 }
 
-ErrorCode UnstructuredElemSeq::get_connectivity( EntityHandle                 handle,
-                                                 std::vector< EntityHandle >& connect,
-                                                 bool                         topological ) const
+ErrorCode UnstructuredElemSeq::get_connectivity( EntityHandle handle, std::vector< EntityHandle >& connect,
+                                                 bool topological ) const
 {
     EntityHandle const* conn = get_array( ) + nodes_per_element( ) * ( handle - start_handle( ) );
     int                 len = topological ? CN::VerticesPerEntity( type( ) ) : nodes_per_element( );
@@ -57,17 +55,15 @@ ErrorCode UnstructuredElemSeq::get_connectivity( EntityHandle                 ha
     return MB_SUCCESS;
 }
 
-ErrorCode UnstructuredElemSeq::get_connectivity( EntityHandle handle, EntityHandle const*& conn_ptr,
-                                                 int& len, bool topological,
-                                                 std::vector< EntityHandle >* ) const
+ErrorCode UnstructuredElemSeq::get_connectivity( EntityHandle handle, EntityHandle const*& conn_ptr, int& len,
+                                                 bool topological, std::vector< EntityHandle >* ) const
 {
     conn_ptr = get_array( ) + nodes_per_element( ) * ( handle - start_handle( ) );
     len = topological ? CN::VerticesPerEntity( type( ) ) : nodes_per_element( );
     return MB_SUCCESS;
 }
 
-ErrorCode UnstructuredElemSeq::set_connectivity( EntityHandle handle, EntityHandle const* connect,
-                                                 int connect_length )
+ErrorCode UnstructuredElemSeq::set_connectivity( EntityHandle handle, EntityHandle const* connect, int connect_length )
 {
     if( (unsigned)connect_length != nodes_per_element( ) ) return MB_INDEX_OUT_OF_RANGE;
     EntityHandle* conn_ptr = get_array( ) + nodes_per_element( ) * ( handle - start_handle( ) );

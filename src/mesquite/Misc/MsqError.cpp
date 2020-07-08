@@ -44,28 +44,27 @@ namespace MBMesquite
 
 const char* MsqError::error_message( ) const
 {
-    static const char* const error_messages[] = {
-        "No Error",
-        "<unknown>",
-        "Out of memory",
-        "Invalid argument",
-        "Data not initialized",
-        "Invalid state",
-        "File access error",
-        "File format error",
-        "Syntax error",
-        "I/O error",
-        "Invalid mesh",
-        "No storage mode for PatchData",
-        "Not implemented",
-        "Internal error",
-        "Interrupted",
-        "Duplicate tag name",
-        "Tag not found",
-        "Unsupported element type",
-        "Parallel Error - error occurred on at least one processor",
-        "barruer violated when processing barrier Target Metric",
-        "Invalid Error Code" };
+    static const char* const error_messages[] = { "No Error",
+                                                  "<unknown>",
+                                                  "Out of memory",
+                                                  "Invalid argument",
+                                                  "Data not initialized",
+                                                  "Invalid state",
+                                                  "File access error",
+                                                  "File format error",
+                                                  "Syntax error",
+                                                  "I/O error",
+                                                  "Invalid mesh",
+                                                  "No storage mode for PatchData",
+                                                  "Not implemented",
+                                                  "Internal error",
+                                                  "Interrupted",
+                                                  "Duplicate tag name",
+                                                  "Tag not found",
+                                                  "Unsupported element type",
+                                                  "Parallel Error - error occurred on at least one processor",
+                                                  "barruer violated when processing barrier Target Metric",
+                                                  "Invalid Error Code" };
 
     /* If this is ever false, it should be caught by a unit test.
        Do an assert here so the unit test fails.
@@ -158,8 +157,7 @@ std::ostream& operator<<( std::ostream& str, const MsqError::Trace& tr )
 
 std::ostream& operator<<( std::ostream& str, const MsqError& err )
 {
-    str << "MESQUITE ERROR " << (int)err.error_code( ) << " : " << err.error_message( )
-        << std::endl;
+    str << "MESQUITE ERROR " << (int)err.error_code( ) << " : " << err.error_message( ) << std::endl;
 
     MsqError::StackTrace::const_iterator       iter = err.stack( ).begin( );
     const MsqError::StackTrace::const_iterator end = err.stack( ).end( );

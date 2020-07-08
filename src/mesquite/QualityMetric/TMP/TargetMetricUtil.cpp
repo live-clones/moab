@@ -127,8 +127,7 @@ static inline void append_elem_samples( PatchData& pd, size_t e, std::vector< si
         *( i++ ) = ElemSampleQM::handle( Sample( 3, 0 ), e );
 }
 
-void get_sample_pt_evaluations( PatchData& pd, std::vector< size_t >& handles, bool free,
-                                MsqError& err )
+void get_sample_pt_evaluations( PatchData& pd, std::vector< size_t >& handles, bool free, MsqError& err )
 {
     handles.clear( );
     std::vector< size_t > elems;
@@ -137,8 +136,7 @@ void get_sample_pt_evaluations( PatchData& pd, std::vector< size_t >& handles, b
         append_elem_samples( pd, *i, handles );
 }
 
-void get_elem_sample_points( PatchData& pd, size_t elem, std::vector< size_t >& handles,
-                             MsqError& /*err*/ )
+void get_elem_sample_points( PatchData& pd, size_t elem, std::vector< size_t >& handles, MsqError& /*err*/ )
 {
     handles.clear( );
     append_elem_samples( pd, elem, handles );

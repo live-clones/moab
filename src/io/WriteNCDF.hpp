@@ -95,10 +95,10 @@ class WriteNCDF : public WriterIface
     virtual ~WriteNCDF( );
 
     //! writes out an ExoII file
-    ErrorCode write_file( const char* exodus_file_name, const bool overwrite,
-                          const FileOptions& opts, const EntityHandle* output_list,
-                          const int num_sets, const std::vector< std::string >& qa_records,
-                          const Tag* = NULL, int = 0, int user_dimension = 3 );
+    ErrorCode write_file( const char* exodus_file_name, const bool overwrite, const FileOptions& opts,
+                          const EntityHandle* output_list, const int num_sets,
+                          const std::vector< std::string >& qa_records, const Tag* = NULL, int = 0,
+                          int                               user_dimension = 3 );
 
   protected:
     //! number of dimensions in this exo file
@@ -148,24 +148,20 @@ class WriteNCDF : public WriterIface
 
     int repeat_face_blocks;  // only to make paraview and visit happy
 
-    ErrorCode gather_mesh_information( ExodusMeshInfo&                  mesh_info,
-                                       std::vector< MaterialSetData >&  block_info,
+    ErrorCode gather_mesh_information( ExodusMeshInfo& mesh_info, std::vector< MaterialSetData >& block_info,
                                        std::vector< NeumannSetData >&   sideset_info,
                                        std::vector< DirichletSetData >& nodeset_info,
-                                       std::vector< EntityHandle >&     blocks,
-                                       std::vector< EntityHandle >&     sidesets,
-                                       std::vector< EntityHandle >&     nodesets );
+                                       std::vector< EntityHandle >& blocks, std::vector< EntityHandle >& sidesets,
+                                       std::vector< EntityHandle >& nodesets );
 
     ErrorCode write_header( ExodusMeshInfo& mesh_info, std::vector< MaterialSetData >& block_info,
-                            std::vector< NeumannSetData >&   sideset_info,
-                            std::vector< DirichletSetData >& nodeset_info, const char* filename );
+                            std::vector< NeumannSetData >& sideset_info, std::vector< DirichletSetData >& nodeset_info,
+                            const char* filename );
 
-    ErrorCode initialize_exodus_file( ExodusMeshInfo&                  mesh_info,
-                                      std::vector< MaterialSetData >&  block_data,
+    ErrorCode initialize_exodus_file( ExodusMeshInfo& mesh_info, std::vector< MaterialSetData >& block_data,
                                       std::vector< NeumannSetData >&   sideset_data,
-                                      std::vector< DirichletSetData >& nodeset_data,
-                                      const char* title_string, bool write_maps = true,
-                                      bool write_sideset_distribution_factors = true );
+                                      std::vector< DirichletSetData >& nodeset_data, const char* title_string,
+                                      bool write_maps = true, bool write_sideset_distribution_factors = true );
 
     ErrorCode write_qa_string( const char* string, int record_number, int record_position );
 
@@ -174,18 +170,16 @@ class WriteNCDF : public WriterIface
     ErrorCode write_nodes( int num_nodes, Range& nodes, int dimension );
 
     ErrorCode write_poly_faces( ExodusMeshInfo& mesh_info );
-    ErrorCode write_elementblocks( ExodusMeshInfo&                 mesh_info,
-                                   std::vector< MaterialSetData >& block_data );
+    ErrorCode write_elementblocks( ExodusMeshInfo& mesh_info, std::vector< MaterialSetData >& block_data );
 
-    ErrorCode write_exodus_integer_variable( const char* variable_name, int* variable_array,
-                                             int start_position, int number_values );
+    ErrorCode write_exodus_integer_variable( const char* variable_name, int* variable_array, int start_position,
+                                             int number_values );
 
     ErrorCode write_global_node_order_map( int num_nodes, Range& nodes );
     ErrorCode write_global_element_order_map( int num_elements );
     ErrorCode write_element_order_map( int num_elements );
 
-    ErrorCode write_BCs( std::vector< NeumannSetData >&   sidesets,
-                         std::vector< DirichletSetData >& nodesets );
+    ErrorCode write_BCs( std::vector< NeumannSetData >& sidesets, std::vector< DirichletSetData >& nodesets );
 
     ErrorCode find_side_element_type( const int element_id, ExoIIElementType& type );
 
@@ -198,11 +192,9 @@ class WriteNCDF : public WriterIface
     //! recursive function; given a meshset handle, get the entities and put them
     //! on the right list, then call recursively for any contained meshsets, first
     //! checking for sense reversals
-    ErrorCode get_sideset_elems( EntityHandle sideset, int current_sense, Range& forward_elems,
-                                 Range& reverse_elems );
+    ErrorCode get_sideset_elems( EntityHandle sideset, int current_sense, Range& forward_elems, Range& reverse_elems );
 
-    ErrorCode get_valid_sides( Range& elems, ExodusMeshInfo& mesh_info, const int sense,
-                               NeumannSetData& sideset_data );
+    ErrorCode get_valid_sides( Range& elems, ExodusMeshInfo& mesh_info, const int sense, NeumannSetData& sideset_data );
 
     //! get the time and date in strings
     static void time_and_date( char* time_string, char* date_string );

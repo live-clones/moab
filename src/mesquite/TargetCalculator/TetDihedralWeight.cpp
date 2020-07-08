@@ -61,9 +61,9 @@ double TetDihedralWeight::get_weight( PatchData& pd, size_t element, Sample, Msq
     if( refMesh )
     {
         const Mesh::VertexHandle* vtx_hdl = pd.get_vertex_handles_array( );
-        Mesh::VertexHandle        handles[] = { vtx_hdl[ indices[ 0 ] ], vtx_hdl[ indices[ 1 ] ],
-                                         vtx_hdl[ indices[ 2 ] ], vtx_hdl[ indices[ 3 ] ] };
-        Vector3D                  coords[ 4 ];
+        Mesh::VertexHandle handles[] = { vtx_hdl[ indices[ 0 ] ], vtx_hdl[ indices[ 1 ] ], vtx_hdl[ indices[ 2 ] ],
+                                         vtx_hdl[ indices[ 3 ] ] };
+        Vector3D           coords[ 4 ];
         refMesh->get_reference_vertex_coordinates( handles, 4, coords, err );
         MSQ_ERRZERO( err );
 

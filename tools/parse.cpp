@@ -368,16 +368,15 @@ int parse_tag_create( char* name, TagSpec& result, Interface* iface )
             }
             else if( rval == MB_ENTITY_NOT_FOUND || memcmp( &value[ 0 ], result.value, esize ) )
             {
-                std::cerr << "Tag already exists and default value doesn't match: " << name
-                          << std::endl;
+                std::cerr << "Tag already exists and default value doesn't match: " << name << std::endl;
                 return 1;
             }
         }
     }
     else
     {
-        ErrorCode rval = iface->tag_get_handle( name, count, type, result.handle,
-                                                MB_TAG_SPARSE | MB_TAG_CREAT, result.value );
+        ErrorCode rval =
+            iface->tag_get_handle( name, count, type, result.handle, MB_TAG_SPARSE | MB_TAG_CREAT, result.value );
         if( MB_SUCCESS != rval )
         {
             std::cerr << "Failed to create tag: " << name << std::endl;

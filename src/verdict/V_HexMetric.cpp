@@ -74,41 +74,29 @@ C_FUNC_DEF void v_set_hex_size( double size )
 //! make VerdictVectors from coordinates
 void make_hex_edges( double coordinates[][ 3 ], VerdictVector edges[ 12 ] )
 {
-    edges[ 0 ].set( coordinates[ 1 ][ 0 ] - coordinates[ 0 ][ 0 ],
-                    coordinates[ 1 ][ 1 ] - coordinates[ 0 ][ 1 ],
+    edges[ 0 ].set( coordinates[ 1 ][ 0 ] - coordinates[ 0 ][ 0 ], coordinates[ 1 ][ 1 ] - coordinates[ 0 ][ 1 ],
                     coordinates[ 1 ][ 2 ] - coordinates[ 0 ][ 2 ] );
-    edges[ 1 ].set( coordinates[ 2 ][ 0 ] - coordinates[ 1 ][ 0 ],
-                    coordinates[ 2 ][ 1 ] - coordinates[ 1 ][ 1 ],
+    edges[ 1 ].set( coordinates[ 2 ][ 0 ] - coordinates[ 1 ][ 0 ], coordinates[ 2 ][ 1 ] - coordinates[ 1 ][ 1 ],
                     coordinates[ 2 ][ 2 ] - coordinates[ 1 ][ 2 ] );
-    edges[ 2 ].set( coordinates[ 3 ][ 0 ] - coordinates[ 2 ][ 0 ],
-                    coordinates[ 3 ][ 1 ] - coordinates[ 2 ][ 1 ],
+    edges[ 2 ].set( coordinates[ 3 ][ 0 ] - coordinates[ 2 ][ 0 ], coordinates[ 3 ][ 1 ] - coordinates[ 2 ][ 1 ],
                     coordinates[ 3 ][ 2 ] - coordinates[ 2 ][ 2 ] );
-    edges[ 3 ].set( coordinates[ 0 ][ 0 ] - coordinates[ 3 ][ 0 ],
-                    coordinates[ 0 ][ 1 ] - coordinates[ 3 ][ 1 ],
+    edges[ 3 ].set( coordinates[ 0 ][ 0 ] - coordinates[ 3 ][ 0 ], coordinates[ 0 ][ 1 ] - coordinates[ 3 ][ 1 ],
                     coordinates[ 0 ][ 2 ] - coordinates[ 3 ][ 2 ] );
-    edges[ 4 ].set( coordinates[ 5 ][ 0 ] - coordinates[ 4 ][ 0 ],
-                    coordinates[ 5 ][ 1 ] - coordinates[ 4 ][ 1 ],
+    edges[ 4 ].set( coordinates[ 5 ][ 0 ] - coordinates[ 4 ][ 0 ], coordinates[ 5 ][ 1 ] - coordinates[ 4 ][ 1 ],
                     coordinates[ 5 ][ 2 ] - coordinates[ 4 ][ 2 ] );
-    edges[ 5 ].set( coordinates[ 6 ][ 0 ] - coordinates[ 5 ][ 0 ],
-                    coordinates[ 6 ][ 1 ] - coordinates[ 5 ][ 1 ],
+    edges[ 5 ].set( coordinates[ 6 ][ 0 ] - coordinates[ 5 ][ 0 ], coordinates[ 6 ][ 1 ] - coordinates[ 5 ][ 1 ],
                     coordinates[ 6 ][ 2 ] - coordinates[ 5 ][ 2 ] );
-    edges[ 6 ].set( coordinates[ 7 ][ 0 ] - coordinates[ 6 ][ 0 ],
-                    coordinates[ 7 ][ 1 ] - coordinates[ 6 ][ 1 ],
+    edges[ 6 ].set( coordinates[ 7 ][ 0 ] - coordinates[ 6 ][ 0 ], coordinates[ 7 ][ 1 ] - coordinates[ 6 ][ 1 ],
                     coordinates[ 7 ][ 2 ] - coordinates[ 6 ][ 2 ] );
-    edges[ 7 ].set( coordinates[ 4 ][ 0 ] - coordinates[ 7 ][ 0 ],
-                    coordinates[ 4 ][ 1 ] - coordinates[ 7 ][ 1 ],
+    edges[ 7 ].set( coordinates[ 4 ][ 0 ] - coordinates[ 7 ][ 0 ], coordinates[ 4 ][ 1 ] - coordinates[ 7 ][ 1 ],
                     coordinates[ 4 ][ 2 ] - coordinates[ 7 ][ 2 ] );
-    edges[ 8 ].set( coordinates[ 4 ][ 0 ] - coordinates[ 0 ][ 0 ],
-                    coordinates[ 4 ][ 1 ] - coordinates[ 0 ][ 1 ],
+    edges[ 8 ].set( coordinates[ 4 ][ 0 ] - coordinates[ 0 ][ 0 ], coordinates[ 4 ][ 1 ] - coordinates[ 0 ][ 1 ],
                     coordinates[ 4 ][ 2 ] - coordinates[ 0 ][ 2 ] );
-    edges[ 9 ].set( coordinates[ 5 ][ 0 ] - coordinates[ 1 ][ 0 ],
-                    coordinates[ 5 ][ 1 ] - coordinates[ 1 ][ 1 ],
+    edges[ 9 ].set( coordinates[ 5 ][ 0 ] - coordinates[ 1 ][ 0 ], coordinates[ 5 ][ 1 ] - coordinates[ 1 ][ 1 ],
                     coordinates[ 5 ][ 2 ] - coordinates[ 1 ][ 2 ] );
-    edges[ 10 ].set( coordinates[ 6 ][ 0 ] - coordinates[ 2 ][ 0 ],
-                     coordinates[ 6 ][ 1 ] - coordinates[ 2 ][ 1 ],
+    edges[ 10 ].set( coordinates[ 6 ][ 0 ] - coordinates[ 2 ][ 0 ], coordinates[ 6 ][ 1 ] - coordinates[ 2 ][ 1 ],
                      coordinates[ 6 ][ 2 ] - coordinates[ 2 ][ 2 ] );
-    edges[ 11 ].set( coordinates[ 7 ][ 0 ] - coordinates[ 3 ][ 0 ],
-                     coordinates[ 7 ][ 1 ] - coordinates[ 3 ][ 1 ],
+    edges[ 11 ].set( coordinates[ 7 ][ 0 ] - coordinates[ 3 ][ 0 ], coordinates[ 7 ][ 1 ] - coordinates[ 3 ][ 1 ],
                      coordinates[ 7 ][ 2 ] - coordinates[ 3 ][ 2 ] );
 }
 
@@ -121,8 +109,7 @@ void localize_hex_coordinates( double coordinates[][ 3 ], VerdictVector position
     int ii;
     for( ii = 0; ii < 8; ii++ )
     {
-        position[ ii ].set( coordinates[ ii ][ 0 ], coordinates[ ii ][ 1 ],
-                            coordinates[ ii ][ 2 ] );
+        position[ ii ].set( coordinates[ ii ][ 0 ], coordinates[ ii ][ 1 ], coordinates[ ii ][ 2 ] );
     }
 
     // ... Make centroid of element the center of coordinate system
@@ -163,10 +150,8 @@ void localize_hex_coordinates( double coordinates[][ 3 ], VerdictVector position
 
     for( i = 0; i < 8; i++ )
     {
-        temp =
-            CY * CZ * position[ i ].x( ) + CY * SZ * position[ i ].z( ) + SY * position[ i ].y( );
-        position[ i ].y( -SY * CZ * position[ i ].x( ) - SY * SZ * position[ i ].z( ) +
-                         CY * position[ i ].y( ) );
+        temp = CY * CZ * position[ i ].x( ) + CY * SZ * position[ i ].z( ) + SY * position[ i ].y( );
+        position[ i ].y( -SY * CZ * position[ i ].x( ) - SY * SZ * position[ i ].z( ) + CY * position[ i ].y( ) );
         position[ i ].z( -SZ * position[ i ].x( ) + CZ * position[ i ].z( ) );
         position[ i ].x( temp );
     }
@@ -205,13 +190,11 @@ double safe_ratio3( const double numerator, const double denominator, const doub
 
     const double filter_n = max_ratio * 1.0e-16;
     const double filter_d = 1.0e-16;
-    if( fabs( numerator ) <= filter_n && fabs( denominator ) >= filter_d )
-    { return_value = numerator / denominator; }
+    if( fabs( numerator ) <= filter_n && fabs( denominator ) >= filter_d ) { return_value = numerator / denominator; }
     else
     {
         return_value = fabs( numerator ) / max_ratio >= fabs( denominator )
-                           ? ( ( numerator >= 0.0 && denominator >= 0.0 ) ||
-                                       ( numerator < 0.0 && denominator < 0.0 )
+                           ? ( ( numerator >= 0.0 && denominator >= 0.0 ) || ( numerator < 0.0 && denominator < 0.0 )
                                    ? max_ratio
                                    : -max_ratio )
                            : numerator / denominator;
@@ -226,8 +209,7 @@ double safe_ratio( const double numerator, const double denominator )
     double       return_value;
     const double filter_n = VERDICT_DBL_MAX;
     const double filter_d = VERDICT_DBL_MIN;
-    if( fabs( numerator ) <= filter_n && fabs( denominator ) >= filter_d )
-    { return_value = numerator / denominator; }
+    if( fabs( numerator ) <= filter_n && fabs( denominator ) >= filter_d ) { return_value = numerator / denominator; }
     else
     {
         return_value = VERDICT_DBL_MAX;
@@ -236,16 +218,15 @@ double safe_ratio( const double numerator, const double denominator )
     return return_value;
 }
 
-double condition_comp( const VerdictVector& xxi, const VerdictVector& xet,
-                       const VerdictVector& xze )
+double condition_comp( const VerdictVector& xxi, const VerdictVector& xet, const VerdictVector& xze )
 {
     double det = xxi % ( xet * xze );
 
     if( det <= VERDICT_DBL_MIN ) { return VERDICT_DBL_MAX; }
 
     double term1 = xxi % xxi + xet % xet + xze % xze;
-    double term2 = ( ( xxi * xet ) % ( xxi * xet ) ) + ( ( xet * xze ) % ( xet * xze ) ) +
-                   ( ( xze * xxi ) % ( xze * xxi ) );
+    double term2 =
+        ( ( xxi * xet ) % ( xxi * xet ) ) + ( ( xet * xze ) % ( xet * xze ) ) + ( ( xze * xxi ) % ( xze * xxi ) );
 
     return sqrt( term1 * term2 ) / det;
 }
@@ -267,13 +248,11 @@ double oddy_comp( const VerdictVector& xxi, const VerdictVector& xet, const Verd
     double oddy_metric;
     if( rt_g > VERDICT_DBL_MIN )
     {
-        double norm_G_squared =
-            g11 * g11 + 2.0 * g12 * g12 + 2.0 * g13 * g13 + g22 * g22 + 2.0 * g23 * g23 + g33 * g33;
+        double norm_G_squared = g11 * g11 + 2.0 * g12 * g12 + 2.0 * g13 * g13 + g22 * g22 + 2.0 * g23 * g23 + g33 * g33;
 
         double norm_J_squared = g11 + g22 + g33;
 
-        oddy_metric =
-            ( norm_G_squared - third * norm_J_squared * norm_J_squared ) / pow( rt_g, 4. * third );
+        oddy_metric = ( norm_G_squared - third * norm_J_squared * norm_J_squared ) / pow( rt_g, 4. * third );
     }
 
     else
@@ -726,12 +705,9 @@ C_FUNC_DEF double v_hex_taper( int /*num_nodes*/, double coordinates[][ 3 ] )
     VerdictVector efg13 = calc_hex_efg( 13, node_pos );
     VerdictVector efg23 = calc_hex_efg( 23, node_pos );
 
-    double taper_1 =
-        fabs( safe_ratio( efg12.length( ), VERDICT_MIN( efg1.length( ), efg2.length( ) ) ) );
-    double taper_2 =
-        fabs( safe_ratio( efg13.length( ), VERDICT_MIN( efg1.length( ), efg3.length( ) ) ) );
-    double taper_3 =
-        fabs( safe_ratio( efg23.length( ), VERDICT_MIN( efg2.length( ), efg3.length( ) ) ) );
+    double taper_1 = fabs( safe_ratio( efg12.length( ), VERDICT_MIN( efg1.length( ), efg2.length( ) ) ) );
+    double taper_2 = fabs( safe_ratio( efg13.length( ), VERDICT_MIN( efg1.length( ), efg3.length( ) ) ) );
+    double taper_3 = fabs( safe_ratio( efg23.length( ), VERDICT_MIN( efg2.length( ), efg3.length( ) ) ) );
 
     double taper = (double)VERDICT_MAX( taper_1, VERDICT_MAX( taper_2, taper_3 ) );
 
@@ -838,188 +814,186 @@ C_FUNC_DEF double v_hex_dimension( int /*num_nodes*/, double coordinates[][ 3 ] 
     double z24 = z2 - z4;
     double z52 = z5 - z2;
     double z45 = z4 - z5;
-    gradop[ 1 ][ 1 ] = ( y2 * ( z6 - z3 - z45 ) + y3 * z24 + y4 * ( z3 - z8 - z52 ) +
-                         y5 * ( z8 - z6 - z24 ) + y6 * z52 + y8 * z45 ) /
-                       12.0;
+    gradop[ 1 ][ 1 ] =
+        ( y2 * ( z6 - z3 - z45 ) + y3 * z24 + y4 * ( z3 - z8 - z52 ) + y5 * ( z8 - z6 - z24 ) + y6 * z52 + y8 * z45 ) /
+        12.0;
 
     double z31 = z3 - z1;
     double z63 = z6 - z3;
     double z16 = z1 - z6;
-    gradop[ 2 ][ 1 ] = ( y3 * ( z7 - z4 - z16 ) + y4 * z31 + y1 * ( z4 - z5 - z63 ) +
-                         y6 * ( z5 - z7 - z31 ) + y7 * z63 + y5 * z16 ) /
-                       12.0;
+    gradop[ 2 ][ 1 ] =
+        ( y3 * ( z7 - z4 - z16 ) + y4 * z31 + y1 * ( z4 - z5 - z63 ) + y6 * ( z5 - z7 - z31 ) + y7 * z63 + y5 * z16 ) /
+        12.0;
 
     double z42 = z4 - z2;
     double z74 = z7 - z4;
     double z27 = z2 - z7;
-    gradop[ 3 ][ 1 ] = ( y4 * ( z8 - z1 - z27 ) + y1 * z42 + y2 * ( z1 - z6 - z74 ) +
-                         y7 * ( z6 - z8 - z42 ) + y8 * z74 + y6 * z27 ) /
-                       12.0;
+    gradop[ 3 ][ 1 ] =
+        ( y4 * ( z8 - z1 - z27 ) + y1 * z42 + y2 * ( z1 - z6 - z74 ) + y7 * ( z6 - z8 - z42 ) + y8 * z74 + y6 * z27 ) /
+        12.0;
 
     double z13 = z1 - z3;
     double z81 = z8 - z1;
     double z38 = z3 - z8;
-    gradop[ 4 ][ 1 ] = ( y1 * ( z5 - z2 - z38 ) + y2 * z13 + y3 * ( z2 - z7 - z81 ) +
-                         y8 * ( z7 - z5 - z13 ) + y5 * z81 + y7 * z38 ) /
-                       12.0;
+    gradop[ 4 ][ 1 ] =
+        ( y1 * ( z5 - z2 - z38 ) + y2 * z13 + y3 * ( z2 - z7 - z81 ) + y8 * ( z7 - z5 - z13 ) + y5 * z81 + y7 * z38 ) /
+        12.0;
 
     double z86 = z8 - z6;
     double z18 = z1 - z8;
     double z61 = z6 - z1;
-    gradop[ 5 ][ 1 ] = ( y8 * ( z4 - z7 - z61 ) + y7 * z86 + y6 * ( z7 - z2 - z18 ) +
-                         y1 * ( z2 - z4 - z86 ) + y4 * z18 + y2 * z61 ) /
-                       12.0;
+    gradop[ 5 ][ 1 ] =
+        ( y8 * ( z4 - z7 - z61 ) + y7 * z86 + y6 * ( z7 - z2 - z18 ) + y1 * ( z2 - z4 - z86 ) + y4 * z18 + y2 * z61 ) /
+        12.0;
 
     double z57 = z5 - z7;
     double z25 = z2 - z5;
     double z72 = z7 - z2;
-    gradop[ 6 ][ 1 ] = ( y5 * ( z1 - z8 - z72 ) + y8 * z57 + y7 * ( z8 - z3 - z25 ) +
-                         y2 * ( z3 - z1 - z57 ) + y1 * z25 + y3 * z72 ) /
-                       12.0;
+    gradop[ 6 ][ 1 ] =
+        ( y5 * ( z1 - z8 - z72 ) + y8 * z57 + y7 * ( z8 - z3 - z25 ) + y2 * ( z3 - z1 - z57 ) + y1 * z25 + y3 * z72 ) /
+        12.0;
 
     double z68 = z6 - z8;
     double z36 = z3 - z6;
     double z83 = z8 - z3;
-    gradop[ 7 ][ 1 ] = ( y6 * ( z2 - z5 - z83 ) + y5 * z68 + y8 * ( z5 - z4 - z36 ) +
-                         y3 * ( z4 - z2 - z68 ) + y2 * z36 + y4 * z83 ) /
-                       12.0;
+    gradop[ 7 ][ 1 ] =
+        ( y6 * ( z2 - z5 - z83 ) + y5 * z68 + y8 * ( z5 - z4 - z36 ) + y3 * ( z4 - z2 - z68 ) + y2 * z36 + y4 * z83 ) /
+        12.0;
 
     double z75 = z7 - z5;
     double z47 = z4 - z7;
     double z54 = z5 - z4;
-    gradop[ 8 ][ 1 ] = ( y7 * ( z3 - z6 - z54 ) + y6 * z75 + y5 * ( z6 - z1 - z47 ) +
-                         y4 * ( z1 - z3 - z75 ) + y3 * z47 + y1 * z54 ) /
-                       12.0;
+    gradop[ 8 ][ 1 ] =
+        ( y7 * ( z3 - z6 - z54 ) + y6 * z75 + y5 * ( z6 - z1 - z47 ) + y4 * ( z1 - z3 - z75 ) + y3 * z47 + y1 * z54 ) /
+        12.0;
 
     double x24 = x2 - x4;
     double x52 = x5 - x2;
     double x45 = x4 - x5;
-    gradop[ 1 ][ 2 ] = ( z2 * ( x6 - x3 - x45 ) + z3 * x24 + z4 * ( x3 - x8 - x52 ) +
-                         z5 * ( x8 - x6 - x24 ) + z6 * x52 + z8 * x45 ) /
-                       12.0;
+    gradop[ 1 ][ 2 ] =
+        ( z2 * ( x6 - x3 - x45 ) + z3 * x24 + z4 * ( x3 - x8 - x52 ) + z5 * ( x8 - x6 - x24 ) + z6 * x52 + z8 * x45 ) /
+        12.0;
 
     double x31 = x3 - x1;
     double x63 = x6 - x3;
     double x16 = x1 - x6;
-    gradop[ 2 ][ 2 ] = ( z3 * ( x7 - x4 - x16 ) + z4 * x31 + z1 * ( x4 - x5 - x63 ) +
-                         z6 * ( x5 - x7 - x31 ) + z7 * x63 + z5 * x16 ) /
-                       12.0;
+    gradop[ 2 ][ 2 ] =
+        ( z3 * ( x7 - x4 - x16 ) + z4 * x31 + z1 * ( x4 - x5 - x63 ) + z6 * ( x5 - x7 - x31 ) + z7 * x63 + z5 * x16 ) /
+        12.0;
 
     double x42 = x4 - x2;
     double x74 = x7 - x4;
     double x27 = x2 - x7;
-    gradop[ 3 ][ 2 ] = ( z4 * ( x8 - x1 - x27 ) + z1 * x42 + z2 * ( x1 - x6 - x74 ) +
-                         z7 * ( x6 - x8 - x42 ) + z8 * x74 + z6 * x27 ) /
-                       12.0;
+    gradop[ 3 ][ 2 ] =
+        ( z4 * ( x8 - x1 - x27 ) + z1 * x42 + z2 * ( x1 - x6 - x74 ) + z7 * ( x6 - x8 - x42 ) + z8 * x74 + z6 * x27 ) /
+        12.0;
 
     double x13 = x1 - x3;
     double x81 = x8 - x1;
     double x38 = x3 - x8;
-    gradop[ 4 ][ 2 ] = ( z1 * ( x5 - x2 - x38 ) + z2 * x13 + z3 * ( x2 - x7 - x81 ) +
-                         z8 * ( x7 - x5 - x13 ) + z5 * x81 + z7 * x38 ) /
-                       12.0;
+    gradop[ 4 ][ 2 ] =
+        ( z1 * ( x5 - x2 - x38 ) + z2 * x13 + z3 * ( x2 - x7 - x81 ) + z8 * ( x7 - x5 - x13 ) + z5 * x81 + z7 * x38 ) /
+        12.0;
 
     double x86 = x8 - x6;
     double x18 = x1 - x8;
     double x61 = x6 - x1;
-    gradop[ 5 ][ 2 ] = ( z8 * ( x4 - x7 - x61 ) + z7 * x86 + z6 * ( x7 - x2 - x18 ) +
-                         z1 * ( x2 - x4 - x86 ) + z4 * x18 + z2 * x61 ) /
-                       12.0;
+    gradop[ 5 ][ 2 ] =
+        ( z8 * ( x4 - x7 - x61 ) + z7 * x86 + z6 * ( x7 - x2 - x18 ) + z1 * ( x2 - x4 - x86 ) + z4 * x18 + z2 * x61 ) /
+        12.0;
 
     double x57 = x5 - x7;
     double x25 = x2 - x5;
     double x72 = x7 - x2;
-    gradop[ 6 ][ 2 ] = ( z5 * ( x1 - x8 - x72 ) + z8 * x57 + z7 * ( x8 - x3 - x25 ) +
-                         z2 * ( x3 - x1 - x57 ) + z1 * x25 + z3 * x72 ) /
-                       12.0;
+    gradop[ 6 ][ 2 ] =
+        ( z5 * ( x1 - x8 - x72 ) + z8 * x57 + z7 * ( x8 - x3 - x25 ) + z2 * ( x3 - x1 - x57 ) + z1 * x25 + z3 * x72 ) /
+        12.0;
 
     double x68 = x6 - x8;
     double x36 = x3 - x6;
     double x83 = x8 - x3;
-    gradop[ 7 ][ 2 ] = ( z6 * ( x2 - x5 - x83 ) + z5 * x68 + z8 * ( x5 - x4 - x36 ) +
-                         z3 * ( x4 - x2 - x68 ) + z2 * x36 + z4 * x83 ) /
-                       12.0;
+    gradop[ 7 ][ 2 ] =
+        ( z6 * ( x2 - x5 - x83 ) + z5 * x68 + z8 * ( x5 - x4 - x36 ) + z3 * ( x4 - x2 - x68 ) + z2 * x36 + z4 * x83 ) /
+        12.0;
 
     double x75 = x7 - x5;
     double x47 = x4 - x7;
     double x54 = x5 - x4;
-    gradop[ 8 ][ 2 ] = ( z7 * ( x3 - x6 - x54 ) + z6 * x75 + z5 * ( x6 - x1 - x47 ) +
-                         z4 * ( x1 - x3 - x75 ) + z3 * x47 + z1 * x54 ) /
-                       12.0;
+    gradop[ 8 ][ 2 ] =
+        ( z7 * ( x3 - x6 - x54 ) + z6 * x75 + z5 * ( x6 - x1 - x47 ) + z4 * ( x1 - x3 - x75 ) + z3 * x47 + z1 * x54 ) /
+        12.0;
 
     double y24 = y2 - y4;
     double y52 = y5 - y2;
     double y45 = y4 - y5;
-    gradop[ 1 ][ 3 ] = ( x2 * ( y6 - y3 - y45 ) + x3 * y24 + x4 * ( y3 - y8 - y52 ) +
-                         x5 * ( y8 - y6 - y24 ) + x6 * y52 + x8 * y45 ) /
-                       12.0;
+    gradop[ 1 ][ 3 ] =
+        ( x2 * ( y6 - y3 - y45 ) + x3 * y24 + x4 * ( y3 - y8 - y52 ) + x5 * ( y8 - y6 - y24 ) + x6 * y52 + x8 * y45 ) /
+        12.0;
 
     double y31 = y3 - y1;
     double y63 = y6 - y3;
     double y16 = y1 - y6;
-    gradop[ 2 ][ 3 ] = ( x3 * ( y7 - y4 - y16 ) + x4 * y31 + x1 * ( y4 - y5 - y63 ) +
-                         x6 * ( y5 - y7 - y31 ) + x7 * y63 + x5 * y16 ) /
-                       12.0;
+    gradop[ 2 ][ 3 ] =
+        ( x3 * ( y7 - y4 - y16 ) + x4 * y31 + x1 * ( y4 - y5 - y63 ) + x6 * ( y5 - y7 - y31 ) + x7 * y63 + x5 * y16 ) /
+        12.0;
 
     double y42 = y4 - y2;
     double y74 = y7 - y4;
     double y27 = y2 - y7;
-    gradop[ 3 ][ 3 ] = ( x4 * ( y8 - y1 - y27 ) + x1 * y42 + x2 * ( y1 - y6 - y74 ) +
-                         x7 * ( y6 - y8 - y42 ) + x8 * y74 + x6 * y27 ) /
-                       12.0;
+    gradop[ 3 ][ 3 ] =
+        ( x4 * ( y8 - y1 - y27 ) + x1 * y42 + x2 * ( y1 - y6 - y74 ) + x7 * ( y6 - y8 - y42 ) + x8 * y74 + x6 * y27 ) /
+        12.0;
 
     double y13 = y1 - y3;
     double y81 = y8 - y1;
     double y38 = y3 - y8;
-    gradop[ 4 ][ 3 ] = ( x1 * ( y5 - y2 - y38 ) + x2 * y13 + x3 * ( y2 - y7 - y81 ) +
-                         x8 * ( y7 - y5 - y13 ) + x5 * y81 + x7 * y38 ) /
-                       12.0;
+    gradop[ 4 ][ 3 ] =
+        ( x1 * ( y5 - y2 - y38 ) + x2 * y13 + x3 * ( y2 - y7 - y81 ) + x8 * ( y7 - y5 - y13 ) + x5 * y81 + x7 * y38 ) /
+        12.0;
 
     double y86 = y8 - y6;
     double y18 = y1 - y8;
     double y61 = y6 - y1;
-    gradop[ 5 ][ 3 ] = ( x8 * ( y4 - y7 - y61 ) + x7 * y86 + x6 * ( y7 - y2 - y18 ) +
-                         x1 * ( y2 - y4 - y86 ) + x4 * y18 + x2 * y61 ) /
-                       12.0;
+    gradop[ 5 ][ 3 ] =
+        ( x8 * ( y4 - y7 - y61 ) + x7 * y86 + x6 * ( y7 - y2 - y18 ) + x1 * ( y2 - y4 - y86 ) + x4 * y18 + x2 * y61 ) /
+        12.0;
 
     double y57 = y5 - y7;
     double y25 = y2 - y5;
     double y72 = y7 - y2;
-    gradop[ 6 ][ 3 ] = ( x5 * ( y1 - y8 - y72 ) + x8 * y57 + x7 * ( y8 - y3 - y25 ) +
-                         x2 * ( y3 - y1 - y57 ) + x1 * y25 + x3 * y72 ) /
-                       12.0;
+    gradop[ 6 ][ 3 ] =
+        ( x5 * ( y1 - y8 - y72 ) + x8 * y57 + x7 * ( y8 - y3 - y25 ) + x2 * ( y3 - y1 - y57 ) + x1 * y25 + x3 * y72 ) /
+        12.0;
 
     double y68 = y6 - y8;
     double y36 = y3 - y6;
     double y83 = y8 - y3;
-    gradop[ 7 ][ 3 ] = ( x6 * ( y2 - y5 - y83 ) + x5 * y68 + x8 * ( y5 - y4 - y36 ) +
-                         x3 * ( y4 - y2 - y68 ) + x2 * y36 + x4 * y83 ) /
-                       12.0;
+    gradop[ 7 ][ 3 ] =
+        ( x6 * ( y2 - y5 - y83 ) + x5 * y68 + x8 * ( y5 - y4 - y36 ) + x3 * ( y4 - y2 - y68 ) + x2 * y36 + x4 * y83 ) /
+        12.0;
 
     double y75 = y7 - y5;
     double y47 = y4 - y7;
     double y54 = y5 - y4;
-    gradop[ 8 ][ 3 ] = ( x7 * ( y3 - y6 - y54 ) + x6 * y75 + x5 * ( y6 - y1 - y47 ) +
-                         x4 * ( y1 - y3 - y75 ) + x3 * y47 + x1 * y54 ) /
-                       12.0;
+    gradop[ 8 ][ 3 ] =
+        ( x7 * ( y3 - y6 - y54 ) + x6 * y75 + x5 * ( y6 - y1 - y47 ) + x4 * ( y1 - y3 - y75 ) + x3 * y47 + x1 * y54 ) /
+        12.0;
 
     //     calculate element volume and characteristic element aspect ratio
     //     (used in time step and hourglass control) -
 
-    double volume =
-        coordinates[ 0 ][ 0 ] * gradop[ 1 ][ 1 ] + coordinates[ 1 ][ 0 ] * gradop[ 2 ][ 1 ] +
-        coordinates[ 2 ][ 0 ] * gradop[ 3 ][ 1 ] + coordinates[ 3 ][ 0 ] * gradop[ 4 ][ 1 ] +
-        coordinates[ 4 ][ 0 ] * gradop[ 5 ][ 1 ] + coordinates[ 5 ][ 0 ] * gradop[ 6 ][ 1 ] +
-        coordinates[ 6 ][ 0 ] * gradop[ 7 ][ 1 ] + coordinates[ 7 ][ 0 ] * gradop[ 8 ][ 1 ];
-    double aspect = .5 * SQR( volume ) /
-                    ( SQR( gradop[ 1 ][ 1 ] ) + SQR( gradop[ 2 ][ 1 ] ) + SQR( gradop[ 3 ][ 1 ] ) +
-                      SQR( gradop[ 4 ][ 1 ] ) + SQR( gradop[ 5 ][ 1 ] ) + SQR( gradop[ 6 ][ 1 ] ) +
-                      SQR( gradop[ 7 ][ 1 ] ) + SQR( gradop[ 8 ][ 1 ] ) + SQR( gradop[ 1 ][ 2 ] ) +
-                      SQR( gradop[ 2 ][ 2 ] ) + SQR( gradop[ 3 ][ 2 ] ) + SQR( gradop[ 4 ][ 2 ] ) +
-                      SQR( gradop[ 5 ][ 2 ] ) + SQR( gradop[ 6 ][ 2 ] ) + SQR( gradop[ 7 ][ 2 ] ) +
-                      SQR( gradop[ 8 ][ 2 ] ) + SQR( gradop[ 1 ][ 3 ] ) + SQR( gradop[ 2 ][ 3 ] ) +
-                      SQR( gradop[ 3 ][ 3 ] ) + SQR( gradop[ 4 ][ 3 ] ) + SQR( gradop[ 5 ][ 3 ] ) +
-                      SQR( gradop[ 6 ][ 3 ] ) + SQR( gradop[ 7 ][ 3 ] ) + SQR( gradop[ 8 ][ 3 ] ) );
+    double volume = coordinates[ 0 ][ 0 ] * gradop[ 1 ][ 1 ] + coordinates[ 1 ][ 0 ] * gradop[ 2 ][ 1 ] +
+                    coordinates[ 2 ][ 0 ] * gradop[ 3 ][ 1 ] + coordinates[ 3 ][ 0 ] * gradop[ 4 ][ 1 ] +
+                    coordinates[ 4 ][ 0 ] * gradop[ 5 ][ 1 ] + coordinates[ 5 ][ 0 ] * gradop[ 6 ][ 1 ] +
+                    coordinates[ 6 ][ 0 ] * gradop[ 7 ][ 1 ] + coordinates[ 7 ][ 0 ] * gradop[ 8 ][ 1 ];
+    double aspect =
+        .5 * SQR( volume ) /
+        ( SQR( gradop[ 1 ][ 1 ] ) + SQR( gradop[ 2 ][ 1 ] ) + SQR( gradop[ 3 ][ 1 ] ) + SQR( gradop[ 4 ][ 1 ] ) +
+          SQR( gradop[ 5 ][ 1 ] ) + SQR( gradop[ 6 ][ 1 ] ) + SQR( gradop[ 7 ][ 1 ] ) + SQR( gradop[ 8 ][ 1 ] ) +
+          SQR( gradop[ 1 ][ 2 ] ) + SQR( gradop[ 2 ][ 2 ] ) + SQR( gradop[ 3 ][ 2 ] ) + SQR( gradop[ 4 ][ 2 ] ) +
+          SQR( gradop[ 5 ][ 2 ] ) + SQR( gradop[ 6 ][ 2 ] ) + SQR( gradop[ 7 ][ 2 ] ) + SQR( gradop[ 8 ][ 2 ] ) +
+          SQR( gradop[ 1 ][ 3 ] ) + SQR( gradop[ 2 ][ 3 ] ) + SQR( gradop[ 3 ][ 3 ] ) + SQR( gradop[ 4 ][ 3 ] ) +
+          SQR( gradop[ 5 ][ 3 ] ) + SQR( gradop[ 6 ][ 3 ] ) + SQR( gradop[ 7 ][ 3 ] ) + SQR( gradop[ 8 ][ 3 ] ) );
 
     return (double)sqrt( aspect );
 }
@@ -1045,121 +1019,97 @@ C_FUNC_DEF double v_hex_oddy( int /*num_nodes*/, double coordinates[][ 3 ] )
     current_oddy = oddy_comp( xxi, xet, xze );
     if( current_oddy > oddy ) { oddy = current_oddy; }
 
-    xxi.set( coordinates[ 1 ][ 0 ] - coordinates[ 0 ][ 0 ],
-             coordinates[ 1 ][ 1 ] - coordinates[ 0 ][ 1 ],
+    xxi.set( coordinates[ 1 ][ 0 ] - coordinates[ 0 ][ 0 ], coordinates[ 1 ][ 1 ] - coordinates[ 0 ][ 1 ],
              coordinates[ 1 ][ 2 ] - coordinates[ 0 ][ 2 ] );
 
-    xet.set( coordinates[ 3 ][ 0 ] - coordinates[ 0 ][ 0 ],
-             coordinates[ 3 ][ 1 ] - coordinates[ 0 ][ 1 ],
+    xet.set( coordinates[ 3 ][ 0 ] - coordinates[ 0 ][ 0 ], coordinates[ 3 ][ 1 ] - coordinates[ 0 ][ 1 ],
              coordinates[ 3 ][ 2 ] - coordinates[ 0 ][ 2 ] );
 
-    xze.set( coordinates[ 4 ][ 0 ] - coordinates[ 0 ][ 0 ],
-             coordinates[ 4 ][ 1 ] - coordinates[ 0 ][ 1 ],
+    xze.set( coordinates[ 4 ][ 0 ] - coordinates[ 0 ][ 0 ], coordinates[ 4 ][ 1 ] - coordinates[ 0 ][ 1 ],
              coordinates[ 4 ][ 2 ] - coordinates[ 0 ][ 2 ] );
 
     current_oddy = oddy_comp( xxi, xet, xze );
     if( current_oddy > oddy ) { oddy = current_oddy; }
 
-    xxi.set( coordinates[ 2 ][ 0 ] - coordinates[ 1 ][ 0 ],
-             coordinates[ 2 ][ 1 ] - coordinates[ 1 ][ 1 ],
+    xxi.set( coordinates[ 2 ][ 0 ] - coordinates[ 1 ][ 0 ], coordinates[ 2 ][ 1 ] - coordinates[ 1 ][ 1 ],
              coordinates[ 2 ][ 2 ] - coordinates[ 1 ][ 2 ] );
 
-    xet.set( coordinates[ 0 ][ 0 ] - coordinates[ 1 ][ 0 ],
-             coordinates[ 0 ][ 1 ] - coordinates[ 1 ][ 1 ],
+    xet.set( coordinates[ 0 ][ 0 ] - coordinates[ 1 ][ 0 ], coordinates[ 0 ][ 1 ] - coordinates[ 1 ][ 1 ],
              coordinates[ 0 ][ 2 ] - coordinates[ 1 ][ 2 ] );
 
-    xze.set( coordinates[ 5 ][ 0 ] - coordinates[ 1 ][ 0 ],
-             coordinates[ 5 ][ 1 ] - coordinates[ 1 ][ 1 ],
+    xze.set( coordinates[ 5 ][ 0 ] - coordinates[ 1 ][ 0 ], coordinates[ 5 ][ 1 ] - coordinates[ 1 ][ 1 ],
              coordinates[ 5 ][ 2 ] - coordinates[ 1 ][ 2 ] );
 
     current_oddy = oddy_comp( xxi, xet, xze );
     if( current_oddy > oddy ) { oddy = current_oddy; }
 
-    xxi.set( coordinates[ 3 ][ 0 ] - coordinates[ 2 ][ 0 ],
-             coordinates[ 3 ][ 1 ] - coordinates[ 2 ][ 1 ],
+    xxi.set( coordinates[ 3 ][ 0 ] - coordinates[ 2 ][ 0 ], coordinates[ 3 ][ 1 ] - coordinates[ 2 ][ 1 ],
              coordinates[ 3 ][ 2 ] - coordinates[ 2 ][ 2 ] );
 
-    xet.set( coordinates[ 1 ][ 0 ] - coordinates[ 2 ][ 0 ],
-             coordinates[ 1 ][ 1 ] - coordinates[ 2 ][ 1 ],
+    xet.set( coordinates[ 1 ][ 0 ] - coordinates[ 2 ][ 0 ], coordinates[ 1 ][ 1 ] - coordinates[ 2 ][ 1 ],
              coordinates[ 1 ][ 2 ] - coordinates[ 2 ][ 2 ] );
 
-    xze.set( coordinates[ 6 ][ 0 ] - coordinates[ 2 ][ 0 ],
-             coordinates[ 6 ][ 1 ] - coordinates[ 2 ][ 1 ],
+    xze.set( coordinates[ 6 ][ 0 ] - coordinates[ 2 ][ 0 ], coordinates[ 6 ][ 1 ] - coordinates[ 2 ][ 1 ],
              coordinates[ 6 ][ 2 ] - coordinates[ 2 ][ 2 ] );
 
     current_oddy = oddy_comp( xxi, xet, xze );
     if( current_oddy > oddy ) { oddy = current_oddy; }
 
-    xxi.set( coordinates[ 0 ][ 0 ] - coordinates[ 3 ][ 0 ],
-             coordinates[ 0 ][ 1 ] - coordinates[ 3 ][ 1 ],
+    xxi.set( coordinates[ 0 ][ 0 ] - coordinates[ 3 ][ 0 ], coordinates[ 0 ][ 1 ] - coordinates[ 3 ][ 1 ],
              coordinates[ 0 ][ 2 ] - coordinates[ 3 ][ 2 ] );
 
-    xet.set( coordinates[ 2 ][ 0 ] - coordinates[ 3 ][ 0 ],
-             coordinates[ 2 ][ 1 ] - coordinates[ 3 ][ 1 ],
+    xet.set( coordinates[ 2 ][ 0 ] - coordinates[ 3 ][ 0 ], coordinates[ 2 ][ 1 ] - coordinates[ 3 ][ 1 ],
              coordinates[ 2 ][ 2 ] - coordinates[ 3 ][ 2 ] );
 
-    xze.set( coordinates[ 7 ][ 0 ] - coordinates[ 3 ][ 0 ],
-             coordinates[ 7 ][ 1 ] - coordinates[ 3 ][ 1 ],
+    xze.set( coordinates[ 7 ][ 0 ] - coordinates[ 3 ][ 0 ], coordinates[ 7 ][ 1 ] - coordinates[ 3 ][ 1 ],
              coordinates[ 7 ][ 2 ] - coordinates[ 3 ][ 2 ] );
 
     current_oddy = oddy_comp( xxi, xet, xze );
     if( current_oddy > oddy ) { oddy = current_oddy; }
 
-    xxi.set( coordinates[ 7 ][ 0 ] - coordinates[ 4 ][ 0 ],
-             coordinates[ 7 ][ 1 ] - coordinates[ 4 ][ 1 ],
+    xxi.set( coordinates[ 7 ][ 0 ] - coordinates[ 4 ][ 0 ], coordinates[ 7 ][ 1 ] - coordinates[ 4 ][ 1 ],
              coordinates[ 7 ][ 2 ] - coordinates[ 4 ][ 2 ] );
 
-    xet.set( coordinates[ 5 ][ 0 ] - coordinates[ 4 ][ 0 ],
-             coordinates[ 5 ][ 1 ] - coordinates[ 4 ][ 1 ],
+    xet.set( coordinates[ 5 ][ 0 ] - coordinates[ 4 ][ 0 ], coordinates[ 5 ][ 1 ] - coordinates[ 4 ][ 1 ],
              coordinates[ 5 ][ 2 ] - coordinates[ 4 ][ 2 ] );
 
-    xze.set( coordinates[ 0 ][ 0 ] - coordinates[ 4 ][ 0 ],
-             coordinates[ 0 ][ 1 ] - coordinates[ 4 ][ 1 ],
+    xze.set( coordinates[ 0 ][ 0 ] - coordinates[ 4 ][ 0 ], coordinates[ 0 ][ 1 ] - coordinates[ 4 ][ 1 ],
              coordinates[ 0 ][ 2 ] - coordinates[ 4 ][ 2 ] );
 
     current_oddy = oddy_comp( xxi, xet, xze );
     if( current_oddy > oddy ) { oddy = current_oddy; }
 
-    xxi.set( coordinates[ 4 ][ 0 ] - coordinates[ 5 ][ 0 ],
-             coordinates[ 4 ][ 1 ] - coordinates[ 5 ][ 1 ],
+    xxi.set( coordinates[ 4 ][ 0 ] - coordinates[ 5 ][ 0 ], coordinates[ 4 ][ 1 ] - coordinates[ 5 ][ 1 ],
              coordinates[ 4 ][ 2 ] - coordinates[ 5 ][ 2 ] );
 
-    xet.set( coordinates[ 6 ][ 0 ] - coordinates[ 5 ][ 0 ],
-             coordinates[ 6 ][ 1 ] - coordinates[ 5 ][ 1 ],
+    xet.set( coordinates[ 6 ][ 0 ] - coordinates[ 5 ][ 0 ], coordinates[ 6 ][ 1 ] - coordinates[ 5 ][ 1 ],
              coordinates[ 6 ][ 2 ] - coordinates[ 5 ][ 2 ] );
 
-    xze.set( coordinates[ 1 ][ 0 ] - coordinates[ 5 ][ 0 ],
-             coordinates[ 1 ][ 1 ] - coordinates[ 5 ][ 1 ],
+    xze.set( coordinates[ 1 ][ 0 ] - coordinates[ 5 ][ 0 ], coordinates[ 1 ][ 1 ] - coordinates[ 5 ][ 1 ],
              coordinates[ 1 ][ 2 ] - coordinates[ 5 ][ 2 ] );
 
     current_oddy = oddy_comp( xxi, xet, xze );
     if( current_oddy > oddy ) { oddy = current_oddy; }
 
-    xxi.set( coordinates[ 5 ][ 0 ] - coordinates[ 6 ][ 0 ],
-             coordinates[ 5 ][ 1 ] - coordinates[ 6 ][ 1 ],
+    xxi.set( coordinates[ 5 ][ 0 ] - coordinates[ 6 ][ 0 ], coordinates[ 5 ][ 1 ] - coordinates[ 6 ][ 1 ],
              coordinates[ 5 ][ 2 ] - coordinates[ 6 ][ 2 ] );
 
-    xet.set( coordinates[ 7 ][ 0 ] - coordinates[ 6 ][ 0 ],
-             coordinates[ 7 ][ 1 ] - coordinates[ 6 ][ 1 ],
+    xet.set( coordinates[ 7 ][ 0 ] - coordinates[ 6 ][ 0 ], coordinates[ 7 ][ 1 ] - coordinates[ 6 ][ 1 ],
              coordinates[ 7 ][ 2 ] - coordinates[ 6 ][ 2 ] );
 
-    xze.set( coordinates[ 2 ][ 0 ] - coordinates[ 6 ][ 0 ],
-             coordinates[ 2 ][ 1 ] - coordinates[ 6 ][ 1 ],
+    xze.set( coordinates[ 2 ][ 0 ] - coordinates[ 6 ][ 0 ], coordinates[ 2 ][ 1 ] - coordinates[ 6 ][ 1 ],
              coordinates[ 2 ][ 2 ] - coordinates[ 6 ][ 2 ] );
 
     current_oddy = oddy_comp( xxi, xet, xze );
     if( current_oddy > oddy ) { oddy = current_oddy; }
 
-    xxi.set( coordinates[ 6 ][ 0 ] - coordinates[ 7 ][ 0 ],
-             coordinates[ 6 ][ 1 ] - coordinates[ 7 ][ 1 ],
+    xxi.set( coordinates[ 6 ][ 0 ] - coordinates[ 7 ][ 0 ], coordinates[ 6 ][ 1 ] - coordinates[ 7 ][ 1 ],
              coordinates[ 6 ][ 2 ] - coordinates[ 7 ][ 2 ] );
 
-    xet.set( coordinates[ 4 ][ 0 ] - coordinates[ 7 ][ 0 ],
-             coordinates[ 4 ][ 1 ] - coordinates[ 7 ][ 1 ],
+    xet.set( coordinates[ 4 ][ 0 ] - coordinates[ 7 ][ 0 ], coordinates[ 4 ][ 1 ] - coordinates[ 7 ][ 1 ],
              coordinates[ 4 ][ 2 ] - coordinates[ 7 ][ 2 ] );
 
-    xze.set( coordinates[ 3 ][ 0 ] - coordinates[ 7 ][ 0 ],
-             coordinates[ 3 ][ 1 ] - coordinates[ 7 ][ 1 ],
+    xze.set( coordinates[ 3 ][ 0 ] - coordinates[ 7 ][ 0 ], coordinates[ 3 ][ 1 ] - coordinates[ 7 ][ 1 ],
              coordinates[ 3 ][ 2 ] - coordinates[ 7 ][ 2 ] );
 
     current_oddy = oddy_comp( xxi, xet, xze );
@@ -1243,8 +1193,7 @@ C_FUNC_DEF double v_hex_med_aspect_frobenius( int /*num_nodes*/, double coordina
     med_aspect_frobenius += condition_comp( xxi, xet, xze );
     med_aspect_frobenius /= 24.;
 
-    if( med_aspect_frobenius > 0 )
-        return (double)VERDICT_MIN( med_aspect_frobenius, VERDICT_DBL_MAX );
+    if( med_aspect_frobenius > 0 ) return (double)VERDICT_MIN( med_aspect_frobenius, VERDICT_DBL_MAX );
     return (double)VERDICT_MAX( med_aspect_frobenius, -VERDICT_DBL_MAX );
 }
 
@@ -1713,8 +1662,7 @@ C_FUNC_DEF double v_hex_shear( int /*num_nodes*/, double coordinates[][ 3 ] )
     len2_sq = xet.length_squared( );
     len3_sq = xze.length_squared( );
 
-    if( len1_sq <= VERDICT_DBL_MIN || len2_sq <= VERDICT_DBL_MIN || len3_sq <= VERDICT_DBL_MIN )
-        return 0;
+    if( len1_sq <= VERDICT_DBL_MIN || len2_sq <= VERDICT_DBL_MIN || len3_sq <= VERDICT_DBL_MIN ) return 0;
 
     lengths = sqrt( len1_sq * len2_sq * len3_sq );
     det = xxi % ( xet * xze );
@@ -1733,8 +1681,7 @@ C_FUNC_DEF double v_hex_shear( int /*num_nodes*/, double coordinates[][ 3 ] )
     len2_sq = xet.length_squared( );
     len3_sq = xze.length_squared( );
 
-    if( len1_sq <= VERDICT_DBL_MIN || len2_sq <= VERDICT_DBL_MIN || len3_sq <= VERDICT_DBL_MIN )
-        return 0;
+    if( len1_sq <= VERDICT_DBL_MIN || len2_sq <= VERDICT_DBL_MIN || len3_sq <= VERDICT_DBL_MIN ) return 0;
 
     lengths = sqrt( len1_sq * len2_sq * len3_sq );
     det = xxi % ( xet * xze );
@@ -1753,8 +1700,7 @@ C_FUNC_DEF double v_hex_shear( int /*num_nodes*/, double coordinates[][ 3 ] )
     len2_sq = xet.length_squared( );
     len3_sq = xze.length_squared( );
 
-    if( len1_sq <= VERDICT_DBL_MIN || len2_sq <= VERDICT_DBL_MIN || len3_sq <= VERDICT_DBL_MIN )
-        return 0;
+    if( len1_sq <= VERDICT_DBL_MIN || len2_sq <= VERDICT_DBL_MIN || len3_sq <= VERDICT_DBL_MIN ) return 0;
 
     lengths = sqrt( len1_sq * len2_sq * len3_sq );
     det = xxi % ( xet * xze );
@@ -1773,8 +1719,7 @@ C_FUNC_DEF double v_hex_shear( int /*num_nodes*/, double coordinates[][ 3 ] )
     len2_sq = xet.length_squared( );
     len3_sq = xze.length_squared( );
 
-    if( len1_sq <= VERDICT_DBL_MIN || len2_sq <= VERDICT_DBL_MIN || len3_sq <= VERDICT_DBL_MIN )
-        return 0;
+    if( len1_sq <= VERDICT_DBL_MIN || len2_sq <= VERDICT_DBL_MIN || len3_sq <= VERDICT_DBL_MIN ) return 0;
 
     lengths = sqrt( len1_sq * len2_sq * len3_sq );
     det = xxi % ( xet * xze );
@@ -1793,8 +1738,7 @@ C_FUNC_DEF double v_hex_shear( int /*num_nodes*/, double coordinates[][ 3 ] )
     len2_sq = xet.length_squared( );
     len3_sq = xze.length_squared( );
 
-    if( len1_sq <= VERDICT_DBL_MIN || len2_sq <= VERDICT_DBL_MIN || len3_sq <= VERDICT_DBL_MIN )
-        return 0;
+    if( len1_sq <= VERDICT_DBL_MIN || len2_sq <= VERDICT_DBL_MIN || len3_sq <= VERDICT_DBL_MIN ) return 0;
 
     lengths = sqrt( len1_sq * len2_sq * len3_sq );
     det = xxi % ( xet * xze );
@@ -1813,8 +1757,7 @@ C_FUNC_DEF double v_hex_shear( int /*num_nodes*/, double coordinates[][ 3 ] )
     len2_sq = xet.length_squared( );
     len3_sq = xze.length_squared( );
 
-    if( len1_sq <= VERDICT_DBL_MIN || len2_sq <= VERDICT_DBL_MIN || len3_sq <= VERDICT_DBL_MIN )
-        return 0;
+    if( len1_sq <= VERDICT_DBL_MIN || len2_sq <= VERDICT_DBL_MIN || len3_sq <= VERDICT_DBL_MIN ) return 0;
 
     lengths = sqrt( len1_sq * len2_sq * len3_sq );
     det = xxi % ( xet * xze );
@@ -1833,8 +1776,7 @@ C_FUNC_DEF double v_hex_shear( int /*num_nodes*/, double coordinates[][ 3 ] )
     len2_sq = xet.length_squared( );
     len3_sq = xze.length_squared( );
 
-    if( len1_sq <= VERDICT_DBL_MIN || len2_sq <= VERDICT_DBL_MIN || len3_sq <= VERDICT_DBL_MIN )
-        return 0;
+    if( len1_sq <= VERDICT_DBL_MIN || len2_sq <= VERDICT_DBL_MIN || len3_sq <= VERDICT_DBL_MIN ) return 0;
 
     lengths = sqrt( len1_sq * len2_sq * len3_sq );
     det = xxi % ( xet * xze );
@@ -1853,8 +1795,7 @@ C_FUNC_DEF double v_hex_shear( int /*num_nodes*/, double coordinates[][ 3 ] )
     len2_sq = xet.length_squared( );
     len3_sq = xze.length_squared( );
 
-    if( len1_sq <= VERDICT_DBL_MIN || len2_sq <= VERDICT_DBL_MIN || len3_sq <= VERDICT_DBL_MIN )
-        return 0;
+    if( len1_sq <= VERDICT_DBL_MIN || len2_sq <= VERDICT_DBL_MIN || len3_sq <= VERDICT_DBL_MIN ) return 0;
 
     lengths = sqrt( len1_sq * len2_sq * len3_sq );
     det = xxi % ( xet * xze );
@@ -2159,9 +2100,8 @@ C_FUNC_DEF double v_hex_distortion( int num_nodes, double coordinates[][ 3 ] )
         // 3x3 quadrature rule
         number_of_gauss_points = 3;
 
-    int number_dimension = 3;
-    int total_number_of_gauss_points =
-        number_of_gauss_points * number_of_gauss_points * number_of_gauss_points;
+    int    number_dimension = 3;
+    int    total_number_of_gauss_points = number_of_gauss_points * number_of_gauss_points * number_of_gauss_points;
     double distortion = VERDICT_DBL_MAX;
 
     // maxTotalNumberGaussPoints =27, maxNumberNodes = 20
@@ -2179,8 +2119,7 @@ C_FUNC_DEF double v_hex_distortion( int num_nodes, double coordinates[][ 3 ] )
     // create an object of GaussIntegration
     GaussIntegration::initialize( number_of_gauss_points, num_nodes, number_dimension );
     GaussIntegration::calculate_shape_function_3d_hex( );
-    GaussIntegration::get_shape_func( shape_function[ 0 ], dndy1[ 0 ], dndy2[ 0 ], dndy3[ 0 ],
-                                      weight );
+    GaussIntegration::get_shape_func( shape_function[ 0 ], dndy1[ 0 ], dndy2[ 0 ], dndy3[ 0 ], weight );
 
     VerdictVector xxi, xet, xze, xin;
 
@@ -2215,8 +2154,7 @@ C_FUNC_DEF double v_hex_distortion( int num_nodes, double coordinates[][ 3 ] )
     double dndy2_at_node[ maxNumberNodes ][ maxNumberNodes ];
     double dndy3_at_node[ maxNumberNodes ][ maxNumberNodes ];
 
-    GaussIntegration::calculate_derivative_at_nodes_3d( dndy1_at_node, dndy2_at_node,
-                                                        dndy3_at_node );
+    GaussIntegration::calculate_derivative_at_nodes_3d( dndy1_at_node, dndy2_at_node, dndy3_at_node );
     int node_id;
     for( node_id = 0; node_id < num_nodes; node_id++ )
     {
@@ -2573,8 +2511,8 @@ C_FUNC_DEF double hex_jac_normjac_oddy_cond( int choices[],
 /*!
   multiple quality metrics of a hex
 */
-C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][ 3 ],
-                               unsigned int metrics_request_flag, HexMetricVals* metric_vals )
+C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][ 3 ], unsigned int metrics_request_flag,
+                               HexMetricVals* metric_vals )
 {
     memset( metric_vals, 0, sizeof( HexMetricVals ) );
 
@@ -2597,15 +2535,12 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][ 3 ],
             double mag_efg2 = efg2.length( );
             double mag_efg3 = efg3.length( );
 
-            max_edge_ratio_12 =
-                safe_ratio( VERDICT_MAX( mag_efg1, mag_efg2 ), VERDICT_MIN( mag_efg1, mag_efg2 ) );
-            max_edge_ratio_13 =
-                safe_ratio( VERDICT_MAX( mag_efg1, mag_efg3 ), VERDICT_MIN( mag_efg1, mag_efg3 ) );
-            max_edge_ratio_23 =
-                safe_ratio( VERDICT_MAX( mag_efg2, mag_efg3 ), VERDICT_MIN( mag_efg2, mag_efg3 ) );
+            max_edge_ratio_12 = safe_ratio( VERDICT_MAX( mag_efg1, mag_efg2 ), VERDICT_MIN( mag_efg1, mag_efg2 ) );
+            max_edge_ratio_13 = safe_ratio( VERDICT_MAX( mag_efg1, mag_efg3 ), VERDICT_MIN( mag_efg1, mag_efg3 ) );
+            max_edge_ratio_23 = safe_ratio( VERDICT_MAX( mag_efg2, mag_efg3 ), VERDICT_MIN( mag_efg2, mag_efg3 ) );
 
-            metric_vals->max_edge_ratio = (double)VERDICT_MAX(
-                max_edge_ratio_12, VERDICT_MAX( max_edge_ratio_13, max_edge_ratio_23 ) );
+            metric_vals->max_edge_ratio =
+                (double)VERDICT_MAX( max_edge_ratio_12, VERDICT_MAX( max_edge_ratio_13, max_edge_ratio_23 ) );
         }
 
         if( metrics_request_flag & V_HEX_SKEW )
@@ -2634,23 +2569,19 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][ 3 ],
             VerdictVector efg13 = calc_hex_efg( 13, node_pos );
             VerdictVector efg23 = calc_hex_efg( 23, node_pos );
 
-            double taperx = fabs(
-                safe_ratio( efg12.length( ), VERDICT_MIN( efg1.length( ), efg2.length( ) ) ) );
-            double tapery = fabs(
-                safe_ratio( efg13.length( ), VERDICT_MIN( efg1.length( ), efg3.length( ) ) ) );
-            double taperz = fabs(
-                safe_ratio( efg23.length( ), VERDICT_MIN( efg2.length( ), efg3.length( ) ) ) );
+            double taperx = fabs( safe_ratio( efg12.length( ), VERDICT_MIN( efg1.length( ), efg2.length( ) ) ) );
+            double tapery = fabs( safe_ratio( efg13.length( ), VERDICT_MIN( efg1.length( ), efg3.length( ) ) ) );
+            double taperz = fabs( safe_ratio( efg23.length( ), VERDICT_MIN( efg2.length( ), efg3.length( ) ) ) );
 
             metric_vals->taper = (double)VERDICT_MAX( taperx, VERDICT_MAX( tapery, taperz ) );
         }
     }
 
-    if( metrics_request_flag & V_HEX_VOLUME )
-    { metric_vals->volume = v_hex_volume( 8, coordinates ); }
+    if( metrics_request_flag & V_HEX_VOLUME ) { metric_vals->volume = v_hex_volume( 8, coordinates ); }
 
-    if( metrics_request_flag & ( V_HEX_JACOBIAN | V_HEX_SCALED_JACOBIAN | V_HEX_CONDITION |
-                                 V_HEX_SHEAR | V_HEX_SHAPE | V_HEX_RELATIVE_SIZE_SQUARED |
-                                 V_HEX_SHAPE_AND_SIZE | V_HEX_SHEAR_AND_SIZE | V_HEX_STRETCH ) )
+    if( metrics_request_flag &
+        ( V_HEX_JACOBIAN | V_HEX_SCALED_JACOBIAN | V_HEX_CONDITION | V_HEX_SHEAR | V_HEX_SHAPE |
+          V_HEX_RELATIVE_SIZE_SQUARED | V_HEX_SHAPE_AND_SIZE | V_HEX_SHEAR_AND_SIZE | V_HEX_STRETCH ) )
     {
 
         static const double two_thirds = 2.0 / 3.0;
@@ -2662,22 +2593,20 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][ 3 ],
 
         // calculate the length squares if we need to
         if( metrics_request_flag &
-            ( V_HEX_JACOBIAN | V_HEX_SHEAR | V_HEX_SCALED_JACOBIAN | V_HEX_SHAPE |
-              V_HEX_SHAPE_AND_SIZE | V_HEX_RELATIVE_SIZE_SQUARED | V_HEX_SHEAR_AND_SIZE |
-              V_HEX_STRETCH ) )
+            ( V_HEX_JACOBIAN | V_HEX_SHEAR | V_HEX_SCALED_JACOBIAN | V_HEX_SHAPE | V_HEX_SHAPE_AND_SIZE |
+              V_HEX_RELATIVE_SIZE_SQUARED | V_HEX_SHEAR_AND_SIZE | V_HEX_STRETCH ) )
             make_edge_length_squares( edges, length_squared );
 
-        double jacobian = VERDICT_DBL_MAX, scaled_jacobian = VERDICT_DBL_MAX, condition = 0.0,
-               shear = 1.0, shape = 1.0, oddy = 0.0;
-        double current_jacobian, current_scaled_jacobian, current_condition, current_shape,
-            detw = 0, det_sum = 0, current_oddy;
+        double jacobian = VERDICT_DBL_MAX, scaled_jacobian = VERDICT_DBL_MAX, condition = 0.0, shear = 1.0, shape = 1.0,
+               oddy = 0.0;
+        double current_jacobian, current_scaled_jacobian, current_condition, current_shape, detw = 0, det_sum = 0,
+                                                                                            current_oddy;
         VerdictBoolean rel_size_error = VERDICT_FALSE;
 
         VerdictVector xxi, xet, xze;
 
         // get weights if we need based on average size of a hex
-        if( metrics_request_flag &
-            ( V_HEX_RELATIVE_SIZE_SQUARED | V_HEX_SHAPE_AND_SIZE | V_HEX_SHEAR_AND_SIZE ) )
+        if( metrics_request_flag & ( V_HEX_RELATIVE_SIZE_SQUARED | V_HEX_SHAPE_AND_SIZE | V_HEX_SHEAR_AND_SIZE ) )
         {
             v_hex_get_weight( xxi, xet, xze );
             detw = xxi % ( xet * xze );
@@ -2695,10 +2624,8 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][ 3 ],
         {
             current_jacobian *= 64.0;
             current_scaled_jacobian =
-                current_jacobian /
-                sqrt( xxi.length_squared( ) * xet.length_squared( ) * xze.length_squared( ) );
-            if( current_scaled_jacobian < scaled_jacobian )
-                shear = scaled_jacobian = current_scaled_jacobian;
+                current_jacobian / sqrt( xxi.length_squared( ) * xet.length_squared( ) * xze.length_squared( ) );
+            if( current_scaled_jacobian < scaled_jacobian ) shear = scaled_jacobian = current_scaled_jacobian;
         }
 
         if( metrics_request_flag & V_HEX_CONDITION )
@@ -2717,8 +2644,7 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][ 3 ],
         current_jacobian = edges[ 0 ] % ( -edges[ 3 ] * edges[ 8 ] );
         if( current_jacobian < jacobian ) jacobian = current_jacobian;
 
-        if( metrics_request_flag &
-            ( V_HEX_RELATIVE_SIZE_SQUARED | V_HEX_SHAPE_AND_SIZE | V_HEX_SHEAR_AND_SIZE ) )
+        if( metrics_request_flag & ( V_HEX_RELATIVE_SIZE_SQUARED | V_HEX_SHAPE_AND_SIZE | V_HEX_SHEAR_AND_SIZE ) )
         { det_sum += current_jacobian; }
 
         if( metrics_request_flag & ( V_HEX_SCALED_JACOBIAN | V_HEX_SHEAR | V_HEX_SHEAR_AND_SIZE ) )
@@ -2729,11 +2655,9 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][ 3 ],
             else
             {
                 current_scaled_jacobian =
-                    current_jacobian /
-                    sqrt( length_squared[ 0 ] * length_squared[ 3 ] * length_squared[ 8 ] );
+                    current_jacobian / sqrt( length_squared[ 0 ] * length_squared[ 3 ] * length_squared[ 8 ] );
             }
-            if( current_scaled_jacobian < scaled_jacobian )
-                shear = scaled_jacobian = current_scaled_jacobian;
+            if( current_scaled_jacobian < scaled_jacobian ) shear = scaled_jacobian = current_scaled_jacobian;
         }
 
         if( metrics_request_flag & V_HEX_CONDITION )
@@ -2763,8 +2687,7 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][ 3 ],
         current_jacobian = edges[ 1 ] % ( -edges[ 0 ] * edges[ 9 ] );
         if( current_jacobian < jacobian ) jacobian = current_jacobian;
 
-        if( metrics_request_flag &
-            ( V_HEX_RELATIVE_SIZE_SQUARED | V_HEX_SHAPE_AND_SIZE | V_HEX_SHEAR_AND_SIZE ) )
+        if( metrics_request_flag & ( V_HEX_RELATIVE_SIZE_SQUARED | V_HEX_SHAPE_AND_SIZE | V_HEX_SHEAR_AND_SIZE ) )
         { det_sum += current_jacobian; }
 
         if( metrics_request_flag & ( V_HEX_SCALED_JACOBIAN | V_HEX_SHEAR | V_HEX_SHEAR_AND_SIZE ) )
@@ -2775,11 +2698,9 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][ 3 ],
             else
             {
                 current_scaled_jacobian =
-                    current_jacobian /
-                    sqrt( length_squared[ 1 ] * length_squared[ 0 ] * length_squared[ 9 ] );
+                    current_jacobian / sqrt( length_squared[ 1 ] * length_squared[ 0 ] * length_squared[ 9 ] );
             }
-            if( current_scaled_jacobian < scaled_jacobian )
-                shear = scaled_jacobian = current_scaled_jacobian;
+            if( current_scaled_jacobian < scaled_jacobian ) shear = scaled_jacobian = current_scaled_jacobian;
         }
 
         if( metrics_request_flag & V_HEX_CONDITION )
@@ -2809,8 +2730,7 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][ 3 ],
         current_jacobian = edges[ 2 ] % ( -edges[ 1 ] * edges[ 10 ] );
         if( current_jacobian < jacobian ) jacobian = current_jacobian;
 
-        if( metrics_request_flag &
-            ( V_HEX_RELATIVE_SIZE_SQUARED | V_HEX_SHAPE_AND_SIZE | V_HEX_SHEAR_AND_SIZE ) )
+        if( metrics_request_flag & ( V_HEX_RELATIVE_SIZE_SQUARED | V_HEX_SHAPE_AND_SIZE | V_HEX_SHEAR_AND_SIZE ) )
         { det_sum += current_jacobian; }
 
         if( metrics_request_flag & ( V_HEX_SCALED_JACOBIAN | V_HEX_SHEAR | V_HEX_SHEAR_AND_SIZE ) )
@@ -2821,11 +2741,9 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][ 3 ],
             else
             {
                 current_scaled_jacobian =
-                    current_jacobian /
-                    sqrt( length_squared[ 2 ] * length_squared[ 1 ] * length_squared[ 10 ] );
+                    current_jacobian / sqrt( length_squared[ 2 ] * length_squared[ 1 ] * length_squared[ 10 ] );
             }
-            if( current_scaled_jacobian < scaled_jacobian )
-                shear = scaled_jacobian = current_scaled_jacobian;
+            if( current_scaled_jacobian < scaled_jacobian ) shear = scaled_jacobian = current_scaled_jacobian;
         }
 
         if( metrics_request_flag & V_HEX_CONDITION )
@@ -2843,9 +2761,8 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][ 3 ],
         if( metrics_request_flag & ( V_HEX_SHAPE | V_HEX_SHAPE_AND_SIZE ) )
         {
             if( current_jacobian > VERDICT_DBL_MIN )
-                current_shape =
-                    3 * pow( current_jacobian, two_thirds ) /
-                    ( length_squared[ 2 ] + length_squared[ 1 ] + length_squared[ 10 ] );
+                current_shape = 3 * pow( current_jacobian, two_thirds ) /
+                                ( length_squared[ 2 ] + length_squared[ 1 ] + length_squared[ 10 ] );
             else
                 current_shape = 0;
 
@@ -2856,8 +2773,7 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][ 3 ],
         current_jacobian = edges[ 3 ] % ( -edges[ 2 ] * edges[ 11 ] );
         if( current_jacobian < jacobian ) jacobian = current_jacobian;
 
-        if( metrics_request_flag &
-            ( V_HEX_RELATIVE_SIZE_SQUARED | V_HEX_SHAPE_AND_SIZE | V_HEX_SHEAR_AND_SIZE ) )
+        if( metrics_request_flag & ( V_HEX_RELATIVE_SIZE_SQUARED | V_HEX_SHAPE_AND_SIZE | V_HEX_SHEAR_AND_SIZE ) )
         { det_sum += current_jacobian; }
 
         if( metrics_request_flag & ( V_HEX_SCALED_JACOBIAN | V_HEX_SHEAR | V_HEX_SHEAR_AND_SIZE ) )
@@ -2868,11 +2784,9 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][ 3 ],
             else
             {
                 current_scaled_jacobian =
-                    current_jacobian /
-                    sqrt( length_squared[ 3 ] * length_squared[ 2 ] * length_squared[ 11 ] );
+                    current_jacobian / sqrt( length_squared[ 3 ] * length_squared[ 2 ] * length_squared[ 11 ] );
             }
-            if( current_scaled_jacobian < scaled_jacobian )
-                shear = scaled_jacobian = current_scaled_jacobian;
+            if( current_scaled_jacobian < scaled_jacobian ) shear = scaled_jacobian = current_scaled_jacobian;
         }
 
         if( metrics_request_flag & V_HEX_CONDITION )
@@ -2890,9 +2804,8 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][ 3 ],
         if( metrics_request_flag & ( V_HEX_SHAPE | V_HEX_SHAPE_AND_SIZE ) )
         {
             if( current_jacobian > VERDICT_DBL_MIN )
-                current_shape =
-                    3 * pow( current_jacobian, two_thirds ) /
-                    ( length_squared[ 3 ] + length_squared[ 2 ] + length_squared[ 11 ] );
+                current_shape = 3 * pow( current_jacobian, two_thirds ) /
+                                ( length_squared[ 3 ] + length_squared[ 2 ] + length_squared[ 11 ] );
             else
                 current_shape = 0;
 
@@ -2903,8 +2816,7 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][ 3 ],
         current_jacobian = edges[ 4 ] % ( -edges[ 8 ] * -edges[ 7 ] );
         if( current_jacobian < jacobian ) jacobian = current_jacobian;
 
-        if( metrics_request_flag &
-            ( V_HEX_RELATIVE_SIZE_SQUARED | V_HEX_SHAPE_AND_SIZE | V_HEX_SHEAR_AND_SIZE ) )
+        if( metrics_request_flag & ( V_HEX_RELATIVE_SIZE_SQUARED | V_HEX_SHAPE_AND_SIZE | V_HEX_SHEAR_AND_SIZE ) )
         { det_sum += current_jacobian; }
 
         if( metrics_request_flag & ( V_HEX_SCALED_JACOBIAN | V_HEX_SHEAR | V_HEX_SHEAR_AND_SIZE ) )
@@ -2915,11 +2827,9 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][ 3 ],
             else
             {
                 current_scaled_jacobian =
-                    current_jacobian /
-                    sqrt( length_squared[ 4 ] * length_squared[ 8 ] * length_squared[ 7 ] );
+                    current_jacobian / sqrt( length_squared[ 4 ] * length_squared[ 8 ] * length_squared[ 7 ] );
             }
-            if( current_scaled_jacobian < scaled_jacobian )
-                shear = scaled_jacobian = current_scaled_jacobian;
+            if( current_scaled_jacobian < scaled_jacobian ) shear = scaled_jacobian = current_scaled_jacobian;
         }
 
         if( metrics_request_flag & V_HEX_CONDITION )
@@ -2949,8 +2859,7 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][ 3 ],
         current_jacobian = -edges[ 4 ] % ( edges[ 5 ] * -edges[ 9 ] );
         if( current_jacobian < jacobian ) jacobian = current_jacobian;
 
-        if( metrics_request_flag &
-            ( V_HEX_RELATIVE_SIZE_SQUARED | V_HEX_SHAPE_AND_SIZE | V_HEX_SHEAR_AND_SIZE ) )
+        if( metrics_request_flag & ( V_HEX_RELATIVE_SIZE_SQUARED | V_HEX_SHAPE_AND_SIZE | V_HEX_SHEAR_AND_SIZE ) )
         { det_sum += current_jacobian; }
 
         if( metrics_request_flag & ( V_HEX_SCALED_JACOBIAN | V_HEX_SHEAR | V_HEX_SHEAR_AND_SIZE ) )
@@ -2961,11 +2870,9 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][ 3 ],
             else
             {
                 current_scaled_jacobian =
-                    current_jacobian /
-                    sqrt( length_squared[ 4 ] * length_squared[ 5 ] * length_squared[ 9 ] );
+                    current_jacobian / sqrt( length_squared[ 4 ] * length_squared[ 5 ] * length_squared[ 9 ] );
             }
-            if( current_scaled_jacobian < scaled_jacobian )
-                shear = scaled_jacobian = current_scaled_jacobian;
+            if( current_scaled_jacobian < scaled_jacobian ) shear = scaled_jacobian = current_scaled_jacobian;
         }
 
         if( metrics_request_flag & V_HEX_CONDITION )
@@ -2995,8 +2902,7 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][ 3 ],
         current_jacobian = -edges[ 5 ] % ( edges[ 6 ] * -edges[ 10 ] );
         if( current_jacobian < jacobian ) jacobian = current_jacobian;
 
-        if( metrics_request_flag &
-            ( V_HEX_RELATIVE_SIZE_SQUARED | V_HEX_SHAPE_AND_SIZE | V_HEX_SHEAR_AND_SIZE ) )
+        if( metrics_request_flag & ( V_HEX_RELATIVE_SIZE_SQUARED | V_HEX_SHAPE_AND_SIZE | V_HEX_SHEAR_AND_SIZE ) )
         { det_sum += current_jacobian; }
 
         if( metrics_request_flag & ( V_HEX_SCALED_JACOBIAN | V_HEX_SHEAR | V_HEX_SHEAR_AND_SIZE ) )
@@ -3007,11 +2913,9 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][ 3 ],
             else
             {
                 current_scaled_jacobian =
-                    current_jacobian /
-                    sqrt( length_squared[ 5 ] * length_squared[ 6 ] * length_squared[ 10 ] );
+                    current_jacobian / sqrt( length_squared[ 5 ] * length_squared[ 6 ] * length_squared[ 10 ] );
             }
-            if( current_scaled_jacobian < scaled_jacobian )
-                shear = scaled_jacobian = current_scaled_jacobian;
+            if( current_scaled_jacobian < scaled_jacobian ) shear = scaled_jacobian = current_scaled_jacobian;
         }
 
         if( metrics_request_flag & V_HEX_CONDITION )
@@ -3029,9 +2933,8 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][ 3 ],
         if( metrics_request_flag & ( V_HEX_SHAPE | V_HEX_SHAPE_AND_SIZE ) )
         {
             if( current_jacobian > VERDICT_DBL_MIN )
-                current_shape =
-                    3 * pow( current_jacobian, two_thirds ) /
-                    ( length_squared[ 5 ] + length_squared[ 6 ] + length_squared[ 10 ] );
+                current_shape = 3 * pow( current_jacobian, two_thirds ) /
+                                ( length_squared[ 5 ] + length_squared[ 6 ] + length_squared[ 10 ] );
             else
                 current_shape = 0;
 
@@ -3042,8 +2945,7 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][ 3 ],
         current_jacobian = -edges[ 6 ] % ( edges[ 7 ] * -edges[ 11 ] );
         if( current_jacobian < jacobian ) jacobian = current_jacobian;
 
-        if( metrics_request_flag &
-            ( V_HEX_RELATIVE_SIZE_SQUARED | V_HEX_SHAPE_AND_SIZE | V_HEX_SHEAR_AND_SIZE ) )
+        if( metrics_request_flag & ( V_HEX_RELATIVE_SIZE_SQUARED | V_HEX_SHAPE_AND_SIZE | V_HEX_SHEAR_AND_SIZE ) )
         { det_sum += current_jacobian; }
 
         if( metrics_request_flag & ( V_HEX_SCALED_JACOBIAN | V_HEX_SHEAR | V_HEX_SHEAR_AND_SIZE ) )
@@ -3054,11 +2956,9 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][ 3 ],
             else
             {
                 current_scaled_jacobian =
-                    current_jacobian /
-                    sqrt( length_squared[ 6 ] * length_squared[ 7 ] * length_squared[ 11 ] );
+                    current_jacobian / sqrt( length_squared[ 6 ] * length_squared[ 7 ] * length_squared[ 11 ] );
             }
-            if( current_scaled_jacobian < scaled_jacobian )
-                shear = scaled_jacobian = current_scaled_jacobian;
+            if( current_scaled_jacobian < scaled_jacobian ) shear = scaled_jacobian = current_scaled_jacobian;
         }
 
         if( metrics_request_flag & V_HEX_CONDITION )
@@ -3076,23 +2976,20 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][ 3 ],
         if( metrics_request_flag & ( V_HEX_SHAPE | V_HEX_SHAPE_AND_SIZE ) )
         {
             if( current_jacobian > VERDICT_DBL_MIN )
-                current_shape =
-                    3 * pow( current_jacobian, two_thirds ) /
-                    ( length_squared[ 6 ] + length_squared[ 7 ] + length_squared[ 11 ] );
+                current_shape = 3 * pow( current_jacobian, two_thirds ) /
+                                ( length_squared[ 6 ] + length_squared[ 7 ] + length_squared[ 11 ] );
             else
                 current_shape = 0;
 
             if( current_shape < shape ) { shape = current_shape; }
         }
 
-        if( metrics_request_flag &
-            ( V_HEX_RELATIVE_SIZE_SQUARED | V_HEX_SHAPE_AND_SIZE | V_HEX_SHEAR_AND_SIZE ) )
+        if( metrics_request_flag & ( V_HEX_RELATIVE_SIZE_SQUARED | V_HEX_SHAPE_AND_SIZE | V_HEX_SHEAR_AND_SIZE ) )
         {
             if( det_sum > VERDICT_DBL_MIN && rel_size_error != VERDICT_TRUE )
             {
                 double tau = det_sum / ( 8 * detw );
-                metric_vals->relative_size_squared =
-                    (double)VERDICT_MIN( tau * tau, 1.0 / tau / tau );
+                metric_vals->relative_size_squared = (double)VERDICT_MIN( tau * tau, 1.0 / tau / tau );
             }
             else
                 metric_vals->relative_size_squared = 0.0;
@@ -3101,11 +2998,9 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][ 3 ],
         // set values from above calculations
         if( metrics_request_flag & V_HEX_JACOBIAN ) metric_vals->jacobian = (double)jacobian;
 
-        if( metrics_request_flag & V_HEX_SCALED_JACOBIAN )
-            metric_vals->scaled_jacobian = (double)scaled_jacobian;
+        if( metrics_request_flag & V_HEX_SCALED_JACOBIAN ) metric_vals->scaled_jacobian = (double)scaled_jacobian;
 
-        if( metrics_request_flag & V_HEX_CONDITION )
-            metric_vals->condition = (double)( condition / 3.0 );
+        if( metrics_request_flag & V_HEX_CONDITION ) metric_vals->condition = (double)( condition / 3.0 );
 
         if( metrics_request_flag & V_HEX_SHEAR )
         {
@@ -3133,26 +3028,20 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][ 3 ],
 
             double max_diag = diag_length( 1, coordinates );
 
-            metric_vals->stretch =
-                (double)( HEX_STRETCH_SCALE_FACTOR * ( safe_ratio( sqrt( min_edge ), max_diag ) ) );
+            metric_vals->stretch = (double)( HEX_STRETCH_SCALE_FACTOR * ( safe_ratio( sqrt( min_edge ), max_diag ) ) );
         }
     }
 
-    if( metrics_request_flag & V_HEX_DIAGONAL )
-        metric_vals->diagonal = v_hex_diagonal( num_nodes, coordinates );
-    if( metrics_request_flag & V_HEX_DIMENSION )
-        metric_vals->dimension = v_hex_dimension( num_nodes, coordinates );
-    if( metrics_request_flag & V_HEX_DISTORTION )
-        metric_vals->distortion = v_hex_distortion( num_nodes, coordinates );
+    if( metrics_request_flag & V_HEX_DIAGONAL ) metric_vals->diagonal = v_hex_diagonal( num_nodes, coordinates );
+    if( metrics_request_flag & V_HEX_DIMENSION ) metric_vals->dimension = v_hex_dimension( num_nodes, coordinates );
+    if( metrics_request_flag & V_HEX_DISTORTION ) metric_vals->distortion = v_hex_distortion( num_nodes, coordinates );
 
     // take care of any overflow problems
     // max_edge_ratio
     if( metric_vals->max_edge_ratio > 0 )
-        metric_vals->max_edge_ratio =
-            (double)VERDICT_MIN( metric_vals->max_edge_ratio, VERDICT_DBL_MAX );
+        metric_vals->max_edge_ratio = (double)VERDICT_MIN( metric_vals->max_edge_ratio, VERDICT_DBL_MAX );
     else
-        metric_vals->max_edge_ratio =
-            (double)VERDICT_MAX( metric_vals->max_edge_ratio, -VERDICT_DBL_MAX );
+        metric_vals->max_edge_ratio = (double)VERDICT_MAX( metric_vals->max_edge_ratio, -VERDICT_DBL_MAX );
 
     // skew
     if( metric_vals->skew > 0 )
@@ -3210,11 +3099,9 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][ 3 ],
 
     // scaled_jacobian
     if( metric_vals->scaled_jacobian > 0 )
-        metric_vals->scaled_jacobian =
-            (double)VERDICT_MIN( metric_vals->scaled_jacobian, VERDICT_DBL_MAX );
+        metric_vals->scaled_jacobian = (double)VERDICT_MIN( metric_vals->scaled_jacobian, VERDICT_DBL_MAX );
     else
-        metric_vals->scaled_jacobian =
-            (double)VERDICT_MAX( metric_vals->scaled_jacobian, -VERDICT_DBL_MAX );
+        metric_vals->scaled_jacobian = (double)VERDICT_MAX( metric_vals->scaled_jacobian, -VERDICT_DBL_MAX );
 
     // shear
     if( metric_vals->shear > 0 )
@@ -3230,27 +3117,22 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][ 3 ],
 
     // relative_size_squared
     if( metric_vals->relative_size_squared > 0 )
-        metric_vals->relative_size_squared =
-            (double)VERDICT_MIN( metric_vals->relative_size_squared, VERDICT_DBL_MAX );
+        metric_vals->relative_size_squared = (double)VERDICT_MIN( metric_vals->relative_size_squared, VERDICT_DBL_MAX );
     else
         metric_vals->relative_size_squared =
             (double)VERDICT_MAX( metric_vals->relative_size_squared, -VERDICT_DBL_MAX );
 
     // shape_and_size
     if( metric_vals->shape_and_size > 0 )
-        metric_vals->shape_and_size =
-            (double)VERDICT_MIN( metric_vals->shape_and_size, VERDICT_DBL_MAX );
+        metric_vals->shape_and_size = (double)VERDICT_MIN( metric_vals->shape_and_size, VERDICT_DBL_MAX );
     else
-        metric_vals->shape_and_size =
-            (double)VERDICT_MAX( metric_vals->shape_and_size, -VERDICT_DBL_MAX );
+        metric_vals->shape_and_size = (double)VERDICT_MAX( metric_vals->shape_and_size, -VERDICT_DBL_MAX );
 
     // shear_and_size
     if( metric_vals->shear_and_size > 0 )
-        metric_vals->shear_and_size =
-            (double)VERDICT_MIN( metric_vals->shear_and_size, VERDICT_DBL_MAX );
+        metric_vals->shear_and_size = (double)VERDICT_MIN( metric_vals->shear_and_size, VERDICT_DBL_MAX );
     else
-        metric_vals->shear_and_size =
-            (double)VERDICT_MAX( metric_vals->shear_and_size, -VERDICT_DBL_MAX );
+        metric_vals->shear_and_size = (double)VERDICT_MAX( metric_vals->shear_and_size, -VERDICT_DBL_MAX );
 
     // distortion
     if( metric_vals->distortion > 0 )
@@ -3261,6 +3143,5 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][ 3 ],
     if( metrics_request_flag & V_HEX_MED_ASPECT_FROBENIUS )
         metric_vals->med_aspect_frobenius = v_hex_med_aspect_frobenius( 8, coordinates );
 
-    if( metrics_request_flag & V_HEX_EDGE_RATIO )
-        metric_vals->edge_ratio = v_hex_edge_ratio( 8, coordinates );
+    if( metrics_request_flag & V_HEX_EDGE_RATIO ) metric_vals->edge_ratio = v_hex_edge_ratio( 8, coordinates );
 }

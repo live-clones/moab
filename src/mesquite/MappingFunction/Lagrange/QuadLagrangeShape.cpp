@@ -44,8 +44,8 @@ int QuadLagrangeShape::num_nodes( ) const
     return 9;
 }
 
-void QuadLagrangeShape::coefficients( Sample loc, NodeSet nodeset, double* coeff_out,
-                                      size_t* indices_out, size_t& num_coeff, MsqError& err ) const
+void QuadLagrangeShape::coefficients( Sample loc, NodeSet nodeset, double* coeff_out, size_t* indices_out,
+                                      size_t& num_coeff, MsqError& err ) const
 {
     if( !nodeset.have_any_mid_node( ) )
     {
@@ -61,8 +61,8 @@ void QuadLagrangeShape::coefficients( Sample loc, NodeSet nodeset, double* coeff
             coeff_out[ 0 ] = 1.0;
             break;
         case 1:
-            coeff_out[ 0 ] = coeff_out[ 1 ] = coeff_out[ 2 ] = coeff_out[ 3 ] = coeff_out[ 4 ] =
-                coeff_out[ 5 ] = coeff_out[ 6 ] = coeff_out[ 7 ] = coeff_out[ 8 ] = 0.0;
+            coeff_out[ 0 ] = coeff_out[ 1 ] = coeff_out[ 2 ] = coeff_out[ 3 ] = coeff_out[ 4 ] = coeff_out[ 5 ] =
+                coeff_out[ 6 ] = coeff_out[ 7 ] = coeff_out[ 8 ] = 0.0;
             if( nodeset.mid_edge_node( loc.number ) )
             {
                 // if mid-edge node is present
@@ -123,8 +123,8 @@ void QuadLagrangeShape::coefficients( Sample loc, NodeSet nodeset, double* coeff
     }
 }
 
-static void derivatives_at_corner( unsigned corner, NodeSet nodeset, size_t* vertices,
-                                   MsqVector< 2 >* derivs, size_t& num_vtx )
+static void derivatives_at_corner( unsigned corner, NodeSet nodeset, size_t* vertices, MsqVector< 2 >* derivs,
+                                   size_t& num_vtx )
 {
     static const unsigned xi_adj_corners[] = { 1, 0, 3, 2 };
     static const unsigned xi_adj_edges[] = { 0, 0, 2, 2 };
@@ -133,10 +133,8 @@ static void derivatives_at_corner( unsigned corner, NodeSet nodeset, size_t* ver
 
     static const double corner_xi[] = { -1, 1, 1, -1 };  // xi values by corner
     static const double corner_eta[] = { -1, -1, 1, 1 };  // eta values by corner
-    static const double other_xi[] = { 1, -1, -1,
-                                       1 };  // xi values for adjacent corner in xi direction
-    static const double other_eta[] = { 1, 1, -1,
-                                        -1 };  // eta values for adjcent corner in eta direction
+    static const double other_xi[] = { 1, -1, -1, 1 };  // xi values for adjacent corner in xi direction
+    static const double other_eta[] = { 1, 1, -1, -1 };  // eta values for adjcent corner in eta direction
     static const double mid_xi[] = { 2, -2, -2, 2 };  // xi values for mid-node in xi direction
     static const double mid_eta[] = { 2, 2, -2, -2 };  // eta values for mid-node in eta direction
 
@@ -173,8 +171,8 @@ static void derivatives_at_corner( unsigned corner, NodeSet nodeset, size_t* ver
     }
 }
 
-static void derivatives_at_mid_edge( unsigned edge, NodeSet nodeset, size_t* vertices,
-                                     MsqVector< 2 >* derivs, size_t& num_vtx )
+static void derivatives_at_mid_edge( unsigned edge, NodeSet nodeset, size_t* vertices, MsqVector< 2 >* derivs,
+                                     size_t& num_vtx )
 {
     static const double values[][ 9 ] = { { -0.5, -0.5, 0.5, 0.5, -1.0, 2.0, 1.0, 2.0, 4.0 },
                                           { -0.5, 0.5, 0.5, -0.5, -2.0, 1.0, -2.0, -1.0, -4.0 },
@@ -186,10 +184,8 @@ static void derivatives_at_mid_edge( unsigned edge, NodeSet nodeset, size_t* ver
     const unsigned      is_eta_edge = edge % 2;  // edge is xi = +/- 0
     const unsigned      is_xi_edge = 1 - is_eta_edge;  // edge is eta = +/- 0
     // const unsigned mid_edge_node = edge + 4;     // mid-edge node index
-    const unsigned prev_opposite =
-        ( prev_corner + 3 ) % 4;  // index of corner adjacent to prev_corner
-    const unsigned next_opposite =
-        ( next_corner + 1 ) % 4;  // index of corner adjacent to next_corner;
+    const unsigned prev_opposite = ( prev_corner + 3 ) % 4;  // index of corner adjacent to prev_corner
+    const unsigned next_opposite = ( next_corner + 1 ) % 4;  // index of corner adjacent to next_corner;
 
     // First do derivatives along edge (e.g. wrt xi if edge is eta = +/-1)
     num_vtx = 2;
@@ -219,8 +215,7 @@ static void derivatives_at_mid_edge( unsigned edge, NodeSet nodeset, size_t* ver
     }
 
     // Initial (linear) contribution for each corner
-    double v[ 4 ] = { values[ edge ][ 0 ], values[ edge ][ 1 ], values[ edge ][ 2 ],
-                      values[ edge ][ 3 ] };
+    double v[ 4 ] = { values[ edge ][ 0 ], values[ edge ][ 1 ], values[ edge ][ 2 ], values[ edge ][ 3 ] };
 
     // If mid-face node is present
     double v8 = 0.0;
@@ -275,8 +270,7 @@ static void derivatives_at_mid_edge( unsigned edge, NodeSet nodeset, size_t* ver
     }
 }
 
-static void derivatives_at_mid_elem( NodeSet nodeset, size_t* vertices, MsqVector< 2 >* derivs,
-                                     size_t& num_vtx )
+static void derivatives_at_mid_elem( NodeSet nodeset, size_t* vertices, MsqVector< 2 >* derivs, size_t& num_vtx )
 {
     // fast linear case
     // This is provided as an optimization for linear elements.
@@ -378,25 +372,21 @@ static void derivatives_at_mid_elem( NodeSet nodeset, size_t* vertices, MsqVecto
 }
 
 void QuadLagrangeShape::derivatives( Sample loc, NodeSet nodeset, size_t* vertex_indices_out,
-                                     MsqVector< 2 >* d_coeff_d_xi_out, size_t& num_vtx,
-                                     MsqError& err ) const
+                                     MsqVector< 2 >* d_coeff_d_xi_out, size_t& num_vtx, MsqError& err ) const
 {
     if( !nodeset.have_any_mid_node( ) )
     {
-        LinearQuadrilateral::derivatives( loc, nodeset, vertex_indices_out, d_coeff_d_xi_out,
-                                          num_vtx );
+        LinearQuadrilateral::derivatives( loc, nodeset, vertex_indices_out, d_coeff_d_xi_out, num_vtx );
         return;
     }
 
     switch( loc.dimension )
     {
         case 0:
-            derivatives_at_corner( loc.number, nodeset, vertex_indices_out, d_coeff_d_xi_out,
-                                   num_vtx );
+            derivatives_at_corner( loc.number, nodeset, vertex_indices_out, d_coeff_d_xi_out, num_vtx );
             break;
         case 1:
-            derivatives_at_mid_edge( loc.number, nodeset, vertex_indices_out, d_coeff_d_xi_out,
-                                     num_vtx );
+            derivatives_at_mid_edge( loc.number, nodeset, vertex_indices_out, d_coeff_d_xi_out, num_vtx );
             break;
         case 2:
             derivatives_at_mid_elem( nodeset, vertex_indices_out, d_coeff_d_xi_out, num_vtx );

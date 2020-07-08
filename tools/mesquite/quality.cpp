@@ -29,8 +29,7 @@ int main( int argc, char* argv[] )
                  "and optinally export a VTK file for which quality "
                  "values are stored as attribute data." );
     args.int_flag( 'H', "ints", "Print histograms with specified number of intervals", &histogram );
-    args.toggle_flag( 'f', "Assess quality only for elements with at least one free vertex",
-                      &freeonly );
+    args.toggle_flag( 'f', "Assess quality only for elements with at least one free vertex", &freeonly );
     args.add_required_arg( "input_file" );
     args.add_optional_arg( "output_file" );
     add_domain_args( args );

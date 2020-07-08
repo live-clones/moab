@@ -93,8 +93,7 @@ void test_var_length_no_data( )
     Tag        tag;
 
     create_mesh( mb1 );
-    rval = mb1.tag_get_handle( "test_tag", 0, MB_TYPE_DOUBLE, tag,
-                               MB_TAG_EXCL | MB_TAG_VARLEN | MB_TAG_DENSE );CHECK_ERR( rval );
+    rval = mb1.tag_get_handle( "test_tag", 0, MB_TYPE_DOUBLE, tag, MB_TAG_EXCL | MB_TAG_VARLEN | MB_TAG_DENSE );CHECK_ERR( rval );
 
     read_write( "test_var_length_no_data.h5m", mb1, mb2 );
     compare_tags( "test_tag", mb1, mb2 );
@@ -106,8 +105,7 @@ void test_var_length_data_common( const char* filename, Interface& mb1, bool opa
     ErrorCode rval;
     Tag       tag;
     DataType  type = opaque ? MB_TYPE_OPAQUE : MB_TYPE_INTEGER;
-    rval =
-        mb1.tag_get_handle( "test_tag", 0, type, tag, MB_TAG_EXCL | MB_TAG_VARLEN | MB_TAG_SPARSE );CHECK_ERR( rval );
+    rval = mb1.tag_get_handle( "test_tag", 0, type, tag, MB_TAG_EXCL | MB_TAG_VARLEN | MB_TAG_SPARSE );CHECK_ERR( rval );
 
     // get all entities
     Range entities;
@@ -210,8 +208,7 @@ void test_var_length_big_data( )
     Tag        tag;
 
     create_mesh( mb1 );
-    rval = mb1.tag_get_handle( "test_tag", 0, MB_TYPE_DOUBLE, tag,
-                               MB_TAG_SPARSE | MB_TAG_VARLEN | MB_TAG_EXCL );CHECK_ERR( rval );
+    rval = mb1.tag_get_handle( "test_tag", 0, MB_TYPE_DOUBLE, tag, MB_TAG_SPARSE | MB_TAG_VARLEN | MB_TAG_EXCL );CHECK_ERR( rval );
 
     // choose 3 vertices upon which to set data
     Range range;
@@ -320,8 +317,7 @@ void test_global_value_common( bool mesh_value )
     // write and read file
     Core       moab2;
     Interface& mb2 = moab2;
-    read_write( mesh_value ? "test_var_length_mesh_data.h5m" : "test_var_length_default_data.h5m",
-                mb, mb2 );
+    read_write( mesh_value ? "test_var_length_mesh_data.h5m" : "test_var_length_default_data.h5m", mb, mb2 );
     compare_tags( "handle_tag", mb, mb2 );
     compare_tags( "coord_tag", mb, mb2 );
 
@@ -413,9 +409,7 @@ void test_global_opaque_common( bool mesh_value )
     // write and read file
     Core       moab2;
     Interface& mb2 = moab2;
-    read_write( mesh_value ? "test_var_length_mesh_opaque.h5m"
-                           : "test_var_length_default_opaque.h5m",
-                mb, mb2 );
+    read_write( mesh_value ? "test_var_length_mesh_opaque.h5m" : "test_var_length_default_opaque.h5m", mb, mb2 );
     compare_tags( "opaque_tag", mb, mb2 );
 
     // get tag handles
@@ -464,8 +458,7 @@ void test_var_length_handle_tag( )
     Range::const_iterator i;
 
     create_mesh( mb1 );
-    rval = mb1.tag_get_handle( "test_tag", 0, MB_TYPE_HANDLE, tag,
-                               MB_TAG_SPARSE | MB_TAG_VARLEN | MB_TAG_EXCL );CHECK_ERR( rval );
+    rval = mb1.tag_get_handle( "test_tag", 0, MB_TYPE_HANDLE, tag, MB_TAG_SPARSE | MB_TAG_VARLEN | MB_TAG_EXCL );CHECK_ERR( rval );
 
     // Get all entities
     Range range;
@@ -547,8 +540,7 @@ void create_structured_quad_mesh( Interface& mb, int x, int y )
     {
         for( int j = 0; j <= y; ++j )
         {
-            double coords[ 3 ] = { static_cast< double >( i ), static_cast< double >( j ),
-                                   static_cast< double >( z ) };
+            double coords[ 3 ] = { static_cast< double >( i ), static_cast< double >( j ), static_cast< double >( z ) };
             rval = mb.create_vertex( coords, verts[ i + ( x + 1 ) * j ] );CHECK_ERR( rval );
         }
     }
@@ -559,8 +551,7 @@ void create_structured_quad_mesh( Interface& mb, int x, int y )
         for( int j = 0; j < y; ++j )
         {
             EntityHandle conn[ 4 ] = { verts[ i + ( x + 1 ) * j ], verts[ i + 1 + ( x + 1 ) * j ],
-                                       verts[ i + 1 + ( x + 1 ) * ( j + 1 ) ],
-                                       verts[ i + ( x + 1 ) * ( j + 1 ) ] };
+                                       verts[ i + 1 + ( x + 1 ) * ( j + 1 ) ], verts[ i + ( x + 1 ) * ( j + 1 ) ] };
             rval = mb.create_element( MBQUAD, conn, 4, elems[ i + x * j ] );CHECK_ERR( rval );
         }
     }

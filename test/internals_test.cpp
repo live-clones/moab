@@ -89,11 +89,10 @@ int main( )
         handleUtils = HandleUtils( 0, cpus[ num_cpu ] );
 
         // init these after setting num_cpu, because max id depends on num cpu.
-        const EntityID ids[] = { 0, 1, handleUtils.max_id( ) / 2, handleUtils.max_id( ) - 1,
-                                 handleUtils.max_id( ) };
-        const TagId tids[] = { 0, 1, MB_TAG_PROP_MASK / 2, MB_TAG_PROP_MASK - 1, MB_TAG_PROP_MASK };
-        const int   num_ids = sizeof( ids ) / sizeof( ids[ 0 ] );
-        const int   num_tids = sizeof( tids ) / sizeof( tids[ 0 ] );
+        const EntityID ids[] = { 0, 1, handleUtils.max_id( ) / 2, handleUtils.max_id( ) - 1, handleUtils.max_id( ) };
+        const TagId    tids[] = { 0, 1, MB_TAG_PROP_MASK / 2, MB_TAG_PROP_MASK - 1, MB_TAG_PROP_MASK };
+        const int      num_ids = sizeof( ids ) / sizeof( ids[ 0 ] );
+        const int      num_tids = sizeof( tids ) / sizeof( tids[ 0 ] );
 
         for( unsigned cpu = 0; cpu < cpus[ num_cpu ]; ++cpu )
         {
@@ -103,8 +102,8 @@ int main( )
                     ++tests;
                     if( !handle_test( type, ids[ id ], cpu, false ) )
                     {
-                        cout << "Test of handle with type=" << type << ", id=" << ids[ id ]
-                             << ", proc=" << cpu << ", and numproc=" << cpus[ num_cpu ] << endl;
+                        cout << "Test of handle with type=" << type << ", id=" << ids[ id ] << ", proc=" << cpu
+                             << ", and numproc=" << cpus[ num_cpu ] << endl;
                         ++errors;
                     }
                 }
@@ -115,8 +114,8 @@ int main( )
                     ++tests;
                     if( !tag_test( tids[ id ], (TagType)prop ) )
                     {
-                        cout << "Test of tag handle with prop=" << prop << ", id=" << tids[ id ]
-                             << ", proc=" << cpu << ", and numproc=" << cpus[ num_cpu ] << endl;
+                        cout << "Test of tag handle with prop=" << prop << ", id=" << tids[ id ] << ", proc=" << cpu
+                             << ", and numproc=" << cpus[ num_cpu ] << endl;
                         ++errors;
                     }
                 }

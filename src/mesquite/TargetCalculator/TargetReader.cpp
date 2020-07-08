@@ -40,8 +40,8 @@
 namespace MBMesquite
 {
 
-static TagHandle get_tag( Mesh* mesh, unsigned num_matrices, unsigned dimension,
-                          const char* base_name, bool orient_surface, MsqError& err )
+static TagHandle get_tag( Mesh* mesh, unsigned num_matrices, unsigned dimension, const char* base_name,
+                          bool orient_surface, MsqError& err )
 {
     unsigned matrix_size;
     if( dimension == 2 && !orient_surface )
@@ -65,22 +65,18 @@ static TagHandle get_tag( Mesh* mesh, unsigned num_matrices, unsigned dimension,
     if( temp_type != Mesh::DOUBLE || temp_length != num_doubles )
     {
         MSQ_SETERR( err )
-        ( MsqError::TAG_ALREADY_EXISTS, "Mismatched type or length for existing tag \"%s\"",
-          str.str( ).c_str( ) );
+        ( MsqError::TAG_ALREADY_EXISTS, "Mismatched type or length for existing tag \"%s\"", str.str( ).c_str( ) );
     }
 
     return handle;
 }
 
-TargetReader::TargetReader( bool orient2d, std::string name )
-    : tagBaseName( name ), orient2D( orient2d )
-{
-}
+TargetReader::TargetReader( bool orient2d, std::string name ) : tagBaseName( name ), orient2D( orient2d ) {}
 
 TargetReader::~TargetReader( ) {}
 
-bool TargetReader::get_3D_target( PatchData& pd, size_t element, Sample sample,
-                                  MsqMatrix< 3, 3 >& W_out, MsqError& err )
+bool TargetReader::get_3D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 3, 3 >& W_out,
+                                  MsqError& err )
 {
     // calculate index of sample in array
     NodeSet  all_samples = pd.get_samples( element );
@@ -106,8 +102,7 @@ bool TargetReader::get_3D_target( PatchData& pd, size_t element, Sample sample,
 
     // get the tag handle
     const size_t INVALID_HANDLE = (size_t)-1;
-    if( data.handles3D.size( ) <= handle_idx )
-        data.handles3D.resize( handle_idx + 1, (TagHandle)INVALID_HANDLE );
+    if( data.handles3D.size( ) <= handle_idx ) data.handles3D.resize( handle_idx + 1, (TagHandle)INVALID_HANDLE );
     TagHandle& tag_handle = data.handles3D[ handle_idx ];
     if( tag_handle == (TagHandle)INVALID_HANDLE )
     {
@@ -131,8 +126,8 @@ bool TargetReader::get_3D_target( PatchData& pd, size_t element, Sample sample,
     return true;
 }
 
-bool TargetReader::get_2D_target( PatchData& pd, size_t element, Sample sample,
-                                  MsqMatrix< 2, 2 >& W_out, MsqError& err )
+bool TargetReader::get_2D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 2, 2 >& W_out,
+                                  MsqError& err )
 {
     // which type of 2D target do we actually have
     if( orient2D )
@@ -165,8 +160,7 @@ bool TargetReader::get_2D_target( PatchData& pd, size_t element, Sample sample,
 
     // get the tag handle
     const size_t INVALID_HANDLE = (size_t)-1;
-    if( data.handles2D.size( ) <= handle_idx )
-        data.handles2D.resize( handle_idx + 1, (TagHandle)INVALID_HANDLE );
+    if( data.handles2D.size( ) <= handle_idx ) data.handles2D.resize( handle_idx + 1, (TagHandle)INVALID_HANDLE );
     TagHandle& tag_handle = data.handles2D[ handle_idx ];
     if( tag_handle == (TagHandle)INVALID_HANDLE )
     {
@@ -190,8 +184,8 @@ bool TargetReader::get_2D_target( PatchData& pd, size_t element, Sample sample,
     return true;
 }
 
-bool TargetReader::get_surface_target( PatchData& pd, size_t element, Sample sample,
-                                       MsqMatrix< 3, 2 >& W_out, MsqError& err )
+bool TargetReader::get_surface_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 3, 2 >& W_out,
+                                       MsqError& err )
 {
     // which type of 2D target do we actually have
     if( !orient2D )
@@ -224,8 +218,7 @@ bool TargetReader::get_surface_target( PatchData& pd, size_t element, Sample sam
 
     // get the tag handle
     const size_t INVALID_HANDLE = (size_t)-1;
-    if( data.handles2D.size( ) <= handle_idx )
-        data.handles2D.resize( handle_idx + 1, (TagHandle)INVALID_HANDLE );
+    if( data.handles2D.size( ) <= handle_idx ) data.handles2D.resize( handle_idx + 1, (TagHandle)INVALID_HANDLE );
     TagHandle& tag_handle = data.handles2D[ handle_idx ];
     if( tag_handle == (TagHandle)INVALID_HANDLE )
     {
@@ -265,8 +258,8 @@ void TargetReader::notify_new_patch( PatchData&, TargetReaderData& data )
     data.targetsSurface.clear( );
 }
 
-void TargetReader::notify_sub_patch( PatchData& /*pd*/, TargetReaderData& data, PatchData& subpatch,
-                                     const size_t*, const size_t*, MsqError& /*err*/ )
+void TargetReader::notify_sub_patch( PatchData& /*pd*/, TargetReaderData& data, PatchData& subpatch, const size_t*,
+                                     const size_t*, MsqError& /*err*/ )
 {
     TargetReaderData& other = get_data( subpatch );
     if( other.handles2D.empty( ) && other.handles3D.empty( ) )

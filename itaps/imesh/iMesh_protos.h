@@ -18,10 +18,8 @@
 #define iMesh_load ITAPS_FC_WRAPPER( imesh_load, IMESH_LOAD )
 #define iMesh_save ITAPS_FC_WRAPPER( imesh_save, IMESH_SAVE )
 #define iMesh_getRootSet ITAPS_FC_WRAPPER( imesh_getrootset, IMESH_GETROOTSET )
-#define iMesh_getGeometricDimension \
-    ITAPS_FC_WRAPPER( imesh_getgeometricdimension, IMESH_GETGEOMETRICDIMENSION )
-#define iMesh_setGeometricDimension \
-    ITAPS_FC_WRAPPER( imesh_setgeometricdimension, IMESH_SETGEOMETRICDIMENSION )
+#define iMesh_getGeometricDimension ITAPS_FC_WRAPPER( imesh_getgeometricdimension, IMESH_GETGEOMETRICDIMENSION )
+#define iMesh_setGeometricDimension ITAPS_FC_WRAPPER( imesh_setgeometricdimension, IMESH_SETGEOMETRICDIMENSION )
 #define iMesh_getDfltStorage ITAPS_FC_WRAPPER( imesh_getdfltstorage, IMESH_GETDFLTSTORAGE )
 #define iMesh_getAdjTable ITAPS_FC_WRAPPER( imesh_getadjtable, IMESH_GETADJTABLE )
 #define iMesh_setAdjTable ITAPS_FC_WRAPPER( imesh_setadjtable, IMESH_SETADJTABLE )
@@ -129,8 +127,7 @@
 #define iMesh_getNumOfTypeRec ITAPS_FC_WRAPPER( imesh_getnumoftyperec, IMESH_GETNUMOFTYPEREC )
 #define iMesh_getNumOfTopoRec ITAPS_FC_WRAPPER( imesh_getnumoftoporec, IMESH_GETNUMOFTOPOREC )
 #define iMesh_getEntsByTagsRec ITAPS_FC_WRAPPER( imesh_getentsbytagsrec, IMESH_GETENTSBYTAGSREC )
-#define iMesh_getEntSetsByTagsRec \
-    ITAPS_FC_WRAPPER( imesh_getentsetsbytagsrec, IMESH_GETENTSETSBYTAGSREC )
+#define iMesh_getEntSetsByTagsRec ITAPS_FC_WRAPPER( imesh_getentsetsbytagsrec, IMESH_GETENTSETSBYTAGSREC )
 #define iMesh_MBCNType ITAPS_FC_WRAPPER( imesh_mbcntype, IMESH_MBCNTYPE )
 #define iMesh_tagIterate ITAPS_FC_WRAPPER( imesh_tagiterate, IMESH_TAGITERATE )
 #define iMesh_connectIterate ITAPS_FC_WRAPPER( imesh_connectiterate, IMESH_CONNECTITERATE )
@@ -139,10 +136,8 @@
 #define iMesh_stepEntArrIter ITAPS_FC_WRAPPER( imesh_stepentarriter, IMESH_STEPENTARRITER )
 #define iMesh_initEntArrIterRec ITAPS_FC_WRAPPER( imesh_initentarriterrec, IMESH_INITENTARRITERREC )
 #define iMesh_getAllIfaceTags ITAPS_FC_WRAPPER( imesh_getallifacetags, IMESH_GETALLIFACETAGS )
-#define iMesh_createTagWithOptions \
-    ITAPS_FC_WRAPPER( imesh_createtagwithoptions, IMESH_CREATETAGWITHOPTIONS )
-#define iMesh_createStructuredMesh \
-    ITAPS_FC_WRAPPER( imesh_createstructuredmesh, IMESH_CREATESTRUCTUREDMESH )
+#define iMesh_createTagWithOptions ITAPS_FC_WRAPPER( imesh_createtagwithoptions, IMESH_CREATETAGWITHOPTIONS )
+#define iMesh_createStructuredMesh ITAPS_FC_WRAPPER( imesh_createstructuredmesh, IMESH_CREATESTRUCTUREDMESH )
 #define iMesh_freeMemory ITAPS_FC_WRAPPER( imesh_freememory, IMESH_FREEMEMORY )
 
 #endif

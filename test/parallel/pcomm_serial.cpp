@@ -70,9 +70,8 @@ int main( int argc, char* argv[] )
     for( int i = 0; i < nprocs; i++ )
     {
         ReadParallel rp( moab + i, pc[ i ] );
-        rval = rp.load_file( &fnames, 1, 0, ReadParallel::POPT_READ_DELETE, ptag_name,
-                             partition_tag_vals, partition_distrib, false, pa_vec, fopts, NULL,
-                             NULL, i, false, -1, -1, -1, -1, 0, 0 );CHECK_ERR( rval );
+        rval = rp.load_file( &fnames, 1, 0, ReadParallel::POPT_READ_DELETE, ptag_name, partition_tag_vals,
+                             partition_distrib, false, pa_vec, fopts, NULL, NULL, i, false, -1, -1, -1, -1, 0, 0 );CHECK_ERR( rval );
     }
 
     rval = ParallelComm::resolve_shared_ents( &pc[ 0 ], nprocs, 0, 3 );CHECK_ERR( rval );

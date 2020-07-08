@@ -51,9 +51,7 @@ int main( int argc, char* argv[] )
     }
     Core        mb;
     std::string read_options;
-    if( size > 1 )
-        read_options =
-            "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_SHARED_ENTS";
+    if( size > 1 ) read_options = "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_SHARED_ENTS";
 
     if( size > 1 && argc > 2 )
     {
@@ -169,19 +167,18 @@ int main( int argc, char* argv[] )
                 {
                     // write first header or this entity type, then the first values, separated by
                     // commas
-                    ofile << " There are " << ne_local << " entities of type "
-                          << vw.entity_type_name( et ) << " with " << qualities.size( )
-                          << " qualities:\n"
+                    ofile << " There are " << ne_local << " entities of type " << vw.entity_type_name( et ) << " with "
+                          << qualities.size( ) << " qualities:\n"
                           << " Entity id ";
-                    for( std::map< QualityType, double >::iterator qit = qualities.begin( );
-                         qit != qualities.end( ); ++qit )
+                    for( std::map< QualityType, double >::iterator qit = qualities.begin( ); qit != qualities.end( );
+                         ++qit )
                     {
                         ofile << ", " << vw.quality_name( qit->first );
                     }
                     ofile << "\n";
                     ofile << mb.id_from_handle( *it );
-                    for( std::map< QualityType, double >::iterator qit = qualities.begin( );
-                         qit != qualities.end( ); ++qit )
+                    for( std::map< QualityType, double >::iterator qit = qualities.begin( ); qit != qualities.end( );
+                         ++qit )
                     {
                         ofile << ", " << qit->second;
                     }
@@ -195,8 +192,8 @@ int main( int argc, char* argv[] )
                     rval = vw.all_quality_measures( *it, qualities );
                     if( MB_SUCCESS != rval )
                     {
-                        fprintf( stderr, "Error getting quality for entity type %d with id %ld \n",
-                                 et, (long)mb.id_from_handle( *it ) );
+                        fprintf( stderr, "Error getting quality for entity type %d with id %ld \n", et,
+                                 (long)mb.id_from_handle( *it ) );
 #ifdef MOAB_HAVE_MPI
                         MPI_Finalize( );
 #endif
@@ -214,8 +211,8 @@ int main( int argc, char* argv[] )
                     }
                     std::map< QualityType, double >::iterator minit = minq.begin( );
                     std::map< QualityType, double >::iterator maxit = maxq.begin( );
-                    for( std::map< QualityType, double >::iterator mit = qualities.begin( );
-                         mit != qualities.end( ); ++mit, ++minit, ++maxit )
+                    for( std::map< QualityType, double >::iterator mit = qualities.begin( ); mit != qualities.end( );
+                         ++mit, ++minit, ++maxit )
                     {
                         if( mit->second > maxit->second ) maxit->second = mit->second;
                         if( mit->second < minit->second ) minit->second = mit->second;
@@ -224,19 +221,16 @@ int main( int argc, char* argv[] )
             }
             if( 0 == proc_id )
             {
-                std::cout << " \n\n   " << ne_global << " entities of type "
-                          << vw.entity_type_name( et ) << "\n";
-                std::cout << std::setw( 30 ) << "Quality Name" << std::setw( 15 ) << "    MIN"
-                          << std::setw( 15 ) << "  MAX"
+                std::cout << " \n\n   " << ne_global << " entities of type " << vw.entity_type_name( et ) << "\n";
+                std::cout << std::setw( 30 ) << "Quality Name" << std::setw( 15 ) << "    MIN" << std::setw( 15 )
+                          << "  MAX"
                           << "\n";
             }
 
             QualityType quality_type = MB_EDGE_RATIO;
-            for( int i = 0; i < num_qualities;
-                 i++, quality_type = ( QualityType )( quality_type + 1 ) )
+            for( int i = 0; i < num_qualities; i++, quality_type = ( QualityType )( quality_type + 1 ) )
             {
-                while( !( vw.possible_quality( et, quality_type ) ) &&
-                       quality_type < MB_QUALITY_COUNT )
+                while( !( vw.possible_quality( et, quality_type ) ) && quality_type < MB_QUALITY_COUNT )
                     quality_type = ( QualityType )( quality_type + 1 );  // will get them in order
                 const char* name_q = vw.quality_name( quality_type );
                 double      local_min, global_min;
@@ -252,15 +246,13 @@ int main( int argc, char* argv[] )
                     local_max = -1.e38;  // it can get here only in parallel
                 }
 #ifdef MOAB_HAVE_MPI
-                mpi_err = MPI_Reduce( &local_min, &global_min, 1, MPI_DOUBLE, MPI_MIN, 0,
-                                      MPI_COMM_WORLD );
+                mpi_err = MPI_Reduce( &local_min, &global_min, 1, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD );
                 if( mpi_err )
                 {
                     MPI_Finalize( );
                     return 1;
                 }
-                mpi_err = MPI_Reduce( &local_max, &global_max, 1, MPI_DOUBLE, MPI_MAX, 0,
-                                      MPI_COMM_WORLD );
+                mpi_err = MPI_Reduce( &local_max, &global_max, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD );
                 if( mpi_err )
                 {
                     MPI_Finalize( );
@@ -272,8 +264,8 @@ int main( int argc, char* argv[] )
 #endif
                 if( 0 == proc_id )
                 {
-                    std::cout << std::setw( 30 ) << name_q << std::setw( 15 ) << global_min
-                              << std::setw( 15 ) << global_max << "\n";
+                    std::cout << std::setw( 30 ) << name_q << std::setw( 15 ) << global_min << std::setw( 15 )
+                              << global_max << "\n";
                 }
             }
         }

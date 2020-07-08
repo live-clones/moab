@@ -85,8 +85,7 @@ int main( int argc, char** argv )
 
             ents.clear( );
 
-            std::cout << "Total area of meshes in surface " << gid << " =  " << total_area
-                      << std::endl;
+            std::cout << "Total area of meshes in surface " << gid << " =  " << total_area << std::endl;
         }
     }
 }

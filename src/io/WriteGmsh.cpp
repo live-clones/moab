@@ -48,12 +48,10 @@ struct ElemInfo
 };
 
 //! Writes out a file
-ErrorCode WriteGmsh::write_file( const char* file_name, const bool overwrite,
-                                 const FileOptions& options, const EntityHandle* output_list,
-                                 const int num_sets,
-                                 const std::vector< std::string >& /* qa_list */,
-                                 const Tag* /* tag_list */, int /* num_tags */,
-                                 int /* export_dimension */ )
+ErrorCode WriteGmsh::write_file( const char* file_name, const bool overwrite, const FileOptions& options,
+                                 const EntityHandle* output_list, const int num_sets,
+                                 const std::vector< std::string >& /* qa_list */, const Tag* /* tag_list */,
+                                 int /* num_tags */, int /* export_dimension */ )
 {
     ErrorCode rval;
     Tag       global_id = 0, block_tag = 0, geom_tag = 0, prtn_tag = 0;
@@ -93,8 +91,7 @@ ErrorCode WriteGmsh::write_file( const char* file_name, const bool overwrite,
         {
             if( set_tags[ s ] )
             {
-                rval = mbImpl->get_entities_by_type_and_tag( 0, MBENTITYSET, set_tags + s, 0, 1,
-                                                             sets[ s ] );
+                rval = mbImpl->get_entities_by_type_and_tag( 0, MBENTITYSET, set_tags + s, 0, 1, sets[ s ] );
                 if( MB_SUCCESS != rval ) return rval;
             }
         }
@@ -120,8 +117,7 @@ ErrorCode WriteGmsh::write_file( const char* file_name, const bool overwrite,
                 if( set_tags[ s ] )
                 {
                     Range tmp_range;
-                    rval = mbImpl->get_entities_by_type_and_tag( set, MBENTITYSET, set_tags + s, 0,
-                                                                 1, tmp_range );
+                    rval = mbImpl->get_entities_by_type_and_tag( set, MBENTITYSET, set_tags + s, 0, 1, tmp_range );
                     if( MB_SUCCESS != rval ) return rval;
                     sets[ s ].merge( tmp_range );
                     int junk;
@@ -139,8 +135,7 @@ ErrorCode WriteGmsh::write_file( const char* file_name, const bool overwrite,
     // for all elements, use handle value instead.
     std::vector< int >           global_id_array( elements.size( ) );
     std::vector< int >::iterator id_iter;
-    if( !global_id ||
-        MB_SUCCESS != mbImpl->tag_get_data( global_id, elements, &global_id_array[ 0 ] ) )
+    if( !global_id || MB_SUCCESS != mbImpl->tag_get_data( global_id, elements, &global_id_array[ 0 ] ) )
     {
         id_iter = global_id_array.begin( );
         for( Range::iterator i = elements.begin( ); i != elements.end( ); ++i, ++id_iter )
@@ -179,8 +174,7 @@ ErrorCode WriteGmsh::write_file( const char* file_name, const bool overwrite,
         if( ei.type < 0 )
         {
             MB_SET_ERR( MB_FILE_WRITE_ERROR, "Gmem file format does not support element of type "
-                                                 << CN::EntityTypeName( type ) << " with "
-                                                 << num_vtx << " vertices" );
+                                                 << CN::EntityTypeName( type ) << " with " << num_vtx << " vertices" );
         }
     }
     // Don't need these any more, free memory.
@@ -225,8 +219,7 @@ ErrorCode WriteGmsh::write_file( const char* file_name, const bool overwrite,
 
     // Set precision for node coordinates
     int precision;
-    if( MB_SUCCESS != options.get_int_option( "PRECISION", precision ) )
-        precision = DEFAULT_PRECISION;
+    if( MB_SUCCESS != options.get_int_option( "PRECISION", precision ) ) precision = DEFAULT_PRECISION;
     const int old_precision = out.precision( );
     out.precision( precision );
 
@@ -257,8 +250,7 @@ ErrorCode WriteGmsh::write_file( const char* file_name, const bool overwrite,
     // Write elements
     out << "$Elements" << std::endl;
     out << elem_sets.size( ) << std::endl;
-    for( std::map< EntityHandle, ElemInfo >::iterator i = elem_sets.begin( ); i != elem_sets.end( );
-         ++i )
+    for( std::map< EntityHandle, ElemInfo >::iterator i = elem_sets.begin( ); i != elem_sets.end( ); ++i )
     {
         int                 num_vtx;
         const EntityHandle* conn;

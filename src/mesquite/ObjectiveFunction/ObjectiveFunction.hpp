@@ -129,8 +129,7 @@ class MESQUITE_EXPORT ObjectiveFunction
     //! because every practical OF implementation at this time should
     //! have an implementation that at least recursively calls the same
     //! function on the underlying QualityMetric or ObjectiveFunction(s).
-    virtual void initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
-                                   MsqError& err ) = 0;
+    virtual void initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings, MsqError& err ) = 0;
 
     /**\brief Initial accumulated value for block coordinate descent algorithms
      *
@@ -143,9 +142,8 @@ class MESQUITE_EXPORT ObjectiveFunction
      *\param domain The MeshDomain
      *\param user_set User-defined patch set - not relevant for most OF templates.
      */
-    virtual bool initialize_block_coordinate_descent( MeshDomainAssoc* mesh_and_domain,
-                                                      const Settings* settings, PatchSet* user_set,
-                                                      MsqError& err ) = 0;
+    virtual bool initialize_block_coordinate_descent( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
+                                                      PatchSet* user_set, MsqError& err ) = 0;
 
     /**\brief Evaluate objective function for specified patch.
      *
@@ -162,8 +160,7 @@ class MESQUITE_EXPORT ObjectiveFunction
      *\return false if any QualityMetric evaluation returned false,
      *        true otherwise.
      */
-    virtual bool evaluate( EvalType type, PatchData& pd, double& value_out, bool free,
-                           MsqError& err ) = 0;
+    virtual bool evaluate( EvalType type, PatchData& pd, double& value_out, bool free, MsqError& err ) = 0;
 
     /**\brief Evaluate objective function and gradient for specified patch.
      *
@@ -214,8 +211,7 @@ class MESQUITE_EXPORT ObjectiveFunction
      */
     virtual bool evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd, double& value_out,
                                                  std::vector< Vector3D >&    grad_out,
-                                                 std::vector< SymMatrix3D >& hess_diag_out,
-                                                 MsqError&                   err );
+                                                 std::vector< SymMatrix3D >& hess_diag_out, MsqError& err );
 
     /**\brief Evaluate objective function and Hessian for specified patch.
      *
@@ -237,8 +233,7 @@ class MESQUITE_EXPORT ObjectiveFunction
      *        true otherwise.
      */
     virtual bool evaluate_with_Hessian( EvalType type, PatchData& pd, double& value_out,
-                                        std::vector< Vector3D >& grad_out, MsqHessian& Hessian_out,
-                                        MsqError& err );
+                                        std::vector< Vector3D >& grad_out, MsqHessian& Hessian_out, MsqError& err );
 
     /**\brief Create copy with same state
      *
@@ -265,8 +260,7 @@ class MESQUITE_EXPORT ObjectiveFunction
      * The objective function value at the perturbed vertex position is given
      * in local_val.
      */
-    double get_eps( PatchData& pd, EvalType eval_type, double& local_val, int k,
-                    size_t vertex_index, MsqError& err );
+    double get_eps( PatchData& pd, EvalType eval_type, double& local_val, int k, size_t vertex_index, MsqError& err );
 
   private:
     /**\brief Compute numerical approx. of gradient for 1 vertex's coordinates.
@@ -286,13 +280,11 @@ class MESQUITE_EXPORT ObjectiveFunction
      *\return       The result of calling the ObjectiveFunction::evaluate
      *              method.
      */
-    bool compute_subpatch_numerical_gradient( EvalType type, EvalType get_eps_eval_type,
-                                              PatchData& pd, double& flocal, Vector3D& grad,
-                                              MsqError& err );
+    bool compute_subpatch_numerical_gradient( EvalType type, EvalType get_eps_eval_type, PatchData& pd, double& flocal,
+                                              Vector3D& grad, MsqError& err );
 
-    bool compute_patch_numerical_gradient( EvalType type, EvalType get_eps_eval_type, PatchData& pd,
-                                           double& flocal, std::vector< Vector3D >& grad,
-                                           MsqError& err );
+    bool compute_patch_numerical_gradient( EvalType type, EvalType get_eps_eval_type, PatchData& pd, double& flocal,
+                                           std::vector< Vector3D >& grad, MsqError& err );
 };
 
 }  // namespace MBMesquite

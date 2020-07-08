@@ -224,8 +224,7 @@ class TupleList
      * param index     index of the tuple needed
      * param *&sp, *&ip, *&lp, *&dp   pointers to each piece of the tuple
      */
-    ErrorCode get( unsigned int index, const sint*& sp, const slong*& ip, const Ulong*& lp,
-                   const realType*& dp );
+    ErrorCode get( unsigned int index, const sint*& sp, const slong*& ip, const Ulong*& lp, const realType*& dp );
 
     /**push back a new tuple on the TupleList;
      *
@@ -329,30 +328,28 @@ class TupleList
 #define COUNT_SIZE ( DIGITS * DIGIT_VALUES )
 
     template< class Value >
-    static Value radix_count( const Value* A, const Value* end, Index stride,
-                              Index count[ DIGITS ][ DIGIT_VALUES ] );
+    static Value radix_count( const Value* A, const Value* end, Index stride, Index count[ DIGITS ][ DIGIT_VALUES ] );
 
     static void radix_offsets( Index* c );
 
     template< class Value >
-    static unsigned radix_zeros( Value bitorkey, Index count[ DIGITS ][ DIGIT_VALUES ],
-                                 unsigned* shift, Index** offsets );
+    static unsigned radix_zeros( Value bitorkey, Index count[ DIGITS ][ DIGIT_VALUES ], unsigned* shift,
+                                 Index** offsets );
 
     template< class Value >
     static void radix_index_pass_b( const Value* A, Index n, Index stride, unsigned sh, Index* off,
                                     SortData< Value >* out );
 
     template< class Value >
-    static void radix_index_pass_m( const SortData< Value >* src, const SortData< Value >* end,
-                                    unsigned sh, Index* off, SortData< Value >* out );
+    static void radix_index_pass_m( const SortData< Value >* src, const SortData< Value >* end, unsigned sh, Index* off,
+                                    SortData< Value >* out );
 
     template< class Value >
-    static void radix_index_pass_e( const SortData< Value >* src, const SortData< Value >* end,
-                                    unsigned sh, Index* off, Index* out );
+    static void radix_index_pass_e( const SortData< Value >* src, const SortData< Value >* end, unsigned sh, Index* off,
+                                    Index* out );
 
     template< class Value >
-    static void radix_index_pass_be( const Value* A, Index n, Index stride, unsigned sh, Index* off,
-                                     Index* out );
+    static void radix_index_pass_be( const Value* A, Index n, Index stride, unsigned sh, Index* off, Index* out );
 
     /*------------------------------------------------------------------------------
 
@@ -363,8 +360,7 @@ class TupleList
 
       ----------------------------------------------------------------------------*/
     template< class Value >
-    static void radix_index_sort( const Value* A, Index n, Index stride, Index* idx,
-                                  SortData< Value >* work );
+    static void radix_index_sort( const Value* A, Index n, Index stride, Index* idx, SortData< Value >* work );
 
     /*------------------------------------------------------------------------------
 
@@ -375,12 +371,10 @@ class TupleList
 
       ----------------------------------------------------------------------------*/
     template< class Value >
-    static void merge_index_sort( const Value* A, const Index An, Index stride, Index* idx,
-                                  SortData< Value >* work );
+    static void merge_index_sort( const Value* A, const Index An, Index stride, Index* idx, SortData< Value >* work );
 
     template< class Value >
-    static void index_sort( const Value* A, Index n, Index stride, Index* idx,
-                            SortData< Value >* work );
+    static void index_sort( const Value* A, Index n, Index stride, Index* idx, SortData< Value >* work );
 
 #undef DIGIT_BITS
 #undef DIGIT_VALUES

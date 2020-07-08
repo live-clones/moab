@@ -24,10 +24,8 @@ static void test_save( );
 #define ASSERT_DOUBLES_EQUAL( A, B ) assert_doubles_equal( ( A ), ( B ), #A, #B, __LINE__ )
 #define ASSERT( B ) assert_bool( ( B ), #B, __LINE__ )
 
-static void assert_vector_element( const CartVect& a, const Matrix3& b, const char* sa,
-                                   const char* sb, int lineno );
-static void assert_vectors_equal( const CartVect& a, const CartVect& b, const char* sa,
-                                  const char* sb, int lineno );
+static void assert_vector_element( const CartVect& a, const Matrix3& b, const char* sa, const char* sb, int lineno );
+static void assert_vectors_equal( const CartVect& a, const CartVect& b, const char* sa, const char* sb, int lineno );
 static void assert_doubles_equal( double a, double b, const char* sa, const char* sb, int lineno );
 static void assert_bool( bool b, const char* sb, int lineno );
 
@@ -55,8 +53,7 @@ const CartVect    unitcenter( 10, 20, 30 );
 const OrientedBox offsetbox( unitaxes, unitcenter );
 
 // define non-unit centered at origin
-const Matrix3     origaxes( 5 * unitaxes.col( 0 ), 10 * unitaxes.col( 1 ), 0.1 * unitaxes.col( 2 ),
-                        true );
+const Matrix3     origaxes( 5 * unitaxes.col( 0 ), 10 * unitaxes.col( 1 ), 0.1 * unitaxes.col( 2 ), true );
 const OrientedBox oblongbox( origaxes, origin );
 
 // define non-axis-aligned box at origin (non unit) ;
@@ -67,9 +64,8 @@ const CartVect    rotax2 = CartVect( 1.0, 1.0, 0.0 ) * CartVect( 1.0, -1.0, 1.0 
 const CartVect    rotax[ 3 ] = { rotax0, rotax1, rotax2 };
 const OrientedBox rotbox_cv( rotax, origin );
 
-const Matrix3
-                  rotaxes( rotax0, rotax1, rotax2,
-             false );  // so these are columns, as in the constructor that takes 3 "CartVect"s
+const Matrix3     rotaxes( rotax0, rotax1, rotax2,
+                       false );  // so these are columns, as in the constructor that takes 3 "CartVect"s
 const OrientedBox rotbox( rotaxes, origin );
 
 /********************* Utility methods for tests ***************************/
@@ -80,8 +76,7 @@ static CartVect scaled_corner( const OrientedBox& box, int corner, double factor
     static const int signs[][ 3 ] = { { 1, 1, -1 }, { -1, 1, -1 }, { -1, -1, -1 }, { 1, -1, -1 },
                                       { 1, 1, 1 },  { -1, 1, 1 },  { -1, -1, 1 },  { 1, -1, 1 } };
     return box.center + signs[ corner ][ 0 ] * factor * box.scaled_axis( 0 ) +
-           signs[ corner ][ 1 ] * factor * box.scaled_axis( 1 ) +
-           signs[ corner ][ 2 ] * factor * box.scaled_axis( 2 );
+           signs[ corner ][ 1 ] * factor * box.scaled_axis( 1 ) + signs[ corner ][ 2 ] * factor * box.scaled_axis( 2 );
 }
 
 // return point at specified fraction between box center and specified box face
@@ -1490,18 +1485,16 @@ void test_build_from_tri( )
     int       i;
 
     // define a planar patch of triangles
-    const double coords[] = { 0,  0,  0,  5,  0,  0,  5,  5,   0, 0,  5,  0,  -5, 5,   0, -5,
-                              0,  0,  -5, -5, 0,  0,  -5, 0,   5, -5, 0,  10, 0,  0,   8, 5,
-                              0,  5,  8,  0,  0,  10, 0,  -5,  8, 0,  -8, 5,  0,  -10, 0, 0,
-                              -8, -5, 0,  -5, -8, 0,  0,  -10, 0, 5,  -8, 0,  8,  -5,  0 };
-    const int    conn[] = {
-        3, 12, 13, 3, 11, 12, 4, 13, 14, 4, 3,  13, 3, 2, 11, 2, 10, 11,
+    const double coords[] = { 0,  0,  0, 5,   0,  0, 5,  5,  0, 0,  5,  0, -5, 5,   0, -5, 0,  0, -5, -5, 0,
+                              0,  -5, 0, 5,   -5, 0, 10, 0,  0, 8,  5,  0, 5,  8,   0, 0,  10, 0, -5, 8,  0,
+                              -8, 5,  0, -10, 0,  0, -8, -5, 0, -5, -8, 0, 0,  -10, 0, 5,  -8, 0, 8,  -5, 0 };
+    const int    conn[] = { 3, 12, 13, 3, 11, 12, 4, 13, 14, 4, 3,  13, 3, 2, 11, 2, 10, 11,
 
-        5, 14, 15, 5, 4,  14, 3, 4,  5,  0, 3,  5,  0, 1, 3,  1, 2,  3,  2, 1, 10, 1, 9, 10,
+                         5, 14, 15, 5, 4,  14, 3, 4,  5,  0, 3,  5,  0, 1, 3,  1, 2,  3,  2, 1, 10, 1, 9, 10,
 
-        5, 15, 16, 6, 5,  16, 5, 6,  7,  0, 5,  7,  1, 0, 7,  1, 7,  8,  1, 8, 20, 9, 1, 20,
+                         5, 15, 16, 6, 5,  16, 5, 6,  7,  0, 5,  7,  1, 0, 7,  1, 7,  8,  1, 8, 20, 9, 1, 20,
 
-        6, 16, 17, 7, 6,  17, 7, 17, 18, 7, 18, 19, 8, 7, 19, 8, 19, 20 };
+                         6, 16, 17, 7, 6,  17, 7, 17, 18, 7, 18, 19, 8, 7, 19, 8, 19, 20 };
 
     // build triangle mesh
     std::vector< EntityHandle > vertices( 21 );
@@ -1568,8 +1561,7 @@ void test_build_from_pts( )
     Core             moab;
     Interface* const gMB = &moab;
 
-    const double vertex_coords[] = { 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0,
-                                     0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1 };
+    const double vertex_coords[] = { 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1 };
     const int    num_double = sizeof( vertex_coords ) / ( sizeof( double ) );
     const int    num_vertex = num_double / 3;
     assert( 0 == num_double % 3 );
@@ -1606,8 +1598,7 @@ void test_build_from_pts( )
     double  center[ 3 ] = { 0.5 * ( max[ 0 ] + min[ 0 ] ), 0.5 * ( max[ 1 ] + min[ 1 ] ),
                            0.5 * ( max[ 2 ] + min[ 2 ] ) };
     double  diag[ 3 ] = { max[ 0 ] - min[ 0 ], max[ 1 ] - min[ 1 ], max[ 2 ] - min[ 2 ] };
-    double  outside1[ 3 ] = { center[ 0 ] + diag[ 0 ], center[ 1 ] + diag[ 1 ],
-                             center[ 2 ] + diag[ 2 ] };
+    double  outside1[ 3 ] = { center[ 0 ] + diag[ 0 ], center[ 1 ] + diag[ 1 ], center[ 2 ] + diag[ 2 ] };
     double  outside2[ 3 ] = { center[ 0 ] + diag[ 0 ], center[ 1 ] + diag[ 1 ], center[ 2 ] };
     double  outside3[ 3 ] = { center[ 0 ] + diag[ 0 ], center[ 1 ], center[ 2 ] };
     double* outside[ 3 ] = { outside1, outside2, outside3 };
@@ -1638,8 +1629,7 @@ static void test_save( )
 
 /********************* Error Checking Code ***************************/
 
-static void assert_vector_element( const CartVect& a, const Matrix3& b, const char* sa,
-                                   const char* sb, int lineno )
+static void assert_vector_element( const CartVect& a, const Matrix3& b, const char* sa, const char* sb, int lineno )
 {
     int  i;
     bool ismatch = false;
@@ -1663,16 +1653,14 @@ static void assert_vector_element( const CartVect& a, const Matrix3& b, const ch
     return;
 }
 
-void assert_vectors_equal( const CartVect& a, const CartVect& b, const char* sa, const char* sb,
-                           int lineno )
+void assert_vectors_equal( const CartVect& a, const CartVect& b, const char* sa, const char* sb, int lineno )
 {
-    if( fabs( a[ 0 ] - b[ 0 ] ) > TOL || fabs( a[ 1 ] - b[ 1 ] ) > TOL ||
-        fabs( a[ 2 ] - b[ 2 ] ) > TOL )
+    if( fabs( a[ 0 ] - b[ 0 ] ) > TOL || fabs( a[ 1 ] - b[ 1 ] ) > TOL || fabs( a[ 2 ] - b[ 2 ] ) > TOL )
     {
         std::cerr << "Assertion failed at line " << lineno << std::endl
                   << "\t" << sa << " == " << sb << std::endl
-                  << "\t[" << a[ 0 ] << ", " << a[ 1 ] << ", " << a[ 2 ] << "] == [" << b[ 0 ]
-                  << ", " << b[ 1 ] << ", " << b[ 2 ] << "]" << std::endl;
+                  << "\t[" << a[ 0 ] << ", " << a[ 1 ] << ", " << a[ 2 ] << "] == [" << b[ 0 ] << ", " << b[ 1 ] << ", "
+                  << b[ 2 ] << "]" << std::endl;
         ++error_count;
     }
 }

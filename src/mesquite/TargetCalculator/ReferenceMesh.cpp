@@ -42,8 +42,7 @@ ReferenceMeshInterface::~ReferenceMeshInterface( ) {}
 
 ReferenceMesh::~ReferenceMesh( ) {}
 
-void ReferenceMesh::get_reference_vertex_coordinates( const Mesh::VertexHandle* vertices,
-                                                      size_t                    num_vertices,
+void ReferenceMesh::get_reference_vertex_coordinates( const Mesh::VertexHandle* vertices, size_t num_vertices,
                                                       Vector3D* coordinates_out, MsqError& err )
 {
     tmpStorage.resize( num_vertices );

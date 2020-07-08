@@ -17,11 +17,10 @@ const CartVect cube_corners[ 8 ] = { CartVect( 0, 0, 0 ), CartVect( 1, 0, 0 ), C
                                      CartVect( 0, 1, 0 ), CartVect( 0, 0, 1 ), CartVect( 1, 0, 1 ),
                                      CartVect( 1, 1, 1 ), CartVect( 0, 1, 1 ) };
 
-const CartVect hex_corners[ 8 ] = {
-    CartVect( 1.0e0, 0.0e0, 0.0e0 ), CartVect( 1.0e0, 1.0e0, 0.3e0 ),
-    CartVect( 0.0e0, 2.0e0, 0.6e0 ), CartVect( 0.2e0, 1.1e0, 0.4e0 ),
-    CartVect( 1.5e0, 0.3e0, 1.0e0 ), CartVect( 1.5e0, 1.3e0, 1.0e0 ),
-    CartVect( 0.5e0, 2.3e0, 1.0e0 ), CartVect( 0.7e0, 1.4e0, 1.0e0 ) };
+const CartVect hex_corners[ 8 ] = { CartVect( 1.0e0, 0.0e0, 0.0e0 ), CartVect( 1.0e0, 1.0e0, 0.3e0 ),
+                                    CartVect( 0.0e0, 2.0e0, 0.6e0 ), CartVect( 0.2e0, 1.1e0, 0.4e0 ),
+                                    CartVect( 1.5e0, 0.3e0, 1.0e0 ), CartVect( 1.5e0, 1.3e0, 1.0e0 ),
+                                    CartVect( 0.5e0, 2.3e0, 1.0e0 ), CartVect( 0.7e0, 1.4e0, 1.0e0 ) };
 
 /** shape function for trilinear hex */
 CartVect hex_map( const CartVect& xi, const CartVect* corners )
@@ -115,8 +114,8 @@ void test_hex_nat_coords( )
         {
             for( x[ 2 ] = -1; x[ 2 ] <= 2; x[ 2 ] += 0.4 )
             {
-                bool in_box = x[ 0 ] >= min[ 0 ] && x[ 0 ] <= max[ 0 ] && x[ 1 ] >= min[ 1 ] &&
-                              x[ 1 ] <= max[ 1 ] && x[ 2 ] >= min[ 2 ] && x[ 2 ] <= max[ 2 ];
+                bool in_box = x[ 0 ] >= min[ 0 ] && x[ 0 ] <= max[ 0 ] && x[ 1 ] >= min[ 1 ] && x[ 1 ] <= max[ 1 ] &&
+                              x[ 2 ] >= min[ 2 ] && x[ 2 ] <= max[ 2 ];
                 if( in_box ) continue;
                 result_xi = hex.ievaluate( x, EPS1 / 10 );
                 double dum = EPS1 / 10;
@@ -136,8 +135,8 @@ void test_hex_nat_coords( )
         {
             for( x[ 2 ] = -1; x[ 2 ] <= 2; x[ 2 ] += 0.4 )
             {
-                bool in_box = x[ 0 ] >= min[ 0 ] && x[ 0 ] <= max[ 0 ] && x[ 1 ] >= min[ 1 ] &&
-                              x[ 1 ] <= max[ 1 ] && x[ 2 ] >= min[ 2 ] && x[ 2 ] <= max[ 2 ];
+                bool in_box = x[ 0 ] >= min[ 0 ] && x[ 0 ] <= max[ 0 ] && x[ 1 ] >= min[ 1 ] && x[ 1 ] <= max[ 1 ] &&
+                              x[ 2 ] >= min[ 2 ] && x[ 2 ] <= max[ 2 ];
                 if( in_box ) continue;
                 try
                 {

@@ -93,8 +93,7 @@ namespace MeshWriter
     MESQUITE_EXPORT
     void write_gnuplot( PatchData& pd, const char* filename, MsqError& err );
     MESQUITE_EXPORT
-    void write_gnuplot( Mesh* mesh, std::vector< Mesh::ElementHandle >& elems, const char* filename,
-                        MsqError& err );
+    void write_gnuplot( Mesh* mesh, std::vector< Mesh::ElementHandle >& elems, const char* filename, MsqError& err );
 
     /**\brief Write animator for sequence of gnuplot data files
      *
@@ -125,8 +124,7 @@ namespace MeshWriter
     MESQUITE_EXPORT
     void write_vtk( Mesh* mesh, const char* filename, MsqError& err );
     MESQUITE_EXPORT
-    void write_vtk( PatchData& pd, const char* filename, MsqError& err,
-                    const Vector3D* OF_gradient = 0 );
+    void write_vtk( PatchData& pd, const char* filename, MsqError& err, const Vector3D* OF_gradient = 0 );
 
     /** Convert inches to points */
     inline int in2pt( float inches )
@@ -148,8 +146,8 @@ namespace MeshWriter
      *\param height - The height of the output image, in points.
      */
     MESQUITE_EXPORT
-    void write_eps( Mesh* mesh, const char* filename, Projection proj, MsqError& err,
-                    int width = in2pt( 6.5 ), int height = in2pt( 9 ) );
+    void write_eps( Mesh* mesh, const char* filename, Projection proj, MsqError& err, int width = in2pt( 6.5 ),
+                    int height = in2pt( 9 ) );
 
     /**\brief Write an SVG file.
      *
@@ -174,14 +172,12 @@ namespace MeshWriter
     /**\brief Write EPS file containing single triangle in XY plane.
      */
     MESQUITE_EXPORT
-    void write_eps_triangle( Mesh* mesh, Mesh::ElementHandle elem, const char* filename,
-                             bool draw_iso_lines, bool draw_nodes, MsqError& err,
-                             int width = in2pt( 6.5 ), int height = in2pt( 9 ) );
+    void write_eps_triangle( Mesh* mesh, Mesh::ElementHandle elem, const char* filename, bool draw_iso_lines,
+                             bool draw_nodes, MsqError& err, int width = in2pt( 6.5 ), int height = in2pt( 9 ) );
     MESQUITE_EXPORT
-    void write_eps_triangle( const Vector3D* coords, size_t num_vtx, const char* filename,
-                             bool draw_iso_lines, bool draw_nodes, MsqError& err,
-                             const std::vector< bool >& fixed_flags, int width = in2pt( 6.5 ),
-                             int height = in2pt( 9 ) );
+    void write_eps_triangle( const Vector3D* coords, size_t num_vtx, const char* filename, bool draw_iso_lines,
+                             bool draw_nodes, MsqError& err, const std::vector< bool >& fixed_flags,
+                             int width = in2pt( 6.5 ), int height = in2pt( 9 ) );
 
 }  // namespace MeshWriter
 

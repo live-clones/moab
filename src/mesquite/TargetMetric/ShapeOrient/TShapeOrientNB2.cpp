@@ -53,8 +53,7 @@ template< unsigned DIM > static inline bool eval( const MsqMatrix< DIM, DIM >& T
 }
 
 template< unsigned DIM >
-static inline bool grad( const MsqMatrix< DIM, DIM >& T, double& result,
-                         MsqMatrix< DIM, DIM >& deriv_wrt_T )
+static inline bool grad( const MsqMatrix< DIM, DIM >& T, double& result, MsqMatrix< DIM, DIM >& deriv_wrt_T )
 {
     const double tr = trace( T );
     const double f = DimConst< DIM >::inv( ) * fabs( tr );
@@ -66,8 +65,8 @@ static inline bool grad( const MsqMatrix< DIM, DIM >& T, double& result,
 }
 
 template< unsigned DIM >
-static inline bool hess( const MsqMatrix< DIM, DIM >& T, double& result,
-                         MsqMatrix< DIM, DIM >& deriv_wrt_T, MsqMatrix< DIM, DIM >* second_wrt_T )
+static inline bool hess( const MsqMatrix< DIM, DIM >& T, double& result, MsqMatrix< DIM, DIM >& deriv_wrt_T,
+                         MsqMatrix< DIM, DIM >* second_wrt_T )
 {
     const double tr = trace( T );
     const double f = DimConst< DIM >::inv( ) * fabs( tr );

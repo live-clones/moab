@@ -312,8 +312,7 @@ void test_read_physical_set( )
     Range             phys_set;
     const int         phys_set_id = 4;
     const void* const phys_set_id_val[] = { &phys_set_id };
-    rval =
-        mb.get_entities_by_type_and_tag( 0, MBENTITYSET, &phys_tag, phys_set_id_val, 1, phys_set );CHECK_ERR( rval );
+    rval = mb.get_entities_by_type_and_tag( 0, MBENTITYSET, &phys_tag, phys_set_id_val, 1, phys_set );CHECK_ERR( rval );
     CHECK_EQUAL( 1, (int)phys_set.size( ) );
 
     std::vector< EntityHandle > tets, contents;

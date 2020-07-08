@@ -46,8 +46,7 @@ std::string AWShapeSizeB1::get_name( ) const
 
 AWShapeSizeB1::~AWShapeSizeB1( ) {}
 
-bool AWShapeSizeB1::evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W,
-                              double& result, MsqError& err )
+bool AWShapeSizeB1::evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result, MsqError& err )
 {
     const double alpha = det( A );
     if( AWMetric::invalid_determinant( alpha ) )
@@ -60,8 +59,7 @@ bool AWShapeSizeB1::evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 
     return true;
 }
 
-bool AWShapeSizeB1::evaluate( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >& W,
-                              double& result, MsqError& err )
+bool AWShapeSizeB1::evaluate( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >& W, double& result, MsqError& err )
 {
     const double alpha = det( A );
     if( AWMetric::invalid_determinant( alpha ) )

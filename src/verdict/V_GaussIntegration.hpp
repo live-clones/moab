@@ -34,8 +34,7 @@
 namespace GaussIntegration
 {
 
-void get_signs_for_node_local_coord_hex( int node_id, double& sign_y1, double& sign_y2,
-                                         double& sign_y3 );
+void get_signs_for_node_local_coord_hex( int node_id, double& sign_y1, double& sign_y2, double& sign_y3 );
 //- to get the signs for  coordinates of hex nodes in the local computational space
 
 // constructors
@@ -56,13 +55,12 @@ void calculate_shape_function_2d_quad( );
 //- calculate the shape functions and derivatives of shape functions
 //- at gaussian points for 2D quad elements
 
-void get_shape_func( double shape_function[], double dndy1_at_gauss_pts[],
-                     double dndy2_at_gauss_ptsp[], double gauss_weight[] );
+void get_shape_func( double shape_function[], double dndy1_at_gauss_pts[], double dndy2_at_gauss_ptsp[],
+                     double gauss_weight[] );
 //- get shape functions and the derivatives
 
-void get_shape_func( double shape_function[], double dndy1_at_gauss_pts[],
-                     double dndy2_at_gauss_pts[], double dndy3_at_gauss_pts[],
-                     double gauss_weight[] );
+void get_shape_func( double shape_function[], double dndy1_at_gauss_pts[], double dndy2_at_gauss_pts[],
+                     double dndy3_at_gauss_pts[], double gauss_weight[] );
 //- get shape functions and the derivatives for 3D elements
 
 void calculate_derivative_at_nodes( double dndy1_at_nodes[][ maxNumberNodes ],

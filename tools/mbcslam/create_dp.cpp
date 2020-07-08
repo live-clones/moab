@@ -25,19 +25,16 @@ ErrorCode add_field_value( Interface& mb )
 {
     Tag         tagTracer = 0;
     std::string tag_name( "Tracer" );
-    ErrorCode   rval = mb.tag_get_handle( tag_name.c_str( ), 1, MB_TYPE_DOUBLE, tagTracer,
-                                        MB_TAG_DENSE | MB_TAG_CREAT );CHECK_ERR( rval );
+    ErrorCode rval = mb.tag_get_handle( tag_name.c_str( ), 1, MB_TYPE_DOUBLE, tagTracer, MB_TAG_DENSE | MB_TAG_CREAT );CHECK_ERR( rval );
 
     // tagElem is the average computed at each element, from nodal values
     Tag         tagElem = 0;
     std::string tag_name2( "TracerAverage" );
-    rval = mb.tag_get_handle( tag_name2.c_str( ), 1, MB_TYPE_DOUBLE, tagElem,
-                              MB_TAG_DENSE | MB_TAG_CREAT );CHECK_ERR( rval );
+    rval = mb.tag_get_handle( tag_name2.c_str( ), 1, MB_TYPE_DOUBLE, tagElem, MB_TAG_DENSE | MB_TAG_CREAT );CHECK_ERR( rval );
 
     Tag         tagArea = 0;
     std::string tag_name4( "Area" );
-    rval = mb.tag_get_handle( tag_name4.c_str( ), 1, MB_TYPE_DOUBLE, tagArea,
-                              MB_TAG_DENSE | MB_TAG_CREAT );CHECK_ERR( rval );
+    rval = mb.tag_get_handle( tag_name4.c_str( ), 1, MB_TYPE_DOUBLE, tagArea, MB_TAG_DENSE | MB_TAG_CREAT );CHECK_ERR( rval );
 
     /*
      * get all plys first, then vertices, then move them on the surface of the sphere
@@ -119,8 +116,7 @@ ErrorCode add_field_value( Interface& mb )
 
             moab::IntxUtils::SphereCoords sphCoord = moab::IntxUtils::cart_to_spherical( posi );
 
-            ptr_DP[ 0 ] =
-                IntxUtilsCSLAM::slotted_cylinder_field( sphCoord.lon, sphCoord.lat, params );
+            ptr_DP[ 0 ] = IntxUtilsCSLAM::slotted_cylinder_field( sphCoord.lon, sphCoord.lat, params );
             ;
 
             ptr_DP++;  // increment to the next node
@@ -214,8 +210,7 @@ int main( int argc, char** argv )
 
     rval = mb.load_mesh( input_mesh1 );
 
-    std::cout << " -t " << t << " -dt " << dt << " input: " << input_mesh1 << "  output: " << output
-              << "\n";
+    std::cout << " -t " << t << " -dt " << dt << " input: " << input_mesh1 << "  output: " << output << "\n";
 
     // skip if we need for DP (already existing)
     if( skip ) { std::cout << " do not add DP tag \n"; }
@@ -229,13 +224,11 @@ int main( int argc, char** argv )
         int     count;
         rval = mb.coords_iterate( verts.begin( ), verts.end( ), x_ptr, y_ptr, z_ptr, count );
         if( MB_SUCCESS != rval ) return 1;
-        assert( count ==
-                (int)verts.size( ) );  // should end up with just one contiguous chunk of vertices
+        assert( count == (int)verts.size( ) );  // should end up with just one contiguous chunk of vertices
 
         Tag         tagh = 0;
         std::string tag_name( "DP" );
-        rval = mb.tag_get_handle( tag_name.c_str( ), 3, MB_TYPE_DOUBLE, tagh,
-                                  MB_TAG_DENSE | MB_TAG_CREAT );CHECK_ERR( rval );
+        rval = mb.tag_get_handle( tag_name.c_str( ), 3, MB_TYPE_DOUBLE, tagh, MB_TAG_DENSE | MB_TAG_CREAT );CHECK_ERR( rval );
         void* data;  // pointer to the LOC in memory, for each vertex
         int   count_tag;
 

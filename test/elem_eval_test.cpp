@@ -30,15 +30,15 @@ ErrorCode create_mesh( Core& mb, EntityType type );
 
 CartVect hex_verts[] = {
     // corners
-    CartVect( -1, -1, -1 ), CartVect( 1, -1, -1 ), CartVect( 1, 1, -1 ), CartVect( -1, 1, -1 ),
-    CartVect( -1, -1, 1 ), CartVect( 1, -1, 1 ), CartVect( 1, 1, 1 ), CartVect( -1, 1, 1 ),
+    CartVect( -1, -1, -1 ), CartVect( 1, -1, -1 ), CartVect( 1, 1, -1 ), CartVect( -1, 1, -1 ), CartVect( -1, -1, 1 ),
+    CartVect( 1, -1, 1 ), CartVect( 1, 1, 1 ), CartVect( -1, 1, 1 ),
     // mid-edge (bottom, middle, top)
-    CartVect( 0, -1, -1 ), CartVect( 1, 0, -1 ), CartVect( 0, 1, -1 ), CartVect( -1, 0, -1 ),
-    CartVect( -1, -1, 0 ), CartVect( 1, -1, 0 ), CartVect( 1, 1, 0 ), CartVect( -1, 1, 0 ),
-    CartVect( 0, -1, 1 ), CartVect( 1, 0, 1 ), CartVect( 0, 1, 1 ), CartVect( -1, 0, 1 ),
+    CartVect( 0, -1, -1 ), CartVect( 1, 0, -1 ), CartVect( 0, 1, -1 ), CartVect( -1, 0, -1 ), CartVect( -1, -1, 0 ),
+    CartVect( 1, -1, 0 ), CartVect( 1, 1, 0 ), CartVect( -1, 1, 0 ), CartVect( 0, -1, 1 ), CartVect( 1, 0, 1 ),
+    CartVect( 0, 1, 1 ), CartVect( -1, 0, 1 ),
     // mid-face (middle, bottom, top)
-    CartVect( 0, -1, 0 ), CartVect( 1, 0, 0 ), CartVect( 0, 1, 0 ), CartVect( -1, 0, 0 ),
-    CartVect( 0, 0, -1 ), CartVect( 0, 0, 1 ),
+    CartVect( 0, -1, 0 ), CartVect( 1, 0, 0 ), CartVect( 0, 1, 0 ), CartVect( -1, 0, 0 ), CartVect( 0, 0, -1 ),
+    CartVect( 0, 0, 1 ),
     // mid-element
     CartVect( 0, 0, 0 ) };
 
@@ -81,10 +81,8 @@ void test_eval( ElemEvaluator& ee, bool test_integrate )
     // tag equal to coordinates should integrate to avg position, test that
     Tag tag;
     // make a temporary tag and set it on vertices to the vertex positions
-    rval =
-        ee.get_moab( )->tag_get_handle( NULL, 3, MB_TYPE_DOUBLE, tag, MB_TAG_DENSE | MB_TAG_CREAT );CHECK_ERR( rval );
-    rval = ee.get_moab( )->tag_set_data( tag, ee.get_vert_handles( ), ee.get_num_verts( ),
-                                         ee.get_vert_pos( ) );CHECK_ERR( rval );
+    rval = ee.get_moab( )->tag_get_handle( NULL, 3, MB_TYPE_DOUBLE, tag, MB_TAG_DENSE | MB_TAG_CREAT );CHECK_ERR( rval );
+    rval = ee.get_moab( )->tag_set_data( tag, ee.get_vert_handles( ), ee.get_num_verts( ), ee.get_vert_pos( ) );CHECK_ERR( rval );
     // set that temporary tag on the evaluator so that's what gets integrated
     rval = ee.set_tag_handle( tag, 0 );CHECK_ERR( rval );
 
@@ -98,8 +96,7 @@ void test_eval( ElemEvaluator& ee, bool test_integrate )
     EntityHandle          eh = ee.get_ent_handle( );
     rval = EvalSet::get_eval_set( ee.get_moab( ), eh, es );CHECK_ERR( rval );
     rval = ( *es.integrateFcn )( &one[ 0 ], ee.get_vert_pos( ), ee.get_num_verts( ),
-                                 ee.get_moab( )->dimension_from_handle( eh ), 1,
-                                 ee.get_work_space( ), &measure );CHECK_ERR( rval );
+                                 ee.get_moab( )->dimension_from_handle( eh ), 1, ee.get_work_space( ), &measure );CHECK_ERR( rval );
     if( measure ) integral /= measure;
 
     // check against avg of entity's vertices' positions
@@ -112,8 +109,8 @@ void test_eval( ElemEvaluator& ee, bool test_integrate )
     rval = ee.set_tag_handle( 0, 0 );CHECK_ERR( rval );
 }
 
-void test_evals( ElemEvaluator& ee, bool test_integrate, EntityHandle* ents, int num_ents,
-                 Tag onetag, double total_vol )
+void test_evals( ElemEvaluator& ee, bool test_integrate, EntityHandle* ents, int num_ents, Tag onetag,
+                 double total_vol )
 {
     for( int i = 0; i < num_ents; i++ )
     {
@@ -141,8 +138,7 @@ int main( )
 {
     int failures = 0;
 
-    failures += RUN_TEST(
-        test_linear_tri );  // currently failing linear tri, bad formulation, working on it...
+    failures += RUN_TEST( test_linear_tri );  // currently failing linear tri, bad formulation, working on it...
     failures += RUN_TEST( test_linear_quad );
     failures += RUN_TEST( test_linear_hex );
     failures += RUN_TEST( test_quadratic_hex );
@@ -278,8 +274,8 @@ void test_normal_linear_tri( )
     {
         if( i == 3 )
         {
-            double val = nrms[ 7 ][ 0 ] * nrms[ 0 ][ 0 ] + nrms[ 7 ][ 1 ] * nrms[ 0 ][ 1 ] +
-                         nrms[ 7 ][ 2 ] * nrms[ 0 ][ 2 ];
+            double val =
+                nrms[ 7 ][ 0 ] * nrms[ 0 ][ 0 ] + nrms[ 7 ][ 1 ] * nrms[ 0 ][ 1 ] + nrms[ 7 ][ 2 ] * nrms[ 0 ][ 2 ];
             CHECK_EQUAL( val, -1 );
         }
         else
@@ -317,8 +313,8 @@ void test_normal_linear_quad( )
     {
         if( i == 3 )
         {
-            double val = nrms[ 7 ][ 0 ] * nrms[ 0 ][ 0 ] + nrms[ 7 ][ 1 ] * nrms[ 0 ][ 1 ] +
-                         nrms[ 7 ][ 2 ] * nrms[ 0 ][ 2 ];
+            double val =
+                nrms[ 7 ][ 0 ] * nrms[ 0 ][ 0 ] + nrms[ 7 ][ 1 ] * nrms[ 0 ][ 1 ] + nrms[ 7 ][ 2 ] * nrms[ 0 ][ 2 ];
             CHECK_EQUAL( val, -1 );
         }
         else
@@ -356,8 +352,8 @@ void test_normal_linear_tet( )
     {
         if( i == 3 )
         {
-            double val = nrms[ 7 ][ 0 ] * nrms[ 0 ][ 0 ] + nrms[ 7 ][ 1 ] * nrms[ 0 ][ 1 ] +
-                         nrms[ 7 ][ 2 ] * nrms[ 0 ][ 2 ];
+            double val =
+                nrms[ 7 ][ 0 ] * nrms[ 0 ][ 0 ] + nrms[ 7 ][ 1 ] * nrms[ 0 ][ 1 ] + nrms[ 7 ][ 2 ] * nrms[ 0 ][ 2 ];
             CHECK_EQUAL( val, -1 );
         }
         else
@@ -395,8 +391,8 @@ void test_normal_linear_hex( )
     {
         if( i == 3 )
         {
-            double val = nrms[ 7 ][ 0 ] * nrms[ 0 ][ 0 ] + nrms[ 7 ][ 1 ] * nrms[ 0 ][ 1 ] +
-                         nrms[ 7 ][ 2 ] * nrms[ 0 ][ 2 ];
+            double val =
+                nrms[ 7 ][ 0 ] * nrms[ 0 ][ 0 ] + nrms[ 7 ][ 1 ] * nrms[ 0 ][ 1 ] + nrms[ 7 ][ 2 ] * nrms[ 0 ][ 2 ];
             CHECK_EQUAL( val, -1 );
         }
         else
@@ -484,9 +480,9 @@ ErrorCode create_mesh( Core& mb, EntityType type )
     }
     else if( type == MBHEX )
     {
-        const double coords[] = {
-            0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, -1, 1, 0, -1, 0, 0, -1, -1, 0, 0, -1, 0, 1, -1, 0,
-            0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, -1, 1, 1, -1, 0, 1, -1, -1, 1, 0, -1, 1, 1, -1, 1 };
+        const double coords[] = { 0,  0,  0, 1,  0,  0, 1,  1,  0, 0,  1,  0, -1, 1,  0, -1, 0,  0,
+                                  -1, -1, 0, 0,  -1, 0, 1,  -1, 0, 0,  0,  1, 1,  0,  1, 1,  1,  1,
+                                  0,  1,  1, -1, 1,  1, -1, 0,  1, -1, -1, 1, 0,  -1, 1, 1,  -1, 1 };
         const size_t num_vtx = sizeof( coords ) / sizeof( double ) / 3;
 
         const int    conn[] = { 0, 1, 2, 3, 9, 10, 11, 12, 0, 3, 4, 5, 9, 12, 13, 14,

@@ -38,14 +38,11 @@
 // #define VERBOSE
 
 extern void BuildIntegrationArray( const Mesh& m_meshInput, const Mesh& m_meshOverlap,
-                                   const TriangularQuadratureRule& triquadrule, int ixFirstFace,
-                                   int ixOverlapBegin, int ixOverlapEnd, int nOrder,
-                                   DataArray2D< double >& dIntArray );
+                                   const TriangularQuadratureRule& triquadrule, int ixFirstFace, int ixOverlapBegin,
+                                   int ixOverlapEnd, int nOrder, DataArray2D< double >& dIntArray );
 
-extern void InvertFitArray_Corrected( const DataArray1D< double >& dConstraint,
-                                      DataArray2D< double >&       dFitArray,
-                                      DataArray1D< double >&       dFitWeights,
-                                      DataArray2D< double >&       dFitArrayPlus );
+extern void InvertFitArray_Corrected( const DataArray1D< double >& dConstraint, DataArray2D< double >& dFitArray,
+                                      DataArray1D< double >& dFitWeights, DataArray2D< double >& dFitArrayPlus );
 
 /// <summary>
 ///     Face index and distance metric pair.
@@ -57,27 +54,25 @@ typedef std::pair< int, int > FaceDistancePair;
 /// </summary>
 typedef std::vector< FaceDistancePair > AdjacentFaceVector;
 
-extern void BuildFitArray( const Mesh& mesh, const TriangularQuadratureRule& triquadrule,
-                           int ixFirst, const AdjacentFaceVector& vecAdjFaces, int nOrder,
-                           int nFitWeightsExponent, const DataArray1D< double >& dConstraint,
-                           DataArray2D< double >& dFitArray, DataArray1D< double >& dFitWeights );
+extern void BuildFitArray( const Mesh& mesh, const TriangularQuadratureRule& triquadrule, int ixFirst,
+                           const AdjacentFaceVector& vecAdjFaces, int nOrder, int nFitWeightsExponent,
+                           const DataArray1D< double >& dConstraint, DataArray2D< double >& dFitArray,
+                           DataArray1D< double >& dFitWeights );
 
-extern void GetAdjacentFaceVectorByEdge( const Mesh& mesh, int iFaceInitial,
-                                         int nRequiredFaceSetSize, AdjacentFaceVector& vecFaces );
+extern void GetAdjacentFaceVectorByEdge( const Mesh& mesh, int iFaceInitial, int nRequiredFaceSetSize,
+                                         AdjacentFaceVector& vecFaces );
 
 ///////////////////////////////////////////////////////////////////////////////
 
-moab::ErrorCode moab::TempestOnlineMap::LinearRemapNN_MOAB( bool use_GID_matching,
-                                                            bool strict_check )
+moab::ErrorCode moab::TempestOnlineMap::LinearRemapNN_MOAB( bool use_GID_matching, bool strict_check )
 {
     /* m_mapRemap size = (m_nTotDofs_Dest X m_nTotDofs_SrcCov)  */
 
 #ifdef VVERBOSE
     {
         std::ofstream output_file( "rowcolindices.txt", std::ios::out );
-        output_file << m_nTotDofs_Dest << " " << m_nTotDofs_SrcCov << " " << row_gdofmap.size( )
-                    << " " << row_ldofmap.size( ) << " " << col_gdofmap.size( ) << " "
-                    << col_ldofmap.size( ) << "\n";
+        output_file << m_nTotDofs_Dest << " " << m_nTotDofs_SrcCov << " " << row_gdofmap.size( ) << " "
+                    << row_ldofmap.size( ) << " " << col_gdofmap.size( ) << " " << col_ldofmap.size( ) << "\n";
         output_file << "Rows \n";
         for( unsigned iv = 0; iv < row_gdofmap.size( ); iv++ )
             output_file << row_gdofmap[ iv ] << " " << row_dofmap[ iv ] << "\n";
@@ -199,8 +194,8 @@ void moab::TempestOnlineMap::LinearRemapFVtoFV_Tempest_MOAB( int nOrder )
         // Build integration array
         DataArray2D< double > dIntArray;
 
-        BuildIntegrationArray( *m_meshInputCov, *m_meshOverlap, triquadrule, ixFirst,
-                               ixOverlapBegin, ixOverlapEnd, nOrder, dIntArray );
+        BuildIntegrationArray( *m_meshInputCov, *m_meshOverlap, triquadrule, ixFirst, ixOverlapBegin, ixOverlapEnd,
+                               nOrder, dIntArray );
 
         // Set of Faces to use in building the reconstruction and associated
         // distance metric.
@@ -230,8 +225,8 @@ void moab::TempestOnlineMap::LinearRemapFVtoFV_Tempest_MOAB( int nOrder )
         DataArray1D< double > dFitWeights;
         DataArray2D< double > dFitArrayPlus;
 
-        BuildFitArray( *m_meshInputCov, triquadrule, ixFirst, vecAdjFaces, nOrder,
-                       nFitWeightsExponent, dConstraint, dFitArray, dFitWeights );
+        BuildFitArray( *m_meshInputCov, triquadrule, ixFirst, vecAdjFaces, nOrder, nFitWeightsExponent, dConstraint,
+                       dFitArray, dFitWeights );
 
         // Compute the inverse fit array
         InvertFitArray_Corrected( dConstraint, dFitArray, dFitWeights, dFitArrayPlus );
@@ -299,8 +294,7 @@ void moab::TempestOnlineMap::copy_tempest_sparsemat_to_eigen3( )
     int locrows = std::max( m_mapRemap.GetRows( ), m_nTotDofs_Dest );
     int loccols = std::max( m_mapRemap.GetColumns( ), m_nTotDofs_SrcCov );
 
-    std::cout << m_weightMatrix.rows( ) << ", " << locrows << ", " << m_weightMatrix.cols( ) << ", "
-              << loccols << "\n";
+    std::cout << m_weightMatrix.rows( ) << ", " << locrows << ", " << m_weightMatrix.cols( ) << ", " << loccols << "\n";
     // assert(m_weightMatrix.rows() == locrows && m_weightMatrix.cols() == loccols);
 #endif
 
@@ -331,8 +325,8 @@ void moab::TempestOnlineMap::copy_tempest_sparsemat_to_eigen3( )
         // output_file << lrows[iv] << " " << row_ldofmap[lrows[iv]] << " " <<
         // row_gdofmap[row_ldofmap[lrows[iv]]] << " " << col_gdofmap[col_ldofmap[lcols[iv]]] << " "
         // << lvals[iv] << "\n";
-        output_file << row_gdofmap[ row_ldofmap[ lrows[ iv ] ] ] << " "
-                    << col_gdofmap[ col_ldofmap[ lcols[ iv ] ] ] << " " << lvals[ iv ] << "\n";
+        output_file << row_gdofmap[ row_ldofmap[ lrows[ iv ] ] ] << " " << col_gdofmap[ col_ldofmap[ lcols[ iv ] ] ]
+                    << " " << lvals[ iv ] << "\n";
     }
     output_file.flush( );  // required here
     output_file.close( );
@@ -353,14 +347,12 @@ void moab::TempestOnlineMap::WriteParallelWeightsToFile( std::string strFilename
     // m_weightMatrix.Print(filename.c_str(), 0, 0);
 
 #ifdef IO_USE_PARALLEL_NETCDF
-    NcmpiFile ncMap( MPI_COMM_WORLD, strFilename.c_str( ), NcmpiFile::Replace,
-                     NcmpiFile::classic5 );
+    NcmpiFile ncMap( MPI_COMM_WORLD, strFilename.c_str( ), NcmpiFile::Replace, NcmpiFile::classic5 );
 #else
     NcFile ncMap( strFilename.c_str( ), NcFile::Replace );
 #endif
 
-    if( !ncMap.is_valid( ) )
-    { _EXCEPTION1( "Unable to open output map file \"%s\"", strFilename.c_str( ) ); }
+    if( !ncMap.is_valid( ) ) { _EXCEPTION1( "Unable to open output map file \"%s\"", strFilename.c_str( ) ); }
 
     // Attributes
     ncMap.add_att( "Title", "MOAB-TempestRemap Online Regridding Weight Generator" );
@@ -493,22 +485,14 @@ void moab::TempestOnlineMap::WriteParallelWeightsToFile( std::string strFilename
     varXVB->add_att( "units", "degrees" );
 
     // Verify dimensionality
-    if( m_dSourceCenterLon.GetRows( ) != nA )
-    { _EXCEPTIONT( "Mismatch between m_dSourceCenterLon and nA" ); }
-    if( m_dSourceCenterLat.GetRows( ) != nA )
-    { _EXCEPTIONT( "Mismatch between m_dSourceCenterLat and nA" ); }
-    if( m_dTargetCenterLon.GetRows( ) != nB )
-    { _EXCEPTIONT( "Mismatch between m_dTargetCenterLon and nB" ); }
-    if( m_dTargetCenterLat.GetRows( ) != nB )
-    { _EXCEPTIONT( "Mismatch between m_dTargetCenterLat and nB" ); }
-    if( m_dSourceVertexLon.GetRows( ) != nA )
-    { _EXCEPTIONT( "Mismatch between m_dSourceVertexLon and nA" ); }
-    if( m_dSourceVertexLat.GetRows( ) != nA )
-    { _EXCEPTIONT( "Mismatch between m_dSourceVertexLat and nA" ); }
-    if( m_dTargetVertexLon.GetRows( ) != nB )
-    { _EXCEPTIONT( "Mismatch between m_dTargetVertexLon and nB" ); }
-    if( m_dTargetVertexLat.GetRows( ) != nB )
-    { _EXCEPTIONT( "Mismatch between m_dTargetVertexLat and nB" ); }
+    if( m_dSourceCenterLon.GetRows( ) != nA ) { _EXCEPTIONT( "Mismatch between m_dSourceCenterLon and nA" ); }
+    if( m_dSourceCenterLat.GetRows( ) != nA ) { _EXCEPTIONT( "Mismatch between m_dSourceCenterLat and nA" ); }
+    if( m_dTargetCenterLon.GetRows( ) != nB ) { _EXCEPTIONT( "Mismatch between m_dTargetCenterLon and nB" ); }
+    if( m_dTargetCenterLat.GetRows( ) != nB ) { _EXCEPTIONT( "Mismatch between m_dTargetCenterLat and nB" ); }
+    if( m_dSourceVertexLon.GetRows( ) != nA ) { _EXCEPTIONT( "Mismatch between m_dSourceVertexLon and nA" ); }
+    if( m_dSourceVertexLat.GetRows( ) != nA ) { _EXCEPTIONT( "Mismatch between m_dSourceVertexLat and nA" ); }
+    if( m_dTargetVertexLon.GetRows( ) != nB ) { _EXCEPTIONT( "Mismatch between m_dTargetVertexLon and nB" ); }
+    if( m_dTargetVertexLat.GetRows( ) != nB ) { _EXCEPTIONT( "Mismatch between m_dTargetVertexLat and nB" ); }
 
     varYCA->put( &( m_dSourceCenterLat[ 0 ] ), nA );
     varYCB->put( &( m_dTargetCenterLat[ 0 ] ), nB );
@@ -523,8 +507,7 @@ void moab::TempestOnlineMap::WriteParallelWeightsToFile( std::string strFilename
     varXVB->put( &( m_dTargetVertexLon[ 0 ][ 0 ] ), nB, nTargetNodesPerFace );
 
     // Write vector centers
-    if( ( m_dVectorTargetCenterLat.GetRows( ) != 0 ) &&
-        ( m_dVectorTargetCenterLon.GetRows( ) != 0 ) )
+    if( ( m_dVectorTargetCenterLat.GetRows( ) != 0 ) && ( m_dVectorTargetCenterLon.GetRows( ) != 0 ) )
     {
         NcDim* dimLatB = ncMap.add_dim( "lat_b", m_dVectorTargetCenterLat.GetRows( ) );
         NcDim* dimLonB = ncMap.add_dim( "lon_b", m_dVectorTargetCenterLon.GetRows( ) );
@@ -539,10 +522,8 @@ void moab::TempestOnlineMap::WriteParallelWeightsToFile( std::string strFilename
         NcVar* varLatBounds = ncMap.add_var( "lat_bnds", ncDouble, dimLatB, dimBounds );
         NcVar* varLonBounds = ncMap.add_var( "lon_bnds", ncDouble, dimLonB, dimBounds );
 
-        varLatBounds->put( &( m_dVectorTargetBoundsLat[ 0 ][ 0 ] ),
-                           m_dVectorTargetBoundsLat.GetRows( ), 2 );
-        varLonBounds->put( &( m_dVectorTargetBoundsLon[ 0 ][ 0 ] ),
-                           m_dVectorTargetBoundsLon.GetRows( ), 2 );
+        varLatBounds->put( &( m_dVectorTargetBoundsLat[ 0 ][ 0 ] ), m_dVectorTargetBoundsLat.GetRows( ), 2 );
+        varLonBounds->put( &( m_dVectorTargetBoundsLon[ 0 ][ 0 ] ), m_dVectorTargetBoundsLon.GetRows( ), 2 );
     }
 
     // Write areas
@@ -639,9 +620,8 @@ void moab::TempestOnlineMap::WriteParallelWeightsToFile( std::string strFilename
 
 ///////////////////////////////////////////////////////////////////////////////
 
-moab::ErrorCode moab::TempestOnlineMap::ApplyWeights( std::vector< double >& srcVals,
-                                                      std::vector< double >& tgtVals,
-                                                      bool                   transpose )
+moab::ErrorCode moab::TempestOnlineMap::ApplyWeights( std::vector< double >& srcVals, std::vector< double >& tgtVals,
+                                                      bool transpose )
 {
     // Reset the source and target data first
     m_rowVector.setZero( );
@@ -659,8 +639,7 @@ moab::ErrorCode moab::TempestOnlineMap::ApplyWeights( std::vector< double >& src
         // Permute the source data first
         for( unsigned i = 0; i < srcVals.size( ); ++i )
         {
-            m_rowVector( row_dtoc_dofmap[ i ] ) =
-                srcVals[ i ];  // permute and set the row (source) vector properly
+            m_rowVector( row_dtoc_dofmap[ i ] ) = srcVals[ i ];  // permute and set the row (source) vector properly
         }
 
         m_colVector = m_weightMatrix.adjoint( ) * m_rowVector;
@@ -668,8 +647,7 @@ moab::ErrorCode moab::TempestOnlineMap::ApplyWeights( std::vector< double >& src
         // Permute the resulting target data back
         for( unsigned i = 0; i < tgtVals.size( ); ++i )
         {
-            tgtVals[ i ] = m_colVector(
-                col_dtoc_dofmap[ i ] );  // permute and set the row (source) vector properly
+            tgtVals[ i ] = m_colVector( col_dtoc_dofmap[ i ] );  // permute and set the row (source) vector properly
         }
     }
     else
@@ -681,11 +659,10 @@ moab::ErrorCode moab::TempestOnlineMap::ApplyWeights( std::vector< double >& src
 #endif
         for( unsigned i = 0; i < srcVals.size( ); ++i )
         {
-            m_colVector( col_dtoc_dofmap[ i ] ) =
-                srcVals[ i ];  // permute and set the row (source) vector properly
+            m_colVector( col_dtoc_dofmap[ i ] ) = srcVals[ i ];  // permute and set the row (source) vector properly
 #ifdef VERBOSE
-            output_file << "Col: " << i << ", GID: " << col_gdofmap[ i ]
-                        << ", Data = " << srcVals[ i ] << ", " << m_colVector( i ) << "\n";
+            output_file << "Col: " << i << ", GID: " << col_gdofmap[ i ] << ", Data = " << srcVals[ i ] << ", "
+                        << m_colVector( i ) << "\n";
 #endif
         }
 
@@ -698,11 +675,9 @@ moab::ErrorCode moab::TempestOnlineMap::ApplyWeights( std::vector< double >& src
 #endif
         for( unsigned i = 0; i < tgtVals.size( ); ++i )
         {
-            tgtVals[ i ] = m_rowVector(
-                row_dtoc_dofmap[ i ] );  // permute and set the row (source) vector properly
+            tgtVals[ i ] = m_rowVector( row_dtoc_dofmap[ i ] );  // permute and set the row (source) vector properly
 #ifdef VERBOSE
-            output_file << "Row: " << i << ", GID: " << row_gdofmap[ i ]
-                        << ", Data = " << m_rowVector( i ) << "\n";
+            output_file << "Row: " << i << ", GID: " << row_gdofmap[ i ] << ", Data = " << m_rowVector( i ) << "\n";
 #endif
         }
     }
@@ -721,8 +696,8 @@ moab::ErrorCode moab::TempestOnlineMap::ApplyWeights( std::vector< double >& src
 ///////////////////////////////////////////////////////////////////////////////
 
 extern void ForceConsistencyConservation3( const DataArray1D< double >& vecSourceArea,
-                                           const DataArray1D< double >& vecTargetArea,
-                                           DataArray2D< double >& dCoeff, bool fMonotone );
+                                           const DataArray1D< double >& vecTargetArea, DataArray2D< double >& dCoeff,
+                                           bool fMonotone );
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -732,9 +707,9 @@ extern void ForceIntArrayConsistencyConservation( const DataArray1D< double >& v
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB(
-    const DataArray3D< int >& dataGLLNodes, const DataArray3D< double >& dataGLLJacobian,
-    int nMonotoneType, bool fContinuousIn, bool fNoConservation )
+void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB( const DataArray3D< int >&    dataGLLNodes,
+                                                          const DataArray3D< double >& dataGLLJacobian,
+                                                          int nMonotoneType, bool fContinuousIn, bool fNoConservation )
 {
     // Order of the polynomial interpolant
     int nP = dataGLLNodes.GetRows( );
@@ -797,8 +772,7 @@ void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB(
     {
         const Face& faceFirst = m_meshInputCov->faces[ ixFirst ];
 
-        if( faceFirst.edges.size( ) != 4 )
-        { _EXCEPTIONT( "Only quadrilateral elements allowed for SE remapping" ); }
+        if( faceFirst.edges.size( ) != 4 ) { _EXCEPTIONT( "Only quadrilateral elements allowed for SE remapping" ); }
 
         // Announce computation progress
         if( ixFirst % outputFrequency == 0 && is_root )
@@ -847,8 +821,7 @@ void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB(
             int nnodes = faceOverlap.edges.size( );
             for( int j1 = 1; j1 < nnodes; j1++ )
             {
-                if( nodesOverlap[ faceOverlap[ j1 ] ] < nodesOverlap[ faceOverlap[ minIndex ] ] )
-                { minIndex = j1; }
+                if( nodesOverlap[ faceOverlap[ j1 ] ] < nodesOverlap[ faceOverlap[ minIndex ] ] ) { minIndex = j1; }
             }
 #endif
 
@@ -885,20 +858,16 @@ void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB(
                 for( int l = 0; l < TriQuadraturePoints; l++ )
                 {
                     Node nodeQuadrature;
-                    nodeQuadrature.x = TriQuadratureG[ l ][ 0 ] * node0.x +
-                                       TriQuadratureG[ l ][ 1 ] * node1.x +
+                    nodeQuadrature.x = TriQuadratureG[ l ][ 0 ] * node0.x + TriQuadratureG[ l ][ 1 ] * node1.x +
                                        TriQuadratureG[ l ][ 2 ] * node2.x;
 
-                    nodeQuadrature.y = TriQuadratureG[ l ][ 0 ] * node0.y +
-                                       TriQuadratureG[ l ][ 1 ] * node1.y +
+                    nodeQuadrature.y = TriQuadratureG[ l ][ 0 ] * node0.y + TriQuadratureG[ l ][ 1 ] * node1.y +
                                        TriQuadratureG[ l ][ 2 ] * node2.y;
 
-                    nodeQuadrature.z = TriQuadratureG[ l ][ 0 ] * node0.z +
-                                       TriQuadratureG[ l ][ 1 ] * node1.z +
+                    nodeQuadrature.z = TriQuadratureG[ l ][ 0 ] * node0.z + TriQuadratureG[ l ][ 1 ] * node1.z +
                                        TriQuadratureG[ l ][ 2 ] * node2.z;
 
-                    double dMag = sqrt( nodeQuadrature.x * nodeQuadrature.x +
-                                        nodeQuadrature.y * nodeQuadrature.y +
+                    double dMag = sqrt( nodeQuadrature.x * nodeQuadrature.x + nodeQuadrature.y * nodeQuadrature.y +
                                         nodeQuadrature.z * nodeQuadrature.z );
 
                     nodeQuadrature.x /= dMag;
@@ -913,8 +882,8 @@ void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB(
                     ApplyInverseMap( faceFirst, nodesFirst, nodeQuadrature, dAlpha, dBeta );
 
                     // Check inverse map value
-                    if( ( dAlpha < -1.0e-13 ) || ( dAlpha > 1.0 + 1.0e-13 ) ||
-                        ( dBeta < -1.0e-13 ) || ( dBeta > 1.0 + 1.0e-13 ) )
+                    if( ( dAlpha < -1.0e-13 ) || ( dAlpha > 1.0 + 1.0e-13 ) || ( dBeta < -1.0e-13 ) ||
+                        ( dBeta > 1.0 + 1.0e-13 ) )
                     {
                         _EXCEPTION4( "Inverse Map for element %d and subtriangle %d out of range "
                                      "(%1.5e %1.5e)",
@@ -929,9 +898,8 @@ void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB(
                     {
                         for( int q = 0; q < nP; q++ )
                         {
-                            dRemapCoeff[ p ][ q ][ j ] +=
-                                TriQuadratureW[ l ] * dTriangleArea * dSampleCoeff[ p ][ q ] /
-                                m_meshOverlap->vecFaceArea[ ixOverlap + j ];
+                            dRemapCoeff[ p ][ q ][ j ] += TriQuadratureW[ l ] * dTriangleArea * dSampleCoeff[ p ][ q ] /
+                                                          m_meshOverlap->vecFaceArea[ ixOverlap + j ];
                         }
                     }
                 }
@@ -1029,8 +997,7 @@ void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB(
                 {
                     for( int q = 0; q < nP; q++ )
                     {
-                        dCoeff[ nOverlapFaces ][ p * nP + q ] =
-                            dataGLLJacobian[ p ][ q ][ ixFirst ];
+                        dCoeff[ nOverlapFaces ][ p * nP + q ] = dataGLLJacobian[ p ][ q ][ ixFirst ];
                     }
                 }
                 for( int j = 0; j < nOverlapFaces; j++ )
@@ -1040,8 +1007,7 @@ void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB(
                         for( int q = 0; q < nP; q++ )
                         {
                             dCoeff[ nOverlapFaces ][ p * nP + q ] -=
-                                dRemapCoeff[ p ][ q ][ j ] *
-                                m_meshOverlap->vecFaceArea[ ixOverlap + j ];
+                                dRemapCoeff[ p ][ q ][ j ] * m_meshOverlap->vecFaceArea[ ixOverlap + j ];
                         }
                     }
                 }
@@ -1062,8 +1028,7 @@ void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB(
                 _EXCEPTIONT( "Target grid must be a subset of source grid" );
             }
 
-            ForceConsistencyConservation3( vecSourceArea, vecTargetArea, dCoeff,
-                                           ( nMonotoneType > 0 )
+            ForceConsistencyConservation3( vecSourceArea, vecTargetArea, dCoeff, ( nMonotoneType > 0 )
                                            /*, m_remapper->lid_to_gid_covsrc[ixFirst]*/ );
 
             for( int j = 0; j < nOverlapFaces; j++ )
@@ -1109,19 +1074,17 @@ void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB(
                     {
                         int ixFirstNode = dataGLLNodes[ p ][ q ][ ixFirst ] - 1;
 
-                        smatMap( ixSecondFace, ixFirstNode ) +=
-                            dRemapCoeff[ p ][ q ][ j ] *
-                            m_meshOverlap->vecFaceArea[ ixOverlap + j ] /
-                            m_meshOutput->vecFaceArea[ ixSecondFace ];
+                        smatMap( ixSecondFace, ixFirstNode ) += dRemapCoeff[ p ][ q ][ j ] *
+                                                                m_meshOverlap->vecFaceArea[ ixOverlap + j ] /
+                                                                m_meshOutput->vecFaceArea[ ixSecondFace ];
                     }
                     else
                     {
                         int ixFirstNode = ixFirst * nP * nP + p * nP + q;
 
-                        smatMap( ixSecondFace, ixFirstNode ) +=
-                            dRemapCoeff[ p ][ q ][ j ] *
-                            m_meshOverlap->vecFaceArea[ ixOverlap + j ] /
-                            m_meshOutput->vecFaceArea[ ixSecondFace ];
+                        smatMap( ixSecondFace, ixFirstNode ) += dRemapCoeff[ p ][ q ][ j ] *
+                                                                m_meshOverlap->vecFaceArea[ ixOverlap + j ] /
+                                                                m_meshOutput->vecFaceArea[ ixSecondFace ];
                     }
                 }
             }
@@ -1139,11 +1102,13 @@ void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB(
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_MOAB(
-    const DataArray3D< int >& dataGLLNodesIn, const DataArray3D< double >& dataGLLJacobianIn,
-    const DataArray3D< int >& dataGLLNodesOut, const DataArray3D< double >& dataGLLJacobianOut,
-    const DataArray1D< double >& dataNodalAreaOut, int nPin, int nPout, int nMonotoneType,
-    bool fContinuousIn, bool fContinuousOut, bool fNoConservation )
+void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_MOAB( const DataArray3D< int >&    dataGLLNodesIn,
+                                                        const DataArray3D< double >& dataGLLJacobianIn,
+                                                        const DataArray3D< int >&    dataGLLNodesOut,
+                                                        const DataArray3D< double >& dataGLLJacobianOut,
+                                                        const DataArray1D< double >& dataNodalAreaOut, int nPin,
+                                                        int nPout, int nMonotoneType, bool fContinuousIn,
+                                                        bool fContinuousOut, bool fNoConservation )
 {
     // Triangular quadrature rule
     TriangularQuadratureRule triquadrule( 8 );
@@ -1169,8 +1134,7 @@ void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_MOAB(
     }
 
     // Build the integration array for each element on m_meshOverlap
-    DataArray3D< double > dGlobalIntArray( nPin * nPin, m_meshOverlap->faces.size( ),
-                                           nPout * nPout );
+    DataArray3D< double > dGlobalIntArray( nPin * nPin, m_meshOverlap->faces.size( ), nPout * nPout );
 
     // Number of overlap Faces per source Face
     DataArray1D< int > nAllOverlapFaces( m_meshInputCov->faces.size( ) );
@@ -1247,8 +1211,7 @@ void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_MOAB(
             int nnodes = faceOverlap.edges.size( );
             for( int j1 = 1; j1 < nnodes; j1++ )
             {
-                if( nodesOverlap[ faceOverlap[ j1 ] ] < nodesOverlap[ faceOverlap[ minIndex ] ] )
-                { minIndex = j1; }
+                if( nodesOverlap[ faceOverlap[ j1 ] ] < nodesOverlap[ faceOverlap[ minIndex ] ] ) { minIndex = j1; }
             }
 #endif
 
@@ -1340,12 +1303,10 @@ void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_MOAB(
                                         }
                     */
                     // Sample the First finite element at this point
-                    SampleGLLFiniteElement( nMonotoneType, nPin, dAlphaIn, dBetaIn,
-                                            dSampleCoeffIn );
+                    SampleGLLFiniteElement( nMonotoneType, nPin, dAlphaIn, dBetaIn, dSampleCoeffIn );
 
                     // Sample the Second finite element at this point
-                    SampleGLLFiniteElement( nMonotoneType, nPout, dAlphaOut, dBetaOut,
-                                            dSampleCoeffOut );
+                    SampleGLLFiniteElement( nMonotoneType, nPout, dAlphaOut, dBetaOut, dSampleCoeffOut );
 
                     // Overlap output area
                     for( int s = 0; s < nPout; s++ )
@@ -1373,8 +1334,7 @@ void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_MOAB(
                                 {
                                     // Sample the Second finite element at this point
                                     dGlobalIntArray[ ixp ][ ixOverlap + i ][ ixs ] +=
-                                        dSampleCoeffOut[ s ][ t ] * dSampleCoeffIn[ p ][ q ] *
-                                        dW[ k ] * dTriArea;
+                                        dSampleCoeffOut[ s ][ t ] * dSampleCoeffIn[ p ][ q ] * dW[ k ] * dTriArea;
 
                                     ixs++;
                                 }
@@ -1439,8 +1399,7 @@ void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_MOAB(
             {
                 for( int t = 0; t < nPout; t++ )
                 {
-                    vecTargetArea[ i * nPout * nPout + ixs ] =
-                        dOverlapOutputArea[ ixOverlap + i ][ nPout * s + t ];
+                    vecTargetArea[ i * nPout * nPout + ixs ] = dOverlapOutputArea[ ixOverlap + i ][ nPout * s + t ];
 
                     ixs++;
                 }
@@ -1449,10 +1408,7 @@ void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_MOAB(
 
         // Force consistency and conservation
         if( !fNoConservation )
-        {
-            ForceIntArrayConsistencyConservation( vecSourceArea, vecTargetArea, dCoeff,
-                                                  ( nMonotoneType != 0 ) );
-        }
+        { ForceIntArrayConsistencyConservation( vecSourceArea, vecTargetArea, dCoeff, ( nMonotoneType != 0 ) ); }
 
         // Update global coefficients
         for( int i = 0; i < nOverlapFaces; i++ )
@@ -1536,16 +1492,14 @@ void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_MOAB(
 
         if( !fNoConservation )
         {
-            ForceIntArrayConsistencyConservation( dRedistSourceArea, dRedistTargetArea,
-                                                  dRedistributionMaps[ ixSecond ],
+            ForceIntArrayConsistencyConservation( dRedistSourceArea, dRedistTargetArea, dRedistributionMaps[ ixSecond ],
                                                   ( nMonotoneType != 0 ) );
 
             for( int s = 0; s < nPout * nPout; s++ )
             {
                 for( int t = 0; t < nPout * nPout; t++ )
                 {
-                    dRedistributionMaps[ ixSecond ][ s ][ t ] *=
-                        dRedistTargetArea[ s ] / dRedistSourceArea[ t ];
+                    dRedistributionMaps[ ixSecond ][ s ][ t ] *= dRedistTargetArea[ s ] / dRedistSourceArea[ t ];
                 }
             }
         }
@@ -1600,8 +1554,7 @@ void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_MOAB(
                     for( int t = 0; t < nPout * nPout; t++ )
                     {
                         dRedistributedOp[ p ][ s ] +=
-                            dRedistributionMaps[ ixSecondFace ][ s ][ t ] *
-                            dGlobalIntArray[ p ][ ixOverlap + j ][ t ];
+                            dRedistributionMaps[ ixSecondFace ][ s ][ t ] * dGlobalIntArray[ p ][ ixOverlap + j ][ t ];
                     }
                 }
             }
@@ -1631,14 +1584,12 @@ void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_MOAB(
                                 if( !fNoConservation )
                                 {
                                     smatMap( ixSecondNode, ixFirstNode ) +=
-                                        dRedistributedOp[ ixp ][ ixs ] /
-                                        dataNodalAreaOut[ ixSecondNode ];
+                                        dRedistributedOp[ ixp ][ ixs ] / dataNodalAreaOut[ ixSecondNode ];
                                 }
                                 else
                                 {
                                     smatMap( ixSecondNode, ixFirstNode ) +=
-                                        dRedistributedOp[ ixp ][ ixs ] /
-                                        dTotalGeometricArea[ ixSecondNode ];
+                                        dRedistributedOp[ ixp ][ ixs ] / dTotalGeometricArea[ ixSecondNode ];
                                 }
                             }
                             else
@@ -1648,8 +1599,7 @@ void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_MOAB(
                                 if( !fNoConservation )
                                 {
                                     smatMap( ixSecondNode, ixFirstNode ) +=
-                                        dRedistributedOp[ ixp ][ ixs ] /
-                                        dataGLLJacobianOut[ s ][ t ][ ixSecondFace ];
+                                        dRedistributedOp[ ixp ][ ixs ] / dataGLLJacobianOut[ s ][ t ][ ixSecondFace ];
                                 }
                                 else
                                 {
@@ -1677,11 +1627,13 @@ void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_MOAB(
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_Pointwise_MOAB(
-    const DataArray3D< int >& dataGLLNodesIn, const DataArray3D< double >& /*dataGLLJacobianIn*/,
-    const DataArray3D< int >& dataGLLNodesOut, const DataArray3D< double >& /*dataGLLJacobianOut*/,
-    const DataArray1D< double >& dataNodalAreaOut, int nPin, int nPout, int nMonotoneType,
-    bool fContinuousIn, bool fContinuousOut )
+void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_Pointwise_MOAB( const DataArray3D< int >& dataGLLNodesIn,
+                                                                  const DataArray3D< double >& /*dataGLLJacobianIn*/,
+                                                                  const DataArray3D< int >& dataGLLNodesOut,
+                                                                  const DataArray3D< double >& /*dataGLLJacobianOut*/,
+                                                                  const DataArray1D< double >& dataNodalAreaOut,
+                                                                  int nPin, int nPout, int nMonotoneType,
+                                                                  bool fContinuousIn, bool fContinuousOut )
 {
     // Gauss-Lobatto quadrature within Faces
     DataArray1D< double > dGL;
@@ -1773,15 +1725,13 @@ void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_Pointwise_MOAB(
                 for( int t = 0; t < nPout; t++ )
                 {
                     size_t ixSecondNode;
-                    if( fContinuousOut )
-                    { ixSecondNode = dataGLLNodesOut[ s ][ t ][ ixSecond ] - 1; }
+                    if( fContinuousOut ) { ixSecondNode = dataGLLNodesOut[ s ][ t ][ ixSecond ] - 1; }
                     else
                     {
                         ixSecondNode = ixSecond * nPout * nPout + s * nPout + t;
                     }
 
-                    if( ixSecondNode >= fSecondNodeFound.GetRows( ) )
-                    { _EXCEPTIONT( "Logic error" ); }
+                    if( ixSecondNode >= fSecondNodeFound.GetRows( ) ) { _EXCEPTIONT( "Logic error" ); }
 
                     // Check if this node has been found already
                     if( fSecondNodeFound[ ixSecondNode ] ) { continue; }
@@ -1791,8 +1741,7 @@ void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_Pointwise_MOAB(
                     Node dDx1G;
                     Node dDx2G;
 
-                    ApplyLocalMap( faceSecond, nodesSecond, dGL[ t ], dGL[ s ], node, dDx1G,
-                                   dDx2G );
+                    ApplyLocalMap( faceSecond, nodesSecond, dGL[ t ], dGL[ s ], node, dDx1G, dDx2G );
 
                     // Find the components of this quadrature point in the basis
                     // of the first Face.
@@ -1802,16 +1751,15 @@ void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_Pointwise_MOAB(
                     ApplyInverseMap( faceFirst, nodesFirst, node, dAlphaIn, dBetaIn );
 
                     // Check if this node is within the first Face
-                    if( ( dAlphaIn < -1.0e-10 ) || ( dAlphaIn > 1.0 + 1.0e-10 ) ||
-                        ( dBetaIn < -1.0e-10 ) || ( dBetaIn > 1.0 + 1.0e-10 ) )
+                    if( ( dAlphaIn < -1.0e-10 ) || ( dAlphaIn > 1.0 + 1.0e-10 ) || ( dBetaIn < -1.0e-10 ) ||
+                        ( dBetaIn > 1.0 + 1.0e-10 ) )
                     { continue; }
 
                     // Node is within the overlap region, mark as found
                     fSecondNodeFound[ ixSecondNode ] = true;
 
                     // Sample the First finite element at this point
-                    SampleGLLFiniteElement( nMonotoneType, nPin, dAlphaIn, dBetaIn,
-                                            dSampleCoeffIn );
+                    SampleGLLFiniteElement( nMonotoneType, nPin, dAlphaIn, dBetaIn, dSampleCoeffIn );
 
                     // Add to map
                     for( int p = 0; p < nPin; p++ )
@@ -1819,8 +1767,7 @@ void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_Pointwise_MOAB(
                         for( int q = 0; q < nPin; q++ )
                         {
                             int ixFirstNode;
-                            if( fContinuousIn )
-                            { ixFirstNode = dataGLLNodesIn[ p ][ q ][ ixFirst ] - 1; }
+                            if( fContinuousIn ) { ixFirstNode = dataGLLNodesIn[ p ][ q ][ ixFirst ] - 1; }
                             else
                             {
                                 ixFirstNode = ixFirst * nPin * nPin + p * nPin + q;

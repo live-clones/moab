@@ -52,8 +52,7 @@ template< unsigned DIM > static inline bool eval( const MsqMatrix< DIM, DIM >& T
 }
 
 template< unsigned DIM >
-static inline bool grad( const MsqMatrix< DIM, DIM >& T, double& result,
-                         MsqMatrix< DIM, DIM >& wrt_T )
+static inline bool grad( const MsqMatrix< DIM, DIM >& T, double& result, MsqMatrix< DIM, DIM >& wrt_T )
 {
     result = sqr_Frobenius( T );
     wrt_T = 2 * T;
@@ -61,8 +60,8 @@ static inline bool grad( const MsqMatrix< DIM, DIM >& T, double& result,
 }
 
 template< unsigned DIM >
-static inline bool hess( const MsqMatrix< DIM, DIM >& T, double& result,
-                         MsqMatrix< DIM, DIM >& deriv_wrt_T, MsqMatrix< DIM, DIM >* second_wrt_T )
+static inline bool hess( const MsqMatrix< DIM, DIM >& T, double& result, MsqMatrix< DIM, DIM >& deriv_wrt_T,
+                         MsqMatrix< DIM, DIM >* second_wrt_T )
 {
     result = sqr_Frobenius( T );
     deriv_wrt_T = 2 * T;

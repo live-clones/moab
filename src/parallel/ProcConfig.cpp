@@ -37,8 +37,7 @@ ProcConfig::ProcConfig( MPI_Comm proc_comm1 ) : procComm( proc_comm1 ), crystalD
 gs_data::crystal_data* ProcConfig::crystal_router( bool construct_if_missing )
 {
 #ifdef MOAB_HAVE_MPI
-    if( !crystalData && construct_if_missing )
-    { crystalData = new gs_data::crystal_data( procComm ); }
+    if( !crystalData && construct_if_missing ) { crystalData = new gs_data::crystal_data( procComm ); }
 #endif
 
     return crystalData;

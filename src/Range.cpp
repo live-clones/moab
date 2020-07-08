@@ -176,8 +176,7 @@ Range::Range( const Range& copy )
     PairNode*       new_node = &mHead;
     for( ; copy_node != &( copy.mHead ); copy_node = copy_node->mNext )
     {
-        PairNode* tmp_node =
-            alloc_pair( new_node->mNext, new_node, copy_node->first, copy_node->second );
+        PairNode* tmp_node = alloc_pair( new_node->mNext, new_node, copy_node->first, copy_node->second );
         new_node->mNext->mPrev = tmp_node;
         new_node->mNext = tmp_node;
         new_node = tmp_node;
@@ -205,8 +204,7 @@ Range& Range::operator=( const Range& copy )
     PairNode*       new_node = &mHead;
     for( ; copy_node != &( copy.mHead ); copy_node = copy_node->mNext )
     {
-        PairNode* tmp_node =
-            alloc_pair( new_node->mNext, new_node, copy_node->first, copy_node->second );
+        PairNode* tmp_node = alloc_pair( new_node->mNext, new_node, copy_node->first, copy_node->second );
         new_node->mNext->mPrev = tmp_node;
         new_node->mNext = tmp_node;
         new_node = tmp_node;
@@ -391,8 +389,7 @@ Range::iterator Range::erase( iterator iter )
     // split the range
     else
     {
-        PairNode* new_node =
-            alloc_pair( iter.mNode->mNext, iter.mNode, iter.mValue + 1, kter->second );
+        PairNode* new_node = alloc_pair( iter.mNode->mNext, iter.mNode, iter.mValue + 1, kter->second );
         new_node->mPrev->mNext = new_node->mNext->mPrev = new_node;
         iter.mNode->second = iter.mValue - 1;
         new_iter = const_iterator( new_node, new_node->first );
@@ -506,8 +503,7 @@ Range::const_iterator Range::find( EntityHandle val ) const
     PairNode* iter = mHead.mNext;
     for( ; iter != &mHead && ( val > iter->second ); iter = iter->mNext )
         ;
-    return ( ( iter->second >= val ) && ( iter->first <= val ) ) ? const_iterator( iter, val )
-                                                                 : end( );
+    return ( ( iter->second >= val ) && ( iter->first <= val ) ) ? const_iterator( iter, val ) : end( );
 }
 
 /*!
@@ -587,8 +583,7 @@ const std::string Range::str_rep( const char* indent_prefix ) const
         EntityType t1 = TYPE_FROM_HANDLE( i->first );
         EntityType t2 = TYPE_FROM_HANDLE( i->second );
 
-        str_stream << indent_prefix_str << "\t" << CN::EntityTypeName( t1 ) << " "
-                   << ID_FROM_HANDLE( i->first );
+        str_stream << indent_prefix_str << "\t" << CN::EntityTypeName( t1 ) << " " << ID_FROM_HANDLE( i->first );
         if( i->first != i->second )
         {
             str_stream << " - ";
@@ -617,8 +612,7 @@ void Range::print( const char* indent_prefix ) const
 #define MIN( a, b ) ( a > b ? b : a )
 Range intersect( const Range& range1, const Range& range2 )
 {
-    Range::const_pair_iterator r_it[ 2 ] = { range1.const_pair_begin( ),
-                                             range2.const_pair_begin( ) };
+    Range::const_pair_iterator r_it[ 2 ] = { range1.const_pair_begin( ), range2.const_pair_begin( ) };
     EntityHandle               low_it, high_it;
 
     Range           lhs;
@@ -700,8 +694,8 @@ Range subtract( const Range& range1, const Range& range2 )
             // case d: pair completely surrounds subtracted pair
             else if( r_it0->first < r_it1->first && r_it0->second > r_it1->second )
             {
-                Range::PairNode* new_node = alloc_pair( r_it0.node( ), r_it0.node( )->mPrev,
-                                                        r_it0->first, r_it1->first - 1 );
+                Range::PairNode* new_node =
+                    alloc_pair( r_it0.node( ), r_it0.node( )->mPrev, r_it0->first, r_it1->first - 1 );
                 new_node->mPrev->mNext = new_node->mNext->mPrev = new_node;
                 r_it0.node( )->first = r_it1->second + 1;
                 ++r_it1;
@@ -764,8 +758,8 @@ Range& Range::operator-=( const Range& range2 )
             // case d: pair completely surrounds subtracted pair
             else if( r_it0->first < r_it1->first && r_it0->second > r_it1->second )
             {
-                Range::PairNode* new_node = alloc_pair( r_it0.node( ), r_it0.node( )->mPrev,
-                                                        r_it0->first, r_it1->first - 1 );
+                Range::PairNode* new_node =
+                    alloc_pair( r_it0.node( ), r_it0.node( )->mPrev, r_it0->first, r_it1->first - 1 );
                 new_node->mPrev->mNext = new_node->mNext->mPrev = new_node;
                 r_it0.node( )->first = r_it1->second + 1;
                 ++r_it1;
@@ -796,8 +790,7 @@ EntityID operator-( const Range::const_iterator& it2, const Range::const_iterato
     return result;
 }
 
-Range::const_iterator Range::lower_bound( Range::const_iterator first, Range::const_iterator last,
-                                          EntityHandle val )
+Range::const_iterator Range::lower_bound( Range::const_iterator first, Range::const_iterator last, EntityHandle val )
 {
     // Find the first pair whose end is >= val
     PairNode* iter;
@@ -820,8 +813,7 @@ Range::const_iterator Range::lower_bound( Range::const_iterator first, Range::co
         return last;
 }
 
-Range::const_iterator Range::upper_bound( Range::const_iterator first, Range::const_iterator last,
-                                          EntityHandle val )
+Range::const_iterator Range::upper_bound( Range::const_iterator first, Range::const_iterator last, EntityHandle val )
 {
     Range::const_iterator result = lower_bound( first, last, val );
     if( result != last && *result == val ) ++result;
@@ -856,12 +848,11 @@ Range::const_iterator Range::upper_bound( EntityType type, const_iterator first 
     return err ? end( ) : lower_bound( first, end( ), handle );
 }
 
-std::pair< Range::const_iterator, Range::const_iterator >
-    Range::equal_range( EntityType type ) const
+std::pair< Range::const_iterator, Range::const_iterator > Range::equal_range( EntityType type ) const
 {
     std::pair< Range::const_iterator, Range::const_iterator > result;
     int                                                       err;
-    EntityHandle handle = CREATE_HANDLE( type, 0, err );
+    EntityHandle                                              handle = CREATE_HANDLE( type, 0, err );
     result.first = err ? end( ) : lower_bound( begin( ), end( ), handle );
     // if (type+1) overflows, err will be true and we return end().
     handle = CREATE_HANDLE( type + 1, 0, err );
@@ -871,8 +862,7 @@ std::pair< Range::const_iterator, Range::const_iterator >
 
 bool Range::all_of_type( EntityType type ) const
 {
-    return empty( ) ||
-           ( TYPE_FROM_HANDLE( front( ) ) == type && TYPE_FROM_HANDLE( back( ) ) == type );
+    return empty( ) || ( TYPE_FROM_HANDLE( front( ) ) == type && TYPE_FROM_HANDLE( back( ) ) == type );
 }
 
 bool Range::all_of_dimension( int dimension ) const
@@ -905,8 +895,7 @@ unsigned Range::num_of_type( EntityType type ) const
 unsigned Range::num_of_dimension( int dim ) const
 {
     const_pair_iterator iter = const_pair_begin( );
-    while( iter != const_pair_end( ) &&
-           CN::Dimension( TYPE_FROM_HANDLE( ( *iter ).second ) ) < dim )
+    while( iter != const_pair_end( ) && CN::Dimension( TYPE_FROM_HANDLE( ( *iter ).second ) ) < dim )
         ++iter;
 
     int      junk;
@@ -917,12 +906,10 @@ unsigned Range::num_of_dimension( int dim ) const
         int end_dim = CN::Dimension( TYPE_FROM_HANDLE( ( *iter ).second ) );
         if( start_dim > dim ) break;
 
-        EntityHandle sh = start_dim < dim
-                              ? CREATE_HANDLE( CN::TypeDimensionMap[ dim ].first, 1, junk )
-                              : ( *iter ).first;
-        EntityHandle eh = end_dim > dim
-                              ? CREATE_HANDLE( CN::TypeDimensionMap[ dim ].second, MB_END_ID, junk )
-                              : ( *iter ).second;
+        EntityHandle sh =
+            start_dim < dim ? CREATE_HANDLE( CN::TypeDimensionMap[ dim ].first, 1, junk ) : ( *iter ).first;
+        EntityHandle eh =
+            end_dim > dim ? CREATE_HANDLE( CN::TypeDimensionMap[ dim ].second, MB_END_ID, junk ) : ( *iter ).second;
         count += eh - sh + 1;
     }
 
@@ -988,8 +975,7 @@ bool operator==( const Range& r1, const Range& r2 )
     i1 = r1.const_pair_begin( );
     i2 = r2.const_pair_begin( );
     for( ; i1 != r1.const_pair_end( ); ++i1, ++i2 )
-        if( i2 == r2.const_pair_end( ) || i1->first != i2->first || i1->second != i2->second )
-            return false;
+        if( i2 == r2.const_pair_end( ) || i1->first != i2->first || i1->second != i2->second ) return false;
     return i2 == r2.const_pair_end( );
 }
 

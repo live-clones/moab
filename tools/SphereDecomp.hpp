@@ -8,8 +8,7 @@ class SphereDecomp
   public:
     SphereDecomp( moab::Interface* impl );
 
-    moab::ErrorCode build_sphere_mesh( const char*         sphere_radii_tag_name,
-                                       moab::EntityHandle* hex_set = NULL );
+    moab::ErrorCode build_sphere_mesh( const char* sphere_radii_tag_name, moab::EntityHandle* hex_set = NULL );
 
   private:
     //! compute subdivision vertices on entities of specified dimension
@@ -21,8 +20,7 @@ class SphereDecomp
                                  std::vector< moab::EntityHandle >& interstic_hexes );
 
     //! subdivide an individual tet
-    moab::ErrorCode subdivide_tet( moab::EntityHandle                 tet,
-                                   std::vector< moab::EntityHandle >& sphere_hexes,
+    moab::ErrorCode subdivide_tet( moab::EntityHandle tet, std::vector< moab::EntityHandle >& sphere_hexes,
                                    std::vector< moab::EntityHandle >& interstic_hexes );
 
     //! retrieve the subdivision vertices for a given entity in a given tet,

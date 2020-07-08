@@ -89,14 +89,12 @@ void test_meshset_tags_1( )
     Tag dim_tag;
     entities.clear( );
     // get the tag handle
-    rval = moab.tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, dim_tag,
-                                MB_TAG_SPARSE | MB_TAG_CREAT );CHECK_ERR( rval );
+    rval = moab.tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, dim_tag, MB_TAG_SPARSE | MB_TAG_CREAT );CHECK_ERR( rval );
 
     // get the entities that are tagged with dim 3
     int               dim3 = 3;
     const void* const tag_vals_dim3[] = { &dim3 };
-    rval = moab.get_entities_by_type_and_tag( 0, moab::MBENTITYSET, &dim_tag, tag_vals_dim3, 1,
-                                              entities );CHECK_ERR( rval );
+    rval = moab.get_entities_by_type_and_tag( 0, moab::MBENTITYSET, &dim_tag, tag_vals_dim3, 1, entities );CHECK_ERR( rval );
 
     // there should only be 10 meshsets of dimension 3
     num_sets = entities.size( );
@@ -106,8 +104,7 @@ void test_meshset_tags_1( )
     // get the entities that are tagged with dim 2
     int               dim2 = 2;
     const void* const tag_vals_dim2[] = { &dim2 };
-    rval = moab.get_entities_by_type_and_tag( 0, moab::MBENTITYSET, &dim_tag, tag_vals_dim2, 1,
-                                              entities );CHECK_ERR( rval );
+    rval = moab.get_entities_by_type_and_tag( 0, moab::MBENTITYSET, &dim_tag, tag_vals_dim2, 1, entities );CHECK_ERR( rval );
 
     // there should only be 129 meshsets of dimension 2
     num_sets = entities.size( );
@@ -145,8 +142,7 @@ void test_tet_tags_1( )
     entities.clear( );
     Tag material_number;
     // get the tag handle
-    rval = moab.tag_get_handle( "MATERIAL_NUMBER", 1, MB_TYPE_INTEGER, material_number,
-                                MB_TAG_SPARSE | MB_TAG_CREAT );CHECK_ERR( rval );
+    rval = moab.tag_get_handle( "MATERIAL_NUMBER", 1, MB_TYPE_INTEGER, material_number, MB_TAG_SPARSE | MB_TAG_CREAT );CHECK_ERR( rval );
 
     // get the entities that are tagged
     rval = moab.get_entities_by_type_and_tag( 0, moab::MBTET, &material_number, 0, 1, entities );
@@ -186,8 +182,7 @@ void test_triangles_tags_1( )
     entities.clear( );
     Tag surface_number;
     // get the tag handle
-    rval = moab.tag_get_handle( "SURFACE_NUMBER", 1, MB_TYPE_INTEGER, surface_number,
-                                MB_TAG_SPARSE | MB_TAG_CREAT );CHECK_ERR( rval );
+    rval = moab.tag_get_handle( "SURFACE_NUMBER", 1, MB_TYPE_INTEGER, surface_number, MB_TAG_SPARSE | MB_TAG_CREAT );CHECK_ERR( rval );
 
     // get the entities that are tagged
     rval = moab.get_entities_by_type_and_tag( 0, moab::MBTRI, &surface_number, 0, 1, entities );
@@ -199,8 +194,7 @@ void test_triangles_tags_1( )
     entities.clear( );
     Tag sideid_tag;
     // get the tag handle
-    rval = moab.tag_get_handle( "SIDEID_TAG", 1, MB_TYPE_INTEGER, sideid_tag,
-                                MB_TAG_SPARSE | MB_TAG_CREAT );CHECK_ERR( rval );
+    rval = moab.tag_get_handle( "SIDEID_TAG", 1, MB_TYPE_INTEGER, sideid_tag, MB_TAG_SPARSE | MB_TAG_CREAT );CHECK_ERR( rval );
 
     // get the entities that are tagged
     rval = moab.get_entities_by_type_and_tag( 0, moab::MBTRI, &sideid_tag, 0, 1, entities );
@@ -253,14 +247,12 @@ void test_meshset_tags_2( )
     Tag dim_tag;
     entities.clear( );
     // get the tag handle
-    rval = moab.tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, dim_tag,
-                                MB_TAG_SPARSE | MB_TAG_CREAT );CHECK_ERR( rval );
+    rval = moab.tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, dim_tag, MB_TAG_SPARSE | MB_TAG_CREAT );CHECK_ERR( rval );
 
     // get the entities that are tagged with dim 3
     int               dim3 = 3;
     const void* const tag_vals_dim3[] = { &dim3 };
-    rval = moab.get_entities_by_type_and_tag( 0, moab::MBENTITYSET, &dim_tag, tag_vals_dim3, 1,
-                                              entities );CHECK_ERR( rval );
+    rval = moab.get_entities_by_type_and_tag( 0, moab::MBENTITYSET, &dim_tag, tag_vals_dim3, 1, entities );CHECK_ERR( rval );
 
     // there should only be 10 meshsets of dimension 3
     num_sets = entities.size( );
@@ -270,8 +262,7 @@ void test_meshset_tags_2( )
     // get the entities that are tagged with dim 2
     int               dim2 = 2;
     const void* const tag_vals_dim2[] = { &dim2 };
-    rval = moab.get_entities_by_type_and_tag( 0, moab::MBENTITYSET, &dim_tag, tag_vals_dim2, 1,
-                                              entities );CHECK_ERR( rval );
+    rval = moab.get_entities_by_type_and_tag( 0, moab::MBENTITYSET, &dim_tag, tag_vals_dim2, 1, entities );CHECK_ERR( rval );
 
     // there should only be 129 meshsets of dimension 2
     num_sets = entities.size( );
@@ -309,8 +300,7 @@ void test_tet_tags_2( )
     entities.clear( );
     Tag material_number;
     // get the tag handle
-    rval = moab.tag_get_handle( "MATERIAL_NUMBER", 1, MB_TYPE_INTEGER, material_number,
-                                MB_TAG_SPARSE | MB_TAG_CREAT );CHECK_ERR( rval );
+    rval = moab.tag_get_handle( "MATERIAL_NUMBER", 1, MB_TYPE_INTEGER, material_number, MB_TAG_SPARSE | MB_TAG_CREAT );CHECK_ERR( rval );
 
     // get the entities that are tagged
     rval = moab.get_entities_by_type_and_tag( 0, moab::MBTET, &material_number, 0, 1, entities );
@@ -350,8 +340,7 @@ void test_triangles_tags_2( )
     entities.clear( );
     Tag surface_number;
     // get the tag handle
-    rval = moab.tag_get_handle( "SURFACE_NUMBER", 1, MB_TYPE_INTEGER, surface_number,
-                                MB_TAG_SPARSE | MB_TAG_CREAT );CHECK_ERR( rval );
+    rval = moab.tag_get_handle( "SURFACE_NUMBER", 1, MB_TYPE_INTEGER, surface_number, MB_TAG_SPARSE | MB_TAG_CREAT );CHECK_ERR( rval );
 
     // get the entities that are tagged
     rval = moab.get_entities_by_type_and_tag( 0, moab::MBTRI, &surface_number, 0, 1, entities );
@@ -363,8 +352,7 @@ void test_triangles_tags_2( )
     entities.clear( );
     Tag sideid_tag;
     // get the tag handle
-    rval = moab.tag_get_handle( "SIDEID_TAG", 1, MB_TYPE_INTEGER, sideid_tag,
-                                MB_TAG_SPARSE | MB_TAG_CREAT );CHECK_ERR( rval );
+    rval = moab.tag_get_handle( "SIDEID_TAG", 1, MB_TYPE_INTEGER, sideid_tag, MB_TAG_SPARSE | MB_TAG_CREAT );CHECK_ERR( rval );
 
     // get the entities that are tagged
     rval = moab.get_entities_by_type_and_tag( 0, moab::MBTRI, &sideid_tag, 0, 1, entities );

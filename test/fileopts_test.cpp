@@ -35,19 +35,17 @@ using namespace moab;
         return 1;                                                                             \
     }
 
-#define EQUAL( A, B )                                                                        \
-    if( A != B )                                                                             \
-    {                                                                                        \
-        std::cerr << "Failure at line " << __LINE__ << ": expected " << ( B ) << " but got " \
-                  << ( A ) << std::endl;                                                     \
-        return 2;                                                                            \
+#define EQUAL( A, B )                                                                                               \
+    if( A != B )                                                                                                    \
+    {                                                                                                               \
+        std::cerr << "Failure at line " << __LINE__ << ": expected " << ( B ) << " but got " << ( A ) << std::endl; \
+        return 2;                                                                                                   \
     }
 
 int main( )
 {
-    FileOptions tool(
-        "INT1=1;NUL1;STR1=ABC;DBL1=1.0;dbl2=2.0;DBL3=3.0;INT2=2;nul2;NUL3;INT3=3;str2=once upon a "
-        "time;str3==fubar=;;INTS=1-3,5,6;DBLS=1.0,2.0, 3.0;STRS=var1, var2_var2;STRS2=" );
+    FileOptions tool( "INT1=1;NUL1;STR1=ABC;DBL1=1.0;dbl2=2.0;DBL3=3.0;INT2=2;nul2;NUL3;INT3=3;str2=once upon a "
+                      "time;str3==fubar=;;INTS=1-3,5,6;DBLS=1.0,2.0, 3.0;STRS=var1, var2_var2;STRS2=" );
 
     std::string s;
     int         i;

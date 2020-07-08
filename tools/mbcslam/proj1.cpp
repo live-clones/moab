@@ -56,8 +56,7 @@ int main( int argc, char** argv )
     int     count;
     rval = mb.coords_iterate( verts.begin( ), verts.end( ), x_ptr, y_ptr, z_ptr, count );
     if( MB_SUCCESS != rval ) return 1;
-    assert( count ==
-            (int)verts.size( ) );  // should end up with just one contiguous chunk of vertices
+    assert( count == (int)verts.size( ) );  // should end up with just one contiguous chunk of vertices
 
     for( int v = 0; v < count; v++ )
     {
@@ -94,8 +93,8 @@ int main( int argc, char** argv )
 
         {
             Range par_sets;
-            rval = mb.get_entities_by_type_and_tag( 0, MBENTITYSET, &par_tag, NULL, 1, par_sets,
-                                                    moab::Interface::UNION );
+            rval =
+                mb.get_entities_by_type_and_tag( 0, MBENTITYSET, &par_tag, NULL, 1, par_sets, moab::Interface::UNION );
             if( !par_sets.empty( ) ) mb.delete_entities( par_sets );
             mb.tag_delete( par_tag );
         }

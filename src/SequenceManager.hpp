@@ -14,10 +14,7 @@ class Error;
 class SequenceManager
 {
   public:
-    SequenceManager( double default_seq_multiplier = 1.0 )
-        : sequence_multiplier( default_seq_multiplier )
-    {
-    }
+    SequenceManager( double default_seq_multiplier = 1.0 ) : sequence_multiplier( default_seq_multiplier ) {}
 
     ~SequenceManager( );
 
@@ -96,8 +93,8 @@ class SequenceManager
      *\param root_set_okay  If true, do not returnan error if the passed
      *                      array contains one or more zero-valued handles
      */
-    ErrorCode check_valid_entities( Error* error_handler, const EntityHandle entities[],
-                                    size_t num_entities, bool root_set_okay = false ) const;
+    ErrorCode check_valid_entities( Error* error_handler, const EntityHandle entities[], size_t num_entities,
+                                    bool root_set_okay = false ) const;
 
     /** Delete an entity.  Deletes sequence if only contained entity. */
     ErrorCode delete_entity( Error* error_handler, EntityHandle entity );
@@ -113,8 +110,8 @@ class SequenceManager
     /** Allocate a element (possibly in an existing sequence) and
      *  assign it the passed connectivity.
      */
-    ErrorCode create_element( EntityType type, const EntityHandle* conn_array,
-                              unsigned num_vertices, EntityHandle& handle_out );
+    ErrorCode create_element( EntityType type, const EntityHandle* conn_array, unsigned num_vertices,
+                              EntityHandle& handle_out );
 
     /** Allocate an entity set (possibly in an existing sequence) */
     ErrorCode create_mesh_set( unsigned flags, EntityHandle& handle_out );
@@ -163,48 +160,41 @@ class SequenceManager
      *                    NOTE: first_handle_out may not be first handle in
      *                    sequence.
      */
-    ErrorCode create_meshset_sequence( EntityID num_sets, EntityID start_id_hint,
-                                       const unsigned* flags, EntityHandle& first_handle_out,
-                                       EntitySequence*& sequence_out );
+    ErrorCode create_meshset_sequence( EntityID num_sets, EntityID start_id_hint, const unsigned* flags,
+                                       EntityHandle& first_handle_out, EntitySequence*& sequence_out );
 
     /**\brief Allocate a block of consecutive mesh sets
      *
      * Alternate form that creates all mesh sets with same flags.
      */
     ErrorCode create_meshset_sequence( EntityID num_sets, EntityID start_id_hint, unsigned flags,
-                                       EntityHandle&    first_handle_out,
-                                       EntitySequence*& sequence_out );
+                                       EntityHandle& first_handle_out, EntitySequence*& sequence_out );
 
     /** Create structured mesh */
-    ErrorCode create_scd_sequence( int imin, int jmin, int kmin, int imax, int jmax, int kmax,
-                                   EntityType type, EntityID start_id_hint,
-                                   EntityHandle& first_handle_out, EntitySequence*& sequence_out,
-                                   int* is_periodic = NULL );
+    ErrorCode create_scd_sequence( int imin, int jmin, int kmin, int imax, int jmax, int kmax, EntityType type,
+                                   EntityID start_id_hint, EntityHandle& first_handle_out,
+                                   EntitySequence*& sequence_out, int* is_periodic = NULL );
 
     /** Create structured mesh */
-    ErrorCode create_scd_sequence( const HomCoord& coord_min, const HomCoord& coord_max,
-                                   EntityType type, EntityID start_id_hint,
-                                   EntityHandle& first_handle_out, EntitySequence*& sequence_out,
-                                   int* is_periodic = NULL );
+    ErrorCode create_scd_sequence( const HomCoord& coord_min, const HomCoord& coord_max, EntityType type,
+                                   EntityID start_id_hint, EntityHandle& first_handle_out,
+                                   EntitySequence*& sequence_out, int* is_periodic = NULL );
 
     /** Create swept mesh */
-    ErrorCode create_sweep_sequence( int imin, int jmin, int kmin, int imax, int jmax, int kmax,
-                                     int* Cq, EntityType type, EntityID start_id_hint,
-                                     EntityHandle&    first_handle_out,
+    ErrorCode create_sweep_sequence( int imin, int jmin, int kmin, int imax, int jmax, int kmax, int* Cq,
+                                     EntityType type, EntityID start_id_hint, EntityHandle& first_handle_out,
                                      EntitySequence*& sequence_out );
 
     /** Create swept mesh */
-    ErrorCode create_sweep_sequence( const HomCoord& coord_min, const HomCoord& coord_max, int* Cq,
-                                     EntityType type, EntityID start_id_hint,
-                                     EntityHandle&    first_handle_out,
+    ErrorCode create_sweep_sequence( const HomCoord& coord_min, const HomCoord& coord_max, int* Cq, EntityType type,
+                                     EntityID start_id_hint, EntityHandle& first_handle_out,
                                      EntitySequence*& sequence_out );
 
     /** Add a structured vertex sequence to this structured element sequence;
      * see comments in ScdElementData */
-    ErrorCode add_vsequence( EntitySequence* vert_seq, EntitySequence* elem_seq, const HomCoord& p1,
-                             const HomCoord& q1, const HomCoord& p2, const HomCoord& q2,
-                             const HomCoord& p3, const HomCoord& q3, bool bb_input = false,
-                             const HomCoord* bb_min = NULL, const HomCoord* bb_max = NULL );
+    ErrorCode add_vsequence( EntitySequence* vert_seq, EntitySequence* elem_seq, const HomCoord& p1, const HomCoord& q1,
+                             const HomCoord& p2, const HomCoord& q2, const HomCoord& p3, const HomCoord& q3,
+                             bool bb_input = false, const HomCoord* bb_min = NULL, const HomCoord* bb_max = NULL );
 
     /** Get data for a specific EntityType */
     TypeSequenceManager& entity_map( EntityType type )
@@ -218,8 +208,7 @@ class SequenceManager
         return typeData[ type ];
     }
 
-    void get_memory_use( unsigned long long& total_entity_storage,
-                         unsigned long long& total_storage ) const;
+    void get_memory_use( unsigned long long& total_entity_storage, unsigned long long& total_storage ) const;
 
     void get_memory_use( EntityType type, unsigned long long& total_entity_storage,
                          unsigned long long& total_storage ) const;
@@ -247,8 +236,7 @@ class SequenceManager
      * If sequence_size != -1, will try to allocate that, unless there isn't available
      * space
      */
-    EntityID new_sequence_size( EntityHandle start_handle, EntityID requested_size,
-                                int sequence_size ) const;
+    EntityID new_sequence_size( EntityHandle start_handle, EntityID requested_size, int sequence_size ) const;
 
     /** \brief Interface to control memory allocation for sequences
      * Provide a factor that controls the size of the sequence that gets allocated.
@@ -310,9 +298,8 @@ class SequenceManager
      *                         the handle range.
      *\return zero if no available handle range, start handle otherwise.
      */
-    EntityHandle sequence_start_handle( EntityType type, EntityID entity_count,
-                                        int values_per_entity, EntityID start_id_hint,
-                                        SequenceData*& data_out, EntityID& data_size );
+    EntityHandle sequence_start_handle( EntityType type, EntityID entity_count, int values_per_entity,
+                                        EntityID start_id_hint, SequenceData*& data_out, EntityID& data_size );
 
     TypeSequenceManager typeData[ MBMAXTYPE ];
 

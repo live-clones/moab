@@ -63,8 +63,8 @@ ErrorCode migrate_trivial( const char* filename );
 // some global variables, used by all tests
 int rank, size, ierr;
 
-int compid1, compid2;  // component ids are unique over all pes, and established in advance;
-int nghlay;  // number of ghost layers for loading the file
+int                compid1, compid2;  // component ids are unique over all pes, and established in advance;
+int                nghlay;  // number of ghost layers for loading the file
 std::vector< int > groupTasks;  // at most 4 tasks
 int                startG1, startG2, endG1, endG2;
 
@@ -101,8 +101,7 @@ ErrorCode migrate_smart( const char* filename, const char* outfile, int partMeth
     ierr = MPI_Comm_create_group( jcomm, group2, tagcomm2, &comm2 );
     CHECKRC( ierr, "can't create comm2" )
 
-    ierr = iMOAB_Initialize(
-        0, 0 );  // not really needed anything from argc, argv, yet; maybe we should
+    ierr = iMOAB_Initialize( 0, 0 );  // not really needed anything from argc, argv, yet; maybe we should
     CHECKRC( ierr, "can't initialize iMOAB" )
 
     // give some dummy values to component ids, just to differentiate between them
@@ -129,16 +128,14 @@ ErrorCode migrate_smart( const char* filename, const char* outfile, int partMeth
     if( comm1 != MPI_COMM_NULL )
     {
 
-        std::string readopts(
-            "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_SHARED_ENTS" );
+        std::string readopts( "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_SHARED_ENTS" );
 
         nghlay = 0;
 
         ierr = iMOAB_LoadMesh( pid1, filen.c_str( ), readopts.c_str( ), &nghlay, filen.length( ),
                                strlen( readopts.c_str( ) ) );
         CHECKRC( ierr, "can't load mesh " )
-        ierr =
-            iMOAB_SendMesh( pid1, &jcomm, &group2, &compid2, &partMethod );  // send to component 2
+        ierr = iMOAB_SendMesh( pid1, &jcomm, &group2, &compid2, &partMethod );  // send to component 2
         CHECKRC( ierr, "cannot send elements" )
 #ifdef GRAPH_INFO
         int is_sender = 1;
@@ -153,8 +150,8 @@ ErrorCode migrate_smart( const char* filename, const char* outfile, int partMeth
         CHECKRC( ierr, "cannot receive elements" )
         std::string wopts;
         wopts = "PARALLEL=WRITE_PART;";
-        ierr = iMOAB_WriteMesh( pid2, (char*)outfile, (char*)wopts.c_str( ), strlen( outfile ),
-                                strlen( wopts.c_str( ) ) );
+        ierr =
+            iMOAB_WriteMesh( pid2, (char*)outfile, (char*)wopts.c_str( ), strlen( outfile ), strlen( wopts.c_str( ) ) );
         CHECKRC( ierr, "cannot write received mesh" )
 #ifdef GRAPH_INFO
         int is_sender = 0;
@@ -232,8 +229,7 @@ int main( int argc, char* argv[] )
     opts.addOpt< int >( "startRecv,c", "start task for receiver layout", &startG2 );
     opts.addOpt< int >( "endRecv,d", "end task for receiver layout", &endG2 );
 
-    opts.addOpt< int >( "typeTest,t",
-                        "test types (0 - trivial, 1 graph, 2 geom, 3 both  graph and geometry",
+    opts.addOpt< int >( "typeTest,t", "test types (0 - trivial, 1 graph, 2 geom, 3 both  graph and geometry",
                         &typeTest );
 
     opts.parseCommandLine( argc, argv );
@@ -243,17 +239,14 @@ int main( int argc, char* argv[] )
         std::cout << " input file : " << filename << "\n";
         std::cout << " sender   on tasks: " << startG1 << ":" << endG1 << "\n";
         std::cout << " receiver on tasks: " << startG2 << ":" << endG2 << "\n";
-        std::cout << " type migrate: " << typeTest
-                  << " (0 - trivial, 1 graph , 2 geom, 3 both graph and geom  ) \n";
+        std::cout << " type migrate: " << typeTest << " (0 - trivial, 1 graph , 2 geom, 3 both graph and geom  ) \n";
     }
 
     int num_errors = 0;
 
     if( 0 == typeTest ) num_errors += RUN_TEST_ARG2( migrate_trivial, filename.c_str( ) );
-    if( 3 == typeTest || 1 == typeTest )
-        num_errors += RUN_TEST_ARG2( migrate_graph, filename.c_str( ) );
-    if( 3 == typeTest || 2 == typeTest )
-        num_errors += RUN_TEST_ARG2( migrate_geom, filename.c_str( ) );
+    if( 3 == typeTest || 1 == typeTest ) num_errors += RUN_TEST_ARG2( migrate_graph, filename.c_str( ) );
+    if( 3 == typeTest || 2 == typeTest ) num_errors += RUN_TEST_ARG2( migrate_geom, filename.c_str( ) );
 
     if( rank == 0 )
     {

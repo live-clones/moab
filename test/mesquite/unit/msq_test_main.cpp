@@ -44,10 +44,7 @@ using namespace std;
 class CPPUNIT_API SummaryOutput : public CppUnit::Outputter
 {
   public:
-    SummaryOutput( FILE* file, CppUnit::TestResultCollector* result )
-        : file_( file ), results_( result )
-    {
-    }
+    SummaryOutput( FILE* file, CppUnit::TestResultCollector* result ) : file_( file ), results_( result ) {}
     void write( );
 
   private:
@@ -88,8 +85,7 @@ int main( int argc, char** argv )
         while( argc > firsttest )
         {
             argc--;
-            CppUnit::TestFactoryRegistry& registry =
-                CppUnit::TestFactoryRegistry::getRegistry( argv[ argc ] );
+            CppUnit::TestFactoryRegistry& registry = CppUnit::TestFactoryRegistry::getRegistry( argv[ argc ] );
             test = registry.makeTest( );
             if( !test->countTestCases( ) )
             {

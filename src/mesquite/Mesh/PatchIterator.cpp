@@ -47,8 +47,7 @@ bool PatchIterator::get_next_patch( PatchData& pd, MsqError& err )
             else
             {
                 MSQ_SETERR( err )
-                ( "PatchSet and PatchData do not share the same Mesh instance.",
-                  MsqError::INVALID_STATE );
+                ( "PatchSet and PatchData do not share the same Mesh instance.", MsqError::INVALID_STATE );
                 return false;
             }
         }

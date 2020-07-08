@@ -19,8 +19,7 @@
 namespace moab
 {
 
-NCHelper* NCHelper::get_nc_helper( ReadNC* readNC, int fileId, const FileOptions& opts,
-                                   EntityHandle fileSet )
+NCHelper* NCHelper::get_nc_helper( ReadNC* readNC, int fileId, const FileOptions& opts, EntityHandle fileSet )
 {
     // Check if CF convention is being followed
     bool is_CF = false;
@@ -35,8 +34,8 @@ NCHelper* NCHelper::get_nc_helper( ReadNC* readNC, int fileId, const FileOptions
         std::string  att_data;
         att_data.resize( sz + 1 );
         att_data[ sz ] = '\000';
-        int success = NCFUNC( get_att_text )( fileId, attIt->second.attVarId,
-                                              attIt->second.attName.c_str( ), &att_data[ 0 ] );
+        int success =
+            NCFUNC( get_att_text )( fileId, attIt->second.attVarId, attIt->second.attName.c_str( ), &att_data[ 0 ] );
         if( 0 == success && att_data.find( "CF" ) != std::string::npos ) is_CF = true;
     }
 
@@ -85,8 +84,7 @@ ErrorCode NCHelper::create_conventional_tags( const std::vector< int >& tstep_nu
     Tag numDimsTag = 0;
     tag_name = "__NUM_DIMS";
     int numDims = dimNames.size( );
-    rval = mbImpl->tag_get_handle( tag_name.c_str( ), 1, MB_TYPE_INTEGER, numDimsTag,
-                                   MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_SET_ERR( rval, "Trouble creating conventional tag " << tag_name );
+    rval = mbImpl->tag_get_handle( tag_name.c_str( ), 1, MB_TYPE_INTEGER, numDimsTag, MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_SET_ERR( rval, "Trouble creating conventional tag " << tag_name );
     rval = mbImpl->tag_set_data( numDimsTag, &_fileSet, 1, &numDims );MB_CHK_SET_ERR( rval, "Trouble setting data to conventional tag " << tag_name );
     dbgOut.tprintf( 2, "Conventional tag %s created\n", tag_name.c_str( ) );
 
@@ -94,8 +92,7 @@ ErrorCode NCHelper::create_conventional_tags( const std::vector< int >& tstep_nu
     Tag numVarsTag = 0;
     tag_name = "__NUM_VARS";
     int numVars = varInfo.size( );
-    rval = mbImpl->tag_get_handle( tag_name.c_str( ), 1, MB_TYPE_INTEGER, numVarsTag,
-                                   MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_SET_ERR( rval, "Trouble creating conventional tag " << tag_name );
+    rval = mbImpl->tag_get_handle( tag_name.c_str( ), 1, MB_TYPE_INTEGER, numVarsTag, MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_SET_ERR( rval, "Trouble creating conventional tag " << tag_name );
     rval = mbImpl->tag_set_data( numVarsTag, &_fileSet, 1, &numVars );MB_CHK_SET_ERR( rval, "Trouble setting data to conventional tag " << tag_name );
     dbgOut.tprintf( 2, "Conventional tag %s created\n", tag_name.c_str( ) );
 
@@ -158,8 +155,7 @@ ErrorCode NCHelper::create_conventional_tags( const std::vector< int >& tstep_nu
             std::vector< int > val( 2, 0 );
             val[ 0 ] = 0;
             val[ 1 ] = nTimeSteps - 1;
-            rval = mbImpl->tag_get_handle( tag_name.c_str( ), 2, MB_TYPE_INTEGER, tagh,
-                                           MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_SET_ERR( rval, "Trouble creating conventional tag " << tag_name );
+            rval = mbImpl->tag_get_handle( tag_name.c_str( ), 2, MB_TYPE_INTEGER, tagh, MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_SET_ERR( rval, "Trouble creating conventional tag " << tag_name );
             rval = mbImpl->tag_set_data( tagh, &_fileSet, 1, &val[ 0 ] );MB_CHK_SET_ERR( rval, "Trouble setting data to conventional tag " << tag_name );
             dbgOut.tprintf( 2, "Conventional tag %s created\n", tag_name.c_str( ) );
         }
@@ -207,8 +203,7 @@ ErrorCode NCHelper::create_conventional_tags( const std::vector< int >& tstep_nu
         {
             Tag         tmptag = 0;
             std::string tmptagname = dimNames[ varInfo[ mapIter->first ].varDims[ i ] ];
-            rval = mbImpl->tag_get_handle( tmptagname.c_str( ), 0, MB_TYPE_OPAQUE, tmptag,
-                                           MB_TAG_ANY );MB_CHK_SET_ERR( rval, "Trouble getting tag " << tmptagname );
+            rval = mbImpl->tag_get_handle( tmptagname.c_str( ), 0, MB_TYPE_OPAQUE, tmptag, MB_TAG_ANY );MB_CHK_SET_ERR( rval, "Trouble getting tag " << tmptagname );
             varDimTags[ i ] = tmptag;
         }
         // rval = mbImpl->tag_get_handle(tag_name.c_str(), varDimSz, MB_TYPE_HANDLE,
@@ -216,8 +211,8 @@ ErrorCode NCHelper::create_conventional_tags( const std::vector< int >& tstep_nu
         // here. Tag is a pointer, which is 4 bytes on 32 bit machines and 8 bytes on 64 bit
         // machines. Normally, entity handle is 8 bytes on 64 bit machines, but it can also be
         // configured to 4 bytes.
-        rval = mbImpl->tag_get_handle( tag_name.c_str( ), varDimSz * sizeof( Tag ), MB_TYPE_OPAQUE,
-                                       varNamesDimsTag, MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_SET_ERR( rval, "Trouble creating conventional tag " << tag_name );
+        rval = mbImpl->tag_get_handle( tag_name.c_str( ), varDimSz * sizeof( Tag ), MB_TYPE_OPAQUE, varNamesDimsTag,
+                                       MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_SET_ERR( rval, "Trouble creating conventional tag " << tag_name );
         rval = mbImpl->tag_set_data( varNamesDimsTag, &_fileSet, 1, &( varDimTags[ 0 ] ) );MB_CHK_SET_ERR( rval, "Trouble setting data to conventional tag " << tag_name );
         dbgOut.tprintf( 2, "Conventional tag %s created\n", tag_name.c_str( ) );
     }
@@ -245,8 +240,8 @@ ErrorCode NCHelper::create_conventional_tags( const std::vector< int >& tstep_nu
     tag_name = "__GLOBAL_ATTRIBS_LEN";
     Tag globalAttLenTag = 0;
     if( gattLen.size( ) == 0 ) gattLen.push_back( 0 );
-    rval = mbImpl->tag_get_handle( tag_name.c_str( ), gattLen.size( ), MB_TYPE_INTEGER,
-                                   globalAttLenTag, MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_SET_ERR( rval, "Trouble creating conventional tag " << tag_name );
+    rval = mbImpl->tag_get_handle( tag_name.c_str( ), gattLen.size( ), MB_TYPE_INTEGER, globalAttLenTag,
+                                   MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_SET_ERR( rval, "Trouble creating conventional tag " << tag_name );
     rval = mbImpl->tag_set_data( globalAttLenTag, &_fileSet, 1, &gattLen[ 0 ] );MB_CHK_SET_ERR( rval, "Trouble setting data to conventional tag " << tag_name );
     dbgOut.tprintf( 2, "Conventional tag %s created\n", tag_name.c_str( ) );
 
@@ -277,8 +272,7 @@ ErrorCode NCHelper::create_conventional_tags( const std::vector< int >& tstep_nu
         }
         else
         {
-            rval = create_attrib_string( mapIter->second.varAtts, varAttVal, varAttLen );MB_CHK_SET_ERR( rval,
-                            "Trouble creating attribute string for variable " << mapIter->first );
+            rval = create_attrib_string( mapIter->second.varAtts, varAttVal, varAttLen );MB_CHK_SET_ERR( rval, "Trouble creating attribute string for variable " << mapIter->first );
         }
         const void* varAttPtr = varAttVal.c_str( );
         int         varAttSz = varAttVal.size( );
@@ -290,8 +284,8 @@ ErrorCode NCHelper::create_conventional_tags( const std::vector< int >& tstep_nu
         tag_name = ssTagName.str( );
         Tag varAttLenTag = 0;
         if( 0 == varAttLen.size( ) ) varAttLen.push_back( 0 );
-        rval = mbImpl->tag_get_handle( tag_name.c_str( ), varAttLen.size( ), MB_TYPE_INTEGER,
-                                       varAttLenTag, MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_SET_ERR( rval, "Trouble creating conventional tag " << tag_name );
+        rval = mbImpl->tag_get_handle( tag_name.c_str( ), varAttLen.size( ), MB_TYPE_INTEGER, varAttLenTag,
+                                       MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_SET_ERR( rval, "Trouble creating conventional tag " << tag_name );
         rval = mbImpl->tag_set_data( varAttLenTag, &_fileSet, 1, &varAttLen[ 0 ] );MB_CHK_SET_ERR( rval, "Trouble setting data to conventional tag " << tag_name );
         dbgOut.tprintf( 2, "Conventional tag %s created\n", tag_name.c_str( ) );
     }
@@ -300,8 +294,8 @@ ErrorCode NCHelper::create_conventional_tags( const std::vector< int >& tstep_nu
     tag_name = "__VAR_NAMES_LOCATIONS";
     Tag                varNamesLocsTag = 0;
     std::vector< int > varNamesLocs( varInfo.size( ) );
-    rval = mbImpl->tag_get_handle( tag_name.c_str( ), varNamesLocs.size( ), MB_TYPE_INTEGER,
-                                   varNamesLocsTag, MB_TAG_CREAT | MB_TAG_SPARSE );MB_CHK_SET_ERR( rval, "Trouble creating conventional tag " << tag_name );
+    rval = mbImpl->tag_get_handle( tag_name.c_str( ), varNamesLocs.size( ), MB_TYPE_INTEGER, varNamesLocsTag,
+                                   MB_TAG_CREAT | MB_TAG_SPARSE );MB_CHK_SET_ERR( rval, "Trouble creating conventional tag " << tag_name );
     for( mapIter = varInfo.begin( ); mapIter != varInfo.end( ); ++mapIter )
     {
         varNamesLocs[ std::distance( varInfo.begin( ), mapIter ) ] = mapIter->second.entLoc;
@@ -338,8 +332,7 @@ ErrorCode NCHelper::update_time_tag_vals( )
     Tag         time_tag = 0;
     const void* data = NULL;
     int         time_tag_size = 0;
-    rval = mbImpl->tag_get_handle( time_tag_name.c_str( ), 0, MB_TYPE_DOUBLE, time_tag,
-                                   MB_TAG_VARLEN );MB_CHK_SET_ERR( rval, "Trouble getting tag " << time_tag_name );
+    rval = mbImpl->tag_get_handle( time_tag_name.c_str( ), 0, MB_TYPE_DOUBLE, time_tag, MB_TAG_VARLEN );MB_CHK_SET_ERR( rval, "Trouble getting tag " << time_tag_name );
     rval = mbImpl->tag_get_by_ptr( time_tag, &_fileSet, 1, &data, &time_tag_size );MB_CHK_SET_ERR( rval, "Trouble getting data of tag " << time_tag_name );
     const double* time_tag_vals = static_cast< const double* >( data );
 
@@ -374,8 +367,7 @@ ErrorCode NCHelper::update_time_tag_vals( )
     return MB_SUCCESS;
 }
 
-ErrorCode NCHelper::read_variables_setup( std::vector< std::string >&     var_names,
-                                          std::vector< int >&             tstep_nums,
+ErrorCode NCHelper::read_variables_setup( std::vector< std::string >& var_names, std::vector< int >& tstep_nums,
                                           std::vector< ReadNC::VarData >& vdatas,
                                           std::vector< ReadNC::VarData >& vsetdatas )
 {
@@ -395,8 +387,7 @@ ErrorCode NCHelper::read_variables_setup( std::vector< std::string >&     var_na
             if( ignoredVarNames.find( vd.varName ) != ignoredVarNames.end( ) ) continue;
 
             // Coordinate variables (include dummy ones) were read to the file set by default
-            if( std::find( dimNames.begin( ), dimNames.end( ), vd.varName ) != dimNames.end( ) )
-                continue;
+            if( std::find( dimNames.begin( ), dimNames.end( ), vd.varName ) != dimNames.end( ) ) continue;
 
             if( vd.entLoc == ReadNC::ENTLOCSET )
                 vsetdatas.push_back( vd );
@@ -450,8 +441,8 @@ ErrorCode NCHelper::read_variables_setup( std::vector< std::string >&     var_na
 
         for( unsigned int i = 0; i < vsetdatas.size( ); i++ )
         {
-            if( ( std::find( vsetdatas[ i ].varDims.begin( ), vsetdatas[ i ].varDims.end( ),
-                             tDim ) != vsetdatas[ i ].varDims.end( ) ) &&
+            if( ( std::find( vsetdatas[ i ].varDims.begin( ), vsetdatas[ i ].varDims.end( ), tDim ) !=
+                  vsetdatas[ i ].varDims.end( ) ) &&
                 ( vsetdatas[ i ].varName != dimNames[ tDim ] ) )
             {
                 // Set variables with timesteps: e.g. xtime(Time) or xtime(Time, StrLen)
@@ -472,8 +463,7 @@ ErrorCode NCHelper::read_variables_setup( std::vector< std::string >&     var_na
     return MB_SUCCESS;
 }
 
-ErrorCode NCHelper::read_variables_to_set( std::vector< ReadNC::VarData >& vdatas,
-                                           std::vector< int >&             tstep_nums )
+ErrorCode NCHelper::read_variables_to_set( std::vector< ReadNC::VarData >& vdatas, std::vector< int >& tstep_nums )
 {
     Interface*&  mbImpl = _readNC->mbImpl;
     DebugOutput& dbgOut = _readNC->dbgOut;
@@ -500,40 +490,33 @@ ErrorCode NCHelper::read_variables_to_set( std::vector< ReadNC::VarData >& vdata
             {
                 case NC_BYTE:
                 case NC_CHAR:
-                    success = NCFUNCAG( _vara_text )( _fileId, vdatas[ i ].varId,
-                                                      &vdatas[ i ].readStarts[ 0 ],
+                    success = NCFUNCAG( _vara_text )( _fileId, vdatas[ i ].varId, &vdatas[ i ].readStarts[ 0 ],
                                                       &vdatas[ i ].readCounts[ 0 ], (char*)data );
                     if( success )
-                        MB_SET_ERR( MB_FAILURE, "Failed to read byte/char data for variable "
-                                                    << vdatas[ i ].varName );
+                        MB_SET_ERR( MB_FAILURE, "Failed to read byte/char data for variable " << vdatas[ i ].varName );
                     break;
                 case NC_SHORT:
                 case NC_INT:
-                    success = NCFUNCAG( _vara_int )( _fileId, vdatas[ i ].varId,
-                                                     &vdatas[ i ].readStarts[ 0 ],
+                    success = NCFUNCAG( _vara_int )( _fileId, vdatas[ i ].varId, &vdatas[ i ].readStarts[ 0 ],
                                                      &vdatas[ i ].readCounts[ 0 ], (int*)data );
                     if( success )
-                        MB_SET_ERR( MB_FAILURE, "Failed to read short/int data for variable "
-                                                    << vdatas[ i ].varName );
+                        MB_SET_ERR( MB_FAILURE, "Failed to read short/int data for variable " << vdatas[ i ].varName );
                     break;
                 case NC_FLOAT:
                 case NC_DOUBLE:
-                    success = NCFUNCAG( _vara_double )(
-                        _fileId, vdatas[ i ].varId, &vdatas[ i ].readStarts[ 0 ],
-                        &vdatas[ i ].readCounts[ 0 ], (double*)data );
+                    success = NCFUNCAG( _vara_double )( _fileId, vdatas[ i ].varId, &vdatas[ i ].readStarts[ 0 ],
+                                                        &vdatas[ i ].readCounts[ 0 ], (double*)data );
                     if( success )
-                        MB_SET_ERR( MB_FAILURE, "Failed to read float/double data for variable "
-                                                    << vdatas[ i ].varName );
+                        MB_SET_ERR( MB_FAILURE,
+                                    "Failed to read float/double data for variable " << vdatas[ i ].varName );
                     break;
                 default:
-                    MB_SET_ERR( MB_FAILURE,
-                                "Unexpected data type for variable " << vdatas[ i ].varName );
+                    MB_SET_ERR( MB_FAILURE, "Unexpected data type for variable " << vdatas[ i ].varName );
             }
 
-            dbgOut.tprintf( 2, "Setting data for variable %s, time step %d\n",
-                            vdatas[ i ].varName.c_str( ), tstep_nums[ t ] );
-            rval = mbImpl->tag_set_by_ptr( vdatas[ i ].varTags[ t ], &_fileSet, 1, &data,
-                                           &vdatas[ i ].sz );MB_CHK_SET_ERR( rval, "Trouble setting tag data for variable " << vdatas[ i ].varName );
+            dbgOut.tprintf( 2, "Setting data for variable %s, time step %d\n", vdatas[ i ].varName.c_str( ),
+                            tstep_nums[ t ] );
+            rval = mbImpl->tag_set_by_ptr( vdatas[ i ].varTags[ t ], &_fileSet, 1, &data, &vdatas[ i ].sz );MB_CHK_SET_ERR( rval, "Trouble setting tag data for variable " << vdatas[ i ].varName );
 
             // Memory pointed by pointer data can be deleted, as tag_set_by_ptr() has already copied
             // the tag values
@@ -574,8 +557,7 @@ ErrorCode NCHelper::read_variables_to_set( std::vector< ReadNC::VarData >& vdata
     return rval;
 }
 
-ErrorCode NCHelper::read_coordinate( const char* var_name, int lmin, int lmax,
-                                     std::vector< double >& cvals )
+ErrorCode NCHelper::read_coordinate( const char* var_name, int lmin, int lmax, std::vector< double >& cvals )
 {
     std::map< std::string, ReadNC::VarData >&          varInfo = _readNC->varInfo;
     std::map< std::string, ReadNC::VarData >::iterator vmit = varInfo.find( var_name );
@@ -596,11 +578,9 @@ ErrorCode NCHelper::read_coordinate( const char* var_name, int lmin, int lmax,
         case NC_FLOAT:
         case NC_DOUBLE:
             // Read float as double
-            success = NCFUNCAG( _vars_double )( _fileId, ( *vmit ).second.varId, &tstart, &tcount,
-                                                &dum_stride, &cvals[ 0 ] );
-            if( success )
-                MB_SET_ERR( MB_FAILURE,
-                            "Failed to read float/double data for variable " << var_name );
+            success =
+                NCFUNCAG( _vars_double )( _fileId, ( *vmit ).second.varId, &tstart, &tcount, &dum_stride, &cvals[ 0 ] );
+            if( success ) MB_SET_ERR( MB_FAILURE, "Failed to read float/double data for variable " << var_name );
             break;
         default:
             MB_SET_ERR( MB_FAILURE, "Unexpected data type for variable " << var_name );
@@ -651,8 +631,7 @@ ErrorCode NCHelper::get_tag_to_set( ReadNC::VarData& var_data, int tstep_num, Ta
     return rval;
 }
 
-ErrorCode NCHelper::get_tag_to_nonset( ReadNC::VarData& var_data, int tstep_num, Tag& tagh,
-                                       int num_lev )
+ErrorCode NCHelper::get_tag_to_nonset( ReadNC::VarData& var_data, int tstep_num, Tag& tagh, int num_lev )
 {
     Interface*&  mbImpl = _readNC->mbImpl;
     DebugOutput& dbgOut = _readNC->dbgOut;
@@ -691,8 +670,8 @@ ErrorCode NCHelper::get_tag_to_nonset( ReadNC::VarData& var_data, int tstep_num,
     return rval;
 }
 
-ErrorCode NCHelper::create_attrib_string( const std::map< std::string, ReadNC::AttData >& attMap,
-                                          std::string& attVal, std::vector< int >& attLen )
+ErrorCode NCHelper::create_attrib_string( const std::map< std::string, ReadNC::AttData >& attMap, std::string& attVal,
+                                          std::vector< int >& attLen )
 {
     int                                                      success;
     std::stringstream                                        ssAtt;
@@ -709,59 +688,50 @@ ErrorCode NCHelper::create_attrib_string( const std::map< std::string, ReadNC::A
             case NC_CHAR:
                 sz = attIt->second.attLen;
                 attData = (char*)malloc( sz );
-                success = NCFUNC( get_att_text )( _fileId, attIt->second.attVarId,
-                                                  attIt->second.attName.c_str( ), (char*)attData );
+                success = NCFUNC( get_att_text )( _fileId, attIt->second.attVarId, attIt->second.attName.c_str( ),
+                                                  (char*)attData );
                 if( success )
-                    MB_SET_ERR( MB_FAILURE, "Failed to read byte/char data for attribute "
-                                                << attIt->second.attName );
+                    MB_SET_ERR( MB_FAILURE, "Failed to read byte/char data for attribute " << attIt->second.attName );
                 ssAtt << "char;";
                 break;
             case NC_SHORT:
                 sz = attIt->second.attLen * sizeof( short );
                 attData = (short*)malloc( sz );
-                success =
-                    NCFUNC( get_att_short )( _fileId, attIt->second.attVarId,
-                                             attIt->second.attName.c_str( ), (short*)attData );
+                success = NCFUNC( get_att_short )( _fileId, attIt->second.attVarId, attIt->second.attName.c_str( ),
+                                                   (short*)attData );
                 if( success )
-                    MB_SET_ERR( MB_FAILURE, "Failed to read short data for attribute "
-                                                << attIt->second.attName );
+                    MB_SET_ERR( MB_FAILURE, "Failed to read short data for attribute " << attIt->second.attName );
                 ssAtt << "short;";
                 break;
             case NC_INT:
                 sz = attIt->second.attLen * sizeof( int );
                 attData = (int*)malloc( sz );
-                success = NCFUNC( get_att_int )( _fileId, attIt->second.attVarId,
-                                                 attIt->second.attName.c_str( ), (int*)attData );
+                success = NCFUNC( get_att_int )( _fileId, attIt->second.attVarId, attIt->second.attName.c_str( ),
+                                                 (int*)attData );
                 if( success )
-                    MB_SET_ERR( MB_FAILURE,
-                                "Failed to read int data for attribute " << attIt->second.attName );
+                    MB_SET_ERR( MB_FAILURE, "Failed to read int data for attribute " << attIt->second.attName );
                 ssAtt << "int;";
                 break;
             case NC_FLOAT:
                 sz = attIt->second.attLen * sizeof( float );
                 attData = (float*)malloc( sz );
-                success =
-                    NCFUNC( get_att_float )( _fileId, attIt->second.attVarId,
-                                             attIt->second.attName.c_str( ), (float*)attData );
+                success = NCFUNC( get_att_float )( _fileId, attIt->second.attVarId, attIt->second.attName.c_str( ),
+                                                   (float*)attData );
                 if( success )
-                    MB_SET_ERR( MB_FAILURE, "Failed to read float data for attribute "
-                                                << attIt->second.attName );
+                    MB_SET_ERR( MB_FAILURE, "Failed to read float data for attribute " << attIt->second.attName );
                 ssAtt << "float;";
                 break;
             case NC_DOUBLE:
                 sz = attIt->second.attLen * sizeof( double );
                 attData = (double*)malloc( sz );
-                success =
-                    NCFUNC( get_att_double )( _fileId, attIt->second.attVarId,
-                                              attIt->second.attName.c_str( ), (double*)attData );
+                success = NCFUNC( get_att_double )( _fileId, attIt->second.attVarId, attIt->second.attName.c_str( ),
+                                                    (double*)attData );
                 if( success )
-                    MB_SET_ERR( MB_FAILURE, "Failed to read double data for attribute "
-                                                << attIt->second.attName );
+                    MB_SET_ERR( MB_FAILURE, "Failed to read double data for attribute " << attIt->second.attName );
                 ssAtt << "double;";
                 break;
             default:
-                MB_SET_ERR( MB_FAILURE,
-                            "Unexpected data type for attribute " << attIt->second.attName );
+                MB_SET_ERR( MB_FAILURE, "Unexpected data type for attribute " << attIt->second.attName );
         }
         char* tmpc = (char*)attData;
         for( unsigned int counter = 0; counter != sz; ++counter )
@@ -805,8 +775,7 @@ ErrorCode NCHelper::create_dummy_variables( )
         data.numAtts = 0;
         data.entLoc = ReadNC::ENTLOCSET;
         dummyVarNames.insert( var_name );
-        dbgOut.tprintf( 2, "Dummy coordinate variable created for dimension %s\n",
-                        var_name.c_str( ) );
+        dbgOut.tprintf( 2, "Dummy coordinate variable created for dimension %s\n", var_name.c_str( ) );
 
         // Create a corresponding sparse tag
         Tag       tagh;
@@ -817,8 +786,7 @@ ErrorCode NCHelper::create_dummy_variables( )
         const void* ptr = &dimLens[ i ];
         // Tag size is 1
         int size = 1;
-        rval = mbImpl->tag_set_by_ptr( tagh, &_fileSet, 1, &ptr, &size );MB_CHK_SET_ERR( rval,
-                        "Trouble setting tag data for dummy coordinate variable " << var_name );
+        rval = mbImpl->tag_set_by_ptr( tagh, &_fileSet, 1, &ptr, &size );MB_CHK_SET_ERR( rval, "Trouble setting tag data for dummy coordinate variable " << var_name );
 
         dbgOut.tprintf( 2, "Sparse tag created for dimension %s\n", var_name.c_str( ) );
     }
@@ -840,8 +808,7 @@ ErrorCode NCHelper::read_variables_to_set_allocate( std::vector< ReadNC::VarData
         if( vdatas[ i ].has_tsteps )
         {
             // First: time
-            vdatas[ i ].readStarts.push_back(
-                0 );  // This value is timestep dependent, will be set later
+            vdatas[ i ].readStarts.push_back( 0 );  // This value is timestep dependent, will be set later
             vdatas[ i ].readCounts.push_back( 1 );
 
             // Next: other dimensions
@@ -877,20 +844,15 @@ ErrorCode NCHelper::read_variables_to_set_allocate( std::vector< ReadNC::VarData
         // Note, for set variables without timesteps, loop one time and then break
         for( unsigned int t = 0; t < tstep_nums.size( ); t++ )
         {
-            dbgOut.tprintf( 2, "Reading variable %s, time step %d\n", vdatas[ i ].varName.c_str( ),
-                            tstep_nums[ t ] );
+            dbgOut.tprintf( 2, "Reading variable %s, time step %d\n", vdatas[ i ].varName.c_str( ), tstep_nums[ t ] );
 
             if( tstep_nums[ t ] >= dimLens[ tDim ] )
-            {
-                MB_SET_ERR( MB_INDEX_OUT_OF_RANGE,
-                            "Wrong value for timestep number " << tstep_nums[ t ] );
-            }
+            { MB_SET_ERR( MB_INDEX_OUT_OF_RANGE, "Wrong value for timestep number " << tstep_nums[ t ] ); }
 
             // Get the tag to read into
             if( !vdatas[ i ].varTags[ t ] )
             {
-                rval = get_tag_to_set( vdatas[ i ], tstep_nums[ t ], vdatas[ i ].varTags[ t ] );MB_CHK_SET_ERR( rval,
-                                "Trouble getting tag to set variable " << vdatas[ i ].varName );
+                rval = get_tag_to_set( vdatas[ i ], tstep_nums[ t ], vdatas[ i ].varTags[ t ] );MB_CHK_SET_ERR( rval, "Trouble getting tag to set variable " << vdatas[ i ].varName );
             }
 
             switch( vdatas[ i ].varDataType )
@@ -908,8 +870,7 @@ ErrorCode NCHelper::read_variables_to_set_allocate( std::vector< ReadNC::VarData
                     vdatas[ i ].varDatas[ t ] = new double[ vdatas[ i ].sz ];
                     break;
                 default:
-                    MB_SET_ERR( MB_FAILURE,
-                                "Unexpected data type for variable " << vdatas[ i ].varName );
+                    MB_SET_ERR( MB_FAILURE, "Unexpected data type for variable " << vdatas[ i ].varName );
             }
 
             // Loop continues only for set variables with timesteps, e.g. xtime(Time) or xtime(Time,
@@ -942,8 +903,7 @@ ErrorCode ScdNCHelper::check_existing_mesh( )
 
     // Check the number of elements too
     int num_elems;
-    rval = mbImpl->get_number_entities_by_dimension( _fileSet, ( -1 == lCDims[ 2 ] ? 2 : 3 ),
-                                                     num_elems );MB_CHK_SET_ERR( rval, "Trouble getting number of elements" );
+    rval = mbImpl->get_number_entities_by_dimension( _fileSet, ( -1 == lCDims[ 2 ] ? 2 : 3 ), num_elems );MB_CHK_SET_ERR( rval, "Trouble getting number of elements" );
 
     /*
     // Check against parameters
@@ -972,23 +932,20 @@ ErrorCode ScdNCHelper::create_mesh( Range& faces )
     ScdBox* scd_box;
 
     ErrorCode rval = scdi->construct_box( HomCoord( lDims[ 0 ], lDims[ 1 ], lDims[ 2 ], 1 ),
-                                          HomCoord( lDims[ 3 ], lDims[ 4 ], lDims[ 5 ], 1 ), NULL,
-                                          0, scd_box, locallyPeriodic, &parData, true );MB_CHK_SET_ERR( rval, "Trouble creating scd vertex sequence" );
+                                          HomCoord( lDims[ 3 ], lDims[ 4 ], lDims[ 5 ], 1 ), NULL, 0, scd_box,
+                                          locallyPeriodic, &parData, true );MB_CHK_SET_ERR( rval, "Trouble creating scd vertex sequence" );
 
     // Add verts to tmp_range first, so we can duplicate global ids in vertex ids
-    tmp_range.insert( scd_box->start_vertex( ),
-                      scd_box->start_vertex( ) + scd_box->num_vertices( ) - 1 );
+    tmp_range.insert( scd_box->start_vertex( ), scd_box->start_vertex( ) + scd_box->num_vertices( ) - 1 );
 
     if( mpFileIdTag )
     {
         int   count;
         void* data;
-        rval =
-            mbImpl->tag_iterate( *mpFileIdTag, tmp_range.begin( ), tmp_range.end( ), count, data );MB_CHK_SET_ERR( rval, "Failed to iterate file ID tag on local vertices" );
+        rval = mbImpl->tag_iterate( *mpFileIdTag, tmp_range.begin( ), tmp_range.end( ), count, data );MB_CHK_SET_ERR( rval, "Failed to iterate file ID tag on local vertices" );
         assert( count == scd_box->num_vertices( ) );
         int* fid_data = (int*)data;
-        rval =
-            mbImpl->tag_iterate( mGlobalIdTag, tmp_range.begin( ), tmp_range.end( ), count, data );MB_CHK_SET_ERR( rval, "Failed to iterate global ID tag on local vertices" );
+        rval = mbImpl->tag_iterate( mGlobalIdTag, tmp_range.begin( ), tmp_range.end( ), count, data );MB_CHK_SET_ERR( rval, "Failed to iterate global ID tag on local vertices" );
         assert( count == scd_box->num_vertices( ) );
         int* gid_data = (int*)data;
         for( int i = 0; i < count; i++ )
@@ -996,13 +953,11 @@ ErrorCode ScdNCHelper::create_mesh( Range& faces )
     }
 
     // Then add box set and elements to the range, then to the file set
-    tmp_range.insert( scd_box->start_element( ),
-                      scd_box->start_element( ) + scd_box->num_elements( ) - 1 );
+    tmp_range.insert( scd_box->start_element( ), scd_box->start_element( ) + scd_box->num_elements( ) - 1 );
     tmp_range.insert( scd_box->box_set( ) );
     rval = mbImpl->add_entities( _fileSet, tmp_range );MB_CHK_SET_ERR( rval, "Couldn't add new vertices to current file set" );
 
-    dbgOut.tprintf( 1, "scdbox %d quads, %d vertices\n", scd_box->num_elements( ),
-                    scd_box->num_vertices( ) );
+    dbgOut.tprintf( 1, "scdbox %d quads, %d vertices\n", scd_box->num_elements( ), scd_box->num_vertices( ) );
 
     // Set the vertex coordinates
     double *xc, *yc, *zc;
@@ -1035,8 +990,7 @@ ErrorCode ScdNCHelper::create_mesh( Range& faces )
     int num_verts = ( lDims[ 3 ] - lDims[ 0 ] + 1 ) * ( lDims[ 4 ] - lDims[ 1 ] + 1 ) *
                     ( -1 == lDims[ 2 ] ? 1 : lDims[ 5 ] - lDims[ 2 ] + 1 );
     std::vector< int > gids( num_verts );
-    Range              verts( scd_box->start_vertex( ),
-                 scd_box->start_vertex( ) + scd_box->num_vertices( ) - 1 );
+    Range              verts( scd_box->start_vertex( ), scd_box->start_vertex( ) + scd_box->num_vertices( ) - 1 );
     rval = mbImpl->tag_get_data( mGlobalIdTag, verts, &gids[ 0 ] );MB_CHK_SET_ERR( rval, "Trouble getting local gid values of vertices" );
     int vmin = *( std::min_element( gids.begin( ), gids.end( ) ) ),
         vmax = *( std::max_element( gids.begin( ), gids.end( ) ) );
@@ -1044,8 +998,7 @@ ErrorCode ScdNCHelper::create_mesh( Range& faces )
 #endif
 
     // Add elements to the range passed in
-    faces.insert( scd_box->start_element( ),
-                  scd_box->start_element( ) + scd_box->num_elements( ) - 1 );
+    faces.insert( scd_box->start_element( ), scd_box->start_element( ) + scd_box->num_elements( ) - 1 );
 
     if( 2 <= dbgOut.get_verbosity( ) )
     {
@@ -1068,8 +1021,7 @@ ErrorCode ScdNCHelper::create_mesh( Range& faces )
     return MB_SUCCESS;
 }
 
-ErrorCode ScdNCHelper::read_variables( std::vector< std::string >& var_names,
-                                       std::vector< int >&         tstep_nums )
+ErrorCode ScdNCHelper::read_variables( std::vector< std::string >& var_names, std::vector< int >& tstep_nums )
 {
     std::vector< ReadNC::VarData > vdatas;
     std::vector< ReadNC::VarData > vsetdatas;
@@ -1089,9 +1041,8 @@ ErrorCode ScdNCHelper::read_variables( std::vector< std::string >& var_names,
     return MB_SUCCESS;
 }
 
-ErrorCode
-    ScdNCHelper::read_scd_variables_to_nonset_allocate( std::vector< ReadNC::VarData >& vdatas,
-                                                        std::vector< int >&             tstep_nums )
+ErrorCode ScdNCHelper::read_scd_variables_to_nonset_allocate( std::vector< ReadNC::VarData >& vdatas,
+                                                              std::vector< int >&             tstep_nums )
 {
     Interface*&         mbImpl = _readNC->mbImpl;
     std::vector< int >& dimLens = _readNC->dimLens;
@@ -1102,8 +1053,7 @@ ErrorCode
     // Get vertices
     Range     verts;
     ErrorCode rval = mbImpl->get_entities_by_dimension( _fileSet, 0, verts );MB_CHK_SET_ERR( rval, "Trouble getting vertices in current file set" );
-    assert( "Should only have a single vertex subrange, since they were read in one shot" &&
-            verts.psize( ) == 1 );
+    assert( "Should only have a single vertex subrange, since they were read in one shot" && verts.psize( ) == 1 );
 
     Range edges;
     rval = mbImpl->get_entities_by_dimension( _fileSet, 1, edges );MB_CHK_SET_ERR( rval, "Trouble getting edges in current file set" );
@@ -1111,8 +1061,7 @@ ErrorCode
     // Get faces
     Range faces;
     rval = mbImpl->get_entities_by_dimension( _fileSet, 2, faces );MB_CHK_SET_ERR( rval, "Trouble getting faces in current file set" );
-    assert( "Should only have a single face subrange, since they were read in one shot" &&
-            faces.psize( ) == 1 );
+    assert( "Should only have a single face subrange, since they were read in one shot" && faces.psize( ) == 1 );
 
 #ifdef MOAB_HAVE_MPI
     moab::Range faces_owned;
@@ -1175,35 +1124,26 @@ ErrorCode
 #endif
                 break;
             default:
-                MB_SET_ERR( MB_FAILURE, "Unexpected entity location type for variable "
-                                            << vdatas[ i ].varName );
+                MB_SET_ERR( MB_FAILURE, "Unexpected entity location type for variable " << vdatas[ i ].varName );
         }
 
         for( unsigned int t = 0; t < tstep_nums.size( ); t++ )
         {
-            dbgOut.tprintf( 2, "Reading variable %s, time step %d\n", vdatas[ i ].varName.c_str( ),
-                            tstep_nums[ t ] );
+            dbgOut.tprintf( 2, "Reading variable %s, time step %d\n", vdatas[ i ].varName.c_str( ), tstep_nums[ t ] );
 
             if( tstep_nums[ t ] >= dimLens[ tDim ] )
-            {
-                MB_SET_ERR( MB_INDEX_OUT_OF_RANGE,
-                            "Wrong value for timestep number " << tstep_nums[ t ] );
-            }
+            { MB_SET_ERR( MB_INDEX_OUT_OF_RANGE, "Wrong value for timestep number " << tstep_nums[ t ] ); }
 
             // Get the tag to read into
             if( !vdatas[ i ].varTags[ t ] )
             {
-                rval = get_tag_to_nonset( vdatas[ i ], tstep_nums[ t ], vdatas[ i ].varTags[ t ],
-                                          vdatas[ i ].numLev );MB_CHK_SET_ERR( rval,
-                                "Trouble getting tag to non-set variable " << vdatas[ i ].varName );
+                rval = get_tag_to_nonset( vdatas[ i ], tstep_nums[ t ], vdatas[ i ].varTags[ t ], vdatas[ i ].numLev );MB_CHK_SET_ERR( rval, "Trouble getting tag to non-set variable " << vdatas[ i ].varName );
             }
 
             // Get ptr to tag space
             void* data;
             int   count;
-            rval = mbImpl->tag_iterate( vdatas[ i ].varTags[ t ], range->begin( ), range->end( ),
-                                        count, data );MB_CHK_SET_ERR( rval,
-                            "Failed to iterate tag for non-set variable " << vdatas[ i ].varName );
+            rval = mbImpl->tag_iterate( vdatas[ i ].varTags[ t ], range->begin( ), range->end( ), count, data );MB_CHK_SET_ERR( rval, "Failed to iterate tag for non-set variable " << vdatas[ i ].varName );
             assert( (unsigned)count == range->size( ) );
             vdatas[ i ].varDatas[ t ] = data;
         }
@@ -1249,12 +1189,10 @@ ErrorCode ScdNCHelper::read_scd_variables_to_nonset( std::vector< ReadNC::VarDat
                 case NC_BYTE:
                 case NC_CHAR: {
                     std::vector< char > tmpchardata( sz );
-                    success = NCFUNCAG( _vara_text )(
-                        _fileId, vdatas[ i ].varId, &vdatas[ i ].readStarts[ 0 ],
-                        &vdatas[ i ].readCounts[ 0 ], &tmpchardata[ 0 ] );
+                    success = NCFUNCAG( _vara_text )( _fileId, vdatas[ i ].varId, &vdatas[ i ].readStarts[ 0 ],
+                                                      &vdatas[ i ].readCounts[ 0 ], &tmpchardata[ 0 ] );
                     if( success )
-                        MB_SET_ERR( MB_FAILURE, "Failed to read byte/char data for variable "
-                                                    << vdatas[ i ].varName );
+                        MB_SET_ERR( MB_FAILURE, "Failed to read byte/char data for variable " << vdatas[ i ].varName );
                     if( vdatas[ i ].numLev > 1 )
                         // Transpose (lev, lat, lon) to (lat, lon, lev)
                         kji_to_jik( ni, nj, nk, data, &tmpchardata[ 0 ] );
@@ -1268,12 +1206,10 @@ ErrorCode ScdNCHelper::read_scd_variables_to_nonset( std::vector< ReadNC::VarDat
                 case NC_SHORT:
                 case NC_INT: {
                     std::vector< int > tmpintdata( sz );
-                    success = NCFUNCAG( _vara_int )(
-                        _fileId, vdatas[ i ].varId, &vdatas[ i ].readStarts[ 0 ],
-                        &vdatas[ i ].readCounts[ 0 ], &tmpintdata[ 0 ] );
+                    success = NCFUNCAG( _vara_int )( _fileId, vdatas[ i ].varId, &vdatas[ i ].readStarts[ 0 ],
+                                                     &vdatas[ i ].readCounts[ 0 ], &tmpintdata[ 0 ] );
                     if( success )
-                        MB_SET_ERR( MB_FAILURE, "Failed to read short/int data for variable "
-                                                    << vdatas[ i ].varName );
+                        MB_SET_ERR( MB_FAILURE, "Failed to read short/int data for variable " << vdatas[ i ].varName );
                     if( vdatas[ i ].numLev > 1 )
                         // Transpose (lev, lat, lon) to (lat, lon, lev)
                         kji_to_jik( ni, nj, nk, data, &tmpintdata[ 0 ] );
@@ -1287,12 +1223,11 @@ ErrorCode ScdNCHelper::read_scd_variables_to_nonset( std::vector< ReadNC::VarDat
                 case NC_FLOAT:
                 case NC_DOUBLE: {
                     std::vector< double > tmpdoubledata( sz );
-                    success = NCFUNCAG( _vara_double )(
-                        _fileId, vdatas[ i ].varId, &vdatas[ i ].readStarts[ 0 ],
-                        &vdatas[ i ].readCounts[ 0 ], &tmpdoubledata[ 0 ] );
+                    success = NCFUNCAG( _vara_double )( _fileId, vdatas[ i ].varId, &vdatas[ i ].readStarts[ 0 ],
+                                                        &vdatas[ i ].readCounts[ 0 ], &tmpdoubledata[ 0 ] );
                     if( success )
-                        MB_SET_ERR( MB_FAILURE, "Failed to read float/double data for variable "
-                                                    << vdatas[ i ].varName );
+                        MB_SET_ERR( MB_FAILURE,
+                                    "Failed to read float/double data for variable " << vdatas[ i ].varName );
                     if( vdatas[ i ].numLev > 1 )
                         // Transpose (lev, lat, lon) to (lat, lon, lev)
                         kji_to_jik( ni, nj, nk, data, &tmpdoubledata[ 0 ] );
@@ -1304,8 +1239,7 @@ ErrorCode ScdNCHelper::read_scd_variables_to_nonset( std::vector< ReadNC::VarDat
                     break;
                 }
                 default:
-                    MB_SET_ERR( MB_FAILURE,
-                                "Unexpected data type for variable " << vdatas[ i ].varName );
+                    MB_SET_ERR( MB_FAILURE, "Unexpected data type for variable " << vdatas[ i ].varName );
             }
         }
     }
@@ -1365,8 +1299,7 @@ ErrorCode ScdNCHelper::create_quad_coordinate_tag( )
     }
     std::string tag_name = "COORDS";
     Tag         tagh = 0;
-    rval = mbImpl->tag_get_handle( tag_name.c_str( ), 3, MB_TYPE_DOUBLE, tagh,
-                                   MB_TAG_DENSE | MB_TAG_CREAT );MB_CHK_SET_ERR( rval, "Trouble creating COORDS tag" );
+    rval = mbImpl->tag_get_handle( tag_name.c_str( ), 3, MB_TYPE_DOUBLE, tagh, MB_TAG_DENSE | MB_TAG_CREAT );MB_CHK_SET_ERR( rval, "Trouble creating COORDS tag" );
 
     void* data;
     int   count;
@@ -1382,8 +1315,7 @@ ErrorCode ScdNCHelper::create_quad_coordinate_tag( )
     return MB_SUCCESS;
 }
 
-ErrorCode UcdNCHelper::read_variables( std::vector< std::string >& var_names,
-                                       std::vector< int >&         tstep_nums )
+ErrorCode UcdNCHelper::read_variables( std::vector< std::string >& var_names, std::vector< int >& tstep_nums )
 {
     std::vector< ReadNC::VarData > vdatas;
     std::vector< ReadNC::VarData > vsetdatas;

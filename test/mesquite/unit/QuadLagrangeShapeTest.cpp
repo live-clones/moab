@@ -46,12 +46,10 @@
 using namespace MBMesquite;
 using namespace std;
 const double epsilon = 1e-6;
-#define ASSERT_VALUES_EQUAL( v1, v2, location, bits )                        \
-    ASSERT_MESSAGE( value_message( ( location ), ( bits ), ( v1 ), ( v2 ) ), \
-                    ( fabs( ( v1 ) - ( v2 ) ) < epsilon ) )
+#define ASSERT_VALUES_EQUAL( v1, v2, location, bits ) \
+    ASSERT_MESSAGE( value_message( ( location ), ( bits ), ( v1 ), ( v2 ) ), ( fabs( ( v1 ) - ( v2 ) ) < epsilon ) )
 
-static inline CppUnit::Message value_message( unsigned location, NodeSet bits, double v1,
-                                              double v2 )
+static inline CppUnit::Message value_message( unsigned location, NodeSet bits, double v1, double v2 )
 {
     CppUnit::Message m( "equality assertion failed" );
 
@@ -293,8 +291,7 @@ static double dN8deta( double xi, double eta )
 
 typedef double ( *N_t )( double, double );
 static const N_t N_a[ 9 ] = { &N0, &N1, &N2, &N3, &N4, &N5, &N6, &N7, &N8 };
-static const N_t dNdxi_a[ 9 ] = { &dN0dxi, &dN1dxi, &dN2dxi, &dN3dxi, &dN4dxi,
-                                  &dN5dxi, &dN6dxi, &dN7dxi, &dN8dxi };
+static const N_t dNdxi_a[ 9 ] = { &dN0dxi, &dN1dxi, &dN2dxi, &dN3dxi, &dN4dxi, &dN5dxi, &dN6dxi, &dN7dxi, &dN8dxi };
 static const N_t dNdeta_a[ 9 ] = { &dN0deta, &dN1deta, &dN2deta, &dN3deta, &dN4deta,
                                    &dN5deta, &dN6deta, &dN7deta, &dN8deta };
 
@@ -384,9 +381,8 @@ static void check_valid_indices( const size_t* vertices, size_t num_vtx, NodeSet
     size_t vertcopy[ 9 ];
     std::copy( vertices, vertices + num_vtx, vertcopy );
     std::sort( vertcopy, vertcopy + num_vtx );
-    CPPUNIT_ASSERT( vertcopy[ num_vtx - 1 ] <=
-                    8 );  // max value less than 9
-                          // make sure there are no duplicates in the list
+    CPPUNIT_ASSERT( vertcopy[ num_vtx - 1 ] <= 8 );  // max value less than 9
+                                                     // make sure there are no duplicates in the list
     const size_t* iter = std::unique( vertcopy, vertcopy + num_vtx );
     CPPUNIT_ASSERT( iter == vertcopy + num_vtx );
 
@@ -442,9 +438,8 @@ static void compare_coefficients( const double* coeffs, const size_t* indices, s
     ASSERT_VALUES_EQUAL( expected_coeffs[ 8 ], test_vals[ 8 ], loc, bits );
 }
 
-static void compare_derivatives( const size_t* vertices, size_t num_vtx,
-                                 const MsqVector< 2 >* derivs, const double* expected_dxi,
-                                 const double* expected_deta, unsigned loc, NodeSet bits )
+static void compare_derivatives( const size_t* vertices, size_t num_vtx, const MsqVector< 2 >* derivs,
+                                 const double* expected_dxi, const double* expected_deta, unsigned loc, NodeSet bits )
 {
     check_valid_indices( vertices, num_vtx, bits );
     check_no_zeros( derivs, num_vtx );
@@ -535,8 +530,7 @@ void QuadLagrangeShapeTest::test_corner_derivs( int corner, NodeSet nodebits )
 
     double expected_dxi[ 9 ], expected_deta[ 9 ];
     get_partial_wrt_xi( nodebits, corners[ corner ][ XI ], corners[ corner ][ ETA ], expected_dxi );
-    get_partial_wrt_eta( nodebits, corners[ corner ][ XI ], corners[ corner ][ ETA ],
-                         expected_deta );
+    get_partial_wrt_eta( nodebits, corners[ corner ][ XI ], corners[ corner ][ ETA ], expected_deta );
 
     size_t         vertices[ 100 ], num_vtx = 23;
     MsqVector< 2 > derivs[ 100 ];
@@ -559,8 +553,7 @@ void QuadLagrangeShapeTest::test_edge_derivs( int edge, NodeSet nodebits )
     sf.derivatives( Sample( 1, edge ), nodebits, vertices, derivs, num_vtx, err );
     CPPUNIT_ASSERT( !err );
 
-    compare_derivatives( vertices, num_vtx, derivs, expected_dxi, expected_deta, edge + 4,
-                         nodebits );
+    compare_derivatives( vertices, num_vtx, derivs, expected_dxi, expected_deta, edge + 4, nodebits );
 }
 
 void QuadLagrangeShapeTest::test_mid_derivs( NodeSet nodebits )

@@ -116,8 +116,8 @@ class MESQUITE_EXPORT Matrix3D
         set( value );
     }
 
-    Matrix3D( double a00, double a01, double a02, double a10, double a11, double a12, double a20,
-              double a21, double a22 )
+    Matrix3D( double a00, double a01, double a02, double a10, double a11, double a12, double a20, double a21,
+              double a22 )
     {
         v_[ 0 ] = a00;
         v_[ 1 ] = a01;
@@ -246,8 +246,7 @@ class MESQUITE_EXPORT Matrix3D
     //! returns the column length -- i is 0-based.
     double column_length( int i ) const
     {
-        return sqrt( v_[ 0 + i ] * v_[ 0 + i ] + v_[ 3 + i ] * v_[ 3 + i ] +
-                     v_[ 6 + i ] * v_[ 6 + i ] );
+        return sqrt( v_[ 0 + i ] * v_[ 0 + i ] + v_[ 3 + i ] * v_[ 3 + i ] + v_[ 6 + i ] * v_[ 6 + i ] );
     }
 
     double sub_det( int r, int c ) const
@@ -407,8 +406,8 @@ inline bool operator!=( const Matrix3D& lhs, const Matrix3D& rhs )
 
 inline Matrix3D operator-( const Matrix3D& A )
 {
-    return Matrix3D( -A.v_[ 0 ], -A.v_[ 1 ], -A.v_[ 2 ], -A.v_[ 3 ], -A.v_[ 4 ], -A.v_[ 5 ],
-                     -A.v_[ 6 ], -A.v_[ 7 ], -A.v_[ 8 ] );
+    return Matrix3D( -A.v_[ 0 ], -A.v_[ 1 ], -A.v_[ 2 ], -A.v_[ 3 ], -A.v_[ 4 ], -A.v_[ 5 ], -A.v_[ 6 ], -A.v_[ 7 ],
+                     -A.v_[ 8 ] );
 }
 
 //! \return A+B
@@ -421,11 +420,10 @@ inline const Matrix3D operator+( const Matrix3D& A, const Matrix3D& B )
 
 inline Matrix3D operator+( const Matrix3D& A, const SymMatrix3D& B )
 {
-    return Matrix3D( A( 0, 0 ) + B[ SymMatrix3D::T00 ], A( 0, 1 ) + B[ SymMatrix3D::T01 ],
-                     A( 0, 2 ) + B[ SymMatrix3D::T02 ], A( 1, 0 ) + B[ SymMatrix3D::T10 ],
-                     A( 1, 1 ) + B[ SymMatrix3D::T11 ], A( 1, 2 ) + B[ SymMatrix3D::T12 ],
-                     A( 2, 0 ) + B[ SymMatrix3D::T20 ], A( 2, 1 ) + B[ SymMatrix3D::T21 ],
-                     A( 2, 2 ) + B[ SymMatrix3D::T22 ] );
+    return Matrix3D(
+        A( 0, 0 ) + B[ SymMatrix3D::T00 ], A( 0, 1 ) + B[ SymMatrix3D::T01 ], A( 0, 2 ) + B[ SymMatrix3D::T02 ],
+        A( 1, 0 ) + B[ SymMatrix3D::T10 ], A( 1, 1 ) + B[ SymMatrix3D::T11 ], A( 1, 2 ) + B[ SymMatrix3D::T12 ],
+        A( 2, 0 ) + B[ SymMatrix3D::T20 ], A( 2, 1 ) + B[ SymMatrix3D::T21 ], A( 2, 2 ) + B[ SymMatrix3D::T22 ] );
 }
 inline Matrix3D operator+( const SymMatrix3D& B, const Matrix3D& A )
 {
@@ -442,19 +440,17 @@ inline const Matrix3D operator-( const Matrix3D& A, const Matrix3D& B )
 
 inline Matrix3D operator-( const Matrix3D& A, const SymMatrix3D& B )
 {
-    return Matrix3D( A( 0, 0 ) - B[ SymMatrix3D::T00 ], A( 0, 1 ) - B[ SymMatrix3D::T01 ],
-                     A( 0, 2 ) - B[ SymMatrix3D::T02 ], A( 1, 0 ) - B[ SymMatrix3D::T10 ],
-                     A( 1, 1 ) - B[ SymMatrix3D::T11 ], A( 1, 2 ) - B[ SymMatrix3D::T12 ],
-                     A( 2, 0 ) - B[ SymMatrix3D::T20 ], A( 2, 1 ) - B[ SymMatrix3D::T21 ],
-                     A( 2, 2 ) - B[ SymMatrix3D::T22 ] );
+    return Matrix3D(
+        A( 0, 0 ) - B[ SymMatrix3D::T00 ], A( 0, 1 ) - B[ SymMatrix3D::T01 ], A( 0, 2 ) - B[ SymMatrix3D::T02 ],
+        A( 1, 0 ) - B[ SymMatrix3D::T10 ], A( 1, 1 ) - B[ SymMatrix3D::T11 ], A( 1, 2 ) - B[ SymMatrix3D::T12 ],
+        A( 2, 0 ) - B[ SymMatrix3D::T20 ], A( 2, 1 ) - B[ SymMatrix3D::T21 ], A( 2, 2 ) - B[ SymMatrix3D::T22 ] );
 }
 inline Matrix3D operator-( const SymMatrix3D& B, const Matrix3D& A )
 {
-    return Matrix3D( B[ SymMatrix3D::T00 ] - A( 0, 0 ), B[ SymMatrix3D::T01 ] - A( 0, 1 ),
-                     B[ SymMatrix3D::T02 ] - A( 0, 2 ), B[ SymMatrix3D::T10 ] - A( 1, 0 ),
-                     B[ SymMatrix3D::T11 ] - A( 1, 1 ), B[ SymMatrix3D::T12 ] - A( 1, 2 ),
-                     B[ SymMatrix3D::T20 ] - A( 2, 0 ), B[ SymMatrix3D::T21 ] - A( 2, 1 ),
-                     B[ SymMatrix3D::T22 ] - A( 2, 2 ) );
+    return Matrix3D(
+        B[ SymMatrix3D::T00 ] - A( 0, 0 ), B[ SymMatrix3D::T01 ] - A( 0, 1 ), B[ SymMatrix3D::T02 ] - A( 0, 2 ),
+        B[ SymMatrix3D::T10 ] - A( 1, 0 ), B[ SymMatrix3D::T11 ] - A( 1, 1 ), B[ SymMatrix3D::T12 ] - A( 1, 2 ),
+        B[ SymMatrix3D::T20 ] - A( 2, 0 ), B[ SymMatrix3D::T21 ] - A( 2, 1 ), B[ SymMatrix3D::T22 ] - A( 2, 2 ) );
 }
 
 inline Matrix3D& Matrix3D::equal_mult_elem( const Matrix3D& A )
@@ -482,9 +478,9 @@ inline const Matrix3D mult_element( const Matrix3D& A, const Matrix3D& B )
 //! Return the square of the Frobenius norm of A, i.e. sum (diag (A' * A))
 inline double Frobenius_2( const Matrix3D& A )
 {
-    return A.v_[ 0 ] * A.v_[ 0 ] + A.v_[ 1 ] * A.v_[ 1 ] + A.v_[ 2 ] * A.v_[ 2 ] +
-           A.v_[ 3 ] * A.v_[ 3 ] + A.v_[ 4 ] * A.v_[ 4 ] + A.v_[ 5 ] * A.v_[ 5 ] +
-           A.v_[ 6 ] * A.v_[ 6 ] + A.v_[ 7 ] * A.v_[ 7 ] + A.v_[ 8 ] * A.v_[ 8 ];
+    return A.v_[ 0 ] * A.v_[ 0 ] + A.v_[ 1 ] * A.v_[ 1 ] + A.v_[ 2 ] * A.v_[ 2 ] + A.v_[ 3 ] * A.v_[ 3 ] +
+           A.v_[ 4 ] * A.v_[ 4 ] + A.v_[ 5 ] * A.v_[ 5 ] + A.v_[ 6 ] * A.v_[ 6 ] + A.v_[ 7 ] * A.v_[ 7 ] +
+           A.v_[ 8 ] * A.v_[ 8 ];
 }
 
 inline Matrix3D& Matrix3D::transpose( )
@@ -700,17 +696,15 @@ inline const Matrix3D operator*( const SymMatrix3D& B, const Matrix3D& A )
 
 inline const Matrix3D operator*( const SymMatrix3D& a, const SymMatrix3D& b )
 {
-    return Matrix3D( a[ 0 ] * b[ 0 ] + a[ 1 ] * b[ 1 ] + a[ 2 ] * b[ 2 ],
-                     a[ 0 ] * b[ 1 ] + a[ 1 ] * b[ 3 ] + a[ 2 ] * b[ 4 ],
-                     a[ 0 ] * b[ 2 ] + a[ 1 ] * b[ 4 ] + a[ 2 ] * b[ 5 ],
+    return Matrix3D(
+        a[ 0 ] * b[ 0 ] + a[ 1 ] * b[ 1 ] + a[ 2 ] * b[ 2 ], a[ 0 ] * b[ 1 ] + a[ 1 ] * b[ 3 ] + a[ 2 ] * b[ 4 ],
+        a[ 0 ] * b[ 2 ] + a[ 1 ] * b[ 4 ] + a[ 2 ] * b[ 5 ],
 
-                     a[ 1 ] * b[ 0 ] + a[ 3 ] * b[ 1 ] + a[ 4 ] * b[ 2 ],
-                     a[ 1 ] * b[ 1 ] + a[ 3 ] * b[ 3 ] + a[ 4 ] * b[ 4 ],
-                     a[ 1 ] * b[ 2 ] + a[ 3 ] * b[ 4 ] + a[ 4 ] * b[ 5 ],
+        a[ 1 ] * b[ 0 ] + a[ 3 ] * b[ 1 ] + a[ 4 ] * b[ 2 ], a[ 1 ] * b[ 1 ] + a[ 3 ] * b[ 3 ] + a[ 4 ] * b[ 4 ],
+        a[ 1 ] * b[ 2 ] + a[ 3 ] * b[ 4 ] + a[ 4 ] * b[ 5 ],
 
-                     a[ 2 ] * b[ 0 ] + a[ 4 ] * b[ 1 ] + a[ 5 ] * b[ 2 ],
-                     a[ 2 ] * b[ 1 ] + a[ 4 ] * b[ 3 ] + a[ 5 ] * b[ 4 ],
-                     a[ 2 ] * b[ 2 ] + a[ 4 ] * b[ 4 ] + a[ 5 ] * b[ 5 ] );
+        a[ 2 ] * b[ 0 ] + a[ 4 ] * b[ 1 ] + a[ 5 ] * b[ 2 ], a[ 2 ] * b[ 1 ] + a[ 4 ] * b[ 3 ] + a[ 5 ] * b[ 4 ],
+        a[ 2 ] * b[ 2 ] + a[ 4 ] * b[ 4 ] + a[ 5 ] * b[ 5 ] );
 }
 
 //! multiplies each entry by the scalar s
@@ -783,22 +777,16 @@ inline void plusEqAx( Vector3D& v, const Matrix3D& A, const Vector3D& x )
 
 inline void eqTransAx( Vector3D& v, const Matrix3D& A, const Vector3D& x )
 {
-    v.mCoords[ 0 ] =
-        A.v_[ 0 ] * x.mCoords[ 0 ] + A.v_[ 3 ] * x.mCoords[ 1 ] + A.v_[ 6 ] * x.mCoords[ 2 ];
-    v.mCoords[ 1 ] =
-        A.v_[ 1 ] * x.mCoords[ 0 ] + A.v_[ 4 ] * x.mCoords[ 1 ] + A.v_[ 7 ] * x.mCoords[ 2 ];
-    v.mCoords[ 2 ] =
-        A.v_[ 2 ] * x.mCoords[ 0 ] + A.v_[ 5 ] * x.mCoords[ 1 ] + A.v_[ 8 ] * x.mCoords[ 2 ];
+    v.mCoords[ 0 ] = A.v_[ 0 ] * x.mCoords[ 0 ] + A.v_[ 3 ] * x.mCoords[ 1 ] + A.v_[ 6 ] * x.mCoords[ 2 ];
+    v.mCoords[ 1 ] = A.v_[ 1 ] * x.mCoords[ 0 ] + A.v_[ 4 ] * x.mCoords[ 1 ] + A.v_[ 7 ] * x.mCoords[ 2 ];
+    v.mCoords[ 2 ] = A.v_[ 2 ] * x.mCoords[ 0 ] + A.v_[ 5 ] * x.mCoords[ 1 ] + A.v_[ 8 ] * x.mCoords[ 2 ];
 }
 
 inline void plusEqTransAx( Vector3D& v, const Matrix3D& A, const Vector3D& x )
 {
-    v.mCoords[ 0 ] +=
-        A.v_[ 0 ] * x.mCoords[ 0 ] + A.v_[ 3 ] * x.mCoords[ 1 ] + A.v_[ 6 ] * x.mCoords[ 2 ];
-    v.mCoords[ 1 ] +=
-        A.v_[ 1 ] * x.mCoords[ 0 ] + A.v_[ 4 ] * x.mCoords[ 1 ] + A.v_[ 7 ] * x.mCoords[ 2 ];
-    v.mCoords[ 2 ] +=
-        A.v_[ 2 ] * x.mCoords[ 0 ] + A.v_[ 5 ] * x.mCoords[ 1 ] + A.v_[ 8 ] * x.mCoords[ 2 ];
+    v.mCoords[ 0 ] += A.v_[ 0 ] * x.mCoords[ 0 ] + A.v_[ 3 ] * x.mCoords[ 1 ] + A.v_[ 6 ] * x.mCoords[ 2 ];
+    v.mCoords[ 1 ] += A.v_[ 1 ] * x.mCoords[ 0 ] + A.v_[ 4 ] * x.mCoords[ 1 ] + A.v_[ 7 ] * x.mCoords[ 2 ];
+    v.mCoords[ 2 ] += A.v_[ 2 ] * x.mCoords[ 0 ] + A.v_[ 5 ] * x.mCoords[ 1 ] + A.v_[ 8 ] * x.mCoords[ 2 ];
 }
 
 inline void plusEqaA( Matrix3D& B, const double a, const Matrix3D& A )
@@ -855,8 +843,7 @@ inline void QR( Matrix3D& Q, Matrix3D& R, const Matrix3D& A )
 
     Q = A;
 
-    R[ 0 ][ 0 ] =
-        sqrt( Q[ 0 ][ 0 ] * Q[ 0 ][ 0 ] + Q[ 1 ][ 0 ] * Q[ 1 ][ 0 ] + Q[ 2 ][ 0 ] * Q[ 2 ][ 0 ] );
+    R[ 0 ][ 0 ] = sqrt( Q[ 0 ][ 0 ] * Q[ 0 ][ 0 ] + Q[ 1 ][ 0 ] * Q[ 1 ][ 0 ] + Q[ 2 ][ 0 ] * Q[ 2 ][ 0 ] );
     double temp_dbl = 1.0 / R[ 0 ][ 0 ];
     R[ 1 ][ 0 ] = 0.0L;
     R[ 2 ][ 0 ] = 0.0L;
@@ -877,8 +864,7 @@ inline void QR( Matrix3D& Q, Matrix3D& R, const Matrix3D& A )
     Q[ 1 ][ 2 ] -= Q[ 1 ][ 0 ] * R[ 0 ][ 2 ];
     Q[ 2 ][ 2 ] -= Q[ 2 ][ 0 ] * R[ 0 ][ 2 ];
 
-    R[ 1 ][ 1 ] =
-        sqrt( Q[ 0 ][ 1 ] * Q[ 0 ][ 1 ] + Q[ 1 ][ 1 ] * Q[ 1 ][ 1 ] + Q[ 2 ][ 1 ] * Q[ 2 ][ 1 ] );
+    R[ 1 ][ 1 ] = sqrt( Q[ 0 ][ 1 ] * Q[ 0 ][ 1 ] + Q[ 1 ][ 1 ] * Q[ 1 ][ 1 ] + Q[ 2 ][ 1 ] * Q[ 2 ][ 1 ] );
     temp_dbl = 1.0 / R[ 1 ][ 1 ];
     R[ 2 ][ 1 ] = 0.0L;
     //     Q[0][1] /= R[1][1];
@@ -893,8 +879,7 @@ inline void QR( Matrix3D& Q, Matrix3D& R, const Matrix3D& A )
     Q[ 1 ][ 2 ] -= Q[ 1 ][ 1 ] * R[ 1 ][ 2 ];
     Q[ 2 ][ 2 ] -= Q[ 2 ][ 1 ] * R[ 1 ][ 2 ];
 
-    R[ 2 ][ 2 ] =
-        sqrt( Q[ 0 ][ 2 ] * Q[ 0 ][ 2 ] + Q[ 1 ][ 2 ] * Q[ 1 ][ 2 ] + Q[ 2 ][ 2 ] * Q[ 2 ][ 2 ] );
+    R[ 2 ][ 2 ] = sqrt( Q[ 0 ][ 2 ] * Q[ 0 ][ 2 ] + Q[ 1 ][ 2 ] * Q[ 1 ][ 2 ] + Q[ 2 ][ 2 ] * Q[ 2 ][ 2 ] );
     temp_dbl = 1.0 / R[ 2 ][ 2 ];
 
     //     Q[0][2] /= R[2][2];

@@ -145,8 +145,7 @@ int main( int argc, char* argv[] )
         if( !hexgroup && !strcmp( mdhf_HEX_TYPE_NAME, namebuffer ) )
             hexgroup = strdup( elem_groups[ k ] );
         else
-            printf( "Skipping element group '%s' containing element of type '%s'\n",
-                    elem_groups[ k ], namebuffer );
+            printf( "Skipping element group '%s' containing element of type '%s'\n", elem_groups[ k ], namebuffer );
     }
     free( elem_groups );
 
@@ -184,8 +183,7 @@ int main( int argc, char* argv[] )
         havedense = mhdf_haveDenseTag( file, "GLOBAL_ID", mhdf_node_type_handle( ), sptr );CHK_ERR( sptr );
         if( havedense )
         {
-            handle =
-                mhdf_openDenseTagData( file, "GLOBAL_ID", mhdf_node_type_handle( ), &numtag, sptr );CHK_ERR( sptr );
+            handle = mhdf_openDenseTagData( file, "GLOBAL_ID", mhdf_node_type_handle( ), &numtag, sptr );CHK_ERR( sptr );
             assert( numtag == numnode );
             mhdf_readDenseTag( handle, 0, numtag, H5T_NATIVE_UINT, nodeids, sptr );CHK_ERR( sptr );
             mhdf_closeData( file, handle, sptr );CHK_ERR( sptr );
@@ -206,11 +204,9 @@ int main( int argc, char* argv[] )
         {
             mhdf_openSparseTagData( file, "GLOBAL_ID", &numtag, &junk, sparse_handle, sptr );CHK_ERR( sptr );
             sparse_entities = (unsigned*)malloc( numtag * sizeof( unsigned ) );
-            mhdf_readSparseTagEntities( sparse_handle[ 0 ], 0, numtag, H5T_NATIVE_UINT,
-                                        sparse_entities, sptr );CHK_ERR( sptr );
+            mhdf_readSparseTagEntities( sparse_handle[ 0 ], 0, numtag, H5T_NATIVE_UINT, sparse_entities, sptr );CHK_ERR( sptr );
             sparse_ids = (unsigned*)malloc( numtag * sizeof( unsigned ) );
-            mhdf_readSparseTagValues( sparse_handle[ 1 ], 0, numtag, H5T_NATIVE_UINT, sparse_ids,
-                                      sptr );CHK_ERR( sptr );
+            mhdf_readSparseTagValues( sparse_handle[ 1 ], 0, numtag, H5T_NATIVE_UINT, sparse_ids, sptr );CHK_ERR( sptr );
             mhdf_closeData( file, sparse_handle[ 0 ], sptr );CHK_ERR( sptr );
             mhdf_closeData( file, sparse_handle[ 1 ], sptr );CHK_ERR( sptr );
 

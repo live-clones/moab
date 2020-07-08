@@ -40,16 +40,16 @@ enum QualityType
     MB_SHAPE_AND_SIZE,  // 17 MBHEX, MBTET,                    MBQUAD
     MB_SHEAR_AND_SIZE,  // 18 MBHEX,                           MBQUAD
     MB_DISTORTION,  // 19 MBHEX, MBTET,                    MBQUAD
-    // length for edge:
+                    // length for edge:
     MB_LENGTH,  // 20 only for MBEDGE
-    // specific to tets
+                // specific to tets
     MB_RADIUS_RATIO,  // 21        MBTET,                    MBQUAD,  MBTRI
     MB_ASPECT_BETA,  // 22        MBTET
     MB_ASPECT_RATIO,  // 23        MBTET,                    MBQUAD,  MBTRI
     MB_ASPECT_GAMMA,  // 24        MBTET
     MB_MINIMUM_ANGLE,  // 25        MBTET,                    MBQUAD,  MBTRI
     MB_COLLAPSE_RATIO,  // 26        MBTET
-    // specific to quads
+                        // specific to quads
     MB_WARPAGE,  // 27                                  MBQUAD
     MB_AREA,  // 28                                  MBQUAD,  MBTRI
     MB_MAXIMUM_ANGLE,  // 29                                  MBQUAD,  MBTRI

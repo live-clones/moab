@@ -40,8 +40,8 @@ bool debug_surf_eval1 = false;
 
 SmoothFace::SmoothFace( Interface* mb, EntityHandle surface_set, GeomTopoTool* gTool )
     : _markTag( 0 ), _gradientTag( 0 ), _tangentsTag( 0 ), _edgeCtrlTag( 0 ), _facetCtrlTag( 0 ),
-      _facetEdgeCtrlTag( 0 ), _planeTag( 0 ), _mb( mb ), _set( surface_set ),
-      _my_geomTopoTool( gTool ), _obb_root( 0 ), _evaluationsCounter( 0 )
+      _facetEdgeCtrlTag( 0 ), _planeTag( 0 ), _mb( mb ), _set( surface_set ), _my_geomTopoTool( gTool ), _obb_root( 0 ),
+      _evaluationsCounter( 0 )
 {
     //_smooth_face = NULL;
     //_mbOut->create_meshset(MESHSET_SET, _oSet); //will contain the
@@ -144,8 +144,7 @@ bool SmoothFace::normal_at( double x, double y, double z, double& nx, double& ny
     return true;
 }
 
-ErrorCode SmoothFace::compute_control_points_on_edges( double min_dot, Tag edgeCtrlTag,
-                                                       Tag markTag )
+ErrorCode SmoothFace::compute_control_points_on_edges( double min_dot, Tag edgeCtrlTag, Tag markTag )
 {
 
     _edgeCtrlTag = edgeCtrlTag;
@@ -198,19 +197,16 @@ int SmoothFace::init_gradient( )
     // they are at the feature edges
     unsigned long setId = _mb->id_from_handle( _set );
     char          name[ 50 ] = { 0 };
-    sprintf(
-        name, "GRADIENT%lu",
-        setId );  // name should be something like GRADIENT29, where 29 is the set ID of the face
-    rval = _mb->tag_get_handle( name, 3, MB_TYPE_DOUBLE, _gradientTag, MB_TAG_DENSE | MB_TAG_CREAT,
-                                &defNormal );
+    sprintf( name, "GRADIENT%lu",
+             setId );  // name should be something like GRADIENT29, where 29 is the set ID of the face
+    rval = _mb->tag_get_handle( name, 3, MB_TYPE_DOUBLE, _gradientTag, MB_TAG_DENSE | MB_TAG_CREAT, &defNormal );
     assert( rval == MB_SUCCESS );
 
     double defPlane[ 4 ] = { 0., 0., 1., 0. };
     // also define a plane tag ; this will be for each triangle
     char namePlaneTag[ 50 ] = { 0 };
     sprintf( namePlaneTag, "PLANE%lu", setId );
-    rval = _mb->tag_get_handle( "PLANE", 4, MB_TYPE_DOUBLE, _planeTag, MB_TAG_DENSE | MB_TAG_CREAT,
-                                &defPlane );
+    rval = _mb->tag_get_handle( "PLANE", 4, MB_TYPE_DOUBLE, _planeTag, MB_TAG_DENSE | MB_TAG_CREAT, &defPlane );
     assert( rval == MB_SUCCESS );
     // the fourth double is for weight, accumulated at each vertex so far
     // maybe not needed in the end
@@ -288,9 +284,8 @@ int SmoothFace::init_gradient( )
         for( Range::iterator it = _nodes.begin( ); it != _nodes.end( ); ++it, i++ )
         {
             EntityHandle node = *it;
-            std::cout << " Node id " << _mb->id_from_handle( node ) << "  " << normalVal[ 3 * i ]
-                      << " " << normalVal[ 3 * i + 1 ] << " " << normalVal[ 3 * i + 2 ]
-                      << std::endl;
+            std::cout << " Node id " << _mb->id_from_handle( node ) << "  " << normalVal[ 3 * i ] << " "
+                      << normalVal[ 3 * i + 1 ] << " " << normalVal[ 3 * i + 2 ] << std::endl;
         }
     }
 
@@ -355,12 +350,10 @@ ErrorCode SmoothFace::init_bezier_edge( EntityHandle edge, double )
 
     if( debug_surf_eval1 )
     {
-        std::cout << "edge: " << _mb->id_from_handle( edge ) << " tangents: " << T[ 0 ] << T[ 1 ]
-                  << std::endl;
+        std::cout << "edge: " << _mb->id_from_handle( edge ) << " tangents: " << T[ 0 ] << T[ 1 ] << std::endl;
         std::cout << "  points: " << P[ 0 ] << " " << P[ 1 ] << std::endl;
         std::cout << "  normals: " << N[ 0 ] << " " << N[ 1 ] << std::endl;
-        std::cout << "  Control points  " << ctrl_pts[ 0 ] << " " << ctrl_pts[ 1 ] << " "
-                  << ctrl_pts[ 2 ] << std::endl;
+        std::cout << "  Control points  " << ctrl_pts[ 0 ] << " " << ctrl_pts[ 1 ] << " " << ctrl_pts[ 2 ] << std::endl;
     }
 
     return MB_SUCCESS;
@@ -370,8 +363,8 @@ ErrorCode SmoothFace::compute_tangents_for_each_edge( )
 // they will be used for control points
 {
     double    defTangents[ 6 ] = { 0., 0., 0., 0., 0., 0. };
-    ErrorCode rval = _mb->tag_get_handle( "TANGENTS", 6, MB_TYPE_DOUBLE, _tangentsTag,
-                                          MB_TAG_DENSE | MB_TAG_CREAT, &defTangents );
+    ErrorCode rval =
+        _mb->tag_get_handle( "TANGENTS", 6, MB_TYPE_DOUBLE, _tangentsTag, MB_TAG_DENSE | MB_TAG_CREAT, &defTangents );
     if( MB_SUCCESS != rval ) return MB_FAILURE;
 
     // now, compute Tangents for all edges that are not on boundary, so they are not marked
@@ -403,9 +396,8 @@ ErrorCode SmoothFace::compute_tangents_for_each_edge( )
 // Member Type:  PRIVATE
 // Description:  compute the control points for an edge
 //===========================================================================
-ErrorCode SmoothFace::init_edge_control_points( CartVect& P0, CartVect& P3, CartVect& N0,
-                                                CartVect& N3, CartVect& T0, CartVect& T3,
-                                                CartVect* Pi )
+ErrorCode SmoothFace::init_edge_control_points( CartVect& P0, CartVect& P3, CartVect& N0, CartVect& N3, CartVect& T0,
+                                                CartVect& T3, CartVect* Pi )
 {
     CartVect Vi[ 4 ];
     Vi[ 0 ] = P0;
@@ -422,10 +414,8 @@ ErrorCode SmoothFace::init_edge_control_points( CartVect& P0, CartVect& P3, Cart
     }
     double row = 6.0e0 * ( 2.0e0 * ai0 + ai * ai3 ) / denom;
     double omega = 6.0e0 * ( 2.0e0 * ai3 + ai * ai0 ) / denom;
-    Vi[ 1 ] = Vi[ 0 ] +
-              ( di * ( ( ( 6.0e0 * T0 ) - ( ( 2.0e0 * row ) * N0 ) + ( omega * N3 ) ) / 18.0e0 ) );
-    Vi[ 2 ] = Vi[ 3 ] -
-              ( di * ( ( ( 6.0e0 * T3 ) + ( row * N0 ) - ( ( 2.0e0 * omega ) * N3 ) ) / 18.0e0 ) );
+    Vi[ 1 ] = Vi[ 0 ] + ( di * ( ( ( 6.0e0 * T0 ) - ( ( 2.0e0 * row ) * N0 ) + ( omega * N3 ) ) / 18.0e0 ) );
+    Vi[ 2 ] = Vi[ 3 ] - ( di * ( ( ( 6.0e0 * T3 ) + ( row * N0 ) - ( ( 2.0e0 * omega ) * N3 ) ) / 18.0e0 ) );
     // CartVect Wi[3];
     // Wi[0] = Vi[1] - Vi[0];
     // Wi[1] = Vi[2] - Vi[1];
@@ -471,8 +461,7 @@ ErrorCode SmoothFace::find_edges_orientations( EntityHandle edges[ 3 ], const En
     }
     return MB_SUCCESS;
 }
-ErrorCode SmoothFace::compute_internal_control_points_on_facets( double, Tag facetCtrlTag,
-                                                                 Tag facetEdgeCtrlTag )
+ErrorCode SmoothFace::compute_internal_control_points_on_facets( double, Tag facetCtrlTag, Tag facetEdgeCtrlTag )
 {
     // collect from each triangle the control points in order
     //
@@ -582,10 +571,9 @@ void SmoothFace::adjust_bounding_box( CartVect& vect )
 ////Member Type:  PRIVATE
 ////Description:  compute the control points for a facet
 ////===============================================================
-ErrorCode
-    SmoothFace::init_facet_control_points( CartVect N[ 6 ],  // vertex normals (per edge)
-                                           CartVect P[ 3 ][ 5 ],  // edge control points
-                                           CartVect G[ 6 ] )  // return internal control points
+ErrorCode SmoothFace::init_facet_control_points( CartVect N[ 6 ],  // vertex normals (per edge)
+                                                 CartVect P[ 3 ][ 5 ],  // edge control points
+                                                 CartVect G[ 6 ] )  // return internal control points
 {
     CartVect Di[ 4 ], Ai[ 3 ], N0, N3, Vi[ 4 ], Wi[ 3 ];
     double   denom;
@@ -615,14 +603,12 @@ ErrorCode
         lambda[ 1 ] = ( Di[ 3 ] % Wi[ 2 ] ) / ( Wi[ 2 ] % Wi[ 2 ] );
         mu[ 0 ] = ( Di[ 0 ] % Ai[ 0 ] );
         mu[ 1 ] = ( Di[ 3 ] % Ai[ 2 ] );
-        G[ i * 2 ] = 0.5 * ( P[ i ][ 1 ] + P[ i ][ 2 ] ) +
-                     0.66666666666666 * lambda[ 0 ] * Wi[ 1 ] +
-                     0.33333333333333 * lambda[ 1 ] * Wi[ 0 ] +
-                     0.66666666666666 * mu[ 0 ] * Ai[ 1 ] + 0.33333333333333 * mu[ 1 ] * Ai[ 0 ];
-        G[ i * 2 + 1 ] =
-            0.5 * ( P[ i ][ 2 ] + P[ i ][ 3 ] ) + 0.33333333333333 * lambda[ 0 ] * Wi[ 2 ] +
-            0.66666666666666 * lambda[ 1 ] * Wi[ 1 ] + 0.33333333333333 * mu[ 0 ] * Ai[ 2 ] +
-            0.66666666666666 * mu[ 1 ] * Ai[ 1 ];
+        G[ i * 2 ] = 0.5 * ( P[ i ][ 1 ] + P[ i ][ 2 ] ) + 0.66666666666666 * lambda[ 0 ] * Wi[ 1 ] +
+                     0.33333333333333 * lambda[ 1 ] * Wi[ 0 ] + 0.66666666666666 * mu[ 0 ] * Ai[ 1 ] +
+                     0.33333333333333 * mu[ 1 ] * Ai[ 0 ];
+        G[ i * 2 + 1 ] = 0.5 * ( P[ i ][ 2 ] + P[ i ][ 3 ] ) + 0.33333333333333 * lambda[ 0 ] * Wi[ 2 ] +
+                         0.66666666666666 * lambda[ 1 ] * Wi[ 1 ] + 0.33333333333333 * mu[ 0 ] * Ai[ 2 ] +
+                         0.66666666666666 * mu[ 1 ] * Ai[ 1 ];
     }
     return rval;
 }
@@ -656,8 +642,7 @@ void SmoothFace::DumpModelControlPoints( )
         for( int i = 0; i < 3; i++ )
         {
             CartVect& c = controlPoints[ i ];
-            point3DEdgeFile << std::setprecision( 11 ) << c[ 0 ] << " " << c[ 1 ] << " " << c[ 2 ]
-                            << " \n";
+            point3DEdgeFile << std::setprecision( 11 ) << c[ 0 ] << " " << c[ 1 ] << " " << c[ 2 ] << " \n";
         }
     }
     CartVect controlTriPoints[ 6 ];  // triangle control points
@@ -683,8 +668,7 @@ void SmoothFace::DumpModelControlPoints( )
             for( int i = 0; i < 3; i++ )
             {
                 CartVect& c = P_facet[ i ];
-                point3DFile << std::setprecision( 11 ) << c[ 0 ] << " " << c[ 1 ] << " " << c[ 2 ]
-                            << " \n";
+                point3DFile << std::setprecision( 11 ) << c[ 0 ] << " " << c[ 1 ] << " " << c[ 2 ] << " \n";
             }
         }
 
@@ -698,8 +682,7 @@ void SmoothFace::DumpModelControlPoints( )
                 CartVect areacoord( 1. * k / N, 1. * m / N, 1. * n / N );
                 CartVect pt;
                 eval_bezier_patch( tri, areacoord, pt );
-                smoothPoints << std::setprecision( 11 ) << pt[ 0 ] << " " << pt[ 1 ] << " "
-                             << pt[ 2 ] << " \n";
+                smoothPoints << std::setprecision( 11 ) << pt[ 0 ] << " " << pt[ 1 ] << " " << pt[ 2 ] << " \n";
             }
         }
     }
@@ -751,8 +734,7 @@ ErrorCode SmoothFace::evaluate_smooth_edge( EntityHandle eh, double& tt, CartVec
     one_minus_t4 = one_minus_t3 * one_minus_t;
 
     outv = one_minus_t4 * P[ 0 ] + 4. * one_minus_t3 * tt * controlPoints[ 0 ] +
-           6. * one_minus_t2 * t2 * controlPoints[ 1 ] +
-           4. * one_minus_t * t3 * controlPoints[ 2 ] + t4 * P[ 1 ];
+           6. * one_minus_t2 * t2 * controlPoints[ 1 ] + 4. * one_minus_t * t3 * controlPoints[ 2 ] + t4 * P[ 1 ];
 
     return MB_SUCCESS;
 }
@@ -766,8 +748,7 @@ ErrorCode SmoothFace::eval_bezier_patch( EntityHandle tri, CartVect& areacoord, 
     // get the control points  facet->get_control_points( gctrl_pts );
     // init_facet_control_points( N, P, G) ;
     // what do we need to store in the tag control points?
-    ErrorCode rval =
-        _mb->tag_get_data( _facetCtrlTag, &tri, 1, &gctrl_pts[ 0 ] );  // get all 6 control points
+    ErrorCode rval = _mb->tag_get_data( _facetCtrlTag, &tri, 1, &gctrl_pts[ 0 ] );  // get all 6 control points
     assert( MB_SUCCESS == rval );
     if( MB_SUCCESS != rval ) return rval;
     const EntityHandle* conn3 = NULL;
@@ -937,8 +918,7 @@ void SmoothFace::project_to_facet_plane( EntityHandle tri, CartVect& pt, CartVec
 // Descriptoin:  Determine the area coordinates of a point on the plane
 //              of a facet
 //===========================================================================
-void SmoothFace::facet_area_coordinate( EntityHandle facet, CartVect& pt_on_plane,
-                                        CartVect& areacoord )
+void SmoothFace::facet_area_coordinate( EntityHandle facet, CartVect& pt_on_plane, CartVect& areacoord )
 {
 
     const EntityHandle* conn3 = NULL;
@@ -975,15 +955,13 @@ void SmoothFace::facet_area_coordinate( EntityHandle facet, CartVect& pt_on_plan
 
     if( absnorm[ 0 ] >= absnorm[ 1 ] && absnorm[ 0 ] >= absnorm[ 2 ] )
     {
-        area2 =
-            determ3( p[ 0 ][ 1 ], p[ 0 ][ 2 ], p[ 1 ][ 1 ], p[ 1 ][ 2 ], p[ 2 ][ 1 ], p[ 2 ][ 2 ] );
+        area2 = determ3( p[ 0 ][ 1 ], p[ 0 ][ 2 ], p[ 1 ][ 1 ], p[ 1 ][ 2 ], p[ 2 ][ 1 ], p[ 2 ][ 2 ] );
         if( fabs( area2 ) < tol )
         {
-            areacoord = CartVect(
-                -std::numeric_limits< double >::min( ) );  // .set(
-                                                           // -std::numeric_limits<double>::min(),
-                                                           // -std::numeric_limits<double>::min(),
-                                                           // -std::numeric_limits<double>::min() );
+            areacoord = CartVect( -std::numeric_limits< double >::min( ) );  // .set(
+                                                                             // -std::numeric_limits<double>::min(),
+                                                                             // -std::numeric_limits<double>::min(),
+                                                                             // -std::numeric_limits<double>::min() );
         }
         else if( within_tolerance( p[ 0 ], pt_on_plane, GEOMETRY_RESABS ) )
         {
@@ -1000,31 +978,29 @@ void SmoothFace::facet_area_coordinate( EntityHandle facet, CartVect& pt_on_plan
         else
         {
 
-            areacoord[ 0 ] = determ3( pt_on_plane[ 1 ], pt_on_plane[ 2 ], p[ 1 ][ 1 ], p[ 1 ][ 2 ],
-                                      p[ 2 ][ 1 ], p[ 2 ][ 2 ] ) /
-                             area2;
+            areacoord[ 0 ] =
+                determ3( pt_on_plane[ 1 ], pt_on_plane[ 2 ], p[ 1 ][ 1 ], p[ 1 ][ 2 ], p[ 2 ][ 1 ], p[ 2 ][ 2 ] ) /
+                area2;
 
-            areacoord[ 1 ] = determ3( p[ 0 ][ 1 ], p[ 0 ][ 2 ], pt_on_plane[ 1 ], pt_on_plane[ 2 ],
-                                      p[ 2 ][ 1 ], p[ 2 ][ 2 ] ) /
-                             area2;
+            areacoord[ 1 ] =
+                determ3( p[ 0 ][ 1 ], p[ 0 ][ 2 ], pt_on_plane[ 1 ], pt_on_plane[ 2 ], p[ 2 ][ 1 ], p[ 2 ][ 2 ] ) /
+                area2;
 
-            areacoord[ 2 ] = determ3( p[ 0 ][ 1 ], p[ 0 ][ 2 ], p[ 1 ][ 1 ], p[ 1 ][ 2 ],
-                                      pt_on_plane[ 1 ], pt_on_plane[ 2 ] ) /
-                             area2;
+            areacoord[ 2 ] =
+                determ3( p[ 0 ][ 1 ], p[ 0 ][ 2 ], p[ 1 ][ 1 ], p[ 1 ][ 2 ], pt_on_plane[ 1 ], pt_on_plane[ 2 ] ) /
+                area2;
         }
     }
     else if( absnorm[ 1 ] >= absnorm[ 0 ] && absnorm[ 1 ] >= absnorm[ 2 ] )
     {
 
-        area2 =
-            determ3( p[ 0 ][ 0 ], p[ 0 ][ 2 ], p[ 1 ][ 0 ], p[ 1 ][ 2 ], p[ 2 ][ 0 ], p[ 2 ][ 2 ] );
+        area2 = determ3( p[ 0 ][ 0 ], p[ 0 ][ 2 ], p[ 1 ][ 0 ], p[ 1 ][ 2 ], p[ 2 ][ 0 ], p[ 2 ][ 2 ] );
         if( fabs( area2 ) < tol )
         {
-            areacoord = CartVect(
-                -std::numeric_limits< double >::min( ) );  //.set(
-                                                           //-std::numeric_limits<double>::min(),
-                                                           //-std::numeric_limits<double>::min(),
-                                                           //-std::numeric_limits<double>::min() );
+            areacoord = CartVect( -std::numeric_limits< double >::min( ) );  //.set(
+                                                                             //-std::numeric_limits<double>::min(),
+                                                                             //-std::numeric_limits<double>::min(),
+                                                                             //-std::numeric_limits<double>::min() );
         }
         else if( within_tolerance( p[ 0 ], pt_on_plane, GEOMETRY_RESABS ) )
         {
@@ -1041,17 +1017,17 @@ void SmoothFace::facet_area_coordinate( EntityHandle facet, CartVect& pt_on_plan
         else
         {
 
-            areacoord[ 0 ] = determ3( pt_on_plane[ 0 ], pt_on_plane[ 2 ], p[ 1 ][ 0 ], p[ 1 ][ 2 ],
-                                      p[ 2 ][ 0 ], p[ 2 ][ 2 ] ) /
-                             area2;
+            areacoord[ 0 ] =
+                determ3( pt_on_plane[ 0 ], pt_on_plane[ 2 ], p[ 1 ][ 0 ], p[ 1 ][ 2 ], p[ 2 ][ 0 ], p[ 2 ][ 2 ] ) /
+                area2;
 
-            areacoord[ 1 ] = determ3( p[ 0 ][ 0 ], p[ 0 ][ 2 ], pt_on_plane[ 0 ], pt_on_plane[ 2 ],
-                                      p[ 2 ][ 0 ], p[ 2 ][ 2 ] ) /
-                             area2;
+            areacoord[ 1 ] =
+                determ3( p[ 0 ][ 0 ], p[ 0 ][ 2 ], pt_on_plane[ 0 ], pt_on_plane[ 2 ], p[ 2 ][ 0 ], p[ 2 ][ 2 ] ) /
+                area2;
 
-            areacoord[ 2 ] = determ3( p[ 0 ][ 0 ], p[ 0 ][ 2 ], p[ 1 ][ 0 ], p[ 1 ][ 2 ],
-                                      pt_on_plane[ 0 ], pt_on_plane[ 2 ] ) /
-                             area2;
+            areacoord[ 2 ] =
+                determ3( p[ 0 ][ 0 ], p[ 0 ][ 2 ], p[ 1 ][ 0 ], p[ 1 ][ 2 ], pt_on_plane[ 0 ], pt_on_plane[ 2 ] ) /
+                area2;
         }
     }
     else
@@ -1059,15 +1035,13 @@ void SmoothFace::facet_area_coordinate( EntityHandle facet, CartVect& pt_on_plan
         /*area2 = determ3(pt0->x(), pt0->y(),
          pt1->x(), pt1->y(),
          pt2->x(), pt2->y());*/
-        area2 =
-            determ3( p[ 0 ][ 0 ], p[ 0 ][ 1 ], p[ 1 ][ 0 ], p[ 1 ][ 1 ], p[ 2 ][ 0 ], p[ 2 ][ 1 ] );
+        area2 = determ3( p[ 0 ][ 0 ], p[ 0 ][ 1 ], p[ 1 ][ 0 ], p[ 1 ][ 1 ], p[ 2 ][ 0 ], p[ 2 ][ 1 ] );
         if( fabs( area2 ) < tol )
         {
-            areacoord = CartVect(
-                -std::numeric_limits< double >::min( ) );  //.set(
-                                                           //-std::numeric_limits<double>::min(),
-                                                           //-std::numeric_limits<double>::min(),
-                                                           //-std::numeric_limits<double>::min() );
+            areacoord = CartVect( -std::numeric_limits< double >::min( ) );  //.set(
+                                                                             //-std::numeric_limits<double>::min(),
+                                                                             //-std::numeric_limits<double>::min(),
+                                                                             //-std::numeric_limits<double>::min() );
         }
         else if( within_tolerance( p[ 0 ], pt_on_plane, GEOMETRY_RESABS ) )
         {
@@ -1084,17 +1058,17 @@ void SmoothFace::facet_area_coordinate( EntityHandle facet, CartVect& pt_on_plan
         else
         {
 
-            areacoord[ 0 ] = determ3( pt_on_plane[ 0 ], pt_on_plane[ 1 ], p[ 1 ][ 0 ], p[ 1 ][ 1 ],
-                                      p[ 2 ][ 0 ], p[ 2 ][ 1 ] ) /
-                             area2;
+            areacoord[ 0 ] =
+                determ3( pt_on_plane[ 0 ], pt_on_plane[ 1 ], p[ 1 ][ 0 ], p[ 1 ][ 1 ], p[ 2 ][ 0 ], p[ 2 ][ 1 ] ) /
+                area2;
 
-            areacoord[ 1 ] = determ3( p[ 0 ][ 0 ], p[ 0 ][ 1 ], pt_on_plane[ 0 ], pt_on_plane[ 1 ],
-                                      p[ 2 ][ 0 ], p[ 2 ][ 1 ] ) /
-                             area2;
+            areacoord[ 1 ] =
+                determ3( p[ 0 ][ 0 ], p[ 0 ][ 1 ], pt_on_plane[ 0 ], pt_on_plane[ 1 ], p[ 2 ][ 0 ], p[ 2 ][ 1 ] ) /
+                area2;
 
-            areacoord[ 2 ] = determ3( p[ 0 ][ 0 ], p[ 0 ][ 1 ], p[ 1 ][ 0 ], p[ 1 ][ 1 ],
-                                      pt_on_plane[ 0 ], pt_on_plane[ 1 ] ) /
-                             area2;
+            areacoord[ 2 ] =
+                determ3( p[ 0 ][ 0 ], p[ 0 ][ 1 ], p[ 1 ][ 0 ], p[ 1 ][ 1 ], pt_on_plane[ 0 ], pt_on_plane[ 1 ] ) /
+                area2;
         }
     }
 }
@@ -1110,23 +1084,21 @@ ErrorCode SmoothFace::project_to_facets_main( CartVect& this_point, bool trim, b
     double                      tolerance = 1.e-5;
     std::vector< EntityHandle > facets_out;
     // we will start with a list of facets anyway, the best among them wins
-    ErrorCode rval = _my_geomTopoTool->obb_tree( )->closest_to_location(
-        (double*)&this_point, _obb_root, tolerance, facets_out );
+    ErrorCode rval =
+        _my_geomTopoTool->obb_tree( )->closest_to_location( (double*)&this_point, _obb_root, tolerance, facets_out );
     if( MB_SUCCESS != rval ) return rval;
 
     int          interpOrder = 4;
     double       compareTol = 1.e-5;
     EntityHandle lastFacet = facets_out.front( );
-    rval = project_to_facets( facets_out, lastFacet, interpOrder, compareTol, this_point, trim,
-                              outside, closest_point_ptr, normal_ptr );
+    rval = project_to_facets( facets_out, lastFacet, interpOrder, compareTol, this_point, trim, outside,
+                              closest_point_ptr, normal_ptr );
 
     return rval;
 }
-ErrorCode SmoothFace::project_to_facets( std::vector< EntityHandle >& facet_list,
-                                         EntityHandle& lastFacet, int interpOrder,
-                                         double compareTol, CartVect& this_point, bool,
-                                         bool& outside, CartVect* closest_point_ptr,
-                                         CartVect* normal_ptr )
+ErrorCode SmoothFace::project_to_facets( std::vector< EntityHandle >& facet_list, EntityHandle& lastFacet,
+                                         int interpOrder, double compareTol, CartVect& this_point, bool, bool& outside,
+                                         CartVect* closest_point_ptr, CartVect* normal_ptr )
 {
 
     bool         outside_facet = false;
@@ -1156,19 +1128,16 @@ ErrorCode SmoothFace::project_to_facets( std::vector< EntityHandle >& facet_list
             // modify the areacoord - project to the bezier patch- snaps to the
             // edge of the patch if necessary
 
-            if( project_to_facet( facet, this_point, areacoord, close_point, outside_facet,
-                                  compareTol ) != MB_SUCCESS )
+            if( project_to_facet( facet, this_point, areacoord, close_point, outside_facet, compareTol ) != MB_SUCCESS )
             { return MB_FAILURE; }
             // if (closest_point_ptr)
             //*closest_point_ptr = close_point;
         }
         // keep track of the minimum distance
 
-        double dist =
-            ( close_point - this_point ).length( );  // close_point.distance_between(this_point);
+        double dist = ( close_point - this_point ).length( );  // close_point.distance_between(this_point);
         if( ( best_outside_facet == outside_facet && dist < mindist ) ||
-            ( best_outside_facet && !outside_facet &&
-              ( dist < big_dist || best_facet == 0L /*!best_facet*/ ) ) )
+            ( best_outside_facet && !outside_facet && ( dist < big_dist || best_facet == 0L /*!best_facet*/ ) ) )
         {
             mindist = dist;
             best_point = close_point;
@@ -1186,8 +1155,7 @@ ErrorCode SmoothFace::project_to_facets( std::vector< EntityHandle >& facet_list
     if( normal_ptr )
     {
         CartVect normal;
-        if( eval_bezier_patch_normal( best_facet, best_areacoord, normal ) != MB_SUCCESS )
-        { return MB_FAILURE; }
+        if( eval_bezier_patch_normal( best_facet, best_areacoord, normal ) != MB_SUCCESS ) { return MB_FAILURE; }
         *normal_ptr = normal;
     }
 
@@ -1209,15 +1177,14 @@ ErrorCode SmoothFace::project_to_facets( std::vector< EntityHandle >& facet_list
 //              assumes that the point is contained within the patch -
 //              if not, it will project to one of its edges.
 //===========================================================================
-ErrorCode SmoothFace::project_to_patch(
-    EntityHandle facet,  // (IN) the facet where the patch is defined
-    CartVect&    ac,  // (IN) area coordinate initial guess (from linear facet)
-    CartVect&    pt,  // (IN) point we are projecting to patch
-    CartVect&    eval_pt,  // (OUT) The projected point
-    CartVect*    eval_norm,  // (OUT) normal at evaluated point
-    bool&        outside,  // (OUT) the closest point on patch to pt is on an edge
-    double       compare_tol,  // (IN) comparison tolerance
-    int          edge_id )  // (IN) only used if this is to be projected to one
+ErrorCode SmoothFace::project_to_patch( EntityHandle facet,  // (IN) the facet where the patch is defined
+                                        CartVect&    ac,  // (IN) area coordinate initial guess (from linear facet)
+                                        CartVect&    pt,  // (IN) point we are projecting to patch
+                                        CartVect&    eval_pt,  // (OUT) The projected point
+                                        CartVect*    eval_norm,  // (OUT) normal at evaluated point
+                                        bool&        outside,  // (OUT) the closest point on patch to pt is on an edge
+                                        double       compare_tol,  // (IN) comparison tolerance
+                                        int          edge_id )  // (IN) only used if this is to be projected to one
 //      of the edges.  Otherwise, should be -1
 {
     ErrorCode status = MB_SUCCESS;
@@ -1292,11 +1259,8 @@ ErrorCode SmoothFace::project_to_patch(
         {
             xac[ 0 ] = lastac[ 0 ] + INCR;  // xac.x( lastac.x() + INCR );
             if( lastac[ 1 ] + lastac[ 2 ] == 0.0 ) return MB_FAILURE;
-            ratio =
-                lastac[ 2 ] /
-                ( lastac[ 1 ] + lastac[ 2 ] );  // ratio = lastac.z() / (lastac.y() + lastac.z());
-            xac[ 1 ] =
-                ( 1.0 - xac[ 0 ] ) * ( 1.0 - ratio );  // xac.y( (1.0 - xac.x()) * (1.0 - ratio) );
+            ratio = lastac[ 2 ] / ( lastac[ 1 ] + lastac[ 2 ] );  // ratio = lastac.z() / (lastac.y() + lastac.z());
+            xac[ 1 ] = ( 1.0 - xac[ 0 ] ) * ( 1.0 - ratio );  // xac.y( (1.0 - xac.x()) * (1.0 - ratio) );
             xac[ 2 ] = 1.0 - xac[ 0 ] - xac[ 1 ];  // xac.z( 1.0 - xac.x() - xac.y() );
             eval_bezier_patch( facet, xac, xpt );
             xvec = xpt - lastpt;
@@ -1307,11 +1271,8 @@ ErrorCode SmoothFace::project_to_patch(
             yac[ 1 ] = ( lastac[ 1 ] + INCR );  // yac.y( lastac.y() + INCR );
             if( lastac[ 0 ] + lastac[ 2 ] == 0.0 )  // if (lastac.x() + lastac.z() == 0.0)
                 return MB_FAILURE;
-            ratio =
-                lastac[ 2 ] /
-                ( lastac[ 0 ] + lastac[ 2 ] );  // ratio = lastac.z() / (lastac.x() + lastac.z());
-            yac[ 0 ] = ( ( 1.0 - yac[ 1 ] ) *
-                         ( 1.0 - ratio ) );  // yac.x( (1.0 - yac.y()) * (1.0 - ratio) );
+            ratio = lastac[ 2 ] / ( lastac[ 0 ] + lastac[ 2 ] );  // ratio = lastac.z() / (lastac.x() + lastac.z());
+            yac[ 0 ] = ( ( 1.0 - yac[ 1 ] ) * ( 1.0 - ratio ) );  // yac.x( (1.0 - yac.y()) * (1.0 - ratio) );
             yac[ 2 ] = ( 1.0 - yac[ 0 ] - yac[ 1 ] );  // yac.z( 1.0 - yac.x() - yac.y() );
             eval_bezier_patch( facet, yac, ypt );
             yvec = ypt - lastpt;
@@ -1322,11 +1283,8 @@ ErrorCode SmoothFace::project_to_patch(
             zac[ 2 ] = ( lastac[ 2 ] + INCR );  // zac.z( lastac.z() + INCR );
             if( lastac[ 0 ] + lastac[ 1 ] == 0.0 )  // if (lastac.x() + lastac.y() == 0.0)
                 return MB_FAILURE;
-            ratio =
-                lastac[ 1 ] /
-                ( lastac[ 0 ] + lastac[ 1 ] );  // ratio = lastac.y() / (lastac.x() + lastac.y());
-            zac[ 0 ] = ( ( 1.0 - zac[ 2 ] ) *
-                         ( 1.0 - ratio ) );  // zac.x( (1.0 - zac.z()) * (1.0 - ratio) );
+            ratio = lastac[ 1 ] / ( lastac[ 0 ] + lastac[ 1 ] );  // ratio = lastac.y() / (lastac.x() + lastac.y());
+            zac[ 0 ] = ( ( 1.0 - zac[ 2 ] ) * ( 1.0 - ratio ) );  // zac.x( (1.0 - zac.z()) * (1.0 - ratio) );
             zac[ 1 ] = ( 1.0 - zac[ 0 ] - zac[ 2 ] );  // zac.y( 1.0 - zac.x() - zac.z() );
             eval_bezier_patch( facet, zac, zpt );
             zvec = zpt - lastpt;
@@ -1400,20 +1358,17 @@ ErrorCode SmoothFace::project_to_patch(
             case 0:
                 newac[ 1 ] = ( lastac[ 1 ] + umove );  // newac.y( lastac.y() + umove );
                 newac[ 2 ] = ( lastac[ 2 ] + vmove );  // newac.z( lastac.z() + vmove );
-                newac[ 0 ] =
-                    ( 1.0 - newac[ 1 ] - newac[ 2 ] );  // newac.x( 1.0 - newac.y() - newac.z() );
+                newac[ 0 ] = ( 1.0 - newac[ 1 ] - newac[ 2 ] );  // newac.x( 1.0 - newac.y() - newac.z() );
                 break;
             case 1:
                 newac[ 2 ] = ( lastac[ 2 ] + umove );  // newac.z( lastac.z() + umove );
                 newac[ 0 ] = ( lastac[ 0 ] + vmove );  // newac.x( lastac.x() + vmove );
-                newac[ 1 ] =
-                    ( 1.0 - newac[ 2 ] - newac[ 0 ] );  // newac.y( 1.0 - newac.z() - newac.x() );
+                newac[ 1 ] = ( 1.0 - newac[ 2 ] - newac[ 0 ] );  // newac.y( 1.0 - newac.z() - newac.x() );
                 break;
             case 2:
                 newac[ 0 ] = ( lastac[ 0 ] + umove );  // newac.x( lastac.x() + umove );
                 newac[ 1 ] = ( lastac[ 1 ] + vmove );  // newac.y( lastac.y() + vmove );
-                newac[ 2 ] =
-                    ( 1.0 - newac[ 0 ] - newac[ 1 ] );  // newac.z( 1.0 - newac.x() - newac.y() );
+                newac[ 2 ] = ( 1.0 - newac[ 0 ] - newac[ 1 ] );  // newac.z( 1.0 - newac.x() - newac.y() );
                 break;
         }
 
@@ -1550,9 +1505,8 @@ void SmoothFace::ac_at_edge( CartVect& fac,  // facet area coordinate
 // Description:  project to a single facet.  Uses the input areacoord as
 //              a starting guess.
 //===========================================================================
-ErrorCode SmoothFace::project_to_facet( EntityHandle facet, CartVect& pt, CartVect& areacoord,
-                                        CartVect& close_point, bool& outside_facet,
-                                        double compare_tol )
+ErrorCode SmoothFace::project_to_facet( EntityHandle facet, CartVect& pt, CartVect& areacoord, CartVect& close_point,
+                                        bool& outside_facet, double compare_tol )
 {
     const EntityHandle* conn3 = NULL;
     int                 nnodes = 0;
@@ -1564,8 +1518,7 @@ ErrorCode SmoothFace::project_to_facet( EntityHandle facet, CartVect& pt, CartVe
     _mb->get_coords( conn3, 3, (double*)&p[ 0 ] );
 
     int       edge_id = -1;
-    ErrorCode stat = project_to_patch( facet, areacoord, pt, close_point, NULL, outside_facet,
-                                       compare_tol, edge_id );
+    ErrorCode stat = project_to_patch( facet, areacoord, pt, close_point, NULL, outside_facet, compare_tol, edge_id );
     /* }
      break;
      }*/
@@ -1707,8 +1660,7 @@ bool SmoothFace::move_ac_inside( CartVect& ac, double tol )
 // Member Type:  PRIVATE
 // Description:  evaluate the Bezier patch defined at a facet
 //===========================================================================
-ErrorCode SmoothFace::eval_bezier_patch_normal( EntityHandle facet, CartVect& areacoord,
-                                                CartVect& normal )
+ErrorCode SmoothFace::eval_bezier_patch_normal( EntityHandle facet, CartVect& areacoord, CartVect& normal )
 {
     // interpolate internal control points
 
@@ -1908,13 +1860,12 @@ ErrorCode SmoothFace::get_normals_for_vertices( const EntityHandle* conn2, CartV
     return rval;
 }
 
-ErrorCode SmoothFace::ray_intersection_correct(
-    EntityHandle,  // (IN) the facet where the patch is defined
-    CartVect& pt,  // (IN) shoot from
-    CartVect& ray,  // (IN) ray direction
-    CartVect& eval_pt,  // (INOUT) The intersection point
-    double&   distance,  // (IN OUT) the new distance
-    bool&     outside )
+ErrorCode SmoothFace::ray_intersection_correct( EntityHandle,  // (IN) the facet where the patch is defined
+                                                CartVect& pt,  // (IN) shoot from
+                                                CartVect& ray,  // (IN) ray direction
+                                                CartVect& eval_pt,  // (INOUT) The intersection point
+                                                double&   distance,  // (IN OUT) the new distance
+                                                bool&     outside )
 {
     // find a point on the smooth surface
     CartVect currentPoint = eval_pt;

@@ -82,8 +82,7 @@ class MESQUITE_EXPORT TagVertexMesh : public MeshDecorator, public Instruction
      *                  is destroyed.
      *\param tag_name Name of tag in which to store alternate vertex coordinates.
      */
-    TagVertexMesh( MsqError& err, Mesh* real_mesh, bool clean_up_tag_data = true,
-                   std::string tag_name = "" );
+    TagVertexMesh( MsqError& err, Mesh* real_mesh, bool clean_up_tag_data = true, std::string tag_name = "" );
 
     /** Destroy tag data for alternate coordinates if
      *  clean_up_tag_data is true.
@@ -150,16 +149,15 @@ class MESQUITE_EXPORT TagVertexMesh : public MeshDecorator, public Instruction
      */
     void clear( MsqError& err );
 
-    virtual void vertices_get_coordinates( const VertexHandle vert_array[], MsqVertex* coordinates,
-                                           size_t num_vtx, MsqError& err );
+    virtual void vertices_get_coordinates( const VertexHandle vert_array[], MsqVertex* coordinates, size_t num_vtx,
+                                           MsqError& err );
 
-    virtual void vertex_set_coordinates( VertexHandle vertex, const Vector3D& coordinates,
-                                         MsqError& err );
+    virtual void vertex_set_coordinates( VertexHandle vertex, const Vector3D& coordinates, MsqError& err );
 
     //***************  Tags  ***********
 
-    virtual TagHandle tag_create( const std::string& tag_name, TagType type, unsigned length,
-                                  const void* default_value, MsqError& err );
+    virtual TagHandle tag_create( const std::string& tag_name, TagType type, unsigned length, const void* default_value,
+                                  MsqError& err );
 
     virtual TagHandle tag_get( const std::string& name, MsqError& err );
 
@@ -169,8 +167,7 @@ class MESQUITE_EXPORT TagVertexMesh : public MeshDecorator, public Instruction
 
     //**************** Instruction ****************
 
-    virtual double loop_over_mesh( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
-                                   MsqError& err );
+    virtual double loop_over_mesh( MeshDomainAssoc* mesh_and_domain, const Settings* settings, MsqError& err );
 
     virtual std::string get_name( ) const;
 
@@ -178,8 +175,7 @@ class MESQUITE_EXPORT TagVertexMesh : public MeshDecorator, public Instruction
     //!
     //! Do any preliminary global initialization, consistency checking,
     //! etc.  Default implementation does nothing.
-    virtual void initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
-                                   MsqError& err );
+    virtual void initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings, MsqError& err );
 };
 
 }  // namespace MBMesquite

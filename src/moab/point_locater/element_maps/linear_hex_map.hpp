@@ -29,8 +29,7 @@ namespace element_utility
         {
             CartVect params( 3, 0.0 );
             solve_inverse( eval_point, params, verts );
-            bool point_found =
-                solve_inverse( eval_point, params, verts, tol ) && is_contained( params, tol );
+            bool point_found = solve_inverse( eval_point, params, verts, tol ) && is_contained( params, tol );
             return std::make_pair( point_found, params );
         }
 
@@ -40,9 +39,8 @@ namespace element_utility
         // This should unroll..
         inline const CartVect& reference_points( const std::size_t& i ) const
         {
-            const CartVect rpts[ 8 ] = { CartVect( -1, -1, -1 ), CartVect( 1, -1, -1 ),
-                                         CartVect( 1, 1, -1 ),   CartVect( -1, 1, -1 ),
-                                         CartVect( -1, -1, 1 ),  CartVect( 1, -1, 1 ),
+            const CartVect rpts[ 8 ] = { CartVect( -1, -1, -1 ), CartVect( 1, -1, -1 ), CartVect( 1, 1, -1 ),
+                                         CartVect( -1, 1, -1 ),  CartVect( -1, -1, 1 ), CartVect( 1, -1, 1 ),
                                          CartVect( 1, 1, 1 ),    CartVect( -1, 1, 1 ) };
             return rpts[ i ];
         }
@@ -50,9 +48,8 @@ namespace element_utility
         bool is_contained( const CartVect& params, const double tol ) const
         {
             // just look at the box+tol here
-            return ( params[ 0 ] >= -1. - tol ) && ( params[ 0 ] <= 1. + tol ) &&
-                   ( params[ 1 ] >= -1. - tol ) && ( params[ 1 ] <= 1. + tol ) &&
-                   ( params[ 2 ] >= -1. - tol ) && ( params[ 2 ] <= 1. + tol );
+            return ( params[ 0 ] >= -1. - tol ) && ( params[ 0 ] <= 1. + tol ) && ( params[ 1 ] >= -1. - tol ) &&
+                   ( params[ 1 ] <= 1. + tol ) && ( params[ 2 ] >= -1. - tol ) && ( params[ 2 ] <= 1. + tol );
         }
 
         bool solve_inverse( const CartVect& point, CartVect& params, const CartVect* verts,
@@ -70,8 +67,7 @@ namespace element_utility
             ss << point[ 0 ] << ", " << point[ 1 ] << ", " << point[ 2 ] << std::endl;
             ss << "Hex: ";
             for( int i = 0; i < 8; ++i )
-                ss << points[ i ][ 0 ] << ", " << points[ i ][ 1 ] << ", " << points[ i ][ 2 ]
-                   << std::endl;
+                ss << points[ i ][ 0 ] << ", " << points[ i ][ 1 ] << ", " << points[ i ][ 2 ] << std::endl;
             ss << std::endl;
 #endif
             while( delta.length_squared( ) > error_tol_sqr )

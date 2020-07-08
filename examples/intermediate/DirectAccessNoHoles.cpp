@@ -54,8 +54,7 @@ int main( int argc, char** argv )
 
     // Parse options
     ProgOptions opts;
-    opts.addOpt< int >( string( "nquads,n" ),
-                        string( "Number of quads in the mesh (default = 1000" ), &nquads );
+    opts.addOpt< int >( string( "nquads,n" ), string( "Number of quads in the mesh (default = 1000" ), &nquads );
     opts.parseCommandLine( argc, argv );
 
     // Create simple structured mesh with hole, but using unstructured representation
@@ -70,13 +69,10 @@ int main( int argc, char** argv )
     // Create tag1 (element-based avg), tag2 (vertex-based avg), tag3 (# connected verts)
     Tag tag1, tag2, tag3;
     rval = mbImpl->tag_get_handle( "tag1", 3, MB_TYPE_DOUBLE, tag1, MB_TAG_DENSE | MB_TAG_CREAT );MB_CHK_SET_ERR( rval, "Trouble creating tag1" );
-    double def_val[ 3 ] = { 0.0, 0.0,
-                            0.0 };  // need a default value for tag2 because we sum into it
-    rval = mbImpl->tag_get_handle( "tag2", 3, MB_TYPE_DOUBLE, tag2, MB_TAG_DENSE | MB_TAG_CREAT,
-                                   def_val );MB_CHK_SET_ERR( rval, "Trouble creating tag2" );
+    double def_val[ 3 ] = { 0.0, 0.0, 0.0 };  // need a default value for tag2 because we sum into it
+    rval = mbImpl->tag_get_handle( "tag2", 3, MB_TYPE_DOUBLE, tag2, MB_TAG_DENSE | MB_TAG_CREAT, def_val );MB_CHK_SET_ERR( rval, "Trouble creating tag2" );
     int def_val_int = 0;  // need a default value for tag3 because we increment it
-    rval = mbImpl->tag_get_handle( "tag3", 1, MB_TYPE_INTEGER, tag3, MB_TAG_DENSE | MB_TAG_CREAT,
-                                   &def_val_int );MB_CHK_SET_ERR( rval, "Trouble creating tag3" );
+    rval = mbImpl->tag_get_handle( "tag3", 1, MB_TYPE_INTEGER, tag3, MB_TAG_DENSE | MB_TAG_CREAT, &def_val_int );MB_CHK_SET_ERR( rval, "Trouble creating tag3" );
 
     // Get pointers to connectivity, coordinate, tag, and adjacency arrays; each of these returns a
     // count, which should be compared to the # entities you expect to verify there's only one chunk
@@ -88,8 +84,7 @@ int main( int argc, char** argv )
 
     double *x_ptr, *y_ptr, *z_ptr;
     rval = mbImpl->coords_iterate( verts.begin( ), verts.end( ), x_ptr, y_ptr, z_ptr, count );MB_CHK_SET_ERR( rval, "Error in coords_iterate" );
-    assert( count ==
-            (int)verts.size( ) );  // Should end up with just one contiguous chunk of vertices
+    assert( count == (int)verts.size( ) );  // Should end up with just one contiguous chunk of vertices
 
     double *tag1_ptr, *tag2_ptr;
     int*    tag3_ptr;
@@ -102,8 +97,7 @@ int main( int argc, char** argv )
 
     const vector< EntityHandle >** adjs_ptr;
     rval = mbImpl->adjacencies_iterate( verts.begin( ), verts.end( ), adjs_ptr, count );MB_CHK_SET_ERR( rval, "Error in adjacencies_iterate" );
-    assert( count ==
-            (int)verts.size( ) );  // Should end up with just one contiguous chunk of vertices
+    assert( count == (int)verts.size( ) );  // Should end up with just one contiguous chunk of vertices
     // Start_ handles used to compute indices into vertex/quad arrays; can use direct subtraction
     // because we know there aren't any holes in the handle spaces for verts or quads
     EntityHandle start_vert = *verts.begin( ), start_quad = *quads.begin( );
@@ -115,8 +109,7 @@ int main( int argc, char** argv )
             0.0;  // Initialize position for this element
         for( int j = 0; j < vpere; j++ )
         {  // Loop over vertices in this element
-            int v_index = conn_ptr[ vpere * i + j ] -
-                          start_vert;  // vert index is just the offset from start vertex
+            int v_index = conn_ptr[ vpere * i + j ] - start_vert;  // vert index is just the offset from start vertex
             tag1_ptr[ 3 * i + 0 ] += x_ptr[ v_index ];
             tag1_ptr[ 3 * i + 1 ] += y_ptr[ v_index ];  // Sum vertex positions into tag1...
             tag1_ptr[ 3 * i + 2 ] += z_ptr[ v_index ];
@@ -131,8 +124,7 @@ int main( int argc, char** argv )
     for( int v = 0; v < count; v++ )
     {
         const vector< EntityHandle >* avec = *( adjs_ptr + v );
-        for( vector< EntityHandle >::const_iterator ait = avec->begin( ); ait != avec->end( );
-             ++ait )
+        for( vector< EntityHandle >::const_iterator ait = avec->begin( ); ait != avec->end( ); ++ait )
         {
             // *ait is the quad handle, its index is computed by subtracting the start quad handle
             int a_ind = *ait - start_quad;
@@ -151,8 +143,7 @@ int main( int argc, char** argv )
         int i = *q_it - start_quad;
         for( int j = 0; j < 3; j++ )
             tag2_ptr[ 3 * i + j ] /= (double)tag3_ptr[ i ];  // Normalize by # verts
-        if( tag1_ptr[ 3 * i ] != tag2_ptr[ 3 * i ] ||
-            tag1_ptr[ 3 * i + 1 ] != tag2_ptr[ 3 * i + 1 ] ||
+        if( tag1_ptr[ 3 * i ] != tag2_ptr[ 3 * i ] || tag1_ptr[ 3 * i + 1 ] != tag2_ptr[ 3 * i + 1 ] ||
             tag1_ptr[ 3 * i + 2 ] != tag2_ptr[ 3 * i + 2 ] )
         {
             cout << "Tag1, tag2 disagree for element " << *q_it + i << endl;
@@ -185,8 +176,7 @@ ErrorCode create_mesh_no_holes( Interface* mbImpl, int nquads )
         coords[ 0 ][ 2 * i ] = coords[ 0 ][ 2 * i + 1 ] = (double)i;  // x values are all i
         coords[ 1 ][ 2 * i ] = 0.0;
         coords[ 1 ][ 2 * i + 1 ] = 1.0;  // y coords
-        coords[ 2 ][ 2 * i ] = coords[ 2 ][ 2 * i + 1 ] =
-            (double)0.0;  // z values, all zero (2d mesh)
+        coords[ 2 ][ 2 * i ] = coords[ 2 ][ 2 * i + 1 ] = (double)0.0;  // z values, all zero (2d mesh)
         EntityHandle quad_v = start_vert + 2 * i;
         connect[ 4 * i + 0 ] = quad_v;
         connect[ 4 * i + 1 ] = quad_v + 2;
@@ -199,8 +189,7 @@ ErrorCode create_mesh_no_holes( Interface* mbImpl, int nquads )
     coords[ 0 ][ 2 * nquads ] = coords[ 0 ][ 2 * nquads + 1 ] = (double)nquads;
     coords[ 1 ][ 2 * nquads ] = 0.0;
     coords[ 1 ][ 2 * nquads + 1 ] = 1.0;  // y coords
-    coords[ 2 ][ 2 * nquads ] = coords[ 2 ][ 2 * nquads + 1 ] =
-        (double)0.0;  // z values, all zero (2d mesh)
+    coords[ 2 ][ 2 * nquads ] = coords[ 2 ][ 2 * nquads + 1 ] = (double)0.0;  // z values, all zero (2d mesh)
 
     // Call a vertex-quad adjacencies function to generate vertex-element adjacencies in MOAB
     Range dum_range;

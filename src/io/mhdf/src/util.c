@@ -143,8 +143,7 @@ char* mhdf_name_to_path_cat( const char* prefix, const char* name, mhdf_Status* 
     return buffer;
 }
 
-hid_t mhdf_elem_group_from_handle( FileHandle* file_ptr, const char* elem_handle,
-                                   mhdf_Status* status )
+hid_t mhdf_elem_group_from_handle( FileHandle* file_ptr, const char* elem_handle, mhdf_Status* status )
 {
     char* path;
     hid_t result;
@@ -162,8 +161,7 @@ hid_t mhdf_elem_group_from_handle( FileHandle* file_ptr, const char* elem_handle
     return result;
 }
 
-int mhdf_create_scalar_attrib( hid_t object, const char* name, hid_t type, const void* value,
-                               mhdf_Status* status )
+int mhdf_create_scalar_attrib( hid_t object, const char* name, hid_t type, const void* value, mhdf_Status* status )
 {
     hid_t  dspace_id, attr_id;
     herr_t rval;
@@ -199,8 +197,7 @@ int mhdf_create_scalar_attrib( hid_t object, const char* name, hid_t type, const
     return 1;
 }
 
-int mhdf_read_scalar_attrib( hid_t object, const char* name, hid_t type, void* value,
-                             mhdf_Status* status )
+int mhdf_read_scalar_attrib( hid_t object, const char* name, hid_t type, void* value, mhdf_Status* status )
 {
     hid_t  attr_id, type_id;
     herr_t rval;
@@ -236,8 +233,7 @@ int mhdf_read_scalar_attrib( hid_t object, const char* name, hid_t type, void* v
 }
 
 #if defined( H5Aiterate_vers ) && H5Aiterate_vers > 1
-static herr_t find_attr_by_name( hid_t handle, const char* name, const H5A_info_t* info,
-                                 void* mydata )
+static herr_t find_attr_by_name( hid_t handle, const char* name, const H5A_info_t* info, void* mydata )
 {
     /* empty statement to remove compiler warning */
     if( info ) {}
@@ -250,14 +246,12 @@ static herr_t find_attr_by_name( hid_t handle, const char* name, void* mydata )
     return !strcmp( name, (const char*)mydata );
 }
 
-int mhdf_find_attribute( hid_t object, const char* attrib_name, unsigned int* index_out,
-                         mhdf_Status* status )
+int mhdf_find_attribute( hid_t object, const char* attrib_name, unsigned int* index_out, mhdf_Status* status )
 {
     herr_t rval;
 #if defined( H5Aiterate_vers ) && H5Aiterate_vers > 1
     hsize_t idx = 0;
-    rval = H5Aiterate2( object, H5_INDEX_CRT_ORDER, H5_ITER_NATIVE, &idx, &find_attr_by_name,
-                        (void*)attrib_name );
+    rval = H5Aiterate2( object, H5_INDEX_CRT_ORDER, H5_ITER_NATIVE, &idx, &find_attr_by_name, (void*)attrib_name );
     *index_out = (unsigned int)idx;
 #else
     *index_out = 0;
@@ -282,8 +276,8 @@ int mhdf_is_in_group( hid_t group, const char* name, mhdf_Status* status )
     return rval;
 }
 
-static int mhdf_readwrite( hid_t data_id, int read, long offset, long count, hid_t type,
-                           void* array, hid_t io_prop, mhdf_Status* status )
+static int mhdf_readwrite( hid_t data_id, int read, long offset, long count, hid_t type, void* array, hid_t io_prop,
+                           mhdf_Status* status )
 {
     hid_t   slab_id, mem_id;
     hsize_t offsets[ 2 ], counts[ 2 ] = { 1, 1 };
@@ -328,9 +322,8 @@ static int mhdf_readwrite( hid_t data_id, int read, long offset, long count, hid
     if( (unsigned long)( offset + count ) > counts[ 0 ] )
     {
         H5Sclose( slab_id );
-        mhdf_setFail( status, "Requested %s of rows %ld to %ld of a %ld row table.\n",
-                      read ? "read" : "write", offset, offset + count - 1,
-                      (long)counts[ dims - 1 ] );
+        mhdf_setFail( status, "Requested %s of rows %ld to %ld of a %ld row table.\n", read ? "read" : "write", offset,
+                      offset + count - 1, (long)counts[ dims - 1 ] );
         return 0;
     }
 
@@ -390,8 +383,8 @@ static int mhdf_readwrite( hid_t data_id, int read, long offset, long count, hid
     return 1;
 }
 
-static int mhdf_readwrite_column( hid_t data_id, int read, int column, long offset, long count,
-                                  hid_t type, void* array, hid_t io_prop, mhdf_Status* status )
+static int mhdf_readwrite_column( hid_t data_id, int read, int column, long offset, long count, hid_t type, void* array,
+                                  hid_t io_prop, mhdf_Status* status )
 {
     hid_t   slab_id, mem_id;
     hsize_t offsets[ 2 ], counts[ 2 ];
@@ -436,9 +429,8 @@ static int mhdf_readwrite_column( hid_t data_id, int read, int column, long offs
     if( (unsigned long)( offset + count ) > counts[ 0 ] || (unsigned long)column > counts[ 1 ] )
     {
         H5Sclose( slab_id );
-        mhdf_setFail( status, "Requested %s of (%ld,%d)->(%ld,%ld) of (%ld, %ld) table.\n",
-                      read ? "read" : "write", offset, column, offset + count - 1, column,
-                      (long)counts[ 0 ], (long)counts[ 1 ] );
+        mhdf_setFail( status, "Requested %s of (%ld,%d)->(%ld,%ld) of (%ld, %ld) table.\n", read ? "read" : "write",
+                      offset, column, offset + count - 1, column, (long)counts[ 0 ], (long)counts[ 1 ] );
         return 0;
     }
 
@@ -500,8 +492,8 @@ static int mhdf_readwrite_column( hid_t data_id, int read, int column, long offs
     return 1;
 }
 
-int mhdf_write_data( hid_t data_id, long offset, long count, hid_t type_id, const void* array,
-                     hid_t prop, mhdf_Status* status )
+int mhdf_write_data( hid_t data_id, long offset, long count, hid_t type_id, const void* array, hid_t prop,
+                     mhdf_Status* status )
 {
     return mhdf_readwrite( data_id, 0, offset, count, type_id, (void*)array, prop, status );
 }
@@ -512,27 +504,25 @@ int mhdf_read_data( hid_t data_id, long offset, long count, hid_t type_id, void*
     return mhdf_readwrite( data_id, 1, offset, count, type_id, array, prop, status );
 }
 
-int mhdf_read_column( hid_t data_id, int column, long offset, long count, hid_t type, void* array,
-                      hid_t prop, mhdf_Status* status )
+int mhdf_read_column( hid_t data_id, int column, long offset, long count, hid_t type, void* array, hid_t prop,
+                      mhdf_Status* status )
 {
     return mhdf_readwrite_column( data_id, 1, column, offset, count, type, array, prop, status );
 }
 
-int mhdf_write_column( hid_t data_id, int column, long offset, long count, hid_t type,
-                       const void* array, hid_t prop, mhdf_Status* status )
+int mhdf_write_column( hid_t data_id, int column, long offset, long count, hid_t type, const void* array, hid_t prop,
+                       mhdf_Status* status )
 {
-    return mhdf_readwrite_column( data_id, 0, column, offset, count, type, (void*)array, prop,
-                                  status );
+    return mhdf_readwrite_column( data_id, 0, column, offset, count, type, (void*)array, prop, status );
 }
 
-hid_t mhdf_create_table( hid_t group_id, const char* path, hid_t type, int rank, hsize_t* dims,
-                         mhdf_Status* status )
+hid_t mhdf_create_table( hid_t group_id, const char* path, hid_t type, int rank, hsize_t* dims, mhdf_Status* status )
 {
     return mhdf_create_table_with_prop( group_id, path, type, rank, dims, H5P_DEFAULT, status );
 }
 
-hid_t mhdf_create_table_with_prop( hid_t group_id, const char* path, hid_t type, int rank,
-                                   hsize_t* dims, hid_t create_prop, mhdf_Status* status )
+hid_t mhdf_create_table_with_prop( hid_t group_id, const char* path, hid_t type, int rank, hsize_t* dims,
+                                   hid_t create_prop, mhdf_Status* status )
 {
     hid_t space_id, table_id;
 
@@ -559,8 +549,7 @@ hid_t mhdf_create_table_with_prop( hid_t group_id, const char* path, hid_t type,
     return table_id;
 }
 
-hid_t mhdf_open_table( hid_t group_id, const char* path, int columns, hsize_t* rows_out,
-                       mhdf_Status* status )
+hid_t mhdf_open_table( hid_t group_id, const char* path, int columns, hsize_t* rows_out, mhdf_Status* status )
 {
     hid_t   table_id, space_id;
     hsize_t dims[ 2 ];
@@ -608,8 +597,8 @@ hid_t mhdf_open_table( hid_t group_id, const char* path, int columns, hsize_t* r
     return table_id;
 }
 
-hid_t mhdf_open_table2( hid_t group_id, const char* path, int rank, hsize_t* dims_out,
-                        long* start_id_out, mhdf_Status* status )
+hid_t mhdf_open_table2( hid_t group_id, const char* path, int rank, hsize_t* dims_out, long* start_id_out,
+                        mhdf_Status* status )
 {
     hid_t table_id, space_id;
 
@@ -649,8 +638,7 @@ hid_t mhdf_open_table2( hid_t group_id, const char* path, int rank, hsize_t* dim
         return -1;
     }
 
-    if( !mhdf_read_scalar_attrib( table_id, START_ID_ATTRIB, H5T_NATIVE_LONG, start_id_out,
-                                  status ) )
+    if( !mhdf_read_scalar_attrib( table_id, START_ID_ATTRIB, H5T_NATIVE_LONG, start_id_out, status ) )
     {
         mhdf_setFail( status, "File format error.  Failed to retreive ID offset." );
         H5Dclose( table_id );
@@ -747,8 +735,7 @@ hid_t get_elem_type_enum( FileHandle* file_ptr, mhdf_Status* status )
 #else
     result = H5Topen( file_ptr->hdf_handle, TYPE_ENUM_PATH );
 #endif
-    if( result < 0 )
-        mhdf_setFail( status, "Element type enum does not exist in file.  Invalid file." );
+    if( result < 0 ) mhdf_setFail( status, "Element type enum does not exist in file.  Invalid file." );
     return result;
 }
 
@@ -773,8 +760,7 @@ int mhdf_write_max_id( FileHandle* file_ptr, mhdf_Status* status )
     {
         space_id = H5Screate( H5S_SCALAR );
 #if defined( H5Acreate_vers ) && H5Acreate_vers > 1
-        attr_id = H5Acreate2( group_id, MAX_ID_ATTRIB, H5T_NATIVE_ULONG, space_id, H5P_DEFAULT,
-                              H5P_DEFAULT );
+        attr_id = H5Acreate2( group_id, MAX_ID_ATTRIB, H5T_NATIVE_ULONG, space_id, H5P_DEFAULT, H5P_DEFAULT );
 #else
         attr_id = H5Acreate( group_id, MAX_ID_ATTRIB, H5T_NATIVE_ULONG, space_id, H5P_DEFAULT );
 #endif
@@ -783,8 +769,7 @@ int mhdf_write_max_id( FileHandle* file_ptr, mhdf_Status* status )
     H5Gclose( group_id );
     if( attr_id < 0 )
     {
-        mhdf_setFail( status, "Failed to create attribute \"%s\" on \"%s\"", MAX_ID_ATTRIB,
-                      ROOT_GROUP );
+        mhdf_setFail( status, "Failed to create attribute \"%s\" on \"%s\"", MAX_ID_ATTRIB, ROOT_GROUP );
         return 0;
     }
 
@@ -834,8 +819,8 @@ void mhdf_api_end_internal( int expected_diff, const char* filename, int linenum
     if( mhdf_api_handle_count + expected_diff != num_open( ) )
     {
         fprintf( stderr, "Unclosed handles at end of mhdf API call.\n" );
-        fprintf( stderr, "Entered with %d, expected %d change, got %d.\n", mhdf_api_handle_count,
-                 expected_diff, num_open( ) );
+        fprintf( stderr, "Entered with %d, expected %d change, got %d.\n", mhdf_api_handle_count, expected_diff,
+                 num_open( ) );
         fprintf( stderr, "%s:%d\n", filename, linenumber );
         abort( );
     }

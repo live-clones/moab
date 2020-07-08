@@ -46,13 +46,11 @@ class FauxAbsShapeMetric : public AWMetric
     {
         return mMetric.get_name( );
     }
-    bool evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result,
-                   MsqError& err )
+    bool evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result, MsqError& err )
     {
         return mMetric.evaluate( A * inverse( W ), result, err );
     }
-    bool evaluate( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >& W, double& result,
-                   MsqError& err )
+    bool evaluate( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >& W, double& result, MsqError& err )
     {
         return mMetric.evaluate( A * inverse( W ), result, err );
     }

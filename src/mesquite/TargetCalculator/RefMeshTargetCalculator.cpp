@@ -41,8 +41,8 @@ namespace MBMesquite
 
 RefMeshTargetCalculator::~RefMeshTargetCalculator( ) {}
 
-bool RefMeshTargetCalculator::get_3D_target( PatchData& pd, size_t element, Sample sample,
-                                             MsqMatrix< 3, 3 >& W_out, MsqError& err )
+bool RefMeshTargetCalculator::get_3D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 3, 3 >& W_out,
+                                             MsqError& err )
 {
     get_refmesh_Jacobian_3D( refMesh, pd, element, sample, W_out, err );
     return !MSQ_CHKERR( err );
@@ -55,8 +55,8 @@ bool RefMeshTargetCalculator::get_surface_target( PatchData& pd, size_t element,
     return !MSQ_CHKERR( err );
 }
 
-bool RefMeshTargetCalculator::get_2D_target( PatchData& pd, size_t element, Sample sample,
-                                             MsqMatrix< 2, 2 >& W_out, MsqError& err )
+bool RefMeshTargetCalculator::get_2D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 2, 2 >& W_out,
+                                             MsqError& err )
 {
     MsqMatrix< 3, 2 > W_orient;
     bool              valid = get_surface_target( pd, element, sample, W_orient, err );

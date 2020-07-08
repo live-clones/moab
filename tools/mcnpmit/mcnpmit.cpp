@@ -233,8 +233,7 @@ MCNPError McnpData::read_mcnpfile( bool skip_mesh )
         }
     }
 
-    std::cout << "SUCCESS! Read in " << elem_handles.size( ) << " elements!" << std::endl
-              << std::endl;
+    std::cout << "SUCCESS! Read in " << elem_handles.size( ) << " elements!" << std::endl << std::endl;
     // MCNP_vertices.clear();
     vert_handles.clear( );
     MCNP_elems.clear( );
@@ -327,10 +326,8 @@ MCNPError McnpData::make_elements( std::vector< double > x[ 3 ], int* n )
 MCNPError McnpData::initialize_tags( )
 {
 
-    MBI->tag_get_handle( TALLY_TAG, 1, moab::MB_TYPE_DOUBLE, tally_tag,
-                         moab::MB_TAG_DENSE | moab::MB_TAG_CREAT );
-    MBI->tag_get_handle( ERROR_TAG, 1, moab::MB_TYPE_DOUBLE, relerr_tag,
-                         moab::MB_TAG_DENSE | moab::MB_TAG_CREAT );
+    MBI->tag_get_handle( TALLY_TAG, 1, moab::MB_TYPE_DOUBLE, tally_tag, moab::MB_TAG_DENSE | moab::MB_TAG_CREAT );
+    MBI->tag_get_handle( ERROR_TAG, 1, moab::MB_TYPE_DOUBLE, relerr_tag, moab::MB_TAG_DENSE | moab::MB_TAG_CREAT );
 
     return MCNP_SUCCESS;
 }
@@ -433,8 +430,7 @@ MCNPError McnpData::transform_point( double* p, double* r, int csys, double* rma
     // Apply the rotation matrix
     for( unsigned int i = 0; i < 3; i++ )
     {
-        q[ i ] = p[ 0 ] * rmat[ 4 * i ] + p[ 1 ] * rmat[ 4 * i + 1 ] + p[ 2 ] * rmat[ 4 * i + 2 ] +
-                 rmat[ 4 * i + 3 ];
+        q[ i ] = p[ 0 ] * rmat[ 4 * i ] + p[ 1 ] * rmat[ 4 * i + 1 ] + p[ 2 ] * rmat[ 4 * i + 2 ] + rmat[ 4 * i + 3 ];
     }
 
     // Transform coordinate system

@@ -186,6 +186,5 @@ class IdealWeightInverseMeanRatioTest : public CppUnit::TestFixture
     }
 };
 
-CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( IdealWeightInverseMeanRatioTest,
-                                       "IdealWeightInverseMeanRatioTest" );
+CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( IdealWeightInverseMeanRatioTest, "IdealWeightInverseMeanRatioTest" );
 CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( IdealWeightInverseMeanRatioTest, "Unit" );

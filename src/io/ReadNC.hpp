@@ -75,9 +75,8 @@ class ReadNC : public ReaderIface
     static ReaderIface* factory( Interface* );
 
     //! Load an NC file
-    ErrorCode load_file( const char* file_name, const EntityHandle* file_set,
-                         const FileOptions& opts, const SubsetList* subset_list = 0,
-                         const Tag* file_id_tag = 0 );
+    ErrorCode load_file( const char* file_name, const EntityHandle* file_set, const FileOptions& opts,
+                         const SubsetList* subset_list = 0, const Tag* file_id_tag = 0 );
 
     //! Constructor
     ReadNC( Interface* impl = NULL );
@@ -85,9 +84,8 @@ class ReadNC : public ReaderIface
     //! Destructor
     virtual ~ReadNC( );
 
-    virtual ErrorCode read_tag_values( const char* file_name, const char* tag_name,
-                                       const FileOptions& opts, std::vector< int >& tag_values_out,
-                                       const SubsetList* subset_list = 0 );
+    virtual ErrorCode read_tag_values( const char* file_name, const char* tag_name, const FileOptions& opts,
+                                       std::vector< int >& tag_values_out, const SubsetList* subset_list = 0 );
 
     //! ENTLOCNSEDGE for north/south edge
     //! ENTLOCWEEDGE for west/east edge
@@ -117,28 +115,21 @@ class ReadNC : public ReaderIface
     class VarData
     {
       public:
-        VarData( )
-            : varId( -1 ), numAtts( -1 ), entLoc( ENTLOCSET ), numLev( 0 ), sz( 0 ),
-              has_tsteps( false )
-        {
-        }
-        int     varId;
-        int     numAtts;
-        nc_type varDataType;
-        std::vector< int >
-                                         varDims;  // The dimension indices making up this multi-dimensional variable
+        VarData( ) : varId( -1 ), numAtts( -1 ), entLoc( ENTLOCSET ), numLev( 0 ), sz( 0 ), has_tsteps( false ) {}
+        int                              varId;
+        int                              numAtts;
+        nc_type                          varDataType;
+        std::vector< int >               varDims;  // The dimension indices making up this multi-dimensional variable
         std::map< std::string, AttData > varAtts;
         std::string                      varName;
-        std::vector< Tag >   varTags;  // Tags created for this variable, e.g. one tag per timestep
-        std::vector< void* > varDatas;
-        std::vector< NCDF_SIZE >
-            readStarts;  // Starting index for reading data values along each dimension
-        std::vector< NCDF_SIZE >
-             readCounts;  // Number of data values to be read along each dimension
-        int  entLoc;
-        int  numLev;
-        int  sz;
-        bool has_tsteps;  // Indicate whether timestep numbers are appended to tag names
+        std::vector< Tag >               varTags;  // Tags created for this variable, e.g. one tag per timestep
+        std::vector< void* >             varDatas;
+        std::vector< NCDF_SIZE >         readStarts;  // Starting index for reading data values along each dimension
+        std::vector< NCDF_SIZE >         readCounts;  // Number of data values to be read along each dimension
+        int                              entLoc;
+        int                              numLev;
+        int                              sz;
+        bool                             has_tsteps;  // Indicate whether timestep numbers are appended to tag names
     };
 
     ReadUtilIface* readMeshIface;
@@ -151,8 +142,7 @@ class ReadNC : public ReaderIface
                               const char* prefix = "" );
 
     //! Get all dimensions in the file
-    ErrorCode get_dimensions( int file_id, std::vector< std::string >& dim_names,
-                              std::vector< int >& dim_lens );
+    ErrorCode get_dimensions( int file_id, std::vector< std::string >& dim_names, std::vector< int >& dim_lens );
 
     //! Get the variable names and other info defined for this file
     ErrorCode get_variables( );

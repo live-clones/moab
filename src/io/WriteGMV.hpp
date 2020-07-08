@@ -52,13 +52,12 @@ class WriteGMV : public WriterIface
 
     ErrorCode write_file( const char* filename, const bool overwite, const FileOptions& opts,
                           const EntityHandle* output_sets, const int num_output_sets,
-                          const std::vector< std::string >& qa_list, const Tag* tag_list = NULL,
-                          int num_tags = 0, int requested_dimension = 3 );
+                          const std::vector< std::string >& qa_list, const Tag* tag_list = NULL, int num_tags = 0,
+                          int requested_dimension = 3 );
 
     //! writes out a mesh file
-    ErrorCode write_file( const char* file_name, const EntityHandle output_set,
-                          const int user_dimension = 3, const bool mesh = true,
-                          const bool poly_mesh = true );
+    ErrorCode write_file( const char* file_name, const EntityHandle output_set, const int user_dimension = 3,
+                          const bool mesh = true, const bool poly_mesh = true );
 
   protected:
   private:
@@ -77,8 +76,8 @@ class WriteGMV : public WriterIface
 
     static const char* gmvTypeNames[ MBMAXTYPE ];
 
-    ErrorCode local_write_mesh( const char* file_name, const EntityHandle output_set,
-                                const int user_dimension, const bool mesh, const bool poly_mesh );
+    ErrorCode local_write_mesh( const char* file_name, const EntityHandle output_set, const int user_dimension,
+                                const bool mesh, const bool poly_mesh );
 };
 
 }  // namespace moab

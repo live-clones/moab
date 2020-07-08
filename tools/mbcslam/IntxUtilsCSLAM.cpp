@@ -102,11 +102,11 @@ void IntxUtilsCSLAM::departure_point_case1( CartVect& arrival_point, double t, d
     // formula 35, page 8
     // this will approximate dep point using a Taylor series with up to second derivative
     // this will be O(delta_t^3) exact.
-    double lon_dep = sph.lon - delta_t * u_tilda -
-                     delta_t * delta_t * k * sl2 *
-                         ( sl2 * sin( sph.lat ) * sin( pit ) * omega -
-                           u_tilda * sin( sph.lat ) * cos( pit ) * cos( sph.lon / 2 ) -
-                           v * sl2 * costetha * cos( pit ) );
+    double lon_dep =
+        sph.lon - delta_t * u_tilda -
+        delta_t * delta_t * k * sl2 *
+            ( sl2 * sin( sph.lat ) * sin( pit ) * omega - u_tilda * sin( sph.lat ) * cos( pit ) * cos( sph.lon / 2 ) -
+              v * sl2 * costetha * cos( pit ) );
     // formula 36, page 8 again
     double lat_dep = sph.lat - delta_t * v -
                      delta_t * delta_t / 4 * k *
@@ -149,8 +149,7 @@ ErrorCode IntxUtilsCSLAM::create_span_quads( Interface* mb, EntityHandle euler_s
     // first get all edges adjacent to polygons
     Tag         dpTag = 0;
     std::string tag_name( "DP" );
-    ErrorCode   rval =
-        mb->tag_get_handle( tag_name.c_str( ), 3, MB_TYPE_DOUBLE, dpTag, MB_TAG_DENSE );
+    ErrorCode   rval = mb->tag_get_handle( tag_name.c_str( ), 3, MB_TYPE_DOUBLE, dpTag, MB_TAG_DENSE );
     // if the tag does not exist, get out early
     if( rval != MB_SUCCESS ) return rval;
     Range polygons;
@@ -220,8 +219,7 @@ ErrorCode IntxUtilsCSLAM::create_span_quads( Interface* mb, EntityHandle euler_s
     mb->add_entities( outSet, quads );
 
     Tag colTag;
-    rval =
-        mb->tag_get_handle( "COLOR_ID", 1, MB_TYPE_INTEGER, colTag, MB_TAG_DENSE | MB_TAG_CREAT );
+    rval = mb->tag_get_handle( "COLOR_ID", 1, MB_TYPE_INTEGER, colTag, MB_TAG_DENSE | MB_TAG_CREAT );
     if( MB_SUCCESS != rval ) return rval;
     int j = 1;
     for( Range::iterator itq = quads.begin( ); itq != quads.end( ); ++itq, j++ )
@@ -264,15 +262,13 @@ ErrorCode IntxUtilsCSLAM::create_span_quads( Interface* mb, EntityHandle euler_s
 
 // this simply copies the one mesh set into another, and sets some correlation tags
 // for easy mapping back and forth
-ErrorCode IntxUtilsCSLAM::deep_copy_set( Interface* mb, EntityHandle source_set,
-                                         EntityHandle dest_set )
+ErrorCode IntxUtilsCSLAM::deep_copy_set( Interface* mb, EntityHandle source_set, EntityHandle dest_set )
 {
     // create the handle tag for the corresponding element / vertex
 
     EntityHandle dum = 0;
     Tag          corrTag = 0;  // it will be created here
-    ErrorCode    rval = mb->tag_get_handle( CORRTAGNAME, 1, MB_TYPE_HANDLE, corrTag,
-                                         MB_TAG_DENSE | MB_TAG_CREAT, &dum );MB_CHK_ERR( rval );
+    ErrorCode rval = mb->tag_get_handle( CORRTAGNAME, 1, MB_TYPE_HANDLE, corrTag, MB_TAG_DENSE | MB_TAG_CREAT, &dum );MB_CHK_ERR( rval );
 
     // give the same global id to new verts and cells created in the lagr(departure) mesh
     Tag gid = mb->globalId_tag( );

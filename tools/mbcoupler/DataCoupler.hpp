@@ -61,8 +61,8 @@ class DataCoupler
      * \param init_locator If true, initializes a spatial locator inside the constructor
      * \param dim Dimension of entities to be coupled; if -1, get from source_elems
      */
-    DataCoupler( Interface* impl, Range& source_ents, int coupler_id, ParallelComm* pc = NULL,
-                 bool init_locator = true, int dim = -1 );
+    DataCoupler( Interface* impl, Range& source_ents, int coupler_id, ParallelComm* pc = NULL, bool init_locator = true,
+                 int dim = -1 );
 
     /* Destructor
      */
@@ -84,8 +84,7 @@ class DataCoupler
      * parameters in hs \param store_local If true, stores the located points on SpatialLocator
      */
     ErrorCode locate_points( double* xyz, int num_points, const double rel_iter_tol = 1.0e-10,
-                             const double abs_iter_tol = 1.0e-10,
-                             const double inside_tol = 1.0e-6 );
+                             const double abs_iter_tol = 1.0e-10, const double inside_tol = 1.0e-6 );
 
     /* \brief Locate points on the source mesh
      * This is a pass-through function to SpatialLocator::locate_points
@@ -101,8 +100,7 @@ class DataCoupler
      * mesh entity handle, hs = source mesh entity containing point (0 if not found), pr =
      * parameters in hs \param store_local If true, stores the located points on SpatialLocator
      */
-    ErrorCode locate_points( Range& ents, const double rel_iter_tol = 1.0e-10,
-                             const double abs_iter_tol = 1.0e-10,
+    ErrorCode locate_points( Range& ents, const double rel_iter_tol = 1.0e-10, const double abs_iter_tol = 1.0e-10,
                              const double inside_tol = 1.0e-6 );
 
     /* \brief Interpolate data from the source mesh onto points
@@ -140,8 +138,33 @@ class DataCoupler
      *        input to locate_points
      * \param normalize If true, normalization is done according to method
      */
-    ErrorCode interpolate( /*DataCoupler::Method*/ int method, const std::string& tag_name,
-                           double* interp_vals = NULL, std::vector< int >* point_indices = NULL,
+    ErrorCode interpolate( /*DataCoupler::Method*/ int method, const std::string& tag_name, double* interp_vals = NULL,
+                           std::vector< int >* point_indices = NULL, bool normalize = true );
+
+    /* \brief Interpolate data from multiple tags
+     * All entities/points or, if tuple_list is input, only those points
+     * are interpolated from the source mesh.  Application should
+     * allocate enough memory in interp_vals to hold interpolation results.
+     *
+     * In this variant, multiple tags, possibly with multiple interpolation
+     * methods, are specified.  Sum of values in points_per_method should be
+     * the number of points in tl or, if NULL, targetPts.
+     *
+     * If normalization is requested, technique used depends on the coupling
+     * method.
+     *
+     * \param methods Vector of Interpolation/normalization methods
+     * \param tag_names Names of tag being interpolated for each method
+     * \param points_per_method Number of points for each method
+     * \param num_methods Length of vectors in previous 3 arguments
+     * \param interp_vals Memory holding interpolated data; if NULL, data is written to same tag on
+     * target ents \param point_indices If non-NULL, a set of indices of points input to
+     *        locate_points at which to interpolate; if NULL, interpolates at all points
+     *        input to locate_points
+     * \param normalize If true, normalization is done according to method
+     */
+    ErrorCode interpolate( /*DataCoupler::Method*/ int* methods, const std::string* tag_names, int* points_per_method,
+                           int num_methods, double* interp_vals = NULL, std::vector< int >* point_indices = NULL,
                            bool normalize = true );
 
     /* \brief Interpolate data from multiple tags
@@ -166,35 +189,9 @@ class DataCoupler
      *        input to locate_points
      * \param normalize If true, normalization is done according to method
      */
-    ErrorCode interpolate( /*DataCoupler::Method*/ int* methods, const std::string* tag_names,
-                           int* points_per_method, int num_methods, double* interp_vals = NULL,
-                           std::vector< int >* point_indices = NULL, bool normalize = true );
-
-    /* \brief Interpolate data from multiple tags
-     * All entities/points or, if tuple_list is input, only those points
-     * are interpolated from the source mesh.  Application should
-     * allocate enough memory in interp_vals to hold interpolation results.
-     *
-     * In this variant, multiple tags, possibly with multiple interpolation
-     * methods, are specified.  Sum of values in points_per_method should be
-     * the number of points in tl or, if NULL, targetPts.
-     *
-     * If normalization is requested, technique used depends on the coupling
-     * method.
-     *
-     * \param methods Vector of Interpolation/normalization methods
-     * \param tag_names Names of tag being interpolated for each method
-     * \param points_per_method Number of points for each method
-     * \param num_methods Length of vectors in previous 3 arguments
-     * \param interp_vals Memory holding interpolated data; if NULL, data is written to same tag on
-     * target ents \param point_indices If non-NULL, a set of indices of points input to
-     *        locate_points at which to interpolate; if NULL, interpolates at all points
-     *        input to locate_points
-     * \param normalize If true, normalization is done according to method
-     */
-    ErrorCode interpolate( /*DataCoupler::Method*/ int* methods, Tag* tag_names,
-                           int* points_per_method, int num_methods, double* interp_vals = NULL,
-                           std::vector< int >* point_indices = NULL, bool normalize = true );
+    ErrorCode interpolate( /*DataCoupler::Method*/ int* methods, Tag* tag_names, int* points_per_method,
+                           int num_methods, double* interp_vals = NULL, std::vector< int >* point_indices = NULL,
+                           bool normalize = true );
 
     /* Get functions */
     inline SpatialLocator* spatial_locator( )
@@ -243,9 +240,8 @@ class DataCoupler
     int myDim;
 };
 
-inline ErrorCode DataCoupler::interpolate( /*DataCoupler::Method*/ int method, Tag tag,
-                                           double* interp_vals, std::vector< int >* point_indices,
-                                           bool normalize )
+inline ErrorCode DataCoupler::interpolate( /*DataCoupler::Method*/ int method, Tag tag, double* interp_vals,
+                                           std::vector< int >* point_indices, bool normalize )
 {
     // No point indices input,
     int num_pts = ( point_indices ? point_indices->size( ) : targetEnts.size( ) );

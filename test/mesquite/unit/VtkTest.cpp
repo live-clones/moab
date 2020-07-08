@@ -433,8 +433,7 @@ void VtkTest::check_8hex_structured( Mesh& mesh )
 
 // Check if the 2x2x2 brick of hexes
 // read from file is as expected.
-void VtkTest::check_8hex_block( Mesh&                                       mesh,
-                                std::vector< Mesh::VertexHandle >::iterator connectivity )
+void VtkTest::check_8hex_block( Mesh& mesh, std::vector< Mesh::VertexHandle >::iterator connectivity )
 {
     MsqPrintError err( cout );
     const int     base_corners[] = { 0, 1, 3, 4, 9, 10, 12, 13 };
@@ -483,8 +482,7 @@ void VtkTest::check_4quad_structured( Mesh& mesh )
 
 // Check if the 2x2 brick of quads
 // read from file is as expected.
-void VtkTest::check_4quad_block( Mesh&                                       mesh,
-                                 std::vector< Mesh::VertexHandle >::iterator connectivity )
+void VtkTest::check_4quad_block( Mesh& mesh, std::vector< Mesh::VertexHandle >::iterator connectivity )
 {
     MsqPrintError err( cout );
     const int     base_corners[] = { 0, 1, 3, 4 };
@@ -910,17 +908,14 @@ void VtkTest::test_read_quadratic( const char* filename )
     mesh.elements_get_topologies( arrptr( elems ), types, NUM_ELEM, err );
     ASSERT_NO_ERROR( err );
 
-    static const double   hex_corners[] = { 1.0,  -1.0, -1.0, 1.0,  1.0, -1.0, -1.0, 1.0,
-                                          -1.0, -1.0, -1.0, -1.0, 1.0, -1.0, 1.0,  1.0,
-                                          1.0,  1.0,  -1.0, 1.0,  1.0, -1.0, -1.0, 1.0 };
-    static const double   tet_corners[] = { 1.0,  -1.0, -1.0, 1.0, 1.0, -1.0,
-                                          -1.0, 0.0,  -1.0, 0.0, 0.0, 1.0 };
+    static const double   hex_corners[] = { 1.0, -1.0, -1.0, 1.0, 1.0, -1.0, -1.0, 1.0, -1.0, -1.0, -1.0, -1.0,
+                                          1.0, -1.0, 1.0,  1.0, 1.0, 1.0,  -1.0, 1.0, 1.0,  -1.0, -1.0, 1.0 };
+    static const double   tet_corners[] = { 1.0, -1.0, -1.0, 1.0, 1.0, -1.0, -1.0, 0.0, -1.0, 0.0, 0.0, 1.0 };
     static const double   pyr_corners[] = { 1.0,  -1.0, -1.0, 1.0,  1.0, -1.0, -1.0, 1.0,
                                           -1.0, -1.0, -1.0, -1.0, 0.0, 0.0,  1.0 };
     static const double   pri_corners[] = { -1.0, -1.0, -1.0, 1.0, 1.0, -1.0, -1.0, 1.0, -1.0,
                                           -1.0, -1.0, 1.0,  1.0, 1.0, 1.0,  -1.0, 1.0, 1.0 };
-    static const unsigned hex_edges[] = { 0, 1, 1, 2, 2, 3, 3, 0, 0, 4, 1, 5,
-                                          2, 6, 3, 7, 4, 5, 5, 6, 6, 7, 7, 4 };
+    static const unsigned hex_edges[] = { 0, 1, 1, 2, 2, 3, 3, 0, 0, 4, 1, 5, 2, 6, 3, 7, 4, 5, 5, 6, 6, 7, 7, 4 };
     static const unsigned tet_edges[] = { 0, 1, 1, 2, 2, 0, 0, 3, 1, 3, 2, 3 };
     static const unsigned pri_edges[] = { 0, 1, 1, 2, 2, 0, 0, 3, 1, 4, 2, 5, 3, 4, 4, 5, 5, 3 };
     static const unsigned pyr_edges[] = { 0, 1, 1, 2, 2, 3, 3, 0, 0, 4, 1, 4, 2, 4, 3, 4 };
@@ -936,15 +931,14 @@ void VtkTest::test_read_quadratic( const char* filename )
         const double*   corners;
         const unsigned* edges;
         const unsigned* faces;
-    } expected_elems[ NUM_ELEM ] = {
-        { MBMesquite::HEXAHEDRON, 8, 12, 0, 0, hex_corners, hex_edges, hex_faces },
-        { MBMesquite::HEXAHEDRON, 8, 12, 6, 1, hex_corners, hex_edges, hex_faces },
-        { MBMesquite::TETRAHEDRON, 4, 6, 0, 0, tet_corners, tet_edges, 0 },
-        { MBMesquite::QUADRILATERAL, 4, 4, 0, 0, hex_corners, hex_edges, 0 },
-        { MBMesquite::QUADRILATERAL, 4, 4, 0, 1, hex_corners, hex_edges, 0 },
-        { MBMesquite::TRIANGLE, 3, 3, 0, 0, tet_corners, tet_edges, 0 },
-        { MBMesquite::PRISM, 6, 9, 0, 0, pri_corners, pri_edges, 0 },
-        { MBMesquite::PYRAMID, 5, 8, 0, 0, pyr_corners, pyr_edges, 0 } };
+    } expected_elems[ NUM_ELEM ] = { { MBMesquite::HEXAHEDRON, 8, 12, 0, 0, hex_corners, hex_edges, hex_faces },
+                                     { MBMesquite::HEXAHEDRON, 8, 12, 6, 1, hex_corners, hex_edges, hex_faces },
+                                     { MBMesquite::TETRAHEDRON, 4, 6, 0, 0, tet_corners, tet_edges, 0 },
+                                     { MBMesquite::QUADRILATERAL, 4, 4, 0, 0, hex_corners, hex_edges, 0 },
+                                     { MBMesquite::QUADRILATERAL, 4, 4, 0, 1, hex_corners, hex_edges, 0 },
+                                     { MBMesquite::TRIANGLE, 3, 3, 0, 0, tet_corners, tet_edges, 0 },
+                                     { MBMesquite::PRISM, 6, 9, 0, 0, pri_corners, pri_edges, 0 },
+                                     { MBMesquite::PYRAMID, 5, 8, 0, 0, pyr_corners, pyr_edges, 0 } };
 
     MsqVertex                                   have;
     std::vector< Mesh::VertexHandle >::iterator v_it = conn.begin( );
@@ -1082,8 +1076,7 @@ void VtkTest::test_elements( )
     size_t num_vertices = pd.num_nodes( );
     CPPUNIT_ASSERT( num_vertices == 7 );
 
-    CPPUNIT_ASSERT( tri_check_validity( element_array, num_elements, vtx_array, num_vertices ) ==
-                    1 );
+    CPPUNIT_ASSERT( tri_check_validity( element_array, num_elements, vtx_array, num_vertices ) == 1 );
 
     patches.get_next_patch( pd, err );
     ASSERT_NO_ERROR( err );
@@ -1098,13 +1091,11 @@ void VtkTest::test_elements( )
     num_vertices = pd.num_nodes( );
     CPPUNIT_ASSERT( num_vertices == 7 );
 
-    CPPUNIT_ASSERT( tri_check_validity( element_array, num_elements, vtx_array, num_vertices ) ==
-                    1 );
+    CPPUNIT_ASSERT( tri_check_validity( element_array, num_elements, vtx_array, num_vertices ) == 1 );
 }
 
-int VtkTest::tri_check_validity( const MBMesquite::MsqMeshEntity* element_array,
-                                 size_t num_elements, const MBMesquite::MsqVertex* vtx_array,
-                                 size_t num_vertices )
+int VtkTest::tri_check_validity( const MBMesquite::MsqMeshEntity* element_array, size_t num_elements,
+                                 const MBMesquite::MsqVertex* vtx_array, size_t num_vertices )
 {
 
     /* check that the simplicial mesh is still valid,
@@ -1144,8 +1135,8 @@ int VtkTest::tri_check_validity( const MBMesquite::MsqMeshEntity* element_array,
     return ( valid );
 }
 
-int VtkTest::tet_validity_check( const MBMesquite::MsqMeshEntity* element_array,
-                                 size_t num_elements, const MBMesquite::MsqVertex* vtx_array )
+int VtkTest::tet_validity_check( const MBMesquite::MsqMeshEntity* element_array, size_t num_elements,
+                                 const MBMesquite::MsqVertex* vtx_array )
 {
     int                   valid = 1;
     double                dEps = 1.e-13;
@@ -1185,22 +1176,16 @@ int VtkTest::tet_validity_check( const MBMesquite::MsqMeshEntity* element_array,
         double dDZ4 = z4 - z1;
 
         /* dDet is proportional to the cell volume */
-        double dDet = dDX2 * dDY3 * dDZ4 + dDX3 * dDY4 * dDZ2 + dDX4 * dDY2 * dDZ3 -
-                      dDZ2 * dDY3 * dDX4 - dDZ3 * dDY4 * dDX2 - dDZ4 * dDY2 * dDX3;
+        double dDet = dDX2 * dDY3 * dDZ4 + dDX3 * dDY4 * dDZ2 + dDX4 * dDY2 * dDZ3 - dDZ2 * dDY3 * dDX4 -
+                      dDZ3 * dDY4 * dDX2 - dDZ4 * dDY2 * dDX3;
 
         /* Compute a length scale based on edge lengths. */
-        double dScale = ( sqrt( ( x1 - x2 ) * ( x1 - x2 ) + ( y1 - y2 ) * ( y1 - y2 ) +
-                                ( z1 - z2 ) * ( z1 - z2 ) ) +
-                          sqrt( ( x1 - x3 ) * ( x1 - x3 ) + ( y1 - y3 ) * ( y1 - y3 ) +
-                                ( z1 - z3 ) * ( z1 - z3 ) ) +
-                          sqrt( ( x1 - x4 ) * ( x1 - x4 ) + ( y1 - y4 ) * ( y1 - y4 ) +
-                                ( z1 - z4 ) * ( z1 - z4 ) ) +
-                          sqrt( ( x2 - x3 ) * ( x2 - x3 ) + ( y2 - y3 ) * ( y2 - y3 ) +
-                                ( z2 - z3 ) * ( z2 - z3 ) ) +
-                          sqrt( ( x2 - x4 ) * ( x2 - x4 ) + ( y2 - y4 ) * ( y2 - y4 ) +
-                                ( z2 - z4 ) * ( z2 - z4 ) ) +
-                          sqrt( ( x3 - x4 ) * ( x3 - x4 ) + ( y3 - y4 ) * ( y3 - y4 ) +
-                                ( z3 - z4 ) * ( z3 - z4 ) ) ) /
+        double dScale = ( sqrt( ( x1 - x2 ) * ( x1 - x2 ) + ( y1 - y2 ) * ( y1 - y2 ) + ( z1 - z2 ) * ( z1 - z2 ) ) +
+                          sqrt( ( x1 - x3 ) * ( x1 - x3 ) + ( y1 - y3 ) * ( y1 - y3 ) + ( z1 - z3 ) * ( z1 - z3 ) ) +
+                          sqrt( ( x1 - x4 ) * ( x1 - x4 ) + ( y1 - y4 ) * ( y1 - y4 ) + ( z1 - z4 ) * ( z1 - z4 ) ) +
+                          sqrt( ( x2 - x3 ) * ( x2 - x3 ) + ( y2 - y3 ) * ( y2 - y3 ) + ( z2 - z3 ) * ( z2 - z3 ) ) +
+                          sqrt( ( x2 - x4 ) * ( x2 - x4 ) + ( y2 - y4 ) * ( y2 - y4 ) + ( z2 - z4 ) * ( z2 - z4 ) ) +
+                          sqrt( ( x3 - x4 ) * ( x3 - x4 ) + ( y3 - y4 ) * ( y3 - y4 ) + ( z3 - z4 ) * ( z3 - z4 ) ) ) /
                         6.;
 
         /* Use the length scale to get a better idea if the tet is flat or

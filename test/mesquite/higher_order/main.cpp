@@ -107,12 +107,10 @@ using namespace MBMesquite;
      (12)-----(37)-----(13)-----(38)-----(14)-----(39)-----(15)
 */
 
-std::string LINEAR_INPUT_FILE_NAME = std::string( STRINGIFY( SRCDIR ) ) + "/linear_input.vtk";
-std::string QUADRATIC_INPUT_FILE_NAME = std::string( STRINGIFY( SRCDIR ) ) + "/quadratic_input.vtk";
-std::string EXPECTED_LINAR_FILE_NAME =
-    std::string( STRINGIFY( SRCDIR ) ) + "/expected_linear_output.vtk";
-std::string EXPECTED_QUADRATIC_FILE_NAME =
-    std::string( STRINGIFY( SRCDIR ) ) + "/expected_quadratic_output.vtk";
+std::string    LINEAR_INPUT_FILE_NAME = std::string( STRINGIFY( SRCDIR ) ) + "/linear_input.vtk";
+std::string    QUADRATIC_INPUT_FILE_NAME = std::string( STRINGIFY( SRCDIR ) ) + "/quadratic_input.vtk";
+std::string    EXPECTED_LINAR_FILE_NAME = std::string( STRINGIFY( SRCDIR ) ) + "/expected_linear_output.vtk";
+std::string    EXPECTED_QUADRATIC_FILE_NAME = std::string( STRINGIFY( SRCDIR ) ) + "/expected_quadratic_output.vtk";
 std::string    HOUR_INPUT_FILE_NAME = std::string( STRINGIFY( SRCDIR ) ) + "/hour-quad8.vtk";
 std::string    OUTPUT_FILE_NAME = "smoothed_qudratic_mesh.vtk";
 const unsigned NUM_CORNER_VERTICES = 16;
@@ -187,11 +185,9 @@ void compare_nodes( size_t start_index, size_t end_index, Mesh* mesh1, Mesh* mes
         if( diff > SPATIAL_COMPARE_TOLERANCE )
         {
             MSQ_SETERR( err )
-            ( MsqError::INTERNAL_ERROR, "%u%s vertices differ. (%f,%f,%f) vs (%f,%f,%f)",
-              (unsigned)( 1 + i ),
-              i % 10 == 0 ? "st" : i % 10 == 1 ? "nd" : i % 10 == 2 ? "rd" : "th", verts1[ i ][ 0 ],
-              verts1[ i ][ 1 ], verts1[ i ][ 2 ], verts2[ i ][ 0 ], verts2[ i ][ 1 ],
-              verts2[ i ][ 2 ] );
+            ( MsqError::INTERNAL_ERROR, "%u%s vertices differ. (%f,%f,%f) vs (%f,%f,%f)", (unsigned)( 1 + i ),
+              i % 10 == 0 ? "st" : i % 10 == 1 ? "nd" : i % 10 == 2 ? "rd" : "th", verts1[ i ][ 0 ], verts1[ i ][ 1 ],
+              verts1[ i ][ 2 ], verts2[ i ][ 0 ], verts2[ i ][ 1 ], verts2[ i ][ 2 ] );
             return;
         }
     }
@@ -313,8 +309,7 @@ int do_test( bool slave )
     delete linear_ex;
 
     // Make sure mid-side vertices are updated correctly
-    compare_nodes( NUM_CORNER_VERTICES, NUM_CORNER_VERTICES + NUM_MID_NODES, quadratic_in_2,
-                   quadratic_ex, err );
+    compare_nodes( NUM_CORNER_VERTICES, NUM_CORNER_VERTICES + NUM_MID_NODES, quadratic_in_2, quadratic_ex, err );
     if( MSQ_CHKERR( err ) )
     {
         MsqError tmperr;

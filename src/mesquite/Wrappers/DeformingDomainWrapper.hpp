@@ -219,8 +219,8 @@ class DeformingDomainWrapper : public Wrapper
 
   protected:
     MESQUITE_EXPORT
-    void run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh, Settings* settings,
-                      QualityAssessor* qa, MsqError& err );
+    void run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh, Settings* settings, QualityAssessor* qa,
+                      MsqError& err );
 
     MESQUITE_EXPORT
     void move_to_domain( Mesh* mesh, MeshDomain* geom, MsqError& err );
@@ -315,8 +315,8 @@ class DeformingCurveSmoother
      *\param geometry The curve or 1D domain geometry.
      */
     MESQUITE_EXPORT
-    void store_initial_mesh( Mesh* mesh_instance, const Mesh::VertexHandle* vertex_array,
-                             int vertex_array_length, CurveDomain* geometry, MsqError& err );
+    void store_initial_mesh( Mesh* mesh_instance, const Mesh::VertexHandle* vertex_array, int vertex_array_length,
+                             CurveDomain* geometry, MsqError& err );
 
     /**\brief Redistribute vertices along a curve or 1D domain.
      *
@@ -347,8 +347,8 @@ class DeformingCurveSmoother
      *               vertices and mesh instance before any deformation.
      */
     MESQUITE_EXPORT
-    void smooth_curve( Mesh* mesh_instance, const Mesh::VertexHandle* vertex_array,
-                       int vertex_array_length, CurveDomain* geometry, Scheme type, MsqError& err );
+    void smooth_curve( Mesh* mesh_instance, const Mesh::VertexHandle* vertex_array, int vertex_array_length,
+                       CurveDomain* geometry, Scheme type, MsqError& err );
 
   private:
     Scheme      metricType;

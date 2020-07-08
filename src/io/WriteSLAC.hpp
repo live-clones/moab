@@ -62,8 +62,8 @@ class WriteSLAC : public WriterIface
     //! writes out a file
     ErrorCode write_file( const char* file_name, const bool overwrite, const FileOptions& opts,
                           const EntityHandle* output_list, const int num_sets,
-                          const std::vector< std::string >& qa_list, const Tag* tag_list = NULL,
-                          int num_tags = 0, int export_dimension = 3 );
+                          const std::vector< std::string >& qa_list, const Tag* tag_list = NULL, int num_tags = 0,
+                          int export_dimension = 3 );
 
     //! struct used to hold data for each block to be output; used by
     //! initialize_file to initialize the file header for increased speed
@@ -120,8 +120,7 @@ class WriteSLAC : public WriterIface
         Range        nodes;
 
         MeshInfo( )
-            : num_dim( 0 ), num_nodes( 0 ), num_elements( 0 ), num_matsets( 0 ), num_int_hexes( 0 ),
-              num_int_tets( 0 )
+            : num_dim( 0 ), num_nodes( 0 ), num_elements( 0 ), num_matsets( 0 ), num_int_hexes( 0 ), num_int_tets( 0 )
         {
         }
     };
@@ -145,13 +144,11 @@ class WriteSLAC : public WriterIface
 
     Tag mEntityMark;  // used to say whether an entity will be exported
 
-    ErrorCode gather_mesh_information( MeshInfo&                        mesh_info,
-                                       std::vector< MaterialSetData >&  matset_info,
+    ErrorCode gather_mesh_information( MeshInfo& mesh_info, std::vector< MaterialSetData >& matset_info,
                                        std::vector< NeumannSetData >&   neuset_info,
                                        std::vector< DirichletSetData >& dirset_info,
-                                       std::vector< EntityHandle >&     matsets,
-                                       std::vector< EntityHandle >&     neusets,
-                                       std::vector< EntityHandle >&     dirsets );
+                                       std::vector< EntityHandle >& matsets, std::vector< EntityHandle >& neusets,
+                                       std::vector< EntityHandle >& dirsets );
 
     ErrorCode initialize_file( MeshInfo& mesh_info );
 
@@ -160,17 +157,14 @@ class WriteSLAC : public WriterIface
     ErrorCode write_matsets( MeshInfo& mesh_info, std::vector< MaterialSetData >& matset_data,
                              std::vector< NeumannSetData >& neuset_data );
 
-    ErrorCode get_valid_sides( Range& elems, const int sense,
-                               WriteSLAC::NeumannSetData& sideset_data );
+    ErrorCode get_valid_sides( Range& elems, const int sense, WriteSLAC::NeumannSetData& sideset_data );
 
     void reset_matset( std::vector< MaterialSetData >& matset_info );
 
-    ErrorCode get_neuset_elems( EntityHandle neuset, int current_sense, Range& forward_elems,
-                                Range& reverse_elems );
+    ErrorCode get_neuset_elems( EntityHandle neuset, int current_sense, Range& forward_elems, Range& reverse_elems );
 
-    ErrorCode gather_interior_exterior( MeshInfo&                       mesh_info,
-                                        std::vector< MaterialSetData >& matset_data,
-                                        std::vector< NeumannSetData >&  neuset_data );
+    ErrorCode gather_interior_exterior( MeshInfo& mesh_info, std::vector< MaterialSetData >& matset_data,
+                                        std::vector< NeumannSetData >& neuset_data );
 };
 
 }  // namespace moab

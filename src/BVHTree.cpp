@@ -8,8 +8,7 @@ namespace moab
 {
 const char* BVHTree::treeName = "BVHTree";
 
-ErrorCode BVHTree::build_tree( const Range& entities, EntityHandle* tree_root_set,
-                               FileOptions* options )
+ErrorCode BVHTree::build_tree( const Range& entities, EntityHandle* tree_root_set, FileOptions* options )
 {
     ErrorCode rval;
     CpuTimer  cp;
@@ -44,8 +43,7 @@ ErrorCode BVHTree::build_tree( const Range& entities, EntityHandle* tree_root_se
     if( MB_SUCCESS != rval ) return rval;
 
 #ifndef NDEBUG
-    for( std::vector< HandleData >::const_iterator i = handle_data_vec.begin( );
-         i != handle_data_vec.end( ); ++i )
+    for( std::vector< HandleData >::const_iterator i = handle_data_vec.begin( ); i != handle_data_vec.end( ); ++i )
     {
         if( !boundBox.intersects_box( i->myBox, 0 ) )
         {
@@ -59,20 +57,17 @@ ErrorCode BVHTree::build_tree( const Range& entities, EntityHandle* tree_root_se
     {
         // initially all bits are set
         tree_nodes.push_back( Node( ) );
-        const int depth = local_build_tree( tree_nodes, handle_data_vec.begin( ),
-                                            handle_data_vec.end( ), 0, boundBox );
+        const int depth = local_build_tree( tree_nodes, handle_data_vec.begin( ), handle_data_vec.end( ), 0, boundBox );
 #ifndef NDEBUG
         std::set< EntityHandle > entity_handles;
         for( std::vector< Node >::iterator n = tree_nodes.begin( ); n != tree_nodes.end( ); ++n )
         {
-            for( HandleDataVec::const_iterator j = n->entities.begin( ); j != n->entities.end( );
-                 ++j )
+            for( HandleDataVec::const_iterator j = n->entities.begin( ); j != n->entities.end( ); ++j )
             {
                 entity_handles.insert( j->myHandle );
             }
         }
-        if( entity_handles.size( ) != entities.size( ) )
-        { std::cout << "Entity Handle Size Mismatch!" << std::endl; }
+        if( entity_handles.size( ) != entities.size( ) ) { std::cout << "Entity Handle Size Mismatch!" << std::endl; }
         for( Range::iterator i = entities.begin( ); i != entities.end( ); ++i )
         {
             if( entity_handles.find( *i ) == entity_handles.end( ) )
@@ -102,8 +97,7 @@ ErrorCode BVHTree::convert_tree( std::vector< Node >& tree_nodes )
 
     {  // isolate potentially-large std::vector so it gets deleted earlier
         std::vector< unsigned int > tmp_flags( tree_nodes.size( ), meshsetFlags );
-        rval =
-            read_util->create_entity_sets( tree_nodes.size( ), &tmp_flags[ 0 ], 0, startSetHandle );
+        rval = read_util->create_entity_sets( tree_nodes.size( ), &tmp_flags[ 0 ], 0, startSetHandle );
         if( MB_SUCCESS != rval ) return rval;
         rval = mbImpl->release_interface( read_util );
         if( MB_SUCCESS != rval ) return rval;
@@ -118,8 +112,7 @@ ErrorCode BVHTree::convert_tree( std::vector< Node >& tree_nodes )
         if( it != tree_nodes.begin( ) && !it->entities.empty( ) )
         {
             Range range;
-            for( HandleDataVec::iterator hit = it->entities.begin( ); hit != it->entities.end( );
-                 ++hit )
+            for( HandleDataVec::iterator hit = it->entities.begin( ); hit != it->entities.end( ); ++hit )
                 range.insert( hit->myHandle );
             rval = mbImpl->add_entities( set_handle, range );
             if( MB_SUCCESS != rval ) return rval;
@@ -151,9 +144,8 @@ ErrorCode BVHTree::parse_options( FileOptions& opts )
     return MB_SUCCESS;
 }
 
-void BVHTree::establish_buckets( HandleDataVec::const_iterator begin,
-                                 HandleDataVec::const_iterator end, const BoundBox& interval,
-                                 std::vector< std::vector< Bucket > >& buckets ) const
+void BVHTree::establish_buckets( HandleDataVec::const_iterator begin, HandleDataVec::const_iterator end,
+                                 const BoundBox& interval, std::vector< std::vector< Bucket > >& buckets ) const
 {
     // put each element into its bucket
     for( HandleDataVec::const_iterator i = begin; i != end; ++i )
@@ -182,8 +174,7 @@ void BVHTree::establish_buckets( HandleDataVec::const_iterator begin,
         {
             const unsigned int index = Bucket::bucket_index( splitsPerDir, box, interval, dim );
             Bucket&            bucket = buckets[ dim ][ index ];
-            if( !bucket.boundingBox.intersects_box( box ) )
-                std::cerr << "Buckets not covering elements!" << std::endl;
+            if( !bucket.boundingBox.intersects_box( box ) ) std::cerr << "Buckets not covering elements!" << std::endl;
         }
     }
     if( !elt_union.intersects_box( interval ) )
@@ -202,8 +193,7 @@ void BVHTree::establish_buckets( HandleDataVec::const_iterator begin,
         std::vector< unsigned int >  nonempty;
         const std::vector< Bucket >& buckets_ = buckets[ d ];
         unsigned int                 j = 0;
-        for( std::vector< Bucket >::const_iterator i = buckets_.begin( ); i != buckets_.end( );
-             ++i, ++j )
+        for( std::vector< Bucket >::const_iterator i = buckets_.begin( ); i != buckets_.end( ); ++i, ++j )
         {
             if( i->mySize > 0 ) { nonempty.push_back( j ); }
         }
@@ -212,8 +202,7 @@ void BVHTree::establish_buckets( HandleDataVec::const_iterator begin,
             test_box.update( buckets_[ nonempty[ i ] ].boundingBox );
 
         if( !test_box.intersects_box( interval ) )
-            std::cout << "union of buckets in dimension: " << d << "does not contain original box!"
-                      << std::endl;
+            std::cout << "union of buckets in dimension: " << d << "does not contain original box!" << std::endl;
         if( !interval.intersects_box( test_box ) )
         {
             std::cout << "original box does "
@@ -226,8 +215,7 @@ void BVHTree::establish_buckets( HandleDataVec::const_iterator begin,
 }
 
 void BVHTree::initialize_splits( std::vector< std::vector< SplitData > >&    splits,
-                                 const std::vector< std::vector< Bucket > >& buckets,
-                                 const SplitData&                            data ) const
+                                 const std::vector< std::vector< Bucket > >& buckets, const SplitData& data ) const
 {
     for( unsigned int d = 0; d < 3; ++d )
     {
@@ -276,8 +264,7 @@ void BVHTree::initialize_splits( std::vector< std::vector< SplitData > >&    spl
     }
 }
 
-void BVHTree::median_order( HandleDataVec::iterator& begin, HandleDataVec::iterator& end,
-                            SplitData& data ) const
+void BVHTree::median_order( HandleDataVec::iterator& begin, HandleDataVec::iterator& end, SplitData& data ) const
 {
     int dim = data.dim;
     for( HandleDataVec::iterator i = begin; i != end; ++i )
@@ -319,12 +306,10 @@ void BVHTree::median_order( HandleDataVec::iterator& begin, HandleDataVec::itera
 #endif
 }
 
-void BVHTree::find_split( HandleDataVec::iterator& begin, HandleDataVec::iterator& end,
-                          SplitData& data ) const
+void BVHTree::find_split( HandleDataVec::iterator& begin, HandleDataVec::iterator& end, SplitData& data ) const
 {
     std::vector< std::vector< Bucket > >    buckets( 3, std::vector< Bucket >( splitsPerDir + 1 ) );
-    std::vector< std::vector< SplitData > > splits(
-        3, std::vector< SplitData >( splitsPerDir, data ) );
+    std::vector< std::vector< SplitData > > splits( 3, std::vector< SplitData >( splitsPerDir, data ) );
 
     const BoundBox interval = data.boundingBox;
     establish_buckets( begin, end, interval, buckets );
@@ -394,14 +379,10 @@ void BVHTree::find_split( HandleDataVec::iterator& begin, HandleDataVec::iterato
             }
         }
     }
-    if( !left_box.intersects_box( data.leftBox ) )
-        std::cout << "left elts do not contain left box" << std::endl;
-    if( !data.leftBox.intersects_box( left_box ) )
-        std::cout << "left box does not contain left elts" << std::endl;
-    if( !right_box.intersects_box( data.rightBox ) )
-        std::cout << "right elts do not contain right box" << std::endl;
-    if( !data.rightBox.intersects_box( right_box ) )
-        std::cout << "right box do not contain right elts" << std::endl;
+    if( !left_box.intersects_box( data.leftBox ) ) std::cout << "left elts do not contain left box" << std::endl;
+    if( !data.leftBox.intersects_box( left_box ) ) std::cout << "left box does not contain left elts" << std::endl;
+    if( !right_box.intersects_box( data.rightBox ) ) std::cout << "right elts do not contain right box" << std::endl;
+    if( !data.rightBox.intersects_box( right_box ) ) std::cout << "right box do not contain right elts" << std::endl;
 
     if( count_left != data.nl || count_right != data.nr )
     {
@@ -409,9 +390,7 @@ void BVHTree::find_split( HandleDataVec::iterator& begin, HandleDataVec::iterato
         std::cerr << "total: " << std::distance( begin, end ) << std::endl;
         std::cerr << "Dim: " << data.dim << std::endl;
         std::cerr << data.Lmax << " , " << data.Rmin << std::endl;
-        std::cerr << "Right box: " << std::endl
-                  << data.rightBox << "Left box: " << std::endl
-                  << data.leftBox;
+        std::cerr << "Right box: " << std::endl << data.rightBox << "Left box: " << std::endl << data.leftBox;
         std::cerr << "supposed to be: " << data.nl << " " << data.nr << std::endl;
         std::cerr << "accountant says: " << count_left << " " << count_right << std::endl;
         std::exit( -1 );
@@ -420,8 +399,7 @@ void BVHTree::find_split( HandleDataVec::iterator& begin, HandleDataVec::iterato
 }
 
 int BVHTree::local_build_tree( std::vector< Node >& tree_nodes, HandleDataVec::iterator begin,
-                               HandleDataVec::iterator end, const int index, const BoundBox& box,
-                               const int depth )
+                               HandleDataVec::iterator end, const int index, const BoundBox& box, const int depth )
 {
 #ifndef NDEBUG
     for( HandleDataVec::const_iterator i = begin; i != end; ++i )
@@ -453,11 +431,9 @@ int BVHTree::local_build_tree( std::vector< Node >& tree_nodes, HandleDataVec::i
         tree_nodes.push_back( Node( ) );
         tree_nodes.push_back( Node( ) );
         const int left_depth =
-            local_build_tree( tree_nodes, begin, begin + data.nl, tree_nodes[ index ].child,
-                              data.leftBox, depth + 1 );
-        const int right_depth =
-            local_build_tree( tree_nodes, begin + data.nl, end, tree_nodes[ index ].child + 1,
-                              data.rightBox, depth + 1 );
+            local_build_tree( tree_nodes, begin, begin + data.nl, tree_nodes[ index ].child, data.leftBox, depth + 1 );
+        const int right_depth = local_build_tree( tree_nodes, begin + data.nl, end, tree_nodes[ index ].child + 1,
+                                                  data.rightBox, depth + 1 );
         return std::max( left_depth, right_depth );
     }
 
@@ -466,9 +442,8 @@ int BVHTree::local_build_tree( std::vector< Node >& tree_nodes, HandleDataVec::i
     return depth;
 }
 
-ErrorCode BVHTree::find_point( const std::vector< double >& point, const unsigned int& index,
-                               const double iter_tol, const double inside_tol,
-                               std::pair< EntityHandle, CartVect >& result )
+ErrorCode BVHTree::find_point( const std::vector< double >& point, const unsigned int& index, const double iter_tol,
+                               const double inside_tol, std::pair< EntityHandle, CartVect >& result )
 {
     if( index == 0 ) treeStats.numTraversals++;
     const TreeNode& node = myTree[ index ];
@@ -507,11 +482,9 @@ ErrorCode BVHTree::find_point( const std::vector< double >& point, const unsigne
     if( ( node.Lmax + iter_tol ) < ( node.Rmin - iter_tol ) )
     {
         if( point[ node.dim ] <= ( node.Lmax + iter_tol ) )
-            return find_point( point, children[ 0 ] - startSetHandle, iter_tol, inside_tol,
-                               result );
+            return find_point( point, children[ 0 ] - startSetHandle, iter_tol, inside_tol, result );
         else if( point[ node.dim ] >= ( node.Rmin - iter_tol ) )
-            return find_point( point, children[ 1 ] - startSetHandle, iter_tol, inside_tol,
-                               result );
+            return find_point( point, children[ 1 ] - startSetHandle, iter_tol, inside_tol, result );
         result = std::make_pair( 0, CartVect( &point[ 0 ] ) );  // point lies in empty space.
         return MB_SUCCESS;
     }
@@ -545,8 +518,7 @@ ErrorCode BVHTree::find_point( const std::vector< double >& point, const unsigne
     return MB_SUCCESS;
 }
 
-EntityHandle BVHTree::bruteforce_find( const double* point, const double iter_tol,
-                                       const double inside_tol )
+EntityHandle BVHTree::bruteforce_find( const double* point, const double iter_tol, const double inside_tol )
 {
     treeStats.numTraversals++;
     CartVect params;
@@ -557,9 +529,8 @@ EntityHandle BVHTree::bruteforce_find( const double* point, const double iter_to
         {
             EntityHandle entity = 0;
             treeStats.leavesVisited++;
-            ErrorCode rval = myEval->find_containing_entity( startSetHandle + i, point, iter_tol,
-                                                             inside_tol, entity, params.array( ),
-                                                             &treeStats.traversalLeafObjectTests );
+            ErrorCode rval = myEval->find_containing_entity( startSetHandle + i, point, iter_tol, inside_tol, entity,
+                                                             params.array( ), &treeStats.traversalLeafObjectTests );
             if( entity )
                 return entity;
             else if( MB_SUCCESS != rval )
@@ -587,15 +558,14 @@ ErrorCode BVHTree::get_bounding_box( BoundBox& box, EntityHandle* tree_node ) co
 }
 
 ErrorCode BVHTree::point_search( const double* point, EntityHandle& leaf_out, const double iter_tol,
-                                 const double inside_tol, bool* multiple_leaves,
-                                 EntityHandle* start_node, CartVect* params )
+                                 const double inside_tol, bool* multiple_leaves, EntityHandle* start_node,
+                                 CartVect* params )
 {
     treeStats.numTraversals++;
 
     EntityHandle this_set = ( start_node ? *start_node : startSetHandle );
     // convoluted check because the root is different from startSetHandle
-    if( this_set != myRoot &&
-        ( this_set < startSetHandle || this_set >= startSetHandle + myTree.size( ) ) )
+    if( this_set != myRoot && ( this_set < startSetHandle || this_set >= startSetHandle + myTree.size( ) ) )
         return MB_FAILURE;
     else if( this_set == myRoot )
         this_set = startSetHandle;
@@ -627,9 +597,8 @@ ErrorCode BVHTree::point_search( const double* point, EntityHandle& leaf_out, co
         }
         else if( myTree[ ind ].dim == 3 && myEval && params )
         {
-            rval = myEval->find_containing_entity( startSetHandle + ind, point, iter_tol,
-                                                   inside_tol, leaf_out, params->array( ),
-                                                   &treeStats.traversalLeafObjectTests );
+            rval = myEval->find_containing_entity( startSetHandle + ind, point, iter_tol, inside_tol, leaf_out,
+                                                   params->array( ), &treeStats.traversalLeafObjectTests );
             if( leaf_out || MB_SUCCESS != rval ) return rval;
         }
         else
@@ -647,14 +616,12 @@ ErrorCode BVHTree::point_search( const double* point, EntityHandle& leaf_out, co
 ErrorCode BVHTree::distance_search( const double from_point[ 3 ], const double distance,
                                     std::vector< EntityHandle >& result_list, const double iter_tol,
                                     const double inside_tol, std::vector< double >* result_dists,
-                                    std::vector< CartVect >* result_params,
-                                    EntityHandle*            tree_root )
+                                    std::vector< CartVect >* result_params, EntityHandle* tree_root )
 {
     // non-NULL root should be in tree
     // convoluted check because the root is different from startSetHandle
     EntityHandle this_set = ( tree_root ? *tree_root : startSetHandle );
-    if( this_set != myRoot &&
-        ( this_set < startSetHandle || this_set >= startSetHandle + myTree.size( ) ) )
+    if( this_set != myRoot && ( this_set < startSetHandle || this_set >= startSetHandle + myTree.size( ) ) )
         return MB_FAILURE;
     else if( this_set == myRoot )
         this_set = startSetHandle;
@@ -702,9 +669,8 @@ ErrorCode BVHTree::distance_search( const double from_point[ 3 ], const double d
         {
             EntityHandle ent;
             CartVect     params;
-            rval = myEval->find_containing_entity( startSetHandle + ind, from_point, iter_tol,
-                                                   inside_tol, ent, params.array( ),
-                                                   &treeStats.traversalLeafObjectTests );
+            rval = myEval->find_containing_entity( startSetHandle + ind, from_point, iter_tol, inside_tol, ent,
+                                                   params.array( ), &treeStats.traversalLeafObjectTests );
             if( MB_SUCCESS != rval )
                 return rval;
             else if( ent )
@@ -731,9 +697,8 @@ ErrorCode BVHTree::print_nodes( std::vector< Node >& nodes )
     std::vector< Node >::iterator it;
     for( it = nodes.begin( ), i = 0; it != nodes.end( ); ++it, i++ )
     {
-        std::cout << "Node " << i << ": dim = " << it->dim << ", child = " << it->child
-                  << ", Lmax/Rmin = " << it->Lmax << "/" << it->Rmin << ", box = " << it->box
-                  << std::endl;
+        std::cout << "Node " << i << ": dim = " << it->dim << ", child = " << it->child << ", Lmax/Rmin = " << it->Lmax
+                  << "/" << it->Rmin << ", box = " << it->box << std::endl;
     }
     return MB_SUCCESS;
 }
@@ -744,9 +709,8 @@ ErrorCode BVHTree::print( )
     std::vector< TreeNode >::iterator it;
     for( it = myTree.begin( ), i = 0; it != myTree.end( ); ++it, i++ )
     {
-        std::cout << "Node " << i << ": dim = " << it->dim << ", child = " << it->child
-                  << ", Lmax/Rmin = " << it->Lmax << "/" << it->Rmin << ", box = " << it->box
-                  << std::endl;
+        std::cout << "Node " << i << ": dim = " << it->dim << ", child = " << it->child << ", Lmax/Rmin = " << it->Lmax
+                  << "/" << it->Rmin << ", box = " << it->box << std::endl;
     }
     return MB_SUCCESS;
 }

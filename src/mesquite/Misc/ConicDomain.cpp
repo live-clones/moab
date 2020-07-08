@@ -37,8 +37,7 @@ namespace MBMesquite
 
 ConicDomain::~ConicDomain( ) {}
 
-void ConicDomain::evaluate( Mesh::VertexHandle, const Vector3D& p_point, Vector3D& closest,
-                            Vector3D& normal ) const
+void ConicDomain::evaluate( Mesh::VertexHandle, const Vector3D& p_point, Vector3D& closest, Vector3D& normal ) const
 {
     // translate such that cone point (mPoint) is at origin
     Vector3D pt = p_point - mPoint;
@@ -118,21 +117,19 @@ void ConicDomain::element_normal_at( Mesh::ElementHandle h, Vector3D& v ) const
     ConicDomain::evaluate( h, p, l, v );
 }
 
-void ConicDomain::vertex_normal_at( const Mesh::VertexHandle* h, Vector3D coords[], unsigned count,
-                                    MsqError& ) const
+void ConicDomain::vertex_normal_at( const Mesh::VertexHandle* h, Vector3D coords[], unsigned count, MsqError& ) const
 {
     for( unsigned i = 0; i < count; ++i )
         vertex_normal_at( h[ i ], coords[ i ] );
 }
 
-void ConicDomain::closest_point( Mesh::VertexHandle handle, const Vector3D& position,
-                                 Vector3D& closest, Vector3D& normal, MsqError& ) const
+void ConicDomain::closest_point( Mesh::VertexHandle handle, const Vector3D& position, Vector3D& closest,
+                                 Vector3D& normal, MsqError& ) const
 {
     evaluate( handle, position, closest, normal );
 }
 
-void ConicDomain::domain_DoF( const Mesh::VertexHandle*, unsigned short* dof_array, size_t count,
-                              MsqError& ) const
+void ConicDomain::domain_DoF( const Mesh::VertexHandle*, unsigned short* dof_array, size_t count, MsqError& ) const
 {
     std::fill( dof_array, dof_array + count, (unsigned short)2 );
 }

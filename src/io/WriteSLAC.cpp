@@ -81,20 +81,19 @@ WriteSLAC::WriteSLAC( Interface* impl ) : mbImpl( impl ), ncFile( 0 )
     // Initialize in case tag_get_handle fails below
     //! get and cache predefined tag handles
     int negone = -1;
-    impl->tag_get_handle( MATERIAL_SET_TAG_NAME, 1, MB_TYPE_INTEGER, mMaterialSetTag,
-                          MB_TAG_SPARSE | MB_TAG_CREAT, &negone );
+    impl->tag_get_handle( MATERIAL_SET_TAG_NAME, 1, MB_TYPE_INTEGER, mMaterialSetTag, MB_TAG_SPARSE | MB_TAG_CREAT,
+                          &negone );
 
-    impl->tag_get_handle( DIRICHLET_SET_TAG_NAME, 1, MB_TYPE_INTEGER, mDirichletSetTag,
-                          MB_TAG_SPARSE | MB_TAG_CREAT, &negone );
+    impl->tag_get_handle( DIRICHLET_SET_TAG_NAME, 1, MB_TYPE_INTEGER, mDirichletSetTag, MB_TAG_SPARSE | MB_TAG_CREAT,
+                          &negone );
 
-    impl->tag_get_handle( NEUMANN_SET_TAG_NAME, 1, MB_TYPE_INTEGER, mNeumannSetTag,
-                          MB_TAG_SPARSE | MB_TAG_CREAT, &negone );
+    impl->tag_get_handle( NEUMANN_SET_TAG_NAME, 1, MB_TYPE_INTEGER, mNeumannSetTag, MB_TAG_SPARSE | MB_TAG_CREAT,
+                          &negone );
 
     mGlobalIdTag = impl->globalId_tag( );
 
     int dum_val = -1;
-    impl->tag_get_handle( "__matSetIdTag", 1, MB_TYPE_INTEGER, mMatSetIdTag,
-                          MB_TAG_DENSE | MB_TAG_CREAT, &dum_val );
+    impl->tag_get_handle( "__matSetIdTag", 1, MB_TYPE_INTEGER, mMatSetIdTag, MB_TAG_DENSE | MB_TAG_CREAT, &dum_val );
 
     impl->tag_get_handle( "WriteSLAC element mark", 1, MB_TYPE_BIT, mEntityMark, MB_TAG_CREAT );
 }
@@ -115,9 +114,8 @@ void WriteSLAC::reset_matset( std::vector< WriteSLAC::MaterialSetData >& matset_
 
 ErrorCode WriteSLAC::write_file( const char* file_name, const bool overwrite, const FileOptions&,
                                  const EntityHandle* ent_handles, const int num_sets,
-                                 const std::vector< std::string >& /* qa_list */,
-                                 const Tag* /* tag_list */, int /* num_tags */,
-                                 int /* export_dimension */ )
+                                 const std::vector< std::string >& /* qa_list */, const Tag* /* tag_list */,
+                                 int /* num_tags */, int /* export_dimension */ )
 {
     assert( 0 != mMaterialSetTag && 0 != mNeumannSetTag && 0 != mDirichletSetTag );
 
@@ -134,16 +132,13 @@ ErrorCode WriteSLAC::write_file( const char* file_name, const bool overwrite, co
     {
         // Default to all defined sets
         Range this_range;
-        mbImpl->get_entities_by_type_and_tag( 0, MBENTITYSET, &mMaterialSetTag, NULL, 1,
-                                              this_range );
+        mbImpl->get_entities_by_type_and_tag( 0, MBENTITYSET, &mMaterialSetTag, NULL, 1, this_range );
         std::copy( this_range.begin( ), this_range.end( ), std::back_inserter( matsets ) );
         this_range.clear( );
-        mbImpl->get_entities_by_type_and_tag( 0, MBENTITYSET, &mDirichletSetTag, NULL, 1,
-                                              this_range );
+        mbImpl->get_entities_by_type_and_tag( 0, MBENTITYSET, &mDirichletSetTag, NULL, 1, this_range );
         std::copy( this_range.begin( ), this_range.end( ), std::back_inserter( dirsets ) );
         this_range.clear( );
-        mbImpl->get_entities_by_type_and_tag( 0, MBENTITYSET, &mNeumannSetTag, NULL, 1,
-                                              this_range );
+        mbImpl->get_entities_by_type_and_tag( 0, MBENTITYSET, &mNeumannSetTag, NULL, 1, this_range );
         std::copy( this_range.begin( ), this_range.end( ), std::back_inserter( neusets ) );
     }
     else
@@ -170,8 +165,8 @@ ErrorCode WriteSLAC::write_file( const char* file_name, const bool overwrite, co
     MeshInfo mesh_info;
 
     matset_info.clear( );
-    if( gather_mesh_information( mesh_info, matset_info, neuset_info, dirset_info, matsets, neusets,
-                                 dirsets ) != MB_SUCCESS )
+    if( gather_mesh_information( mesh_info, matset_info, neuset_info, dirset_info, matsets, neusets, dirsets ) !=
+        MB_SUCCESS )
     {
         reset_matset( matset_info );
         return MB_FAILURE;
@@ -211,9 +206,8 @@ ErrorCode WriteSLAC::write_file( const char* file_name, const bool overwrite, co
 
 ErrorCode WriteSLAC::gather_mesh_information(
     MeshInfo& mesh_info, std::vector< WriteSLAC::MaterialSetData >& matset_info,
-    std::vector< WriteSLAC::NeumannSetData >&   neuset_info,
-    std::vector< WriteSLAC::DirichletSetData >& dirset_info, std::vector< EntityHandle >& matsets,
-    std::vector< EntityHandle >& neusets, std::vector< EntityHandle >& dirsets )
+    std::vector< WriteSLAC::NeumannSetData >& neuset_info, std::vector< WriteSLAC::DirichletSetData >& dirset_info,
+    std::vector< EntityHandle >& matsets, std::vector< EntityHandle >& neusets, std::vector< EntityHandle >& dirsets )
 {
     std::vector< EntityHandle >::iterator vector_iter, end_vector_iter;
 
@@ -242,8 +236,7 @@ ErrorCode WriteSLAC::gather_mesh_information(
         matset_data.elements = new Range;
 
         // For the purpose of qa records, get the parents of these matsets
-        if( mbImpl->get_parent_meshsets( *vector_iter, parent_meshsets ) != MB_SUCCESS )
-            return MB_FAILURE;
+        if( mbImpl->get_parent_meshsets( *vector_iter, parent_meshsets ) != MB_SUCCESS ) return MB_FAILURE;
 
         // Get all Entity Handles in the mesh set
         Range dummy_range;
@@ -257,17 +250,14 @@ ErrorCode WriteSLAC::gather_mesh_information(
         --entity_iter;
         int this_dim = CN::Dimension( TYPE_FROM_HANDLE( *entity_iter ) );
         entity_iter = dummy_range.begin( );
-        while( entity_iter != dummy_range.end( ) &&
-               CN::Dimension( TYPE_FROM_HANDLE( *entity_iter ) ) != this_dim )
+        while( entity_iter != dummy_range.end( ) && CN::Dimension( TYPE_FROM_HANDLE( *entity_iter ) ) != this_dim )
             ++entity_iter;
 
         if( entity_iter != dummy_range.end( ) )
-            std::copy( entity_iter, dummy_range.end( ),
-                       range_inserter( *( matset_data.elements ) ) );
+            std::copy( entity_iter, dummy_range.end( ), range_inserter( *( matset_data.elements ) ) );
 
         assert( matset_data.elements->begin( ) == matset_data.elements->end( ) ||
-                CN::Dimension( TYPE_FROM_HANDLE( *( matset_data.elements->begin( ) ) ) ) ==
-                    this_dim );
+                CN::Dimension( TYPE_FROM_HANDLE( *( matset_data.elements->begin( ) ) ) ) == this_dim );
 
         // Get the matset's id
         if( mbImpl->tag_get_data( mMaterialSetTag, &( *vector_iter ), 1, &id ) != MB_SUCCESS )
@@ -296,8 +286,7 @@ ErrorCode WriteSLAC::gather_mesh_information(
         else
             dimension = CN::Dimension( entity_type );
 
-        if( dimension > highest_dimension_of_element_matsets )
-            highest_dimension_of_element_matsets = dimension;
+        if( dimension > highest_dimension_of_element_matsets ) highest_dimension_of_element_matsets = dimension;
 
         matset_data.moab_type = mbImpl->type_from_handle( *( matset_data.elements->begin( ) ) );
         if( MBMAXTYPE == matset_data.moab_type ) return MB_FAILURE;
@@ -308,13 +297,9 @@ ErrorCode WriteSLAC::gather_mesh_information(
             ExoIIUtil::get_element_type_from_num_verts( tmp_conn.size( ), entity_type, dimension );
 
         if( matset_data.element_type == EXOII_MAX_ELEM_TYPE )
-        {
-            MB_SET_ERR( MB_FAILURE,
-                        "Element type in matset " << id << " didn't get set correctly" );
-        }
+        { MB_SET_ERR( MB_FAILURE, "Element type in matset " << id << " didn't get set correctly" ); }
 
-        matset_data.number_nodes_per_element =
-            ExoIIUtil::VerticesPerElement[ matset_data.element_type ];
+        matset_data.number_nodes_per_element = ExoIIUtil::VerticesPerElement[ matset_data.element_type ];
 
         // Number of nodes for this matset
         matset_data.number_elements = matset_data.elements->size( );
@@ -323,14 +308,12 @@ ErrorCode WriteSLAC::gather_mesh_information(
         mesh_info.num_elements += matset_data.number_elements;
 
         // Get the nodes for the elements
-        mWriteIface->gather_nodes_from_elements( *matset_data.elements, mEntityMark,
-                                                 mesh_info.nodes );
+        mWriteIface->gather_nodes_from_elements( *matset_data.elements, mEntityMark, mesh_info.nodes );
 
         if( !neusets.empty( ) )
         {
             // If there are neusets, keep track of which elements are being written out
-            for( Range::iterator iter = matset_data.elements->begin( );
-                 iter != matset_data.elements->end( ); ++iter )
+            for( Range::iterator iter = matset_data.elements->begin( ); iter != matset_data.elements->end( ); ++iter )
             {
                 unsigned char bit = 0x1;
                 mbImpl->tag_set_data( mEntityMark, &( *iter ), 1, &bit );
@@ -407,8 +390,7 @@ ErrorCode WriteSLAC::gather_mesh_information(
         WriteSLAC::NeumannSetData neuset_data;
 
         // Get the neuset's id
-        if( mbImpl->tag_get_data( mNeumannSetTag, &( *vector_iter ), 1, &id ) != MB_SUCCESS )
-            return MB_FAILURE;
+        if( mbImpl->tag_get_data( mNeumannSetTag, &( *vector_iter ), 1, &id ) != MB_SUCCESS ) return MB_FAILURE;
 
         neuset_data.id = id;
         neuset_data.mesh_set_handle = *vector_iter;
@@ -416,8 +398,7 @@ ErrorCode WriteSLAC::gather_mesh_information(
         // Get the sides in two lists, one forward the other reverse; starts with forward sense
         // by convention
         Range forward_elems, reverse_elems;
-        if( get_neuset_elems( *vector_iter, 0, forward_elems, reverse_elems ) == MB_FAILURE )
-            return MB_FAILURE;
+        if( get_neuset_elems( *vector_iter, 0, forward_elems, reverse_elems ) == MB_FAILURE ) return MB_FAILURE;
 
         ErrorCode result = get_valid_sides( forward_elems, 1, neuset_data );MB_CHK_SET_ERR( result, "Couldn't get valid sides data" );
         result = get_valid_sides( reverse_elems, -1, neuset_data );MB_CHK_SET_ERR( result, "Couldn't get valid sides data" );
@@ -430,8 +411,7 @@ ErrorCode WriteSLAC::gather_mesh_information(
     return gather_interior_exterior( mesh_info, matset_info, neuset_info );
 }
 
-ErrorCode WriteSLAC::get_valid_sides( Range& elems, const int sense,
-                                      WriteSLAC::NeumannSetData& neuset_data )
+ErrorCode WriteSLAC::get_valid_sides( Range& elems, const int sense, WriteSLAC::NeumannSetData& neuset_data )
 {
     // This is where we see if underlying element of side set element is included in output
 
@@ -455,8 +435,7 @@ ErrorCode WriteSLAC::get_valid_sides( Range& elems, const int sense,
             int                         dimension = CN::Dimension( TYPE_FROM_HANDLE( *iter ) );
 
             // Get the adjacent parent element of "side"
-            if( mbImpl->get_adjacencies( &( *iter ), 1, dimension + 1, false, parents ) !=
-                MB_SUCCESS )
+            if( mbImpl->get_adjacencies( &( *iter ), 1, dimension + 1, false, parents ) != MB_SUCCESS )
             { MB_SET_ERR( MB_FAILURE, "Couldn't get adjacencies for neuset" ); }
 
             if( !parents.empty( ) )
@@ -464,13 +443,11 @@ ErrorCode WriteSLAC::get_valid_sides( Range& elems, const int sense,
                 // Make sure the adjacent parent element will be output
                 for( unsigned int k = 0; k < parents.size( ); k++ )
                 {
-                    result =
-                        mbImpl->tag_get_data( mEntityMark, &( parents[ k ] ), 1, &element_marked );MB_CHK_SET_ERR( result, "Couldn't get mark data" );
+                    result = mbImpl->tag_get_data( mEntityMark, &( parents[ k ] ), 1, &element_marked );MB_CHK_SET_ERR( result, "Couldn't get mark data" );
 
                     int side_no, this_sense, this_offset;
                     if( 0x1 == element_marked &&
-                        mbImpl->side_number( parents[ k ], *iter, side_no, this_sense,
-                                             this_offset ) == MB_SUCCESS &&
+                        mbImpl->side_number( parents[ k ], *iter, side_no, this_sense, this_offset ) == MB_SUCCESS &&
                         this_sense == sense )
                     {
                         neuset_data.elements.push_back( parents[ k ] );
@@ -481,8 +458,7 @@ ErrorCode WriteSLAC::get_valid_sides( Range& elems, const int sense,
             }
             else
             {
-                MB_SET_ERR( MB_FAILURE,
-                            "No parent element exists for element in neuset " << neuset_data.id );
+                MB_SET_ERR( MB_FAILURE, "No parent element exists for element in neuset " << neuset_data.id );
             }
         }
     }
@@ -508,8 +484,7 @@ ErrorCode WriteSLAC::write_nodes( const int num_nodes, const Range& nodes, const
 
     if( num_coords_to_fill == 3 ) coord_arrays[ 2 ] = new double[ num_nodes ];
 
-    result =
-        mWriteIface->get_node_coords( dimension, num_nodes, nodes, mGlobalIdTag, 0, coord_arrays );
+    result = mWriteIface->get_node_coords( dimension, num_nodes, nodes, mGlobalIdTag, 0, coord_arrays );
     if( result != MB_SUCCESS )
     {
         delete[] coord_arrays[ 0 ];
@@ -568,17 +543,16 @@ ErrorCode WriteSLAC::write_nodes( const int num_nodes, const Range& nodes, const
     return MB_SUCCESS;
 }
 
-ErrorCode
-    WriteSLAC::gather_interior_exterior( MeshInfo&                                  mesh_info,
-                                         std::vector< WriteSLAC::MaterialSetData >& matset_data,
-                                         std::vector< WriteSLAC::NeumannSetData >&  neuset_data )
+ErrorCode WriteSLAC::gather_interior_exterior( MeshInfo&                                  mesh_info,
+                                               std::vector< WriteSLAC::MaterialSetData >& matset_data,
+                                               std::vector< WriteSLAC::NeumannSetData >&  neuset_data )
 {
     // Need to assign a tag with the matset id
     Tag          matset_id_tag;
     unsigned int i;
     int          dum = -1;
-    ErrorCode    result = mbImpl->tag_get_handle( "__matset_id", 4, MB_TYPE_INTEGER, matset_id_tag,
-                                               MB_TAG_DENSE | MB_TAG_CREAT, &dum );
+    ErrorCode    result =
+        mbImpl->tag_get_handle( "__matset_id", 4, MB_TYPE_INTEGER, matset_id_tag, MB_TAG_DENSE | MB_TAG_CREAT, &dum );
     if( MB_SUCCESS != result ) return result;
 
     Range::iterator rit;
@@ -593,8 +567,8 @@ ErrorCode
             mesh_info.num_int_tets += matset.elements->size( );
         else
         {
-            std::cout << "WriteSLAC doesn't support elements of type "
-                      << CN::EntityTypeName( matset.moab_type ) << std::endl;
+            std::cout << "WriteSLAC doesn't support elements of type " << CN::EntityTypeName( matset.moab_type )
+                      << std::endl;
             continue;
         }
 
@@ -628,9 +602,8 @@ ErrorCode
     return MB_SUCCESS;
 }
 
-ErrorCode WriteSLAC::write_matsets( MeshInfo&                                  mesh_info,
-                                    std::vector< WriteSLAC::MaterialSetData >& matset_data,
-                                    std::vector< WriteSLAC::NeumannSetData >&  neuset_data )
+ErrorCode WriteSLAC::write_matsets( MeshInfo& mesh_info, std::vector< WriteSLAC::MaterialSetData >& matset_data,
+                                    std::vector< WriteSLAC::NeumannSetData >& neuset_data )
 {
     unsigned int        i;
     std::vector< int >  connect;
@@ -755,13 +728,12 @@ ErrorCode WriteSLAC::write_matsets( MeshInfo&                                  m
             // Now write the side numbers
             for( i = 0; i < neuset_data.size( ); i++ )
             {
-                std::vector< EntityHandle >::iterator vit = std::find(
-                    neuset_data[ i ].elements.begin( ), neuset_data[ i ].elements.end( ), *rit );
+                std::vector< EntityHandle >::iterator vit =
+                    std::find( neuset_data[ i ].elements.begin( ), neuset_data[ i ].elements.end( ), *rit );
                 while( vit != neuset_data[ i ].elements.end( ) )
                 {
                     // Have a side - get the side # and put in connect array
-                    int side_no =
-                        neuset_data[ i ].side_numbers[ vit - neuset_data[ i ].elements.begin( ) ];
+                    int side_no = neuset_data[ i ].side_numbers[ vit - neuset_data[ i ].elements.begin( ) ];
                     connect[ 9 + side_no ] = neuset_data[ i ].id;
                     ++vit;
                     vit = std::find( vit, neuset_data[ i ].elements.end( ), *rit );
@@ -809,13 +781,12 @@ ErrorCode WriteSLAC::write_matsets( MeshInfo&                                  m
             // Now write the side numbers
             for( i = 0; i < neuset_data.size( ); i++ )
             {
-                std::vector< EntityHandle >::iterator vit = std::find(
-                    neuset_data[ i ].elements.begin( ), neuset_data[ i ].elements.end( ), *rit );
+                std::vector< EntityHandle >::iterator vit =
+                    std::find( neuset_data[ i ].elements.begin( ), neuset_data[ i ].elements.end( ), *rit );
                 while( vit != neuset_data[ i ].elements.end( ) )
                 {
                     // Have a side - get the side # and put in connect array
-                    int side_no =
-                        neuset_data[ i ].side_numbers[ vit - neuset_data[ i ].elements.begin( ) ];
+                    int side_no = neuset_data[ i ].side_numbers[ vit - neuset_data[ i ].elements.begin( ) ];
                     connect[ 5 + side_no ] = neuset_data[ i ].id;
                     ++vit;
                     vit = std::find( vit, neuset_data[ i ].elements.end( ), *rit );
@@ -850,32 +821,28 @@ ErrorCode WriteSLAC::initialize_file( MeshInfo& mesh_info )
     { MB_SET_ERR( MB_FAILURE, "WriteSLAC: failed to define number of nodes" ); }
 
     if( 0 != mesh_info.num_int_hexes &&
-        nc_def_dim( ncFile, "hexinterior", (size_t)mesh_info.num_int_hexes, &hexinterior ) !=
-            NC_NOERR )
+        nc_def_dim( ncFile, "hexinterior", (size_t)mesh_info.num_int_hexes, &hexinterior ) != NC_NOERR )
     { MB_SET_ERR( MB_FAILURE, "WriteSLAC: failed to define number of interior hex elements" ); }
 
     if( nc_def_dim( ncFile, "hexinteriorsize", (size_t)9, &hexinteriorsize ) != NC_NOERR )
     { MB_SET_ERR( MB_FAILURE, "WriteSLAC: failed to define interior hex element size" ); }
 
     if( 0 != mesh_info.bdy_hexes.size( ) &&
-        nc_def_dim( ncFile, "hexexterior", (size_t)mesh_info.bdy_hexes.size( ), &hexexterior ) !=
-            NC_NOERR )
+        nc_def_dim( ncFile, "hexexterior", (size_t)mesh_info.bdy_hexes.size( ), &hexexterior ) != NC_NOERR )
     { MB_SET_ERR( MB_FAILURE, "WriteSLAC: failed to define number of exterior hex elements" ); }
 
     if( nc_def_dim( ncFile, "hexexteriorsize", (size_t)15, &hexexteriorsize ) != NC_NOERR )
     { MB_SET_ERR( MB_FAILURE, "WriteSLAC: failed to define exterior hex element size" ); }
 
     if( 0 != mesh_info.num_int_tets &&
-        nc_def_dim( ncFile, "tetinterior", (size_t)mesh_info.num_int_tets, &tetinterior ) !=
-            NC_NOERR )
+        nc_def_dim( ncFile, "tetinterior", (size_t)mesh_info.num_int_tets, &tetinterior ) != NC_NOERR )
     { MB_SET_ERR( MB_FAILURE, "WriteSLAC: failed to define number of interior tet elements" ); }
 
     if( nc_def_dim( ncFile, "tetinteriorsize", (size_t)5, &tetinteriorsize ) != NC_NOERR )
     { MB_SET_ERR( MB_FAILURE, "WriteSLAC: failed to define interior tet element size" ); }
 
     if( 0 != mesh_info.bdy_tets.size( ) &&
-        nc_def_dim( ncFile, "tetexterior", (size_t)mesh_info.bdy_tets.size( ), &tetexterior ) !=
-            NC_NOERR )
+        nc_def_dim( ncFile, "tetexterior", (size_t)mesh_info.bdy_tets.size( ), &tetexterior ) != NC_NOERR )
     { MB_SET_ERR( MB_FAILURE, "WriteSLAC: failed to define number of exterior tet elements" ); }
 
     if( nc_def_dim( ncFile, "tetexteriorsize", (size_t)9, &tetexteriorsize ) != NC_NOERR )
@@ -889,37 +856,25 @@ ErrorCode WriteSLAC::initialize_file( MeshInfo& mesh_info )
     int dum_var;
     if( 0 != mesh_info.num_int_hexes &&
         NC_NOERR != nc_def_var( ncFile, "hexahedron_interior", NC_LONG, 2, dims, &dum_var ) )
-    {
-        MB_SET_ERR( MB_FAILURE,
-                    "WriteSLAC: failed to create connectivity array for interior hexes" );
-    }
+    { MB_SET_ERR( MB_FAILURE, "WriteSLAC: failed to create connectivity array for interior hexes" ); }
 
     dims[ 0 ] = hexexterior;
     dims[ 1 ] = hexexteriorsize;
     if( 0 != mesh_info.bdy_hexes.size( ) &&
         NC_NOERR != nc_def_var( ncFile, "hexahedron_exterior", NC_LONG, 2, dims, &dum_var ) )
-    {
-        MB_SET_ERR( MB_FAILURE,
-                    "WriteSLAC: failed to create connectivity array for exterior hexes" );
-    }
+    { MB_SET_ERR( MB_FAILURE, "WriteSLAC: failed to create connectivity array for exterior hexes" ); }
 
     dims[ 0 ] = tetinterior;
     dims[ 1 ] = tetinteriorsize;
     if( 0 != mesh_info.num_int_tets &&
         NC_NOERR != nc_def_var( ncFile, "tetrahedron_exterior", NC_LONG, 2, dims, &dum_var ) )
-    {
-        MB_SET_ERR( MB_FAILURE,
-                    "WriteSLAC: failed to create connectivity array for interior tets" );
-    }
+    { MB_SET_ERR( MB_FAILURE, "WriteSLAC: failed to create connectivity array for interior tets" ); }
 
     dims[ 0 ] = tetexterior;
     dims[ 1 ] = tetexteriorsize;
     if( 0 != mesh_info.bdy_tets.size( ) &&
         NC_NOERR != nc_def_var( ncFile, "tetrahedron_exterior", NC_LONG, 2, dims, &dum_var ) )
-    {
-        MB_SET_ERR( MB_FAILURE,
-                    "WriteSLAC: failed to create connectivity array for exterior tets" );
-    }
+    { MB_SET_ERR( MB_FAILURE, "WriteSLAC: failed to create connectivity array for exterior tets" ); }
 
     /* Node coordinate arrays: */
 
@@ -934,8 +889,7 @@ ErrorCode WriteSLAC::initialize_file( MeshInfo& mesh_info )
 ErrorCode WriteSLAC::open_file( const char* filename )
 {
     // Not a valid filname
-    if( strlen( (const char*)filename ) == 0 )
-    { MB_SET_ERR( MB_FAILURE, "Output filename not specified" ); }
+    if( strlen( (const char*)filename ) == 0 ) { MB_SET_ERR( MB_FAILURE, "Output filename not specified" ); }
 
     int fail = nc_create( filename, NC_CLOBBER, &ncFile );
     // File couldn't be opened
@@ -992,8 +946,7 @@ ErrorCode WriteSLAC::get_neuset_elems( EntityHandle neuset, int current_sense, R
     {
         // First get the sense; if it's not there, by convention it's forward
         int this_sense;
-        if( 0 == sense_tag ||
-            MB_FAILURE == mbImpl->tag_get_data( sense_tag, &( *range_iter ), 1, &this_sense ) )
+        if( 0 == sense_tag || MB_FAILURE == mbImpl->tag_get_data( sense_tag, &( *range_iter ), 1, &this_sense ) )
             this_sense = 1;
 
         // Now get all the entities on this meshset, with the proper (possibly reversed) sense

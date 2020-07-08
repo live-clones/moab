@@ -46,8 +46,7 @@ NCWriteHelper* NCWriteHelper::get_nc_helper( WriteNC* writeNC, int fileId, const
     return NULL;
 }
 
-ErrorCode NCWriteHelper::collect_variable_data( std::vector< std::string >& var_names,
-                                                std::vector< int >&         tstep_nums )
+ErrorCode NCWriteHelper::collect_variable_data( std::vector< std::string >& var_names, std::vector< int >& tstep_nums )
 {
     Interface*&                                mbImpl = _writeNC->mbImpl;
     std::vector< std::string >&                dimNames = _writeNC->dimNames;
@@ -82,14 +81,11 @@ ErrorCode NCWriteHelper::collect_variable_data( std::vector< std::string >& var_
         {
             std::string dimName = dimNames[ currentVarData.varDims[ j ] ];
             vit = varInfo.find( dimName );
-            if( vit == varInfo.end( ) )
-                MB_SET_ERR( MB_FAILURE, "Can't find coordinate variable " << dimName );
+            if( vit == varInfo.end( ) ) MB_SET_ERR( MB_FAILURE, "Can't find coordinate variable " << dimName );
 
-            usedCoordinates.insert(
-                dimName );  // Collect those used, we will need to write them to the file
-            dbgOut.tprintf( 2, "    for variable %s need dimension %s with length %d\n",
-                            varname.c_str( ), dimName.c_str( ),
-                            dimLens[ currentVarData.varDims[ j ] ] );
+            usedCoordinates.insert( dimName );  // Collect those used, we will need to write them to the file
+            dbgOut.tprintf( 2, "    for variable %s need dimension %s with length %d\n", varname.c_str( ),
+                            dimName.c_str( ), dimLens[ currentVarData.varDims[ j ] ] );
         }
 
         // Process coordinate variables later
@@ -112,8 +108,7 @@ ErrorCode NCWriteHelper::collect_variable_data( std::vector< std::string >& var_
             {
                 // Set variables with timesteps, e.g. xtime(Time) or xtime(Time, StrLen)
                 // TBD
-                MB_SET_ERR( MB_NOT_IMPLEMENTED,
-                            "Writing set variables with timesteps is not implemented yet" );
+                MB_SET_ERR( MB_NOT_IMPLEMENTED, "Writing set variables with timesteps is not implemented yet" );
             }
             else
             {
@@ -146,8 +141,7 @@ ErrorCode NCWriteHelper::collect_variable_data( std::vector< std::string >& var_
                     for( size_t j = 0; j < currentVarData.varDims.size( ); j++ )
                     {
                         currentVarData.writeStarts.push_back( 0 );
-                        currentVarData.writeCounts.push_back(
-                            dimLens[ currentVarData.varDims[ j ] ] );
+                        currentVarData.writeCounts.push_back( dimLens[ currentVarData.varDims[ j ] ] );
                     }
                 }
 
@@ -180,10 +174,9 @@ ErrorCode NCWriteHelper::collect_variable_data( std::vector< std::string >& var_
                 // Treat it like having one, 0th, timestep
                 std::stringstream ssTagNameWithIndex;
                 ssTagNameWithIndex << varname << 0;
-                rval = mbImpl->tag_get_handle( ssTagNameWithIndex.str( ).c_str( ), indexedTag );MB_CHK_SET_ERR( rval, "Can't find tag " << ssTagNameWithIndex.str( )
-                                                        << " for a user-created variable" );
-                dbgOut.tprintf( 2, "    found indexed tag 0 with name %s\n",
-                                ssTagNameWithIndex.str( ).c_str( ) );
+                rval = mbImpl->tag_get_handle( ssTagNameWithIndex.str( ).c_str( ), indexedTag );MB_CHK_SET_ERR( rval,
+                                "Can't find tag " << ssTagNameWithIndex.str( ) << " for a user-created variable" );
+                dbgOut.tprintf( 2, "    found indexed tag 0 with name %s\n", ssTagNameWithIndex.str( ).c_str( ) );
                 currentVarData.varTags.push_back( indexedTag );
             }
 
@@ -198,14 +191,12 @@ ErrorCode NCWriteHelper::collect_variable_data( std::vector< std::string >& var_
 
     // Process coordinate variables here
     // Check that for used coordinates we have found the tags
-    for( std::set< std::string >::iterator setIt = usedCoordinates.begin( );
-         setIt != usedCoordinates.end( ); ++setIt )
+    for( std::set< std::string >::iterator setIt = usedCoordinates.begin( ); setIt != usedCoordinates.end( ); ++setIt )
     {
         const std::string& coordName = *setIt;
 
         std::map< std::string, WriteNC::VarData >::iterator vit = varInfo.find( coordName );
-        if( vit == varInfo.end( ) )
-            MB_SET_ERR( MB_FAILURE, "Can't find coordinate variable " << coordName );
+        if( vit == varInfo.end( ) ) MB_SET_ERR( MB_FAILURE, "Can't find coordinate variable " << coordName );
 
         WriteNC::VarData& varCoordData = vit->second;
         Tag               coordTag = 0;
@@ -215,8 +206,8 @@ ErrorCode NCWriteHelper::collect_variable_data( std::vector< std::string >& var_
         const void* data;
         int         sizeCoordinate;
         rval = mbImpl->tag_get_by_ptr( coordTag, &_fileSet, 1, &data, &sizeCoordinate );MB_CHK_SET_ERR( rval, "Can't get coordinate values of " << coordName );
-        dbgOut.tprintf( 2, "    found coordinate tag with name %s and length %d\n",
-                        coordName.c_str( ), sizeCoordinate );
+        dbgOut.tprintf( 2, "    found coordinate tag with name %s and length %d\n", coordName.c_str( ),
+                        sizeCoordinate );
 
         // Find the type of tag, and use it
         DataType type;
@@ -251,8 +242,7 @@ ErrorCode NCWriteHelper::collect_variable_data( std::vector< std::string >& var_
         {
             // Does not apply to dummy time tag (e.g. 'Time' tag of MPAS), when timesteps
             // spread across files
-            if( NULL != data )
-                assert( tstep_nums.size( ) > 0 && tstep_nums.size( ) <= (size_t)sizeCoordinate );
+            if( NULL != data ) assert( tstep_nums.size( ) > 0 && tstep_nums.size( ) <= (size_t)sizeCoordinate );
 
             sizeCoordinate = tstep_nums.size( );
 
@@ -281,8 +271,8 @@ ErrorCode NCWriteHelper::collect_variable_data( std::vector< std::string >& var_
     return MB_SUCCESS;
 }
 
-ErrorCode NCWriteHelper::init_file( std::vector< std::string >& var_names,
-                                    std::vector< std::string >& desired_names, bool append )
+ErrorCode NCWriteHelper::init_file( std::vector< std::string >& var_names, std::vector< std::string >& desired_names,
+                                    bool append )
 {
     std::vector< std::string >&                dimNames = _writeNC->dimNames;
     std::set< std::string >&                   usedCoordinates = _writeNC->usedCoordinates;
@@ -304,14 +294,12 @@ ErrorCode NCWriteHelper::init_file( std::vector< std::string >& var_names,
 
     // First initialize all coordinates, then fill VarData for actual variables (and dimensions)
     // Check that for used coordinates we have found the tags
-    for( std::set< std::string >::iterator setIt = usedCoordinates.begin( );
-         setIt != usedCoordinates.end( ); ++setIt )
+    for( std::set< std::string >::iterator setIt = usedCoordinates.begin( ); setIt != usedCoordinates.end( ); ++setIt )
     {
         const std::string& coordName = *setIt;
 
         std::map< std::string, WriteNC::VarData >::iterator vit = varInfo.find( coordName );
-        if( vit == varInfo.end( ) )
-            MB_SET_ERR( MB_FAILURE, "Can't find coordinate variable " << coordName );
+        if( vit == varInfo.end( ) ) MB_SET_ERR( MB_FAILURE, "Can't find coordinate variable " << coordName );
 
         WriteNC::VarData& varCoordData = vit->second;
         varCoordData.varDims.resize( 1 );
@@ -327,8 +315,8 @@ ErrorCode NCWriteHelper::init_file( std::vector< std::string >& var_names,
             if( NCFUNC( inq_dimid )( _fileId, coordName.c_str( ), &dimId ) == NC_NOERR )
             {  // If not found, create it later
                 varCoordData.varDims[ 0 ] = dimId;
-                dbgOut.tprintf( 2, "    file already has coordName %s dim id is %d \n",
-                                coordName.c_str( ), (int)varCoordData.varDims[ 0 ] );
+                dbgOut.tprintf( 2, "    file already has coordName %s dim id is %d \n", coordName.c_str( ),
+                                (int)varCoordData.varDims[ 0 ] );
 
                 // Update tDim and levDim to actual dimension id
                 if( coordName == dimNames[ tDim_in_dimNames ] )
@@ -343,12 +331,10 @@ ErrorCode NCWriteHelper::init_file( std::vector< std::string >& var_names,
                 // Inquire for a variable with the same name
                 int varId;
                 if( NCFUNC( inq_varid )( _fileId, coordName.c_str( ), &varId ) != NC_NOERR )
-                    MB_SET_ERR( MB_FAILURE,
-                                "We do not have a variable with the same name " << coordName );
+                    MB_SET_ERR( MB_FAILURE, "We do not have a variable with the same name " << coordName );
                 // We should also check that this variable has one dimension, and it is dimId
                 varCoordData.varId = varId;
-                dbgOut.tprintf( 2, "    file already has coordinate %s and varId is %d \n",
-                                coordName.c_str( ), varId );
+                dbgOut.tprintf( 2, "    file already has coordinate %s and varId is %d \n", coordName.c_str( ), varId );
 
                 continue;  // Maybe more checks are needed here
             }
@@ -359,11 +345,10 @@ ErrorCode NCWriteHelper::init_file( std::vector< std::string >& var_names,
          */
 
         // Actually define a dimension
-        if( NCFUNC( def_dim )( _fileId, coordName.c_str( ), (size_t)varCoordData.sz,
-                               &varCoordData.varDims[ 0 ] ) != NC_NOERR )
+        if( NCFUNC( def_dim )( _fileId, coordName.c_str( ), (size_t)varCoordData.sz, &varCoordData.varDims[ 0 ] ) !=
+            NC_NOERR )
             MB_SET_ERR( MB_FAILURE, "Failed to generate dimension " << coordName );
-        dbgOut.tprintf( 2, "    for coordName %s dim id is %d \n", coordName.c_str( ),
-                        (int)varCoordData.varDims[ 0 ] );
+        dbgOut.tprintf( 2, "    for coordName %s dim id is %d \n", coordName.c_str( ), (int)varCoordData.varDims[ 0 ] );
 
         // Update tDim and levDim to actual dimension id
         if( coordName == dimNames[ tDim_in_dimNames ] )
@@ -383,12 +368,11 @@ ErrorCode NCWriteHelper::init_file( std::vector< std::string >& var_names,
         if( dummyVarNames.find( coordName ) != dummyVarNames.end( ) ) continue;
 
         // Define a coordinate variable
-        if( NCFUNC( def_var )( _fileId, coordName.c_str( ), varCoordData.varDataType, 1,
-                               &( varCoordData.varDims[ 0 ] ), &varCoordData.varId ) != NC_NOERR )
+        if( NCFUNC( def_var )( _fileId, coordName.c_str( ), varCoordData.varDataType, 1, &( varCoordData.varDims[ 0 ] ),
+                               &varCoordData.varId ) != NC_NOERR )
             MB_SET_ERR( MB_FAILURE, "Failed to create coordinate variable " << coordName );
 
-        dbgOut.tprintf( 2, "    for coordName %s variable id is %d \n", coordName.c_str( ),
-                        varCoordData.varId );
+        dbgOut.tprintf( 2, "    for coordName %s variable id is %d \n", coordName.c_str( ), varCoordData.varId );
     }
 
     // Now look at requested variables, and update from the index in dimNames to the actual
@@ -396,8 +380,7 @@ ErrorCode NCWriteHelper::init_file( std::vector< std::string >& var_names,
     for( size_t i = 0; i < var_names.size( ); i++ )
     {
         std::map< std::string, WriteNC::VarData >::iterator vit = varInfo.find( var_names[ i ] );
-        if( vit == varInfo.end( ) )
-            MB_SET_ERR( MB_FAILURE, "Can't find requested variable " << var_names[ i ] );
+        if( vit == varInfo.end( ) ) MB_SET_ERR( MB_FAILURE, "Can't find requested variable " << var_names[ i ] );
 
         // Skip coordinate variables
         if( usedCoordinates.find( var_names[ i ] ) != usedCoordinates.end( ) ) continue;
@@ -408,29 +391,27 @@ ErrorCode NCWriteHelper::init_file( std::vector< std::string >& var_names,
         int numDims = (int)variableData.varDims.size( );
         for( int j = 0; j < numDims; j++ )
         {
-            std::string dimName = dimNames[ variableData.varDims[ j ] ];
+            std::string                                         dimName = dimNames[ variableData.varDims[ j ] ];
             std::map< std::string, WriteNC::VarData >::iterator vit2 = varInfo.find( dimName );
             if( vit2 == varInfo.end( ) )
                 MB_SET_ERR( MB_FAILURE, "Can't find requested coordinate variable " << dimName );
 
             WriteNC::VarData& coordData = vit2->second;
             // Index in dimNames to actual dimension id
-            variableData.varDims[ j ] =
-                coordData.varDims[ 0 ];  // This one, being a coordinate, is the only one
-            dbgOut.tprintf( 2, "          dimension with index %d name %s has ID %d \n", j,
-                            dimName.c_str( ), variableData.varDims[ j ] );
+            variableData.varDims[ j ] = coordData.varDims[ 0 ];  // This one, being a coordinate, is the only one
+            dbgOut.tprintf( 2, "          dimension with index %d name %s has ID %d \n", j, dimName.c_str( ),
+                            variableData.varDims[ j ] );
         }
 
         // Define the variable now:
         int errCode =
             NCFUNC( def_var )( _fileId, desired_names[ i ].c_str( ), variableData.varDataType,
-                               (int)variableData.varDims.size( ), &( variableData.varDims[ 0 ] ),
-                               &variableData.varId );
+                               (int)variableData.varDims.size( ), &( variableData.varDims[ 0 ] ), &variableData.varId );
         if( errCode != NC_NOERR )
             MB_SET_ERR( MB_FAILURE, "Failed to create requested variable " << desired_names[ i ] );
 
-        dbgOut.tprintf( 2, "    for variable %s with desired name %s variable id is %d \n",
-                        var_names[ i ].c_str( ), desired_names[ i ].c_str( ), variableData.varId );
+        dbgOut.tprintf( 2, "    for variable %s with desired name %s variable id is %d \n", var_names[ i ].c_str( ),
+                        desired_names[ i ].c_str( ), variableData.varId );
         // Now define the variable, with all dimensions
     }
 
@@ -449,29 +430,28 @@ ErrorCode NCWriteHelper::init_file( std::vector< std::string >& var_names,
         {
             case NC_BYTE:
             case NC_CHAR:
-                if( NC_NOERR != NCFUNC( put_att_text )( _fileId, NC_GLOBAL, attName.c_str( ),
-                                                        attLen, attValue.c_str( ) ) )
+                if( NC_NOERR !=
+                    NCFUNC( put_att_text )( _fileId, NC_GLOBAL, attName.c_str( ), attLen, attValue.c_str( ) ) )
                     MB_SET_ERR( MB_FAILURE, "Failed to define text type attribute" );
                 break;
             case NC_DOUBLE:
-                if( NC_NOERR != NCFUNC( put_att_double )( _fileId, NC_GLOBAL, attName.c_str( ),
-                                                          NC_DOUBLE, 1,
+                if( NC_NOERR != NCFUNC( put_att_double )( _fileId, NC_GLOBAL, attName.c_str( ), NC_DOUBLE, 1,
                                                           (double*)attValue.c_str( ) ) )
                     MB_SET_ERR( MB_FAILURE, "Failed to define double type attribute" );
                 break;
             case NC_FLOAT:
-                if( NC_NOERR != NCFUNC( put_att_float )( _fileId, NC_GLOBAL, attName.c_str( ),
-                                                         NC_FLOAT, 1, (float*)attValue.c_str( ) ) )
+                if( NC_NOERR != NCFUNC( put_att_float )( _fileId, NC_GLOBAL, attName.c_str( ), NC_FLOAT, 1,
+                                                         (float*)attValue.c_str( ) ) )
                     MB_SET_ERR( MB_FAILURE, "Failed to define float type attribute" );
                 break;
             case NC_INT:
-                if( NC_NOERR != NCFUNC( put_att_int )( _fileId, NC_GLOBAL, attName.c_str( ), NC_INT,
-                                                       1, (int*)attValue.c_str( ) ) )
+                if( NC_NOERR !=
+                    NCFUNC( put_att_int )( _fileId, NC_GLOBAL, attName.c_str( ), NC_INT, 1, (int*)attValue.c_str( ) ) )
                     MB_SET_ERR( MB_FAILURE, "Failed to define int type attribute" );
                 break;
             case NC_SHORT:
-                if( NC_NOERR != NCFUNC( put_att_short )( _fileId, NC_GLOBAL, attName.c_str( ),
-                                                         NC_SHORT, 1, (short*)attValue.c_str( ) ) )
+                if( NC_NOERR != NCFUNC( put_att_short )( _fileId, NC_GLOBAL, attName.c_str( ), NC_SHORT, 1,
+                                                         (short*)attValue.c_str( ) ) )
                     MB_SET_ERR( MB_FAILURE, "Failed to define short type attribute" );
                 break;
             default:
@@ -480,14 +460,12 @@ ErrorCode NCWriteHelper::init_file( std::vector< std::string >& var_names,
     }
 
     // Take it out of define mode
-    if( NC_NOERR != NCFUNC( enddef )( _fileId ) )
-        MB_SET_ERR( MB_FAILURE, "Failed to close define mode" );
+    if( NC_NOERR != NCFUNC( enddef )( _fileId ) ) MB_SET_ERR( MB_FAILURE, "Failed to close define mode" );
 
     return MB_SUCCESS;
 }
 
-ErrorCode NCWriteHelper::write_values( std::vector< std::string >& var_names,
-                                       std::vector< int >&         tstep_nums )
+ErrorCode NCWriteHelper::write_values( std::vector< std::string >& var_names, std::vector< int >& tstep_nums )
 {
     std::set< std::string >&                   usedCoordinates = _writeNC->usedCoordinates;
     std::set< std::string >&                   dummyVarNames = _writeNC->dummyVarNames;
@@ -497,8 +475,7 @@ ErrorCode NCWriteHelper::write_values( std::vector< std::string >& var_names,
     std::vector< WriteNC::VarData > vsetdatas;
 
     // For set variables, include coordinates used by requested var_names
-    for( std::set< std::string >::iterator setIt = usedCoordinates.begin( );
-         setIt != usedCoordinates.end( ); ++setIt )
+    for( std::set< std::string >::iterator setIt = usedCoordinates.begin( ); setIt != usedCoordinates.end( ); ++setIt )
     {
         const std::string& coordName = *setIt;
 
@@ -506,8 +483,7 @@ ErrorCode NCWriteHelper::write_values( std::vector< std::string >& var_names,
         if( dummyVarNames.find( coordName ) != dummyVarNames.end( ) ) continue;
 
         std::map< std::string, WriteNC::VarData >::iterator vit = varInfo.find( coordName );
-        if( vit == varInfo.end( ) )
-        { MB_SET_ERR( MB_FAILURE, "Can't find coordinate variable " << coordName ); }
+        if( vit == varInfo.end( ) ) { MB_SET_ERR( MB_FAILURE, "Can't find coordinate variable " << coordName ); }
 
         vsetdatas.push_back( vit->second );
     }
@@ -516,8 +492,7 @@ ErrorCode NCWriteHelper::write_values( std::vector< std::string >& var_names,
     for( unsigned int i = 0; i < var_names.size( ); i++ )
     {
         std::map< std::string, WriteNC::VarData >::iterator vit = varInfo.find( var_names[ i ] );
-        if( vit == varInfo.end( ) )
-        { MB_SET_ERR( MB_FAILURE, "Can't find requested variable " << var_names[ i ] ); }
+        if( vit == varInfo.end( ) ) { MB_SET_ERR( MB_FAILURE, "Can't find requested variable " << var_names[ i ] ); }
 
         WriteNC::VarData& variableData = vit->second;
         if( WriteNC::ENTLOCSET == variableData.entLoc )
@@ -572,34 +547,28 @@ ErrorCode NCWriteHelper::write_set_variables( std::vector< WriteNC::VarData >& v
 
             // Set variables with timesteps, e.g. xtime(Time) or xtime(Time, StrLen)
             if( variableData.has_tsteps )
-            {
-                MB_SET_ERR( MB_NOT_IMPLEMENTED,
-                            "Writing set variables with timesteps is not implemented yet" );
-            }
+            { MB_SET_ERR( MB_NOT_IMPLEMENTED, "Writing set variables with timesteps is not implemented yet" ); }
 
             switch( variableData.varDataType )
             {
                 case NC_DOUBLE:
                     // Independent I/O mode put
-                    success = NCFUNCP( _vara_double )(
-                        _fileId, variableData.varId, &variableData.writeStarts[ 0 ],
-                        &variableData.writeCounts[ 0 ], (double*)( variableData.memoryHogs[ 0 ] ) );
+                    success = NCFUNCP( _vara_double )( _fileId, variableData.varId, &variableData.writeStarts[ 0 ],
+                                                       &variableData.writeCounts[ 0 ],
+                                                       (double*)( variableData.memoryHogs[ 0 ] ) );
                     if( success )
-                        MB_SET_ERR( MB_FAILURE, "Failed to write double data for variable "
-                                                    << variableData.varName );
+                        MB_SET_ERR( MB_FAILURE, "Failed to write double data for variable " << variableData.varName );
                     break;
                 case NC_INT:
                     // Independent I/O mode put
-                    success = NCFUNCP( _vara_int )(
-                        _fileId, variableData.varId, &variableData.writeStarts[ 0 ],
-                        &variableData.writeCounts[ 0 ], (int*)( variableData.memoryHogs[ 0 ] ) );
+                    success =
+                        NCFUNCP( _vara_int )( _fileId, variableData.varId, &variableData.writeStarts[ 0 ],
+                                              &variableData.writeCounts[ 0 ], (int*)( variableData.memoryHogs[ 0 ] ) );
                     if( success )
-                        MB_SET_ERR( MB_FAILURE, "Failed to write int data for variable "
-                                                    << variableData.varName );
+                        MB_SET_ERR( MB_FAILURE, "Failed to write int data for variable " << variableData.varName );
                     break;
                 default:
-                    MB_SET_ERR( MB_NOT_IMPLEMENTED,
-                                "Writing non-double or non-int data is not implemented yet" );
+                    MB_SET_ERR( MB_NOT_IMPLEMENTED, "Writing non-double or non-int data is not implemented yet" );
             }
         }
     }
@@ -636,8 +605,7 @@ ErrorCode ScdNCWriteHelper::collect_mesh_info( )
     // Get number of levels
     if( ( vecIt = std::find( dimNames.begin( ), dimNames.end( ), "lev" ) ) != dimNames.end( ) )
         levDim = vecIt - dimNames.begin( );
-    else if( ( vecIt = std::find( dimNames.begin( ), dimNames.end( ), "ilev" ) ) !=
-             dimNames.end( ) )
+    else if( ( vecIt = std::find( dimNames.begin( ), dimNames.end( ), "ilev" ) ) != dimNames.end( ) )
         levDim = vecIt - dimNames.begin( );
     else
     {
@@ -726,8 +694,7 @@ ErrorCode ScdNCWriteHelper::collect_variable_data( std::vector< std::string >& v
             // Time should be the first dimension
             assert( tDim == varDims[ 0 ] );
 
-            currentVarData.writeStarts[ dim_idx ] =
-                0;  // This value is timestep dependent, will be set later
+            currentVarData.writeStarts[ dim_idx ] = 0;  // This value is timestep dependent, will be set later
             currentVarData.writeCounts[ dim_idx ] = 1;
             dim_idx++;
         }
@@ -770,8 +737,7 @@ ErrorCode ScdNCWriteHelper::collect_variable_data( std::vector< std::string >& v
                 currentVarData.writeCounts[ dim_idx + 1 ] = lCDims[ 3 ] - lCDims[ 0 ] + 1;
                 break;
             default:
-                MB_SET_ERR( MB_FAILURE,
-                            "Unexpected entity location type for variable " << varname );
+                MB_SET_ERR( MB_FAILURE, "Unexpected entity location type for variable " << varname );
         }
         dim_idx += 2;
 
@@ -806,8 +772,7 @@ ErrorCode ScdNCWriteHelper::write_nonset_variables( std::vector< WriteNC::VarDat
                 // Faces
                 break;
             default:
-                MB_SET_ERR( MB_FAILURE, "Unexpected entity location type for variable "
-                                            << variableData.varName );
+                MB_SET_ERR( MB_FAILURE, "Unexpected entity location type for variable " << variableData.varName );
         }
 
         unsigned int num_timesteps;
@@ -858,13 +823,11 @@ ErrorCode ScdNCWriteHelper::write_nonset_variables( std::vector< WriteNC::VarDat
             // We will write one time step, and count will be one; start will be different
             // Use tag_iterate to get tag data (assume that localCellsOwned is contiguous)
             // We should also transpose for level so that means deep copy for transpose
-            if( tDim == variableData.varDims[ 0 ] )
-                variableData.writeStarts[ 0 ] = t;  // This is start for time
+            if( tDim == variableData.varDims[ 0 ] ) variableData.writeStarts[ 0 ] = t;  // This is start for time
             int       count;
             void*     dataptr;
-            ErrorCode rval =
-                mbImpl->tag_iterate( variableData.varTags[ t ], localCellsOwned.begin( ),
-                                     localCellsOwned.end( ), count, dataptr );MB_CHK_SET_ERR( rval, "Failed to iterate tag on owned faces" );
+            ErrorCode rval = mbImpl->tag_iterate( variableData.varTags[ t ], localCellsOwned.begin( ),
+                                                  localCellsOwned.end( ), count, dataptr );MB_CHK_SET_ERR( rval, "Failed to iterate tag on owned faces" );
             assert( count == (int)localCellsOwned.size( ) );
 
             // Now transpose and write tag data
@@ -877,17 +840,14 @@ ErrorCode ScdNCWriteHelper::write_nonset_variables( std::vector< WriteNC::VarDat
                     if( num_lev > 1 )
                         // Transpose (lat, lon, lev) back to (lev, lat, lon)
                         jik_to_kji( ni, nj, num_lev, &tmpdoubledata[ 0 ], (double*)( dataptr ) );
-                    success = NCFUNCAP( _vara_double )(
-                        _fileId, variableData.varId, &variableData.writeStarts[ 0 ],
-                        &variableData.writeCounts[ 0 ], &tmpdoubledata[ 0 ] );
+                    success = NCFUNCAP( _vara_double )( _fileId, variableData.varId, &variableData.writeStarts[ 0 ],
+                                                        &variableData.writeCounts[ 0 ], &tmpdoubledata[ 0 ] );
                     if( success )
-                        MB_SET_ERR( MB_FAILURE, "Failed to write double data for variable "
-                                                    << variableData.varName );
+                        MB_SET_ERR( MB_FAILURE, "Failed to write double data for variable " << variableData.varName );
                     break;
                 }
                 default:
-                    MB_SET_ERR( MB_NOT_IMPLEMENTED,
-                                "Writing non-double data is not implemented yet" );
+                    MB_SET_ERR( MB_NOT_IMPLEMENTED, "Writing non-double data is not implemented yet" );
             }
         }
     }

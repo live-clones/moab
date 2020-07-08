@@ -76,18 +76,17 @@ int main( int argc, char** argv )
     EntityHandle elem;
     for( int i = 0; i < num_queries; i++ )
     {
-        pos = box.bMin + CartVect( box_extents[ 0 ] * .01 * ( rand( ) % 100 ),
-                                   box_extents[ 1 ] * .01 * ( rand( ) % 100 ),
-                                   box_extents[ 2 ] * .01 * ( rand( ) % 100 ) );
+        pos =
+            box.bMin + CartVect( box_extents[ 0 ] * .01 * ( rand( ) % 100 ), box_extents[ 1 ] * .01 * ( rand( ) % 100 ),
+                                 box_extents[ 2 ] * .01 * ( rand( ) % 100 ) );
         rval = sl.locate_point( pos.array( ), elem, params.array( ), &is_inside, 0.0, 0.0 );MB_CHK_ERR( rval );
         if( is_inside ) num_inside++;
     }
 
     cout << "Mesh contains " << elems.size( ) << " elements of type "
          << CN::EntityTypeName( mb.type_from_handle( *elems.begin( ) ) ) << endl;
-    cout << "Bounding box min-max = (" << box.bMin[ 0 ] << "," << box.bMin[ 1 ] << ","
-         << box.bMin[ 2 ] << ")-(" << box.bMax[ 0 ] << "," << box.bMax[ 1 ] << "," << box.bMax[ 2 ]
-         << ")" << endl;
+    cout << "Bounding box min-max = (" << box.bMin[ 0 ] << "," << box.bMin[ 1 ] << "," << box.bMin[ 2 ] << ")-("
+         << box.bMax[ 0 ] << "," << box.bMax[ 1 ] << "," << box.bMax[ 2 ] << ")" << endl;
     cout << "Queries inside box = " << num_inside << "/" << num_queries << " = "
          << 100.0 * ( (double)num_inside ) / num_queries << "%" << endl;
 

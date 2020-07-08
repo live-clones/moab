@@ -58,8 +58,7 @@ int mhdf_haveAdjacency( mhdf_FileHandle file, const char* elem_group, mhdf_Statu
     return result;
 }
 
-hid_t mhdf_createAdjacency( mhdf_FileHandle file, const char* elem_handle, long adj_list_size,
-                            mhdf_Status* status )
+hid_t mhdf_createAdjacency( mhdf_FileHandle file, const char* elem_handle, long adj_list_size, mhdf_Status* status )
 {
     FileHandle* file_ptr;
     hid_t       elem_id, table_id;
@@ -76,10 +75,7 @@ hid_t mhdf_createAdjacency( mhdf_FileHandle file, const char* elem_handle, long 
     }
 
     if( elem_handle == mhdf_node_type_handle( ) )
-    {
-        table_id = mhdf_create_table( file_ptr->hdf_handle, NODE_ADJCY_PATH, file_ptr->id_type, 1,
-                                      &dim, status );
-    }
+    { table_id = mhdf_create_table( file_ptr->hdf_handle, NODE_ADJCY_PATH, file_ptr->id_type, 1, &dim, status ); }
     else
     {
         elem_id = mhdf_elem_group_from_handle( file_ptr, elem_handle, status );
@@ -93,8 +89,7 @@ hid_t mhdf_createAdjacency( mhdf_FileHandle file, const char* elem_handle, long 
     return table_id;
 }
 
-hid_t mhdf_openAdjacency( mhdf_FileHandle file, const char* elem_handle, long* adj_list_size_out,
-                          mhdf_Status* status )
+hid_t mhdf_openAdjacency( mhdf_FileHandle file, const char* elem_handle, long* adj_list_size_out, mhdf_Status* status )
 
 {
     FileHandle* file_ptr;
@@ -126,31 +121,29 @@ hid_t mhdf_openAdjacency( mhdf_FileHandle file, const char* elem_handle, long* a
     return table_id;
 }
 
-void mhdf_writeAdjacency( hid_t table_id, long offset, long count, hid_t type, const void* data,
-                          mhdf_Status* status )
+void mhdf_writeAdjacency( hid_t table_id, long offset, long count, hid_t type, const void* data, mhdf_Status* status )
 {
     API_BEGIN;
     mhdf_write_data( table_id, offset, count, type, data, H5P_DEFAULT, status );
     API_END;
 }
 
-void mhdf_writeAdjacencyWithOpt( hid_t table_id, long offset, long count, hid_t type,
-                                 const void* data, hid_t prop, mhdf_Status* status )
+void mhdf_writeAdjacencyWithOpt( hid_t table_id, long offset, long count, hid_t type, const void* data, hid_t prop,
+                                 mhdf_Status* status )
 {
     API_BEGIN;
     mhdf_write_data( table_id, offset, count, type, data, prop, status );
     API_END;
 }
 
-void mhdf_readAdjacency( hid_t table_id, long offset, long count, hid_t type, void* data,
-                         mhdf_Status* status )
+void mhdf_readAdjacency( hid_t table_id, long offset, long count, hid_t type, void* data, mhdf_Status* status )
 {
     API_BEGIN;
     mhdf_read_data( table_id, offset, count, type, data, H5P_DEFAULT, status );
     API_END;
 }
-void mhdf_readAdjacencyWithOpt( hid_t table_id, long offset, long count, hid_t type, void* data,
-                                hid_t prop, mhdf_Status* status )
+void mhdf_readAdjacencyWithOpt( hid_t table_id, long offset, long count, hid_t type, void* data, hid_t prop,
+                                mhdf_Status* status )
 {
     API_BEGIN;
     mhdf_read_data( table_id, offset, count, type, data, prop, status );

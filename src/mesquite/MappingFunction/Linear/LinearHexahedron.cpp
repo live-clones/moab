@@ -36,8 +36,7 @@
 namespace MBMesquite
 {
 
-static const char* nonlinear_error =
-    "Attempt to use LinearHexahedron mapping function for a nonlinear element\n";
+static const char* nonlinear_error = "Attempt to use LinearHexahedron mapping function for a nonlinear element\n";
 
 EntityTopology LinearHexahedron::element_topology( ) const
 {
@@ -62,8 +61,7 @@ static inline int coeff_zeta_sign( unsigned coeff )
     return 2 * ( coeff / 4 ) - 1;
 }
 
-static void coefficients_at_corner( unsigned corner, double* coeff_out, size_t* indices_out,
-                                    size_t& num_coeff )
+static void coefficients_at_corner( unsigned corner, double* coeff_out, size_t* indices_out, size_t& num_coeff )
 {
     num_coeff = 1;
     coeff_out[ 0 ] = 1.0;
@@ -75,17 +73,16 @@ const int      edge_dir[] = { xi, eta, xi, eta, zeta, zeta, zeta, zeta, xi, eta,
 const int      edge_beg[] = { 0, 1, 2, 3, 0, 1, 2, 3, 4, 5, 6, 7 };  // start vertex by edge number
 const int      edge_end[] = { 1, 2, 3, 0, 4, 5, 6, 7, 5, 6, 7, 4 };  // end vetex by edge number
 const int      edge_opposite[] = { 10, 11, 8, 9, 6, 7, 4, 5, 2, 3, 0, 1 };  // opposite edge
-const int      edge_beg_orth1[] = {
-    3, 5, 1, 7, 1, 0, 3, 2, 7, 1, 5, 3 };  // vtx adjacent to edge start in edge_dir[e]+1 direction
-const int edge_beg_orth2[] = {
-    4, 0, 6, 2, 3, 2, 1, 0, 0, 4, 2, 6 };  // vtx adjacent to edge start in edge_dir[e]+2 direction
-const int edge_end_orth1[] = {
-    2, 6, 0, 4, 5, 4, 7, 6, 6, 2, 4, 0 };  // vtx adjacent to edge end in edge_dir[e]+1 direction
-const int edge_end_orth2[] = {
-    5, 3, 7, 1, 7, 6, 5, 4, 1, 7, 3, 5 };  // vtx adjacent to edge end in edge_dir[e]+2 direction
+const int      edge_beg_orth1[] = { 3, 5, 1, 7, 1, 0,
+                               3, 2, 7, 1, 5, 3 };  // vtx adjacent to edge start in edge_dir[e]+1 direction
+const int      edge_beg_orth2[] = { 4, 0, 6, 2, 3, 2,
+                               1, 0, 0, 4, 2, 6 };  // vtx adjacent to edge start in edge_dir[e]+2 direction
+const int      edge_end_orth1[] = { 2, 6, 0, 4, 5, 4,
+                               7, 6, 6, 2, 4, 0 };  // vtx adjacent to edge end in edge_dir[e]+1 direction
+const int      edge_end_orth2[] = { 5, 3, 7, 1, 7, 6,
+                               5, 4, 1, 7, 3, 5 };  // vtx adjacent to edge end in edge_dir[e]+2 direction
 
-static void coefficients_at_mid_edge( unsigned edge, double* coeff_out, size_t* indices_out,
-                                      size_t& num_coeff )
+static void coefficients_at_mid_edge( unsigned edge, double* coeff_out, size_t* indices_out, size_t& num_coeff )
 {
     num_coeff = 2;
     coeff_out[ 0 ] = 0.5;
@@ -103,8 +100,7 @@ const int face_vtx[ 6 ][ 4 ] = { { 0, 1, 4, 5 },  // face 0 vertices
 const int face_opp[ 6 ] = { 2, 3, 0, 1, 5, 4 };  // opposite faces on hex
 const int face_dir[ 6 ] = { eta, xi, eta, xi, zeta, zeta };  // normal direction
 
-static void coefficients_at_mid_face( unsigned face, double* coeff_out, size_t* indices_out,
-                                      size_t& num_coeff )
+static void coefficients_at_mid_face( unsigned face, double* coeff_out, size_t* indices_out, size_t& num_coeff )
 {
     num_coeff = 4;
     coeff_out[ 0 ] = 0.25;
@@ -138,8 +134,8 @@ static void coefficients_at_mid_elem( double* coeff_out, size_t* indices_out, si
     indices_out[ 7 ] = 7;
 }
 
-void LinearHexahedron::coefficients( Sample loc, NodeSet nodeset, double* coeff_out,
-                                     size_t* indices_out, size_t& num_coeff, MsqError& err ) const
+void LinearHexahedron::coefficients( Sample loc, NodeSet nodeset, double* coeff_out, size_t* indices_out,
+                                     size_t& num_coeff, MsqError& err ) const
 {
     if( nodeset.have_any_mid_node( ) )
     {
@@ -166,8 +162,8 @@ void LinearHexahedron::coefficients( Sample loc, NodeSet nodeset, double* coeff_
     }
 }
 
-static void derivatives_at_corner( unsigned corner, size_t* vertex_indices_out,
-                                   MsqVector< 3 >* d_coeff_d_xi_out, size_t& num_vtx )
+static void derivatives_at_corner( unsigned corner, size_t* vertex_indices_out, MsqVector< 3 >* d_coeff_d_xi_out,
+                                   size_t& num_vtx )
 {
     const int xi_sign = coeff_xi_sign( corner );
     const int eta_sign = coeff_eta_sign( corner );
@@ -201,8 +197,8 @@ static void derivatives_at_corner( unsigned corner, size_t* vertex_indices_out,
     d_coeff_d_xi_out[ 3 ][ 2 ] = -zeta_sign;
 }
 
-static void derivatives_at_mid_edge( unsigned edge, size_t* vertex_indices_out,
-                                     MsqVector< 3 >* d_coeff_d_xi_out, size_t& num_vtx )
+static void derivatives_at_mid_edge( unsigned edge, size_t* vertex_indices_out, MsqVector< 3 >* d_coeff_d_xi_out,
+                                     size_t& num_vtx )
 {
     const int direction = edge_dir[ edge ];
     const int ortho1 = ( direction + 1 ) % 3;
@@ -246,18 +242,17 @@ static void derivatives_at_mid_edge( unsigned edge, size_t* vertex_indices_out,
     d_coeff_d_xi_out[ 5 ][ ortho2 ] = -sign_or2 * 0.5;
 }
 
-static void derivatives_at_mid_face( unsigned face, size_t* vertex_indices_out,
-                                     MsqVector< 3 >* d_coeff_d_xi_out, size_t& num_vtx )
+static void derivatives_at_mid_face( unsigned face, size_t* vertex_indices_out, MsqVector< 3 >* d_coeff_d_xi_out,
+                                     size_t& num_vtx )
 {
-    const int vtx_signs[ 4 ][ 3 ] = {
-        { coeff_xi_sign( face_vtx[ face ][ 0 ] ), coeff_eta_sign( face_vtx[ face ][ 0 ] ),
-          coeff_zeta_sign( face_vtx[ face ][ 0 ] ) },
-        { coeff_xi_sign( face_vtx[ face ][ 1 ] ), coeff_eta_sign( face_vtx[ face ][ 1 ] ),
-          coeff_zeta_sign( face_vtx[ face ][ 1 ] ) },
-        { coeff_xi_sign( face_vtx[ face ][ 2 ] ), coeff_eta_sign( face_vtx[ face ][ 2 ] ),
-          coeff_zeta_sign( face_vtx[ face ][ 2 ] ) },
-        { coeff_xi_sign( face_vtx[ face ][ 3 ] ), coeff_eta_sign( face_vtx[ face ][ 3 ] ),
-          coeff_zeta_sign( face_vtx[ face ][ 3 ] ) } };
+    const int vtx_signs[ 4 ][ 3 ] = { { coeff_xi_sign( face_vtx[ face ][ 0 ] ), coeff_eta_sign( face_vtx[ face ][ 0 ] ),
+                                        coeff_zeta_sign( face_vtx[ face ][ 0 ] ) },
+                                      { coeff_xi_sign( face_vtx[ face ][ 1 ] ), coeff_eta_sign( face_vtx[ face ][ 1 ] ),
+                                        coeff_zeta_sign( face_vtx[ face ][ 1 ] ) },
+                                      { coeff_xi_sign( face_vtx[ face ][ 2 ] ), coeff_eta_sign( face_vtx[ face ][ 2 ] ),
+                                        coeff_zeta_sign( face_vtx[ face ][ 2 ] ) },
+                                      { coeff_xi_sign( face_vtx[ face ][ 3 ] ), coeff_eta_sign( face_vtx[ face ][ 3 ] ),
+                                        coeff_zeta_sign( face_vtx[ face ][ 3 ] ) } };
     const int ortho_dir = face_dir[ face ];
     const int face_dir1 = ( ortho_dir + 1 ) % 3;
     const int face_dir2 = ( ortho_dir + 2 ) % 3;
@@ -306,8 +301,7 @@ static void derivatives_at_mid_face( unsigned face, size_t* vertex_indices_out,
     d_coeff_d_xi_out[ 7 ][ face_dir2 ] = 0.0;
 }
 
-static void derivatives_at_mid_elem( size_t* vertex_indices_out, MsqVector< 3 >* d_coeff_d_xi_out,
-                                     size_t& num_vtx )
+static void derivatives_at_mid_elem( size_t* vertex_indices_out, MsqVector< 3 >* d_coeff_d_xi_out, size_t& num_vtx )
 
 {
     num_vtx = 8;
@@ -354,8 +348,7 @@ static void derivatives_at_mid_elem( size_t* vertex_indices_out, MsqVector< 3 >*
 }
 
 void LinearHexahedron::derivatives( Sample loc, NodeSet nodeset, size_t* vertex_indices_out,
-                                    MsqVector< 3 >* d_coeff_d_xi_out, size_t& num_vtx,
-                                    MsqError& err ) const
+                                    MsqVector< 3 >* d_coeff_d_xi_out, size_t& num_vtx, MsqError& err ) const
 {
     if( nodeset.have_any_mid_node( ) )
     {

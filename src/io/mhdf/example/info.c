@@ -43,9 +43,8 @@ int main( int argc, char* argv[] )
     return result;
 }
 
-static void print_ent_desc( const char* name, const char* subname, struct mhdf_EntDesc* data,
-                            const char* vals_label, const char* extra_label,
-                            struct mhdf_FileDesc* all )
+static void print_ent_desc( const char* name, const char* subname, struct mhdf_EntDesc* data, const char* vals_label,
+                            const char* extra_label, struct mhdf_FileDesc* all )
 {
     int i, len = 10;
 
@@ -66,8 +65,7 @@ static void print_ent_desc( const char* name, const char* subname, struct mhdf_E
 
     if( !data->num_dense_tags ) return;
 
-    printf( "      %-*s: \"%s\"", len, "dense tags",
-            all->tags[ data->dense_tag_indices[ 0 ] ].name );
+    printf( "      %-*s: \"%s\"", len, "dense tags", all->tags[ data->dense_tag_indices[ 0 ] ].name );
     for( i = 1; i < data->num_dense_tags; ++i )
         printf( ", \"%s\"", all->tags[ data->dense_tag_indices[ i ] ].name );
     printf( "\n" );
@@ -238,8 +236,7 @@ static void print_tag_desc( struct mhdf_TagDesc* data, struct mhdf_FileDesc* all
     }
     else if( data->num_dense_indices )
     {
-        printf( "      %-*s: %s", width, "tables",
-                ent_desc_name( all, data->dense_elem_indices[ 0 ] ) );
+        printf( "      %-*s: %s", width, "tables", ent_desc_name( all, data->dense_elem_indices[ 0 ] ) );
         for( i = 1; i < data->num_dense_indices; ++i )
             printf( ", %s", ent_desc_name( all, data->dense_elem_indices[ i ] ) );
     }

@@ -53,8 +53,7 @@ the negateFlag is set to one.  Defaults to the analytical gradient.
   \param Obj1 (ObjectiveFunction*)
   \param Obj2 (ObjectiveFunction*)
  */
-CompositeOFMultiply::CompositeOFMultiply( ObjectiveFunction* Obj1, ObjectiveFunction* Obj2,
-                                          bool delete_OFs )
+CompositeOFMultiply::CompositeOFMultiply( ObjectiveFunction* Obj1, ObjectiveFunction* Obj2, bool delete_OFs )
     : deleteObjFuncs( delete_OFs )
 {
     objFunc1 = Obj1;
@@ -82,28 +81,24 @@ void CompositeOFMultiply::clear( )
     objFunc2->clear( );
 }
 
-void CompositeOFMultiply::initialize_queue( MeshDomainAssoc* mesh_and_domain,
-                                            const Settings* settings, MsqError& err )
+void CompositeOFMultiply::initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings, MsqError& err )
 {
     objFunc1->initialize_queue( mesh_and_domain, settings, err );MSQ_ERRRTN( err );
     objFunc2->initialize_queue( mesh_and_domain, settings, err );MSQ_ERRRTN( err );
 }
 
 bool CompositeOFMultiply::initialize_block_coordinate_descent( MeshDomainAssoc* mesh_and_domain,
-                                                               const Settings*  settings,
-                                                               PatchSet* user_set, MsqError& err )
+                                                               const Settings* settings, PatchSet* user_set,
+                                                               MsqError& err )
 {
     bool rval1, rval2;
-    rval1 =
-        objFunc1->initialize_block_coordinate_descent( mesh_and_domain, settings, user_set, err );
+    rval1 = objFunc1->initialize_block_coordinate_descent( mesh_and_domain, settings, user_set, err );
     MSQ_ERRZERO( err );
-    rval2 =
-        objFunc2->initialize_block_coordinate_descent( mesh_and_domain, settings, user_set, err );
+    rval2 = objFunc2->initialize_block_coordinate_descent( mesh_and_domain, settings, user_set, err );
     return !MSQ_CHKERR( err ) && rval1 && rval2;
 }
 
-bool CompositeOFMultiply::evaluate( EvalType type, PatchData& pd, double& value_out, bool free,
-                                    MsqError& err )
+bool CompositeOFMultiply::evaluate( EvalType type, PatchData& pd, double& value_out, bool free, MsqError& err )
 {
     double value_2;
     bool   ok;
@@ -144,20 +139,16 @@ bool CompositeOFMultiply::evaluate_with_gradient( EvalType type, PatchData& pd, 
     return true;
 }
 
-bool CompositeOFMultiply::evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd,
-                                                          double&                     value_out,
+bool CompositeOFMultiply::evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd, double& value_out,
                                                           std::vector< Vector3D >&    grad_out,
-                                                          std::vector< SymMatrix3D >& diag_out,
-                                                          MsqError&                   err )
+                                                          std::vector< SymMatrix3D >& diag_out, MsqError& err )
 {
     double value_2;
     bool   valid;
 
-    valid =
-        objFunc1->evaluate_with_Hessian_diagonal( type, pd, value_out, grad_out, diag_out, err );
+    valid = objFunc1->evaluate_with_Hessian_diagonal( type, pd, value_out, grad_out, diag_out, err );
     if( MSQ_CHKERR( err ) || !valid ) return false;
-    valid =
-        objFunc2->evaluate_with_Hessian_diagonal( type, pd, value_2, mGradient, mDiagonal, err );
+    valid = objFunc2->evaluate_with_Hessian_diagonal( type, pd, value_2, mGradient, mDiagonal, err );
     if( MSQ_CHKERR( err ) || !valid ) return false;
 
     for( size_t i = 0; i < pd.num_free_vertices( ); ++i )
@@ -176,8 +167,7 @@ bool CompositeOFMultiply::evaluate_with_Hessian_diagonal( EvalType type, PatchDa
     return true;
 }
 
-bool CompositeOFMultiply::evaluate_with_Hessian( EvalType, PatchData&, double&,
-                                                 std::vector< Vector3D >&, MsqHessian&,
+bool CompositeOFMultiply::evaluate_with_Hessian( EvalType, PatchData&, double&, std::vector< Vector3D >&, MsqHessian&,
                                                  MsqError& err )
 {
     MSQ_SETERR( err )

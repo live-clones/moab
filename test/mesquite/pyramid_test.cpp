@@ -95,8 +95,8 @@ int main( int argc, char* argv[] )
     QualityMetric*               metrics[] = { &m1, &m2, &m3, 0 };
 
     // Read Mesh
-    std::string mesh_file = TestDir + "/3D/vtk/pyramids/untangled/12-pyramid-unit-sphere.vtk";
-    std::string imesh_file = TestDir + "/3D/vtk/pyramids/untangled/12-pyramid-unit-sphere.vtk";
+    std::string          mesh_file = TestDir + "/3D/vtk/pyramids/untangled/12-pyramid-unit-sphere.vtk";
+    std::string          imesh_file = TestDir + "/3D/vtk/pyramids/untangled/12-pyramid-unit-sphere.vtk";
     MBMesquite::MeshImpl mesh;
     mesh.read_vtk( mesh_file.c_str( ), err );
     CPPUNIT_ASSERT( !err );
@@ -116,8 +116,7 @@ int main( int argc, char* argv[] )
     mesh.get_all_elements( elem_array, err );
     CPPUNIT_ASSERT( !err );
     CPPUNIT_ASSERT( elem_array.size( ) == 12 );
-    mesh.elements_get_attached_vertices( arrptr( elem_array ), elem_array.size( ), vert_array,
-                                         conn_offsets, err );
+    mesh.elements_get_attached_vertices( arrptr( elem_array ), elem_array.size( ), vert_array, conn_offsets, err );
     CPPUNIT_ASSERT( !err );
     CPPUNIT_ASSERT( vert_array.size( ) == 60 );
     CPPUNIT_ASSERT( conn_offsets.size( ) == 13 );
@@ -177,15 +176,14 @@ int main( int argc, char* argv[] )
     return 0;
 }
 
-bool smooth_mesh( Mesh* mesh, Mesh*, Mesh::VertexHandle free_vertex_at_origin,
-                  Vector3D initial_free_vertex_position, QualityMetric* metric )
+bool smooth_mesh( Mesh* mesh, Mesh*, Mesh::VertexHandle free_vertex_at_origin, Vector3D initial_free_vertex_position,
+                  QualityMetric* metric )
 {
     MBMesquite::MsqPrintError err( cout );
     const Vector3D            origin( 0, 0, 0 );
 
     // print a little output so we know when we died
-    std::cout << "**************************************************************************"
-              << std::endl
+    std::cout << "**************************************************************************" << std::endl
               << "* Smoothing..." << std::endl
               << "* Metric: " << metric->get_name( ) << std::endl
               << "* Apex position: " << initial_free_vertex_position
@@ -235,13 +233,12 @@ bool smooth_mesh( Mesh* mesh, Mesh*, Mesh::VertexHandle free_vertex_at_origin,
 
     // print a little output so we know when we died
     std::cout  //<<
-        //"**************************************************************************"
+               //"**************************************************************************"
         << std::endl
         << "* Done Smoothing:" << std::endl
         << "* Metric: " << metric->get_name( ) << std::endl
         << "* Apex position: " << position << std::endl
-        << "**************************************************************************"
-        << std::endl;
+        << "**************************************************************************" << std::endl;
 
     CPPUNIT_ASSERT( position.within_tolerance_box( Vector3D( 0, 0, 0 ), TOL ) );
     return false;
@@ -252,11 +249,9 @@ bool smooth_mixed_mesh( const char* filename )
     MBMesquite::MsqPrintError err( cout );
 
     // print a little output so we know when we died
-    std::cout << "**************************************************************************"
-              << std::endl
+    std::cout << "**************************************************************************" << std::endl
               << "* Smoothing: " << filename << std::endl
-              << "**************************************************************************"
-              << std::endl;
+              << "**************************************************************************" << std::endl;
 
     // The instruction queue to set up
     InstructionQueue Q;

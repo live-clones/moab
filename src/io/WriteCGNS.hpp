@@ -77,8 +77,8 @@ class WriteCGNS : public WriterIface
     //! writes out a file
     ErrorCode write_file( const char* file_name, const bool overwrite, const FileOptions& opts,
                           const EntityHandle* output_list, const int num_sets,
-                          const std::vector< std::string >& qa_list, const Tag* tag_list = NULL,
-                          int num_tags = 0, int export_dimension = 3 );
+                          const std::vector< std::string >& qa_list, const Tag* tag_list = NULL, int num_tags = 0,
+                          int export_dimension = 3 );
 
     // Get and count vertex entities
     ErrorCode get_vertex_entities( cgsize_t& VrtSize, std::vector< moab::EntityHandle >& Nodes );
@@ -96,10 +96,8 @@ class WriteCGNS : public WriterIface
     ErrorCode write_coord_cgns( std::vector< moab::EntityHandle >& nodes );
 
     // Set Tag values on entities
-    ErrorCode set_tag_values( std::vector< moab::Tag >&            TagHandles,
-                              std::vector< moab::EntityHandle >&   Edges,
-                              std::vector< moab::EntityHandle >&   Faces,
-                              std::vector< moab::EntityHandle >&   Cells,
+    ErrorCode set_tag_values( std::vector< moab::Tag >& TagHandles, std::vector< moab::EntityHandle >& Edges,
+                              std::vector< moab::EntityHandle >& Faces, std::vector< moab::EntityHandle >& Cells,
                               std::vector< WriteCGNS::SetStruct >& Sets );
 
     // Get Entities in the set
@@ -110,9 +108,8 @@ class WriteCGNS : public WriterIface
     ErrorCode get_cgns_type( int i, std::vector< WriteCGNS::SetStruct >& Sets );
 
     // Get the connectivity table
-    ErrorCode get_conn_table( std::vector< moab::EntityHandle >& Elements,
-                              std::vector< int >& Begin, std::vector< int >& End,
-                              std::vector< moab::Tag >&               TagHandles,
+    ErrorCode get_conn_table( std::vector< moab::EntityHandle >& Elements, std::vector< int >& Begin,
+                              std::vector< int >& End, std::vector< moab::Tag >& TagHandles,
                               std::vector< WriteCGNS::SetStruct >&    Sets,
                               std::vector< std::vector< cgsize_t > >& ConnTable );
 

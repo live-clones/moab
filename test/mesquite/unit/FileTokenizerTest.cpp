@@ -17,15 +17,12 @@ using std::cout;
 using MBMesquite::FileTokenizer;
 using MBMesquite::MsqPrintError;
 
-extern const char* const tokens[] = { "foo",   "bar",   "0",      "123abc", "123", "0x5",
-                                      "1e200", "jason", "abc123", "1.0",    0 };
-extern const char* const spaces[] = { " ",     " \n ", "\n\n\n ", "\t",   "\t\t",
-                                      "     ", "\n",   "  ",      "\t\n", 0 };
+extern const char* const tokens[] = { "foo", "bar", "0", "123abc", "123", "0x5", "1e200", "jason", "abc123", "1.0", 0 };
+extern const char* const spaces[] = { " ", " \n ", "\n\n\n ", "\t", "\t\t", "     ", "\n", "  ", "\t\n", 0 };
 
 extern const bool doubles[] = { false, false, true, false, true, false, true, false, false, true };
 extern const bool longs[] = { false, false, true, false, true, true, false, false, false, false };
-extern const bool booleans[] = { false, false, true,  false, false,
-                                 false, false, false, false, false };
+extern const bool booleans[] = { false, false, true, false, false, false, false, false, false, false };
 
 class FileTokenizerTest : public CppUnit::TestFixture
 {

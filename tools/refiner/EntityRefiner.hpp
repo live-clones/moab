@@ -82,8 +82,7 @@ class EntityRefinerOutputFunctor
     virtual ~EntityRefinerOutputFunctor( ) {}
     /// Map an input vertex to the output mesh. This should return the same value when given the
     /// same input across multiple calls.
-    virtual EntityHandle map_vertex( EntityHandle vhash, const double* vcoords,
-                                     const void* vtags ) = 0;
+    virtual EntityHandle map_vertex( EntityHandle vhash, const double* vcoords, const void* vtags ) = 0;
     /**\brief Create a new vertex along an edge.
      *
      * @param[in] h0 An edge endpoint handle on the output mesh.
@@ -92,8 +91,7 @@ class EntityRefinerOutputFunctor
      * @param[in] vtags Field values at the midpoint.
      * @retval    A handle for the midpoint on the output mesh.
      */
-    EntityHandle operator( )( EntityHandle h0, EntityHandle h1, const double* vcoords,
-                              const void* vtags )
+    EntityHandle operator( )( EntityHandle h0, EntityHandle h1, const double* vcoords, const void* vtags )
     {
         EntityHandle harr[ 2 ];
         // Cppcheck warning (false positive): variable harr is assigned a value that is never used
@@ -110,8 +108,8 @@ class EntityRefinerOutputFunctor
      * @param[in] vtags Field values at the mid-face point.
      * @retval    A handle for the mid-face point on the output mesh.
      */
-    virtual EntityHandle operator( )( EntityHandle h0, EntityHandle h1, EntityHandle h2,
-                                      const double* vcoords, const void* vtags )
+    virtual EntityHandle operator( )( EntityHandle h0, EntityHandle h1, EntityHandle h2, const double* vcoords,
+                                      const void* vtags )
     {
         EntityHandle harr[ 3 ];
         // Cppcheck warning (false positive): variable harr is assigned a value that is never used
@@ -128,8 +126,7 @@ class EntityRefinerOutputFunctor
      * @param[in] vtags Field values at the new point.
      * @retval    A handle for the new point on the output mesh.
      */
-    virtual EntityHandle operator( )( int nhash, EntityHandle* hash, const double* vcoords,
-                                      const void* vtags ) = 0;
+    virtual EntityHandle operator( )( int nhash, EntityHandle* hash, const double* vcoords, const void* vtags ) = 0;
     /**\brief Append an output vertex to the list of vertices defining a new entity.
      *
      * @param[in] vhash A vertex of the output mesh.

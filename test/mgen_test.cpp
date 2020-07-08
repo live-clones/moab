@@ -38,28 +38,18 @@ int main( int argc, char* argv[] )
 
     ProgOptions popts;
 
-    popts.addOpt< int >( string( "blockSize,b" ), string( "Block size of mesh (default=4)" ),
-                         &opts.blockSize );
-    popts.addOpt< int >( string( "xproc,M" ), string( "Number of processors in x dir (default=1)" ),
-                         &opts.M );
-    popts.addOpt< int >( string( "yproc,N" ), string( "Number of processors in y dir (default=1)" ),
-                         &opts.N );
-    popts.addOpt< int >( string( "zproc,K" ), string( "Number of processors in z dir (default=1)" ),
-                         &opts.K );
+    popts.addOpt< int >( string( "blockSize,b" ), string( "Block size of mesh (default=4)" ), &opts.blockSize );
+    popts.addOpt< int >( string( "xproc,M" ), string( "Number of processors in x dir (default=1)" ), &opts.M );
+    popts.addOpt< int >( string( "yproc,N" ), string( "Number of processors in y dir (default=1)" ), &opts.N );
+    popts.addOpt< int >( string( "zproc,K" ), string( "Number of processors in z dir (default=1)" ), &opts.K );
 
-    popts.addOpt< int >( string( "xblocks,A" ),
-                         string( "Number of blocks on a task in x dir (default=2)" ), &opts.A );
-    popts.addOpt< int >( string( "yblocks,B" ),
-                         string( "Number of blocks on a task in y dir (default=2)" ), &opts.B );
-    popts.addOpt< int >( string( "zblocks,C" ),
-                         string( "Number of blocks on a task in x dir (default=2)" ), &opts.C );
+    popts.addOpt< int >( string( "xblocks,A" ), string( "Number of blocks on a task in x dir (default=2)" ), &opts.A );
+    popts.addOpt< int >( string( "yblocks,B" ), string( "Number of blocks on a task in y dir (default=2)" ), &opts.B );
+    popts.addOpt< int >( string( "zblocks,C" ), string( "Number of blocks on a task in x dir (default=2)" ), &opts.C );
 
-    popts.addOpt< double >( string( "xsize,x" ), string( "Total size in x direction (default=1.)" ),
-                            &opts.xsize );
-    popts.addOpt< double >( string( "ysize,y" ), string( "Total size in y direction (default=1.)" ),
-                            &opts.ysize );
-    popts.addOpt< double >( string( "zsize,z" ), string( "Total size in z direction (default=1.)" ),
-                            &opts.zsize );
+    popts.addOpt< double >( string( "xsize,x" ), string( "Total size in x direction (default=1.)" ), &opts.xsize );
+    popts.addOpt< double >( string( "ysize,y" ), string( "Total size in y direction (default=1.)" ), &opts.ysize );
+    popts.addOpt< double >( string( "zsize,z" ), string( "Total size in z direction (default=1.)" ), &opts.zsize );
 
     popts.addOpt< void >( "newMerge,w", "use new merging method", &opts.newMergeMethod );
 
@@ -71,11 +61,9 @@ int main( int argc, char* argv[] )
 
     popts.addOpt< void >( "faces_edges,f", "create all faces and edges", &opts.adjEnts );
 
-    popts.addOpt< int >( string( "ghost_layers,g" ), string( "Number of ghost layers (default=0)" ),
-                         &opts.GL );
+    popts.addOpt< int >( string( "ghost_layers,g" ), string( "Number of ghost layers (default=0)" ), &opts.GL );
 
-    popts.addOpt< void >( "parallel_merge,p", "use parallel mesh merge, not vertex ID based merge",
-                          &opts.parmerge );
+    popts.addOpt< void >( "parallel_merge,p", "use parallel mesh merge, not vertex ID based merge", &opts.parmerge );
 
     popts.parseCommandLine( argc, argv );
 

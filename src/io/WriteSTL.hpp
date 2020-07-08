@@ -55,8 +55,8 @@ class WriteSTL : public WriterIface
     //! writes out a file
     ErrorCode write_file( const char* file_name, const bool overwrite, const FileOptions& opts,
                           const EntityHandle* output_list, const int num_sets,
-                          const std::vector< std::string >& qa_list, const Tag* tag_list = NULL,
-                          int num_tags = 0, int export_dimension = 3 );
+                          const std::vector< std::string >& qa_list, const Tag* tag_list = NULL, int num_tags = 0,
+                          int export_dimension = 3 );
 
   protected:
     enum ByteOrder
@@ -67,8 +67,7 @@ class WriteSTL : public WriterIface
     };
 
     //! Write list of triangles to an STL file.
-    ErrorCode ascii_write_triangles( FILE* file, const char header[ 81 ], const Range& triangles,
-                                     int precision );
+    ErrorCode ascii_write_triangles( FILE* file, const char header[ 81 ], const Range& triangles, int precision );
     //! Write list of triangles to an STL file.
     ErrorCode binary_write_triangles( FILE* file, const char header[ 81 ], ByteOrder byte_order,
                                       const Range& triangles );
@@ -76,11 +75,10 @@ class WriteSTL : public WriterIface
     //! Given an array of vertex coordinates for a triangle,
     //! pass back individual point coordinates as floats and
     //! calculate triangle normal.
-    ErrorCode get_triangle_data( const double vtx_coords[ 9 ], float v1[ 3 ], float v2[ 3 ],
-                                 float v3[ 3 ], float n[ 3 ] );
+    ErrorCode get_triangle_data( const double vtx_coords[ 9 ], float v1[ 3 ], float v2[ 3 ], float v3[ 3 ],
+                                 float n[ 3 ] );
 
-    ErrorCode get_triangle_data( const double vtx_coords[ 9 ], CartVect& v1, CartVect& v2,
-                                 CartVect& v3, CartVect& n );
+    ErrorCode get_triangle_data( const double vtx_coords[ 9 ], CartVect& v1, CartVect& v2, CartVect& v3, CartVect& n );
 
     //! interface instance
     Interface*      mbImpl;
@@ -93,8 +91,7 @@ class WriteSTL : public WriterIface
 
     //! Get triangles to write from input array of entity sets.  If
     //! no sets, gets all triangles.
-    ErrorCode get_triangles( const EntityHandle* set_array, int set_array_length,
-                             Range& triangles );
+    ErrorCode get_triangles( const EntityHandle* set_array, int set_array_length, Range& triangles );
 
     //! Open a file, respecting passed overwrite value and
     //! subclass-specified value for need_binary_io().

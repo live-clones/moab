@@ -120,8 +120,7 @@ iMesh_Instance create_mesh( )
             for( int k = 0; k < INTERVALS; ++k )
             {
                 HEX_VERTS( i, j, k, conn );
-                iMesh_createEnt( tmp, iMesh_HEXAHEDRON, conn, 8, &HEXES[ i ][ j ][ k ], &status,
-                                 &err );
+                iMesh_createEnt( tmp, iMesh_HEXAHEDRON, conn, 8, &HEXES[ i ][ j ][ k ], &status, &err );
                 CHECK_EQUAL( iBase_SUCCESS, err );
                 CHECK_EQUAL( iBase_NEW, status );
             }
@@ -131,8 +130,7 @@ iMesh_Instance create_mesh( )
             for( int j = 0; j < INTERVALS; ++j )
             {
                 QUAD_VERTS( f, i, j, conn );
-                iMesh_createEnt( tmp, iMesh_QUADRILATERAL, conn, 4, &FACES[ f ][ i ][ j ], &status,
-                                 &err );
+                iMesh_createEnt( tmp, iMesh_QUADRILATERAL, conn, 4, &FACES[ f ][ i ][ j ], &status, &err );
                 CHECK_EQUAL( iBase_SUCCESS, err );
             }
 
@@ -156,8 +154,8 @@ void test_getEntArrAdj_conn( )
             int                 adj_size = -1, off_size = -1;
             iBase_EntityHandle* adj_ptr = adj;
             int*                off_ptr = off;
-            iMesh_getEntArrAdj( mesh, HEXES[ i ][ j ], INTERVALS, iBase_VERTEX, &adj_ptr,
-                                &adj_alloc, &adj_size, &off_ptr, &off_alloc, &off_size, &err );
+            iMesh_getEntArrAdj( mesh, HEXES[ i ][ j ], INTERVALS, iBase_VERTEX, &adj_ptr, &adj_alloc, &adj_size,
+                                &off_ptr, &off_alloc, &off_size, &err );
             CHECK_EQUAL( &adj[ 0 ], adj_ptr );
             CHECK_EQUAL( &off[ 0 ], off_ptr );
             CHECK_EQUAL( iBase_SUCCESS, err );
@@ -186,8 +184,8 @@ void test_getEntArrAdj_conn( )
         int                 adj_size = -1, off_size = -1;
         iBase_EntityHandle* adj_ptr = adj;
         int*                off_ptr = off;
-        iMesh_getEntArrAdj( mesh, FACES[ f ][ i ], INTERVALS, iBase_VERTEX, &adj_ptr, &adj_alloc,
-                            &adj_size, &off_ptr, &off_alloc, &off_size, &err );
+        iMesh_getEntArrAdj( mesh, FACES[ f ][ i ], INTERVALS, iBase_VERTEX, &adj_ptr, &adj_alloc, &adj_size, &off_ptr,
+                            &off_alloc, &off_size, &err );
         CHECK_EQUAL( &adj[ 0 ], adj_ptr );
         CHECK_EQUAL( &off[ 0 ], off_ptr );
         CHECK_EQUAL( iBase_SUCCESS, err );
@@ -215,8 +213,8 @@ void test_getEntArrAdj_vertex( )
     int*                off = 0;
     int                 adj_alloc = 0, off_alloc = 0;
     int                 adj_size = -1, off_size = -1;
-    iMesh_getEntArrAdj( mesh, VERTS[ 0 ][ 0 ], INTERVALS + 1, iBase_REGION, &adj, &adj_alloc,
-                        &adj_size, &off, &off_alloc, &off_size, &err );
+    iMesh_getEntArrAdj( mesh, VERTS[ 0 ][ 0 ], INTERVALS + 1, iBase_REGION, &adj, &adj_alloc, &adj_size, &off,
+                        &off_alloc, &off_size, &err );
     CHECK_EQUAL( iBase_SUCCESS, err );
     CHECK( 0 != adj );
     CHECK( 0 != off );
@@ -253,8 +251,8 @@ void test_getEntArrAdj_up( )
     int*                off = 0;
     int                 adj_alloc = 0, off_alloc = 0;
     int                 adj_size = -1, off_size = -1;
-    iMesh_getEntArrAdj( mesh, FACES[ 4 ][ 0 ], INTERVALS, iBase_REGION, &adj, &adj_alloc, &adj_size,
-                        &off, &off_alloc, &off_size, &err );
+    iMesh_getEntArrAdj( mesh, FACES[ 4 ][ 0 ], INTERVALS, iBase_REGION, &adj, &adj_alloc, &adj_size, &off, &off_alloc,
+                        &off_size, &err );
     CHECK_EQUAL( iBase_SUCCESS, err );
     CHECK( 0 != adj );
     CHECK( 0 != off );
@@ -283,8 +281,8 @@ void test_getEntArrAdj_down( )
     int*                off = 0;
     int                 adj_alloc = 0, off_alloc = 0;
     int                 adj_size = -1, off_size = -1;
-    iMesh_getEntArrAdj( mesh, HEXES[ 0 ][ 0 ], INTERVALS, iBase_FACE, &adj, &adj_alloc, &adj_size,
-                        &off, &off_alloc, &off_size, &err );
+    iMesh_getEntArrAdj( mesh, HEXES[ 0 ][ 0 ], INTERVALS, iBase_FACE, &adj, &adj_alloc, &adj_size, &off, &off_alloc,
+                        &off_size, &err );
     CHECK_EQUAL( iBase_SUCCESS, err );
     CHECK( 0 != adj );
     CHECK( 0 != off );
@@ -295,8 +293,7 @@ void test_getEntArrAdj_down( )
 
     // first (corner) hex should have three adjacent faces
     CHECK_EQUAL( 3, off[ 1 ] - off[ 0 ] );
-    iBase_EntityHandle exp[ 3 ] = { FACES[ 0 ][ 0 ][ 0 ], FACES[ 3 ][ 0 ][ 0 ],
-                                    FACES[ 4 ][ 0 ][ 0 ] };
+    iBase_EntityHandle exp[ 3 ] = { FACES[ 0 ][ 0 ][ 0 ], FACES[ 3 ][ 0 ][ 0 ], FACES[ 4 ][ 0 ][ 0 ] };
     iBase_EntityHandle act[ 3 ];
     std::copy( adj + off[ 0 ], adj + off[ 1 ], act );
     std::sort( exp, exp + 3 );
@@ -305,8 +302,8 @@ void test_getEntArrAdj_down( )
 
     // last (corner) hex should have three adjacent faces
     CHECK_EQUAL( 3, off[ INTERVALS ] - off[ INTERVALS - 1 ] );
-    iBase_EntityHandle exp2[ 3 ] = { FACES[ 0 ][ 0 ][ INTERVALS - 1 ],
-                                     FACES[ 3 ][ 0 ][ INTERVALS - 1 ], FACES[ 5 ][ 0 ][ 0 ] };
+    iBase_EntityHandle exp2[ 3 ] = { FACES[ 0 ][ 0 ][ INTERVALS - 1 ], FACES[ 3 ][ 0 ][ INTERVALS - 1 ],
+                                     FACES[ 5 ][ 0 ][ 0 ] };
     std::copy( adj + off[ INTERVALS - 1 ], adj + off[ INTERVALS ], act );
     std::sort( exp2, exp2 + 3 );
     std::sort( act, act + 3 );
@@ -354,8 +351,8 @@ void test_getEntArrAdj_invalid_size( )
     int                 adj_size, off_size;
     iBase_EntityHandle* adj_ptr = adj1;
     int*                off_ptr = off1;
-    iMesh_getEntArrAdj( mesh, HEXES[ 0 ][ 0 ], INTERVALS, iBase_VERTEX, &adj_ptr, &adj1_alloc,
-                        &adj_size, &off_ptr, &off1_alloc, &off_size, &err );
+    iMesh_getEntArrAdj( mesh, HEXES[ 0 ][ 0 ], INTERVALS, iBase_VERTEX, &adj_ptr, &adj1_alloc, &adj_size, &off_ptr,
+                        &off1_alloc, &off_size, &err );
     CHECK_EQUAL( &adj1[ 0 ], adj_ptr );
     CHECK_EQUAL( &off1[ 0 ], off_ptr );
     // first ensure no stack corruption from writing off end of array
@@ -372,8 +369,8 @@ void test_getEntArrAdj_invalid_size( )
     err = iBase_SUCCESS;
     adj_ptr = adj1;
     off_ptr = off2;
-    iMesh_getEntArrAdj( mesh, VERTS[ 0 ][ 0 ], INTERVALS + 1, iBase_REGION, &adj_ptr, &adj1_alloc,
-                        &adj_size, &off_ptr, &off2_alloc, &off_size, &err );
+    iMesh_getEntArrAdj( mesh, VERTS[ 0 ][ 0 ], INTERVALS + 1, iBase_REGION, &adj_ptr, &adj1_alloc, &adj_size, &off_ptr,
+                        &off2_alloc, &off_size, &err );
     // first ensure no stack corruption from writing off end of array
     CHECK_EQUAL( &adj1[ 0 ], adj_ptr );
     CHECK_EQUAL( &off2[ 0 ], off_ptr );
@@ -392,8 +389,7 @@ void test_getEntArrAdj_none( )
     int*                off = 0;
     int                 adj_alloc = 0, off_alloc = 0;
     int                 adj_size = -1, off_size = -1;
-    iMesh_getEntArrAdj( mesh, NULL, 0, iBase_REGION, &adj, &adj_alloc, &adj_size, &off, &off_alloc,
-                        &off_size, &err );
+    iMesh_getEntArrAdj( mesh, NULL, 0, iBase_REGION, &adj, &adj_alloc, &adj_size, &off, &off_alloc, &off_size, &err );
     CHECK_EQUAL( iBase_SUCCESS, err );
     CHECK_EQUAL( 0, adj_alloc );
     CHECK_EQUAL( 0, adj_size );
@@ -458,8 +454,8 @@ void test_tags_retrieval( )
         iBase_TagHandle* tag_handles = NULL;
         int              tag_handles_allocated = 0;
         int              tag_handles_size;
-        iMesh_getAllEntSetTags( mesh, contained_set_handles[ i ], &tag_handles,
-                                &tag_handles_allocated, &tag_handles_size, &err );
+        iMesh_getAllEntSetTags( mesh, contained_set_handles[ i ], &tag_handles, &tag_handles_allocated,
+                                &tag_handles_size, &err );
         CHECK_EQUAL( iBase_SUCCESS, err );
 
         for( int j = 0; j < tag_handles_size; j++ )

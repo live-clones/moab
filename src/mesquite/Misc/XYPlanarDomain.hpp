@@ -61,14 +61,14 @@ class MESQUITE_EXPORT XYPlanarDomain : public MBMesquite::MeshDomain
 
     virtual void element_normal_at( Mesh::ElementHandle entity_handle, Vector3D& coordinate ) const;
 
-    virtual void vertex_normal_at( const Mesh::VertexHandle* handle, Vector3D coords[],
-                                   unsigned count, MsqError& err ) const;
+    virtual void vertex_normal_at( const Mesh::VertexHandle* handle, Vector3D coords[], unsigned count,
+                                   MsqError& err ) const;
 
-    virtual void closest_point( Mesh::VertexHandle handle, const Vector3D& position,
-                                Vector3D& closest, Vector3D& normal, MsqError& err ) const;
+    virtual void closest_point( Mesh::VertexHandle handle, const Vector3D& position, Vector3D& closest,
+                                Vector3D& normal, MsqError& err ) const;
 
-    virtual void domain_DoF( const Mesh::VertexHandle* handle_array, unsigned short* dof_array,
-                             size_t num_vertices, MsqError& err ) const;
+    virtual void domain_DoF( const Mesh::VertexHandle* handle_array, unsigned short* dof_array, size_t num_vertices,
+                             MsqError& err ) const;
 };
 }  // namespace MBMesquite
 

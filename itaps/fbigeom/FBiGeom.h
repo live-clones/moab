@@ -98,8 +98,7 @@ void FBiGeom_getErrorType( FBiGeom_Instance instance,
  * \param *err Pointer to error type returned from function
  * \param options_len Length of the character string pointed to by options
  */
-void FBiGeom_newGeom( char const* options, FBiGeom_Instance* instance_out, int* err,
-                      int options_len );
+void FBiGeom_newGeom( char const* options, FBiGeom_Instance* instance_out, int* err, int options_len );
 
 /**\brief  Construct a new FBiGeom instance
  *
@@ -137,8 +136,8 @@ void FBiGeom_dtor( FBiGeom_Instance instance, int* err );
  * \param name_len Length of the file name character string
  * \param options_len Length of the options character string
  */
-void FBiGeom_load( FBiGeom_Instance instance, char const* name, char const* options, int* err,
-                   int name_len, int options_len );
+void FBiGeom_load( FBiGeom_Instance instance, char const* name, char const* options, int* err, int name_len,
+                   int options_len );
 
 /**\brief  Save a geom to a file
  *
@@ -152,8 +151,8 @@ void FBiGeom_load( FBiGeom_Instance instance, char const* name, char const* opti
  * \param name_len Length of the file name character string
  * \param options_len Length of the options character string
  */
-void FBiGeom_save( FBiGeom_Instance instance, char const* name, char const* options, int* err,
-                   int name_len, int options_len );
+void FBiGeom_save( FBiGeom_Instance instance, char const* name, char const* options, int* err, int name_len,
+                   int options_len );
 
 /**\brief  Get handle of the root set for this instance
  *
@@ -177,8 +176,8 @@ void FBiGeom_getRootSet( FBiGeom_Instance instance, iBase_EntitySetHandle* root_
  * \param max_z Maximum coordinate of bounding box
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getBoundBox( FBiGeom_Instance instance, double* min_x, double* min_y, double* min_z,
-                          double* max_x, double* max_y, double* max_z, int* err );
+void FBiGeom_getBoundBox( FBiGeom_Instance instance, double* min_x, double* min_y, double* min_z, double* max_x,
+                          double* max_y, double* max_z, int* err );
 
 /**\brief  Get entities of specific type in set or instance
  *
@@ -197,9 +196,9 @@ void FBiGeom_getBoundBox( FBiGeom_Instance instance, double* min_x, double* min_
  *        array
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getEntities( FBiGeom_Instance instance, iBase_EntitySetHandle set_handle,
-                          int entity_type, iBase_EntityHandle** entity_handles,
-                          int* entity_handles_allococated, int* entity_handles_size, int* err );
+void FBiGeom_getEntities( FBiGeom_Instance instance, iBase_EntitySetHandle set_handle, int entity_type,
+                          iBase_EntityHandle** entity_handles, int* entity_handles_allococated,
+                          int* entity_handles_size, int* err );
 
 /**\brief  Get the number of entities with the specified type in the
  *         instance or set
@@ -215,8 +214,8 @@ void FBiGeom_getEntities( FBiGeom_Instance instance, iBase_EntitySetHandle set_h
  * \param num_type Pointer to number of entities, returned from function
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getNumOfType( FBiGeom_Instance instance, iBase_EntitySetHandle set_handle,
-                           int entity_type, int* num_out, int* err );
+void FBiGeom_getNumOfType( FBiGeom_Instance instance, iBase_EntitySetHandle set_handle, int entity_type, int* num_out,
+                           int* err );
 
 /**\brief  Get the entity type for the specified entity
  *
@@ -227,8 +226,7 @@ void FBiGeom_getNumOfType( FBiGeom_Instance instance, iBase_EntitySetHandle set_
  * \param *type Pointer to location at which to store the returned type
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getEntType( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, int* type,
-                         int* err );
+void FBiGeom_getEntType( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, int* type, int* err );
 
 /**\brief  Get the entity type for the specified entities
  *
@@ -242,9 +240,8 @@ void FBiGeom_getEntType( FBiGeom_Instance instance, iBase_EntityHandle entity_ha
  * \param *type_size Pointer to occupied size of type array
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getArrType( FBiGeom_Instance instance, iBase_EntityHandle const* entity_handles,
-                         int entity_handles_size, int** type, int* type_allocated, int* type_size,
-                         int* err );
+void FBiGeom_getArrType( FBiGeom_Instance instance, iBase_EntityHandle const* entity_handles, int entity_handles_size,
+                         int** type, int* type_allocated, int* type_size, int* err );
 
 /**\brief  Get entities of specified type adjacent to an entity
  *
@@ -261,9 +258,9 @@ void FBiGeom_getArrType( FBiGeom_Instance instance, iBase_EntityHandle const* en
  *        adj_entity_handles array
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getEntAdj( FBiGeom_Instance instance, iBase_EntityHandle entity_handle,
-                        int to_dimension, iBase_EntityHandle** adj_entities,
-                        int* adj_entities_allocated, int* adj_entities_size, int* err );
+void FBiGeom_getEntAdj( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, int to_dimension,
+                        iBase_EntityHandle** adj_entities, int* adj_entities_allocated, int* adj_entities_size,
+                        int* err );
 
 /**\brief  Get entities of specified type adjacent to entities
  *
@@ -286,11 +283,10 @@ void FBiGeom_getEntAdj( FBiGeom_Instance instance, iBase_EntityHandle entity_han
  * \param *offset_size Pointer to occupied size of offset array
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getArrAdj( FBiGeom_Instance instance, iBase_EntityHandle const* entity_handles,
-                        int entity_handles_size, int requested_entity_type,
-                        iBase_EntityHandle** adj_entity_handles, int* adj_entity_handles_allocated,
-                        int* adj_entity_handles_size, int** offset, int* offset_allocated,
-                        int* offset_size, int* err );
+void FBiGeom_getArrAdj( FBiGeom_Instance instance, iBase_EntityHandle const* entity_handles, int entity_handles_size,
+                        int requested_entity_type, iBase_EntityHandle** adj_entity_handles,
+                        int* adj_entity_handles_allocated, int* adj_entity_handles_size, int** offset,
+                        int* offset_allocated, int* offset_size, int* err );
 
 /**\brief  Get "2nd order" adjacencies to an entity
  *
@@ -306,9 +302,8 @@ void FBiGeom_getArrAdj( FBiGeom_Instance instance, iBase_EntityHandle const* ent
  * \param adjacent_entities_size Occupied size of returned array
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getEnt2ndAdj( FBiGeom_Instance instance, iBase_EntityHandle entity_handle,
-                           int bridge_dimension, int to_dimension,
-                           iBase_EntityHandle** adjacent_entities, int* adjacent_entities_allocated,
+void FBiGeom_getEnt2ndAdj( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, int bridge_dimension,
+                           int to_dimension, iBase_EntityHandle** adjacent_entities, int* adjacent_entities_allocated,
                            int* adjacent_entities_size, int* err );
 
 /**\brief  Get "2nd order" adjacencies to an array of entities
@@ -331,11 +326,10 @@ void FBiGeom_getEnt2ndAdj( FBiGeom_Instance instance, iBase_EntityHandle entity_
  * \param offset_size Occupied size of offset array
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getArr2ndAdj( FBiGeom_Instance instance, iBase_EntityHandle const* entity_handles,
-                           int entity_handles_size, int order_adjacent_key,
-                           int requested_entity_type, iBase_EntityHandle** adj_entity_handles,
-                           int* adj_entity_handles_allocated, int* adj_entity_handles_size,
-                           int** offset, int* offset_allocated, int* offset_size, int* err );
+void FBiGeom_getArr2ndAdj( FBiGeom_Instance instance, iBase_EntityHandle const* entity_handles, int entity_handles_size,
+                           int order_adjacent_key, int requested_entity_type, iBase_EntityHandle** adj_entity_handles,
+                           int* adj_entity_handles_allocated, int* adj_entity_handles_size, int** offset,
+                           int* offset_allocated, int* offset_size, int* err );
 
 /**\brief  Return whether two entities are adjacent
  *
@@ -347,8 +341,8 @@ void FBiGeom_getArr2ndAdj( FBiGeom_Instance instance, iBase_EntityHandle const* 
  *        otherwise they are not
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_isEntAdj( FBiGeom_Instance instance, iBase_EntityHandle entity_handle1,
-                       iBase_EntityHandle entity_handle2, int* are_adjacent, int* err );
+void FBiGeom_isEntAdj( FBiGeom_Instance instance, iBase_EntityHandle entity_handle1, iBase_EntityHandle entity_handle2,
+                       int* are_adjacent, int* err );
 
 /**\brief  Return whether entity pairs are adjacent
  *
@@ -365,9 +359,8 @@ void FBiGeom_isEntAdj( FBiGeom_Instance instance, iBase_EntityHandle entity_hand
  * \param is_adjacent_info_size Occupied size of flags array
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_isArrAdj( FBiGeom_Instance instance, iBase_EntityHandle const* entity_handles_1,
-                       int entity_handles_1_size, iBase_EntityHandle const* entity_handles_2,
-                       int entity_handles_2_size, int** is_adjacent_info,
+void FBiGeom_isArrAdj( FBiGeom_Instance instance, iBase_EntityHandle const* entity_handles_1, int entity_handles_1_size,
+                       iBase_EntityHandle const* entity_handles_2, int entity_handles_2_size, int** is_adjacent_info,
                        int* is_adjacent_info_allocated, int* is_adjacent_info_size, int* err );
 
 /**\brief  Return the topology level of the geometry
@@ -393,9 +386,8 @@ void FBiGeom_getTopoLevel( FBiGeom_Instance instance, int* topo_level_out, int* 
  * \param on_z Closest point on entity
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getEntClosestPt( FBiGeom_Instance instance, iBase_EntityHandle entity_handle,
-                              double near_x, double near_y, double near_z, double* on_x,
-                              double* on_y, double* on_z, int* err );
+void FBiGeom_getEntClosestPt( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, double near_x, double near_y,
+                              double near_z, double* on_x, double* on_y, double* on_z, int* err );
 
 /**\brief  Get closest point for an array of entities and points
  * For surfaces, closest point could be on the void space inside it.
@@ -416,9 +408,8 @@ void FBiGeom_getEntClosestPt( FBiGeom_Instance instance, iBase_EntityHandle enti
  * \param *err Pointer to error type returned from function
  */
 
-void FBiGeom_getEntClosestPtTrimmed( FBiGeom_Instance instance, iBase_EntityHandle entity_handle,
-                                     double near_x, double near_y, double near_z, double* on_x,
-                                     double* on_y, double* on_z, int* err );
+void FBiGeom_getEntClosestPtTrimmed( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, double near_x,
+                                     double near_y, double near_z, double* on_x, double* on_y, double* on_z, int* err );
 
 /**\brief  Get closest point for an array of entities and points
  * For surfaces, it made sure the closest point in on surface.
@@ -439,9 +430,8 @@ void FBiGeom_getEntClosestPtTrimmed( FBiGeom_Instance instance, iBase_EntityHand
  * \param *err Pointer to error type returned from function
  */
 void FBiGeom_getArrClosestPt( FBiGeom_Instance instance, iBase_EntityHandle const* entity_handles,
-                              int entity_handles_size, int storage_order,
-                              double const* near_coordinates, int near_coordinates_size,
-                              double** on_coordinates, int* on_coordinates_allocated,
+                              int entity_handles_size, int storage_order, double const* near_coordinates,
+                              int near_coordinates_size, double** on_coordinates, int* on_coordinates_allocated,
                               int* on_coordinates_size, int* err );
 
 /**\brief  Get the normal vector on an entity at the given position
@@ -456,9 +446,8 @@ void FBiGeom_getArrClosestPt( FBiGeom_Instance instance, iBase_EntityHandle cons
  * \param nrml_k Normal vector at starting point
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getEntNrmlXYZ( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, double x,
-                            double y, double z, double* nrml_i, double* nrml_j, double* nrml_k,
-                            int* err );
+void FBiGeom_getEntNrmlXYZ( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, double x, double y, double z,
+                            double* nrml_i, double* nrml_j, double* nrml_k, int* err );
 
 /**\brief  Get the normal vector on an entity(ies) at given position(s)
  *
@@ -479,9 +468,8 @@ void FBiGeom_getEntNrmlXYZ( FBiGeom_Instance instance, iBase_EntityHandle entity
  * \param *err Pointer to error type returned from function
  */
 void FBiGeom_getArrNrmlXYZ( FBiGeom_Instance instance, iBase_EntityHandle const* entity_handles,
-                            int entity_handles_size, int storage_order, double const* coordinates,
-                            int coordinates_size, double** normals, int* normals_allocated,
-                            int* normals_size, int* err );
+                            int entity_handles_size, int storage_order, double const* coordinates, int coordinates_size,
+                            double** normals, int* normals_allocated, int* normals_size, int* err );
 
 /**\brief  Get the normal vector AND closest point on an entity at given
  *         position
@@ -500,9 +488,9 @@ void FBiGeom_getArrNrmlXYZ( FBiGeom_Instance instance, iBase_EntityHandle const*
  * \param nrml_k Normal at closest point
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getEntNrmlPlXYZ( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, double x,
-                              double y, double z, double* pt_x, double* pt_y, double* pt_z,
-                              double* nrml_i, double* nrml_j, double* nrml_k, int* err );
+void FBiGeom_getEntNrmlPlXYZ( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, double x, double y, double z,
+                              double* pt_x, double* pt_y, double* pt_z, double* nrml_i, double* nrml_j, double* nrml_k,
+                              int* err );
 
 /**\brief Get the normal vector AND closest point on an entity(ies) at
  *        given position(s)
@@ -527,11 +515,10 @@ void FBiGeom_getEntNrmlPlXYZ( FBiGeom_Instance instance, iBase_EntityHandle enti
  * \param *err Pointer to error type returned from function
  */
 void FBiGeom_getArrNrmlPlXYZ( FBiGeom_Instance instance, iBase_EntityHandle const* entity_handles,
-                              int entity_handles_size, int storage_order,
-                              double const* near_coordinates, int near_coordinates_size,
-                              double** on_coordinates, int* on_coordinates_allocated,
-                              int* on_coordinates_size, double** normals, int* normals_allocated,
-                              int* normals_size, int* err );
+                              int entity_handles_size, int storage_order, double const* near_coordinates,
+                              int near_coordinates_size, double** on_coordinates, int* on_coordinates_allocated,
+                              int* on_coordinates_size, double** normals, int* normals_allocated, int* normals_size,
+                              int* err );
 
 /**\brief  Get the tangent vector on an entity at given position
  *
@@ -546,9 +533,8 @@ void FBiGeom_getArrNrmlPlXYZ( FBiGeom_Instance instance, iBase_EntityHandle cons
  * \param tgnt_k Tangent at closest point
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getEntTgntXYZ( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, double x,
-                            double y, double z, double* tgnt_i, double* tgnt_j, double* tgnt_k,
-                            int* err );
+void FBiGeom_getEntTgntXYZ( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, double x, double y, double z,
+                            double* tgnt_i, double* tgnt_j, double* tgnt_k, int* err );
 
 /**\brief  Get the tangent vector on an entity(ies) at given position(s)
  *
@@ -569,9 +555,8 @@ void FBiGeom_getEntTgntXYZ( FBiGeom_Instance instance, iBase_EntityHandle entity
  * \param *err Pointer to error type returned from function
  */
 void FBiGeom_getArrTgntXYZ( FBiGeom_Instance instance, iBase_EntityHandle const* entity_handles,
-                            int entity_handles_size, int storage_order, double const* coordinates,
-                            int coordinates_size, double** tangents, int* tangents_allocated,
-                            int* tangents_size, int* err );
+                            int entity_handles_size, int storage_order, double const* coordinates, int coordinates_size,
+                            double** tangents, int* tangents_allocated, int* tangents_size, int* err );
 
 /**\brief  Get the two principle curvature vectors for a face at a point
  *
@@ -591,9 +576,9 @@ void FBiGeom_getArrTgntXYZ( FBiGeom_Instance instance, iBase_EntityHandle const*
  * \param cvtr2_k Minimum curvature vector
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getFcCvtrXYZ( FBiGeom_Instance instance, iBase_EntityHandle face_handle, double x,
-                           double y, double z, double* cvtr1_i, double* cvtr1_j, double* cvtr1_k,
-                           double* cvtr2_i, double* cvtr2_j, double* cvtr2_k, int* err );
+void FBiGeom_getFcCvtrXYZ( FBiGeom_Instance instance, iBase_EntityHandle face_handle, double x, double y, double z,
+                           double* cvtr1_i, double* cvtr1_j, double* cvtr1_k, double* cvtr2_i, double* cvtr2_j,
+                           double* cvtr2_k, int* err );
 
 /**\brief  Get the principle curvature vector for an edge at a point
  *
@@ -609,9 +594,8 @@ void FBiGeom_getFcCvtrXYZ( FBiGeom_Instance instance, iBase_EntityHandle face_ha
  * \param cvtr_k Maximum curvature vector
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getEgCvtrXYZ( FBiGeom_Instance instance, iBase_EntityHandle edge_handle, double x,
-                           double y, double z, double* cvtr_i, double* cvtr_j, double* cvtr_k,
-                           int* err );
+void FBiGeom_getEgCvtrXYZ( FBiGeom_Instance instance, iBase_EntityHandle edge_handle, double x, double y, double z,
+                           double* cvtr_i, double* cvtr_j, double* cvtr_k, int* err );
 
 /**\brief  Get the curvature(s) on an entity(ies) at given position(s)
  *
@@ -635,10 +619,9 @@ void FBiGeom_getEgCvtrXYZ( FBiGeom_Instance instance, iBase_EntityHandle edge_ha
  * \param *err Pointer to error type returned from function
  */
 void FBiGeom_getEntArrCvtrXYZ( FBiGeom_Instance instance, iBase_EntityHandle const* entity_handles,
-                               int entity_handles_size, int storage_order, double const* coords,
-                               int coords_size, double** cvtr_1, int* cvtr_1_allocated,
-                               int* cvtr_1_size, double** cvtr_2, int* cvtr_2_allocated,
-                               int* cvtr_2_size, int* err );
+                               int entity_handles_size, int storage_order, double const* coords, int coords_size,
+                               double** cvtr_1, int* cvtr_1_allocated, int* cvtr_1_size, double** cvtr_2,
+                               int* cvtr_2_allocated, int* cvtr_2_size, int* err );
 
 /**\brief  Get closest point, tangent, and curvature of edge
  *
@@ -659,10 +642,9 @@ void FBiGeom_getEntArrCvtrXYZ( FBiGeom_Instance instance, iBase_EntityHandle con
  * \param cvtr_k Curvature at point being queried
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getEgEvalXYZ( FBiGeom_Instance instance, iBase_EntityHandle edge_handle, double x,
-                           double y, double z, double* on_x, double* on_y, double* on_z,
-                           double* tgnt_i, double* tgnt_j, double* tgnt_k, double* cvtr_i,
-                           double* cvtr_j, double* cvtr_k, int* err );
+void FBiGeom_getEgEvalXYZ( FBiGeom_Instance instance, iBase_EntityHandle edge_handle, double x, double y, double z,
+                           double* on_x, double* on_y, double* on_z, double* tgnt_i, double* tgnt_j, double* tgnt_k,
+                           double* cvtr_i, double* cvtr_j, double* cvtr_k, int* err );
 
 /**\brief  Get closest point, tangent, and curvature of face
  *
@@ -687,10 +669,9 @@ void FBiGeom_getEgEvalXYZ( FBiGeom_Instance instance, iBase_EntityHandle edge_ha
  * \param cvtr2_k Second principal curvature at point being queried
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getFcEvalXYZ( FBiGeom_Instance instance, iBase_EntityHandle face_handle, double x,
-                           double y, double z, double* on_x, double* on_y, double* on_z,
-                           double* nrml_i, double* nrml_j, double* nrml_k, double* cvtr1_i,
-                           double* cvtr1_j, double* cvtr1_k, double* cvtr2_i, double* cvtr2_j,
+void FBiGeom_getFcEvalXYZ( FBiGeom_Instance instance, iBase_EntityHandle face_handle, double x, double y, double z,
+                           double* on_x, double* on_y, double* on_z, double* nrml_i, double* nrml_j, double* nrml_k,
+                           double* cvtr1_i, double* cvtr1_j, double* cvtr1_k, double* cvtr2_i, double* cvtr2_j,
                            double* cvtr2_k, int* err );
 
 /**\brief  Get the closest point(s), tangent(s), and curvature(s) on an
@@ -719,12 +700,10 @@ void FBiGeom_getFcEvalXYZ( FBiGeom_Instance instance, iBase_EntityHandle face_ha
  * \param cvtr_size Occupied size of first curvature array
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getArrEgEvalXYZ( FBiGeom_Instance instance, iBase_EntityHandle const* edge_handles,
-                              int edge_handles_size, int storage_order, double const* coords,
-                              int coords_size, double** on_coords, int* on_coords_allocated,
-                              int* on_coords_size, double** tangent, int* tangent_allocated,
-                              int* tangent_size, double** cvtr, int* cvtr_allocated, int* cvtr_size,
-                              int* err );
+void FBiGeom_getArrEgEvalXYZ( FBiGeom_Instance instance, iBase_EntityHandle const* edge_handles, int edge_handles_size,
+                              int storage_order, double const* coords, int coords_size, double** on_coords,
+                              int* on_coords_allocated, int* on_coords_size, double** tangent, int* tangent_allocated,
+                              int* tangent_size, double** cvtr, int* cvtr_allocated, int* cvtr_size, int* err );
 
 /**\brief  Get the closest point(s), tangent(s), and curvature(s) on an
  *         entity(ies) at given position(s)
@@ -755,13 +734,11 @@ void FBiGeom_getArrEgEvalXYZ( FBiGeom_Instance instance, iBase_EntityHandle cons
  * \param cvtr_2_size Occupied size of second curvature array
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getArrFcEvalXYZ( FBiGeom_Instance instance, iBase_EntityHandle const* face_handles,
-                              int face_handles_size, int storage_order, double const* coords,
-                              int coords_size, double** on_coords, int* on_coords_allocated,
-                              int* on_coords_size, double** normal, int* normal_allocated,
-                              int* normal_size, double** cvtr1, int* cvtr1_allocated,
-                              int* cvtr1_size, double** cvtr2, int* cvtr2_allocated,
-                              int* cvtr2_size, int* err );
+void FBiGeom_getArrFcEvalXYZ( FBiGeom_Instance instance, iBase_EntityHandle const* face_handles, int face_handles_size,
+                              int storage_order, double const* coords, int coords_size, double** on_coords,
+                              int* on_coords_allocated, int* on_coords_size, double** normal, int* normal_allocated,
+                              int* normal_size, double** cvtr1, int* cvtr1_allocated, int* cvtr1_size, double** cvtr2,
+                              int* cvtr2_allocated, int* cvtr2_size, int* err );
 
 /**\brief  Get the bounding box of the specified entity
  *
@@ -776,9 +753,8 @@ void FBiGeom_getArrFcEvalXYZ( FBiGeom_Instance instance, iBase_EntityHandle cons
  * \param max_z Maximum coordinate of bounding box
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getEntBoundBox( FBiGeom_Instance instance, iBase_EntityHandle entity_handle,
-                             double* min_x, double* min_y, double* min_z, double* max_x,
-                             double* max_y, double* max_z, int* err );
+void FBiGeom_getEntBoundBox( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, double* min_x, double* min_y,
+                             double* min_z, double* max_x, double* max_y, double* max_z, int* err );
 
 /**\brief  Get the bounding box of the specified entities
  *
@@ -797,9 +773,9 @@ void FBiGeom_getEntBoundBox( FBiGeom_Instance instance, iBase_EntityHandle entit
  * \param *err Pointer to error type returned from function
  */
 void FBiGeom_getArrBoundBox( FBiGeom_Instance instance, iBase_EntityHandle const* entity_handles,
-                             int entity_handles_size, int storage_order, double** min_corner,
-                             int* min_corner_allocated, int* min_corner_size, double** max_corner,
-                             int* max_corner_allocated, int* max_corner_size, int* err );
+                             int entity_handles_size, int storage_order, double** min_corner, int* min_corner_allocated,
+                             int* min_corner_size, double** max_corner, int* max_corner_allocated, int* max_corner_size,
+                             int* err );
 
 /**\brief  Get coordinates of specified vertex
  *
@@ -811,8 +787,8 @@ void FBiGeom_getArrBoundBox( FBiGeom_Instance instance, iBase_EntityHandle const
  * \param *z Pointer to z coordinate returned from function
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getVtxCoord( FBiGeom_Instance instance, iBase_EntityHandle vertex_handle, double* x,
-                          double* y, double* z, int* err );
+void FBiGeom_getVtxCoord( FBiGeom_Instance instance, iBase_EntityHandle vertex_handle, double* x, double* y, double* z,
+                          int* err );
 
 /**\brief  Get coordinates of specified vertices
  *
@@ -859,14 +835,12 @@ void FBiGeom_getVtxArrCoords( FBiGeom_Instance instance, iBase_EntityHandle cons
  * \param param_coords_size Occupied size of param_coords array
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getPntRayIntsct( FBiGeom_Instance instance, double x, double y, double z, double dir_x,
-                              double dir_y, double dir_z,
-                              iBase_EntityHandle** intersect_entity_handles,
-                              int*                 intersect_entity_handles_allocated,
-                              int* intersect_entity_hangles_size, int storage_order,
-                              double** intersect_coords, int* intersect_coords_allocated,
-                              int* intersect_coords_size, double** param_coords,
-                              int* param_coords_allocated, int* param_coords_size, int* err );
+void FBiGeom_getPntRayIntsct( FBiGeom_Instance instance, double x, double y, double z, double dir_x, double dir_y,
+                              double dir_z, iBase_EntityHandle** intersect_entity_handles,
+                              int* intersect_entity_handles_allocated, int* intersect_entity_hangles_size,
+                              int storage_order, double** intersect_coords, int* intersect_coords_allocated,
+                              int* intersect_coords_size, double** param_coords, int* param_coords_allocated,
+                              int* param_coords_size, int* err );
 
 /**\brief  Intersect an array of rays with the model
  *
@@ -895,14 +869,12 @@ void FBiGeom_getPntRayIntsct( FBiGeom_Instance instance, double x, double y, dou
  * \param param_coords_size Occupied size of param_coords array
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getPntArrRayIntsct( FBiGeom_Instance instance, int storage_order, const double* coords,
-                                 int coords_size, const double* directions, int directions_size,
-                                 iBase_EntityHandle** intersect_entity_handles,
-                                 int*                 intersect_entity_handles_allocated,
-                                 int* intersect_entity_hangles_size, int** offset,
-                                 int* offset_allocated, int* offset_size, double** intersect_coords,
-                                 int* intersect_coords_allocated, int* intersect_coords_size,
-                                 double** param_coords, int* param_coords_allocated,
+void FBiGeom_getPntArrRayIntsct( FBiGeom_Instance instance, int storage_order, const double* coords, int coords_size,
+                                 const double* directions, int directions_size,
+                                 iBase_EntityHandle** intersect_entity_handles, int* intersect_entity_handles_allocated,
+                                 int* intersect_entity_hangles_size, int** offset, int* offset_allocated,
+                                 int* offset_size, double** intersect_coords, int* intersect_coords_allocated,
+                                 int* intersect_coords_size, double** param_coords, int* param_coords_allocated,
                                  int* param_coords_size, int* err );
 
 /**\brief  Get the entity on which a point is located
@@ -915,8 +887,8 @@ void FBiGeom_getPntArrRayIntsct( FBiGeom_Instance instance, int storage_order, c
  * \param entity_handle Entity on which point is located
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getPntClsf( FBiGeom_Instance instance, double x, double y, double z,
-                         iBase_EntityHandle* entity_handle, int* err );
+void FBiGeom_getPntClsf( FBiGeom_Instance instance, double x, double y, double z, iBase_EntityHandle* entity_handle,
+                         int* err );
 
 /**\brief  Get the entities on which points are located
  *
@@ -931,9 +903,9 @@ void FBiGeom_getPntClsf( FBiGeom_Instance instance, double x, double y, double z
  * \param entity_handles_size Occupied size of entity_handles array
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getPntArrClsf( FBiGeom_Instance instance, int storage_order, double const* coords,
-                            int coords_size, iBase_EntityHandle** entity_handles,
-                            int* entity_handles_allocated, int* entity_handles_size, int* err );
+void FBiGeom_getPntArrClsf( FBiGeom_Instance instance, int storage_order, double const* coords, int coords_size,
+                            iBase_EntityHandle** entity_handles, int* entity_handles_allocated,
+                            int* entity_handles_size, int* err );
 
 /**\brief  Get the sense of a face with respect to a region
  *
@@ -946,8 +918,8 @@ void FBiGeom_getPntArrClsf( FBiGeom_Instance instance, int storage_order, double
  * \param sense_out Sense of face with respect to region
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getEntNrmlSense( FBiGeom_Instance instance, iBase_EntityHandle face,
-                              iBase_EntityHandle region, int* sense_out, int* err );
+void FBiGeom_getEntNrmlSense( FBiGeom_Instance instance, iBase_EntityHandle face, iBase_EntityHandle region,
+                              int* sense_out, int* err );
 
 /**\brief  Get the senses of an array of faces with respect to an array of
  *         regions
@@ -966,10 +938,9 @@ void FBiGeom_getEntNrmlSense( FBiGeom_Instance instance, iBase_EntityHandle face
  * \param sense_size Occupied size of senses array
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getArrNrmlSense( FBiGeom_Instance instance, iBase_EntityHandle const* face_handles,
-                              int face_handles_size, iBase_EntityHandle const* region_handles,
-                              int region_handles_size, int** sense, int* sense_allocated,
-                              int* sense_size, int* err );
+void FBiGeom_getArrNrmlSense( FBiGeom_Instance instance, iBase_EntityHandle const* face_handles, int face_handles_size,
+                              iBase_EntityHandle const* region_handles, int region_handles_size, int** sense,
+                              int* sense_allocated, int* sense_size, int* err );
 
 /**\brief  Get the sense of an edge with respect to a face
  *
@@ -982,8 +953,8 @@ void FBiGeom_getArrNrmlSense( FBiGeom_Instance instance, iBase_EntityHandle cons
  * \param sense_out Sense of edge with respect to face
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getEgFcSense( FBiGeom_Instance, iBase_EntityHandle edge, iBase_EntityHandle face,
-                           int* sense_out, int* err );
+void FBiGeom_getEgFcSense( FBiGeom_Instance, iBase_EntityHandle edge, iBase_EntityHandle face, int* sense_out,
+                           int* err );
 
 /**\brief  Get the senses of an array of edges with respect to an array of
  *         faces
@@ -1002,10 +973,9 @@ void FBiGeom_getEgFcSense( FBiGeom_Instance, iBase_EntityHandle edge, iBase_Enti
  * \param sense_size Occupied size of senses array
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getEgFcArrSense( FBiGeom_Instance instance, iBase_EntityHandle const* edge_handles,
-                              int edge_handles_size, iBase_EntityHandle const* face_handles,
-                              int face_handles_size, int** sense, int* sense_allocated,
-                              int* sense_size, int* err );
+void FBiGeom_getEgFcArrSense( FBiGeom_Instance instance, iBase_EntityHandle const* edge_handles, int edge_handles_size,
+                              iBase_EntityHandle const* face_handles, int face_handles_size, int** sense,
+                              int* sense_allocated, int* sense_size, int* err );
 
 /**\brief  Get the sense of a vertex pair with respect to an edge
  *
@@ -1020,9 +990,8 @@ void FBiGeom_getEgFcArrSense( FBiGeom_Instance instance, iBase_EntityHandle cons
  * \param sense_out Sense of vertex pair with respect to edge
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getEgVtxSense( FBiGeom_Instance instance, iBase_EntityHandle edge,
-                            iBase_EntityHandle vertex1, iBase_EntityHandle vertex2, int* sense_out,
-                            int* err );
+void FBiGeom_getEgVtxSense( FBiGeom_Instance instance, iBase_EntityHandle edge, iBase_EntityHandle vertex1,
+                            iBase_EntityHandle vertex2, int* sense_out, int* err );
 
 /**\brief  Get the senses of vertex pair with respect to a edges
  *
@@ -1042,12 +1011,10 @@ void FBiGeom_getEgVtxSense( FBiGeom_Instance instance, iBase_EntityHandle edge,
  * \param sense_size Occupied size of sense array
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getEgVtxArrSense( FBiGeom_Instance instance, iBase_EntityHandle const* edge_handles,
-                               int edge_handles_size, iBase_EntityHandle const* vertex_handles_1,
-                               int                       veretx_handles_1_size,
-                               iBase_EntityHandle const* vertex_handles_2,
-                               int vertex_handles_2_size, int** sense, int* sense_allocated,
-                               int* sense_size, int* err );
+void FBiGeom_getEgVtxArrSense( FBiGeom_Instance instance, iBase_EntityHandle const* edge_handles, int edge_handles_size,
+                               iBase_EntityHandle const* vertex_handles_1, int veretx_handles_1_size,
+                               iBase_EntityHandle const* vertex_handles_2, int vertex_handles_2_size, int** sense,
+                               int* sense_allocated, int* sense_size, int* err );
 
 /**\brief  Return the measure (length, area, or volume) of entities
  *
@@ -1060,9 +1027,8 @@ void FBiGeom_getEgVtxArrSense( FBiGeom_Instance instance, iBase_EntityHandle con
  * \param measures_size Occupied size of measures array
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_measure( FBiGeom_Instance instance, iBase_EntityHandle const* entity_handles,
-                      int entity_handles_size, double** measures, int* measures_allocated,
-                      int* measures_size, int* err );
+void FBiGeom_measure( FBiGeom_Instance instance, iBase_EntityHandle const* entity_handles, int entity_handles_size,
+                      double** measures, int* measures_allocated, int* measures_size, int* err );
 
 /**\brief  Get the geometric type of a face
  *
@@ -1073,8 +1039,8 @@ void FBiGeom_measure( FBiGeom_Instance instance, iBase_EntityHandle const* entit
  * \param face_type Face type
  * \param face_type_length Length of face type string
  */
-void FBiGeom_getFaceType( FBiGeom_Instance instance, iBase_EntityHandle face_handle,
-                          char* face_type, int* err, int* face_type_length );
+void FBiGeom_getFaceType( FBiGeom_Instance instance, iBase_EntityHandle face_handle, char* face_type, int* err,
+                          int* face_type_length );
 
 /**\brief  Return whether interface has information about parameterization
  *
@@ -1095,8 +1061,7 @@ void FBiGeom_getParametric( FBiGeom_Instance instance, int* is_parametric, int* 
  * \param is_parametric Entity has a parameterization (=1) or not (=0)
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_isEntParametric( FBiGeom_Instance instance, iBase_EntityHandle entity_handle,
-                              int* parametric, int* err );
+void FBiGeom_isEntParametric( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, int* parametric, int* err );
 
 /**\brief  Return whether entities have parameterizations
  *
@@ -1111,8 +1076,8 @@ void FBiGeom_isEntParametric( FBiGeom_Instance instance, iBase_EntityHandle enti
  * \param *err Pointer to error type returned from function
  */
 void FBiGeom_isArrParametric( FBiGeom_Instance instance, iBase_EntityHandle const* entity_handles,
-                              int entity_handles_size, int** is_parametric,
-                              int* is_parametric_allocated, int* is_parametric_size, int* err );
+                              int entity_handles_size, int** is_parametric, int* is_parametric_allocated,
+                              int* is_parametric_size, int* err );
 
 /**\brief  Return coordinate position at specified parametric position on
  *         entity
@@ -1127,8 +1092,8 @@ void FBiGeom_isArrParametric( FBiGeom_Instance instance, iBase_EntityHandle cons
  * \param z Spatial coordinate at parametric position being queried
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getEntUVtoXYZ( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, double u,
-                            double v, double* x, double* y, double* z, int* err );
+void FBiGeom_getEntUVtoXYZ( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, double u, double v, double* x,
+                            double* y, double* z, int* err );
 
 /**\brief  Return coordinate positions at specified parametric position(s)
  *         on entity(ies)
@@ -1152,9 +1117,8 @@ void FBiGeom_getEntUVtoXYZ( FBiGeom_Instance instance, iBase_EntityHandle entity
  * \param *err Pointer to error type returned from function
  */
 void FBiGeom_getArrUVtoXYZ( FBiGeom_Instance instance, iBase_EntityHandle const* entity_handles,
-                            int entity_handles_size, int storage_order, double const* uv,
-                            int uv_size, double** coordinates, int* coordinates_allocated,
-                            int* coordinates_size, int* err );
+                            int entity_handles_size, int storage_order, double const* uv, int uv_size,
+                            double** coordinates, int* coordinates_allocated, int* coordinates_size, int* err );
 
 /**\brief  Return coordinate position at specified parametric position on
  *         entity
@@ -1168,8 +1132,8 @@ void FBiGeom_getArrUVtoXYZ( FBiGeom_Instance instance, iBase_EntityHandle const*
  * \param z Spatial coordinate at parametric position being queried
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getEntUtoXYZ( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, double u,
-                           double* x, double* y, double* z, int* err );
+void FBiGeom_getEntUtoXYZ( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, double u, double* x, double* y,
+                           double* z, int* err );
 
 /**\brief  Return coordinate positions at specified parametric position(s)
  *         on entity(ies)
@@ -1191,10 +1155,9 @@ void FBiGeom_getEntUtoXYZ( FBiGeom_Instance instance, iBase_EntityHandle entity_
  * \param coordinates_size Occupied size of coordinates array
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getArrUtoXYZ( FBiGeom_Instance instance, iBase_EntityHandle const* entity_handles,
-                           int entity_handles_size, double const* u, int u_size, int storage_order,
-                           double** on_coords, int* on_coords_allocated, int* on_coords_size,
-                           int* err );
+void FBiGeom_getArrUtoXYZ( FBiGeom_Instance instance, iBase_EntityHandle const* entity_handles, int entity_handles_size,
+                           double const* u, int u_size, int storage_order, double** on_coords, int* on_coords_allocated,
+                           int* on_coords_size, int* err );
 
 /**\brief  Return parametric position at specified spatial position on
  *         entity
@@ -1209,8 +1172,8 @@ void FBiGeom_getArrUtoXYZ( FBiGeom_Instance instance, iBase_EntityHandle const* 
  * \param v Parametric coordinate at spatial position being queried
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getEntXYZtoUV( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, double x,
-                            double y, double z, double* u, double* v, int* err );
+void FBiGeom_getEntXYZtoUV( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, double x, double y, double z,
+                            double* u, double* v, int* err );
 
 /**\brief  Return parametric position at specified spatial position on
  *         entity
@@ -1224,8 +1187,8 @@ void FBiGeom_getEntXYZtoUV( FBiGeom_Instance instance, iBase_EntityHandle entity
  * \param u Parametric coordinate at spatial position being queried
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getEntXYZtoU( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, double x,
-                           double y, double z, double* u, int* err );
+void FBiGeom_getEntXYZtoU( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, double x, double y, double z,
+                           double* u, int* err );
 
 /**\brief  Return parametric positions at specified spatial position(s) on
  *         entity(ies)
@@ -1247,9 +1210,8 @@ void FBiGeom_getEntXYZtoU( FBiGeom_Instance instance, iBase_EntityHandle entity_
  * \param *err Pointer to error type returned from function
  */
 void FBiGeom_getArrXYZtoUV( FBiGeom_Instance instance, iBase_EntityHandle const* entity_handles,
-                            int entity_handles_size, int storage_order, double const* coordinates,
-                            int coordinates_size, double** uv, int* uv_allocated, int* uv_size,
-                            int* err );
+                            int entity_handles_size, int storage_order, double const* coordinates, int coordinates_size,
+                            double** uv, int* uv_allocated, int* uv_size, int* err );
 
 /**\brief  Return spatial positions at specified parametric position(s) on
  *         entity(ies)
@@ -1271,10 +1233,9 @@ void FBiGeom_getArrXYZtoUV( FBiGeom_Instance instance, iBase_EntityHandle const*
  * \param u_size Occupied size of coordinates array
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getArrXYZtoU( FBiGeom_Instance instance, iBase_EntityHandle const* entity_handles,
-                           int entity_handles_size, int storage_order, double const* coordinates,
-                           int coordinates_size, double** u, int* u_allocated, int* u_size,
-                           int* err );
+void FBiGeom_getArrXYZtoU( FBiGeom_Instance instance, iBase_EntityHandle const* entity_handles, int entity_handles_size,
+                           int storage_order, double const* coordinates, int coordinates_size, double** u,
+                           int* u_allocated, int* u_size, int* err );
 
 /**\brief  Return parametric position at specified spatial position on
  *         entity, based on parametric position hint
@@ -1292,8 +1253,8 @@ void FBiGeom_getArrXYZtoU( FBiGeom_Instance instance, iBase_EntityHandle const* 
  * \param v Parametric coordinate at spatial position being queried
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getEntXYZtoUVHint( FBiGeom_Instance instance, iBase_EntityHandle entity_handle,
-                                double x, double y, double z, double* u, double* v, int* err );
+void FBiGeom_getEntXYZtoUVHint( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, double x, double y,
+                                double z, double* u, double* v, int* err );
 
 /**\brief  Return parametric positions at specified spatial position(s) on
  *         entity(ies), based on parametric position hints
@@ -1315,9 +1276,8 @@ void FBiGeom_getEntXYZtoUVHint( FBiGeom_Instance instance, iBase_EntityHandle en
  * \param *err Pointer to error type returned from function
  */
 void FBiGeom_getArrXYZtoUVHint( FBiGeom_Instance instance, iBase_EntityHandle const* entity_handles,
-                                int entity_handles_size, int storage_order, double const* coords,
-                                int coords_size, double** uv, int* uv_allocated, int* uv_size,
-                                int* err );
+                                int entity_handles_size, int storage_order, double const* coords, int coords_size,
+                                double** uv, int* uv_allocated, int* uv_size, int* err );
 
 /**\brief  Get parametric range of entity
  *
@@ -1330,8 +1290,8 @@ void FBiGeom_getArrXYZtoUVHint( FBiGeom_Instance instance, iBase_EntityHandle co
  * \param v_max Maximum parametric coordinate for entity
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getEntUVRange( FBiGeom_Instance instance, iBase_EntityHandle entity_handle,
-                            double* u_min, double* v_min, double* u_max, double* v_max, int* err );
+void FBiGeom_getEntUVRange( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, double* u_min, double* v_min,
+                            double* u_max, double* v_max, int* err );
 
 /**\brief  Get parametric range of entity
  *
@@ -1342,8 +1302,8 @@ void FBiGeom_getEntUVRange( FBiGeom_Instance instance, iBase_EntityHandle entity
  * \param u_max Maximum parametric coordinate for entity
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getEntURange( FBiGeom_Instance instance, iBase_EntityHandle entity_handle,
-                           double* u_min, double* u_max, int* err );
+void FBiGeom_getEntURange( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, double* u_min, double* u_max,
+                           int* err );
 
 /**\brief  Get parametric range of entities
  *
@@ -1364,9 +1324,8 @@ void FBiGeom_getEntURange( FBiGeom_Instance instance, iBase_EntityHandle entity_
  * \param *err Pointer to error type returned from function
  */
 void FBiGeom_getArrUVRange( FBiGeom_Instance instance, iBase_EntityHandle const* entity_handles,
-                            int entity_handles_size, int storage_order, double** uv_min,
-                            int* uv_min_allocated, int* uv_min_size, double** uv_max,
-                            int* uv_max_allocated, int* uv_max_size, int* err );
+                            int entity_handles_size, int storage_order, double** uv_min, int* uv_min_allocated,
+                            int* uv_min_size, double** uv_max, int* uv_max_allocated, int* uv_max_size, int* err );
 
 /**\brief  Get parametric range of entities
  *
@@ -1386,10 +1345,9 @@ void FBiGeom_getArrUVRange( FBiGeom_Instance instance, iBase_EntityHandle const*
  * \param u_max_size Occupied size of maximum parametric coordinate array
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getArrURange( FBiGeom_Instance instance, iBase_EntityHandle const* entity_handles,
-                           int entity_handles_size, double** u_min, int* u_min_allocated,
-                           int* u_min_size, double** u_max, int* u_max_allocated, int* u_max_size,
-                           int* err );
+void FBiGeom_getArrURange( FBiGeom_Instance instance, iBase_EntityHandle const* entity_handles, int entity_handles_size,
+                           double** u_min, int* u_min_allocated, int* u_min_size, double** u_max, int* u_max_allocated,
+                           int* u_max_size, int* err );
 
 /**\brief  Return the face parametric coordinates for a parametric position
  *         on a bounding edge
@@ -1404,9 +1362,8 @@ void FBiGeom_getArrURange( FBiGeom_Instance instance, iBase_EntityHandle const* 
  * \param v Corresponding parametric position on face
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getEntUtoUV( FBiGeom_Instance instance, iBase_EntityHandle edge_handle,
-                          iBase_EntityHandle face_handle, double in_u, double* u, double* v,
-                          int* err );
+void FBiGeom_getEntUtoUV( FBiGeom_Instance instance, iBase_EntityHandle edge_handle, iBase_EntityHandle face_handle,
+                          double in_u, double* u, double* v, int* err );
 
 /**\brief  Return parametric coordinates on face of vertex position
  *
@@ -1418,8 +1375,8 @@ void FBiGeom_getEntUtoUV( FBiGeom_Instance instance, iBase_EntityHandle edge_han
  * \param v Corresponding parametric position on face
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getVtxToUV( FBiGeom_Instance instance, iBase_EntityHandle vertex_handle,
-                         iBase_EntityHandle face_handle, double* u, double* v, int* err );
+void FBiGeom_getVtxToUV( FBiGeom_Instance instance, iBase_EntityHandle vertex_handle, iBase_EntityHandle face_handle,
+                         double* u, double* v, int* err );
 
 /**\brief  Return parametric coordinates on edge of vertex position
  *
@@ -1430,8 +1387,8 @@ void FBiGeom_getVtxToUV( FBiGeom_Instance instance, iBase_EntityHandle vertex_ha
  * \param u Corresponding parametric position on face
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getVtxToU( FBiGeom_Instance instance, iBase_EntityHandle vertex_handle,
-                        iBase_EntityHandle edge_handle, double* u, int* err );
+void FBiGeom_getVtxToU( FBiGeom_Instance instance, iBase_EntityHandle vertex_handle, iBase_EntityHandle edge_handle,
+                        double* u, int* err );
 
 /**\brief  Return the face parametric coordinates for a parametric position
  *         on bounding edges
@@ -1451,11 +1408,9 @@ void FBiGeom_getVtxToU( FBiGeom_Instance instance, iBase_EntityHandle vertex_han
  * \param uv_size Occupied size of parameter array
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getArrUtoUV( FBiGeom_Instance instance, iBase_EntityHandle const* edge_handles,
-                          int edge_handles_size, iBase_EntityHandle const* face_handles,
-                          int face_handles_size, double const* u_in, int u_in_size,
-                          int storage_order, double** uv, int* uv_allocated, int* uv_size,
-                          int* err );
+void FBiGeom_getArrUtoUV( FBiGeom_Instance instance, iBase_EntityHandle const* edge_handles, int edge_handles_size,
+                          iBase_EntityHandle const* face_handles, int face_handles_size, double const* u_in,
+                          int u_in_size, int storage_order, double** uv, int* uv_allocated, int* uv_size, int* err );
 
 /**\brief  Return parametric coordinates on faces of vertex positions
  *
@@ -1472,9 +1427,8 @@ void FBiGeom_getArrUtoUV( FBiGeom_Instance instance, iBase_EntityHandle const* e
  * \param *err Pointer to error type returned from function
  */
 void FBiGeom_getVtxArrToUV( FBiGeom_Instance instance, iBase_EntityHandle const* vertex_handles,
-                            int vertex_handles_size, iBase_EntityHandle const* face_handles,
-                            int face_handles_size, int storage_order, double** uv,
-                            int* uv_allocated, int* uv_size, int* err );
+                            int vertex_handles_size, iBase_EntityHandle const* face_handles, int face_handles_size,
+                            int storage_order, double** uv, int* uv_allocated, int* uv_size, int* err );
 
 /**\brief  Return parametric coordinates on edges of vertex positions
  *
@@ -1489,10 +1443,9 @@ void FBiGeom_getVtxArrToUV( FBiGeom_Instance instance, iBase_EntityHandle const*
  * \param u_size Occupied size of positions array
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getVtxArrToU( FBiGeom_Instance instance, iBase_EntityHandle const* vertex_handles,
-                           int vertex_handles_size, iBase_EntityHandle const* edge_handles,
-                           int edge_handles_size, double** u, int* u_allocated, int* u_size,
-                           int* err );
+void FBiGeom_getVtxArrToU( FBiGeom_Instance instance, iBase_EntityHandle const* vertex_handles, int vertex_handles_size,
+                           iBase_EntityHandle const* edge_handles, int edge_handles_size, double** u, int* u_allocated,
+                           int* u_size, int* err );
 
 /**\brief  Return the normal at a specified parametric position
  *
@@ -1506,8 +1459,8 @@ void FBiGeom_getVtxArrToU( FBiGeom_Instance instance, iBase_EntityHandle const* 
  * \param nrml_k Normal at specified position
  * \param *err Pointer to error type returned from functino
  */
-void FBiGeom_getEntNrmlUV( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, double u,
-                           double v, double* nrml_i, double* nrml_j, double* nrml_k, int* err );
+void FBiGeom_getEntNrmlUV( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, double u, double v,
+                           double* nrml_i, double* nrml_j, double* nrml_k, int* err );
 
 /**\brief  Return the normals at specified parametric positions
  *
@@ -1527,10 +1480,9 @@ void FBiGeom_getEntNrmlUV( FBiGeom_Instance instance, iBase_EntityHandle entity_
  * \param normals_size Occupied size of normals array
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getArrNrmlUV( FBiGeom_Instance instance, iBase_EntityHandle const* face_handles,
-                           int face_handles_size, int storage_order, double const* parameters,
-                           int parameters_size, double** normals, int* normals_allocated,
-                           int* normals_size, int* err );
+void FBiGeom_getArrNrmlUV( FBiGeom_Instance instance, iBase_EntityHandle const* face_handles, int face_handles_size,
+                           int storage_order, double const* parameters, int parameters_size, double** normals,
+                           int* normals_allocated, int* normals_size, int* err );
 
 /**\brief  Return the tangent at a specified parametric position
  *
@@ -1543,8 +1495,8 @@ void FBiGeom_getArrNrmlUV( FBiGeom_Instance instance, iBase_EntityHandle const* 
  * \param tgnt_k Tangent at specified position
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getEntTgntU( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, double u,
-                          double* tgnt_i, double* tgnt_j, double* tgnt_k, int* err );
+void FBiGeom_getEntTgntU( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, double u, double* tgnt_i,
+                          double* tgnt_j, double* tgnt_k, int* err );
 
 /**\brief  Return the tangents at specified parametric positions
  *
@@ -1564,10 +1516,9 @@ void FBiGeom_getEntTgntU( FBiGeom_Instance instance, iBase_EntityHandle entity_h
  * \param tangents_size Occupied size of tangents array
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getArrTgntU( FBiGeom_Instance instance, iBase_EntityHandle const* edge_handles,
-                          int edge_handles_size, int storage_order, double const* parameters,
-                          int parameters_size, double** tangents, int* tangents_allocated,
-                          int* tangents_size, int* err );
+void FBiGeom_getArrTgntU( FBiGeom_Instance instance, iBase_EntityHandle const* edge_handles, int edge_handles_size,
+                          int storage_order, double const* parameters, int parameters_size, double** tangents,
+                          int* tangents_allocated, int* tangents_size, int* err );
 
 /**\brief  Get the first derivative of a face at specified parametric
  *         position
@@ -1587,9 +1538,9 @@ void FBiGeom_getArrTgntU( FBiGeom_Instance instance, iBase_EntityHandle const* e
  * \param dvrt_v_size Occupied size of dvrt_v array
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getEnt1stDrvt( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, double u,
-                            double v, double** drvt_u, int* drvt_u_allocated, int* drvt_u_size,
-                            double** drvt_v, int* dvrt_v_allocated, int* dvrt_v_size, int* err );
+void FBiGeom_getEnt1stDrvt( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, double u, double v,
+                            double** drvt_u, int* drvt_u_allocated, int* drvt_u_size, double** drvt_v,
+                            int* dvrt_v_allocated, int* dvrt_v_size, int* err );
 
 /**\brief  Get the first derivatives of faces at specified parametric
  *         positions
@@ -1621,10 +1572,9 @@ void FBiGeom_getEnt1stDrvt( FBiGeom_Instance instance, iBase_EntityHandle entity
  * \param *err Pointer to error type returned from function
  */
 void FBiGeom_getArr1stDrvt( FBiGeom_Instance instance, iBase_EntityHandle const* entity_handles,
-                            int entity_handles_size, int storage_order, double const* uv,
-                            int uv_size, double** dvrt_u, int* dvrt_u_allocated, int* dvrt_u_size,
-                            int** u_offset, int* u_offset_allocated, int* u_offset_size,
-                            double** dvrt_v, int* dvrt_v_allocated, int* dvrt_v_size,
+                            int entity_handles_size, int storage_order, double const* uv, int uv_size, double** dvrt_u,
+                            int* dvrt_u_allocated, int* dvrt_u_size, int** u_offset, int* u_offset_allocated,
+                            int* u_offset_size, double** dvrt_v, int* dvrt_v_allocated, int* dvrt_v_size,
                             int** v_offset, int* v_offset_allocated, int* v_offset_size, int* err );
 
 /**\brief  Get the second derivative of a face at specified parametric
@@ -1649,10 +1599,10 @@ void FBiGeom_getArr1stDrvt( FBiGeom_Instance instance, iBase_EntityHandle const*
  * \param dvrt_uv_size Occupied size of dvrt_uv array
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getEnt2ndDrvt( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, double u,
-                            double v, double** drvt_uu, int* drvt_uu_allocated, int* drvt_uu_size,
-                            double** drvt_vv, int* dvrt_vv_allocated, int* dvrt_vv_size,
-                            double** drvt_uv, int* dvrt_uv_allocated, int* dvrt_uv_size, int* err );
+void FBiGeom_getEnt2ndDrvt( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, double u, double v,
+                            double** drvt_uu, int* drvt_uu_allocated, int* drvt_uu_size, double** drvt_vv,
+                            int* dvrt_vv_allocated, int* dvrt_vv_size, double** drvt_uv, int* dvrt_uv_allocated,
+                            int* dvrt_uv_size, int* err );
 
 /**\brief  Get the second derivatives of faces at specified parametric
  *         positions
@@ -1692,13 +1642,11 @@ void FBiGeom_getEnt2ndDrvt( FBiGeom_Instance instance, iBase_EntityHandle entity
  * \param *err Pointer to error type returned from function
  */
 void FBiGeom_getArr2ndDrvt( FBiGeom_Instance instance, iBase_EntityHandle const* entity_handles,
-                            int entity_handles_size, int storage_order, double const* uv,
-                            int uv_size, double** dvtr_uu, int* dvrt_uu_allocated,
-                            int* dvrt_uu_size, int** uu_offset, int* uu_offset_allocated,
-                            int* uu_offset_size, double** dvtr_vv, int* dvrt_vv_allocated,
-                            int* dvrt_vv_size, int** vv_offset, int* vv_offset_allocated,
-                            int* vv_offset_size, double** dvrt_uv, int* dvrt_uv_allocated,
-                            int* dvrt_uv_size, int** uv_offset, int* uv_offset_allocated,
+                            int entity_handles_size, int storage_order, double const* uv, int uv_size, double** dvtr_uu,
+                            int* dvrt_uu_allocated, int* dvrt_uu_size, int** uu_offset, int* uu_offset_allocated,
+                            int* uu_offset_size, double** dvtr_vv, int* dvrt_vv_allocated, int* dvrt_vv_size,
+                            int** vv_offset, int* vv_offset_allocated, int* vv_offset_size, double** dvrt_uv,
+                            int* dvrt_uv_allocated, int* dvrt_uv_size, int** uv_offset, int* uv_offset_allocated,
                             int* uv_offset_size, int* err );
 
 /**\brief  Get the two principle curvature vectors for a face at a
@@ -1719,9 +1667,9 @@ void FBiGeom_getArr2ndDrvt( FBiGeom_Instance instance, iBase_EntityHandle const*
  * \param cvtr2_k Minimum curvature vector
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getFcCvtrUV( FBiGeom_Instance instance, iBase_EntityHandle face_handle, double u,
-                          double v, double* cvtr1_i, double* cvtr1_j, double* cvtr1_k,
-                          double* cvtr2_i, double* cvtr2_j, double* cvtr2_k, int* err );
+void FBiGeom_getFcCvtrUV( FBiGeom_Instance instance, iBase_EntityHandle face_handle, double u, double v,
+                          double* cvtr1_i, double* cvtr1_j, double* cvtr1_k, double* cvtr2_i, double* cvtr2_j,
+                          double* cvtr2_k, int* err );
 
 /**\brief  Get the curvature(s) on face(s) at given parametric position(s)
  *
@@ -1744,10 +1692,9 @@ void FBiGeom_getFcCvtrUV( FBiGeom_Instance instance, iBase_EntityHandle face_han
  * \param cvtr_2_size Occupied size of second curvature array
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getFcArrCvtrUV( FBiGeom_Instance instance, iBase_EntityHandle const* face_handles,
-                             int face_handles_size, int storage_order, double const* uv,
-                             int uv_size, double** cvtr_1, int* cvtr_1_allocated, int* cvtr_1_size,
-                             double** cvtr_2, int* cvtr_2_allocated, int* cvtr_2_size, int* err );
+void FBiGeom_getFcArrCvtrUV( FBiGeom_Instance instance, iBase_EntityHandle const* face_handles, int face_handles_size,
+                             int storage_order, double const* uv, int uv_size, double** cvtr_1, int* cvtr_1_allocated,
+                             int* cvtr_1_size, double** cvtr_2, int* cvtr_2_allocated, int* cvtr_2_size, int* err );
 
 /**\brief  Return whether an entity is periodic
  *
@@ -1759,8 +1706,8 @@ void FBiGeom_getFcArrCvtrUV( FBiGeom_Instance instance, iBase_EntityHandle const
  * \param in_v Entity is periodic in v direction (=1) or not (=0)
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_isEntPeriodic( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, int* in_u,
-                            int* in_v, int* err );
+void FBiGeom_isEntPeriodic( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, int* in_u, int* in_v,
+                            int* err );
 
 /**\brief  Return whether entities are periodic
  *
@@ -1777,8 +1724,7 @@ void FBiGeom_isEntPeriodic( FBiGeom_Instance instance, iBase_EntityHandle entity
  * \param *err Pointer to error type returned from function
  */
 void FBiGeom_isArrPeriodic( FBiGeom_Instance instance, iBase_EntityHandle const* entity_handles,
-                            int entity_handles_size, int** in_uv, int* in_uv_allocated,
-                            int* in_uv_size, int* err );
+                            int entity_handles_size, int** in_uv, int* in_uv_allocated, int* in_uv_size, int* err );
 
 /**\brief  Return whether a face is degenerate
  *
@@ -1788,8 +1734,7 @@ void FBiGeom_isArrPeriodic( FBiGeom_Instance instance, iBase_EntityHandle const*
  * \param is_degenerate Face is degenerate (=1) or not (=0)
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_isFcDegenerate( FBiGeom_Instance instance, iBase_EntityHandle face_handle,
-                             int* is_degenerate, int* err );
+void FBiGeom_isFcDegenerate( FBiGeom_Instance instance, iBase_EntityHandle face_handle, int* is_degenerate, int* err );
 
 /**\brief  Return whether faces are degenerate
  *
@@ -1828,8 +1773,8 @@ void FBiGeom_getTolerance( FBiGeom_Instance instance, int* type, double* toleran
  * \param tolerance Pointer to tolerance returned from function
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getEntTolerance( FBiGeom_Instance instance, iBase_EntityHandle entity_handle,
-                              double* tolerance, int* err );
+void FBiGeom_getEntTolerance( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, double* tolerance,
+                              int* err );
 
 /**\brief  Get the tolerances of the specified entities
  *
@@ -1843,8 +1788,8 @@ void FBiGeom_getEntTolerance( FBiGeom_Instance instance, iBase_EntityHandle enti
  * \param *err Pointer to error type returned from function
  */
 void FBiGeom_getArrTolerance( FBiGeom_Instance instance, iBase_EntityHandle const* entity_handles,
-                              int entity_handles_size, double** tolerances,
-                              int* tolerances_allocated, int* tolerances_size, int* err );
+                              int entity_handles_size, double** tolerances, int* tolerances_allocated,
+                              int* tolerances_size, int* err );
 
 /**\brief  Initialize an iterator over specified entity type
  *
@@ -1859,9 +1804,8 @@ void FBiGeom_getArrTolerance( FBiGeom_Instance instance, iBase_EntityHandle cons
  * \param entity_iterator Pointer to iterator returned from function
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_initEntIter( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set_handle,
-                          int requested_entity_type, iBase_EntityIterator* entity_iterator,
-                          int* err );
+void FBiGeom_initEntIter( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set_handle, int requested_entity_type,
+                          iBase_EntityIterator* entity_iterator, int* err );
 
 /**\brief  Initialize an array iterator over specified entity type and size
  *
@@ -1931,8 +1875,7 @@ void FBiGeom_getNextEntArrIter( FBiGeom_Instance instance, iBase_EntityArrIterat
  * \param entity_iterator Iterator to reset
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_resetEntIter( FBiGeom_Instance instance, iBase_EntityIterator entity_iterator,
-                           int* err );
+void FBiGeom_resetEntIter( FBiGeom_Instance instance, iBase_EntityIterator entity_iterator, int* err );
 
 /**\brief  Reset the array iterator
  *
@@ -1941,8 +1884,7 @@ void FBiGeom_resetEntIter( FBiGeom_Instance instance, iBase_EntityIterator entit
  * \param entArr_iterator Iterator to reset
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_resetEntArrIter( FBiGeom_Instance instance, iBase_EntityArrIterator entArr_iterator,
-                              int* err );
+void FBiGeom_resetEntArrIter( FBiGeom_Instance instance, iBase_EntityArrIterator entArr_iterator, int* err );
 
 /**\brief  Destroy the specified iterator
  *
@@ -1951,8 +1893,7 @@ void FBiGeom_resetEntArrIter( FBiGeom_Instance instance, iBase_EntityArrIterator
  * \param entity_iterator Iterator which gets destroyed
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_endEntIter( FBiGeom_Instance instance, iBase_EntityIterator entity_iterator,
-                         int* err );
+void FBiGeom_endEntIter( FBiGeom_Instance instance, iBase_EntityIterator entity_iterator, int* err );
 
 /**\brief  Destroy the specified array iterator
  *
@@ -1961,8 +1902,7 @@ void FBiGeom_endEntIter( FBiGeom_Instance instance, iBase_EntityIterator entity_
  * \param entArr_iterator Iterator which gets destroyed
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_endEntArrIter( FBiGeom_Instance instance, iBase_EntityArrIterator entArr_iterator,
-                            int* err );
+void FBiGeom_endEntArrIter( FBiGeom_Instance instance, iBase_EntityArrIterator entArr_iterator, int* err );
 
 /**\brief  Make a copy of the specified entity
  *
@@ -1972,8 +1912,7 @@ void FBiGeom_endEntArrIter( FBiGeom_Instance instance, iBase_EntityArrIterator e
  * \param copy the newly-created entity
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_copyEnt( FBiGeom_Instance instance, iBase_EntityHandle source,
-                      iBase_EntityHandle* copy, int* err );
+void FBiGeom_copyEnt( FBiGeom_Instance instance, iBase_EntityHandle source, iBase_EntityHandle* copy, int* err );
 
 /**\brief  Sweep (extrude) an entity about an axis
  *
@@ -1988,9 +1927,8 @@ void FBiGeom_copyEnt( FBiGeom_Instance instance, iBase_EntityHandle source,
  * \param geom_entity2 Pointer to new entity handle returned from function
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_sweepEntAboutAxis( FBiGeom_Instance instance, iBase_EntityHandle geom_entity,
-                                double angle, double axis_x, double axis_y, double axis_z,
-                                iBase_EntityHandle* geom_entity2, int* err );
+void FBiGeom_sweepEntAboutAxis( FBiGeom_Instance instance, iBase_EntityHandle geom_entity, double angle, double axis_x,
+                                double axis_y, double axis_z, iBase_EntityHandle* geom_entity2, int* err );
 
 /**\brief  Delete all entities and sets
  *
@@ -2017,8 +1955,7 @@ void FBiGeom_deleteEnt( FBiGeom_Instance instance, iBase_EntityHandle entity_han
  * \param geom_entity Pointer to new entity handle returned from function
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_createSphere( FBiGeom_Instance instance, double radius,
-                           iBase_EntityHandle* geom_entity, int* err );
+void FBiGeom_createSphere( FBiGeom_Instance instance, double radius, iBase_EntityHandle* geom_entity, int* err );
 
 /**\brief  Create a prism
  *
@@ -2032,8 +1969,8 @@ void FBiGeom_createSphere( FBiGeom_Instance instance, double radius,
  * \param geom_entity Pointer to new entity handle returned from function
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_createPrism( FBiGeom_Instance instance, double height, int n_sides, double major_rad,
-                          double minor_rad, iBase_EntityHandle* geom_entity, int* err );
+void FBiGeom_createPrism( FBiGeom_Instance instance, double height, int n_sides, double major_rad, double minor_rad,
+                          iBase_EntityHandle* geom_entity, int* err );
 
 /**\brief  Create an axis-oriented box
  *
@@ -2046,8 +1983,8 @@ void FBiGeom_createPrism( FBiGeom_Instance instance, double height, int n_sides,
  * \param geom_entity Pointer to new entity handle returned from function
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_createBrick( FBiGeom_Instance instance, double x, double y, double z,
-                          iBase_EntityHandle* geom_entity, int* err );
+void FBiGeom_createBrick( FBiGeom_Instance instance, double x, double y, double z, iBase_EntityHandle* geom_entity,
+                          int* err );
 
 /**\brief  Create a cylinder
  *
@@ -2061,8 +1998,8 @@ void FBiGeom_createBrick( FBiGeom_Instance instance, double x, double y, double 
  * \param geom_entity Pointer to new entity handle returned from function
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_createCylinder( FBiGeom_Instance instance, double height, double major_rad,
-                             double minor_rad, iBase_EntityHandle* geom_entity, int* err );
+void FBiGeom_createCylinder( FBiGeom_Instance instance, double height, double major_rad, double minor_rad,
+                             iBase_EntityHandle* geom_entity, int* err );
 
 /**\brief  Create a cone or tapered cylinder
  *
@@ -2082,9 +2019,8 @@ void FBiGeom_createCylinder( FBiGeom_Instance instance, double height, double ma
  * \param geom_entity Pointer to new entity handle returned from function
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_createCone( FBiGeom_Instance instance, double height, double major_rad_base,
-                         double minor_rad_base, double rad_top, iBase_EntityHandle* geom_entity,
-                         int* err );
+void FBiGeom_createCone( FBiGeom_Instance instance, double height, double major_rad_base, double minor_rad_base,
+                         double rad_top, iBase_EntityHandle* geom_entity, int* err );
 
 /**\brief  Create a torus
  *
@@ -2109,8 +2045,8 @@ void FBiGeom_createTorus( FBiGeom_Instance instance, double major_rad, double mi
  * \param z z coordinate of the vector
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_moveEnt( FBiGeom_Instance instance, iBase_EntityHandle geom_entity, double x, double y,
-                      double z, int* err );
+void FBiGeom_moveEnt( FBiGeom_Instance instance, iBase_EntityHandle geom_entity, double x, double y, double z,
+                      int* err );
 
 /**\brief  Rotate an entity about an axis
  *
@@ -2123,8 +2059,8 @@ void FBiGeom_moveEnt( FBiGeom_Instance instance, iBase_EntityHandle geom_entity,
  * \param axis_z z coordinate of the axis
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_rotateEnt( FBiGeom_Instance instance, iBase_EntityHandle geom_entity, double angle,
-                        double axis_x, double axis_y, double axis_z, int* err );
+void FBiGeom_rotateEnt( FBiGeom_Instance instance, iBase_EntityHandle geom_entity, double angle, double axis_x,
+                        double axis_y, double axis_z, int* err );
 
 /**\brief  Reflect an entity across a plane
  *
@@ -2139,9 +2075,8 @@ void FBiGeom_rotateEnt( FBiGeom_Instance instance, iBase_EntityHandle geom_entit
  * \param plane_normal_z z coordinate of the plane's normal
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_reflectEnt( FBiGeom_Instance instance, iBase_EntityHandle geom_entity, double x,
-                         double y, double z, double plane_normal_x, double plane_normal_y,
-                         double plane_normal_z, int* err );
+void FBiGeom_reflectEnt( FBiGeom_Instance instance, iBase_EntityHandle geom_entity, double x, double y, double z,
+                         double plane_normal_x, double plane_normal_y, double plane_normal_z, int* err );
 
 /**\brief  Scale an entity in the x, y, and z directions
  *
@@ -2156,9 +2091,8 @@ void FBiGeom_reflectEnt( FBiGeom_Instance instance, iBase_EntityHandle geom_enti
  * \param scale_z factor to scale by in the z direction
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_scaleEnt( FBiGeom_Instance instance, iBase_EntityHandle geom_entity, double x,
-                       double y, double z, double scale_x, double scale_y, double scale_z,
-                       int* err );
+void FBiGeom_scaleEnt( FBiGeom_Instance instance, iBase_EntityHandle geom_entity, double x, double y, double z,
+                       double scale_x, double scale_y, double scale_z, int* err );
 
 /**\brief  Geometrically unite entities
  *
@@ -2169,8 +2103,8 @@ void FBiGeom_scaleEnt( FBiGeom_Instance instance, iBase_EntityHandle geom_entity
  * \param geom_entity Pointer to new entity handle returned from function
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_uniteEnts( FBiGeom_Instance instace, iBase_EntityHandle const* geom_entities,
-                        int geom_entities_size, iBase_EntityHandle* geom_entity, int* err );
+void FBiGeom_uniteEnts( FBiGeom_Instance instace, iBase_EntityHandle const* geom_entities, int geom_entities_size,
+                        iBase_EntityHandle* geom_entity, int* err );
 
 /**\brief  Geometrically subtract one entity from another
  *
@@ -2181,8 +2115,8 @@ void FBiGeom_uniteEnts( FBiGeom_Instance instace, iBase_EntityHandle const* geom
  * \param geom_entity Pointer to new entity handle returned from function
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_subtractEnts( FBiGeom_Instance instance, iBase_EntityHandle blank,
-                           iBase_EntityHandle tool, iBase_EntityHandle* geom_entity, int* err );
+void FBiGeom_subtractEnts( FBiGeom_Instance instance, iBase_EntityHandle blank, iBase_EntityHandle tool,
+                           iBase_EntityHandle* geom_entity, int* err );
 
 /**\brief  Geometrically intersect a pair of entities
  *
@@ -2193,8 +2127,8 @@ void FBiGeom_subtractEnts( FBiGeom_Instance instance, iBase_EntityHandle blank,
  * \param geom_entity Pointer to new entity handle returned from function
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_intersectEnts( FBiGeom_Instance instance, iBase_EntityHandle entity2,
-                            iBase_EntityHandle entity1, iBase_EntityHandle* geom_entity, int* err );
+void FBiGeom_intersectEnts( FBiGeom_Instance instance, iBase_EntityHandle entity2, iBase_EntityHandle entity1,
+                            iBase_EntityHandle* geom_entity, int* err );
 
 /**\brief  Section (cut) a region with a plane
  *
@@ -2210,9 +2144,9 @@ void FBiGeom_intersectEnts( FBiGeom_Instance instance, iBase_EntityHandle entity
  * \param geom_entity2 Pointer to new entity handle returned from function
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_sectionEnt( FBiGeom_Instance instance, iBase_EntityHandle geom_entity,
-                         double plane_normal_x, double plane_normal_y, double plane_normal_z,
-                         double offset, int reverse, iBase_EntityHandle* geom_entity2, int* err );
+void FBiGeom_sectionEnt( FBiGeom_Instance instance, iBase_EntityHandle geom_entity, double plane_normal_x,
+                         double plane_normal_y, double plane_normal_z, double offset, int reverse,
+                         iBase_EntityHandle* geom_entity2, int* err );
 
 /**\brief  Imprint entities
  *
@@ -2222,8 +2156,8 @@ void FBiGeom_sectionEnt( FBiGeom_Instance instance, iBase_EntityHandle geom_enti
  * \param geom_entities_size Number of entities in geom_entities array
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_imprintEnts( FBiGeom_Instance instance, iBase_EntityHandle const* geom_entities,
-                          int geom_entities_size, int* err );
+void FBiGeom_imprintEnts( FBiGeom_Instance instance, iBase_EntityHandle const* geom_entities, int geom_entities_size,
+                          int* err );
 
 /**\brief  Merge ents
  *
@@ -2235,8 +2169,8 @@ void FBiGeom_imprintEnts( FBiGeom_Instance instance, iBase_EntityHandle const* g
  * \param tolerance Tolerance within which entities are considered the same
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_mergeEnts( FBiGeom_Instance instance, iBase_EntityHandle const* geom_entities,
-                        int geom_entities_size, double tolerance, int* err );
+void FBiGeom_mergeEnts( FBiGeom_Instance instance, iBase_EntityHandle const* geom_entities, int geom_entities_size,
+                        double tolerance, int* err );
 
 /**\brief  Create an entity set
  *
@@ -2249,8 +2183,7 @@ void FBiGeom_mergeEnts( FBiGeom_Instance instance, iBase_EntityHandle const* geo
  * \param entity_set_created Entity set created by function
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_createEntSet( FBiGeom_Instance instance, int isList,
-                           iBase_EntitySetHandle* entity_set_created, int* err );
+void FBiGeom_createEntSet( FBiGeom_Instance instance, int isList, iBase_EntitySetHandle* entity_set_created, int* err );
 
 /**\brief  Destroy an entity set
  *
@@ -2270,8 +2203,7 @@ void FBiGeom_destroyEntSet( FBiGeom_Instance instance, iBase_EntitySetHandle ent
  * \param is_list Pointer to flag returned from function
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_isList( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set, int* is_list,
-                     int* err );
+void FBiGeom_isList( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set, int* is_list, int* err );
 
 /**\brief  Get the number of entity sets contained in a set or interface
  *
@@ -2286,8 +2218,8 @@ void FBiGeom_isList( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set
  * \param num_sets Pointer to the number of sets returned from function
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getNumEntSets( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set_handle,
-                            int num_hops, int* num_sets, int* err );
+void FBiGeom_getNumEntSets( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set_handle, int num_hops,
+                            int* num_sets, int* err );
 
 /**\brief  Get the entity sets contained in a set or interface
  *
@@ -2307,10 +2239,9 @@ void FBiGeom_getNumEntSets( FBiGeom_Instance instance, iBase_EntitySetHandle ent
  *        contained_set_handles array
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getEntSets( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set_handle,
-                         int num_hops, iBase_EntitySetHandle** contained_set_handles,
-                         int* contained_set_handles_allocated, int* contained_set_handles_size,
-                         int* err );
+void FBiGeom_getEntSets( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set_handle, int num_hops,
+                         iBase_EntitySetHandle** contained_set_handles, int* contained_set_handles_allocated,
+                         int* contained_set_handles_size, int* err );
 
 /**\brief  Add an entity to a set
  *
@@ -2320,8 +2251,8 @@ void FBiGeom_getEntSets( FBiGeom_Instance instance, iBase_EntitySetHandle entity
  * \param entity_set Pointer to the set being added to
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_addEntToSet( FBiGeom_Instance instance, iBase_EntityHandle entity_handle,
-                          iBase_EntitySetHandle entity_set, int* err );
+void FBiGeom_addEntToSet( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, iBase_EntitySetHandle entity_set,
+                          int* err );
 
 /**\brief  Remove an entity from a set
  *
@@ -2357,8 +2288,7 @@ void FBiGeom_addEntArrToSet( FBiGeom_Instance instance, const iBase_EntityHandle
  * \param *err Pointer to error type returned from function
  */
 void FBiGeom_rmvEntArrFromSet( FBiGeom_Instance instance, const iBase_EntityHandle* entity_handles,
-                               int entity_handles_size, iBase_EntitySetHandle entity_set,
-                               int* err );
+                               int entity_handles_size, iBase_EntitySetHandle entity_set, int* err );
 
 /**\brief  Add an entity set to a set
  *
@@ -2426,10 +2356,8 @@ void FBiGeom_isEntArrContained( FBiGeom_Instance                 instance,
  * \param is_contained Pointer to flag returned from function
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_isEntSetContained( FBiGeom_Instance      instance,
-                                iBase_EntitySetHandle containing_entity_set,
-                                iBase_EntitySetHandle contained_entity_set, int* is_contained,
-                                int* err );
+void FBiGeom_isEntSetContained( FBiGeom_Instance instance, iBase_EntitySetHandle containing_entity_set,
+                                iBase_EntitySetHandle contained_entity_set, int* is_contained, int* err );
 
 /**\brief  Add parent/child links between two sets
  *
@@ -2479,8 +2407,8 @@ void FBiGeom_isChildOf( FBiGeom_Instance instance, iBase_EntitySetHandle parent_
  * \param num_child Pointer to number of children returned from function
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getNumChld( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set, int num_hops,
-                         int* num_child, int* err );
+void FBiGeom_getNumChld( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set, int num_hops, int* num_child,
+                         int* err );
 
 /**\brief  Get the number of parent sets linked from a specified set
  *
@@ -2494,8 +2422,8 @@ void FBiGeom_getNumChld( FBiGeom_Instance instance, iBase_EntitySetHandle entity
  * \param num_parent Pointer to number of parents returned from function
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getNumPrnt( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set, int num_hops,
-                         int* num_parent, int* err );
+void FBiGeom_getNumPrnt( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set, int num_hops, int* num_parent,
+                         int* err );
 
 /**\brief  Get the child sets linked from a specified set
  *
@@ -2514,9 +2442,9 @@ void FBiGeom_getNumPrnt( FBiGeom_Instance instance, iBase_EntitySetHandle entity
  *        entity_set_handles array
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getChldn( FBiGeom_Instance instance, iBase_EntitySetHandle from_entity_set,
-                       int num_hops, iBase_EntitySetHandle** entity_set_handles,
-                       int* entity_set_handles_allocated, int* entity_set_handles_size, int* err );
+void FBiGeom_getChldn( FBiGeom_Instance instance, iBase_EntitySetHandle from_entity_set, int num_hops,
+                       iBase_EntitySetHandle** entity_set_handles, int* entity_set_handles_allocated,
+                       int* entity_set_handles_size, int* err );
 
 /**\brief  Get the parent sets linked from a specified set
  *
@@ -2535,9 +2463,9 @@ void FBiGeom_getChldn( FBiGeom_Instance instance, iBase_EntitySetHandle from_ent
  *        entity_set_handles array
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getPrnts( FBiGeom_Instance instance, iBase_EntitySetHandle from_entity_set,
-                       int num_hops, iBase_EntitySetHandle** entity_set_handles,
-                       int* entity_set_handles_allocated, int* entity_set_handles_size, int* err );
+void FBiGeom_getPrnts( FBiGeom_Instance instance, iBase_EntitySetHandle from_entity_set, int num_hops,
+                       iBase_EntitySetHandle** entity_set_handles, int* entity_set_handles_allocated,
+                       int* entity_set_handles_size, int* err );
 
 /**\brief  Create a tag with specified name, size, and type
  *
@@ -2567,8 +2495,7 @@ void FBiGeom_createTag( FBiGeom_Instance instance, const char* tag_name, int tag
  *        set for that tag
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_destroyTag( FBiGeom_Instance instance, iBase_TagHandle tag_handle, int forced,
-                         int* err );
+void FBiGeom_destroyTag( FBiGeom_Instance instance, iBase_TagHandle tag_handle, int forced, int* err );
 
 /**\brief  Get the name for a given tag handle
  *
@@ -2580,8 +2507,7 @@ void FBiGeom_destroyTag( FBiGeom_Instance instance, iBase_TagHandle tag_handle, 
  * \param *err Pointer to error type returned from function
  * \param name_len Length of character string input to function
  */
-void FBiGeom_getTagName( FBiGeom_Instance instance, iBase_TagHandle tag_handle, char* name,
-                         int* err, int name_len );
+void FBiGeom_getTagName( FBiGeom_Instance instance, iBase_TagHandle tag_handle, char* name, int* err, int name_len );
 
 /**\brief  Get size of a tag in units of numbers of tag data type
  *
@@ -2591,8 +2517,7 @@ void FBiGeom_getTagName( FBiGeom_Instance instance, iBase_TagHandle tag_handle, 
  * \param tag_size Pointer to tag size returned from function
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getTagSizeValues( FBiGeom_Instance instance, iBase_TagHandle tag_handle, int* tag_size,
-                               int* err );
+void FBiGeom_getTagSizeValues( FBiGeom_Instance instance, iBase_TagHandle tag_handle, int* tag_size, int* err );
 
 /**\brief  Get size of a tag in units of bytes
  *
@@ -2602,8 +2527,7 @@ void FBiGeom_getTagSizeValues( FBiGeom_Instance instance, iBase_TagHandle tag_ha
  * \param tag_size Pointer to tag size returned from function
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getTagSizeBytes( FBiGeom_Instance instance, iBase_TagHandle tag_handle, int* tag_size,
-                              int* err );
+void FBiGeom_getTagSizeBytes( FBiGeom_Instance instance, iBase_TagHandle tag_handle, int* tag_size, int* err );
 
 /**\brief  Get a the handle of an existing tag with the specified name
  *
@@ -2614,8 +2538,8 @@ void FBiGeom_getTagSizeBytes( FBiGeom_Instance instance, iBase_TagHandle tag_han
  * \param *err Pointer to error type returned from function
  * \param tag_name_len Length of tag name string
  */
-void FBiGeom_getTagHandle( FBiGeom_Instance instance, const char* tag_name,
-                           iBase_TagHandle* tag_handle, int* err, int tag_name_len );
+void FBiGeom_getTagHandle( FBiGeom_Instance instance, const char* tag_name, iBase_TagHandle* tag_handle, int* err,
+                           int tag_name_len );
 
 /**\brief  Get the data type of the specified tag handle
  *
@@ -2626,8 +2550,7 @@ void FBiGeom_getTagHandle( FBiGeom_Instance instance, const char* tag_name,
  * \param tag_type Pointer to tag type returned from function
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getTagType( FBiGeom_Instance instance, iBase_TagHandle tag_handle, int* tag_type,
-                         int* err );
+void FBiGeom_getTagType( FBiGeom_Instance instance, iBase_TagHandle tag_handle, int* tag_type, int* err );
 
 /**\brief  Set a tag value of arbitrary type on an entity set
  *
@@ -2646,8 +2569,8 @@ void FBiGeom_getTagType( FBiGeom_Instance instance, iBase_TagHandle tag_handle, 
  * \param *err Pointer to error type returned from function
  */
 void FBiGeom_setEntSetData( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set_handle,
-                            const iBase_TagHandle tag_handle, const void* tag_value,
-                            const int tag_value_size, int* err );
+                            const iBase_TagHandle tag_handle, const void* tag_value, const int tag_value_size,
+                            int* err );
 
 /**\brief  Set a tag value of integer type on an entity set
  *
@@ -2658,8 +2581,8 @@ void FBiGeom_setEntSetData( FBiGeom_Instance instance, iBase_EntitySetHandle ent
  * \param tag_value Tag value being set on entity set
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_setEntSetIntData( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set,
-                               iBase_TagHandle tag_handle, int tag_value, int* err );
+void FBiGeom_setEntSetIntData( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set, iBase_TagHandle tag_handle,
+                               int tag_value, int* err );
 
 /**\brief  Set a tag value of double type on an entity set
  *
@@ -2670,8 +2593,8 @@ void FBiGeom_setEntSetIntData( FBiGeom_Instance instance, iBase_EntitySetHandle 
  * \param tag_value Tag value being set on entity set
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_setEntSetDblData( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set,
-                               iBase_TagHandle tag_handle, double tag_value, int* err );
+void FBiGeom_setEntSetDblData( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set, iBase_TagHandle tag_handle,
+                               double tag_value, int* err );
 
 /**\brief  Set a tag value of entity handle type on an entity set
  *
@@ -2682,8 +2605,8 @@ void FBiGeom_setEntSetDblData( FBiGeom_Instance instance, iBase_EntitySetHandle 
  * \param tag_value Tag value being set on entity set
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_setEntSetEHData( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set,
-                              iBase_TagHandle tag_handle, iBase_EntityHandle tag_value, int* err );
+void FBiGeom_setEntSetEHData( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set, iBase_TagHandle tag_handle,
+                              iBase_EntityHandle tag_value, int* err );
 
 /**\brief  Set a tag value of entity set handle type on an entity set
  *
@@ -2694,9 +2617,8 @@ void FBiGeom_setEntSetEHData( FBiGeom_Instance instance, iBase_EntitySetHandle e
  * \param tag_value Tag value being set on entity set
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_setEntSetESHData( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set,
-                               iBase_TagHandle tag_handle, iBase_EntitySetHandle tag_value,
-                               int* err );
+void FBiGeom_setEntSetESHData( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set, iBase_TagHandle tag_handle,
+                               iBase_EntitySetHandle tag_value, int* err );
 
 /**\brief  Get the value of a tag of arbitrary type on an entity set
  *
@@ -2718,8 +2640,8 @@ void FBiGeom_setEntSetESHData( FBiGeom_Instance instance, iBase_EntitySetHandle 
  * \param *err Pointer to error type returned from function
  */
 void FBiGeom_getEntSetData( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set_handle,
-                            iBase_TagHandle tag_handle, void** tag_value, int* tag_value_allocated,
-                            int* tag_value_size, int* err );
+                            iBase_TagHandle tag_handle, void** tag_value, int* tag_value_allocated, int* tag_value_size,
+                            int* err );
 
 /**\brief  Get the value of a tag of integer type on an entity set
  *
@@ -2730,8 +2652,8 @@ void FBiGeom_getEntSetData( FBiGeom_Instance instance, iBase_EntitySetHandle ent
  * \param *out_data Pointer to tag value returned from function
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getEntSetIntData( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set,
-                               iBase_TagHandle tag_handle, int* out_data, int* err );
+void FBiGeom_getEntSetIntData( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set, iBase_TagHandle tag_handle,
+                               int* out_data, int* err );
 
 /**\brief  Get the value of a tag of double type on an entity set
  *
@@ -2742,8 +2664,8 @@ void FBiGeom_getEntSetIntData( FBiGeom_Instance instance, iBase_EntitySetHandle 
  * \param *out_data Pointer to tag value returned from function
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getEntSetDblData( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set,
-                               iBase_TagHandle tag_handle, double* out_data, int* err );
+void FBiGeom_getEntSetDblData( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set, iBase_TagHandle tag_handle,
+                               double* out_data, int* err );
 
 /**\brief  Get the value of a tag of entity handle type on an entity set
  *
@@ -2754,8 +2676,8 @@ void FBiGeom_getEntSetDblData( FBiGeom_Instance instance, iBase_EntitySetHandle 
  * \param *out_data Pointer to tag value returned from function
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getEntSetEHData( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set,
-                              iBase_TagHandle tag_handle, iBase_EntityHandle* out_data, int* err );
+void FBiGeom_getEntSetEHData( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set, iBase_TagHandle tag_handle,
+                              iBase_EntityHandle* out_data, int* err );
 
 /**\brief  Get the value of a tag of entity set handle type on an entity set
  *
@@ -2766,9 +2688,8 @@ void FBiGeom_getEntSetEHData( FBiGeom_Instance instance, iBase_EntitySetHandle e
  * \param *out_data Pointer to tag value returned from function
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getEntSetESHData( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set,
-                               iBase_TagHandle tag_handle, iBase_EntitySetHandle* out_data,
-                               int* err );
+void FBiGeom_getEntSetESHData( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set, iBase_TagHandle tag_handle,
+                               iBase_EntitySetHandle* out_data, int* err );
 
 /**\brief  Get all the tags associated with a specified entity set
  *
@@ -2783,8 +2704,8 @@ void FBiGeom_getEntSetESHData( FBiGeom_Instance instance, iBase_EntitySetHandle 
  * \param *err Pointer to error type returned from function
  */
 void FBiGeom_getAllEntSetTags( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set_handle,
-                               iBase_TagHandle** tag_handles, int* tag_handles_allocated,
-                               int* tag_handles_size, int* err );
+                               iBase_TagHandle** tag_handles, int* tag_handles_allocated, int* tag_handles_size,
+                               int* err );
 
 /**\brief  Remove a tag value from an entity set
  *
@@ -2819,9 +2740,9 @@ void FBiGeom_rmvEntSetTag( FBiGeom_Instance instance, iBase_EntitySetHandle enti
  *        array
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getArrData( FBiGeom_Instance instance, const iBase_EntityHandle* entity_handles,
-                         int entity_handles_size, iBase_TagHandle tag_handle, void** tag_values,
-                         int* tag_values_allocated, int* tag_values_size, int* err );
+void FBiGeom_getArrData( FBiGeom_Instance instance, const iBase_EntityHandle* entity_handles, int entity_handles_size,
+                         iBase_TagHandle tag_handle, void** tag_values, int* tag_values_allocated, int* tag_values_size,
+                         int* err );
 
 /**\brief  Get tag values of integer type for an array of entities
  *
@@ -2854,9 +2775,8 @@ void FBiGeom_getIntArrData( FBiGeom_Instance instance, const iBase_EntityHandle*
  * \param *err Pointer to error type returned from function
  */
 void FBiGeom_getDblArrData( FBiGeom_Instance instance, const iBase_EntityHandle* entity_handles,
-                            int entity_handles_size, iBase_TagHandle tag_handle,
-                            double** tag_values, int* tag_values_allocated, int* tag_values_size,
-                            int* err );
+                            int entity_handles_size, iBase_TagHandle tag_handle, double** tag_values,
+                            int* tag_values_allocated, int* tag_values_size, int* err );
 
 /**\brief  Get tag values of entity handle type for an array of entities
  *
@@ -2871,9 +2791,8 @@ void FBiGeom_getDblArrData( FBiGeom_Instance instance, const iBase_EntityHandle*
  * \param tag_value_size Pointer to occupied size of tag data array
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getEHArrData( FBiGeom_Instance instance, const iBase_EntityHandle* entity_handles,
-                           int entity_handles_size, iBase_TagHandle tag_handle,
-                           iBase_EntityHandle** tag_value, int* tag_value_allocated,
+void FBiGeom_getEHArrData( FBiGeom_Instance instance, const iBase_EntityHandle* entity_handles, int entity_handles_size,
+                           iBase_TagHandle tag_handle, iBase_EntityHandle** tag_value, int* tag_value_allocated,
                            int* tag_value_size, int* err );
 
 /**\brief  Get tag values of entity set handle type for an array of entities
@@ -2890,9 +2809,8 @@ void FBiGeom_getEHArrData( FBiGeom_Instance instance, const iBase_EntityHandle* 
  * \param *err Pointer to error type returned from function
  */
 void FBiGeom_getESHArrData( FBiGeom_Instance instance, const iBase_EntityHandle* entity_handles,
-                            int entity_handles_size, iBase_TagHandle tag_handle,
-                            iBase_EntitySetHandle** tag_value, int* tag_value_allocated,
-                            int* tag_value_size, int* err );
+                            int entity_handles_size, iBase_TagHandle tag_handle, iBase_EntitySetHandle** tag_value,
+                            int* tag_value_allocated, int* tag_value_size, int* err );
 
 /**\brief  Set tag values of arbitrary type on an array of entities
  *
@@ -2914,9 +2832,8 @@ void FBiGeom_getESHArrData( FBiGeom_Instance instance, const iBase_EntityHandle*
  * \param tag_values_size Size in bytes of tag data
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_setArrData( FBiGeom_Instance instance, const iBase_EntityHandle* entity_handles,
-                         int entity_handles_size, iBase_TagHandle tag_handle,
-                         const void* tag_values, int tag_values_size, int* err );
+void FBiGeom_setArrData( FBiGeom_Instance instance, const iBase_EntityHandle* entity_handles, int entity_handles_size,
+                         iBase_TagHandle tag_handle, const void* tag_values, int tag_values_size, int* err );
 
 /**\brief  Set tag values of integer type on an array of entities
  *
@@ -2930,8 +2847,8 @@ void FBiGeom_setArrData( FBiGeom_Instance instance, const iBase_EntityHandle* en
  * \param *err Pointer to error type returned from function
  */
 void FBiGeom_setIntArrData( FBiGeom_Instance instance, const iBase_EntityHandle* entity_handles,
-                            int entity_handles_size, iBase_TagHandle tag_handle,
-                            const int* tag_values, int tag_values_size, int* err );
+                            int entity_handles_size, iBase_TagHandle tag_handle, const int* tag_values,
+                            int tag_values_size, int* err );
 
 /**\brief  Set tag values of double type on an array of entities
  *
@@ -2945,8 +2862,8 @@ void FBiGeom_setIntArrData( FBiGeom_Instance instance, const iBase_EntityHandle*
  * \param *err Pointer to error type returned from function
  */
 void FBiGeom_setDblArrData( FBiGeom_Instance instance, const iBase_EntityHandle* entity_handles,
-                            int entity_handles_size, iBase_TagHandle tag_handle,
-                            const double* tag_values, const int tag_values_size, int* err );
+                            int entity_handles_size, iBase_TagHandle tag_handle, const double* tag_values,
+                            const int tag_values_size, int* err );
 
 /**\brief  Set tag values of entity handle type on an array of entities
  *
@@ -2960,9 +2877,9 @@ void FBiGeom_setDblArrData( FBiGeom_Instance instance, const iBase_EntityHandle*
  *        data
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_setEHArrData( FBiGeom_Instance instance, const iBase_EntityHandle* entity_handles,
-                           int entity_handles_size, iBase_TagHandle tag_handle,
-                           const iBase_EntityHandle* tag_values, int tag_values_size, int* err );
+void FBiGeom_setEHArrData( FBiGeom_Instance instance, const iBase_EntityHandle* entity_handles, int entity_handles_size,
+                           iBase_TagHandle tag_handle, const iBase_EntityHandle* tag_values, int tag_values_size,
+                           int* err );
 
 /**\brief  Set tag values of entity set handle type on an array of entities
  *
@@ -2978,8 +2895,7 @@ void FBiGeom_setEHArrData( FBiGeom_Instance instance, const iBase_EntityHandle* 
  */
 void FBiGeom_setESHArrData( FBiGeom_Instance instance, const iBase_EntityHandle* entity_handles,
                             int entity_handles_size, iBase_TagHandle tag_handle,
-                            const iBase_EntitySetHandle* tag_values, int tag_values_size,
-                            int* err );
+                            const iBase_EntitySetHandle* tag_values, int tag_values_size, int* err );
 
 /**\brief  Remove a tag value from an array of entities
  *
@@ -2990,8 +2906,8 @@ void FBiGeom_setESHArrData( FBiGeom_Instance instance, const iBase_EntityHandle*
  * \param tag_handle Tag handle of tag being removed
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_rmvArrTag( FBiGeom_Instance instance, const iBase_EntityHandle* entity_handles,
-                        int entity_handles_size, iBase_TagHandle tag_handle, int* err );
+void FBiGeom_rmvArrTag( FBiGeom_Instance instance, const iBase_EntityHandle* entity_handles, int entity_handles_size,
+                        iBase_TagHandle tag_handle, int* err );
 
 /**\brief  Get the value of a tag of arbitrary type on an entity
  *
@@ -3012,9 +2928,8 @@ void FBiGeom_rmvArrTag( FBiGeom_Instance instance, const iBase_EntityHandle* ent
  *        array
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getData( FBiGeom_Instance instance, iBase_EntityHandle entity_handle,
-                      iBase_TagHandle tag_handle, void** tag_value, int* tag_value_allocated,
-                      int* tag_value_size, int* err );
+void FBiGeom_getData( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, iBase_TagHandle tag_handle,
+                      void** tag_value, int* tag_value_allocated, int* tag_value_size, int* err );
 
 /**\brief  Get the value of a tag of integer type on an entity
  *
@@ -3025,8 +2940,8 @@ void FBiGeom_getData( FBiGeom_Instance instance, iBase_EntityHandle entity_handl
  * \param *out_data Pointer to tag value returned from function
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getIntData( FBiGeom_Instance instance, iBase_EntityHandle entity_handle,
-                         iBase_TagHandle tag_handle, int* out_data, int* err );
+void FBiGeom_getIntData( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, iBase_TagHandle tag_handle,
+                         int* out_data, int* err );
 
 /**\brief  Get the value of a tag of double type on an entity
  *
@@ -3050,8 +2965,8 @@ void FBiGeom_getDblData( FBiGeom_Instance                instance,
  * \param *out_data Pointer to tag value returned from function
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getEHData( FBiGeom_Instance instance, iBase_EntityHandle entity_handle,
-                        iBase_TagHandle tag_handle, iBase_EntityHandle* out_data, int* err );
+void FBiGeom_getEHData( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, iBase_TagHandle tag_handle,
+                        iBase_EntityHandle* out_data, int* err );
 
 /**\brief  Get the value of a tag of entity set handle type on an entity
  *
@@ -3062,8 +2977,8 @@ void FBiGeom_getEHData( FBiGeom_Instance instance, iBase_EntityHandle entity_han
  * \param *out_data Pointer to tag value returned from function
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getESHData( FBiGeom_Instance instance, iBase_EntityHandle entity_handle,
-                         iBase_TagHandle tag_handle, iBase_EntitySetHandle* out_data, int* err );
+void FBiGeom_getESHData( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, iBase_TagHandle tag_handle,
+                         iBase_EntitySetHandle* out_data, int* err );
 
 /**\brief  Set a tag value of arbitrary type on an entity
  *
@@ -3082,9 +2997,8 @@ void FBiGeom_getESHData( FBiGeom_Instance instance, iBase_EntityHandle entity_ha
  * \param tag_value_size Size in bytes of tag data
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_setData( FBiGeom_Instance instance, iBase_EntityHandle entity_handle,
-                      iBase_TagHandle tag_handle, const void* tag_value, int tag_value_size,
-                      int* err );
+void FBiGeom_setData( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, iBase_TagHandle tag_handle,
+                      const void* tag_value, int tag_value_size, int* err );
 
 /**\brief  Set a tag value of integer type on an entity
  *
@@ -3095,8 +3009,8 @@ void FBiGeom_setData( FBiGeom_Instance instance, iBase_EntityHandle entity_handl
  * \param tag_value Tag value being set on entity
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_setIntData( FBiGeom_Instance instance, iBase_EntityHandle entity_handle,
-                         iBase_TagHandle tag_handle, int tag_value, int* err );
+void FBiGeom_setIntData( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, iBase_TagHandle tag_handle,
+                         int tag_value, int* err );
 
 /**\brief  Set a tag value of double type on an entity
  *
@@ -3107,8 +3021,8 @@ void FBiGeom_setIntData( FBiGeom_Instance instance, iBase_EntityHandle entity_ha
  * \param tag_value Tag value being set on entity
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_setDblData( FBiGeom_Instance instance, iBase_EntityHandle entity_handle,
-                         iBase_TagHandle tag_handle, double tag_value, int* err );
+void FBiGeom_setDblData( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, iBase_TagHandle tag_handle,
+                         double tag_value, int* err );
 
 /**\brief  Set a tag value of entity handle type on an entity
  *
@@ -3119,8 +3033,8 @@ void FBiGeom_setDblData( FBiGeom_Instance instance, iBase_EntityHandle entity_ha
  * \param tag_value Tag value being set on entity
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_setEHData( FBiGeom_Instance instance, iBase_EntityHandle entity_handle,
-                        iBase_TagHandle tag_handle, iBase_EntityHandle tag_value, int* err );
+void FBiGeom_setEHData( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, iBase_TagHandle tag_handle,
+                        iBase_EntityHandle tag_value, int* err );
 
 /**\brief  Set a tag value of entity set handle type on an entity
  *
@@ -3131,8 +3045,8 @@ void FBiGeom_setEHData( FBiGeom_Instance instance, iBase_EntityHandle entity_han
  * \param tag_value Tag value being set on entity
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_setESHData( FBiGeom_Instance instance, iBase_EntityHandle entity_handle,
-                         iBase_TagHandle tag_handle, iBase_EntitySetHandle tag_value, int* err );
+void FBiGeom_setESHData( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, iBase_TagHandle tag_handle,
+                         iBase_EntitySetHandle tag_value, int* err );
 
 /**\brief  Get all the tags associated with a specified entity handle
  *
@@ -3146,9 +3060,8 @@ void FBiGeom_setESHData( FBiGeom_Instance instance, iBase_EntityHandle entity_ha
  * \param *tag_handles_size Pointer to occupied size of tag_handles array
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getAllTags( FBiGeom_Instance instance, iBase_EntityHandle entity_handle,
-                         iBase_TagHandle** tag_handles, int* tag_handles_allocated,
-                         int* tag_handles_size, int* err );
+void FBiGeom_getAllTags( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, iBase_TagHandle** tag_handles,
+                         int* tag_handles_allocated, int* tag_handles_size, int* err );
 
 /**\brief  Remove a tag value from an entity
  *
@@ -3158,8 +3071,8 @@ void FBiGeom_getAllTags( FBiGeom_Instance instance, iBase_EntityHandle entity_ha
  * \param tag_handle Tag handle of tag being removed
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_rmvTag( FBiGeom_Instance instance, iBase_EntityHandle entity_handle,
-                     iBase_TagHandle tag_handle, int* err );
+void FBiGeom_rmvTag( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, iBase_TagHandle tag_handle,
+                     int* err );
 
 /**\brief  Subtract contents of one entity set from another
  *
@@ -3171,8 +3084,7 @@ void FBiGeom_rmvTag( FBiGeom_Instance instance, iBase_EntityHandle entity_handle
  * \param *err Pointer to error type returned from function
  */
 void FBiGeom_subtract( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set_1,
-                       iBase_EntitySetHandle entity_set_2, iBase_EntitySetHandle* result_entity_set,
-                       int* err );
+                       iBase_EntitySetHandle entity_set_2, iBase_EntitySetHandle* result_entity_set, int* err );
 
 /**\brief  Intersect contents of one entity set with another
  *
@@ -3184,8 +3096,7 @@ void FBiGeom_subtract( FBiGeom_Instance instance, iBase_EntitySetHandle entity_s
  * \param *err Pointer to error type returned from function
  */
 void FBiGeom_intersect( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set_1,
-                        iBase_EntitySetHandle  entity_set_2,
-                        iBase_EntitySetHandle* result_entity_set, int* err );
+                        iBase_EntitySetHandle entity_set_2, iBase_EntitySetHandle* result_entity_set, int* err );
 
 /**\brief  Unite contents of one entity set with another
  *
@@ -3196,9 +3107,8 @@ void FBiGeom_intersect( FBiGeom_Instance instance, iBase_EntitySetHandle entity_
  * \param result_entity_set Pointer to entity set returned from function
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_unite( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set_1,
-                    iBase_EntitySetHandle entity_set_2, iBase_EntitySetHandle* result_entity_set,
-                    int* err );
+void FBiGeom_unite( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set_1, iBase_EntitySetHandle entity_set_2,
+                    iBase_EntitySetHandle* result_entity_set, int* err );
 
 /**\brief  Return facet information from solid modeling engine
  *
@@ -3214,9 +3124,9 @@ void FBiGeom_unite( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set_
  * \param facets_size Occupied size of facet list array
  * \param *err Pointer to error type returned from function
  */
-void FBiGeom_getFacets( FBiGeom_Instance instance, iBase_EntityHandle entity, double dist_tolerance,
-                        double** points, int* points_allocated, int* points_size, int** facets,
-                        int* facets_allocated, int* facets_size, int* err );
+void FBiGeom_getFacets( FBiGeom_Instance instance, iBase_EntityHandle entity, double dist_tolerance, double** points,
+                        int* points_allocated, int* points_size, int** facets, int* facets_allocated, int* facets_size,
+                        int* err );
 
 #ifdef __cplusplus
 } /* extern "C" */

@@ -80,7 +80,7 @@ int main( int argc, char** argv )
     // resp.
     Range verts, elems;
     rval = mb->get_entities_by_dimension( 0, 0, verts );MB_CHK_ERR( rval );  // First '0' specifies "root set", or entire MOAB instance, second the
-                         // entity dimension being requested
+    // entity dimension being requested
     rval = mb->get_entities_by_dimension( 0, dim, elems );MB_CHK_ERR( rval );
 
 #define MYSTREAM( a ) \
@@ -91,8 +91,7 @@ int main( int argc, char** argv )
 #ifdef MOAB_HAVE_MPI
         MYSTREAM( "Proc 0: " );
 #endif
-        MYSTREAM( "Created " << elems.size( ) << " "
-                             << CN::EntityTypeName( mb->type_from_handle( *elems.begin( ) ) )
+        MYSTREAM( "Created " << elems.size( ) << " " << CN::EntityTypeName( mb->type_from_handle( *elems.begin( ) ) )
                              << " elements and " << verts.size( ) << " vertices." << endl );
     }
     else

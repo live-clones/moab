@@ -16,8 +16,7 @@ namespace moab
 // GCRM cells are either pentagons or hexagons, and pentagons are always padded to hexagons
 const int EDGES_PER_CELL = 6;
 
-NCHelperGCRM::NCHelperGCRM( ReadNC* readNC, int fileId, const FileOptions& opts,
-                            EntityHandle fileSet )
+NCHelperGCRM::NCHelperGCRM( ReadNC* readNC, int fileId, const FileOptions& opts, EntityHandle fileSet )
     : UcdNCHelper( readNC, fileId, opts, fileSet ), createGatherSet( false )
 {
     // Ignore variables containing topological information
@@ -33,8 +32,7 @@ bool NCHelperGCRM::can_read_file( ReadNC* readNC )
     std::vector< std::string >& dimNames = readNC->dimNames;
 
     // If dimension name "cells" exists then it should be the GCRM grid
-    if( std::find( dimNames.begin( ), dimNames.end( ), std::string( "cells" ) ) != dimNames.end( ) )
-        return true;
+    if( std::find( dimNames.begin( ), dimNames.end( ), std::string( "cells" ) ) != dimNames.end( ) ) return true;
 
     return false;
 }
@@ -143,11 +141,9 @@ ErrorCode NCHelperGCRM::init_mesh_vals( )
         {
             if( std::find( vd.varDims.begin( ), vd.varDims.end( ), vDim ) != vd.varDims.end( ) )
                 vd.entLoc = ReadNC::ENTLOCVERT;
-            else if( std::find( vd.varDims.begin( ), vd.varDims.end( ), eDim ) !=
-                     vd.varDims.end( ) )
+            else if( std::find( vd.varDims.begin( ), vd.varDims.end( ), eDim ) != vd.varDims.end( ) )
                 vd.entLoc = ReadNC::ENTLOCEDGE;
-            else if( std::find( vd.varDims.begin( ), vd.varDims.end( ), cDim ) !=
-                     vd.varDims.end( ) )
+            else if( std::find( vd.varDims.begin( ), vd.varDims.end( ), cDim ) != vd.varDims.end( ) )
                 vd.entLoc = ReadNC::ENTLOCFACE;
         }
 
@@ -159,8 +155,7 @@ ErrorCode NCHelperGCRM::init_mesh_vals( )
             // If layers dimension is not found, try other optional levels such as interfaces
             for( unsigned int i = 0; i < opt_lev_dims.size( ); i++ )
             {
-                if( std::find( vd.varDims.begin( ), vd.varDims.end( ), opt_lev_dims[ i ] ) !=
-                    vd.varDims.end( ) )
+                if( std::find( vd.varDims.begin( ), vd.varDims.end( ), opt_lev_dims[ i ] ) != vd.varDims.end( ) )
                 {
                     vd.numLev = dimLens[ opt_lev_dims[ i ] ];
                     break;
@@ -313,8 +308,7 @@ ErrorCode NCHelperGCRM::create_mesh( Range& faces )
     if( success ) MB_SET_ERR( MB_FAILURE, "Failed to get variable id of cell_corners" );
     std::vector< int > vertices_on_local_cells( nLocalCells * EDGES_PER_CELL );
     dbgOut.tprintf( 1, " nLocalCells = %d\n", (int)nLocalCells );
-    dbgOut.tprintf( 1, " vertices_on_local_cells.size() = %d\n",
-                    (int)vertices_on_local_cells.size( ) );
+    dbgOut.tprintf( 1, " vertices_on_local_cells.size() = %d\n", (int)vertices_on_local_cells.size( ) );
 #ifdef MOAB_HAVE_PNETCDF
     size_t             nb_reads = localGidCells.psize( );
     std::vector< int > requests( nb_reads );
@@ -322,8 +316,8 @@ ErrorCode NCHelperGCRM::create_mesh( Range& faces )
     size_t             idxReq = 0;
 #endif
     size_t indexInArray = 0;
-    for( Range::pair_iterator pair_iter = localGidCells.pair_begin( );
-         pair_iter != localGidCells.pair_end( ); ++pair_iter )
+    for( Range::pair_iterator pair_iter = localGidCells.pair_begin( ); pair_iter != localGidCells.pair_end( );
+         ++pair_iter )
     {
         EntityHandle starth = pair_iter->first;
         EntityHandle endh = pair_iter->second;
@@ -336,8 +330,7 @@ ErrorCode NCHelperGCRM::create_mesh( Range& faces )
         // Do a partial read in each subrange
 #ifdef MOAB_HAVE_PNETCDF
         success = NCFUNCREQG( _vara_int )( _fileId, verticesOnCellVarId, read_starts, read_counts,
-                                           &( vertices_on_local_cells[ indexInArray ] ),
-                                           &requests[ idxReq++ ] );
+                                           &( vertices_on_local_cells[ indexInArray ] ), &requests[ idxReq++ ] );
 #else
         success = NCFUNCAG( _vara_int )( _fileId, verticesOnCellVarId, read_starts, read_counts,
                                          &( vertices_on_local_cells[ indexInArray ] ) );
@@ -411,9 +404,8 @@ ErrorCode NCHelperGCRM::create_mesh( Range& faces )
     return MB_SUCCESS;
 }
 
-ErrorCode
-    NCHelperGCRM::read_ucd_variables_to_nonset_allocate( std::vector< ReadNC::VarData >& vdatas,
-                                                         std::vector< int >& tstep_nums )
+ErrorCode NCHelperGCRM::read_ucd_variables_to_nonset_allocate( std::vector< ReadNC::VarData >& vdatas,
+                                                               std::vector< int >&             tstep_nums )
 {
     Interface*&         mbImpl = _readNC->mbImpl;
     std::vector< int >& dimLens = _readNC->dimLens;
@@ -425,8 +417,7 @@ ErrorCode
     // Get vertices
     Range     verts;
     ErrorCode rval = mbImpl->get_entities_by_dimension( _fileSet, 0, verts );MB_CHK_SET_ERR( rval, "Trouble getting vertices in current file set" );
-    assert( "Should only have a single vertex subrange, since they were read in one shot" &&
-            verts.psize( ) == 1 );
+    assert( "Should only have a single vertex subrange, since they were read in one shot" && verts.psize( ) == 1 );
 
     // Get edges
     Range edges;
@@ -435,8 +426,7 @@ ErrorCode
     // Get faces
     Range faces;
     rval = mbImpl->get_entities_by_dimension( _fileSet, 2, faces );MB_CHK_SET_ERR( rval, "Trouble getting faces in current file set" );
-    assert( "Should only have a single face subrange, since they were read in one shot" &&
-            faces.psize( ) == 1 );
+    assert( "Should only have a single face subrange, since they were read in one shot" && faces.psize( ) == 1 );
 
 #ifdef MOAB_HAVE_MPI
     bool& isParallel = _readNC->isParallel;
@@ -499,8 +489,7 @@ ErrorCode
                 range = &edges;
                 break;
             default:
-                MB_SET_ERR( MB_FAILURE, "Unexpected entity location type for variable "
-                                            << vdatas[ i ].varName );
+                MB_SET_ERR( MB_FAILURE, "Unexpected entity location type for variable " << vdatas[ i ].varName );
         }
 
         // Finally: layers or other optional levels, it is possible that there is no
@@ -516,28 +505,22 @@ ErrorCode
 
         for( unsigned int t = 0; t < tstep_nums.size( ); t++ )
         {
-            dbgOut.tprintf( 2, "Reading variable %s, time step %d\n", vdatas[ i ].varName.c_str( ),
-                            tstep_nums[ t ] );
+            dbgOut.tprintf( 2, "Reading variable %s, time step %d\n", vdatas[ i ].varName.c_str( ), tstep_nums[ t ] );
 
             if( tstep_nums[ t ] >= dimLens[ tDim ] )
-            {
-                MB_SET_ERR( MB_INDEX_OUT_OF_RANGE,
-                            "Wrong value for timestep number " << tstep_nums[ t ] );
-            }
+            { MB_SET_ERR( MB_INDEX_OUT_OF_RANGE, "Wrong value for timestep number " << tstep_nums[ t ] ); }
 
             // Get the tag to read into
             if( !vdatas[ i ].varTags[ t ] )
             {
-                rval = get_tag_to_nonset( vdatas[ i ], tstep_nums[ t ], vdatas[ i ].varTags[ t ],
-                                          vdatas[ i ].numLev );MB_CHK_SET_ERR( rval, "Trouble getting tag for variable " << vdatas[ i ].varName );
+                rval = get_tag_to_nonset( vdatas[ i ], tstep_nums[ t ], vdatas[ i ].varTags[ t ], vdatas[ i ].numLev );MB_CHK_SET_ERR( rval, "Trouble getting tag for variable " << vdatas[ i ].varName );
             }
 
             // Get ptr to tag space
             assert( 1 == range->psize( ) );
             void* data;
             int   count;
-            rval = mbImpl->tag_iterate( vdatas[ i ].varTags[ t ], range->begin( ), range->end( ),
-                                        count, data );MB_CHK_SET_ERR( rval, "Failed to iterate tag for variable " << vdatas[ i ].varName );
+            rval = mbImpl->tag_iterate( vdatas[ i ].varTags[ t ], range->begin( ), range->end( ), count, data );MB_CHK_SET_ERR( rval, "Failed to iterate tag for variable " << vdatas[ i ].varName );
             assert( (unsigned)count == range->size( ) );
             vdatas[ i ].varDatas[ t ] = data;
         }
@@ -548,7 +531,7 @@ ErrorCode
 
 #ifdef MOAB_HAVE_PNETCDF
 ErrorCode NCHelperGCRM::read_ucd_variables_to_nonset_async( std::vector< ReadNC::VarData >& vdatas,
-                                                            std::vector< int >& tstep_nums )
+                                                            std::vector< int >&             tstep_nums )
 {
     bool&        noEdges = _readNC->noEdges;
     DebugOutput& dbgOut = _readNC->dbgOut;
@@ -576,8 +559,7 @@ ErrorCode NCHelperGCRM::read_ucd_variables_to_nonset_async( std::vector< ReadNC:
                 pLocalGid = &localGidEdges;
                 break;
             default:
-                MB_SET_ERR( MB_FAILURE, "Unexpected entity location type for variable "
-                                            << vdatas[ i ].varName );
+                MB_SET_ERR( MB_FAILURE, "Unexpected entity location type for variable " << vdatas[ i ].varName );
         }
 
         std::size_t sz = vdatas[ i ].sz;
@@ -607,8 +589,8 @@ ErrorCode NCHelperGCRM::read_ucd_variables_to_nonset_async( std::vector< ReadNC:
                     // for data to start, for every subrange :(
                     size_t indexInDoubleArray = 0;
                     size_t ic = 0;
-                    for( Range::pair_iterator pair_iter = pLocalGid->pair_begin( );
-                         pair_iter != pLocalGid->pair_end( ); ++pair_iter, ic++ )
+                    for( Range::pair_iterator pair_iter = pLocalGid->pair_begin( ); pair_iter != pLocalGid->pair_end( );
+                         ++pair_iter, ic++ )
                     {
                         EntityHandle starth = pair_iter->first;
                         EntityHandle endh = pair_iter->second;  // inclusive
@@ -619,20 +601,18 @@ ErrorCode NCHelperGCRM::read_ucd_variables_to_nonset_async( std::vector< ReadNC:
                         // wait outside this loop
                         success = NCFUNCREQG( _vara_double )(
                             _fileId, vdatas[ i ].varId, &( vdatas[ i ].readStarts[ 0 ] ),
-                            &( vdatas[ i ].readCounts[ 0 ] ),
-                            &( tmpdoubledata[ indexInDoubleArray ] ), &requests[ idxReq++ ] );
+                            &( vdatas[ i ].readCounts[ 0 ] ), &( tmpdoubledata[ indexInDoubleArray ] ),
+                            &requests[ idxReq++ ] );
                         if( success )
                             MB_SET_ERR( MB_FAILURE,
-                                        "Failed to read double data in a loop for variable "
-                                            << vdatas[ i ].varName );
+                                        "Failed to read double data in a loop for variable " << vdatas[ i ].varName );
                         // We need to increment the index in double array for the
                         // next subrange
                         indexInDoubleArray += ( endh - starth + 1 ) * 1 * vdatas[ i ].numLev;
                     }
                     assert( ic == pLocalGid->psize( ) );
 
-                    success = NCFUNC( wait_all )( _fileId, requests.size( ), &requests[ 0 ],
-                                                  &statuss[ 0 ] );
+                    success = NCFUNC( wait_all )( _fileId, requests.size( ), &requests[ 0 ], &statuss[ 0 ] );
                     if( success ) MB_SET_ERR( MB_FAILURE, "Failed on wait_all" );
 
                     void* data = vdatas[ i ].varDatas[ t ];
@@ -642,8 +622,7 @@ ErrorCode NCHelperGCRM::read_ucd_variables_to_nonset_async( std::vector< ReadNC:
                     break;
                 }
                 default:
-                    MB_SET_ERR( MB_FAILURE,
-                                "Unexpected data type for variable " << vdatas[ i ].varName );
+                    MB_SET_ERR( MB_FAILURE, "Unexpected data type for variable " << vdatas[ i ].varName );
             }
         }
     }
@@ -689,8 +668,7 @@ ErrorCode NCHelperGCRM::read_ucd_variables_to_nonset( std::vector< ReadNC::VarDa
                 pLocalGid = &localGidEdges;
                 break;
             default:
-                MB_SET_ERR( MB_FAILURE, "Unexpected entity location type for variable "
-                                            << vdatas[ i ].varName );
+                MB_SET_ERR( MB_FAILURE, "Unexpected entity location type for variable " << vdatas[ i ].varName );
         }
 
         std::size_t sz = vdatas[ i ].sz;
@@ -714,8 +692,8 @@ ErrorCode NCHelperGCRM::read_ucd_variables_to_nonset( std::vector< ReadNC::VarDa
                     // for data to start, for every subrange :(
                     size_t indexInDoubleArray = 0;
                     size_t ic = 0;
-                    for( Range::pair_iterator pair_iter = pLocalGid->pair_begin( );
-                         pair_iter != pLocalGid->pair_end( ); ++pair_iter, ic++ )
+                    for( Range::pair_iterator pair_iter = pLocalGid->pair_begin( ); pair_iter != pLocalGid->pair_end( );
+                         ++pair_iter, ic++ )
                     {
                         EntityHandle starth = pair_iter->first;
                         EntityHandle endh = pair_iter->second;  // Inclusive
@@ -724,12 +702,10 @@ ErrorCode NCHelperGCRM::read_ucd_variables_to_nonset( std::vector< ReadNC::VarDa
 
                         success = NCFUNCAG( _vara_double )(
                             _fileId, vdatas[ i ].varId, &( vdatas[ i ].readStarts[ 0 ] ),
-                            &( vdatas[ i ].readCounts[ 0 ] ),
-                            &( tmpdoubledata[ indexInDoubleArray ] ) );
+                            &( vdatas[ i ].readCounts[ 0 ] ), &( tmpdoubledata[ indexInDoubleArray ] ) );
                         if( success )
                             MB_SET_ERR( MB_FAILURE,
-                                        "Failed to read double data in a loop for variable "
-                                            << vdatas[ i ].varName );
+                                        "Failed to read double data in a loop for variable " << vdatas[ i ].varName );
                         // We need to increment the index in double array for the
                         // next subrange
                         indexInDoubleArray += ( endh - starth + 1 ) * 1 * vdatas[ i ].numLev;
@@ -743,8 +719,7 @@ ErrorCode NCHelperGCRM::read_ucd_variables_to_nonset( std::vector< ReadNC::VarDa
                     break;
                 }
                 default:
-                    MB_SET_ERR( MB_FAILURE,
-                                "Unexpected data type for variable " << vdatas[ i ].varName );
+                    MB_SET_ERR( MB_FAILURE, "Unexpected data type for variable " << vdatas[ i ].varName );
             }
         }
     }
@@ -777,8 +752,7 @@ ErrorCode NCHelperGCRM::redistribute_local_cells( int start_cell_idx )
         std::vector< double > xCell( nLocalCells );
         NCDF_SIZE             read_start = static_cast< NCDF_SIZE >( start_cell_idx - 1 );
         NCDF_SIZE             read_count = static_cast< NCDF_SIZE >( nLocalCells );
-        success =
-            NCFUNCAG( _vara_double )( _fileId, xCellVarId, &read_start, &read_count, &xCell[ 0 ] );
+        success = NCFUNCAG( _vara_double )( _fileId, xCellVarId, &read_start, &read_count, &xCell[ 0 ] );
         if( success ) MB_SET_ERR( MB_FAILURE, "Failed to read grid_center_lat data" );
 
         // Read y coordinates of cell centers
@@ -786,8 +760,7 @@ ErrorCode NCHelperGCRM::redistribute_local_cells( int start_cell_idx )
         success = NCFUNC( inq_varid )( _fileId, "grid_center_lon", &yCellVarId );
         if( success ) MB_SET_ERR( MB_FAILURE, "Failed to get variable id of grid_center_lon" );
         std::vector< double > yCell( nLocalCells );
-        success =
-            NCFUNCAG( _vara_double )( _fileId, yCellVarId, &read_start, &read_count, &yCell[ 0 ] );
+        success = NCFUNCAG( _vara_double )( _fileId, yCellVarId, &read_start, &read_count, &yCell[ 0 ] );
         if( success ) MB_SET_ERR( MB_FAILURE, "Failed to read grid_center_lon data" );
 
         // Convert lon/lat/rad to x/y/z
@@ -809,14 +782,11 @@ ErrorCode NCHelperGCRM::redistribute_local_cells( int start_cell_idx )
         Interface*&        mbImpl = _readNC->mbImpl;
         DebugOutput&       dbgOut = _readNC->dbgOut;
         ZoltanPartitioner* mbZTool = new ZoltanPartitioner( mbImpl, false, 0, NULL );
-        ErrorCode          rval =
-            mbZTool->repartition( xCell, yCell, zCell, start_cell_idx, "RCB", localGidCells );MB_CHK_SET_ERR( rval, "Error in Zoltan partitioning" );
+        ErrorCode          rval = mbZTool->repartition( xCell, yCell, zCell, start_cell_idx, "RCB", localGidCells );MB_CHK_SET_ERR( rval, "Error in Zoltan partitioning" );
         delete mbZTool;
 
-        dbgOut.tprintf( 1, "After Zoltan partitioning, localGidCells.psize() = %d\n",
-                        (int)localGidCells.psize( ) );
-        dbgOut.tprintf( 1, "                           localGidCells.size() = %d\n",
-                        (int)localGidCells.size( ) );
+        dbgOut.tprintf( 1, "After Zoltan partitioning, localGidCells.psize() = %d\n", (int)localGidCells.psize( ) );
+        dbgOut.tprintf( 1, "                           localGidCells.size() = %d\n", (int)localGidCells.size( ) );
 
         // This is important: local cells are now redistributed, so nLocalCells might be different!
         nLocalCells = localGidCells.size( );
@@ -854,10 +824,10 @@ ErrorCode NCHelperGCRM::create_local_vertices( const std::vector< int >& vertice
 
     // Create local vertices
     std::vector< double* > arrays;
-    ErrorCode              rval = _readNC->readMeshIface->get_node_coords(
-        3, nLocalVertices, 0, start_vertex, arrays,
-        // Might have to create gather mesh later
-        ( createGatherSet ? nLocalVertices + nVertices : nLocalVertices ) );MB_CHK_SET_ERR( rval, "Failed to create local vertices" );
+    ErrorCode              rval =
+        _readNC->readMeshIface->get_node_coords( 3, nLocalVertices, 0, start_vertex, arrays,
+                                                 // Might have to create gather mesh later
+                                                 ( createGatherSet ? nLocalVertices + nVertices : nLocalVertices ) );MB_CHK_SET_ERR( rval, "Failed to create local vertices" );
 
     // Add local vertices to current file set
     Range local_verts_range( start_vertex, start_vertex + nLocalVertices - 1 );
@@ -866,8 +836,7 @@ ErrorCode NCHelperGCRM::create_local_vertices( const std::vector< int >& vertice
     // Get ptr to GID memory for local vertices
     int   count = 0;
     void* data = NULL;
-    rval = mbImpl->tag_iterate( mGlobalIdTag, local_verts_range.begin( ), local_verts_range.end( ),
-                                count, data );MB_CHK_SET_ERR( rval, "Failed to iterate global id tag on local vertices" );
+    rval = mbImpl->tag_iterate( mGlobalIdTag, local_verts_range.begin( ), local_verts_range.end( ), count, data );MB_CHK_SET_ERR( rval, "Failed to iterate global id tag on local vertices" );
     assert( count == nLocalVertices );
     int* gid_data = (int*)data;
     std::copy( localGidVerts.begin( ), localGidVerts.end( ), gid_data );
@@ -875,8 +844,7 @@ ErrorCode NCHelperGCRM::create_local_vertices( const std::vector< int >& vertice
     // Duplicate GID data, which will be used to resolve sharing
     if( mpFileIdTag )
     {
-        rval = mbImpl->tag_iterate( *mpFileIdTag, local_verts_range.begin( ),
-                                    local_verts_range.end( ), count, data );MB_CHK_SET_ERR( rval, "Failed to iterate file id tag on local vertices" );
+        rval = mbImpl->tag_iterate( *mpFileIdTag, local_verts_range.begin( ), local_verts_range.end( ), count, data );MB_CHK_SET_ERR( rval, "Failed to iterate file id tag on local vertices" );
         assert( count == nLocalVertices );
         int bytes_per_tag = 4;
         rval = mbImpl->tag_get_bytes( *mpFileIdTag, bytes_per_tag );MB_CHK_SET_ERR( rval, "can't get number of bytes for file id tag" );
@@ -901,13 +869,11 @@ ErrorCode NCHelperGCRM::create_local_vertices( const std::vector< int >& vertice
 
     // Store lev values in levVals
     std::map< std::string, ReadNC::VarData >::iterator vmit;
-    if( ( vmit = varInfo.find( "layers" ) ) != varInfo.end( ) &&
-        ( *vmit ).second.varDims.size( ) == 1 )
+    if( ( vmit = varInfo.find( "layers" ) ) != varInfo.end( ) && ( *vmit ).second.varDims.size( ) == 1 )
     {
         rval = read_coordinate( "layers", 0, nLevels - 1, levVals );MB_CHK_SET_ERR( rval, "Trouble reading 'layers' variable" );
     }
-    else if( ( vmit = varInfo.find( "interfaces" ) ) != varInfo.end( ) &&
-             ( *vmit ).second.varDims.size( ) == 1 )
+    else if( ( vmit = varInfo.find( "interfaces" ) ) != varInfo.end( ) && ( *vmit ).second.varDims.size( ) == 1 )
     {
         rval = read_coordinate( "interfaces", 0, nLevels - 1, levVals );MB_CHK_SET_ERR( rval, "Trouble reading 'interfaces' variable" );
     }
@@ -921,8 +887,7 @@ ErrorCode NCHelperGCRM::create_local_vertices( const std::vector< int >& vertice
     int  success = NCFUNC( get_att_text )( _fileId, ( *vmit ).second.varId, "positive", posval );
     if( 0 == success && !strncmp( posval, "down", 4 ) )
     {
-        for( std::vector< double >::iterator dvit = levVals.begin( ); dvit != levVals.end( );
-             ++dvit )
+        for( std::vector< double >::iterator dvit = levVals.begin( ); dvit != levVals.end( ); ++dvit )
             ( *dvit ) *= -1.0;
     }
 
@@ -932,8 +897,8 @@ ErrorCode NCHelperGCRM::create_local_vertices( const std::vector< int >& vertice
     success = NCFUNC( inq_varid )( _fileId, "grid_corner_lon", &xVertexVarId );
     if( success ) MB_SET_ERR( MB_FAILURE, "Failed to get variable id of grid_corner_lon" );
     size_t indexInArray = 0;
-    for( Range::pair_iterator pair_iter = localGidVerts.pair_begin( );
-         pair_iter != localGidVerts.pair_end( ); ++pair_iter )
+    for( Range::pair_iterator pair_iter = localGidVerts.pair_begin( ); pair_iter != localGidVerts.pair_end( );
+         ++pair_iter )
     {
         EntityHandle starth = pair_iter->first;
         EntityHandle endh = pair_iter->second;
@@ -945,8 +910,8 @@ ErrorCode NCHelperGCRM::create_local_vertices( const std::vector< int >& vertice
         success = NCFUNCREQG( _vara_double )( _fileId, xVertexVarId, &read_start, &read_count,
                                               &( xptr[ indexInArray ] ), &requests[ idxReq++ ] );
 #else
-        success = NCFUNCAG( _vara_double )( _fileId, xVertexVarId, &read_start, &read_count,
-                                            &( xptr[ indexInArray ] ) );
+        success =
+            NCFUNCAG( _vara_double )( _fileId, xVertexVarId, &read_start, &read_count, &( xptr[ indexInArray ] ) );
 #endif
         if( success ) MB_SET_ERR( MB_FAILURE, "Failed to read grid_corner_lon data in a loop" );
 
@@ -969,8 +934,8 @@ ErrorCode NCHelperGCRM::create_local_vertices( const std::vector< int >& vertice
     idxReq = 0;
 #endif
     indexInArray = 0;
-    for( Range::pair_iterator pair_iter = localGidVerts.pair_begin( );
-         pair_iter != localGidVerts.pair_end( ); ++pair_iter )
+    for( Range::pair_iterator pair_iter = localGidVerts.pair_begin( ); pair_iter != localGidVerts.pair_end( );
+         ++pair_iter )
     {
         EntityHandle starth = pair_iter->first;
         EntityHandle endh = pair_iter->second;
@@ -982,8 +947,8 @@ ErrorCode NCHelperGCRM::create_local_vertices( const std::vector< int >& vertice
         success = NCFUNCREQG( _vara_double )( _fileId, yVertexVarId, &read_start, &read_count,
                                               &( yptr[ indexInArray ] ), &requests[ idxReq++ ] );
 #else
-        success = NCFUNCAG( _vara_double )( _fileId, yVertexVarId, &read_start, &read_count,
-                                            &( yptr[ indexInArray ] ) );
+        success =
+            NCFUNCAG( _vara_double )( _fileId, yVertexVarId, &read_start, &read_count, &( yptr[ indexInArray ] ) );
 #endif
         if( success ) MB_SET_ERR( MB_FAILURE, "Failed to read grid_corner_lat data in a loop" );
 
@@ -1035,8 +1000,8 @@ ErrorCode NCHelperGCRM::create_local_edges( EntityHandle start_vertex )
     size_t             idxReq = 0;
 #endif
     size_t indexInArray = 0;
-    for( Range::pair_iterator pair_iter = localGidCells.pair_begin( );
-         pair_iter != localGidCells.pair_end( ); ++pair_iter )
+    for( Range::pair_iterator pair_iter = localGidCells.pair_begin( ); pair_iter != localGidCells.pair_end( );
+         ++pair_iter )
     {
         EntityHandle starth = pair_iter->first;
         EntityHandle endh = pair_iter->second;
@@ -1049,8 +1014,7 @@ ErrorCode NCHelperGCRM::create_local_edges( EntityHandle start_vertex )
         // Do a partial read in each subrange
 #ifdef MOAB_HAVE_PNETCDF
         success = NCFUNCREQG( _vara_int )( _fileId, edgesOnCellVarId, read_starts, read_counts,
-                                           &( edges_on_local_cells[ indexInArray ] ),
-                                           &requests[ idxReq++ ] );
+                                           &( edges_on_local_cells[ indexInArray ] ), &requests[ idxReq++ ] );
 #else
         success = NCFUNCAG( _vara_int )( _fileId, edgesOnCellVarId, read_starts, read_counts,
                                          &( edges_on_local_cells[ indexInArray ] ) );
@@ -1073,8 +1037,7 @@ ErrorCode NCHelperGCRM::create_local_edges( EntityHandle start_vertex )
 
     // Collect local edges
     std::sort( edges_on_local_cells.begin( ), edges_on_local_cells.end( ) );
-    std::copy( edges_on_local_cells.rbegin( ), edges_on_local_cells.rend( ),
-               range_inserter( localGidEdges ) );
+    std::copy( edges_on_local_cells.rbegin( ), edges_on_local_cells.rend( ), range_inserter( localGidEdges ) );
     nLocalEdges = localGidEdges.size( );
 
     dbgOut.tprintf( 1, "   localGidEdges.psize() = %d\n", (int)localGidEdges.psize( ) );
@@ -1083,10 +1046,10 @@ ErrorCode NCHelperGCRM::create_local_edges( EntityHandle start_vertex )
     // Create local edges
     EntityHandle  start_edge;
     EntityHandle* conn_arr_edges = NULL;
-    ErrorCode     rval = _readNC->readMeshIface->get_element_connect(
-        nLocalEdges, 2, MBEDGE, 0, start_edge, conn_arr_edges,
-        // Might have to create gather mesh later
-        ( createGatherSet ? nLocalEdges + nEdges : nLocalEdges ) );MB_CHK_SET_ERR( rval, "Failed to create local edges" );
+    ErrorCode     rval =
+        _readNC->readMeshIface->get_element_connect( nLocalEdges, 2, MBEDGE, 0, start_edge, conn_arr_edges,
+                                                     // Might have to create gather mesh later
+                                                     ( createGatherSet ? nLocalEdges + nEdges : nLocalEdges ) );MB_CHK_SET_ERR( rval, "Failed to create local edges" );
 
     // Add local edges to current file set
     Range local_edges_range( start_edge, start_edge + nLocalEdges - 1 );
@@ -1095,8 +1058,7 @@ ErrorCode NCHelperGCRM::create_local_edges( EntityHandle start_vertex )
     // Get ptr to GID memory for edges
     int   count = 0;
     void* data = NULL;
-    rval = mbImpl->tag_iterate( mGlobalIdTag, local_edges_range.begin( ), local_edges_range.end( ),
-                                count, data );MB_CHK_SET_ERR( rval, "Failed to iterate global id tag on local edges" );
+    rval = mbImpl->tag_iterate( mGlobalIdTag, local_edges_range.begin( ), local_edges_range.end( ), count, data );MB_CHK_SET_ERR( rval, "Failed to iterate global id tag on local edges" );
     assert( count == nLocalEdges );
     int* gid_data = (int*)data;
     std::copy( localGidEdges.begin( ), localGidEdges.end( ), gid_data );
@@ -1115,8 +1077,8 @@ ErrorCode NCHelperGCRM::create_local_edges( EntityHandle start_vertex )
     idxReq = 0;
 #endif
     indexInArray = 0;
-    for( Range::pair_iterator pair_iter = localGidEdges.pair_begin( );
-         pair_iter != localGidEdges.pair_end( ); ++pair_iter )
+    for( Range::pair_iterator pair_iter = localGidEdges.pair_begin( ); pair_iter != localGidEdges.pair_end( );
+         ++pair_iter )
     {
         EntityHandle starth = pair_iter->first;
         EntityHandle endh = pair_iter->second;
@@ -1126,8 +1088,7 @@ ErrorCode NCHelperGCRM::create_local_edges( EntityHandle start_vertex )
         // Do a partial read in each subrange
 #ifdef MOAB_HAVE_PNETCDF
         success = NCFUNCREQG( _vara_int )( _fileId, verticesOnEdgeVarId, read_starts, read_counts,
-                                           &( vertices_on_local_edges[ indexInArray ] ),
-                                           &requests[ idxReq++ ] );
+                                           &( vertices_on_local_edges[ indexInArray ] ), &requests[ idxReq++ ] );
 #else
         success = NCFUNCAG( _vara_int )( _fileId, verticesOnEdgeVarId, read_starts, read_counts,
                                          &( vertices_on_local_edges[ indexInArray ] ) );
@@ -1150,8 +1111,7 @@ ErrorCode NCHelperGCRM::create_local_edges( EntityHandle start_vertex )
     for( int edge_vert = nLocalEdges * 2 - 1; edge_vert >= 0; edge_vert-- )
     {
         // Note, indices stored in vertices_on_local_edges are 0 based
-        int global_vert_idx =
-            vertices_on_local_edges[ edge_vert ] + 1;  // Global vertex index, 1 based
+        int global_vert_idx = vertices_on_local_edges[ edge_vert ] + 1;  // Global vertex index, 1 based
         int local_vert_idx = localGidVerts.index( global_vert_idx );  // Local vertex index, 0 based
         assert( local_vert_idx != -1 );
         conn_arr_edges[ edge_vert ] = start_vertex + local_vert_idx;
@@ -1160,9 +1120,8 @@ ErrorCode NCHelperGCRM::create_local_edges( EntityHandle start_vertex )
     return MB_SUCCESS;
 }
 
-ErrorCode
-    NCHelperGCRM::create_padded_local_cells( const std::vector< int >& vertices_on_local_cells,
-                                             EntityHandle start_vertex, Range& faces )
+ErrorCode NCHelperGCRM::create_padded_local_cells( const std::vector< int >& vertices_on_local_cells,
+                                                   EntityHandle start_vertex, Range& faces )
 {
     Interface*& mbImpl = _readNC->mbImpl;
     Tag&        mGlobalIdTag = _readNC->mGlobalIdTag;
@@ -1183,8 +1142,7 @@ ErrorCode
     // Get ptr to GID memory for local cells
     int   count = 0;
     void* data = NULL;
-    rval = mbImpl->tag_iterate( mGlobalIdTag, local_cells_range.begin( ), local_cells_range.end( ),
-                                count, data );MB_CHK_SET_ERR( rval, "Failed to iterate global id tag on local cells" );
+    rval = mbImpl->tag_iterate( mGlobalIdTag, local_cells_range.begin( ), local_cells_range.end( ), count, data );MB_CHK_SET_ERR( rval, "Failed to iterate global id tag on local cells" );
     assert( count == nLocalCells );
     int* gid_data = (int*)data;
     std::copy( localGidCells.begin( ), localGidCells.end( ), gid_data );
@@ -1198,21 +1156,17 @@ ErrorCode
         {
             // Note, indices stored in vertices_on_local_cells are 1 based
             EntityHandle global_vert_idx =
-                vertices_on_local_cells[ local_cell_idx * EDGES_PER_CELL +
-                                         i ];  // Global vertex index, 1 based
-            int local_vert_idx =
-                localGidVerts.index( global_vert_idx );  // Local vertex index, 0 based
+                vertices_on_local_cells[ local_cell_idx * EDGES_PER_CELL + i ];  // Global vertex index, 1 based
+            int local_vert_idx = localGidVerts.index( global_vert_idx );  // Local vertex index, 0 based
             assert( local_vert_idx != -1 );
-            conn_arr_local_cells[ local_cell_idx * EDGES_PER_CELL + i ] =
-                start_vertex + local_vert_idx;
+            conn_arr_local_cells[ local_cell_idx * EDGES_PER_CELL + i ] = start_vertex + local_vert_idx;
         }
     }
 
     return MB_SUCCESS;
 }
 
-ErrorCode NCHelperGCRM::create_gather_set_vertices( EntityHandle  gather_set,
-                                                    EntityHandle& gather_set_start_vertex )
+ErrorCode NCHelperGCRM::create_gather_set_vertices( EntityHandle gather_set, EntityHandle& gather_set_start_vertex )
 {
     Interface*& mbImpl = _readNC->mbImpl;
     Tag&        mGlobalIdTag = _readNC->mGlobalIdTag;
@@ -1222,12 +1176,10 @@ ErrorCode NCHelperGCRM::create_gather_set_vertices( EntityHandle  gather_set,
     std::vector< double* > arrays;
     // Don't need to specify allocation number here, because we know enough vertices were created
     // before
-    ErrorCode rval =
-        _readNC->readMeshIface->get_node_coords( 3, nVertices, 0, gather_set_start_vertex, arrays );MB_CHK_SET_ERR( rval, "Failed to create gather set vertices" );
+    ErrorCode rval = _readNC->readMeshIface->get_node_coords( 3, nVertices, 0, gather_set_start_vertex, arrays );MB_CHK_SET_ERR( rval, "Failed to create gather set vertices" );
 
     // Add vertices to the gather set
-    Range gather_set_verts_range( gather_set_start_vertex,
-                                  gather_set_start_vertex + nVertices - 1 );
+    Range gather_set_verts_range( gather_set_start_vertex, gather_set_start_vertex + nVertices - 1 );
     rval = mbImpl->add_entities( gather_set, gather_set_verts_range );MB_CHK_SET_ERR( rval, "Failed to add vertices to the gather set" );
 
     // Read x coordinates for gather set vertices
@@ -1285,8 +1237,8 @@ ErrorCode NCHelperGCRM::create_gather_set_vertices( EntityHandle  gather_set,
     // Get ptr to GID memory for gather set vertices
     int   count = 0;
     void* data = NULL;
-    rval = mbImpl->tag_iterate( mGlobalIdTag, gather_set_verts_range.begin( ),
-                                gather_set_verts_range.end( ), count, data );MB_CHK_SET_ERR( rval, "Failed to iterate global id tag on gather set vertices" );
+    rval = mbImpl->tag_iterate( mGlobalIdTag, gather_set_verts_range.begin( ), gather_set_verts_range.end( ), count,
+                                data );MB_CHK_SET_ERR( rval, "Failed to iterate global id tag on gather set vertices" );
     assert( count == nVertices );
     int* gid_data = (int*)data;
     for( int j = 1; j <= nVertices; j++ )
@@ -1295,8 +1247,8 @@ ErrorCode NCHelperGCRM::create_gather_set_vertices( EntityHandle  gather_set,
     // Set the file id tag too, it should be bigger something not interfering with global id
     if( mpFileIdTag )
     {
-        rval = mbImpl->tag_iterate( *mpFileIdTag, gather_set_verts_range.begin( ),
-                                    gather_set_verts_range.end( ), count, data );MB_CHK_SET_ERR( rval, "Failed to iterate file id tag on gather set vertices" );
+        rval = mbImpl->tag_iterate( *mpFileIdTag, gather_set_verts_range.begin( ), gather_set_verts_range.end( ), count,
+                                    data );MB_CHK_SET_ERR( rval, "Failed to iterate file id tag on gather set vertices" );
         assert( count == nVertices );
         int bytes_per_tag = 4;
         rval = mbImpl->tag_get_bytes( *mpFileIdTag, bytes_per_tag );MB_CHK_SET_ERR( rval, "Can't get number of bytes for file id tag" );
@@ -1317,8 +1269,7 @@ ErrorCode NCHelperGCRM::create_gather_set_vertices( EntityHandle  gather_set,
     return MB_SUCCESS;
 }
 
-ErrorCode NCHelperGCRM::create_gather_set_edges( EntityHandle gather_set,
-                                                 EntityHandle gather_set_start_vertex )
+ErrorCode NCHelperGCRM::create_gather_set_edges( EntityHandle gather_set, EntityHandle gather_set_start_vertex )
 {
     Interface*& mbImpl = _readNC->mbImpl;
 
@@ -1327,8 +1278,8 @@ ErrorCode NCHelperGCRM::create_gather_set_edges( EntityHandle gather_set,
     EntityHandle* conn_arr_gather_set_edges = NULL;
     // Don't need to specify allocation number here, because we know enough edges were created
     // before
-    ErrorCode rval = _readNC->readMeshIface->get_element_connect( nEdges, 2, MBEDGE, 0, start_edge,
-                                                                  conn_arr_gather_set_edges );MB_CHK_SET_ERR( rval, "Failed to create gather set edges" );
+    ErrorCode rval =
+        _readNC->readMeshIface->get_element_connect( nEdges, 2, MBEDGE, 0, start_edge, conn_arr_gather_set_edges );MB_CHK_SET_ERR( rval, "Failed to create gather set edges" );
 
     // Add edges to the gather set
     Range gather_set_edges_range( start_edge, start_edge + nEdges - 1 );
@@ -1346,14 +1297,14 @@ ErrorCode NCHelperGCRM::create_gather_set_edges( EntityHandle gather_set,
     // Enter independent I/O mode, since this read is only for the gather processor
     success = NCFUNC( begin_indep_data )( _fileId );
     if( success ) MB_SET_ERR( MB_FAILURE, "Failed to begin independent I/O mode" );
-    success = NCFUNCG( _vara_int )( _fileId, verticesOnEdgeVarId, read_starts, read_counts,
-                                    vertices_on_gather_set_edges );
+    success =
+        NCFUNCG( _vara_int )( _fileId, verticesOnEdgeVarId, read_starts, read_counts, vertices_on_gather_set_edges );
     if( success ) MB_SET_ERR( MB_FAILURE, "Failed to read edge_corners data" );
     success = NCFUNC( end_indep_data )( _fileId );
     if( success ) MB_SET_ERR( MB_FAILURE, "Failed to end independent I/O mode" );
 #else
-    success = NCFUNCG( _vara_int )( _fileId, verticesOnEdgeVarId, read_starts, read_counts,
-                                    vertices_on_gather_set_edges );
+    success =
+        NCFUNCG( _vara_int )( _fileId, verticesOnEdgeVarId, read_starts, read_counts, vertices_on_gather_set_edges );
     if( success ) MB_SET_ERR( MB_FAILURE, "Failed to read edge_corners data" );
 #endif
 
@@ -1363,8 +1314,7 @@ ErrorCode NCHelperGCRM::create_gather_set_edges( EntityHandle gather_set,
     for( int edge_vert = nEdges * 2 - 1; edge_vert >= 0; edge_vert-- )
     {
         // Note, indices stored in vertices_on_gather_set_edges are 0 based
-        int gather_set_vert_idx =
-            vertices_on_gather_set_edges[ edge_vert ];  // Global vertex index, 0 based
+        int gather_set_vert_idx = vertices_on_gather_set_edges[ edge_vert ];  // Global vertex index, 0 based
         // Connectivity array is shifted by where the gather set vertices start
         conn_arr_gather_set_edges[ edge_vert ] = gather_set_start_vertex + gather_set_vert_idx;
     }
@@ -1372,8 +1322,7 @@ ErrorCode NCHelperGCRM::create_gather_set_edges( EntityHandle gather_set,
     return MB_SUCCESS;
 }
 
-ErrorCode NCHelperGCRM::create_padded_gather_set_cells( EntityHandle gather_set,
-                                                        EntityHandle gather_set_start_vertex )
+ErrorCode NCHelperGCRM::create_padded_gather_set_cells( EntityHandle gather_set, EntityHandle gather_set_start_vertex )
 {
     Interface*& mbImpl = _readNC->mbImpl;
 
@@ -1382,8 +1331,8 @@ ErrorCode NCHelperGCRM::create_padded_gather_set_cells( EntityHandle gather_set,
     EntityHandle* conn_arr_gather_set_cells = NULL;
     // Don't need to specify allocation number here, because we know enough cells were created
     // before
-    ErrorCode rval = _readNC->readMeshIface->get_element_connect(
-        nCells, EDGES_PER_CELL, MBPOLYGON, 0, start_element, conn_arr_gather_set_cells );MB_CHK_SET_ERR( rval, "Failed to create gather set cells" );
+    ErrorCode rval = _readNC->readMeshIface->get_element_connect( nCells, EDGES_PER_CELL, MBPOLYGON, 0, start_element,
+                                                                  conn_arr_gather_set_cells );MB_CHK_SET_ERR( rval, "Failed to create gather set cells" );
 
     // Add cells to the gather set
     Range gather_set_cells_range( start_element, start_element + nCells - 1 );
@@ -1396,20 +1345,19 @@ ErrorCode NCHelperGCRM::create_padded_gather_set_cells( EntityHandle gather_set,
     // Utilize the memory storage pointed by conn_arr_gather_set_cells
     int*      vertices_on_gather_set_cells = (int*)conn_arr_gather_set_cells;
     NCDF_SIZE read_starts[ 2 ] = { 0, 0 };
-    NCDF_SIZE read_counts[ 2 ] = { static_cast< NCDF_SIZE >( nCells ),
-                                   static_cast< NCDF_SIZE >( EDGES_PER_CELL ) };
+    NCDF_SIZE read_counts[ 2 ] = { static_cast< NCDF_SIZE >( nCells ), static_cast< NCDF_SIZE >( EDGES_PER_CELL ) };
 #ifdef MOAB_HAVE_PNETCDF
     // Enter independent I/O mode, since this read is only for the gather processor
     success = NCFUNC( begin_indep_data )( _fileId );
     if( success ) MB_SET_ERR( MB_FAILURE, "Failed to begin independent I/O mode" );
-    success = NCFUNCG( _vara_int )( _fileId, verticesOnCellVarId, read_starts, read_counts,
-                                    vertices_on_gather_set_cells );
+    success =
+        NCFUNCG( _vara_int )( _fileId, verticesOnCellVarId, read_starts, read_counts, vertices_on_gather_set_cells );
     if( success ) MB_SET_ERR( MB_FAILURE, "Failed to read cell_corners data" );
     success = NCFUNC( end_indep_data )( _fileId );
     if( success ) MB_SET_ERR( MB_FAILURE, "Failed to end independent I/O mode" );
 #else
-    success = NCFUNCG( _vara_int )( _fileId, verticesOnCellVarId, read_starts, read_counts,
-                                    vertices_on_gather_set_cells );
+    success =
+        NCFUNCG( _vara_int )( _fileId, verticesOnCellVarId, read_starts, read_counts, vertices_on_gather_set_cells );
     if( success ) MB_SET_ERR( MB_FAILURE, "Failed to read cell_corners data" );
 #endif
 
@@ -1437,8 +1385,7 @@ ErrorCode NCHelperGCRM::create_padded_gather_set_cells( EntityHandle gather_set,
     for( int cell_vert = nCells * EDGES_PER_CELL - 1; cell_vert >= 0; cell_vert-- )
     {
         // Note, indices stored in vertices_on_gather_set_cells are 0 based
-        int gather_set_vert_idx =
-            vertices_on_gather_set_cells[ cell_vert ];  // Global vertex index, 0 based
+        int gather_set_vert_idx = vertices_on_gather_set_cells[ cell_vert ];  // Global vertex index, 0 based
         // Connectivity array is shifted by where the gather set vertices start
         conn_arr_gather_set_cells[ cell_vert ] = gather_set_start_vertex + gather_set_vert_idx;
     }

@@ -86,8 +86,7 @@ class QualityMetricTest : public CppUnit::TestFixture
     void compare_indices( QualityMetric& qm, PatchData& pd, size_t sample, double value,
                           const std::vector< size_t >& indices );
     void compare_gradient( QualityMetric& qm, PatchData& pd, size_t sample, double value,
-                           const std::vector< size_t >&   indices,
-                           const std::vector< Vector3D >& grad );
+                           const std::vector< size_t >& indices, const std::vector< Vector3D >& grad );
 };
 
 CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( QualityMetricTest, "QualityMetricTest" );
@@ -129,8 +128,8 @@ class LinearVertexMetric : public VertexQM
         value = pd.vertex_by_index( vtx_idx )[ 0 ];
         return true;
     }
-    bool evaluate_with_indices( PatchData& pd, size_t vtx_idx, double& value,
-                                std::vector< size_t >& indices, MsqError& )
+    bool evaluate_with_indices( PatchData& pd, size_t vtx_idx, double& value, std::vector< size_t >& indices,
+                                MsqError& )
     {
         value = pd.vertex_by_index( vtx_idx )[ 0 ];
         indices.resize( 1 );
@@ -160,8 +159,8 @@ class ConstantElementMetric : public ElementQM
         value = 1.0;
         return true;
     }
-    bool evaluate_with_indices( PatchData& pd, size_t elem_idx, double& value,
-                                std::vector< size_t >& indices, MsqError& )
+    bool evaluate_with_indices( PatchData& pd, size_t elem_idx, double& value, std::vector< size_t >& indices,
+                                MsqError& )
     {
         MsqMeshEntity& elem = pd.element_by_index( elem_idx );
         unsigned       nv = elem.node_count( );
@@ -198,8 +197,8 @@ class ParabolicVertexMetric : public VertexQM
         value *= value;
         return true;
     }
-    bool evaluate_with_indices( PatchData& pd, size_t vtx_idx, double& value,
-                                std::vector< size_t >& indices, MsqError& )
+    bool evaluate_with_indices( PatchData& pd, size_t vtx_idx, double& value, std::vector< size_t >& indices,
+                                MsqError& )
     {
         value = pd.vertex_by_index( vtx_idx )[ 1 ];
         value *= value;
@@ -248,8 +247,8 @@ class TriTauMetric : public ElementQM
         return true;
     }
 
-    bool evaluate_with_indices( PatchData& pd, size_t elem_idx, double& value,
-                                std::vector< size_t >& indices, MsqError& )
+    bool evaluate_with_indices( PatchData& pd, size_t elem_idx, double& value, std::vector< size_t >& indices,
+                                MsqError& )
     {
         MsqMatrix< 3, 3 > M = matrix( pd, elem_idx );
         value = det( M ) - 1;
@@ -281,8 +280,7 @@ void QualityMetricTest::test_fixed_vertex_list( )
      *   4------5-----6   \   \
      *           \____\____\___\__ fixed
      */
-    const double coords[] = { 0, 0, 0,  0, 1, 0,  -1, 1, 0, -1, 0, 0, -1, -1,
-                              0, 0, -1, 0, 1, -1, 0,  1, 0, 0,  1, 1, 0 };
+    const double coords[] = { 0, 0, 0, 0, 1, 0, -1, 1, 0, -1, 0, 0, -1, -1, 0, 0, -1, 0, 1, -1, 0, 1, 0, 0, 1, 1, 0 };
     const size_t conn[] = { 0, 1, 2, 3, 3, 4, 5, 0, 6, 7, 0, 5, 0, 7, 8, 1 };
     const bool   fixed[] = { false, false, false, false, false, true, true, true, true };
 
@@ -301,8 +299,7 @@ void QualityMetricTest::test_fixed_vertex_list( )
     bits = QualityMetric::fixed_vertex_bitmap( pd, &pd.element_by_index( 0 ), indices );
     CPPUNIT_ASSERT_EQUAL( (size_t)4, indices.size( ) );
     CPPUNIT_ASSERT_EQUAL( (uint32_t)0, bits & 0xF );
-    CPPUNIT_ASSERT( pd.num_free_vertices( ) >
-                    *std::max_element( indices.begin( ), indices.end( ) ) );
+    CPPUNIT_ASSERT( pd.num_free_vertices( ) > *std::max_element( indices.begin( ), indices.end( ) ) );
     verts = pd.element_by_index( 0 ).get_vertex_index_array( );
     for( i = 0; i < 4; ++i )
         CPPUNIT_ASSERT( std::find( verts, verts + 4, indices[ i ] ) != verts + 4 );
@@ -389,9 +386,8 @@ void QualityMetricTest::test_remove_fixed_gradients( )
 void QualityMetricTest::test_remove_fixed_hessians( )
 {
     // define Hessian matrix for a quadrilateral
-    Matrix3D m[ 10 ] = { Matrix3D( 0.0 ), Matrix3D( 1.0 ), Matrix3D( 2.0 ), Matrix3D( 3.0 ),
-                         Matrix3D( 4.0 ), Matrix3D( 5.0 ), Matrix3D( 6.0 ), Matrix3D( 7.0 ),
-                         Matrix3D( 8.0 ), Matrix3D( 9.0 ) };
+    Matrix3D m[ 10 ] = { Matrix3D( 0.0 ), Matrix3D( 1.0 ), Matrix3D( 2.0 ), Matrix3D( 3.0 ), Matrix3D( 4.0 ),
+                         Matrix3D( 5.0 ), Matrix3D( 6.0 ), Matrix3D( 7.0 ), Matrix3D( 8.0 ), Matrix3D( 9.0 ) };
     // convert to std::vector
     std::vector< Matrix3D > hess( 10 );
     std::copy( m, m + 10, hess.begin( ) );
@@ -520,8 +516,7 @@ void QualityMetricTest::test_Hessian_constant( )
     ConstantElementMetric constant;
     QualityMetric&        qm = constant;
 
-    bool valid =
-        qm.evaluate_with_Hessian( tri_pd, ELEMENT, value, indices, gradient, Hessian, err );
+    bool valid = qm.evaluate_with_Hessian( tri_pd, ELEMENT, value, indices, gradient, Hessian, err );
     CPPUNIT_ASSERT( !err );
     CPPUNIT_ASSERT( valid );
     compare_gradient( qm, tri_pd, ELEMENT, value, indices, gradient );
@@ -587,8 +582,7 @@ void QualityMetricTest::test_Hessian_tau( )
 
     TriTauMetric qm;
 
-    bool valid =
-        qm.evaluate_with_Hessian( tri_pd, ELEMENT, value, indices, gradient, Hessian, err );
+    bool valid = qm.evaluate_with_Hessian( tri_pd, ELEMENT, value, indices, gradient, Hessian, err );
     CPPUNIT_ASSERT( !err );
     CPPUNIT_ASSERT( valid );
     compare_gradient( qm, tri_pd, ELEMENT, value, indices, gradient );
@@ -631,8 +625,7 @@ void QualityMetricTest::test_diagonal_constant( )
     ConstantElementMetric constant;
     QualityMetric&        qm = constant;
 
-    bool valid = qm.evaluate_with_Hessian_diagonal( tri_pd, ELEMENT, value, indices, gradient,
-                                                    Hessian, err );
+    bool valid = qm.evaluate_with_Hessian_diagonal( tri_pd, ELEMENT, value, indices, gradient, Hessian, err );
     CPPUNIT_ASSERT( !err );
     CPPUNIT_ASSERT( valid );
     compare_gradient( qm, tri_pd, ELEMENT, value, indices, gradient );
@@ -655,8 +648,7 @@ void QualityMetricTest::test_diagonal_linear( )
     LinearVertexMetric linear;
     QualityMetric&     qm = linear;
 
-    bool valid =
-        qm.evaluate_with_Hessian_diagonal( tri_pd, VERTEX, value, indices, gradient, Hessian, err );
+    bool valid = qm.evaluate_with_Hessian_diagonal( tri_pd, VERTEX, value, indices, gradient, Hessian, err );
     CPPUNIT_ASSERT( !err );
     CPPUNIT_ASSERT( valid );
     compare_gradient( qm, tri_pd, VERTEX, value, indices, gradient );
@@ -677,8 +669,7 @@ void QualityMetricTest::test_diagonal_parabolic( )
     ParabolicVertexMetric parab;
     QualityMetric&        qm = parab;
 
-    bool valid =
-        qm.evaluate_with_Hessian_diagonal( tri_pd, VERTEX, value, indices, gradient, Hessian, err );
+    bool valid = qm.evaluate_with_Hessian_diagonal( tri_pd, VERTEX, value, indices, gradient, Hessian, err );
     CPPUNIT_ASSERT( !err );
     CPPUNIT_ASSERT( valid );
     compare_gradient( qm, tri_pd, VERTEX, value, indices, gradient );
@@ -700,8 +691,7 @@ void QualityMetricTest::test_diagonal_tau( )
 
     TriTauMetric qm;
 
-    bool valid = qm.evaluate_with_Hessian_diagonal( tri_pd, ELEMENT, value, indices, gradient,
-                                                    Hessian, err );
+    bool valid = qm.evaluate_with_Hessian_diagonal( tri_pd, ELEMENT, value, indices, gradient, Hessian, err );
     CPPUNIT_ASSERT( !err );
     CPPUNIT_ASSERT( valid );
     compare_gradient( qm, tri_pd, ELEMENT, value, indices, gradient );
@@ -726,17 +716,17 @@ void QualityMetricTest::test_diagonal_tau( )
         CPPUNIT_ASSERT_EQUAL( (size_t)2, indices[ 1 ] );
     }
 
-    SymMatrix3D exp0( d2M[ 0 ]( 0, 0 ), d2M[ 0 ]( 0, 1 ), d2M[ 0 ]( 0, 2 ), d2M[ 0 ]( 1, 1 ),
-                      d2M[ 0 ]( 1, 2 ), d2M[ 0 ]( 2, 2 ) );
-    SymMatrix3D exp1( d2M[ 3 ]( 0, 0 ), d2M[ 3 ]( 0, 1 ), d2M[ 3 ]( 0, 2 ), d2M[ 3 ]( 1, 1 ),
-                      d2M[ 3 ]( 1, 2 ), d2M[ 3 ]( 2, 2 ) );
+    SymMatrix3D exp0( d2M[ 0 ]( 0, 0 ), d2M[ 0 ]( 0, 1 ), d2M[ 0 ]( 0, 2 ), d2M[ 0 ]( 1, 1 ), d2M[ 0 ]( 1, 2 ),
+                      d2M[ 0 ]( 2, 2 ) );
+    SymMatrix3D exp1( d2M[ 3 ]( 0, 0 ), d2M[ 3 ]( 0, 1 ), d2M[ 3 ]( 0, 2 ), d2M[ 3 ]( 1, 1 ), d2M[ 3 ]( 1, 2 ),
+                      d2M[ 3 ]( 2, 2 ) );
 
     CPPUNIT_ASSERT_MATRICES_EQUAL( exp0, Hessian[ 0 ], EPSILON );
     CPPUNIT_ASSERT_MATRICES_EQUAL( exp1, Hessian[ 1 ], EPSILON );
 }
 
-void QualityMetricTest::compare_indices( QualityMetric& qm, PatchData& pd, size_t sample,
-                                         double value, const std::vector< size_t >& indices )
+void QualityMetricTest::compare_indices( QualityMetric& qm, PatchData& pd, size_t sample, double value,
+                                         const std::vector< size_t >& indices )
 {
     double                value2;
     std::vector< size_t > indices2;
@@ -751,15 +741,14 @@ void QualityMetricTest::compare_indices( QualityMetric& qm, PatchData& pd, size_
     ASSERT_STD_VECTORS_EQUAL( indices2, indices1 );
 }
 
-void QualityMetricTest::compare_gradient( QualityMetric& qm, PatchData& pd, size_t sample,
-                                          double value, const std::vector< size_t >& indices,
-                                          const std::vector< Vector3D >& grad )
+void QualityMetricTest::compare_gradient( QualityMetric& qm, PatchData& pd, size_t sample, double value,
+                                          const std::vector< size_t >& indices, const std::vector< Vector3D >& grad )
 {
     double                  value2;
     std::vector< size_t >   indices2;
     std::vector< Vector3D > grad2;
     MsqError                err;
-    bool valid = qm.evaluate_with_gradient( pd, sample, value2, indices2, grad2, err );
+    bool                    valid = qm.evaluate_with_gradient( pd, sample, value2, indices2, grad2, err );
     ASSERT_NO_ERROR( err );
     CPPUNIT_ASSERT( valid );
     CPPUNIT_ASSERT_DOUBLES_EQUAL( value2, value, EPSILON );
@@ -768,8 +757,7 @@ void QualityMetricTest::compare_gradient( QualityMetric& qm, PatchData& pd, size
 
     for( size_t i = 0; i < indices.size( ); ++i )
     {
-        size_t j =
-            std::find( indices2.begin( ), indices2.end( ), indices[ i ] ) - indices2.begin( );
+        size_t j = std::find( indices2.begin( ), indices2.end( ), indices[ i ] ) - indices2.begin( );
         CPPUNIT_ASSERT( j < indices2.size( ) );  // not found->indices don't match
         CPPUNIT_ASSERT_VECTORS_EQUAL( grad2[ j ], grad[ i ], EPSILON );
     }

@@ -60,8 +60,7 @@ ErrorCode Tree::find_all_trees( Range& results )
     return MB_SUCCESS;
 }
 
-ErrorCode Tree::create_root( const double box_min[ 3 ], const double box_max[ 3 ],
-                             EntityHandle& root_handle )
+ErrorCode Tree::create_root( const double box_min[ 3 ], const double box_max[ 3 ], EntityHandle& root_handle )
 {
     ErrorCode rval = mbImpl->create_meshset( meshsetFlags, root_handle );
     if( MB_SUCCESS != rval ) return rval;

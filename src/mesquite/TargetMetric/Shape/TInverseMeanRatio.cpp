@@ -59,8 +59,8 @@ bool TInverseMeanRatio::evaluate( const MsqMatrix< 2, 2 >& T, double& result, Ms
     }
 }
 
-bool TInverseMeanRatio::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& result,
-                                            MsqMatrix< 2, 2 >& deriv_wrt_T, MsqError& err )
+bool TInverseMeanRatio::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& result, MsqMatrix< 2, 2 >& deriv_wrt_T,
+                                            MsqError& err )
 {
     const double d = det( T );
     if( invalid_determinant( d ) )
@@ -81,9 +81,8 @@ bool TInverseMeanRatio::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& 
     }
 }
 
-bool TInverseMeanRatio::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& result,
-                                            MsqMatrix< 2, 2 >& dA, MsqMatrix< 2, 2 > d2A[ 3 ],
-                                            MsqError& err )
+bool TInverseMeanRatio::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& result, MsqMatrix< 2, 2 >& dA,
+                                            MsqMatrix< 2, 2 > d2A[ 3 ], MsqError& err )
 {
     const double d = det( T );
     if( invalid_determinant( d ) )
@@ -108,12 +107,10 @@ bool TInverseMeanRatio::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& 
         const double            p2 = -inv_det * inv_det;
         const MsqMatrix< 2, 2 > AT_T_op_00 = outer( AT.row( 0 ), T.row( 0 ) );
         const MsqMatrix< 2, 2 > AT_T_op_11 = outer( AT.row( 1 ), T.row( 1 ) );
-        d2A[ 0 ] =
-            p1 * outer( AT.row( 0 ), AT.row( 0 ) ) + p2 * ( AT_T_op_00 + transpose( AT_T_op_00 ) );
+        d2A[ 0 ] = p1 * outer( AT.row( 0 ), AT.row( 0 ) ) + p2 * ( AT_T_op_00 + transpose( AT_T_op_00 ) );
         d2A[ 1 ] = p1 * outer( AT.row( 0 ), AT.row( 1 ) ) +
                    p2 * ( outer( AT.row( 0 ), T.row( 1 ) ) + outer( T.row( 0 ), AT.row( 1 ) ) );
-        d2A[ 2 ] =
-            p1 * outer( AT.row( 1 ), AT.row( 1 ) ) + p2 * ( AT_T_op_11 + transpose( AT_T_op_11 ) );
+        d2A[ 2 ] = p1 * outer( AT.row( 1 ), AT.row( 1 ) ) + p2 * ( AT_T_op_11 + transpose( AT_T_op_11 ) );
 
         d2A[ 0 ]( 0, 0 ) += inv_det;
         d2A[ 0 ]( 1, 1 ) += inv_det;
@@ -143,8 +140,8 @@ bool TInverseMeanRatio::evaluate( const MsqMatrix< 3, 3 >& T, double& result, Ms
     }
 }
 
-bool TInverseMeanRatio::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& result,
-                                            MsqMatrix< 3, 3 >& deriv_wrt_T, MsqError& err )
+bool TInverseMeanRatio::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& result, MsqMatrix< 3, 3 >& deriv_wrt_T,
+                                            MsqError& err )
 {
     const double d = det( T );
     if( invalid_determinant( d ) )
@@ -166,9 +163,8 @@ bool TInverseMeanRatio::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& 
     return true;
 }
 
-bool TInverseMeanRatio::evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result,
-                                            MsqMatrix< 3, 3 >& dA, MsqMatrix< 3, 3 > d2A[ 6 ],
-                                            MsqError& err )
+bool TInverseMeanRatio::evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result, MsqMatrix< 3, 3 >& dA,
+                                            MsqMatrix< 3, 3 > d2A[ 6 ], MsqError& err )
 {
     const double d = det( T );
     if( invalid_determinant( d ) )

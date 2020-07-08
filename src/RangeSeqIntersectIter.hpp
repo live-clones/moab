@@ -56,8 +56,7 @@ class RangeSeqIntersectIter
 {
   public:
     RangeSeqIntersectIter( SequenceManager* sequences )
-        : mSequenceManager( sequences ), mSequence( 0 ), mStartHandle( 0 ), mEndHandle( 0 ),
-          mLastHandle( 0 )
+        : mSequenceManager( sequences ), mSequence( 0 ), mStartHandle( 0 ), mEndHandle( 0 ), mLastHandle( 0 )
     {
     }
 

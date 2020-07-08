@@ -53,8 +53,7 @@ static void init_scale_factors( double factors[MIXED] )
 }
 */
 
-RefSizeTargetCalculator::RefSizeTargetCalculator( ReferenceMesh*    reference_mesh,
-                                                  TargetCalculator* tc )
+RefSizeTargetCalculator::RefSizeTargetCalculator( ReferenceMesh* reference_mesh, TargetCalculator* tc )
     : refMesh( reference_mesh ), scaledTargets( tc )
 {
 }  //   { init_scale_factors( scaleFactor ); }
@@ -94,8 +93,8 @@ double RefSizeTargetCalculator::average_edge_length( PatchData& pd, size_t eleme
     return len_sum * ( 1.0 / num_edges );  // scaleFactor[type];
 }
 
-bool RefSizeTargetCalculator::get_3D_target( PatchData& pd, size_t element, Sample sample,
-                                             MsqMatrix< 3, 3 >& W, MsqError& err )
+bool RefSizeTargetCalculator::get_3D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 3, 3 >& W,
+                                             MsqError& err )
 {
     scaledTargets->get_3D_target( pd, element, sample, W, err );
     MSQ_ERRZERO( err );
@@ -107,8 +106,8 @@ bool RefSizeTargetCalculator::get_3D_target( PatchData& pd, size_t element, Samp
     return true;
 }
 
-bool RefSizeTargetCalculator::get_surface_target( PatchData& pd, size_t element, Sample sample,
-                                                  MsqMatrix< 3, 2 >& W, MsqError& err )
+bool RefSizeTargetCalculator::get_surface_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 3, 2 >& W,
+                                                  MsqError& err )
 {
     scaledTargets->get_surface_target( pd, element, sample, W, err );
     MSQ_ERRZERO( err );
@@ -120,8 +119,8 @@ bool RefSizeTargetCalculator::get_surface_target( PatchData& pd, size_t element,
     return true;
 }
 
-bool RefSizeTargetCalculator::get_2D_target( PatchData& pd, size_t element, Sample sample,
-                                             MsqMatrix< 2, 2 >& W, MsqError& err )
+bool RefSizeTargetCalculator::get_2D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 2, 2 >& W,
+                                             MsqError& err )
 {
     scaledTargets->get_2D_target( pd, element, sample, W, err );
     MSQ_ERRZERO( err );

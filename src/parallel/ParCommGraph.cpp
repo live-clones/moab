@@ -17,8 +17,7 @@
 
 namespace moab
 {
-ParCommGraph::ParCommGraph( MPI_Comm joincomm, MPI_Group group1, MPI_Group group2, int coid1,
-                            int coid2 )
+ParCommGraph::ParCommGraph( MPI_Comm joincomm, MPI_Group group1, MPI_Group group2, int coid1, int coid2 )
     : comm( joincomm ), compid1( coid1 ), compid2( coid2 )
 {
     // find out the tasks from each group, in the joint communicator
@@ -169,9 +168,8 @@ ErrorCode ParCommGraph::compute_trivial_partition( std::vector< int >& numElemsP
                     else
                         sizeOverlap = starts[ k + 1 ] - accum[ j ];
                 }
-                recv_sizes[ receiverTasks[ k ] ].push_back(
-                    sizeOverlap );  // basically, task k will receive from
-                                    //   sender j, sizeOverlap elems
+                recv_sizes[ receiverTasks[ k ] ].push_back( sizeOverlap );  // basically, task k will receive from
+                                                                            //   sender j, sizeOverlap elems
                 sender_sizes[ senderTasks[ j ] ].push_back( sizeOverlap );
                 if( starts[ k ] > accum[ j + 1 ] )
                 {
@@ -202,8 +200,7 @@ ErrorCode ParCommGraph::pack_receivers_graph( std::vector< int >& packed_recv_ar
         // big problem, we have empty partitions in receive
         std::cout << " WARNING: empty partitions, some receiver tasks will receive nothing.\n";
     }
-    for( std::map< int, std::vector< int > >::iterator it = recv_graph.begin( );
-         it != recv_graph.end( ); it++ )
+    for( std::map< int, std::vector< int > >::iterator it = recv_graph.begin( ); it != recv_graph.end( ); it++ )
     {
         int                 recv = it->first;
         std::vector< int >& senders = it->second;
@@ -316,8 +313,7 @@ ErrorCode ParCommGraph::send_mesh_parts( MPI_Comm jcomm, ParallelComm* pco, Rang
     int ierr;  // MPI error
     if( is_root_sender( ) ) indexReq = 1;  // for sendReqs
     sendReqs.resize( indexReq + split_ranges.size( ) );
-    for( std::map< int, Range >::iterator it = split_ranges.begin( ); it != split_ranges.end( );
-         it++ )
+    for( std::map< int, Range >::iterator it = split_ranges.begin( ); it != split_ranges.end( ); it++ )
     {
         int   receiver_proc = it->first;
         Range ents = it->second;
@@ -358,8 +354,7 @@ ErrorCode ParCommGraph::send_mesh_parts( MPI_Comm jcomm, ParallelComm* pco, Rang
 }
 
 // this is called on receiver side
-ErrorCode ParCommGraph::receive_comm_graph( MPI_Comm jcomm, ParallelComm* pco,
-                                            std::vector< int >& pack_array )
+ErrorCode ParCommGraph::receive_comm_graph( MPI_Comm jcomm, ParallelComm* pco, std::vector< int >& pack_array )
 {
     // first, receive from sender_rank 0, the communication graph (matrix), so each receiver
     // knows what data to expect
@@ -393,8 +388,7 @@ ErrorCode ParCommGraph::receive_comm_graph( MPI_Comm jcomm, ParallelComm* pco,
         std::cout << " receive comm graph size: " << size_pack_array << "\n";
 #endif
         pack_array.resize( size_pack_array );
-        ierr =
-            MPI_Recv( &pack_array[ 0 ], size_pack_array, MPI_INT, sender( 0 ), 20, jcomm, &status );
+        ierr = MPI_Recv( &pack_array[ 0 ], size_pack_array, MPI_INT, sender( 0 ), 20, jcomm, &status );
         if( 0 != ierr ) return MB_FAILURE;
 #ifdef VERBOSE
         std::cout << " receive comm graph ";
@@ -428,9 +422,8 @@ ErrorCode ParCommGraph::receive_mesh( MPI_Comm jcomm, ParallelComm* pco, EntityH
     // primary element came from, in the joint communicator ; this will be forwarded by coverage
     // mesh
     int defaultInt = -1;  // no processor, so it was not migrated from somewhere else
-    rval = pco->get_moab( )->tag_get_handle( "orig_sending_processor", 1, MB_TYPE_INTEGER,
-                                             orgSendProcTag, MB_TAG_DENSE | MB_TAG_CREAT,
-                                             &defaultInt );MB_CHK_SET_ERR( rval, "can't create original sending processor tag" );
+    rval = pco->get_moab( )->tag_get_handle( "orig_sending_processor", 1, MB_TYPE_INTEGER, orgSendProcTag,
+                                             MB_TAG_DENSE | MB_TAG_CREAT, &defaultInt );MB_CHK_SET_ERR( rval, "can't create original sending processor tag" );
     if( !senders_local.empty( ) )
     {
         for( size_t k = 0; k < senders_local.size( ); k++ )
@@ -456,8 +449,7 @@ ErrorCode ParCommGraph::receive_mesh( MPI_Comm jcomm, ParallelComm* pco, EntityH
             ierr = MPI_Get_count( &status, MPI_CHAR, &size_pack );
             if( 0 != ierr )
             {
-                std::cout << " MPI_Get_count failure in ParCommGraph::receive_mesh  " << ierr
-                          << "\n";
+                std::cout << " MPI_Get_count failure in ParCommGraph::receive_mesh  " << ierr << "\n";
                 return MB_FAILURE;
             }
 
@@ -483,8 +475,8 @@ ErrorCode ParCommGraph::receive_mesh( MPI_Comm jcomm, ParallelComm* pco, EntityH
             buffer->reset_ptr( sizeof( int ) );
             std::vector< EntityHandle > entities_vec( entities.size( ) );
             std::copy( entities.begin( ), entities.end( ), entities_vec.begin( ) );
-            rval = pco->unpack_buffer( buffer->buff_ptr, false, -1, -1, L1hloc, L1hrem, L1p, L2hloc,
-                                       L2hrem, L2p, entities_vec );
+            rval = pco->unpack_buffer( buffer->buff_ptr, false, -1, -1, L1hloc, L1hrem, L1p, L2hloc, L2hrem, L2p,
+                                       entities_vec );
             delete buffer;
             if( MB_SUCCESS != rval ) return rval;
 
@@ -506,8 +498,7 @@ ErrorCode ParCommGraph::receive_mesh( MPI_Comm jcomm, ParallelComm* pco, EntityH
                 // set a tag with the original sender for the primary entity
                 // will be used later for coverage mesh
                 std::vector< int > orig_senders( local_primary_ents.size( ), sender1 );
-                rval = pco->get_moab( )->tag_set_data( orgSendProcTag, local_primary_ents,
-                                                       &orig_senders[ 0 ] );
+                rval = pco->get_moab( )->tag_set_data( orgSendProcTag, local_primary_ents, &orig_senders[ 0 ] );
             }
             corr_sizes.push_back( (int)local_primary_ents.size( ) );
 
@@ -601,9 +592,8 @@ ErrorCode ParCommGraph::send_tag_values( MPI_Comm jcomm, ParallelComm* pco, Rang
         int tag_size1;  // length
         rval = mb->tag_get_length( tag_handles[ i ], tag_size1 );MB_CHK_ERR( rval );
         if( graph_type == DOF_BASED )
-            bytes_per_tag =
-                bytes_per_tag / tag_size1;  // we know we have one double per tag , per ID sent;
-                                            // could be 8 for double, 4 for int, etc
+            bytes_per_tag = bytes_per_tag / tag_size1;  // we know we have one double per tag , per ID sent;
+                                                        // could be 8 for double, 4 for int, etc
         total_bytes_per_entity += bytes_per_tag;
         vect_bytes_per_tag.push_back( bytes_per_tag );
 #ifdef VERBOSE
@@ -619,15 +609,12 @@ ErrorCode ParCommGraph::send_tag_values( MPI_Comm jcomm, ParallelComm* pco, Rang
         // use the buffers data structure to allocate memory for sending the tags
         sendReqs.resize( split_ranges.size( ) );
 
-        for( std::map< int, Range >::iterator it = split_ranges.begin( ); it != split_ranges.end( );
-             it++ )
+        for( std::map< int, Range >::iterator it = split_ranges.begin( ); it != split_ranges.end( ); it++ )
         {
             int   receiver_proc = it->first;
             Range ents = it->second;  // primary entities, with the tag data
-            int   size_buffer =
-                4 +
-                total_bytes_per_entity *
-                    (int)ents.size( );  // hopefully, below 2B; if more, we have a big problem ...
+            int   size_buffer = 4 + total_bytes_per_entity *
+                                      (int)ents.size( );  // hopefully, below 2B; if more, we have a big problem ...
             ParallelComm::Buffer* buffer = new ParallelComm::Buffer( size_buffer );
 
             buffer->reset_ptr( sizeof( int ) );
@@ -645,8 +632,7 @@ ErrorCode ParCommGraph::send_tag_values( MPI_Comm jcomm, ParallelComm* pco, Rang
                               &sendReqs[ indexReq ] );  // we have to use global communicator
             if( ierr != 0 ) return MB_FAILURE;
             indexReq++;
-            localSendBuffs.push_back(
-                buffer );  // we will release them after nonblocking sends are completed
+            localSendBuffs.push_back( buffer );  // we will release them after nonblocking sends are completed
         }
     }
     else if( graph_type == COVERAGE )
@@ -673,10 +659,8 @@ ErrorCode ParCommGraph::send_tag_values( MPI_Comm jcomm, ParallelComm* pco, Rang
         {
             int                 receiver_proc = mit->first;
             std::vector< int >& eids = mit->second;
-            int                 size_buffer =
-                4 +
-                total_bytes_per_entity *
-                    (int)eids.size( );  // hopefully, below 2B; if more, we have a big problem ...
+            int                 size_buffer = 4 + total_bytes_per_entity *
+                                      (int)eids.size( );  // hopefully, below 2B; if more, we have a big problem ...
             ParallelComm::Buffer* buffer = new ParallelComm::Buffer( size_buffer );
             buffer->reset_ptr( sizeof( int ) );
 #ifdef VERBOSE
@@ -696,11 +680,9 @@ ErrorCode ParCommGraph::send_tag_values( MPI_Comm jcomm, ParallelComm* pco, Rang
                 EntityHandle eh = gidToHandle[ eID ];
                 for( i = 0; i < tag_handles.size( ); i++ )
                 {
-                    rval =
-                        mb->tag_get_data( tag_handles[ i ], &eh, 1, (void*)( buffer->buff_ptr ) );MB_CHK_ERR( rval );
+                    rval = mb->tag_get_data( tag_handles[ i ], &eh, 1, (void*)( buffer->buff_ptr ) );MB_CHK_ERR( rval );
 #ifdef VERBOSE
-                    dbfile << "global ID " << eID << " local handle " << mb->id_from_handle( eh )
-                           << " vals: ";
+                    dbfile << "global ID " << eID << " local handle " << mb->id_from_handle( eh ) << " vals: ";
                     double* vals = (double*)( buffer->buff_ptr );
                     for( int kk = 0; kk < tag_sizes[ i ]; kk++ )
                     {
@@ -722,8 +704,7 @@ ErrorCode ParCommGraph::send_tag_values( MPI_Comm jcomm, ParallelComm* pco, Rang
                               &sendReqs[ indexReq ] );  // we have to use global communicator
             if( ierr != 0 ) return MB_FAILURE;
             indexReq++;
-            localSendBuffs.push_back(
-                buffer );  // we will release them after nonblocking sends are completed
+            localSendBuffs.push_back( buffer );  // we will release them after nonblocking sends are completed
         }
     }
     else if( graph_type == DOF_BASED )
@@ -740,8 +721,7 @@ ErrorCode ParCommGraph::send_tag_values( MPI_Comm jcomm, ParallelComm* pco, Rang
             rval = mb->tag_get_bytes( tag_handles[ i ], bytes_per_tag );MB_CHK_ERR( rval );
             valuesTags[ i ].resize( owned.size( ) * bytes_per_tag );
             // fill the whole array, we will pick up from here
-            rval =
-                mb->tag_get_data( tag_handles[ i ], owned, (void*)( &( valuesTags[ i ][ 0 ] ) ) );MB_CHK_ERR( rval );
+            rval = mb->tag_get_data( tag_handles[ i ], owned, (void*)( &( valuesTags[ i ][ 0 ] ) ) );MB_CHK_ERR( rval );
         }
         // now, pack the data and send it
         sendReqs.resize( involved_IDs_map.size( ) );
@@ -752,10 +732,8 @@ ErrorCode ParCommGraph::send_tag_values( MPI_Comm jcomm, ParallelComm* pco, Rang
             std::vector< int >& eids = mit->second;
             std::vector< int >& index_in_values = map_index[ receiver_proc ];
             std::vector< int >& index_ptr = map_ptr[ receiver_proc ];  // this is eids.size()+1;
-            int                 size_buffer =
-                4 +
-                total_bytes_per_entity *
-                    (int)eids.size( );  // hopefully, below 2B; if more, we have a big problem ...
+            int                 size_buffer = 4 + total_bytes_per_entity *
+                                      (int)eids.size( );  // hopefully, below 2B; if more, we have a big problem ...
             ParallelComm::Buffer* buffer = new ParallelComm::Buffer( size_buffer );
             buffer->reset_ptr( sizeof( int ) );
 #ifdef VERBOSE
@@ -784,8 +762,7 @@ ErrorCode ParCommGraph::send_tag_values( MPI_Comm jcomm, ParallelComm* pco, Rang
                               &sendReqs[ indexReq ] );  // we have to use global communicator
             if( ierr != 0 ) return MB_FAILURE;
             indexReq++;
-            localSendBuffs.push_back(
-                buffer );  // we will release them after nonblocking sends are completed
+            localSendBuffs.push_back( buffer );  // we will release them after nonblocking sends are completed
         }
     }
     return MB_SUCCESS;
@@ -827,15 +804,12 @@ ErrorCode ParCommGraph::receive_tag_values( MPI_Comm jcomm, ParallelComm* pco, R
         // rval = split_owned_range ( owned);MB_CHK_ERR ( rval );
 
         // use the buffers data structure to allocate memory for receiving the tags
-        for( std::map< int, Range >::iterator it = split_ranges.begin( ); it != split_ranges.end( );
-             it++ )
+        for( std::map< int, Range >::iterator it = split_ranges.begin( ); it != split_ranges.end( ); it++ )
         {
             int   sender_proc = it->first;
             Range ents = it->second;  // primary entities, with the tag data, we will receive
-            int   size_buffer =
-                4 +
-                total_bytes_per_entity *
-                    (int)ents.size( );  // hopefully, below 2B; if more, we have a big problem ...
+            int   size_buffer = 4 + total_bytes_per_entity *
+                                      (int)ents.size( );  // hopefully, below 2B; if more, we have a big problem ...
             ParallelComm::Buffer* buffer = new ParallelComm::Buffer( size_buffer );
 
             buffer->reset_ptr( sizeof( int ) );
@@ -843,8 +817,7 @@ ErrorCode ParCommGraph::receive_tag_values( MPI_Comm jcomm, ParallelComm* pco, R
             *( (int*)buffer->mem_ptr ) = size_buffer;
             // int size_pack = buffer->get_current_size(); // debug check
 
-            ierr = MPI_Recv( buffer->mem_ptr, size_buffer, MPI_CHAR, sender_proc, 222, jcomm,
-                             &status );
+            ierr = MPI_Recv( buffer->mem_ptr, size_buffer, MPI_CHAR, sender_proc, 222, jcomm, &status );
             if( ierr != 0 ) return MB_FAILURE;
             // now set the tag
             // copy to tag
@@ -881,18 +854,14 @@ ErrorCode ParCommGraph::receive_tag_values( MPI_Comm jcomm, ParallelComm* pco, R
         {
             int                 sender_proc = mit->first;
             std::vector< int >& eids = mit->second;
-            int                 size_buffer =
-                4 +
-                total_bytes_per_entity *
-                    (int)eids.size( );  // hopefully, below 2B; if more, we have a big problem ...
+            int                 size_buffer = 4 + total_bytes_per_entity *
+                                      (int)eids.size( );  // hopefully, below 2B; if more, we have a big problem ...
             ParallelComm::Buffer* buffer = new ParallelComm::Buffer( size_buffer );
             buffer->reset_ptr( sizeof( int ) );
-            *( (int*)buffer->mem_ptr ) =
-                size_buffer;  // this is really not necessary, it should receive this too
+            *( (int*)buffer->mem_ptr ) = size_buffer;  // this is really not necessary, it should receive this too
 
             // receive the buffer
-            ierr = MPI_Recv( buffer->mem_ptr, size_buffer, MPI_CHAR, sender_proc, 222, jcomm,
-                             &status );
+            ierr = MPI_Recv( buffer->mem_ptr, size_buffer, MPI_CHAR, sender_proc, 222, jcomm, &status );
             if( ierr != 0 ) return MB_FAILURE;
 // start copy
 #ifdef VERBOSE
@@ -914,18 +883,16 @@ ErrorCode ParCommGraph::receive_tag_values( MPI_Comm jcomm, ParallelComm* pco, R
                 std::map< int, EntityHandle >::iterator mit = gidToHandle.find( eID );
                 if( mit == gidToHandle.end( ) )
                 {
-                    std::cout << " on rank: " << rankInJoin
-                              << " cannot find entity handle with global ID " << eID << "\n";
+                    std::cout << " on rank: " << rankInJoin << " cannot find entity handle with global ID " << eID
+                              << "\n";
                     return MB_FAILURE;
                 }
                 EntityHandle eh = mit->second;
                 for( i = 0; i < tag_handles.size( ); i++ )
                 {
-                    rval =
-                        mb->tag_set_data( tag_handles[ i ], &eh, 1, (void*)( buffer->buff_ptr ) );MB_CHK_ERR( rval );
+                    rval = mb->tag_set_data( tag_handles[ i ], &eh, 1, (void*)( buffer->buff_ptr ) );MB_CHK_ERR( rval );
 #ifdef VERBOSE
-                    dbfile << "global ID " << eID << " local handle " << mb->id_from_handle( eh )
-                           << " vals: ";
+                    dbfile << "global ID " << eID << " local handle " << mb->id_from_handle( eh ) << " vals: ";
                     double* vals = (double*)( buffer->buff_ptr );
                     for( int kk = 0; kk < tag_sizes[ i ]; kk++ )
                     {
@@ -971,16 +938,13 @@ ErrorCode ParCommGraph::receive_tag_values( MPI_Comm jcomm, ParallelComm* pco, R
             std::vector< int >& eids = mit->second;
             std::vector< int >& index_in_values = map_index[ sender_proc ];
             std::vector< int >& index_ptr = map_ptr[ sender_proc ];  // this is eids.size()+1;
-            int                 size_buffer =
-                4 +
-                total_bytes_per_entity *
-                    (int)eids.size( );  // hopefully, below 2B; if more, we have a big problem ...
+            int                 size_buffer = 4 + total_bytes_per_entity *
+                                      (int)eids.size( );  // hopefully, below 2B; if more, we have a big problem ...
             ParallelComm::Buffer* buffer = new ParallelComm::Buffer( size_buffer );
             buffer->reset_ptr( sizeof( int ) );
 
             // receive the buffer
-            ierr = MPI_Recv( buffer->mem_ptr, size_buffer, MPI_CHAR, sender_proc, 222, jcomm,
-                             &status );
+            ierr = MPI_Recv( buffer->mem_ptr, size_buffer, MPI_CHAR, sender_proc, 222, jcomm, &status );
             if( ierr != 0 ) return MB_FAILURE;
             // use the values in buffer to populate valuesTag arrays, fill it up!
             int j = 0;
@@ -1002,8 +966,7 @@ ErrorCode ParCommGraph::receive_tag_values( MPI_Comm jcomm, ParallelComm* pco, R
         for( size_t i = 0; i < tag_handles.size( ); i++ )
         {
             // we will fill this array, using data from received buffer
-            rval =
-                mb->tag_set_data( tag_handles[ i ], owned, (void*)( &( valuesTags[ i ][ 0 ] ) ) );MB_CHK_ERR( rval );
+            rval = mb->tag_set_data( tag_handles[ i ], owned, (void*)( &( valuesTags[ i ][ 0 ] ) ) );MB_CHK_ERR( rval );
         }
     }
     return MB_SUCCESS;
@@ -1016,8 +979,7 @@ ErrorCode ParCommGraph::settle_send_graph( TupleList& TLcovIDs )
     // fill involved_IDs_map with data
     // will have "receiving proc" and global id of element
     int n = TLcovIDs.get_n( );
-    graph_type =
-        COVERAGE;  // do not rely only on involved_IDs_map.size(); this can be 0 in some cases
+    graph_type = COVERAGE;  // do not rely only on involved_IDs_map.size(); this can be 0 in some cases
     for( int i = 0; i < n; i++ )
     {
         int to_proc = TLcovIDs.vi_wr[ 2 * i ];
@@ -1025,11 +987,10 @@ ErrorCode ParCommGraph::settle_send_graph( TupleList& TLcovIDs )
         involved_IDs_map[ to_proc ].push_back( globalIdElem );
     }
 #ifdef VERBOSE
-    for( std::map< int, std::vector< int > >::iterator mit = involved_IDs_map.begin( );
-         mit != involved_IDs_map.end( ); mit++ )
+    for( std::map< int, std::vector< int > >::iterator mit = involved_IDs_map.begin( ); mit != involved_IDs_map.end( );
+         mit++ )
     {
-        std::cout << " towards task " << mit->first << " send: " << mit->second.size( ) << " cells "
-                  << std::endl;
+        std::cout << " towards task " << mit->first << " send: " << mit->second.size( ) << " cells " << std::endl;
         for( size_t i = 0; i < mit->second.size( ); i++ )
         {
             std::cout << " " << mit->second[ i ];
@@ -1042,11 +1003,9 @@ ErrorCode ParCommGraph::settle_send_graph( TupleList& TLcovIDs )
 
 // this will set involved_IDs_map will store all ids to be received from one sender task
 void ParCommGraph::SetReceivingAfterCoverage(
-    std::map< int, std::set< int > >&
-        idsFromProcs )  // will make sense only on receivers, right now after cov
+    std::map< int, std::set< int > >& idsFromProcs )  // will make sense only on receivers, right now after cov
 {
-    for( std::map< int, std::set< int > >::iterator mt = idsFromProcs.begin( );
-         mt != idsFromProcs.end( ); mt++ )
+    for( std::map< int, std::set< int > >::iterator mt = idsFromProcs.begin( ); mt != idsFromProcs.end( ); mt++ )
     {
         int              fromProc = mt->first;
         std::set< int >& setIds = mt->second;
@@ -1063,12 +1022,10 @@ void ParCommGraph::SetReceivingAfterCoverage(
     return;
 }
 //#define VERBOSE
-void ParCommGraph::settle_comm_by_ids( int comp, TupleList& TLBackToComp,
-                                       std::vector< int >& valuesComp )
+void ParCommGraph::settle_comm_by_ids( int comp, TupleList& TLBackToComp, std::vector< int >& valuesComp )
 {
     // settle comm graph on comp
-    if( rootSender || rootReceiver )
-        std::cout << " settle comm graph by id on component " << comp << "\n";
+    if( rootSender || rootReceiver ) std::cout << " settle comm graph by id on component " << comp << "\n";
     int n = TLBackToComp.get_n( );
     // third_method = true; // do not rely only on involved_IDs_map.size(); this can be 0 in some
     // cases
@@ -1098,8 +1055,7 @@ void ParCommGraph::settle_comm_by_ids( int comp, TupleList& TLBackToComp,
     // vp[i].first, second
 
     // count now how many times some value appears in ordered (so in valuesComp)
-    for( std::map< int, std::set< int > >::iterator it = uniqueIDs.begin( ); it != uniqueIDs.end( );
-         it++ )
+    for( std::map< int, std::set< int > >::iterator it = uniqueIDs.begin( ); it != uniqueIDs.end( ); it++ )
     {
         int                 procId = it->first;
         std::set< int >&    nums = it->second;
@@ -1114,8 +1070,7 @@ void ParCommGraph::settle_comm_by_ids( int comp, TupleList& TLBackToComp,
             int val = *sst;
             involved_IDs_map[ procId ].push_back( val );
             indx[ indexVal + 1 ] = indx[ indexVal ];
-            while( ( indexInVp < (int)valuesComp.size( ) ) &&
-                   ( vp[ indexInVp ].first <= val ) )  // should be equal !
+            while( ( indexInVp < (int)valuesComp.size( ) ) && ( vp[ indexInVp ].first <= val ) )  // should be equal !
             {
                 if( vp[ indexInVp ].first == val )
                 {
@@ -1131,8 +1086,8 @@ void ParCommGraph::settle_comm_by_ids( int comp, TupleList& TLBackToComp,
     std::ofstream     dbfile;
     f1 << "Involve_" << comp << "_" << rankInJoin << ".txt";
     dbfile.open( f1.str( ).c_str( ) );
-    for( std::map< int, std::vector< int > >::iterator mit = involved_IDs_map.begin( );
-         mit != involved_IDs_map.end( ); mit++ )
+    for( std::map< int, std::vector< int > >::iterator mit = involved_IDs_map.begin( ); mit != involved_IDs_map.end( );
+         mit++ )
     {
         int                 corrTask = mit->first;
         std::vector< int >& corrIds = mit->second;
@@ -1202,8 +1157,8 @@ ErrorCode ParCommGraph::compute_partition( ParallelComm* pco, Range& owned, int 
                                          /*const bool iface*/ true );MB_CHK_ERR( rval );
 
 #ifdef VERBOSE
-        std::cout << " on sender task " << pco->rank( ) << " number of shared interface cells "
-                  << sharedEdges.size( ) << "\n";
+        std::cout << " on sender task " << pco->rank( ) << " number of shared interface cells " << sharedEdges.size( )
+                  << "\n";
 #endif
         // find to what processors we need to send the ghost info about the edge
         // first determine the local graph; what elements are adjacent to each cell in owned range
@@ -1247,40 +1202,34 @@ ErrorCode ParCommGraph::compute_partition( ParallelComm* pco, Range& owned, int 
         int ne = TLe.get_n( );
         for( int i = 0; i < ne; i++ )
         {
-            int sharedProc = TLe.vi_rd[ 2 * i ];  // this info is coming from here, originally
-            int remoteCellID =
-                TLe.vi_rd[ 2 * i + 1 ];  // this is the id of the remote cell, on sharedProc
+            int          sharedProc = TLe.vi_rd[ 2 * i ];  // this info is coming from here, originally
+            int          remoteCellID = TLe.vi_rd[ 2 * i + 1 ];  // this is the id of the remote cell, on sharedProc
             EntityHandle localCell = TLe.vul_rd[ i ];  // this is now local edge/face on this proc
-            int          localCellId =
-                edgeToCell[ localCell ];  // this is the local cell  adjacent to edge/face
+            int          localCellId = edgeToCell[ localCell ];  // this is the local cell  adjacent to edge/face
             // now, we will need to add to the graph the pair <localCellId, remoteCellID>
             std::pair< int, int > extraAdj = std::make_pair( localCellId, remoteCellID );
             extraGraphEdges.insert( extraAdj );
             // adjCellsId [edgeToCell[localCell]] = remoteCellID;
             extraCellsProc[ remoteCellID ] = sharedProc;
 #ifdef VERBOSE
-            std::cout << "local ID " << edgeToCell[ localCell ]
-                      << " remote cell ID: " << remoteCellID << "\n";
+            std::cout << "local ID " << edgeToCell[ localCell ] << " remote cell ID: " << remoteCellID << "\n";
 #endif
         }
     }
     t2 = MPI_Wtime( );
-    if( rootSender )
-        std::cout << " time preparing the input for Zoltan:" << t2 - t1 << " seconds. \n";
+    if( rootSender ) std::cout << " time preparing the input for Zoltan:" << t2 - t1 << " seconds. \n";
         // so adj cells ids; need to call zoltan for parallel partition
 #ifdef MOAB_HAVE_ZOLTAN
     ZoltanPartitioner* mbZTool = new ZoltanPartitioner( mb );
     if( 1 <= met )  //  partition in zoltan, either graph or geometric partitioner
     {
-        std::map< int, Range >
-            distribution;  // how to distribute owned elements by processors in receiving groups
+        std::map< int, Range > distribution;  // how to distribute owned elements by processors in receiving groups
         // in how many tasks do we want to be distributed?
         int   numNewPartitions = (int)receiverTasks.size( );
         Range primaryCells = owned.subset_by_dimension( primaryDim );
-        rval = mbZTool->partition_owned_cells( primaryCells, pco, extraGraphEdges, extraCellsProc,
-                                               numNewPartitions, distribution, met );MB_CHK_ERR( rval );
-        for( std::map< int, Range >::iterator mit = distribution.begin( );
-             mit != distribution.end( ); mit++ )
+        rval = mbZTool->partition_owned_cells( primaryCells, pco, extraGraphEdges, extraCellsProc, numNewPartitions,
+                                               distribution, met );MB_CHK_ERR( rval );
+        for( std::map< int, Range >::iterator mit = distribution.begin( ); mit != distribution.end( ); mit++ )
         {
             int part_index = mit->first;
             assert( part_index < numNewPartitions );
@@ -1301,8 +1250,7 @@ ErrorCode ParCommGraph::send_graph_partition( ParallelComm* pco, MPI_Comm jcomm 
     // first, accumulate the info to root of sender; use gatherv
     // first, accumulate number of receivers from each sender, to the root receiver
     int numberReceivers =
-        (int)split_ranges
-            .size( );  // these are ranges of elements to be sent to each receiver, from this task
+        (int)split_ranges.size( );  // these are ranges of elements to be sent to each receiver, from this task
     int nSenders = (int)senderTasks.size( );  //
     // this sender will have to send to this many receivers
     std::vector< int > displs( 1 );  // displacements for gatherv
@@ -1313,8 +1261,7 @@ ErrorCode ParCommGraph::send_graph_partition( ParallelComm* pco, MPI_Comm jcomm 
         counts.resize( nSenders );
     }
 
-    int ierr =
-        MPI_Gather( &numberReceivers, 1, MPI_INT, &counts[ 0 ], 1, MPI_INT, 0, pco->comm( ) );
+    int ierr = MPI_Gather( &numberReceivers, 1, MPI_INT, &counts[ 0 ], 1, MPI_INT, 0, pco->comm( ) );
     if( ierr != MPI_SUCCESS ) return MB_FAILURE;
     // compute now displacements
     if( is_root_sender( ) )
@@ -1326,17 +1273,15 @@ ErrorCode ParCommGraph::send_graph_partition( ParallelComm* pco, MPI_Comm jcomm 
         }
     }
     std::vector< int > buffer;
-    if( is_root_sender( ) )
-        buffer.resize( displs[ nSenders ] );  // the last one will have the total count now
+    if( is_root_sender( ) ) buffer.resize( displs[ nSenders ] );  // the last one will have the total count now
 
     std::vector< int > recvs;
-    for( std::map< int, Range >::iterator mit = split_ranges.begin( ); mit != split_ranges.end( );
-         mit++ )
+    for( std::map< int, Range >::iterator mit = split_ranges.begin( ); mit != split_ranges.end( ); mit++ )
     {
         recvs.push_back( mit->first );
     }
-    ierr = MPI_Gatherv( &recvs[ 0 ], numberReceivers, MPI_INT, &buffer[ 0 ], &counts[ 0 ],
-                        &displs[ 0 ], MPI_INT, 0, pco->comm( ) );
+    ierr = MPI_Gatherv( &recvs[ 0 ], numberReceivers, MPI_INT, &buffer[ 0 ], &counts[ 0 ], &displs[ 0 ], MPI_INT, 0,
+                        pco->comm( ) );
     if( ierr != MPI_SUCCESS ) return MB_FAILURE;
 
     // now form recv_graph map; points from the
@@ -1371,9 +1316,8 @@ ErrorCode ParCommGraph::send_graph_partition( ParallelComm* pco, MPI_Comm jcomm 
             for( int j = 0; j < counts[ k ]; j++ )
             {
                 int recvTask = buffer[ indexInBuff + j ];
-                recv_graph[ recvTask ].push_back(
-                    senderTask );  // this will be packed and sent to root receiver, with
-                                   // nonblocking send
+                recv_graph[ recvTask ].push_back( senderTask );  // this will be packed and sent to root receiver, with
+                                                                 // nonblocking send
             }
         }
 #ifdef GRAPH_INFO
@@ -1383,8 +1327,7 @@ ErrorCode ParCommGraph::send_graph_partition( ParallelComm* pco, MPI_Comm jcomm 
         dbfile.open( outf2.str( ).c_str( ) );
         dbfile << " number receivers: " << recv_graph.size( ) << "\n";
         dbfile << " receiverRank \tsenders \n";
-        for( std::map< int, std::vector< int > >::iterator mit = recv_graph.begin( );
-             mit != recv_graph.end( ); mit++ )
+        for( std::map< int, std::vector< int > >::iterator mit = recv_graph.begin( ); mit != recv_graph.end( ); mit++ )
         {
             int                 recvTask = mit->first;
             std::vector< int >& senders = mit->second;
@@ -1410,8 +1353,7 @@ ErrorCode ParCommGraph::dump_comm_information( std::string prefix, int is_send )
     {
         std::ofstream     dbfile;
         std::stringstream outf;
-        outf << prefix << "_sender_" << rankInGroup1 << "_joint" << rankInJoin << "_type_"
-             << (int)graph_type << ".txt";
+        outf << prefix << "_sender_" << rankInGroup1 << "_joint" << rankInJoin << "_type_" << (int)graph_type << ".txt";
         dbfile.open( outf.str( ).c_str( ) );
 
         if( graph_type == COVERAGE )
@@ -1426,8 +1368,7 @@ ErrorCode ParCommGraph::dump_comm_information( std::string prefix, int is_send )
         }
         else if( graph_type == INITIAL_MIGRATE )  // just after migration
         {
-            for( std::map< int, Range >::iterator mit = split_ranges.begin( );
-                 mit != split_ranges.end( ); mit++ )
+            for( std::map< int, Range >::iterator mit = split_ranges.begin( ); mit != split_ranges.end( ); mit++ )
             {
                 int    receiver_proc = mit->first;
                 Range& eids = mit->second;
@@ -1449,8 +1390,8 @@ ErrorCode ParCommGraph::dump_comm_information( std::string prefix, int is_send )
     {
         std::ofstream     dbfile;
         std::stringstream outf;
-        outf << prefix << "_receiver_" << rankInGroup2 << "_joint" << rankInJoin << "_type_"
-             << (int)graph_type << ".txt";
+        outf << prefix << "_receiver_" << rankInGroup2 << "_joint" << rankInJoin << "_type_" << (int)graph_type
+             << ".txt";
         dbfile.open( outf.str( ).c_str( ) );
 
         if( graph_type == COVERAGE )
@@ -1465,8 +1406,7 @@ ErrorCode ParCommGraph::dump_comm_information( std::string prefix, int is_send )
         }
         else if( graph_type == INITIAL_MIGRATE )  // just after migration
         {
-            for( std::map< int, Range >::iterator mit = split_ranges.begin( );
-                 mit != split_ranges.end( ); mit++ )
+            for( std::map< int, Range >::iterator mit = split_ranges.begin( ); mit != split_ranges.end( ); mit++ )
             {
                 int    sender_proc = mit->first;
                 Range& eids = mit->second;

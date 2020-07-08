@@ -47,8 +47,7 @@ class Mesh;
 namespace DomainUtil
 {
 
-    void bounding_box( const MsqVertex* vertex_array, size_t num_vertices, Vector3D& box_min,
-                       Vector3D& box_max );
+    void bounding_box( const MsqVertex* vertex_array, size_t num_vertices, Vector3D& box_min, Vector3D& box_max );
 
     double max_box_extent( const MsqVertex* vertex_array, size_t num_vertices );
 
@@ -57,15 +56,14 @@ namespace DomainUtil
         return 1e-3 * max_box_extent( vertex_array, num_vertices );
     }
 
-    void get_fixed_vertices( Mesh* mesh_instance, const Mesh::VertexHandle* vertex_array,
-                             size_t                             num_vertices,
+    void get_fixed_vertices( Mesh* mesh_instance, const Mesh::VertexHandle* vertex_array, size_t num_vertices,
                              std::vector< Mesh::VertexHandle >& fixed_handles_out, MsqError& err );
 
-    bool non_colinear_vertices( const MsqVertex* vertex_array, size_t num_vertices,
-                                Vector3D coords_out[ 3 ], double epsilon );
+    bool non_colinear_vertices( const MsqVertex* vertex_array, size_t num_vertices, Vector3D coords_out[ 3 ],
+                                double epsilon );
 
-    bool non_coplanar_vertices( const MsqVertex* vertex_array, size_t num_vertices,
-                                Vector3D coords_out[ 4 ], double epsilon );
+    bool non_coplanar_vertices( const MsqVertex* vertex_array, size_t num_vertices, Vector3D coords_out[ 4 ],
+                                double epsilon );
 
 }  // namespace DomainUtil
 

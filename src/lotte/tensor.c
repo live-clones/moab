@@ -10,8 +10,7 @@
       C is always column-major
   --------------------------------------------------------------------------*/
 
-static void mxm_cc( const realType* A, unsigned na, const realType* B, unsigned nb, realType* C,
-                    unsigned nc )
+static void mxm_cc( const realType* A, unsigned na, const realType* B, unsigned nb, realType* C, unsigned nc )
 {
     unsigned        i, j, k;
     realType*       Ccol = C;
@@ -27,8 +26,7 @@ static void mxm_cc( const realType* A, unsigned na, const realType* B, unsigned 
     }
 }
 
-static void mxm_rc( const realType* A, unsigned na, const realType* B, unsigned nb, realType* C,
-                    unsigned nc )
+static void mxm_rc( const realType* A, unsigned na, const realType* B, unsigned nb, realType* C, unsigned nc )
 {
     unsigned        i, j, k;
     realType*       Ccol = C;
@@ -45,8 +43,7 @@ static void mxm_rc( const realType* A, unsigned na, const realType* B, unsigned 
     }
 }
 
-static void mxm_cr( const realType* A, unsigned na, const realType* B, unsigned nb, realType* C,
-                    unsigned nc )
+static void mxm_cr( const realType* A, unsigned na, const realType* B, unsigned nb, realType* C, unsigned nc )
 {
     unsigned        i, j, k;
     const realType *Acol = A, *Brow = B;
@@ -166,16 +163,16 @@ void tensor_r1( const realType* R, unsigned mr, unsigned nr, const realType* u, 
 }
 
 /* W holds mr*ns reals */
-void tensor_c2( const realType* R, unsigned mr, unsigned nr, const realType* S, unsigned ms,
-                unsigned ns, const realType* u, realType* v, realType* W )
+void tensor_c2( const realType* R, unsigned mr, unsigned nr, const realType* S, unsigned ms, unsigned ns,
+                const realType* u, realType* v, realType* W )
 {
     mxm_cc( R, mr, u, nr, W, ns );
     mxm_cr( W, mr, S, ns, v, ms );
 }
 
 /* W holds mr*ns reals */
-void tensor_r2( const realType* R, unsigned mr, unsigned nr, const realType* S, unsigned ms,
-                unsigned ns, const realType* u, realType* v, realType* W )
+void tensor_r2( const realType* R, unsigned mr, unsigned nr, const realType* S, unsigned ms, unsigned ns,
+                const realType* u, realType* v, realType* W )
 {
     mxm_rc( R, mr, u, nr, W, ns );
     mxm_cc( W, mr, S, ns, v, ms );
@@ -183,9 +180,8 @@ void tensor_r2( const realType* R, unsigned mr, unsigned nr, const realType* S, 
 
 /* W holds mr*ns*nt reals,
    Z holds mr*ms*nt reals */
-void tensor_c3( const realType* R, unsigned mr, unsigned nr, const realType* S, unsigned ms,
-                unsigned ns, const realType* T, unsigned mt, unsigned nt, const realType* u,
-                realType* v, realType* W, realType* Z )
+void tensor_c3( const realType* R, unsigned mr, unsigned nr, const realType* S, unsigned ms, unsigned ns,
+                const realType* T, unsigned mt, unsigned nt, const realType* u, realType* v, realType* W, realType* Z )
 {
     unsigned  n, mrns = mr * ns, mrms = mr * ms;
     realType* Zp = Z;
@@ -197,9 +193,8 @@ void tensor_c3( const realType* R, unsigned mr, unsigned nr, const realType* S, 
 
 /* W holds mr*ns*nt reals,
    Z holds mr*ms*nt reals */
-void tensor_r3( const realType* R, unsigned mr, unsigned nr, const realType* S, unsigned ms,
-                unsigned ns, const realType* T, unsigned mt, unsigned nt, const realType* u,
-                realType* v, realType* W, realType* Z )
+void tensor_r3( const realType* R, unsigned mr, unsigned nr, const realType* S, unsigned ms, unsigned ns,
+                const realType* T, unsigned mt, unsigned nt, const realType* u, realType* v, realType* W, realType* Z )
 {
     unsigned  n, mrns = mr * ns, mrms = mr * ms;
     realType* Zp = Z;
@@ -227,16 +222,16 @@ realType tensor_i1( const realType* Jr, unsigned nr, const realType* u )
 }
 
 /* work holds ns reals */
-realType tensor_i2( const realType* Jr, unsigned nr, const realType* Js, unsigned ns,
-                    const realType* u, realType* work )
+realType tensor_i2( const realType* Jr, unsigned nr, const realType* Js, unsigned ns, const realType* u,
+                    realType* work )
 {
     mxv_r( work, ns, u, Jr, nr );
     return inner( Js, work, ns );
 }
 
 /* work holds ns*nt + nt reals */
-realType tensor_i3( const realType* Jr, unsigned nr, const realType* Js, unsigned ns,
-                    const realType* Jt, unsigned nt, const realType* u, realType* work )
+realType tensor_i3( const realType* Jr, unsigned nr, const realType* Js, unsigned ns, const realType* Jt, unsigned nt,
+                    const realType* u, realType* work )
 {
     realType* work2 = work + nt;
     mxv_r( work2, ns * nt, u, Jr, nr );
@@ -260,17 +255,15 @@ realType tensor_i3( const realType* Jr, unsigned nr, const realType* Js, unsigne
      v is a scalar, g is an array of 3 reals
   --------------------------------------------------------------------------*/
 
-realType tensor_ig1( const realType* Jr, const realType* Dr, unsigned nr, const realType* u,
-                     realType* g )
+realType tensor_ig1( const realType* Jr, const realType* Dr, unsigned nr, const realType* u, realType* g )
 {
     *g = inner( Dr, u, nr );
     return inner( Jr, u, nr );
 }
 
 /* work holds 2*ns reals */
-realType tensor_ig2( const realType* Jr, const realType* Dr, unsigned nr, const realType* Js,
-                     const realType* Ds, unsigned ns, const realType* u, realType* g,
-                     realType* work )
+realType tensor_ig2( const realType* Jr, const realType* Dr, unsigned nr, const realType* Js, const realType* Ds,
+                     unsigned ns, const realType* u, realType* g, realType* work )
 {
     realType *a = work, *ar = a + ns;
     mxv_r( a, ns, u, Jr, nr );
@@ -281,9 +274,9 @@ realType tensor_ig2( const realType* Jr, const realType* Dr, unsigned nr, const 
 }
 
 /* work holds 2*ns*nt + 3*ns reals */
-realType tensor_ig3( const realType* Jr, const realType* Dr, unsigned nr, const realType* Js,
-                     const realType* Ds, unsigned ns, const realType* Jt, const realType* Dt,
-                     unsigned nt, const realType* u, realType* g, realType* work )
+realType tensor_ig3( const realType* Jr, const realType* Dr, unsigned nr, const realType* Js, const realType* Ds,
+                     unsigned ns, const realType* Jt, const realType* Dt, unsigned nt, const realType* u, realType* g,
+                     realType* work )
 {
     unsigned  nsnt = ns * nt;
     realType *a = work, *ar = a + nsnt, *b = ar + nsnt, *br = b + ns, *bs = br + ns;

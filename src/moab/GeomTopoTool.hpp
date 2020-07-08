@@ -69,21 +69,16 @@ class GeomTopoTool
     //! Returns MB_ENTITY_NOT_FOUND if no relationship found
     ErrorCode get_sense( EntityHandle entity, EntityHandle wrt_entity, int& sense );
     //! Get the sense of the surface(s) with respect to the volume
-    ErrorCode get_surface_senses( EntityHandle volume, int num_surfs, const EntityHandle* surfs,
-                                  int* senses_out );
+    ErrorCode get_surface_senses( EntityHandle volume, int num_surfs, const EntityHandle* surfs, int* senses_out );
     //! Get the senses of a surface with respect to its volumes
-    ErrorCode get_surface_senses( EntityHandle surface_ent, EntityHandle& forward_vol,
-                                  EntityHandle& reverse_vol );
+    ErrorCode get_surface_senses( EntityHandle surface_ent, EntityHandle& forward_vol, EntityHandle& reverse_vol );
 
     //! Set the senses of a surface with respect to its volumes
-    ErrorCode set_surface_senses( EntityHandle surface_ent, EntityHandle forward_vol,
-                                  EntityHandle reverse_vol );
+    ErrorCode set_surface_senses( EntityHandle surface_ent, EntityHandle forward_vol, EntityHandle reverse_vol );
     //! Get the senses of the lower dimension entity handle wrt the higher dimension entities
-    ErrorCode get_senses( EntityHandle entity, std::vector< EntityHandle >& wrt_entities,
-                          std::vector< int >& senses );
+    ErrorCode get_senses( EntityHandle entity, std::vector< EntityHandle >& wrt_entities, std::vector< int >& senses );
     //! Set the senses of the entity wrt multiple higher dimension entities
-    ErrorCode set_senses( EntityHandle entity, std::vector< EntityHandle >& wrt_entities,
-                          std::vector< int >& senses );
+    ErrorCode set_senses( EntityHandle entity, std::vector< EntityHandle >& wrt_entities, std::vector< int >& senses );
 
     /** \brief Get the volume on the other side of a surface
      *
@@ -120,8 +115,8 @@ class GeomTopoTool
      * @param axis2 scaled axis two of the oriented bounding box
      * @param axis3 scaled axis three of the oriented bounding box
      */
-    ErrorCode get_obb( EntityHandle volume, double center[ 3 ], double axis1[ 3 ],
-                       double axis2[ 3 ], double axis3[ 3 ] );
+    ErrorCode get_obb( EntityHandle volume, double center[ 3 ], double axis1[ 3 ], double axis2[ 3 ],
+                       double axis3[ 3 ] );
 
     /** \brief Get the other (d-1)-dimensional entity bounding a set across a (d-2)-dimensional
      * entity
@@ -136,8 +131,7 @@ class GeomTopoTool
      * In the special case where bounded is a curve, then not_this can be a vertex and across zero.
      * This function returns the other vertex on the curve.
      */
-    ErrorCode other_entity( EntityHandle bounded, EntityHandle not_this, EntityHandle across,
-                            EntityHandle& other );
+    ErrorCode other_entity( EntityHandle bounded, EntityHandle not_this, EntityHandle across, EntityHandle& other );
 
     /** \brief Return the dimension of the set, or -1 if it's not a geom_dimension set
      */
@@ -213,8 +207,7 @@ class GeomTopoTool
     //  will take as input a pointer to a std::vector of gents (surfaces and volumes, usually),
     //  which will serve to filter the gents from modelSet (only dependents will be part of the new
     //  gtt) if the pointer is null, all gsets in the original modelSet are duplicated
-    ErrorCode duplicate_model( GeomTopoTool*&               duplicate,
-                               std::vector< EntityHandle >* pvGEnts = NULL );
+    ErrorCode duplicate_model( GeomTopoTool*& duplicate, std::vector< EntityHandle >* pvGEnts = NULL );
 
     //! Return the model set handle (this is the full geometry)
     EntityHandle get_root_model_set( )
@@ -351,8 +344,7 @@ class GeomTopoTool
 
     //! Used by restore_topology_from_geometric_inclusion to generate the
     //  hierarchical tree of volumes
-    ErrorCode insert_in_tree( const EntityHandle ct_root, const EntityHandle volume,
-                              GeomQueryTool* GQT );
+    ErrorCode insert_in_tree( const EntityHandle ct_root, const EntityHandle volume, GeomQueryTool* GQT );
 };
 
 inline int GeomTopoTool::num_ents_of_dim( int dim )

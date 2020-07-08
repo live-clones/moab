@@ -24,30 +24,26 @@
 namespace moab
 {
 
-MeshSetSequence::MeshSetSequence( EntityHandle start, EntityID count, const unsigned* flags,
-                                  SequenceData* dat )
+MeshSetSequence::MeshSetSequence( EntityHandle start, EntityID count, const unsigned* flags, SequenceData* dat )
     : EntitySequence( start, count, dat )
 {
     initialize( flags );
 }
 
-MeshSetSequence::MeshSetSequence( EntityHandle start, EntityID count, unsigned flags,
-                                  SequenceData* dat )
+MeshSetSequence::MeshSetSequence( EntityHandle start, EntityID count, unsigned flags, SequenceData* dat )
     : EntitySequence( start, count, dat )
 {
     std::vector< unsigned > vect( count, flags );
     initialize( &vect[ 0 ] );
 }
 
-MeshSetSequence::MeshSetSequence( EntityHandle start, EntityID count, const unsigned* flags,
-                                  EntityID data_size )
+MeshSetSequence::MeshSetSequence( EntityHandle start, EntityID count, const unsigned* flags, EntityID data_size )
     : EntitySequence( start, count, new SequenceData( 1, start, start + data_size - 1 ) )
 {
     initialize( flags );
 }
 
-MeshSetSequence::MeshSetSequence( EntityHandle start, EntityID count, unsigned flags,
-                                  EntityID data_size )
+MeshSetSequence::MeshSetSequence( EntityHandle start, EntityID count, unsigned flags, EntityID data_size )
     : EntitySequence( start, count, new SequenceData( 1, start, start + data_size - 1 ) )
 {
     std::vector< unsigned > vect( count, flags );
@@ -122,8 +118,7 @@ void MeshSetSequence::get_const_memory_use( unsigned long& per_ent, unsigned lon
     seq_size = sizeof( *this );
 }
 
-unsigned long MeshSetSequence::get_per_entity_memory_use( EntityHandle first,
-                                                          EntityHandle last ) const
+unsigned long MeshSetSequence::get_per_entity_memory_use( EntityHandle first, EntityHandle last ) const
 {
     if( first < start_handle( ) ) first = start_handle( );
     if( last > end_handle( ) ) last = end_handle( );
@@ -134,8 +129,8 @@ unsigned long MeshSetSequence::get_per_entity_memory_use( EntityHandle first,
     return sum;
 }
 
-ErrorCode MeshSetSequence::get_entities( const SequenceManager* seqman, EntityHandle handle,
-                                         Range& entities, bool recursive ) const
+ErrorCode MeshSetSequence::get_entities( const SequenceManager* seqman, EntityHandle handle, Range& entities,
+                                         bool recursive ) const
 {
     if( !recursive )
     {
@@ -152,16 +147,14 @@ ErrorCode MeshSetSequence::get_entities( const SequenceManager* seqman, EntityHa
     }
 }
 
-ErrorCode MeshSetSequence::get_entities( EntityHandle                 handle,
-                                         std::vector< EntityHandle >& entities ) const
+ErrorCode MeshSetSequence::get_entities( EntityHandle handle, std::vector< EntityHandle >& entities ) const
 {
     get_set( handle )->get_entities( entities );
     return MB_SUCCESS;
 }
 
-ErrorCode MeshSetSequence::get_dimension( const SequenceManager* seqman, EntityHandle handle,
-                                          int dimension, std::vector< EntityHandle >& entities,
-                                          bool recursive ) const
+ErrorCode MeshSetSequence::get_dimension( const SequenceManager* seqman, EntityHandle handle, int dimension,
+                                          std::vector< EntityHandle >& entities, bool recursive ) const
 {
     if( !recursive )
     {
@@ -178,8 +171,8 @@ ErrorCode MeshSetSequence::get_dimension( const SequenceManager* seqman, EntityH
     }
 }
 
-ErrorCode MeshSetSequence::get_dimension( const SequenceManager* seqman, EntityHandle handle,
-                                          int dimension, Range& entities, bool recursive ) const
+ErrorCode MeshSetSequence::get_dimension( const SequenceManager* seqman, EntityHandle handle, int dimension,
+                                          Range& entities, bool recursive ) const
 {
     if( !recursive )
     {
@@ -196,9 +189,8 @@ ErrorCode MeshSetSequence::get_dimension( const SequenceManager* seqman, EntityH
     }
 }
 
-ErrorCode MeshSetSequence::get_type( const SequenceManager* seqman, EntityHandle handle,
-                                     EntityType tp, std::vector< EntityHandle >& entities,
-                                     bool recursive ) const
+ErrorCode MeshSetSequence::get_type( const SequenceManager* seqman, EntityHandle handle, EntityType tp,
+                                     std::vector< EntityHandle >& entities, bool recursive ) const
 {
     if( !recursive )
     {
@@ -233,8 +225,8 @@ ErrorCode MeshSetSequence::get_type( const SequenceManager* seqman, EntityHandle
     }
 }
 
-ErrorCode MeshSetSequence::get_type( const SequenceManager* seqman, EntityHandle handle,
-                                     EntityType tp, Range& entities, bool recursive ) const
+ErrorCode MeshSetSequence::get_type( const SequenceManager* seqman, EntityHandle handle, EntityType tp, Range& entities,
+                                     bool recursive ) const
 {
     if( !recursive )
     {
@@ -263,8 +255,8 @@ ErrorCode MeshSetSequence::get_type( const SequenceManager* seqman, EntityHandle
     }
 }
 
-ErrorCode MeshSetSequence::num_entities( const SequenceManager* seqman, EntityHandle handle,
-                                         int& number, bool recursive ) const
+ErrorCode MeshSetSequence::num_entities( const SequenceManager* seqman, EntityHandle handle, int& number,
+                                         bool recursive ) const
 {
     if( !recursive )
     {
@@ -280,8 +272,8 @@ ErrorCode MeshSetSequence::num_entities( const SequenceManager* seqman, EntityHa
     }
 }
 
-ErrorCode MeshSetSequence::num_dimension( const SequenceManager* seqman, EntityHandle handle,
-                                          int dimension, int& number, bool recursive ) const
+ErrorCode MeshSetSequence::num_dimension( const SequenceManager* seqman, EntityHandle handle, int dimension,
+                                          int& number, bool recursive ) const
 {
     if( !recursive )
     {
@@ -297,8 +289,8 @@ ErrorCode MeshSetSequence::num_dimension( const SequenceManager* seqman, EntityH
     }
 }
 
-ErrorCode MeshSetSequence::num_type( const SequenceManager* seqman, EntityHandle handle,
-                                     EntityType tp, int& number, bool recursive ) const
+ErrorCode MeshSetSequence::num_type( const SequenceManager* seqman, EntityHandle handle, EntityType tp, int& number,
+                                     bool recursive ) const
 {
     if( !recursive )
     {
@@ -314,11 +306,9 @@ ErrorCode MeshSetSequence::num_type( const SequenceManager* seqman, EntityHandle
     }
 }
 
-ErrorCode MeshSetSequence::recursive_get_sets( EntityHandle                   start_set,
-                                               const SequenceManager*         seq_sets,
-                                               std::vector< const MeshSet* >* sets,
-                                               Range*                         set_handles,
-                                               std::vector< EntityHandle >*   set_vector )
+ErrorCode MeshSetSequence::recursive_get_sets( EntityHandle start_set, const SequenceManager* seq_sets,
+                                               std::vector< const MeshSet* >* sets, Range* set_handles,
+                                               std::vector< EntityHandle >* set_vector )
 {
     std::set< EntityHandle >    visited;
     std::vector< EntityHandle > stack;
@@ -395,10 +385,9 @@ ErrorCode MeshSetSequence::recursive_get_sets( EntityHandle start_set, SequenceM
     return MB_SUCCESS;
 }
 
-ErrorCode MeshSetSequence::get_parent_child_meshsets( EntityHandle                 meshset,
-                                                      const SequenceManager*       seq_sets,
-                                                      std::vector< EntityHandle >& results,
-                                                      int num_hops, SearchType link_type ) const
+ErrorCode MeshSetSequence::get_parent_child_meshsets( EntityHandle meshset, const SequenceManager* seq_sets,
+                                                      std::vector< EntityHandle >& results, int num_hops,
+                                                      SearchType link_type ) const
 {
     ErrorCode                             result = MB_SUCCESS;
     std::vector< EntityHandle >::iterator i;
@@ -430,8 +419,7 @@ ErrorCode MeshSetSequence::get_parent_child_meshsets( EntityHandle              
             const EntitySequence* seq;
             ErrorCode             rval = seq_sets->find( *i, seq );
             if( MB_SUCCESS != rval ) return rval;
-            const MeshSet* ms_ptr =
-                reinterpret_cast< const MeshSetSequence* >( seq )->get_set( *i );
+            const MeshSet* ms_ptr = reinterpret_cast< const MeshSetSequence* >( seq )->get_set( *i );
 
             switch( link_type )
             {
@@ -441,15 +429,13 @@ ErrorCode MeshSetSequence::get_parent_child_meshsets( EntityHandle              
                     if( ms_ptr->vector_based( ) )
                     {
                         for( ; tmp_array != end; ++tmp_array )
-                            if( MBENTITYSET == TYPE_FROM_HANDLE( *tmp_array ) &&
-                                visited.insert( *tmp_array ).second )
+                            if( MBENTITYSET == TYPE_FROM_HANDLE( *tmp_array ) && visited.insert( *tmp_array ).second )
                                 lists[ 1 - index ].push_back( *tmp_array );
                     }
                     else
                     {
                         assert( n % 2 == 0 );
-                        tmp_array = std::lower_bound( tmp_array, tmp_array + n,
-                                                      FIRST_HANDLE( MBENTITYSET ) );
+                        tmp_array = std::lower_bound( tmp_array, tmp_array + n, FIRST_HANDLE( MBENTITYSET ) );
                         // only part of first block is of type
                         if( ( end - tmp_array ) % 2 )
                         {
@@ -478,8 +464,7 @@ ErrorCode MeshSetSequence::get_parent_child_meshsets( EntityHandle              
 
             // copy any parents/children we haven't visited yet into list
             for( end = tmp_array + count; tmp_array != end; ++tmp_array )
-                if( visited.insert( *tmp_array ).second )
-                    lists[ 1 - index ].push_back( *tmp_array );
+                if( visited.insert( *tmp_array ).second ) lists[ 1 - index ].push_back( *tmp_array );
         }
 
         // iterate
@@ -547,8 +532,7 @@ ErrorCode MeshSetSequence::get_children( const SequenceManager* seqman, EntityHa
 }
 
 ErrorCode MeshSetSequence::get_contained_sets( const SequenceManager* seqman, EntityHandle handle,
-                                               std::vector< EntityHandle >& contained,
-                                               int                          num_hops ) const
+                                               std::vector< EntityHandle >& contained, int num_hops ) const
 {
     if( num_hops == 1 && contained.empty( ) )
     { return get_set( handle )->get_entities_by_type( MBENTITYSET, contained ); }
@@ -559,8 +543,8 @@ ErrorCode MeshSetSequence::get_contained_sets( const SequenceManager* seqman, En
         return get_parent_child_meshsets( handle, seqman, contained, -1, CONTAINED );
 }
 
-ErrorCode MeshSetSequence::num_parents( const SequenceManager* seqman, EntityHandle handle,
-                                        int& number, int num_hops ) const
+ErrorCode MeshSetSequence::num_parents( const SequenceManager* seqman, EntityHandle handle, int& number,
+                                        int num_hops ) const
 {
     if( num_hops == 1 )
     {
@@ -574,8 +558,8 @@ ErrorCode MeshSetSequence::num_parents( const SequenceManager* seqman, EntityHan
     return result;
 }
 
-ErrorCode MeshSetSequence::num_children( const SequenceManager* seqman, EntityHandle handle,
-                                         int& number, int num_hops ) const
+ErrorCode MeshSetSequence::num_children( const SequenceManager* seqman, EntityHandle handle, int& number,
+                                         int num_hops ) const
 {
     if( num_hops == 1 )
     {
@@ -589,8 +573,8 @@ ErrorCode MeshSetSequence::num_children( const SequenceManager* seqman, EntityHa
     return result;
 }
 
-ErrorCode MeshSetSequence::num_contained_sets( const SequenceManager* seqman, EntityHandle handle,
-                                               int& number, int num_hops ) const
+ErrorCode MeshSetSequence::num_contained_sets( const SequenceManager* seqman, EntityHandle handle, int& number,
+                                               int num_hops ) const
 {
     if( num_hops == 1 )
     {

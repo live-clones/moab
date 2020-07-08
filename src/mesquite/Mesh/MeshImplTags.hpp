@@ -122,13 +122,10 @@ class MeshImplTags
          *\param default_val Default value for tag
          *\param vtk_type Attribute type in VTK file
          */
-        inline TagData( const std::string& name, Mesh::TagType type, unsigned length,
-                        void*                   default_val = 0,
-                        TagDescription::VtkType vtk_type = TagDescription::NONE,
-                        const std::string&      field_member = "" )
-            : desc( name, type, vtk_type, length * size_from_tag_type( type ), field_member ),
-              elementData( 0 ), elementCount( 0 ), vertexData( 0 ), vertexCount( 0 ),
-              defaultValue( default_val )
+        inline TagData( const std::string& name, Mesh::TagType type, unsigned length, void* default_val = 0,
+                        TagDescription::VtkType vtk_type = TagDescription::NONE, const std::string& field_member = "" )
+            : desc( name, type, vtk_type, length * size_from_tag_type( type ), field_member ), elementData( 0 ),
+              elementCount( 0 ), vertexData( 0 ), vertexCount( 0 ), defaultValue( default_val )
         {
         }
 
@@ -136,8 +133,7 @@ class MeshImplTags
          *\param desc Tag description object
          */
         inline TagData( const TagDescription& descr )
-            : desc( descr ), elementData( 0 ), elementCount( 0 ), vertexData( 0 ), vertexCount( 0 ),
-              defaultValue( 0 )
+            : desc( descr ), elementData( 0 ), elementCount( 0 ), vertexData( 0 ), vertexCount( 0 ), defaultValue( 0 )
         {
         }
 
@@ -164,8 +160,7 @@ class MeshImplTags
      *\param length Number of values in tag (array length, 1 for scalar)
      *\param defval Optional default value for tag
      */
-    size_t create( const std::string& name, Mesh::TagType type, unsigned length, const void* defval,
-                   MsqError& err );
+    size_t create( const std::string& name, Mesh::TagType type, unsigned length, const void* defval, MsqError& err );
 
     /** \brief Create a new tag
      *
@@ -177,20 +172,20 @@ class MeshImplTags
     void destroy( size_t tag_index, MsqError& err );
 
     /**\brief Set tag data on elements */
-    void set_element_data( size_t tag_handle, size_t num_indices, const size_t* elem_indices,
-                           const void* tag_data, MsqError& err );
+    void set_element_data( size_t tag_handle, size_t num_indices, const size_t* elem_indices, const void* tag_data,
+                           MsqError& err );
 
     /**\brief Set tag data on vertices */
-    void set_vertex_data( size_t tag_handle, size_t num_indices, const size_t* elem_indices,
-                          const void* tag_data, MsqError& err );
+    void set_vertex_data( size_t tag_handle, size_t num_indices, const size_t* elem_indices, const void* tag_data,
+                          MsqError& err );
 
     /**\brief Get tag data on elements */
-    void get_element_data( size_t tag_handle, size_t num_indices, const size_t* elem_indices,
-                           void* tag_data, MsqError& err ) const;
+    void get_element_data( size_t tag_handle, size_t num_indices, const size_t* elem_indices, void* tag_data,
+                           MsqError& err ) const;
 
     /**\brief Get tag data on vertices */
-    void get_vertex_data( size_t tag_handle, size_t num_indices, const size_t* elem_indices,
-                          void* tag_data, MsqError& err ) const;
+    void get_vertex_data( size_t tag_handle, size_t num_indices, const size_t* elem_indices, void* tag_data,
+                          MsqError& err ) const;
 
     /**\class TagIterator
      *

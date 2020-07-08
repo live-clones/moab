@@ -69,60 +69,52 @@ template< typename T > inline T itaps_set_cast_( EntityHandle h )
 }
 
 // define conversion routines between itaps handle and EntityHandle types
-#define DECLARE_ALLOWED_ITAPS_CONVERSION( ITAPS_HANDLE_TYPE )                                     \
-    template<>                                                                                    \
-    inline ITAPS_HANDLE_TYPE itaps_cast< ITAPS_HANDLE_TYPE, EntityHandle >( EntityHandle h )      \
-    {                                                                                             \
-        return itaps_cast_internal_< ITAPS_HANDLE_TYPE >( h );                                    \
-    }                                                                                             \
-                                                                                                  \
-    template<>                                                                                    \
-    inline EntityHandle itaps_cast< EntityHandle, ITAPS_HANDLE_TYPE >( ITAPS_HANDLE_TYPE handle ) \
-    {                                                                                             \
-        return reinterpret_cast< EntityHandle >( handle );                                        \
-    }                                                                                             \
-                                                                                                  \
-    template<>                                                                                    \
-    inline EntityHandle* itaps_cast< EntityHandle*, ITAPS_HANDLE_TYPE* >( ITAPS_HANDLE_TYPE *     \
-                                                                          ptr )                   \
-    {                                                                                             \
-        return itaps_cast_ptr_( ptr );                                                            \
-    }                                                                                             \
-                                                                                                  \
-    template<>                                                                                    \
-    inline const EntityHandle* itaps_cast< const EntityHandle*, const ITAPS_HANDLE_TYPE* >(       \
-        const ITAPS_HANDLE_TYPE* ptr )                                                            \
-    {                                                                                             \
-        return itaps_cast_const_ptr_( ptr );                                                      \
+#define DECLARE_ALLOWED_ITAPS_CONVERSION( ITAPS_HANDLE_TYPE )                                                  \
+    template<> inline ITAPS_HANDLE_TYPE itaps_cast< ITAPS_HANDLE_TYPE, EntityHandle >( EntityHandle h )        \
+    {                                                                                                          \
+        return itaps_cast_internal_< ITAPS_HANDLE_TYPE >( h );                                                 \
+    }                                                                                                          \
+                                                                                                               \
+    template<> inline EntityHandle itaps_cast< EntityHandle, ITAPS_HANDLE_TYPE >( ITAPS_HANDLE_TYPE handle )   \
+    {                                                                                                          \
+        return reinterpret_cast< EntityHandle >( handle );                                                     \
+    }                                                                                                          \
+                                                                                                               \
+    template<> inline EntityHandle* itaps_cast< EntityHandle*, ITAPS_HANDLE_TYPE* >( ITAPS_HANDLE_TYPE * ptr ) \
+    {                                                                                                          \
+        return itaps_cast_ptr_( ptr );                                                                         \
+    }                                                                                                          \
+                                                                                                               \
+    template<>                                                                                                 \
+    inline const EntityHandle* itaps_cast< const EntityHandle*, const ITAPS_HANDLE_TYPE* >(                    \
+        const ITAPS_HANDLE_TYPE* ptr )                                                                         \
+    {                                                                                                          \
+        return itaps_cast_const_ptr_( ptr );                                                                   \
     }
 
 // define conversion routines between itaps handle and EntityHandle types
 // but limit to EntityHandle for MBENTITYSET type.
-#define DECLARE_ALLOWED_ITAPS_SET_CONVERSION( ITAPS_HANDLE_TYPE )                                 \
-    template<>                                                                                    \
-    inline ITAPS_HANDLE_TYPE itaps_cast< ITAPS_HANDLE_TYPE, EntityHandle >( EntityHandle h )      \
-    {                                                                                             \
-        return itaps_set_cast_< ITAPS_HANDLE_TYPE >( h );                                         \
-    }                                                                                             \
-                                                                                                  \
-    template<>                                                                                    \
-    inline EntityHandle itaps_cast< EntityHandle, ITAPS_HANDLE_TYPE >( ITAPS_HANDLE_TYPE handle ) \
-    {                                                                                             \
-        return reinterpret_cast< EntityHandle >( handle );                                        \
-    }                                                                                             \
-                                                                                                  \
-    template<>                                                                                    \
-    inline EntityHandle* itaps_cast< EntityHandle*, ITAPS_HANDLE_TYPE* >( ITAPS_HANDLE_TYPE *     \
-                                                                          ptr )                   \
-    {                                                                                             \
-        return itaps_cast_ptr_( ptr );                                                            \
-    }                                                                                             \
-                                                                                                  \
-    template<>                                                                                    \
-    inline const EntityHandle* itaps_cast< const EntityHandle*, const ITAPS_HANDLE_TYPE* >(       \
-        const ITAPS_HANDLE_TYPE* ptr )                                                            \
-    {                                                                                             \
-        return itaps_cast_const_ptr_( ptr );                                                      \
+#define DECLARE_ALLOWED_ITAPS_SET_CONVERSION( ITAPS_HANDLE_TYPE )                                              \
+    template<> inline ITAPS_HANDLE_TYPE itaps_cast< ITAPS_HANDLE_TYPE, EntityHandle >( EntityHandle h )        \
+    {                                                                                                          \
+        return itaps_set_cast_< ITAPS_HANDLE_TYPE >( h );                                                      \
+    }                                                                                                          \
+                                                                                                               \
+    template<> inline EntityHandle itaps_cast< EntityHandle, ITAPS_HANDLE_TYPE >( ITAPS_HANDLE_TYPE handle )   \
+    {                                                                                                          \
+        return reinterpret_cast< EntityHandle >( handle );                                                     \
+    }                                                                                                          \
+                                                                                                               \
+    template<> inline EntityHandle* itaps_cast< EntityHandle*, ITAPS_HANDLE_TYPE* >( ITAPS_HANDLE_TYPE * ptr ) \
+    {                                                                                                          \
+        return itaps_cast_ptr_( ptr );                                                                         \
+    }                                                                                                          \
+                                                                                                               \
+    template<>                                                                                                 \
+    inline const EntityHandle* itaps_cast< const EntityHandle*, const ITAPS_HANDLE_TYPE* >(                    \
+        const ITAPS_HANDLE_TYPE* ptr )                                                                         \
+    {                                                                                                          \
+        return itaps_cast_const_ptr_( ptr );                                                                   \
     }
 
 DECLARE_ALLOWED_ITAPS_SET_CONVERSION( iMeshP_PartitionHandle )
@@ -156,16 +148,14 @@ iBase_TagHandle itaps_tag_cast( Tag t )
 /********************* ITAPS arrays **************************/
 
 // Handle returning Range in ITAPS array (do ALLOCATE_ARRAY and copy).
-#define RANGE_TO_ITAPS_ARRAY( RANGE, NAME )                    \
-    do                                                         \
-    {                                                          \
-        ALLOC_CHECK_ARRAY_NOFAIL( NAME, ( RANGE ).size( ) );   \
-        std::copy( ( RANGE ).begin( ), ( RANGE ).end( ),       \
-                   itaps_cast< EntityHandle* >( *( NAME ) ) ); \
+#define RANGE_TO_ITAPS_ARRAY( RANGE, NAME )                                                          \
+    do                                                                                               \
+    {                                                                                                \
+        ALLOC_CHECK_ARRAY_NOFAIL( NAME, ( RANGE ).size( ) );                                         \
+        std::copy( ( RANGE ).begin( ), ( RANGE ).end( ), itaps_cast< EntityHandle* >( *( NAME ) ) ); \
     } while( false )
 
-static inline ErrorCode get_entities( Interface* iface, EntityHandle set, int type, int topology,
-                                      Range& entities )
+static inline ErrorCode get_entities( Interface* iface, EntityHandle set, int type, int topology, Range& entities )
 {
     if( topology != iMesh_ALL_TOPOLOGIES )
         return iface->get_entities_by_type( set, mb_topology_table[ topology ], entities );
@@ -214,9 +204,8 @@ static inline ErrorCode count_owned( ParallelComm* pcomm, const Range& ents, int
     return MB_SUCCESS;
 }
 
-static void set_intersection_query( iMesh_Instance instance, iMeshP_PartHandle set1,
-                                    iBase_EntitySetHandle set2, int type, int topo, Range& result,
-                                    int* err )
+static void set_intersection_query( iMesh_Instance instance, iMeshP_PartHandle set1, iBase_EntitySetHandle set2,
+                                    int type, int topo, Range& result, int* err )
 {
     ErrorCode rval;
 
@@ -241,9 +230,8 @@ static void set_intersection_query( iMesh_Instance instance, iMeshP_PartHandle s
 
 /********************* Iterators **************************/
 
-static ErrorCode get_boundary_entities( ParallelComm* pcomm, EntityHandle part_handle,
-                                        int entity_type, int entity_topology, int adj_part_id,
-                                        Range& entities_out )
+static ErrorCode get_boundary_entities( ParallelComm* pcomm, EntityHandle part_handle, int entity_type,
+                                        int entity_topology, int adj_part_id, Range& entities_out )
 {
     int* adj_part_id_ptr = ( adj_part_id == iMeshP_ALL_PARTS ) ? 0 : &adj_part_id;
 
@@ -267,19 +255,16 @@ class PartBoundaryIter : public MBRangeIter
     int           adjPart;
 
   public:
-    inline PartBoundaryIter( ParallelComm* pcomm, EntityHandle part_handle,
-                             iBase_EntityType entity_type, iMesh_EntityTopology entity_topology,
-                             int adj_part_id, int array_sz )
-        : MBRangeIter( entity_type, entity_topology, part_handle, array_sz ), pComm( pcomm ),
-          adjPart( adj_part_id )
+    inline PartBoundaryIter( ParallelComm* pcomm, EntityHandle part_handle, iBase_EntityType entity_type,
+                             iMesh_EntityTopology entity_topology, int adj_part_id, int array_sz )
+        : MBRangeIter( entity_type, entity_topology, part_handle, array_sz ), pComm( pcomm ), adjPart( adj_part_id )
     {
     }
 
     virtual ErrorCode reset( Interface* )
     {
         iterData.clear( );
-        ErrorCode result =
-            get_boundary_entities( pComm, entSet, entType, entTopo, adjPart, iterData );
+        ErrorCode result = get_boundary_entities( pComm, entSet, entType, entTopo, adjPart, iterData );
         iterPos = iterData.begin( );
         return result;
     }
@@ -291,8 +276,8 @@ template< class Container > class SetIntersectIter : public MBIter< Container >
     EntityHandle otherSet;
 
   public:
-    SetIntersectIter( iBase_EntityType type, iMesh_EntityTopology topology, EntityHandle set,
-                      EntityHandle other_set, int array_sz )
+    SetIntersectIter( iBase_EntityType type, iMesh_EntityTopology topology, EntityHandle set, EntityHandle other_set,
+                      int array_sz )
         : MBIter< Container >( type, topology, set, array_sz ), otherSet( other_set )
     {
     }
@@ -342,8 +327,8 @@ void iMeshP_createPartitionAll( iMesh_Instance                  instance,
     *partition_handle = 0;
 
     Tag       prtn_tag;
-    ErrorCode rval = MOABI->tag_get_handle( PARALLEL_PARTITIONING_TAG_NAME, 1, MB_TYPE_INTEGER,
-                                            prtn_tag, MB_TAG_SPARSE | MB_TAG_CREAT );CHKERR( rval, "tag creation failed" );
+    ErrorCode rval = MOABI->tag_get_handle( PARALLEL_PARTITIONING_TAG_NAME, 1, MB_TYPE_INTEGER, prtn_tag,
+                                            MB_TAG_SPARSE | MB_TAG_CREAT );CHKERR( rval, "tag creation failed" );
 
     EntityHandle handle;
     rval = MOABI->create_meshset( MESHSET_SET, handle );CHKERR( rval, "set creation failed" );
@@ -363,8 +348,7 @@ void iMeshP_createPartitionAll( iMesh_Instance                  instance,
     RETURN( iBase_SUCCESS );
 }
 
-void iMeshP_destroyPartitionAll( iMesh_Instance instance, iMeshP_PartitionHandle partition_handle,
-                                 int* err )
+void iMeshP_destroyPartitionAll( iMesh_Instance instance, iMeshP_PartitionHandle partition_handle, int* err )
 {
     ParallelComm* pcomm = PCOMM;
     if( pcomm ) delete pcomm;
@@ -373,30 +357,24 @@ void iMeshP_destroyPartitionAll( iMesh_Instance instance, iMeshP_PartitionHandle
     RETURN( iBase_SUCCESS );
 }
 
-void iMeshP_getPartIdFromPartHandle( iMesh_Instance               instance,
-                                     const iMeshP_PartitionHandle partition_handle,
-                                     const iMeshP_PartHandle part_handle, iMeshP_Part* part_id,
-                                     int* err )
+void iMeshP_getPartIdFromPartHandle( iMesh_Instance instance, const iMeshP_PartitionHandle partition_handle,
+                                     const iMeshP_PartHandle part_handle, iMeshP_Part* part_id, int* err )
 {
     int junk1 = 1, junk2;
-    iMeshP_getPartIdsFromPartHandlesArr( instance, partition_handle, &part_handle, 1, &part_id,
-                                         &junk1, &junk2, err );
+    iMeshP_getPartIdsFromPartHandlesArr( instance, partition_handle, &part_handle, 1, &part_id, &junk1, &junk2, err );
 }
 
-void iMeshP_getPartHandleFromPartId( iMesh_Instance               instance,
-                                     const iMeshP_PartitionHandle partition_handle,
+void iMeshP_getPartHandleFromPartId( iMesh_Instance instance, const iMeshP_PartitionHandle partition_handle,
                                      iMeshP_Part part_id, iMeshP_PartHandle* part_handle, int* err )
 {
     int junk1 = 1, junk2;
-    iMeshP_getPartHandlesFromPartsIdsArr( instance, partition_handle, &part_id, 1, &part_handle,
-                                          &junk1, &junk2, err );
+    iMeshP_getPartHandlesFromPartsIdsArr( instance, partition_handle, &part_id, 1, &part_handle, &junk1, &junk2, err );
 }
 
-void iMeshP_getPartIdsFromPartHandlesArr( iMesh_Instance               instance,
-                                          const iMeshP_PartitionHandle partition_handle,
-                                          const iMeshP_PartHandle*     part_handles,
-                                          const int part_handles_size, iMeshP_Part** part_ids,
-                                          int* part_ids_allocated, int* part_ids_size, int* err )
+void iMeshP_getPartIdsFromPartHandlesArr( iMesh_Instance instance, const iMeshP_PartitionHandle partition_handle,
+                                          const iMeshP_PartHandle* part_handles, const int part_handles_size,
+                                          iMeshP_Part** part_ids, int* part_ids_allocated, int* part_ids_size,
+                                          int* err )
 {
     ErrorCode     rval;
     ParallelComm* pcomm = PCOMM;
@@ -411,12 +389,10 @@ void iMeshP_getPartIdsFromPartHandlesArr( iMesh_Instance               instance,
     RETURN( iBase_SUCCESS );
 }
 
-void iMeshP_getPartHandlesFromPartsIdsArr( iMesh_Instance               instance,
-                                           const iMeshP_PartitionHandle partition_handle,
+void iMeshP_getPartHandlesFromPartsIdsArr( iMesh_Instance instance, const iMeshP_PartitionHandle partition_handle,
                                            const iMeshP_Part* part_ids, const int part_ids_size,
-                                           iMeshP_PartHandle** part_handles,
-                                           int* part_handles_allocated, int* part_handles_size,
-                                           int* err )
+                                           iMeshP_PartHandle** part_handles, int* part_handles_allocated,
+                                           int* part_handles_size, int* err )
 {
     ErrorCode     rval;
     ParallelComm* pcomm = PCOMM;
@@ -440,8 +416,7 @@ void iMeshP_getPartitionComm( iMesh_Instance instance, iMeshP_PartitionHandle pa
     RETURN( iBase_SUCCESS );
 }
 
-void iMeshP_syncPartitionAll( iMesh_Instance instance, iMeshP_PartitionHandle partition_handle,
-                              int* err )
+void iMeshP_syncPartitionAll( iMesh_Instance instance, iMeshP_PartitionHandle partition_handle, int* err )
 {
     ParallelComm* pcomm = PCOMM;
     if( !pcomm ) ERROR( iBase_FAILURE, "No PComm" );
@@ -483,9 +458,8 @@ void iMeshP_getPartitions( iMesh_Instance instance, iMeshP_PartitionHandle** par
     RETURN( iBase_SUCCESS );
 }
 
-void iMeshP_getNumGlobalParts( iMesh_Instance               instance,
-                               const iMeshP_PartitionHandle partition_handle, int* num_global_part,
-                               int* err )
+void iMeshP_getNumGlobalParts( iMesh_Instance instance, const iMeshP_PartitionHandle partition_handle,
+                               int* num_global_part, int* err )
 {
     ParallelComm* pcomm = PCOMM;
     if( !pcomm ) ERROR( iBase_FAILURE, "No PComm" );
@@ -494,9 +468,8 @@ void iMeshP_getNumGlobalParts( iMesh_Instance               instance,
     RETURN( iBase_SUCCESS );
 }
 
-void iMeshP_getNumLocalParts( iMesh_Instance               instance,
-                              const iMeshP_PartitionHandle partition_handle, int* num_local_part,
-                              int* err )
+void iMeshP_getNumLocalParts( iMesh_Instance instance, const iMeshP_PartitionHandle partition_handle,
+                              int* num_local_part, int* err )
 {
     ParallelComm* pcomm = PCOMM;
     if( !pcomm ) ERROR( iBase_FAILURE, "No PComm" );
@@ -506,8 +479,8 @@ void iMeshP_getNumLocalParts( iMesh_Instance               instance,
 }
 
 void iMeshP_getLocalParts( iMesh_Instance instance, const iMeshP_PartitionHandle partition_handle,
-                           iMeshP_PartHandle** part_handles, int* part_handles_allocated,
-                           int* part_handles_size, int* err )
+                           iMeshP_PartHandle** part_handles, int* part_handles_allocated, int* part_handles_size,
+                           int* err )
 {
     ParallelComm* pcomm = PCOMM;
     if( !pcomm ) ERROR( iBase_FAILURE, "No PComm" );
@@ -523,10 +496,9 @@ void iMeshP_getRankOfPart( iMesh_Instance instance, const iMeshP_PartitionHandle
     iMeshP_getRankOfPartArr( instance, partition_handle, &part_id, 1, &rank, &junk1, &junk2, err );
 }
 
-void iMeshP_getRankOfPartArr( iMesh_Instance               instance,
-                              const iMeshP_PartitionHandle partition_handle,
-                              const iMeshP_Part* part_ids, const int part_ids_size, int** rank,
-                              int* rank_allocated, int* rank_size, int* err )
+void iMeshP_getRankOfPartArr( iMesh_Instance instance, const iMeshP_PartitionHandle partition_handle,
+                              const iMeshP_Part* part_ids, const int part_ids_size, int** rank, int* rank_allocated,
+                              int* rank_size, int* err )
 {
     ParallelComm* pcomm = PCOMM;
     if( !pcomm ) ERROR( iBase_FAILURE, "No PComm" );
@@ -542,15 +514,15 @@ void iMeshP_getRankOfPartArr( iMesh_Instance               instance,
 }
 
 void iMeshP_getNumOfTypeAll( iMesh_Instance instance, const iMeshP_PartitionHandle partition_handle,
-                             const iBase_EntitySetHandle entity_set_handle, const int entity_type,
-                             int* num_type, int* err )
+                             const iBase_EntitySetHandle entity_set_handle, const int entity_type, int* num_type,
+                             int* err )
 {
     ParallelComm* pcomm = PCOMM;
     if( !pcomm ) ERROR( iBase_FAILURE, "No PComm" );
 
     Range     entities;
-    ErrorCode rval = get_entities( MOABI, itaps_cast< EntityHandle >( entity_set_handle ),
-                                   entity_type, iMesh_ALL_TOPOLOGIES, entities );
+    ErrorCode rval = get_entities( MOABI, itaps_cast< EntityHandle >( entity_set_handle ), entity_type,
+                                   iMesh_ALL_TOPOLOGIES, entities );
     int       count = 0;
     if( MB_SUCCESS == rval ) rval = count_owned( pcomm, entities, count );
 
@@ -564,15 +536,15 @@ void iMeshP_getNumOfTypeAll( iMesh_Instance instance, const iMeshP_PartitionHand
 }
 
 void iMeshP_getNumOfTopoAll( iMesh_Instance instance, const iMeshP_PartitionHandle partition_handle,
-                             const iBase_EntitySetHandle entity_set_handle,
-                             const int entity_topology, int* num_topo, int* err )
+                             const iBase_EntitySetHandle entity_set_handle, const int entity_topology, int* num_topo,
+                             int* err )
 {
     ParallelComm* pcomm = PCOMM;
     if( !pcomm ) ERROR( iBase_FAILURE, "No PComm" );
 
     Range     entities;
-    ErrorCode rval = get_entities( MOABI, itaps_cast< EntityHandle >( entity_set_handle ),
-                                   iBase_ALL_TYPES, entity_topology, entities );
+    ErrorCode rval = get_entities( MOABI, itaps_cast< EntityHandle >( entity_set_handle ), iBase_ALL_TYPES,
+                                   entity_topology, entities );
     int       count = 0;
     if( MB_SUCCESS == rval ) rval = count_owned( pcomm, entities, count );
 
@@ -608,19 +580,17 @@ void iMeshP_destroyPart( iMesh_Instance instance, iMeshP_PartitionHandle partiti
 }
 
 void iMeshP_getNumPartNbors( iMesh_Instance instance, iMeshP_PartitionHandle partition_handle,
-                             iMeshP_PartHandle part_handle, int entity_type, int* num_part_nbors,
-                             int* err )
+                             iMeshP_PartHandle part_handle, int entity_type, int* num_part_nbors, int* err )
 {
     int junk1 = 1, junk2 = 1;
-    iMeshP_getNumPartNborsArr( instance, partition_handle, &part_handle, 1, entity_type,
-                               &num_part_nbors, &junk1, &junk2, err );
+    iMeshP_getNumPartNborsArr( instance, partition_handle, &part_handle, 1, entity_type, &num_part_nbors, &junk1,
+                               &junk2, err );
 }
 
-void iMeshP_getNumPartNborsArr( iMesh_Instance               instance,
-                                const iMeshP_PartitionHandle partition_handle,
-                                const iMeshP_PartHandle* part_handles, const int part_handles_size,
-                                int /*entity_type*/, int**                       num_part_nbors,
-                                int* num_part_nbors_allocated, int* num_part_nbors_size, int* err )
+void iMeshP_getNumPartNborsArr( iMesh_Instance instance, const iMeshP_PartitionHandle partition_handle,
+                                const iMeshP_PartHandle* part_handles, const int part_handles_size, int /*entity_type*/,
+                                int** num_part_nbors, int* num_part_nbors_allocated, int* num_part_nbors_size,
+                                int* err )
 {
     ParallelComm* pcomm = PCOMM;
     if( !pcomm ) ERROR( iBase_FAILURE, "No PComm" );
@@ -642,21 +612,18 @@ void iMeshP_getNumPartNborsArr( iMesh_Instance               instance,
 
 void iMeshP_getPartNbors( iMesh_Instance instance, const iMeshP_PartitionHandle partition_handle,
                           const iMeshP_PartHandle part_handle, int entity_type, int* num_part_nbors,
-                          iMeshP_Part** nbor_part_ids, int* nbor_part_ids_allocated,
-                          int* nbor_part_ids_size, int* err )
+                          iMeshP_Part** nbor_part_ids, int* nbor_part_ids_allocated, int* nbor_part_ids_size, int* err )
 {
     int junk1 = 1, junk2 = 1;
-    iMeshP_getPartNborsArr( instance, partition_handle, &part_handle, 1, entity_type,
-                            &num_part_nbors, &junk1, &junk2, nbor_part_ids, nbor_part_ids_allocated,
-                            nbor_part_ids_size, err );
+    iMeshP_getPartNborsArr( instance, partition_handle, &part_handle, 1, entity_type, &num_part_nbors, &junk1, &junk2,
+                            nbor_part_ids, nbor_part_ids_allocated, nbor_part_ids_size, err );
 }
 
 void iMeshP_getPartNborsArr( iMesh_Instance instance, const iMeshP_PartitionHandle partition_handle,
-                             const iMeshP_PartHandle* part_handles, const int part_handles_size,
-                             int /*entity_type*/, int**                       num_part_nbors,
-                             int* num_part_nbors_allocated, int* num_part_nbors_size,
-                             iMeshP_Part** nbor_part_ids, int* nbor_part_ids_allocated,
-                             int* nbor_part_ids_size, int* err )
+                             const iMeshP_PartHandle* part_handles, const int part_handles_size, int /*entity_type*/,
+                             int** num_part_nbors, int* num_part_nbors_allocated, int* num_part_nbors_size,
+                             iMeshP_Part** nbor_part_ids, int* nbor_part_ids_allocated, int* nbor_part_ids_size,
+                             int* err )
 {
     ParallelComm* pcomm = PCOMM;
     if( !pcomm ) ERROR( iBase_FAILURE, "No PComm" );
@@ -681,110 +648,91 @@ void iMeshP_getPartNborsArr( iMesh_Instance instance, const iMeshP_PartitionHand
     RETURN( iBase_SUCCESS );
 }
 
-void iMeshP_getNumPartBdryEnts( iMesh_Instance               instance,
-                                const iMeshP_PartitionHandle partition_handle,
-                                const iMeshP_PartHandle part_handle, const int entity_type,
-                                const int entity_topology, const iMeshP_Part target_part_id,
-                                int* num_entities, int* err )
+void iMeshP_getNumPartBdryEnts( iMesh_Instance instance, const iMeshP_PartitionHandle partition_handle,
+                                const iMeshP_PartHandle part_handle, const int entity_type, const int entity_topology,
+                                const iMeshP_Part target_part_id, int* num_entities, int* err )
 {
     Range     entities;
-    ErrorCode rval =
-        get_boundary_entities( PCOMM, itaps_cast< EntityHandle >( part_handle ), entity_type,
-                               entity_topology, target_part_id, entities );CHKERR( rval, "failed to get boundary entities" );
+    ErrorCode rval = get_boundary_entities( PCOMM, itaps_cast< EntityHandle >( part_handle ), entity_type,
+                                            entity_topology, target_part_id, entities );CHKERR( rval, "failed to get boundary entities" );
     *num_entities = entities.size( );
     RETURN( iBase_SUCCESS );
 }
 
 void iMeshP_getPartBdryEnts( iMesh_Instance instance, const iMeshP_PartitionHandle partition_handle,
-                             const iMeshP_PartHandle part_handle, const int entity_type,
-                             const int entity_topology, const iMeshP_Part target_part_id,
-                             iBase_EntityHandle** entity_handles, int* entity_handles_allocated,
-                             int* entity_handles_size, int* err )
+                             const iMeshP_PartHandle part_handle, const int entity_type, const int entity_topology,
+                             const iMeshP_Part target_part_id, iBase_EntityHandle** entity_handles,
+                             int* entity_handles_allocated, int* entity_handles_size, int* err )
 {
     Range     entities;
-    ErrorCode rval =
-        get_boundary_entities( PCOMM, itaps_cast< EntityHandle >( part_handle ), entity_type,
-                               entity_topology, target_part_id, entities );CHKERR( rval, "failed to get boundary entities" );
+    ErrorCode rval = get_boundary_entities( PCOMM, itaps_cast< EntityHandle >( part_handle ), entity_type,
+                                            entity_topology, target_part_id, entities );CHKERR( rval, "failed to get boundary entities" );
     RANGE_TO_ITAPS_ARRAY( entities, entity_handles );
     RETURN( iBase_SUCCESS );
 }
 
-void iMeshP_initPartBdryEntIter( iMesh_Instance               instance,
-                                 const iMeshP_PartitionHandle partition_handle,
-                                 const iMeshP_PartHandle part_handle, const int entity_type,
-                                 const int entity_topology, const iMeshP_Part nbor_part_id,
-                                 iBase_EntityIterator* entity_iterator, int* err )
+void iMeshP_initPartBdryEntIter( iMesh_Instance instance, const iMeshP_PartitionHandle partition_handle,
+                                 const iMeshP_PartHandle part_handle, const int entity_type, const int entity_topology,
+                                 const iMeshP_Part nbor_part_id, iBase_EntityIterator* entity_iterator, int* err )
 {
-    iMeshP_initPartBdryEntArrIter(
-        instance, partition_handle, part_handle, entity_type, entity_topology, 1, nbor_part_id,
-        reinterpret_cast< iBase_EntityArrIterator* >( entity_iterator ), err );
+    iMeshP_initPartBdryEntArrIter( instance, partition_handle, part_handle, entity_type, entity_topology, 1,
+                                   nbor_part_id, reinterpret_cast< iBase_EntityArrIterator* >( entity_iterator ), err );
 }
 
-void iMeshP_initPartBdryEntArrIter( iMesh_Instance               instance,
-                                    const iMeshP_PartitionHandle partition_handle,
+void iMeshP_initPartBdryEntArrIter( iMesh_Instance instance, const iMeshP_PartitionHandle partition_handle,
                                     const iMeshP_PartHandle part_handle, const int entity_type,
-                                    const int entity_topology, const int array_size,
-                                    const iMeshP_Part        nbor_part_id,
+                                    const int entity_topology, const int array_size, const iMeshP_Part nbor_part_id,
                                     iBase_EntityArrIterator* entity_iterator, int* err )
 {
-    *entity_iterator = new PartBoundaryIter(
-        PCOMM, itaps_cast< EntityHandle >( part_handle ), (iBase_EntityType)entity_type,
-        (iMesh_EntityTopology)entity_topology, nbor_part_id, array_size );
+    *entity_iterator =
+        new PartBoundaryIter( PCOMM, itaps_cast< EntityHandle >( part_handle ), (iBase_EntityType)entity_type,
+                              (iMesh_EntityTopology)entity_topology, nbor_part_id, array_size );
     ErrorCode result = ( *entity_iterator )->reset( MOABI );
     if( MB_SUCCESS != result ) delete *entity_iterator;CHKERR( result, "iMesh_initEntArrIter: ERROR getting entities of proper type or topology." );
     RETURN( iBase_SUCCESS );
 }
 
-void iMeshP_getNumOfType( iMesh_Instance              instance, const iMeshP_PartitionHandle,
-                          const iMeshP_PartHandle     part_handle,
-                          const iBase_EntitySetHandle entity_set_handle, const int entity_type,
-                          int* num_type, int* err )
+void iMeshP_getNumOfType( iMesh_Instance instance, const iMeshP_PartitionHandle, const iMeshP_PartHandle part_handle,
+                          const iBase_EntitySetHandle entity_set_handle, const int entity_type, int* num_type,
+                          int* err )
 {
     Range r;
-    set_intersection_query( instance, part_handle, entity_set_handle, entity_type,
-                            iMesh_ALL_TOPOLOGIES, r, err );
+    set_intersection_query( instance, part_handle, entity_set_handle, entity_type, iMesh_ALL_TOPOLOGIES, r, err );
     *num_type = r.size( );
 }
 
-void iMeshP_getNumOfTopo( iMesh_Instance instance,
-                          const iMeshP_PartitionHandle /*partition_handle*/,
-                          const iMeshP_PartHandle     part_handle,
-                          const iBase_EntitySetHandle entity_set_handle, const int entity_topology,
-                          int* num_topo, int* err )
+void iMeshP_getNumOfTopo( iMesh_Instance          instance, const iMeshP_PartitionHandle /*partition_handle*/,
+                          const iMeshP_PartHandle part_handle, const iBase_EntitySetHandle entity_set_handle,
+                          const int entity_topology, int* num_topo, int* err )
 {
     Range r;
-    set_intersection_query( instance, part_handle, entity_set_handle, iBase_ALL_TYPES,
-                            entity_topology, r, err );
+    set_intersection_query( instance, part_handle, entity_set_handle, iBase_ALL_TYPES, entity_topology, r, err );
     *num_topo = r.size( );
 }
 
-void iMeshP_getAdjEntIndices( iMesh_Instance instance, iMeshP_PartitionHandle partition,
-                              iMeshP_PartHandle part, iBase_EntitySetHandle entity_set_handle,
-                              int entity_type_requestor, int entity_topology_requestor,
-                              int entity_type_requested, iBase_EntityHandle** entity_handles,
-                              int* entity_handles_allocated, int* entity_handles_size,
-                              iBase_EntityHandle** adj_entity_handles,
-                              int* adj_entity_handles_allocated, int* adj_entity_handles_size,
-                              int** adj_entity_indices, int* adj_entity_indices_allocated,
-                              int* adj_entity_indices_size, int** offset, int* offset_allocated,
-                              int* offset_size, int* err )
+void iMeshP_getAdjEntIndices( iMesh_Instance instance, iMeshP_PartitionHandle partition, iMeshP_PartHandle part,
+                              iBase_EntitySetHandle entity_set_handle, int entity_type_requestor,
+                              int entity_topology_requestor, int entity_type_requested,
+                              iBase_EntityHandle** entity_handles, int* entity_handles_allocated,
+                              int* entity_handles_size, iBase_EntityHandle** adj_entity_handles,
+                              int* adj_entity_handles_allocated, int* adj_entity_handles_size, int** adj_entity_indices,
+                              int* adj_entity_indices_allocated, int* adj_entity_indices_size, int** offset,
+                              int* offset_allocated, int* offset_size, int* err )
 {
     const int allocated_entity_handles = ( *entity_handles_allocated == 0 );
     const int allocated_indices = ( *adj_entity_indices_allocated == 0 );
     const int allocated_offset = ( *offset_allocated == 0 );
 
     // get source entities
-    iMeshP_getEntities( instance, partition, part, entity_set_handle, entity_type_requestor,
-                        entity_topology_requestor, entity_handles, entity_handles_allocated,
-                        entity_handles_size, err );
+    iMeshP_getEntities( instance, partition, part, entity_set_handle, entity_type_requestor, entity_topology_requestor,
+                        entity_handles, entity_handles_allocated, entity_handles_size, err );
     if( iBase_SUCCESS != *err ) return;
 
     // get adjacencies
     iBase_EntityHandle* all_adj_handles = 0;
     int                 size = 0, alloc = 0;
-    iMesh_getEntArrAdj( instance, *entity_handles, *entity_handles_size, entity_type_requested,
-                        &all_adj_handles, &alloc, &size, offset, offset_allocated, offset_size,
-                        err );
+    iMesh_getEntArrAdj( instance, *entity_handles, *entity_handles_size, entity_type_requested, &all_adj_handles,
+                        &alloc, &size, offset, offset_allocated, offset_size, err );
     if( *err != iBase_SUCCESS )
     {
         if( allocated_entity_handles )
@@ -850,8 +798,8 @@ void iMeshP_getAdjEntIndices( iMesh_Instance instance, iMeshP_PartitionHandle pa
     {
         if( !*adj_entity_handles_allocated )
         {
-            *adj_entity_handles = (iBase_EntityHandle*)malloc( sizeof( iBase_EntityHandle ) *
-                                                               *adj_entity_handles_size );
+            *adj_entity_handles =
+                (iBase_EntityHandle*)malloc( sizeof( iBase_EntityHandle ) * *adj_entity_handles_size );
             if( !*adj_entity_handles )
                 *err = iBase_MEMORY_ALLOCATION_FAILED;
             else
@@ -892,40 +840,35 @@ void iMeshP_getAdjEntIndices( iMesh_Instance instance, iMeshP_PartitionHandle pa
     // convert from adjacency list to indices into unique_adj
     for( int i = 0; i < *adj_entity_indices_size; ++i )
         ( *adj_entity_indices )[ i ] =
-            std::lower_bound( unique_adj, unique_adj + *adj_entity_handles_size,
-                              all_adj_handles[ i ] ) -
-            unique_adj;
+            std::lower_bound( unique_adj, unique_adj + *adj_entity_handles_size, all_adj_handles[ i ] ) - unique_adj;
     free( all_adj_handles );
 }
 
-void iMeshP_getEntities( iMesh_Instance              instance, const iMeshP_PartitionHandle,
-                         const iMeshP_PartHandle     part_handle,
+void iMeshP_getEntities( iMesh_Instance instance, const iMeshP_PartitionHandle, const iMeshP_PartHandle part_handle,
                          const iBase_EntitySetHandle entity_set_handle, const int entity_type,
-                         const int entity_topology, iBase_EntityHandle** entity_handles,
-                         int* entity_handles_allocated, int* entity_handles_size, int* err )
+                         const int entity_topology, iBase_EntityHandle** entity_handles, int* entity_handles_allocated,
+                         int* entity_handles_size, int* err )
 {
     Range r;
-    set_intersection_query( instance, part_handle, entity_set_handle, entity_type, entity_topology,
-                            r, err );
+    set_intersection_query( instance, part_handle, entity_set_handle, entity_type, entity_topology, r, err );
     if( iBase_SUCCESS != *err ) return;
 
     RANGE_TO_ITAPS_ARRAY( r, entity_handles );
     RETURN( iBase_SUCCESS );
 }
 
-void iMeshP_getAdjEntities(
-    iMesh_Instance          instance, const iMeshP_PartitionHandle /*partition_handle*/,
-    const iMeshP_PartHandle part_handle, const iBase_EntitySetHandle entity_set_handle,
-    const int entity_type_requestor, const int entity_topology_requestor,
-    const int entity_type_requested, iBase_EntityHandle** adj_entity_handles,
-    int* adj_entity_handles_allocated, int* adj_entity_handles_size, int** offset,
-    int* offset_allocated, int* offset_size, int** in_entity_set, int* in_entity_set_allocated,
-    int* in_entity_set_size, int* err )
+void iMeshP_getAdjEntities( iMesh_Instance          instance, const iMeshP_PartitionHandle /*partition_handle*/,
+                            const iMeshP_PartHandle part_handle, const iBase_EntitySetHandle entity_set_handle,
+                            const int entity_type_requestor, const int entity_topology_requestor,
+                            const int entity_type_requested, iBase_EntityHandle** adj_entity_handles,
+                            int* adj_entity_handles_allocated, int* adj_entity_handles_size, int** offset,
+                            int* offset_allocated, int* offset_size, int** in_entity_set, int* in_entity_set_allocated,
+                            int* in_entity_set_size, int* err )
 {
     ErrorCode rval;
     Range     r;
-    set_intersection_query( instance, part_handle, entity_set_handle, entity_type_requestor,
-                            entity_topology_requestor, r, err );
+    set_intersection_query( instance, part_handle, entity_set_handle, entity_type_requestor, entity_topology_requestor,
+                            r, err );
     if( iBase_SUCCESS != *err ) return;
 
     // count adjacencies
@@ -960,8 +903,7 @@ void iMeshP_getAdjEntities(
 
         tmp_storage.clear( );
         rval = MOABI->get_adjacencies( &*i, 1, entity_type_requested, false, tmp_storage );CHKERR( rval, "get_adjacencies failed" );
-        for( std::vector< EntityHandle >::iterator j = tmp_storage.begin( );
-             j != tmp_storage.end( ); ++j )
+        for( std::vector< EntityHandle >::iterator j = tmp_storage.begin( ); j != tmp_storage.end( ); ++j )
         {
             ( *adj_entity_handles )[ arr_pos ] = itaps_cast< iBase_EntityHandle >( *j );
             ++arr_pos;
@@ -969,9 +911,8 @@ void iMeshP_getAdjEntities(
     }
 
     // get in_entity_set
-    iMesh_isEntArrContained( instance, entity_set_handle, *adj_entity_handles,
-                             *adj_entity_handles_size, in_entity_set, in_entity_set_allocated,
-                             in_entity_set_size, err );
+    iMesh_isEntArrContained( instance, entity_set_handle, *adj_entity_handles, *adj_entity_handles_size, in_entity_set,
+                             in_entity_set_allocated, in_entity_set_size, err );
 
     if( iBase_SUCCESS == *err )
     {
@@ -981,69 +922,57 @@ void iMeshP_getAdjEntities(
 }
 
 void iMeshP_initEntIter( iMesh_Instance instance, const iMeshP_PartitionHandle partition_handle,
-                         const iMeshP_PartHandle     part_handle,
-                         const iBase_EntitySetHandle entity_set_handle,
+                         const iMeshP_PartHandle part_handle, const iBase_EntitySetHandle entity_set_handle,
                          const int requested_entity_type, const int requested_entity_topology,
                          iBase_EntityIterator* entity_iterator, int* err )
 {
-    iMeshP_initEntArrIter( instance, partition_handle, part_handle, entity_set_handle,
-                           requested_entity_type, requested_entity_topology, 1,
+    iMeshP_initEntArrIter( instance, partition_handle, part_handle, entity_set_handle, requested_entity_type,
+                           requested_entity_topology, 1,
                            reinterpret_cast< iBase_EntityArrIterator* >( entity_iterator ), err );
 }
 
-void iMeshP_initEntArrIter( iMesh_Instance instance,
-                            const iMeshP_PartitionHandle /*partition_handle*/,
-                            const iMeshP_PartHandle     part_handle,
-                            const iBase_EntitySetHandle entity_set_handle,
+void iMeshP_initEntArrIter( iMesh_Instance          instance, const iMeshP_PartitionHandle /*partition_handle*/,
+                            const iMeshP_PartHandle part_handle, const iBase_EntitySetHandle entity_set_handle,
                             const int requested_entity_type, const int requested_entity_topology,
-                            const int                requested_array_size,
-                            iBase_EntityArrIterator* entArr_iterator, int* err )
+                            const int requested_array_size, iBase_EntityArrIterator* entArr_iterator, int* err )
 {
     if( !entity_set_handle || entity_set_handle == part_handle )
     {
-        iMesh_initEntArrIter( instance, part_handle, requested_entity_type,
-                              requested_entity_topology, requested_array_size,
+        iMesh_initEntArrIter( instance, part_handle, requested_entity_type, requested_entity_topology,
+                              requested_array_size,
                               0,  // TODO: update this function for "resilient" arg
                               entArr_iterator, err );
     }
     else
     {
         unsigned  flags;
-        ErrorCode result =
-            MOABI->get_meshset_options( itaps_cast< EntityHandle >( entity_set_handle ), flags );CHKERR( result, "Invalid entity set handle" );
+        ErrorCode result = MOABI->get_meshset_options( itaps_cast< EntityHandle >( entity_set_handle ), flags );CHKERR( result, "Invalid entity set handle" );
         if( flags & MESHSET_ORDERED )
             *entArr_iterator = new SetIntersectIter< std::vector< EntityHandle > >(
-                (iBase_EntityType)requested_entity_type,
-                (iMesh_EntityTopology)requested_entity_topology,
-                itaps_cast< EntityHandle >( entity_set_handle ),
-                itaps_cast< EntityHandle >( part_handle ), requested_array_size );
+                (iBase_EntityType)requested_entity_type, (iMesh_EntityTopology)requested_entity_topology,
+                itaps_cast< EntityHandle >( entity_set_handle ), itaps_cast< EntityHandle >( part_handle ),
+                requested_array_size );
         else
             *entArr_iterator = new SetIntersectIter< Range >(
-                (iBase_EntityType)requested_entity_type,
-                (iMesh_EntityTopology)requested_entity_topology,
-                itaps_cast< EntityHandle >( entity_set_handle ),
-                itaps_cast< EntityHandle >( part_handle ), requested_array_size );
+                (iBase_EntityType)requested_entity_type, (iMesh_EntityTopology)requested_entity_topology,
+                itaps_cast< EntityHandle >( entity_set_handle ), itaps_cast< EntityHandle >( part_handle ),
+                requested_array_size );
         result = ( *entArr_iterator )->reset( MOABI );
-        if( MB_SUCCESS != result ) delete *entArr_iterator;CHKERR( result,
-                "iMesh_initEntArrIter: ERROR getting entities of proper type or topology." );
+        if( MB_SUCCESS != result ) delete *entArr_iterator;CHKERR( result, "iMesh_initEntArrIter: ERROR getting entities of proper type or topology." );
         RETURN( iBase_SUCCESS );
     }
 }
 
 void iMeshP_getEntOwnerPart( iMesh_Instance instance, const iMeshP_PartitionHandle partition_handle,
-                             const iBase_EntityHandle entity_handle, iMeshP_Part* part_id,
-                             int* err )
+                             const iBase_EntityHandle entity_handle, iMeshP_Part* part_id, int* err )
 {
     int junk1 = 1, junk2 = 1;
-    iMeshP_getEntOwnerPartArr( instance, partition_handle, &entity_handle, 1, &part_id, &junk1,
-                               &junk2, err );
+    iMeshP_getEntOwnerPartArr( instance, partition_handle, &entity_handle, 1, &part_id, &junk1, &junk2, err );
 }
 
-void iMeshP_getEntOwnerPartArr( iMesh_Instance               instance,
-                                const iMeshP_PartitionHandle partition_handle,
-                                const iBase_EntityHandle*    entity_handles,
-                                const int entity_handles_size, iMeshP_Part** part_ids,
-                                int* part_ids_allocated, int* part_ids_size, int* err )
+void iMeshP_getEntOwnerPartArr( iMesh_Instance instance, const iMeshP_PartitionHandle partition_handle,
+                                const iBase_EntityHandle* entity_handles, const int entity_handles_size,
+                                iMeshP_Part** part_ids, int* part_ids_allocated, int* part_ids_size, int* err )
 {
     ParallelComm* pcomm = PCOMM;
     if( !pcomm ) ERROR( iBase_FAILURE, "No PComm" );
@@ -1062,18 +991,17 @@ void iMeshP_getEntOwnerPartArr( iMesh_Instance               instance,
 }
 
 void iMeshP_isEntOwner( iMesh_Instance instance, const iMeshP_PartitionHandle partition_handle,
-                        const iMeshP_PartHandle part_handle, const iBase_EntityHandle entity_handle,
-                        int* is_owner, int* err )
+                        const iMeshP_PartHandle part_handle, const iBase_EntityHandle entity_handle, int* is_owner,
+                        int* err )
 {
     int junk1 = 1, junk2 = 1;
-    iMeshP_isEntOwnerArr( instance, partition_handle, part_handle, &entity_handle, 1, &is_owner,
-                          &junk1, &junk2, err );
+    iMeshP_isEntOwnerArr( instance, partition_handle, part_handle, &entity_handle, 1, &is_owner, &junk1, &junk2, err );
 }
 
 void iMeshP_isEntOwnerArr( iMesh_Instance instance, const iMeshP_PartitionHandle partition_handle,
-                           const iMeshP_PartHandle   part_handle,
-                           const iBase_EntityHandle* entity_handles, const int entity_handles_size,
-                           int** is_owner, int* is_owner_allocated, int* is_owner_size, int* err )
+                           const iMeshP_PartHandle part_handle, const iBase_EntityHandle* entity_handles,
+                           const int entity_handles_size, int** is_owner, int* is_owner_allocated, int* is_owner_size,
+                           int* err )
 {
     ErrorCode     rval;
     ParallelComm* pcomm = PCOMM;
@@ -1100,12 +1028,12 @@ void iMeshP_getEntStatus( iMesh_Instance                      instance,
                           /*in*/ const iMeshP_PartitionHandle partition_handle,
                           /*in*/ const iMeshP_PartHandle      part_handle,
                           /*in*/ const iBase_EntityHandle     entity_handle,
-                          /*out*/ int* par_status,  // Values=INTERNAL,BOUNDARY,GHOST
-                          int*         err )
+                          /*out*/ int*                        par_status,  // Values=INTERNAL,BOUNDARY,GHOST
+                          int*                                err )
 {
     int junk1 = 1, junk2 = 1;
-    iMeshP_getEntStatusArr( instance, partition_handle, part_handle, &entity_handle, 1, &par_status,
-                            &junk1, &junk2, err );
+    iMeshP_getEntStatusArr( instance, partition_handle, part_handle, &entity_handle, 1, &par_status, &junk1, &junk2,
+                            err );
 }
 
 void iMeshP_getEntStatusArr( iMesh_Instance                      instance,
@@ -1113,16 +1041,15 @@ void iMeshP_getEntStatusArr( iMesh_Instance                      instance,
                              /*in*/ const iMeshP_PartHandle /*part_handle*/,
                              /*in*/ const iBase_EntityHandle* entity_handles,
                              /*in*/ const int                 entity_handles_size,
-                             /*inout*/ int** par_status,  // Values=INTERNAL,BOUNDARY,GHOST
-                             /*inout*/ int*  par_status_allocated,
+                             /*inout*/ int**                  par_status,  // Values=INTERNAL,BOUNDARY,GHOST
+                             /*inout*/ int*                   par_status_allocated,
                              /*inout*/ int* par_status_size, int* err )
 {
     ParallelComm* pcomm = PCOMM;
     if( !pcomm ) ERROR( iBase_FAILURE, "No PComm" );
 
     std::vector< unsigned char > pstatus( entity_handles_size );
-    ErrorCode                    result = MOABI->tag_get_data( pcomm->pstatus_tag( ),
-                                            itaps_cast< const EntityHandle* >( entity_handles ),
+    ErrorCode result = MOABI->tag_get_data( pcomm->pstatus_tag( ), itaps_cast< const EntityHandle* >( entity_handles ),
                                             entity_handles_size, &pstatus[ 0 ] );CHKERR( result, "error getting pstatus_tag" );
 
     ALLOC_CHECK_ARRAY( par_status, entity_handles_size );
@@ -1147,40 +1074,35 @@ void iMeshP_getNumCopies( iMesh_Instance instance, const iMeshP_PartitionHandle 
     if( !pcomm ) ERROR( iBase_FAILURE, "No PComm" );
 
     int       ids[ MAX_SHARING_PROCS ];
-    ErrorCode rval = pcomm->get_sharing_parts( itaps_cast< EntityHandle >( entity_handle ), ids,
-                                               *num_copies_ent );CHKERR( rval, "ParallelComm::get_sharing_parts failed" );
+    ErrorCode rval = pcomm->get_sharing_parts( itaps_cast< EntityHandle >( entity_handle ), ids, *num_copies_ent );CHKERR( rval, "ParallelComm::get_sharing_parts failed" );
     RETURN( iBase_SUCCESS );
 }
 
 void iMeshP_getCopyParts( iMesh_Instance instance, const iMeshP_PartitionHandle partition_handle,
-                          const iBase_EntityHandle entity_handle, iMeshP_Part** part_ids,
-                          int* part_ids_allocated, int* part_ids_size, int* err )
+                          const iBase_EntityHandle entity_handle, iMeshP_Part** part_ids, int* part_ids_allocated,
+                          int* part_ids_size, int* err )
 {
     ParallelComm* pcomm = PCOMM;
     if( !pcomm ) ERROR( iBase_FAILURE, "No PComm" );
 
     int       ids[ MAX_SHARING_PROCS ], num_ids;
-    ErrorCode rval =
-        pcomm->get_sharing_parts( itaps_cast< EntityHandle >( entity_handle ), ids, num_ids );CHKERR( rval, "ParallelComm::get_sharing_parts failed" );
+    ErrorCode rval = pcomm->get_sharing_parts( itaps_cast< EntityHandle >( entity_handle ), ids, num_ids );CHKERR( rval, "ParallelComm::get_sharing_parts failed" );
     ALLOC_CHECK_ARRAY_NOFAIL( part_ids, num_ids );
     std::copy( ids, ids + num_ids, *part_ids );
     RETURN( iBase_SUCCESS );
 }
 
 void iMeshP_getCopies( iMesh_Instance instance, const iMeshP_PartitionHandle partition_handle,
-                       const iBase_EntityHandle entity_handle, iMeshP_Part** part_ids,
-                       int* part_ids_allocated, int* part_ids_size,
-                       iBase_EntityHandle** copies_entity_handles,
-                       int* copies_entity_handles_allocated, int* copies_entity_handles_size,
-                       int* err )
+                       const iBase_EntityHandle entity_handle, iMeshP_Part** part_ids, int* part_ids_allocated,
+                       int* part_ids_size, iBase_EntityHandle** copies_entity_handles,
+                       int* copies_entity_handles_allocated, int* copies_entity_handles_size, int* err )
 {
     ParallelComm* pcomm = PCOMM;
     if( !pcomm ) ERROR( iBase_FAILURE, "No PComm" );
 
     int          ids[ MAX_SHARING_PROCS ], num_ids;
     EntityHandle handles[ MAX_SHARING_PROCS ];
-    ErrorCode    rval = pcomm->get_sharing_parts( itaps_cast< EntityHandle >( entity_handle ), ids,
-                                               num_ids, handles );CHKERR( rval, "ParallelComm::get_sharing_parts failed" );
+    ErrorCode    rval = pcomm->get_sharing_parts( itaps_cast< EntityHandle >( entity_handle ), ids, num_ids, handles );CHKERR( rval, "ParallelComm::get_sharing_parts failed" );
     ALLOC_CHECK_ARRAY_NOFAIL( part_ids, num_ids );
     ALLOC_CHECK_ARRAY_NOFAIL( copies_entity_handles, num_ids );
     for( int i = 0; i < num_ids; ++i )
@@ -1200,8 +1122,7 @@ void iMeshP_getCopyOnPart( iMesh_Instance instance, const iMeshP_PartitionHandle
 
     int          ids[ MAX_SHARING_PROCS ], num_ids;
     EntityHandle handles[ MAX_SHARING_PROCS ];
-    ErrorCode    rval = pcomm->get_sharing_parts( itaps_cast< EntityHandle >( entity_handle ), ids,
-                                               num_ids, handles );CHKERR( rval, "ParallelComm::get_sharing_parts failed" );
+    ErrorCode    rval = pcomm->get_sharing_parts( itaps_cast< EntityHandle >( entity_handle ), ids, num_ids, handles );CHKERR( rval, "ParallelComm::get_sharing_parts failed" );
     int idx = std::find( ids, ids + num_ids, part_id ) - ids;
     if( idx == num_ids ) RETURN( iBase_FAILURE );
 
@@ -1218,52 +1139,48 @@ void iMeshP_getOwnerCopy( iMesh_Instance instance, const iMeshP_PartitionHandle 
 
     int          id;
     EntityHandle h;
-    ErrorCode rval = pcomm->get_owning_part( itaps_cast< EntityHandle >( entity_handle ), id, &h );CHKERR( rval, "Failed to get owner" );
+    ErrorCode    rval = pcomm->get_owning_part( itaps_cast< EntityHandle >( entity_handle ), id, &h );CHKERR( rval, "Failed to get owner" );
     *owner_part_id = id;
     *owner_entity_handle = itaps_cast< iBase_EntityHandle >( h );
     RETURN( iBase_SUCCESS );
 }
 
-void iMeshP_waitForAnyRequest( iMesh_Instance instance, iMeshP_PartitionHandle,
-                               iMeshP_RequestHandle*, int, int*, int* err )
+void iMeshP_waitForAnyRequest( iMesh_Instance instance, iMeshP_PartitionHandle, iMeshP_RequestHandle*, int, int*,
+                               int*           err )
 {
     FIXME;
     RETURN( iBase_NOT_SUPPORTED );
 }
 
-void iMeshP_waitForAllRequests( iMesh_Instance instance, iMeshP_PartitionHandle,
-                                iMeshP_RequestHandle*, int, int* err )
+void iMeshP_waitForAllRequests( iMesh_Instance instance, iMeshP_PartitionHandle, iMeshP_RequestHandle*, int, int* err )
 {
     FIXME;
     RETURN( iBase_NOT_SUPPORTED );
 }
 
-void iMeshP_waitForRequestEnt( iMesh_Instance instance, const iMeshP_PartitionHandle,
-                               iMeshP_RequestHandle, iBase_EntityHandle**, int*, int*, int* err )
+void iMeshP_waitForRequestEnt( iMesh_Instance instance, const iMeshP_PartitionHandle, iMeshP_RequestHandle,
+                               iBase_EntityHandle**, int*, int*, int* err )
 {
     FIXME;
     RETURN( iBase_NOT_SUPPORTED );
 }
 
-void iMeshP_testRequest( iMesh_Instance instance, const iMeshP_PartitionHandle,
-                         iMeshP_RequestHandle, int*, int* err )
+void iMeshP_testRequest( iMesh_Instance instance, const iMeshP_PartitionHandle, iMeshP_RequestHandle, int*, int* err )
 {
     FIXME;
     RETURN( iBase_NOT_SUPPORTED );
 }
 
-void iMeshP_pollForRequests( iMesh_Instance instance, iMeshP_PartitionHandle,
-                             iMeshP_RequestHandle**, int*, int*, int* err )
+void iMeshP_pollForRequests( iMesh_Instance instance, iMeshP_PartitionHandle, iMeshP_RequestHandle**, int*, int*,
+                             int*           err )
 {
     FIXME;
     RETURN( iBase_NOT_SUPPORTED );
 }
 
-void iMeshP_exchEntArrToPartsAll( iMesh_Instance               instance,
-                                  const iMeshP_PartitionHandle partition_handle,
-                                  const iBase_EntityHandle*    entity_handles,
-                                  const int entity_handles_size, const iMeshP_Part* target_part_ids,
-                                  int command_code, int                   update_ghost,
+void iMeshP_exchEntArrToPartsAll( iMesh_Instance instance, const iMeshP_PartitionHandle partition_handle,
+                                  const iBase_EntityHandle* entity_handles, const int entity_handles_size,
+                                  const iMeshP_Part* target_part_ids, int command_code, int update_ghost,
                                   iMeshP_RequestHandle* /*request*/, int* err )
 {
     if( command_code == 1 )
@@ -1306,8 +1223,7 @@ void iMeshP_exchEntArrToPartsAll( iMesh_Instance               instance,
     }
 
     std::vector< MPI_Request > recv_ent_reqs, recv_remoteh_reqs;
-    rval = pcomm->exchange_owned_meshs( exchange_procs, exchange_ents, recv_ent_reqs,
-                                        recv_remoteh_reqs, true );CHKERR( rval, "ParallelComm::exchange_owned_meshs failed" );
+    rval = pcomm->exchange_owned_meshs( exchange_procs, exchange_ents, recv_ent_reqs, recv_remoteh_reqs, true );CHKERR( rval, "ParallelComm::exchange_owned_meshs failed" );
 
     // delete exchange list
     std::vector< Range* >::iterator vit;
@@ -1317,24 +1233,21 @@ void iMeshP_exchEntArrToPartsAll( iMesh_Instance               instance,
     RETURN( iBase_SUCCESS );
 }
 
-void iMeshP_migrateEntity( iMesh_Instance instance, const iMeshP_PartitionHandle,
-                           const iMeshP_PartHandle, const iBase_EntityHandle, iMeshP_RequestHandle*,
-                           int* err )
+void iMeshP_migrateEntity( iMesh_Instance instance, const iMeshP_PartitionHandle, const iMeshP_PartHandle,
+                           const iBase_EntityHandle, iMeshP_RequestHandle*, int* err )
 {
     FIXME;
     RETURN( iBase_NOT_SUPPORTED );
 }
 
-void iMeshP_updateVtxCoords( iMesh_Instance instance, const iMeshP_PartitionHandle,
-                             const iBase_EntityHandle, int* err )
+void iMeshP_updateVtxCoords( iMesh_Instance instance, const iMeshP_PartitionHandle, const iBase_EntityHandle, int* err )
 {
     FIXME;
     RETURN( iBase_NOT_SUPPORTED );
 }
 
-void iMeshP_replaceOnPartBdry( iMesh_Instance instance, const iMeshP_PartitionHandle,
-                               const iBase_EntityHandle*, const int, const iBase_EntityHandle*,
-                               const int, const int*, const int, int* err )
+void iMeshP_replaceOnPartBdry( iMesh_Instance instance, const iMeshP_PartitionHandle, const iBase_EntityHandle*,
+                               const int, const iBase_EntityHandle*, const int, const int*, const int, int* err )
 {
     FIXME;
     RETURN( iBase_NOT_SUPPORTED );
@@ -1354,18 +1267,15 @@ void iMeshP_rmvGhostOf( iMesh_Instance instance, const iMeshP_PartitionHandle, c
     RETURN( iBase_NOT_SUPPORTED );
 }
 
-void iMeshP_syncMeshAll( iMesh_Instance instance, const iMeshP_PartitionHandle partition_handle,
-                         int* err )
+void iMeshP_syncMeshAll( iMesh_Instance instance, const iMeshP_PartitionHandle partition_handle, int* err )
 {
     ParallelComm* pcomm = PCOMM;
-    ErrorCode     rval =
-        pcomm->resolve_shared_ents( itaps_cast< EntityHandle >( partition_handle ), -1, -1 );CHKERR( rval, "update failed" );
+    ErrorCode     rval = pcomm->resolve_shared_ents( itaps_cast< EntityHandle >( partition_handle ), -1, -1 );CHKERR( rval, "update failed" );
     RETURN( iBase_SUCCESS );
 }
 
 void iMeshP_pushTags( iMesh_Instance instance, const iMeshP_PartitionHandle partition_handle,
-                      iBase_TagHandle source_tag, iBase_TagHandle dest_tag, int entity_type,
-                      int entity_topo, int* err )
+                      iBase_TagHandle source_tag, iBase_TagHandle dest_tag, int entity_type, int entity_topo, int* err )
 {
     ParallelComm* pcomm = PCOMM;
     DimensionPair types;
@@ -1388,8 +1298,7 @@ void iMeshP_pushTags( iMesh_Instance instance, const iMeshP_PartitionHandle part
     Range     entities;
     for( EntityType t = types.first; t <= types.second; ++t )
     {
-        rval = MOABI->get_entities_by_type_and_tag( 0, t, &src_tags[ 0 ], 0, 1, entities,
-                                                    Interface::UNION );CHKERR( rval, "error getting entities to push" );
+        rval = MOABI->get_entities_by_type_and_tag( 0, t, &src_tags[ 0 ], 0, 1, entities, Interface::UNION );CHKERR( rval, "error getting entities to push" );
     }
 
     rval = pcomm->exchange_tags( src_tags, dst_tags, entities );CHKERR( rval, "tag data communication failed" );
@@ -1397,8 +1306,8 @@ void iMeshP_pushTags( iMesh_Instance instance, const iMeshP_PartitionHandle part
 }
 
 void iMeshP_pushTagsEnt( iMesh_Instance instance, const iMeshP_PartitionHandle partition_handle,
-                         iBase_TagHandle source_tag, iBase_TagHandle dest_tag,
-                         const iBase_EntityHandle* entities, int entities_size, int* err )
+                         iBase_TagHandle source_tag, iBase_TagHandle dest_tag, const iBase_EntityHandle* entities,
+                         int entities_size, int* err )
 {
 
     Range               range;
@@ -1412,24 +1321,22 @@ void iMeshP_pushTagsEnt( iMesh_Instance instance, const iMeshP_PartitionHandle p
     RETURN( iBase_SUCCESS );
 }
 
-void iMeshP_iPushTags( iMesh_Instance instance, const iMeshP_PartitionHandle, iBase_TagHandle,
-                       iBase_TagHandle, int, int, iMeshP_RequestHandle*, int* err )
+void iMeshP_iPushTags( iMesh_Instance instance, const iMeshP_PartitionHandle, iBase_TagHandle, iBase_TagHandle, int,
+                       int, iMeshP_RequestHandle*, int* err )
 {
     FIXME;
     RETURN( iBase_NOT_SUPPORTED );
 }
 
-void iMeshP_iPushTagsEnt( iMesh_Instance instance, const iMeshP_PartitionHandle, iBase_TagHandle,
-                          iBase_TagHandle, const iBase_EntityHandle*, int, iMeshP_RequestHandle*,
-                          int* err )
+void iMeshP_iPushTagsEnt( iMesh_Instance instance, const iMeshP_PartitionHandle, iBase_TagHandle, iBase_TagHandle,
+                          const iBase_EntityHandle*, int, iMeshP_RequestHandle*, int* err )
 {
     FIXME;
     RETURN( iBase_NOT_SUPPORTED );
 }
 
-void iMeshP_createGhostEntsAll( iMesh_Instance instance, iMeshP_PartitionHandle partition_handle,
-                                int ghost_dim, int bridge_dim, int num_layers, int include_copies,
-                                int* err )
+void iMeshP_createGhostEntsAll( iMesh_Instance instance, iMeshP_PartitionHandle partition_handle, int ghost_dim,
+                                int bridge_dim, int num_layers, int include_copies, int* err )
 {
     if( include_copies )
     {
@@ -1450,8 +1357,8 @@ void iMeshP_deleteGhostEntsAll( iMesh_Instance instance, iMeshP_PartitionHandle,
     RETURN( iBase_NOT_SUPPORTED );
 }
 
-void iMeshP_ghostEntInfo( const iMesh_Instance instance, const iMeshP_PartitionHandle, int*, int*,
-                          int**, int**, int**, int* err )
+void iMeshP_ghostEntInfo( const iMesh_Instance instance, const iMeshP_PartitionHandle, int*, int*, int**, int**, int**,
+                          int*                 err )
 {
     FIXME;
     RETURN( iBase_NOT_SUPPORTED );
@@ -1497,8 +1404,8 @@ static bool append_option( std::string& opt, const char* option, const char* def
 }
 
 void iMeshP_loadAll( iMesh_Instance instance, const iMeshP_PartitionHandle partition,
-                     const iBase_EntitySetHandle entity_set_handle, const char* name,
-                     const char* options, int* err, int name_len, int options_len )
+                     const iBase_EntitySetHandle entity_set_handle, const char* name, const char* options, int* err,
+                     int name_len, int options_len )
 {
     ErrorCode rval;
 
@@ -1537,14 +1444,12 @@ void iMeshP_loadAll( iMesh_Instance instance, const iMeshP_PartitionHandle parti
 }
 
 void iMeshP_saveAll( iMesh_Instance instance, const iMeshP_PartitionHandle partition,
-                     const iBase_EntitySetHandle entity_set_handle, const char* name,
-                     const char* options, int* err, const int name_len, int options_len )
+                     const iBase_EntitySetHandle entity_set_handle, const char* name, const char* options, int* err,
+                     const int name_len, int options_len )
 {
     EntityHandle set;
-    set = entity_set_handle ? itaps_cast< EntityHandle >( entity_set_handle )
-                            : itaps_cast< EntityHandle >( partition );
-    iMesh_save( instance, itaps_cast< iBase_EntitySetHandle >( set ), name, options, err, name_len,
-                options_len );
+    set = entity_set_handle ? itaps_cast< EntityHandle >( entity_set_handle ) : itaps_cast< EntityHandle >( partition );
+    iMesh_save( instance, itaps_cast< iBase_EntitySetHandle >( set ), name, options, err, name_len, options_len );
 }
 
 //  Map from processes to parts:
@@ -1566,15 +1471,13 @@ void iMeshP_getPartsOnRank( iMesh_Instance instance, const iMeshP_PartitionHandl
     ALLOC_CHECK_ARRAY_NOFAIL( part_handles, pc->partition_sets( ).size( ) );
     Range::iterator rit;
     int             i;
-    for( i = 0, rit = pc->partition_sets( ).begin( ); rit != pc->partition_sets( ).end( );
-         ++rit, i++ )
+    for( i = 0, rit = pc->partition_sets( ).begin( ); rit != pc->partition_sets( ).end( ); ++rit, i++ )
         ( *part_handles )[ i ] = itaps_cast< iMeshP_PartHandle >( *rit );
 
     RETURN( iBase_SUCCESS );
 }
 
-void iMeshP_getPartsArrOnRank( iMesh_Instance                instance,
-                               const iMeshP_PartitionHandle  partition_handle,
+void iMeshP_getPartsArrOnRank( iMesh_Instance instance, const iMeshP_PartitionHandle partition_handle,
                                /*in*/ const int*             rank,
                                /*in*/ const int              rank_size,
                                /*inout*/ iMeshP_PartHandle** part_handles,
@@ -1588,8 +1491,8 @@ void iMeshP_getPartsArrOnRank( iMesh_Instance                instance,
     if( rank[ 0 ] != (int)pc->proc_config( ).proc_rank( ) || rank_size > 1 )
     { RETURN( iBase_ERROR_MAP[ MB_NOT_IMPLEMENTED ] ); }
 
-    iMeshP_getPartsOnRank( instance, partition_handle, rank[ 0 ], part_handles,
-                           part_handles_allocated, part_handles_size, err );
+    iMeshP_getPartsOnRank( instance, partition_handle, rank[ 0 ], part_handles, part_handles_allocated,
+                           part_handles_size, err );
 }
 
 /** \brief Assign a global id space to entities
@@ -1598,9 +1501,8 @@ void iMeshP_getPartsArrOnRank( iMesh_Instance                instance,
  *  COMMUNICATION:  Collective.
  */
 void iMeshP_assignGlobalIds( iMesh_Instance instance, const iMeshP_PartitionHandle partition,
-                             const iBase_EntitySetHandle this_set, const int dimension,
-                             const int start_id, const int largest_dim_only, const int parallel,
-                             const int owned_only, int* err )
+                             const iBase_EntitySetHandle this_set, const int dimension, const int start_id,
+                             const int largest_dim_only, const int parallel, const int owned_only, int* err )
 {
     ErrorCode rval;
 
@@ -1618,8 +1520,7 @@ void iMeshP_assignGlobalIds( iMesh_Instance instance, const iMeshP_PartitionHand
     ParallelComm* pcomm = ParallelComm::get_pcomm( MOABI, partitionset, &default_comm );
     if( !pcomm ) { RETURN( iBase_FAILURE ); }
 
-    rval = pcomm->assign_global_ids( this_mb_set, dimension, start_id, largest_dim_only, parallel,
-                                     owned_only );
+    rval = pcomm->assign_global_ids( this_mb_set, dimension, start_id, largest_dim_only, parallel, owned_only );
 
     RETURN( rval );
 }

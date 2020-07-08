@@ -24,18 +24,17 @@ void test_sqijk( )
         par_data.gPeriodic[ i ] = 0;
     par_data.partMethod = ScdParData::SQIJK;
 
-    std::cout << "gDims =  (" << par_data.gDims[ 0 ] << "," << par_data.gDims[ 1 ] << ","
-              << par_data.gDims[ 2 ] << ")--(" << par_data.gDims[ 3 ] << "," << par_data.gDims[ 4 ]
-              << "," << par_data.gDims[ 5 ] << ")" << std::endl;
+    std::cout << "gDims =  (" << par_data.gDims[ 0 ] << "," << par_data.gDims[ 1 ] << "," << par_data.gDims[ 2 ]
+              << ")--(" << par_data.gDims[ 3 ] << "," << par_data.gDims[ 4 ] << "," << par_data.gDims[ 5 ] << ")"
+              << std::endl;
 
     int lperiodic[ 3 ], pijk[ 3 ];
 
     rval = ScdInterface::compute_partition( np, 0, par_data, ldims, lperiodic, pijk );CHECK_ERR( rval );
 
-    std::cout << "#proc in 3 directions = (" << pijk[ 0 ] << "," << pijk[ 1 ] << "," << pijk[ 2 ]
-              << ")" << std::endl;
-    std::cout << "local dims are (" << ldims[ 0 ] << "," << ldims[ 1 ] << "," << ldims[ 2 ]
-              << ")--(" << ldims[ 3 ] << "," << ldims[ 4 ] << "," << ldims[ 5 ] << ")\n";
+    std::cout << "#proc in 3 directions = (" << pijk[ 0 ] << "," << pijk[ 1 ] << "," << pijk[ 2 ] << ")" << std::endl;
+    std::cout << "local dims are (" << ldims[ 0 ] << "," << ldims[ 1 ] << "," << ldims[ 2 ] << ")--(" << ldims[ 3 ]
+              << "," << ldims[ 4 ] << "," << ldims[ 5 ] << ")\n";
 }
 
 int main( int argc, char** argv )

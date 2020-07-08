@@ -47,8 +47,7 @@ class ReferenceMeshInterface;
 class RefMeshTargetCalculator : public TargetCalculator
 {
   public:
-    MESQUITE_EXPORT RefMeshTargetCalculator( ReferenceMeshInterface* ref_mesh,
-                                             bool                    orient_2d = false )
+    MESQUITE_EXPORT RefMeshTargetCalculator( ReferenceMeshInterface* ref_mesh, bool orient_2d = false )
         : refMesh( ref_mesh ), orient2D( orient_2d )
     {
     }
@@ -62,8 +61,8 @@ class RefMeshTargetCalculator : public TargetCalculator
      *\param sample  The sample point in the element.
      *\param W_out   The resulting target matrix.
      */
-    MESQUITE_EXPORT virtual bool get_3D_target( PatchData& pd, size_t element, Sample sample,
-                                                MsqMatrix< 3, 3 >& W_out, MsqError& err );
+    MESQUITE_EXPORT virtual bool get_3D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 3, 3 >& W_out,
+                                                MsqError& err );
 
     /**\brief Get a target matrix
      *
@@ -72,8 +71,8 @@ class RefMeshTargetCalculator : public TargetCalculator
      *\param sample  The sample point in the element.
      *\param W_out   The resulting target matrix.
      */
-    MESQUITE_EXPORT virtual bool get_2D_target( PatchData& pd, size_t element, Sample sample,
-                                                MsqMatrix< 2, 2 >& W_out, MsqError& err );
+    MESQUITE_EXPORT virtual bool get_2D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 2, 2 >& W_out,
+                                                MsqError& err );
 
     /**\brief Get a target matrix
      *

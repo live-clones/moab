@@ -104,8 +104,7 @@ ErrorCode adj_perf( const char* filename )
 
     if( procs > 1 )
     {
-        read_options =
-            "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_SHARED_ENTS";
+        read_options = "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_SHARED_ENTS";
 
         error = mbImpl->load_file( filename, 0, read_options.c_str( ) );CHECK_ERR( error );
     }
@@ -120,8 +119,7 @@ ErrorCode adj_perf( const char* filename )
     // Storage Costs before any call to adjacencies
     unsigned long long sTotS, sTAS, sES, sAES, sAS, sAAS, sTS, sATS;
     sTotS = sTAS = sES = sAES = sAS = sAAS = sTS = sATS = 0;
-    mbImpl->estimated_memory_use( NULL, 0, &sTotS, &sTAS, &sES, &sAES, &sAS, &sAAS, NULL, 0, &sTS,
-                                  &sATS );
+    mbImpl->estimated_memory_use( NULL, 0, &sTotS, &sTAS, &sES, &sAES, &sAS, &sAAS, NULL, 0, &sTS, &sATS );
 
     qmem.total_storage[ 0 ] = sTotS;
     qmem.amortized_total_storage[ 0 ] = sTAS;
@@ -145,8 +143,7 @@ ErrorCode adj_perf( const char* filename )
     int ncells = cells.size( );
 
     std::cout << "MESH SIZE :: "
-              << "NV = " << nverts << ", NE = " << nedges << ", NF = " << nfaces
-              << ", NC = " << ncells << std::endl;
+              << "NV = " << nverts << ", NE = " << nedges << ", NF = " << nfaces << ", NC = " << ncells << std::endl;
 
     CpuTimer* mt = new CpuTimer;
     double    time_start, time_avg, time_total;
@@ -374,8 +371,7 @@ ErrorCode adj_perf( const char* filename )
     // Storage Costs after calling ahf deinitialize
     unsigned long long eTotS, eTAS, eES, eAES, eAS, eAAS, eTS, eATS;
     eTotS = eTAS = eES = eAES = eAS = eAAS = eTS = eATS = 0;
-    mbImpl->estimated_memory_use( NULL, 0, &eTotS, &eTAS, &eES, &eAES, &eAS, &eAAS, NULL, 0, &eTS,
-                                  &eATS );
+    mbImpl->estimated_memory_use( NULL, 0, &eTotS, &eTAS, &eES, &eAES, &eAS, &eAAS, NULL, 0, &eTS, &eATS );
 
     qmem.total_storage[ 1 ] = eTotS;
     qmem.amortized_total_storage[ 1 ] = eTAS;
@@ -388,13 +384,11 @@ ErrorCode adj_perf( const char* filename )
 
     // Print times
     std::cout << std::endl;
-    std::cout << " Data Structure Construction Time = " << qtime.ds_construction << " Secs"
-              << std::endl;
+    std::cout << " Data Structure Construction Time = " << qtime.ds_construction << " Secs" << std::endl;
     std::cout << std::endl;
     std::cout << "Query times in Seconds" << std::endl;
 #ifdef MOAB_HAVE_AHF
-    std::cout << "QUERY: Vertex -> Edges :: MOAB_AHF: Average time =  "
-              << qtime.vertex_to_edges_avg;
+    std::cout << "QUERY: Vertex -> Edges :: MOAB_AHF: Average time =  " << qtime.vertex_to_edges_avg;
     std::cout << ", Total time = " << qtime.vertex_to_edges_total << std::endl;
     std::cout << std::endl;
 #else
@@ -414,8 +408,7 @@ ErrorCode adj_perf( const char* filename )
 #endif
 
 #ifdef MOAB_HAVE_AHF
-    std::cout << "QUERY: Vertex -> Faces :: MOAB_AHF: Average time =  "
-              << qtime.vertex_to_faces_avg;
+    std::cout << "QUERY: Vertex -> Faces :: MOAB_AHF: Average time =  " << qtime.vertex_to_faces_avg;
     std::cout << ", Total time = " << qtime.vertex_to_faces_total << std::endl;
     std::cout << std::endl;
 #else
@@ -455,8 +448,7 @@ ErrorCode adj_perf( const char* filename )
 #endif
 
 #ifdef MOAB_HAVE_AHF
-    std::cout << "QUERY: Vertex -> Cells :: MOAB_AHF: Average time =  "
-              << qtime.vertex_to_cells_avg;
+    std::cout << "QUERY: Vertex -> Cells :: MOAB_AHF: Average time =  " << qtime.vertex_to_cells_avg;
     std::cout << ", Total time = " << qtime.vertex_to_cells_total << std::endl;
     std::cout << std::endl;
 #else
@@ -529,13 +521,11 @@ ErrorCode adj_perf( const char* filename )
         std::cout << std::endl;
 
         std::cout << "Entity storage = " << qmem.entity_storage[ i ] << std::endl;
-        std::cout << "Amortized entity storage = " << qmem.amortized_entity_storage[ i ]
-                  << std::endl;
+        std::cout << "Amortized entity storage = " << qmem.amortized_entity_storage[ i ] << std::endl;
         std::cout << std::endl;
 
         std::cout << "Adjacency storage = " << qmem.adjacency_storage[ i ] << std::endl;
-        std::cout << "Amortized adjacency storage = " << qmem.amortized_adjacency_storage[ i ]
-                  << std::endl;
+        std::cout << "Amortized adjacency storage = " << qmem.amortized_adjacency_storage[ i ] << std::endl;
         std::cout << std::endl;
 
         std::cout << "Tag storage = " << qmem.tag_storage[ i ] << std::endl;
@@ -543,21 +533,18 @@ ErrorCode adj_perf( const char* filename )
         std::cout << std::endl;
     }
 
-    double total_time =
-        qtime.vertex_to_edges_total + qtime.edge_to_edges_total + qtime.vertex_to_faces_total +
-        qtime.edge_to_faces_total + qtime.face_to_faces_total + qtime.face_to_edges_total +
-        qtime.vertex_to_cells_total + qtime.edge_to_cells_total + qtime.face_to_cells_total +
-        qtime.cell_to_cells_total + qtime.cell_to_edges_total + qtime.cell_to_faces_total;
+    double total_time = qtime.vertex_to_edges_total + qtime.edge_to_edges_total + qtime.vertex_to_faces_total +
+                        qtime.edge_to_faces_total + qtime.face_to_faces_total + qtime.face_to_edges_total +
+                        qtime.vertex_to_cells_total + qtime.edge_to_cells_total + qtime.face_to_cells_total +
+                        qtime.cell_to_cells_total + qtime.cell_to_edges_total + qtime.cell_to_faces_total;
 
     // Print values in a line to aid data copying later
-    std::cout << qtime.ds_construction << "  " << total_time << "  " << qmem.entity_storage[ 1 ]
-              << "  " << qmem.adjacency_storage[ 1 ] << "  " << qtime.vertex_to_edges_avg << "  "
-              << qtime.edge_to_edges_avg << "  " << qtime.vertex_to_faces_avg << "  "
-              << qtime.edge_to_faces_avg << "  " << qtime.face_to_faces_avg << "  "
-              << qtime.face_to_edges_avg << "  " << qtime.vertex_to_cells_avg << "  "
-              << qtime.edge_to_cells_avg << "  " << qtime.face_to_cells_avg << "  "
-              << qtime.cell_to_cells_avg << "  " << qtime.cell_to_edges_avg << "  "
-              << qtime.cell_to_faces_avg << std::endl;
+    std::cout << qtime.ds_construction << "  " << total_time << "  " << qmem.entity_storage[ 1 ] << "  "
+              << qmem.adjacency_storage[ 1 ] << "  " << qtime.vertex_to_edges_avg << "  " << qtime.edge_to_edges_avg
+              << "  " << qtime.vertex_to_faces_avg << "  " << qtime.edge_to_faces_avg << "  " << qtime.face_to_faces_avg
+              << "  " << qtime.face_to_edges_avg << "  " << qtime.vertex_to_cells_avg << "  " << qtime.edge_to_cells_avg
+              << "  " << qtime.face_to_cells_avg << "  " << qtime.cell_to_cells_avg << "  " << qtime.cell_to_edges_avg
+              << "  " << qtime.cell_to_faces_avg << std::endl;
 
     delete mt;
     return MB_SUCCESS;

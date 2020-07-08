@@ -79,8 +79,7 @@ class LPtoPTemplate : public ObjectiveFunctionTemplate
     virtual void clear( );
 
     MESQUITE_EXPORT
-    virtual bool evaluate( EvalType type, PatchData& pd, double& value_out, bool free,
-                           MsqError& err );
+    virtual bool evaluate( EvalType type, PatchData& pd, double& value_out, bool free, MsqError& err );
 
     MESQUITE_EXPORT
     virtual bool evaluate_with_gradient( EvalType type, PatchData& pd, double& value_out,
@@ -89,13 +88,11 @@ class LPtoPTemplate : public ObjectiveFunctionTemplate
     MESQUITE_EXPORT
     virtual bool evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd, double& value_out,
                                                  std::vector< Vector3D >&    grad_out,
-                                                 std::vector< SymMatrix3D >& hess_diag_out,
-                                                 MsqError&                   err );
+                                                 std::vector< SymMatrix3D >& hess_diag_out, MsqError& err );
 
     MESQUITE_EXPORT
     virtual bool evaluate_with_Hessian( EvalType type, PatchData& pd, double& value_out,
-                                        std::vector< Vector3D >& grad_out, MsqHessian& Hessian_out,
-                                        MsqError& err );
+                                        std::vector< Vector3D >& grad_out, MsqHessian& Hessian_out, MsqError& err );
 
     MESQUITE_EXPORT
     virtual ObjectiveFunction* clone( ) const;
@@ -117,8 +114,7 @@ class LPtoPTemplate : public ObjectiveFunctionTemplate
     }
 
   private:
-    double get_value( double power_sum, size_t count, EvalType type, size_t& global_count,
-                      MsqError& err );
+    double get_value( double power_sum, size_t count, EvalType type, size_t& global_count, MsqError& err );
 
     //! The metric value entries are raised to the pVal power
     short pVal;

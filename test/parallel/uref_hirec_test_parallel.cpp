@@ -34,8 +34,8 @@ using namespace moab;
 std::string read_options;
 #endif
 
-ErrorCode load_meshset_hirec( const char* infile, Interface* mbimpl, EntityHandle& meshset,
-                              ParallelComm*& pc, const int degree, const int dim )
+ErrorCode load_meshset_hirec( const char* infile, Interface* mbimpl, EntityHandle& meshset, ParallelComm*& pc,
+                              const int degree, const int dim )
 {
     ErrorCode error;
     error = mbimpl->create_meshset( moab::MESHSET_SET, meshset );MB_CHK_ERR( error );
@@ -51,8 +51,7 @@ ErrorCode load_meshset_hirec( const char* infile, Interface* mbimpl, EntityHandl
 
     if( nprocs > 1 )
     {
-        int nghlayers =
-            degree > 0 ? HiReconstruction::estimate_num_ghost_layers( degree, true ) : 0;
+        int nghlayers = degree > 0 ? HiReconstruction::estimate_num_ghost_layers( degree, true ) : 0;
         assert( nghlayers < 10 );
 
         if( nghlayers )
@@ -79,8 +78,7 @@ ErrorCode load_meshset_hirec( const char* infile, Interface* mbimpl, EntityHandl
         }
         else
         {
-            read_options =
-                "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_SHARED_ENTS;";
+            read_options = "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_SHARED_ENTS;";
         }
 
         /*for debug*/
@@ -113,8 +111,7 @@ ErrorCode load_meshset_hirec( const char* infile, Interface* mbimpl, EntityHandl
     return error;
 }
 
-ErrorCode closedsurface_uref_hirec_convergence_study( const char*         infile,
-                                                      std::vector< int >& degs2fit, bool interp,
+ErrorCode closedsurface_uref_hirec_convergence_study( const char* infile, std::vector< int >& degs2fit, bool interp,
                                                       int dim, geomObject* obj, int& ntestverts,
                                                       std::vector< double >& geoml1errs,
                                                       std::vector< double >& geoml2errs,
@@ -188,7 +185,9 @@ ErrorCode closedsurface_uref_hirec_convergence_study( const char*         infile
     /*Range verts_owned;
     #ifdef MOAB_HAVE_MPI
         if(pc){
-            error = pc->filter_pstatus(verts,PSTATUS_GHOST,PSTATUS_NOT,-1,&verts_owned);MB_CHK_ERR(error); }else{ verts_owned = verts;
+            error =
+    pc->filter_pstatus(verts,PSTATUS_GHOST,PSTATUS_NOT,-1,&verts_owned);MB_CHK_ERR(error); }else{
+    verts_owned = verts;
         }
 
         HalfFacetRep *ahf = new HalfFacetRep(&moab,pc,meshset);
@@ -279,8 +278,8 @@ ErrorCode closedsurface_uref_hirec_convergence_study( const char*         infile
         {
             if( type == MBTRI )
             {
-                double a = (double)rand( ) / RAND_MAX, b = (double)rand( ) / RAND_MAX,
-                       c = (double)rand( ) / RAND_MAX, sum;
+                double a = (double)rand( ) / RAND_MAX, b = (double)rand( ) / RAND_MAX, c = (double)rand( ) / RAND_MAX,
+                       sum;
                 sum = a + b + c;
 
                 if( sum < 1e-12 )
@@ -294,14 +293,10 @@ ErrorCode closedsurface_uref_hirec_convergence_study( const char*         infile
                 }
 
                 assert( a > 0 && b > 0 && c > 0 && fabs( a + b + c - 1 ) < 1e-12 );
-                testpnts.push_back( a * elemcoords[ 0 ] + b * elemcoords[ 3 ] +
-                                    c * elemcoords[ 6 ] );
-                testpnts.push_back( a * elemcoords[ 1 ] + b * elemcoords[ 4 ] +
-                                    c * elemcoords[ 7 ] );
-                testpnts.push_back( a * elemcoords[ 2 ] + b * elemcoords[ 5 ] +
-                                    c * elemcoords[ 8 ] );
-                testnaturalcoords.push_back( a ), testnaturalcoords.push_back( b ),
-                    testnaturalcoords.push_back( c );
+                testpnts.push_back( a * elemcoords[ 0 ] + b * elemcoords[ 3 ] + c * elemcoords[ 6 ] );
+                testpnts.push_back( a * elemcoords[ 1 ] + b * elemcoords[ 4 ] + c * elemcoords[ 7 ] );
+                testpnts.push_back( a * elemcoords[ 2 ] + b * elemcoords[ 5 ] + c * elemcoords[ 8 ] );
+                testnaturalcoords.push_back( a ), testnaturalcoords.push_back( b ), testnaturalcoords.push_back( c );
             }
             else if( type == MBQUAD )
             {
@@ -310,12 +305,12 @@ ErrorCode closedsurface_uref_hirec_convergence_study( const char*         infile
                 eta = 2 * eta - 1;
                 N[ 0 ] = ( 1 - xi ) * ( 1 - eta ) / 4, N[ 1 ] = ( 1 + xi ) * ( 1 - eta ) / 4,
                      N[ 2 ] = ( 1 + xi ) * ( 1 + eta ) / 4, N[ 3 ] = ( 1 - xi ) * ( 1 + eta ) / 4;
-                testpnts.push_back( N[ 0 ] * elemcoords[ 0 ] + N[ 1 ] * elemcoords[ 3 ] +
-                                    N[ 2 ] * elemcoords[ 6 ] + N[ 3 ] * elemcoords[ 9 ] );
-                testpnts.push_back( N[ 0 ] * elemcoords[ 1 ] + N[ 1 ] * elemcoords[ 4 ] +
-                                    N[ 2 ] * elemcoords[ 7 ] + N[ 3 ] * elemcoords[ 10 ] );
-                testpnts.push_back( N[ 0 ] * elemcoords[ 2 ] + N[ 1 ] * elemcoords[ 5 ] +
-                                    N[ 2 ] * elemcoords[ 8 ] + N[ 3 ] * elemcoords[ 11 ] );
+                testpnts.push_back( N[ 0 ] * elemcoords[ 0 ] + N[ 1 ] * elemcoords[ 3 ] + N[ 2 ] * elemcoords[ 6 ] +
+                                    N[ 3 ] * elemcoords[ 9 ] );
+                testpnts.push_back( N[ 0 ] * elemcoords[ 1 ] + N[ 1 ] * elemcoords[ 4 ] + N[ 2 ] * elemcoords[ 7 ] +
+                                    N[ 3 ] * elemcoords[ 10 ] );
+                testpnts.push_back( N[ 0 ] * elemcoords[ 2 ] + N[ 1 ] * elemcoords[ 5 ] + N[ 2 ] * elemcoords[ 8 ] +
+                                    N[ 3 ] * elemcoords[ 11 ] );
                 testnaturalcoords.push_back( N[ 0 ] ), testnaturalcoords.push_back( N[ 1 ] ),
                     testnaturalcoords.push_back( N[ 2 ] ), testnaturalcoords.push_back( N[ 3 ] );
             }
@@ -331,8 +326,7 @@ ErrorCode closedsurface_uref_hirec_convergence_study( const char*         infile
     geoml1errs.clear( );
     geoml2errs.clear( );
     geomlinferrs.clear( );
-    obj->compute_projecterror( 3, elems_owned.size( ) * nsamples, &( testpnts[ 0 ] ), l1err, l2err,
-                               linferr );
+    obj->compute_projecterror( 3, elems_owned.size( ) * nsamples, &( testpnts[ 0 ] ), l1err, l2err, linferr );
     geoml1errs.push_back( l1err );
     geoml2errs.push_back( l2err );
     geomlinferrs.push_back( linferr );
@@ -350,13 +344,12 @@ ErrorCode closedsurface_uref_hirec_convergence_study( const char*         infile
         /*double maxlinferr=0,elemlinferr=0,eleml1err=0,eleml2err;
         EntityHandle elem_maxerr;*/
 
-        for( Range::iterator ielem = elems_owned.begin( ); ielem != elems_owned.end( );
-             ++ielem, ++index )
+        for( Range::iterator ielem = elems_owned.begin( ); ielem != elems_owned.end( ); ++ielem, ++index )
         {
             // Projection
-            error = hirec.hiproj_walf_in_element( *ielem, nvpe, nsamples,
-                                                  &( testnaturalcoords[ nvpe * nsamples * index ] ),
-                                                  &( testpnts[ 3 * nsamples * index ] ) );MB_CHK_ERR( error );
+            error =
+                hirec.hiproj_walf_in_element( *ielem, nvpe, nsamples, &( testnaturalcoords[ nvpe * nsamples * index ] ),
+                                              &( testpnts[ 3 * nsamples * index ] ) );MB_CHK_ERR( error );
             // for debug
             /*obj->compute_projecterror(3,nsamples,&(testpnts[3*nsamples*index]),eleml1err,eleml2err,elemlinferr);
             if(elemlinferr>maxlinferr){
@@ -366,8 +359,7 @@ ErrorCode closedsurface_uref_hirec_convergence_study( const char*         infile
 
         assert( (size_t)index == elems_owned.size( ) );
         // Estimate error
-        obj->compute_projecterror( 3, elems_owned.size( ) * nsamples, &( testpnts[ 0 ] ), l1err,
-                                   l2err, linferr );
+        obj->compute_projecterror( 3, elems_owned.size( ) * nsamples, &( testpnts[ 0 ] ), l1err, l2err, linferr );
         geoml1errs.push_back( l1err );
         geoml2errs.push_back( l2err );
         geomlinferrs.push_back( linferr );
@@ -485,14 +477,10 @@ int main( int argc, char* argv[] )
 #ifdef MOAB_HAVE_MPI
 
             if( 0 == rank )
-            {
-                std::cout << "Dimension of input mesh should be provided, positive and less than 3"
-                          << std::endl;
-            }
+            { std::cout << "Dimension of input mesh should be provided, positive and less than 3" << std::endl; }
 
 #else
-            std::cout << "Dimension of input mesh should be provided, positive and less than 3"
-                      << std::endl;
+            std::cout << "Dimension of input mesh should be provided, positive and less than 3" << std::endl;
 #endif
             return 0;
         }
@@ -501,8 +489,7 @@ int main( int argc, char* argv[] )
         {
 #ifdef MOAB_HAVE_MPI
 
-            if( 0 == rank )
-            { std::cout << "Input dimesion should be positive and less than 3;" << std::endl; }
+            if( 0 == rank ) { std::cout << "Input dimesion should be positive and less than 3;" << std::endl; }
 
 #else
             std::cout << "Input dimesion should be positive and less than 3;" << std::endl;
@@ -514,15 +501,13 @@ int main( int argc, char* argv[] )
 
         if( 0 == rank )
         {
-            std::cout << "Testing on " << prefix + istr + "-" + iend + suffix << " with dimension "
-                      << dim << "\n";
+            std::cout << "Testing on " << prefix + istr + "-" + iend + suffix << " with dimension " << dim << "\n";
             std::string opts = interp ? "interpolation" : "least square fitting";
             std::cout << "High order reconstruction in " << opts << std::endl;
         }
 
 #else
-        std::cout << "Testing on " << prefix + istr + "-" + iend + suffix << " with dimension "
-                  << dim << "\n";
+        std::cout << "Testing on " << prefix + istr + "-" + iend + suffix << " with dimension " << dim << "\n";
         std::string opts = interp ? "interpolation" : "least square fitting";
         std::cout << "High order reconstruction in " << opts << std::endl;
 #endif
@@ -548,21 +533,21 @@ int main( int argc, char* argv[] )
 
     if( rank == 0 )
     {
-        geoml1errs_global = std::vector< std::vector< double > >(
-            1 + degs2fit.size( ), std::vector< double >( end - begin, 0 ) );
-        geoml2errs_global = std::vector< std::vector< double > >(
-            1 + degs2fit.size( ), std::vector< double >( end - begin, 0 ) );
-        geomlinferrs_global = std::vector< std::vector< double > >(
-            1 + degs2fit.size( ), std::vector< double >( end - begin, 0 ) );
+        geoml1errs_global =
+            std::vector< std::vector< double > >( 1 + degs2fit.size( ), std::vector< double >( end - begin, 0 ) );
+        geoml2errs_global =
+            std::vector< std::vector< double > >( 1 + degs2fit.size( ), std::vector< double >( end - begin, 0 ) );
+        geomlinferrs_global =
+            std::vector< std::vector< double > >( 1 + degs2fit.size( ), std::vector< double >( end - begin, 0 ) );
     }
 
 #else
-    std::vector< std::vector< double > > geoml1errs_global(
-        1 + degs2fit.size( ), std::vector< double >( end - begin, 0 ) );
-    std::vector< std::vector< double > > geoml2errs_global(
-        1 + degs2fit.size( ), std::vector< double >( end - begin, 0 ) );
-    std::vector< std::vector< double > > geomlinferrs_global(
-        1 + degs2fit.size( ), std::vector< double >( end - begin, 0 ) );
+    std::vector< std::vector< double > > geoml1errs_global( 1 + degs2fit.size( ),
+                                                            std::vector< double >( end - begin, 0 ) );
+    std::vector< std::vector< double > > geoml2errs_global( 1 + degs2fit.size( ),
+                                                            std::vector< double >( end - begin, 0 ) );
+    std::vector< std::vector< double > > geomlinferrs_global( 1 + degs2fit.size( ),
+                                                              std::vector< double >( end - begin, 0 ) );
 #endif
 
     for( int i = begin; i < end; ++i )
@@ -576,11 +561,9 @@ int main( int argc, char* argv[] )
 #ifdef MOAB_HAVE_MPI
         std::cout << "Processor " << rank << " is working on file " << infile << std::endl;
 #endif
-        error = closedsurface_uref_hirec_convergence_study( infile.c_str( ), degs2fit, interp, dim,
-                                                            obj, ntestverts, geoml1errs, geoml2errs,
-                                                            geomlinferrs );MB_CHK_ERR( error );
-        assert( geoml1errs.size( ) == 1 + degs2fit.size( ) &&
-                geoml2errs.size( ) == 1 + degs2fit.size( ) &&
+        error = closedsurface_uref_hirec_convergence_study( infile.c_str( ), degs2fit, interp, dim, obj, ntestverts,
+                                                            geoml1errs, geoml2errs, geomlinferrs );MB_CHK_ERR( error );
+        assert( geoml1errs.size( ) == 1 + degs2fit.size( ) && geoml2errs.size( ) == 1 + degs2fit.size( ) &&
                 geomlinferrs.size( ) == 1 + degs2fit.size( ) );
 #ifdef MOAB_HAVE_MPI
 
@@ -595,16 +578,12 @@ int main( int argc, char* argv[] )
                        local_l2err = geoml2errs[ d ] * ( geoml2errs[ d ] * ntestverts ),
                        local_linferr = geomlinferrs[ d ];
                 std::cout << "On Processor " << rank << " with mesh " << i
-                          << " Degree = " << ( d == 0 ? 0 : degs2fit[ d - 1 ] )
-                          << " L1:" << geoml1errs[ d ] << " L2:" << geoml2errs[ d ]
-                          << " Li:" << geomlinferrs[ d ] << std::endl;
+                          << " Degree = " << ( d == 0 ? 0 : degs2fit[ d - 1 ] ) << " L1:" << geoml1errs[ d ]
+                          << " L2:" << geoml2errs[ d ] << " Li:" << geomlinferrs[ d ] << std::endl;
                 double global_l1err = 0, global_l2err = 0, global_linferr = 0;
-                MPI_Reduce( &local_l1err, &global_l1err, 1, MPI_DOUBLE, MPI_SUM, 0,
-                            MPI_COMM_WORLD );
-                MPI_Reduce( &local_l2err, &global_l2err, 1, MPI_DOUBLE, MPI_SUM, 0,
-                            MPI_COMM_WORLD );
-                MPI_Reduce( &local_linferr, &global_linferr, 1, MPI_DOUBLE, MPI_MAX, 0,
-                            MPI_COMM_WORLD );
+                MPI_Reduce( &local_l1err, &global_l1err, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD );
+                MPI_Reduce( &local_l2err, &global_l2err, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD );
+                MPI_Reduce( &local_linferr, &global_linferr, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD );
 
                 if( rank == 0 )
                 {

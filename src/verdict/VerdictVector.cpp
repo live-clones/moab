@@ -216,8 +216,7 @@ double VerdictVector::vector_angle_quick( const VerdictVector& vec1, const Verdi
     return angle;
 }
 
-VerdictVector vectorRotate( const double angle, const VerdictVector& normalAxis,
-                            const VerdictVector& referenceAxis )
+VerdictVector vectorRotate( const double angle, const VerdictVector& normalAxis, const VerdictVector& referenceAxis )
 {
     // A new coordinate system is created with the xy plane corresponding
     // to the plane normal to the normal axis, and the x axis corresponding to
@@ -244,8 +243,7 @@ VerdictVector vectorRotate( const double angle, const VerdictVector& normalAxis,
     return VerdictVector( xAxis + yAxis );
 }
 
-double VerdictVector::vector_angle( const VerdictVector& vector1,
-                                    const VerdictVector& vector2 ) const
+double VerdictVector::vector_angle( const VerdictVector& vector1, const VerdictVector& vector2 ) const
 {
     // This routine does not assume that any of the input vectors are of unit
     // length. This routine does not normalize the input vectors.
@@ -302,8 +300,7 @@ double VerdictVector::vector_angle( const VerdictVector& vector1,
     {
         // The normal and vector1 are not colinear, now check for vector2
         dot = vector2 % normal;
-        if( dot * dot >= vector2.length_squared( ) * normal_lensq * dot_tol )
-        { normal = vector1 * vector2; }
+        if( dot * dot >= vector2.length_squared( ) * normal_lensq * dot_tol ) { normal = vector1 * vector2; }
     }
 
     // Assume a plane such that the normal vector is the plane's normal.
@@ -330,8 +327,7 @@ double VerdictVector::vector_angle( const VerdictVector& vector1,
 
 bool VerdictVector::within_tolerance( const VerdictVector& vectorPtr2, double tolerance ) const
 {
-    if( ( fabs( this->x( ) - vectorPtr2.x( ) ) < tolerance ) &&
-        ( fabs( this->y( ) - vectorPtr2.y( ) ) < tolerance ) &&
+    if( ( fabs( this->x( ) - vectorPtr2.x( ) ) < tolerance ) && ( fabs( this->y( ) - vectorPtr2.y( ) ) < tolerance ) &&
         ( fabs( this->z( ) - vectorPtr2.z( ) ) < tolerance ) )
     { return true; }
 
@@ -409,8 +405,7 @@ void VerdictVector::orthogonal_vectors( VerdictVector& vector2, VerdictVector& v
 }
 
 //- Find next point from this point using a direction and distance
-void VerdictVector::next_point( const VerdictVector& direction, double distance,
-                                VerdictVector& out_point )
+void VerdictVector::next_point( const VerdictVector& direction, double distance, VerdictVector& out_point )
 {
     VerdictVector my_direction = direction;
     my_direction.normalize( );
@@ -423,7 +418,4 @@ void VerdictVector::next_point( const VerdictVector& direction, double distance,
     return;
 }
 
-VerdictVector::VerdictVector( const double xyz[ 3 ] )
-    : xVal( xyz[ 0 ] ), yVal( xyz[ 1 ] ), zVal( xyz[ 2 ] )
-{
-}
+VerdictVector::VerdictVector( const double xyz[ 3 ] ) : xVal( xyz[ 0 ] ), yVal( xyz[ 1 ] ), zVal( xyz[ 2 ] ) {}

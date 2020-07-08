@@ -64,8 +64,7 @@ ErrorOutput::ErrorOutput( FILE* impl ) : outputImpl( new FILEErrorStream( impl )
     lineBuffer.reserve( 1024 );
 }
 
-ErrorOutput::ErrorOutput( std::ostream& str )
-    : outputImpl( new CxxErrorStream( str ) ), mpiRank( -1 )
+ErrorOutput::ErrorOutput( std::ostream& str ) : outputImpl( new CxxErrorStream( str ) ), mpiRank( -1 )
 {
     lineBuffer.reserve( 1024 );
 }

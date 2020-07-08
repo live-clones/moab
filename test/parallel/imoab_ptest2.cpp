@@ -141,8 +141,7 @@ int main( int argc, char** argv )
     int num_components = 1;
     int tagIndex = 0;  // output
 
-    rc = iMOAB_DefineTagStorage( pid, "INTFIELD", &tagType, &num_components, &tagIndex,
-                                 strlen( "INTFIELD" ) );
+    rc = iMOAB_DefineTagStorage( pid, "INTFIELD", &tagType, &num_components, &tagIndex, strlen( "INTFIELD" ) );
     ERROR( rc, "failed to get tag INTFIELD " );
     // set some values
     std::vector< int > valstest( numv );

@@ -79,8 +79,8 @@ int main( int argc, char* argv[] )
     bool only_cropping = false;
     if( argc == 1 )
     {
-        std::cout << "Using default input files: " << filename << " " << polygon_file_name << " "
-                  << filename_out << " " << min_dot << " " << quads_file << std::endl;
+        std::cout << "Using default input files: " << filename << " " << polygon_file_name << " " << filename_out << " "
+                  << min_dot << " " << quads_file << std::endl;
         std::cout << "    default output file: " << filename_out << " will be deleted \n";
     }
     else if( argc == 5 )
@@ -99,15 +99,13 @@ int main( int argc, char* argv[] )
         min_dot = atof( argv[ 4 ] );
         quads_file = argv[ 5 ];
         keep_output = true;
-        std::cout << "Using input files: " << filename << " " << polygon_file_name << " "
-                  << std::endl;
+        std::cout << "Using input files: " << filename << " " << polygon_file_name << " " << std::endl;
         std::cout << "    default output file: " << filename_out << " will be saved \n";
         std::cout << " min_dot: " << min_dot << " quads file:" << quads_file << "\n";
     }
     else
     {
-        std::cerr << "Usage: " << argv[ 0 ]
-                  << " [geom_filename] [polygon_file] [output_file] [min_dot] [quads_file]"
+        std::cerr << "Usage: " << argv[ 0 ] << " [geom_filename] [polygon_file] [output_file] [min_dot] [quads_file]"
                   << std::endl;
         return 1;
     }
@@ -197,9 +195,8 @@ ErrorCode gentityset_test( FBEngine* pFacet )
 
     // get the number of sets in the whole model
     int all_sets = 0;
-    rval = pFacet->getNumEntSets( root_set, 0, &all_sets );MB_CHK_SET_ERR(
-        rval, "Problem getting the number of all gentity sets in whole model." );  // why do we
-                                                                                   // count all sets
+    rval = pFacet->getNumEntSets( root_set, 0, &all_sets );MB_CHK_SET_ERR( rval, "Problem getting the number of all gentity sets in whole model." );  // why do we
+                                                                                               // count all sets
 
     // add gentities to entitysets by type
     for( ; ent_type < num_type; ent_type++ )
@@ -321,13 +318,13 @@ ErrorCode geometry_evaluation_test( FBEngine* pFacet )
             {
                 EntityHandle this_gent = *vit;
 
-                rval = pFacet->getEntBoundBox( this_gent, &min[ 0 ], &min[ 1 ], &min[ 2 ],
-                                               &max[ 0 ], &max[ 1 ], &max[ 2 ] );MB_CHK_SET_ERR( rval, "Failed to get bounding box of entity." );
+                rval = pFacet->getEntBoundBox( this_gent, &min[ 0 ], &min[ 1 ], &min[ 2 ], &max[ 0 ], &max[ 1 ],
+                                               &max[ 2 ] );MB_CHK_SET_ERR( rval, "Failed to get bounding box of entity." );
 
                 for( int j = 0; j < 3; j++ )
                     near[ j ] = ( min[ j ] + max[ j ] ) / 2.;
-                rval = pFacet->getEntClosestPt( this_gent, near[ 0 ], near[ 1 ], near[ 2 ],
-                                                &on[ 0 ], &on[ 1 ], &on[ 2 ] );MB_CHK_SET_ERR( rval, "Failed to get closest point on entity." );
+                rval =
+                    pFacet->getEntClosestPt( this_gent, near[ 0 ], near[ 1 ], near[ 2 ], &on[ 0 ], &on[ 1 ], &on[ 2 ] );MB_CHK_SET_ERR( rval, "Failed to get closest point on entity." );
             }
         }
         else
@@ -341,13 +338,12 @@ ErrorCode geometry_evaluation_test( FBEngine* pFacet )
                 // some random parameter
                 rval = pFacet->getEntUtoXYZ( this_gent, 0.33, near[ 0 ], near[ 1 ], near[ 2 ] );MB_CHK_SET_ERR( rval, "Failed to get a new point" );
 
-                std::cout << " entity of type " << i << " position:\n  " << near[ 0 ] << " "
-                          << near[ 1 ] << " " << near[ 2 ] << "\n";
-                rval = pFacet->getEntClosestPt( this_gent, near[ 0 ], near[ 1 ], near[ 2 ],
-                                                &on[ 0 ], &on[ 1 ], &on[ 2 ] );MB_CHK_SET_ERR( rval, "Failed to get closest point on entity." );
+                std::cout << " entity of type " << i << " position:\n  " << near[ 0 ] << " " << near[ 1 ] << " "
+                          << near[ 2 ] << "\n";
+                rval =
+                    pFacet->getEntClosestPt( this_gent, near[ 0 ], near[ 1 ], near[ 2 ], &on[ 0 ], &on[ 1 ], &on[ 2 ] );MB_CHK_SET_ERR( rval, "Failed to get closest point on entity." );
 
-                std::cout << "   close by:  " << on[ 0 ] << " " << on[ 1 ] << " " << on[ 2 ]
-                          << "\n";
+                std::cout << "   close by:  " << on[ 0 ] << " " << on[ 1 ] << " " << on[ 2 ] << "\n";
             }
         }
     }
@@ -362,8 +358,8 @@ ErrorCode normals_test( FBEngine* pFacet )
     EntityHandle root_set;
     ErrorCode    rval = pFacet->getRootSet( &root_set );MB_CHK_SET_ERR( rval, "ERROR : getRootSet failed!" );
 
-    int top = 0;  // iBase_VERTEX;
-    int num_test_top = 4;  // iBase_ALL_TYPES;
+    int                                        top = 0;  // iBase_VERTEX;
+    int                                        num_test_top = 4;  // iBase_ALL_TYPES;
     std::vector< std::vector< EntityHandle > > gentity_vectors( num_test_top );
 
     // fill the vectors of each topology entities
@@ -386,15 +382,14 @@ ErrorCode normals_test( FBEngine* pFacet )
         for( vit = gentity_vectors[ i ].begin( ); vit != gentity_vectors[ i ].end( ); ++vit )
         {
             EntityHandle this_gent = *vit;
-            rval = pFacet->getEntBoundBox( this_gent, &min[ 0 ], &min[ 1 ], &min[ 2 ], &max[ 0 ],
-                                           &max[ 1 ], &max[ 2 ] );MB_CHK_SET_ERR( rval, "Failed to get bounding box of entity." );
+            rval =
+                pFacet->getEntBoundBox( this_gent, &min[ 0 ], &min[ 1 ], &min[ 2 ], &max[ 0 ], &max[ 1 ], &max[ 2 ] );MB_CHK_SET_ERR( rval, "Failed to get bounding box of entity." );
 
-            rval = pFacet->getEntNrmlXYZ( this_gent, ( max[ 0 ] + min[ 0 ] ) / 2,
-                                          ( max[ 1 ] + min[ 1 ] ) / 2, ( max[ 2 ] + min[ 2 ] ) / 2,
-                                          &normal[ 0 ], &normal[ 1 ], &normal[ 2 ] );MB_CHK_SET_ERR( rval, "Failed to get normal to the closest point." );
+            rval = pFacet->getEntNrmlXYZ( this_gent, ( max[ 0 ] + min[ 0 ] ) / 2, ( max[ 1 ] + min[ 1 ] ) / 2,
+                                          ( max[ 2 ] + min[ 2 ] ) / 2, &normal[ 0 ], &normal[ 1 ], &normal[ 2 ] );MB_CHK_SET_ERR( rval, "Failed to get normal to the closest point." );
 
-            std::cout << " entity of type " << i << " closest normal to center:\n  " << normal[ 0 ]
-                      << " " << normal[ 1 ] << " " << normal[ 2 ] << "\n";
+            std::cout << " entity of type " << i << " closest normal to center:\n  " << normal[ 0 ] << " "
+                      << normal[ 1 ] << " " << normal[ 2 ] << "\n";
         }
     }
 
@@ -420,12 +415,11 @@ ErrorCode ray_test( FBEngine* pFacet )
 
     EntityHandle first_face = faces[ 0 ];
 
-    rval = pFacet->getEntBoundBox( first_face, &min[ 0 ], &min[ 1 ], &min[ 2 ], &max[ 0 ],
-                                   &max[ 1 ], &max[ 2 ] );MB_CHK_SET_ERR( rval, "Failed to get bounding box of entity." );
+    rval = pFacet->getEntBoundBox( first_face, &min[ 0 ], &min[ 1 ], &min[ 2 ], &max[ 0 ], &max[ 1 ], &max[ 2 ] );MB_CHK_SET_ERR( rval, "Failed to get bounding box of entity." );
 
     // assume that the ray shot from the bottom of the box (middle) is a pretty good candidate
     // in z direction
-    double x = ( min[ 0 ] + max[ 0 ] ) / 2, y = ( min[ 1 ] + max[ 1 ] ) / 2, z = min[ 2 ];
+    double                      x = ( min[ 0 ] + max[ 0 ] ) / 2, y = ( min[ 1 ] + max[ 1 ] ) / 2, z = min[ 2 ];
     std::vector< EntityHandle > intersect_entity_handles;
     std::vector< double >       intersect_coords;
     std::vector< double >       param_coords;
@@ -439,10 +433,8 @@ ErrorCode ray_test( FBEngine* pFacet )
     for( unsigned int i = 0; i < intersect_entity_handles.size( ); i++ )
     {
 
-        std::cout << " entity of type "
-                  << pFacet->moab_instance( )->type_from_handle( intersect_entity_handles[ i ] )
-                  << " id from handle: "
-                  << pFacet->moab_instance( )->id_from_handle( intersect_entity_handles[ i ] )
+        std::cout << " entity of type " << pFacet->moab_instance( )->type_from_handle( intersect_entity_handles[ i ] )
+                  << " id from handle: " << pFacet->moab_instance( )->id_from_handle( intersect_entity_handles[ i ] )
                   << "\n"
                   << intersect_coords[ 3 * i ] << " " << intersect_coords[ 3 * i + 1 ] << " "
                   << intersect_coords[ 3 * i + 2 ] << "\n"
@@ -511,8 +503,7 @@ ErrorCode split_test( Interface* mb, FBEngine* pFacet )
     }
 
     EntityHandle newFace;  // first test is with closed surface
-    rval = pFacet->split_surface_with_direction( first_face, xyz, direction, /*closed*/ 1, min_dot,
-                                                 newFace );MB_CHK_SET_ERR( rval, "ERROR : splitting surface failed!" );
+    rval = pFacet->split_surface_with_direction( first_face, xyz, direction, /*closed*/ 1, min_dot, newFace );MB_CHK_SET_ERR( rval, "ERROR : splitting surface failed!" );
 
     // save a new database
     pFacet->delete_smooth_tags( );

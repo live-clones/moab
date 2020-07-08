@@ -89,8 +89,7 @@ int                startG1 = 0, startG2 = 0, endG1 = numProcesses - 1, endG2 = n
 int                typeA = 1;  // spectral mesh, with GLOBAL_DOFS tags on cells
 int                typeB = 2;  // point cloud mesh, with GLOBAL_ID tag on vertices
 
-std::string
-            readopts( "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_SHARED_ENTS" );
+std::string readopts( "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_SHARED_ENTS" );
 std::string readoptsPC( "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION" );
 std::string fileWriteOptions( "PARALLEL=WRITE_PART" );
 std::string tagT( "a2oTbot" );
@@ -139,9 +138,8 @@ int commgraphtest( )
 
     if( !rankInGlobalComm )
     {
-        std::cout << " first  file: " << atmFilename << "\n   on tasks : " << startG1 << ":"
-                  << endG1 << "\n second file: " << atmPhysFilename
-                  << "\n     on tasks : " << startG2 << ":" << endG2 << "\n  ";
+        std::cout << " first  file: " << atmFilename << "\n   on tasks : " << startG1 << ":" << endG1
+                  << "\n second file: " << atmPhysFilename << "\n     on tasks : " << startG2 << ":" << endG2 << "\n  ";
     }
 
     // load files on 2 different communicators, groups
@@ -187,8 +185,7 @@ int commgraphtest( )
     ierr = MPI_Comm_create_group( MPI_COMM_WORLD, joinAtmPhysAtmGroup, JOIN_COMM_TAG, &joinComm );
     CHECKIERR( ierr, "Cannot create joint atm cou communicator" )
 
-    ierr = iMOAB_Initialize(
-        0, NULL );  // not really needed anything from argc, argv, yet; maybe we should
+    ierr = iMOAB_Initialize( 0, NULL );  // not really needed anything from argc, argv, yet; maybe we should
     CHECKIERR( ierr, "Cannot initialize iMOAB" )
 
     int         cmpAtmAppID = -1;
@@ -206,8 +203,8 @@ int commgraphtest( )
         // load first model
         std::string rdopts = readopts;
         if( typeA == 2 ) rdopts = readoptsPC;  // point cloud
-        ierr = iMOAB_LoadMesh( cmpAtmPID, atmFilename.c_str( ), rdopts.c_str( ), &nghlay,
-                               atmFilename.length( ), rdopts.length( ) );
+        ierr = iMOAB_LoadMesh( cmpAtmPID, atmFilename.c_str( ), rdopts.c_str( ), &nghlay, atmFilename.length( ),
+                               rdopts.length( ) );
         CHECKIERR( ierr, "Cannot load ATM mesh" )
     }
 
@@ -226,8 +223,8 @@ int commgraphtest( )
 
     if( MPI_COMM_NULL != joinComm )
     {
-        ierr = iMOAB_ComputeCommGraph( cmpAtmPID, physAtmPID, &joinComm, &atmPEGroup, &atmPhysGroup,
-                                       &typeA, &typeB, &cmpatm, &physatm );
+        ierr = iMOAB_ComputeCommGraph( cmpAtmPID, physAtmPID, &joinComm, &atmPEGroup, &atmPhysGroup, &typeA, &typeB,
+                                       &cmpatm, &physatm );
         // it will generate parcomm graph between atm and atmPhys models
         // 2 meshes, that are distributed in parallel
         CHECKIERR( ierr, "Cannot compute comm graph between the two apps " )
@@ -237,8 +234,7 @@ int commgraphtest( )
     {
         // call send tag;
         std::string tags = tagT + separ + tagU + separ + tagV + separ;
-        ierr =
-            iMOAB_SendElementTag( cmpAtmPID, tags.c_str( ), &joinComm, &physatm, tags.length( ) );
+        ierr = iMOAB_SendElementTag( cmpAtmPID, tags.c_str( ), &joinComm, &physatm, tags.length( ) );
         CHECKIERR( ierr, "cannot send tag values" )
     }
 
@@ -250,20 +246,16 @@ int commgraphtest( )
         int         ndof = 1;
         if( typeB == 1 ) ndof = 16;
         int tagIndex = 0;
-        ierr = iMOAB_DefineTagStorage( physAtmPID, tagT1.c_str( ), &tagType, &ndof, &tagIndex,
-                                       tagT1.length( ) );
+        ierr = iMOAB_DefineTagStorage( physAtmPID, tagT1.c_str( ), &tagType, &ndof, &tagIndex, tagT1.length( ) );
         CHECKIERR( ierr, "failed to define the field tag a2oTbot" );
 
-        ierr = iMOAB_DefineTagStorage( physAtmPID, tagU1.c_str( ), &tagType, &ndof, &tagIndex,
-                                       tagU1.length( ) );
+        ierr = iMOAB_DefineTagStorage( physAtmPID, tagU1.c_str( ), &tagType, &ndof, &tagIndex, tagU1.length( ) );
         CHECKIERR( ierr, "failed to define the field tag a2oUbot" );
 
-        ierr = iMOAB_DefineTagStorage( physAtmPID, tagV1.c_str( ), &tagType, &ndof, &tagIndex,
-                                       tagV1.length( ) );
+        ierr = iMOAB_DefineTagStorage( physAtmPID, tagV1.c_str( ), &tagType, &ndof, &tagIndex, tagV1.length( ) );
         CHECKIERR( ierr, "failed to define the field tag a2oVbot" );
 
-        ierr = iMOAB_ReceiveElementTag( physAtmPID, tags1.c_str( ), &joinComm, &cmpatm,
-                                        tags1.length( ) );
+        ierr = iMOAB_ReceiveElementTag( physAtmPID, tags1.c_str( ), &joinComm, &cmpatm, tags1.length( ) );
         CHECKIERR( ierr, "cannot receive tag values" )
     }
 
@@ -276,15 +268,13 @@ int commgraphtest( )
 
     if( physComm != MPI_COMM_NULL )
     {
-        ierr = iMOAB_WriteMesh( physAtmPID, (char*)atmPhysOutFilename.c_str( ),
-                                (char*)fileWriteOptions.c_str( ), atmPhysOutFilename.length( ),
-                                fileWriteOptions.length( ) );
+        ierr = iMOAB_WriteMesh( physAtmPID, (char*)atmPhysOutFilename.c_str( ), (char*)fileWriteOptions.c_str( ),
+                                atmPhysOutFilename.length( ), fileWriteOptions.length( ) );
     }
     if( physComm != MPI_COMM_NULL )
     {
         // send back first tag only
-        ierr =
-            iMOAB_SendElementTag( physAtmPID, tagT1.c_str( ), &joinComm, &cmpatm, tagT1.length( ) );
+        ierr = iMOAB_SendElementTag( physAtmPID, tagT1.c_str( ), &joinComm, &cmpatm, tagT1.length( ) );
         CHECKIERR( ierr, "cannot send tag values" )
     }
     // receive it in a different tag
@@ -295,12 +285,10 @@ int commgraphtest( )
         int ndof = 16;
         if( typeA == 2 ) ndof = 1;
         int tagIndex = 0;
-        ierr = iMOAB_DefineTagStorage( cmpAtmPID, tagT2.c_str( ), &tagType, &ndof, &tagIndex,
-                                       tagT2.length( ) );
+        ierr = iMOAB_DefineTagStorage( cmpAtmPID, tagT2.c_str( ), &tagType, &ndof, &tagIndex, tagT2.length( ) );
         CHECKIERR( ierr, "failed to define the field tag a2oTbot_2" );
 
-        ierr = iMOAB_ReceiveElementTag( cmpAtmPID, tagT2.c_str( ), &joinComm, &physatm,
-                                        tagT2.length( ) );
+        ierr = iMOAB_ReceiveElementTag( cmpAtmPID, tagT2.c_str( ), &joinComm, &physatm, tagT2.length( ) );
         CHECKIERR( ierr, "cannot receive tag values a2oTbot_2" )
     }
     // now send back one tag , into a different tag, and see if we get the same values back
@@ -312,9 +300,8 @@ int commgraphtest( )
     }
     if( atmComm != MPI_COMM_NULL )
     {
-        ierr = iMOAB_WriteMesh( cmpAtmPID, (char*)atmFilename2.c_str( ),
-                                (char*)fileWriteOptions.c_str( ), atmFilename2.length( ),
-                                fileWriteOptions.length( ) );
+        ierr = iMOAB_WriteMesh( cmpAtmPID, (char*)atmFilename2.c_str( ), (char*)fileWriteOptions.c_str( ),
+                                atmFilename2.length( ), fileWriteOptions.length( ) );
     }
 
     // unregister in reverse order

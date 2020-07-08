@@ -38,8 +38,7 @@ unsigned int DGMSolver::compute_numcols_vander_multivar( unsigned int kvars, uns
         unsigned int temp = nchoosek( kvars - 1 + i, kvars - 1 );
         if( !temp )
         {
-            std::cout << "overflow to compute nchoosek n= " << kvars - 1 + i << " k= " << kvars - 1
-                      << std::endl;
+            std::cout << "overflow to compute nchoosek n= " << kvars - 1 + i << " k= " << kvars - 1 << std::endl;
             return 0;
         }
         mcols += temp;
@@ -84,8 +83,8 @@ void DGMSolver::gen_multivar_monomial_basis( const int kvars, const double* vars
     assert( len == iend - istr );
 }
 
-void DGMSolver::gen_vander_multivar( const int mrows, const int kvars, const double* us,
-                                     const int degree, std::vector< double >& V )
+void DGMSolver::gen_vander_multivar( const int mrows, const int kvars, const double* us, const int degree,
+                                     std::vector< double >& V )
 {
     unsigned int ncols = compute_numcols_vander_multivar( kvars, degree );
     V.reserve( mrows * ncols - V.capacity( ) + V.size( ) );
@@ -169,8 +168,7 @@ void DGMSolver::compute_qtransposeB( int mrows, int ncols, const double* Q, int 
     }
 }
 
-void DGMSolver::qr_polyfit_safeguarded( const int mrows, const int ncols, double* V, double* D,
-                                        int* rank )
+void DGMSolver::qr_polyfit_safeguarded( const int mrows, const int ncols, double* V, double* D, int* rank )
 {
     double tol = 1e-8;
     *rank = ncols;
@@ -265,8 +263,7 @@ void DGMSolver::backsolve( int mrows, int ncols, double* R, int bncols, double* 
         for( int j = ncols - 1; j >= 0; j-- )
         {
             for( int i = j + 1; i < ncols; ++i )
-                bs[ mrows * k + j ] =
-                    bs[ mrows * k + j ] - R[ mrows * i + j ] * bs[ mrows * k + i ];
+                bs[ mrows * k + j ] = bs[ mrows * k + j ] - R[ mrows * i + j ] * bs[ mrows * k + i ];
 
             assert( R[ mrows * j + j ] != 0 );
             bs[ mrows * k + j ] = bs[ mrows * k + j ] / R[ mrows * j + j ];
@@ -280,9 +277,8 @@ void DGMSolver::backsolve( int mrows, int ncols, double* R, int bncols, double* 
     }
 }
 
-void DGMSolver::backsolve_polyfit_safeguarded( int dim, int degree, const bool interp, int mrows,
-                                               int ncols, double* R, int bncols, double* bs,
-                                               const double* ws, int* degree_out )
+void DGMSolver::backsolve_polyfit_safeguarded( int dim, int degree, const bool interp, int mrows, int ncols, double* R,
+                                               int bncols, double* bs, const double* ws, int* degree_out )
 {
 #if 0
     std::cout.precision(12);
@@ -371,8 +367,7 @@ void DGMSolver::backsolve_polyfit_safeguarded( int dim, int degree, const bool i
                     {
                         assert( mrows * k + i < mrows * bncols );
                         assert( mrows * i + j < mrows * ncols );  // check R
-                        bs[ mrows * k + j ] =
-                            bs[ mrows * k + j ] - R[ mrows * i + j ] * bs[ mrows * k + i ];
+                        bs[ mrows * k + j ] = bs[ mrows * k + j ] - R[ mrows * i + j ] * bs[ mrows * k + i ];
                     }
                     assert( mrows * j + j < mrows * ncols );  // check R
                     bs[ mrows * k + j ] = bs[ mrows * k + j ] / R[ mrows * j + j ];
@@ -413,8 +408,7 @@ void DGMSolver::backsolve_polyfit_safeguarded( int dim, int degree, const bool i
                             for( int i = j + 1; i <= cend; ++i )
                             {
                                 assert( mrows * i + j < mrows * ncols );  // check R
-                                tb.at( jind ) =
-                                    tb.at( jind ) - R[ mrows * i + j ] * tb.at( i - cstart );
+                                tb.at( jind ) = tb.at( jind ) - R[ mrows * i + j ] * tb.at( i - cstart );
                             }
                             assert( mrows * j + j < mrows * ncols );  // check R
                             tb.at( jind ) = tb.at( jind ) / R[ mrows * j + j ];
@@ -597,8 +591,8 @@ void DGMSolver::vec_projoff( const int len, const double* a, const double* b, do
     }
 }
 
-void DGMSolver::vec_linear_operation( const int len, const double mu, const double* a,
-                                      const double psi, const double* b, double* c )
+void DGMSolver::vec_linear_operation( const int len, const double mu, const double* a, const double psi,
+                                      const double* b, double* c )
 {
     if( !a || !b || !c ) { MB_SET_ERR_RET( "NULL Pointer" ); }
     for( int i = 0; i < len; ++i )
@@ -614,12 +608,9 @@ void DGMSolver::get_tri_natural_coords( const int dim, const double* cornercoord
     double a = 0, b = 0, d = 0, tol = 1e-12;
     for( int i = 0; i < dim; ++i )
     {
-        a += ( cornercoords[ dim + i ] - cornercoords[ i ] ) *
-             ( cornercoords[ dim + i ] - cornercoords[ i ] );
-        b += ( cornercoords[ dim + i ] - cornercoords[ i ] ) *
-             ( cornercoords[ 2 * dim + i ] - cornercoords[ i ] );
-        d += ( cornercoords[ 2 * dim + i ] - cornercoords[ i ] ) *
-             ( cornercoords[ 2 * dim + i ] - cornercoords[ i ] );
+        a += ( cornercoords[ dim + i ] - cornercoords[ i ] ) * ( cornercoords[ dim + i ] - cornercoords[ i ] );
+        b += ( cornercoords[ dim + i ] - cornercoords[ i ] ) * ( cornercoords[ 2 * dim + i ] - cornercoords[ i ] );
+        d += ( cornercoords[ 2 * dim + i ] - cornercoords[ i ] ) * ( cornercoords[ 2 * dim + i ] - cornercoords[ i ] );
     }
     double det = a * d - b * b;
     assert( det > 0 );
@@ -628,8 +619,7 @@ void DGMSolver::get_tri_natural_coords( const int dim, const double* cornercoord
         double e = 0, f = 0;
         for( int i = 0; i < dim; ++i )
         {
-            e += ( cornercoords[ dim + i ] - cornercoords[ i ] ) *
-                 ( currcoords[ ipt * dim + i ] - cornercoords[ i ] );
+            e += ( cornercoords[ dim + i ] - cornercoords[ i ] ) * ( currcoords[ ipt * dim + i ] - cornercoords[ i ] );
             f += ( cornercoords[ 2 * dim + i ] - cornercoords[ i ] ) *
                  ( currcoords[ ipt * dim + i ] - cornercoords[ i ] );
         }
@@ -640,25 +630,22 @@ void DGMSolver::get_tri_natural_coords( const int dim, const double* cornercoord
             naturalcoords[ ipt * 3 + 2 ] < -tol )
         {
             std::cout << "Corners: \n";
-            std::cout << cornercoords[ 0 ] << "\t" << cornercoords[ 1 ] << "\t" << cornercoords[ 3 ]
-                      << std::endl;
-            std::cout << cornercoords[ 3 ] << "\t" << cornercoords[ 4 ] << "\t" << cornercoords[ 5 ]
-                      << std::endl;
-            std::cout << cornercoords[ 6 ] << "\t" << cornercoords[ 7 ] << "\t" << cornercoords[ 8 ]
-                      << std::endl;
+            std::cout << cornercoords[ 0 ] << "\t" << cornercoords[ 1 ] << "\t" << cornercoords[ 3 ] << std::endl;
+            std::cout << cornercoords[ 3 ] << "\t" << cornercoords[ 4 ] << "\t" << cornercoords[ 5 ] << std::endl;
+            std::cout << cornercoords[ 6 ] << "\t" << cornercoords[ 7 ] << "\t" << cornercoords[ 8 ] << std::endl;
             std::cout << "Candidate: \n";
             std::cout << currcoords[ ipt * dim ] << "\t" << currcoords[ ipt * dim + 1 ] << "\t"
                       << currcoords[ ipt * dim + 2 ] << std::endl;
             exit( 0 );
         }
-        assert( fabs( naturalcoords[ ipt * 3 ] + naturalcoords[ ipt * 3 + 1 ] +
-                      naturalcoords[ ipt * 3 + 2 ] - 1 ) < tol );
+        assert( fabs( naturalcoords[ ipt * 3 ] + naturalcoords[ ipt * 3 + 1 ] + naturalcoords[ ipt * 3 + 2 ] - 1 ) <
+                tol );
         for( int i = 0; i < dim; ++i )
         {
             assert( fabs( naturalcoords[ ipt * 3 ] * cornercoords[ i ] +
                           naturalcoords[ ipt * 3 + 1 ] * cornercoords[ dim + i ] +
-                          naturalcoords[ ipt * 3 + 2 ] * cornercoords[ 2 * dim + i ] -
-                          currcoords[ ipt * dim + i ] ) < tol );
+                          naturalcoords[ ipt * 3 + 2 ] * cornercoords[ 2 * dim + i ] - currcoords[ ipt * dim + i ] ) <
+                    tol );
         }
     }
 }

@@ -116,8 +116,7 @@ void build_mesh( )
     rval = mb->tag_get_handle( SET_IDS_NAME, ENTS_PER_SET, MB_TYPE_INTEGER, set_ids, sparse );CHECK_ERR( rval );
 
     Tag set_handles;
-    rval =
-        mb->tag_get_handle( SET_HANDLES_NAME, ENTS_PER_SET, MB_TYPE_HANDLE, set_handles, sparse );CHECK_ERR( rval );
+    rval = mb->tag_get_handle( SET_HANDLES_NAME, ENTS_PER_SET, MB_TYPE_HANDLE, set_handles, sparse );CHECK_ERR( rval );
 
     Tag var_data;
     rval = mb->tag_get_handle( VAR_INTS_NAME, 0, MB_TYPE_INTEGER, var_data, dense | MB_TAG_VARLEN );CHECK_ERR( rval );
@@ -173,8 +172,8 @@ void build_mesh( )
             int tagval = idx;
             rval = mb->tag_set_data( gid, &h, 1, &tagval );CHECK_ERR( rval );
 
-            int ids[ 4 ] = { static_cast< int >( n0 ), static_cast< int >( n1 ),
-                             static_cast< int >( n2 ), static_cast< int >( n3 ) };
+            int ids[ 4 ] = { static_cast< int >( n0 ), static_cast< int >( n1 ), static_cast< int >( n2 ),
+                             static_cast< int >( n3 ) };
             rval = mb->tag_set_data( conn_ids, &h, 1, ids );CHECK_ERR( rval );
 
             rval = mb->tag_set_data( conn_handles, &h, 1, conn );CHECK_ERR( rval );
@@ -412,8 +411,7 @@ void check_meshset_common( bool ordered )
     for( Range::iterator it = sets.begin( ); it != sets.end( ); ++it )
     {
         rval = mb->get_meshset_options( *it, flags );CHECK_ERR( rval );
-        if( ( ordered && ( flags & MESHSET_ORDERED ) ) ||
-            ( !ordered && !( flags & MESHSET_ORDERED ) ) )
+        if( ( ordered && ( flags & MESHSET_ORDERED ) ) || ( !ordered && !( flags & MESHSET_ORDERED ) ) )
         {
             set = *it;
             break;

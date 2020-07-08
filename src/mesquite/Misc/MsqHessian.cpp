@@ -52,8 +52,8 @@ namespace MBMesquite
 {
 
 MsqHessian::MsqHessian( )
-    : mEntries( 0 ), mRowStart( 0 ), mColIndex( 0 ), mSize( 0 ), mPreconditioner( 0 ),
-      precondArraySize( 0 ), mR( 0 ), mZ( 0 ), mP( 0 ), mW( 0 ), cgArraySizes( 0 ), maxCGiter( 50 )
+    : mEntries( 0 ), mRowStart( 0 ), mColIndex( 0 ), mSize( 0 ), mPreconditioner( 0 ), precondArraySize( 0 ), mR( 0 ),
+      mZ( 0 ), mP( 0 ), mW( 0 ), cgArraySizes( 0 ), maxCGiter( 50 )
 {
 }
 
@@ -463,25 +463,20 @@ void MsqHessian::compute_preconditioner( MsqError& /*err*/ )
         else
         {
             mPreconditioner[ m ][ 0 ][ 0 ] = 1.0 / ( *diag_block )[ 0 ][ 0 ];
-            mPreconditioner[ m ][ 0 ][ 1 ] =
-                ( *diag_block )[ 0 ][ 1 ] * mPreconditioner[ m ][ 0 ][ 0 ];
-            mPreconditioner[ m ][ 0 ][ 2 ] =
-                ( *diag_block )[ 0 ][ 2 ] * mPreconditioner[ m ][ 0 ][ 0 ];
-            sum = ( ( *diag_block )[ 1 ][ 1 ] -
-                    ( *diag_block )[ 0 ][ 1 ] * mPreconditioner[ m ][ 0 ][ 1 ] );
+            mPreconditioner[ m ][ 0 ][ 1 ] = ( *diag_block )[ 0 ][ 1 ] * mPreconditioner[ m ][ 0 ][ 0 ];
+            mPreconditioner[ m ][ 0 ][ 2 ] = ( *diag_block )[ 0 ][ 2 ] * mPreconditioner[ m ][ 0 ][ 0 ];
+            sum = ( ( *diag_block )[ 1 ][ 1 ] - ( *diag_block )[ 0 ][ 1 ] * mPreconditioner[ m ][ 0 ][ 1 ] );
             if( fabs( sum ) <= DBL_EPSILON )
                 use_diag = true;
             else
             {
                 mPreconditioner[ m ][ 1 ][ 1 ] = 1.0 / sum;
 
-                tmp = ( *diag_block )[ 1 ][ 2 ] -
-                      ( *diag_block )[ 0 ][ 2 ] * mPreconditioner[ m ][ 0 ][ 1 ];
+                tmp = ( *diag_block )[ 1 ][ 2 ] - ( *diag_block )[ 0 ][ 2 ] * mPreconditioner[ m ][ 0 ][ 1 ];
 
                 mPreconditioner[ m ][ 1 ][ 2 ] = mPreconditioner[ m ][ 1 ][ 1 ] * tmp;
 
-                sum = ( ( *diag_block )[ 2 ][ 2 ] -
-                        ( *diag_block )[ 0 ][ 2 ] * mPreconditioner[ m ][ 0 ][ 2 ] -
+                sum = ( ( *diag_block )[ 2 ][ 2 ] - ( *diag_block )[ 0 ][ 2 ] * mPreconditioner[ m ][ 0 ][ 2 ] -
                         mPreconditioner[ m ][ 1 ][ 2 ] * tmp );
 
                 if( fabs( sum ) <= DBL_EPSILON )

@@ -95,8 +95,7 @@
                                                                                ******************************************************************************/
 #define IBASE_VERSION_TAG__( I, X, Y, Z ) I##_Version_##X##_##Y##_##Z
 #define IBASE_VERSION_TAG_( I, X, Y, Z ) IBASE_VERSION_TAG__( I, X, Y, Z )
-#define IBASE_VERSION_TAG( I ) \
-    IBASE_VERSION_TAG_( I, IBASE_VERSION_MAJOR, IBASE_VERSION_MINOR, IBASE_VERSION_PATCH )
+#define IBASE_VERSION_TAG( I ) IBASE_VERSION_TAG_( I, IBASE_VERSION_MAJOR, IBASE_VERSION_MINOR, IBASE_VERSION_PATCH )
 
 /***************************************************************************/ /**
                                                                                * \ingroup
@@ -164,8 +163,7 @@
                                                                                ******************************************************************************/
 #define IBASE_MINENUM( enumName ) enumName##_MIN
 #define IBASE_MAXENUM( enumName ) enumName##_MAX
-#define IBASE_NUMENUM( enumName ) \
-    ( (int)IBASE_MAXENUM( enumName ) - (int)IBASE_MINENUM( enumName ) + 1 )
+#define IBASE_NUMENUM( enumName ) ( (int)IBASE_MAXENUM( enumName ) - (int)IBASE_MINENUM( enumName ) + 1 )
 #define IBASE_INCENUM( enumName, I ) ( I = ( enum enumName )( (int)I + 1 ) )
 /** @} */
 

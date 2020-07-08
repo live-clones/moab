@@ -126,8 +126,7 @@ void SlaveBoundaryVerticesTest::test_fail_if_slaves_not_calculated( )
     err.clear( );
 }
 
-void SlaveBoundaryVerticesTest::make_mesh( MeshImpl& mesh, DomainClassifier& domain,
-                                           const int intervals )
+void SlaveBoundaryVerticesTest::make_mesh( MeshImpl& mesh, DomainClassifier& domain, const int intervals )
 {
     MsqPrintError err( std::cerr );
     const char    input_file[] = MESH_FILES_DIR "3D/vtk/quadratic/6x6x6-hex20.vtk";
@@ -172,10 +171,8 @@ void SlaveBoundaryVerticesTest::make_mesh( MeshImpl& mesh, DomainClassifier& dom
                                      new PointDomain( corners[ 5 ] ),
                                      new PointDomain( corners[ 6 ] ),
                                      new PointDomain( corners[ 7 ] ) };
-    const int   subdims[ 26 ] = { 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1,
-                                1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0 };
-    DomainClassifier::classify_skin_geometrically( domain, &mesh, 1e-6, subdomains, subdims, 26,
-                                                   err );
+    const int   subdims[ 26 ] = { 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0 };
+    DomainClassifier::classify_skin_geometrically( domain, &mesh, 1e-6, subdomains, subdims, 26, err );
     domain.delete_sub_domains( true );
     ASSERT_NO_ERROR( err );
 }

@@ -10,11 +10,11 @@ namespace moab
 class UnstructuredElemSeq : public ElementSequence
 {
   public:
-    UnstructuredElemSeq( EntityHandle start_handle, EntityID entity_count,
-                         unsigned nodes_per_entity, SequenceData* data );
+    UnstructuredElemSeq( EntityHandle start_handle, EntityID entity_count, unsigned nodes_per_entity,
+                         SequenceData* data );
 
-    UnstructuredElemSeq( EntityHandle start_handle, EntityID entity_count,
-                         unsigned nodes_per_entity, EntityID sequence_data_size );
+    UnstructuredElemSeq( EntityHandle start_handle, EntityID entity_count, unsigned nodes_per_entity,
+                         EntityID sequence_data_size );
 
     virtual ~UnstructuredElemSeq( );
 
@@ -27,20 +27,17 @@ class UnstructuredElemSeq : public ElementSequence
     virtual ErrorCode get_connectivity( EntityHandle handle, std::vector< EntityHandle >& connect,
                                         bool topological = false ) const;
 
-    virtual ErrorCode get_connectivity( EntityHandle handle, EntityHandle const*& connect,
-                                        int& connect_length, bool topological = false,
-                                        std::vector< EntityHandle >* storage = 0 ) const;
+    virtual ErrorCode get_connectivity( EntityHandle handle, EntityHandle const*& connect, int& connect_length,
+                                        bool topological = false, std::vector< EntityHandle >* storage = 0 ) const;
 
-    ErrorCode set_connectivity( EntityHandle handle, EntityHandle const* connect,
-                                int connect_length );
+    ErrorCode set_connectivity( EntityHandle handle, EntityHandle const* connect, int connect_length );
 
     EntityHandle* get_connectivity_array( );
 
     ErrorCode push_front( EntityID count );
     ErrorCode push_back( EntityID count );
 
-    void get_const_memory_use( unsigned long& bytes_per_entity,
-                               unsigned long& size_of_sequence ) const;
+    void get_const_memory_use( unsigned long& bytes_per_entity, unsigned long& size_of_sequence ) const;
 
   protected:
     inline EntityHandle const* get_array( ) const
@@ -55,10 +52,7 @@ class UnstructuredElemSeq : public ElementSequence
                nodes_per_element( ) * ( start_handle( ) - data( )->start_handle( ) );
     }
 
-    UnstructuredElemSeq( UnstructuredElemSeq& split_from, EntityHandle here )
-        : ElementSequence( split_from, here )
-    {
-    }
+    UnstructuredElemSeq( UnstructuredElemSeq& split_from, EntityHandle here ) : ElementSequence( split_from, here ) {}
 };
 
 }  // namespace moab

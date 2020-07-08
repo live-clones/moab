@@ -64,18 +64,16 @@ int main( )
 }
 
 // Make CHECK_EQUAL macro work for planes
-void check_equal( const BSPTree::Plane& p1, const BSPTree::Plane& p2, const char* exp1,
-                  const char* exp2, int line, const char* file )
+void check_equal( const BSPTree::Plane& p1, const BSPTree::Plane& p2, const char* exp1, const char* exp2, int line,
+                  const char* file )
 {
     if( fabs( p1.norm[ 0 ] - p2.norm[ 0 ] ) > 1e-6 || fabs( p1.norm[ 1 ] - p2.norm[ 1 ] ) > 1e-6 ||
         fabs( p1.norm[ 2 ] - p2.norm[ 2 ] ) > 1e-6 || fabs( p1.coeff - p2.coeff ) > 1e-6 )
     {
         printf( "Equality Test Failed: %s == %s\n", exp1, exp2 );
         printf( "  at line %d of '%s'\n", line, file );
-        printf( "  Expected: %f x + %f y + %f z + %f = 0\n", p1.norm[ 0 ], p1.norm[ 1 ],
-                p1.norm[ 2 ], p1.coeff );
-        printf( "  Actual  : %f x + %f y + %f z + %f = 0\n", p2.norm[ 0 ], p2.norm[ 1 ],
-                p2.norm[ 2 ], p2.coeff );
+        printf( "  Expected: %f x + %f y + %f z + %f = 0\n", p1.norm[ 0 ], p1.norm[ 1 ], p1.norm[ 2 ], p1.coeff );
+        printf( "  Actual  : %f x + %f y + %f z + %f = 0\n", p2.norm[ 0 ], p2.norm[ 1 ], p2.norm[ 2 ], p2.coeff );
         printf( "\n" );
         FLAG_ERROR;
     }
@@ -193,10 +191,9 @@ bool compare_hexes( const double expected[ 8 ][ 3 ], const double actual[ 8 ][ 3
                 // for each coordinate
                 for( int d = 0; d < 3; ++d )
                 {
-                    if( fabs( expected[ ( j + k ) % 4 ][ d ] -
-                              actual[ rotation_maps[ i ][ k ] ][ d ] ) > epsilon ||
-                        fabs( expected[ ( j + k ) % 4 + 4 ][ d ] -
-                              actual[ rotation_maps[ i ][ k + 4 ] ][ d ] ) > epsilon )
+                    if( fabs( expected[ ( j + k ) % 4 ][ d ] - actual[ rotation_maps[ i ][ k ] ][ d ] ) > epsilon ||
+                        fabs( expected[ ( j + k ) % 4 + 4 ][ d ] - actual[ rotation_maps[ i ][ k + 4 ] ][ d ] ) >
+                            epsilon )
                     {
                         match = false;
                         break;
@@ -212,8 +209,8 @@ bool compare_hexes( const double expected[ 8 ][ 3 ], const double actual[ 8 ][ 3
     printf( "           Exected                         Actual\n" );
     for( int v = 0; v < 8; ++v )
     {
-        printf( "% 9f % 9f % 9f   % 9f % 9f % 9f\n", expected[ v ][ 0 ], expected[ v ][ 1 ],
-                expected[ v ][ 2 ], actual[ v ][ 0 ], actual[ v ][ 1 ], actual[ v ][ 2 ] );
+        printf( "% 9f % 9f % 9f   % 9f % 9f % 9f\n", expected[ v ][ 0 ], expected[ v ][ 1 ], expected[ v ][ 2 ],
+                actual[ v ][ 0 ], actual[ v ][ 1 ], actual[ v ][ 2 ] );
     }
 
     return false;
@@ -221,16 +218,15 @@ bool compare_hexes( const double expected[ 8 ][ 3 ], const double actual[ 8 ][ 3
 
 static void aabox_corners( const double min[ 3 ], const double max[ 3 ], double corners[ 8 ][ 3 ] )
 {
-    const double expt[ 8 ][ 3 ] = {
-        { min[ 0 ], min[ 1 ], min[ 2 ] }, { max[ 0 ], min[ 1 ], min[ 2 ] },
-        { max[ 0 ], max[ 1 ], min[ 2 ] }, { min[ 0 ], max[ 1 ], min[ 2 ] },
-        { min[ 0 ], min[ 1 ], max[ 2 ] }, { max[ 0 ], min[ 1 ], max[ 2 ] },
-        { max[ 0 ], max[ 1 ], max[ 2 ] }, { min[ 0 ], max[ 1 ], max[ 2 ] } };
+    const double expt[ 8 ][ 3 ] = { { min[ 0 ], min[ 1 ], min[ 2 ] }, { max[ 0 ], min[ 1 ], min[ 2 ] },
+                                    { max[ 0 ], max[ 1 ], min[ 2 ] }, { min[ 0 ], max[ 1 ], min[ 2 ] },
+                                    { min[ 0 ], min[ 1 ], max[ 2 ] }, { max[ 0 ], min[ 1 ], max[ 2 ] },
+                                    { max[ 0 ], max[ 1 ], max[ 2 ] }, { min[ 0 ], max[ 1 ], max[ 2 ] } };
     memcpy( corners, expt, sizeof( expt ) );
 }
 
-static void aabox_corners( double min_x, double min_y, double min_z, double max_x, double max_y,
-                           double max_z, double corners[ 8 ][ 3 ] )
+static void aabox_corners( double min_x, double min_y, double min_z, double max_x, double max_y, double max_z,
+                           double corners[ 8 ][ 3 ] )
 {
     double min[] = { min_x, min_y, min_z };
     double max[] = { max_x, max_y, max_z };
@@ -1781,8 +1777,7 @@ static EntityHandle build_tree( const double points[], int num_points, BSPTree& 
                     right_pts.push_back( pts[ i ] );
             }
 
-            rval = tool.split_leaf( iter, BSPTree::Plane( norm.array( ), coeff ), left_pts,
-                                    right_pts );CHECK_ERR( rval );
+            rval = tool.split_leaf( iter, BSPTree::Plane( norm.array( ), coeff ), left_pts, right_pts );CHECK_ERR( rval );
             CHECK( !left_pts.empty( ) && !right_pts.empty( ) );
             pts.swap( left_pts );
         }

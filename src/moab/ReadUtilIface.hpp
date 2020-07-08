@@ -49,11 +49,9 @@ class ReadUtilIface
     //! \param sequence_size If specified, allocate this sequence size instead of
     //!      SequenceManager::DEFAULT_VERTEX_SEQUENCE_SIZE
     //! \return status Success/failure of this call
-    virtual ErrorCode get_node_coords( const int num_arrays, const int num_nodes,
-                                       const int               preferred_start_id,
-                                       EntityHandle&           actual_start_handle,
-                                       std::vector< double* >& arrays,
-                                       const int               sequence_size = -1 ) = 0;
+    virtual ErrorCode get_node_coords( const int num_arrays, const int num_nodes, const int preferred_start_id,
+                                       EntityHandle& actual_start_handle, std::vector< double* >& arrays,
+                                       const int sequence_size = -1 ) = 0;
 
     //! Given requested number of elements, element type, and number of
     //! elements, returns pointer to memory space allocated to store connectivity
@@ -81,11 +79,9 @@ class ReadUtilIface
      * \param file_set If non-NULL, entity sets contained in this set will be checked;
      *        otherwise, all sets in the instance will be checked
      */
-    virtual ErrorCode gather_related_ents( Range& partition, Range& related_ents,
-                                           EntityHandle* file_set = NULL ) = 0;
+    virtual ErrorCode gather_related_ents( Range& partition, Range& related_ents, EntityHandle* file_set = NULL ) = 0;
 
-    virtual ErrorCode create_entity_sets( EntityID num_sets, const unsigned* set_flags,
-                                          EntityID      preffered_start_id,
+    virtual ErrorCode create_entity_sets( EntityID num_sets, const unsigned* set_flags, EntityID preffered_start_id,
                                           EntityHandle& actual_start_handle ) = 0;
 
     //! Update adjacencies
@@ -97,10 +93,8 @@ class ReadUtilIface
     //! \param number_vertices_per_element Number of vertices in each new element
     //! \param conn_array Connectivity of new elements
     //! \return status Success/failure of this call
-    virtual ErrorCode update_adjacencies( const EntityHandle  start_handle,
-                                          const int           number_elements,
-                                          const int           number_vertices_per_element,
-                                          const EntityHandle* conn_array ) = 0;
+    virtual ErrorCode update_adjacencies( const EntityHandle start_handle, const int number_elements,
+                                          const int number_vertices_per_element, const EntityHandle* conn_array ) = 0;
 
     /**\brief Re-order incoming element connectivity
      *
@@ -114,14 +108,12 @@ class ReadUtilIface
      *\param num_elem  The number of elements in the connectivity array
      *\param node_per_elem The number of nodes in each element's connectivity list.
      */
-    static inline void reorder( const int* order, EntityHandle* conn, int num_elem,
-                                int node_per_elem );
+    static inline void reorder( const int* order, EntityHandle* conn, int num_elem, int node_per_elem );
 
     //! Given an ordered list of bounding entities and the sense of
     //! those entities, return an ordered list of vertices
-    virtual ErrorCode get_ordered_vertices( EntityHandle* bound_ents, int* sense, int num_bound,
-                                            int dim, EntityHandle* bound_verts,
-                                            EntityType& etype ) = 0;
+    virtual ErrorCode get_ordered_vertices( EntityHandle* bound_ents, int* sense, int num_bound, int dim,
+                                            EntityHandle* bound_verts, EntityType& etype ) = 0;
 
     //! Assign sequential IDS to entities in range and store IDs in tag
     virtual ErrorCode assign_ids( Tag id_tag, const Range& ents, int start = 0 ) = 0;
@@ -129,8 +121,7 @@ class ReadUtilIface
     //! Assign to each entity in an array the ID that is its position
     //! in the array plus the value of 'start'.  For any non-zero handles
     //! in the array, store the ID value in the passed tag.
-    virtual ErrorCode assign_ids( Tag id_tag, const EntityHandle* ents, size_t num_ents,
-                                  int start = 0 ) = 0;
+    virtual ErrorCode assign_ids( Tag id_tag, const EntityHandle* ents, size_t num_ents, int start = 0 ) = 0;
 
     //! Create a new gather set with tag GATHER_SET
     virtual ErrorCode create_gather_set( EntityHandle& gather_set ) = 0;
@@ -139,8 +130,7 @@ class ReadUtilIface
     virtual ErrorCode get_gather_set( EntityHandle& gather_set ) = 0;
 };
 
-inline void ReadUtilIface::reorder( const int* order, EntityHandle* conn, int num_elem,
-                                    int node_per_elem )
+inline void ReadUtilIface::reorder( const int* order, EntityHandle* conn, int num_elem, int node_per_elem )
 {
     std::vector< EntityHandle > elem( node_per_elem );
     EntityHandle* const         end = conn + num_elem * node_per_elem;
