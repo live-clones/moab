@@ -61,6 +61,7 @@
 #include "iMesh.h"
 #include "iMesh_extensions.h"
 #include "moab/Types.hpp"
+#include "TestUtil.hpp"
 using namespace moab;
 extern enum iBase_ErrorType iBase_ERROR_MAP[ MB_FAILURE + 1 ];
 
@@ -69,10 +70,8 @@ extern enum iBase_ErrorType iBase_ERROR_MAP[ MB_FAILURE + 1 ];
 
 #define DEFAULT_TEST_FILE brick.vtk
 
-#define STRINGIFY_( X ) #X
-#define STRINGIFY( X ) STRINGIFY_( X )
 #ifdef SRCDIR
-#define DEFAULT_INPUT_FILE STRINGIFY( SRCDIR / DEFAULT_TEST_FILE )
+#define DEFAULT_INPUT_FILE STRINGIFY( SRCDIR/DEFAULT_TEST_FILE )
 #else
 #define DEFAULT_INPUT_FILE STRINGIFY( DEFAULT_TEST_FILE )
 #endif

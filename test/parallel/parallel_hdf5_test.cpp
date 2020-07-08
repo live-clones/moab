@@ -17,9 +17,6 @@
 #include <stdio.h>
 #include <ctime>
 
-#define STRINGIFY_( X ) #X
-#define STRINGIFY( X ) STRINGIFY_( X )
-
 using namespace moab;
 
 #ifdef MESHDIR
