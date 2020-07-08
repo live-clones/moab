@@ -481,17 +481,22 @@ The following code fragment shows very basic use of AdaptiveKDTree.  A range of 
 \code
 using namespace moab;
 // create the adaptive kd tree from a range of tets
-EntityHandle tree_root
-AdaptiveKDTree myTree(moab);
-ErrorCode rval = myTree.build_tree(tets, tree_root);
+std::ostringstream options;
+options << "MAX_PER_LEAF=1;SPLITS_PER_DIR=1;PLANE_SET=0;";
+FileOptions opts(options.str().c_str());
+EntityHandle root;
+ErrorCode rval;
+AdaptiveKDTree tool( &moab );
+rval = tool.build_tree( tets, &root, &opts);
 
 // get the overall bounding box corners
-double boxmax[3], boxmin;
-rval = myTree.get_tree_box(tree_root, boxmax, boxmin);
+const double * boxmax, * boxmin;
+boxmax = myTree.box_max();
+boxmin = myTree.box_min;
 
 // get the tree leaf containing point xyz, and the tets in that leaf
 AdaptiveKDTreeIter treeiter;
-rval = myTree.leaf_containing_point(tree_root, xyz, treeiter);
+rval = myTree.point_search(xyz, treeiter);
 Range leaf_tets;
 rval = moab->get_entities_by_dimension(treeiter.handle(), 3, 
                                        leaf_tets, false);
