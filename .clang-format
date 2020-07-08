@@ -49,8 +49,6 @@ ForEachMacros:   [ foreach, Q_FOREACH, BOOST_FOREACH ]
 IncludeCategories:
   - Regex:           '^"(moab)/'
     Priority:        2
-  - Regex:           '^(<|"(Eigen)/)'
-    Priority:        3
   - Regex:           '.*'
     Priority:        1
 IncludeIsMainRegex: '$'

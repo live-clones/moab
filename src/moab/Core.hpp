@@ -40,20 +40,6 @@ class SetIterator;
 class HalfFacetRep;
 #endif
 
-#ifdef XPCOM_MB
-
-#define MBCORE_CID                                       \
-    {                                                    \
-        0x7cb5b7a0, 0x7d7, 0x11d3,                       \
-        {                                                \
-            0xba, 0xb2, 0x0, 0x0, 0x64, 0x65, 0x73, 0x74 \
-        }                                                \
-    }
-
-#define MBCORE_CONTRACTID "@sandia.gov/MB;1"
-
-#endif
-
 /**\class Core
  * \brief Implementation of MOAB Interface
  * Implementation of the MOAB Interface class.  You shouldn't call functions directly
@@ -69,9 +55,6 @@ class Core : public Interface
     //! constructor
     Core( );
 
-    //! deprecated constructor -- values are ignored
-    Core( int rank, int num_cpu );
-
     //! destructor
     ~Core( );
 
@@ -81,11 +64,6 @@ class Core : public Interface
 
     //! Release reference to MB interface
     virtual ErrorCode release_interface_type( const std::type_info& iface_type, void* iface );
-
-#if defined( XPCOM_MB )
-    // this macro expands to all the nsISupports interface functions
-    NS_DECL_ISUPPORTS
-#endif
 
     virtual int QueryInterface( const MBuuid& uuid, UnknownInterface** iface );
 

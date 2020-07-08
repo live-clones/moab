@@ -486,9 +486,7 @@ endif (ENABLE_FORTRAN)
 
 ## Find and use clang-format if available
 find_program( CLANG_FORMAT_EXE NAMES "clang-format" DOC "Path to clang-format executable" )
-if(NOT CLANG_FORMAT_EXE)
-	message(STATUS "clang-format not found.")
-else()
+if(CLANG_FORMAT_EXE)
 	message(STATUS "clang-format found: ${CLANG_FORMAT_EXE}")
 	set(DO_CLANG_FORMAT "${CLANG_FORMAT_EXE}" "-i -style=file")
 endif()
@@ -516,6 +514,36 @@ if(CLANG_FORMAT_EXE)
 	prepend(FILES_TO_FORMAT ${CMAKE_CURRENT_SOURCE_DIR} ${MOAB_PROJECT_SOURCE_FILES})
 	add_custom_target( clang-format-project-files COMMAND ${CLANG_FORMAT_EXE} -i -style=file ${FILES_TO_FORMAT} )
 endif()
+
+## Check for clang-tidy as well for performing pre-commit checks
+find_program(CLANG_TIDY_EXE NAMES "clang-tidy" DOC "Path to clang-tidy executable")
+if(CLANG_TIDY_EXE)
+  message(STATUS "clang-tidy found: ${CLANG_TIDY_EXE}")
+  SET(CMAKE_CXX_CLANG_TIDY ${CLANG_TIDY_EXE} 
+    -format-style=file 
+    -checks=clan*,mpi-*,port*,bug*,llvm-namespace-comment,perf*,modernize-deprecated-headers,modernize-avoid-bind,modernize-use-bool-literals,misc-noexcept-move-constructor,-readability-braces-around-statements,-misc-unused-parameters 
+    -header-filter="\"moab/*\""
+    -fix -fix-errors
+    -p=${CMAKE_CURRENT_BINARY_DIR} )
+
+  find_program(RUN_CLANG_TIDY_BIN /usr/local/Cellar/llvm/10.0.0_3/share/clang/run-clang-tidy.py)
+  find_program(RUN_CLANG_APPLY_REPLACEMENTS_BIN clang-apply-replacements PATH /usr/local/bin /usr/local/opt/llvm/bin)
+  list(APPEND RUN_CLANG_TIDY_BIN_ARGS
+        -clang-tidy-binary ${CLANG_TIDY_EXE}
+        -clang-apply-replacements-binary ${RUN_CLANG_APPLY_REPLACEMENTS_BIN}
+        -header-filter="\"moab/*\""
+        -checks=clan*,mpi-*,port*,bug*,llvm-namespace-comment,perf*,modernize-deprecated-headers,modernize-avoid-bind,modernize-use-bool-literals,misc-noexcept-move-constructor,-readability-braces-around-statements,-misc-unused-parameters
+        -fix
+        )
+
+	add_custom_target(
+		tidy
+		COMMAND ${RUN_CLANG_TIDY_BIN} ${RUN_CLANG_TIDY_BIN_ARGS}
+		COMMENT "running clang tidy"
+		)
+	add_custom_target( clang-tidy-project-files COMMAND ${CMAKE_CXX_CLANG_TIDY} ${FILES_TO_FORMAT} )
+
+endif(CLANG_TIDY_EXE)
 
 # Generate the CMake input header file and then pass it through configuration
 ## execute_process( COMMAND cat MOABConfig.h.in COMMAND sed -e "s/#undef /#cmakedefine MOAB_/g"
