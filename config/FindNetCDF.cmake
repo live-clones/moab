@@ -70,49 +70,6 @@ mark_as_advanced(
   NETCDF_LIBRARIES
 )
 
-IF (MOAB_HAVE_MPI AND ENABLE_PNETCDF)
-  set (PNETCDF_ROOT "" CACHE PATH "Path to search for PNetCDF header and library files" )
-  set (PNETCDF_FOUND NO CACHE INTERNAL "Found PNetCDF components successfully." )
-
-  find_path( PNETCDF_INCLUDES pnetcdf.h
-    ${PNETCDF_ROOT}
-    ${PNETCDF_ROOT}/include
-    ENV CPLUS_INCLUDE_PATH
-    NO_DEFAULT_PATH
-  )
-
-find_library( PNETCDF_LIBRARIES
-    NAMES pnetcdf libpnetcdf.a
-    HINTS ${PNETCDF_ROOT}
-    ${PNETCDF_ROOT}/lib64
-    ${PNETCDF_ROOT}/lib
-    NO_DEFAULT_PATH
-  )
-
-  IF (NOT PNETCDF_FOUND)
-    if ( PNETCDF_INCLUDES AND PNETCDF_LIBRARIES )
-      set( PNETCDF_FOUND YES )
-      message (STATUS "---   PNetCDF Configuration ::")
-      message (STATUS "        Directory : ${PNETCDF_ROOT}")
-      message (STATUS "        INCLUDES  : ${PNETCDF_INCLUDES}")
-      message (STATUS "        LIBRARIES : ${PNETCDF_LIBRARIES}")
-    else ( PNETCDF_INCLUDES AND PNETCDF_LIBRARIES )
-      set( PNETCDF_FOUND NO )
-      message("finding PNetCDF failed, please try to set the var PNETCDF_ROOT")
-    endif ( PNETCDF_INCLUDES AND PNETCDF_LIBRARIES )
-  ENDIF (NOT PNETCDF_FOUND)
-
-  mark_as_advanced(
-    PNETCDF_ROOT
-    PNETCDF_INCLUDES
-    PNETCDF_LIBRARIES
-  )
-ELSE (MOAB_HAVE_MPI AND ENABLE_PNETCDF)
-  message (STATUS "Not configuring with PNetCDF since MPI installation not specified or explicitly disabled by user")
-ENDIF (MOAB_HAVE_MPI AND ENABLE_PNETCDF)
-
 include (FindPackageHandleStandardArgs)
 find_package_handle_standard_args (NetCDF "NetCDF not found, check the CMake NETCDF_ROOT variable"
   NETCDF_ROOT NETCDF_INCLUDES NETCDF_LIBRARIES)
-find_package_handle_standard_args (PNetCDF "PNetCDF not found, check the CMake PNETCDF_ROOT variable"
-  PNETCDF_ROOT PNETCDF_INCLUDES PNETCDF_LIBRARIES)
