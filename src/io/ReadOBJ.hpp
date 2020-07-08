@@ -25,7 +25,6 @@
 // Owner    : Chelsea D'Angelo
 //-----------------------------------------------------------------------------
 
-
 /**
  * This class will read in an obj file and populate a MOAB instance with the
  * vertex and connectivity information in the file.  A specification for obj files
@@ -62,12 +61,11 @@
  * Triangular faces will be created and added as members of the surface meshets.
  */
 
-
 #ifndef READ_OBJ_HPP
 #define READ_OBJ_HPP
 
 #ifndef IS_BUILDING_MB
-  #error "ReadOBJ.hpp isn't supposed to be included into an application"
+#error "ReadOBJ.hpp isn't supposed to be included into an application"
 #endif
 
 #include <iostream>
@@ -86,28 +84,34 @@
    of vertices. This is a convenience structure making
    i/o easier.
 */
-struct vertex {
-  int vertex_id;
-  double coord[3];
+struct vertex
+{
+    int    vertex_id;
+    double coord[ 3 ];
 };
 
 /* struct face is a structure that stores connectivity.
    This is a convenience structure makin i/o easier.
 */
-struct face {
-  int face_id;
-  moab::EntityHandle conn[3];
+struct face
+{
+    int                face_id;
+    moab::EntityHandle conn[ 3 ];
 };
-namespace moab {
+namespace moab
+{
 
 /* Supported obj file keywords
  */
-enum keyword_type {obj_undefined = 0,
-                   object_start,
-                   group_start,
-                   face_start,
-                   vertex_start,
-                   valid_unsupported};
+enum keyword_type
+{
+    obj_undefined = 0,
+    object_start,
+    group_start,
+    face_start,
+    vertex_start,
+    valid_unsupported
+};
 
 class ReadUtilIface;
 class GeomTopoTool;
@@ -115,102 +119,88 @@ class GeomTopoTool;
 class ReadOBJ : public ReaderIface
 {
 
-public:
+  public:
+    //! factory method
+    static ReaderIface* factory( Interface* );
 
-  //! factory method
-  static ReaderIface* factory( Interface* );
+    ErrorCode load_file( const char* file_name, const EntityHandle* file_set,
+                         const FileOptions& opts, const SubsetList* subset_list = 0,
+                         const Tag* file_id_tag = 0 );
 
-  ErrorCode load_file( const char* file_name,
-                       const EntityHandle* file_set,
-                       const FileOptions& opts,
-                       const SubsetList* subset_list = 0,
-                       const Tag* file_id_tag = 0 );
+    ErrorCode read_tag_values( const char* file_name, const char* tag_name, const FileOptions& opts,
+                               std::vector< int >& tag_values_out,
+                               const SubsetList*   subset_list = 0 );
 
-  ErrorCode read_tag_values( const char* file_name,
-                             const char* tag_name,
-                             const FileOptions& opts,
-                             std::vector<int>& tag_values_out,
-                             const SubsetList* subset_list = 0 );
+    //! Constructor
+    ReadOBJ( Interface* impl = NULL );
 
+    //! Destructor
+    virtual ~ReadOBJ( );
 
+  private:
+    ReadUtilIface* readMeshIface;
 
-  //! Constructor
-  ReadOBJ(Interface* impl = NULL);
+    //! interface instance
+    Interface* MBI;
 
-   //! Destructor
-  virtual ~ReadOBJ();
+    GeomTopoTool* myGeomTool;
 
-private:
-  ReadUtilIface* readMeshIface;
+    Tag geom_tag, id_tag, name_tag, category_tag, faceting_tol_tag, geometry_resabs_tag,
+        obj_name_tag;
 
-  //! interface instance
-  Interface* MBI;
+    /*  The keyword type function matches the first character extracted from each line to a type of
+     * line
+     */
+    keyword_type get_keyword( std::vector< std::string > tokens );
 
-  GeomTopoTool* myGeomTool;
+    /*  The match function searches a list of map keys for a match with the token
+     */
+    template< typename T >
+    std::string match( const std::string& token, std::map< std::string, T >& tokenList );
 
-  Tag geom_tag,id_tag,name_tag,category_tag,faceting_tol_tag, geometry_resabs_tag, obj_name_tag;
+    /* The tokenize function takes a string as input and splits it into
+     * a vector of strings based on the delimiter
+     */
+    static const char* delimiters;
 
-  /*  The keyword type function matches the first character extracted from each line to a type of line
-   */
-  keyword_type get_keyword(std::vector<std::string> tokens);
+    void tokenize( const std::string& str, std::vector< std::string >& tokens,
+                   const char* delimiters );
 
-  /*  The match function searches a list of map keys for a match with the token
-   */
-  template <typename T>
-  std::string match(const std::string &token, std::map<std::string, T> &tokenList);
+    /*
+     * The create_object funtion will create a new meshset for
+     * each object that contains all vertices and faces
+     */
+    ErrorCode create_new_object( std::string object_name, int object_id,
+                                 EntityHandle& curr_obj_meshset );
 
+    ErrorCode create_new_group( std::string object_name, int curr_object,
+                                EntityHandle& object_meshset );
 
-  /* The tokenize function takes a string as input and splits it into
-   * a vector of strings based on the delimiter
-   */
-  static const char* delimiters;
+    /* create_new_vertex converts tokenized string input to
+       vertex structure
+     */
+    ErrorCode create_new_vertex( std::vector< std::string > v_tokens, EntityHandle& vertex_eh );
 
-  void tokenize( const std::string& str, std::vector<std::string>& tokens,
-                 const char* delimiters );
+    /* create_new_face converts tokenized string input to
+     * face structure
+     */
+    ErrorCode create_new_face( std::vector< std::string >         f_tokens,
+                               const std::vector< EntityHandle >& vertex_list,
+                               EntityHandle&                      face_eh );
 
-  /*
-   * The create_object funtion will create a new meshset for
-   * each object that contains all vertices and faces
-   */
-  ErrorCode create_new_object(std::string object_name,
-                              int object_id,
-                              EntityHandle &curr_obj_meshset);
+    /*
+     * The split_quad function creates 1 new vertex and 4 new tri faces
+     * from a quad face.
+     */
 
-  ErrorCode create_new_group ( std::string object_name,
-                                       int curr_object,
-                                       EntityHandle &object_meshset );
+    ErrorCode split_quad( std::vector< std::string >   f_tokens,
+                          std::vector< EntityHandle >& vertex_list, Range& face_eh );
 
-  /* create_new_vertex converts tokenized string input to
-     vertex structure
-   */
-  ErrorCode create_new_vertex (std::vector<std::string> v_tokens,
-                                      EntityHandle &vertex_eh);
-
-  /* create_new_face converts tokenized string input to
-   * face structure
-   */
-  ErrorCode create_new_face (std::vector<std::string> f_tokens,
-                                       const std::vector<EntityHandle>&vertex_list,
-                                       EntityHandle &face_eh);
-
-
-  /*
-   * The split_quad function creates 1 new vertex and 4 new tri faces
-   * from a quad face.
-   */
-
-  ErrorCode split_quad(std::vector<std::string> f_tokens,
-                                       std::vector<EntityHandle>&vertex_list,
-                                       Range &face_eh);
-
- ErrorCode create_tri_faces( std::vector<EntityHandle> quad_vert_eh,
-//				       EntityHandle center_vertex_eh,
-				       Range &face_eh );
-
+    ErrorCode create_tri_faces( std::vector< EntityHandle > quad_vert_eh,
+                                //				       EntityHandle center_vertex_eh,
+                                Range& face_eh );
 };
 
-} // namespace moab
-
-
+}  // namespace moab
 
 #endif

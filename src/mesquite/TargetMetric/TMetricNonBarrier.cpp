@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file TMetric.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -36,27 +35,26 @@
 #include "MsqError.hpp"
 #include <limits>
 
-namespace MBMesquite {
-
-TMetricNonBarrier::~TMetricNonBarrier() {}
-
-TMetricNonBarrier2D::~TMetricNonBarrier2D() {}
-TMetricNonBarrier3D::~TMetricNonBarrier3D() {}
-
-bool TMetricNonBarrier2D::evaluate( const MsqMatrix<3,3>&, double&, MsqError& err )
+namespace MBMesquite
 {
-  MSQ_SETERR(err)("2D target metric cannot be evaluated for volume elements",
-                  MsqError::UNSUPPORTED_ELEMENT);
-  return false;
+
+TMetricNonBarrier::~TMetricNonBarrier( ) {}
+
+TMetricNonBarrier2D::~TMetricNonBarrier2D( ) {}
+TMetricNonBarrier3D::~TMetricNonBarrier3D( ) {}
+
+bool TMetricNonBarrier2D::evaluate( const MsqMatrix< 3, 3 >&, double&, MsqError& err )
+{
+    MSQ_SETERR( err )
+    ( "2D target metric cannot be evaluated for volume elements", MsqError::UNSUPPORTED_ELEMENT );
+    return false;
 }
 
-bool TMetricNonBarrier3D::evaluate( const MsqMatrix<2,2>&, double&, MsqError& err )
+bool TMetricNonBarrier3D::evaluate( const MsqMatrix< 2, 2 >&, double&, MsqError& err )
 {
-  MSQ_SETERR(err)("2D target metric cannot be evaluated for volume elements",
-                  MsqError::UNSUPPORTED_ELEMENT);
-  return false;
+    MSQ_SETERR( err )
+    ( "2D target metric cannot be evaluated for volume elements", MsqError::UNSUPPORTED_ELEMENT );
+    return false;
 }
 
-
-} // namespace MBMesquite
-
+}  // namespace MBMesquite

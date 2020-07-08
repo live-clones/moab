@@ -24,7 +24,8 @@
     pknupp@sandia.gov, tleurent@mcs.anl.gov, tmunson@mcs.anl.gov
 
   ***************************************************************** */
-// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3 -*-
+// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3
+// -*-
 //
 //   SUMMARY:
 //     USAGE:
@@ -46,7 +47,6 @@ Unit testing of various functions in the MsqFreeVertexIndexIterator class.
 // DESCRIP-END.
 //
 
-
 #include "MsqFreeVertexIndexIterator.hpp"
 #include "PatchDataInstances.hpp"
 
@@ -56,86 +56,85 @@ Unit testing of various functions in the MsqFreeVertexIndexIterator class.
 #include "cppunit/extensions/HelperMacros.h"
 
 using namespace MBMesquite;
-using std::cout;
 using std::cerr;
+using std::cout;
 using std::endl;
 
 class MsqFreeVertexIndexIteratorTest : public CppUnit::TestFixture
 {
 
-private:
-  CPPUNIT_TEST_SUITE(MsqFreeVertexIndexIteratorTest);
-  CPPUNIT_TEST (test_hard_fixed_flags);
-  CPPUNIT_TEST (test_soft_fixed_flags);
-  CPPUNIT_TEST_SUITE_END();
+  private:
+    CPPUNIT_TEST_SUITE( MsqFreeVertexIndexIteratorTest );
+    CPPUNIT_TEST( test_hard_fixed_flags );
+    CPPUNIT_TEST( test_soft_fixed_flags );
+    CPPUNIT_TEST_SUITE_END( );
 
-private:
-  PatchData pd;
+  private:
+    PatchData pd;
 
-public:
-  void setUp()
-  {
-    MsqPrintError err(cout);
+  public:
+    void setUp( )
+    {
+        MsqPrintError err( cout );
 
-    /*      7____6____5___11
-            |    |    |    |
-            | 2  |  3 | 5  |
-            8-_  |  _-4---10       vertex 1 is at (0,0)
-            |  -_0_-  |    |       vertex 11 is at (3,2)
-            | 0  |  1 | 4  |
-            1----2----3----9
-    */
-    create_six_quads_patch_with_domain(pd, err);
-  }
+        /*      7____6____5___11
+                |    |    |    |
+                | 2  |  3 | 5  |
+                8-_  |  _-4---10       vertex 1 is at (0,0)
+                |  -_0_-  |    |       vertex 11 is at (3,2)
+                | 0  |  1 | 4  |
+                1----2----3----9
+        */
+        create_six_quads_patch_with_domain( pd, err );
+    }
 
-  void tearDown()
-  {
-    destroy_patch_with_domain(pd);
-  }
+    void tearDown( )
+    {
+        destroy_patch_with_domain( pd );
+    }
 
-public:
-  MsqFreeVertexIndexIteratorTest()
-    {}
+  public:
+    MsqFreeVertexIndexIteratorTest( ) {}
 
-  void test_hard_fixed_flags()
-  {
-     MsqPrintError err(cout);
-     int indices[10];
-     int i=0;
-     MsqFreeVertexIndexIterator ind(pd, err);
-     ind.reset();
-     while (ind.next()) {
-        indices[i] = ind.value();
-//         cout << i << "th free vertex value: " << ind.value() << endl;
-        ++i;
-     }
+    void test_hard_fixed_flags( )
+    {
+        MsqPrintError              err( cout );
+        int                        indices[ 10 ];
+        int                        i = 0;
+        MsqFreeVertexIndexIterator ind( pd, err );
+        ind.reset( );
+        while( ind.next( ) )
+        {
+            indices[ i ] = ind.value( );
+            //         cout << i << "th free vertex value: " << ind.value() << endl;
+            ++i;
+        }
 
-     CPPUNIT_ASSERT(i==2); // number of free vertices.
-     CPPUNIT_ASSERT(pd.vertex_by_index(indices[0]).is_free_vertex());
-     CPPUNIT_ASSERT(pd.vertex_by_index(indices[1]).is_free_vertex());
-  }
+        CPPUNIT_ASSERT( i == 2 );  // number of free vertices.
+        CPPUNIT_ASSERT( pd.vertex_by_index( indices[ 0 ] ).is_free_vertex( ) );
+        CPPUNIT_ASSERT( pd.vertex_by_index( indices[ 1 ] ).is_free_vertex( ) );
+    }
 
-  void test_soft_fixed_flags()
-  {
-     MsqPrintError err(cout);
-     pd.set_vertex_culled( 0 );
+    void test_soft_fixed_flags( )
+    {
+        MsqPrintError err( cout );
+        pd.set_vertex_culled( 0 );
 
-     int indices[10];
-     int i=0;
-     MsqFreeVertexIndexIterator ind(pd, err);
-     ind.reset();
-     while (ind.next()) {
-        indices[i] = ind.value();
-        ++i;
-     }
+        int                        indices[ 10 ];
+        int                        i = 0;
+        MsqFreeVertexIndexIterator ind( pd, err );
+        ind.reset( );
+        while( ind.next( ) )
+        {
+            indices[ i ] = ind.value( );
+            ++i;
+        }
 
-     CPPUNIT_ASSERT(i==1); // number of free vertices.
-     CPPUNIT_ASSERT(pd.vertex_by_index(indices[0]).is_free_vertex());
-  }
-
-
+        CPPUNIT_ASSERT( i == 1 );  // number of free vertices.
+        CPPUNIT_ASSERT( pd.vertex_by_index( indices[ 0 ] ).is_free_vertex( ) );
+    }
 };
 
-
-CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(MsqFreeVertexIndexIteratorTest, "MsqFreeVertexIndexIteratorTest");
-CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(MsqFreeVertexIndexIteratorTest, "Unit");
+CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( MsqFreeVertexIndexIteratorTest,
+                                       "MsqFreeVertexIndexIteratorTest" );
+CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( MsqFreeVertexIndexIteratorTest, "Unit" );

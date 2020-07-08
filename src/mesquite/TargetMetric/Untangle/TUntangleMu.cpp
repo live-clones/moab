@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file TRel2DUntangle.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -37,81 +36,76 @@
 #include "TMPCommon.hpp"
 #include "MsqError.hpp"
 
-namespace MBMesquite {
-
-
-TUntangleMu::~TUntangleMu()
-{}
-
-std::string TUntangleMu::get_name() const
-  { return "untangle(" + mBaseMetric->get_name() + ")"; }
-
-
-template <unsigned DIM> inline
-bool TUntangleMu::eval( const MsqMatrix<DIM,DIM>& T,
-                        double& result,
-                        MsqError& err )
+namespace MBMesquite
 {
-  bool valid = mBaseMetric->evaluate( T, result, err );
-  if (MSQ_CHKERR(err) || !valid)
-    return false;
 
-  const double d = mConstant - result;
-  const double s = fabs(d) - d;
-  result = 0.125*s*s*s;
-  return true;
+TUntangleMu::~TUntangleMu( ) {}
+
+std::string TUntangleMu::get_name( ) const
+{
+    return "untangle(" + mBaseMetric->get_name( ) + ")";
 }
 
-template <unsigned DIM> inline
-bool TUntangleMu::grad( const MsqMatrix<DIM,DIM>& T,
-                        double& result,
-                        MsqMatrix<DIM,DIM>& deriv_wrt_T,
-                        MsqError& err )
+template< unsigned DIM >
+inline bool TUntangleMu::eval( const MsqMatrix< DIM, DIM >& T, double& result, MsqError& err )
 {
-  bool valid = mBaseMetric->evaluate_with_grad( T, result, deriv_wrt_T, err );
-  if (MSQ_CHKERR(err) || !valid)
-    return false;
+    bool valid = mBaseMetric->evaluate( T, result, err );
+    if( MSQ_CHKERR( err ) || !valid ) return false;
 
-  if (mConstant < result) {
-    const double s = result - mConstant;
-    result = s*s*s;
-    deriv_wrt_T *= 3*s*s;
-  }
-  else {
-    result = 0;
-    deriv_wrt_T = MsqMatrix<DIM,DIM>(0.0);
-  }
-
-  return true;
+    const double d = mConstant - result;
+    const double s = fabs( d ) - d;
+    result = 0.125 * s * s * s;
+    return true;
 }
 
-template <unsigned DIM> inline
-bool TUntangleMu::hess( const MsqMatrix<DIM,DIM>& T,
-                        double& result,
-                        MsqMatrix<DIM,DIM>& deriv_wrt_T,
-                        MsqMatrix<DIM,DIM>* second_wrt_T,
-                        MsqError& err )
+template< unsigned DIM >
+inline bool TUntangleMu::grad( const MsqMatrix< DIM, DIM >& T, double& result,
+                               MsqMatrix< DIM, DIM >& deriv_wrt_T, MsqError& err )
 {
-  bool valid = mBaseMetric->evaluate_with_hess( T, result, deriv_wrt_T, second_wrt_T, err );
-  if (MSQ_CHKERR(err) || !valid)
-    return false;
+    bool valid = mBaseMetric->evaluate_with_grad( T, result, deriv_wrt_T, err );
+    if( MSQ_CHKERR( err ) || !valid ) return false;
 
-  if (mConstant < result) {
-    const double s = result - mConstant;
-    result = s*s*s;
-    hess_scale( second_wrt_T, 3*s*s );
-    pluseq_scaled_outer_product( second_wrt_T, 6*s, deriv_wrt_T );
-    deriv_wrt_T *= 3*s*s;
-  }
-  else {
-    result = 0;
-    deriv_wrt_T = MsqMatrix<DIM,DIM>(0.0);
-    set_scaled_I( second_wrt_T, 0.0 ); // zero everything
-  }
+    if( mConstant < result )
+    {
+        const double s = result - mConstant;
+        result = s * s * s;
+        deriv_wrt_T *= 3 * s * s;
+    }
+    else
+    {
+        result = 0;
+        deriv_wrt_T = MsqMatrix< DIM, DIM >( 0.0 );
+    }
 
-  return true;
+    return true;
 }
 
-TMP_T_TEMPL_IMPL_COMMON_ERR(TUntangleMu)
+template< unsigned DIM >
+inline bool TUntangleMu::hess( const MsqMatrix< DIM, DIM >& T, double& result,
+                               MsqMatrix< DIM, DIM >& deriv_wrt_T,
+                               MsqMatrix< DIM, DIM >* second_wrt_T, MsqError& err )
+{
+    bool valid = mBaseMetric->evaluate_with_hess( T, result, deriv_wrt_T, second_wrt_T, err );
+    if( MSQ_CHKERR( err ) || !valid ) return false;
 
-} // namespace MBMesquite
+    if( mConstant < result )
+    {
+        const double s = result - mConstant;
+        result = s * s * s;
+        hess_scale( second_wrt_T, 3 * s * s );
+        pluseq_scaled_outer_product( second_wrt_T, 6 * s, deriv_wrt_T );
+        deriv_wrt_T *= 3 * s * s;
+    }
+    else
+    {
+        result = 0;
+        deriv_wrt_T = MsqMatrix< DIM, DIM >( 0.0 );
+        set_scaled_I( second_wrt_T, 0.0 );  // zero everything
+    }
+
+    return true;
+}
+
+TMP_T_TEMPL_IMPL_COMMON_ERR( TUntangleMu )
+
+}  // namespace MBMesquite

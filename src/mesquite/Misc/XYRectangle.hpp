@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file XYRectangle.hpp
  *  \brief Define simple domain for 2D test problems
  *  \author Jason Kraftcheck
@@ -38,7 +37,8 @@
 
 #include <map>
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 /**\brief Simple 2D Domain for free-smooth testing
  *
@@ -51,84 +51,86 @@ namespace MBMesquite {
 class XYRectangle : public MBMesquite::MeshDomain
 {
   public:
+    enum Plane
+    {
+        XY = 2,
+        YZ = 0,
+        ZX = 1
+    };
 
-    enum Plane { XY = 2, YZ = 0, ZX = 1 };
-
-
-      /**\brief Define rectangular domain
-       *
-       *\param w Width of rectangle (X-range)
-       *\param h Height of rectangle (Y-range)
-       *\param x Minimum X coordinate of rectangle
-       *\param y Minimum Y coordinate of rectangle
-       *\param z Minimum Z coordinate of rectangle
-       *\param plane Which plane (default is XY).
-       *
-       * Create w x h rectangle with, if plane is XY: X range of [x, x+w] and
-       * Y range of [y, y+h].
-       */
+    /**\brief Define rectangular domain
+     *
+     *\param w Width of rectangle (X-range)
+     *\param h Height of rectangle (Y-range)
+     *\param x Minimum X coordinate of rectangle
+     *\param y Minimum Y coordinate of rectangle
+     *\param z Minimum Z coordinate of rectangle
+     *\param plane Which plane (default is XY).
+     *
+     * Create w x h rectangle with, if plane is XY: X range of [x, x+w] and
+     * Y range of [y, y+h].
+     */
     MESQUITE_EXPORT
     XYRectangle( double w, double h, double x = 0, double y = 0, double z = 0, Plane plane = XY );
 
-      /**\brief Classify mesh vertices against domain
-       *
-       * Figure out which input mesh vertices like on corners
-       * or edges of the domain.  Will fail if any vertex is outside
-       * of the rectangle.
-       */
+    /**\brief Classify mesh vertices against domain
+     *
+     * Figure out which input mesh vertices like on corners
+     * or edges of the domain.  Will fail if any vertex is outside
+     * of the rectangle.
+     */
     MESQUITE_EXPORT
     void setup( MBMesquite::Mesh* mesh, MBMesquite::MsqError& err );
 
     MESQUITE_EXPORT
     void snap_to( MBMesquite::Mesh::VertexHandle entity_handle,
-                  MBMesquite::Vector3D &coordinate) const;
+                  MBMesquite::Vector3D&          coordinate ) const;
 
     MESQUITE_EXPORT
     void vertex_normal_at( MBMesquite::Mesh::VertexHandle entity_handle,
-                           MBMesquite::Vector3D &coordinate) const;
+                           MBMesquite::Vector3D&          coordinate ) const;
 
     MESQUITE_EXPORT
     void element_normal_at( MBMesquite::Mesh::ElementHandle entity_handle,
-                            MBMesquite::Vector3D &coordinate) const;
+                            MBMesquite::Vector3D&           coordinate ) const;
 
     MESQUITE_EXPORT
     void vertex_normal_at( const MBMesquite::Mesh::VertexHandle* handles,
-                           MBMesquite::Vector3D coordinates[],
-                           unsigned count,
+                           MBMesquite::Vector3D coordinates[], unsigned count,
                            MBMesquite::MsqError& err ) const;
 
     MESQUITE_EXPORT
-    void closest_point( MBMesquite:: Mesh::VertexHandle handle,
-                        const MBMesquite::Vector3D& position,
-                        MBMesquite::Vector3D& closest,
-                        MBMesquite::Vector3D& normal,
+    void closest_point( MBMesquite::Mesh::VertexHandle handle, const MBMesquite::Vector3D& position,
+                        MBMesquite::Vector3D& closest, MBMesquite::Vector3D& normal,
                         MBMesquite::MsqError& err ) const;
 
     MESQUITE_EXPORT
-    void domain_DoF( const MBMesquite::Mesh::VertexHandle* handle_array,
-                     unsigned short* dof_array,
-                     size_t num_handles,
-                     MBMesquite::MsqError& err ) const;
+    void domain_DoF( const MBMesquite::Mesh::VertexHandle* handle_array, unsigned short* dof_array,
+                     size_t num_handles, MBMesquite::MsqError& err ) const;
 
   private:
-    double minCoords[3], maxCoords[3]; //!< corner coords
+    double    minCoords[ 3 ], maxCoords[ 3 ];  //!< corner coords
     const int normalDir, widthDir, heightDir;
 
     //! Single constraint on a vertex (reduces degrees of freedom by 1)
-    struct VertexConstraint {
-      enum Constraint { XC = 0, YC = 1, ZC = 2 };
-      VertexConstraint(int a, double c)  : axis((Constraint)a), coord(c) {}
-      Constraint axis;
-      double coord;
+    struct VertexConstraint
+    {
+        enum Constraint
+        {
+            XC = 0,
+            YC = 1,
+            ZC = 2
+        };
+        VertexConstraint( int a, double c ) : axis( (Constraint)a ), coord( c ) {}
+        Constraint axis;
+        double     coord;
     };
 
     //! Map vertex handles to constraints
-    typedef std::multimap<Mesh::VertexHandle,VertexConstraint> constraint_t;
-    constraint_t mConstraints;
+    typedef std::multimap< Mesh::VertexHandle, VertexConstraint > constraint_t;
+    constraint_t                                                  mConstraints;
 };
 
-
-
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

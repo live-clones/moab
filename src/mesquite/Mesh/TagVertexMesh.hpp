@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file TagVertexMesh.hpp
  *  \brief Definition of MBMesquite::TagVertexMesh class
  *  \author Jason Kraftcheck
@@ -37,7 +36,8 @@
 #include "MeshDecorator.hpp"
 #include "Instruction.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 /**\brief Store alternate vertex coordinates in tags.
  *
@@ -60,21 +60,19 @@ namespace MBMesquite {
 class MESQUITE_EXPORT TagVertexMesh : public MeshDecorator, public Instruction
 {
   private:
+    std::string tagName;  //< Name of tag storing vertex coordinates
+    TagHandle   tagHandle;  //< Handle of tag storing vertex coordinates
+    bool        haveTagHandle;  //< True if tagHandle is set
+    bool        cleanUpTag;  //< If true, destroy tag in destructor
 
-    std::string tagName; //< Name of tag storing vertex coordinates
-    TagHandle tagHandle;     //< Handle of tag storing vertex coordinates
-    bool haveTagHandle;      //< True if tagHandle is set
-    bool cleanUpTag;         //< If true, destroy tag in destructor
-
-      /**\brief common code for constructor, set_mesh, and set_tag_name */
+    /**\brief common code for constructor, set_mesh, and set_tag_name */
     void initialize( Mesh* mesh, std::string name, MsqError& );
-      /**\brief copy real coordinate values into tag data */
+    /**\brief copy real coordinate values into tag data */
     void copy_all_coordinates( MsqError& err );
-      /**\brief if cleanUpTag, delete tag and clear handle */
+    /**\brief if cleanUpTag, delete tag and clear handle */
     void check_remove_tag( MsqError& err );
 
   public:
-
     /**
      *\param real_mesh  The mesh from which to aquire topology information
      *                  and vertex coordinates, and upon which to store
@@ -84,15 +82,13 @@ class MESQUITE_EXPORT TagVertexMesh : public MeshDecorator, public Instruction
      *                  is destroyed.
      *\param tag_name Name of tag in which to store alternate vertex coordinates.
      */
-    TagVertexMesh( MsqError& err,
-                   Mesh* real_mesh,
-                   bool clean_up_tag_data = true,
+    TagVertexMesh( MsqError& err, Mesh* real_mesh, bool clean_up_tag_data = true,
                    std::string tag_name = "" );
 
-      /** Destroy tag data for alternate coordinates if
-       *  clean_up_tag_data is true.
-       */
-    virtual ~TagVertexMesh();
+    /** Destroy tag data for alternate coordinates if
+     *  clean_up_tag_data is true.
+     */
+    virtual ~TagVertexMesh( );
 
     /**\brief Change the Mesh instance used as the real mesh.
      *
@@ -113,13 +109,22 @@ class MESQUITE_EXPORT TagVertexMesh : public MeshDecorator, public Instruction
      * vertex coordinates from the real mesh when a) the real Mesh
      * instance is changed or b) this object instance is destroted.
      */
-    void should_clean_up_tag_data( bool value ) { cleanUpTag = value; }
+    void should_clean_up_tag_data( bool value )
+    {
+        cleanUpTag = value;
+    }
 
     /**\brief Will tag storing alternate coordinates be destroyed. */
-    bool will_clean_up_tag_data() const { return cleanUpTag; }
+    bool will_clean_up_tag_data( ) const
+    {
+        return cleanUpTag;
+    }
 
     /**\brief Get name of tag used to store alternate vertex coordinates. */
-    std::string get_tag_name() const { return tagName; }
+    std::string get_tag_name( ) const
+    {
+        return tagName;
+    }
 
     /**\brief Set tag name used to store alternate vertex coordinates
      *
@@ -145,51 +150,38 @@ class MESQUITE_EXPORT TagVertexMesh : public MeshDecorator, public Instruction
      */
     void clear( MsqError& err );
 
+    virtual void vertices_get_coordinates( const VertexHandle vert_array[], MsqVertex* coordinates,
+                                           size_t num_vtx, MsqError& err );
 
+    virtual void vertex_set_coordinates( VertexHandle vertex, const Vector3D& coordinates,
+                                         MsqError& err );
 
-    virtual void vertices_get_coordinates( const VertexHandle vert_array[],
-                                           MsqVertex* coordinates,
-                                           size_t num_vtx,
-                                           MsqError &err );
+    //***************  Tags  ***********
 
-    virtual void vertex_set_coordinates( VertexHandle vertex,
-                                         const Vector3D &coordinates,
-                                         MsqError &err );
+    virtual TagHandle tag_create( const std::string& tag_name, TagType type, unsigned length,
+                                  const void* default_value, MsqError& err );
 
+    virtual TagHandle tag_get( const std::string& name, MsqError& err );
 
-//***************  Tags  ***********
+    //**************** Memory Management ****************
 
-    virtual TagHandle tag_create( const std::string& tag_name,
-                                  TagType type, unsigned length,
-                                  const void* default_value,
-                                  MsqError &err);
+    virtual void release( );
 
-    virtual TagHandle tag_get( const std::string& name,
-                               MsqError& err );
+    //**************** Instruction ****************
 
-//**************** Memory Management ****************
-
-    virtual void release();
-
-
-//**************** Instruction ****************
-
-    virtual double loop_over_mesh( MeshDomainAssoc* mesh_and_domain,
-                                   const Settings* settings,
+    virtual double loop_over_mesh( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
                                    MsqError& err );
 
-    virtual std::string get_name() const;
+    virtual std::string get_name( ) const;
 
-     //!\brief Called at start of instruction queue processing
-     //!
-     //! Do any preliminary global initialization, consistency checking,
-     //! etc.  Default implementation does nothing.
-    virtual void initialize_queue( MeshDomainAssoc* mesh_and_domain,
-                                   const Settings* settings,
+    //!\brief Called at start of instruction queue processing
+    //!
+    //! Do any preliminary global initialization, consistency checking,
+    //! etc.  Default implementation does nothing.
+    virtual void initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
                                    MsqError& err );
 };
 
-
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file LaplaceWrapper.cpp
  *  \brief Implement LaplaceWrapper class
  *  \author Jason Kraftcheck
@@ -38,58 +37,56 @@
 #include "TerminationCriterion.hpp"
 #include "MsqError.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 const double DEFAULT_MOVEMENT_FACTOR = 0.001;
-const bool CULLING_DEFAULT = true;
-const int DEFAULT_ITERATION_LIMIT = 100;
+const bool   CULLING_DEFAULT = true;
+const int    DEFAULT_ITERATION_LIMIT = 100;
 
-LaplaceWrapper::LaplaceWrapper()
-  : maxTime(-1.0),
-    movementFactor(DEFAULT_MOVEMENT_FACTOR),
-    iterationLimit(DEFAULT_ITERATION_LIMIT),
-    doCulling(CULLING_DEFAULT)
-{}
-
-LaplaceWrapper::~LaplaceWrapper()
-{}
-
-void LaplaceWrapper::run_wrapper( MeshDomainAssoc* mesh_and_domain,
-                                  ParallelMesh* pmesh,
-                                  Settings* settings,
-                                  QualityAssessor* qa,
-                                  MsqError& err )
+LaplaceWrapper::LaplaceWrapper( )
+    : maxTime( -1.0 ), movementFactor( DEFAULT_MOVEMENT_FACTOR ),
+      iterationLimit( DEFAULT_ITERATION_LIMIT ), doCulling( CULLING_DEFAULT )
 {
-  if (maxTime <= 0.0 && movementFactor <= 0.0 && iterationLimit <= 0) {
-    MSQ_SETERR(err)("No termination criterion set.  "
-                    "LaplaceWrapper will run forever.",
-                    MsqError::INVALID_STATE);
-    return;
-  }
-
-  IdealWeightInverseMeanRatio qa_metric;
-  qa->add_quality_assessment( &qa_metric );
-
-  LaplacianSmoother smoother;
-  TerminationCriterion outer("<type:laplace_outer>"), inner("<type:laplace_inner>");
-  if (maxTime > 0.0)
-    outer.add_cpu_time( maxTime );
-  if (iterationLimit > 0)
-    outer.add_iteration_limit( iterationLimit );
-  if (doCulling && movementFactor > 0.0) {
-    inner.cull_on_absolute_vertex_movement_edge_length( movementFactor );
-    smoother.set_inner_termination_criterion( &inner );
-  }
-  else if (movementFactor > 0.0) {
-    outer.add_absolute_vertex_movement_edge_length( movementFactor );
-  }
-  smoother.set_outer_termination_criterion( &outer );
-
-  InstructionQueue q;
-  q.add_quality_assessor( qa, err ); MSQ_ERRRTN(err);
-  q.set_master_quality_improver( &smoother, err ); MSQ_ERRRTN(err);
-  q.add_quality_assessor( qa, err ); MSQ_ERRRTN(err);
-  q.run_common( mesh_and_domain, pmesh, settings, err ); MSQ_ERRRTN(err);
 }
 
-} // namespace MBMesquite
+LaplaceWrapper::~LaplaceWrapper( ) {}
+
+void LaplaceWrapper::run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh,
+                                  Settings* settings, QualityAssessor* qa, MsqError& err )
+{
+    if( maxTime <= 0.0 && movementFactor <= 0.0 && iterationLimit <= 0 )
+    {
+        MSQ_SETERR( err )
+        ( "No termination criterion set.  "
+          "LaplaceWrapper will run forever.",
+          MsqError::INVALID_STATE );
+        return;
+    }
+
+    IdealWeightInverseMeanRatio qa_metric;
+    qa->add_quality_assessment( &qa_metric );
+
+    LaplacianSmoother    smoother;
+    TerminationCriterion outer( "<type:laplace_outer>" ), inner( "<type:laplace_inner>" );
+    if( maxTime > 0.0 ) outer.add_cpu_time( maxTime );
+    if( iterationLimit > 0 ) outer.add_iteration_limit( iterationLimit );
+    if( doCulling && movementFactor > 0.0 )
+    {
+        inner.cull_on_absolute_vertex_movement_edge_length( movementFactor );
+        smoother.set_inner_termination_criterion( &inner );
+    }
+    else if( movementFactor > 0.0 )
+    {
+        outer.add_absolute_vertex_movement_edge_length( movementFactor );
+    }
+    smoother.set_outer_termination_criterion( &outer );
+
+    InstructionQueue q;
+    q.add_quality_assessor( qa, err );MSQ_ERRRTN( err );
+    q.set_master_quality_improver( &smoother, err );MSQ_ERRRTN( err );
+    q.add_quality_assessor( qa, err );MSQ_ERRRTN( err );
+    q.run_common( mesh_and_domain, pmesh, settings, err );MSQ_ERRRTN( err );
+}
+
+}  // namespace MBMesquite

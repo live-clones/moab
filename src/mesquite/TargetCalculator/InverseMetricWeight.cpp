@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file InverseMetricWeight.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -35,26 +34,26 @@
 #include "ElemSampleQM.hpp"
 #include "MsqError.hpp"
 
-namespace MBMesquite {
-
-InverseMetricWeight::~InverseMetricWeight() {}
-
-
-double InverseMetricWeight::get_weight( PatchData& pd,
-                                 size_t element,
-                                 Sample sample,
-                                 MsqError& err )
+namespace MBMesquite
 {
-  size_t h = ElemSampleQM::handle( sample, element );
-  double value;
-  bool flag = mMetric->evaluate( pd, h, value, err );
-  MSQ_ERRZERO(err);
-  if (!flag) {
-    MSQ_SETERR(err)("Invalid metric value canot be used as target weight", MsqError::INVALID_STATE);
-    return 0.0;
-  }
 
-  return 1.0/value;
+InverseMetricWeight::~InverseMetricWeight( ) {}
+
+double InverseMetricWeight::get_weight( PatchData& pd, size_t element, Sample sample,
+                                        MsqError& err )
+{
+    size_t h = ElemSampleQM::handle( sample, element );
+    double value;
+    bool   flag = mMetric->evaluate( pd, h, value, err );
+    MSQ_ERRZERO( err );
+    if( !flag )
+    {
+        MSQ_SETERR( err )
+        ( "Invalid metric value canot be used as target weight", MsqError::INVALID_STATE );
+        return 0.0;
+    }
+
+    return 1.0 / value;
 }
 
-} // namespace MBMesquite
+}  // namespace MBMesquite

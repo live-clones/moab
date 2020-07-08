@@ -31,27 +31,26 @@
 #include "MeshInterface.hpp"
 #include "MsqError.hpp"
 
-namespace MBMesquite {
-
-ElementPatches::~ElementPatches() {}
-
-void ElementPatches::get_patch_handles(
-                             std::vector<PatchHandle>& patch_handles_out,
-                             MsqError& err )
+namespace MBMesquite
 {
-  get_mesh()->get_all_elements( patch_handles_out, err ); MSQ_CHKERR(err);
+
+ElementPatches::~ElementPatches( ) {}
+
+void ElementPatches::get_patch_handles( std::vector< PatchHandle >& patch_handles_out,
+                                        MsqError&                   err )
+{
+    get_mesh( )->get_all_elements( patch_handles_out, err );MSQ_CHKERR( err );
 }
 
-void ElementPatches::get_patch( PatchHandle patch_handle,
-                     std::vector<Mesh::ElementHandle>& elem_handles_out,
-                     std::vector<Mesh::VertexHandle>& free_vertices_out,
-                     MsqError& )
+void ElementPatches::get_patch( PatchHandle                         patch_handle,
+                                std::vector< Mesh::ElementHandle >& elem_handles_out,
+                                std::vector< Mesh::VertexHandle >&  free_vertices_out, MsqError& )
 {
-  elem_handles_out.clear();
-  free_vertices_out.clear();
-  elem_handles_out.push_back( patch_handle );
+    elem_handles_out.clear( );
+    free_vertices_out.clear( );
+    elem_handles_out.push_back( patch_handle );
 }
 
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

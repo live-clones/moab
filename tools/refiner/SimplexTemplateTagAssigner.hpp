@@ -14,47 +14,44 @@
  */
 
 /**\class moab::SimplexTemplateTagAssigner
-  *
-  * This is an class that embodies the process of assigning tag
-  * values to new vertices based on some pre-existing neighbors in a
-  * simplicial mesh.
-  *
-  * \author David Thompson
-  * \author Philippe Pebay
-  *
-  * \date 28 December 2007
-  */
+ *
+ * This is an class that embodies the process of assigning tag
+ * values to new vertices based on some pre-existing neighbors in a
+ * simplicial mesh.
+ *
+ * \author David Thompson
+ * \author Philippe Pebay
+ *
+ * \date 28 December 2007
+ */
 #ifndef MOAB_SIMPEX_TEMPLATE_TAG_ASSIGNER_HPP
 #define MOAB_SIMPEX_TEMPLATE_TAG_ASSIGNER_HPP
 
-#include "moab/Compiler.hpp" // for MB_DLL_EXPORT
+#include "moab/Compiler.hpp"  // for MB_DLL_EXPORT
 #include "moab/Types.hpp"
 
-namespace moab {
+namespace moab
+{
 
 class RefinerTagManager;
 class SimplexTemplateRefiner;
 
 class SimplexTemplateTagAssigner
 {
-public:
-  SimplexTemplateTagAssigner( SimplexTemplateRefiner* );
-  virtual ~SimplexTemplateTagAssigner();
+  public:
+    SimplexTemplateTagAssigner( SimplexTemplateRefiner* );
+    virtual ~SimplexTemplateTagAssigner( );
 
-  virtual void operator () ( const double* c0, const void* t0, EntityHandle h0,
-                             const double* cm, void* tm,
-                             const double* c1, const void* t1, EntityHandle h1 );
-  virtual void operator () ( const void* t0,
-                             const void* t1,
-                             const void* t2,
-                             void* tp );
-  virtual void set_tag_manager( RefinerTagManager* tmgr );
+    virtual void operator( )( const double* c0, const void* t0, EntityHandle h0, const double* cm,
+                              void* tm, const double* c1, const void* t1, EntityHandle h1 );
+    virtual void operator( )( const void* t0, const void* t1, const void* t2, void* tp );
+    virtual void set_tag_manager( RefinerTagManager* tmgr );
 
-protected:
-  SimplexTemplateRefiner* mesh_refiner;
-  RefinerTagManager* tag_manager;
+  protected:
+    SimplexTemplateRefiner* mesh_refiner;
+    RefinerTagManager*      tag_manager;
 };
 
-} // namespace moab
+}  // namespace moab
 
-#endif // MOAB_SIMPEX_TEMPLATE_TAG_ASSIGNER_HPP
+#endif  // MOAB_SIMPEX_TEMPLATE_TAG_ASSIGNER_HPP

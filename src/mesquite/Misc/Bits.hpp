@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file Bits.hpp
  *  \brief Functions implementing misc. bit-wise algorithms
  *  \author Jason Kraftcheck
@@ -35,7 +34,8 @@
 
 #include "Mesquite.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 /**\brief Count number of 1-bits in an unsigned integer
  *
@@ -44,17 +44,18 @@ namespace MBMesquite {
  * It is also sometimes referred to as "sideways addition" (e.g. Knuth
  * volume 4.)
  */
-inline int popcount( unsigned int x ) {
+inline int popcount( unsigned int x )
+{
 #if 0  // April '08 bug report says gcc builtin not so good unless Intel SSE4
 //#ifdef __GNUC__
   return __builtin_popcount( x );
 #else
     // Use "parallel" algorithm
-//  if (sizeof(x) == 4) {
-    x = (x & 0x55555555u) + ((x >> 1) & 0x55555555u);
-    x = (x & 0x33333333u) + ((x >> 2) & 0x33333333u);
-    x = (x & 0x0f0f0f0fu) + ((x >> 4) & 0x0f0f0f0fu);
-    return (x * 0x1010101u) >> 24; // x % 255
+    //  if (sizeof(x) == 4) {
+    x = ( x & 0x55555555u ) + ( ( x >> 1 ) & 0x55555555u );
+    x = ( x & 0x33333333u ) + ( ( x >> 2 ) & 0x33333333u );
+    x = ( x & 0x0f0f0f0fu ) + ( ( x >> 4 ) & 0x0f0f0f0fu );
+    return ( x * 0x1010101u ) >> 24;  // x % 255
 //  }
 //  else {
 //    x = (x & 0x5555555555555555ULL) + ((x >> 1) & 0x5555555555555555ULL);
@@ -65,6 +66,6 @@ inline int popcount( unsigned int x ) {
 #endif
 }
 
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

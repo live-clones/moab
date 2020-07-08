@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file RemainingWeight.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -33,16 +32,14 @@
 #include "Mesquite.hpp"
 #include "RemainingWeight.hpp"
 
-namespace MBMesquite {
-
-RemainingWeight::~RemainingWeight() {}
-
-double RemainingWeight::get_weight( PatchData& pd,
-                             size_t element,
-                             Sample sample,
-                             MsqError& err )
+namespace MBMesquite
 {
-  return 1.0 - primaryWeight->get_weight( pd, element, sample, err );
+
+RemainingWeight::~RemainingWeight( ) {}
+
+double RemainingWeight::get_weight( PatchData& pd, size_t element, Sample sample, MsqError& err )
+{
+    return 1.0 - primaryWeight->get_weight( pd, element, sample, err );
 }
 
-} // namespace MBMesquite
+}  // namespace MBMesquite

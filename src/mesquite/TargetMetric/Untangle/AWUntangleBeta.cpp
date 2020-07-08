@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file AWUntangleBeta.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -36,53 +35,54 @@
 #include "TMPDerivs.hpp"
 #include "TMPCommon.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
-std::string AWUntangleBeta::get_name() const
-  { return "AWUntangleBeta"; }
+std::string AWUntangleBeta::get_name( ) const
+{
+    return "AWUntangleBeta";
+}
 
-AWUntangleBeta::~AWUntangleBeta() {}
+AWUntangleBeta::~AWUntangleBeta( ) {}
 
 const int P = 3;
 
-template <unsigned DIM> inline
-bool AWUntangleBeta::eval( const MsqMatrix<DIM,DIM>& A,
-                           const MsqMatrix<DIM,DIM>& W,
-                           double& result)
+template< unsigned DIM >
+inline bool AWUntangleBeta::eval( const MsqMatrix< DIM, DIM >& A, const MsqMatrix< DIM, DIM >& W,
+                                  double& result )
 {
-  const double alpha = det(A);
-  const double omega = det(W);
-  double tmp = alpha - mGamma * omega;
-  tmp = fabs(tmp) - tmp;
-  result = tmp;
-  for (int i = 1; i < P; ++i)
-    result *= tmp;
+    const double alpha = det( A );
+    const double omega = det( W );
+    double       tmp = alpha - mGamma * omega;
+    tmp = fabs( tmp ) - tmp;
+    result = tmp;
+    for( int i = 1; i < P; ++i )
+        result *= tmp;
 
-  return true;
+    return true;
 }
 
-template <unsigned DIM> inline
-bool AWUntangleBeta::grad( const MsqMatrix<DIM,DIM>& A,
-                           const MsqMatrix<DIM,DIM>& W,
-                           double& result,
-                           MsqMatrix<DIM,DIM>& deriv )
+template< unsigned DIM >
+inline bool AWUntangleBeta::grad( const MsqMatrix< DIM, DIM >& A, const MsqMatrix< DIM, DIM >& W,
+                                  double& result, MsqMatrix< DIM, DIM >& deriv )
 {
-  const double alpha = det(A);
-  const double omega = det(W);
-  double tmp = 2 * (mGamma * omega - alpha);
-  if (tmp < 0.0) {
-    result = 0.0;
-    deriv = MsqMatrix<DIM,DIM>(0.0);
+    const double alpha = det( A );
+    const double omega = det( W );
+    double       tmp = 2 * ( mGamma * omega - alpha );
+    if( tmp < 0.0 )
+    {
+        result = 0.0;
+        deriv = MsqMatrix< DIM, DIM >( 0.0 );
+        return true;
+    }
+
+    double prod = 1.0;
+    for( int i = 1; i < P; ++i )
+        prod *= tmp;
+    result = prod * tmp;
+
+    deriv = -2 * P * prod * transpose_adj( A );
     return true;
-  }
-
-  double prod = 1.0;
-  for (int i = 1; i < P; ++i)
-    prod *= tmp;
-  result = prod * tmp;
-
-  deriv = -2 *P * prod * transpose_adj(A);
-  return true;
 }
 /*
 template <unsigned DIM> inline
@@ -101,6 +101,6 @@ bool AWUntangleBeta::hess( const MsqMatrix<DIM,DIM>& A,
   return true;
 }
 */
-TMP_AW_TEMPL_IMPL_COMMON_NO2ND(AWUntangleBeta)
+TMP_AW_TEMPL_IMPL_COMMON_NO2ND( AWUntangleBeta )
 
-} // namespace MBMesquite
+}  // namespace MBMesquite

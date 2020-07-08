@@ -7,8 +7,8 @@
 // A structure containing the parsed CL tag specification.
 struct TagSpec
 {
-  moab::Tag handle;  // Tag handle
-  void* value;   // Tag value (malloc'd) or NULL if no value specified
+    moab::Tag handle;  // Tag handle
+    void*     value;  // Tag value (malloc'd) or NULL if no value specified
 };
 
 // Parse a tag specified in the form: tagname=value,

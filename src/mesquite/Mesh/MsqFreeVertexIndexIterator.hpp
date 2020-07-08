@@ -45,57 +45,64 @@
 
 namespace MBMesquite
 {
-  class MsqError;
+class MsqError;
 
-  /*! \class MsqFreeVertexIndexIterator
-    \brief iterates over indexes of free vetices in a PatchData.
+/*! \class MsqFreeVertexIndexIterator
+  \brief iterates over indexes of free vetices in a PatchData.
 
-    A free vertex is defined as not having the MSQ_CULLED and MSQ_HARD_FIXED
-    flags activated.
+  A free vertex is defined as not having the MSQ_CULLED and MSQ_HARD_FIXED
+  flags activated.
 
-    Use the iterator as follow:
-    MsqFreeVertexIndexIterator ind(&patch_data,err);
-    ind.reset();
-    while (ind.next()) {
-      cout << ind.value();
-    }  .*/
-  class MsqFreeVertexIndexIterator {
+  Use the iterator as follow:
+  MsqFreeVertexIndexIterator ind(&patch_data,err);
+  ind.reset();
+  while (ind.next()) {
+    cout << ind.value();
+  }  .*/
+class MsqFreeVertexIndexIterator
+{
   public:
-    MsqFreeVertexIndexIterator(const PatchData& p_pd, MsqError &) :
-      iterOriginator(p_pd), iterCurrentIndex((size_t)-1)
-      {}
+    MsqFreeVertexIndexIterator( const PatchData& p_pd, MsqError& )
+        : iterOriginator( p_pd ), iterCurrentIndex( (size_t)-1 )
+    {
+    }
     //! Resets the iterator.
     //! The next call to next() will set the iterator on the first free vertex.
-    void reset() { iterCurrentIndex=(size_t)-1; }
+    void reset( )
+    {
+        iterCurrentIndex = (size_t)-1;
+    }
     //! Increments the iterator. returns false if there is no more free vertex.
-    inline bool next();
+    inline bool next( );
     //! Returns an index corresponding to a free vertex.
-    std::size_t value() {return iterCurrentIndex;}
+    std::size_t value( )
+    {
+        return iterCurrentIndex;
+    }
+
   private:
     const PatchData& iterOriginator;
-    std::size_t iterCurrentIndex;
-  };
+    std::size_t      iterCurrentIndex;
+};
 
-
-  /** \brief Advance iterator
-   *
-   * Advance iterator to next free vertex
-   *\return false if at end, true otherwise
-   */
-  inline bool MsqFreeVertexIndexIterator::next()
-  {
+/** \brief Advance iterator
+ *
+ * Advance iterator to next free vertex
+ *\return false if at end, true otherwise
+ */
+inline bool MsqFreeVertexIndexIterator::next( )
+{
     ++iterCurrentIndex;
-    while (iterCurrentIndex < iterOriginator.num_free_vertices())
+    while( iterCurrentIndex < iterOriginator.num_free_vertices( ) )
     {
-      if (!iterOriginator.vertex_by_index(iterCurrentIndex).is_flag_set(MsqVertex::MSQ_CULLED))
-        return true;
-      ++iterCurrentIndex;
+        if( !iterOriginator.vertex_by_index( iterCurrentIndex )
+                 .is_flag_set( MsqVertex::MSQ_CULLED ) )
+            return true;
+        ++iterCurrentIndex;
     }
     return false;
-  }
+}
 
+}  // namespace MBMesquite
 
-
-} // namespace
-
-#endif //  MsqFreeVertexIndexIterator_hpp
+#endif  //  MsqFreeVertexIndexIterator_hpp

@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file ExtraData.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -36,51 +35,54 @@
 #include "Mesquite.hpp"
 #include <stdlib.h>
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 class PatchData;
 class MsqError;
 
 /**\brief Object used to attach auxiliary data to PatchData */
-class ExtraData {
+class ExtraData
+{
   public:
     ExtraData( PatchData& patch );
 
-    virtual ~ExtraData();
+    virtual ~ExtraData( );
 
-    PatchData* get_patch_data() const { return patchPtr; }
+    PatchData* get_patch_data( ) const
+    {
+        return patchPtr;
+    }
 
-      /**\brief Notify that the owning PatchData is being destroyed.
-       *
-       * Notify an ExtraData object that the patch it is attached to
-       * is being destroyed.  The ExtraData will have been removed
-       * from the PatchData before being notified.  Therefore
-       * this->get_patch_data() will return NULL.
-       *
-       * ExtraData instances will also be notified via this method
-       * and removed and removed from the PatchData if the attached
-       * MBMesquite::Mesh or MBMesquite::MeshDomain instance is changed.
-       */
+    /**\brief Notify that the owning PatchData is being destroyed.
+     *
+     * Notify an ExtraData object that the patch it is attached to
+     * is being destroyed.  The ExtraData will have been removed
+     * from the PatchData before being notified.  Therefore
+     * this->get_patch_data() will return NULL.
+     *
+     * ExtraData instances will also be notified via this method
+     * and removed and removed from the PatchData if the attached
+     * MBMesquite::Mesh or MBMesquite::MeshDomain instance is changed.
+     */
     virtual void notify_patch_destroyed( ) = 0;
 
-      /**\brief Notify that the patch (mesh) in the PatchData is changing
-       *
-       * Notify attached ExtraData that the PatchData is being changed
-       * to contain an new patch (set of mesh entities.)
-       */
+    /**\brief Notify that the patch (mesh) in the PatchData is changing
+     *
+     * Notify attached ExtraData that the PatchData is being changed
+     * to contain an new patch (set of mesh entities.)
+     */
     virtual void notify_new_patch( ) = 0;
 
-      /**\brief Nofity that a subpatch is being created from this patch.
-       *\param sub_patch The new, populated subpatch
-       *\param vertex_index_map The indices in the original patch for each
-       *          vertex in the subpatch.
-       *\param element_index_map The indices in the original patch for each
-       *          element in the subpatch.
-       */
-    virtual void notify_sub_patch( PatchData& sub_patch,
-                                   const size_t* vertex_index_map,
-                                   const size_t* element_index_map,
-                                   MsqError& err ) = 0;
+    /**\brief Nofity that a subpatch is being created from this patch.
+     *\param sub_patch The new, populated subpatch
+     *\param vertex_index_map The indices in the original patch for each
+     *          vertex in the subpatch.
+     *\param element_index_map The indices in the original patch for each
+     *          element in the subpatch.
+     */
+    virtual void notify_sub_patch( PatchData& sub_patch, const size_t* vertex_index_map,
+                                   const size_t* element_index_map, MsqError& err ) = 0;
 
   private:
     friend class PatchData;
@@ -88,8 +90,6 @@ class ExtraData {
     PatchData* patchPtr;
 };
 
-
-
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file TargetWriter.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -37,7 +36,8 @@
 #include "Instruction.hpp"
 #include "MeshInterface.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 class TargetCalculator;
 class WeightCalculator;
@@ -49,43 +49,37 @@ class WeightCalculator;
  */
 class TargetWriter : public Instruction
 {
-public:
-  MESQUITE_EXPORT
-  TargetWriter( TargetCalculator* tc,
-                WeightCalculator* wc = 0,
-                std::string target_base_name = "MSQ_TARGET_MATRIX",
-                std::string weight_base_name = "MSQ_TARGET_WEIGHT") ;
+  public:
+    MESQUITE_EXPORT
+    TargetWriter( TargetCalculator* tc, WeightCalculator* wc = 0,
+                  std::string target_base_name = "MSQ_TARGET_MATRIX",
+                  std::string weight_base_name = "MSQ_TARGET_WEIGHT" );
 
-  MESQUITE_EXPORT virtual
-  ~TargetWriter();
+    MESQUITE_EXPORT virtual ~TargetWriter( );
 
-  MESQUITE_EXPORT
-  double loop_over_mesh( MeshDomainAssoc* mesh_and_domain, const Settings*, MsqError& );
+    MESQUITE_EXPORT
+    double loop_over_mesh( MeshDomainAssoc* mesh_and_domain, const Settings*, MsqError& );
 
-  MESQUITE_EXPORT
-  void initialize_queue( MeshDomainAssoc* mesh_and_domain,
-                         const Settings* settings,
-                         MsqError& err );
+    MESQUITE_EXPORT
+    void initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
+                           MsqError& err );
 
-  MESQUITE_EXPORT
-  std::string get_name() const;
+    MESQUITE_EXPORT
+    std::string get_name( ) const;
 
-private:
+  private:
+    TagHandle get_target_tag( unsigned dimension, unsigned count, Mesh* mesh, MsqError& err );
+    TagHandle get_weight_tag( unsigned count, Mesh* mesh, MsqError& err );
+    TagHandle get_tag_handle( const std::string& base_name, unsigned num_dbl, Mesh* mesh,
+                              MsqError& err );
 
-  TagHandle get_target_tag( unsigned dimension,  unsigned count,
-                            Mesh* mesh, MsqError& err );
-  TagHandle get_weight_tag( unsigned count, Mesh* mesh, MsqError& err );
-  TagHandle get_tag_handle( const std::string& base_name,
-                            unsigned num_dbl, Mesh* mesh, MsqError& err );
+    TargetCalculator* targetCalc;
+    WeightCalculator* weightCalc;
 
-  TargetCalculator* targetCalc;
-  WeightCalculator* weightCalc;
-
-  std::string targetName, weightName;
-  std::vector<TagHandle> targetTags, weightTags;
+    std::string              targetName, weightName;
+    std::vector< TagHandle > targetTags, weightTags;
 };
 
-
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

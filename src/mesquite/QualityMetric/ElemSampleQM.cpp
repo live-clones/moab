@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file ElemSampleQM.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -32,8 +31,9 @@
 
 #include "ElemSampleQM.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
-ElemSampleQM::~ElemSampleQM() {}
+ElemSampleQM::~ElemSampleQM( ) {}
 
-} // namespace MBMesquite
+}  // namespace MBMesquite

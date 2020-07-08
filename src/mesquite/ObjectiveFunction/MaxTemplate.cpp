@@ -38,57 +38,54 @@
 #include "QualityMetric.hpp"
 #include "MsqError.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
-MaxTemplate::MaxTemplate(QualityMetric *qualitymetric)
-   : ObjectiveFunctionTemplate(qualitymetric) {}
-
-//Lori:  need to clean up here
-MaxTemplate::~MaxTemplate(){
-
+MaxTemplate::MaxTemplate( QualityMetric* qualitymetric )
+    : ObjectiveFunctionTemplate( qualitymetric )
+{
 }
 
-ObjectiveFunction* MaxTemplate::clone() const
-  { return new MaxTemplate(get_quality_metric()); }
+// Lori:  need to clean up here
+MaxTemplate::~MaxTemplate( ) {}
 
-void MaxTemplate::clear()
-  { }
+ObjectiveFunction* MaxTemplate::clone( ) const
+{
+    return new MaxTemplate( get_quality_metric( ) );
+}
 
-bool MaxTemplate::evaluate( EvalType type,
-                            PatchData& pd,
-                            double& value_out,
-                            bool free,
+void MaxTemplate::clear( ) {}
+
+bool MaxTemplate::evaluate( EvalType type, PatchData& pd, double& value_out, bool free,
                             MsqError& err )
 {
-  if (type != ObjectiveFunction::CALCULATE) {
-    MSQ_SETERR(err)(
-      "MaxTemplate does not support block coodinate descent algoritms",
-      MsqError::INVALID_STATE );
-    return false;
-  }
+    if( type != ObjectiveFunction::CALCULATE )
+    {
+        MSQ_SETERR( err )
+        ( "MaxTemplate does not support block coodinate descent algoritms",
+          MsqError::INVALID_STATE );
+        return false;
+    }
 
-  QualityMetric* qm = get_quality_metric();
-  qm->get_evaluations( pd, qmHandles, free, err );  MSQ_ERRFALSE(err);
-  const double sign = qm->get_negate_flag();
+    QualityMetric* qm = get_quality_metric( );
+    qm->get_evaluations( pd, qmHandles, free, err );
+    MSQ_ERRFALSE( err );
+    const double sign = qm->get_negate_flag( );
 
     // calculate OF value for just the patch
-  std::vector<size_t>::const_iterator i;
-  double value;
-  value_out = -HUGE_VAL;
-  for (i = qmHandles.begin(); i != qmHandles.end(); ++i)
-  {
-    bool result = qm->evaluate( pd, *i, value, err );
-    if (MSQ_CHKERR(err) || !result)
-      return false;
+    std::vector< size_t >::const_iterator i;
+    double                                value;
+    value_out = -HUGE_VAL;
+    for( i = qmHandles.begin( ); i != qmHandles.end( ); ++i )
+    {
+        bool result = qm->evaluate( pd, *i, value, err );
+        if( MSQ_CHKERR( err ) || !result ) return false;
 
-    value *= sign;
-    if (value > value_out)
-      value_out = value;
-  }
+        value *= sign;
+        if( value > value_out ) value_out = value;
+    }
 
-  return true;
+    return true;
 }
 
-} // namespace MBMesquite
-
-	
+}  // namespace MBMesquite

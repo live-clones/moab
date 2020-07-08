@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file NumericalQM.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -36,7 +35,8 @@
 #include "Mesquite.hpp"
 #include "QualityMetric.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 /**\brief Use finite difference rather than analytical derivative calculations.
  *
@@ -48,68 +48,47 @@ namespace MBMesquite {
 class NumericalQM : public QualityMetric
 {
   public:
-
     /**
      *\param real_metric  The actual quality metric.
      *\param numerical_gradient Use finite difference to calculate first derivatives
      *\param numerical_hessian  Use finite difference to calculate second derivatives
      */
-    NumericalQM( QualityMetric* real_metric,
-                 bool numerical_gradient = true,
+    NumericalQM( QualityMetric* real_metric, bool numerical_gradient = true,
                  bool numerical_hessian = true );
 
-    MetricType get_metric_type() const;
+    MetricType get_metric_type( ) const;
 
-    std::string get_name() const;
+    std::string get_name( ) const;
 
-    int get_negate_flag() const;
+    int get_negate_flag( ) const;
 
-    void get_evaluations( PatchData& pd,
-                          std::vector<size_t>& handles,
-                          bool free_vertices_only,
+    void get_evaluations( PatchData& pd, std::vector< size_t >& handles, bool free_vertices_only,
                           MsqError& err );
 
-    bool evaluate( PatchData& pd,
-                   size_t handle,
-                   double& value,
-                   MsqError& err );
+    bool evaluate( PatchData& pd, size_t handle, double& value, MsqError& err );
 
-    bool evaluate_with_indices( PatchData& pd,
-                   size_t handle,
-                   double& value,
-                   std::vector<size_t>& indices,
-                   MsqError& err );
+    bool evaluate_with_indices( PatchData& pd, size_t handle, double& value,
+                                std::vector< size_t >& indices, MsqError& err );
 
-    bool evaluate_with_gradient( PatchData& pd,
-                   size_t handle,
-                   double& value,
-                   std::vector<size_t>& indices,
-                   std::vector<Vector3D>& gradient,
-                   MsqError& err );
+    bool evaluate_with_gradient( PatchData& pd, size_t handle, double& value,
+                                 std::vector< size_t >& indices, std::vector< Vector3D >& gradient,
+                                 MsqError& err );
 
-    bool evaluate_with_Hessian_diagonal( PatchData& pd,
-                   size_t handle,
-                   double& value,
-                   std::vector<size_t>& indices,
-                   std::vector<Vector3D>& gradient,
-                   std::vector<SymMatrix3D>& Hessian_diagonal,
-                   MsqError& err );
+    bool evaluate_with_Hessian_diagonal( PatchData& pd, size_t handle, double& value,
+                                         std::vector< size_t >&      indices,
+                                         std::vector< Vector3D >&    gradient,
+                                         std::vector< SymMatrix3D >& Hessian_diagonal,
+                                         MsqError&                   err );
 
-    bool evaluate_with_Hessian( PatchData& pd,
-                   size_t handle,
-                   double& value,
-                   std::vector<size_t>& indices,
-                   std::vector<Vector3D>& gradient,
-                   std::vector<Matrix3D>& Hessian,
-                   MsqError& err );
+    bool evaluate_with_Hessian( PatchData& pd, size_t handle, double& value,
+                                std::vector< size_t >& indices, std::vector< Vector3D >& gradient,
+                                std::vector< Matrix3D >& Hessian, MsqError& err );
 
   private:
     QualityMetric* realMetric;
-    bool numericGrad, numericHess;
-
+    bool           numericGrad, numericHess;
 };
 
-
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

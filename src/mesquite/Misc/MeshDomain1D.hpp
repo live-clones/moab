@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file MeshDomain1D.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -38,9 +37,8 @@
 #include "MsqGeomPrim.hpp"
 #include "CurveDomain.hpp"
 
-namespace MBMesquite {
-
-
+namespace MBMesquite
+{
 
 class MESQUITE_EXPORT PointDomain : public MeshDomain
 {
@@ -48,35 +46,26 @@ class MESQUITE_EXPORT PointDomain : public MeshDomain
     Vector3D mGeom;
 
   public:
+    PointDomain( const Vector3D& location ) : mGeom( location ) {}
 
-    PointDomain( const Vector3D& location ) : mGeom(location) {}
+    const Vector3D& geom( ) const
+    {
+        return mGeom;
+    }
 
-    const Vector3D& geom() const { return mGeom; }
+    virtual void snap_to( Mesh::VertexHandle entity_handle, Vector3D& coordinate ) const;
 
+    virtual void vertex_normal_at( Mesh::VertexHandle entity_handle, Vector3D& coordinate ) const;
+    virtual void element_normal_at( Mesh::ElementHandle entity_handle, Vector3D& coordinate ) const;
 
-    virtual void snap_to(Mesh::VertexHandle entity_handle,
-                         Vector3D &coordinate) const;
+    virtual void vertex_normal_at( const Mesh::VertexHandle* handles, Vector3D coordinates[],
+                                   unsigned count, MsqError& err ) const;
 
-    virtual void vertex_normal_at(Mesh::VertexHandle entity_handle,
-                                  Vector3D &coordinate) const;
-    virtual void element_normal_at(Mesh::ElementHandle entity_handle,
-                                  Vector3D &coordinate) const;
+    virtual void closest_point( Mesh::VertexHandle handle, const Vector3D& position,
+                                Vector3D& closest, Vector3D& normal, MsqError& err ) const;
 
-    virtual void vertex_normal_at( const Mesh::VertexHandle* handles,
-                                   Vector3D coordinates[],
-                                   unsigned count,
-                                   MsqError& err ) const;
-
-    virtual void closest_point( Mesh::VertexHandle handle,
-                                const Vector3D& position,
-                                Vector3D& closest,
-                                Vector3D& normal,
-                                MsqError& err ) const;
-
-    virtual void domain_DoF( const Mesh::VertexHandle* handle_array,
-                             unsigned short* dof_array,
-                             size_t num_handles,
-                             MsqError& err ) const;
+    virtual void domain_DoF( const Mesh::VertexHandle* handle_array, unsigned short* dof_array,
+                             size_t num_handles, MsqError& err ) const;
 };
 
 class MESQUITE_EXPORT LineDomain : public MeshDomain, public CurveDomain
@@ -85,50 +74,34 @@ class MESQUITE_EXPORT LineDomain : public MeshDomain, public CurveDomain
     MsqLine mGeom;
 
   public:
+    LineDomain( const Vector3D& point, const Vector3D& dir ) : mGeom( point, dir ) {}
 
-    LineDomain( const Vector3D& point, const Vector3D& dir )
-      : mGeom( point, dir )
-    {}
+    LineDomain( const MsqLine& line ) : mGeom( line ) {}
 
-    LineDomain( const MsqLine& line )
-      : mGeom( line )
-    {}
+    const MsqLine& geom( ) const
+    {
+        return mGeom;
+    }
 
-    const MsqLine& geom() const { return mGeom; }
+    virtual void snap_to( Mesh::VertexHandle entity_handle, Vector3D& coordinate ) const;
 
+    virtual void vertex_normal_at( Mesh::VertexHandle entity_handle, Vector3D& coordinate ) const;
+    virtual void element_normal_at( Mesh::ElementHandle entity_handle, Vector3D& coordinate ) const;
 
-    virtual void snap_to(Mesh::VertexHandle entity_handle,
-                         Vector3D &coordinate) const;
+    virtual void vertex_normal_at( const Mesh::VertexHandle* handles, Vector3D coordinates[],
+                                   unsigned count, MsqError& err ) const;
 
-    virtual void vertex_normal_at(Mesh::VertexHandle entity_handle,
-                                  Vector3D &coordinate) const;
-    virtual void element_normal_at(Mesh::ElementHandle entity_handle,
-                                  Vector3D &coordinate) const;
+    virtual void closest_point( Mesh::VertexHandle handle, const Vector3D& position,
+                                Vector3D& closest, Vector3D& normal, MsqError& err ) const;
 
-    virtual void vertex_normal_at( const Mesh::VertexHandle* handles,
-                                   Vector3D coordinates[],
-                                   unsigned count,
-                                   MsqError& err ) const;
+    virtual void domain_DoF( const Mesh::VertexHandle* handle_array, unsigned short* dof_array,
+                             size_t num_handles, MsqError& err ) const;
 
-    virtual void closest_point( Mesh::VertexHandle handle,
-                                const Vector3D& position,
-                                Vector3D& closest,
-                                Vector3D& normal,
-                                MsqError& err ) const;
+    virtual double arc_length( const double position1[ 3 ], const double position2[ 3 ],
+                               MsqError& err );
 
-    virtual void domain_DoF( const Mesh::VertexHandle* handle_array,
-                             unsigned short* dof_array,
-                             size_t num_handles,
-                             MsqError& err ) const;
-
-  virtual double arc_length( const double position1[3],
-                             const double position2[3],
-                             MsqError& err );
-
-  virtual void position_from_length( const double from_here[3],
-                                     double length,
-                                     double result_point[3],
-                                     MsqError& err );
+    virtual void position_from_length( const double from_here[ 3 ], double length,
+                                       double result_point[ 3 ], MsqError& err );
 };
 
 class MESQUITE_EXPORT CircleDomain : public MeshDomain, CurveDomain
@@ -137,56 +110,39 @@ class MESQUITE_EXPORT CircleDomain : public MeshDomain, CurveDomain
     MsqCircle mGeom;
 
   public:
-
     CircleDomain( const Vector3D& center, const Vector3D& normal, double radius )
-      : mGeom( center, normal, radius )
-      {}
+        : mGeom( center, normal, radius )
+    {
+    }
 
-    CircleDomain( const MsqCircle& circle )
-      : mGeom( circle )
-      {}
+    CircleDomain( const MsqCircle& circle ) : mGeom( circle ) {}
 
-    const MsqCircle& geom() const { return mGeom; }
+    const MsqCircle& geom( ) const
+    {
+        return mGeom;
+    }
 
+    virtual void snap_to( Mesh::VertexHandle entity_handle, Vector3D& coordinate ) const;
 
-    virtual void snap_to(Mesh::VertexHandle entity_handle,
-                         Vector3D &coordinate) const;
+    virtual void vertex_normal_at( Mesh::VertexHandle entity_handle, Vector3D& coordinate ) const;
+    virtual void element_normal_at( Mesh::ElementHandle entity_handle, Vector3D& coordinate ) const;
 
-    virtual void vertex_normal_at(Mesh::VertexHandle entity_handle,
-                                  Vector3D &coordinate) const;
-    virtual void element_normal_at(Mesh::ElementHandle entity_handle,
-                                  Vector3D &coordinate) const;
+    virtual void vertex_normal_at( const Mesh::VertexHandle* handles, Vector3D coordinates[],
+                                   unsigned count, MsqError& err ) const;
 
-    virtual void vertex_normal_at( const Mesh::VertexHandle* handles,
-                                   Vector3D coordinates[],
-                                   unsigned count,
-                                   MsqError& err ) const;
+    virtual void closest_point( Mesh::VertexHandle handle, const Vector3D& position,
+                                Vector3D& closest, Vector3D& normal, MsqError& err ) const;
 
-    virtual void closest_point( Mesh::VertexHandle handle,
-                                const Vector3D& position,
-                                Vector3D& closest,
-                                Vector3D& normal,
-                                MsqError& err ) const;
+    virtual void domain_DoF( const Mesh::VertexHandle* handle_array, unsigned short* dof_array,
+                             size_t num_handles, MsqError& err ) const;
 
-    virtual void domain_DoF( const Mesh::VertexHandle* handle_array,
-                             unsigned short* dof_array,
-                             size_t num_handles,
-                             MsqError& err ) const;
+    virtual double arc_length( const double position1[ 3 ], const double position2[ 3 ],
+                               MsqError& err );
 
-  virtual double arc_length( const double position1[3],
-                             const double position2[3],
-                             MsqError& err );
-
-  virtual void position_from_length( const double from_here[3],
-                                     double length,
-                                     double result_point[3],
-                                     MsqError& err );
+    virtual void position_from_length( const double from_here[ 3 ], double length,
+                                       double result_point[ 3 ], MsqError& err );
 };
 
-
-
-
-
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

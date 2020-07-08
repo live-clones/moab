@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file VertexQM.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -36,37 +35,33 @@
 #include "Mesquite.hpp"
 #include "QualityMetric.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 /**\brief Base type for per-vertex quality metrics */
 class VertexQM : public QualityMetric
 {
-public:
+  public:
+    MESQUITE_EXPORT virtual ~VertexQM( );
 
-  MESQUITE_EXPORT virtual ~VertexQM();
+    MESQUITE_EXPORT virtual MetricType get_metric_type( ) const
+    {
+        return VERTEX_BASED;
+    }
 
-  MESQUITE_EXPORT virtual MetricType get_metric_type() const
-    { return VERTEX_BASED; }
+    /**\brief Returns list of vertex indices in PatchData */
+    MESQUITE_EXPORT virtual void get_evaluations( PatchData& pd, std::vector< size_t >& handles,
+                                                  bool free_vertices_only, MsqError& err );
 
-  /**\brief Returns list of vertex indices in PatchData */
-  MESQUITE_EXPORT virtual
-  void get_evaluations( PatchData& pd,
-                        std::vector<size_t>& handles,
-                        bool free_vertices_only,
-                        MsqError& err );
+    MESQUITE_EXPORT static void get_vertex_evaluations( PatchData&             pd,
+                                                        std::vector< size_t >& handles,
+                                                        bool free_vertices_only, MsqError& err );
 
-  MESQUITE_EXPORT static
-  void get_vertex_evaluations( PatchData& pd,
-                               std::vector<size_t>& handles,
-                               bool free_vertices_only,
-                               MsqError& err );
-
-  MESQUITE_EXPORT static
-  void get_vertex_corner_handles( PatchData& pd, size_t vertex_index,
-                                  std::vector<size_t>& handles_out,
-                                  MsqError& err );
+    MESQUITE_EXPORT static void get_vertex_corner_handles( PatchData& pd, size_t vertex_index,
+                                                           std::vector< size_t >& handles_out,
+                                                           MsqError&              err );
 };
 
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

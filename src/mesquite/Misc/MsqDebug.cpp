@@ -33,44 +33,44 @@ namespace MBMesquite
 {
 
 /* IMPORTANT: Be careful to initialize the InitializeFlags object
-              *LAST* as it will access the other static data. */
+ *LAST* as it will access the other static data. */
 
-std::vector<std::ostream*> MsqDebug::streams;
-std::vector<bool> MsqDebug::flags;
+std::vector< std::ostream* > MsqDebug::streams;
+std::vector< bool >          MsqDebug::flags;
 
 #ifdef MSQ_ENABLE_DEBUG
 static void parse_flag_string( const char* str, bool flag_val )
 {
-  char* s = strdup(str);
-  const char delim[] = ";,";
-  for (const char* p = strtok( s, delim ); p; p = strtok( 0, delim ) ) {
-    int beg, end;
-    switch (sscanf( p, "%u - %u", &beg, &end )) {
-      case 1:
-        end = beg;
-        // fall through
-      case 2:
-        for ( ; beg <= end; ++beg)
-          MsqDebug::set( beg, flag_val );
-        break;
+    char*      s = strdup( str );
+    const char delim[] = ";,";
+    for( const char* p = strtok( s, delim ); p; p = strtok( 0, delim ) )
+    {
+        int beg, end;
+        switch( sscanf( p, "%u - %u", &beg, &end ) )
+        {
+            case 1:
+                end = beg;
+                // fall through
+            case 2:
+                for( ; beg <= end; ++beg )
+                    MsqDebug::set( beg, flag_val );
+                break;
+        }
     }
-  }
-  free( s );
+    free( s );
 }
 
 MsqDebug::InitializeFlags::InitializeFlags( )
 {
-  const unsigned flag_array[] = { MSQ_ENABLE_DEBUG, 0 };
-  size_t length = sizeof(flag_array) / sizeof(unsigned) - 1;
-  while (length > 0)
-    MsqDebug::set( flag_array[--length], true );
+    const unsigned flag_array[] = { MSQ_ENABLE_DEBUG, 0 };
+    size_t         length = sizeof( flag_array ) / sizeof( unsigned ) - 1;
+    while( length > 0 )
+        MsqDebug::set( flag_array[ --length ], true );
 
-  const char* envstr = getenv( "MESQUITE_DEBUG" );
-  if (envstr)
-    parse_flag_string( envstr, true );
-  envstr = getenv( "MESQUITE_NO_DEBUG" );
-  if (envstr)
-    parse_flag_string( envstr, false );
+    const char* envstr = getenv( "MESQUITE_DEBUG" );
+    if( envstr ) parse_flag_string( envstr, true );
+    envstr = getenv( "MESQUITE_NO_DEBUG" );
+    if( envstr ) parse_flag_string( envstr, false );
 }
 #else
 MsqDebug::InitializeFlags::InitializeFlags( ) {}
@@ -78,84 +78,76 @@ MsqDebug::InitializeFlags::InitializeFlags( ) {}
 
 MsqDebug::InitializeFlags MsqDebug::init;
 
-
 bool MsqDebug::get( unsigned flag )
 {
-  return flag < flags.size() && flags[flag];
+    return flag < flags.size( ) && flags[ flag ];
 }
 
 void MsqDebug::set( unsigned flag, bool state )
 {
-  if (state)
-  {
-    if (flag >= flags.size())
+    if( state )
     {
-      flags.resize(flag+1);
+        if( flag >= flags.size( ) ) { flags.resize( flag + 1 ); }
+        flags[ flag ] = true;
     }
-    flags[flag] = true;
-  }
-  else
-  {
-    if (flag < flags.size())
-      flags[flag] = false;
-  }
+    else
+    {
+        if( flag < flags.size( ) ) flags[ flag ] = false;
+    }
 }
 
-void MsqDebug::disable_all()
+void MsqDebug::disable_all( )
 {
-  flags.clear();
+    flags.clear( );
 }
 
 std::ostream& MsqDebug::get_stream( unsigned flag )
 {
-  if (flag < streams.size())
-    return *streams[flag];
-  else
-    return std::cout;
+    if( flag < streams.size( ) )
+        return *streams[ flag ];
+    else
+        return std::cout;
 }
 
 void MsqDebug::set_stream( unsigned flag, std::ostream& stream )
 {
-  if (flag >= streams.size())
-  {
-    size_t old_size = streams.size();
-    streams.resize( flag );
-    for (unsigned i = old_size; i < flag; ++i)
-      streams[i] = &std::cout;
-  }
-  streams[flag] = &stream;
+    if( flag >= streams.size( ) )
+    {
+        size_t old_size = streams.size( );
+        streams.resize( flag );
+        for( unsigned i = old_size; i < flag; ++i )
+            streams[ i ] = &std::cout;
+    }
+    streams[ flag ] = &stream;
 }
-
 
 void MsqDebug::FormatPrinter::print( const char* format, ... ) const
 {
-  if (!MsqDebug::get( myFlag ))
-    return;
+    if( !MsqDebug::get( myFlag ) ) return;
 
-  char buffer[512];
+    char buffer[ 512 ];
 
-#if defined(HAVE_VSNPRINTF)
-  va_list args;
-  va_start( args, format );
-  vsnprintf( buffer, sizeof(buffer), format, args );
-  va_end( args );
-#elif defined(HAVE__VSNPRINTF)
-  va_list args;
-  va_start( args, format );
-  _vsnprintf( buffer, sizeof(buffer), format, args );
-  va_end( args );
-#elif defined(HAVE_VSPRINTF)
-  va_list args;
-  va_start( args, format );
-  vsprintf( buffer, format, args );
-  va_end( args );
+#if defined( HAVE_VSNPRINTF )
+    va_list args;
+    va_start( args, format );
+    vsnprintf( buffer, sizeof( buffer ), format, args );
+    va_end( args );
+#elif defined( HAVE__VSNPRINTF )
+    va_list args;
+    va_start( args, format );
+    _vsnprintf( buffer, sizeof( buffer ), format, args );
+    va_end( args );
+#elif defined( HAVE_VSPRINTF )
+    va_list args;
+    va_start( args, format );
+    vsprintf( buffer, format, args );
+    va_end( args );
 #else
-  strncpy( buffer, format, sizeof(buffer) );
-  buffer[sizeof(buffer)-1] = '\0';
+    strncpy( buffer, format, sizeof( buffer ) );
+    buffer[ sizeof( buffer ) - 1 ] = '\0';
 #endif
 
-  MsqDebug::get_stream( myFlag ) << buffer;
+    MsqDebug::get_stream( myFlag ) << buffer;
 }
 
-}
-
+}  // namespace MBMesquite

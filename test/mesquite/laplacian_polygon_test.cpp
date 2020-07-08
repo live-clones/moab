@@ -24,7 +24,8 @@
     pknupp@sandia.gov, tleurent@mcs.anl.gov, tmunson@mcs.anl.gov
 
   ***************************************************************** */
-// -*- Mode : c++; tab-width: 2; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+// -*- Mode : c++; tab-width: 2; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 2
+// -*-
 //
 //   SUMMARY:
 //     USAGE:
@@ -70,81 +71,80 @@ using namespace MBMesquite;
 
 std::string DEFAULT_INPUT = TestDir + "/2D/vtk/N-Polygonal/poly1.vtk";
 
-void help(const char* argv0)
+void help( const char* argv0 )
 {
-  std::cerr << "Usage: " << argv0 << " [<input_file>] [<output_file>]" << std::endl
-            << "  default input file is: " << DEFAULT_INPUT << std::endl
-            << "  defualt is no output file" << std::endl;
-  exit(1);
+    std::cerr << "Usage: " << argv0 << " [<input_file>] [<output_file>]" << std::endl
+              << "  default input file is: " << DEFAULT_INPUT << std::endl
+              << "  defualt is no output file" << std::endl;
+    exit( 1 );
 }
 
-int main(int argc, char* argv[])
+int main( int argc, char* argv[] )
 {
-  const char* input_file = DEFAULT_INPUT.c_str();
-  const char* output_file = NULL;
-  switch (argc) {
-    default:
-      help(argv[0]);
-    case 3:
-      if (!strcmp(argv[2],"-h"))
-        help(argv[0]);
-      output_file = argv[2];
-    case 2:
-      if (!strcmp(argv[1],"-h"))
-        help(argv[0]);
-      input_file = argv[1];
-    case 1:
-      ;
-  }
+    const char* input_file = DEFAULT_INPUT.c_str( );
+    const char* output_file = NULL;
+    switch( argc )
+    {
+        default:
+            help( argv[ 0 ] );
+        case 3:
+            if( !strcmp( argv[ 2 ], "-h" ) ) help( argv[ 0 ] );
+            output_file = argv[ 2 ];
+        case 2:
+            if( !strcmp( argv[ 1 ], "-h" ) ) help( argv[ 0 ] );
+            input_file = argv[ 1 ];
+        case 1:;
+    }
 
     /* Read a VTK Mesh file */
-  MsqPrintError err(cout);
-  MBMesquite::MeshImpl mesh;
-  mesh.read_vtk( input_file, err);
-  if (err) return 1;
+    MsqPrintError        err( cout );
+    MBMesquite::MeshImpl mesh;
+    mesh.read_vtk( input_file, err );
+    if( err ) return 1;
 
     // creates an intruction queue
-  InstructionQueue queue1;
+    InstructionQueue queue1;
 
     // creates a mean ratio quality metric ...
-  ConditionNumberQualityMetric shape_metric;
-  EdgeLengthQualityMetric lapl_met;
-  lapl_met.set_averaging_method(QualityMetric::RMS);
+    ConditionNumberQualityMetric shape_metric;
+    EdgeLengthQualityMetric      lapl_met;
+    lapl_met.set_averaging_method( QualityMetric::RMS );
 
     // creates the laplacian smoother  procedures
-  LaplacianSmoother lapl1;
-  QualityAssessor stop_qa=QualityAssessor(&shape_metric);
-  stop_qa.add_quality_assessment(&lapl_met);
+    LaplacianSmoother lapl1;
+    QualityAssessor   stop_qa = QualityAssessor( &shape_metric );
+    stop_qa.add_quality_assessment( &lapl_met );
 
     //**************Set stopping criterion****************
-  TerminationCriterion sc2;
-  sc2.add_iteration_limit( 10 );
-  if (err) return 1;
-  lapl1.set_outer_termination_criterion(&sc2);
+    TerminationCriterion sc2;
+    sc2.add_iteration_limit( 10 );
+    if( err ) return 1;
+    lapl1.set_outer_termination_criterion( &sc2 );
 
     // adds 1 pass of pass1 to mesh_set1
-//  queue1.add_quality_assessor(&stop_qa,err);
-  if (err) return 1;
-  queue1.set_master_quality_improver(&lapl1, err);
-  if (err) return 1;
-//  queue1.add_quality_assessor(&stop_qa,err);
-  if (err) return 1;
+    //  queue1.add_quality_assessor(&stop_qa,err);
+    if( err ) return 1;
+    queue1.set_master_quality_improver( &lapl1, err );
+    if( err ) return 1;
+    //  queue1.add_quality_assessor(&stop_qa,err);
+    if( err ) return 1;
 
-  PlanarDomain plane(Vector3D(0,0,1), Vector3D(0,0,0));
+    PlanarDomain plane( Vector3D( 0, 0, 1 ), Vector3D( 0, 0, 0 ) );
 
     // launches optimization on mesh_set1
-  MeshDomainAssoc mesh_and_domain = MeshDomainAssoc(&mesh, &plane);
-  Timer t;
-  queue1.run_instructions(&mesh_and_domain, err);
-  if (err) return 1;
-  double secs = t.since_birth();
-  std::cout << "Optimization completed in " << secs << " seconds" << std::endl;
+    MeshDomainAssoc mesh_and_domain = MeshDomainAssoc( &mesh, &plane );
+    Timer           t;
+    queue1.run_instructions( &mesh_and_domain, err );
+    if( err ) return 1;
+    double secs = t.since_birth( );
+    std::cout << "Optimization completed in " << secs << " seconds" << std::endl;
 
-  if (output_file) {
-    mesh.write_vtk(output_file, err);
-    if (err) return 1;
-    std::cout << "Wrote file: " << output_file << std::endl;
-  }
+    if( output_file )
+    {
+        mesh.write_vtk( output_file, err );
+        if( err ) return 1;
+        std::cout << "Wrote file: " << output_file << std::endl;
+    }
 
-  return 0;
+    return 0;
 }

@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file ManPage.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -33,28 +32,27 @@
 #include "Mesquite.hpp"
 #include "ManPage.hpp"
 
-
 std::ostream& ManPage::write_text( std::ostream& str, bool hanging_indent, const std::string& text )
 {
-  std::string::size_type i = 0, j;
-  if (hanging_indent)
-    begin_hanging_paragraph( str );
-  else
-    begin_paragraph( str );
-  const std::string::size_type n = text.size();
-  while (i != n) {
-    if (text[i] == '\n') {
-      begin_paragraph( str );
-      ++i;
-      continue;
+    std::string::size_type i = 0, j;
+    if( hanging_indent )
+        begin_hanging_paragraph( str );
+    else
+        begin_paragraph( str );
+    const std::string::size_type n = text.size( );
+    while( i != n )
+    {
+        if( text[ i ] == '\n' )
+        {
+            begin_paragraph( str );
+            ++i;
+            continue;
+        }
+        j = text.find( "\n", i );
+        if( j == std::string::npos ) j = n;
+        if( text[ i ] == '.' ) str << '\\';
+        str << text.substr( i, j - i );
+        i = j;
     }
-    j = text.find( "\n", i );
-    if (j == std::string::npos)
-      j = n;
-    if (text[i] == '.')
-      str << '\\';
-    str << text.substr( i, j - i );
-    i = j;
-  }
-  return str;
+    return str;
 }

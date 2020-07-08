@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file ObjectiveFunctionTemplate.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -36,7 +35,8 @@
 #include "Mesquite.hpp"
 #include "ObjectiveFunction.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 /**\brief Base for most concrete objective functions
  *
@@ -46,35 +46,37 @@ namespace MBMesquite {
 class MESQUITE_EXPORT ObjectiveFunctionTemplate : public ObjectiveFunction
 {
   public:
+    ObjectiveFunctionTemplate( QualityMetric* qm = 0 ) : qualityMetric( qm ) {}
 
-    ObjectiveFunctionTemplate( QualityMetric* qm = 0 ) : qualityMetric(qm) {}
+    virtual ~ObjectiveFunctionTemplate( );
 
-    virtual ~ObjectiveFunctionTemplate();
+    QualityMetric* get_quality_metric( ) const
+    {
+        return qualityMetric;
+    }
 
-    QualityMetric* get_quality_metric() const { return qualityMetric; }
-
-    void set_quality_metric( QualityMetric* metric ) { qualityMetric = metric; }
+    void set_quality_metric( QualityMetric* metric )
+    {
+        qualityMetric = metric;
+    }
 
     virtual bool initialize_block_coordinate_descent( MeshDomainAssoc* mesh_and_domain,
-                                                      const Settings* settings,
-                                                      PatchSet* user_set,
+                                                      const Settings* settings, PatchSet* user_set,
                                                       MsqError& err );
 
-    virtual int min_patch_layers() const;
+    virtual int min_patch_layers( ) const;
 
-      //!\brief Called at start of instruction queue processing
-      //!
-      //! Do any preliminary global initialization, consistency checking,
-      //! etc.  Default implementation does nothing.
-     virtual void initialize_queue( MeshDomainAssoc* mesh_and_domain,
-                                    const Settings* settings,
-                                    MsqError& err );
+    //!\brief Called at start of instruction queue processing
+    //!
+    //! Do any preliminary global initialization, consistency checking,
+    //! etc.  Default implementation does nothing.
+    virtual void initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
+                                   MsqError& err );
 
   private:
-
     QualityMetric* qualityMetric;
 };
 
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

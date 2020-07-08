@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file VarianceTemplate.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -37,7 +36,8 @@
 #include "MsqHessian.hpp"
 #include "ObjectiveFunctionTemplate.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 /**\brief (variance)^2 template
  *
@@ -47,62 +47,50 @@ namespace MBMesquite {
 class VarianceTemplate : public ObjectiveFunctionTemplate
 {
   public:
+    MESQUITE_EXPORT
+    VarianceTemplate( QualityMetric* qm = 0 ) : ObjectiveFunctionTemplate( qm )
+    {
+        clear( );
+    }
 
-	MESQUITE_EXPORT
-    VarianceTemplate( QualityMetric* qm = 0 ) : ObjectiveFunctionTemplate(qm)
-      { clear(); }
-
-      /**\brief copy constructor
-       *
-       * Define a copy constructor because the compiler-provided
-       * default one would also copy the temporary arrays, which
-       * would be a waste of time.
-       */
-	MESQUITE_EXPORT
+    /**\brief copy constructor
+     *
+     * Define a copy constructor because the compiler-provided
+     * default one would also copy the temporary arrays, which
+     * would be a waste of time.
+     */
+    MESQUITE_EXPORT
     VarianceTemplate( const VarianceTemplate& copy )
-      : ObjectiveFunctionTemplate( copy ),
-        mCount( copy.mCount ),
-        mSum( copy.mSum ),
-        mSqrSum( copy.mSqrSum ),
-        saveCount( copy.saveCount ),
-        saveSum( copy.saveSum ),
-        saveSqrSum( copy.saveSqrSum )
-      {}
+        : ObjectiveFunctionTemplate( copy ), mCount( copy.mCount ), mSum( copy.mSum ),
+          mSqrSum( copy.mSqrSum ), saveCount( copy.saveCount ), saveSum( copy.saveSum ),
+          saveSqrSum( copy.saveSqrSum )
+    {
+    }
 
-	MESQUITE_EXPORT
-    virtual ~VarianceTemplate()
-      {}
+    MESQUITE_EXPORT
+    virtual ~VarianceTemplate( ) {}
 
-	MESQUITE_EXPORT
-    virtual bool evaluate( EvalType type,
-                           PatchData& pd,
-                           double& value_out,
-                           bool free,
+    MESQUITE_EXPORT
+    virtual bool evaluate( EvalType type, PatchData& pd, double& value_out, bool free,
                            MsqError& err );
 
-	MESQUITE_EXPORT
-    virtual bool evaluate_with_gradient( EvalType type,
-                                         PatchData& pd,
-                                         double& value_out,
-                                         std::vector<Vector3D>& grad_out,
-                                         MsqError& err );
+    MESQUITE_EXPORT
+    virtual bool evaluate_with_gradient( EvalType type, PatchData& pd, double& value_out,
+                                         std::vector< Vector3D >& grad_out, MsqError& err );
 
-	MESQUITE_EXPORT
-    virtual bool evaluate_with_Hessian_diagonal( EvalType type,
-                                        PatchData& pd,
-                                        double& value_out,
-                                        std::vector<Vector3D>& grad_out,
-                                        std::vector<SymMatrix3D>& hess_diag_out,
-                                        MsqError& err );
+    MESQUITE_EXPORT
+    virtual bool evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd, double& value_out,
+                                                 std::vector< Vector3D >&    grad_out,
+                                                 std::vector< SymMatrix3D >& hess_diag_out,
+                                                 MsqError&                   err );
 
-	MESQUITE_EXPORT
-    virtual ObjectiveFunction* clone() const;
+    MESQUITE_EXPORT
+    virtual ObjectiveFunction* clone( ) const;
 
-	MESQUITE_EXPORT
-    virtual void clear();
+    MESQUITE_EXPORT
+    virtual void clear( );
 
   private:
-
     /**\brief Handle EvalType for all eval functions, return OF value
      *
      * This function implements the common handling of the EvalType
@@ -118,27 +106,26 @@ class VarianceTemplate : public ObjectiveFunctionTemplate
      *\param result_sum The sum term of the variance
      *\param result_sqr The sum of squares term of the variance
      */
-    void accumulate( double sum, double sqr_sum, size_t count,
-                     EvalType type,
-                     double& result_sum, double& result_sqr, size_t& global_count );
+    void accumulate( double sum, double sqr_sum, size_t count, EvalType type, double& result_sum,
+                     double& result_sqr, size_t& global_count );
 
-    size_t mCount;    /**< The number of accumulated entires */
-    double mSum;      /**< The runnnig sum of the qualtiy metric valuse */
-    double mSqrSum;   /**< The running sum of the square of QM values */
+    size_t mCount; /**< The number of accumulated entires */
+    double mSum; /**< The runnnig sum of the qualtiy metric valuse */
+    double mSqrSum; /**< The running sum of the square of QM values */
     size_t saveCount; /**< Saved count from previous patch */
-    double saveSum;   /**< Saved sum from previous patch */
-    double saveSqrSum;/**< Saved sum from previous patch */
+    double saveSum; /**< Saved sum from previous patch */
+    double saveSqrSum; /**< Saved sum from previous patch */
 
     /** Temporary storage for qm sample handles */
-    mutable std::vector<size_t> qmHandles;
+    mutable std::vector< size_t > qmHandles;
     /** Temporary storage for qm vertex indices */
-    mutable std::vector<size_t> mIndices;
+    mutable std::vector< size_t > mIndices;
     /** Temporary storage for qm gradient */
-    mutable std::vector<Vector3D> mGradient, gradSum;
+    mutable std::vector< Vector3D > mGradient, gradSum;
     /** Temporary storage for qm Hessian diagonal data */
-    mutable std::vector<SymMatrix3D> mHessDiag, hessSum;
+    mutable std::vector< SymMatrix3D > mHessDiag, hessSum;
 };
 
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

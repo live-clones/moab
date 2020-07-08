@@ -26,7 +26,7 @@
  * value = integer id for this set (block id from ExodusII)
  * default value = -1
  */
-#define MATERIAL_SET_TAG_NAME  "MATERIAL_SET"
+#define MATERIAL_SET_TAG_NAME "MATERIAL_SET"
 
 /* DIRICHLET_SET_TAG_NAME tag:
  * Represents dirichlet-type boundary condition, usually contains only mesh vertices
@@ -47,7 +47,7 @@
  * value = integer id for this set (sideset id from ExodusII)
  * default value = -1
  */
-#define NEUMANN_SET_TAG_NAME   "NEUMANN_SET"
+#define NEUMANN_SET_TAG_NAME "NEUMANN_SET"
 
 /* HAS_MID_NODES_TAG_NAM tag:
  * Flags telling whether elements in a given set have mid-(edge, face, region) vertices/nodes;

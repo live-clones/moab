@@ -31,41 +31,47 @@
 #include "MsqError.hpp"
 #include "PatchData.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 bool PatchIterator::get_next_patch( PatchData& pd, MsqError& err )
 {
-  if (!patches.size()) {
-    if (pd.get_mesh() != patchSet->get_mesh()) {
-      if (pd.get_mesh() == 0)
-        pd.set_mesh( patchSet->get_mesh() );
-      else if(patchSet->get_mesh() == 0)
-        patchSet->set_mesh( pd.get_mesh() );
-      else {
-        MSQ_SETERR(err)("PatchSet and PatchData do not share the same Mesh instance.",
-                        MsqError::INVALID_STATE);
-        return false;
-      }
+    if( !patches.size( ) )
+    {
+        if( pd.get_mesh( ) != patchSet->get_mesh( ) )
+        {
+            if( pd.get_mesh( ) == 0 )
+                pd.set_mesh( patchSet->get_mesh( ) );
+            else if( patchSet->get_mesh( ) == 0 )
+                patchSet->set_mesh( pd.get_mesh( ) );
+            else
+            {
+                MSQ_SETERR( err )
+                ( "PatchSet and PatchData do not share the same Mesh instance.",
+                  MsqError::INVALID_STATE );
+                return false;
+            }
+        }
+        patchSet->get_patch_handles( patches, err );
+        MSQ_ERRZERO( err );
+        current = patches.begin( );
     }
-    patchSet->get_patch_handles( patches, err ); MSQ_ERRZERO(err);
-    current = patches.begin();
-  }
 
-  if (current == patches.end())
-    return false;
+    if( current == patches.end( ) ) return false;
 
-  patchSet->get_patch( *current, elems, verts, err ); MSQ_ERRZERO(err);
-  pd.set_mesh_entities( elems, verts, err ); MSQ_ERRZERO(err);
-  ++current;
-  return true;
+    patchSet->get_patch( *current, elems, verts, err );
+    MSQ_ERRZERO( err );
+    pd.set_mesh_entities( elems, verts, err );
+    MSQ_ERRZERO( err );
+    ++current;
+    return true;
 }
 
-void PatchIterator::reset()
+void PatchIterator::reset( )
 {
-  current = patches.begin();
+    current = patches.begin( );
 }
 
-
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

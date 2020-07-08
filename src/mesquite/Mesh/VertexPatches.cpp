@@ -39,98 +39,86 @@
 
 #include <algorithm>
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
-VertexPatches::~VertexPatches()
-{}
+VertexPatches::~VertexPatches( ) {}
 
-void VertexPatches::get_patch_handles( std::vector<PatchHandle>& patch_handles_out,
-                                       MsqError& err )
+void VertexPatches::get_patch_handles( std::vector< PatchHandle >& patch_handles_out,
+                                       MsqError&                   err )
 {
     // get all vertex handles
-  get_mesh()->get_all_vertices( patch_handles_out, err ); MSQ_ERRRTN(err);
-  if (patch_handles_out.empty())
-    return;
+    get_mesh( )->get_all_vertices( patch_handles_out, err );MSQ_ERRRTN( err );
+    if( patch_handles_out.empty( ) ) return;
 
-  if (free_vertices_only()) {
-      // get fixed flags for vertices
-    std::vector<unsigned char> flags(patch_handles_out.size());
-    get_mesh()->vertices_get_byte( arrptr(patch_handles_out),
-                                   arrptr(flags),
-                                   patch_handles_out.size(),
-                                   err ); MSQ_ERRRTN(err);
+    if( free_vertices_only( ) )
+    {
+        // get fixed flags for vertices
+        std::vector< unsigned char > flags( patch_handles_out.size( ) );
+        get_mesh( )->vertices_get_byte( arrptr( patch_handles_out ), arrptr( flags ),
+                                        patch_handles_out.size( ), err );MSQ_ERRRTN( err );
 
-      // remove fixed  and slaved vertices from list
-    size_t write = 0;
-    for (size_t read = 0; read < patch_handles_out.size(); ++read)
-      if (!(flags[read] & (MsqVertex::MSQ_HARD_FIXED|MsqVertex::MSQ_DEPENDENT)))
-        patch_handles_out[write++] = patch_handles_out[read];
-    patch_handles_out.resize(write);
-  }
+        // remove fixed  and slaved vertices from list
+        size_t write = 0;
+        for( size_t read = 0; read < patch_handles_out.size( ); ++read )
+            if( !( flags[ read ] & ( MsqVertex::MSQ_HARD_FIXED | MsqVertex::MSQ_DEPENDENT ) ) )
+                patch_handles_out[ write++ ] = patch_handles_out[ read ];
+        patch_handles_out.resize( write );
+    }
 }
 
-void VertexPatches::get_patch( PatchHandle patch_handle,
-                               std::vector<Mesh::ElementHandle>& elem_handles_out,
-                               std::vector<Mesh::VertexHandle>& free_vertices_out,
-                               MsqError& err )
+void VertexPatches::get_patch( PatchHandle                         patch_handle,
+                               std::vector< Mesh::ElementHandle >& elem_handles_out,
+                               std::vector< Mesh::VertexHandle >& free_vertices_out, MsqError& err )
 {
-  free_vertices_out.clear();
-  elem_handles_out.clear();
+    free_vertices_out.clear( );
+    elem_handles_out.clear( );
 
-  if (free_vertices_only()) { // check if vertex is culled
-    unsigned char byte;
-    get_mesh()->vertices_get_byte( &patch_handle, &byte, 1, err );
-    if (MSQ_CHKERR(err) || (byte & MsqVertex::MSQ_CULLED))
-      return;
-  }
+    if( free_vertices_only( ) )
+    {  // check if vertex is culled
+        unsigned char byte;
+        get_mesh( )->vertices_get_byte( &patch_handle, &byte, 1, err );
+        if( MSQ_CHKERR( err ) || ( byte & MsqVertex::MSQ_CULLED ) ) return;
+    }
 
-  free_vertices_out.push_back( patch_handle );
-  if (!numLayers)  // if no layers of elements, then done.
-    return;
+    free_vertices_out.push_back( patch_handle );
+    if( !numLayers )  // if no layers of elements, then done.
+        return;
 
     // get elements adjacent to free vertex
-  get_mesh()->vertices_get_attached_elements( &patch_handle,
-                                              1,
-                                              elem_handles_out,
-                                              junk, err );
-  if (MSQ_CHKERR(err))
-    return;
+    get_mesh( )->vertices_get_attached_elements( &patch_handle, 1, elem_handles_out, junk, err );
+    if( MSQ_CHKERR( err ) ) return;
 
-  unsigned remaining = numLayers;
-  while (--remaining) { // loop if more than one layer of elements
-    if (elem_handles_out.empty())
-      break;
+    unsigned remaining = numLayers;
+    while( --remaining )
+    {  // loop if more than one layer of elements
+        if( elem_handles_out.empty( ) ) break;
 
-      // Get vertices adjacent to elements
-    free_vertices_out.clear();
-    get_mesh()->elements_get_attached_vertices( arrptr(elem_handles_out),
-                                                elem_handles_out.size(),
-                                                free_vertices_out,
-                                                junk, err );
-    if (MSQ_CHKERR(err)) break;
+        // Get vertices adjacent to elements
+        free_vertices_out.clear( );
+        get_mesh( )->elements_get_attached_vertices(
+            arrptr( elem_handles_out ), elem_handles_out.size( ), free_vertices_out, junk, err );
+        if( MSQ_CHKERR( err ) ) break;
 
-      // remove duplicates from vertex list
-    std::sort( free_vertices_out.begin(), free_vertices_out.end() );
-    free_vertices_out.erase(
-        std::unique( free_vertices_out.begin(), free_vertices_out.end() ),
-        free_vertices_out.end() );
+        // remove duplicates from vertex list
+        std::sort( free_vertices_out.begin( ), free_vertices_out.end( ) );
+        free_vertices_out.erase(
+            std::unique( free_vertices_out.begin( ), free_vertices_out.end( ) ),
+            free_vertices_out.end( ) );
 
-      // Get elements adjacent to vertices
-    elem_handles_out.clear();
-    get_mesh()->vertices_get_attached_elements( arrptr(free_vertices_out),
-                                                free_vertices_out.size(),
-                                                elem_handles_out,
-                                                junk, err );
-    if (MSQ_CHKERR(err)) break;
+        // Get elements adjacent to vertices
+        elem_handles_out.clear( );
+        get_mesh( )->vertices_get_attached_elements(
+            arrptr( free_vertices_out ), free_vertices_out.size( ), elem_handles_out, junk, err );
+        if( MSQ_CHKERR( err ) ) break;
 
-      // Remove duplicates from element list
-    std::sort( elem_handles_out.begin(), elem_handles_out.end() );
-    elem_handles_out.erase(
-        std::unique( elem_handles_out.begin(), elem_handles_out.end() ),
-        elem_handles_out.end() );
-  }
+        // Remove duplicates from element list
+        std::sort( elem_handles_out.begin( ), elem_handles_out.end( ) );
+        elem_handles_out.erase( std::unique( elem_handles_out.begin( ), elem_handles_out.end( ) ),
+                                elem_handles_out.end( ) );
+    }
 }
 
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

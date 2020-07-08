@@ -6,11 +6,12 @@
 
 #include "NCWriteEuler.hpp"
 
-namespace moab {
-
-NCWriteEuler::~NCWriteEuler()
+namespace moab
 {
-  // TODO Auto-generated destructor stub
+
+NCWriteEuler::~NCWriteEuler( )
+{
+    // TODO Auto-generated destructor stub
 }
 
 } /* namespace moab */

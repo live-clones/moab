@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file SimpleStats.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -33,22 +32,21 @@
 #include "SimpleStats.hpp"
 #include <limits>
 
-namespace MBMesquite {
-
-SimpleStats::SimpleStats()
-  : valueSum(0),
-    valueSqrSum(0),
-    valueMin(std::numeric_limits<double>::infinity()),
-    valueMax(-std::numeric_limits<double>::infinity()),
-    valueCount(0)
-  {}
-
-void SimpleStats::clear()
+namespace MBMesquite
 {
-  valueSum = valueSqrSum = 0;
-  valueMin = std::numeric_limits<double>::infinity();
-  valueMax = -valueMin;
-  valueCount = 0;
+
+SimpleStats::SimpleStats( )
+    : valueSum( 0 ), valueSqrSum( 0 ), valueMin( std::numeric_limits< double >::infinity( ) ),
+      valueMax( -std::numeric_limits< double >::infinity( ) ), valueCount( 0 )
+{
 }
 
-} // namespace MBMesquite
+void SimpleStats::clear( )
+{
+    valueSum = valueSqrSum = 0;
+    valueMin = std::numeric_limits< double >::infinity( );
+    valueMax = -valueMin;
+    valueCount = 0;
+}
+
+}  // namespace MBMesquite

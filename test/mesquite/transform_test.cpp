@@ -43,8 +43,8 @@ describe main.cpp here
 //
 
 #include <iostream>
-using std::cout;
 using std::cerr;
+using std::cout;
 using std::endl;
 #include <cstdlib>
 
@@ -64,65 +64,71 @@ using namespace MBMesquite;
 
 const double EPSILON = 1e-6;
 
-int main(int , char* [])
+int main( int, char*[] )
 {
-  MBMesquite::MsqPrintError err(cout);
-  MBMesquite::MeshImpl mesh;
+    MBMesquite::MsqPrintError err( cout );
+    MBMesquite::MeshImpl      mesh;
 
-  std::string default_file_name = TestDir + "/2D/vtk/quads/untangled/tfi_horse10x4-12.vtk";
-    //mesh->read_exodus("transformed_mesh.exo", err);
-  mesh.read_vtk(default_file_name.c_str(), err);
-  if (err) return 1;
+    std::string default_file_name = TestDir + "/2D/vtk/quads/untangled/tfi_horse10x4-12.vtk";
+    // mesh->read_exodus("transformed_mesh.exo", err);
+    mesh.read_vtk( default_file_name.c_str( ), err );
+    if( err ) return 1;
 
     // Get all vertex coordinates from mesh
-  std::vector<MBMesquite::Mesh::VertexHandle> handles;
-  mesh.get_all_vertices( handles, err );
-  if (err) return 1;
-  if (handles.empty()) {
-    std::cerr << "No verticies in mesh" << endl;
-    return 1;
-  }
-  std::vector<MBMesquite::MsqVertex> coords( handles.size() );
-  mesh.vertices_get_coordinates( arrptr(handles), arrptr(coords), handles.size(), err );
-  if (err) return 1;
+    std::vector< MBMesquite::Mesh::VertexHandle > handles;
+    mesh.get_all_vertices( handles, err );
+    if( err ) return 1;
+    if( handles.empty( ) )
+    {
+        std::cerr << "No verticies in mesh" << endl;
+        return 1;
+    }
+    std::vector< MBMesquite::MsqVertex > coords( handles.size( ) );
+    mesh.vertices_get_coordinates( arrptr( handles ), arrptr( coords ), handles.size( ), err );
+    if( err ) return 1;
 
-    //create the matrix for affine transformation
-  double array_entries[9];
-  array_entries[0]=0; array_entries[1]=1; array_entries[2]=0;
-  array_entries[3]=1; array_entries[4]=0; array_entries[5]=0;
-  array_entries[6]=0; array_entries[7]=0; array_entries[8]=1;
-    //create the translation vector
-  Matrix3D my_mat(array_entries);
-  Vector3D my_vec(0, 0 , 10);
-  MeshTransform my_transform(my_mat, my_vec);
-    //mesh->write_exodus("original_mesh.exo", err);
-  MeshDomainAssoc mesh_and_domain = MeshDomainAssoc(&mesh, 0);
-  my_transform.loop_over_mesh(&mesh_and_domain, 0, err);
-  if (err) return 1;
-    //mesh->write_exodus("transformed_mesh.exo", err);
-  mesh.write_vtk("transformed_mesh.vtk", err);
-  if (err) return 1;
+    // create the matrix for affine transformation
+    double array_entries[ 9 ];
+    array_entries[ 0 ] = 0;
+    array_entries[ 1 ] = 1;
+    array_entries[ 2 ] = 0;
+    array_entries[ 3 ] = 1;
+    array_entries[ 4 ] = 0;
+    array_entries[ 5 ] = 0;
+    array_entries[ 6 ] = 0;
+    array_entries[ 7 ] = 0;
+    array_entries[ 8 ] = 1;
+    // create the translation vector
+    Matrix3D      my_mat( array_entries );
+    Vector3D      my_vec( 0, 0, 10 );
+    MeshTransform my_transform( my_mat, my_vec );
+    // mesh->write_exodus("original_mesh.exo", err);
+    MeshDomainAssoc mesh_and_domain = MeshDomainAssoc( &mesh, 0 );
+    my_transform.loop_over_mesh( &mesh_and_domain, 0, err );
+    if( err ) return 1;
+    // mesh->write_exodus("transformed_mesh.exo", err);
+    mesh.write_vtk( "transformed_mesh.vtk", err );
+    if( err ) return 1;
 
     // Get transformed coordinates
-  std::vector<MBMesquite::MsqVertex> coords2( handles.size() );
-  mesh.vertices_get_coordinates( arrptr(handles), arrptr(coords2), handles.size(), err );
-  if (err) return 1;
+    std::vector< MBMesquite::MsqVertex > coords2( handles.size( ) );
+    mesh.vertices_get_coordinates( arrptr( handles ), arrptr( coords2 ), handles.size( ), err );
+    if( err ) return 1;
 
     // Compare vertex coordinates
-  size_t invalid = 0;
-  std::vector<MBMesquite::MsqVertex>::iterator iter, iter2;
-  iter = coords.begin();
-  iter2 = coords2.begin();
-  for ( ; iter != coords.end(); ++iter, ++iter2 )
-  {
-    MBMesquite::Vector3D xform = my_mat * *iter + my_vec;
-    double d = (xform - *iter2).length();
-    if (d > EPSILON)
-      ++invalid;
-  }
+    size_t                                         invalid = 0;
+    std::vector< MBMesquite::MsqVertex >::iterator iter, iter2;
+    iter = coords.begin( );
+    iter2 = coords2.begin( );
+    for( ; iter != coords.end( ); ++iter, ++iter2 )
+    {
+        MBMesquite::Vector3D xform = my_mat * *iter + my_vec;
+        double               d = ( xform - *iter2 ).length( );
+        if( d > EPSILON ) ++invalid;
+    }
 
-  std::cerr << invalid << " vertices not within " << EPSILON
-                  << " of expected location" << std::endl;
+    std::cerr << invalid << " vertices not within " << EPSILON << " of expected location"
+              << std::endl;
 
-  return (invalid != 0);
+    return ( invalid != 0 );
 }

@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file TQualityMetric.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -37,7 +36,8 @@
 #include "TMPQualityMetric.hpp"
 #include "MsqMatrix.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 class TMetric;
 
@@ -52,80 +52,66 @@ class TMetric;
  */
 class TQualityMetric : public TMPQualityMetric
 {
-public:
+  public:
+    /** Used in tests and other templatized code */
+    typedef TMetric MetricType;
 
-  /** Used in tests and other templatized code */
-  typedef TMetric MetricType;
+    /**
+     *\param tc   The target calculator
+     *\param wc   The weight calculator
+     *\param target_metric The target metric
+     */
+    TQualityMetric( TargetCalculator* tc, WeightCalculator* wc, TMetric* target_metric )
+        : TMPQualityMetric( tc, wc ), targetMetric( target_metric )
+    {
+    }
 
-  /**
-   *\param tc   The target calculator
-   *\param wc   The weight calculator
-   *\param target_metric The target metric
-   */
-  TQualityMetric( TargetCalculator* tc,
-                  WeightCalculator* wc,
-                  TMetric* target_metric )
-    : TMPQualityMetric(tc,wc),
-      targetMetric(target_metric)
-   {}
+    /**
+     *\param tc   The target calculator
+     *\param target_metric The target metric
+     */
+    TQualityMetric( TargetCalculator* tc, TMetric* target_metric )
+        : TMPQualityMetric( tc, 0 ), targetMetric( target_metric )
+    {
+    }
 
-  /**
-   *\param tc   The target calculator
-   *\param target_metric The target metric
-   */
-  TQualityMetric( TargetCalculator* tc,
-                  TMetric* target_metric )
-    : TMPQualityMetric(tc,0),
-      targetMetric(target_metric)
-   {}
+    MESQUITE_EXPORT virtual std::string get_name( ) const;
 
-  MESQUITE_EXPORT virtual
-  std::string get_name() const;
+    MESQUITE_EXPORT virtual bool evaluate_with_gradient( PatchData& pd, size_t handle,
+                                                         double&                  value,
+                                                         std::vector< size_t >&   indices,
+                                                         std::vector< Vector3D >& gradient,
+                                                         MsqError&                err );
 
-  MESQUITE_EXPORT virtual
-  bool evaluate_with_gradient( PatchData& pd,
-                               size_t handle,
-                               double& value,
-                               std::vector<size_t>& indices,
-                               std::vector<Vector3D>& gradient,
-                               MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate_with_Hessian_diagonal(
+        PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
+        std::vector< Vector3D >& gradient, std::vector< SymMatrix3D >& Hessian_diagonal,
+        MsqError& err );
 
-  MESQUITE_EXPORT virtual
-  bool evaluate_with_Hessian_diagonal( PatchData& pd,
-                                       size_t handle,
-                                       double& value,
-                                       std::vector<size_t>& indices,
-                                       std::vector<Vector3D>& gradient,
-                                       std::vector<SymMatrix3D>& Hessian_diagonal,
-                                       MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate_with_Hessian( PatchData& pd, size_t handle, double& value,
+                                                        std::vector< size_t >&   indices,
+                                                        std::vector< Vector3D >& gradient,
+                                                        std::vector< Matrix3D >& Hessian,
+                                                        MsqError&                err );
 
-  MESQUITE_EXPORT virtual
-  bool evaluate_with_Hessian( PatchData& pd,
-                              size_t handle,
-                              double& value,
-                              std::vector<size_t>& indices,
-                              std::vector<Vector3D>& gradient,
-                              std::vector<Matrix3D>& Hessian,
-                              MsqError& err );
+    TMetric* get_target_metric( ) const
+    {
+        return targetMetric;
+    }
+    void set_target_metric( TMetric* m )
+    {
+        targetMetric = m;
+    }
 
-  TMetric* get_target_metric() const { return targetMetric; }
-  void set_target_metric( TMetric* m ) { targetMetric = m; }
+  protected:
+    MESQUITE_EXPORT virtual bool evaluate_internal( PatchData& pd, size_t handle, double& value,
+                                                    size_t* indices, size_t& num_indices,
+                                                    MsqError& err );
 
-protected:
-
-  MESQUITE_EXPORT virtual
-  bool evaluate_internal( PatchData& pd,
-                 size_t handle,
-                 double& value,
-                 size_t* indices,
-                 size_t& num_indices,
-                 MsqError& err );
-
-private:
-
-  TMetric* targetMetric;
+  private:
+    TMetric* targetMetric;
 };
 
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

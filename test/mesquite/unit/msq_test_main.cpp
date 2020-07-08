@@ -45,109 +45,110 @@ class CPPUNIT_API SummaryOutput : public CppUnit::Outputter
 {
   public:
     SummaryOutput( FILE* file, CppUnit::TestResultCollector* result )
-      : file_(file), results_(result) {}
-    void write();
+        : file_( file ), results_( result )
+    {
+    }
+    void write( );
+
   private:
-    FILE* file_;
+    FILE*                         file_;
     CppUnit::TestResultCollector* results_;
 };
 
-
-int main(int argc, char **argv)
+int main( int argc, char** argv )
 {
-  CppUnit::Test* test;
-  vector<CppUnit::Test*> test_list;
-  CppUnit::TextUi::TestRunner runner;
-  int firsttest = 1;
-  bool list = false;
-  MBMesquite::MsqFPE trap_fpe(true);
+    CppUnit::Test*              test;
+    vector< CppUnit::Test* >    test_list;
+    CppUnit::TextUi::TestRunner runner;
+    int                         firsttest = 1;
+    bool                        list = false;
+    MBMesquite::MsqFPE          trap_fpe( true );
 
     // Check for command line arguments
-  if (argc > 2 && !strcmp(argv[1],"-s"))
-  {
-    FILE* file = fopen(argv[2],"w");
-    if (!file)
+    if( argc > 2 && !strcmp( argv[ 1 ], "-s" ) )
     {
-      perror( argv[2] );
-      exit(1);
+        FILE* file = fopen( argv[ 2 ], "w" );
+        if( !file )
+        {
+            perror( argv[ 2 ] );
+            exit( 1 );
+        }
+        runner.setOutputter( new SummaryOutput( file, &runner.result( ) ) );
+        firsttest += 2;
     }
-    runner.setOutputter( new SummaryOutput( file, &runner.result() ) );
-    firsttest += 2;
-  }
-  else if (argc > 1 && !strcmp(argv[1],"-l"))
-  {
-    ++firsttest;
-    list = true;
-  }
+    else if( argc > 1 && !strcmp( argv[ 1 ], "-l" ) )
+    {
+        ++firsttest;
+        list = true;
+    }
 
     // If the user requested a specific test...
-  if (argc > firsttest)
-  {
-    while (argc > firsttest)
+    if( argc > firsttest )
     {
-      argc--;
-      CppUnit::TestFactoryRegistry &registry =
-        CppUnit::TestFactoryRegistry::getRegistry(argv[argc]);
-      test = registry.makeTest();
-      if (!test->countTestCases()) {
-        std::cerr << argv[argc] << ": does not match any test or group" << std::endl;
-        return 1;
-      }
-      test_list.push_back( test );
+        while( argc > firsttest )
+        {
+            argc--;
+            CppUnit::TestFactoryRegistry& registry =
+                CppUnit::TestFactoryRegistry::getRegistry( argv[ argc ] );
+            test = registry.makeTest( );
+            if( !test->countTestCases( ) )
+            {
+                std::cerr << argv[ argc ] << ": does not match any test or group" << std::endl;
+                return 1;
+            }
+            test_list.push_back( test );
+        }
     }
-
-  }
     // Otherwise do Unit and Regression suites
-  else
-  {
-     test = CppUnit::TestFactoryRegistry::getRegistry("Unit").makeTest();
-     test_list.push_back( test );
-     test = CppUnit::TestFactoryRegistry::getRegistry("Regression").makeTest();
-     test_list.push_back( test );
-  }
+    else
+    {
+        test = CppUnit::TestFactoryRegistry::getRegistry( "Unit" ).makeTest( );
+        test_list.push_back( test );
+        test = CppUnit::TestFactoryRegistry::getRegistry( "Regression" ).makeTest( );
+        test_list.push_back( test );
+    }
 
     // If user just wants list of tests
-  if (list) {
-    for (vector<CppUnit::Test*>::iterator i = test_list.begin();
-         i != test_list.end(); ++i) {
-      CppUnit::TestSuite* suite = dynamic_cast<CppUnit::TestSuite*>(*i);
-      if (!suite) {
-        cout << (*i)->getName() << endl;
-        continue;
-      }
-      const vector<CppUnit::Test*>& list = suite->getTests();
-      for (vector<CppUnit::Test*>::const_iterator j = list.begin();
-         j != list.end(); ++j)
-        cout << (*j)->getName() << endl;
+    if( list )
+    {
+        for( vector< CppUnit::Test* >::iterator i = test_list.begin( ); i != test_list.end( ); ++i )
+        {
+            CppUnit::TestSuite* suite = dynamic_cast< CppUnit::TestSuite* >( *i );
+            if( !suite )
+            {
+                cout << ( *i )->getName( ) << endl;
+                continue;
+            }
+            const vector< CppUnit::Test* >& list = suite->getTests( );
+            for( vector< CppUnit::Test* >::const_iterator j = list.begin( ); j != list.end( ); ++j )
+                cout << ( *j )->getName( ) << endl;
+        }
     }
-  }
     // Otherwise run the tests
-  else {
-    for (vector<CppUnit::Test*>::iterator i = test_list.begin();
-         i != test_list.end(); ++i)
-      runner.addTest( *i );
-    return !runner.run();
-  }
+    else
+    {
+        for( vector< CppUnit::Test* >::iterator i = test_list.begin( ); i != test_list.end( ); ++i )
+            runner.addTest( *i );
+        return !runner.run( );
+    }
 
     // Return 0 if there were no errors
-  return 0;
+    return 0;
 }
 
-void SummaryOutput::write()
+void SummaryOutput::write( )
 {
-  CppUnit::TestResultCollector::TestFailures fails = results_->failures();
-  CppUnit::TestResultCollector::Tests tests = results_->tests();
+    CppUnit::TestResultCollector::TestFailures fails = results_->failures( );
+    CppUnit::TestResultCollector::Tests        tests = results_->tests( );
 
-  CppUnit::TestResultCollector::TestFailures::const_iterator f_iter = fails.begin();
-  CppUnit::TestResultCollector::Tests::const_iterator t_iter;
+    CppUnit::TestResultCollector::TestFailures::const_iterator f_iter = fails.begin( );
+    CppUnit::TestResultCollector::Tests::const_iterator        t_iter;
 
-  fprintf(file_,"****Tests Run:\n");
-  for (t_iter = tests.begin(); t_iter != tests.end(); ++t_iter)
-    fprintf(file_, "%s\n", (*t_iter)->getName().c_str());
+    fprintf( file_, "****Tests Run:\n" );
+    for( t_iter = tests.begin( ); t_iter != tests.end( ); ++t_iter )
+        fprintf( file_, "%s\n", ( *t_iter )->getName( ).c_str( ) );
 
-  fprintf(file_,"****Tests Failed:\n");
-  for (f_iter = fails.begin(); f_iter != fails.end(); ++f_iter)
-    fprintf(file_, "%s\n", (*f_iter)->failedTestName().c_str());
-
+    fprintf( file_, "****Tests Failed:\n" );
+    for( f_iter = fails.begin( ); f_iter != fails.end( ); ++f_iter )
+        fprintf( file_, "%s\n", ( *f_iter )->failedTestName( ).c_str( ) );
 }
-

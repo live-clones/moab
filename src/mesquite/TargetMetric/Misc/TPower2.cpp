@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file TPower2.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -38,55 +37,50 @@
 #include "MsqError.hpp"
 #include "TMPCommon.hpp"
 
-namespace MBMesquite {
-
-std::string TPower2::get_name() const
-  { return "sqr(" + mMetric->get_name() + ')'; }
-
-TPower2::~TPower2() {}
-
-template <unsigned DIM> inline
-bool TPower2::eval( const MsqMatrix<DIM,DIM>& T,
-                    double& result,
-                    MsqError& err )
+namespace MBMesquite
 {
-  bool rval = mMetric->evaluate( T, result, err );
-  MSQ_ERRZERO(err);
-  result *= result;
-  return rval;
+
+std::string TPower2::get_name( ) const
+{
+    return "sqr(" + mMetric->get_name( ) + ')';
 }
 
-template <unsigned DIM> inline
-bool TPower2::grad( const MsqMatrix<DIM,DIM>& T,
-                    double& result,
-                    MsqMatrix<DIM,DIM>& deriv_wrt_T,
-                    MsqError& err )
+TPower2::~TPower2( ) {}
+
+template< unsigned DIM >
+inline bool TPower2::eval( const MsqMatrix< DIM, DIM >& T, double& result, MsqError& err )
 {
-  bool rval = mMetric->evaluate_with_grad( T, result, deriv_wrt_T, err );
-  MSQ_ERRZERO(err);
-  deriv_wrt_T *= 2 * result;
-  result *= result;
-  return rval;
+    bool rval = mMetric->evaluate( T, result, err );
+    MSQ_ERRZERO( err );
+    result *= result;
+    return rval;
 }
 
-template <unsigned DIM> inline
-bool TPower2::hess( const MsqMatrix<DIM,DIM>& T,
-                    double& result,
-                    MsqMatrix<DIM,DIM>& deriv_wrt_T,
-                    MsqMatrix<DIM,DIM>* second_wrt_T,
-                    MsqError& err )
+template< unsigned DIM >
+inline bool TPower2::grad( const MsqMatrix< DIM, DIM >& T, double& result,
+                           MsqMatrix< DIM, DIM >& deriv_wrt_T, MsqError& err )
 {
-  bool rval = mMetric->evaluate_with_hess( T, result, deriv_wrt_T, second_wrt_T, err );//
-  MSQ_ERRZERO(err);
-  hess_scale( second_wrt_T, 2*result );
-  pluseq_scaled_outer_product( second_wrt_T, 2.0, deriv_wrt_T );
-  deriv_wrt_T *= 2 * result;
-  result *= result;
-  return rval;
+    bool rval = mMetric->evaluate_with_grad( T, result, deriv_wrt_T, err );
+    MSQ_ERRZERO( err );
+    deriv_wrt_T *= 2 * result;
+    result *= result;
+    return rval;
 }
 
+template< unsigned DIM >
+inline bool TPower2::hess( const MsqMatrix< DIM, DIM >& T, double& result,
+                           MsqMatrix< DIM, DIM >& deriv_wrt_T, MsqMatrix< DIM, DIM >* second_wrt_T,
+                           MsqError& err )
+{
+    bool rval = mMetric->evaluate_with_hess( T, result, deriv_wrt_T, second_wrt_T, err );  //
+    MSQ_ERRZERO( err );
+    hess_scale( second_wrt_T, 2 * result );
+    pluseq_scaled_outer_product( second_wrt_T, 2.0, deriv_wrt_T );
+    deriv_wrt_T *= 2 * result;
+    result *= result;
+    return rval;
+}
 
-TMP_T_TEMPL_IMPL_COMMON_ERR(TPower2)
+TMP_T_TEMPL_IMPL_COMMON_ERR( TPower2 )
 
-
-} // namespace MBMesquite
+}  // namespace MBMesquite

@@ -44,26 +44,26 @@
 namespace MBMesquite
 {
 
-  /*! \class LaplacianSmoother
-    Moves free center vertex to the average of the neighboring vertices.
-   */
-  class LaplacianSmoother : public RelaxationSmoother
-  {
+/*! \class LaplacianSmoother
+  Moves free center vertex to the average of the neighboring vertices.
+ */
+class LaplacianSmoother : public RelaxationSmoother
+{
   public:
     /**
      *\param OF ObjectiveFunction used by some termination criteria
      */
-    MESQUITE_EXPORT LaplacianSmoother( ObjectiveFunction* OF = NULL )
-      : RelaxationSmoother(OF) {}
+    MESQUITE_EXPORT LaplacianSmoother( ObjectiveFunction* OF = NULL ) : RelaxationSmoother( OF ) {}
 
-    MESQUITE_EXPORT virtual ~LaplacianSmoother();
-    MESQUITE_EXPORT virtual std::string get_name() const;
+    MESQUITE_EXPORT virtual ~LaplacianSmoother( );
+    MESQUITE_EXPORT virtual std::string get_name( ) const;
+
   protected:
-    MESQUITE_EXPORT virtual
-    void optimize_vertex_positions( PatchData &pd, MsqError &err );
+    MESQUITE_EXPORT virtual void optimize_vertex_positions( PatchData& pd, MsqError& err );
+
   private:
-    std::vector<size_t> adjVtxList;
-  };
-}
+    std::vector< size_t > adjVtxList;
+};
+}  // namespace MBMesquite
 
 #endif

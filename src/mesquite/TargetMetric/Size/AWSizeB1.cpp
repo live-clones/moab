@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file AWSizeB1.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -37,97 +36,90 @@
 #include "TMPDerivs.hpp"
 #include "TMPCommon.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
-std::string AWSizeB1::get_name() const
-  { return "AWSizeB1"; }
+std::string AWSizeB1::get_name( ) const
+{
+    return "AWSizeB1";
+}
 
-AWSizeB1::~AWSizeB1() {}
+AWSizeB1::~AWSizeB1( ) {}
 
-bool AWSizeB1::evaluate( const MsqMatrix<2,2>& A,
-                         const MsqMatrix<2,2>& W,
-                         double& result,
+bool AWSizeB1::evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result,
                          MsqError& err )
 {
-  const double alpha = det(A);
-  const double omega = det(W);
-  const double prod = alpha * omega;
-  if (AWMetric::invalid_determinant( prod ))
-  {
-    MSQ_SETERR(err)( barrier_violated_msg_aw, MsqError::BARRIER_VIOLATED );
-    return false;
-  }
+    const double alpha = det( A );
+    const double omega = det( W );
+    const double prod = alpha * omega;
+    if( AWMetric::invalid_determinant( prod ) )
+    {
+        MSQ_SETERR( err )( barrier_violated_msg_aw, MsqError::BARRIER_VIOLATED );
+        return false;
+    }
 
-  result = (alpha - omega);
-  result *= result;
-  result /= prod;
-  return true;
+    result = ( alpha - omega );
+    result *= result;
+    result /= prod;
+    return true;
 }
 
-bool AWSizeB1::evaluate_with_grad( const MsqMatrix<2,2>& A,
-                                   const MsqMatrix<2,2>& W,
-                                   double& result,
-                                   MsqMatrix<2,2>& deriv_wrt_A,
-                                   MsqError& err )
+bool AWSizeB1::evaluate_with_grad( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W,
+                                   double& result, MsqMatrix< 2, 2 >& deriv_wrt_A, MsqError& err )
 {
-  const double alpha = det(A);
-  const double omega = det(W);
-  const double prod = alpha * omega;
-  if (AWMetric::invalid_determinant( prod ))
-  {
-    MSQ_SETERR(err)( barrier_violated_msg_aw, MsqError::BARRIER_VIOLATED );
-    return false;
-  }
+    const double alpha = det( A );
+    const double omega = det( W );
+    const double prod = alpha * omega;
+    if( AWMetric::invalid_determinant( prod ) )
+    {
+        MSQ_SETERR( err )( barrier_violated_msg_aw, MsqError::BARRIER_VIOLATED );
+        return false;
+    }
 
-  result = (alpha - omega);
-  result *= result;
-  result /= prod;
-  deriv_wrt_A = transpose_adj(A);
-  deriv_wrt_A *= (alpha*alpha - omega*omega)/(alpha*prod);
-  return true;
+    result = ( alpha - omega );
+    result *= result;
+    result /= prod;
+    deriv_wrt_A = transpose_adj( A );
+    deriv_wrt_A *= ( alpha * alpha - omega * omega ) / ( alpha * prod );
+    return true;
 }
 
-bool AWSizeB1::evaluate( const MsqMatrix<3,3>& A,
-                         const MsqMatrix<3,3>& W,
-                         double& result,
+bool AWSizeB1::evaluate( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >& W, double& result,
                          MsqError& err )
 {
-  const double alpha = det(A);
-  const double omega = det(W);
-  const double prod = alpha * omega;
-  if (AWMetric::invalid_determinant( prod ))
-  {
-    MSQ_SETERR(err)( barrier_violated_msg_aw, MsqError::BARRIER_VIOLATED );
-    return false;
-  };
+    const double alpha = det( A );
+    const double omega = det( W );
+    const double prod = alpha * omega;
+    if( AWMetric::invalid_determinant( prod ) )
+    {
+        MSQ_SETERR( err )( barrier_violated_msg_aw, MsqError::BARRIER_VIOLATED );
+        return false;
+    };
 
-  result = (alpha - omega);
-  result *= result;
-  result /= prod;
-  return true;
+    result = ( alpha - omega );
+    result *= result;
+    result /= prod;
+    return true;
 }
 
-bool AWSizeB1::evaluate_with_grad( const MsqMatrix<3,3>& A,
-                                   const MsqMatrix<3,3>& W,
-                                   double& result,
-                                   MsqMatrix<3,3>& deriv_wrt_A,
-                                   MsqError& err )
+bool AWSizeB1::evaluate_with_grad( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >& W,
+                                   double& result, MsqMatrix< 3, 3 >& deriv_wrt_A, MsqError& err )
 {
-  const double alpha = det(A);
-  const double omega = det(W);
-  const double prod = alpha * omega;
-  if (AWMetric::invalid_determinant( prod ))
-  {
-    MSQ_SETERR(err)( barrier_violated_msg_aw, MsqError::BARRIER_VIOLATED );
-    return false;
-  }
+    const double alpha = det( A );
+    const double omega = det( W );
+    const double prod = alpha * omega;
+    if( AWMetric::invalid_determinant( prod ) )
+    {
+        MSQ_SETERR( err )( barrier_violated_msg_aw, MsqError::BARRIER_VIOLATED );
+        return false;
+    }
 
-  result = (alpha - omega);
-  result *= result;
-  result /= prod;
-  deriv_wrt_A = transpose_adj(A);
-  deriv_wrt_A *= (alpha*alpha - omega*omega)/(alpha*prod);
-  return true;
+    result = ( alpha - omega );
+    result *= result;
+    result /= prod;
+    deriv_wrt_A = transpose_adj( A );
+    deriv_wrt_A *= ( alpha * alpha - omega * omega ) / ( alpha * prod );
+    return true;
 }
 
-} // namespace MBMesquite
+}  // namespace MBMesquite

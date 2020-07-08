@@ -3,12 +3,12 @@
 
 #include "moab/MOABConfig.h"
 
-#if defined(MOAB_FC_FUNC_)
+#if defined( MOAB_FC_FUNC_ )
 #define ITAPS_FC_WRAPPER MOAB_FC_FUNC_
-#elif defined(MOAB_FC_FUNC)
+#elif defined( MOAB_FC_FUNC )
 #define ITAPS_FC_WRAPPER MOAB_FC_FUNC
 #else
-#define ITAPS_FC_WRAPPER(name,NAME) name
+#define ITAPS_FC_WRAPPER( name, NAME ) name
 #endif
 
 #define FBiGeom_getDescription ITAPS_FC_WRAPPER( fbigeom_getdescription, FBIGEOM_GETDESCRIPTION )
@@ -31,7 +31,8 @@
 #define FBiGeom_isArrAdj ITAPS_FC_WRAPPER( fbigeom_isarradj, FBIGEOM_ISARRADJ )
 #define FBiGeom_getTopoLevel ITAPS_FC_WRAPPER( fbigeom_gettopolevel, FBIGEOM_GETTOPOLEVEL )
 #define FBiGeom_getEntClosestPt ITAPS_FC_WRAPPER( fbigeom_getentclosestpt, FBIGEOM_GETENTCLOSESTPT )
-#define FBiGeom_getEntClosestPtTrimmed ITAPS_FC_WRAPPER( fbigeom_getentclosestpttrimmed, FBIGEOM_GETENTCLOSESTPTTRIMMED )
+#define FBiGeom_getEntClosestPtTrimmed \
+    ITAPS_FC_WRAPPER( fbigeom_getentclosestpttrimmed, FBIGEOM_GETENTCLOSESTPTTRIMMED )
 #define FBiGeom_getArrClosestPt ITAPS_FC_WRAPPER( fbigeom_getarrclosestpt, FBIGEOM_GETARRCLOSESTPT )
 #define FBiGeom_getEntNrmlXYZ ITAPS_FC_WRAPPER( fbigeom_getentnrmlxyz, FBIGEOM_GETENTNRMLXYZ )
 #define FBiGeom_getArrNrmlXYZ ITAPS_FC_WRAPPER( fbigeom_getarrnrmlxyz, FBIGEOM_GETARRNRMLXYZ )
@@ -41,7 +42,8 @@
 #define FBiGeom_getArrTgntXYZ ITAPS_FC_WRAPPER( fbigeom_getarrtgntxyz, FBIGEOM_GETARRTGNTXYZ )
 #define FBiGeom_getFcCvtrXYZ ITAPS_FC_WRAPPER( fbigeom_getfccvtrxyz, FBIGEOM_GETFCCVTRXYZ )
 #define FBiGeom_getEgCvtrXYZ ITAPS_FC_WRAPPER( fbigeom_getegcvtrxyz, FBIGEOM_GETEGCVTRXYZ )
-#define FBiGeom_getEntArrCvtrXYZ ITAPS_FC_WRAPPER( fbigeom_getentarrcvtrxyz, FBIGEOM_GETENTARRCVTRXYZ )
+#define FBiGeom_getEntArrCvtrXYZ \
+    ITAPS_FC_WRAPPER( fbigeom_getentarrcvtrxyz, FBIGEOM_GETENTARRCVTRXYZ )
 #define FBiGeom_getEgEvalXYZ ITAPS_FC_WRAPPER( fbigeom_getegevalxyz, FBIGEOM_GETEGEVALXYZ )
 #define FBiGeom_getFcEvalXYZ ITAPS_FC_WRAPPER( fbigeom_getfcevalxyz, FBIGEOM_GETFCEVALXYZ )
 #define FBiGeom_getArrEgEvalXYZ ITAPS_FC_WRAPPER( fbigeom_getarregevalxyz, FBIGEOM_GETARREGEVALXYZ )
@@ -51,7 +53,8 @@
 #define FBiGeom_getVtxCoord ITAPS_FC_WRAPPER( fbigeom_getvtxcoord, FBIGEOM_GETVTXCOORD )
 #define FBiGeom_getVtxArrCoords ITAPS_FC_WRAPPER( fbigeom_getvtxarrcoords, FBIGEOM_GETVTXARRCOORDS )
 #define FBiGeom_getPntRayIntsct ITAPS_FC_WRAPPER( fbigeom_getpntrayintsct, FBIGEOM_GETPNTRAYINTSCT )
-#define FBiGeom_getPntArrRayIntsct ITAPS_FC_WRAPPER( fbigeom_getpntarrrayintsct, FBIGEOM_GETPNTARRRAYINTSCT )
+#define FBiGeom_getPntArrRayIntsct \
+    ITAPS_FC_WRAPPER( fbigeom_getpntarrrayintsct, FBIGEOM_GETPNTARRRAYINTSCT )
 #define FBiGeom_getPntClsf ITAPS_FC_WRAPPER( fbigeom_getpntclsf, FBIGEOM_GETPNTCLSF )
 #define FBiGeom_getPntArrClsf ITAPS_FC_WRAPPER( fbigeom_getpntarrclsf, FBIGEOM_GETPNTARRCLSF )
 #define FBiGeom_getEntNrmlSense ITAPS_FC_WRAPPER( fbigeom_getentnrmlsense, FBIGEOM_GETENTNRMLSENSE )
@@ -59,7 +62,8 @@
 #define FBiGeom_getEgFcSense ITAPS_FC_WRAPPER( fbigeom_getegfcsense, FBIGEOM_GETEGFCSENSE )
 #define FBiGeom_getEgFcArrSense ITAPS_FC_WRAPPER( fbigeom_getegfcarrsense, FBIGEOM_GETEGFCARRSENSE )
 #define FBiGeom_getEgVtxSense ITAPS_FC_WRAPPER( fbigeom_getegvtxsense, FBIGEOM_GETEGVTXSENSE )
-#define FBiGeom_getEgVtxArrSense ITAPS_FC_WRAPPER( fbigeom_getegvtxarrsense, FBIGEOM_GETEGVTXARRSENSE )
+#define FBiGeom_getEgVtxArrSense \
+    ITAPS_FC_WRAPPER( fbigeom_getegvtxarrsense, FBIGEOM_GETEGVTXARRSENSE )
 #define FBiGeom_measure ITAPS_FC_WRAPPER( fbigeom_measure, FBIGEOM_MEASURE )
 #define FBiGeom_getFaceType ITAPS_FC_WRAPPER( fbigeom_getfacetype, FBIGEOM_GETFACETYPE )
 #define FBiGeom_getParametric ITAPS_FC_WRAPPER( fbigeom_getparametric, FBIGEOM_GETPARAMETRIC )
@@ -73,8 +77,10 @@
 #define FBiGeom_getEntXYZtoU ITAPS_FC_WRAPPER( fbigeom_getentxyztou, FBIGEOM_GETENTXYZTOU )
 #define FBiGeom_getArrXYZtoUV ITAPS_FC_WRAPPER( fbigeom_getarrxyztouv, FBIGEOM_GETARRXYZTOUV )
 #define FBiGeom_getArrXYZtoU ITAPS_FC_WRAPPER( fbigeom_getarrxyztou, FBIGEOM_GETARRXYZTOU )
-#define FBiGeom_getEntXYZtoUVHint ITAPS_FC_WRAPPER( fbigeom_getentxyztouvhint, FBIGEOM_GETENTXYZTOUVHINT )
-#define FBiGeom_getArrXYZtoUVHint ITAPS_FC_WRAPPER( fbigeom_getarrxyztouvhint, FBIGEOM_GETARRXYZTOUVHINT )
+#define FBiGeom_getEntXYZtoUVHint \
+    ITAPS_FC_WRAPPER( fbigeom_getentxyztouvhint, FBIGEOM_GETENTXYZTOUVHINT )
+#define FBiGeom_getArrXYZtoUVHint \
+    ITAPS_FC_WRAPPER( fbigeom_getarrxyztouvhint, FBIGEOM_GETARRXYZTOUVHINT )
 #define FBiGeom_getEntUVRange ITAPS_FC_WRAPPER( fbigeom_getentuvrange, FBIGEOM_GETENTUVRANGE )
 #define FBiGeom_getEntURange ITAPS_FC_WRAPPER( fbigeom_getenturange, FBIGEOM_GETENTURANGE )
 #define FBiGeom_getArrUVRange ITAPS_FC_WRAPPER( fbigeom_getarruvrange, FBIGEOM_GETARRUVRANGE )
@@ -98,20 +104,23 @@
 #define FBiGeom_isEntPeriodic ITAPS_FC_WRAPPER( fbigeom_isentperiodic, FBIGEOM_ISENTPERIODIC )
 #define FBiGeom_isArrPeriodic ITAPS_FC_WRAPPER( fbigeom_isarrperiodic, FBIGEOM_ISARRPERIODIC )
 #define FBiGeom_isFcDegenerate ITAPS_FC_WRAPPER( fbigeom_isfcdegenerate, FBIGEOM_ISFCDEGENERATE )
-#define FBiGeom_isFcArrDegenerate ITAPS_FC_WRAPPER( fbigeom_isfcarrdegenerate, FBIGEOM_ISFCARRDEGENERATE )
+#define FBiGeom_isFcArrDegenerate \
+    ITAPS_FC_WRAPPER( fbigeom_isfcarrdegenerate, FBIGEOM_ISFCARRDEGENERATE )
 #define FBiGeom_getTolerance ITAPS_FC_WRAPPER( fbigeom_gettolerance, FBIGEOM_GETTOLERANCE )
 #define FBiGeom_getEntTolerance ITAPS_FC_WRAPPER( fbigeom_getenttolerance, FBIGEOM_GETENTTOLERANCE )
 #define FBiGeom_getArrTolerance ITAPS_FC_WRAPPER( fbigeom_getarrtolerance, FBIGEOM_GETARRTOLERANCE )
 #define FBiGeom_initEntIter ITAPS_FC_WRAPPER( fbigeom_initentiter, FBIGEOM_INITENTITER )
 #define FBiGeom_initEntArrIter ITAPS_FC_WRAPPER( fbigeom_initentarriter, FBIGEOM_INITENTARRITER )
 #define FBiGeom_getNextEntIter ITAPS_FC_WRAPPER( fbigeom_getnextentiter, FBIGEOM_GETNEXTENTITER )
-#define FBiGeom_getNextEntArrIter ITAPS_FC_WRAPPER( fbigeom_getnextentarriter, FBIGEOM_GETNEXTENTARRITER )
+#define FBiGeom_getNextEntArrIter \
+    ITAPS_FC_WRAPPER( fbigeom_getnextentarriter, FBIGEOM_GETNEXTENTARRITER )
 #define FBiGeom_resetEntIter ITAPS_FC_WRAPPER( fbigeom_resetentiter, FBIGEOM_RESETENTITER )
 #define FBiGeom_resetEntArrIter ITAPS_FC_WRAPPER( fbigeom_resetentarriter, FBIGEOM_RESETENTARRITER )
 #define FBiGeom_endEntIter ITAPS_FC_WRAPPER( fbigeom_endentiter, FBIGEOM_ENDENTITER )
 #define FBiGeom_endEntArrIter ITAPS_FC_WRAPPER( fbigeom_endentarriter, FBIGEOM_ENDENTARRITER )
 #define FBiGeom_copyEnt ITAPS_FC_WRAPPER( fbigeom_copyent, FBIGEOM_COPYENT )
-#define FBiGeom_sweepEntAboutAxis ITAPS_FC_WRAPPER( fbigeom_sweepentaboutaxis, FBIGEOM_SWEEPENTABOUTAXIS )
+#define FBiGeom_sweepEntAboutAxis \
+    ITAPS_FC_WRAPPER( fbigeom_sweepentaboutaxis, FBIGEOM_SWEEPENTABOUTAXIS )
 #define FBiGeom_deleteAll ITAPS_FC_WRAPPER( fbigeom_deleteall, FBIGEOM_DELETEALL )
 #define FBiGeom_deleteEnt ITAPS_FC_WRAPPER( fbigeom_deleteent, FBIGEOM_DELETEENT )
 #define FBiGeom_createSphere ITAPS_FC_WRAPPER( fbigeom_createsphere, FBIGEOM_CREATESPHERE )
@@ -138,12 +147,15 @@
 #define FBiGeom_addEntToSet ITAPS_FC_WRAPPER( fbigeom_addenttoset, FBIGEOM_ADDENTTOSET )
 #define FBiGeom_rmvEntFromSet ITAPS_FC_WRAPPER( fbigeom_rmventfromset, FBIGEOM_RMVENTFROMSET )
 #define FBiGeom_addEntArrToSet ITAPS_FC_WRAPPER( fbigeom_addentarrtoset, FBIGEOM_ADDENTARRTOSET )
-#define FBiGeom_rmvEntArrFromSet ITAPS_FC_WRAPPER( fbigeom_rmventarrfromset, FBIGEOM_RMVENTARRFROMSET )
+#define FBiGeom_rmvEntArrFromSet \
+    ITAPS_FC_WRAPPER( fbigeom_rmventarrfromset, FBIGEOM_RMVENTARRFROMSET )
 #define FBiGeom_addEntSet ITAPS_FC_WRAPPER( fbigeom_addentset, FBIGEOM_ADDENTSET )
 #define FBiGeom_rmvEntSet ITAPS_FC_WRAPPER( fbigeom_rmventset, FBIGEOM_RMVENTSET )
 #define FBiGeom_isEntContained ITAPS_FC_WRAPPER( fbigeom_isentcontained, FBIGEOM_ISENTCONTAINED )
-#define FBiGeom_isEntArrContained ITAPS_FC_WRAPPER( fbigeom_isentarrcontained, FBIGEOM_ISENTARRCONTAINED )
-#define FBiGeom_isEntSetContained ITAPS_FC_WRAPPER( fbigeom_isentsetcontained, FBIGEOM_ISENTSETCONTAINED )
+#define FBiGeom_isEntArrContained \
+    ITAPS_FC_WRAPPER( fbigeom_isentarrcontained, FBIGEOM_ISENTARRCONTAINED )
+#define FBiGeom_isEntSetContained \
+    ITAPS_FC_WRAPPER( fbigeom_isentsetcontained, FBIGEOM_ISENTSETCONTAINED )
 #define FBiGeom_addPrntChld ITAPS_FC_WRAPPER( fbigeom_addprntchld, FBIGEOM_ADDPRNTCHLD )
 #define FBiGeom_rmvPrntChld ITAPS_FC_WRAPPER( fbigeom_rmvprntchld, FBIGEOM_RMVPRNTCHLD )
 #define FBiGeom_isChildOf ITAPS_FC_WRAPPER( fbigeom_ischildof, FBIGEOM_ISCHILDOF )
@@ -154,21 +166,29 @@
 #define FBiGeom_createTag ITAPS_FC_WRAPPER( fbigeom_createtag, FBIGEOM_CREATETAG )
 #define FBiGeom_destroyTag ITAPS_FC_WRAPPER( fbigeom_destroytag, FBIGEOM_DESTROYTAG )
 #define FBiGeom_getTagName ITAPS_FC_WRAPPER( fbigeom_gettagname, FBIGEOM_GETTAGNAME )
-#define FBiGeom_getTagSizeValues ITAPS_FC_WRAPPER( fbigeom_gettagsizevalues, FBIGEOM_GETTAGSIZEVALUES )
+#define FBiGeom_getTagSizeValues \
+    ITAPS_FC_WRAPPER( fbigeom_gettagsizevalues, FBIGEOM_GETTAGSIZEVALUES )
 #define FBiGeom_getTagSizeBytes ITAPS_FC_WRAPPER( fbigeom_gettagsizebytes, FBIGEOM_GETTAGSIZEBYTES )
 #define FBiGeom_getTagHandle ITAPS_FC_WRAPPER( fbigeom_gettaghandle, FBIGEOM_GETTAGHANDLE )
 #define FBiGeom_getTagType ITAPS_FC_WRAPPER( fbigeom_gettagtype, FBIGEOM_GETTAGTYPE )
 #define FBiGeom_setEntSetData ITAPS_FC_WRAPPER( fbigeom_setentsetdata, FBIGEOM_SETENTSETDATA )
-#define FBiGeom_setEntSetIntData ITAPS_FC_WRAPPER( fbigeom_setentsetintdata, FBIGEOM_SETENTSETINTDATA )
-#define FBiGeom_setEntSetDblData ITAPS_FC_WRAPPER( fbigeom_setentsetdbldata, FBIGEOM_SETENTSETDBLDATA )
+#define FBiGeom_setEntSetIntData \
+    ITAPS_FC_WRAPPER( fbigeom_setentsetintdata, FBIGEOM_SETENTSETINTDATA )
+#define FBiGeom_setEntSetDblData \
+    ITAPS_FC_WRAPPER( fbigeom_setentsetdbldata, FBIGEOM_SETENTSETDBLDATA )
 #define FBiGeom_setEntSetEHData ITAPS_FC_WRAPPER( fbigeom_setentsetehdata, FBIGEOM_SETENTSETEHDATA )
-#define FBiGeom_setEntSetESHData ITAPS_FC_WRAPPER( fbigeom_setentseteshdata, FBIGEOM_SETENTSETESHDATA )
+#define FBiGeom_setEntSetESHData \
+    ITAPS_FC_WRAPPER( fbigeom_setentseteshdata, FBIGEOM_SETENTSETESHDATA )
 #define FBiGeom_getEntSetData ITAPS_FC_WRAPPER( fbigeom_getentsetdata, FBIGEOM_GETENTSETDATA )
-#define FBiGeom_getEntSetIntData ITAPS_FC_WRAPPER( fbigeom_getentsetintdata, FBIGEOM_GETENTSETINTDATA )
-#define FBiGeom_getEntSetDblData ITAPS_FC_WRAPPER( fbigeom_getentsetdbldata, FBIGEOM_GETENTSETDBLDATA )
+#define FBiGeom_getEntSetIntData \
+    ITAPS_FC_WRAPPER( fbigeom_getentsetintdata, FBIGEOM_GETENTSETINTDATA )
+#define FBiGeom_getEntSetDblData \
+    ITAPS_FC_WRAPPER( fbigeom_getentsetdbldata, FBIGEOM_GETENTSETDBLDATA )
 #define FBiGeom_getEntSetEHData ITAPS_FC_WRAPPER( fbigeom_getentsetehdata, FBIGEOM_GETENTSETEHDATA )
-#define FBiGeom_getEntSetESHData ITAPS_FC_WRAPPER( fbigeom_getentseteshdata, FBIGEOM_GETENTSETESHDATA )
-#define FBiGeom_getAllEntSetTags ITAPS_FC_WRAPPER( fbigeom_getallentsettags, FBIGEOM_GETALLENTSETTAGS )
+#define FBiGeom_getEntSetESHData \
+    ITAPS_FC_WRAPPER( fbigeom_getentseteshdata, FBIGEOM_GETENTSETESHDATA )
+#define FBiGeom_getAllEntSetTags \
+    ITAPS_FC_WRAPPER( fbigeom_getallentsettags, FBIGEOM_GETALLENTSETTAGS )
 #define FBiGeom_rmvEntSetTag ITAPS_FC_WRAPPER( fbigeom_rmventsettag, FBIGEOM_RMVENTSETTAG )
 #define FBiGeom_getArrData ITAPS_FC_WRAPPER( fbigeom_getarrdata, FBIGEOM_GETARRDATA )
 #define FBiGeom_getIntArrData ITAPS_FC_WRAPPER( fbigeom_getintarrdata, FBIGEOM_GETINTARRDATA )

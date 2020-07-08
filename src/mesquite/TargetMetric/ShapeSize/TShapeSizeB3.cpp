@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file TShapeSizeB3.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -37,146 +36,142 @@
 
 #include <iostream>
 
-namespace MBMesquite {
-
-std::string TShapeSizeB3::get_name() const
-  { return "TShapeSizeB3"; }
-
-TShapeSizeB3::~TShapeSizeB3() {}
-
-bool TShapeSizeB3::evaluate( const MsqMatrix<2,2>& T,
-                                           double& result,
-                                           MsqError& err )
+namespace MBMesquite
 {
-  const double tau = det(T);
-  if (invalid_determinant(tau)) { // barrier
-    MSQ_SETERR(err)( barrier_violated_msg, MsqError::BARRIER_VIOLATED );
-    return false;
-  }
 
-  result = sqr_Frobenius(T) - 2.0 * std::log(tau) - 2;
-  return true;
+std::string TShapeSizeB3::get_name( ) const
+{
+    return "TShapeSizeB3";
 }
 
-bool TShapeSizeB3::evaluate_with_grad( const MsqMatrix<2,2>& T,
-                                                     double& result,
-                                                     MsqMatrix<2,2>& deriv_wrt_T,
-                                                     MsqError& err )
+TShapeSizeB3::~TShapeSizeB3( ) {}
+
+bool TShapeSizeB3::evaluate( const MsqMatrix< 2, 2 >& T, double& result, MsqError& err )
 {
-  const double tau = det(T);
-  if (invalid_determinant(tau)) { // barrier
-    MSQ_SETERR(err)( barrier_violated_msg, MsqError::BARRIER_VIOLATED );
-    return false;
-  }
+    const double tau = det( T );
+    if( invalid_determinant( tau ) )
+    {  // barrier
+        MSQ_SETERR( err )( barrier_violated_msg, MsqError::BARRIER_VIOLATED );
+        return false;
+    }
 
-  result = sqr_Frobenius(T) - 2.0 * std::log(tau) - 2;
-  deriv_wrt_T = T;
-  deriv_wrt_T -= 1/tau * transpose_adj(T);
-  deriv_wrt_T *= 2;
-
-  return true;
+    result = sqr_Frobenius( T ) - 2.0 * std::log( tau ) - 2;
+    return true;
 }
 
-bool TShapeSizeB3::evaluate_with_hess( const MsqMatrix<2,2>& T,
-                                                     double& result,
-                                                     MsqMatrix<2,2>& deriv_wrt_T,
-                                                     MsqMatrix<2,2> second_wrt_T[3],
-                                                     MsqError& err )
+bool TShapeSizeB3::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& result,
+                                       MsqMatrix< 2, 2 >& deriv_wrt_T, MsqError& err )
 {
-  const double tau = det(T);
-  if (invalid_determinant(tau)) { // barrier
-    MSQ_SETERR(err)( barrier_violated_msg, MsqError::BARRIER_VIOLATED );
-    return false;
-  }
+    const double tau = det( T );
+    if( invalid_determinant( tau ) )
+    {  // barrier
+        MSQ_SETERR( err )( barrier_violated_msg, MsqError::BARRIER_VIOLATED );
+        return false;
+    }
 
-  result = sqr_Frobenius(T) - 2.0 * std::log(tau) - 2;
+    result = sqr_Frobenius( T ) - 2.0 * std::log( tau ) - 2;
+    deriv_wrt_T = T;
+    deriv_wrt_T -= 1 / tau * transpose_adj( T );
+    deriv_wrt_T *= 2;
 
-  const MsqMatrix<2,2> adjt = transpose_adj(T);
-  const double it = 1/tau;
-  deriv_wrt_T = T;
-  deriv_wrt_T -= it * adjt;
-  deriv_wrt_T *= 2;
-
-  set_scaled_outer_product( second_wrt_T, 2*it*it, adjt );
-  pluseq_scaled_2nd_deriv_of_det( second_wrt_T, -2*it );
-  pluseq_scaled_I( second_wrt_T, 2.0 );
-
-  return true;
+    return true;
 }
 
-
-bool TShapeSizeB3::evaluate( const MsqMatrix<3,3>& T,
-                             double& result,
-                             MsqError& err )
+bool TShapeSizeB3::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& result,
+                                       MsqMatrix< 2, 2 >& deriv_wrt_T,
+                                       MsqMatrix< 2, 2 > second_wrt_T[ 3 ], MsqError& err )
 {
-  const double tau = det(T);
-  if (invalid_determinant(tau)) { // barrier
-    MSQ_SETERR(err)( barrier_violated_msg, MsqError::BARRIER_VIOLATED );
-    return false;
-  }
+    const double tau = det( T );
+    if( invalid_determinant( tau ) )
+    {  // barrier
+        MSQ_SETERR( err )( barrier_violated_msg, MsqError::BARRIER_VIOLATED );
+        return false;
+    }
 
-  double n = Frobenius(T);
-  result = n*n*n - 3*MSQ_SQRT_THREE*( log(tau) + 1 );
-  return true;
+    result = sqr_Frobenius( T ) - 2.0 * std::log( tau ) - 2;
+
+    const MsqMatrix< 2, 2 > adjt = transpose_adj( T );
+    const double            it = 1 / tau;
+    deriv_wrt_T = T;
+    deriv_wrt_T -= it * adjt;
+    deriv_wrt_T *= 2;
+
+    set_scaled_outer_product( second_wrt_T, 2 * it * it, adjt );
+    pluseq_scaled_2nd_deriv_of_det( second_wrt_T, -2 * it );
+    pluseq_scaled_I( second_wrt_T, 2.0 );
+
+    return true;
 }
 
-bool TShapeSizeB3::evaluate_with_grad( const MsqMatrix<3,3>& T,
-                                       double& result,
-                                       MsqMatrix<3,3>& deriv_wrt_T,
-                                       MsqError& err )
+bool TShapeSizeB3::evaluate( const MsqMatrix< 3, 3 >& T, double& result, MsqError& err )
 {
-  const double tau = det(T);
-  if (invalid_determinant(tau)) { // barrier
-    MSQ_SETERR(err)( barrier_violated_msg, MsqError::BARRIER_VIOLATED );
-    return false;
-  }
+    const double tau = det( T );
+    if( invalid_determinant( tau ) )
+    {  // barrier
+        MSQ_SETERR( err )( barrier_violated_msg, MsqError::BARRIER_VIOLATED );
+        return false;
+    }
 
-  double n = Frobenius(T);
-  result = n*n*n - 3*MSQ_SQRT_THREE*( log(tau) + 1 );
-
-  const MsqMatrix<3,3> adjt = transpose_adj(T);
-  deriv_wrt_T = T;
-  deriv_wrt_T *= 3*n;
-  deriv_wrt_T -= 3*MSQ_SQRT_THREE/tau * adjt;
-
-  return true;
+    double n = Frobenius( T );
+    result = n * n * n - 3 * MSQ_SQRT_THREE * ( log( tau ) + 1 );
+    return true;
 }
 
-bool TShapeSizeB3::evaluate_with_hess( const MsqMatrix<3,3>& T,
-                                       double& result,
-                                       MsqMatrix<3,3>& deriv_wrt_T,
-                                       MsqMatrix<3,3> second_wrt_T[6],
-                                       MsqError& err )
+bool TShapeSizeB3::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& result,
+                                       MsqMatrix< 3, 3 >& deriv_wrt_T, MsqError& err )
 {
-  const double tau = det(T);
-  if (invalid_determinant(tau)) { // barrier
-    MSQ_SETERR(err)( barrier_violated_msg, MsqError::BARRIER_VIOLATED );
-    return false;
-  }
+    const double tau = det( T );
+    if( invalid_determinant( tau ) )
+    {  // barrier
+        MSQ_SETERR( err )( barrier_violated_msg, MsqError::BARRIER_VIOLATED );
+        return false;
+    }
 
-  double n = Frobenius(T);
-  result = n*n*n - 3*MSQ_SQRT_THREE*( log(tau) + 1 );
+    double n = Frobenius( T );
+    result = n * n * n - 3 * MSQ_SQRT_THREE * ( log( tau ) + 1 );
 
-  const MsqMatrix<3,3> adjt = transpose_adj(T);
-  const double it = 1/tau;
-  deriv_wrt_T = T;
-  deriv_wrt_T *= 3*n;
-  deriv_wrt_T -= 3*MSQ_SQRT_THREE*it * adjt;
+    const MsqMatrix< 3, 3 > adjt = transpose_adj( T );
+    deriv_wrt_T = T;
+    deriv_wrt_T *= 3 * n;
+    deriv_wrt_T -= 3 * MSQ_SQRT_THREE / tau * adjt;
 
-  if (n > 1e-50)
-  {
-    set_scaled_outer_product( second_wrt_T, 3/n, T );
-    pluseq_scaled_I( second_wrt_T, 3*n );
-    pluseq_scaled_2nd_deriv_of_det( second_wrt_T, -3*MSQ_SQRT_THREE*it, T );
-    pluseq_scaled_outer_product( second_wrt_T, 3*MSQ_SQRT_THREE*it*it, adjt );
-  }
-  else
-  {
-    std::cout << "Warning: Division by zero avoided in TShapeSizeB3::evaluate_with_hess()" << std::endl;
-  }
-
-
-  return true;
+    return true;
 }
 
-} // namespace MBMesquite
+bool TShapeSizeB3::evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result,
+                                       MsqMatrix< 3, 3 >& deriv_wrt_T,
+                                       MsqMatrix< 3, 3 > second_wrt_T[ 6 ], MsqError& err )
+{
+    const double tau = det( T );
+    if( invalid_determinant( tau ) )
+    {  // barrier
+        MSQ_SETERR( err )( barrier_violated_msg, MsqError::BARRIER_VIOLATED );
+        return false;
+    }
+
+    double n = Frobenius( T );
+    result = n * n * n - 3 * MSQ_SQRT_THREE * ( log( tau ) + 1 );
+
+    const MsqMatrix< 3, 3 > adjt = transpose_adj( T );
+    const double            it = 1 / tau;
+    deriv_wrt_T = T;
+    deriv_wrt_T *= 3 * n;
+    deriv_wrt_T -= 3 * MSQ_SQRT_THREE * it * adjt;
+
+    if( n > 1e-50 )
+    {
+        set_scaled_outer_product( second_wrt_T, 3 / n, T );
+        pluseq_scaled_I( second_wrt_T, 3 * n );
+        pluseq_scaled_2nd_deriv_of_det( second_wrt_T, -3 * MSQ_SQRT_THREE * it, T );
+        pluseq_scaled_outer_product( second_wrt_T, 3 * MSQ_SQRT_THREE * it * it, adjt );
+    }
+    else
+    {
+        std::cout << "Warning: Division by zero avoided in TShapeSizeB3::evaluate_with_hess()"
+                  << std::endl;
+    }
+
+    return true;
+}
+
+}  // namespace MBMesquite

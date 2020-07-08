@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file CLArgs.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -32,7 +31,6 @@
 
 #ifndef MSQ_CLARGS_HPP
 #define MSQ_CLARGS_HPP
-
 
 class CLArgImpl;
 
@@ -66,233 +64,294 @@ class CLArgImpl;
 class CLArgs
 {
   public:
-
-      /**\brief Base class for callback interface (type-independent functions) */
-    class ArgIBase {
-      private: bool wasSeen; //!< Keep track of whether or not this flag was encountered
-      public: ArgIBase() : wasSeen(false) {} //!< constructor
-              virtual ~ArgIBase() {}         //!< virtual destructor for proper cleanup
-                /**\brief Get short description string for usage output or empty string for default*/
-              virtual std::string brief() const { return std::string(); }
-                /**\brief Get short description string for UNIX man page output or empty string for default */
-              virtual std::string manstr() const { return std::string(); }
-                /**\brief Get optional additional info to print with flag description */
-              virtual std::string desc_append() const { return std::string(); }
-                /**\brief Get optional string containing default value for option if not specified by user */
-              virtual std::string default_str() const { return std::string(); }
-                /**\brief Mark this flag as having been specified by the user */
-              void set_seen() { wasSeen = true; }
-                /**\brief Test if the user specified this flag */
-              bool seen() const { return wasSeen; }
+    /**\brief Base class for callback interface (type-independent functions) */
+    class ArgIBase
+    {
+      private:
+        bool wasSeen;  //!< Keep track of whether or not this flag was encountered
+      public:
+        ArgIBase( ) : wasSeen( false ) {}  //!< constructor
+        virtual ~ArgIBase( ) {}  //!< virtual destructor for proper cleanup
+        /**\brief Get short description string for usage output or empty string for default*/
+        virtual std::string brief( ) const
+        {
+            return std::string( );
+        }
+        /**\brief Get short description string for UNIX man page output or empty string for default
+         */
+        virtual std::string manstr( ) const
+        {
+            return std::string( );
+        }
+        /**\brief Get optional additional info to print with flag description */
+        virtual std::string desc_append( ) const
+        {
+            return std::string( );
+        }
+        /**\brief Get optional string containing default value for option if not specified by user
+         */
+        virtual std::string default_str( ) const
+        {
+            return std::string( );
+        }
+        /**\brief Mark this flag as having been specified by the user */
+        void set_seen( )
+        {
+            wasSeen = true;
+        }
+        /**\brief Test if the user specified this flag */
+        bool seen( ) const
+        {
+            return wasSeen;
+        }
     };
 
-      /**\brief Interface for type-specific callback classes */
-    template <typename T> class ArgTemplateI : public ArgIBase {
-      public: virtual bool value( const T& val ) = 0;
+    /**\brief Interface for type-specific callback classes */
+    template< typename T > class ArgTemplateI : public ArgIBase
+    {
+      public:
+        virtual bool value( const T& val ) = 0;
     };
-      /**\brief Trivial implementation for type-specific classes */
-    template <typename T> class ArgTemplate :public ArgTemplateI<T> {
-      private: T mValue;         //!< The default or user-specified value for an option.
-               bool haveDefault; //!< True if app. provided default value.
-      public:  virtual ~ArgTemplate() {}
-               virtual bool value( const T& val ) //!< Set value
-               {
-                  mValue = val;
-                  ArgTemplateI<T>::set_seen();
-                  return true;
-               }
-               const T& value() const { return mValue; } //!< get value
-                /**\brief Initialize with default value */
-               ArgTemplate( const T& initial_value ) : mValue(initial_value), haveDefault(true) {}
-                /**\brief Initialize without default value */
-               ArgTemplate() : mValue(T()), haveDefault(false) {}
-                /**\brief Get string representation of default value, or empty string of no default value */
-               virtual std::string default_str() const {
-                 std::ostringstream ss;
-                 if (haveDefault)
-                   ss << mValue;
-                 return ss.str();
-               }
-
-    };
-
-      /**\brief Trivial implementation for type-specific classes */
-    template <typename T> class ArgListTemplate : public ArgTemplateI< std::vector<T> > {
-      private: std::vector<T> mValue;         //!< The default or user-specified value for an option.
-               bool haveDefault; //!< True if app. provided default value.
-      public:  virtual ~ArgListTemplate() {}
-               virtual bool value( const std::vector<T>& val ) //!< Set value
-               {
-                  mValue = val;
-                  ArgTemplateI< std::vector<T> >::set_seen();
-                  return true;
-               }
-               const std::vector<T>& value() const { return mValue; } //!< get value
-                /**\brief Initialize with default value */
-               ArgListTemplate( const std::vector<T>& initial_value ) : mValue(initial_value), haveDefault(true) {}
-                /**\brief Initialize without default value */
-               ArgListTemplate() : haveDefault(false) {}
-                /**\brief Get string representation of default value, or empty string of no default value */
-               virtual std::string default_str() const {
-                 std::ostringstream ss;
-                 std::copy( mValue.begin(), mValue.end(),
-                   std::ostream_iterator<T>( ss, ", " ) );
-                 return ss.str();
-               }
-
+    /**\brief Trivial implementation for type-specific classes */
+    template< typename T > class ArgTemplate : public ArgTemplateI< T >
+    {
+      private:
+        T    mValue;  //!< The default or user-specified value for an option.
+        bool haveDefault;  //!< True if app. provided default value.
+      public:
+        virtual ~ArgTemplate( ) {}
+        virtual bool value( const T& val )  //!< Set value
+        {
+            mValue = val;
+            ArgTemplateI< T >::set_seen( );
+            return true;
+        }
+        const T& value( ) const
+        {
+            return mValue;
+        }  //!< get value
+        /**\brief Initialize with default value */
+        ArgTemplate( const T& initial_value ) : mValue( initial_value ), haveDefault( true ) {}
+        /**\brief Initialize without default value */
+        ArgTemplate( ) : mValue( T( ) ), haveDefault( false ) {}
+        /**\brief Get string representation of default value, or empty string of no default value */
+        virtual std::string default_str( ) const
+        {
+            std::ostringstream ss;
+            if( haveDefault ) ss << mValue;
+            return ss.str( );
+        }
     };
 
-      /**\brief Callback API for a string argument */
-    typedef ArgTemplateI< std::string >     StringArgI;
-      /**\brief Callback API for an integer argument */
-    typedef ArgTemplateI< int >                 IntArgI;
-      /**\brief Callback API for a long integer argument */
-    typedef ArgTemplateI< long >                LongArgI;
-      /**\brief Callback API for a double-precision floating-point argument */
-    typedef ArgTemplateI< double >              DoubleArgI;
-      /**\brief Callback API for a Boolean or toggle argument */
-    typedef ArgTemplateI< bool >                ToggleArgI;
-      /**\brief Callback API for an integer list argument */
-    typedef ArgTemplateI< std::vector<int> >    IntListArgI;
-      /**\brief Callback API for a double list argument */
-    typedef ArgTemplateI< std::vector<double> > DoubleListArgI;
+    /**\brief Trivial implementation for type-specific classes */
+    template< typename T > class ArgListTemplate : public ArgTemplateI< std::vector< T > >
+    {
+      private:
+        std::vector< T > mValue;  //!< The default or user-specified value for an option.
+        bool             haveDefault;  //!< True if app. provided default value.
+      public:
+        virtual ~ArgListTemplate( ) {}
+        virtual bool value( const std::vector< T >& val )  //!< Set value
+        {
+            mValue = val;
+            ArgTemplateI< std::vector< T > >::set_seen( );
+            return true;
+        }
+        const std::vector< T >& value( ) const
+        {
+            return mValue;
+        }  //!< get value
+        /**\brief Initialize with default value */
+        ArgListTemplate( const std::vector< T >& initial_value )
+            : mValue( initial_value ), haveDefault( true )
+        {
+        }
+        /**\brief Initialize without default value */
+        ArgListTemplate( ) : haveDefault( false ) {}
+        /**\brief Get string representation of default value, or empty string of no default value */
+        virtual std::string default_str( ) const
+        {
+            std::ostringstream ss;
+            std::copy( mValue.begin( ), mValue.end( ), std::ostream_iterator< T >( ss, ", " ) );
+            return ss.str( );
+        }
+    };
 
-      /**\brief Trivial callback implementation for a string argument */
-    typedef ArgTemplate< std::string>      StringArg;
-      /**\brief Trivial callback implementation for an integer argument */
-    typedef ArgTemplate< int >                 IntArg;
-      /**\brief Trivial callback implementation for a long integer argument */
-    typedef ArgTemplate< long >                LongArg;
-      /**\brief Trivial callback implementation for a ouble-precision floating-point argument */
-    typedef ArgTemplate< double >              DoubleArg;
-      /**\brief Trivial callback implementation for a Boolean or toggle argument */
-    typedef ArgTemplate< bool >                ToggleArg;
-      /**\brief Trivial callback implementation for an integer list argument */
-    typedef ArgListTemplate< int >    IntListArg;
-      /**\brief Trivial callback implementation for a double list argument */
+    /**\brief Callback API for a string argument */
+    typedef ArgTemplateI< std::string > StringArgI;
+    /**\brief Callback API for an integer argument */
+    typedef ArgTemplateI< int > IntArgI;
+    /**\brief Callback API for a long integer argument */
+    typedef ArgTemplateI< long > LongArgI;
+    /**\brief Callback API for a double-precision floating-point argument */
+    typedef ArgTemplateI< double > DoubleArgI;
+    /**\brief Callback API for a Boolean or toggle argument */
+    typedef ArgTemplateI< bool > ToggleArgI;
+    /**\brief Callback API for an integer list argument */
+    typedef ArgTemplateI< std::vector< int > > IntListArgI;
+    /**\brief Callback API for a double list argument */
+    typedef ArgTemplateI< std::vector< double > > DoubleListArgI;
+
+    /**\brief Trivial callback implementation for a string argument */
+    typedef ArgTemplate< std::string > StringArg;
+    /**\brief Trivial callback implementation for an integer argument */
+    typedef ArgTemplate< int > IntArg;
+    /**\brief Trivial callback implementation for a long integer argument */
+    typedef ArgTemplate< long > LongArg;
+    /**\brief Trivial callback implementation for a ouble-precision floating-point argument */
+    typedef ArgTemplate< double > DoubleArg;
+    /**\brief Trivial callback implementation for a Boolean or toggle argument */
+    typedef ArgTemplate< bool > ToggleArg;
+    /**\brief Trivial callback implementation for an integer list argument */
+    typedef ArgListTemplate< int > IntListArg;
+    /**\brief Trivial callback implementation for a double list argument */
     typedef ArgListTemplate< double > DoubleListArg;
 
-      /**\brief String arugment that is limited to a list of acceptable keywords
-       *
-       * A specialized string arugment implementation that limits the
-       * acceptable string argument to one of a list of keywords.
-       * A case-insensitive comparison is done with the allowed keywords.
-       * The "value" has the case of the keyword rather than the case
-       * used in the literal value specified in the command line argument.
-       */
+    /**\brief String arugment that is limited to a list of acceptable keywords
+     *
+     * A specialized string arugment implementation that limits the
+     * acceptable string argument to one of a list of keywords.
+     * A case-insensitive comparison is done with the allowed keywords.
+     * The "value" has the case of the keyword rather than the case
+     * used in the literal value specified in the command line argument.
+     */
     class KeyWordArg : public StringArg
     {
       private:
         std::vector< std::string > mKeyWords;
-        void initialize( const char* keyword_list[], int list_length );
+        void                       initialize( const char* keyword_list[], int list_length );
+
       public:
         KeyWordArg( const char* keyword_list[], int list_length )
-          { initialize( keyword_list, list_length ); }
+        {
+            initialize( keyword_list, list_length );
+        }
         KeyWordArg( const char* default_val, const char* keyword_list[], int list_length )
-          : StringArg( default_val )
-          { initialize( keyword_list, list_length ); }
-        virtual bool value( const std::string& val );
-        virtual std::string brief() const;
-        virtual std::string manstr() const;
-        static bool compare_no_case( const char* s1, const char* s2 );
+            : StringArg( default_val )
+        {
+            initialize( keyword_list, list_length );
+        }
+        virtual bool        value( const std::string& val );
+        virtual std::string brief( ) const;
+        virtual std::string manstr( ) const;
+        static bool         compare_no_case( const char* s1, const char* s2 );
     };
 
     class IntRange
     {
       private:
         int mMin, mMax;
+
       public:
         IntRange( const int* min, const int* max );
-        bool is_valid( int val ) const;
-        std::string desc_append() const;
+        bool        is_valid( int val ) const;
+        std::string desc_append( ) const;
     };
 
-      /**\brief Integer argument constrained to a range of valid values. */
+    /**\brief Integer argument constrained to a range of valid values. */
     class IntRangeArg : public IntArg
     {
       private:
         IntRange mRange;
+
       public:
-        IntRangeArg( const int* min = 0, const int* max = 0 )
-          : mRange( min, max ) {}
+        IntRangeArg( const int* min = 0, const int* max = 0 ) : mRange( min, max ) {}
         IntRangeArg( int default_val, const int* min, const int* max )
-          : IntArg(default_val), mRange( min, max ) {}
-        bool value( const int& val );
-        const int& value() const { return IntArg::value(); }
-        std::string desc_append() const
-          { return mRange.desc_append(); }
+            : IntArg( default_val ), mRange( min, max )
+        {
+        }
+        bool       value( const int& val );
+        const int& value( ) const
+        {
+            return IntArg::value( );
+        }
+        std::string desc_append( ) const
+        {
+            return mRange.desc_append( );
+        }
     };
 
-      /**\brief Integer list argument constrained to a range of valid values. */
+    /**\brief Integer list argument constrained to a range of valid values. */
     class IntListRangeArg : public IntListArg
     {
       private:
         IntRange mRange;
+
       public:
-        IntListRangeArg( const int* min = 0, const int* max = 0 )
-          : mRange( min, max ) {}
-        bool value( const std::vector<int>& val );
-        const std::vector<int>& value() const { return IntListArg::value(); }
-        std::string desc_append() const
-          { return mRange.desc_append(); }
+        IntListRangeArg( const int* min = 0, const int* max = 0 ) : mRange( min, max ) {}
+        bool                      value( const std::vector< int >& val );
+        const std::vector< int >& value( ) const
+        {
+            return IntListArg::value( );
+        }
+        std::string desc_append( ) const
+        {
+            return mRange.desc_append( );
+        }
     };
 
     class DoubleRange
     {
       private:
-        bool haveMin, haveMax, mInclusive;
+        bool   haveMin, haveMax, mInclusive;
         double mMin, mMax;
+
       public:
         DoubleRange( const double* min, const double* max, bool inclusive );
-        bool is_valid( double value ) const;
-        std::string desc_append() const;
+        bool        is_valid( double value ) const;
+        std::string desc_append( ) const;
     };
 
-      /**\brief Double argument constrained to a range of valid values. */
+    /**\brief Double argument constrained to a range of valid values. */
     class DoubleRangeArg : public DoubleArg
     {
       private:
         DoubleRange mRange;
+
       public:
-        DoubleRangeArg( const double* min = 0,
-                        const double* max = 0,
+        DoubleRangeArg( const double* min = 0, const double* max = 0, bool inclusive = true )
+            : mRange( min, max, inclusive )
+        {
+        }
+        DoubleRangeArg( double default_val, const double* min = 0, const double* max = 0,
                         bool inclusive = true )
-                      : mRange( min, max, inclusive )
-                        {}
-        DoubleRangeArg( double default_val,
-                        const double* min = 0,
-                        const double* max = 0,
-                        bool inclusive = true )
-                      : DoubleArg(default_val),
-                        mRange( min, max, inclusive )
-                        {}
-        bool value( const double& val );
-        const double& value() const { return DoubleArg::value(); }
-        std::string desc_append() const
-          { return mRange.desc_append(); }
+            : DoubleArg( default_val ), mRange( min, max, inclusive )
+        {
+        }
+        bool          value( const double& val );
+        const double& value( ) const
+        {
+            return DoubleArg::value( );
+        }
+        std::string desc_append( ) const
+        {
+            return mRange.desc_append( );
+        }
     };
 
-      /**\brief Double list argument constrained to a range of valid values. */
+    /**\brief Double list argument constrained to a range of valid values. */
     class DoubleListRangeArg : public DoubleListArg
     {
       private:
         DoubleRange mRange;
+
       public:
-        DoubleListRangeArg( const double* min = 0,
-                            const double* max = 0,
-                            bool inclusive = true )
-                          : mRange( min, max, inclusive )
-                            {}
-        bool value( const std::vector<double>& val );
-        const std::vector<double>& value() const { return DoubleListArg::value(); }
-        std::string desc_append() const
-          { return mRange.desc_append(); }
+        DoubleListRangeArg( const double* min = 0, const double* max = 0, bool inclusive = true )
+            : mRange( min, max, inclusive )
+        {
+        }
+        bool                         value( const std::vector< double >& val );
+        const std::vector< double >& value( ) const
+        {
+            return DoubleListArg::value( );
+        }
+        std::string desc_append( ) const
+        {
+            return mRange.desc_append( );
+        }
     };
 
-
-
   public:
-
     /**\brief Define basic program
      *
      *\param progname  The program name
@@ -301,9 +360,9 @@ class CLArgs
      */
     CLArgs( const char* progname, const char* brief_desc, const char* desc );
 
-    ~CLArgs();
+    ~CLArgs( );
 
-      /**\brief Check if flag is undefined */
+    /**\brief Check if flag is undefined */
     bool is_flag_available( char fl ) const;
 
     /**\brief Register a flag that requires a string argument.
@@ -315,10 +374,7 @@ class CLArgs
      *\parma callback Object instance to which to pass the parsed argument value.
      *\return         false if flag is already in use, true otherwise.
      */
-    bool str_flag( char fl,
-                   const char* name,
-                   const char* desc,
-                   StringArgI* callback );
+    bool str_flag( char fl, const char* name, const char* desc, StringArgI* callback );
 
     /**\brief Register a flag that requires an integer argument.
      *
@@ -329,10 +385,7 @@ class CLArgs
      *\parma callback Object instance to which to pass the parsed argument value.
      *\return         false if flag is already in use, true otherwise.
      */
-    bool int_flag( char fl,
-                   const char* name,
-                   const char* desc,
-                   IntArgI* callback );
+    bool int_flag( char fl, const char* name, const char* desc, IntArgI* callback );
 
     /**\brief Register a flag that requires an integer argument.
      *
@@ -343,10 +396,7 @@ class CLArgs
      *\parma callback Object instance to which to pass the parsed argument value.
      *\return         false if flag is already in use, true otherwise.
      */
-    bool long_flag( char fl,
-                    const char* name,
-                    const char* desc,
-                    LongArgI* callback );
+    bool long_flag( char fl, const char* name, const char* desc, LongArgI* callback );
 
     /**\brief Register a flag that requires a real umber argument.
      *
@@ -359,10 +409,7 @@ class CLArgs
      *                 false, reject 'min' and 'max' values: (min,max).
      *\return          false if flag is already in use, true otherwise.
      */
-    bool double_flag( char fl,
-                      const char* name,
-                      const char* desc,
-                      DoubleArgI* callback );
+    bool double_flag( char fl, const char* name, const char* desc, DoubleArgI* callback );
 
     /**\brief Register a pair of flags that accept no arguments and have
      *        opposing affects.
@@ -376,10 +423,7 @@ class CLArgs
      *\parma callback Object instance to which to pass the parsed argument value.
      *\return         false if flag is already in use, true otherwise.
      */
-    bool toggle_flag( char on_flag,
-                      char off_flag,
-                      const char* desc,
-                      ToggleArgI* callback );
+    bool toggle_flag( char on_flag, char off_flag, const char* desc, ToggleArgI* callback );
 
     /**\brief Register a flag with no value.
      *
@@ -392,7 +436,6 @@ class CLArgs
      *\return         false if flag is already in use, true otherwise.
      */
     bool toggle_flag( char fl, const char* desc, ToggleArgI* callback );
-
 
     /**\brief Register a flag that accepts a list of positive integer arguments.
      *
@@ -442,9 +485,7 @@ class CLArgs
      *\parma callback Object instance to which to pass the parsed argument value.
      *\return         false if flag is already in use, true otherwise.
      */
-    bool double_list_flag( char fl,
-                           const char* desc,
-                           DoubleListArgI* callback );
+    bool double_list_flag( char fl, const char* desc, DoubleListArgI* callback );
 
     /**\brief Set a limit on the number of values accepted for a list-type
      *        flag.  May be called multiple times for a flag.
@@ -461,9 +502,7 @@ class CLArgs
      *        method has already been called with the same flag AND
      *        number of values.  True otherwise.
      */
-    bool limit_list_flag( char fl,
-                          int num_values,
-                          const char* const* value_names );
+    bool limit_list_flag( char fl, int num_values, const char* const* value_names );
 
     /**\brief Specify that an argument without a flag is expected.
      *
@@ -488,13 +527,8 @@ class CLArgs
      *\param error_stream  stream to which to write error messages.
      *\return true if all arguments were accepted.  false otherwise.
      */
-    bool parse_options( int argc,
-                        char* argv[],
-                        std::vector< std::string >& args_out,
+    bool parse_options( int argc, char* argv[], std::vector< std::string >& args_out,
                         std::ostream& error_stream );
-
-
-
 
     /**\brief Write help
      *
@@ -513,19 +547,19 @@ class CLArgs
     void print_usage( std::ostream& stream ) const;
 
   private:
-
     CLArgImpl* impl;
 };
 
-template <typename T> std::ostream& operator<<( std::ostream& str, const std::vector<T>& list )
+template< typename T > std::ostream& operator<<( std::ostream& str, const std::vector< T >& list )
 {
-  typename std::vector<T>::const_iterator i = list.begin();
-  if (i != list.end()) {
-    str << *i;
-    for (++i; i != list.end(); ++i)
-      str << ',' << *i;
-  }
-  return str;
+    typename std::vector< T >::const_iterator i = list.begin( );
+    if( i != list.end( ) )
+    {
+        str << *i;
+        for( ++i; i != list.end( ); ++i )
+            str << ',' << *i;
+    }
+    return str;
 }
 
 #endif

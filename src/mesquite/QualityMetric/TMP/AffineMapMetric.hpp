@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file AffineMapMetric.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -36,12 +35,13 @@
 #include "Mesquite.hpp"
 #include "ElemSampleQM.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 class TargetCalculator;
 class WeightCalculator;
 class TMetric;
-template <unsigned R, unsigned C> class MsqMatrix;
+template< unsigned R, unsigned C > class MsqMatrix;
 
 /**\brief Compare targets to affine map to ideal element.
  *
@@ -51,61 +51,63 @@ template <unsigned R, unsigned C> class MsqMatrix;
  */
 class AffineMapMetric : public ElemSampleQM
 {
-public:
+  public:
+    MESQUITE_EXPORT
+    AffineMapMetric( TargetCalculator* tc, WeightCalculator* wc, TMetric* target_metric );
 
-  MESQUITE_EXPORT
-  AffineMapMetric( TargetCalculator* tc,
-                   WeightCalculator* wc,
-                   TMetric* target_metric );
+    MESQUITE_EXPORT
+    AffineMapMetric( TargetCalculator* tc, TMetric* target_metric );
 
-  MESQUITE_EXPORT
-  AffineMapMetric( TargetCalculator* tc,
-                   TMetric* target_metric );
+    MESQUITE_EXPORT virtual std::string get_name( ) const;
 
-  MESQUITE_EXPORT virtual
-  std::string get_name() const;
+    MESQUITE_EXPORT virtual int get_negate_flag( ) const;
 
-  MESQUITE_EXPORT virtual
-  int get_negate_flag() const;
+    MESQUITE_EXPORT virtual void get_evaluations( PatchData& pd, std::vector< size_t >& handles,
+                                                  bool free_vertices_only, MsqError& err );
 
-  MESQUITE_EXPORT virtual
-  void get_evaluations( PatchData& pd,
-                        std::vector<size_t>& handles,
-                        bool free_vertices_only,
-                        MsqError& err );
+    MESQUITE_EXPORT virtual void get_element_evaluations( PatchData& pd, size_t elem_index,
+                                                          std::vector< size_t >& handles,
+                                                          MsqError&              err );
 
-  MESQUITE_EXPORT virtual
-  void get_element_evaluations( PatchData& pd, size_t elem_index,
-                                std::vector<size_t>& handles,
-                                MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate( PatchData& pd, size_t handle, double& value,
+                                           MsqError& err );
 
-  MESQUITE_EXPORT virtual
-  bool evaluate( PatchData& pd,
-                 size_t handle,
-                 double& value,
-                 MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate_with_indices( PatchData& pd, size_t handle, double& value,
+                                                        std::vector< size_t >& indices,
+                                                        MsqError&              err );
 
-  MESQUITE_EXPORT virtual
-  bool evaluate_with_indices( PatchData& pd,
-                 size_t handle,
-                 double& value,
-                 std::vector<size_t>& indices,
-                 MsqError& err );
+    void set_target_calculator( TargetCalculator* tc )
+    {
+        targetCalc = tc;
+    }
+    void set_weight_calculator( WeightCalculator* wc )
+    {
+        weightCalc = wc;
+    }
+    TargetCalculator* get_target_calculator( ) const
+    {
+        return targetCalc;
+    }
+    WeightCalculator* get_weight_calculator( ) const
+    {
+        return weightCalc;
+    }
 
-  void set_target_calculator( TargetCalculator* tc ) { targetCalc = tc; }
-  void set_weight_calculator( WeightCalculator* wc ) { weightCalc = wc; }
-  TargetCalculator* get_target_calculator() const { return targetCalc; }
-  WeightCalculator* get_weight_calculator() const { return weightCalc; }
+    TMetric* get_target_metric( ) const
+    {
+        return targetMetric;
+    }
+    void set_target_metric( TMetric* m )
+    {
+        targetMetric = m;
+    }
 
-  TMetric* get_target_metric() const { return targetMetric; }
-  void set_target_metric( TMetric* m ) { targetMetric = m; }
-
-private:
-  TargetCalculator* targetCalc;
-  WeightCalculator* weightCalc;
-  TMetric* targetMetric;
+  private:
+    TargetCalculator* targetCalc;
+    WeightCalculator* weightCalc;
+    TMetric*          targetMetric;
 };
 
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

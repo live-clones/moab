@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file TMetric.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -36,20 +35,18 @@
 #include "Mesquite.hpp"
 #include <string>
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 class MsqError;
-template <unsigned R, unsigned C> class MsqMatrix;
+template< unsigned R, unsigned C > class MsqMatrix;
 
 class TMetric
 {
-public:
+  public:
+    MESQUITE_EXPORT virtual ~TMetric( );
 
-  MESQUITE_EXPORT virtual
-  ~TMetric();
-
-  MESQUITE_EXPORT virtual
-  std::string get_name() const = 0;
+    MESQUITE_EXPORT virtual std::string get_name( ) const = 0;
 
     /**\brief Evaluate \f$\mu(T)\f$
      *
@@ -58,10 +55,8 @@ public:
      *\return false if function cannot be evaluated for given T
      *          (e.g. division by zero, etc.), true otherwise.
      */
-  MESQUITE_EXPORT virtual
-  bool evaluate( const MsqMatrix<2,2>& T,
-                 double& result,
-                 MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 2, 2 >& T, double& result,
+                                           MsqError& err );
 
     /**\brief Evaluate \f$\mu(T)\f$
      *
@@ -70,10 +65,8 @@ public:
      *\return false if function cannot be evaluated for given T
      *          (e.g. division by zero, etc.), true otherwise.
      */
-  MESQUITE_EXPORT virtual
-  bool evaluate( const MsqMatrix<3,3>& T,
-                 double& result,
-                 MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 3, 3 >& T, double& result,
+                                           MsqError& err );
 
     /**\brief Gradient of \f$\mu(T)\f$ with respect to components of T
      *
@@ -90,11 +83,9 @@ public:
      *\return false if function cannot be evaluated for given T
      *          (e.g. division by zero, etc.), true otherwise.
      */
-  MESQUITE_EXPORT virtual
-  bool evaluate_with_grad( const MsqMatrix<2,2>& T,
-                           double& result,
-                           MsqMatrix<2,2>& deriv_wrt_T,
-                           MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& result,
+                                                     MsqMatrix< 2, 2 >& deriv_wrt_T,
+                                                     MsqError&          err );
 
     /**\brief Gradient of \f$\mu(T)\f$ with respect to components of T
      *
@@ -116,11 +107,9 @@ public:
      *\return false if function cannot be evaluated for given T
      *          (e.g. division by zero, etc.), true otherwise.
      */
-  MESQUITE_EXPORT virtual
-  bool evaluate_with_grad( const MsqMatrix<3,3>& T,
-                           double& result,
-                           MsqMatrix<3,3>& deriv_wrt_T,
-                           MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& result,
+                                                     MsqMatrix< 3, 3 >& deriv_wrt_T,
+                                                     MsqError&          err );
 
     /**\brief Hessian of \f$\mu(T)\f$ with respect to components of T
      *
@@ -152,12 +141,10 @@ public:
      *\return false if function cannot be evaluated for given T
      *          (e.g. division by zero, etc.), true otherwise.
      */
-  MESQUITE_EXPORT virtual
-  bool evaluate_with_hess( const MsqMatrix<2,2>& T,
-                           double& result,
-                           MsqMatrix<2,2>& deriv_wrt_T,
-                           MsqMatrix<2,2> second_wrt_T[3],
-                           MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& result,
+                                                     MsqMatrix< 2, 2 >& deriv_wrt_T,
+                                                     MsqMatrix< 2, 2 >  second_wrt_T[ 3 ],
+                                                     MsqError&          err );
     /**\brief Hessian of \f$\mu(T)\f$ with respect to components of T
      *
      *\param T 3x3 relative measure matrix (typically A W^-1)
@@ -233,52 +220,43 @@ public:
      *\return false if function cannot be evaluated for given T
      *          (e.g. division by zero, etc.), true otherwise.
      */
-  MESQUITE_EXPORT virtual
-  bool evaluate_with_hess( const MsqMatrix<3,3>& T,
-                           double& result,
-                           MsqMatrix<3,3>& deriv_wrt_T,
-                           MsqMatrix<3,3> second_wrt_T[6],
-                           MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result,
+                                                     MsqMatrix< 3, 3 >& deriv_wrt_T,
+                                                     MsqMatrix< 3, 3 >  second_wrt_T[ 6 ],
+                                                     MsqError&          err );
 
-  static inline bool invalid_determinant( double d )
-    { return d < 1e-12; }
+    static inline bool invalid_determinant( double d )
+    {
+        return d < 1e-12;
+    }
 };
 
 class TMetric2D : public TMetric
 {
-public:
-
-  MESQUITE_EXPORT virtual
-  ~TMetric2D();
+  public:
+    MESQUITE_EXPORT virtual ~TMetric2D( );
 
     /**\brief Evaluate \f$\mu(T)\f$
      *
      * This method always returns an error for 2D-only metrics
      */
-  MESQUITE_EXPORT virtual
-  bool evaluate( const MsqMatrix<3,3>& T,
-                 double& result,
-                 MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 3, 3 >& T, double& result,
+                                           MsqError& err );
 };
 
 class TMetric3D : public TMetric
 {
-public:
-
-  MESQUITE_EXPORT virtual
-  ~TMetric3D();
+  public:
+    MESQUITE_EXPORT virtual ~TMetric3D( );
 
     /**\brief Evaluate \f$\mu(T)\f$
      *
      * This method always returns an error for 3D-only metrics
      */
-  MESQUITE_EXPORT virtual
-  bool evaluate( const MsqMatrix<2,2>& T,
-                 double& result,
-                 MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 2, 2 >& T, double& result,
+                                           MsqError& err );
 };
 
-
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

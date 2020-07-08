@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file VertexMaxQM.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -36,47 +35,37 @@
 #include "Mesquite.hpp"
 #include "VertexQM.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 class ElemSampleQM;
 
 class VertexMaxQM : public VertexQM
 {
-public:
+  public:
+    VertexMaxQM( ElemSampleQM* metric );
 
-  VertexMaxQM( ElemSampleQM* metric );
+    virtual ~VertexMaxQM( );
 
-  virtual ~VertexMaxQM();
+    ElemSampleQM* get_quality_metric( ) const
+    {
+        return mMetric;
+    }
 
-  ElemSampleQM* get_quality_metric() const
-    { return mMetric; }
+    virtual std::string get_name( ) const;
 
-  virtual std::string get_name() const;
+    virtual int get_negate_flag( ) const;
 
-  virtual int get_negate_flag() const;
+    virtual bool evaluate( PatchData& pd, size_t handle, double& value, MsqError& err );
 
-   virtual
-   bool evaluate( PatchData& pd,
-                  size_t handle,
-                  double& value,
-                  MsqError& err );
+    virtual bool evaluate_with_indices( PatchData& pd, size_t handle, double& value,
+                                        std::vector< size_t >& indices, MsqError& err );
 
-   virtual
-   bool evaluate_with_indices( PatchData& pd,
-                  size_t handle,
-                  double& value,
-                  std::vector<size_t>& indices,
-                  MsqError& err );
-
-private:
-
-  ElemSampleQM* mMetric;
-  mutable std::vector<size_t> mHandles, mIndices;
+  private:
+    ElemSampleQM*                 mMetric;
+    mutable std::vector< size_t > mHandles, mIndices;
 };
 
-
-
-
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

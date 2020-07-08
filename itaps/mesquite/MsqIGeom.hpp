@@ -1,4 +1,3 @@
-
 /* *****************************************************************
     MESQUITE -- The Mesh Quality Improvement Toolkit
 
@@ -49,61 +48,56 @@ namespace MBMesquite
  */
 class MsqCommonIGeom : public MeshDomain
 {
-public:
-
+  public:
     /**\param geom The ITAPS geometry interface implementation to query */
-  MsqCommonIGeom( iGeom_Instance geom );
+    MsqCommonIGeom( iGeom_Instance geom );
 
-  virtual ~MsqCommonIGeom();
+    virtual ~MsqCommonIGeom( );
 
     /** Evaluate the closest point to the input position on the specified
      *  geometric entity and return the result in the passed position
      *  argument (move the passed position onto the geometry.)
      */
-  int move_to( iBase_EntityHandle geom_handle, Vector3D& coord ) const;
+    int move_to( iBase_EntityHandle geom_handle, Vector3D& coord ) const;
 
     /** Given a geometric entity and a position, evaluate the normal
      *  on the geometric entity at the closest point on that entity
      *  to the input position, and pass back the result in the input
      *  coord vector.
      */
-  int normal ( iBase_EntityHandle geom_handle, Vector3D& coord ) const ;
+    int normal( iBase_EntityHandle geom_handle, Vector3D& coord ) const;
 
     /** Given a geometric entity and a position, evaluate the normal
      *  on the geometric entity at the closest point on that entity
      *  to the input position, and pass back the result in the input
      *  coord vector.
      */
-  int normal ( iBase_EntityHandle geom_handle, Vector3D coords[], unsigned count ) const;
+    int normal( iBase_EntityHandle geom_handle, Vector3D coords[], unsigned count ) const;
 
     /** Given a geometric entity and a position, evaluate the normal
      *  on the geometric entity at the closest point on that entity
      *  to the input position, and pass back the result in the input
      *  coord vector.
      */
-  int normal ( const iBase_EntityHandle geom_handles[], Vector3D coords[], unsigned count ) const;
+    int normal( const iBase_EntityHandle geom_handles[], Vector3D coords[], unsigned count ) const;
 
     /** Given a geometric entity and a position, get point on
      *  the geometric entity closest to the input position, and
      *  the surface normal at that position.
      */
-  int closest_and_normal( iBase_EntityHandle geom_handle,
-                           const Vector3D& position,
-                           Vector3D& closest,
-                           Vector3D& normal ) const;
+    int closest_and_normal( iBase_EntityHandle geom_handle, const Vector3D& position,
+                            Vector3D& closest, Vector3D& normal ) const;
 
-  int get_dimension( iBase_EntityHandle const* geom_handle,
-                      unsigned short* dof_out,
-                      size_t count ) const ;
+    int get_dimension( iBase_EntityHandle const* geom_handle, unsigned short* dof_out,
+                       size_t count ) const;
 
-  iGeom_Instance geomIFace;
+    iGeom_Instance geomIFace;
 
-private:
-  mutable std::vector<iBase_EntityHandle> geomHandles;
-  mutable std::vector<double> coordArray;
-  mutable std::vector<int> typeArray;
+  private:
+    mutable std::vector< iBase_EntityHandle > geomHandles;
+    mutable std::vector< double >             coordArray;
+    mutable std::vector< int >                typeArray;
 };
-
 
 /**\brief A MBMesquite::MeshDomain implemented on top of the ITAPS iGeom API.
  *
@@ -113,43 +107,31 @@ private:
  */
 class MsqIGeom : public MsqCommonIGeom
 {
-public:
+  public:
+    MsqIGeom( iGeom_Instance geom, iBase_EntityHandle geom_ent_handle );
 
-  MsqIGeom( iGeom_Instance geom,
-            iBase_EntityHandle geom_ent_handle );
+    virtual ~MsqIGeom( );
 
-  virtual ~MsqIGeom();
+    void snap_to( Mesh::VertexHandle entity_handle, Vector3D& coordinat ) const;
 
-  void snap_to( Mesh::VertexHandle entity_handle,
-                Vector3D& coordinat ) const;
+    void vertex_normal_at( Mesh::VertexHandle entity_handle, Vector3D& coordinate ) const;
 
-  void vertex_normal_at( Mesh::VertexHandle entity_handle,
-                         Vector3D& coordinate ) const;
+    void element_normal_at( Mesh::ElementHandle entity_handle, Vector3D& coordinate ) const;
 
-  void element_normal_at( Mesh::ElementHandle entity_handle,
-                          Vector3D& coordinate ) const;
+    void vertex_normal_at( const Mesh::VertexHandle* handles, Vector3D coordinates[],
+                           unsigned count, MsqError& err ) const;
 
-  void vertex_normal_at( const Mesh::VertexHandle* handles,
-                         Vector3D coordinates[],
-                         unsigned count,
-                         MsqError& err ) const;
+    void closest_point( Mesh::VertexHandle handle, const Vector3D& position, Vector3D& closest,
+                        Vector3D& normal, MsqError& err ) const;
 
-  void closest_point( Mesh::VertexHandle handle,
-                      const Vector3D& position,
-                      Vector3D& closest,
-                      Vector3D& normal,
-                      MsqError& err ) const;
+    void domain_DoF( const Mesh::VertexHandle* handle_array, unsigned short* dof_array,
+                     size_t num_vertices, MsqError& err ) const;
 
-  void domain_DoF( const Mesh::VertexHandle* handle_array,
-                   unsigned short* dof_array,
-                   size_t num_vertices,
-                   MsqError& err ) const;
-private:
-
+  private:
     /** A handle for the geometry entity to evaluate */
-  iBase_EntityHandle geomEntHandle;
+    iBase_EntityHandle geomEntHandle;
 };
 
-}
+}  // namespace MBMesquite
 
 #endif

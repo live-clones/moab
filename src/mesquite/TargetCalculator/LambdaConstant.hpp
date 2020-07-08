@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file LambdaConstant.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -36,7 +35,8 @@
 #include "Mesquite.hpp"
 #include "TargetCalculator.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 /**\brief Scale a target matrix
  *
@@ -46,43 +46,35 @@ namespace MBMesquite {
  */
 class LambdaConstant : public TargetCalculator
 {
-public:
-  /**
-   *\param lambda Target size.
-   *\param target Target calcualtor from which to obtain
-   *               a target that will be scaled by lambda.
-   */
-  LambdaConstant( double lambda, TargetCalculator* target );
+  public:
+    /**
+     *\param lambda Target size.
+     *\param target Target calcualtor from which to obtain
+     *               a target that will be scaled by lambda.
+     */
+    LambdaConstant( double lambda, TargetCalculator* target );
 
-  ~LambdaConstant();
+    ~LambdaConstant( );
 
-  bool get_3D_target( PatchData& pd,
-                      size_t element,
-                      Sample sample,
-                      MsqMatrix<3,3>& W_out,
-                      MsqError& err );
+    bool get_3D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 3, 3 >& W_out,
+                        MsqError& err );
 
-  bool get_2D_target( PatchData& pd,
-                      size_t element,
-                      Sample sample,
-                      MsqMatrix<2,2>& W_out,
-                      MsqError& err );
+    bool get_2D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 2, 2 >& W_out,
+                        MsqError& err );
 
-  bool get_surface_target( PatchData& pd,
-                      size_t element,
-                      Sample sample,
-                      MsqMatrix<3,2>& W_out,
-                      MsqError& err );
+    bool get_surface_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 3, 2 >& W_out,
+                             MsqError& err );
 
-  bool have_surface_orient() const
-    { return mTarget->have_surface_orient(); }
+    bool have_surface_orient( ) const
+    {
+        return mTarget->have_surface_orient( );
+    }
 
-private:
-  double mLambda;
-  TargetCalculator* mTarget;
+  private:
+    double            mLambda;
+    TargetCalculator* mTarget;
 };
 
-
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

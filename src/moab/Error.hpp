@@ -13,7 +13,6 @@
  *
  */
 
-
 /*
  *
  *  File:      Error.hpp
@@ -26,8 +25,6 @@
  *  Author:    Clinton Stimpson
  *
  */
-
-
 
 #ifndef MOAB_ERROR_HPP
 #define MOAB_ERROR_HPP
@@ -49,57 +46,54 @@
 #define VSNPRINTF vsnprintf
 #endif
 
-namespace moab {
+namespace moab
+{
 
 class Error
 {
-  //! string to hold the last error that occurred in MB
-  std::string mLastError;
+    //! string to hold the last error that occurred in MB
+    std::string mLastError;
 
-public:
+  public:
+    Error( ) {}
+    ~Error( ) {}
 
-  Error() {}
-  ~Error(){}
+    ErrorCode set_last_error( const std::string& error )
+    {
+        mLastError = error;
+        return MB_SUCCESS;
+    }
 
-  ErrorCode set_last_error(const std::string& error)
-  {
-    mLastError = error;
-    return MB_SUCCESS;
-  }
+    inline ErrorCode set_last_error( const char* fmt, ... ) MB_PRINTF( 1 );
 
-  inline ErrorCode set_last_error(const char* fmt, ...) MB_PRINTF(1);
+    ErrorCode set_last_error( const char* fmt, va_list args )
+    {
+        char text[ 1024 ];
+        VSNPRINTF( text, sizeof( text ), fmt, args );
+        mLastError = text;
+        return MB_SUCCESS;
+    }
 
-  ErrorCode set_last_error( const char* fmt, va_list args )
-  {
-    char text[1024];
-    VSNPRINTF( text, sizeof(text), fmt, args );
-    mLastError = text;
-    return MB_SUCCESS;
-  }
-
-  ErrorCode get_last_error(std::string& error) const
-  {
-    error = mLastError;
-    return MB_SUCCESS;
-  }
-
+    ErrorCode get_last_error( std::string& error ) const
+    {
+        error = mLastError;
+        return MB_SUCCESS;
+    }
 };
 
-inline ErrorCode Error::set_last_error(const char* fmt, ...)
+inline ErrorCode Error::set_last_error( const char* fmt, ... )
 {
-  ErrorCode result = MB_FAILURE;
-  if (fmt)
-  {
-    va_list args;
-    va_start( args, fmt );
-    result = set_last_error( fmt, args );
-    va_end( args );
-  }
-  return result;
+    ErrorCode result = MB_FAILURE;
+    if( fmt )
+    {
+        va_list args;
+        va_start( args, fmt );
+        result = set_last_error( fmt, args );
+        va_end( args );
+    }
+    return result;
 }
 
-} // namespace moab
+}  // namespace moab
 
 #endif
-
-

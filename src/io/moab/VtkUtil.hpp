@@ -18,7 +18,8 @@
 
 #include "moab/EntityType.hpp"
 
-namespace moab {
+namespace moab
+{
 
 //! Structure defining relation between MOAB and VTK element
 //! types.  VTK had different types for quadratic than linear
@@ -26,15 +27,15 @@ namespace moab {
 //! elements maps to a VTK type.
 struct VtkElemType
 {
-  const char* name;            //!< String name for use in error messages
-  unsigned vtk_type;           //!< VTK integer type
-  EntityType mb_type;        //!< MOAB type
-  unsigned num_nodes;          //!< Number of nodes (0 for polygon)
-  const unsigned* node_order;  //!< VTK element node ordering, indexed by
-                               //!< the VTK node position and containing
-                               //!< the corresponding MOAB node position.
-                               //!< NOTE: This field is NULL if MOAB and VTK
-                               //!< ordering is the same!
+    const char*     name;  //!< String name for use in error messages
+    unsigned        vtk_type;  //!< VTK integer type
+    EntityType      mb_type;  //!< MOAB type
+    unsigned        num_nodes;  //!< Number of nodes (0 for polygon)
+    const unsigned* node_order;  //!< VTK element node ordering, indexed by
+                                 //!< the VTK node position and containing
+                                 //!< the corresponding MOAB node position.
+                                 //!< NOTE: This field is NULL if MOAB and VTK
+                                 //!< ordering is the same!
 };
 
 //! General data about VTK files for use by read and write code.
@@ -42,22 +43,22 @@ struct VtkElemType
 class VtkUtil
 {
 
-public:
+  public:
     //! vtk data type names, indexed by DataType
-  static const char *vtkTypeNames[];
+    static const char* vtkTypeNames[];
 
     //! Vtk types, indexed by VTK type number.
     //! For unused VTK type numbers, mb_type will be MBMAXTYPE.
-  static const VtkElemType vtkElemTypes[];
+    static const VtkElemType vtkElemTypes[];
 
     //! Lenght of \ref vtkElemTypes
-  static const unsigned numVtkElemType;
+    static const unsigned numVtkElemType;
 
     //! Get the VTK type corresponding to a tuple of the MOAB type and number of nodes.
     //! num_nodes is ignored for MBPOLYGON type.
-  static const VtkElemType* get_vtk_type( EntityType type, unsigned num_nodes );
+    static const VtkElemType* get_vtk_type( EntityType type, unsigned num_nodes );
 };
 
-} // namespace moab
+}  // namespace moab
 
 #endif

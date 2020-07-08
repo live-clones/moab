@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file TShapeOrientNB1.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -36,65 +35,65 @@
 #include "TMPDerivs.hpp"
 #include "TMPCommon.hpp"
 
-namespace MBMesquite {
-
-std::string TShapeOrientNB1::get_name() const
-  { return "TShapeOrientNB1"; }
-
-TShapeOrientNB1::~TShapeOrientNB1() {}
-
-template <unsigned DIM> static inline
-bool eval( const MsqMatrix<DIM,DIM>& T, double& result )
+namespace MBMesquite
 {
-  result = Frobenius( T ) - trace(T)/DimConst<DIM>::sqrt();
-  return true;
+
+std::string TShapeOrientNB1::get_name( ) const
+{
+    return "TShapeOrientNB1";
 }
 
+TShapeOrientNB1::~TShapeOrientNB1( ) {}
 
-template <unsigned DIM> static inline
-bool grad( const MsqMatrix<DIM,DIM>& T,
-           double& result,
-           MsqMatrix<DIM,DIM>& deriv )
+template< unsigned DIM > static inline bool eval( const MsqMatrix< DIM, DIM >& T, double& result )
 {
-  const double norm = Frobenius(T);
-  const double invroot = 1.0/DimConst<DIM>::sqrt();
-  result = norm - invroot * trace(T);
-
-  if (norm < 1e-50) {
-    deriv = MsqMatrix<DIM,DIM>(0.0);
+    result = Frobenius( T ) - trace( T ) / DimConst< DIM >::sqrt( );
     return true;
-  }
-
-  deriv = 1.0/norm * T;
-  pluseq_scaled_I( deriv, -invroot );
-  return true;
 }
 
-template <unsigned DIM> static inline
-bool hess( const MsqMatrix<DIM,DIM>& T,
-           double& result,
-           MsqMatrix<DIM,DIM>& deriv,
-           MsqMatrix<DIM,DIM>* second )
+template< unsigned DIM >
+static inline bool grad( const MsqMatrix< DIM, DIM >& T, double& result,
+                         MsqMatrix< DIM, DIM >& deriv )
 {
-  const double norm = Frobenius(T);
-  const double invroot = 1.0/DimConst<DIM>::sqrt();
-  result = norm - invroot * trace(T);
+    const double norm = Frobenius( T );
+    const double invroot = 1.0 / DimConst< DIM >::sqrt( );
+    result = norm - invroot * trace( T );
 
-  if (norm < 1e-50) {
-    deriv = MsqMatrix<DIM,DIM>(0.0);
-    set_scaled_I( second, 1.0 );
+    if( norm < 1e-50 )
+    {
+        deriv = MsqMatrix< DIM, DIM >( 0.0 );
+        return true;
+    }
+
+    deriv = 1.0 / norm * T;
+    pluseq_scaled_I( deriv, -invroot );
     return true;
-  }
-
-  const double invnorm = 1.0/norm;
-  deriv = invnorm * T;
-  pluseq_scaled_I( deriv, -invroot );
-
-  set_scaled_outer_product( second, -invnorm*invnorm*invnorm, T );
-  pluseq_scaled_I( second, invnorm );
-  return true;
 }
 
-TMP_T_TEMPL_IMPL_COMMON(TShapeOrientNB1)
+template< unsigned DIM >
+static inline bool hess( const MsqMatrix< DIM, DIM >& T, double& result,
+                         MsqMatrix< DIM, DIM >& deriv, MsqMatrix< DIM, DIM >* second )
+{
+    const double norm = Frobenius( T );
+    const double invroot = 1.0 / DimConst< DIM >::sqrt( );
+    result = norm - invroot * trace( T );
 
-} // namespace MBMesquite
+    if( norm < 1e-50 )
+    {
+        deriv = MsqMatrix< DIM, DIM >( 0.0 );
+        set_scaled_I( second, 1.0 );
+        return true;
+    }
+
+    const double invnorm = 1.0 / norm;
+    deriv = invnorm * T;
+    pluseq_scaled_I( deriv, -invroot );
+
+    set_scaled_outer_product( second, -invnorm * invnorm * invnorm, T );
+    pluseq_scaled_I( second, invnorm );
+    return true;
+}
+
+TMP_T_TEMPL_IMPL_COMMON( TShapeOrientNB1 )
+
+}  // namespace MBMesquite

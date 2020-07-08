@@ -24,7 +24,8 @@
     pknupp@sandia.gov, tleurent@mcs.anl.gov, tmunson@mcs.anl.gov
 
   ***************************************************************** */
-// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3 -*-
+// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3
+// -*-
 
 /*! \file LocalSizeQualityMetric.hpp
 
@@ -34,10 +35,8 @@ Header file for the MBMesquite::LocalSizeQualityMetric class
   \date   April 9, 2003
  */
 
-
 #ifndef LocalSizeQualityMetric_hpp
 #define LocalSizeQualityMetric_hpp
-
 
 #include "Mesquite.hpp"
 #include "VertexQM.hpp"
@@ -45,44 +44,33 @@ Header file for the MBMesquite::LocalSizeQualityMetric class
 
 namespace MBMesquite
 {
-     /*! \class LocalSizeQualityMetric
-       \brief Computes the local size metric for a given vertex.
+/*! \class LocalSizeQualityMetric
+  \brief Computes the local size metric for a given vertex.
 
-        LocalSizeQualityMetric is a vertex based metric which computes
-        the corner volume (or area) for the element corners attached
-        to a given element.  Then these volumes (or areas) are averaged
-        together.  The default averaging method is QualityMetric::RMS.
-     */
-   class LocalSizeQualityMetric : public VertexQM, public AveragingQM
-   {
+   LocalSizeQualityMetric is a vertex based metric which computes
+   the corner volume (or area) for the element corners attached
+   to a given element.  Then these volumes (or areas) are averaged
+   together.  The default averaging method is QualityMetric::RMS.
+*/
+class LocalSizeQualityMetric : public VertexQM, public AveragingQM
+{
   public:
-        //Default constructor.
-      LocalSizeQualityMetric() : AveragingQM(RMS) {}
+    // Default constructor.
+    LocalSizeQualityMetric( ) : AveragingQM( RMS ) {}
 
-       // virtual destructor ensures use of polymorphism during destruction
-     virtual ~LocalSizeQualityMetric();
+    // virtual destructor ensures use of polymorphism during destruction
+    virtual ~LocalSizeQualityMetric( );
 
-     virtual std::string get_name() const;
+    virtual std::string get_name( ) const;
 
-     virtual int get_negate_flag() const;
+    virtual int get_negate_flag( ) const;
 
-     virtual
-     bool evaluate( PatchData& pd,
-                    size_t handle,
-                    double& value,
-                    MsqError& err );
+    virtual bool evaluate( PatchData& pd, size_t handle, double& value, MsqError& err );
 
-     virtual
-     bool evaluate_with_indices( PatchData& pd,
-                                 size_t handle,
-                                 double& value,
-                                 std::vector<size_t>& indices,
-                                 MsqError& err );
-  };
+    virtual bool evaluate_with_indices( PatchData& pd, size_t handle, double& value,
+                                        std::vector< size_t >& indices, MsqError& err );
+};
 
-} //namespace
+}  // namespace MBMesquite
 
-
-#endif // LocalSizeQualityMetric_hpp
-
-
+#endif  // LocalSizeQualityMetric_hpp

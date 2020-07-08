@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file JacobianCalculator.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -36,53 +35,52 @@
 #include "MsqError.hpp"
 #include "TopologyInfo.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
-void JacobianCalculator::get_Jacobian_2D( const MappingFunction2D* mf,
-                                          NodeSet ho_bits,
-                                          Sample location,
-                                          const Vector3D* verts,
-                                          size_t num_type_vert,
-                                          MsqMatrix<3,2>& J_out,
+void JacobianCalculator::get_Jacobian_2D( const MappingFunction2D* mf, NodeSet ho_bits,
+                                          Sample location, const Vector3D* verts,
+                                          size_t num_type_vert, MsqMatrix< 3, 2 >& J_out,
                                           MsqError& err )
 {
-  size_t num_vtx = 0;
-  mf->derivatives( location, ho_bits, mIndices, mDerivs2D, num_vtx, err ); MSQ_ERRRTN(err);
-  mf->convert_connectivity_indices( num_type_vert, mIndices, num_vtx, err ); MSQ_ERRRTN(err);
-  const MsqVector<2>* d = mDerivs2D;
-  const size_t* const e = mIndices + num_vtx;
-  Vector3D c[2] = {Vector3D(0,0,0), Vector3D(0,0,0)};
-  for (const size_t* i = mIndices; i != e; ++i, ++d) {
-    c[0] += (*d)[0] * verts[*i];
-    c[1] += (*d)[1] * verts[*i];
-  }
-  J_out.set_column( 0, MsqMatrix<3,1>(c[0].to_array()) );
-  J_out.set_column( 1, MsqMatrix<3,1>(c[1].to_array()) );
+    size_t num_vtx = 0;
+    mf->derivatives( location, ho_bits, mIndices, mDerivs2D, num_vtx, err );MSQ_ERRRTN( err );
+    mf->convert_connectivity_indices( num_type_vert, mIndices, num_vtx, err );MSQ_ERRRTN( err );
+    const MsqVector< 2 >* d = mDerivs2D;
+    const size_t* const   e = mIndices + num_vtx;
+    Vector3D              c[ 2 ] = { Vector3D( 0, 0, 0 ), Vector3D( 0, 0, 0 ) };
+    for( const size_t* i = mIndices; i != e; ++i, ++d )
+    {
+        c[ 0 ] += ( *d )[ 0 ] * verts[ *i ];
+        c[ 1 ] += ( *d )[ 1 ] * verts[ *i ];
+    }
+    J_out.set_column( 0, MsqMatrix< 3, 1 >( c[ 0 ].to_array( ) ) );
+    J_out.set_column( 1, MsqMatrix< 3, 1 >( c[ 1 ].to_array( ) ) );
 }
 
-void JacobianCalculator::get_Jacobian_3D( const MappingFunction3D* mf,
-                                          NodeSet ho_bits,
-                                          Sample location,
-                                          const Vector3D* verts,
-                                          size_t num_type_vert,
-                                          MsqMatrix<3,3>& J_out,
+void JacobianCalculator::get_Jacobian_3D( const MappingFunction3D* mf, NodeSet ho_bits,
+                                          Sample location, const Vector3D* verts,
+                                          size_t num_type_vert, MsqMatrix< 3, 3 >& J_out,
                                           MsqError& err )
 {
-  size_t num_vtx = 0;
-  mf->derivatives( location, ho_bits, mIndices, mDerivs3D, num_vtx, err ); MSQ_ERRRTN(err);
-  mf->convert_connectivity_indices( num_type_vert, mIndices, num_vtx, err ); MSQ_ERRRTN(err);
-  const MsqVector<3>* d = mDerivs3D;
-  const size_t* const e = mIndices + num_vtx;
-  Vector3D c[3] = {Vector3D(0,0,0), Vector3D(0,0,0), Vector3D(0,0,0)};
-  for (const size_t* i = mIndices; i != e; ++i, ++d) {
-    c[0] += (*d)[0] * verts[*i];;
-    c[1] += (*d)[1] * verts[*i];;
-    c[2] += (*d)[2] * verts[*i];;
-  }
-  J_out.set_column( 0, MsqMatrix<3,1>(c[0].to_array()) );
-  J_out.set_column( 1, MsqMatrix<3,1>(c[1].to_array()) );
-  J_out.set_column( 2, MsqMatrix<3,1>(c[2].to_array()) );
+    size_t num_vtx = 0;
+    mf->derivatives( location, ho_bits, mIndices, mDerivs3D, num_vtx, err );MSQ_ERRRTN( err );
+    mf->convert_connectivity_indices( num_type_vert, mIndices, num_vtx, err );MSQ_ERRRTN( err );
+    const MsqVector< 3 >* d = mDerivs3D;
+    const size_t* const   e = mIndices + num_vtx;
+    Vector3D c[ 3 ] = { Vector3D( 0, 0, 0 ), Vector3D( 0, 0, 0 ), Vector3D( 0, 0, 0 ) };
+    for( const size_t* i = mIndices; i != e; ++i, ++d )
+    {
+        c[ 0 ] += ( *d )[ 0 ] * verts[ *i ];
+        ;
+        c[ 1 ] += ( *d )[ 1 ] * verts[ *i ];
+        ;
+        c[ 2 ] += ( *d )[ 2 ] * verts[ *i ];
+        ;
+    }
+    J_out.set_column( 0, MsqMatrix< 3, 1 >( c[ 0 ].to_array( ) ) );
+    J_out.set_column( 1, MsqMatrix< 3, 1 >( c[ 1 ].to_array( ) ) );
+    J_out.set_column( 2, MsqMatrix< 3, 1 >( c[ 2 ].to_array( ) ) );
 }
 
-
-} // namespace MBMesquite
+}  // namespace MBMesquite

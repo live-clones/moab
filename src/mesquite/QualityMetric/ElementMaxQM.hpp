@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file ElementMaxQM.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -36,38 +35,35 @@
 #include "Mesquite.hpp"
 #include "ElementQM.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 class ElemSampleQM;
 
 class ElementMaxQM : public ElementQM
 {
-public:
+  public:
+    MESQUITE_EXPORT ElementMaxQM( ElemSampleQM* metric );
 
-  MESQUITE_EXPORT ElementMaxQM( ElemSampleQM* metric );
+    MESQUITE_EXPORT virtual ~ElementMaxQM( );
 
-  MESQUITE_EXPORT virtual ~ElementMaxQM();
+    MESQUITE_EXPORT ElemSampleQM* get_quality_metric( ) const
+    {
+        return mMetric;
+    }
 
-  MESQUITE_EXPORT ElemSampleQM* get_quality_metric() const
-    { return mMetric; }
+    MESQUITE_EXPORT virtual std::string get_name( ) const;
 
-  MESQUITE_EXPORT virtual std::string get_name() const;
+    MESQUITE_EXPORT virtual int get_negate_flag( ) const;
 
-  MESQUITE_EXPORT virtual int get_negate_flag() const;
+    MESQUITE_EXPORT virtual bool evaluate( PatchData& pd, size_t handle, double& value,
+                                           MsqError& err );
 
-  MESQUITE_EXPORT virtual
-  bool evaluate( PatchData& pd,
-                 size_t handle,
-                 double& value,
-                 MsqError& err );
-
-private:
-
-  ElemSampleQM* mMetric;
-  mutable std::vector<size_t> mHandles;
+  private:
+    ElemSampleQM*                 mMetric;
+    mutable std::vector< size_t > mHandles;
 };
 
-
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file PatchPowerMeanP.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -38,68 +37,55 @@
 #include "Exponent.hpp"
 #include "Matrix3D.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 /**\brief Objective function: p-mean^p of p-mean^p of patch metric values
  */
 class PatchPowerMeanP : public PMeanPTemplate
 {
   public:
-
-      /**
-       *\param power   The exponent to use for the power-mean
-       *\param qm      The quality metric.
-       */
+    /**
+     *\param power   The exponent to use for the power-mean
+     *\param qm      The quality metric.
+     */
     MESQUITE_EXPORT
-    PatchPowerMeanP( double power, QualityMetric* qm = 0 )
-      : PMeanPTemplate(power, qm) {}
+    PatchPowerMeanP( double power, QualityMetric* qm = 0 ) : PMeanPTemplate( power, qm ) {}
 
-      /**\brief copy constructor
-       *
-       * Define a copy constructor because the compiler-provided
-       * default one would also copy the temporary arrays, which
-       * would be a waste of time.
-       */
+    /**\brief copy constructor
+     *
+     * Define a copy constructor because the compiler-provided
+     * default one would also copy the temporary arrays, which
+     * would be a waste of time.
+     */
     MESQUITE_EXPORT
-    PatchPowerMeanP( const PatchPowerMeanP& copy )
-      : PMeanPTemplate( copy ) {}
+    PatchPowerMeanP( const PatchPowerMeanP& copy ) : PMeanPTemplate( copy ) {}
 
     MESQUITE_EXPORT
-    virtual ~PatchPowerMeanP()
-      {}
+    virtual ~PatchPowerMeanP( ) {}
 
-    MESQUITE_EXPORT virtual
-    bool initialize_block_coordinate_descent( Mesh* mesh,
-                                              MeshDomain* domain,
-                                              const Settings* settings,
-                                              PatchSet* user_set,
-                                              MsqError& err );
+    MESQUITE_EXPORT virtual bool initialize_block_coordinate_descent( Mesh*           mesh,
+                                                                      MeshDomain*     domain,
+                                                                      const Settings* settings,
+                                                                      PatchSet*       user_set,
+                                                                      MsqError&       err );
 
-    MESQUITE_EXPORT virtual
-    bool evaluate( EvalType type,
-                   PatchData& pd,
-                   double& value_out,
-                   bool free,
-                   MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate( EvalType type, PatchData& pd, double& value_out,
+                                           bool free, MsqError& err );
 
-    MESQUITE_EXPORT virtual
-    bool evaluate_with_gradient( EvalType type,
-                                 PatchData& pd,
-                                 double& value_out,
-                                 std::vector<Vector3D>& grad_out,
-                                 MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate_with_gradient( EvalType type, PatchData& pd,
+                                                         double&                  value_out,
+                                                         std::vector< Vector3D >& grad_out,
+                                                         MsqError&                err );
 
-    MESQUITE_EXPORT virtual
-    bool evaluate_with_Hessian( EvalType type,
-                                PatchData& pd,
-                                double& value_out,
-                                std::vector<Vector3D>& grad_out,
-                                MsqHessian& Hessian_out,
-                                MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate_with_Hessian( EvalType type, PatchData& pd,
+                                                        double&                  value_out,
+                                                        std::vector< Vector3D >& grad_out,
+                                                        MsqHessian& Hessian_out, MsqError& err );
 
-    MESQUITE_EXPORT virtual ObjectiveFunction* clone() const;
+    MESQUITE_EXPORT virtual ObjectiveFunction* clone( ) const;
 };
 
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

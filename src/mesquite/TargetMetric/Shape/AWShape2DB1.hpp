@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file AWShape2DB1.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -36,45 +35,37 @@
 #include "Mesquite.hpp"
 #include "AWMetricBarrier.hpp"
 
-namespace MBMesquite {
-
+namespace MBMesquite
+{
 
 /** \f$ \frac{1}{4 \alpha \omega}|A(adj\,W)-[W(adj\,A)]^t|^2 \f$ */
 class AWShape2DB1 : public AWMetricBarrier2D
 {
   public:
+    MESQUITE_EXPORT virtual ~AWShape2DB1( );
 
-  MESQUITE_EXPORT virtual
-  ~AWShape2DB1();
+    MESQUITE_EXPORT virtual std::string get_name( ) const;
 
-  MESQUITE_EXPORT virtual
-  std::string get_name() const;
+    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W,
+                                           double& result, MsqError& err );
+    /*
+      MESQUITE_EXPORT virtual
+      bool evaluate_with_grad( const MsqMatrix<2,2>& A,
+                               const MsqMatrix<2,2>& W,
+                               double& result,
+                               MsqMatrix<2,2>& deriv_wrt_A,
+                               MsqError& err );
 
-  MESQUITE_EXPORT virtual
-  bool evaluate( const MsqMatrix<2,2>& A,
-                 const MsqMatrix<2,2>& W,
-                 double& result,
-                 MsqError& err );
-/*
-  MESQUITE_EXPORT virtual
-  bool evaluate_with_grad( const MsqMatrix<2,2>& A,
-                           const MsqMatrix<2,2>& W,
-                           double& result,
-                           MsqMatrix<2,2>& deriv_wrt_A,
-                           MsqError& err );
-
-  MESQUITE_EXPORT virtual
-  bool evaluate_with_hess( const MsqMatrix<2,2>& A,
-                           const MsqMatrix<2,2>& W,
-                           double& result,
-                           MsqMatrix<2,2>& deriv_wrt_A,
-                           MsqMatrix<2,2> second_wrt_A[3],
-                           MsqError& err );
-*/
+      MESQUITE_EXPORT virtual
+      bool evaluate_with_hess( const MsqMatrix<2,2>& A,
+                               const MsqMatrix<2,2>& W,
+                               double& result,
+                               MsqMatrix<2,2>& deriv_wrt_A,
+                               MsqMatrix<2,2> second_wrt_A[3],
+                               MsqError& err );
+    */
 };
 
-
-
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

@@ -25,84 +25,79 @@
 #include "MsqInterrupt.hpp"
 #include <signal.h>
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
-unsigned MsqInterrupt::instanceCount = 0;
-bool MsqInterrupt::sawInterrupt = false;
+unsigned                    MsqInterrupt::instanceCount = 0;
+bool                        MsqInterrupt::sawInterrupt = false;
 MsqInterrupt::InterruptMode MsqInterrupt::interruptMode = MsqInterrupt::AUTO;
 
-extern "C" { typedef void (*msq_sig_handler_t)(int); }
+extern "C" {
+typedef void ( *msq_sig_handler_t )( int );
+}
 msq_sig_handler_t oldHandler = SIG_ERR;
-
 
 extern "C" void msq_sigint_handler( int )
 {
-  MsqInterrupt::set_interrupt();
-  if (oldHandler != SIG_DFL && oldHandler != SIG_IGN)
-    oldHandler( SIGINT );
-  MsqInterrupt::set_handler();
+    MsqInterrupt::set_interrupt( );
+    if( oldHandler != SIG_DFL && oldHandler != SIG_IGN ) oldHandler( SIGINT );
+    MsqInterrupt::set_handler( );
 }
 
-
-void MsqInterrupt::set_handler()
+void MsqInterrupt::set_handler( )
 {
-  oldHandler = signal( SIGINT, &msq_sigint_handler );
-  if (MsqInterrupt::interruptMode == MsqInterrupt::AUTO &&
-      (oldHandler == SIG_DFL || oldHandler == SIG_IGN))
-  {
-    signal( SIGINT, oldHandler );
-    oldHandler = SIG_ERR;
-  }
+    oldHandler = signal( SIGINT, &msq_sigint_handler );
+    if( MsqInterrupt::interruptMode == MsqInterrupt::AUTO &&
+        ( oldHandler == SIG_DFL || oldHandler == SIG_IGN ) )
+    {
+        signal( SIGINT, oldHandler );
+        oldHandler = SIG_ERR;
+    }
 }
 
 void MsqInterrupt::disable( MsqError& /*err*/ )
 {
-  interruptMode = IGNORE;
-  if (instanceCount && SIG_ERR != oldHandler)
-  {
-    signal( SIGINT, oldHandler );
-    oldHandler = SIG_ERR;
-  }
-  sawInterrupt = false;
+    interruptMode = IGNORE;
+    if( instanceCount && SIG_ERR != oldHandler )
+    {
+        signal( SIGINT, oldHandler );
+        oldHandler = SIG_ERR;
+    }
+    sawInterrupt = false;
 }
 
 void MsqInterrupt::enable( MsqError& /*err*/ )
 {
-  sawInterrupt = false;
-  interruptMode = CATCH;
-  if (instanceCount && SIG_ERR == oldHandler)
-    set_handler();
+    sawInterrupt = false;
+    interruptMode = CATCH;
+    if( instanceCount && SIG_ERR == oldHandler ) set_handler( );
 }
 
 void MsqInterrupt::allow( MsqError& /*err*/ )
 {
-  sawInterrupt = false;
-  interruptMode = AUTO;
-  if (instanceCount && SIG_ERR == oldHandler)
-    set_handler();
-}
-
-MsqInterrupt::MsqInterrupt()
-{
-  if (!instanceCount)
-  {
-    if (IGNORE != interruptMode)
-      set_handler();
     sawInterrupt = false;
-  }
-  ++instanceCount;
+    interruptMode = AUTO;
+    if( instanceCount && SIG_ERR == oldHandler ) set_handler( );
 }
 
-MsqInterrupt::~MsqInterrupt()
+MsqInterrupt::MsqInterrupt( )
 {
-  if (!--instanceCount && SIG_ERR != oldHandler)
-  {
-    signal( SIGINT, oldHandler );
-    oldHandler = SIG_ERR;
-  }
-  sawInterrupt = false;
+    if( !instanceCount )
+    {
+        if( IGNORE != interruptMode ) set_handler( );
+        sawInterrupt = false;
+    }
+    ++instanceCount;
 }
 
-} // namespace MBMesquite
+MsqInterrupt::~MsqInterrupt( )
+{
+    if( !--instanceCount && SIG_ERR != oldHandler )
+    {
+        signal( SIGINT, oldHandler );
+        oldHandler = SIG_ERR;
+    }
+    sawInterrupt = false;
+}
 
-
+}  // namespace MBMesquite

@@ -44,87 +44,89 @@ using std::vector;
 
 using namespace MBMesquite;
 
-const double fourDivRootThree = 4.0/sqrt(3.0);
-const double twelveDivRootTwo = 12.0/sqrt(2.0);
+const double fourDivRootThree = 4.0 / sqrt( 3.0 );
+const double twelveDivRootTwo = 12.0 / sqrt( 2.0 );
 
-
-std::string AspectRatioGammaQualityMetric::get_name() const
-  { return "AspectRatioGamma"; }
-
-int AspectRatioGammaQualityMetric::get_negate_flag() const
-  { return 1; }
-
-//note that we can define this metric for other element types?
-//!Evaluate aspect ratio gamma on ``element''
-bool AspectRatioGammaQualityMetric::evaluate(PatchData &pd,
-                                             size_t elem_index,
-                                             double &fval,
-                                             MsqError &err)
+std::string AspectRatioGammaQualityMetric::get_name( ) const
 {
-  MsqMeshEntity& element = pd.element_by_index( elem_index );
-  EntityTopology entity = element.get_element_type();
-  double vol;
-  Vector3D cross, normal(0,0,0);
-  fval = MSQ_MAX_CAP;
+    return "AspectRatioGamma";
+}
 
-    //get element's nodes
-  vert.clear();
-  pd.get_element_vertex_coordinates(elem_index, vert, err);  MSQ_ERRZERO(err);
+int AspectRatioGammaQualityMetric::get_negate_flag( ) const
+{
+    return 1;
+}
 
-  switch(entity)
-  {
-    case TRIANGLE:
-        //area
-      cross = (vert[1] - vert[0]) * (vert[2] - vert[0]);
-      vol= cross.length() / 2.0;
-      if (vol < MSQ_MIN)
-        return false;
+// note that we can define this metric for other element types?
+//! Evaluate aspect ratio gamma on ``element''
+bool AspectRatioGammaQualityMetric::evaluate( PatchData& pd, size_t elem_index, double& fval,
+                                              MsqError& err )
+{
+    MsqMeshEntity& element = pd.element_by_index( elem_index );
+    EntityTopology entity = element.get_element_type( );
+    double         vol;
+    Vector3D       cross, normal( 0, 0, 0 );
+    fval = MSQ_MAX_CAP;
 
-      if (pd.domain_set()) { // need domain to check for inverted elements
-        pd.get_domain_normal_at_corner( elem_index, 0, normal, err ); MSQ_ERRZERO(err);
-        if ((cross % normal) < -MSQ_MIN)
-          return false;
-      }
+    // get element's nodes
+    vert.clear( );
+    pd.get_element_vertex_coordinates( elem_index, vert, err );
+    MSQ_ERRZERO( err );
 
-        // sum squares of edge lengths
-      fval = ((vert[1] - vert[0]).length_squared()
-            + (vert[2] - vert[0]).length_squared()
-            + (vert[1] - vert[2]).length_squared());
-        // average
-      fval /= 3.0;
+    switch( entity )
+    {
+        case TRIANGLE:
+            // area
+            cross = ( vert[ 1 ] - vert[ 0 ] ) * ( vert[ 2 ] - vert[ 0 ] );
+            vol = cross.length( ) / 2.0;
+            if( vol < MSQ_MIN ) return false;
 
-         //normalize to equil. and div by area
-      fval /= vol * fourDivRootThree;
+            if( pd.domain_set( ) )
+            {  // need domain to check for inverted elements
+                pd.get_domain_normal_at_corner( elem_index, 0, normal, err );
+                MSQ_ERRZERO( err );
+                if( ( cross % normal ) < -MSQ_MIN ) return false;
+            }
 
-      break;
+            // sum squares of edge lengths
+            fval = ( ( vert[ 1 ] - vert[ 0 ] ).length_squared( ) +
+                     ( vert[ 2 ] - vert[ 0 ] ).length_squared( ) +
+                     ( vert[ 1 ] - vert[ 2 ] ).length_squared( ) );
+            // average
+            fval /= 3.0;
 
-    case TETRAHEDRON:
-      vol = (vert[1] - vert[0]) % ((vert[2] - vert[0]) * (vert[3] - vert[0])) / 6.0;
-      if (vol < MSQ_MIN)  // zero for degenerate and negative for inverted
-        return false;
+            // normalize to equil. and div by area
+            fval /= vol * fourDivRootThree;
 
+            break;
 
-        // sum squares of edge lengths
-      fval = (vert[1] - vert[0]).length_squared()
-           + (vert[2] - vert[0]).length_squared()
-           + (vert[3] - vert[0]).length_squared()
-           + (vert[2] - vert[1]).length_squared()
-           + (vert[3] - vert[1]).length_squared()
-           + (vert[3] - vert[2]).length_squared();
-        // average
-      fval /= 6.0;
+        case TETRAHEDRON:
+            vol = ( vert[ 1 ] - vert[ 0 ] ) %
+                  ( ( vert[ 2 ] - vert[ 0 ] ) * ( vert[ 3 ] - vert[ 0 ] ) ) / 6.0;
+            if( vol < MSQ_MIN )  // zero for degenerate and negative for inverted
+                return false;
 
-      fval *= sqrt(fval);
-        //normalize to equil. and div by volume
-      fval /= vol * twelveDivRootTwo;
+            // sum squares of edge lengths
+            fval = ( vert[ 1 ] - vert[ 0 ] ).length_squared( ) +
+                   ( vert[ 2 ] - vert[ 0 ] ).length_squared( ) +
+                   ( vert[ 3 ] - vert[ 0 ] ).length_squared( ) +
+                   ( vert[ 2 ] - vert[ 1 ] ).length_squared( ) +
+                   ( vert[ 3 ] - vert[ 1 ] ).length_squared( ) +
+                   ( vert[ 3 ] - vert[ 2 ] ).length_squared( );
+            // average
+            fval /= 6.0;
 
-      break;
-    default:
-      MSQ_SETERR(err)(MsqError::UNSUPPORTED_ELEMENT,
-                     "Entity type %d is not valid for Aspect Ratio Gamma\n",
-                     (int)entity);
-      return false;
-  };
+            fval *= sqrt( fval );
+            // normalize to equil. and div by volume
+            fval /= vol * twelveDivRootTwo;
 
-  return true;
+            break;
+        default:
+            MSQ_SETERR( err )
+            ( MsqError::UNSUPPORTED_ELEMENT, "Entity type %d is not valid for Aspect Ratio Gamma\n",
+              (int)entity );
+            return false;
+    };
+
+    return true;
 }

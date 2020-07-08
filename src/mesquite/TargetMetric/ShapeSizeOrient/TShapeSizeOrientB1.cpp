@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file TRel2DShapeSizeOrientBarrier.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -37,147 +36,144 @@
 #include "TMPDerivs.hpp"
 #include "TMPCommon.hpp"
 
-namespace MBMesquite {
-
-std::string TShapeSizeOrientB1::get_name() const
-  { return "TShapeSizeOrientB1"; }
-
-TShapeSizeOrientB1::~TShapeSizeOrientB1() {}
-
-bool TShapeSizeOrientB1::evaluate( const MsqMatrix<2,2>& T,
-                                   double& result,
-                                   MsqError& err )
+namespace MBMesquite
 {
-  double tau = det(T);
-  if (TMetric::invalid_determinant(tau)) {
-    MSQ_SETERR(err)( barrier_violated_msg, MsqError::BARRIER_VIOLATED );
-    return false;
-  }
 
-  MsqMatrix<2,2> T_I(T);
-  pluseq_scaled_I( T_I, -1 );
-  result = sqr_Frobenius( T_I ) / (2*tau);
-  return true;
+std::string TShapeSizeOrientB1::get_name( ) const
+{
+    return "TShapeSizeOrientB1";
 }
 
-bool TShapeSizeOrientB1::evaluate_with_grad( const MsqMatrix<2,2>& T,
-                                            double& result,
-                                            MsqMatrix<2,2>& deriv_wrt_T,
-                                            MsqError& err )
+TShapeSizeOrientB1::~TShapeSizeOrientB1( ) {}
+
+bool TShapeSizeOrientB1::evaluate( const MsqMatrix< 2, 2 >& T, double& result, MsqError& err )
 {
-  const double d = det(T);
-  if (TMetric::invalid_determinant(d)) { // barrier
-    MSQ_SETERR(err)( barrier_violated_msg, MsqError::BARRIER_VIOLATED );
-    return false;
-  }
+    double tau = det( T );
+    if( TMetric::invalid_determinant( tau ) )
+    {
+        MSQ_SETERR( err )( barrier_violated_msg, MsqError::BARRIER_VIOLATED );
+        return false;
+    }
 
-  deriv_wrt_T = T;
-  pluseq_scaled_I( deriv_wrt_T, -1 );
-  double inv_d = 1.0/d;
-  result = 0.5 * sqr_Frobenius(deriv_wrt_T) * inv_d;
-
-  deriv_wrt_T -= result * transpose_adj(T);
-  deriv_wrt_T *= inv_d;
-
-  return true;
+    MsqMatrix< 2, 2 > T_I( T );
+    pluseq_scaled_I( T_I, -1 );
+    result = sqr_Frobenius( T_I ) / ( 2 * tau );
+    return true;
 }
 
-bool TShapeSizeOrientB1::evaluate_with_hess( const MsqMatrix<2,2>& T,
-                                             double& result,
-                                             MsqMatrix<2,2>& deriv_wrt_T,
-                                             MsqMatrix<2,2> second_wrt_T[3],
-                                             MsqError& err )
+bool TShapeSizeOrientB1::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& result,
+                                             MsqMatrix< 2, 2 >& deriv_wrt_T, MsqError& err )
 {
-  const double d = det(T);
-  if (TMetric::invalid_determinant(d)) { // barrier
-    MSQ_SETERR(err)( barrier_violated_msg, MsqError::BARRIER_VIOLATED );
-    return false;
-  }
+    const double d = det( T );
+    if( TMetric::invalid_determinant( d ) )
+    {  // barrier
+        MSQ_SETERR( err )( barrier_violated_msg, MsqError::BARRIER_VIOLATED );
+        return false;
+    }
 
-  deriv_wrt_T = T;
-  pluseq_scaled_I( deriv_wrt_T, -1.0 );
-  double inv_d = 1.0/d;
-  result = 0.5 * sqr_Frobenius(deriv_wrt_T) * inv_d;
+    deriv_wrt_T = T;
+    pluseq_scaled_I( deriv_wrt_T, -1 );
+    double inv_d = 1.0 / d;
+    result = 0.5 * sqr_Frobenius( deriv_wrt_T ) * inv_d;
 
-  MsqMatrix<2,2> adjt = transpose_adj(T);
-  set_scaled_outer_product( second_wrt_T, 2*result*inv_d*inv_d, adjt );
-  pluseq_scaled_sum_outer_product( second_wrt_T, -inv_d*inv_d, deriv_wrt_T, adjt );
-  pluseq_scaled_2nd_deriv_of_det( second_wrt_T, -result * inv_d, T );
-  pluseq_scaled_I( second_wrt_T, inv_d );
+    deriv_wrt_T -= result * transpose_adj( T );
+    deriv_wrt_T *= inv_d;
 
-  deriv_wrt_T -= result * adjt;
-  deriv_wrt_T *= inv_d;
-
-  return true;
+    return true;
 }
 
-bool TShapeSizeOrientB1::evaluate( const MsqMatrix<3,3>& T,
-                                   double& result,
-                                   MsqError& err )
+bool TShapeSizeOrientB1::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& result,
+                                             MsqMatrix< 2, 2 >& deriv_wrt_T,
+                                             MsqMatrix< 2, 2 > second_wrt_T[ 3 ], MsqError& err )
 {
-  double tau = det(T);
-  if (TMetric::invalid_determinant(tau)) {
-    MSQ_SETERR(err)( barrier_violated_msg, MsqError::BARRIER_VIOLATED );
-    return false;
-  }
+    const double d = det( T );
+    if( TMetric::invalid_determinant( d ) )
+    {  // barrier
+        MSQ_SETERR( err )( barrier_violated_msg, MsqError::BARRIER_VIOLATED );
+        return false;
+    }
 
-  MsqMatrix<3,3> T_I(T);
-  pluseq_scaled_I( T_I, -1 );
-  result = sqr_Frobenius( T_I ) / (2*tau);
-  return true;
+    deriv_wrt_T = T;
+    pluseq_scaled_I( deriv_wrt_T, -1.0 );
+    double inv_d = 1.0 / d;
+    result = 0.5 * sqr_Frobenius( deriv_wrt_T ) * inv_d;
+
+    MsqMatrix< 2, 2 > adjt = transpose_adj( T );
+    set_scaled_outer_product( second_wrt_T, 2 * result * inv_d * inv_d, adjt );
+    pluseq_scaled_sum_outer_product( second_wrt_T, -inv_d * inv_d, deriv_wrt_T, adjt );
+    pluseq_scaled_2nd_deriv_of_det( second_wrt_T, -result * inv_d, T );
+    pluseq_scaled_I( second_wrt_T, inv_d );
+
+    deriv_wrt_T -= result * adjt;
+    deriv_wrt_T *= inv_d;
+
+    return true;
 }
 
-bool TShapeSizeOrientB1::evaluate_with_grad( const MsqMatrix<3,3>& T,
-                                            double& result,
-                                            MsqMatrix<3,3>& deriv_wrt_T,
-                                            MsqError& err )
+bool TShapeSizeOrientB1::evaluate( const MsqMatrix< 3, 3 >& T, double& result, MsqError& err )
 {
-  const double d = det(T);
-  if (TMetric::invalid_determinant(d)) { // barrier
-    MSQ_SETERR(err)( barrier_violated_msg, MsqError::BARRIER_VIOLATED );
-    return false;
-  }
+    double tau = det( T );
+    if( TMetric::invalid_determinant( tau ) )
+    {
+        MSQ_SETERR( err )( barrier_violated_msg, MsqError::BARRIER_VIOLATED );
+        return false;
+    }
 
-  deriv_wrt_T = T;
-  pluseq_scaled_I( deriv_wrt_T, -1 );
-  double inv_d = 1.0/d;
-  result = 0.5 * sqr_Frobenius(deriv_wrt_T) * inv_d;
-
-  deriv_wrt_T -= result * transpose_adj(T);
-  deriv_wrt_T *= inv_d;
-
-  return true;
+    MsqMatrix< 3, 3 > T_I( T );
+    pluseq_scaled_I( T_I, -1 );
+    result = sqr_Frobenius( T_I ) / ( 2 * tau );
+    return true;
 }
 
-bool TShapeSizeOrientB1::evaluate_with_hess( const MsqMatrix<3,3>& T,
-                                             double& result,
-                                             MsqMatrix<3,3>& deriv_wrt_T,
-                                             MsqMatrix<3,3> second_wrt_T[6],
-                                             MsqError& err )
+bool TShapeSizeOrientB1::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& result,
+                                             MsqMatrix< 3, 3 >& deriv_wrt_T, MsqError& err )
 {
-  const double d = det(T);
-  if (TMetric::invalid_determinant(d)) { // barrier
-    MSQ_SETERR(err)( barrier_violated_msg, MsqError::BARRIER_VIOLATED );
-    return false;
-  }
+    const double d = det( T );
+    if( TMetric::invalid_determinant( d ) )
+    {  // barrier
+        MSQ_SETERR( err )( barrier_violated_msg, MsqError::BARRIER_VIOLATED );
+        return false;
+    }
 
-  deriv_wrt_T = T;
-  pluseq_scaled_I( deriv_wrt_T, -1.0 );
-  double inv_d = 1.0/d;
-  result = 0.5 * sqr_Frobenius(deriv_wrt_T) * inv_d;
+    deriv_wrt_T = T;
+    pluseq_scaled_I( deriv_wrt_T, -1 );
+    double inv_d = 1.0 / d;
+    result = 0.5 * sqr_Frobenius( deriv_wrt_T ) * inv_d;
 
-  MsqMatrix<3,3> adjt = transpose_adj(T);
-  set_scaled_outer_product( second_wrt_T, 2*result*inv_d*inv_d, adjt );
-  pluseq_scaled_sum_outer_product( second_wrt_T, -inv_d*inv_d, deriv_wrt_T, adjt );
-  pluseq_scaled_2nd_deriv_of_det( second_wrt_T, -result * inv_d, T );
-  pluseq_scaled_I( second_wrt_T, inv_d );
+    deriv_wrt_T -= result * transpose_adj( T );
+    deriv_wrt_T *= inv_d;
 
-  deriv_wrt_T -= result * adjt;
-  deriv_wrt_T *= inv_d;
-
-  return true;
+    return true;
 }
 
-//TMP_T_TEMPL_IMPL_COMMON(TShapeSizeOrientB1)
+bool TShapeSizeOrientB1::evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result,
+                                             MsqMatrix< 3, 3 >& deriv_wrt_T,
+                                             MsqMatrix< 3, 3 > second_wrt_T[ 6 ], MsqError& err )
+{
+    const double d = det( T );
+    if( TMetric::invalid_determinant( d ) )
+    {  // barrier
+        MSQ_SETERR( err )( barrier_violated_msg, MsqError::BARRIER_VIOLATED );
+        return false;
+    }
 
-} // namespace MBMesquite
+    deriv_wrt_T = T;
+    pluseq_scaled_I( deriv_wrt_T, -1.0 );
+    double inv_d = 1.0 / d;
+    result = 0.5 * sqr_Frobenius( deriv_wrt_T ) * inv_d;
+
+    MsqMatrix< 3, 3 > adjt = transpose_adj( T );
+    set_scaled_outer_product( second_wrt_T, 2 * result * inv_d * inv_d, adjt );
+    pluseq_scaled_sum_outer_product( second_wrt_T, -inv_d * inv_d, deriv_wrt_T, adjt );
+    pluseq_scaled_2nd_deriv_of_det( second_wrt_T, -result * inv_d, T );
+    pluseq_scaled_I( second_wrt_T, inv_d );
+
+    deriv_wrt_T -= result * adjt;
+    deriv_wrt_T *= inv_d;
+
+    return true;
+}
+
+// TMP_T_TEMPL_IMPL_COMMON(TShapeSizeOrientB1)
+
+}  // namespace MBMesquite

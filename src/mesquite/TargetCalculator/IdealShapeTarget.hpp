@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file IdealShapeTarget.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -36,59 +35,47 @@
 #include "Mesquite.hpp"
 #include "TargetCalculator.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 class MESQUITE_EXPORT IdealShapeTarget : public TargetCalculator
 {
-public:
+  public:
+    virtual ~IdealShapeTarget( );
 
-  virtual ~IdealShapeTarget();
+    /**\brief Get a target matrix
+     *
+     *\param pd      The current PatchData
+     *\param element The index an element within the patch data.
+     *\param sample  The sample point in the element.
+     *\param W_out   The resulting target matrix.
+     */
+    virtual bool get_3D_target( PatchData& pd, size_t element, Sample sample,
+                                MsqMatrix< 3, 3 >& W_out, MsqError& err );
 
+    /**\brief Get a target matrix
+     *
+     *\param pd      The current PatchData
+     *\param element The index an element within the patch data.
+     *\param sample  The sample point in the element.
+     *\param W_out   The resulting target matrix.
+     */
+    virtual bool get_surface_target( PatchData& pd, size_t element, Sample sample,
+                                     MsqMatrix< 3, 2 >& W_out, MsqError& err );
 
-  /**\brief Get a target matrix
-   *
-   *\param pd      The current PatchData
-   *\param element The index an element within the patch data.
-   *\param sample  The sample point in the element.
-   *\param W_out   The resulting target matrix.
-   */
-  virtual bool get_3D_target( PatchData& pd,
-                              size_t element,
-                              Sample sample,
-                              MsqMatrix<3,3>& W_out,
-                              MsqError& err );
+    /**\brief Get a target matrix
+     *
+     *\param pd      The current PatchData
+     *\param element The index an element within the patch data.
+     *\param sample  The sample point in the element.
+     *\param W_out   The resulting target matrix.
+     */
+    virtual bool get_2D_target( PatchData& pd, size_t element, Sample sample,
+                                MsqMatrix< 2, 2 >& W_out, MsqError& err );
 
-  /**\brief Get a target matrix
-   *
-   *\param pd      The current PatchData
-   *\param element The index an element within the patch data.
-   *\param sample  The sample point in the element.
-   *\param W_out   The resulting target matrix.
-   */
-  virtual bool get_surface_target( PatchData& pd,
-                                   size_t element,
-                                   Sample sample,
-                                   MsqMatrix<3,2>& W_out,
-                                   MsqError& err );
-
-  /**\brief Get a target matrix
-   *
-   *\param pd      The current PatchData
-   *\param element The index an element within the patch data.
-   *\param sample  The sample point in the element.
-   *\param W_out   The resulting target matrix.
-   */
-  virtual bool get_2D_target( PatchData& pd,
-                              size_t element,
-                              Sample sample,
-                              MsqMatrix<2,2>& W_out,
-                              MsqError& err );
-
-  virtual bool have_surface_orient() const;
-
+    virtual bool have_surface_orient( ) const;
 };
 
-
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

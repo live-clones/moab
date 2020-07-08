@@ -34,7 +34,6 @@
   \date   2002-01-17
 */
 
-
 #ifndef MSQ_PLANAR_DOMAIN_HPP
 #define MSQ_PLANAR_DOMAIN_HPP
 
@@ -43,79 +42,80 @@
 
 namespace MBMesquite
 {
-  /*! \class PlanarDomain
-       This is a template for a planar domain.
-       It will provide the normal information necessary for surface mesh optimization.
-    */
-  class MESQUITE_EXPORT PlanarDomain : public MBMesquite::MeshDomain
-  {
+/*! \class PlanarDomain
+     This is a template for a planar domain.
+     It will provide the normal information necessary for surface mesh optimization.
+  */
+class MESQUITE_EXPORT PlanarDomain : public MBMesquite::MeshDomain
+{
   public:
-    enum Plane{ XY = 2, XZ = 1, YZ = 0 };
+    enum Plane
+    {
+        XY = 2,
+        XZ = 1,
+        YZ = 0
+    };
 
     inline PlanarDomain( Plane orient, double offset = 0.0 )
     {
-      Vector3D normal(0,0,0), point(0,0,0);
-      normal[orient] = 1.0;
-      point[orient] = offset;
-      set_plane( normal, point );
+        Vector3D normal( 0, 0, 0 ), point( 0, 0, 0 );
+        normal[ orient ] = 1.0;
+        point[ orient ] = offset;
+        set_plane( normal, point );
     }
 
-    PlanarDomain() {}
+    PlanarDomain( ) {}
 
-    inline PlanarDomain(const Vector3D& normal, const Vector3D& point)
-      { set_plane( normal, point ); }
+    inline PlanarDomain( const Vector3D& normal, const Vector3D& point )
+    {
+        set_plane( normal, point );
+    }
 
-    virtual ~PlanarDomain();
+    virtual ~PlanarDomain( );
 
-    void fit_vertices( Mesh* mesh,
-                       MsqError& err,
-                       double epsilon = 0.0 );
+    void fit_vertices( Mesh* mesh, MsqError& err, double epsilon = 0.0 );
 
-    void fit_vertices( Mesh* mesh,
-                       const Mesh::VertexHandle* vertex_array,
-                       size_t vertex_array_length,
-                       MsqError& err,
-                       double epsilon = 0.0 );
+    void fit_vertices( Mesh* mesh, const Mesh::VertexHandle* vertex_array,
+                       size_t vertex_array_length, MsqError& err, double epsilon = 0.0 );
 
     void set_plane( const Vector3D& normal, const Vector3D& point );
 
-    void flip();
+    void flip( );
 
-    const Vector3D& get_normal() const { return mNormal; }
+    const Vector3D& get_normal( ) const
+    {
+        return mNormal;
+    }
 
-    double get_coeff() { return mCoeff; }
+    double get_coeff( )
+    {
+        return mCoeff;
+    }
 
-    Vector3D get_origin() const { return -mCoeff * mNormal; }
+    Vector3D get_origin( ) const
+    {
+        return -mCoeff * mNormal;
+    }
 
-    virtual void snap_to(Mesh::VertexHandle entity_handle,
-                         Vector3D &coordinate) const;
+    virtual void snap_to( Mesh::VertexHandle entity_handle, Vector3D& coordinate ) const;
 
-    virtual void vertex_normal_at(Mesh::VertexHandle entity_handle,
-                                  Vector3D &coordinate) const;
+    virtual void vertex_normal_at( Mesh::VertexHandle entity_handle, Vector3D& coordinate ) const;
 
-    virtual void element_normal_at(Mesh::ElementHandle entity_handle,
-                                   Vector3D &coordinate) const;
+    virtual void element_normal_at( Mesh::ElementHandle entity_handle, Vector3D& coordinate ) const;
 
-    virtual void vertex_normal_at(const Mesh::VertexHandle* handle,
-                                  Vector3D coords[],
-                                  unsigned count,
-                                  MsqError& err) const;
+    virtual void vertex_normal_at( const Mesh::VertexHandle* handle, Vector3D coords[],
+                                   unsigned count, MsqError& err ) const;
 
-    virtual void closest_point( Mesh::VertexHandle handle,
-                                const Vector3D& position,
-                                Vector3D& closest,
-                                Vector3D& normal,
-                                MsqError& err ) const;
+    virtual void closest_point( Mesh::VertexHandle handle, const Vector3D& position,
+                                Vector3D& closest, Vector3D& normal, MsqError& err ) const;
 
-    virtual void domain_DoF( const Mesh::VertexHandle* handle_array,
-                             unsigned short* dof_array,
-                             size_t num_vertices,
-                             MsqError& err ) const;
+    virtual void domain_DoF( const Mesh::VertexHandle* handle_array, unsigned short* dof_array,
+                             size_t num_vertices, MsqError& err ) const;
 
   private:
     Vector3D mNormal;
-    double mCoeff;
-  };
-}
+    double   mCoeff;
+};
+}  // namespace MBMesquite
 
 #endif

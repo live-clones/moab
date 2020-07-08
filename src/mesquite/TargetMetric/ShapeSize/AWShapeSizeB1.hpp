@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file AWShapeSizeB1.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -37,35 +36,24 @@
 #include "AWMetric.hpp"
 #include "AWMetricBarrier.hpp"
 
-namespace MBMesquite {
-
+namespace MBMesquite
+{
 
 /** \f$ | A - A^{-t} W^t W |^2  \f$ */
 class AWShapeSizeB1 : public AWMetricBarrier
 {
   public:
+    MESQUITE_EXPORT virtual ~AWShapeSizeB1( );
 
-  MESQUITE_EXPORT virtual
-  ~AWShapeSizeB1();
+    MESQUITE_EXPORT virtual std::string get_name( ) const;
 
-  MESQUITE_EXPORT virtual
-  std::string get_name() const;
+    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W,
+                                           double& result, MsqError& err );
 
-  MESQUITE_EXPORT virtual
-  bool evaluate( const MsqMatrix<2,2>& A,
-                 const MsqMatrix<2,2>& W,
-                 double& result,
-                 MsqError& err );
-
-  MESQUITE_EXPORT virtual
-  bool evaluate( const MsqMatrix<3,3>& A,
-                 const MsqMatrix<3,3>& W,
-                 double& result,
-                 MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >& W,
+                                           double& result, MsqError& err );
 };
 
-
-
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

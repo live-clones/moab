@@ -14,17 +14,17 @@
  */
 
 /**\class moab::MeshOutputFunctor
-  *\brief Implements the abstract EntityRefinerOutputFunctor class.
-  *
-  * This class is a concrete implementation of the EntityRefinerOutputFunctor.
-  * It creates new vertices and regions in a new or existing mesh as
-  * the input entities are streamed through the refiner.
-  *
-  * \author David Thompson
-  * \author Philippe Pebay
-  *
-  * \date 28 July 2008
-  */
+ *\brief Implements the abstract EntityRefinerOutputFunctor class.
+ *
+ * This class is a concrete implementation of the EntityRefinerOutputFunctor.
+ * It creates new vertices and regions in a new or existing mesh as
+ * the input entities are streamed through the refiner.
+ *
+ * \author David Thompson
+ * \author Philippe Pebay
+ *
+ * \date 28 July 2008
+ */
 #ifndef MOAB_MESH_OUTPUT_FUNCTOR_HPP
 #define MOAB_MESH_OUTPUT_FUNCTOR_HPP
 
@@ -37,7 +37,8 @@
 
 #include <string.h>
 
-namespace moab {
+namespace moab
+{
 
 class SplitVerticesBase;
 class EntitySource;
@@ -45,34 +46,36 @@ class ParallelComm;
 
 class MeshOutputFunctor : public EntityRefinerOutputFunctor
 {
-public:
-  MeshOutputFunctor( RefinerTagManager* tag_mgr );
-  ~MeshOutputFunctor();
+  public:
+    MeshOutputFunctor( RefinerTagManager* tag_mgr );
+    ~MeshOutputFunctor( );
 
-  void print_vert_crud( EntityHandle vout, int nvhash, EntityHandle* vhash, const double* vcoords, const void* vtags );
-  void assign_global_ids( ParallelComm* comm );
-  void exchange_handles( ParallelComm* comm );
+    void print_vert_crud( EntityHandle vout, int nvhash, EntityHandle* vhash, const double* vcoords,
+                          const void* vtags );
+    void assign_global_ids( ParallelComm* comm );
+    void exchange_handles( ParallelComm* comm );
 
-  void assign_tags( EntityHandle vhandle, const void* vtags );
+    void assign_tags( EntityHandle vhandle, const void* vtags );
 
-  virtual EntityHandle map_vertex( EntityHandle vhash, const double* vcoords, const void* vtags );
-  using EntityRefinerOutputFunctor::operator();
-  virtual EntityHandle operator () ( int nvhash, EntityHandle* vhash, const double* vcoords, const void* vtags );
-  virtual void operator () ( EntityHandle h );
-  virtual void operator () ( EntityType etyp );
+    virtual EntityHandle map_vertex( EntityHandle vhash, const double* vcoords, const void* vtags );
+    using EntityRefinerOutputFunctor::operator( );
+    virtual EntityHandle operator( )( int nvhash, EntityHandle* vhash, const double* vcoords,
+                                      const void* vtags );
+    virtual void         operator( )( EntityHandle h );
+    virtual void         operator( )( EntityType etyp );
 
-  Interface* mesh_in;
-  Interface* mesh_out;
-  bool input_is_output;
-  SplitVerticesBase* vertex_map;
-  std::vector<SplitVerticesBase*> split_vertices;
-  std::vector<EntitySource*> new_entities;
-  std::vector<EntityHandle> elem_vert;
-  RefinerTagManager* tag_manager;
-  EntityHandle destination_set;
-  std::map<ProcessSet,int> proc_partition_counts;
+    Interface*                        mesh_in;
+    Interface*                        mesh_out;
+    bool                              input_is_output;
+    SplitVerticesBase*                vertex_map;
+    std::vector< SplitVerticesBase* > split_vertices;
+    std::vector< EntitySource* >      new_entities;
+    std::vector< EntityHandle >       elem_vert;
+    RefinerTagManager*                tag_manager;
+    EntityHandle                      destination_set;
+    std::map< ProcessSet, int >       proc_partition_counts;
 };
 
-} // namespace moab
+}  // namespace moab
 
-#endif // MOAB_MESH_OUTPUT_FUNCTOR_HPP
+#endif  // MOAB_MESH_OUTPUT_FUNCTOR_HPP

@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file ViscousCFDTetShapeWrapper.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -36,7 +35,8 @@
 #include "Mesquite.hpp"
 #include "Wrapper.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 class MeshDomainAssoc;
 
@@ -44,18 +44,14 @@ class MESQUITE_EXPORT ViscousCFDTetShapeWrapper : public Wrapper
 {
   private:
     double dCutoff, aVal;
-    int iterationLimit;
-    int parallelIterations;
+    int    iterationLimit;
+    int    parallelIterations;
     double maxVtxMovement;
 
-    void run_wrapper( MeshDomainAssoc* mesh_and_domain,
-                      ParallelMesh* pmesh,
-                      Settings* settings,
-                      QualityAssessor* qa,
-                      MsqError& err );
+    void run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh, Settings* settings,
+                      QualityAssessor* qa, MsqError& err );
 
   public:
-
     /**
      *\param max_vertex_movement  Termination optimization if no vertex is moved
      *                            by more than this distance in the previous solver
@@ -65,21 +61,14 @@ class MESQUITE_EXPORT ViscousCFDTetShapeWrapper : public Wrapper
      *\param max_iterations       Termination optimizaiton after this many solver
      *                            steps.
      */
-    ViscousCFDTetShapeWrapper( double max_vertex_movement,
-                               double a = 0.4395,
-                               double d_prime = 135,
-                               int max_iterations = 50,
-                               int parallel_iterations = 10 )
-      : dCutoff(d_prime),
-        aVal(a),
-        iterationLimit( max_iterations ),
-        parallelIterations( parallel_iterations ),
-        maxVtxMovement( max_vertex_movement )
-      {}
-
+    ViscousCFDTetShapeWrapper( double max_vertex_movement, double a = 0.4395, double d_prime = 135,
+                               int max_iterations = 50, int parallel_iterations = 10 )
+        : dCutoff( d_prime ), aVal( a ), iterationLimit( max_iterations ),
+          parallelIterations( parallel_iterations ), maxVtxMovement( max_vertex_movement )
+    {
+    }
 };
 
-
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

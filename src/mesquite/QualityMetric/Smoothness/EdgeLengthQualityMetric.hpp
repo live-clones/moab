@@ -24,7 +24,8 @@
     pknupp@sandia.gov, tleurent@mcs.anl.gov, tmunson@mcs.anl.gov
 
   ***************************************************************** */
-// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3 -*-
+// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3
+// -*-
 
 /*! \file EdgeLengthQualityMetric.hpp
 
@@ -33,7 +34,6 @@ Header file for the MBMesquite::EdgeLengthQualityMetric class
   \author Michael Brewer
   \date   2002-06-13
  */
-
 
 #ifndef EdgeLengthQualityMetric_hpp
 #define EdgeLengthQualityMetric_hpp
@@ -44,56 +44,38 @@ Header file for the MBMesquite::EdgeLengthQualityMetric class
 
 namespace MBMesquite
 {
-     /*! \class EdgeLengthQualityMetric
-       \brief Computes the lengths of the edges connected to given a vertex..
+/*! \class EdgeLengthQualityMetric
+  \brief Computes the lengths of the edges connected to given a vertex..
 
-        EdgeLengthQualityMetric is a vertex based metric which computes
-        the lengths of the edges connected to a given vertex and then
-        averages those together, using the specified averaging method
-        The metric uses SUM as the default averaging method.
-     */
-  class EdgeLengthQualityMetric : public VertexQM, public AveragingQM
-  {
-   public:
+   EdgeLengthQualityMetric is a vertex based metric which computes
+   the lengths of the edges connected to a given vertex and then
+   averages those together, using the specified averaging method
+   The metric uses SUM as the default averaging method.
+*/
+class EdgeLengthQualityMetric : public VertexQM, public AveragingQM
+{
+  public:
+    MESQUITE_EXPORT EdgeLengthQualityMetric( ) : AveragingQM( SUM ) {}
 
-    MESQUITE_EXPORT EdgeLengthQualityMetric() : AveragingQM(SUM)
-      {}
+    // virtual destructor ensures use of polymorphism during destruction
+    MESQUITE_EXPORT virtual ~EdgeLengthQualityMetric( ) {}
 
-      // virtual destructor ensures use of polymorphism during destruction
-    MESQUITE_EXPORT virtual ~EdgeLengthQualityMetric()
-       {}
+    MESQUITE_EXPORT virtual std::string get_name( ) const;
 
-    MESQUITE_EXPORT virtual std::string get_name() const;
+    MESQUITE_EXPORT virtual int get_negate_flag( ) const;
 
-    MESQUITE_EXPORT virtual int get_negate_flag() const;
+    MESQUITE_EXPORT virtual bool evaluate( PatchData& pd, size_t vertex, double& value,
+                                           MsqError& err );
 
+    MESQUITE_EXPORT virtual bool evaluate_with_indices( PatchData& pd, size_t vertex, double& value,
+                                                        std::vector< size_t >& indices,
+                                                        MsqError&              err );
 
-    MESQUITE_EXPORT virtual
-    bool evaluate( PatchData& pd,
-                   size_t vertex,
-                   double& value,
-                   MsqError& err );
+  private:
+    bool evaluate_common( PatchData& pd, size_t vertex, double& value,
+                          std::vector< size_t >& vertices, MsqError& err );
+};
 
-    MESQUITE_EXPORT virtual
-    bool evaluate_with_indices( PatchData& pd,
-                   size_t vertex,
-                   double& value,
-                   std::vector<size_t>& indices,
-                   MsqError& err );
+}  // namespace MBMesquite
 
-   private:
-
-    bool evaluate_common( PatchData& pd,
-                          size_t vertex,
-                          double& value,
-                          std::vector<size_t>& vertices,
-                          MsqError& err );
-  };
-
-
-} //namespace
-
-
-#endif // EdgeLengthQualityMetric_hpp
-
-
+#endif  // EdgeLengthQualityMetric_hpp

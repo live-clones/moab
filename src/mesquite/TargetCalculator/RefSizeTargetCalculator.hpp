@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file RefSizeTargetCalculator.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -36,54 +35,44 @@
 #include "Mesquite.hpp"
 #include "IdealShapeTarget.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 class ReferenceMesh;
 
 class RefSizeTargetCalculator : public TargetCalculator
 {
-public:
-  RefSizeTargetCalculator( ReferenceMesh* reference_mesh,
-                           TargetCalculator* tc );
-  RefSizeTargetCalculator( ReferenceMesh* reference_mesh );
+  public:
+    RefSizeTargetCalculator( ReferenceMesh* reference_mesh, TargetCalculator* tc );
+    RefSizeTargetCalculator( ReferenceMesh* reference_mesh );
 
-  virtual bool get_3D_target( PatchData& pd,
-                              size_t element,
-                              Sample sample,
-                              MsqMatrix<3,3>& W_out,
-                              MsqError& err );
+    virtual bool get_3D_target( PatchData& pd, size_t element, Sample sample,
+                                MsqMatrix< 3, 3 >& W_out, MsqError& err );
 
-  virtual bool get_2D_target( PatchData& pd,
-                              size_t element,
-                              Sample sample,
-                              MsqMatrix<2,2>& W_out,
-                              MsqError& err );
+    virtual bool get_2D_target( PatchData& pd, size_t element, Sample sample,
+                                MsqMatrix< 2, 2 >& W_out, MsqError& err );
 
-  virtual bool get_surface_target( PatchData& pd,
-                              size_t element,
-                              Sample sample,
-                              MsqMatrix<3,2>& W_out,
-                              MsqError& err );
+    virtual bool get_surface_target( PatchData& pd, size_t element, Sample sample,
+                                     MsqMatrix< 3, 2 >& W_out, MsqError& err );
 
-  virtual bool have_surface_orient() const
-    { return scaledTargets->have_surface_orient(); }
+    virtual bool have_surface_orient( ) const
+    {
+        return scaledTargets->have_surface_orient( );
+    }
 
-private:
+  private:
+    double average_edge_length( PatchData& pd, size_t element, MsqError& err );
 
-  double average_edge_length( PatchData& pd, size_t element, MsqError& err );
+    ReferenceMesh*    refMesh;
+    IdealShapeTarget  defaultTargets;
+    TargetCalculator* scaledTargets;
 
-  ReferenceMesh* refMesh;
-  IdealShapeTarget defaultTargets;
-  TargetCalculator* scaledTargets;
-
-  /** Amount to scale average edge length by to achive correctly sized
-   *  ideal area/volume target, indexed by element topology.
-   */
-  // double scaleFactor[MIXED];
+    /** Amount to scale average edge length by to achive correctly sized
+     *  ideal area/volume target, indexed by element topology.
+     */
+    // double scaleFactor[MIXED];
 };
 
-
-
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

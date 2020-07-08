@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file TInverseMeanRatio.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -37,57 +36,43 @@
 #include "TMetricBarrier.hpp"
 #include <limits>
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 /** \f$ \frac{|T|^2}{2 det(T)} - 1 \f$ */
-class TInverseMeanRatio : public TMetricBarrier {
-public:
+class TInverseMeanRatio : public TMetricBarrier
+{
+  public:
+    MESQUITE_EXPORT virtual ~TInverseMeanRatio( );
 
-  MESQUITE_EXPORT virtual
-  ~TInverseMeanRatio();
+    MESQUITE_EXPORT virtual std::string get_name( ) const;
 
-  MESQUITE_EXPORT virtual
-  std::string get_name() const;
+    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 2, 2 >& T, double& result,
+                                           MsqError& err );
 
-  MESQUITE_EXPORT virtual
-  bool evaluate( const MsqMatrix<2,2>& T,
-                 double& result,
-                 MsqError& err );
+    /** \f$ \frac{1}{det(T)} [ T - \frac{|T|^2}{2 det(T)}adj(T) ] \f$ */
+    MESQUITE_EXPORT virtual bool evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& result,
+                                                     MsqMatrix< 2, 2 >& deriv_wrt_T,
+                                                     MsqError&          err );
 
-  /** \f$ \frac{1}{det(T)} [ T - \frac{|T|^2}{2 det(T)}adj(T) ] \f$ */
-  MESQUITE_EXPORT virtual
-  bool evaluate_with_grad( const MsqMatrix<2,2>& T,
-                           double& result,
-                           MsqMatrix<2,2>& deriv_wrt_T,
-                           MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& result,
+                                                     MsqMatrix< 2, 2 >& deriv_wrt_T,
+                                                     MsqMatrix< 2, 2 >  second_wrt_T[ 3 ],
+                                                     MsqError&          err );
 
-  MESQUITE_EXPORT virtual
-  bool evaluate_with_hess( const MsqMatrix<2,2>& T,
-                           double& result,
-                           MsqMatrix<2,2>& deriv_wrt_T,
-                           MsqMatrix<2,2> second_wrt_T[3],
-                           MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 3, 3 >& T, double& result,
+                                           MsqError& err );
 
-  MESQUITE_EXPORT virtual
-  bool evaluate( const MsqMatrix<3,3>& T,
-                 double& result,
-                 MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& result,
+                                                     MsqMatrix< 3, 3 >& deriv_wrt_T,
+                                                     MsqError&          err );
 
-  MESQUITE_EXPORT virtual
-  bool evaluate_with_grad( const MsqMatrix<3,3>& T,
-                           double& result,
-                           MsqMatrix<3,3>& deriv_wrt_T,
-                           MsqError& err );
-
-  MESQUITE_EXPORT virtual
-  bool evaluate_with_hess( const MsqMatrix<3,3>& T,
-                           double& result,
-                           MsqMatrix<3,3>& deriv_wrt_T,
-                           MsqMatrix<3,3> second_wrt_T[6],
-                           MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result,
+                                                     MsqMatrix< 3, 3 >& deriv_wrt_T,
+                                                     MsqMatrix< 3, 3 >  second_wrt_T[ 6 ],
+                                                     MsqError&          err );
 };
 
-
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

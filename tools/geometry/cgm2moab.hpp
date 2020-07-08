@@ -6,7 +6,6 @@
 #include "moab/GeomTopoTool.hpp"
 using namespace moab;
 
-
 /// program-wide verbose output flag
 extern bool verbose;
 
@@ -17,7 +16,7 @@ void chkerr( Interface* mbi, ErrorCode code, int line, const char* file );
 void chkerr( Interface& mbi, ErrorCode code, int line, const char* file );
 void chkerr( GeomTopoTool& gtt, ErrorCode code, int line, const char* file );
 
-#define CHECKERR(M,C) chkerr(M,C,__LINE__,__FILE__)
+#define CHECKERR( M, C ) chkerr( M, C, __LINE__, __FILE__ )
 
 // features provided by obb_analysis.cpp
 /* no longer provided by dagmc

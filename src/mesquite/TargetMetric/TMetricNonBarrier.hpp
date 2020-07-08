@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file TMetricNonBarrier.hpp
  *  \brief
  *  \author Boyd Tidwell
@@ -37,60 +36,54 @@
 #include "TMetric.hpp"
 #include <string>
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 class MsqError;
-template <unsigned R, unsigned C> class MsqMatrix;
+template< unsigned R, unsigned C > class MsqMatrix;
 
 class TMetricNonBarrier : public TMetric
 {
-public:
+  public:
+    MESQUITE_EXPORT virtual ~TMetricNonBarrier( );
 
-  MESQUITE_EXPORT virtual
-  ~TMetricNonBarrier();
+    MESQUITE_EXPORT virtual std::string get_name( ) const
+    {
+        return "TMetricNonBarrier";
+    }
 
-  MESQUITE_EXPORT virtual
-  std::string get_name() const {return "TMetricNonBarrier";}
-
-  static inline bool invalid_determinant( double d )
-    { return d < 1e-12; }
+    static inline bool invalid_determinant( double d )
+    {
+        return d < 1e-12;
+    }
 };
 
 class TMetricNonBarrier2D : public TMetric
 {
-public:
-
-  MESQUITE_EXPORT virtual
-  ~TMetricNonBarrier2D();
+  public:
+    MESQUITE_EXPORT virtual ~TMetricNonBarrier2D( );
 
     /**\brief Evaluate \f$\mu(T)\f$
      *
      * This method always returns an error for 2D-only metrics
      */
-  MESQUITE_EXPORT virtual
-  bool evaluate( const MsqMatrix<3,3>& T,
-                 double& result,
-                 MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 3, 3 >& T, double& result,
+                                           MsqError& err );
 };
 
 class TMetricNonBarrier3D : public TMetric
 {
-public:
-
-  MESQUITE_EXPORT virtual
-  ~TMetricNonBarrier3D();
+  public:
+    MESQUITE_EXPORT virtual ~TMetricNonBarrier3D( );
 
     /**\brief Evaluate \f$\mu(T)\f$
      *
      * This method always returns an error for 3D-only metrics
      */
-  MESQUITE_EXPORT virtual
-  bool evaluate( const MsqMatrix<2,2>& T,
-                 double& result,
-                 MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 2, 2 >& T, double& result,
+                                           MsqError& err );
 };
 
-
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

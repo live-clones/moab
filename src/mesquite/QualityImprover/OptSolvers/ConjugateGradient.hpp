@@ -41,65 +41,58 @@
 #include "PatchData.hpp"
 #include "PatchSetUser.hpp"
 
-
 namespace MBMesquite
 {
-  class ObjectiveFunction;
+class ObjectiveFunction;
 
-
-  /*! \class ConjugateGradient
-    \brief Optimizes the objective function using the Polack-Ribiere scheme.
-   */
-  class ConjugateGradient : public VertexMover, public PatchSetUser
-  {
+/*! \class ConjugateGradient
+  \brief Optimizes the objective function using the Polack-Ribiere scheme.
+ */
+class ConjugateGradient : public VertexMover, public PatchSetUser
+{
   public:
-    MESQUITE_EXPORT ConjugateGradient(ObjectiveFunction* objective);
-    MESQUITE_EXPORT ConjugateGradient(ObjectiveFunction* objective,
-                                      MsqError &err);
+    MESQUITE_EXPORT ConjugateGradient( ObjectiveFunction* objective );
+    MESQUITE_EXPORT ConjugateGradient( ObjectiveFunction* objective, MsqError& err );
 
-    MESQUITE_EXPORT virtual ~ConjugateGradient();
+    MESQUITE_EXPORT virtual ~ConjugateGradient( );
 
-    MESQUITE_EXPORT virtual std::string get_name() const;
+    MESQUITE_EXPORT virtual std::string get_name( ) const;
 
-    virtual PatchSet* get_patch_set();
+    virtual PatchSet* get_patch_set( );
 
-      //!Just for debugging purposes or for obtaining more data
-      //! during the optimization process.
-    MESQUITE_EXPORT void set_debugging_level(int new_lev)
-      {
-        conjGradDebug=new_lev;
-      }
+    //! Just for debugging purposes or for obtaining more data
+    //! during the optimization process.
+    MESQUITE_EXPORT void set_debugging_level( int new_lev )
+    {
+        conjGradDebug = new_lev;
+    }
 
   protected:
+    //! Initialize data for smoothing process
+    virtual void initialize( PatchData& pd, MsqError& err );
 
-      //!Initialize data for smoothing process
-    virtual void initialize(PatchData &pd, MsqError &err);
+    virtual void optimize_vertex_positions( PatchData& pd, MsqError& err );
 
-    virtual void optimize_vertex_positions(PatchData &pd, MsqError &err);
+    virtual void initialize_mesh_iteration( PatchData& pd, MsqError& err );
 
-    virtual void initialize_mesh_iteration(PatchData &pd, MsqError &err);
+    virtual void terminate_mesh_iteration( PatchData& pd, MsqError& err );
 
-    virtual void terminate_mesh_iteration(PatchData &pd, MsqError &err);
+    //! Delete arrays initially created in initialize().
+    virtual void cleanup( );
 
-      //!Delete arrays initially created in initialize().
-    virtual void cleanup();
+    //! Returns the step distance to take in the search direction.
+    double get_step( PatchData& pd, double f0, int& j, MsqError& err );
 
-      //!Returns the step distance to take in the search direction.
-    double get_step(PatchData &pd, double f0,int &j, MsqError &err);
+    //! Culls the vertex list free_vertex_list.
+    // void cull_list(PatchData &pd, double beta, MsqError &err);
 
-      //!Culls the vertex list free_vertex_list.
-      //void cull_list(PatchData &pd, double beta, MsqError &err);
-
-
-private:
-    std::vector<Vector3D> fGrad, pGrad, fNewGrad;
+  private:
+    std::vector< Vector3D >   fGrad, pGrad, fNewGrad;
     PatchDataVerticesMemento* pMemento;
-      //just for debugging
+    // just for debugging
     int conjGradDebug;
-  };
+};
 
-
-
-}
+}  // namespace MBMesquite
 
 #endif

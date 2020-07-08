@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file WeightReader.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -37,118 +36,98 @@
 #include "ElemSampleQM.hpp"
 #include <sstream>
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
-static TagHandle get_tag( Mesh* mesh,
-                          unsigned num_doubles,
-                          const std::string& base_name,
+static TagHandle get_tag( Mesh* mesh, unsigned num_doubles, const std::string& base_name,
                           MsqError& err )
 {
-  std::ostringstream str;
-  str << base_name << num_doubles;
+    std::ostringstream str;
+    str << base_name << num_doubles;
 
-  TagHandle handle = mesh->tag_get( str.str().c_str(), err ); MSQ_ERRZERO(err);
+    TagHandle handle = mesh->tag_get( str.str( ).c_str( ), err );
+    MSQ_ERRZERO( err );
 
     // double check tag type
-  std::string temp_name;
-  Mesh::TagType temp_type;
-  unsigned temp_length;
-  mesh->tag_properties( handle, temp_name, temp_type, temp_length, err );
-  MSQ_ERRZERO(err);
+    std::string   temp_name;
+    Mesh::TagType temp_type;
+    unsigned      temp_length;
+    mesh->tag_properties( handle, temp_name, temp_type, temp_length, err );
+    MSQ_ERRZERO( err );
 
-  if (temp_type != Mesh::DOUBLE || temp_length != num_doubles)
-  {
-    MSQ_SETERR(err)( MsqError::TAG_ALREADY_EXISTS,
-                    "Mismatched type or length for existing tag \"%s\"",
-                     str.str().c_str() );
-  }
+    if( temp_type != Mesh::DOUBLE || temp_length != num_doubles )
+    {
+        MSQ_SETERR( err )
+        ( MsqError::TAG_ALREADY_EXISTS, "Mismatched type or length for existing tag \"%s\"",
+          str.str( ).c_str( ) );
+    }
 
-  return handle;
+    return handle;
 }
 
+WeightReader::WeightReader( std::string name ) : tagBaseName( name ) {}
 
+WeightReader::~WeightReader( ) {}
 
-
-WeightReader::WeightReader( std::string name )
-  : tagBaseName(name) {}
-
-WeightReader::~WeightReader()
+double WeightReader::get_weight( PatchData& pd, size_t element, Sample sample, MsqError& err )
 {
-}
-
-double WeightReader::get_weight( PatchData &pd,
-                                 size_t element,
-                                 Sample sample,
-                                 MsqError& err )
-{
-  WeightReaderData& data = get_data( pd );
+    WeightReaderData& data = get_data( pd );
 
     // calculate index of sample in array
-  NodeSet all_samples = pd.get_samples( element );
-  unsigned offset = all_samples.num_before( sample );
+    NodeSet  all_samples = pd.get_samples( element );
+    unsigned offset = all_samples.num_before( sample );
 
-  if (!data.weights.empty() && data.elementIndex == element) {
-    assert(offset < data.weights.size());
-    return data.weights[offset];
-  }
-  const unsigned num_samples = all_samples.num_nodes();
-  const unsigned handle_idx = num_samples - 1;
+    if( !data.weights.empty( ) && data.elementIndex == element )
+    {
+        assert( offset < data.weights.size( ) );
+        return data.weights[ offset ];
+    }
+    const unsigned num_samples = all_samples.num_nodes( );
+    const unsigned handle_idx = num_samples - 1;
 
     // get the tag handle
-  const TagHandle INVALID_HANDLE = (TagHandle)-1;
-  if (data.handles.size() <= handle_idx)
-    data.handles.resize( handle_idx + 1, INVALID_HANDLE );
-  TagHandle& tag_handle = data.handles[handle_idx];
-  if (tag_handle == INVALID_HANDLE) {
-    tag_handle = get_tag( pd.get_mesh(),
-                          num_samples,
-                          tagBaseName.c_str(),
-                          err );
-    MSQ_ERRZERO(err);
-    assert(tag_handle != INVALID_HANDLE);
-  }
+    const TagHandle INVALID_HANDLE = (TagHandle)-1;
+    if( data.handles.size( ) <= handle_idx ) data.handles.resize( handle_idx + 1, INVALID_HANDLE );
+    TagHandle& tag_handle = data.handles[ handle_idx ];
+    if( tag_handle == INVALID_HANDLE )
+    {
+        tag_handle = get_tag( pd.get_mesh( ), num_samples, tagBaseName.c_str( ), err );
+        MSQ_ERRZERO( err );
+        assert( tag_handle != INVALID_HANDLE );
+    }
 
     // get the tag data
-  data.weights.resize( num_samples );
-  pd.get_mesh()->tag_get_element_data( tag_handle, 1,
-                                       pd.get_element_handles_array() + element,
-                                       &data.weights[0],
-                                       err );
-  if (MSQ_CHKERR(err)) {
-    data.weights.clear();
-    return false;
-  }
+    data.weights.resize( num_samples );
+    pd.get_mesh( )->tag_get_element_data( tag_handle, 1, pd.get_element_handles_array( ) + element,
+                                          &data.weights[ 0 ], err );
+    if( MSQ_CHKERR( err ) )
+    {
+        data.weights.clear( );
+        return false;
+    }
 
-  data.elementIndex = element;
+    data.elementIndex = element;
 
-  assert(offset < num_samples);
-  return data.weights[offset];
+    assert( offset < num_samples );
+    return data.weights[ offset ];
 }
-
-
-
 
 void WeightReader::notify_patch_destroyed( WeightReaderData& data )
 {
-  data.handles.clear();
-  data.weights.clear();
+    data.handles.clear( );
+    data.weights.clear( );
 }
 
 void WeightReader::notify_new_patch( PatchData&, WeightReaderData& data )
 {
-  data.weights.clear();
+    data.weights.clear( );
 }
 
-void WeightReader::notify_sub_patch( PatchData& /*pd*/,
-                                     WeightReaderData& data,
-                                     PatchData& subpatch,
-                                     const size_t* ,
-                                     const size_t* ,
-                                     MsqError& /*err*/ )
+void WeightReader::notify_sub_patch( PatchData& /*pd*/, WeightReaderData& data, PatchData& subpatch,
+                                     const size_t*, const size_t*, MsqError& /*err*/ )
 {
-  WeightReaderData& other = get_data(subpatch);
-  if (other.handles.empty())
-    other.handles = data.handles;
+    WeightReaderData& other = get_data( subpatch );
+    if( other.handles.empty( ) ) other.handles = data.handles;
 }
 
-} // namespace MBMesquite
+}  // namespace MBMesquite

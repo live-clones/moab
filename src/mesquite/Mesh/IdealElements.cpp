@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file IdealElements.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -34,33 +33,28 @@
 #include "IdealElements.hpp"
 #include "Vector3D.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
-static Vector3D unit_quad[4] = { Vector3D( -0.5, -0.5, 0.0 ),
-                                 Vector3D(  0.5, -0.5, 0.0 ),
-                                 Vector3D(  0.5,  0.5, 0.0 ),
-                                 Vector3D( -0.5,  0.5, 0.0 ) };
+static Vector3D unit_quad[ 4 ] = { Vector3D( -0.5, -0.5, 0.0 ), Vector3D( 0.5, -0.5, 0.0 ),
+                                   Vector3D( 0.5, 0.5, 0.0 ), Vector3D( -0.5, 0.5, 0.0 ) };
 
-static Vector3D unit_hex[8] = { Vector3D(  0.5, -0.5, -0.5 ),
-                                Vector3D(  0.5,  0.5, -0.5 ),
-                                Vector3D( -0.5,  0.5, -0.5 ),
-                                Vector3D( -0.5, -0.5, -0.5 ),
-                                Vector3D(  0.5, -0.5,  0.5 ),
-                                Vector3D(  0.5,  0.5,  0.5 ),
-                                Vector3D( -0.5,  0.5,  0.5 ),
-                                Vector3D( -0.5, -0.5,  0.5 ) };
+static Vector3D unit_hex[ 8 ] = { Vector3D( 0.5, -0.5, -0.5 ), Vector3D( 0.5, 0.5, -0.5 ),
+                                  Vector3D( -0.5, 0.5, -0.5 ), Vector3D( -0.5, -0.5, -0.5 ),
+                                  Vector3D( 0.5, -0.5, 0.5 ),  Vector3D( 0.5, 0.5, 0.5 ),
+                                  Vector3D( -0.5, 0.5, 0.5 ),  Vector3D( -0.5, -0.5, 0.5 ) };
 
-static Vector3D unit_edge_tri[3];
-static Vector3D unit_edge_tet[4];
-static Vector3D unit_edge_pyr[5];
-static Vector3D unit_edge_wdg[6];
-static Vector3D unit_height_pyr[5];
+static Vector3D unit_edge_tri[ 3 ];
+static Vector3D unit_edge_tet[ 4 ];
+static Vector3D unit_edge_pyr[ 5 ];
+static Vector3D unit_edge_wdg[ 6 ];
+static Vector3D unit_height_pyr[ 5 ];
 
-static Vector3D unit_tri[3];
-static Vector3D unit_tet[4];
-static Vector3D unit_pyr[5];
-static Vector3D unit_wdg[6];
-static Vector3D unit_hex_pyr[5];
+static Vector3D unit_tri[ 3 ];
+static Vector3D unit_tet[ 4 ];
+static Vector3D unit_pyr[ 5 ];
+static Vector3D unit_wdg[ 6 ];
+static Vector3D unit_hex_pyr[ 5 ];
 
 static void init_tri( Vector3D* coords, double side );
 static void init_tet( Vector3D* coords, double side );
@@ -73,106 +67,106 @@ static const Vector3D* const* init_unit_elem( Vector3D** );
 
 const Vector3D* unit_edge_element( EntityTopology ptype, bool punit_pyr )
 {
-  static Vector3D* values[MIXED+1];
-  static const Vector3D* const* data = init_unit_edge( values );
-  return (ptype == PYRAMID && punit_pyr) ? data[MIXED] : data[ptype];
+    static Vector3D*              values[ MIXED + 1 ];
+    static const Vector3D* const* data = init_unit_edge( values );
+    return ( ptype == PYRAMID && punit_pyr ) ? data[ MIXED ] : data[ ptype ];
 }
 
 const Vector3D* unit_element( EntityTopology ptype, bool punit_pyr )
 {
-  static Vector3D* values[MIXED+1];
-  static const Vector3D* const* data = init_unit_elem( values );
-  return (ptype == PYRAMID && punit_pyr) ? data[MIXED] : data[ptype];
+    static Vector3D*              values[ MIXED + 1 ];
+    static const Vector3D* const* data = init_unit_elem( values );
+    return ( ptype == PYRAMID && punit_pyr ) ? data[ MIXED ] : data[ ptype ];
 }
 
 static const Vector3D* const* init_unit_edge( Vector3D** ptr )
 {
-  for (unsigned i = 0; i < MIXED; ++i)
-    ptr[i] = 0;
+    for( unsigned i = 0; i < MIXED; ++i )
+        ptr[ i ] = 0;
 
-  init_tri( unit_edge_tri, 1.0 );
-  init_tet( unit_edge_tet, 1.0 );
-  init_pyr( unit_edge_pyr, 1.0 );
-  init_wdg( unit_edge_wdg, 1.0 );
-  init_hex_pyr( unit_height_pyr, 1.0 );
+    init_tri( unit_edge_tri, 1.0 );
+    init_tet( unit_edge_tet, 1.0 );
+    init_pyr( unit_edge_pyr, 1.0 );
+    init_wdg( unit_edge_wdg, 1.0 );
+    init_hex_pyr( unit_height_pyr, 1.0 );
 
-  ptr[TRIANGLE] = unit_edge_tri;
-  ptr[QUADRILATERAL] = unit_quad;
-  ptr[TETRAHEDRON] = unit_edge_tet;
-  ptr[PYRAMID] = unit_edge_pyr;
-  ptr[PRISM] = unit_edge_wdg;
-  ptr[HEXAHEDRON] = unit_hex;
-  ptr[MIXED] = unit_height_pyr;
-  return ptr;
+    ptr[ TRIANGLE ] = unit_edge_tri;
+    ptr[ QUADRILATERAL ] = unit_quad;
+    ptr[ TETRAHEDRON ] = unit_edge_tet;
+    ptr[ PYRAMID ] = unit_edge_pyr;
+    ptr[ PRISM ] = unit_edge_wdg;
+    ptr[ HEXAHEDRON ] = unit_hex;
+    ptr[ MIXED ] = unit_height_pyr;
+    return ptr;
 }
 
 static const Vector3D* const* init_unit_elem( Vector3D** ptr )
 {
-  for (unsigned i = 0; i < MIXED; ++i)
-    ptr[i] = 0;
+    for( unsigned i = 0; i < MIXED; ++i )
+        ptr[ i ] = 0;
 
-  init_tri( unit_tri, 2.0 * pow( 3.0, -0.25 ) );
-  init_tet( unit_tet, MBMesquite::cbrt( 3.0 ) * sqrt(2.0) );
-  init_pyr( unit_pyr, pow( 18.0, 1.0/6.0 ) );
-  init_wdg( unit_wdg, MBMesquite::cbrt( 4.0 ) * pow( 3.0, -1.0/6.0 ) );
-  init_hex_pyr( unit_hex_pyr, MBMesquite::cbrt( 3.0 ) );
+    init_tri( unit_tri, 2.0 * pow( 3.0, -0.25 ) );
+    init_tet( unit_tet, MBMesquite::cbrt( 3.0 ) * sqrt( 2.0 ) );
+    init_pyr( unit_pyr, pow( 18.0, 1.0 / 6.0 ) );
+    init_wdg( unit_wdg, MBMesquite::cbrt( 4.0 ) * pow( 3.0, -1.0 / 6.0 ) );
+    init_hex_pyr( unit_hex_pyr, MBMesquite::cbrt( 3.0 ) );
 
-  ptr[TRIANGLE] = unit_tri;
-  ptr[QUADRILATERAL] = unit_quad;
-  ptr[TETRAHEDRON] = unit_tet;
-  ptr[PYRAMID] = unit_pyr;
-  ptr[PRISM] = unit_wdg;
-  ptr[HEXAHEDRON] = unit_hex;
-  ptr[MIXED] = unit_hex_pyr;
-  return ptr;
+    ptr[ TRIANGLE ] = unit_tri;
+    ptr[ QUADRILATERAL ] = unit_quad;
+    ptr[ TETRAHEDRON ] = unit_tet;
+    ptr[ PYRAMID ] = unit_pyr;
+    ptr[ PRISM ] = unit_wdg;
+    ptr[ HEXAHEDRON ] = unit_hex;
+    ptr[ MIXED ] = unit_hex_pyr;
+    return ptr;
 }
 
 static void init_tri( Vector3D* coords, double side )
 {
-  const double third_height = side * sqrt(3.0) / 6.0;
-  coords[1] = Vector3D( -0.5*side,  -third_height, 0.0 );
-  coords[2] = Vector3D(  0.5*side,  -third_height, 0.0 );
-  coords[0] = Vector3D(  0.0,      2*third_height, 0.0 );
+    const double third_height = side * sqrt( 3.0 ) / 6.0;
+    coords[ 1 ] = Vector3D( -0.5 * side, -third_height, 0.0 );
+    coords[ 2 ] = Vector3D( 0.5 * side, -third_height, 0.0 );
+    coords[ 0 ] = Vector3D( 0.0, 2 * third_height, 0.0 );
 }
 
 static void init_tet( Vector3D* coords, double side )
 {
-  const double height = side * sqrt(2.0/3.0);
-  const double third_base = side * sqrt(3.0) / 6.0;
-  coords[0] = Vector3D( -0.5*side,  -third_base, -0.25*height );
-  coords[1] = Vector3D(  0.5*side,  -third_base, -0.25*height );
-  coords[2] = Vector3D(  0.0,      2*third_base, -0.25*height );
-  coords[3] = Vector3D(  0.0,      0.0,           0.75*height );
+    const double height = side * sqrt( 2.0 / 3.0 );
+    const double third_base = side * sqrt( 3.0 ) / 6.0;
+    coords[ 0 ] = Vector3D( -0.5 * side, -third_base, -0.25 * height );
+    coords[ 1 ] = Vector3D( 0.5 * side, -third_base, -0.25 * height );
+    coords[ 2 ] = Vector3D( 0.0, 2 * third_base, -0.25 * height );
+    coords[ 3 ] = Vector3D( 0.0, 0.0, 0.75 * height );
 }
 
 static void init_pyr( Vector3D* coords, double side )
 {
-  const double height = side * sqrt(2.0) * 0.5;
-  coords[0] = Vector3D(  0.5*side, -0.5*side, -0.25*height );
-  coords[1] = Vector3D(  0.5*side,  0.5*side, -0.25*height );
-  coords[2] = Vector3D( -0.5*side,  0.5*side, -0.25*height );
-  coords[3] = Vector3D( -0.5*side, -0.5*side, -0.25*height );
-  coords[4] = Vector3D(  0.0,       0.0,       0.75*height );
+    const double height = side * sqrt( 2.0 ) * 0.5;
+    coords[ 0 ] = Vector3D( 0.5 * side, -0.5 * side, -0.25 * height );
+    coords[ 1 ] = Vector3D( 0.5 * side, 0.5 * side, -0.25 * height );
+    coords[ 2 ] = Vector3D( -0.5 * side, 0.5 * side, -0.25 * height );
+    coords[ 3 ] = Vector3D( -0.5 * side, -0.5 * side, -0.25 * height );
+    coords[ 4 ] = Vector3D( 0.0, 0.0, 0.75 * height );
 }
 
 static void init_wdg( Vector3D* coords, double side )
 {
-  const double third_height = side * sqrt(3.0) / 6.0;
-  coords[0] = Vector3D( -0.5*side,  -third_height, -0.5*side );
-  coords[1] = Vector3D(  0.5*side,  -third_height, -0.5*side );
-  coords[2] = Vector3D(  0.0,      2*third_height, -0.5*side );
-  coords[3] = Vector3D( -0.5*side,  -third_height,  0.5*side );
-  coords[4] = Vector3D(  0.5*side,  -third_height,  0.5*side );
-  coords[5] = Vector3D(  0.0,      2*third_height,  0.5*side );
+    const double third_height = side * sqrt( 3.0 ) / 6.0;
+    coords[ 0 ] = Vector3D( -0.5 * side, -third_height, -0.5 * side );
+    coords[ 1 ] = Vector3D( 0.5 * side, -third_height, -0.5 * side );
+    coords[ 2 ] = Vector3D( 0.0, 2 * third_height, -0.5 * side );
+    coords[ 3 ] = Vector3D( -0.5 * side, -third_height, 0.5 * side );
+    coords[ 4 ] = Vector3D( 0.5 * side, -third_height, 0.5 * side );
+    coords[ 5 ] = Vector3D( 0.0, 2 * third_height, 0.5 * side );
 }
 
 static void init_hex_pyr( Vector3D* coords, double side )
 {
-  coords[0] = Vector3D(  0.5*side, -0.5*side, -0.25*side );
-  coords[1] = Vector3D(  0.5*side,  0.5*side, -0.25*side );
-  coords[2] = Vector3D( -0.5*side,  0.5*side, -0.25*side );
-  coords[3] = Vector3D( -0.5*side, -0.5*side, -0.25*side );
-  coords[4] = Vector3D(  0.0,       0.0,       0.75*side );
+    coords[ 0 ] = Vector3D( 0.5 * side, -0.5 * side, -0.25 * side );
+    coords[ 1 ] = Vector3D( 0.5 * side, 0.5 * side, -0.25 * side );
+    coords[ 2 ] = Vector3D( -0.5 * side, 0.5 * side, -0.25 * side );
+    coords[ 3 ] = Vector3D( -0.5 * side, -0.5 * side, -0.25 * side );
+    coords[ 4 ] = Vector3D( 0.0, 0.0, 0.75 * side );
 }
 
-} // namespace MBMesquite
+}  // namespace MBMesquite

@@ -37,7 +37,6 @@
 #ifndef Mesquite_MeshTransform_hpp
 #define Mesquite_MeshTransform_hpp
 
-
 #include "Mesquite.hpp"
 #include "Vector3D.hpp"
 #include "Matrix3D.hpp"
@@ -46,37 +45,39 @@
 namespace MBMesquite
 {
 
-  /*! \class MeshTransform
-    Perform an Affine transformation on Mesh vertex positions.
-    Essentially define the new vertex position, v_new, from the original
-    vertex position, v_old, s.t.
-    v_new = (mMat * v_old) + mVec,
-    where mMat is a constant matrix and mVec is a constant vector.
-   */
-  class MESQUITE_EXPORT MeshTransform : public Instruction
-  {
+/*! \class MeshTransform
+  Perform an Affine transformation on Mesh vertex positions.
+  Essentially define the new vertex position, v_new, from the original
+  vertex position, v_old, s.t.
+  v_new = (mMat * v_old) + mVec,
+  where mMat is a constant matrix and mVec is a constant vector.
+ */
+class MESQUITE_EXPORT MeshTransform : public Instruction
+{
   public:
-    MeshTransform(bool skip_fixed = false)
-      : mMat(1,0,0,0,1,0,0,0,1), mVec(0.0), skipFixed(skip_fixed)
-       {}
-    MeshTransform(Matrix3D &in_mat, Vector3D &in_vec,
-                                  bool skip_fixed = false)
-      : mMat(in_mat), mVec(in_vec), skipFixed(skip_fixed)
-      {}
+    MeshTransform( bool skip_fixed = false )
+        : mMat( 1, 0, 0, 0, 1, 0, 0, 0, 1 ), mVec( 0.0 ), skipFixed( skip_fixed )
+    {
+    }
+    MeshTransform( Matrix3D& in_mat, Vector3D& in_vec, bool skip_fixed = false )
+        : mMat( in_mat ), mVec( in_vec ), skipFixed( skip_fixed )
+    {
+    }
 
-      // virtual destructor ensures use of polymorphism during destruction
-    virtual ~MeshTransform();
+    // virtual destructor ensures use of polymorphism during destruction
+    virtual ~MeshTransform( );
 
-      //virtual functions from PatchDataUser...
-      //!Loop over the mesh and perform the affine transformation
-    virtual double loop_over_mesh( MeshDomainAssoc* mesh_and_domain,
-                                   const Settings* settings,
-                                   MsqError &err);
-      //! Return the name of this PatchDataUser:  Mesh Transform
-    virtual std::string get_name() const { return "Mesh Transform";}
+    // virtual functions from PatchDataUser...
+    //! Loop over the mesh and perform the affine transformation
+    virtual double loop_over_mesh( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
+                                   MsqError& err );
+    //! Return the name of this PatchDataUser:  Mesh Transform
+    virtual std::string get_name( ) const
+    {
+        return "Mesh Transform";
+    }
 
-    virtual void initialize_queue( MeshDomainAssoc* mesh_and_domain,
-                                   const Settings* settings,
+    virtual void initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
                                    MsqError& err );
 
     void add_translation( const Vector3D& offset );
@@ -84,15 +85,20 @@ namespace MBMesquite
     void add_scale( double factor );
     void add_scale( const Vector3D& factors );
 
-    bool skipping_fixed_vertices() const { return skipFixed; }
-    void skip_fixed_vertices(bool yesno) { skipFixed = yesno; }
+    bool skipping_fixed_vertices( ) const
+    {
+        return skipFixed;
+    }
+    void skip_fixed_vertices( bool yesno )
+    {
+        skipFixed = yesno;
+    }
 
   private:
-    Matrix3D mMat;//!Matrix for the affine transformation
-    Vector3D mVec;//!Vector for the affine transformation
-    bool skipFixed;
-  };
+    Matrix3D mMat;  //! Matrix for the affine transformation
+    Vector3D mVec;  //! Vector for the affine transformation
+    bool     skipFixed;
+};
 
-
-} // namespace
-#endif // Mesquite_MeshTransform_hpp
+}  // namespace MBMesquite
+#endif  // Mesquite_MeshTransform_hpp

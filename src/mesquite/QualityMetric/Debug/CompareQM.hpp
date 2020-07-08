@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file CompareQM.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -37,7 +36,8 @@
 #include "QualityMetric.hpp"
 #include "SimpleStats.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 /**\brief Compare values for two supposedly equivalent quality metrics
  *
@@ -55,150 +55,116 @@ namespace MBMesquite {
  */
 class CompareQM : public QualityMetric
 {
-public:
-  MESQUITE_EXPORT
-  CompareQM( QualityMetric* primary,
-             QualityMetric* other,
-             const char* primary_name = 0,
-             const char* other_name = 0 );
+  public:
+    MESQUITE_EXPORT
+    CompareQM( QualityMetric* primary, QualityMetric* other, const char* primary_name = 0,
+               const char* other_name = 0 );
 
-  MESQUITE_EXPORT
-  void abort_on_mismatch( double tolerance_factor = 1e-6 );
+    MESQUITE_EXPORT
+    void abort_on_mismatch( double tolerance_factor = 1e-6 );
 
-  MESQUITE_EXPORT
-  void do_not_abort();
+    MESQUITE_EXPORT
+    void do_not_abort( );
 
-  MESQUITE_EXPORT
-  bool will_abort_on_mismatch() const;
+    MESQUITE_EXPORT
+    bool will_abort_on_mismatch( ) const;
 
-  MESQUITE_EXPORT
-  void print_stats() const;
+    MESQUITE_EXPORT
+    void print_stats( ) const;
 
-  MESQUITE_EXPORT virtual
-  ~CompareQM();
+    MESQUITE_EXPORT virtual ~CompareQM( );
 
-  MESQUITE_EXPORT virtual
-  MetricType get_metric_type() const;
+    MESQUITE_EXPORT virtual MetricType get_metric_type( ) const;
 
-  MESQUITE_EXPORT virtual
-  std::string get_name() const;
+    MESQUITE_EXPORT virtual std::string get_name( ) const;
 
-  MESQUITE_EXPORT virtual
-  int get_negate_flag() const;
+    MESQUITE_EXPORT virtual int get_negate_flag( ) const;
 
-  MESQUITE_EXPORT virtual
-  void get_evaluations( PatchData& pd,
-                        std::vector<size_t>& handles,
-                        bool free_vertices_only,
-                        MsqError& err );
+    MESQUITE_EXPORT virtual void get_evaluations( PatchData& pd, std::vector< size_t >& handles,
+                                                  bool free_vertices_only, MsqError& err );
 
-  MESQUITE_EXPORT virtual
-  bool evaluate( PatchData& pd,
-                 size_t handle,
-                 double& value,
-                 MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate( PatchData& pd, size_t handle, double& value,
+                                           MsqError& err );
 
+    MESQUITE_EXPORT virtual bool evaluate_with_indices( PatchData& pd, size_t handle, double& value,
+                                                        std::vector< size_t >& indices,
+                                                        MsqError&              err );
 
-  MESQUITE_EXPORT virtual
-  bool evaluate_with_indices( PatchData& pd,
-                 size_t handle,
-                 double& value,
-                 std::vector<size_t>& indices,
-                 MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate_with_gradient( PatchData& pd, size_t handle,
+                                                         double&                  value,
+                                                         std::vector< size_t >&   indices,
+                                                         std::vector< Vector3D >& gradient,
+                                                         MsqError&                err );
 
-  MESQUITE_EXPORT virtual
-  bool evaluate_with_gradient( PatchData& pd,
-                 size_t handle,
-                 double& value,
-                 std::vector<size_t>& indices,
-                 std::vector<Vector3D>& gradient,
-                 MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate_with_Hessian_diagonal(
+        PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
+        std::vector< Vector3D >& gradient, std::vector< SymMatrix3D >& Hessian_diagonal,
+        MsqError& err );
 
-  MESQUITE_EXPORT virtual
-  bool evaluate_with_Hessian_diagonal( PatchData& pd,
-                 size_t handle,
-                 double& value,
-                 std::vector<size_t>& indices,
-                 std::vector<Vector3D>& gradient,
-                 std::vector<SymMatrix3D>& Hessian_diagonal,
-                 MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate_with_Hessian( PatchData& pd, size_t handle, double& value,
+                                                        std::vector< size_t >&   indices,
+                                                        std::vector< Vector3D >& gradient,
+                                                        std::vector< Matrix3D >& Hessian,
+                                                        MsqError&                err );
 
-  MESQUITE_EXPORT virtual
-  bool evaluate_with_Hessian( PatchData& pd,
-                 size_t handle,
-                 double& value,
-                 std::vector<size_t>& indices,
-                 std::vector<Vector3D>& gradient,
-                 std::vector<Matrix3D>& Hessian,
-                 MsqError& err );
-private:
+  private:
+    double epsilon( double val1, double val2 );
 
-  double epsilon( double val1, double val2 );
-
-  bool check_valid( size_t handle, bool valid1, bool valid2 );
-
+    bool check_valid( size_t handle, bool valid1, bool valid2 );
 
     /** Compare values, add to stats, etc. */
-  void check_value( size_t handle, double value1, double value2 );
+    void check_value( size_t handle, double value1, double value2 );
 
     /** Check that two index lists are equivalent and return
      *  in \c map_out for each index in \c idx1 the position
      *  of the same index in \c idx2.
      */
-  void check_indices( size_t handle,
-                      const std::vector<size_t>& idx1,
-                      const std::vector<size_t>& idx2,
-                      std::vector<size_t>& map_out,
-                      MsqError& err );
+    void check_indices( size_t handle, const std::vector< size_t >& idx1,
+                        const std::vector< size_t >& idx2, std::vector< size_t >& map_out,
+                        MsqError& err );
 
-  void check_grad( size_t handle,
-                   const std::vector<size_t>& indices,
-                   const std::vector<size_t>& index_map,
-                   const std::vector<Vector3D>& grad1,
-                   const std::vector<Vector3D>& grad2 );
+    void check_grad( size_t handle, const std::vector< size_t >& indices,
+                     const std::vector< size_t >& index_map, const std::vector< Vector3D >& grad1,
+                     const std::vector< Vector3D >& grad2 );
 
-  void check_hess_diag( size_t handle,
-                        const std::vector<size_t>& indices,
-                        const std::vector<size_t>& index_map,
-                        const std::vector<SymMatrix3D>& hess1,
-                        const std::vector<SymMatrix3D>& hess2 );
+    void check_hess_diag( size_t handle, const std::vector< size_t >& indices,
+                          const std::vector< size_t >&      index_map,
+                          const std::vector< SymMatrix3D >& hess1,
+                          const std::vector< SymMatrix3D >& hess2 );
 
-  void check_hess( size_t handle,
-                   const std::vector<size_t>& indices,
-                   const std::vector<size_t>& index_map,
-                   const std::vector<Matrix3D>& hess1,
-                   const std::vector<Matrix3D>& hess2 );
+    void check_hess( size_t handle, const std::vector< size_t >& indices,
+                     const std::vector< size_t >& index_map, const std::vector< Matrix3D >& hess1,
+                     const std::vector< Matrix3D >& hess2 );
 
-  void index_mismatch( size_t handle,
-                       const std::vector<size_t>& idx1,
-                       const std::vector<size_t>& idx2,
-                       MsqError& err );
+    void index_mismatch( size_t handle, const std::vector< size_t >& idx1,
+                         const std::vector< size_t >& idx2, MsqError& err );
 
-  struct GradStat {
-    SimpleStats x, y, z;
-    void add( Vector3D grad );
-    void add_diff( Vector3D grad1, Vector3D grad2 );
-  };
-  struct HessStat {
-    SimpleStats xx, xy, xz, yy, yz, zz;
-    void add_diag( Matrix3D hess );
-    void add_diag( SymMatrix3D hess );
-    void add_diag_diff( Matrix3D hess1, Matrix3D hess2 );
-    void add_diag_diff( SymMatrix3D hess1, SymMatrix3D hess2 );
-    void add_nondiag( Matrix3D hess );
-    void add_nondiag_diff( Matrix3D hess1, Matrix3D hess2 );
-  };
+    struct GradStat
+    {
+        SimpleStats x, y, z;
+        void        add( Vector3D grad );
+        void        add_diff( Vector3D grad1, Vector3D grad2 );
+    };
+    struct HessStat
+    {
+        SimpleStats xx, xy, xz, yy, yz, zz;
+        void        add_diag( Matrix3D hess );
+        void        add_diag( SymMatrix3D hess );
+        void        add_diag_diff( Matrix3D hess1, Matrix3D hess2 );
+        void        add_diag_diff( SymMatrix3D hess1, SymMatrix3D hess2 );
+        void        add_nondiag( Matrix3D hess );
+        void        add_nondiag_diff( Matrix3D hess1, Matrix3D hess2 );
+    };
 
-  std::string primaryName, otherName;
-  QualityMetric *primaryMetric, *otherMetric;
-  bool abortOnMismatch;
-  double toleranceFactor;
-  SimpleStats valPrimary, valOther, valDiff;
-  GradStat gradPrimary, gradOther, gradDiff;
-  HessStat hessPrimary, hessOther, hessDiff;
-
+    std::string    primaryName, otherName;
+    QualityMetric *primaryMetric, *otherMetric;
+    bool           abortOnMismatch;
+    double         toleranceFactor;
+    SimpleStats    valPrimary, valOther, valDiff;
+    GradStat       gradPrimary, gradOther, gradDiff;
+    HessStat       hessPrimary, hessOther, hessDiff;
 };
 
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

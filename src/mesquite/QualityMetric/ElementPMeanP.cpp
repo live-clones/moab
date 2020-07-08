@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file ElementPMeanP.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -36,84 +35,77 @@
 #include "MsqError.hpp"
 #include "PatchData.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 ElementPMeanP::ElementPMeanP( double p, ElemSampleQM* metric )
-    : PMeanPMetric( p ),
-      mMetric(metric)
-    {}
-
-ElementPMeanP::~ElementPMeanP() {}
-
-std::string ElementPMeanP::get_name() const
+    : PMeanPMetric( p ), mMetric( metric )
 {
-  std::string result("ElementPMeanP(");
-  result += mMetric->get_name();
-  result += ")";
-  return result;
 }
 
+ElementPMeanP::~ElementPMeanP( ) {}
 
-int ElementPMeanP::get_negate_flag() const
+std::string ElementPMeanP::get_name( ) const
 {
-  return get_quality_metric()->get_negate_flag();
+    std::string result( "ElementPMeanP(" );
+    result += mMetric->get_name( );
+    result += ")";
+    return result;
 }
 
-bool ElementPMeanP::evaluate( PatchData& pd,
-                              size_t handle,
-                              double& value,
-                              MsqError& err )
+int ElementPMeanP::get_negate_flag( ) const
 {
-  ElemSampleQM* qm = get_quality_metric();
-  mHandles.clear();
-  qm->get_element_evaluations( pd, handle, mHandles, err ); MSQ_ERRFALSE(err);
-  bool result = average( pd, qm, mHandles, value, err );
-  return !MSQ_CHKERR(err) && result;
+    return get_quality_metric( )->get_negate_flag( );
 }
 
-bool ElementPMeanP::evaluate_with_gradient( PatchData& pd,
-                                            size_t handle,
-                                            double& value,
-                                            std::vector<size_t>& indices,
-                                            std::vector<Vector3D>& gradient,
-                                            MsqError& err )
+bool ElementPMeanP::evaluate( PatchData& pd, size_t handle, double& value, MsqError& err )
 {
-  ElemSampleQM* qm = get_quality_metric();
-  mHandles.clear();
-  qm->get_element_evaluations( pd, handle, mHandles, err ); MSQ_ERRFALSE(err);
-  bool result = average_with_gradient( pd, qm, mHandles, value, indices, gradient, err );
-  return !MSQ_CHKERR(err) && result;
+    ElemSampleQM* qm = get_quality_metric( );
+    mHandles.clear( );
+    qm->get_element_evaluations( pd, handle, mHandles, err );
+    MSQ_ERRFALSE( err );
+    bool result = average( pd, qm, mHandles, value, err );
+    return !MSQ_CHKERR( err ) && result;
 }
 
-bool ElementPMeanP::evaluate_with_Hessian( PatchData& pd,
-                          size_t handle,
-                          double& value,
-                          std::vector<size_t>& indices,
-                          std::vector<Vector3D>& gradient,
-                          std::vector<Matrix3D>& Hessian,
-                          MsqError& err )
+bool ElementPMeanP::evaluate_with_gradient( PatchData& pd, size_t handle, double& value,
+                                            std::vector< size_t >&   indices,
+                                            std::vector< Vector3D >& gradient, MsqError& err )
 {
-  ElemSampleQM* qm = get_quality_metric();
-  mHandles.clear();
-  qm->get_element_evaluations( pd, handle, mHandles, err ); MSQ_ERRFALSE(err);
-  bool result = average_with_Hessian( pd, qm, mHandles, value, indices, gradient, Hessian, err );
-  return !MSQ_CHKERR(err) && result;
+    ElemSampleQM* qm = get_quality_metric( );
+    mHandles.clear( );
+    qm->get_element_evaluations( pd, handle, mHandles, err );
+    MSQ_ERRFALSE( err );
+    bool result = average_with_gradient( pd, qm, mHandles, value, indices, gradient, err );
+    return !MSQ_CHKERR( err ) && result;
 }
 
-bool ElementPMeanP::evaluate_with_Hessian_diagonal( PatchData& pd,
-                          size_t handle,
-                          double& value,
-                          std::vector<size_t>& indices,
-                          std::vector<Vector3D>& gradient,
-                          std::vector<SymMatrix3D>& diagonal,
-                          MsqError& err )
+bool ElementPMeanP::evaluate_with_Hessian( PatchData& pd, size_t handle, double& value,
+                                           std::vector< size_t >&   indices,
+                                           std::vector< Vector3D >& gradient,
+                                           std::vector< Matrix3D >& Hessian, MsqError& err )
 {
-  ElemSampleQM* qm = get_quality_metric();
-  mHandles.clear();
-  qm->get_element_evaluations( pd, handle, mHandles, err ); MSQ_ERRFALSE(err);
-  bool result = average_with_Hessian_diagonal( pd, qm, mHandles, value, indices, gradient, diagonal, err );
-  return !MSQ_CHKERR(err) && result;
+    ElemSampleQM* qm = get_quality_metric( );
+    mHandles.clear( );
+    qm->get_element_evaluations( pd, handle, mHandles, err );
+    MSQ_ERRFALSE( err );
+    bool result = average_with_Hessian( pd, qm, mHandles, value, indices, gradient, Hessian, err );
+    return !MSQ_CHKERR( err ) && result;
 }
 
+bool ElementPMeanP::evaluate_with_Hessian_diagonal( PatchData& pd, size_t handle, double& value,
+                                                    std::vector< size_t >&      indices,
+                                                    std::vector< Vector3D >&    gradient,
+                                                    std::vector< SymMatrix3D >& diagonal,
+                                                    MsqError&                   err )
+{
+    ElemSampleQM* qm = get_quality_metric( );
+    mHandles.clear( );
+    qm->get_element_evaluations( pd, handle, mHandles, err );
+    MSQ_ERRFALSE( err );
+    bool result =
+        average_with_Hessian_diagonal( pd, qm, mHandles, value, indices, gradient, diagonal, err );
+    return !MSQ_CHKERR( err ) && result;
+}
 
-} // namespace MBMesquite
+}  // namespace MBMesquite

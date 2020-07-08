@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file WeightCalculator.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -37,7 +36,8 @@
 #include "Sample.hpp"
 #include <stddef.h>
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 class PatchData;
 class MsqError;
@@ -48,33 +48,25 @@ class Settings;
 
 class MESQUITE_EXPORT WeightCalculator
 {
-public:
+  public:
+    virtual ~WeightCalculator( );
 
-  virtual ~WeightCalculator();
+    //!\brief Called at start of instruction queue processing
+    //!
+    //! Do any preliminary global initialization, consistency checking,
+    //! etc.  Default implementation does nothing.
+    virtual void initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
+                                   MsqError& err );
 
-   //!\brief Called at start of instruction queue processing
-   //!
-   //! Do any preliminary global initialization, consistency checking,
-   //! etc.  Default implementation does nothing.
-  virtual void initialize_queue( MeshDomainAssoc* mesh_and_domain,
-                                 const Settings* settings,
-                                 MsqError& err );
-
-
-  /**\brief Get target metric weight
-   *
-   *\param pd      The current PatchData
-   *\param element The index an element within the patch data.
-   *\param sample  The sample point in the element.
-   */
-  virtual double get_weight( PatchData& pd,
-                             size_t element,
-                             Sample sample,
-                             MsqError& err ) = 0;
+    /**\brief Get target metric weight
+     *
+     *\param pd      The current PatchData
+     *\param element The index an element within the patch data.
+     *\param sample  The sample point in the element.
+     */
+    virtual double get_weight( PatchData& pd, size_t element, Sample sample, MsqError& err ) = 0;
 };
 
-
-
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

@@ -34,93 +34,87 @@
   \date   2004-11-06
 */
 
-
 #include "MeshTransform.hpp"
 #include "MeshInterface.hpp"
 #include "MsqVertex.hpp"
 #include "MsqError.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
-  MeshTransform::~MeshTransform() {}
+MeshTransform::~MeshTransform( ) {}
 
 /*!
   Actually apply the affine transformation
   */
-  double MeshTransform::loop_over_mesh( MeshDomainAssoc* mesh_and_domain,
-                                        const Settings*,
-                                        MsqError &err )
-  {
-    Mesh* mesh = mesh_and_domain->get_mesh();
+double MeshTransform::loop_over_mesh( MeshDomainAssoc* mesh_and_domain, const Settings*,
+                                      MsqError&        err )
+{
+    Mesh* mesh = mesh_and_domain->get_mesh( );
 
-    std::vector<Mesh::VertexHandle> handle_list;
+    std::vector< Mesh::VertexHandle > handle_list;
     mesh->get_all_vertices( handle_list, err );
-    if (MSQ_CHKERR(err))
-      return 1.0;
+    if( MSQ_CHKERR( err ) ) return 1.0;
 
-    std::vector<bool> fixed(1);
-    MsqVertex vertex;
-    std::vector<Mesh::VertexHandle>::const_iterator iter;
-    for (iter = handle_list.begin(); iter != handle_list.end(); ++iter)
+    std::vector< bool >                               fixed( 1 );
+    MsqVertex                                         vertex;
+    std::vector< Mesh::VertexHandle >::const_iterator iter;
+    for( iter = handle_list.begin( ); iter != handle_list.end( ); ++iter )
     {
-      mesh->vertices_get_coordinates( &*iter, &vertex, 1, err );
-      if (MSQ_CHKERR(err))
-        return 1.0;
+        mesh->vertices_get_coordinates( &*iter, &vertex, 1, err );
+        if( MSQ_CHKERR( err ) ) return 1.0;
 
-      if (skipFixed) {
-        mesh->vertices_get_fixed_flag( &*iter, fixed, 1, err );
-        if (MSQ_CHKERR(err))
-          return 1.0;
-        if (fixed.front())
-          continue;
-      }
+        if( skipFixed )
+        {
+            mesh->vertices_get_fixed_flag( &*iter, fixed, 1, err );
+            if( MSQ_CHKERR( err ) ) return 1.0;
+            if( fixed.front( ) ) continue;
+        }
 
-      vertex = mMat * vertex + mVec;
+        vertex = mMat * vertex + mVec;
 
-      mesh->vertex_set_coordinates( *iter, vertex, err );
-      if (MSQ_CHKERR(err))
-        return 1.0;
+        mesh->vertex_set_coordinates( *iter, vertex, err );
+        if( MSQ_CHKERR( err ) ) return 1.0;
     }
 
     return 0.0;
-  }
+}
 
+void MeshTransform::add_translation( const Vector3D& offset )
+{
+    mVec += offset;
+}
 
-  void MeshTransform::add_translation( const Vector3D& offset )
-    { mVec += offset; }
+void MeshTransform::add_rotation( const Vector3D& axis, double radians )
+{
+    const double   c = cos( radians );
+    const double   s = sin( radians );
+    const Vector3D a = axis / axis.length( );
+    const Matrix3D m1( c, -a[ 2 ] * s, a[ 1 ] * s, a[ 2 ] * s, c, -a[ 0 ] * s, -a[ 1 ] * s,
+                       a[ 0 ] * s, c );
+    Matrix3D       m2;
+    m2.outer_product( a, a );
+    Matrix3D rot = m1 + ( 1.0 - c ) * m2;
+    mMat = rot * mMat;
+    mVec = rot * mVec;
+}
 
-  void MeshTransform::add_rotation( const Vector3D& axis, double radians )
+void MeshTransform::add_scale( double factor )
+{
+    add_scale( Vector3D( factor ) );
+}
+
+void MeshTransform::add_scale( const Vector3D& f )
+{
+    for( int i = 0; i < 3; ++i )
     {
-      const double c = cos(radians);
-      const double s = sin(radians);
-      const Vector3D a = axis/axis.length();
-      const Matrix3D m1(    c,   -a[2]*s, a[1]*s,
-                          a[2]*s,   c,   -a[0]*s,
-                         -a[1]*s, a[0]*s,   c    );
-      Matrix3D m2;
-      m2.outer_product(a,a);
-      Matrix3D rot = m1 + (1.0 - c) * m2;
-      mMat = rot * mMat;
-      mVec = rot * mVec;
+        mVec[ i ] *= f[ i ];
+        mMat[ i ][ 0 ] *= f[ i ];
+        mMat[ i ][ 1 ] *= f[ i ];
+        mMat[ i ][ 2 ] *= f[ i ];
     }
+}
 
-  void MeshTransform::add_scale( double factor )
-    { add_scale( Vector3D(factor) ); }
+void MeshTransform::initialize_queue( MeshDomainAssoc*, const Settings*, MsqError& ) {}
 
-  void MeshTransform::add_scale( const Vector3D& f )
-    {
-      for (int i = 0; i < 3; ++i) {
-        mVec[i] *= f[i];
-        mMat[i][0] *= f[i];
-        mMat[i][1] *= f[i];
-        mMat[i][2] *= f[i];
-      }
-    }
-
-  void MeshTransform::initialize_queue( MeshDomainAssoc* ,
-                                        const Settings* ,
-                                        MsqError&  )
-    {
-    }
-
-} // namespace MBMesquite
+}  // namespace MBMesquite

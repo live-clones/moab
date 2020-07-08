@@ -30,34 +30,35 @@
 #include "Mesquite.hpp"
 #include "PatchSet.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 class PatchData;
 class MsqError;
 
-class PatchIterator {
-public:
+class PatchIterator
+{
+  public:
+    inline PatchIterator( PatchSet* set ) : patchSet( set ) {}
 
-  inline PatchIterator( PatchSet* set )
-    : patchSet(set)
-    {}
+    bool get_next_patch( PatchData&, MsqError& err );
 
-  bool get_next_patch( PatchData&, MsqError& err );
+    PatchSet* get_patch_set( ) const
+    {
+        return patchSet;
+    }
 
-  PatchSet* get_patch_set() const { return patchSet; }
+    void reset( );  //!< reset current position to beginning o
 
-  void reset(); //!< reset current position to beginning o
+  private:
+    PatchSet* patchSet;
 
-private:
-
-  PatchSet* patchSet;
-
-  std::vector<PatchSet::PatchHandle> patches;
-  std::vector<Mesh::ElementHandle> elems;
-  std::vector<Mesh::VertexHandle> verts;
-  std::vector<PatchSet::PatchHandle>::iterator current;
+    std::vector< PatchSet::PatchHandle >           patches;
+    std::vector< Mesh::ElementHandle >             elems;
+    std::vector< Mesh::VertexHandle >              verts;
+    std::vector< PatchSet::PatchHandle >::iterator current;
 };
 
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

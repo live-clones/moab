@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file LambdaConstant.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -35,65 +34,47 @@
 #include "MsqMatrix.hpp"
 #include "MsqError.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 LambdaConstant::LambdaConstant( double lambda, TargetCalculator* W )
-  : mLambda(lambda), mTarget(W)
-  {}
-
-LambdaConstant::~LambdaConstant()
-  {}
-
-bool LambdaConstant::get_3D_target( PatchData& pd,
-                                    size_t element,
-                                    Sample sample,
-                                    MsqMatrix<3,3>& W_out,
-                                    MsqError& err )
+    : mLambda( lambda ), mTarget( W )
 {
-  bool valid = mTarget->get_3D_target( pd, element, sample, W_out, err );
-  if (MSQ_CHKERR(err) || !valid)
-    return false;
-  double lambda = this->size( W_out );
-  if (lambda < 1e-50)
-    return false;
-  W_out *= mLambda/lambda;
-  return true;
 }
 
-bool LambdaConstant::get_surface_target( PatchData& pd,
-                                    size_t element,
-                                    Sample sample,
-                                    MsqMatrix<3,2>& W_out,
-                                    MsqError& err )
+LambdaConstant::~LambdaConstant( ) {}
+
+bool LambdaConstant::get_3D_target( PatchData& pd, size_t element, Sample sample,
+                                    MsqMatrix< 3, 3 >& W_out, MsqError& err )
 {
-  bool valid = mTarget->get_surface_target( pd, element, sample, W_out, err );
-  if (MSQ_CHKERR(err) || !valid)
-    return false;
-  double lambda = this->size( W_out );
-  if (lambda < 1e-50)
-    return false;
-  W_out *= mLambda/lambda;
-  return true;
+    bool valid = mTarget->get_3D_target( pd, element, sample, W_out, err );
+    if( MSQ_CHKERR( err ) || !valid ) return false;
+    double lambda = this->size( W_out );
+    if( lambda < 1e-50 ) return false;
+    W_out *= mLambda / lambda;
+    return true;
 }
 
-
-bool LambdaConstant::get_2D_target( PatchData& pd,
-                                    size_t element,
-                                    Sample sample,
-                                    MsqMatrix<2,2>& W_out,
-                                    MsqError& err )
+bool LambdaConstant::get_surface_target( PatchData& pd, size_t element, Sample sample,
+                                         MsqMatrix< 3, 2 >& W_out, MsqError& err )
 {
-  bool valid = mTarget->get_2D_target( pd, element, sample, W_out, err );
-  if (MSQ_CHKERR(err) || !valid)
-    return false;
-  double lambda = this->size( W_out );
-  if (lambda < 1e-50)
-    return false;
-  W_out *= mLambda/lambda;
-  return true;
+    bool valid = mTarget->get_surface_target( pd, element, sample, W_out, err );
+    if( MSQ_CHKERR( err ) || !valid ) return false;
+    double lambda = this->size( W_out );
+    if( lambda < 1e-50 ) return false;
+    W_out *= mLambda / lambda;
+    return true;
 }
 
+bool LambdaConstant::get_2D_target( PatchData& pd, size_t element, Sample sample,
+                                    MsqMatrix< 2, 2 >& W_out, MsqError& err )
+{
+    bool valid = mTarget->get_2D_target( pd, element, sample, W_out, err );
+    if( MSQ_CHKERR( err ) || !valid ) return false;
+    double lambda = this->size( W_out );
+    if( lambda < 1e-50 ) return false;
+    W_out *= mLambda / lambda;
+    return true;
+}
 
-
-} // namespace MBMesquite
-
+}  // namespace MBMesquite

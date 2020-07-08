@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file Wrapper.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -35,13 +34,15 @@
 #include "MsqError.hpp"
 #include "QualityAssessor.hpp"
 
-MBMesquite::Wrapper::Wrapper() : qualAssessor( new QualityAssessor ) {}
-MBMesquite::Wrapper::~Wrapper() { delete qualAssessor; }
-
-void MBMesquite::Wrapper::run_common(  MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh,
-                                        Settings* opt, MsqError& err )
+MBMesquite::Wrapper::Wrapper( ) : qualAssessor( new QualityAssessor ) {}
+MBMesquite::Wrapper::~Wrapper( )
 {
-  QualityAssessor qa(*qualAssessor); // use copy so that subclass changes aren't persistent.
-  run_wrapper( mesh_and_domain, pmesh, opt, &qa, err );
-  MSQ_CHKERR(err); // udpate stack trace, don't care about value
+    delete qualAssessor;
+}
+
+void MBMesquite::Wrapper::run_common( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh,
+                                      Settings* opt, MsqError& err )
+{
+    QualityAssessor qa( *qualAssessor );  // use copy so that subclass changes aren't persistent.
+    run_wrapper( mesh_and_domain, pmesh, opt, &qa, err );MSQ_CHKERR( err );  // udpate stack trace, don't care about value
 }

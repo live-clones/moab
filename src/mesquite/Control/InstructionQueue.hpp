@@ -24,7 +24,8 @@
     pknupp@sandia.gov, tleurent@mcs.anl.gov, tmunson@mcs.anl.gov
 
   ***************************************************************** */
-// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3 -*-
+// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3
+// -*-
 
 /*! \file InstructionQueue.hpp
 
@@ -34,7 +35,6 @@ Header file for the MBMesquite::InstructionQueue class
   \date   2002-05-01
  */
 
-
 #ifndef MSQ_INSTRUCTION_QUEUE_HPP
 #define MSQ_INSTRUCTION_QUEUE_HPP
 
@@ -43,57 +43,58 @@ Header file for the MBMesquite::InstructionQueue class
 
 #include <list>
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
-  class MsqError;
-  class QualityImprover;
-  class QualityAssessor;
-  class Mesh;
-  class ParallelMesh;
-  class MeshDomain;
-  class MeshDomainAssoc;
-  class Instruction;
-  class MappingFunctionSet;
-  class TargetWriter;
-  class VertexSlaver;
-  class TagVertexMesh;
+class MsqError;
+class QualityImprover;
+class QualityAssessor;
+class Mesh;
+class ParallelMesh;
+class MeshDomain;
+class MeshDomainAssoc;
+class Instruction;
+class MappingFunctionSet;
+class TargetWriter;
+class VertexSlaver;
+class TagVertexMesh;
 
-  /*! \class InstructionQueue
-    \brief An InstructionQueue object gathers Mesquite Instructions and ensures
-           that the instruction queue is coherent for mesh improvement and/or
-           mesh quality assessment purposes.
+/*! \class InstructionQueue
+  \brief An InstructionQueue object gathers Mesquite Instructions and ensures
+         that the instruction queue is coherent for mesh improvement and/or
+         mesh quality assessment purposes.
 
-           The user can instantiate several InstructionQueue objects to be used
-           with various MeshSet objects.
+         The user can instantiate several InstructionQueue objects to be used
+         with various MeshSet objects.
 
-           The most commonly used functions are:
-           -# add_preconditioner(...)
-           -# add_quality_assessor(...)
-           -# set_master_quality_improver(...)
-           -# run_instructions(...)
-  */
-  class InstructionQueue : public IQInterface
-  {
+         The most commonly used functions are:
+         -# add_preconditioner(...)
+         -# add_quality_assessor(...)
+         -# set_master_quality_improver(...)
+         -# run_instructions(...)
+*/
+class InstructionQueue : public IQInterface
+{
 
   public:
     MESQUITE_EXPORT
-    InstructionQueue();
+    InstructionQueue( );
 
     MESQUITE_EXPORT
     InstructionQueue( const Settings& settings );
 
     MESQUITE_EXPORT
-    virtual ~InstructionQueue();
+    virtual ~InstructionQueue( );
 
     MESQUITE_EXPORT
     void add_target_calculator( TargetWriter* tc, MsqError& err );
 
-      //! Add a tool mark higher-order nodes as slaved.
-      //! Note:  Implies set_slaved_ho_node_mode( Settings::SLAVE_CALCULATED )
+    //! Add a tool mark higher-order nodes as slaved.
+    //! Note:  Implies set_slaved_ho_node_mode( Settings::SLAVE_CALCULATED )
     MESQUITE_EXPORT
     void add_vertex_slaver( VertexSlaver* slaver, MsqError& err );
-      //! Remove a tool mark higher-order nodes as slaved.
-      //! Note:  Implies set_slaved_ho_node_mode( Settings::SLAVE_ALL )
+    //! Remove a tool mark higher-order nodes as slaved.
+    //! Note:  Implies set_slaved_ho_node_mode( Settings::SLAVE_ALL )
     MESQUITE_EXPORT
     void remove_vertex_slaver( VertexSlaver* slaver, MsqError& err );
 
@@ -103,64 +104,62 @@ namespace MBMesquite {
     void remove_tag_vertex_mesh( TagVertexMesh* m, MsqError& err );
 
     MESQUITE_EXPORT
-    void add_preconditioner(QualityImprover* instr, MsqError &err);
+    void add_preconditioner( QualityImprover* instr, MsqError& err );
     MESQUITE_EXPORT
-    void remove_preconditioner(size_t index, MsqError &err);
+    void remove_preconditioner( size_t index, MsqError& err );
     MESQUITE_EXPORT
-    void insert_preconditioner(QualityImprover* instr, size_t index, MsqError &err);
+    void insert_preconditioner( QualityImprover* instr, size_t index, MsqError& err );
 
     MESQUITE_EXPORT
-    void add_quality_assessor(QualityAssessor* instr, MsqError &err);
+    void add_quality_assessor( QualityAssessor* instr, MsqError& err );
     MESQUITE_EXPORT
-    void remove_quality_assessor(size_t index, MsqError &err);
+    void remove_quality_assessor( size_t index, MsqError& err );
     MESQUITE_EXPORT
-    void insert_quality_assessor(QualityAssessor* instr, size_t index, MsqError &err);
+    void insert_quality_assessor( QualityAssessor* instr, size_t index, MsqError& err );
 
     MESQUITE_EXPORT
-    void set_master_quality_improver(QualityImprover* instr, MsqError &err);
+    void set_master_quality_improver( QualityImprover* instr, MsqError& err );
 
     MESQUITE_EXPORT
-    void disable_automatic_quality_assessment()
-       { autoQualAssess = false; }
+    void disable_automatic_quality_assessment( )
+    {
+        autoQualAssess = false;
+    }
     MESQUITE_EXPORT
-    void enable_automatic_quality_assessment()
-       { autoQualAssess = true; }
+    void enable_automatic_quality_assessment( )
+    {
+        autoQualAssess = true;
+    }
 
-      /**\brief Exectute the instruction queue.
-       *
-       * Execute all operations in the instruction queue.
-       *
-       *\param mesh   The mesh to run each instruction on.
-       *\param domain The domain of the mesh -- may be NULL if no domain.
-       */
+    /**\brief Exectute the instruction queue.
+     *
+     * Execute all operations in the instruction queue.
+     *
+     *\param mesh   The mesh to run each instruction on.
+     *\param domain The domain of the mesh -- may be NULL if no domain.
+     */
     MESQUITE_EXPORT
-    virtual void run_common( MeshDomainAssoc* mesh_and_domain,
-                             ParallelMesh* pmesh,
-                             Settings* settings,
-                             MsqError& err );
-
+    virtual void run_common( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh,
+                             Settings* settings, MsqError& err );
 
     MESQUITE_EXPORT
-    void clear();
+    void clear( );
 
   protected:
-
   private:
-    std::list<Instruction*>::iterator clear_master(MsqError &err);
+    std::list< Instruction* >::iterator clear_master( MsqError& err );
 
-    std::list<Instruction*> instructions;
+    std::list< Instruction* > instructions;
 
     bool autoQualAssess;
 
-    int vertexSlaverCount;
+    int    vertexSlaverCount;
     size_t nbPreConditionners;
-    bool isMasterSet;
-    size_t masterInstrIndex; //!< 0-based. Keeping an index instead of an iterator
-                             //!< in case list is reallocated
-  };
+    bool   isMasterSet;
+    size_t masterInstrIndex;  //!< 0-based. Keeping an index instead of an iterator
+                              //!< in case list is reallocated
+};
 
+}  // namespace MBMesquite
 
-} //namespace
-
-
-#endif // InstructionQueue_hpp
+#endif  // InstructionQueue_hpp

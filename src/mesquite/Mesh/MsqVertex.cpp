@@ -24,7 +24,8 @@
     pknupp@sandia.gov, tleurent@mcs.anl.gov, tmunson@mcs.anl.gov
 
   ***************************************************************** */
-// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3 -*-
+// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3
+// -*-
 /*! \file MsqVertex.cpp
 
 describe MsqVertex.cpp here
@@ -35,7 +36,7 @@ describe MsqVertex.cpp here
 
 #include "MsqVertex.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
-
-} // namespace MBMesquite
+}  // namespace MBMesquite

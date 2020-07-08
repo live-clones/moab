@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file RefSizeTargetCalculator.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -36,7 +35,8 @@
 #include "PatchData.hpp"
 #include "MsqError.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 /* We now scale W_ideal such that det(W_ideal) == 1, so don't scale here
 static void init_scale_factors( double factors[MIXED] )
@@ -53,98 +53,84 @@ static void init_scale_factors( double factors[MIXED] )
 }
 */
 
-RefSizeTargetCalculator::RefSizeTargetCalculator(
-                           ReferenceMesh* reference_mesh,
-                           TargetCalculator* tc )
-   : refMesh( reference_mesh ),
-     scaledTargets( tc )
- {} //   { init_scale_factors( scaleFactor ); }
-
-RefSizeTargetCalculator::RefSizeTargetCalculator(
-                           ReferenceMesh* reference_mesh  )
-   : refMesh( reference_mesh ),
-     scaledTargets( &defaultTargets )
- {} //   { init_scale_factors( scaleFactor );  }
-
-double RefSizeTargetCalculator::average_edge_length( PatchData& pd,
-                                                     size_t element,
-                                                     MsqError& err )
+RefSizeTargetCalculator::RefSizeTargetCalculator( ReferenceMesh*    reference_mesh,
+                                                  TargetCalculator* tc )
+    : refMesh( reference_mesh ), scaledTargets( tc )
 {
-  Vector3D coords[8];
-  MsqMeshEntity& elem = pd.element_by_index( element );
-  const size_t* conn = elem.get_vertex_index_array();
-  size_t nvtx = elem.vertex_count();
-  if (nvtx > (sizeof(coords)/sizeof(coords[0]))) {
-    MSQ_SETERR(err)("Invalid element type", MsqError::UNSUPPORTED_ELEMENT );
-    return false;
-  }
+}  //   { init_scale_factors( scaleFactor ); }
 
-  Mesh::VertexHandle handles[8];
-  for (unsigned i = 0; i < nvtx; ++i)
-    handles[i] = pd.get_vertex_handles_array()[conn[i]];
+RefSizeTargetCalculator::RefSizeTargetCalculator( ReferenceMesh* reference_mesh )
+    : refMesh( reference_mesh ), scaledTargets( &defaultTargets )
+{
+}  //   { init_scale_factors( scaleFactor );  }
 
-  refMesh->get_reference_vertex_coordinates( handles, nvtx, coords, err );
-  MSQ_ERRZERO(err);
+double RefSizeTargetCalculator::average_edge_length( PatchData& pd, size_t element, MsqError& err )
+{
+    Vector3D       coords[ 8 ];
+    MsqMeshEntity& elem = pd.element_by_index( element );
+    const size_t*  conn = elem.get_vertex_index_array( );
+    size_t         nvtx = elem.vertex_count( );
+    if( nvtx > ( sizeof( coords ) / sizeof( coords[ 0 ] ) ) )
+    {
+        MSQ_SETERR( err )( "Invalid element type", MsqError::UNSUPPORTED_ELEMENT );
+        return false;
+    }
 
-  EntityTopology type = elem.get_element_type();
-  unsigned num_edges = TopologyInfo::edges( type );
-  double len_sum = 0.0;
-  for (unsigned i = 0; i < num_edges; ++i) {
-    const unsigned* edge = TopologyInfo::edge_vertices( type, i );
-    len_sum += (coords[edge[0]] - coords[edge[1]]).length();
-  }
-  return len_sum * (1.0/num_edges); // scaleFactor[type];
+    Mesh::VertexHandle handles[ 8 ];
+    for( unsigned i = 0; i < nvtx; ++i )
+        handles[ i ] = pd.get_vertex_handles_array( )[ conn[ i ] ];
+
+    refMesh->get_reference_vertex_coordinates( handles, nvtx, coords, err );
+    MSQ_ERRZERO( err );
+
+    EntityTopology type = elem.get_element_type( );
+    unsigned       num_edges = TopologyInfo::edges( type );
+    double         len_sum = 0.0;
+    for( unsigned i = 0; i < num_edges; ++i )
+    {
+        const unsigned* edge = TopologyInfo::edge_vertices( type, i );
+        len_sum += ( coords[ edge[ 0 ] ] - coords[ edge[ 1 ] ] ).length( );
+    }
+    return len_sum * ( 1.0 / num_edges );  // scaleFactor[type];
 }
 
-
-bool RefSizeTargetCalculator::get_3D_target( PatchData& pd,
-                                             size_t element,
-                                             Sample sample,
-                                             MsqMatrix<3,3>& W,
-                                             MsqError& err )
+bool RefSizeTargetCalculator::get_3D_target( PatchData& pd, size_t element, Sample sample,
+                                             MsqMatrix< 3, 3 >& W, MsqError& err )
 {
-  scaledTargets->get_3D_target( pd, element, sample, W, err );
-  MSQ_ERRZERO(err);
+    scaledTargets->get_3D_target( pd, element, sample, W, err );
+    MSQ_ERRZERO( err );
 
-  double f = average_edge_length( pd, element, err );
-  MSQ_ERRZERO(err);
-  W *= f;
+    double f = average_edge_length( pd, element, err );
+    MSQ_ERRZERO( err );
+    W *= f;
 
-  return true;
+    return true;
 }
 
-bool RefSizeTargetCalculator::get_surface_target( PatchData& pd,
-                                            size_t element,
-                                            Sample sample,
-                                            MsqMatrix<3,2>& W,
-                                            MsqError& err )
+bool RefSizeTargetCalculator::get_surface_target( PatchData& pd, size_t element, Sample sample,
+                                                  MsqMatrix< 3, 2 >& W, MsqError& err )
 {
-  scaledTargets->get_surface_target( pd, element, sample, W, err );
-  MSQ_ERRZERO(err);
+    scaledTargets->get_surface_target( pd, element, sample, W, err );
+    MSQ_ERRZERO( err );
 
-  double f = average_edge_length( pd, element, err );
-  MSQ_ERRZERO(err);
-  W *= f;
+    double f = average_edge_length( pd, element, err );
+    MSQ_ERRZERO( err );
+    W *= f;
 
-  return true;
+    return true;
 }
 
-bool RefSizeTargetCalculator::get_2D_target( PatchData& pd,
-                                            size_t element,
-                                            Sample sample,
-                                            MsqMatrix<2,2>& W,
-                                            MsqError& err )
+bool RefSizeTargetCalculator::get_2D_target( PatchData& pd, size_t element, Sample sample,
+                                             MsqMatrix< 2, 2 >& W, MsqError& err )
 {
-  scaledTargets->get_2D_target( pd, element, sample, W, err );
-  MSQ_ERRZERO(err);
+    scaledTargets->get_2D_target( pd, element, sample, W, err );
+    MSQ_ERRZERO( err );
 
-  double f = average_edge_length( pd, element, err );
-  MSQ_ERRZERO(err);
-  W *= f;
+    double f = average_edge_length( pd, element, err );
+    MSQ_ERRZERO( err );
+    W *= f;
 
-  return true;
+    return true;
 }
 
-
-
-} // namespace MBMesquite
+}  // namespace MBMesquite

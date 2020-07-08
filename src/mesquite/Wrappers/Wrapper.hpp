@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file Wrapper.hpp
  *  \brief Common interface implemented by wrappers.
  *  \author Jason Kraftcheck
@@ -36,7 +35,8 @@
 #include "Mesquite.hpp"
 #include "IQInterface.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 class QualityAssessor;
 
@@ -49,42 +49,36 @@ class QualityAssessor;
 class MESQUITE_EXPORT Wrapper : public IQInterface
 {
   public:
+    Wrapper( );
 
-    Wrapper();
-
-    virtual ~Wrapper();
-
-    /** Get the quality assessor associated with this wrapper */
-    inline
-    QualityAssessor& quality_assessor()
-      { return *qualAssessor; }
+    virtual ~Wrapper( );
 
     /** Get the quality assessor associated with this wrapper */
-    inline
-    const QualityAssessor& quality_asssessor() const
-      { return *qualAssessor; }
+    inline QualityAssessor& quality_assessor( )
+    {
+        return *qualAssessor;
+    }
+
+    /** Get the quality assessor associated with this wrapper */
+    inline const QualityAssessor& quality_asssessor( ) const
+    {
+        return *qualAssessor;
+    }
 
   protected:
-
     /** Function inherited from IQInterface that we implement here */
-    void run_common( MeshDomainAssoc* mesh_and_domain,
-                     ParallelMesh* pmesh,
-                     Settings* settings,
+    void run_common( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh, Settings* settings,
                      MsqError& err );
 
     /** Function that each wrapper must implement */
-    virtual void run_wrapper( MeshDomainAssoc* mesh_and_domain,
-                              ParallelMesh* pmesh,
-                              Settings* settings,
-                              QualityAssessor* quality_assessor,
+    virtual void run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh,
+                              Settings* settings, QualityAssessor* quality_assessor,
                               MsqError& err ) = 0;
 
-
   private:
-
     QualityAssessor* qualAssessor;
 };
 
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

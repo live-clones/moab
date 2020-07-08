@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file IdealElements.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -35,7 +34,8 @@
 
 #include "Mesquite.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 class Vector3D;
 
@@ -51,7 +51,7 @@ class Vector3D;
  *          of equilateral triangular faces.
  *\return corner vertex coordinates in canonical order.
  */
-const Vector3D* unit_edge_element( EntityTopology type, bool unit_height_pyramid = false);
+const Vector3D* unit_edge_element( EntityTopology type, bool unit_height_pyramid = false );
 
 /**\brief Get ideal element with unit area or volume
  *
@@ -67,6 +67,6 @@ const Vector3D* unit_edge_element( EntityTopology type, bool unit_height_pyramid
  */
 const Vector3D* unit_element( EntityTopology type, bool unit_height_pyramid = false );
 
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

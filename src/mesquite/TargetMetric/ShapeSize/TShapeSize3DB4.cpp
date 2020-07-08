@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file TShapeSize3DB4.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -37,93 +36,92 @@
 
 #include <iostream>
 
-namespace MBMesquite {
-
-std::string TShapeSize3DB4::get_name() const
-  { return "TShapeSize3DB4"; }
-
-TShapeSize3DB4::~TShapeSize3DB4() {}
-
-bool TShapeSize3DB4::evaluate( const MsqMatrix<3,3>& T,
-                               double& result,
-                               MsqError& err )
+namespace MBMesquite
 {
-  const double tau = det(T);
-  if (invalid_determinant(tau)) { // barrier
-    MSQ_SETERR(err)( barrier_violated_msg, MsqError::BARRIER_VIOLATED );
-    return false;
-  }
 
-  const double norm = Frobenius(T);
-  result = norm*norm*norm / (3*MSQ_SQRT_THREE*tau) - 1
-         + mGamma * (tau + 1/tau - 2);
-  return true;
+std::string TShapeSize3DB4::get_name( ) const
+{
+    return "TShapeSize3DB4";
 }
 
-bool TShapeSize3DB4::evaluate_with_grad( const MsqMatrix<3,3>& T,
-                                         double& result,
-                                         MsqMatrix<3,3>& deriv,
+TShapeSize3DB4::~TShapeSize3DB4( ) {}
+
+bool TShapeSize3DB4::evaluate( const MsqMatrix< 3, 3 >& T, double& result, MsqError& err )
+{
+    const double tau = det( T );
+    if( invalid_determinant( tau ) )
+    {  // barrier
+        MSQ_SETERR( err )( barrier_violated_msg, MsqError::BARRIER_VIOLATED );
+        return false;
+    }
+
+    const double norm = Frobenius( T );
+    result = norm * norm * norm / ( 3 * MSQ_SQRT_THREE * tau ) - 1 + mGamma * ( tau + 1 / tau - 2 );
+    return true;
+}
+
+bool TShapeSize3DB4::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& result,
+                                         MsqMatrix< 3, 3 >& deriv, MsqError& err )
+{
+    const double tau = det( T );
+    if( invalid_determinant( tau ) )
+    {  // barrier
+        MSQ_SETERR( err )( barrier_violated_msg, MsqError::BARRIER_VIOLATED );
+        return false;
+    }
+
+    const double norm = Frobenius( T );
+    const double f = norm * norm / 3.0;
+    const double g = norm / ( MSQ_SQRT_THREE * tau );
+    const double inv_tau = 1.0 / tau;
+    result = f * g - 1 + mGamma * ( tau + inv_tau - 2 );
+
+    deriv = g * T;
+    deriv += ( mGamma * ( 1 - inv_tau * inv_tau ) - f * g * inv_tau ) * transpose_adj( T );
+
+    return true;
+}
+
+bool TShapeSize3DB4::evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result,
+                                         MsqMatrix< 3, 3 >& deriv, MsqMatrix< 3, 3 > second[ 6 ],
                                          MsqError& err )
 {
-  const double tau = det(T);
-  if (invalid_determinant(tau)) { // barrier
-    MSQ_SETERR(err)( barrier_violated_msg, MsqError::BARRIER_VIOLATED );
-    return false;
-  }
+    const double tau = det( T );
+    if( invalid_determinant( tau ) )
+    {  // barrier
+        MSQ_SETERR( err )( barrier_violated_msg, MsqError::BARRIER_VIOLATED );
+        return false;
+    }
 
-  const double norm = Frobenius(T);
-  const double f = norm*norm/3.0;
-  const double g = norm / (MSQ_SQRT_THREE * tau);
-  const double inv_tau = 1.0/tau;
-  result = f * g - 1 + mGamma * (tau + inv_tau - 2);
+    const double norm = Frobenius( T );
+    const double f = norm * norm / 3.0;
+    const double h = 1 / ( MSQ_SQRT_THREE * tau );
+    const double g = norm * h;
+    const double inv_tau = 1.0 / tau;
+    result = f * g - 1 + mGamma * ( tau + inv_tau - 2 );
 
-  deriv = g*T;
-  deriv += (mGamma * (1 - inv_tau*inv_tau) - f*g*inv_tau) * transpose_adj(T);
+    const double            g1 = mGamma * ( 1 - inv_tau * inv_tau );
+    const MsqMatrix< 3, 3 > adjt = transpose_adj( T );
+    deriv = g * T;
+    deriv += ( g1 - f * g * inv_tau ) * adjt;
 
-  return true;
+    if( norm > 1e-50 )
+    {
+        const double inv_norm = 1 / norm;
+        set_scaled_outer_product( second, h * inv_norm, T );
+        pluseq_scaled_I( second, norm * h );
+        pluseq_scaled_2nd_deriv_of_det( second, g1 - f * g * inv_tau, T );
+        pluseq_scaled_outer_product( second, ( f * g + mGamma * inv_tau ) * 2 * inv_tau * inv_tau,
+                                     adjt );
+        pluseq_scaled_sum_outer_product( second, -g * inv_tau, T, adjt );
+    }
+    else
+    {
+        std::cout << "Warning: Division by zero avoided in TShapeSize3DB4::evaluate_with_hess()"
+                  << std::endl;
+    }
+
+    return true;
 }
 
-
-bool TShapeSize3DB4::evaluate_with_hess( const MsqMatrix<3,3>& T,
-                                         double& result,
-                                         MsqMatrix<3,3>& deriv,
-                                         MsqMatrix<3,3> second[6],
-                                         MsqError& err )
-{
-  const double tau = det(T);
-  if (invalid_determinant(tau)) { // barrier
-    MSQ_SETERR(err)( barrier_violated_msg, MsqError::BARRIER_VIOLATED );
-    return false;
-  }
-
-  const double norm = Frobenius(T);
-  const double f = norm*norm/3.0;
-  const double h = 1/(MSQ_SQRT_THREE * tau);
-  const double g = norm * h;
-  const double inv_tau = 1.0/tau;
-  result = f * g - 1 + mGamma * (tau + inv_tau - 2);
-
-  const double g1 = mGamma * (1 - inv_tau*inv_tau);
-  const MsqMatrix<3,3> adjt = transpose_adj(T);
-  deriv = g*T;
-  deriv += (g1 - f*g*inv_tau) * adjt;
-
-  if (norm > 1e-50)
-  {
-    const double inv_norm = 1/norm;
-    set_scaled_outer_product( second, h*inv_norm, T );
-    pluseq_scaled_I( second, norm * h );
-    pluseq_scaled_2nd_deriv_of_det( second, g1 - f*g*inv_tau, T );
-    pluseq_scaled_outer_product( second, (f*g + mGamma*inv_tau)*2*inv_tau*inv_tau, adjt );
-    pluseq_scaled_sum_outer_product( second, -g*inv_tau, T, adjt );
-  }
-  else
-  {
-    std::cout << "Warning: Division by zero avoided in TShapeSize3DB4::evaluate_with_hess()" << std::endl;
-  }
-
-
-  return true;
-}
-
-} // namespace MBMesquite
+}  // namespace MBMesquite

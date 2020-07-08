@@ -13,7 +13,6 @@
  *
  */
 
-
 #ifndef MOAB_READER_IFACE_HPP
 #define MOAB_READER_IFACE_HPP
 
@@ -21,7 +20,8 @@
 
 #include <vector>
 
-namespace moab {
+namespace moab
+{
 
 class FileOptions;
 
@@ -34,28 +34,28 @@ class FileOptions;
 class ReaderIface
 {
   public:
+    virtual ~ReaderIface( ) {}
 
-    virtual ~ReaderIface() {}
-
-      /** Struct used to specify subset of file to read */
-    struct IDTag {
-      const char* tag_name;  //!< Name of tag containing integer IDs
-      const int* tag_values; //!< Array of integer ID values
-      int num_tag_values;    //!< Length of tag_values array
+    /** Struct used to specify subset of file to read */
+    struct IDTag
+    {
+        const char* tag_name;  //!< Name of tag containing integer IDs
+        const int*  tag_values;  //!< Array of integer ID values
+        int         num_tag_values;  //!< Length of tag_values array
     };
 
-    struct SubsetList {
-       /** An array of tag name and value sets specifying
-        *  the subset of the file to read.  If multiple
-        *  tags are specified, the sets that match all
-        *  tags (intersection) should be read.
-        */
-      IDTag* tag_list;
-      int tag_list_length;   //!< Length of tag_list array
-      int num_parts;         //!< If non-zero, load 1/num_parts of the matching sets
-      int part_number;       //!< If num_parts is non-zero, load part_number-th fraction of the sets
+    struct SubsetList
+    {
+        /** An array of tag name and value sets specifying
+         *  the subset of the file to read.  If multiple
+         *  tags are specified, the sets that match all
+         *  tags (intersection) should be read.
+         */
+        IDTag* tag_list;
+        int    tag_list_length;  //!< Length of tag_list array
+        int    num_parts;  //!< If non-zero, load 1/num_parts of the matching sets
+        int    part_number;  //!< If num_parts is non-zero, load part_number-th fraction of the sets
     };
-
 
     /**
      *\brief Load mesh from a file.
@@ -73,12 +73,9 @@ class ReaderIface
      *                      it reads, a unique integer ID for this tag.
      *\author Jason Kraftcheck
      */
-    virtual ErrorCode load_file( const char* file_name,
-                                 const EntityHandle* file_set,
-                                 const FileOptions& opts,
-                                 const SubsetList* subset_list = 0,
+    virtual ErrorCode load_file( const char* file_name, const EntityHandle* file_set,
+                                 const FileOptions& opts, const SubsetList* subset_list = 0,
                                  const Tag* file_id_tag = 0 ) = 0;
-
 
     /**
      *\brief Read tag values from a file.
@@ -95,15 +92,11 @@ class ReaderIface
      *                      tags (intersection) should be read.
      *\param subset_list_length The length of the 'subset_list' array.
      */
-    virtual ErrorCode read_tag_values( const char* file_name,
-                                         const char* tag_name,
-                                         const FileOptions& opts,
-                                         std::vector<int>& tag_values_out,
-                                         const SubsetList* subset_list = 0 ) = 0;
+    virtual ErrorCode read_tag_values( const char* file_name, const char* tag_name,
+                                       const FileOptions& opts, std::vector< int >& tag_values_out,
+                                       const SubsetList* subset_list = 0 ) = 0;
 };
 
-} // namespace moab
+}  // namespace moab
 
 #endif
-
-

@@ -24,7 +24,8 @@
     pknupp@sandia.gov, tleurent@mcs.anl.gov, tmunson@mcs.anl.gov
 
   ***************************************************************** */
-// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3 -*-
+// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3
+// -*-
 
 /*! \file IdealWeightInverseMeanRatio.hpp
 
@@ -34,7 +35,6 @@ Header file for the MBMesquite::IdealWeightInverseMeanRatio class
 \author Thomas Leurent
 \date   2002-06-19
  */
-
 
 #ifndef IdealWeightInverseMeanRatio_hpp
 #define IdealWeightInverseMeanRatio_hpp
@@ -48,96 +48,78 @@ Header file for the MBMesquite::IdealWeightInverseMeanRatio class
 
 namespace MBMesquite
 {
-    class MsqMeshEntity;
-    class PatchData;
-    class MsqError;
+class MsqMeshEntity;
+class PatchData;
+class MsqError;
 
-   /*! \class IdealWeightInverseMeanRatio
-     \brief Computes the inverse mean ratio of given element.
+/*! \class IdealWeightInverseMeanRatio
+  \brief Computes the inverse mean ratio of given element.
 
-     The metric does not use the sample point functionality or the
-     compute_weighted_jacobian.  It evaluates the metric at
-     the element vertices, and uses the isotropic ideal element.
-     Optionally, the metric computation can be raised to the
-     'pow_dbl' power.  This does not necessarily raise the metric
-     value to the 'pow_dbl' power but instead raises each local
-     metric.  For example, if the corner inverse mean ratios of a quadraliteral
-     element were m1,m2,m3, and m4 and we set pow_dbl=2 and
-     used linear averaging, the metric value would then be
-     m = .25(m1*m1 + m2*m2 + m3*m3 + m4*m4).  The metric does
-     require a feasible region, and the metric needs to be minimized
-     if pow_dbl is greater than zero and maximized if pow_dbl
-     is less than zero.  pow_dbl being equal to zero is invalid.
-   */
-   class IdealWeightInverseMeanRatio : public ElementQM, public AveragingQM
-   {
-   public:
-      MESQUITE_EXPORT IdealWeightInverseMeanRatio(MsqError& err, double power = 1.0);
-      MESQUITE_EXPORT IdealWeightInverseMeanRatio();
+  The metric does not use the sample point functionality or the
+  compute_weighted_jacobian.  It evaluates the metric at
+  the element vertices, and uses the isotropic ideal element.
+  Optionally, the metric computation can be raised to the
+  'pow_dbl' power.  This does not necessarily raise the metric
+  value to the 'pow_dbl' power but instead raises each local
+  metric.  For example, if the corner inverse mean ratios of a quadraliteral
+  element were m1,m2,m3, and m4 and we set pow_dbl=2 and
+  used linear averaging, the metric value would then be
+  m = .25(m1*m1 + m2*m2 + m3*m3 + m4*m4).  The metric does
+  require a feasible region, and the metric needs to be minimized
+  if pow_dbl is greater than zero and maximized if pow_dbl
+  is less than zero.  pow_dbl being equal to zero is invalid.
+*/
+class IdealWeightInverseMeanRatio : public ElementQM, public AveragingQM
+{
+  public:
+    MESQUITE_EXPORT IdealWeightInverseMeanRatio( MsqError& err, double power = 1.0 );
+    MESQUITE_EXPORT IdealWeightInverseMeanRatio( );
 
-      //! virtual destructor ensures use of polymorphism during destruction
-      MESQUITE_EXPORT virtual ~IdealWeightInverseMeanRatio() {
-      }
+    //! virtual destructor ensures use of polymorphism during destruction
+    MESQUITE_EXPORT virtual ~IdealWeightInverseMeanRatio( ) {}
 
+    virtual std::string get_name( ) const;
 
-     virtual std::string get_name() const;
+    //! 1 if metric should be minimized, -1 if metric should be maximized.
+    virtual int get_negate_flag( ) const;
 
-      //! 1 if metric should be minimized, -1 if metric should be maximized.
-     virtual int get_negate_flag() const;
+    virtual bool evaluate( PatchData& pd, size_t handle, double& value, MsqError& err );
 
-     virtual
-     bool evaluate( PatchData& pd,
-                    size_t handle,
-                    double& value,
-                    MsqError& err );
+    virtual bool evaluate_with_gradient( PatchData& pd, size_t handle, double& value,
+                                         std::vector< size_t >&   indices,
+                                         std::vector< Vector3D >& gradient, MsqError& err );
 
-     virtual
-     bool evaluate_with_gradient( PatchData& pd,
-                    size_t handle,
-                    double& value,
-                    std::vector<size_t>& indices,
-                    std::vector<Vector3D>& gradient,
-                    MsqError& err );
+    virtual bool evaluate_with_Hessian_diagonal( PatchData& pd, size_t handle, double& value,
+                                                 std::vector< size_t >&      indices,
+                                                 std::vector< Vector3D >&    gradient,
+                                                 std::vector< SymMatrix3D >& Hessian,
+                                                 MsqError&                   err );
 
-     virtual
-     bool evaluate_with_Hessian_diagonal( PatchData& pd,
-                    size_t handle,
-                    double& value,
-                    std::vector<size_t>& indices,
-                    std::vector<Vector3D>& gradient,
-                    std::vector<SymMatrix3D>& Hessian,
-                    MsqError& err );
+    virtual bool evaluate_with_Hessian( PatchData& pd, size_t handle, double& value,
+                                        std::vector< size_t >&   indices,
+                                        std::vector< Vector3D >& gradient,
+                                        std::vector< Matrix3D >& Hessian, MsqError& err );
 
-     virtual
-     bool evaluate_with_Hessian( PatchData& pd,
-                    size_t handle,
-                    double& value,
-                    std::vector<size_t>& indices,
-                    std::vector<Vector3D>& gradient,
-                    std::vector<Matrix3D>& Hessian,
-                    MsqError& err );
+  private:
+    //! Sets the power value in the metric computation.
+    void set_metric_power( double pow_dbl, MsqError& err );
 
-    private:
-       //! Sets the power value in the metric computation.
-     void set_metric_power(double pow_dbl, MsqError& err);
+    // arrays used in Hessian computations
+    // We allocate them here, so that one allocation only is done.
+    // This gives a big computation speed increase.
+    Vector3D mCoords[ 4 ];  // Vertex coordinates for the (decomposed) elements
+    Vector3D mGradients[ 32 ];  // Gradient of metric with respect to the coords
+    Matrix3D mHessians[ 80 ];  // Hessian of metric with respect to the coords
+    double   mMetrics[ 8 ];  // Metric values for the (decomposed) elements
+                           // variables used in the definition of the metric (2d and 3d)
+    double   a2Con;
+    Exponent b2Con;
+    Exponent c2Con;
 
-      // arrays used in Hessian computations
-      // We allocate them here, so that one allocation only is done.
-      // This gives a big computation speed increase.
-      Vector3D mCoords[4]; // Vertex coordinates for the (decomposed) elements
-      Vector3D mGradients[32]; // Gradient of metric with respect to the coords
-      Matrix3D mHessians[80]; // Hessian of metric with respect to the coords
-      double   mMetrics[8]; // Metric values for the (decomposed) elements
-       //variables used in the definition of the metric (2d and 3d)
-     double a2Con;
-     Exponent b2Con;
-     Exponent c2Con;
+    double   a3Con;
+    Exponent b3Con;
+    Exponent c3Con;
+};
+}  // namespace MBMesquite
 
-     double a3Con;
-     Exponent b3Con;
-     Exponent c3Con;
-   };
-} //namespace
-
-
-#endif // IdealWeightInverseMeanRatio_hpp
+#endif  // IdealWeightInverseMeanRatio_hpp

@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file TSquared.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -36,39 +35,41 @@
 #include "TMPCommon.hpp"
 #include "TMPDerivs.hpp"
 
-namespace MBMesquite {
-
-std::string TSquared::get_name() const
-  { return "TSquared"; }
-
-TSquared::~TSquared() {}
-
-template <unsigned DIM> static inline
-bool eval( const MsqMatrix<DIM,DIM>& T, double& result)
+namespace MBMesquite
 {
-  result = sqr_Frobenius( T );
-  return true;
+
+std::string TSquared::get_name( ) const
+{
+    return "TSquared";
 }
 
-template <unsigned DIM> static inline
-bool grad( const MsqMatrix<DIM,DIM>& T, double& result, MsqMatrix<DIM,DIM>& wrt_T )
+TSquared::~TSquared( ) {}
+
+template< unsigned DIM > static inline bool eval( const MsqMatrix< DIM, DIM >& T, double& result )
 {
-  result = sqr_Frobenius( T );
-  wrt_T = 2*T;
-  return true;
+    result = sqr_Frobenius( T );
+    return true;
 }
 
-template <unsigned DIM> static inline
-bool hess( const MsqMatrix<DIM,DIM>& T, double& result,
-           MsqMatrix<DIM,DIM>& deriv_wrt_T, MsqMatrix<DIM,DIM>* second_wrt_T )
+template< unsigned DIM >
+static inline bool grad( const MsqMatrix< DIM, DIM >& T, double& result,
+                         MsqMatrix< DIM, DIM >& wrt_T )
 {
-  result = sqr_Frobenius( T );
-  deriv_wrt_T = 2 * T;
-  set_scaled_I( second_wrt_T, 2.0 );
-  return true;
+    result = sqr_Frobenius( T );
+    wrt_T = 2 * T;
+    return true;
 }
 
-TMP_T_TEMPL_IMPL_COMMON(TSquared)
+template< unsigned DIM >
+static inline bool hess( const MsqMatrix< DIM, DIM >& T, double& result,
+                         MsqMatrix< DIM, DIM >& deriv_wrt_T, MsqMatrix< DIM, DIM >* second_wrt_T )
+{
+    result = sqr_Frobenius( T );
+    deriv_wrt_T = 2 * T;
+    set_scaled_I( second_wrt_T, 2.0 );
+    return true;
+}
 
+TMP_T_TEMPL_IMPL_COMMON( TSquared )
 
-} // namespace MBMesquite
+}  // namespace MBMesquite

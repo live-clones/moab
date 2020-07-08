@@ -37,8 +37,8 @@
 #include "MsqTimer.hpp"
 #include "PatchData.hpp"
 
-namespace MBMesquite {
-
+namespace MBMesquite
+{
 
 /*!
 Sets the QualityMetric pointer to the metric associated with Obj1 and Obj2
@@ -53,153 +53,148 @@ the negateFlag is set to one.  Defaults to the analytical gradient.
   \param Obj1 (ObjectiveFunction*)
   \param Obj2 (ObjectiveFunction*)
  */
-CompositeOFMultiply::CompositeOFMultiply( ObjectiveFunction* Obj1,
-                                          ObjectiveFunction* Obj2,
-                                          bool delete_OFs)
-  : deleteObjFuncs(delete_OFs)
+CompositeOFMultiply::CompositeOFMultiply( ObjectiveFunction* Obj1, ObjectiveFunction* Obj2,
+                                          bool delete_OFs )
+    : deleteObjFuncs( delete_OFs )
 {
-  objFunc1=Obj1;
-  objFunc2=Obj2;
+    objFunc1 = Obj1;
+    objFunc2 = Obj2;
 }
 
-//Michael:  need to clean up here
-CompositeOFMultiply::~CompositeOFMultiply(){
-  if (deleteObjFuncs) {
-    delete objFunc1;
-    delete objFunc2;
-  }
+// Michael:  need to clean up here
+CompositeOFMultiply::~CompositeOFMultiply( )
+{
+    if( deleteObjFuncs )
+    {
+        delete objFunc1;
+        delete objFunc2;
+    }
 }
 
-
-ObjectiveFunction* CompositeOFMultiply::clone() const
-  { return new CompositeOFMultiply( objFunc1->clone(), objFunc2->clone(), true ); }
-
-void CompositeOFMultiply::clear()
+ObjectiveFunction* CompositeOFMultiply::clone( ) const
 {
-  objFunc1->clear();
-  objFunc2->clear();
+    return new CompositeOFMultiply( objFunc1->clone( ), objFunc2->clone( ), true );
+}
+
+void CompositeOFMultiply::clear( )
+{
+    objFunc1->clear( );
+    objFunc2->clear( );
 }
 
 void CompositeOFMultiply::initialize_queue( MeshDomainAssoc* mesh_and_domain,
-                                            const Settings* settings,
-                                            MsqError& err )
+                                            const Settings* settings, MsqError& err )
 {
-  objFunc1->initialize_queue( mesh_and_domain, settings, err ); MSQ_ERRRTN(err);
-  objFunc2->initialize_queue( mesh_and_domain, settings, err ); MSQ_ERRRTN(err);
+    objFunc1->initialize_queue( mesh_and_domain, settings, err );MSQ_ERRRTN( err );
+    objFunc2->initialize_queue( mesh_and_domain, settings, err );MSQ_ERRRTN( err );
 }
 
-bool CompositeOFMultiply::initialize_block_coordinate_descent(
-                                                       MeshDomainAssoc* mesh_and_domain,
-                                                       const Settings* settings,
-                                                       PatchSet* user_set,
-                                                       MsqError& err )
+bool CompositeOFMultiply::initialize_block_coordinate_descent( MeshDomainAssoc* mesh_and_domain,
+                                                               const Settings*  settings,
+                                                               PatchSet* user_set, MsqError& err )
 {
-  bool rval1, rval2;
-  rval1 = objFunc1->initialize_block_coordinate_descent( mesh_and_domain, settings, user_set, err );
-  MSQ_ERRZERO(err);
-  rval2 = objFunc2->initialize_block_coordinate_descent( mesh_and_domain, settings, user_set, err );
-  return !MSQ_CHKERR(err) && rval1 && rval2;
+    bool rval1, rval2;
+    rval1 =
+        objFunc1->initialize_block_coordinate_descent( mesh_and_domain, settings, user_set, err );
+    MSQ_ERRZERO( err );
+    rval2 =
+        objFunc2->initialize_block_coordinate_descent( mesh_and_domain, settings, user_set, err );
+    return !MSQ_CHKERR( err ) && rval1 && rval2;
 }
 
-bool CompositeOFMultiply::evaluate( EvalType type,
-                                    PatchData& pd,
-                                    double& value_out,
-                                    bool free,
+bool CompositeOFMultiply::evaluate( EvalType type, PatchData& pd, double& value_out, bool free,
                                     MsqError& err )
 {
-  double value_2;
-  bool ok;
+    double value_2;
+    bool   ok;
 
-  ok = objFunc1->evaluate( type, pd, value_out, free, err );
-  if (MSQ_CHKERR(err) || !ok) return false;
-  ok = objFunc2->evaluate( type, pd, value_2, free, err );
-  if (MSQ_CHKERR(err) || !ok) return false;
+    ok = objFunc1->evaluate( type, pd, value_out, free, err );
+    if( MSQ_CHKERR( err ) || !ok ) return false;
+    ok = objFunc2->evaluate( type, pd, value_2, free, err );
+    if( MSQ_CHKERR( err ) || !ok ) return false;
 
-  value_out *= value_2;
-  return true;
+    value_out *= value_2;
+    return true;
 }
 
-bool CompositeOFMultiply::evaluate_with_gradient( EvalType type,
-                                             PatchData& pd,
-                                             double& value_out,
-                                             std::vector<Vector3D>& grad_out,
-                                             MsqError& err )
+bool CompositeOFMultiply::evaluate_with_gradient( EvalType type, PatchData& pd, double& value_out,
+                                                  std::vector< Vector3D >& grad_out, MsqError& err )
 {
-  double value_2;
-  bool ok;
+    double value_2;
+    bool   ok;
 
-  ok = objFunc1->evaluate_with_gradient( type, pd, value_out, grad_out, err );
-  if (MSQ_CHKERR(err) || !ok) return false;
-  ok = objFunc2->evaluate_with_gradient( type, pd, value_2, mGradient, err );
-  if (MSQ_CHKERR(err) || !ok) return false;
+    ok = objFunc1->evaluate_with_gradient( type, pd, value_out, grad_out, err );
+    if( MSQ_CHKERR( err ) || !ok ) return false;
+    ok = objFunc2->evaluate_with_gradient( type, pd, value_2, mGradient, err );
+    if( MSQ_CHKERR( err ) || !ok ) return false;
 
-  assert( grad_out.size() == pd.num_free_vertices() );
-  assert( mGradient.size() == pd.num_free_vertices() );
+    assert( grad_out.size( ) == pd.num_free_vertices( ) );
+    assert( mGradient.size( ) == pd.num_free_vertices( ) );
 
-  std::vector<Vector3D>::iterator i = grad_out.begin(), j = mGradient.begin();
-  while (i != grad_out.end()) {
-    *i *= value_2;
-    *j *= value_out;
-    *i += *j;
-    ++i;
-    ++j;
-  }
-  value_out *= value_2;
-  return true;
+    std::vector< Vector3D >::iterator i = grad_out.begin( ), j = mGradient.begin( );
+    while( i != grad_out.end( ) )
+    {
+        *i *= value_2;
+        *j *= value_out;
+        *i += *j;
+        ++i;
+        ++j;
+    }
+    value_out *= value_2;
+    return true;
 }
 
-bool CompositeOFMultiply::evaluate_with_Hessian_diagonal( EvalType type,
-                                            PatchData& pd,
-                                            double& value_out,
-                                            std::vector<Vector3D>& grad_out,
-                                            std::vector<SymMatrix3D>& diag_out,
-                                            MsqError& err )
+bool CompositeOFMultiply::evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd,
+                                                          double&                     value_out,
+                                                          std::vector< Vector3D >&    grad_out,
+                                                          std::vector< SymMatrix3D >& diag_out,
+                                                          MsqError&                   err )
 {
-  double value_2;
-  bool valid;
+    double value_2;
+    bool   valid;
 
-  valid = objFunc1->evaluate_with_Hessian_diagonal( type, pd, value_out, grad_out, diag_out, err );
-  if (MSQ_CHKERR(err) || !valid) return false;
-  valid = objFunc2->evaluate_with_Hessian_diagonal( type, pd, value_2, mGradient, mDiagonal, err );
-  if (MSQ_CHKERR(err) || !valid) return false;
+    valid =
+        objFunc1->evaluate_with_Hessian_diagonal( type, pd, value_out, grad_out, diag_out, err );
+    if( MSQ_CHKERR( err ) || !valid ) return false;
+    valid =
+        objFunc2->evaluate_with_Hessian_diagonal( type, pd, value_2, mGradient, mDiagonal, err );
+    if( MSQ_CHKERR( err ) || !valid ) return false;
 
-  for (size_t i = 0; i < pd.num_free_vertices(); ++i) {
-    diag_out[i] *= value_2;
-    mDiagonal[i] *= value_out;
-    diag_out[i] += mDiagonal[i];
-    diag_out[i] += outer_plus_transpose( grad_out[i], mGradient[i] );
+    for( size_t i = 0; i < pd.num_free_vertices( ); ++i )
+    {
+        diag_out[ i ] *= value_2;
+        mDiagonal[ i ] *= value_out;
+        diag_out[ i ] += mDiagonal[ i ];
+        diag_out[ i ] += outer_plus_transpose( grad_out[ i ], mGradient[ i ] );
 
-    grad_out[i] *= value_2;
-    mGradient[i] *= value_out;
-    grad_out[i] += mGradient[i];
-  }
+        grad_out[ i ] *= value_2;
+        mGradient[ i ] *= value_out;
+        grad_out[ i ] += mGradient[ i ];
+    }
 
-  value_out *= value_2;
-  return true;
+    value_out *= value_2;
+    return true;
 }
 
-bool CompositeOFMultiply::evaluate_with_Hessian( EvalType ,
-                                            PatchData& ,
-                                            double& ,
-                                            std::vector<Vector3D>& ,
-                                            MsqHessian& ,
-                                            MsqError& err )
+bool CompositeOFMultiply::evaluate_with_Hessian( EvalType, PatchData&, double&,
+                                                 std::vector< Vector3D >&, MsqHessian&,
+                                                 MsqError& err )
 {
-  MSQ_SETERR(err)("Mesquite is not capable of representing the dense "
-                  "Hessian of the product of two objective fuctions. "
-                  "Either choose a solver that does not require the "
-                  "Hessian of the objective function or do not use the "
-                  "CompositeOFMultiple objective function .",
-                  MsqError::INVALID_STATE );
-  return false;
+    MSQ_SETERR( err )
+    ( "Mesquite is not capable of representing the dense "
+      "Hessian of the product of two objective fuctions. "
+      "Either choose a solver that does not require the "
+      "Hessian of the objective function or do not use the "
+      "CompositeOFMultiple objective function .",
+      MsqError::INVALID_STATE );
+    return false;
 }
-	
 
-int CompositeOFMultiply::min_patch_layers() const
+int CompositeOFMultiply::min_patch_layers( ) const
 {
-  const int v1 = objFunc1->min_patch_layers();
-  const int v2 = objFunc2->min_patch_layers();
-  return v1 > v2 ? v1 : v2;
+    const int v1 = objFunc1->min_patch_layers( );
+    const int v2 = objFunc2->min_patch_layers( );
+    return v1 > v2 ? v1 : v2;
 }
-	
-} // namespace MBMesquite
+
+}  // namespace MBMesquite

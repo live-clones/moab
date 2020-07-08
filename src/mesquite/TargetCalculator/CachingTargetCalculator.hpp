@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file CachingTargetCalculator.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -40,20 +39,25 @@
 
 #include <vector>
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
-struct CachedTargetData {
-  std::vector<size_t> elementOffsets;
-  std::vector< MsqMatrix<3,3> > targets3D;
-  std::vector< MsqMatrix<3,2> > targetsSurface;
-  std::vector< MsqMatrix<2,2> > targets2D;
-  bool has_data() const { return !elementOffsets.empty(); }
-  void clear()
+struct CachedTargetData
+{
+    std::vector< size_t >            elementOffsets;
+    std::vector< MsqMatrix< 3, 3 > > targets3D;
+    std::vector< MsqMatrix< 3, 2 > > targetsSurface;
+    std::vector< MsqMatrix< 2, 2 > > targets2D;
+    bool                             has_data( ) const
     {
-      elementOffsets.clear();
-      targets3D.clear();
-      targets2D.clear();
-      targetsSurface.clear();
+        return !elementOffsets.empty( );
+    }
+    void clear( )
+    {
+        elementOffsets.clear( );
+        targets3D.clear( );
+        targets2D.clear( );
+        targetsSurface.clear( );
     }
 };
 
@@ -65,59 +69,45 @@ struct CachedTargetData {
  * concrete target calculator are a function of the vertex
  * positions in the active mesh.
  */
-class CachingTargetCalculator : public TargetCalculator,
-                                private ExtraDataUser<CachedTargetData>
+class CachingTargetCalculator : public TargetCalculator, private ExtraDataUser< CachedTargetData >
 {
-public:
+  public:
+    CachingTargetCalculator( TargetCalculator* cached ) : cachedCalculator( cached ) {}
 
-  CachingTargetCalculator( TargetCalculator* cached )
-    : cachedCalculator( cached )
-      {}
+    virtual ~CachingTargetCalculator( );
 
-  virtual ~CachingTargetCalculator();
+    TargetCalculator* get_cached_calculator( ) const
+    {
+        return cachedCalculator;
+    }
 
-  TargetCalculator* get_cached_calculator() const
-    { return cachedCalculator; }
+    virtual bool get_3D_target( PatchData& pd, size_t element, Sample sample,
+                                MsqMatrix< 3, 3 >& W_out, MsqError& err );
 
-  virtual bool get_3D_target( PatchData& pd,
-                              size_t element,
-                              Sample sample,
-                              MsqMatrix<3,3>& W_out,
-                              MsqError& err );
+    virtual bool get_surface_target( PatchData& pd, size_t element, Sample sample,
+                                     MsqMatrix< 3, 2 >& W_out, MsqError& err );
 
-  virtual bool get_surface_target( PatchData& pd,
-                              size_t element,
-                              Sample sample,
-                              MsqMatrix<3,2>& W_out,
-                              MsqError& err );
+    virtual bool get_2D_target( PatchData& pd, size_t element, Sample sample,
+                                MsqMatrix< 2, 2 >& W_out, MsqError& err );
 
-  virtual bool get_2D_target( PatchData& pd,
-                              size_t element,
-                              Sample sample,
-                              MsqMatrix<2,2>& W_out,
-                              MsqError& err );
+    virtual bool have_surface_orient( ) const
+    {
+        return cachedCalculator->have_surface_orient( );
+    }
 
-  virtual bool have_surface_orient() const
-    { return cachedCalculator->have_surface_orient(); }
+  protected:
+    void notify_patch_destroyed( CachedTargetData& d );
 
-protected:
+    void notify_sub_patch( PatchData& orig_patch, CachedTargetData& data, PatchData& sub_patch,
+                           const size_t* vertex_index_map, const size_t* element_index_map,
+                           MsqError& err );
 
-  void notify_patch_destroyed( CachedTargetData& d );
+    void notify_new_patch( PatchData& patch, CachedTargetData& data );
 
-  void notify_sub_patch( PatchData& orig_patch,
-                         CachedTargetData& data,
-                         PatchData& sub_patch,
-                         const size_t* vertex_index_map,
-                         const size_t* element_index_map,
-                         MsqError& err );
-
-  void notify_new_patch( PatchData& patch, CachedTargetData& data );
-
-private:
-
-  TargetCalculator *const cachedCalculator;
+  private:
+    TargetCalculator* const cachedCalculator;
 };
 
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

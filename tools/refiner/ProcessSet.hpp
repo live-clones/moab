@@ -22,48 +22,49 @@
 #include <iostream>
 #include <vector>
 
-namespace moab {
+namespace moab
+{
 
 /**\brief Represent a set of processes using a bit vector.
-  *
-  * This is used by the mesh refiner when determining where to record
-  * split vertices so that labeling can be inferred across process
-  * boundaries without communicating anything other than the number of
-  * entities in a given partition.
-  */
+ *
+ * This is used by the mesh refiner when determining where to record
+ * split vertices so that labeling can be inferred across process
+ * boundaries without communicating anything other than the number of
+ * entities in a given partition.
+ */
 class ProcessSet
 {
-public:
-  enum
+  public:
+    enum
     {
-    SHARED_PROC_BYTES = (MAX_SHARING_PROCS / 8 + (MAX_SHARING_PROCS % 8 ? 1 : 0))
+        SHARED_PROC_BYTES = ( MAX_SHARING_PROCS / 8 + ( MAX_SHARING_PROCS % 8 ? 1 : 0 ) )
     };
 
-  ProcessSet();
-  ProcessSet( const unsigned char* psetbits );
-  ~ProcessSet();
+    ProcessSet( );
+    ProcessSet( const unsigned char* psetbits );
+    ~ProcessSet( );
 
-  void unite( const ProcessSet& other );
-  void intersect( const ProcessSet& other );
+    void unite( const ProcessSet& other );
+    void intersect( const ProcessSet& other );
 
-  void clear();
+    void clear( );
 
-  void set_process_member( int i );
-  void set_process_members( const std::vector<int>& procs );
+    void set_process_member( int i );
+    void set_process_members( const std::vector< int >& procs );
 
-  bool get_process_members( int rank, std::vector<int>& procs );
-  bool is_process_member( int i ) const;
+    bool get_process_members( int rank, std::vector< int >& procs );
+    bool is_process_member( int i ) const;
 
-  const unsigned char* data() const;
+    const unsigned char* data( ) const;
 
-  bool operator < ( const ProcessSet& other ) const;
+    bool operator<( const ProcessSet& other ) const;
 
-  friend std::ostream& operator << ( std::ostream& os, const ProcessSet& pset );
+    friend std::ostream& operator<<( std::ostream& os, const ProcessSet& pset );
 
-protected:
-  unsigned char processes[SHARED_PROC_BYTES];
+  protected:
+    unsigned char processes[ SHARED_PROC_BYTES ];
 };
 
-} // namespace moab
+}  // namespace moab
 
 #endif /* MOAB_PROCESS_SET_HPP */

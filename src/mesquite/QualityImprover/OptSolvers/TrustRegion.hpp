@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file TrustRegion.hpp
  *  \brief Port Todd Munson's trust region solver to Mesquite
  *  \author Jason Kraftcheck
@@ -38,42 +37,40 @@
 #include "PatchSetUser.hpp"
 #include "MsqHessian.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 class PatchDataVerticesMemento;
 
 class TrustRegion : public VertexMover, public PatchSetUser
 {
   public:
-
     MESQUITE_EXPORT TrustRegion( ObjectiveFunction* of );
 
-    MESQUITE_EXPORT virtual ~TrustRegion();
+    MESQUITE_EXPORT virtual ~TrustRegion( );
 
-    PatchSet* get_patch_set();
+    PatchSet* get_patch_set( );
 
-    MESQUITE_EXPORT std::string get_name() const;
+    MESQUITE_EXPORT std::string get_name( ) const;
 
   protected:
-
     virtual void initialize( PatchData& pd, MsqError& err );
     virtual void optimize_vertex_positions( PatchData& pd, MsqError& err );
     virtual void initialize_mesh_iteration( PatchData& pd, MsqError& err );
     virtual void terminate_mesh_iteration( PatchData& pd, MsqError& err );
-    virtual void cleanup();
+    virtual void cleanup( );
 
   private:
-
     void compute_preconditioner( MsqError& err );
     void apply_preconditioner( Vector3D* z, Vector3D* r, MsqError& err );
 
     PatchDataVerticesMemento* mMemento;
-    MsqHessian mHess;
-    std::vector<Vector3D> mGrad;
-    std::vector<Vector3D> wVect, zVect, dVect, pVect, rVect;
-    std::vector<double> preCond;
+    MsqHessian                mHess;
+    std::vector< Vector3D >   mGrad;
+    std::vector< Vector3D >   wVect, zVect, dVect, pVect, rVect;
+    std::vector< double >     preCond;
 };
 
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

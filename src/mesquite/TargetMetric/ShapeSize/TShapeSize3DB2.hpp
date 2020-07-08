@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file TShapeSize3DB2.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -36,41 +35,30 @@
 #include "Mesquite.hpp"
 #include "TMetricBarrier.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 /** 3.3.12: (|T|^2 + |adj(T)|^2)/6\tau - 1 */
 class TShapeSize3DB2 : public TMetricBarrier3D
 {
   public:
+    MESQUITE_EXPORT virtual std::string get_name( ) const;
 
-  MESQUITE_EXPORT virtual
-  std::string get_name() const;
+    MESQUITE_EXPORT virtual ~TShapeSize3DB2( );
 
-  MESQUITE_EXPORT virtual
-  ~TShapeSize3DB2();
+    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 3, 3 >& T, double& result,
+                                           MsqError& err );
 
-  MESQUITE_EXPORT virtual
-  bool evaluate( const MsqMatrix<3,3>& T,
-                 double& result,
-                 MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& result,
+                                                     MsqMatrix< 3, 3 >& deriv_wrt_T,
+                                                     MsqError&          err );
 
-  MESQUITE_EXPORT virtual
-  bool evaluate_with_grad( const MsqMatrix<3,3>& T,
-                           double& result,
-                           MsqMatrix<3,3>& deriv_wrt_T,
-                           MsqError& err );
-
-  MESQUITE_EXPORT virtual
-  bool evaluate_with_hess( const MsqMatrix<3,3>& T,
-                           double& result,
-                           MsqMatrix<3,3>& deriv_wrt_T,
-                           MsqMatrix<3,3> second_wrt_T[6],
-                           MsqError& err );
-
+    MESQUITE_EXPORT virtual bool evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result,
+                                                     MsqMatrix< 3, 3 >& deriv_wrt_T,
+                                                     MsqMatrix< 3, 3 >  second_wrt_T[ 6 ],
+                                                     MsqError&          err );
 };
 
-
-
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

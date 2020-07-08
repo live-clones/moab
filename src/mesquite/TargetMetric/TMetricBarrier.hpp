@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file TRelMetricBarrier.hpp
  *  \brief
  *  \author Boyd Tidwell
@@ -37,65 +36,59 @@
 #include "TMetric.hpp"
 #include <string>
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
-static const std::string& barrier_violated_msg = " Barrier of barrier metric has been violated due to negative volume.\n \
+static const std::string& barrier_violated_msg =
+    " Barrier of barrier metric has been violated due to negative volume.\n \
   Hint: If your initial mesh is tangled, you must use a non-Barrier metric.\n \
         If a Barrier metric is used, you can only use untangled initial meshes.\n";
 
 class MsqError;
-template <unsigned R, unsigned C> class MsqMatrix;
+template< unsigned R, unsigned C > class MsqMatrix;
 
 class TMetricBarrier : public TMetric
 {
-public:
+  public:
+    MESQUITE_EXPORT virtual ~TMetricBarrier( );
 
-  MESQUITE_EXPORT virtual
-  ~TMetricBarrier();
+    MESQUITE_EXPORT virtual std::string get_name( ) const
+    {
+        return "TMetricBarrier";
+    }
 
-  MESQUITE_EXPORT virtual
-  std::string get_name()const {return "TMetricBarrier";}
-
-
-  static inline bool invalid_determinant( double d )
-    { return d < 1e-12; }
+    static inline bool invalid_determinant( double d )
+    {
+        return d < 1e-12;
+    }
 };
 
 class TMetricBarrier2D : public TMetricBarrier
 {
-public:
-
-  MESQUITE_EXPORT virtual
-  ~TMetricBarrier2D();
+  public:
+    MESQUITE_EXPORT virtual ~TMetricBarrier2D( );
 
     /**\brief Evaluate \f$\mu(T)\f$
      *
      * This method always returns an error for 2D-only metrics
      */
-  MESQUITE_EXPORT virtual
-  bool evaluate( const MsqMatrix<3,3>& T,
-                 double& result,
-                 MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 3, 3 >& T, double& result,
+                                           MsqError& err );
 };
 
 class TMetricBarrier3D : public TMetricBarrier
 {
-public:
-
-  MESQUITE_EXPORT virtual
-  ~TMetricBarrier3D();
+  public:
+    MESQUITE_EXPORT virtual ~TMetricBarrier3D( );
 
     /**\brief Evaluate \f$\mu(T)\f$
      *
      * This method always returns an error for 3D-only metrics
      */
-  MESQUITE_EXPORT virtual
-  bool evaluate( const MsqMatrix<2,2>& T,
-                 double& result,
-                 MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 2, 2 >& T, double& result,
+                                           MsqError& err );
 };
 
-
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

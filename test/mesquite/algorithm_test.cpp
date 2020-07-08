@@ -24,7 +24,8 @@
     pknupp@sandia.gov, tleurent@mcs.anl.gov, tmunson@mcs.anl.gov
 
   ***************************************************************** */
-// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3 -*-
+// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3
+// -*-
 //
 //   SUMMARY:
 //     USAGE:
@@ -66,72 +67,72 @@ using std::endl;
 #include "TestUtil.hpp"
 using namespace MBMesquite;
 
-int main()
+int main( )
 {
-  MsqPrintError err(cout);
-  MBMesquite::MeshImpl mesh;
+    MsqPrintError        err( cout );
+    MBMesquite::MeshImpl mesh;
 
-  std::string file_name = TestDir + "/3D/vtk/tets/untangled/tire.vtk";
-  mesh.read_vtk(file_name.c_str(), err);
-  if (err) return 1;
+    std::string file_name = TestDir + "/3D/vtk/tets/untangled/tire.vtk";
+    mesh.read_vtk( file_name.c_str( ), err );
+    if( err ) return 1;
 
     // creates an intruction queue
-  InstructionQueue queue1;
+    InstructionQueue queue1;
 
-  // creates a mean ratio quality metric ...
-  IdealWeightInverseMeanRatio mean(err);
-  if (err) return 1;
+    // creates a mean ratio quality metric ...
+    IdealWeightInverseMeanRatio mean( err );
+    if( err ) return 1;
 
-  LPtoPTemplate obj_func(&mean, 1, err);
-  if (err) return 1;
+    LPtoPTemplate obj_func( &mean, 1, err );
+    if( err ) return 1;
 
-  // creates the optimization procedures
-//   ConjugateGradient* pass1 = new ConjugateGradient( obj_func, err );
-  FeasibleNewton pass1( &obj_func );
+    // creates the optimization procedures
+    //   ConjugateGradient* pass1 = new ConjugateGradient( obj_func, err );
+    FeasibleNewton pass1( &obj_func );
 
-  //perform optimization globally
-  pass1.use_global_patch();
-  if (err) return 1;
+    // perform optimization globally
+    pass1.use_global_patch( );
+    if( err ) return 1;
 
-  QualityAssessor mean_qa=QualityAssessor(&mean);
+    QualityAssessor mean_qa = QualityAssessor( &mean );
 
     //**************Set termination criterion****************
 
-  //perform 1 pass of the outer loop (this line isn't essential as it is
-  //the default behavior).
-  TerminationCriterion tc_outer;
-  tc_outer.add_iteration_limit( 1 );
-  pass1.set_outer_termination_criterion(&tc_outer);
+    // perform 1 pass of the outer loop (this line isn't essential as it is
+    // the default behavior).
+    TerminationCriterion tc_outer;
+    tc_outer.add_iteration_limit( 1 );
+    pass1.set_outer_termination_criterion( &tc_outer );
 
-  //perform the inner loop until a certain objective function value is
-  //reached.  The exact value needs to be determined (about 18095).
-  //As a safety, also stop if the time exceeds 10 minutes (600 seconds).
-  TerminationCriterion tc_inner;
-  tc_inner.add_absolute_quality_improvement( 13975 );
-//  tc_inner.add_absolute_quality_improvement( 13964.93818 );
-  tc_inner.add_cpu_time( 1800 );
+    // perform the inner loop until a certain objective function value is
+    // reached.  The exact value needs to be determined (about 18095).
+    // As a safety, also stop if the time exceeds 10 minutes (600 seconds).
+    TerminationCriterion tc_inner;
+    tc_inner.add_absolute_quality_improvement( 13975 );
+    //  tc_inner.add_absolute_quality_improvement( 13964.93818 );
+    tc_inner.add_cpu_time( 1800 );
 
-  pass1.set_inner_termination_criterion(&tc_inner);
+    pass1.set_inner_termination_criterion( &tc_inner );
 
-  //used for cg to get some info
-//  pass1->set_debugging_level(2);
+    // used for cg to get some info
+    //  pass1->set_debugging_level(2);
 
-  // adds 1 pass of pass1 to mesh_set1
-  queue1.add_quality_assessor(&mean_qa,err);
-  if (err) return 1;
-  queue1.set_master_quality_improver(&pass1, err);
-  if (err) return 1;
-  queue1.add_quality_assessor(&mean_qa,err);
-  if (err) return 1;
-  mesh.write_vtk("original_mesh.vtk", err);
-  if (err) return 1;
+    // adds 1 pass of pass1 to mesh_set1
+    queue1.add_quality_assessor( &mean_qa, err );
+    if( err ) return 1;
+    queue1.set_master_quality_improver( &pass1, err );
+    if( err ) return 1;
+    queue1.add_quality_assessor( &mean_qa, err );
+    if( err ) return 1;
+    mesh.write_vtk( "original_mesh.vtk", err );
+    if( err ) return 1;
 
     // launches optimization on mesh_set1
-  queue1.run_instructions(&mesh, err);
-  if (err) return 1;
+    queue1.run_instructions( &mesh, err );
+    if( err ) return 1;
 
-  mesh.write_vtk("smoothed_mesh.vtk", err);
-  if (err) return 1;
-  print_timing_diagnostics( cout );
-  return 0;
+    mesh.write_vtk( "smoothed_mesh.vtk", err );
+    if( err ) return 1;
+    print_timing_diagnostics( cout );
+    return 0;
 }

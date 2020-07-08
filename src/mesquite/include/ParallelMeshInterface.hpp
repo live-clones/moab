@@ -39,50 +39,46 @@
 
 namespace MBMesquite
 {
-  class ParallelHelper;
+class ParallelHelper;
 
-  /*! \class ParallelMesh \brief MBMesquite::ParallelMesh is an abstract class
-   *  which defines required methods required for using Mesquite in parallel.
-   *  It derives from the MBMesquite::Mesh interface so the user must provide
-   *  implementations of the pure virtual methods in both MBMesquite::Mesh as
-   *  well as those defined here.
-   */
-  class MESQUITE_EXPORT ParallelMesh : virtual public Mesh
-  {
+/*! \class ParallelMesh \brief MBMesquite::ParallelMesh is an abstract class
+ *  which defines required methods required for using Mesquite in parallel.
+ *  It derives from the MBMesquite::Mesh interface so the user must provide
+ *  implementations of the pure virtual methods in both MBMesquite::Mesh as
+ *  well as those defined here.
+ */
+class MESQUITE_EXPORT ParallelMesh : virtual public Mesh
+{
   public:
-
     /*! Get global ids for given vertices.
      */
-    virtual void vertices_get_global_id ( const VertexHandle vert_array[],
-                                          size_t global_id[],
-					  size_t num_vtx,
-					  MsqError& err) = 0;
+    virtual void vertices_get_global_id( const VertexHandle vert_array[], size_t global_id[],
+                                         size_t num_vtx, MsqError& err ) = 0;
 
     /*! Get processor ids for given vertices.
      */
-    virtual void vertices_get_processor_id ( const VertexHandle vert_array[],
-                                             int proc_id[],
-					     size_t num_vtx,
-					     MsqError& err) = 0;
+    virtual void vertices_get_processor_id( const VertexHandle vert_array[], int proc_id[],
+                                            size_t num_vtx, MsqError& err ) = 0;
 
     /*! Set parallel helper
      */
-    virtual void set_parallel_helper(ParallelHelper* p_helper) {
-      this->helper = p_helper;
+    virtual void set_parallel_helper( ParallelHelper* p_helper )
+    {
+        this->helper = p_helper;
     }
 
     /*! Get parallel helper
      */
-    virtual ParallelHelper* get_parallel_helper() {
-      return helper;
+    virtual ParallelHelper* get_parallel_helper( )
+    {
+        return helper;
     }
 
   protected:
     ParallelHelper* helper;
-      //! Don't allow a ParallelMesh to be deleted directly.
-    virtual ~ParallelMesh()
-      {}
-  };
-} // namespace
+    //! Don't allow a ParallelMesh to be deleted directly.
+    virtual ~ParallelMesh( ) {}
+};
+}  // namespace MBMesquite
 
 #endif
