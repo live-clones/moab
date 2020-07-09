@@ -2,20 +2,21 @@
 # Use clang-format to enforce uniform coding style throughout the entire repository
 #   /usr/local/bin/clang-format -i -style=file <source_file_name>
 
+CLANGFORMAT_EXE=`which clang-format`
 function process_source()
 {
 	srcfile=$1
 	echo "Processing $srcfile ..."
-	/usr/local/bin/clang-format -i -style=file $srcfile
-	sed -i ''  -n -e 'H;${x;s/;\n  *MB_CHK/;MB_CHK/g;p;}' $srcfile
-	sed -i ''  -n -e 'H;${x;s/;\n  *RR;/;RR;/g;p;}' $srcfile
-	sed -i ''  -n -e 'H;${x;s/;\n  *CHECK_ERR/;CHECK_ERR/g;p;}' $srcfile
-	sed -i ''  -n -e 'H;${x;s/;\n  *CHKERR/;CHKERR/g;p;}' $srcfile
-	sed -i ''  -n -e 'H;${x;s/;\n  *CHK_ERR/;CHK_ERR/g;p;}' $srcfile
-	sed -i ''  -n -e 'H;${x;s/;\n  *ERRORR/;ERRORR/g;p;}' $srcfile
-	sed -i ''  -n -e 'H;${x;s/;\n  *MSQ_CHKERR/;MSQ_CHKERR/g;p;}' $srcfile
-	sed -i ''  -n -e 'H;${x;s/;\n  *MSQ_ERRRTN/;MSQ_ERRRTN/g;p;}' $srcfile
-	sed -i '' '/./,$!d' $srcfile
+	${CLANGFORMAT_EXE} -i -style=file $srcfile
+	sed -i  -n -e 'H;${x;s/;\n  *MB_CHK/;MB_CHK/g;p;}' $srcfile
+	sed -i  -n -e 'H;${x;s/;\n  *RR;/;RR;/g;p;}' $srcfile
+	sed -i  -n -e 'H;${x;s/;\n  *CHECK_ERR/;CHECK_ERR/g;p;}' $srcfile
+	sed -i  -n -e 'H;${x;s/;\n  *CHKERR/;CHKERR/g;p;}' $srcfile
+	sed -i  -n -e 'H;${x;s/;\n  *CHK_ERR/;CHK_ERR/g;p;}' $srcfile
+	sed -i  -n -e 'H;${x;s/;\n  *ERRORR/;ERRORR/g;p;}' $srcfile
+	sed -i  -n -e 'H;${x;s/;\n  *MSQ_CHKERR/;MSQ_CHKERR/g;p;}' $srcfile
+	sed -i  -n -e 'H;${x;s/;\n  *MSQ_ERRRTN/;MSQ_ERRRTN/g;p;}' $srcfile
+	sed -i '/./,$!d' $srcfile
 }
 
 # TESTS
