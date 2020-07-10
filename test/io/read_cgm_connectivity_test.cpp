@@ -58,8 +58,7 @@ void read_file( Interface* moab, const char* input_file )
     InitCGMA::initialize_cgma();
     GeometryQueryTool::instance()->delete_geometry();
 
-    ErrorCode rval = moab->load_file( input_file );
-    CHECK_ERR( rval );
+    ErrorCode rval = moab->load_file( input_file );CHECK_ERR( rval );
 }
 
 // Checks the adjacency of each vertex entity in a simple cube file load
@@ -75,15 +74,13 @@ void cube_verts_connectivity_test()
 
     // Get all vertex handles from the mesh
     Range verts;
-    rval = mb->get_entities_by_type( 0, MBVERTEX, verts );
-    CHECK_ERR( rval );
+    rval = mb->get_entities_by_type( 0, MBVERTEX, verts );CHECK_ERR( rval );
 
     // Check that each vertex connects to at least 4 and no more than 6 triangles
     for( Range::const_iterator i = verts.begin(); i != verts.end(); ++i )
     {
         std::vector< EntityHandle > adj_tris;
-        rval = mb->get_adjacencies( &( *i ), 1, 2, false, adj_tris );
-        CHECK_ERR( rval );
+        rval = mb->get_adjacencies( &( *i ), 1, 2, false, adj_tris );CHECK_ERR( rval );
 
         int adj_size = adj_tris.size();
         CHECK( adj_size >= 4 && adj_size <= 6 );
@@ -102,8 +99,7 @@ void cube_tris_connectivity_test()
 
     // Get triangles from the mesh
     Range tris;
-    rval = mb->get_entities_by_type( 0, MBTRI, tris );
-    CHECK_ERR( rval );
+    rval = mb->get_entities_by_type( 0, MBTRI, tris );CHECK_ERR( rval );
 
     int expected_num_of_adj_tris = 3;
 
@@ -112,8 +108,7 @@ void cube_tris_connectivity_test()
         Range adj_tris;
         moab::MeshTopoUtil mu( mb );
         // Use Triangle edges to get all adjacent triangles
-        rval = mu.get_bridge_adjacencies( *i, 1, 2, adj_tris );
-        CHECK_ERR( rval );
+        rval = mu.get_bridge_adjacencies( *i, 1, 2, adj_tris );CHECK_ERR( rval );
         CHECK_EQUAL( expected_num_of_adj_tris, (int)adj_tris.size() );
 
         // Check that the entities we found from bridge_adjacencies
@@ -136,28 +131,24 @@ void cube_tri_curve_coincidence_test()
 
     // Get curves from the mesh
     Range curves;
-    rval = mb->get_entities_by_type( 0, MBEDGE, curves );
-    CHECK_ERR( rval );
+    rval = mb->get_entities_by_type( 0, MBEDGE, curves );CHECK_ERR( rval );
     curves.print();
 
     // Get triangles from the mesh
     Range tris;
-    rval = mb->get_entities_by_type( 0, MBTRI, tris );
-    CHECK_ERR( rval );
+    rval = mb->get_entities_by_type( 0, MBTRI, tris );CHECK_ERR( rval );
 
     for( Range::const_iterator i = tris.begin(); i != tris.end(); ++i )
     {
         // Get the any curve edges that are a part of the triangle
         Range tri_edges;
-        rval = mb->get_adjacencies( &( *i ), 1, 1, false, tri_edges );
-        CHECK_ERR( rval );
+        rval = mb->get_adjacencies( &( *i ), 1, 1, false, tri_edges );CHECK_ERR( rval );
         // Check that we've retrieved two edges from get_adjacencies
         // For a this file (cube), each triangle should have two curve
         // edges
         int num_of_tri_edges = tri_edges.size();
         CHECK_EQUAL( 2, num_of_tri_edges );
-        match_tri_edges_w_curve( tri_edges, curves );
-        CHECK_ERR( rval );
+        match_tri_edges_w_curve( tri_edges, curves );CHECK_ERR( rval );
     }
 }
 
@@ -192,15 +183,13 @@ void cube_edge_adjacencies_test()
 
     // Get the curves
     Range curves;
-    rval = mb->get_entities_by_type( 0, MBEDGE, curves );
-    CHECK_ERR( rval );
+    rval = mb->get_entities_by_type( 0, MBEDGE, curves );CHECK_ERR( rval );
 
     for( Range::const_iterator i = curves.begin(); i != curves.end(); ++i )
     {
         // Get triangle adjacent to each edge
         Range adj_tris;
-        rval = mb->get_adjacencies( &( *i ), 1, 2, false, adj_tris );
-        CHECK_ERR( rval );
+        rval = mb->get_adjacencies( &( *i ), 1, 2, false, adj_tris );CHECK_ERR( rval );
 
         int num_adj_tris = adj_tris.size();
         // Ensure that no edge is adjacent to more than two triangles
@@ -219,15 +208,13 @@ void cube_tri_vertex_test()
 
     // Get all triangles
     Range tris;
-    rval = mb->get_entities_by_type( 0, MBTRI, tris );
-    CHECK_ERR( rval );
+    rval = mb->get_entities_by_type( 0, MBTRI, tris );CHECK_ERR( rval );
 
     for( Range::const_iterator i = tris.begin(); i != tris.end(); ++i )
     {
         // Get all triangle vertices
         Range verts;
-        rval = mb->get_connectivity( &( *i ), 1, verts );
-        CHECK_ERR( rval );
+        rval = mb->get_connectivity( &( *i ), 1, verts );CHECK_ERR( rval );
         // Make sure that each vertex making up
         // the triangle is different
         int number_of_verts = verts.size();

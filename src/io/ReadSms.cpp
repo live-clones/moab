@@ -133,8 +133,7 @@ ErrorCode ReadSms::load_file_impl( FILE* file_ptr, const Tag* file_id_tag )
 
     if( file_id_tag )
     {
-        result = add_entities( vstart, nvertices, file_id_tag );
-        MB_CHK_ERR( result );
+        result = add_entities( vstart, nvertices, file_id_tag );MB_CHK_ERR( result );
     }
 
     EntityHandle this_gent, new_handle;
@@ -152,8 +151,7 @@ ErrorCode ReadSms::load_file_impl( FILE* file_ptr, const Tag* file_id_tag )
                     coord_arrays[1] + i, coord_arrays[2] + i );
         CHECKN( 5 );
 
-        result = get_set( gentities, gent_type, gent_id, geomDimension, this_gent, file_id_tag );
-        MB_CHK_ERR( result );
+        result = get_set( gentities, gent_type, gent_id, geomDimension, this_gent, file_id_tag );MB_CHK_ERR( result );
 
         new_handle = vstart + i;
         result     = mdbImpl->add_entities( this_gent, &new_handle, 1 );

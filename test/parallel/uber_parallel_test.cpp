@@ -146,13 +146,11 @@ ErrorCode test_read( const char* filename, const char* option )
     Interface& moab = mb_instance;
     ErrorCode rval;
 
-    rval = moab.load_file( filename, 0, option );
-    CHKERR( rval );
+    rval = moab.load_file( filename, 0, option );CHKERR( rval );
 
     ParallelComm* pcomm = ParallelComm::get_pcomm( &moab, 0 );
 
-    rval = pcomm->check_all_shared_handles();
-    CHKERR( rval );
+    rval = pcomm->check_all_shared_handles();CHKERR( rval );
 
     return MB_SUCCESS;
 }

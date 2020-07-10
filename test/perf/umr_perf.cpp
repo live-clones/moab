@@ -179,8 +179,7 @@ ErrorCode umr_perf_test( Core* mb, int* level_degrees, int num_levels, OUTTYPE o
 
     std::cout << "Starting hierarchy generation" << std::endl;
     time_start = mt->time_elapsed();
-    error      = uref.generate_mesh_hierarchy( num_levels, level_degrees, set );
-    CHECK_ERR( error );
+    error      = uref.generate_mesh_hierarchy( num_levels, level_degrees, set );CHECK_ERR( error );
 
     time_total = mt->time_elapsed() - time_start;
     std::cout << "Finished hierarchy generation" << std::endl;
@@ -197,10 +196,8 @@ ErrorCode umr_perf_test( Core* mb, int* level_degrees, int num_levels, OUTTYPE o
     {
         // Get the current mesh level using its meshset
         Range verts, ents;
-        error = mbImpl->get_entities_by_type( set[l + 1], MBVERTEX, verts );
-        CHECK_ERR( error );
-        error = mbImpl->get_entities_by_dimension( set[l + 1], dim, ents );
-        CHECK_ERR( error );
+        error = mbImpl->get_entities_by_type( set[l + 1], MBVERTEX, verts );CHECK_ERR( error );
+        error = mbImpl->get_entities_by_dimension( set[l + 1], dim, ents );CHECK_ERR( error );
 
         std::cout << "Mesh size for level " << l + 1 << " :: deg = " << level_degrees[l] << " :: NV = " << verts.size()
                   << ", NE = " << ents.size() << std::endl;
@@ -257,8 +254,7 @@ ErrorCode umr_perf_test( Core* mb, int* level_degrees, int num_levels, OUTTYPE o
             {
                 double coords[3];
                 EntityHandle vid = *i;
-                error            = uref.get_coordinates( &vid, 1, (int)l, &coords[0] );
-                CHECK_ERR( error );
+                error            = uref.get_coordinates( &vid, 1, (int)l, &coords[0] );CHECK_ERR( error );
             }
             time_total = mt->time_elapsed() - time_start;
             time_avg   = time_total / (double)verts.size();
@@ -271,8 +267,7 @@ ErrorCode umr_perf_test( Core* mb, int* level_degrees, int num_levels, OUTTYPE o
             {
                 double coords[3];
                 EntityHandle vid = *i;
-                error            = mbImpl->get_coords( &vid, 1, &coords[0] );
-                CHECK_ERR( error );
+                error            = mbImpl->get_coords( &vid, 1, &coords[0] );CHECK_ERR( error );
             }
             time_total = mt->time_elapsed() - time_start;
             time_avg   = time_total / (double)verts.size();
@@ -285,8 +280,7 @@ ErrorCode umr_perf_test( Core* mb, int* level_degrees, int num_levels, OUTTYPE o
             for( Range::iterator i = ents.begin(); i != ents.end(); ++i )
             {
                 std::vector< EntityHandle > conn;
-                error = uref.get_connectivity( *i, l, conn );
-                CHECK_ERR( error );
+                error = uref.get_connectivity( *i, l, conn );CHECK_ERR( error );
             }
             time_total = mt->time_elapsed() - time_start;
             time_avg   = time_total / (double)ents.size();
@@ -298,8 +292,7 @@ ErrorCode umr_perf_test( Core* mb, int* level_degrees, int num_levels, OUTTYPE o
             for( Range::iterator i = ents.begin(); i != ents.end(); ++i )
             {
                 std::vector< EntityHandle > conn;
-                error = mbImpl->get_connectivity( &*i, 1, conn );
-                CHECK_ERR( error );
+                error = mbImpl->get_connectivity( &*i, 1, conn );CHECK_ERR( error );
             }
             time_total = mt->time_elapsed() - time_start;
             time_avg   = time_total / (double)ents.size();
@@ -649,14 +642,12 @@ ErrorCode perf_inmesh( const char* filename, int* level_degrees, int num_levels,
     {
         read_options = "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_SHARED_ENTS;";
 
-        error = mbImpl->load_file( filename, 0, read_options.c_str() );
-        CHECK_ERR( error );
+        error = mbImpl->load_file( filename, 0, read_options.c_str() );CHECK_ERR( error );
     }
     else if( procs == 1 )
     {
 #endif
-        error = mbImpl->load_file( filename );
-        CHECK_ERR( error );
+        error = mbImpl->load_file( filename );CHECK_ERR( error );
 #ifdef MOAB_HAVE_MPI
     }
 #endif

@@ -390,8 +390,7 @@ void MsqMeshEntityTest::test_check_element_orientation( EntityTopology type, int
     CPPUNIT_ASSERT( tested > 0 );
 
     bool mids[4] = { false };
-    TopologyInfo::higher_order( type, nodes, mids[1], mids[2], mids[3], err );
-    MSQ_ERRRTN( err );
+    TopologyInfo::higher_order( type, nodes, mids[1], mids[2], mids[3], err );MSQ_ERRRTN( err );
 
     // invert element at each vertex and test
     Vector3D centroid;

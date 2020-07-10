@@ -509,19 +509,16 @@ int check_global_patch_slaved( Mesh& mesh, MsqError& err )
 void tag_patch_slaved( Mesh& mesh, Settings::HigherOrderSlaveMode mode, MsqError& err )
 {
     int zero      = 0;
-    TagHandle tag = mesh.tag_create( "pd_slaved", Mesh::INT, 1, &zero, err );
-    MSQ_ERRRTN( err );
+    TagHandle tag = mesh.tag_create( "pd_slaved", Mesh::INT, 1, &zero, err );MSQ_ERRRTN( err );
 
     Settings s;
     s.set_slaved_ho_node_mode( mode );
     PatchData pd;
     pd.attach_settings( &s );
     pd.set_mesh( &mesh );
-    pd.fill_global_patch( err );
-    MSQ_ERRRTN( err );
+    pd.fill_global_patch( err );MSQ_ERRRTN( err );
 
     const Mesh::VertexHandle* verts = pd.get_vertex_handles_array() + pd.num_free_vertices();
     std::vector< int > ones( pd.num_slave_vertices(), 1 );
-    mesh.tag_set_vertex_data( tag, pd.num_slave_vertices(), verts, arrptr( ones ), err );
-    MSQ_ERRRTN( err );
+    mesh.tag_set_vertex_data( tag, pd.num_slave_vertices(), verts, arrptr( ones ), err );MSQ_ERRRTN( err );
 }

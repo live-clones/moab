@@ -20,37 +20,28 @@ SphereDecomp::SphereDecomp( Interface* impl )
 
 ErrorCode SphereDecomp::build_sphere_mesh( const char* sphere_radii_tag_name, EntityHandle* hex_set )
 {
-    ErrorCode result = mbImpl->tag_get_handle( sphere_radii_tag_name, 1, MB_TYPE_DOUBLE, sphereRadiiTag );
-    RR;
+    ErrorCode result = mbImpl->tag_get_handle( sphere_radii_tag_name, 1, MB_TYPE_DOUBLE, sphereRadiiTag );RR;
 
     // need to make sure all interior edges and faces are created
     Range all_verts;
-    result = mbImpl->get_entities_by_type( 0, MBVERTEX, all_verts );
-    RR;
+    result = mbImpl->get_entities_by_type( 0, MBVERTEX, all_verts );RR;
     MeshTopoUtil mtu( mbImpl );
-    result = mtu.construct_aentities( all_verts );
-    RR;
+    result = mtu.construct_aentities( all_verts );RR;
 
     // create tag to hold vertices
     result = mbImpl->tag_get_handle( SUBDIV_VERTICES_TAG_NAME, 9, MB_TYPE_HANDLE, subdivVerticesTag,
-                                     MB_TAG_DENSE | MB_TAG_EXCL );
-    RR;
+                                     MB_TAG_DENSE | MB_TAG_EXCL );RR;
 
     // compute nodal positions for each dimension element
-    result = compute_nodes( 1 );
-    RR;
-    result = compute_nodes( 2 );
-    RR;
-    result = compute_nodes( 3 );
-    RR;
+    result = compute_nodes( 1 );RR;
+    result = compute_nodes( 2 );RR;
+    result = compute_nodes( 3 );RR;
 
     // build hex elements
     std::vector< EntityHandle > sphere_hexes, interstic_hexes;
-    result = build_hexes( sphere_hexes, interstic_hexes );
-    RR;
+    result = build_hexes( sphere_hexes, interstic_hexes );RR;
 
-    result = mbImpl->tag_delete( subdivVerticesTag );
-    RR;
+    result = mbImpl->tag_delete( subdivVerticesTag );RR;
 
     if( NULL != hex_set )
     {
@@ -58,16 +49,13 @@ ErrorCode SphereDecomp::build_sphere_mesh( const char* sphere_radii_tag_name, En
         {
             EntityHandle this_set;
             // make a new set
-            result = mbImpl->create_meshset( MESHSET_SET, this_set );
-            RR;
+            result = mbImpl->create_meshset( MESHSET_SET, this_set );RR;
             *hex_set = this_set;
         }
 
         // save all the hexes to this set
-        result = mbImpl->add_entities( *hex_set, &sphere_hexes[0], sphere_hexes.size() );
-        RR;
-        result = mbImpl->add_entities( *hex_set, &interstic_hexes[0], interstic_hexes.size() );
-        RR;
+        result = mbImpl->add_entities( *hex_set, &sphere_hexes[0], sphere_hexes.size() );RR;
+        result = mbImpl->add_entities( *hex_set, &interstic_hexes[0], interstic_hexes.size() );RR;
     }
 
     return result;
@@ -79,8 +67,7 @@ ErrorCode SphereDecomp::compute_nodes( const int dim )
     Range these_ents;
     const EntityType the_types[4] = { MBVERTEX, MBEDGE, MBTRI, MBTET };
 
-    ErrorCode result = mbImpl->get_entities_by_dimension( 0, dim, these_ents );
-    RR;
+    ErrorCode result = mbImpl->get_entities_by_dimension( 0, dim, these_ents );RR;
     assert( mbImpl->type_from_handle( *these_ents.begin() ) == the_types[dim] &&
             mbImpl->type_from_handle( *these_ents.rbegin() ) == the_types[dim] );
 
@@ -96,24 +83,19 @@ ErrorCode SphereDecomp::compute_nodes( const int dim )
         // get vertices
         const EntityHandle* connect;
         int num_connect;
-        result = mbImpl->get_connectivity( *rit, connect, num_connect );
-        RR;
+        result = mbImpl->get_connectivity( *rit, connect, num_connect );RR;
 
         // compute center
-        result = mtu.get_average_position( connect, num_connect, avg_pos );
-        RR;
+        result = mtu.get_average_position( connect, num_connect, avg_pos );RR;
 
         // create center vertex
-        result = mbImpl->create_vertex( avg_pos, subdiv_vertices[num_verts] );
-        RR;
+        result = mbImpl->create_vertex( avg_pos, subdiv_vertices[num_verts] );RR;
 
         // get coords of other vertices
-        result = mbImpl->get_coords( connect, num_connect, vert_pos );
-        RR;
+        result = mbImpl->get_coords( connect, num_connect, vert_pos );RR;
 
         // get radii associated with each vertex
-        result = mbImpl->tag_get_data( sphereRadiiTag, connect, num_connect, radii );
-        RR;
+        result = mbImpl->tag_get_data( sphereRadiiTag, connect, num_connect, radii );RR;
 
         // compute subdiv vertex position for each vertex
         for( int i = 0; i < num_verts; i++ )
@@ -152,8 +134,7 @@ ErrorCode SphereDecomp::compute_nodes( const int dim )
         }
 
         // set the tag
-        result = mbImpl->tag_set_data( subdivVerticesTag, &( *rit ), 1, subdiv_vertices );
-        RR;
+        result = mbImpl->tag_set_data( subdivVerticesTag, &( *rit ), 1, subdiv_vertices );RR;
     }
 
     return result;
@@ -164,13 +145,11 @@ ErrorCode SphereDecomp::build_hexes( std::vector< EntityHandle >& sphere_hexes,
 {
     // build hexes inside each tet element separately
     Range tets;
-    ErrorCode result = mbImpl->get_entities_by_type( 0, MBTET, tets );
-    RR;
+    ErrorCode result = mbImpl->get_entities_by_type( 0, MBTET, tets );RR;
 
     for( Range::iterator vit = tets.begin(); vit != tets.end(); ++vit )
     {
-        result = subdivide_tet( *vit, sphere_hexes, interstic_hexes );
-        RR;
+        result = subdivide_tet( *vit, sphere_hexes, interstic_hexes );RR;
     }
 
     return MB_SUCCESS;
@@ -184,8 +163,7 @@ ErrorCode SphereDecomp::subdivide_tet( EntityHandle tet, std::vector< EntityHand
 
     // get tet connectivity
     std::vector< EntityHandle > tet_conn;
-    ErrorCode result = mbImpl->get_connectivity( &tet, 1, tet_conn );
-    RR;
+    ErrorCode result = mbImpl->get_connectivity( &tet, 1, tet_conn );RR;
 
     for( int dim = 1; dim <= 3; dim++ )
     {
@@ -193,8 +171,7 @@ ErrorCode SphereDecomp::subdivide_tet( EntityHandle tet, std::vector< EntityHand
         std::vector< EntityHandle > ents;
         if( dim != 3 )
         {
-            result = mbImpl->get_adjacencies( &tet, 1, dim, false, ents );
-            RR;
+            result = mbImpl->get_adjacencies( &tet, 1, dim, false, ents );RR;
         }
         else
             ents.push_back( tet );
@@ -202,8 +179,7 @@ ErrorCode SphereDecomp::subdivide_tet( EntityHandle tet, std::vector< EntityHand
         // for each, get subdiv verts & put into vector
         for( std::vector< EntityHandle >::iterator vit = ents.begin(); vit != ents.end(); ++vit )
         {
-            result = retrieve_subdiv_verts( tet, *vit, &tet_conn[0], dim, subdiv_verts );
-            RR;
+            result = retrieve_subdiv_verts( tet, *vit, &tet_conn[0], dim, subdiv_verts );RR;
         }
     }
 
@@ -272,8 +248,7 @@ ErrorCode SphereDecomp::subdivide_tet( EntityHandle tet, std::vector< EntityHand
     this_connect[i++] = FSV( 0, DINDEX );
     this_connect[i++] = TSV( 0, EINDEX );
     this_connect[i++] = TSV( 0, AINDEX );
-    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );
-    RR;
+    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );RR;
     interstic_hexes.push_back( this_hex );
 
     i                 = 0;
@@ -285,8 +260,7 @@ ErrorCode SphereDecomp::subdivide_tet( EntityHandle tet, std::vector< EntityHand
     this_connect[i++] = ESV( 3, CINDEX );
     this_connect[i++] = FSV( 2, DINDEX );
     this_connect[i++] = FSV( 2, AINDEX );
-    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );
-    RR;
+    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );RR;
     interstic_hexes.push_back( this_hex );
 
     i                 = 0;
@@ -298,8 +272,7 @@ ErrorCode SphereDecomp::subdivide_tet( EntityHandle tet, std::vector< EntityHand
     this_connect[i++] = TSV( 0, EINDEX );
     this_connect[i++] = FSV( 2, DINDEX );
     this_connect[i++] = FSV( 2, AINDEX );
-    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );
-    RR;
+    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );RR;
     interstic_hexes.push_back( this_hex );
 
     // V1:
@@ -312,8 +285,7 @@ ErrorCode SphereDecomp::subdivide_tet( EntityHandle tet, std::vector< EntityHand
     this_connect[i++] = FSV( 0, BINDEX );
     this_connect[i++] = TSV( 0, BINDEX );
     this_connect[i++] = TSV( 0, EINDEX );
-    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );
-    RR;
+    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );RR;
     interstic_hexes.push_back( this_hex );
 
     i                 = 0;
@@ -325,8 +297,7 @@ ErrorCode SphereDecomp::subdivide_tet( EntityHandle tet, std::vector< EntityHand
     this_connect[i++] = ESV( 4, AINDEX );
     this_connect[i++] = FSV( 1, AINDEX );
     this_connect[i++] = FSV( 1, DINDEX );
-    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );
-    RR;
+    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );RR;
     interstic_hexes.push_back( this_hex );
 
     i                 = 0;
@@ -338,8 +309,7 @@ ErrorCode SphereDecomp::subdivide_tet( EntityHandle tet, std::vector< EntityHand
     this_connect[i++] = ESV( 1, AINDEX );
     this_connect[i++] = FSV( 3, CINDEX );
     this_connect[i++] = FSV( 3, DINDEX );
-    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );
-    RR;
+    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );RR;
     interstic_hexes.push_back( this_hex );
 
     // V2:
@@ -352,8 +322,7 @@ ErrorCode SphereDecomp::subdivide_tet( EntityHandle tet, std::vector< EntityHand
     this_connect[i++] = FSV( 1, DINDEX );
     this_connect[i++] = FSV( 1, BINDEX );
     this_connect[i++] = TSV( 0, CINDEX );
-    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );
-    RR;
+    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );RR;
     interstic_hexes.push_back( this_hex );
 
     i                 = 0;
@@ -365,8 +334,7 @@ ErrorCode SphereDecomp::subdivide_tet( EntityHandle tet, std::vector< EntityHand
     this_connect[i++] = ESV( 5, CINDEX );
     this_connect[i++] = ESV( 5, AINDEX );
     this_connect[i++] = FSV( 2, CINDEX );
-    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );
-    RR;
+    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );RR;
     interstic_hexes.push_back( this_hex );
 
     i                 = 0;
@@ -378,8 +346,7 @@ ErrorCode SphereDecomp::subdivide_tet( EntityHandle tet, std::vector< EntityHand
     this_connect[i++] = FSV( 2, DINDEX );
     this_connect[i++] = ESV( 2, CINDEX );
     this_connect[i++] = FSV( 3, DINDEX );
-    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );
-    RR;
+    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );RR;
     interstic_hexes.push_back( this_hex );
 
     // V3:
@@ -392,8 +359,7 @@ ErrorCode SphereDecomp::subdivide_tet( EntityHandle tet, std::vector< EntityHand
     this_connect[i++] = FSV( 1, CINDEX );
     this_connect[i++] = ESV( 5, BINDEX );
     this_connect[i++] = FSV( 2, BINDEX );
-    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );
-    RR;
+    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );RR;
     interstic_hexes.push_back( this_hex );
 
     i                 = 0;
@@ -405,8 +371,7 @@ ErrorCode SphereDecomp::subdivide_tet( EntityHandle tet, std::vector< EntityHand
     this_connect[i++] = ESV( 4, BINDEX );
     this_connect[i++] = FSV( 1, CINDEX );
     this_connect[i++] = TSV( 0, DINDEX );
-    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );
-    RR;
+    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );RR;
     interstic_hexes.push_back( this_hex );
 
     i                 = 0;
@@ -418,8 +383,7 @@ ErrorCode SphereDecomp::subdivide_tet( EntityHandle tet, std::vector< EntityHand
     this_connect[i++] = FSV( 0, CINDEX );
     this_connect[i++] = TSV( 0, DINDEX );
     this_connect[i++] = FSV( 2, BINDEX );
-    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );
-    RR;
+    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );RR;
     interstic_hexes.push_back( this_hex );
 
     // now, the sphere interiors, four hexes per vertex sphere
@@ -434,8 +398,7 @@ ErrorCode SphereDecomp::subdivide_tet( EntityHandle tet, std::vector< EntityHand
     this_connect[i++] = FSV( 0, EINDEX );
     this_connect[i++] = TSV( 0, FINDEX );
     this_connect[i++] = FSV( 2, EINDEX );
-    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );
-    RR;
+    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );RR;
     sphere_hexes.push_back( this_hex );
 
     i                 = 0;
@@ -447,8 +410,7 @@ ErrorCode SphereDecomp::subdivide_tet( EntityHandle tet, std::vector< EntityHand
     this_connect[i++] = FSV( 0, AINDEX );
     this_connect[i++] = TSV( 0, AINDEX );
     this_connect[i++] = TSV( 0, FINDEX );
-    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );
-    RR;
+    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );RR;
     sphere_hexes.push_back( this_hex );
 
     i                 = 0;
@@ -460,8 +422,7 @@ ErrorCode SphereDecomp::subdivide_tet( EntityHandle tet, std::vector< EntityHand
     this_connect[i++] = TSV( 0, AINDEX );
     this_connect[i++] = FSV( 2, AINDEX );
     this_connect[i++] = FSV( 2, EINDEX );
-    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );
-    RR;
+    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );RR;
     sphere_hexes.push_back( this_hex );
 
     i                 = 0;
@@ -473,8 +434,7 @@ ErrorCode SphereDecomp::subdivide_tet( EntityHandle tet, std::vector< EntityHand
     this_connect[i++] = FSV( 0, AINDEX );
     this_connect[i++] = ESV( 3, AINDEX );
     this_connect[i++] = ESV( 3, DINDEX );
-    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );
-    RR;
+    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );RR;
     sphere_hexes.push_back( this_hex );
 
     // V1:
@@ -487,8 +447,7 @@ ErrorCode SphereDecomp::subdivide_tet( EntityHandle tet, std::vector< EntityHand
     this_connect[i++] = FSV( 1, EINDEX );
     this_connect[i++] = TSV( 0, GINDEX );
     this_connect[i++] = FSV( 0, FINDEX );
-    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );
-    RR;
+    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );RR;
     sphere_hexes.push_back( this_hex );
 
     i                 = 0;
@@ -500,8 +459,7 @@ ErrorCode SphereDecomp::subdivide_tet( EntityHandle tet, std::vector< EntityHand
     this_connect[i++] = FSV( 1, EINDEX );
     this_connect[i++] = FSV( 1, AINDEX );
     this_connect[i++] = TSV( 0, BINDEX );
-    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );
-    RR;
+    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );RR;
     sphere_hexes.push_back( this_hex );
 
     i                 = 0;
@@ -513,8 +471,7 @@ ErrorCode SphereDecomp::subdivide_tet( EntityHandle tet, std::vector< EntityHand
     this_connect[i++] = ESV( 4, DINDEX );
     this_connect[i++] = ESV( 4, AINDEX );
     this_connect[i++] = FSV( 0, BINDEX );
-    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );
-    RR;
+    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );RR;
     sphere_hexes.push_back( this_hex );
 
     i                 = 0;
@@ -526,8 +483,7 @@ ErrorCode SphereDecomp::subdivide_tet( EntityHandle tet, std::vector< EntityHand
     this_connect[i++] = FSV( 0, FINDEX );
     this_connect[i++] = TSV( 0, GINDEX );
     this_connect[i++] = TSV( 0, BINDEX );
-    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );
-    RR;
+    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );RR;
     sphere_hexes.push_back( this_hex );
 
     // V2:
@@ -540,8 +496,7 @@ ErrorCode SphereDecomp::subdivide_tet( EntityHandle tet, std::vector< EntityHand
     this_connect[i++] = FSV( 1, FINDEX );
     this_connect[i++] = TSV( 0, HINDEX );
     this_connect[i++] = TSV( 0, CINDEX );
-    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );
-    RR;
+    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );RR;
     sphere_hexes.push_back( this_hex );
 
     i                 = 0;
@@ -553,8 +508,7 @@ ErrorCode SphereDecomp::subdivide_tet( EntityHandle tet, std::vector< EntityHand
     this_connect[i++] = FSV( 1, FINDEX );
     this_connect[i++] = ESV( 5, DINDEX );
     this_connect[i++] = FSV( 2, GINDEX );
-    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );
-    RR;
+    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );RR;
     sphere_hexes.push_back( this_hex );
 
     i                 = 0;
@@ -566,8 +520,7 @@ ErrorCode SphereDecomp::subdivide_tet( EntityHandle tet, std::vector< EntityHand
     this_connect[i++] = FSV( 1, BINDEX );
     this_connect[i++] = ESV( 5, AINDEX );
     this_connect[i++] = FSV( 2, CINDEX );
-    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );
-    RR;
+    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );RR;
     sphere_hexes.push_back( this_hex );
 
     i                 = 0;
@@ -579,8 +532,7 @@ ErrorCode SphereDecomp::subdivide_tet( EntityHandle tet, std::vector< EntityHand
     this_connect[i++] = TSV( 0, HINDEX );
     this_connect[i++] = FSV( 2, GINDEX );
     this_connect[i++] = FSV( 2, CINDEX );
-    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );
-    RR;
+    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );RR;
     sphere_hexes.push_back( this_hex );
 
     // V3:
@@ -593,8 +545,7 @@ ErrorCode SphereDecomp::subdivide_tet( EntityHandle tet, std::vector< EntityHand
     this_connect[i++] = ESV( 4, EINDEX );
     this_connect[i++] = FSV( 1, GINDEX );
     this_connect[i++] = TSV( 0, IINDEX );
-    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );
-    RR;
+    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );RR;
     sphere_hexes.push_back( this_hex );
 
     i                 = 0;
@@ -606,8 +557,7 @@ ErrorCode SphereDecomp::subdivide_tet( EntityHandle tet, std::vector< EntityHand
     this_connect[i++] = FSV( 0, GINDEX );
     this_connect[i++] = TSV( 0, IINDEX );
     this_connect[i++] = FSV( 2, FINDEX );
-    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );
-    RR;
+    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );RR;
     sphere_hexes.push_back( this_hex );
 
     i                 = 0;
@@ -619,8 +569,7 @@ ErrorCode SphereDecomp::subdivide_tet( EntityHandle tet, std::vector< EntityHand
     this_connect[i++] = FSV( 1, GINDEX );
     this_connect[i++] = ESV( 5, EINDEX );
     this_connect[i++] = FSV( 2, FINDEX );
-    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );
-    RR;
+    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );RR;
     sphere_hexes.push_back( this_hex );
 
     i                 = 0;
@@ -632,8 +581,7 @@ ErrorCode SphereDecomp::subdivide_tet( EntityHandle tet, std::vector< EntityHand
     this_connect[i++] = CV( V3INDEX );
     this_connect[i++] = ESV( 5, EINDEX );
     this_connect[i++] = FSV( 2, FINDEX );
-    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );
-    RR;
+    result            = mbImpl->create_element( MBHEX, this_connect, 8, this_hex );RR;
     sphere_hexes.push_back( this_hex );
 
     return result;
@@ -655,8 +603,7 @@ ErrorCode SphereDecomp::retrieve_subdiv_verts( EntityHandle tet, EntityHandle th
     // if it's a sub-entity, need to find index, relative orientation, and offset
     // get connectivity of sub-entity
     std::vector< EntityHandle > this_conn;
-    result = mbImpl->get_connectivity( &this_ent, 1, this_conn );
-    RR;
+    result = mbImpl->get_connectivity( &this_ent, 1, this_conn );RR;
 
     // get relative orientation
     std::vector< int > conn_tet_indices( this_conn.size() );

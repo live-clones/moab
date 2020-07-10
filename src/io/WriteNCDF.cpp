@@ -440,8 +440,7 @@ ErrorCode WriteNCDF::gather_mesh_information( ExodusMeshInfo& mesh_info, std::ve
                 EntityHandle polg        = *eit;
                 int nnodes               = 0;
                 const EntityHandle* conn = NULL;
-                rval                     = mdbImpl->get_connectivity( polg, conn, nnodes );
-                MB_CHK_ERR( rval );
+                rval                     = mdbImpl->get_connectivity( polg, conn, nnodes );MB_CHK_ERR( rval );
                 numconn += nnodes;
             }
             block_data.number_nodes_per_element = numconn;
@@ -462,8 +461,7 @@ ErrorCode WriteNCDF::gather_mesh_information( ExodusMeshInfo& mesh_info, std::ve
         // if polyhedra block
         if( EXOII_POLYHEDRON == block_data.element_type )
         {
-            rval = mdbImpl->get_connectivity( block_data.elements, mesh_info.polyhedronFaces );
-            MB_CHK_ERR( rval );
+            rval = mdbImpl->get_connectivity( block_data.elements, mesh_info.polyhedronFaces );MB_CHK_ERR( rval );
             mesh_info.num_polyhedra_blocks++;
         }
 
@@ -572,8 +570,7 @@ ErrorCode WriteNCDF::gather_mesh_information( ExodusMeshInfo& mesh_info, std::ve
         for( ; iter != end_iter; ++iter )
         {
             if( TYPE_FROM_HANDLE( *iter ) != MBVERTEX ) continue;
-            result = mdbImpl->tag_get_data( mEntityMark, &( *iter ), 1, &node_marked );
-            MB_CHK_SET_ERR( result, "Couldn't get mark data" );
+            result = mdbImpl->tag_get_data( mEntityMark, &( *iter ), 1, &node_marked );MB_CHK_SET_ERR( result, "Couldn't get mark data" );
 
             if( 0x1 == node_marked )
             {
@@ -609,10 +606,8 @@ ErrorCode WriteNCDF::gather_mesh_information( ExodusMeshInfo& mesh_info, std::ve
         Range forward_elems, reverse_elems;
         if( get_sideset_elems( *vector_iter, 0, forward_elems, reverse_elems ) == MB_FAILURE ) return MB_FAILURE;
 
-        ErrorCode result = get_valid_sides( forward_elems, mesh_info, 1, sideset_data );
-        MB_CHK_SET_ERR( result, "Couldn't get valid sides data" );
-        result = get_valid_sides( reverse_elems, mesh_info, -1, sideset_data );
-        MB_CHK_SET_ERR( result, "Couldn't get valid sides data" );
+        ErrorCode result = get_valid_sides( forward_elems, mesh_info, 1, sideset_data );MB_CHK_SET_ERR( result, "Couldn't get valid sides data" );
+        result = get_valid_sides( reverse_elems, mesh_info, -1, sideset_data );MB_CHK_SET_ERR( result, "Couldn't get valid sides data" );
 
         sideset_data.number_elements = sideset_data.elements.size();
         sideset_info.push_back( sideset_data );
@@ -649,8 +644,7 @@ ErrorCode WriteNCDF::get_valid_sides( Range& elems, ExodusMeshInfo& /*mesh_info*
     for( Range::iterator iter = elems.begin(); iter != elems.end(); ++iter )
     {
         // Should insert here if "side" is a quad/tri on a quad/tri mesh
-        result = mdbImpl->tag_get_data( mEntityMark, &( *iter ), 1, &element_marked );
-        MB_CHK_SET_ERR( result, "Couldn't get mark data" );
+        result = mdbImpl->tag_get_data( mEntityMark, &( *iter ), 1, &element_marked );MB_CHK_SET_ERR( result, "Couldn't get mark data" );
 
         if( 0x1 == element_marked )
         {
@@ -679,8 +673,7 @@ ErrorCode WriteNCDF::get_valid_sides( Range& elems, ExodusMeshInfo& /*mesh_info*
                 // Make sure the adjacent parent element will be output
                 for( unsigned int k = 0; k < parents.size(); k++ )
                 {
-                    result = mdbImpl->tag_get_data( mEntityMark, &( parents[k] ), 1, &element_marked );
-                    MB_CHK_SET_ERR( result, "Couldn't get mark data" );
+                    result = mdbImpl->tag_get_data( mEntityMark, &( parents[k] ), 1, &element_marked );MB_CHK_SET_ERR( result, "Couldn't get mark data" );
 
                     int side_no, this_sense, this_offset;
                     if( 0x1 == element_marked &&
@@ -820,8 +813,7 @@ ErrorCode WriteNCDF::write_nodes( int num_nodes, Range& nodes, int dimension )
     {
         double trans_matrix[16];
         const EntityHandle mesh = 0;
-        result                  = mdbImpl->tag_get_data( trans_tag, &mesh, 0, trans_matrix );
-        MB_CHK_SET_ERR( result, "Couldn't get transform data" );
+        result                  = mdbImpl->tag_get_data( trans_tag, &mesh, 0, trans_matrix );MB_CHK_SET_ERR( result, "Couldn't get transform data" );
 
         for( int i = 0; i < num_nodes; i++ )
         {
@@ -906,8 +898,7 @@ ErrorCode WriteNCDF::write_poly_faces( ExodusMeshInfo& mesh_info )
             EntityHandle polyg       = *eit;
             int nnodes               = 0;
             const EntityHandle* conn = NULL;
-            ErrorCode rval           = mdbImpl->get_connectivity( polyg, conn, nnodes );
-            MB_CHK_ERR( rval );
+            ErrorCode rval           = mdbImpl->get_connectivity( polyg, conn, nnodes );MB_CHK_ERR( rval );
             for( int k = 0; k < nnodes; k++ )
                 connectivity[ixcon++] = conn[k];
             fbepe[j++] = nnodes;
@@ -1067,8 +1058,7 @@ ErrorCode WriteNCDF::write_elementblocks( ExodusMeshInfo& mesh_info, std::vector
                 EntityHandle polg        = *eit;
                 int nnodes               = 0;
                 const EntityHandle* conn = NULL;
-                ErrorCode rval           = mdbImpl->get_connectivity( polg, conn, nnodes );
-                MB_CHK_ERR( rval );
+                ErrorCode rval           = mdbImpl->get_connectivity( polg, conn, nnodes );MB_CHK_ERR( rval );
                 connectivity[j] = nnodes;
             }
             fail = nc_put_vara_int( ncFile, nc_var, start, count, connectivity );
@@ -1124,8 +1114,7 @@ ErrorCode WriteNCDF::write_elementblocks( ExodusMeshInfo& mesh_info, std::vector
                 EntityHandle polyh       = *eit;
                 int nfaces               = 0;
                 const EntityHandle* conn = NULL;
-                ErrorCode rval           = mdbImpl->get_connectivity( polyh, conn, nfaces );
-                MB_CHK_ERR( rval );
+                ErrorCode rval           = mdbImpl->get_connectivity( polyh, conn, nfaces );MB_CHK_ERR( rval );
                 for( int k = 0; k < nfaces; k++ )
                 {
                     int index = block_faces.index( conn[k] );
@@ -1311,8 +1300,7 @@ ErrorCode WriteNCDF::write_BCs( std::vector< NeumannSetData >& sidesets, std::ve
         // Fill up node array and dist. factor array at the same time
         for( ; begin_iter != end_iter; ++begin_iter )
         {
-            result = mdbImpl->tag_get_data( mGlobalIdTag, &( *begin_iter ), 1, &exodus_id );
-            MB_CHK_SET_ERR( result, "Problem getting id tag data" );
+            result = mdbImpl->tag_get_data( mGlobalIdTag, &( *begin_iter ), 1, &exodus_id );MB_CHK_SET_ERR( result, "Problem getting id tag data" );
 
             exodus_id_array[j]   = exodus_id;
             dist_factor_array[j] = *( other_iter );
@@ -1324,16 +1312,14 @@ ErrorCode WriteNCDF::write_BCs( std::vector< NeumannSetData >& sidesets, std::ve
 
         int num_values = 1;
 
-        result = write_exodus_integer_variable( "ns_prop1", &id, ns_index, num_values );
-        MB_CHK_SET_ERR_RET_VAL( result, "Problem writing node set id " << id, MB_FAILURE );
+        result = write_exodus_integer_variable( "ns_prop1", &id, ns_index, num_values );MB_CHK_SET_ERR_RET_VAL( result, "Problem writing node set id " << id, MB_FAILURE );
 
         // Write out the nodeset status
 
         int status = 1;
         if( !number_nodes ) status = 0;
 
-        result = write_exodus_integer_variable( "ns_status", &status, ns_index, num_values );
-        MB_CHK_SET_ERR_RET_VAL( result, "Problem writing node set status", MB_FAILURE );
+        result = write_exodus_integer_variable( "ns_status", &status, ns_index, num_values );MB_CHK_SET_ERR_RET_VAL( result, "Problem writing node set status", MB_FAILURE );
 
         // Write it out
         char wname[80];
@@ -1389,8 +1375,7 @@ ErrorCode WriteNCDF::write_BCs( std::vector< NeumannSetData >& sidesets, std::ve
         // For each "side"
         for( ; begin_iter != end_iter; ++begin_iter, ++side_iter )
         {
-            ErrorCode result = mdbImpl->tag_get_data( mGlobalIdTag, &( *begin_iter ), 1, &exodus_id );
-            MB_CHK_SET_ERR( result, "Problem getting exodus id for sideset element "
+            ErrorCode result = mdbImpl->tag_get_data( mGlobalIdTag, &( *begin_iter ), 1, &exodus_id );MB_CHK_SET_ERR( result, "Problem getting exodus id for sideset element "
                                         << (long unsigned int)ID_FROM_HANDLE( *begin_iter ) );
 
             output_element_ids[j]            = exodus_id;
@@ -1404,8 +1389,7 @@ ErrorCode WriteNCDF::write_BCs( std::vector< NeumannSetData >& sidesets, std::ve
             int num_values = 1;
 
             // ss_prop1[ss_index] = side_set_id
-            ErrorCode result = write_exodus_integer_variable( "ss_prop1", &side_set_id, ss_index, num_values );
-            MB_CHK_SET_ERR_RET_VAL( result, "Problem writing node set id " << id, MB_FAILURE );
+            ErrorCode result = write_exodus_integer_variable( "ss_prop1", &side_set_id, ss_index, num_values );MB_CHK_SET_ERR_RET_VAL( result, "Problem writing node set id " << id, MB_FAILURE );
 
             // FIXME : Something seems wrong here.  The we are within a block
             // started with if (0 != number_elements), so this condition is always
@@ -1417,8 +1401,7 @@ ErrorCode WriteNCDF::write_BCs( std::vector< NeumannSetData >& sidesets, std::ve
             if( 0 == number_elements ) status = 0;
 
             // ss_status[ss_index] = status
-            result = write_exodus_integer_variable( "ss_status", &status, ss_index, num_values );
-            MB_CHK_SET_ERR_RET_VAL( result, "Problem writing side set status", MB_FAILURE );
+            result = write_exodus_integer_variable( "ss_status", &status, ss_index, num_values );MB_CHK_SET_ERR_RET_VAL( result, "Problem writing side set status", MB_FAILURE );
 
             // Increment ss_index now because we want a) we need to
             // increment it somewhere within the if (0 != number_elements)
@@ -1626,8 +1609,7 @@ ErrorCode WriteNCDF::initialize_exodus_file( ExodusMeshInfo& mesh_info, std::vec
             EntityHandle polyg       = *eit;
             int nnodes               = 0;
             const EntityHandle* conn = NULL;
-            ErrorCode rval           = mdbImpl->get_connectivity( polyg, conn, nnodes );
-            MB_CHK_ERR( rval );
+            ErrorCode rval           = mdbImpl->get_connectivity( polyg, conn, nnodes );MB_CHK_ERR( rval );
             num_nodes_per_face += nnodes;
         }
 
@@ -1777,8 +1759,7 @@ ErrorCode WriteNCDF::initialize_exodus_file( ExodusMeshInfo& mesh_info, std::vec
                 EntityHandle polyh       = *eit;
                 int nfaces               = 0;
                 const EntityHandle* conn = NULL;
-                ErrorCode rval           = mdbImpl->get_connectivity( polyh, conn, nfaces );
-                MB_CHK_ERR( rval );
+                ErrorCode rval           = mdbImpl->get_connectivity( polyh, conn, nfaces );MB_CHK_ERR( rval );
                 num_faces2 += nfaces;
             }
 

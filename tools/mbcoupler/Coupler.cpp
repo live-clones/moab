@@ -633,13 +633,11 @@ ErrorCode Coupler::interpolate( Coupler::Method method, const std::string& inter
     ErrorCode result;
     if( _spectralSource )
     {
-        result = mbImpl->tag_get_handle( interp_tag.c_str(), _ntot, MB_TYPE_DOUBLE, tag );
-        MB_CHK_SET_ERR( result, "Failed to get handle for interpolation tag \"" << interp_tag << "\"" );
+        result = mbImpl->tag_get_handle( interp_tag.c_str(), _ntot, MB_TYPE_DOUBLE, tag );MB_CHK_SET_ERR( result, "Failed to get handle for interpolation tag \"" << interp_tag << "\"" );
     }
     else
     {
-        result = mbImpl->tag_get_handle( interp_tag.c_str(), 1, MB_TYPE_DOUBLE, tag );
-        MB_CHK_SET_ERR( result, "Failed to get handle for interpolation tag \"" << interp_tag << "\"" );
+        result = mbImpl->tag_get_handle( interp_tag.c_str(), 1, MB_TYPE_DOUBLE, tag );MB_CHK_SET_ERR( result, "Failed to get handle for interpolation tag \"" << interp_tag << "\"" );
     }
 
     return interpolate( method, tag, interp_vals, tl, normalize );
@@ -1115,14 +1113,12 @@ ErrorCode Coupler::normalize_mesh( EntityHandle root_set, const char* norm_tag, 
 
     // get all entities from root_set and put into entity_groups
     std::vector< EntityHandle > entities;
-    err = mbImpl->get_entities_by_handle( root_set, entities, true );
-    ERRORR( "Failed to get entities in root_set.", err );
+    err = mbImpl->get_entities_by_handle( root_set, entities, true );ERRORR( "Failed to get entities in root_set.", err );
 
     entity_groups.push_back( entities );
 
     // Call do_normalization() to continue common normalization processing
-    err = do_normalization( norm_tag, entity_sets, entity_groups, integ_type, num_integ_pts );
-    ERRORR( "Failure in do_normalization().", err );
+    err = do_normalization( norm_tag, entity_sets, entity_groups, integ_type, num_integ_pts );ERRORR( "Failure in do_normalization().", err );
     // SLAVE END   ****************************************************************
 
     return err;
@@ -1140,8 +1136,7 @@ ErrorCode Coupler::normalize_subset( EntityHandle root_set, const char* norm_tag
     {
         // get tag handle & size
         Tag th;
-        err = mbImpl->tag_get_handle( tag_names[t], 1, moab::MB_TYPE_DOUBLE, th, moab::MB_TAG_ANY );
-        ERRORR( "Failed to get tag handle.", err );
+        err = mbImpl->tag_get_handle( tag_names[t], 1, moab::MB_TYPE_DOUBLE, th, moab::MB_TAG_ANY );ERRORR( "Failed to get tag handle.", err );
         tag_handles.push_back( th );
     }
 
@@ -1158,12 +1153,10 @@ ErrorCode Coupler::normalize_subset( EntityHandle root_set, const char* norm_tag
     std::vector< std::vector< EntityHandle > > entity_sets;
     std::vector< std::vector< EntityHandle > > entity_groups;
 
-    err = get_matching_entities( root_set, tag_handles, tag_values, num_tags, &entity_sets, &entity_groups );
-    ERRORR( "Failed to get matching entities.", err );
+    err = get_matching_entities( root_set, tag_handles, tag_values, num_tags, &entity_sets, &entity_groups );ERRORR( "Failed to get matching entities.", err );
 
     // Call do_normalization() to continue common normalization processing
-    err = do_normalization( norm_tag, entity_sets, entity_groups, integ_type, num_integ_pts );
-    ERRORR( "Failure in do_normalization().", err );
+    err = do_normalization( norm_tag, entity_sets, entity_groups, integ_type, num_integ_pts );ERRORR( "Failure in do_normalization().", err );
     // SLAVE END   ****************************************************************
 
     return err;
@@ -1190,8 +1183,7 @@ ErrorCode Coupler::do_normalization( const char* norm_tag, std::vector< std::vec
     unsigned int num_ent_grps = entity_groups.size();
     std::vector< double > integ_vals( num_ent_grps );
 
-    err = get_group_integ_vals( entity_groups, integ_vals, norm_tag, num_integ_pts, integ_type );
-    ERRORR( "Failed to get integrated field values for groups in mesh.", err );
+    err = get_group_integ_vals( entity_groups, integ_vals, norm_tag, num_integ_pts, integ_type );ERRORR( "Failed to get integrated field values for groups in mesh.", err );
     // SLAVE END   ****************************************************************
 
     // SLAVE/MASTER START #########################################################
@@ -1249,8 +1241,7 @@ ErrorCode Coupler::do_normalization( const char* norm_tag, std::vector< std::vec
     // and the string "_normF" appended.  This new tag will be created on the entity
     // set that contains all of the entities from a group.
 
-    err = apply_group_norm_factor( entity_sets, sum_integ_vals, norm_tag, integ_type );
-    ERRORR( "Failed to set the normalization factor for groups in mesh.", err );
+    err = apply_group_norm_factor( entity_sets, sum_integ_vals, norm_tag, integ_type );ERRORR( "Failed to set the normalization factor for groups in mesh.", err );
     // SLAVE END   ****************************************************************
 
     return err;
@@ -1270,8 +1261,7 @@ ErrorCode Coupler::get_matching_entities( EntityHandle root_set, const char** ta
     {
         // Get tag handle & size
         Tag th;
-        err = mbImpl->tag_get_handle( tag_names[t], 1, moab::MB_TYPE_DOUBLE, th, moab::MB_TAG_ANY );
-        ERRORR( "Failed to get tag handle.", err );
+        err = mbImpl->tag_get_handle( tag_names[t], 1, moab::MB_TYPE_DOUBLE, th, moab::MB_TAG_ANY );ERRORR( "Failed to get tag handle.", err );
         tag_handles.push_back( th );
     }
 
@@ -1297,12 +1287,10 @@ ErrorCode Coupler::get_matching_entities( EntityHandle root_set, Tag* tag_handle
     Range ent_sets;
     err =
         mbImpl->get_entities_by_type_and_tag( root_set, moab::MBENTITYSET, tag_handles, (const void* const*)tag_values,
-                                              num_tags, ent_sets, Interface::INTERSECT, 0 );
-    ERRORR( "Core::get_entities_by_type_and_tag failed.", err );
+                                              num_tags, ent_sets, Interface::INTERSECT, 0 );ERRORR( "Core::get_entities_by_type_and_tag failed.", err );
 
     TupleList* tag_list = NULL;
-    err                 = create_tuples( ent_sets, tag_handles, num_tags, &tag_list );
-    ERRORR( "Failed to create tuples from entity sets.", err );
+    err                 = create_tuples( ent_sets, tag_handles, num_tags, &tag_list );ERRORR( "Failed to create tuples from entity sets.", err );
 
     // Free up range
     ent_sets.clear();
@@ -1364,8 +1352,7 @@ ErrorCode Coupler::get_matching_entities( EntityHandle root_set, Tag* tag_handle
 
             // MASTER START ***************************************************************
             // Consolidate all tuple_lists into one tuple_list with no duplicates.
-            err = consolidate_tuples( tl_array, nprocs, &cons_tuples );
-            ERRORR( "Failed to consolidate tuples.", err );
+            err = consolidate_tuples( tl_array, nprocs, &cons_tuples );ERRORR( "Failed to consolidate tuples.", err );
 
             for( int i = 0; i < nprocs; i++ )
                 tl_array[i]->reset();
@@ -1417,8 +1404,7 @@ ErrorCode Coupler::get_matching_entities( EntityHandle root_set, Tag* tag_handle
 
         // Get entities recursively based on type and tag data
         err = mbImpl->get_entities_by_type_and_tag( root_set, moab::MBENTITYSET, tag_handles, (const void* const*)vals,
-                                                    mi, ent_sets, Interface::INTERSECT, 0 );
-        ERRORR( "Core::get_entities_by_type_and_tag failed.", err );
+                                                    mi, ent_sets, Interface::INTERSECT, 0 );ERRORR( "Core::get_entities_by_type_and_tag failed.", err );
         if( debug ) std::cout << "ent_sets_size=" << ent_sets.size() << std::endl;
 
         // Free up the array of pointers
@@ -1436,8 +1422,7 @@ ErrorCode Coupler::get_matching_entities( EntityHandle root_set, Tag* tag_handle
             Range ents;
 
             /* VSM: do we need to filter out entity sets ? */
-            err = mbImpl->get_entities_by_handle( ent_sets[j], ents, false );
-            ERRORR( "Core::get_entities_by_handle failed.", err );
+            err = mbImpl->get_entities_by_handle( ent_sets[j], ents, false );ERRORR( "Core::get_entities_by_handle failed.", err );
             if( debug ) std::cout << "ents_size=" << ents.size() << std::endl;
 
             // Save all of the entities from the entity set and free the memory for ents.
@@ -1482,8 +1467,7 @@ ErrorCode Coupler::create_tuples( Range& ent_sets, const char** tag_names, unsig
     {
         // Get tag handle & size
         Tag th;
-        err = mbImpl->tag_get_handle( tag_names[t], 1, moab::MB_TYPE_DOUBLE, th, moab::MB_TAG_ANY );
-        ERRORR( "Failed to get tag handle.", err );
+        err = mbImpl->tag_get_handle( tag_names[t], 1, moab::MB_TYPE_DOUBLE, th, moab::MB_TAG_ANY );ERRORR( "Failed to get tag handle.", err );
         tag_handles.push_back( th );
     }
 
@@ -1514,8 +1498,7 @@ ErrorCode Coupler::create_tuples( Range& ent_sets, Tag* tag_handles, unsigned in
         for( unsigned int j = 0; j < num_tags; j++ )
         {
             EntityHandle set_handle = ent_sets[i];
-            err                     = mbImpl->tag_get_data( tag_handles[j], &set_handle, 1, &val );
-            ERRORR( "Failed to get integer tag data.", err );
+            err                     = mbImpl->tag_get_data( tag_handles[j], &set_handle, 1, &val );ERRORR( "Failed to get integer tag data.", err );
             tag_tuples->vi_wr[i * mi + j] = val;
         }
 
@@ -1631,8 +1614,7 @@ ErrorCode Coupler::get_group_integ_vals( std::vector< std::vector< EntityHandle 
     // Get the tag handle for norm_tag
     Tag norm_hdl;
     err =
-        mbImpl->tag_get_handle( norm_tag, 1, moab::MB_TYPE_DOUBLE, norm_hdl, moab::MB_TAG_SPARSE | moab::MB_TAG_CREAT );
-    ERRORR( "Failed to get norm_tag handle.", err );
+        mbImpl->tag_get_handle( norm_tag, 1, moab::MB_TYPE_DOUBLE, norm_hdl, moab::MB_TAG_SPARSE | moab::MB_TAG_CREAT );ERRORR( "Failed to get norm_tag handle.", err );
 
     // Check size of integ_vals vector
     if( integ_vals.size() != groups.size() ) integ_vals.resize( groups.size() );
@@ -1652,8 +1634,7 @@ ErrorCode Coupler::get_group_integ_vals( std::vector< std::vector< EntityHandle 
             // Check that the entity in iter_j is of the same dimension as the
             // integ_type we are performing
             EntityType j_type;
-            j_type = mbImpl->type_from_handle( ehandle );
-            ERRORR( "Failed to get entity type.", err );
+            j_type = mbImpl->type_from_handle( ehandle );ERRORR( "Failed to get entity type.", err );
             // Skip any entities in the group that are not of the type being considered
             if( ( integ_type == VOLUME ) && ( j_type < MBTET || j_type >= MBENTITYSET ) ) continue;
 
@@ -1663,15 +1644,13 @@ ErrorCode Coupler::get_group_integ_vals( std::vector< std::vector< EntityHandle 
             const EntityHandle* verts = NULL;
             int connectivity_size     = 0;
 
-            err = mbImpl->get_connectivity( ehandle, verts, connectivity_size, false );
-            ERRORR( "Failed to get vertices from entity.", err );
+            err = mbImpl->get_connectivity( ehandle, verts, connectivity_size, false );ERRORR( "Failed to get vertices from entity.", err );
 
             // Get the vertex coordinates and the field values at the vertices.
             double* coords = (double*)malloc( sizeof( double ) * ( 3 * connectivity_size ) );
             /* TODO: VSM: check if this works for lower dimensions also without problems */
             /* if (3 == geom_dim) */
-            err = mbImpl->get_coords( verts, connectivity_size, coords );
-            ERRORR( "Failed to get vertex coordinates.", err );
+            err = mbImpl->get_coords( verts, connectivity_size, coords );ERRORR( "Failed to get vertex coordinates.", err );
 
             /* allocate the field data array */
             double* vfield = (double*)malloc( sizeof( double ) * ( connectivity_size ) );
@@ -1776,13 +1755,11 @@ ErrorCode Coupler::apply_group_norm_factor( std::vector< std::vector< EntityHand
     Tag normf_hdl;
     // Check to see if the tag exists.  If not then create it and get the handle.
     err = mbImpl->tag_get_handle( normf_tag, 1, moab::MB_TYPE_DOUBLE, normf_hdl,
-                                  moab::MB_TAG_SPARSE | moab::MB_TAG_CREAT );
-    ERRORR( "Failed to create normalization factor tag.", err );
+                                  moab::MB_TAG_SPARSE | moab::MB_TAG_CREAT );ERRORR( "Failed to create normalization factor tag.", err );
     if( normf_hdl == NULL )
     {
         std::string msg( "Failed to create normalization factor tag named '" );
-        msg += std::string( normf_tag ) + std::string( "'" );
-        ERRORR( msg.c_str(), MB_FAILURE );
+        msg += std::string( normf_tag ) + std::string( "'" );ERRORR( msg.c_str(), MB_FAILURE );
     }
     free( normf_tag );
 
@@ -1806,8 +1783,7 @@ ErrorCode Coupler::apply_group_norm_factor( std::vector< std::vector< EntityHand
             std::cout << "Coupler: applying normalization for entity set=" << entset
                       << ",  normalization_factor=" << grp_norm_factor << std::endl;
 
-            err = mbImpl->tag_set_data( normf_hdl, &entset, 1, &grp_norm_factor );
-            ERRORR( "Failed to set normalization factor on entity set.", err );
+            err = mbImpl->tag_set_data( normf_hdl, &entset, 1, &grp_norm_factor );ERRORR( "Failed to set normalization factor on entity set.", err );
         }
     }
 

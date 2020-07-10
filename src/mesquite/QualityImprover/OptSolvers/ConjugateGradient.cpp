@@ -79,8 +79,7 @@ ConjugateGradient::ConjugateGradient( ObjectiveFunction* objective, MsqError& er
     }
     else
     {
-        default_crit->add_iteration_limit( 5 );
-        MSQ_ERRRTN( err );
+        default_crit->add_iteration_limit( 5 );MSQ_ERRRTN( err );
     }
 }
 
@@ -206,8 +205,7 @@ void ConjugateGradient::optimize_vertex_positions( PatchData& pd, MsqError& err 
         }
         if( alp != 0 )
         {
-            pd.move_free_vertices_constrained( arrptr( pGrad ), num_vert, alp, err );
-            MSQ_ERRRTN( err );
+            pd.move_free_vertices_constrained( arrptr( pGrad ), num_vert, alp, err );MSQ_ERRRTN( err );
 
             if( !objFunc.update( pd, f, fNewGrad, err ) )
             {
@@ -264,10 +262,8 @@ void ConjugateGradient::optimize_vertex_positions( PatchData& pd, MsqError& err 
 
         }  // end if on alp == 0
 
-        term_crit->accumulate_patch( pd, err );
-        MSQ_ERRRTN( err );
-        term_crit->accumulate_inner( pd, f, arrptr( fGrad ), err );
-        MSQ_ERRRTN( err );
+        term_crit->accumulate_patch( pd, err );MSQ_ERRRTN( err );
+        term_crit->accumulate_inner( pd, f, arrptr( fGrad ), err );MSQ_ERRRTN( err );
     }  // end while
     if( conjGradDebug > 0 )
     {

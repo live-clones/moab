@@ -247,8 +247,7 @@ int main( int argc, char* argv[] )
     while( entities.empty() && dim > 1 )
     {
         dim--;
-        result = iface->get_entities_by_dimension( 0, dim, entities );
-        CHKERROR( result );
+        result = iface->get_entities_by_dimension( 0, dim, entities );CHKERROR( result );
     }
 
     Range skin_ents;
@@ -347,8 +346,7 @@ int main( int argc, char* argv[] )
         // get tag handle
         Tag tag;
         int zero = 0;
-        result   = iface->tag_get_handle( fixed_tag, 1, MB_TYPE_INTEGER, tag, MB_TAG_DENSE | MB_TAG_CREAT, &zero );
-        CHKERROR( result );
+        result   = iface->tag_get_handle( fixed_tag, 1, MB_TYPE_INTEGER, tag, MB_TAG_DENSE | MB_TAG_CREAT, &zero );CHKERROR( result );
 
         // Set tags
         std::vector< int > ones;
@@ -360,8 +358,7 @@ int main( int argc, char* argv[] )
             return 1;
         }
         ones.resize( bverts.size(), 1 );
-        result = iface->tag_set_data( tag, bverts, &ones[0] );
-        CHKERROR( result );
+        result = iface->tag_set_data( tag, bverts, &ones[0] );CHKERROR( result );
     }
 
     if( -1 != neuset_num )

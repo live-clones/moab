@@ -38,16 +38,14 @@ ErrorCode load_meshset_hirec( const char* infile, Interface* mbimpl, EntityHandl
                               const int degree, const int dim )
 {
     ErrorCode error;
-    error = mbimpl->create_meshset( moab::MESHSET_SET, meshset );
-    MB_CHK_ERR( error );
+    error = mbimpl->create_meshset( moab::MESHSET_SET, meshset );MB_CHK_ERR( error );
 #ifdef MOAB_HAVE_MPI
     int nprocs, rank;
     MPI_Comm comm = MPI_COMM_WORLD;
     MPI_Comm_size( comm, &nprocs );
     MPI_Comm_rank( comm, &rank );
     EntityHandle partnset;
-    error = mbimpl->create_meshset( moab::MESHSET_SET, partnset );
-    MB_CHK_ERR( error );
+    error = mbimpl->create_meshset( moab::MESHSET_SET, partnset );MB_CHK_ERR( error );
 
     if( nprocs > 1 ) { pc = moab::ParallelComm::get_pcomm( mbimpl, partnset, &comm ); }
 
@@ -95,8 +93,7 @@ ErrorCode load_meshset_hirec( const char* infile, Interface* mbimpl, EntityHandl
         mbimpl->load_file(infile,&local,local_options.c_str()); MB_CHK_ERR(error); error =
         mbimpl->write_file(localfile.c_str(),0,0,&local,1);*/
 
-        error = mbimpl->load_file( infile, &meshset, read_options.c_str() );
-        MB_CHK_ERR( error );
+        error = mbimpl->load_file( infile, &meshset, read_options.c_str() );MB_CHK_ERR( error );
         /*for debug
         //write local mesh with ghost layers
         localfile = outfile.substr(0,dotpos)+convert.str()+"_ghost.vtk";
@@ -104,14 +101,12 @@ ErrorCode load_meshset_hirec( const char* infile, Interface* mbimpl, EntityHandl
     }
     else
     {
-        error = mbimpl->load_file( infile, &meshset );
-        MB_CHK_ERR( error );
+        error = mbimpl->load_file( infile, &meshset );MB_CHK_ERR( error );
     }
 
 #else
     assert( !pc && degree && dim );
-    error = mbimpl->load_file( infile, &meshset );
-    MB_CHK_ERR( error );
+    error = mbimpl->load_file( infile, &meshset );MB_CHK_ERR( error );
 #endif
     return error;
 }
@@ -141,19 +136,16 @@ ErrorCode closedsurface_uref_hirec_convergence_study( const char* infile, std::v
     {
         mxdeg = std::max( degs2fit[i], mxdeg );
     }
-    error = load_meshset_hirec( infile, mbImpl, meshset, pc, mxdeg, dim );
-    MB_CHK_ERR( error );
+    error = load_meshset_hirec( infile, mbImpl, meshset, pc, mxdeg, dim );MB_CHK_ERR( error );
 
     Range elems, elems_owned;
-    error = mbImpl->get_entities_by_dimension( meshset, dim, elems );
-    MB_CHK_ERR( error );
+    error = mbImpl->get_entities_by_dimension( meshset, dim, elems );MB_CHK_ERR( error );
 
 #ifdef MOAB_HAVE_MPI
 
     if( pc )
     {
-        error = pc->filter_pstatus( elems, PSTATUS_GHOST, PSTATUS_NOT, -1, &elems_owned );
-        MB_CHK_ERR( error );
+        error = pc->filter_pstatus( elems, PSTATUS_GHOST, PSTATUS_NOT, -1, &elems_owned );MB_CHK_ERR( error );
     }
     else
     {
@@ -174,19 +166,16 @@ ErrorCode closedsurface_uref_hirec_convergence_study( const char* infile, std::v
      *************************/
     // project onto exact geometry since each level with uref has only linear coordinates
     Range verts;
-    error = mbImpl->get_entities_by_dimension( meshset, 0, verts );
-    MB_CHK_ERR( error );
+    error = mbImpl->get_entities_by_dimension( meshset, 0, verts );MB_CHK_ERR( error );
 
     for( Range::iterator ivert = verts.begin(); ivert != verts.end(); ++ivert )
     {
         EntityHandle currvert = *ivert;
         double currcoords[3], exactcoords[3];
-        error = mbImpl->get_coords( &currvert, 1, currcoords );
-        MB_CHK_ERR( error );
+        error = mbImpl->get_coords( &currvert, 1, currcoords );MB_CHK_ERR( error );
         obj->project_points2geom( 3, currcoords, exactcoords, NULL );
 
-        error = mbImpl->set_coords( &currvert, 1, exactcoords );
-        MB_CHK_ERR( error );
+        error = mbImpl->set_coords( &currvert, 1, exactcoords );MB_CHK_ERR( error );
         // for debug
         /*error = mbImpl->get_coords(&currvert,1,currcoords); MB_CHK_ERR(error);
         assert(currcoords[0]==exactcoords[0]&&currcoords[1]==exactcoords[1]&&currcoords[2]==exactcoords[2]);*/
@@ -280,11 +269,9 @@ ErrorCode closedsurface_uref_hirec_convergence_study( const char* infile, std::v
     {
         EntityHandle currelem = *ielem;
         std::vector< EntityHandle > conn;
-        error = mbImpl->get_connectivity( &currelem, 1, conn );
-        MB_CHK_ERR( error );
+        error = mbImpl->get_connectivity( &currelem, 1, conn );MB_CHK_ERR( error );
         std::vector< double > elemcoords( 3 * conn.size() );
-        error = mbImpl->get_coords( &( conn[0] ), conn.size(), &( elemcoords[0] ) );
-        MB_CHK_ERR( error );
+        error = mbImpl->get_coords( &( conn[0] ), conn.size(), &( elemcoords[0] ) );MB_CHK_ERR( error );
         EntityType type = TYPE_FROM_HANDLE( currelem );
 
         for( int s = 0; s < nsamples; ++s )
@@ -349,8 +336,7 @@ ErrorCode closedsurface_uref_hirec_convergence_study( const char* infile, std::v
     for( size_t ideg = 0; ideg < degs2fit.size(); ++ideg )
     {
         // High order reconstruction
-        error = hirec.reconstruct3D_surf_geom( degs2fit[ideg], interp, true, true );
-        MB_CHK_ERR( error );
+        error = hirec.reconstruct3D_surf_geom( degs2fit[ideg], interp, true, true );MB_CHK_ERR( error );
 
         int index = 0;
         // for debug
@@ -362,8 +348,7 @@ ErrorCode closedsurface_uref_hirec_convergence_study( const char* infile, std::v
             // Projection
             error =
                 hirec.hiproj_walf_in_element( *ielem, nvpe, nsamples, &( testnaturalcoords[nvpe * nsamples * index] ),
-                                              &( testpnts[3 * nsamples * index] ) );
-            MB_CHK_ERR( error );
+                                              &( testpnts[3 * nsamples * index] ) );MB_CHK_ERR( error );
             // for debug
             /*obj->compute_projecterror(3,nsamples,&(testpnts[3*nsamples*index]),eleml1err,eleml2err,elemlinferr);
             if(elemlinferr>maxlinferr){
@@ -576,8 +561,7 @@ int main( int argc, char* argv[] )
         std::cout << "Processor " << rank << " is working on file " << infile << std::endl;
 #endif
         error = closedsurface_uref_hirec_convergence_study( infile.c_str(), degs2fit, interp, dim, obj, ntestverts,
-                                                            geoml1errs, geoml2errs, geomlinferrs );
-        MB_CHK_ERR( error );
+                                                            geoml1errs, geoml2errs, geomlinferrs );MB_CHK_ERR( error );
         assert( geoml1errs.size() == 1 + degs2fit.size() && geoml2errs.size() == 1 + degs2fit.size() &&
                 geomlinferrs.size() == 1 + degs2fit.size() );
 #ifdef MOAB_HAVE_MPI

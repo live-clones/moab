@@ -426,8 +426,7 @@ void TargetCalculator::ideal_skew_3D( EntityTopology element_type, Sample s, con
             MSQ_SETERR( err )( MsqError::UNSUPPORTED_ELEMENT );
             return;
         }
-        map->ideal( s, q, err );
-        MSQ_ERRRTN( err );
+        map->ideal( s, q, err );MSQ_ERRRTN( err );
         q = TargetCalculator::skew( q );
     }
 }
@@ -444,8 +443,7 @@ void TargetCalculator::ideal_skew_2D( EntityTopology element_type, Sample s, con
             return;
         }
         MsqMatrix< 3, 2 > J;
-        map->ideal( s, J, err );
-        MSQ_ERRRTN( err );
+        map->ideal( s, J, err );MSQ_ERRRTN( err );
         q = TargetCalculator::skew( J );
     }
 }
@@ -461,8 +459,7 @@ void TargetCalculator::ideal_shape_3D( EntityTopology element_type, Sample s, co
             MSQ_SETERR( err )( MsqError::UNSUPPORTED_ELEMENT );
             return;
         }
-        map->ideal( s, q, err );
-        MSQ_ERRRTN( err );
+        map->ideal( s, q, err );MSQ_ERRRTN( err );
         q = TargetCalculator::shape( q );
     }
 }
@@ -479,8 +476,7 @@ void TargetCalculator::ideal_shape_2D( EntityTopology element_type, Sample s, co
             return;
         }
         MsqMatrix< 3, 2 > J;
-        map->ideal( s, J, err );
-        MSQ_ERRRTN( err );
+        map->ideal( s, J, err );MSQ_ERRRTN( err );
         q = TargetCalculator::shape( J );
     }
 }
@@ -525,8 +521,7 @@ void TargetCalculator::jacobian_3D( PatchData& pd, EntityTopology type, int num_
                                     const Vector3D* coords, MsqMatrix< 3, 3 >& J, MsqError& err )
 {
     // Get element properties
-    NodeSet bits = get_nodeset( type, num_nodes, err );
-    MSQ_ERRRTN( err );
+    NodeSet bits = get_nodeset( type, num_nodes, err );MSQ_ERRRTN( err );
     const MappingFunction3D* mf = pd.get_mapping_function_3D( type );
     if( !mf )
     {
@@ -539,8 +534,7 @@ void TargetCalculator::jacobian_3D( PatchData& pd, EntityTopology type, int num_
     assert( num_nodes <= MAX_NODES );
     size_t indices[MAX_NODES], n;
     MsqVector< 3 > derivs[MAX_NODES];
-    mf->derivatives( location, bits, indices, derivs, n, err );
-    MSQ_ERRRTN( err );
+    mf->derivatives( location, bits, indices, derivs, n, err );MSQ_ERRRTN( err );
 
     // calculate Jacobian
     assert( sizeof( Vector3D ) == sizeof( MsqVector< 3 > ) );
@@ -555,8 +549,7 @@ void TargetCalculator::jacobian_2D( PatchData& pd, EntityTopology type, int num_
                                     const Vector3D* coords, MsqMatrix< 3, 2 >& J, MsqError& err )
 {
     // Get element properties
-    NodeSet bits = get_nodeset( type, num_nodes, err );
-    MSQ_ERRRTN( err );
+    NodeSet bits = get_nodeset( type, num_nodes, err );MSQ_ERRRTN( err );
     const MappingFunction2D* mf = pd.get_mapping_function_2D( type );
     if( !mf )
     {
@@ -569,8 +562,7 @@ void TargetCalculator::jacobian_2D( PatchData& pd, EntityTopology type, int num_
     assert( num_nodes <= MAX_NODES );
     size_t indices[MAX_NODES], n;
     MsqVector< 2 > derivs[MAX_NODES];
-    mf->derivatives( location, bits, indices, derivs, n, err );
-    MSQ_ERRRTN( err );
+    mf->derivatives( location, bits, indices, derivs, n, err );MSQ_ERRRTN( err );
 
     // calculate Jacobian
     assert( sizeof( Vector3D ) == sizeof( MsqVector< 3 > ) );
@@ -601,12 +593,10 @@ void TargetCalculator::get_refmesh_Jacobian_3D( ReferenceMeshInterface* ref_mesh
 
     // get vertex coordinates
     Vector3D vert_coords[MAX_NODES];
-    ref_mesh->get_reference_vertex_coordinates( elem_verts, n, vert_coords, err );
-    MSQ_ERRRTN( err );
+    ref_mesh->get_reference_vertex_coordinates( elem_verts, n, vert_coords, err );MSQ_ERRRTN( err );
 
     // calculate Jacobian
-    jacobian_3D( pd, type, n, sample, vert_coords, W_out, err );
-    MSQ_ERRRTN( err );
+    jacobian_3D( pd, type, n, sample, vert_coords, W_out, err );MSQ_ERRRTN( err );
 }
 
 void TargetCalculator::get_refmesh_Jacobian_2D( ReferenceMeshInterface* ref_mesh, PatchData& pd, size_t element,
@@ -629,12 +619,10 @@ void TargetCalculator::get_refmesh_Jacobian_2D( ReferenceMeshInterface* ref_mesh
 
     // get vertex coordinates
     Vector3D vert_coords[MAX_NODES];
-    ref_mesh->get_reference_vertex_coordinates( elem_verts, n, vert_coords, err );
-    MSQ_ERRRTN( err );
+    ref_mesh->get_reference_vertex_coordinates( elem_verts, n, vert_coords, err );MSQ_ERRRTN( err );
 
     // calculate Jacobian
-    jacobian_2D( pd, type, n, sample, vert_coords, W_out, err );
-    MSQ_ERRRTN( err );
+    jacobian_2D( pd, type, n, sample, vert_coords, W_out, err );MSQ_ERRRTN( err );
 }
 
 TargetCalculator::~TargetCalculator() {}

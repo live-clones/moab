@@ -11,7 +11,7 @@ extern "C" {
 
 /** Handles needed in iMeshP */
 typedef struct iMeshP_PartitionHandle_Private* iMeshP_PartitionHandle;
-typedef struct iMeshP_RequestHandle_Private*   iMeshP_RequestHandle;
+typedef struct iMeshP_RequestHandle_Private* iMeshP_RequestHandle;
 
 /* Since we allow overloading of iMesh functions' entity set handles with
  * part handles, iMeshP_PartHandle must be defined the same as
@@ -25,7 +25,7 @@ enum iMeshP_EntStatus
 {
     iMeshP_INTERNAL, /**< An owned entity that is not on a part boundary. */
     iMeshP_BOUNDARY, /**< A shared entity on a part boundary. */
-    iMeshP_GHOST /**< An entity copy that is not a shared boundary entity. */
+    iMeshP_GHOST     /**< An entity copy that is not a shared boundary entity. */
 };
 
 /** Part ID number indicating information should be returned about all parts. */

@@ -55,8 +55,7 @@ void GlobalPatch::get_patch( PatchHandle patch_handle, std::vector< Mesh::Elemen
 {
     free_vertices_out.clear();
     assert( GLOBAL_PATCH_HANDLE == patch_handle );
-    get_mesh()->get_all_elements( elem_handles_out, err );
-    MSQ_ERRRTN( err );
+    get_mesh()->get_all_elements( elem_handles_out, err );MSQ_ERRRTN( err );
     // get_mesh()->get_all_vertices( free_vertices_out, err ); MSQ_ERRRTN(err);
 }
 

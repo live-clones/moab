@@ -95,20 +95,17 @@ namespace MeshWriter
     {
         if( MeshImpl* msq_mesh = dynamic_cast< MeshImpl* >( mesh ) )
         {
-            msq_mesh->write_vtk( out_filename, err );
-            MSQ_CHKERR( err );
+            msq_mesh->write_vtk( out_filename, err );MSQ_CHKERR( err );
             return;
         }
 
         // loads a global patch
         PatchData pd;
         pd.set_mesh( mesh );
-        pd.fill_global_patch( err );
-        MSQ_ERRRTN( err );
+        pd.fill_global_patch( err );MSQ_ERRRTN( err );
 
         // write mesh
-        write_vtk( pd, out_filename, err );
-        MSQ_CHKERR( err );
+        write_vtk( pd, out_filename, err );MSQ_CHKERR( err );
     }
 
     void write_vtk( PatchData& pd, const char* out_filename, MsqError& err, const Vector3D* OF_gradient )
@@ -149,8 +146,7 @@ namespace MeshWriter
 
             // Convert native to VTK node order, if not the same
             const VtkTypeInfo* info =
-                VtkTypeInfo::find_type( pd.element_by_index( i ).get_element_type(), vtx_indices.size(), err );
-            MSQ_ERRRTN( err );
+                VtkTypeInfo::find_type( pd.element_by_index( i ).get_element_type(), vtx_indices.size(), err );MSQ_ERRRTN( err );
             info->mesquiteToVtkOrder( vtx_indices );
 
             file << vtx_indices.size();
@@ -166,8 +162,7 @@ namespace MeshWriter
         for( i = 0; i < pd.num_elements(); i++ )
         {
             const VtkTypeInfo* info = VtkTypeInfo::find_type( pd.element_by_index( i ).get_element_type(),
-                                                              pd.element_by_index( i ).node_count(), err );
-            MSQ_ERRRTN( err );
+                                                              pd.element_by_index( i ).node_count(), err );MSQ_ERRRTN( err );
             file << info->vtkType << '\n';
         }
 
@@ -207,8 +202,7 @@ namespace MeshWriter
         // loads a global patch
         PatchData pd;
         pd.set_mesh( mesh );
-        pd.fill_global_patch( err );
-        MSQ_ERRRTN( err );
+        pd.fill_global_patch( err );MSQ_ERRRTN( err );
         write_gnuplot( pd, out_filebase, err );
     }
 
@@ -218,8 +212,7 @@ namespace MeshWriter
         PatchData pd;
         pd.set_mesh( mesh );
         std::vector< Mesh::VertexHandle > verts;
-        pd.set_mesh_entities( elems, verts, err );
-        MSQ_ERRRTN( err );
+        pd.set_mesh_entities( elems, verts, err );MSQ_ERRRTN( err );
         write_gnuplot( pd, out_filebase, err );
     }
 
@@ -249,8 +242,7 @@ namespace MeshWriter
             return;
         }
 
-        EdgeIterator edges( &pd, err );
-        MSQ_ERRRTN( err );
+        EdgeIterator edges( &pd, err );MSQ_ERRRTN( err );
 
         // Write a header
         file << "\n";
@@ -266,8 +258,7 @@ namespace MeshWriter
             file << e[0] << ' ' << e[1] << ' ' << e[2] << std::endl;
             file << std::endl << std::endl;
 
-            edges.step( err );
-            MSQ_ERRRTN( err );
+            edges.step( err );MSQ_ERRRTN( err );
         }
 
         // Close the file
@@ -320,8 +311,7 @@ namespace MeshWriter
 
         // read all input files to determine extents
         Vector3D min, max;
-        find_gnuplot_agregate_range( count, basename, min, max, err );
-        MSQ_ERRRTN( err );
+        find_gnuplot_agregate_range( count, basename, min, max, err );MSQ_ERRRTN( err );
 
         // chose coordinate plane to plot in
         Vector3D range = max - min;
@@ -408,8 +398,7 @@ namespace MeshWriter
 
         // read all input files to determine extents
         Vector3D min, max;
-        find_gnuplot_agregate_range( count, basename, min, max, err );
-        MSQ_ERRRTN( err );
+        find_gnuplot_agregate_range( count, basename, min, max, err );MSQ_ERRRTN( err );
 
         // chose coordinate plane to plot in
         Vector3D range = max - min;
@@ -482,23 +471,19 @@ namespace MeshWriter
         size_t count = 0;
         std::vector< Mesh::ElementHandle > elems;
         std::vector< Mesh::ElementHandle >::iterator iter;
-        mesh->get_all_elements( elems, err );
-        MSQ_ERRRTN( err );
+        mesh->get_all_elements( elems, err );MSQ_ERRRTN( err );
         for( iter = elems.begin(); iter != elems.end(); ++iter )
         {
             // Skip non-triangles
             Mesh::ElementHandle elem = *iter;
             EntityTopology type;
-            mesh->elements_get_topologies( &elem, &type, 1, err );
-            MSQ_ERRRTN( err );
+            mesh->elements_get_topologies( &elem, &type, 1, err );MSQ_ERRRTN( err );
             if( type != TRIANGLE ) continue;
             ++count;
 
             // Get vertex coordinates
-            mesh->elements_get_attached_vertices( &elem, 1, verts, offsets, err );
-            MSQ_ERRRTN( err );
-            mesh->vertices_get_coordinates( arrptr( verts ), coords, 3, err );
-            MSQ_ERRRTN( err );
+            mesh->elements_get_attached_vertices( &elem, 1, verts, offsets, err );MSQ_ERRRTN( err );
+            mesh->vertices_get_coordinates( arrptr( verts ), coords, 3, err );MSQ_ERRRTN( err );
 
             // Get triagnle normal
             Vector3D n = ( coords[0] - coords[1] ) * ( coords[0] - coords[2] );
@@ -718,8 +703,7 @@ namespace MeshWriter
         // Get a global patch
         PatchData pd;
         pd.set_mesh( mesh );
-        pd.fill_global_patch( err );
-        MSQ_ERRRTN( err );
+        pd.fill_global_patch( err );MSQ_ERRRTN( err );
 
         Transform2D transf( &pd, proj, width, height, false );
 
@@ -754,8 +738,7 @@ namespace MeshWriter
         s << "0.0 setgray" << endl;
 
         // Write mesh edges
-        EdgeIterator iter( &pd, err );
-        MSQ_ERRRTN( err );
+        EdgeIterator iter( &pd, err );MSQ_ERRRTN( err );
         while( !iter.is_at_end() )
         {
             int s_w, s_h, e_w, e_h;
@@ -776,8 +759,7 @@ namespace MeshWriter
             }
             s << "stroke" << endl;
 
-            iter.step( err );
-            MSQ_ERRRTN( err );
+            iter.step( err );MSQ_ERRRTN( err );
         }
 
         // Write footer
@@ -835,8 +817,7 @@ namespace MeshWriter
         // Get triangle vertices
         MsqVertex coords[6];
         EntityTopology type;
-        mesh->elements_get_topologies( &elem, &type, 1, err );
-        MSQ_ERRRTN( err );
+        mesh->elements_get_topologies( &elem, &type, 1, err );MSQ_ERRRTN( err );
         if( type != TRIANGLE )
         {
             MSQ_SETERR( err )( "Invalid element type", MsqError::UNSUPPORTED_ELEMENT );
@@ -844,15 +825,13 @@ namespace MeshWriter
         }
         std::vector< Mesh::VertexHandle > verts;
         std::vector< size_t > junk;
-        mesh->elements_get_attached_vertices( &elem, 1, verts, junk, err );
-        MSQ_ERRRTN( err );
+        mesh->elements_get_attached_vertices( &elem, 1, verts, junk, err );MSQ_ERRRTN( err );
         if( verts.size() != 3 && verts.size() != 6 )
         {
             MSQ_SETERR( err )( "Invalid element type", MsqError::UNSUPPORTED_ELEMENT );
             return;
         }
-        mesh->vertices_get_coordinates( arrptr( verts ), coords, verts.size(), err );
-        MSQ_ERRRTN( err );
+        mesh->vertices_get_coordinates( arrptr( verts ), coords, verts.size(), err );MSQ_ERRRTN( err );
 
         Vector3D coords2[6];
         std::copy( coords, coords + verts.size(), coords2 );
@@ -860,8 +839,7 @@ namespace MeshWriter
         std::vector< bool > fixed( verts.size(), false );
         if( draw_nodes )
         {
-            mesh->vertices_get_fixed_flag( arrptr( verts ), fixed, verts.size(), err );
-            MSQ_ERRRTN( err );
+            mesh->vertices_get_fixed_flag( arrptr( verts ), fixed, verts.size(), err );MSQ_ERRRTN( err );
         }
         write_eps_triangle( coords2, verts.size(), filename, draw_iso_lines, draw_nodes, err, fixed, width, height );
     }
@@ -1025,8 +1003,7 @@ namespace MeshWriter
         // Get a global patch
         PatchData pd;
         pd.set_mesh( mesh );
-        pd.fill_global_patch( err );
-        MSQ_ERRRTN( err );
+        pd.fill_global_patch( err );MSQ_ERRRTN( err );
 
         Transform2D transf( &pd, proj, 400, 400, true );
 
@@ -1047,8 +1024,7 @@ namespace MeshWriter
              << "\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\">" << endl;
 
         // Write mesh edges
-        EdgeIterator iter( &pd, err );
-        MSQ_ERRRTN( err );
+        EdgeIterator iter( &pd, err );MSQ_ERRRTN( err );
         while( !iter.is_at_end() )
         {
             int s_w, s_h, e_w, e_h;
@@ -1063,8 +1039,7 @@ namespace MeshWriter
                  << " style=\"stroke:rgb(99,99,99);stroke-width:2\""
                  << "/>" << endl;
 
-            iter.step( err );
-            MSQ_ERRRTN( err );
+            iter.step( err );MSQ_ERRRTN( err );
         }
 
         // Write footer

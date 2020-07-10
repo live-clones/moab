@@ -434,8 +434,7 @@ void TopologyInfo::side_from_higher_order( EntityTopology topo, unsigned num_nod
                                            unsigned& side_dim_out, unsigned& side_num_out, MsqError& err )
 {
     bool midedge, midface, midvol;
-    higher_order( topo, num_nodes, midedge, midface, midvol, err );
-    MSQ_ERRRTN( err );
+    higher_order( topo, num_nodes, midedge, midface, midvol, err );MSQ_ERRRTN( err );
     side_num_out = node_number;
 
     if( side_num_out < corners( topo ) )
@@ -770,14 +769,12 @@ void TopologyInfo::find_side( EntityTopology topo, const unsigned* side_vertices
             break;
         case 2:
             dimension_out = 1;
-            number_out    = find_edge( topo, side_vertices, reversed_out, err );
-            MSQ_CHKERR( err );
+            number_out    = find_edge( topo, side_vertices, reversed_out, err );MSQ_CHKERR( err );
             break;
         case 3:
         case 4:
             dimension_out = 2;
-            number_out    = find_face( topo, side_vertices, num_vertices, reversed_out, err );
-            MSQ_CHKERR( err );
+            number_out    = find_face( topo, side_vertices, num_vertices, reversed_out, err );MSQ_CHKERR( err );
             break;
         default:
             MSQ_SETERR( err )

@@ -489,10 +489,8 @@ void CompareMetric::get_evaluations( PatchData& pd, std::vector< size_t >& handl
     if( maskPlane ) get_mask_axis( pd );
 
     m2Handles.clear();
-    metric1->get_evaluations( pd, handles, free_vertices_only, err );
-    MSQ_ERRRTN( err );
-    metric2->get_evaluations( pd, m2Handles, free_vertices_only, err );
-    MSQ_ERRRTN( err );
+    metric1->get_evaluations( pd, handles, free_vertices_only, err );MSQ_ERRRTN( err );
+    metric2->get_evaluations( pd, m2Handles, free_vertices_only, err );MSQ_ERRRTN( err );
     bool same = ( handles.size() == m2Handles.size() );
     std::sort( m2Handles.begin(), m2Handles.end() );
     for( std::vector< size_t >::iterator i = handles.begin(); i != handles.end(); ++i )

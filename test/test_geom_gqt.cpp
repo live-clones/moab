@@ -81,68 +81,54 @@ ErrorCode write_geometry( const char* output_file_name )
     EntityHandle verts[num_verts], tris[num_tris], surfs[num_surfs];
     for( unsigned i = 0; i < num_verts; ++i )
     {
-        rval = moab->create_vertex( coords + 3 * i, verts[i] );
-        CHKERR;
+        rval = moab->create_vertex( coords + 3 * i, verts[i] );CHKERR;
     }
     for( unsigned i = 0; i < num_tris; ++i )
     {
         const EntityHandle conn[] = { verts[connectivity[3 * i]], verts[connectivity[3 * i + 1]],
                                       verts[connectivity[3 * i + 2]] };
-        rval                      = moab->create_element( MBTRI, conn, 3, tris[i] );
-        CHKERR;
+        rval                      = moab->create_element( MBTRI, conn, 3, tris[i] );CHKERR;
     }
 
     // create CAD topology
     EntityHandle* tri_iter = tris;
     for( unsigned i = 0; i < num_surfs; ++i )
     {
-        rval = moab->create_meshset( MESHSET_SET, surfs[i] );
-        CHKERR;
-        rval = moab->add_entities( surfs[i], tri_iter, tris_per_surf[i] );
-        CHKERR;
+        rval = moab->create_meshset( MESHSET_SET, surfs[i] );CHKERR;
+        rval = moab->add_entities( surfs[i], tri_iter, tris_per_surf[i] );CHKERR;
         tri_iter += tris_per_surf[i];
     }
 
     Tag dim_tag, id_tag, sense_tag;
-    rval = moab->tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, dim_tag, MB_TAG_SPARSE | MB_TAG_CREAT );
-    CHKERR;
+    rval = moab->tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, dim_tag, MB_TAG_SPARSE | MB_TAG_CREAT );CHKERR;
     id_tag = moab->globalId_tag();
-    rval   = moab->tag_get_handle( "GEOM_SENSE_2", 2, MB_TYPE_HANDLE, sense_tag, MB_TAG_SPARSE | MB_TAG_CREAT );
-    CHKERR;
+    rval   = moab->tag_get_handle( "GEOM_SENSE_2", 2, MB_TYPE_HANDLE, sense_tag, MB_TAG_SPARSE | MB_TAG_CREAT );CHKERR;
 
     std::vector< int > dims( num_surfs, 2 );
-    rval = moab->tag_set_data( dim_tag, surfs, num_surfs, &dims[0] );
-    CHKERR;
+    rval = moab->tag_set_data( dim_tag, surfs, num_surfs, &dims[0] );CHKERR;
     std::vector< int > ids( num_surfs );
     for( size_t i = 0; i < ids.size(); ++i )
         ids[i] = i + 1;
-    rval = moab->tag_set_data( id_tag, surfs, num_surfs, &ids[0] );
-    CHKERR;
+    rval = moab->tag_set_data( id_tag, surfs, num_surfs, &ids[0] );CHKERR;
 
     EntityHandle volume;
-    rval = moab->create_meshset( MESHSET_SET, volume );
-    CHKERR;
+    rval = moab->create_meshset( MESHSET_SET, volume );CHKERR;
     for( unsigned i = 0; i < num_surfs; ++i )
     {
-        rval = moab->add_parent_child( volume, surfs[i] );
-        CHKERR;
+        rval = moab->add_parent_child( volume, surfs[i] );CHKERR;
     }
 
     std::vector< EntityHandle > senses( 2 * num_surfs, 0 );
     for( size_t i = 0; i < senses.size(); i += 2 )
         senses[i] = volume;
-    rval = moab->tag_set_data( sense_tag, surfs, num_surfs, &senses[0] );
-    CHKERR;
+    rval = moab->tag_set_data( sense_tag, surfs, num_surfs, &senses[0] );CHKERR;
 
     const int three = 3;
     const int one   = 1;
-    rval            = moab->tag_set_data( dim_tag, &volume, 1, &three );
-    CHKERR;
-    rval = moab->tag_set_data( id_tag, &volume, 1, &one );
-    CHKERR;
+    rval            = moab->tag_set_data( dim_tag, &volume, 1, &three );CHKERR;
+    rval = moab->tag_set_data( id_tag, &volume, 1, &one );CHKERR;
 
-    rval = moab->write_mesh( output_file_name );
-    CHKERR;
+    rval = moab->write_mesh( output_file_name );CHKERR;
     delete moab;
     return MB_SUCCESS;
 }
@@ -175,77 +161,62 @@ ErrorCode overlap_write_geometry( const char* output_file_name )
 
     for( unsigned i = 0; i < num_verts; ++i )
     {
-        rval = moab->create_vertex( coords + 3 * i, verts[i] );
-        CHKERR;
+        rval = moab->create_vertex( coords + 3 * i, verts[i] );CHKERR;
     }
     // cube0
     for( unsigned i = 0; i < num_tris / 2; ++i )
     {
         const EntityHandle conn[] = { verts[connectivity[3 * i]], verts[connectivity[3 * i + 1]],
                                       verts[connectivity[3 * i + 2]] };
-        rval                      = moab->create_element( MBTRI, conn, 3, tris[i] );
-        CHKERR;
+        rval                      = moab->create_element( MBTRI, conn, 3, tris[i] );CHKERR;
     }
     // cube1
     for( unsigned i = 0; i < num_tris / 2; ++i )
     {
         const EntityHandle conn[] = { verts[8 + connectivity[3 * i]], verts[8 + connectivity[3 * i + 1]],
                                       verts[8 + connectivity[3 * i + 2]] };
-        rval                      = moab->create_element( MBTRI, conn, 3, tris[num_tris / 2 + i] );
-        CHKERR;
+        rval                      = moab->create_element( MBTRI, conn, 3, tris[num_tris / 2 + i] );CHKERR;
     }
 
     // create CAD topology
     EntityHandle* tri_iter = tris;
     for( unsigned i = 0; i < num_surfs; ++i )
     {
-        rval = moab->create_meshset( MESHSET_SET, surfs[i] );
-        CHKERR;
-        rval = moab->add_entities( surfs[i], tri_iter, tris_per_surf );
-        CHKERR;
+        rval = moab->create_meshset( MESHSET_SET, surfs[i] );CHKERR;
+        rval = moab->add_entities( surfs[i], tri_iter, tris_per_surf );CHKERR;
         tri_iter += tris_per_surf;
     }
 
     Tag dim_tag, id_tag, sense_tag;
-    rval = moab->tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, dim_tag, MB_TAG_SPARSE | MB_TAG_CREAT );
-    CHKERR;
+    rval = moab->tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, dim_tag, MB_TAG_SPARSE | MB_TAG_CREAT );CHKERR;
     id_tag = moab->globalId_tag();
-    rval   = moab->tag_get_handle( "GEOM_SENSE_2", 2, MB_TYPE_HANDLE, sense_tag, MB_TAG_SPARSE | MB_TAG_CREAT );
-    CHKERR;
+    rval   = moab->tag_get_handle( "GEOM_SENSE_2", 2, MB_TYPE_HANDLE, sense_tag, MB_TAG_SPARSE | MB_TAG_CREAT );CHKERR;
 
     std::vector< int > dims( num_surfs, 2 );
-    rval = moab->tag_set_data( dim_tag, surfs, num_surfs, &dims[0] );
-    CHKERR;
+    rval = moab->tag_set_data( dim_tag, surfs, num_surfs, &dims[0] );CHKERR;
     std::vector< int > ids( num_surfs );
     for( size_t i = 0; i < ids.size(); ++i )
         ids[i] = i + 1;
-    rval = moab->tag_set_data( id_tag, surfs, num_surfs, &ids[0] );
-    CHKERR;
+    rval = moab->tag_set_data( id_tag, surfs, num_surfs, &ids[0] );CHKERR;
 
     EntityHandle volume;
-    rval = moab->create_meshset( MESHSET_SET, volume );
-    CHKERR;
+    rval = moab->create_meshset( MESHSET_SET, volume );CHKERR;
     for( unsigned i = 0; i < num_surfs; ++i )
     {
-        rval = moab->add_parent_child( volume, surfs[i] );
-        CHKERR;
+        rval = moab->add_parent_child( volume, surfs[i] );CHKERR;
     }
 
     std::vector< EntityHandle > senses( 2 * num_surfs, 0 );
     for( size_t i = 0; i < senses.size(); i += 2 )
         senses[i] = volume;
-    rval = moab->tag_set_data( sense_tag, surfs, num_surfs, &senses[0] );
-    CHKERR;
+    rval = moab->tag_set_data( sense_tag, surfs, num_surfs, &senses[0] );CHKERR;
 
     const int three = 3;
     const int one   = 1;
-    rval            = moab->tag_set_data( dim_tag, &volume, 1, &three );
-    CHKERR;
-    rval = moab->tag_set_data( id_tag, &volume, 1, &one );
-    CHKERR;
+    rval            = moab->tag_set_data( dim_tag, &volume, 1, &three );CHKERR;
+    rval = moab->tag_set_data( id_tag, &volume, 1, &one );CHKERR;
 
-    rval = moab->write_mesh( output_file_name );
-    CHKERR;
+    rval = moab->write_mesh( output_file_name );CHKERR;
     delete moab;
     return MB_SUCCESS;
 }
@@ -267,15 +238,13 @@ int main( int argc, char* argv[] )
     if( fail ) return fail;
 #endif
 
-    rval = write_geometry( filename );
-    MB_CHK_SET_ERR( rval, "Failed to create input file: " << filename );
+    rval = write_geometry( filename );MB_CHK_SET_ERR( rval, "Failed to create input file: " << filename );
 
     Interface* MBI = new Core();
 
     int errors = 0;
     rval       = MBI->load_file( filename );
-    remove( filename );
-    MB_CHK_SET_ERR( rval, "Failed to load file" );
+    remove( filename );MB_CHK_SET_ERR( rval, "Failed to load file" );
 
     GeomTopoTool* gtt  = new GeomTopoTool( MBI );
     GeomQueryTool* gqt = new GeomQueryTool( gtt );
@@ -283,19 +252,16 @@ int main( int argc, char* argv[] )
     errors += run_regular_tests( gqt );
 
     // clear out moab instance
-    rval = MBI->delete_mesh();
-    MB_CHK_SET_ERR( rval, "Failed to delete mesh" );
+    rval = MBI->delete_mesh();MB_CHK_SET_ERR( rval, "Failed to delete mesh" );
 
     delete gtt;
     delete gqt;
 
     // Now load a different geometry: two cubes that slightly overlap
-    rval = overlap_write_geometry( filename );
-    MB_CHK_SET_ERR( rval, "Failed to create input file: " << filename );
+    rval = overlap_write_geometry( filename );MB_CHK_SET_ERR( rval, "Failed to create input file: " << filename );
 
     rval = MBI->load_file( filename );
-    remove( filename );
-    MB_CHK_SET_ERR( rval, "Failed to load file with overlaps" );
+    remove( filename );MB_CHK_SET_ERR( rval, "Failed to load file with overlaps" );
 
     gtt = new GeomTopoTool( MBI );
     gqt = new GeomQueryTool( gtt );
@@ -303,8 +269,7 @@ int main( int argc, char* argv[] )
     errors += run_overlap_tests( gqt );
 
     // clear moab instance
-    rval = MBI->delete_mesh();
-    MB_CHK_SET_ERR( rval, "Failed to delete mesh" );
+    rval = MBI->delete_mesh();MB_CHK_SET_ERR( rval, "Failed to delete mesh" );
 
     delete gtt;
     delete gqt;
@@ -314,30 +279,25 @@ int main( int argc, char* argv[] )
     std::cout << "Re-running tests with MBI constructor" << std::endl;
     std::cout << "-------------------------------------" << std::endl;
 
-    rval = write_geometry( filename );
-    MB_CHK_SET_ERR( rval, "Failed to create input file" );
+    rval = write_geometry( filename );MB_CHK_SET_ERR( rval, "Failed to create input file" );
 
     rval = MBI->load_file( filename );
-    remove( filename );
-    MB_CHK_SET_ERR( rval, "Failed to load file" );
+    remove( filename );MB_CHK_SET_ERR( rval, "Failed to load file" );
 
     gqt = new GeomQueryTool( MBI );
 
     errors += run_regular_tests( gqt );
 
     // clear moab and dagmc instance
-    rval = MBI->delete_mesh();
-    MB_CHK_SET_ERR( rval, "Failed to delete mesh" );
+    rval = MBI->delete_mesh();MB_CHK_SET_ERR( rval, "Failed to delete mesh" );
 
     delete gqt;
 
     // Now load a different geometry: two cubes that slightly overlap
-    rval = overlap_write_geometry( filename );
-    MB_CHK_SET_ERR( rval, "Failed to create input file: " );
+    rval = overlap_write_geometry( filename );MB_CHK_SET_ERR( rval, "Failed to create input file: " );
 
     rval = MBI->load_file( filename );
-    remove( filename );
-    MB_CHK_SET_ERR( rval, "Failed to load file with overlaps." );
+    remove( filename );MB_CHK_SET_ERR( rval, "Failed to load file with overlaps." );
 
     gqt = new GeomQueryTool( MBI );
 
@@ -360,8 +320,7 @@ int run_regular_tests( GeomQueryTool* gqt )
     int errors = 0;
     ErrorCode rval;
 
-    rval = gqt->initialize();
-    MB_CHK_SET_ERR_CONT( rval, "Failed to initialize the GeomQueryTool" );
+    rval = gqt->initialize();MB_CHK_SET_ERR_CONT( rval, "Failed to initialize the GeomQueryTool" );
 
     RUN_TEST( test_ray_fire );
     RUN_TEST( test_closest_to_location );
@@ -384,8 +343,7 @@ int run_overlap_tests( GeomQueryTool* gqt )
     int errors = 0;
     ErrorCode rval;
 
-    rval = gqt->initialize();
-    MB_CHK_SET_ERR_CONT( rval, "Failed to initialize the GeomQueryTool" );
+    rval = gqt->initialize();MB_CHK_SET_ERR_CONT( rval, "Failed to initialize the GeomQueryTool" );
 
     // change settings to use overlap-tolerant mode (with a large enough thickness)
     double overlap_thickness = 3.0;
@@ -409,10 +367,8 @@ ErrorCode test_surface_sense( GeomQueryTool* gqt )
     Range surfs, vols;
     const int two = 2, three = 3;
     const void* ptrs[] = { &two, &three };
-    rval               = moab->get_entities_by_type_and_tag( 0, MBENTITYSET, &dim_tag, ptrs, 1, surfs );
-    CHKERR;
-    rval = moab->get_entities_by_type_and_tag( 0, MBENTITYSET, &dim_tag, ptrs + 1, 1, vols );
-    CHKERR;
+    rval               = moab->get_entities_by_type_and_tag( 0, MBENTITYSET, &dim_tag, ptrs, 1, surfs );CHKERR;
+    rval = moab->get_entities_by_type_and_tag( 0, MBENTITYSET, &dim_tag, ptrs + 1, 1, vols );CHKERR;
 
     if( vols.size() != 2 )
     {
@@ -448,10 +404,8 @@ ErrorCode overlap_test_surface_sense( GeomQueryTool* gqt )
     Range surfs, vols;
     const int two = 2, three = 3;
     const void* ptrs[] = { &two, &three };
-    rval               = moab->get_entities_by_type_and_tag( 0, MBENTITYSET, &dim_tag, ptrs, 1, surfs );
-    CHKERR;
-    rval = moab->get_entities_by_type_and_tag( 0, MBENTITYSET, &dim_tag, ptrs + 1, 1, vols );
-    CHKERR;
+    rval               = moab->get_entities_by_type_and_tag( 0, MBENTITYSET, &dim_tag, ptrs, 1, surfs );CHKERR;
+    rval = moab->get_entities_by_type_and_tag( 0, MBENTITYSET, &dim_tag, ptrs + 1, 1, vols );CHKERR;
 
     if( vols.size() != 2 )
     {
@@ -486,8 +440,7 @@ ErrorCode test_measure_volume( GeomQueryTool* gqt )
     Range vols;
     const int three = 3;
     const void* ptr = &three;
-    rval            = moab->get_entities_by_type_and_tag( 0, MBENTITYSET, &dim_tag, &ptr, 1, vols );
-    CHKERR;
+    rval            = moab->get_entities_by_type_and_tag( 0, MBENTITYSET, &dim_tag, &ptr, 1, vols );CHKERR;
 
     if( vols.size() != 2 )
     {
@@ -500,8 +453,7 @@ ErrorCode test_measure_volume( GeomQueryTool* gqt )
     double result;
     const double vol = 2 * 2 * 2 - 1 * 4. / 3;
 
-    rval = gqt->measure_volume( vols.front(), result );
-    CHKERR;
+    rval = gqt->measure_volume( vols.front(), result );CHKERR;
     if( fabs( result - vol ) > 10 * std::numeric_limits< double >::epsilon() )
     {
         std::cerr << "ERROR: Expected " << vol << " as measure of volume, got " << result << std::endl;
@@ -519,8 +471,7 @@ ErrorCode overlap_test_measure_volume( GeomQueryTool* gqt )
     Range vols;
     const int three = 3;
     const void* ptr = &three;
-    rval            = moab->get_entities_by_type_and_tag( 0, MBENTITYSET, &dim_tag, &ptr, 1, vols );
-    CHKERR;
+    rval            = moab->get_entities_by_type_and_tag( 0, MBENTITYSET, &dim_tag, &ptr, 1, vols );CHKERR;
 
     if( vols.size() != 2 )
     {
@@ -532,8 +483,7 @@ ErrorCode overlap_test_measure_volume( GeomQueryTool* gqt )
     double result;
     const double vol = ( 1 + 1.01 ) * 2 * 2;
 
-    rval = gqt->measure_volume( vols.front(), result );
-    CHKERR;
+    rval = gqt->measure_volume( vols.front(), result );CHKERR;
     if( fabs( result - vol ) > 2 * std::numeric_limits< double >::epsilon() )
     {
         std::cerr << "ERROR: Expected " << vol << " as measure of volume, got " << result << std::endl;
@@ -552,8 +502,7 @@ ErrorCode test_measure_area( GeomQueryTool* gqt )
     Range surfs;
     const int two   = 2;
     const void* ptr = &two;
-    rval            = moab->get_entities_by_type_and_tag( 0, MBENTITYSET, &dim_tag, &ptr, 1, surfs );
-    CHKERR;
+    rval            = moab->get_entities_by_type_and_tag( 0, MBENTITYSET, &dim_tag, &ptr, 1, surfs );CHKERR;
 
     if( surfs.size() != 6 )
     {
@@ -562,8 +511,7 @@ ErrorCode test_measure_area( GeomQueryTool* gqt )
     }
 
     int ids[6];
-    rval = moab->tag_get_data( gqt->gttool()->get_gid_tag(), surfs, ids );
-    CHKERR;
+    rval = moab->tag_get_data( gqt->gttool()->get_gid_tag(), surfs, ids );CHKERR;
 
     // expect area of 4 for all faces except face 6.
     // face 6 should have area == 4*sqrt(2)
@@ -575,8 +523,7 @@ ErrorCode test_measure_area( GeomQueryTool* gqt )
 
         double result;
 
-        rval = gqt->measure_area( *iter, result );
-        CHKERR;
+        rval = gqt->measure_area( *iter, result );CHKERR;
         if( fabs( result - expected ) > std::numeric_limits< double >::epsilon() )
         {
             std::cerr << "ERROR: Expected area of surface " << ids[i] << " to be " << expected << ".  Got " << result
@@ -597,8 +544,7 @@ ErrorCode overlap_test_measure_area( GeomQueryTool* gqt )
     Range surfs;
     const int two   = 2;
     const void* ptr = &two;
-    rval            = moab->get_entities_by_type_and_tag( 0, MBENTITYSET, &dim_tag, &ptr, 1, surfs );
-    CHKERR;
+    rval            = moab->get_entities_by_type_and_tag( 0, MBENTITYSET, &dim_tag, &ptr, 1, surfs );CHKERR;
 
     const unsigned num_surfs = 12;
     if( surfs.size() != num_surfs )
@@ -608,8 +554,7 @@ ErrorCode overlap_test_measure_area( GeomQueryTool* gqt )
     }
 
     int ids[num_surfs];
-    rval = moab->tag_get_data( gqt->gttool()->get_gid_tag(), surfs, ids );
-    CHKERR;
+    rval = moab->tag_get_data( gqt->gttool()->get_gid_tag(), surfs, ids );CHKERR;
 
     const double x_area   = 2 * 2;
     const double yz_area0 = 2 * 1;
@@ -625,8 +570,7 @@ ErrorCode overlap_test_measure_area( GeomQueryTool* gqt )
         else if( 6 == i || 8 == i || 10 == i || 11 == i )
             expected = yz_area1;
 
-        rval = gqt->measure_area( *iter, result );
-        CHKERR;
+        rval = gqt->measure_area( *iter, result );CHKERR;
         if( fabs( result - expected ) > std::numeric_limits< double >::epsilon() )
         {
             std::cerr << "ERROR: Expected area of surface " << ids[i] << " to be " << expected << ".  Got " << result
@@ -676,10 +620,8 @@ ErrorCode test_ray_fire( GeomQueryTool* gqt )
     Range surfs, vols;
     const int two = 2, three = 3;
     const void* ptrs[] = { &two, &three };
-    rval               = moab->get_entities_by_type_and_tag( 0, MBENTITYSET, &dim_tag, ptrs, 1, surfs );
-    CHKERR;
-    rval = moab->get_entities_by_type_and_tag( 0, MBENTITYSET, &dim_tag, ptrs + 1, 1, vols );
-    CHKERR;
+    rval               = moab->get_entities_by_type_and_tag( 0, MBENTITYSET, &dim_tag, ptrs, 1, surfs );CHKERR;
+    rval = moab->get_entities_by_type_and_tag( 0, MBENTITYSET, &dim_tag, ptrs + 1, 1, vols );CHKERR;
 
     if( vols.size() != 2 )
     {
@@ -693,8 +635,7 @@ ErrorCode test_ray_fire( GeomQueryTool* gqt )
     }
 
     int ids[6];
-    rval = moab->tag_get_data( gqt->gttool()->get_gid_tag(), surfs, ids );
-    CHKERR;
+    rval = moab->tag_get_data( gqt->gttool()->get_gid_tag(), surfs, ids );CHKERR;
     EntityHandle surf[6];
     std::copy( surfs.begin(), surfs.end(), surf );
 
@@ -822,10 +763,8 @@ ErrorCode overlap_test_ray_fire( GeomQueryTool* gqt )
     Range surfs, vols;
     const int two = 2, three = 3;
     const void* ptrs[] = { &two, &three };
-    rval               = moab->get_entities_by_type_and_tag( 0, MBENTITYSET, &dim_tag, ptrs, 1, surfs );
-    CHKERR;
-    rval = moab->get_entities_by_type_and_tag( 0, MBENTITYSET, &dim_tag, ptrs + 1, 1, vols );
-    CHKERR;
+    rval               = moab->get_entities_by_type_and_tag( 0, MBENTITYSET, &dim_tag, ptrs, 1, surfs );CHKERR;
+    rval = moab->get_entities_by_type_and_tag( 0, MBENTITYSET, &dim_tag, ptrs + 1, 1, vols );CHKERR;
 
     if( vols.size() != 2 )
     {
@@ -840,8 +779,7 @@ ErrorCode overlap_test_ray_fire( GeomQueryTool* gqt )
     }
 
     int ids[num_surf];
-    rval = moab->tag_get_data( gqt->gttool()->get_gid_tag(), surfs, ids );
-    CHKERR;
+    rval = moab->tag_get_data( gqt->gttool()->get_gid_tag(), surfs, ids );CHKERR;
     EntityHandle surf[num_surf];
     std::copy( surfs.begin(), surfs.end(), surf );
 
@@ -940,8 +878,7 @@ ErrorCode test_point_in_volume( GeomQueryTool* gqt )
     Range vols;
     const int three = 3;
     const void* ptr = &three;
-    rval            = moab->get_entities_by_type_and_tag( 0, MBENTITYSET, &dim_tag, &ptr, 1, vols );
-    CHKERR;
+    rval            = moab->get_entities_by_type_and_tag( 0, MBENTITYSET, &dim_tag, &ptr, 1, vols );CHKERR;
     if( vols.size() != 2 )
     {
         std::cerr << "ERROR: Expected 2 volumes in input, found " << vols.size() << std::endl;
@@ -952,8 +889,7 @@ ErrorCode test_point_in_volume( GeomQueryTool* gqt )
     for( int i = 0; i < num_test; ++i )
     {
         int result;
-        rval = gqt->point_in_volume( vol, tests[i].coords, result, tests[i].dir );
-        CHKERR;
+        rval = gqt->point_in_volume( vol, tests[i].coords, result, tests[i].dir );CHKERR;
         if( result != tests[i].result )
         {
             std::cerr << "ERROR testing point_in_volume[" << i << "]:" << std::endl
@@ -965,8 +901,7 @@ ErrorCode test_point_in_volume( GeomQueryTool* gqt )
         // point_in_volume_slow doesn't to boundary.
         if( tests[i].result == BOUNDARY ) continue;
 
-        rval = gqt->point_in_volume_slow( vol, tests[i].coords, result );
-        CHKERR;
+        rval = gqt->point_in_volume_slow( vol, tests[i].coords, result );CHKERR;
 
         if( result != tests[i].result )
         {
@@ -989,8 +924,7 @@ ErrorCode test_closest_to_location( GeomQueryTool* gqt )
     const int three = 3;
     const void* ptr = &three;
     Tag dim_tag     = gqt->gttool()->get_geom_tag();
-    rval            = moab->get_entities_by_type_and_tag( 0, MBENTITYSET, &dim_tag, &ptr, 1, vols );
-    CHKERR;
+    rval            = moab->get_entities_by_type_and_tag( 0, MBENTITYSET, &dim_tag, &ptr, 1, vols );CHKERR;
     if( vols.size() != 2 )
     {
         std::cerr << "ERROR: Expected 2 volumes in input, found " << vols.size() << std::endl;
@@ -1053,8 +987,7 @@ ErrorCode overlap_test_point_in_volume( GeomQueryTool* gqt )
     Range vols;
     const int three = 3;
     const void* ptr = &three;
-    rval            = moab->get_entities_by_type_and_tag( 0, MBENTITYSET, &dim_tag, &ptr, 1, vols );
-    CHKERR;
+    rval            = moab->get_entities_by_type_and_tag( 0, MBENTITYSET, &dim_tag, &ptr, 1, vols );CHKERR;
     if( vols.size() != 2 )
     {
         std::cerr << "ERROR: Expected 2 volumes in input, found " << vols.size() << std::endl;
@@ -1064,8 +997,7 @@ ErrorCode overlap_test_point_in_volume( GeomQueryTool* gqt )
     for( int i = 0; i < num_test; ++i )
     {
         int result;
-        rval = gqt->point_in_volume( vol, tests[i].coords, result, tests[i].dir );
-        CHKERR;
+        rval = gqt->point_in_volume( vol, tests[i].coords, result, tests[i].dir );CHKERR;
         if( result != tests[i].result )
         {
             std::cerr << "ERROR testing point_in_volume[" << i << "]:" << std::endl
@@ -1077,8 +1009,7 @@ ErrorCode overlap_test_point_in_volume( GeomQueryTool* gqt )
         // point_in_volume_slow doesn't to boundary.
         if( tests[i].result == BOUNDARY ) continue;
 
-        rval = gqt->point_in_volume_slow( vol, tests[i].coords, result );
-        CHKERR;
+        rval = gqt->point_in_volume_slow( vol, tests[i].coords, result );CHKERR;
 
         if( result != tests[i].result )
         {
@@ -1110,10 +1041,8 @@ ErrorCode overlap_test_tracking( GeomQueryTool* gqt )
     const void* ptrs[] = { &two, &three };
     ErrorCode rval;
     Interface* moab = gqt->moab_instance();
-    rval            = moab->get_entities_by_type_and_tag( 0, MBENTITYSET, &dim_tag, ptrs, 1, surfs );
-    CHKERR;
-    rval = moab->get_entities_by_type_and_tag( 0, MBENTITYSET, &dim_tag, ptrs + 1, 1, explicit_vols );
-    CHKERR;
+    rval            = moab->get_entities_by_type_and_tag( 0, MBENTITYSET, &dim_tag, ptrs, 1, surfs );CHKERR;
+    rval = moab->get_entities_by_type_and_tag( 0, MBENTITYSET, &dim_tag, ptrs + 1, 1, explicit_vols );CHKERR;
 
     if( explicit_vols.size() != 2 )
     {
@@ -1134,8 +1063,7 @@ ErrorCode overlap_test_tracking( GeomQueryTool* gqt )
     EntityHandle vol   = explicit_vol;
     int result;
     const int INSIDE = 1;  // OUTSIDE = 0, BOUNDARY = -1;
-    rval             = gqt->point_in_volume( explicit_vol, point, result, dir );
-    CHKERR;
+    rval             = gqt->point_in_volume( explicit_vol, point, result, dir );CHKERR;
     if( result != INSIDE )
     {
         std::cerr << "ERROR: particle not inside explicit volume" << std::endl;
@@ -1146,8 +1074,7 @@ ErrorCode overlap_test_tracking( GeomQueryTool* gqt )
     double dist;
     EntityHandle next_surf;
     GeomQueryTool::RayHistory history;
-    rval = gqt->ray_fire( vol, point, dir, next_surf, dist, &history );
-    CHKERR;
+    rval = gqt->ray_fire( vol, point, dir, next_surf, dist, &history );CHKERR;
     if( next_surf != surfs[7] || fabs( dist - 0.91 ) > 1e-6 )
     {
         std::cerr << "ERROR: failed on advance 1" << std::endl;
@@ -1158,13 +1085,11 @@ ErrorCode overlap_test_tracking( GeomQueryTool* gqt )
 
     // get the next volume (implicit complement)
     EntityHandle next_vol;
-    rval = gqt->gttool()->next_vol( next_surf, vol, next_vol );
-    CHKERR;
+    rval = gqt->gttool()->next_vol( next_surf, vol, next_vol );CHKERR;
 
     // get the next surface (behind numerical location)
     vol  = next_vol;
-    rval = gqt->ray_fire( vol, point, dir, next_surf, dist, &history );
-    CHKERR;
+    rval = gqt->ray_fire( vol, point, dir, next_surf, dist, &history );CHKERR;
     if( next_surf != surfs[3] || fabs( dist - 0.0 ) > 1e-6 )
     {
         std::cerr << "ERROR: failed on advance 2" << std::endl;
@@ -1174,13 +1099,11 @@ ErrorCode overlap_test_tracking( GeomQueryTool* gqt )
         point[i] += dist * dir[i];
 
     // get the next volume (the explicit volume)
-    rval = gqt->gttool()->next_vol( next_surf, vol, next_vol );
-    CHKERR;
+    rval = gqt->gttool()->next_vol( next_surf, vol, next_vol );CHKERR;
 
     // get the next surface
     vol  = next_vol;
-    rval = gqt->ray_fire( vol, point, dir, next_surf, dist, &history );
-    CHKERR;
+    rval = gqt->ray_fire( vol, point, dir, next_surf, dist, &history );CHKERR;
     if( next_surf != surfs[1] || fabs( dist - 0.99 ) > 1e-6 )
     {
         std::cerr << "ERROR: failed on advance 3" << std::endl;

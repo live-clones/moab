@@ -73,8 +73,7 @@ static inline void randomize_vertex( PatchData& pd, size_t free_ind, double perc
 {
     size_t i;
     short j;
-    const MsqVertex* verts = pd.get_vertex_array( err );
-    MSQ_ERRRTN( err );
+    const MsqVertex* verts = pd.get_vertex_array( err );MSQ_ERRRTN( err );
     const size_t num_vtx = pd.num_nodes();
     // a scale w.r.t. the patch size
     double scale_factor = 0.0;
@@ -114,16 +113,13 @@ void Randomize::optimize_vertex_positions( PatchData& pd, MsqError& err )
 
     // gets the array of coordinates for the patch and print it
     // does the randomize smooth
-    MsqFreeVertexIndexIterator free_iter( pd, err );
-    MSQ_ERRRTN( err );
+    MsqFreeVertexIndexIterator free_iter( pd, err );MSQ_ERRRTN( err );
     free_iter.reset();
     free_iter.next();
     // find the free vertex.
     int m = free_iter.value();
-    randomize_vertex( pd, m, mPercent, err );
-    MSQ_ERRRTN( err );
-    pd.snap_vertex_to_domain( m, err );
-    MSQ_ERRRTN( err );
+    randomize_vertex( pd, m, mPercent, err );MSQ_ERRRTN( err );
+    pd.snap_vertex_to_domain( m, err );MSQ_ERRRTN( err );
 }
 
 void Randomize::terminate_mesh_iteration( PatchData& /*pd*/, MsqError& /*err*/ )

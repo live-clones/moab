@@ -36,8 +36,7 @@ ErrorCode get_vartag_data( moab::Interface* mbCore, Tag tag, moab::Range& sets, 
     int* tag_sizes        = new int[sets.size()];
     const void** tag_data = (const void**)new void*[sets.size()];
 
-    ErrorCode rval = mbCore->tag_get_by_ptr( tag, sets, tag_data, tag_sizes );
-    MB_CHK_SET_ERR( rval, "Getting matrix rows failed" );
+    ErrorCode rval = mbCore->tag_get_by_ptr( tag, sets, tag_data, tag_sizes );MB_CHK_SET_ERR( rval, "Getting matrix rows failed" );
 
     out_data_size = 0;
     for( unsigned is = 0; is < sets.size(); ++is )
@@ -114,8 +113,7 @@ int main( int argc, char* argv[] )
     const std::string global_id_name     = "GLOBAL_ID";
 
     // Load file
-    rval = mbCore->load_mesh( h5mfilename.c_str() );
-    MB_CHK_ERR( rval );
+    rval = mbCore->load_mesh( h5mfilename.c_str() );MB_CHK_ERR( rval );
 
     try
     {
@@ -152,14 +150,12 @@ int main( int argc, char* argv[] )
         Tag globalIDTag, materialSetTag;
         globalIDTag = mbCore->globalId_tag();
         // materialSetTag = mbCore->material_tag();
-        rval = mbCore->tag_get_handle( "MATERIAL_SET", 1, MB_TYPE_INTEGER, materialSetTag, MB_TAG_SPARSE );
-        MB_CHK_ERR( rval );
+        rval = mbCore->tag_get_handle( "MATERIAL_SET", 1, MB_TYPE_INTEGER, materialSetTag, MB_TAG_SPARSE );MB_CHK_ERR( rval );
 
         // Get sets entities, by type
         moab::Range meshsets;
         rval = mbCore->get_entities_by_type_and_tag( 0, MBENTITYSET, &globalIDTag, NULL, 1, meshsets,
-                                                     moab::Interface::UNION, true );
-        MB_CHK_ERR( rval );
+                                                     moab::Interface::UNION, true );MB_CHK_ERR( rval );
 
         moab::EntityHandle rootset = 0;
         ///////////////////////////////////////////////////////////////////////////
@@ -186,10 +182,8 @@ int main( int argc, char* argv[] )
         ///////////////////////////////////////////////////////////////////////////
         Tag smatMetadataTag;
         int smat_metadata_glb[13];
-        rval = mbCore->tag_get_handle( "SMAT_DATA", 13, MB_TYPE_INTEGER, smatMetadataTag, MB_TAG_SPARSE );
-        MB_CHK_ERR( rval );
-        rval = mbCore->tag_get_data( smatMetadataTag, &rootset, 1, smat_metadata_glb );
-        MB_CHK_ERR( rval );
+        rval = mbCore->tag_get_handle( "SMAT_DATA", 13, MB_TYPE_INTEGER, smatMetadataTag, MB_TAG_SPARSE );MB_CHK_ERR( rval );
+        rval = mbCore->tag_get_data( smatMetadataTag, &rootset, 1, smat_metadata_glb );MB_CHK_ERR( rval );
         // std::cout << "Number of mesh sets is " << meshsets.size() << std::endl;
 
 #define DTYPE( a )                                               \
@@ -217,8 +211,7 @@ int main( int argc, char* argv[] )
         for( unsigned im = 0; im < meshsets.size(); ++im )
         {
             moab::Range elems;
-            rval = mbCore->get_entities_by_dimension( meshsets[im], 2, elems );
-            MB_CHK_ERR( rval );
+            rval = mbCore->get_entities_by_dimension( meshsets[im], 2, elems );MB_CHK_ERR( rval );
             if( elems.size() - nA == 0 && source_mesh == 0 )
                 source_mesh = meshsets[im];
             else if( elems.size() - nB == 0 && target_mesh == 0 )
@@ -230,58 +223,38 @@ int main( int argc, char* argv[] )
         }
 
         Tag srcIDTag, srcAreaTag, tgtIDTag, tgtAreaTag;
-        rval = mbCore->tag_get_handle( "SourceGIDS", srcIDTag );
-        MB_CHK_ERR( rval );
-        rval = mbCore->tag_get_handle( "SourceAreas", srcAreaTag );
-        MB_CHK_ERR( rval );
-        rval = mbCore->tag_get_handle( "TargetGIDS", tgtIDTag );
-        MB_CHK_ERR( rval );
-        rval = mbCore->tag_get_handle( "TargetAreas", tgtAreaTag );
-        MB_CHK_ERR( rval );
+        rval = mbCore->tag_get_handle( "SourceGIDS", srcIDTag );MB_CHK_ERR( rval );
+        rval = mbCore->tag_get_handle( "SourceAreas", srcAreaTag );MB_CHK_ERR( rval );
+        rval = mbCore->tag_get_handle( "TargetGIDS", tgtIDTag );MB_CHK_ERR( rval );
+        rval = mbCore->tag_get_handle( "TargetAreas", tgtAreaTag );MB_CHK_ERR( rval );
         Tag smatRowdataTag, smatColdataTag, smatValsdataTag;
-        rval = mbCore->tag_get_handle( "SMAT_ROWS", smatRowdataTag );
-        MB_CHK_ERR( rval );
-        rval = mbCore->tag_get_handle( "SMAT_COLS", smatColdataTag );
-        MB_CHK_ERR( rval );
-        rval = mbCore->tag_get_handle( "SMAT_VALS", smatValsdataTag );
-        MB_CHK_ERR( rval );
+        rval = mbCore->tag_get_handle( "SMAT_ROWS", smatRowdataTag );MB_CHK_ERR( rval );
+        rval = mbCore->tag_get_handle( "SMAT_COLS", smatColdataTag );MB_CHK_ERR( rval );
+        rval = mbCore->tag_get_handle( "SMAT_VALS", smatValsdataTag );MB_CHK_ERR( rval );
         Tag srcCenterLon, srcCenterLat, tgtCenterLon, tgtCenterLat;
-        rval = mbCore->tag_get_handle( "SourceCoordCenterLon", srcCenterLon );
-        MB_CHK_ERR( rval );
-        rval = mbCore->tag_get_handle( "SourceCoordCenterLat", srcCenterLat );
-        MB_CHK_ERR( rval );
-        rval = mbCore->tag_get_handle( "TargetCoordCenterLon", tgtCenterLon );
-        MB_CHK_ERR( rval );
-        rval = mbCore->tag_get_handle( "TargetCoordCenterLat", tgtCenterLat );
-        MB_CHK_ERR( rval );
+        rval = mbCore->tag_get_handle( "SourceCoordCenterLon", srcCenterLon );MB_CHK_ERR( rval );
+        rval = mbCore->tag_get_handle( "SourceCoordCenterLat", srcCenterLat );MB_CHK_ERR( rval );
+        rval = mbCore->tag_get_handle( "TargetCoordCenterLon", tgtCenterLon );MB_CHK_ERR( rval );
+        rval = mbCore->tag_get_handle( "TargetCoordCenterLat", tgtCenterLat );MB_CHK_ERR( rval );
         Tag srcVertexLon, srcVertexLat, tgtVertexLon, tgtVertexLat;
-        rval = mbCore->tag_get_handle( "SourceCoordVertexLon", srcVertexLon );
-        MB_CHK_ERR( rval );
-        rval = mbCore->tag_get_handle( "SourceCoordVertexLat", srcVertexLat );
-        MB_CHK_ERR( rval );
-        rval = mbCore->tag_get_handle( "TargetCoordVertexLon", tgtVertexLon );
-        MB_CHK_ERR( rval );
-        rval = mbCore->tag_get_handle( "TargetCoordVertexLat", tgtVertexLat );
-        MB_CHK_ERR( rval );
+        rval = mbCore->tag_get_handle( "SourceCoordVertexLon", srcVertexLon );MB_CHK_ERR( rval );
+        rval = mbCore->tag_get_handle( "SourceCoordVertexLat", srcVertexLat );MB_CHK_ERR( rval );
+        rval = mbCore->tag_get_handle( "TargetCoordVertexLon", tgtVertexLon );MB_CHK_ERR( rval );
+        rval = mbCore->tag_get_handle( "TargetCoordVertexLat", tgtVertexLat );MB_CHK_ERR( rval );
 
         // Get sets entities, by type
         moab::Range sets;
         // rval = mbCore->get_entities_by_type(0, MBENTITYSET, sets);MB_CHK_ERR(rval);
         rval = mbCore->get_entities_by_type_and_tag( 0, MBENTITYSET, &smatRowdataTag, NULL, 1, sets,
-                                                     moab::Interface::UNION, true );
-        MB_CHK_ERR( rval );
+                                                     moab::Interface::UNION, true );MB_CHK_ERR( rval );
 
         std::vector< int > src_gids, tgt_gids;
         std::vector< double > src_areas, tgt_areas;
         int srcID_size, tgtID_size, srcArea_size, tgtArea_size;
-        rval = get_vartag_data( mbCore, srcIDTag, sets, srcID_size, src_gids );
-        MB_CHK_SET_ERR( rval, "Getting source mesh IDs failed" );
-        rval = get_vartag_data( mbCore, tgtIDTag, sets, tgtID_size, tgt_gids );
-        MB_CHK_SET_ERR( rval, "Getting target mesh IDs failed" );
-        rval = get_vartag_data( mbCore, srcAreaTag, sets, srcArea_size, src_areas );
-        MB_CHK_SET_ERR( rval, "Getting source mesh areas failed" );
-        rval = get_vartag_data( mbCore, tgtAreaTag, sets, tgtArea_size, tgt_areas );
-        MB_CHK_SET_ERR( rval, "Getting target mesh areas failed" );
+        rval = get_vartag_data( mbCore, srcIDTag, sets, srcID_size, src_gids );MB_CHK_SET_ERR( rval, "Getting source mesh IDs failed" );
+        rval = get_vartag_data( mbCore, tgtIDTag, sets, tgtID_size, tgt_gids );MB_CHK_SET_ERR( rval, "Getting target mesh IDs failed" );
+        rval = get_vartag_data( mbCore, srcAreaTag, sets, srcArea_size, src_areas );MB_CHK_SET_ERR( rval, "Getting source mesh areas failed" );
+        rval = get_vartag_data( mbCore, tgtAreaTag, sets, tgtArea_size, tgt_areas );MB_CHK_SET_ERR( rval, "Getting target mesh areas failed" );
 
         assert( srcArea_size == srcID_size );
         assert( tgtArea_size == tgtID_size );
@@ -379,10 +352,8 @@ int main( int argc, char* argv[] )
 
             std::vector< double > src_centerlat, src_centerlon;
             int srccenter_size;
-            rval = get_vartag_data( mbCore, srcCenterLat, sets, srccenter_size, src_centerlat );
-            MB_CHK_SET_ERR( rval, "Getting source mesh areas failed" );
-            rval = get_vartag_data( mbCore, srcCenterLon, sets, srccenter_size, src_centerlon );
-            MB_CHK_SET_ERR( rval, "Getting target mesh areas failed" );
+            rval = get_vartag_data( mbCore, srcCenterLat, sets, srccenter_size, src_centerlat );MB_CHK_SET_ERR( rval, "Getting source mesh areas failed" );
+            rval = get_vartag_data( mbCore, srcCenterLon, sets, srccenter_size, src_centerlon );MB_CHK_SET_ERR( rval, "Getting target mesh areas failed" );
             std::vector< double > src_glob_centerlat( nDofA, 0.0 ), src_glob_centerlon( nDofA, 0.0 );
 
             for( int i = 0; i < srccenter_size; ++i )
@@ -396,10 +367,8 @@ int main( int argc, char* argv[] )
 
             std::vector< double > tgt_centerlat, tgt_centerlon;
             int tgtcenter_size;
-            rval = get_vartag_data( mbCore, tgtCenterLat, sets, tgtcenter_size, tgt_centerlat );
-            MB_CHK_SET_ERR( rval, "Getting source mesh areas failed" );
-            rval = get_vartag_data( mbCore, tgtCenterLon, sets, tgtcenter_size, tgt_centerlon );
-            MB_CHK_SET_ERR( rval, "Getting target mesh areas failed" );
+            rval = get_vartag_data( mbCore, tgtCenterLat, sets, tgtcenter_size, tgt_centerlat );MB_CHK_SET_ERR( rval, "Getting source mesh areas failed" );
+            rval = get_vartag_data( mbCore, tgtCenterLon, sets, tgtcenter_size, tgt_centerlon );MB_CHK_SET_ERR( rval, "Getting target mesh areas failed" );
             std::vector< double > tgt_glob_centerlat( nDofB, 0.0 ), tgt_glob_centerlon( nDofB, 0.0 );
             for( int i = 0; i < tgtcenter_size; ++i )
             {
@@ -425,10 +394,8 @@ int main( int argc, char* argv[] )
             {
                 std::vector< double > src_vertexlat, src_vertexlon;
                 int srcvertex_size;
-                rval = get_vartag_data( mbCore, srcVertexLat, sets, srcvertex_size, src_vertexlat );
-                MB_CHK_SET_ERR( rval, "Getting source mesh areas failed" );
-                rval = get_vartag_data( mbCore, srcVertexLon, sets, srcvertex_size, src_vertexlon );
-                MB_CHK_SET_ERR( rval, "Getting target mesh areas failed" );
+                rval = get_vartag_data( mbCore, srcVertexLat, sets, srcvertex_size, src_vertexlat );MB_CHK_SET_ERR( rval, "Getting source mesh areas failed" );
+                rval = get_vartag_data( mbCore, srcVertexLon, sets, srcvertex_size, src_vertexlon );MB_CHK_SET_ERR( rval, "Getting target mesh areas failed" );
                 int offset = 0;
                 for( unsigned vIndex = 0; vIndex < src_gids.size(); ++vIndex )
                 {
@@ -447,10 +414,8 @@ int main( int argc, char* argv[] )
             {
                 std::vector< double > tgt_vertexlat, tgt_vertexlon;
                 int tgtvertex_size;
-                rval = get_vartag_data( mbCore, tgtVertexLat, sets, tgtvertex_size, tgt_vertexlat );
-                MB_CHK_SET_ERR( rval, "Getting source mesh areas failed" );
-                rval = get_vartag_data( mbCore, tgtVertexLon, sets, tgtvertex_size, tgt_vertexlon );
-                MB_CHK_SET_ERR( rval, "Getting target mesh areas failed" );
+                rval = get_vartag_data( mbCore, tgtVertexLat, sets, tgtvertex_size, tgt_vertexlat );MB_CHK_SET_ERR( rval, "Getting source mesh areas failed" );
+                rval = get_vartag_data( mbCore, tgtVertexLon, sets, tgtvertex_size, tgt_vertexlon );MB_CHK_SET_ERR( rval, "Getting target mesh areas failed" );
                 int offset = 0;
                 for( unsigned vIndex = 0; vIndex < tgt_gids.size(); ++vIndex )
                 {
@@ -483,14 +448,11 @@ int main( int argc, char* argv[] )
         std::vector< int > mat_rows, mat_cols;
         std::vector< double > mat_vals;
         int row_sizes, col_sizes, val_sizes;
-        rval = get_vartag_data( mbCore, smatRowdataTag, sets, row_sizes, mat_rows );
-        MB_CHK_SET_ERR( rval, "Getting matrix row data failed" );
+        rval = get_vartag_data( mbCore, smatRowdataTag, sets, row_sizes, mat_rows );MB_CHK_SET_ERR( rval, "Getting matrix row data failed" );
         assert( row_sizes == NNZ );
-        rval = get_vartag_data( mbCore, smatColdataTag, sets, col_sizes, mat_cols );
-        MB_CHK_SET_ERR( rval, "Getting matrix col data failed" );
+        rval = get_vartag_data( mbCore, smatColdataTag, sets, col_sizes, mat_cols );MB_CHK_SET_ERR( rval, "Getting matrix col data failed" );
         assert( col_sizes == NNZ );
-        rval = get_vartag_data( mbCore, smatValsdataTag, sets, val_sizes, mat_vals );
-        MB_CHK_SET_ERR( rval, "Getting matrix values failed" );
+        rval = get_vartag_data( mbCore, smatValsdataTag, sets, val_sizes, mat_vals );MB_CHK_SET_ERR( rval, "Getting matrix values failed" );
         assert( val_sizes == NNZ );
 
         // Let us form the matrix in-memory and consolidate shared DoF rows from shared-process

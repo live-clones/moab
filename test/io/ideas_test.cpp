@@ -37,8 +37,7 @@ int main()
 
 void read_file( Interface& moab, const char* input_file )
 {
-    ErrorCode rval = moab.load_file( input_file );
-    CHECK_ERR( rval );
+    ErrorCode rval = moab.load_file( input_file );CHECK_ERR( rval );
 }
 
 void test_read_nodes()
@@ -50,22 +49,19 @@ void test_read_nodes()
     read_file( moab, example );
 
     std::vector< EntityHandle > nodes;
-    rval = mb.get_entities_by_type( 0, MBVERTEX, nodes );
-    CHECK_ERR( rval );
+    rval = mb.get_entities_by_type( 0, MBVERTEX, nodes );CHECK_ERR( rval );
     CHECK_EQUAL( (size_t)17, nodes.size() );
 
     Tag id_tag = mb.globalId_tag();
 
     std::vector< int > ids( nodes.size() );
-    rval = mb.tag_get_data( id_tag, &nodes[0], nodes.size(), &ids[0] );
-    CHECK_ERR( rval );
+    rval = mb.tag_get_data( id_tag, &nodes[0], nodes.size(), &ids[0] );CHECK_ERR( rval );
 
     std::vector< int > sorted_ids( ids );
     std::sort( sorted_ids.begin(), sorted_ids.end() );
 
     std::vector< double > coords( 3 * nodes.size() );
-    rval = mb.get_coords( &nodes[0], nodes.size(), &coords[0] );
-    CHECK_ERR( rval );
+    rval = mb.get_coords( &nodes[0], nodes.size(), &coords[0] );CHECK_ERR( rval );
 
     int idx, pos = 0;
     // shared between 2 tets and 2 prisms
@@ -200,15 +196,13 @@ void test_read_tets()
     read_file( moab, example );
 
     std::vector< EntityHandle > tets;
-    rval = mb.get_entities_by_type( 0, MBTET, tets );
-    CHECK_ERR( rval );
+    rval = mb.get_entities_by_type( 0, MBTET, tets );CHECK_ERR( rval );
     CHECK_EQUAL( (size_t)2, tets.size() );
 
     Tag id_tag = mb.globalId_tag();
 
     std::vector< int > ids( tets.size() );
-    rval = mb.tag_get_data( id_tag, &tets[0], tets.size(), &ids[0] );
-    CHECK_ERR( rval );
+    rval = mb.tag_get_data( id_tag, &tets[0], tets.size(), &ids[0] );CHECK_ERR( rval );
 
     if( ids[0] != 3 )
     {
@@ -224,22 +218,18 @@ void test_read_tets()
     const int conn1[] = { 13, 14, 15, 16 };
     int pos = 0, offset = 3;
     CHECK_EQUAL( pos + offset, ids[pos] );
-    rval = mb.get_connectivity( tets[pos], conn, len );
-    CHECK_ERR( rval );
+    rval = mb.get_connectivity( tets[pos], conn, len );CHECK_ERR( rval );
     CHECK_EQUAL( 4, len );
-    rval = mb.tag_get_data( id_tag, conn, len, vtx_ids );
-    CHECK_ERR( rval );
+    rval = mb.tag_get_data( id_tag, conn, len, vtx_ids );CHECK_ERR( rval );
     CHECK_ARRAYS_EQUAL( conn1, 4, vtx_ids, len );
 
     // The second tet has id=4
     const int conn2[] = { 13, 17, 14, 16 };
     ++pos;
     CHECK_EQUAL( pos + offset, ids[pos] );
-    rval = mb.get_connectivity( tets[pos], conn, len );
-    CHECK_ERR( rval );
+    rval = mb.get_connectivity( tets[pos], conn, len );CHECK_ERR( rval );
     CHECK_EQUAL( 4, len );
-    rval = mb.tag_get_data( id_tag, conn, len, vtx_ids );
-    CHECK_ERR( rval );
+    rval = mb.tag_get_data( id_tag, conn, len, vtx_ids );CHECK_ERR( rval );
     CHECK_ARRAYS_EQUAL( conn2, 4, vtx_ids, len );
 }
 
@@ -251,15 +241,13 @@ void test_read_hexes()
     read_file( moab, example );
 
     std::vector< EntityHandle > hexes;
-    rval = mb.get_entities_by_type( 0, MBHEX, hexes );
-    CHECK_ERR( rval );
+    rval = mb.get_entities_by_type( 0, MBHEX, hexes );CHECK_ERR( rval );
     CHECK_EQUAL( (size_t)2, hexes.size() );
 
     Tag id_tag = mb.globalId_tag();
 
     std::vector< int > ids( hexes.size() );
-    rval = mb.tag_get_data( id_tag, &hexes[0], hexes.size(), &ids[0] );
-    CHECK_ERR( rval );
+    rval = mb.tag_get_data( id_tag, &hexes[0], hexes.size(), &ids[0] );CHECK_ERR( rval );
 
     int vtx_ids[8];
     const EntityHandle* conn;
@@ -269,22 +257,18 @@ void test_read_hexes()
     int pos = 0, offset = 1;
     // Element id 1 is a hex
     CHECK_EQUAL( pos + offset, ids[pos] );
-    rval = mb.get_connectivity( hexes[pos], conn, len );
-    CHECK_ERR( rval );
+    rval = mb.get_connectivity( hexes[pos], conn, len );CHECK_ERR( rval );
     CHECK_EQUAL( 8, len );
-    rval = mb.tag_get_data( id_tag, conn, len, vtx_ids );
-    CHECK_ERR( rval );
+    rval = mb.tag_get_data( id_tag, conn, len, vtx_ids );CHECK_ERR( rval );
     CHECK_ARRAYS_EQUAL( conn1, 8, vtx_ids, len );
 
     const int conn2[] = { 2, 9, 10, 3, 6, 11, 12, 7 };
     ++pos;
     // Element id 2 is a hex
     CHECK_EQUAL( pos + offset, ids[pos] );
-    rval = mb.get_connectivity( hexes[pos], conn, len );
-    CHECK_ERR( rval );
+    rval = mb.get_connectivity( hexes[pos], conn, len );CHECK_ERR( rval );
     CHECK_EQUAL( 8, len );
-    rval = mb.tag_get_data( id_tag, conn, len, vtx_ids );
-    CHECK_ERR( rval );
+    rval = mb.tag_get_data( id_tag, conn, len, vtx_ids );CHECK_ERR( rval );
     CHECK_ARRAYS_EQUAL( conn2, 8, vtx_ids, len );
 }
 
@@ -297,23 +281,18 @@ void test_read_material_set()
     read_file( moab, example );
 
     Tag mat_tag;
-    rval = mb.tag_get_handle( MAT_PROP_TABLE_TAG, 1, MB_TYPE_INTEGER, mat_tag );
-    CHECK_ERR( rval );
+    rval = mb.tag_get_handle( MAT_PROP_TABLE_TAG, 1, MB_TYPE_INTEGER, mat_tag );CHECK_ERR( rval );
 
     Range mat_set;
     const int mat_set_id               = 100;
     const void* const mat_set_id_val[] = { &mat_set_id };
-    rval = mb.get_entities_by_type_and_tag( 0, MBENTITYSET, &mat_tag, mat_set_id_val, 1, mat_set );
-    CHECK_ERR( rval );
+    rval = mb.get_entities_by_type_and_tag( 0, MBENTITYSET, &mat_tag, mat_set_id_val, 1, mat_set );CHECK_ERR( rval );
     CHECK_EQUAL( 1, (int)mat_set.size() );
 
     std::vector< EntityHandle > elements, contents;
-    rval = mb.get_entities_by_type( 0, MBTET, elements );
-    CHECK_ERR( rval );
-    rval = mb.get_entities_by_type( 0, MBHEX, elements );
-    CHECK_ERR( rval );
-    rval = mb.get_entities_by_handle( mat_set.front(), contents );
-    CHECK_ERR( rval );
+    rval = mb.get_entities_by_type( 0, MBTET, elements );CHECK_ERR( rval );
+    rval = mb.get_entities_by_type( 0, MBHEX, elements );CHECK_ERR( rval );
+    rval = mb.get_entities_by_handle( mat_set.front(), contents );CHECK_ERR( rval );
     std::sort( elements.begin(), elements.end() );
     std::sort( contents.begin(), contents.end() );
     CHECK_EQUAL( elements, contents );
@@ -328,21 +307,17 @@ void test_read_physical_set()
     read_file( moab, example );
 
     Tag phys_tag;
-    rval = mb.tag_get_handle( PHYS_PROP_TABLE_TAG, 1, MB_TYPE_INTEGER, phys_tag );
-    CHECK_ERR( rval );
+    rval = mb.tag_get_handle( PHYS_PROP_TABLE_TAG, 1, MB_TYPE_INTEGER, phys_tag );CHECK_ERR( rval );
 
     Range phys_set;
     const int phys_set_id               = 4;
     const void* const phys_set_id_val[] = { &phys_set_id };
-    rval = mb.get_entities_by_type_and_tag( 0, MBENTITYSET, &phys_tag, phys_set_id_val, 1, phys_set );
-    CHECK_ERR( rval );
+    rval = mb.get_entities_by_type_and_tag( 0, MBENTITYSET, &phys_tag, phys_set_id_val, 1, phys_set );CHECK_ERR( rval );
     CHECK_EQUAL( 1, (int)phys_set.size() );
 
     std::vector< EntityHandle > tets, contents;
-    rval = mb.get_entities_by_type( 0, MBTET, tets );
-    CHECK_ERR( rval );
-    rval = mb.get_entities_by_handle( phys_set.front(), contents );
-    CHECK_ERR( rval );
+    rval = mb.get_entities_by_type( 0, MBTET, tets );CHECK_ERR( rval );
+    rval = mb.get_entities_by_handle( phys_set.front(), contents );CHECK_ERR( rval );
     std::sort( tets.begin(), tets.end() );
     std::sort( contents.begin(), contents.end() );
     CHECK_EQUAL( tets, contents );

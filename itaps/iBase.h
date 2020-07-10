@@ -80,7 +80,7 @@
                                                                                *version number
                                                                                ******************************************************************************/
 #define IBASE_VERSION_STRING___( I, X, Y, Z ) #I "_Version_" #X "." #Y "." #Z
-#define IBASE_VERSION_STRING__( I, X, Y, Z ) IBASE_VERSION_STRING___( I, X, Y, Z )
+#define IBASE_VERSION_STRING__( I, X, Y, Z )  IBASE_VERSION_STRING___( I, X, Y, Z )
 #define IBASE_VERSION_STRING_( I ) \
     IBASE_VERSION_STRING__( I, IBASE_VERSION_MAJOR, IBASE_VERSION_MINOR, IBASE_VERSION_PATCH )
 #define IBASE_VERSION_STRING IBASE_VERSION_STRING_( iBase )
@@ -94,8 +94,8 @@
                                                                                *the version number.
                                                                                ******************************************************************************/
 #define IBASE_VERSION_TAG__( I, X, Y, Z ) I##_Version_##X##_##Y##_##Z
-#define IBASE_VERSION_TAG_( I, X, Y, Z ) IBASE_VERSION_TAG__( I, X, Y, Z )
-#define IBASE_VERSION_TAG( I ) IBASE_VERSION_TAG_( I, IBASE_VERSION_MAJOR, IBASE_VERSION_MINOR, IBASE_VERSION_PATCH )
+#define IBASE_VERSION_TAG_( I, X, Y, Z )  IBASE_VERSION_TAG__( I, X, Y, Z )
+#define IBASE_VERSION_TAG( I )            IBASE_VERSION_TAG_( I, IBASE_VERSION_MAJOR, IBASE_VERSION_MINOR, IBASE_VERSION_PATCH )
 
 /***************************************************************************/ /**
                                                                                * \ingroup
@@ -105,14 +105,14 @@
                                                                                *APIs) version
                                                                                *handling
                                                                                ******************************************************************************/
-#define ITAPS_VERSION_MAJOR IBASE_VERSION_MAJOR
-#define ITAPS_VERSION_MINOR IBASE_VERSION_MINOR
-#define ITAPS_VERSION_PATCH IBASE_VERSION_PATCH
+#define ITAPS_VERSION_MAJOR               IBASE_VERSION_MAJOR
+#define ITAPS_VERSION_MINOR               IBASE_VERSION_MINOR
+#define ITAPS_VERSION_PATCH               IBASE_VERSION_PATCH
 #define ITAPS_VERSION_GE( Maj, Min, Pat ) IBASE_VERSION_GE( Maj, Min, Pat )
-#define ITAPS_VERSION_STRING_( I ) IBASE_VERSION_STRING_( I )
-#define ITAPS_VERSION_STRING ITAPS_VERSION_STRING_( ITAPS )
-#define ITAPS_VERSION_TAG_( I ) IBASE_VERSION_TAG( I )
-#define ITAPS_VERSION_TAG ITAPS_VERSION_TAG_( I )
+#define ITAPS_VERSION_STRING_( I )        IBASE_VERSION_STRING_( I )
+#define ITAPS_VERSION_STRING              ITAPS_VERSION_STRING_( ITAPS )
+#define ITAPS_VERSION_TAG_( I )           IBASE_VERSION_TAG( I )
+#define ITAPS_VERSION_TAG                 ITAPS_VERSION_TAG_( I )
 
 /***************************************************************************/ /**
                                                                                * \defgroup
@@ -161,9 +161,9 @@
                                                                                *EnumIterators
                                                                                * @{
                                                                                ******************************************************************************/
-#define IBASE_MINENUM( enumName ) enumName##_MIN
-#define IBASE_MAXENUM( enumName ) enumName##_MAX
-#define IBASE_NUMENUM( enumName ) ( (int)IBASE_MAXENUM( enumName ) - (int)IBASE_MINENUM( enumName ) + 1 )
+#define IBASE_MINENUM( enumName )    enumName##_MIN
+#define IBASE_MAXENUM( enumName )    enumName##_MAX
+#define IBASE_NUMENUM( enumName )    ( (int)IBASE_MAXENUM( enumName ) - (int)IBASE_MINENUM( enumName ) + 1 )
 #define IBASE_INCENUM( enumName, I ) ( I = ( enum enumName )( (int)I + 1 ) )
 /** @} */
 
@@ -171,11 +171,11 @@
 extern "C" {
 #endif
 
-typedef void*                                   iBase_Instance;
-typedef struct iBase_EntityHandle_Private*      iBase_EntityHandle;
-typedef struct iBase_EntitySetHandle_Private*   iBase_EntitySetHandle;
-typedef struct iBase_TagHandle_Private*         iBase_TagHandle;
-typedef struct iBase_EntityIterator_Private*    iBase_EntityIterator;
+typedef void* iBase_Instance;
+typedef struct iBase_EntityHandle_Private* iBase_EntityHandle;
+typedef struct iBase_EntitySetHandle_Private* iBase_EntitySetHandle;
+typedef struct iBase_TagHandle_Private* iBase_TagHandle;
+typedef struct iBase_EntityIterator_Private* iBase_EntityIterator;
 typedef struct iBase_EntityArrIterator_Private* iBase_EntityArrIterator;
 
 enum iBase_EntityType

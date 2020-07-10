@@ -74,8 +74,7 @@ void UnOptimizer::optimize_vertex_positions( PatchData& pd, MsqError& err )
     double val, junk, coeff;
     bool state;
 
-    state = objectiveFunction->evaluate_with_gradient( ObjectiveFunction::CALCULATE, pd, val, grad, err );
-    MSQ_ERRRTN( err );
+    state = objectiveFunction->evaluate_with_gradient( ObjectiveFunction::CALCULATE, pd, val, grad, err );MSQ_ERRRTN( err );
     if( !state )
     {
         MSQ_SETERR( err )( MsqError::INVALID_MESH );
@@ -83,17 +82,14 @@ void UnOptimizer::optimize_vertex_positions( PatchData& pd, MsqError& err )
     }
     grad[0] /= grad[0].length();
 
-    PatchDataVerticesMemento* memento = pd.create_vertices_memento( err );
-    MSQ_ERRRTN( err );
+    PatchDataVerticesMemento* memento = pd.create_vertices_memento( err );MSQ_ERRRTN( err );
     std::auto_ptr< PatchDataVerticesMemento > deleter( memento );
     pd.get_minmax_edge_length( junk, coeff );
 
     for( int i = 0; i < 100; ++i )
     {
-        pd.set_free_vertices_constrained( memento, arrptr( grad ), 1, coeff, err );
-        MSQ_ERRRTN( err );
-        state = objectiveFunction->evaluate( ObjectiveFunction::CALCULATE, pd, val, true, err );
-        MSQ_ERRRTN( err );
+        pd.set_free_vertices_constrained( memento, arrptr( grad ), 1, coeff, err );MSQ_ERRRTN( err );
+        state = objectiveFunction->evaluate( ObjectiveFunction::CALCULATE, pd, val, true, err );MSQ_ERRRTN( err );
         if( state ) break;
         coeff *= 0.5;
     }

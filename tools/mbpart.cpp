@@ -348,13 +348,11 @@ int main( int argc, char* argv[] )
     std::cout << "Loading file " << input_file << "..." << std::endl;
     if( load_msets == false )
     {
-        rval = mb.load_file( input_file.c_str(), 0, options );
-        MB_CHK_SET_ERR( rval, "Failed to load input file: " + input_file );
+        rval = mb.load_file( input_file.c_str(), 0, options );MB_CHK_SET_ERR( rval, "Failed to load input file: " + input_file );
     }
     else  // load the material set(s)
     {
-        rval = mb.load_mesh( input_file.c_str(), &set_l[0], (int)set_l.size() );
-        MB_CHK_SET_ERR( rval, "Failed to load input mesh: " + input_file );
+        rval = mb.load_mesh( input_file.c_str(), &set_l[0], (int)set_l.size() );MB_CHK_SET_ERR( rval, "Failed to load input mesh: " + input_file );
     }
     if( print_time )
         std::cout << "Read input file in " << ( clock() - t ) / (double)CLOCKS_PER_SEC << " seconds" << std::endl;
@@ -386,8 +384,7 @@ int main( int argc, char* argv[] )
             rval = zoltan_tool->partition_mesh_and_geometry(
                 part_geom_mesh_size, num_parts, zoltan_method.c_str(),
                 ( !parm_method.empty() ? parm_method.c_str() : oct_method.c_str() ), imbal_tol, part_dim, write_sets,
-                write_tags, obj_weight, edge_weight, part_surf, ghost, spherical_coords, print_time );
-            MB_CHK_SET_ERR( rval, "Zoltan partitioner failed." );
+                write_tags, obj_weight, edge_weight, part_surf, ghost, spherical_coords, print_time );MB_CHK_SET_ERR( rval, "Zoltan partitioner failed." );
         }
 #endif
 #ifdef MOAB_HAVE_METIS
@@ -395,8 +392,7 @@ int main( int argc, char* argv[] )
         {
             rval = metis_tool->partition_mesh( num_parts, metis_method.c_str(), part_dim, write_sets, write_tags,
                                                partition_tagged_sets, partition_tagged_ents, aggregating_tag.c_str(),
-                                               print_time );
-            MB_CHK_SET_ERR( rval, "Metis partitioner failed." );
+                                               print_time );MB_CHK_SET_ERR( rval, "Metis partitioner failed." );
         }
 #endif
 
@@ -409,28 +405,23 @@ int main( int argc, char* argv[] )
             std::cout << "Reordering mesh for partition..." << std::endl;
 
             Tag tag, order;
-            rval = mb.tag_get_handle( DEFAULT_TAGGEDSETS_TAG.c_str(), 1, MB_TYPE_INTEGER, tag );
-            MB_CHK_SET_ERR( rval, "Partitioner did not create " + DEFAULT_TAGGEDSETS_TAG + " tag" );
+            rval = mb.tag_get_handle( DEFAULT_TAGGEDSETS_TAG.c_str(), 1, MB_TYPE_INTEGER, tag );MB_CHK_SET_ERR( rval, "Partitioner did not create " + DEFAULT_TAGGEDSETS_TAG + " tag" );
 
             t = clock();
             if( write_sets )
             {
                 Range sets;
                 mb.get_entities_by_type_and_tag( 0, MBENTITYSET, &tag, 0, 1, sets );
-                rval = reorder_tool.handle_order_from_sets_and_adj( sets, order );
-                MB_CHK_SET_ERR( rval, "Failed to calculate reordering." );
+                rval = reorder_tool.handle_order_from_sets_and_adj( sets, order );MB_CHK_SET_ERR( rval, "Failed to calculate reordering." );
             }
             else
             {
-                rval = reorder_tool.handle_order_from_int_tag( tag, -1, order );
-                MB_CHK_SET_ERR( rval, "Failed to calculate reordering." );
+                rval = reorder_tool.handle_order_from_int_tag( tag, -1, order );MB_CHK_SET_ERR( rval, "Failed to calculate reordering." );
             }
 
-            rval = reorder_tool.reorder_entities( order );
-            MB_CHK_SET_ERR( rval, "Failed to perform reordering." );
+            rval = reorder_tool.reorder_entities( order );MB_CHK_SET_ERR( rval, "Failed to perform reordering." );
 
-            rval = mb.tag_delete( order );
-            MB_CHK_SET_ERR( rval, "Failed to delete tag." );
+            rval = mb.tag_delete( order );MB_CHK_SET_ERR( rval, "Failed to delete tag." );
             if( print_time )
                 std::cout << "Reordered mesh in " << ( clock() - t ) / (double)CLOCKS_PER_SEC << " seconds"
                           << std::endl;
@@ -439,8 +430,7 @@ int main( int argc, char* argv[] )
 #ifdef MOAB_HAVE_ZOLTAN
         if( incl_closure )
         {
-            rval = zoltan_tool->include_closure();
-            MB_CHK_SET_ERR( rval, "Closure inclusion failed." );
+            rval = zoltan_tool->include_closure();MB_CHK_SET_ERR( rval, "Closure inclusion failed." );
         }
 #endif
 
@@ -532,35 +522,29 @@ int main( int argc, char* argv[] )
             {
                 EntityHandle rootset = 0;
                 Range masterverts;
-                rval = mb.get_entities_by_dimension( rootset, 0, masterverts );
-                MB_CHK_SET_ERR( rval, "Can't create vertices on master set" );
+                rval = mb.get_entities_by_dimension( rootset, 0, masterverts );MB_CHK_SET_ERR( rval, "Can't create vertices on master set" );
                 double points[6];
                 EntityHandle mfrontback[2] = { masterverts[0], masterverts[masterverts.size() - 1] };
-                rval                       = mb.get_coords( &mfrontback[0], 2, points );
-                MB_CHK_ERR( rval );
+                rval                       = mb.get_coords( &mfrontback[0], 2, points );MB_CHK_ERR( rval );
                 const double mr1 = std::sqrt( points[0] * points[0] + points[1] * points[1] + points[2] * points[2] );
                 const double mr2 = std::sqrt( points[3] * points[3] + points[4] * points[4] + points[5] * points[5] );
                 master_radius    = 0.5 * ( mr1 + mr2 );
             }
             EntityHandle slaveset;
-            rval = mb.create_meshset( moab::MESHSET_SET, slaveset );
-            MB_CHK_SET_ERR( rval, "Can't create new set" );
+            rval = mb.create_meshset( moab::MESHSET_SET, slaveset );MB_CHK_SET_ERR( rval, "Can't create new set" );
             rval = mb.load_file( slave_file_name.c_str(), &slaveset, options );
             if( rescale_spherical_radius )
             {
                 double points[6];
                 Range slaveverts;
-                rval = mb.get_entities_by_dimension( slaveset, 0, slaveverts );
-                MB_CHK_SET_ERR( rval, "Can't create vertices on master set" );
+                rval = mb.get_entities_by_dimension( slaveset, 0, slaveverts );MB_CHK_SET_ERR( rval, "Can't create vertices on master set" );
                 EntityHandle sfrontback[2] = { slaveverts[0], slaveverts[slaveverts.size() - 1] };
-                rval                       = mb.get_coords( &sfrontback[0], 2, points );
-                MB_CHK_ERR( rval );
+                rval                       = mb.get_coords( &sfrontback[0], 2, points );MB_CHK_ERR( rval );
                 const double sr1 = std::sqrt( points[0] * points[0] + points[1] * points[1] + points[2] * points[2] );
                 const double sr2 = std::sqrt( points[3] * points[3] + points[4] * points[4] + points[5] * points[5] );
                 slave_radius     = 0.5 * ( sr1 + sr2 );
                 // Let us rescale both master and slave meshes to a unit sphere
-                rval = moab::IntxUtils::ScaleToRadius( &mb, slaveset, master_radius );
-                MB_CHK_ERR( rval );
+                rval = moab::IntxUtils::ScaleToRadius( &mb, slaveset, master_radius );MB_CHK_ERR( rval );
             }
 
             rval = zoltan_tool->partition_inferred_mesh( slaveset, num_parts, part_dim );
@@ -568,8 +552,7 @@ int main( int argc, char* argv[] )
             if( rescale_spherical_radius )
             {
                 // rescale the slave mesh back to its original radius
-                rval = moab::IntxUtils::ScaleToRadius( &mb, slaveset, slave_radius );
-                MB_CHK_ERR( rval );
+                rval = moab::IntxUtils::ScaleToRadius( &mb, slaveset, slave_radius );MB_CHK_ERR( rval );
             }
 
             if( print_time )

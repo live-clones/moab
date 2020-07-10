@@ -170,8 +170,7 @@ void ParShapeImprover::ParShapeImprovementWrapper::run_wrapper( MeshDomainAssoc*
                   << std::endl;
         InstructionQueue q1;
         QualityAssessor qa_untangle( &untangle_metric );
-        q1.add_quality_assessor( &qa_untangle, err );
-        MSQ_ERRRTN( err );
+        q1.add_quality_assessor( &qa_untangle, err );MSQ_ERRRTN( err );
         q1.run_common( mesh_and_domain, pmesh, settings, err );
         std::cout << "\nP[" << rank << "]  ParShapeImprover.... running QA with untangle_metric... before... done "
                   << std::endl;
@@ -250,12 +249,9 @@ void ParShapeImprover::ParShapeImprovementWrapper::run_wrapper( MeshDomainAssoc*
     {
         InstructionQueue q1;
         QualityAssessor qa_untangle( &untangle_metric );
-        q1.add_quality_assessor( &qa_untangle, err );
-        MSQ_ERRRTN( err );
-        q1.set_master_quality_improver( &untangle_solver, err );
-        MSQ_ERRRTN( err );
-        q1.add_quality_assessor( &qa_untangle, err );
-        MSQ_ERRRTN( err );
+        q1.add_quality_assessor( &qa_untangle, err );MSQ_ERRRTN( err );
+        q1.set_master_quality_improver( &untangle_solver, err );MSQ_ERRRTN( err );
+        q1.add_quality_assessor( &qa_untangle, err );MSQ_ERRRTN( err );
         q1.run_common( mesh_and_domain, pmesh, settings, err );
     }
     std::cout << "\nP[" << rank << "] "
@@ -280,8 +276,7 @@ void ParShapeImprover::ParShapeImprovementWrapper::run_wrapper( MeshDomainAssoc*
             std::cout << "\nP[" << rank << "]  ParShapeImprover.... running QA with untangle_metric " << std::endl;
             InstructionQueue q1;
             QualityAssessor qa_untangle( &untangle_metric );
-            q1.add_quality_assessor( &qa_untangle, err );
-            MSQ_ERRRTN( err );
+            q1.add_quality_assessor( &qa_untangle, err );MSQ_ERRRTN( err );
             q1.run_common( mesh_and_domain, pmesh, settings, err );
             std::cout << "\nP[" << rank << "]  ParShapeImprover.... running QA with untangle_metric... done "
                       << std::endl;
@@ -289,8 +284,7 @@ void ParShapeImprover::ParShapeImprovementWrapper::run_wrapper( MeshDomainAssoc*
 
         if( num_invalid ) return;
     }
-    if( m_do_untangle_only ) return;
-    MSQ_ERRRTN( err );
+    if( m_do_untangle_only ) return;MSQ_ERRRTN( err );
 
     // If limited by CPU time, limit next step to remaning time
     if( maxTime > 0.0 )
@@ -309,17 +303,13 @@ void ParShapeImprover::ParShapeImprovementWrapper::run_wrapper( MeshDomainAssoc*
     std::cout << "\nP[" << rank << "] "
               << " ParShapeImprovementWrapper: running shape improver... \n"
               << std::endl;
-    q2.add_quality_assessor( qa, err );
-    MSQ_ERRRTN( err );
-    q2.set_master_quality_improver( &shape_solver, err );
-    MSQ_ERRRTN( err );
-    q2.add_quality_assessor( qa, err );
-    MSQ_ERRRTN( err );
+    q2.add_quality_assessor( qa, err );MSQ_ERRRTN( err );
+    q2.set_master_quality_improver( &shape_solver, err );MSQ_ERRRTN( err );
+    q2.add_quality_assessor( qa, err );MSQ_ERRRTN( err );
     q2.run_common( mesh_and_domain, pmesh, settings, err );
     std::cout << "\nP[" << rank << "] "
               << " ParShapeImprovementWrapper: running shape improver... done \n"
-              << std::endl;
-    MSQ_ERRRTN( err );
+              << std::endl;MSQ_ERRRTN( err );
 }
 
 int ParShapeImprover::count_invalid_elements( Mesh& mesh, MeshDomain* domain )

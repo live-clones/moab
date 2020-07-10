@@ -159,9 +159,8 @@ void FBiGeom_load( FBiGeom_Instance instance, char const* name, char const* opti
     }
     // load mesh-based geometry
     const EntityHandle* file_set = 0;
-    ErrorCode rval               = MBI->load_file( name, file_set, reducedOptions );
+    ErrorCode rval               = MBI->load_file( name, file_set, reducedOptions );CHKERR( rval, "can't load mesh file" );
     if( localReduce ) delete[] reducedOptions;
-    CHKERR( rval, "can't load mesh file" );
 
     FBEngine* fbe = FBE_cast( instance );
     if( fbe == NULL )
@@ -176,8 +175,7 @@ void FBiGeom_load( FBiGeom_Instance instance, char const* name, char const* opti
         return;
     }
     // keep mesh-based geometries in Range
-    rval = gtt->find_geomsets();
-    CHKERR( rval, "Failure to find geometry lists." );
+    rval = gtt->find_geomsets();CHKERR( rval, "Failure to find geometry lists." );
 
     if( smooth ) fbe->set_smooth();  // assumes that initialization did not happen yet
 
@@ -195,8 +193,7 @@ void FBiGeom_save( FBiGeom_Instance instance, char const* name, char const* opti
 void FBiGeom_getRootSet( FBiGeom_Instance instance, iBase_EntitySetHandle* root_set, int* err )
 {
     EntityHandle modelSet;
-    ErrorCode rval = FBE_cast( instance )->getRootSet( &modelSet );
-    CHKERR( rval, "can't get root set " );
+    ErrorCode rval = FBE_cast( instance )->getRootSet( &modelSet );CHKERR( rval, "can't get root set " );
     *root_set = (iBase_EntitySetHandle)modelSet;
     RETURN( iBase_SUCCESS );
 }
@@ -215,8 +212,7 @@ void FBiGeom_getEntities( FBiGeom_Instance instance, iBase_EntitySetHandle set_h
     else /* 0<= entity_type <= 4) */
     {
         Range gentities;
-        ErrorCode rval = FBE_cast( instance )->getEntities( (EntityHandle)set_handle, entity_type, gentities );
-        CHKERR( rval, "can't get entities " );
+        ErrorCode rval = FBE_cast( instance )->getEntities( (EntityHandle)set_handle, entity_type, gentities );CHKERR( rval, "can't get entities " );
         *entity_handles_size = gentities.size();
 
         CHECK_SIZE( *entity_handles, *entity_handles_allocated, *entity_handles_size, iBase_EntityHandle, NULL );
@@ -230,8 +226,7 @@ void FBiGeom_getNumOfType( FBiGeom_Instance instance, iBase_EntitySetHandle set_
                            int* err )
 {
     if( 0 > entity_type || 4 < entity_type ) { ERROR( iBase_INVALID_ENTITY_TYPE, "Bad entity type." ); }
-    ErrorCode rval = FBE_cast( instance )->getNumOfType( (EntityHandle)set_handle, entity_type, num_out );
-    CHKERR( rval, "can't get number of type " );
+    ErrorCode rval = FBE_cast( instance )->getNumOfType( (EntityHandle)set_handle, entity_type, num_out );CHKERR( rval, "can't get number of type " );
 
     RETURN( iBase_SUCCESS );
 }
@@ -239,8 +234,7 @@ void FBiGeom_getNumOfType( FBiGeom_Instance instance, iBase_EntitySetHandle set_
 void FBiGeom_getEntType( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, int* type, int* err )
 {
 
-    ErrorCode rval = FBE_cast( instance )->getEntType( (EntityHandle)entity_handle, type );
-    CHKERR( rval, "can't get entity type " );
+    ErrorCode rval = FBE_cast( instance )->getEntType( (EntityHandle)entity_handle, type );CHKERR( rval, "can't get entity type " );
 
     RETURN( iBase_SUCCESS );
 }
@@ -298,8 +292,7 @@ void FBiGeom_getArrAdj( FBiGeom_Instance instance, iBase_EntityHandle const* ent
         ( *offset )[i] = total_range.size();
         temp_range.clear();
         ErrorCode rval =
-            FBE_cast( instance )->getEntAdj( MBH_cast( entity_handles[i] ), requested_entity_type, temp_range );
-        CHKERR( rval, "Failed to get adjacent entities in FBiGeom_getArrAdj." );
+            FBE_cast( instance )->getEntAdj( MBH_cast( entity_handles[i] ), requested_entity_type, temp_range );CHKERR( rval, "Failed to get adjacent entities in FBiGeom_getArrAdj." );
         total_range.merge( temp_range );
     }
     int nTot                         = total_range.size();
@@ -358,8 +351,7 @@ void FBiGeom_isEntAdj( FBiGeom_Instance instance, iBase_EntityHandle entity_hand
 
     bool adjacent_out;
     ErrorCode rval =
-        FBE_cast( instance )->isEntAdj( MBH_cast( entity_handle1 ), MBH_cast( entity_handle2 ), adjacent_out );
-    CHKERR( rval, "Failed to get adjacent info" );
+        FBE_cast( instance )->isEntAdj( MBH_cast( entity_handle1 ), MBH_cast( entity_handle2 ), adjacent_out );CHKERR( rval, "Failed to get adjacent info" );
     *are_adjacent = (int)adjacent_out;  // 0 or 1, really
 
     RETURN( iBase_SUCCESS );
@@ -420,8 +412,7 @@ void FBiGeom_getEntClosestPt( FBiGeom_Instance instance, iBase_EntityHandle enti
 {
 
     ErrorCode rval =
-        FBE_cast( instance )->getEntClosestPt( MBH_cast( entity_handle ), near_x, near_y, near_z, on_x, on_y, on_z );
-    CHKERR( rval, "Failed to get closest point" );
+        FBE_cast( instance )->getEntClosestPt( MBH_cast( entity_handle ), near_x, near_y, near_z, on_x, on_y, on_z );CHKERR( rval, "Failed to get closest point" );
 
     RETURN( iBase_SUCCESS );
 }
@@ -460,8 +451,7 @@ void FBiGeom_getEntNrmlXYZ( FBiGeom_Instance instance, iBase_EntityHandle entity
                             double* nrml_i, double* nrml_j, double* nrml_k, int* err )
 {
 
-    ErrorCode rval = FBE_cast( instance )->getEntNrmlXYZ( MBH_cast( entity_handle ), x, y, z, nrml_i, nrml_j, nrml_k );
-    CHKERR( rval, "Failed to get normal" );
+    ErrorCode rval = FBE_cast( instance )->getEntNrmlXYZ( MBH_cast( entity_handle ), x, y, z, nrml_i, nrml_j, nrml_k );CHKERR( rval, "Failed to get normal" );
     RETURN( iBase_SUCCESS );
 }
 
@@ -701,10 +691,8 @@ void FBiGeom_getEntBoundBox( FBiGeom_Instance instance, iBase_EntityHandle entit
         CartVect center, axis[3];
         GeomTopoTool* gtt = GETGTT( instance );
         if( !gtt ) ERROR( iBase_FAILURE, "Can't get geom topo tool." );
-        rval = gtt->get_root( MBH_cast( entity_handle ), root );
-        CHKERR( rval, "Failed to get tree root in FBiGeom_getEntBoundBox." );
-        rval = gtt->obb_tree()->box( root, center.array(), axis[0].array(), axis[1].array(), axis[2].array() );
-        CHKERR( rval, "Failed to get box from obb tree." );
+        rval = gtt->get_root( MBH_cast( entity_handle ), root );CHKERR( rval, "Failed to get tree root in FBiGeom_getEntBoundBox." );
+        rval = gtt->obb_tree()->box( root, center.array(), axis[0].array(), axis[1].array(), axis[2].array() );CHKERR( rval, "Failed to get box from obb tree." );
 
         CartVect absv[3];
         for( int i = 0; i < 3; i++ )
@@ -775,8 +763,7 @@ void FBiGeom_getArrBoundBox( FBiGeom_Instance instance, iBase_EntityHandle const
 void FBiGeom_getVtxCoord( FBiGeom_Instance instance, iBase_EntityHandle vertex_handle, double* x, double* y, double* z,
                           int* err )
 {
-    ErrorCode rval = FBE_cast( instance )->getVtxCoord( MBH_cast( vertex_handle ), x, y, z );
-    CHKERR( rval, "Failed to vertex position" );
+    ErrorCode rval = FBE_cast( instance )->getVtxCoord( MBH_cast( vertex_handle ), x, y, z );CHKERR( rval, "Failed to vertex position" );
     RETURN( iBase_SUCCESS );
 }
 
@@ -830,8 +817,7 @@ void FBiGeom_getPntRayIntsct( FBiGeom_Instance instance, double x, double y, dou
     std::vector< double > coords;
     std::vector< double > params;
     ErrorCode rval =
-        FBE_cast( instance )->getPntRayIntsct( x, y, z, dir_x, dir_y, dir_z, intersect_handles, coords, params );
-    CHKERR( rval, "can't get ray intersections " );
+        FBE_cast( instance )->getPntRayIntsct( x, y, z, dir_x, dir_y, dir_z, intersect_handles, coords, params );CHKERR( rval, "can't get ray intersections " );
     *intersect_entity_handles_size = (int)intersect_handles.size();
 
     CHECK_SIZE( *intersect_entity_handles, *intersect_entity_handles_allocated, *intersect_entity_handles_size,
@@ -875,8 +861,7 @@ void FBiGeom_getEntNrmlSense( FBiGeom_Instance instance, iBase_EntityHandle face
 {
     moab::EntityHandle mbregion = (moab::EntityHandle)region;
     moab::EntityHandle mbface   = (moab::EntityHandle)face;
-    moab::ErrorCode rval        = FBE_cast( instance )->getEgFcSense( mbface, mbregion, *sense_out );
-    CHKERR( rval, "can't get normal sense " );
+    moab::ErrorCode rval        = FBE_cast( instance )->getEgFcSense( mbface, mbregion, *sense_out );CHKERR( rval, "can't get normal sense " );
     RETURN( iBase_SUCCESS );
 }
 void FBiGeom_getArrNrmlSense( FBiGeom_Instance instance, iBase_EntityHandle const*, int, iBase_EntityHandle const*, int,
@@ -917,8 +902,7 @@ void FBiGeom_getEgVtxSense( FBiGeom_Instance instance, iBase_EntityHandle edge, 
 {
 
     ErrorCode rval =
-        FBE_cast( instance )->getEgVtxSense( MBH_cast( edge ), MBH_cast( vertex1 ), MBH_cast( vertex2 ), *sense_out );
-    CHKERR( rval, "Failed to get vertex sense wrt edge in FBiGeom_getEgVtxSense" );
+        FBE_cast( instance )->getEgVtxSense( MBH_cast( edge ), MBH_cast( vertex1 ), MBH_cast( vertex2 ), *sense_out );CHKERR( rval, "Failed to get vertex sense wrt edge in FBiGeom_getEgVtxSense" );
     RETURN( iBase_SUCCESS );
 }
 void FBiGeom_getEgVtxArrSense( FBiGeom_Instance instance, iBase_EntityHandle const*, int, iBase_EntityHandle const*,
@@ -932,8 +916,7 @@ void FBiGeom_measure( FBiGeom_Instance instance, iBase_EntityHandle const* entit
 {
 
     CHECK_SIZE( *measures, *measures_allocated, entity_handles_size, double, NULL );
-    ErrorCode rval = FBE_cast( instance )->measure( (EntityHandle*)( entity_handles ), entity_handles_size, *measures );
-    CHKERR( rval, "Failed to get measures" );
+    ErrorCode rval = FBE_cast( instance )->measure( (EntityHandle*)( entity_handles ), entity_handles_size, *measures );CHKERR( rval, "Failed to get measures" );
     *measures_size = entity_handles_size;
     RETURN( iBase_SUCCESS );
 }
@@ -990,8 +973,7 @@ void FBiGeom_getEntUtoXYZ( FBiGeom_Instance instance, iBase_EntityHandle entity_
     if( type != 1 )  // not edge
         RETURN( iBase_NOT_SUPPORTED );
 
-    ErrorCode rval = FBE_cast( instance )->getEntUtoXYZ( (EntityHandle)entity_handle, u, *x, *y, *z );
-    CHKERR( rval, "Failed to get position from parameter" );
+    ErrorCode rval = FBE_cast( instance )->getEntUtoXYZ( (EntityHandle)entity_handle, u, *x, *y, *z );CHKERR( rval, "Failed to get position from parameter" );
     RETURN( iBase_SUCCESS );
 }
 
@@ -1039,8 +1021,7 @@ void FBiGeom_getEntUVRange( FBiGeom_Instance instance, iBase_EntityHandle, doubl
 void FBiGeom_getEntURange( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, double* u_min, double* u_max,
                            int* err )
 {
-    ErrorCode rval = FBE_cast( instance )->getEntURange( (EntityHandle)entity_handle, *u_min, *u_max );
-    CHKERR( rval, "Failed to get range" );
+    ErrorCode rval = FBE_cast( instance )->getEntURange( (EntityHandle)entity_handle, *u_min, *u_max );CHKERR( rval, "Failed to get range" );
     RETURN( iBase_SUCCESS );
 }
 void FBiGeom_getArrUVRange( FBiGeom_Instance instance, iBase_EntityHandle const*, int, int, double**, int*, int*,
@@ -1095,8 +1076,7 @@ void FBiGeom_getEntTgntU( FBiGeom_Instance instance, iBase_EntityHandle entity_h
                           double* tgnt_j, double* tgnt_k, int* err )
 {
     ErrorCode rval =
-        FBE_cast( instance )->getEntTgntU( (moab::EntityHandle)entity_handle, u, *tgnt_i, *tgnt_j, *tgnt_k );
-    CHKERR( rval, "Failed to get tangent from u" );
+        FBE_cast( instance )->getEntTgntU( (moab::EntityHandle)entity_handle, u, *tgnt_i, *tgnt_j, *tgnt_k );CHKERR( rval, "Failed to get tangent from u" );
     RETURN( iBase_SUCCESS );
 }
 void FBiGeom_getArrTgntU( FBiGeom_Instance instance, iBase_EntityHandle const*, int, int, double const*, int, double**,
@@ -1341,8 +1321,7 @@ void FBiGeom_getNumEntSets( FBiGeom_Instance instance, iBase_EntitySetHandle ent
     const int four               = 4;
     const void* const four_val[] = { &four };
     Range tmp;
-    rval = MBI->get_entities_by_type_and_tag( moabSet, MBENTITYSET, &geomTag, four_val, 1, tmp );
-    CHKERR( rval, "can't get sets of geo dim 4 " );
+    rval = MBI->get_entities_by_type_and_tag( moabSet, MBENTITYSET, &geomTag, four_val, 1, tmp );CHKERR( rval, "can't get sets of geo dim 4 " );
     tmp       = intersect( tmp, gRange[4] );
     *num_sets = tmp.size();  // ignore, for the time being, number of hops
 
@@ -1366,8 +1345,7 @@ void FBiGeom_getEntSets( FBiGeom_Instance instance, iBase_EntitySetHandle entity
     const int four               = 4;
     const void* const four_val[] = { &four };
     Range tmp;
-    rval = MBI->get_entities_by_type_and_tag( moabSet, MBENTITYSET, &geomTag, four_val, 1, tmp );
-    CHKERR( rval, "can't get sets of geo dim 4 " );
+    rval = MBI->get_entities_by_type_and_tag( moabSet, MBENTITYSET, &geomTag, four_val, 1, tmp );CHKERR( rval, "can't get sets of geo dim 4 " );
     tmp                         = intersect( tmp, gRange[4] );
     *contained_set_handles_size = tmp.size();
     CHECK_SIZE( *contained_set_handles, *contained_set_handles_allocated, *contained_set_handles_size,
@@ -1489,8 +1467,7 @@ void FBiGeom_createTag( FBiGeom_Instance instance, const char* tag_name, int tag
 
 void FBiGeom_destroyTag( FBiGeom_Instance instance, iBase_TagHandle tag_handle, int, int* err )
 {
-    ErrorCode rval = MBI->tag_delete( TAG_HANDLE( tag_handle ) );
-    CHKERR( rval, "Failed to delete tag" );
+    ErrorCode rval = MBI->tag_delete( TAG_HANDLE( tag_handle ) );CHKERR( rval, "Failed to delete tag" );
     RETURN( iBase_SUCCESS );
 }
 
@@ -1803,8 +1780,7 @@ void FBiGeom_getEgEvalXYZ( FBiGeom_Instance instance, iBase_EntityHandle edge, d
 {
     ErrorCode rval = FBE_cast( instance )
                          ->getEgEvalXYZ( (moab::EntityHandle)edge, x, y, z, *on_x, *on_y, *on_z, *tngt_i, *tngt_j,
-                                         *tngt_k, *cvtr_i, *cvtr_j, *cvtr_k );
-    CHKERR( rval, "can't get point on edge " );
+                                         *tngt_k, *cvtr_i, *cvtr_j, *cvtr_k );CHKERR( rval, "can't get point on edge " );
     RETURN( iBase_SUCCESS );
 }
 
@@ -1828,8 +1804,7 @@ void FBiGeom_getFcEvalXYZ( FBiGeom_Instance instance, iBase_EntityHandle face_ha
     *cvtr1_i = *cvtr1_j = *cvtr1_k = *cvtr2_i = *cvtr2_j = *cvtr2_k = 0.;
     // first get closest point, then normal, separately
     ErrorCode rval =
-        FBE_cast( instance )->getEntClosestPt( (moab::EntityHandle)face_handle, x, y, z, on_x, on_y, on_z );
-    CHKERR( rval, "can't get closest point on surface " );
+        FBE_cast( instance )->getEntClosestPt( (moab::EntityHandle)face_handle, x, y, z, on_x, on_y, on_z );CHKERR( rval, "can't get closest point on surface " );
     rval = FBE_cast( instance )
                ->getEntNrmlXYZ( (moab::EntityHandle)face_handle, x, y, z, nrml_i, nrml_j,
                                 nrml_k );  // some inconsistency here, we use pointers, not refs

@@ -69,8 +69,7 @@ EntityHandle create_tree( AdaptiveKDTree& tool, unsigned depth, int intervals, T
 
     // Use iterator to create tree to fixed depth of DEPTH
     AdaptiveKDTreeIter iter;
-    err = tool.get_tree_iterator( root, iter );
-    CHECK_ERR( err );
+    err = tool.get_tree_iterator( root, iter );CHECK_ERR( err );
     while( err == MB_SUCCESS )
     {
         if( iter.depth() < depth )
@@ -93,8 +92,7 @@ EntityHandle create_tree( AdaptiveKDTree& tool, unsigned depth, int intervals, T
     if( !tag_handle ) return root;
 
     // define a tag to use to store integer values on tree leaves
-    err = tool.moab()->tag_get_handle( TAG_NAME, 1, MB_TYPE_INTEGER, *tag_handle, MB_TAG_DENSE | MB_TAG_EXCL );
-    CHECK_ERR( err );
+    err = tool.moab()->tag_get_handle( TAG_NAME, 1, MB_TYPE_INTEGER, *tag_handle, MB_TAG_DENSE | MB_TAG_EXCL );CHECK_ERR( err );
 
     // iterate over tree setting data
     int counter = 0;
@@ -103,8 +101,7 @@ EntityHandle create_tree( AdaptiveKDTree& tool, unsigned depth, int intervals, T
         // store integer value on leaf
         ++counter;
         leaf = iter.handle();
-        err  = tool.moab()->tag_set_data( *tag_handle, &leaf, 1, &counter );
-        CHECK_ERR( err );
+        err  = tool.moab()->tag_set_data( *tag_handle, &leaf, 1, &counter );CHECK_ERR( err );
     }
 
     return root;
@@ -138,8 +135,7 @@ void validate_tree( AdaptiveKDTree& tool, EntityHandle root, unsigned depth, int
         CHECK_EQUAL( depth, iter.depth() );
 
         // check tag value on leaf
-        err = tool.moab()->tag_get_data( data, &leaf, 1, &val );
-        CHECK_ERR( err );
+        err = tool.moab()->tag_get_data( data, &leaf, 1, &val );CHECK_ERR( err );
         CHECK_EQUAL( counter, val );
     }
     // check number of leaves
@@ -172,16 +168,13 @@ void test_leaf_merge()
         // get data for first leaf
         int data1;
         EntityHandle leaf = iter.handle();
-        err               = mb.tag_get_data( data, &leaf, 1, &data1 );
-        CHECK_ERR( err );
+        err               = mb.tag_get_data( data, &leaf, 1, &data1 );CHECK_ERR( err );
         // tree traversal is always such that two leaves with same parent are consective
-        err = iter.step();
-        CHECK_ERR( err );
+        err = iter.step();CHECK_ERR( err );
         // get data for sibling
         int data2;
         leaf = iter.handle();
-        err  = mb.tag_get_data( data, &leaf, 1, &data2 );
-        CHECK_ERR( err );
+        err  = mb.tag_get_data( data, &leaf, 1, &data2 );CHECK_ERR( err );
         // as we stored increasing values, these had better be increasing
         CHECK_EQUAL( 1, data2 - data1 );
         // merge leaf pair (iter can be at either one)
@@ -189,8 +182,7 @@ void test_leaf_merge()
         CHECK_ERR( err );
         // store smaller of two values on new leaf
         leaf = iter.handle();
-        err  = mb.tag_set_data( data, &leaf, 1, &data1 );
-        CHECK_ERR( err );
+        err  = mb.tag_set_data( data, &leaf, 1, &data1 );CHECK_ERR( err );
     }
 
     // Iterate over tree, verifying leaves and checking data
@@ -203,8 +195,7 @@ void test_leaf_merge()
         // store integer value on leaf
         int data1;
         EntityHandle leaf = iter.handle();
-        err               = mb.tag_get_data( data, &leaf, 1, &data1 );
-        CHECK_ERR( err );
+        err               = mb.tag_get_data( data, &leaf, 1, &data1 );CHECK_ERR( err );
         CHECK_EQUAL( counter, data1 );
         counter += 2;
 
@@ -229,20 +220,17 @@ void test_tree_readwrite()
     create_tree( tool, DEPTH, INTERVALS, &tag );
 
     // write to file
-    err = mb.write_file( "tree.h5m" );
-    CHECK_ERR( err );
+    err = mb.write_file( "tree.h5m" );CHECK_ERR( err );
 
     // clear everything
     mb.delete_mesh();
 
     // read tree from file
     err = mb.load_file( "tree.h5m" );
-    remove( "tree.h5m" );
-    CHECK_ERR( err );
+    remove( "tree.h5m" );CHECK_ERR( err );
 
     // get tag handle by name, because the handle may have changed
-    err = mb.tag_get_handle( TAG_NAME, 1, MB_TYPE_INTEGER, tag );
-    CHECK_ERR( err );
+    err = mb.tag_get_handle( TAG_NAME, 1, MB_TYPE_INTEGER, tag );CHECK_ERR( err );
 
     // get root handle for tree
     Range range;
@@ -262,12 +250,10 @@ void test_tree_delete()
     Tag data;
     create_tree( tool, DEPTH, INTERVALS, &data );
 
-    err = tool.reset_tree();
-    CHECK_ERR( err );
+    err = tool.reset_tree();CHECK_ERR( err );
 
     Range ents;
-    err = mb.get_entities_by_type_and_tag( 0, MBENTITYSET, &data, 0, 1, ents );
-    CHECK_ERR( err );
+    err = mb.get_entities_by_type_and_tag( 0, MBENTITYSET, &data, 0, 1, ents );CHECK_ERR( err );
     CHECK( ents.empty() );
 }
 
@@ -278,8 +264,7 @@ void test_iterator_back()
     const EntityHandle root = create_tree( tool, DEPTH, INTERVALS );
 
     AdaptiveKDTreeIter iter;
-    ErrorCode rval = tool.get_tree_iterator( root, iter );
-    CHECK_ERR( rval );
+    ErrorCode rval = tool.get_tree_iterator( root, iter );CHECK_ERR( rval );
 
     CartVect min( iter.box_min() );
     CartVect max( iter.box_max() );
@@ -288,8 +273,7 @@ void test_iterator_back()
     // going back from first location should fail.
     rval = iter.back();
     CHECK_EQUAL( MB_ENTITY_NOT_FOUND, rval );
-    rval = tool.get_tree_iterator( root, iter );
-    CHECK_ERR( rval );
+    rval = tool.get_tree_iterator( root, iter );CHECK_ERR( rval );
 
     // make sure iterator is valid
     CHECK_REAL_EQUAL( min[0], iter.box_min()[0], DBL_EPSILON );
@@ -308,8 +292,7 @@ void test_iterator_back()
         EntityHandle next_leaf = iter.handle();
 
         // step back to previous location
-        rval = iter.back();
-        CHECK_ERR( rval );
+        rval = iter.back();CHECK_ERR( rval );
 
         // check expected values for previous location
         CHECK_REAL_EQUAL( min[0], iter.box_min()[0], DBL_EPSILON );
@@ -321,8 +304,7 @@ void test_iterator_back()
         CHECK_EQUAL( leaf, iter.handle() );
 
         // advance iterator to 'current' location
-        rval = iter.step();
-        CHECK_ERR( rval );
+        rval = iter.step();CHECK_ERR( rval );
 
         // check that iterator values are correct
         CHECK_REAL_EQUAL( next_min[0], iter.box_min()[0], DBL_EPSILON );
@@ -355,15 +337,12 @@ void test_point_search()
     CartVect right( CartVect( INTERVALS ) - left );
 
     // compare leaf search to iterator search
-    rval = tool.point_search( left.array(), leaf );
-    CHECK_ERR( rval );
-    rval = tool.point_search( left.array(), iter );
-    CHECK_ERR( rval );
+    rval = tool.point_search( left.array(), leaf );CHECK_ERR( rval );
+    rval = tool.point_search( left.array(), iter );CHECK_ERR( rval );
     CHECK_EQUAL( leaf, iter.handle() );
 
     // iterator should be at 'first' leaf
-    rval = tool.get_tree_iterator( root, iter2 );
-    CHECK_ERR( rval );
+    rval = tool.get_tree_iterator( root, iter2 );CHECK_ERR( rval );
     for( ;; )
     {
         CHECK_EQUAL( iter.handle(), iter2.handle() );
@@ -376,22 +355,17 @@ void test_point_search()
         CHECK_REAL_EQUAL( iter.box_max()[2], iter2.box_max()[2], DBL_EPSILON );
 
         rval = iter2.step();
-        if( MB_ENTITY_NOT_FOUND == rval ) break;
-        CHECK_ERR( rval );
-        rval = iter.step();
-        CHECK_ERR( rval );
+        if( MB_ENTITY_NOT_FOUND == rval ) break;CHECK_ERR( rval );
+        rval = iter.step();CHECK_ERR( rval );
     }
 
     // compare leaf search to iterator search
-    rval = tool.point_search( right.array(), leaf, 0.0, 0.0, NULL, const_cast< EntityHandle* >( &root ) );
-    CHECK_ERR( rval );
-    rval = tool.point_search( right.array(), iter, 0.0, 0.0, NULL, const_cast< EntityHandle* >( &root ) );
-    CHECK_ERR( rval );
+    rval = tool.point_search( right.array(), leaf, 0.0, 0.0, NULL, const_cast< EntityHandle* >( &root ) );CHECK_ERR( rval );
+    rval = tool.point_search( right.array(), iter, 0.0, 0.0, NULL, const_cast< EntityHandle* >( &root ) );CHECK_ERR( rval );
     assert( iter.handle() == leaf );
 
     // iterator should be at 'last' leaf
-    rval = tool.get_last_iterator( root, iter2 );
-    CHECK_ERR( rval );
+    rval = tool.get_last_iterator( root, iter2 );CHECK_ERR( rval );
     for( ;; )
     {
         CHECK_EQUAL( iter.handle(), iter2.handle() );
@@ -404,9 +378,7 @@ void test_point_search()
         CHECK_REAL_EQUAL( iter.box_max()[2], iter2.box_max()[2], DBL_EPSILON );
 
         rval = iter2.back();
-        if( MB_ENTITY_NOT_FOUND == rval ) break;
-        CHECK_ERR( rval );
-        rval = iter.back();
-        CHECK_ERR( rval );
+        if( MB_ENTITY_NOT_FOUND == rval ) break;CHECK_ERR( rval );
+        rval = iter.back();CHECK_ERR( rval );
     }
 }

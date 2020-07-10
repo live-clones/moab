@@ -60,8 +60,7 @@ ErrorCode read_file_( Interface& moab, const char* input_file, const char* optio
 
 void read_file( Interface& moab, const char* input_file, const char* options )
 {
-    ErrorCode rval = read_file_( moab, input_file, options );
-    CHECK_ERR( rval );
+    ErrorCode rval = read_file_( moab, input_file, options );CHECK_ERR( rval );
 }
 
 void convert_file( const char* input_file, const char* output_file, const char* options )
@@ -69,11 +68,9 @@ void convert_file( const char* input_file, const char* output_file, const char* 
     ErrorCode rval;
     Core moab;
 
-    rval = moab.load_file( input_file );
-    CHECK_ERR( rval );
+    rval = moab.load_file( input_file );CHECK_ERR( rval );
 
-    rval = moab.write_file( output_file, "STL", options );
-    CHECK_ERR( rval );
+    rval = moab.write_file( output_file, "STL", options );CHECK_ERR( rval );
 }
 
 void test_read_ascii()
@@ -170,12 +167,9 @@ void check_mesh_is_tet( Interface& moab )
 {
     ErrorCode rval;
     Range verts, tris, other;
-    rval = moab.get_entities_by_type( 0, MBVERTEX, verts );
-    CHECK_ERR( rval );
-    rval = moab.get_entities_by_type( 0, MBTRI, tris );
-    CHECK_ERR( rval );
-    rval = moab.get_entities_by_handle( 0, other );
-    CHECK_ERR( rval );
+    rval = moab.get_entities_by_type( 0, MBVERTEX, verts );CHECK_ERR( rval );
+    rval = moab.get_entities_by_type( 0, MBTRI, tris );CHECK_ERR( rval );
+    rval = moab.get_entities_by_handle( 0, other );CHECK_ERR( rval );
 
     CHECK_EQUAL( 4, (int)verts.size() );
     CHECK_EQUAL( 4, (int)tris.size() );
@@ -188,8 +182,7 @@ void check_mesh_is_tet( Interface& moab )
     for( Range::iterator i = verts.begin(); i != verts.end(); ++i )
     {
         double coords[3];
-        rval = moab.get_coords( &*i, 1, coords );
-        CHECK_ERR( rval );
+        rval = moab.get_coords( &*i, 1, coords );CHECK_ERR( rval );
 
         bool found = false;
         for( int j = 0; j < 4; ++j )
@@ -218,8 +211,7 @@ void check_mesh_is_tet( Interface& moab )
     {
         const EntityHandle* conn = 0;
         int len                  = 0;
-        rval                     = moab.get_connectivity( *i, conn, len );
-        CHECK_ERR( rval );
+        rval                     = moab.get_connectivity( *i, conn, len );CHECK_ERR( rval );
         CHECK_EQUAL( 3, len );
 
         int conn_idx[3] = { static_cast< int >( std::find( vert_handles, vert_handles + 4, conn[0] ) - vert_handles ),

@@ -366,8 +366,7 @@ void ParallelHelperImpl::smoothing_init( MsqError& err )
     if( nprocs == 1 ) return;
 
     /* get the vertices */
-    mesh->get_all_vertices( vertices, err );
-    MSQ_ERRRTN( err );
+    mesh->get_all_vertices( vertices, err );MSQ_ERRRTN( err );
     num_vertex = vertices.size();
 
     /* allocate the data arrays we'll use for smoothing */
@@ -376,12 +375,9 @@ void ParallelHelperImpl::smoothing_init( MsqError& err )
     std::vector< unsigned char > app_fixed( num_vertex );
 
     /* get the data from the mesquite mesh */
-    mesh->vertices_get_global_id( ARRPTR( vertices ), ARRPTR( gid ), num_vertex, err );
-    MSQ_ERRRTN( err );
-    mesh->vertices_get_byte( ARRPTR( vertices ), ARRPTR( app_fixed ), num_vertex, err );
-    MSQ_ERRRTN( err );
-    mesh->vertices_get_processor_id( ARRPTR( vertices ), ARRPTR( proc_owner ), num_vertex, err );
-    MSQ_ERRRTN( err );
+    mesh->vertices_get_global_id( ARRPTR( vertices ), ARRPTR( gid ), num_vertex, err );MSQ_ERRRTN( err );
+    mesh->vertices_get_byte( ARRPTR( vertices ), ARRPTR( app_fixed ), num_vertex, err );MSQ_ERRRTN( err );
+    mesh->vertices_get_processor_id( ARRPTR( vertices ), ARRPTR( proc_owner ), num_vertex, err );MSQ_ERRRTN( err );
     if( 0 )
     {
         int ncull = 0;
@@ -402,17 +398,14 @@ void ParallelHelperImpl::smoothing_init( MsqError& err )
     for( i = 0; i < num_vertex; i++ )
         lid[i] = i;
     const char LOCAL_ID_NAME[] = "LOCAL_ID";
-    TagHandle lid_tag          = mesh->tag_create( LOCAL_ID_NAME, Mesh::INT, 1, NULL, err );
-    MSQ_ERRRTN( err );
-    mesh->tag_set_vertex_data( lid_tag, num_vertex, ARRPTR( vertices ), ARRPTR( lid ), err );
-    MSQ_ERRRTN( err );
+    TagHandle lid_tag          = mesh->tag_create( LOCAL_ID_NAME, Mesh::INT, 1, NULL, err );MSQ_ERRRTN( err );
+    mesh->tag_set_vertex_data( lid_tag, num_vertex, ARRPTR( vertices ), ARRPTR( lid ), err );MSQ_ERRRTN( err );
 
     if( 0 ) printf( "[%d] set local tags on %d vertices\n", rank, num_vertex );
 
     /* get the elements */
     std::vector< MBMesquite::Mesh::ElementHandle > elements;
-    mesh->get_all_elements( elements, err );
-    MSQ_ERRRTN( err );
+    mesh->get_all_elements( elements, err );MSQ_ERRRTN( err );
     int num_elems = elements.size();
 
     /****************************************************************
@@ -1057,8 +1050,7 @@ void ParallelHelperImpl::communicate_first_independent_set( MsqError& err )
             num_already_recv_vertices = comm_smoothed_vtx_b_no_all( err );
             break;
     }
-    global_work_remains = ( neighbourProc.size() ? 1 : 0 );
-    MSQ_CHKERR( err );
+    global_work_remains = ( neighbourProc.size() ? 1 : 0 );MSQ_CHKERR( err );
 }
 
 bool ParallelHelperImpl::compute_next_independent_set()
@@ -1170,14 +1162,11 @@ void ParallelHelperImpl::smoothing_close( MsqError& err )
     {
         /* get the tags so we can find the requested vertices */
         std::vector< size_t > gid( num_vertex );
-        mesh->vertices_get_global_id( ARRPTR( vertices ), ARRPTR( gid ), num_vertex, err );
-        MSQ_ERRRTN( err );
+        mesh->vertices_get_global_id( ARRPTR( vertices ), ARRPTR( gid ), num_vertex, err );MSQ_ERRRTN( err );
         std::vector< unsigned char > app_fixed( num_vertex );
-        mesh->vertices_get_byte( ARRPTR( vertices ), ARRPTR( app_fixed ), num_vertex, err );
-        MSQ_ERRRTN( err );
+        mesh->vertices_get_byte( ARRPTR( vertices ), ARRPTR( app_fixed ), num_vertex, err );MSQ_ERRRTN( err );
         std::vector< int > proc_owner( num_vertex );
-        mesh->vertices_get_processor_id( ARRPTR( vertices ), ARRPTR( proc_owner ), num_vertex, err );
-        MSQ_ERRRTN( err );
+        mesh->vertices_get_processor_id( ARRPTR( vertices ), ARRPTR( proc_owner ), num_vertex, err );MSQ_ERRRTN( err );
 
         if( 0 )
         {
@@ -1213,8 +1202,7 @@ void ParallelHelperImpl::smoothing_close( MsqError& err )
         for( i = 0; i < update_num_vtx; i++ )
         {
             j = vertex_map_find( temp_vid_map, update_gid[i], rank );
-            mesh->vertices_get_coordinates( &( vertices[j] ), &coordinates, 1, err );
-            MSQ_ERRRTN( err );
+            mesh->vertices_get_coordinates( &( vertices[j] ), &coordinates, 1, err );MSQ_ERRRTN( err );
             update_updates[3 * i + 0] = coordinates[0];
             update_updates[3 * i + 1] = coordinates[1];
             update_updates[3 * i + 2] = coordinates[2];
@@ -1279,8 +1267,7 @@ void ParallelHelperImpl::smoothing_close( MsqError& err )
             coordinates[2] = unghost_updates[3 * i + 2];
             //      printf("[%d] recv %g %g %g\n", rank, coordinates[0], coordinates[1],
             //      coordinates[2]);
-            mesh->vertex_set_coordinates( unghost_vertices[i], coordinates, err );
-            MSQ_ERRRTN( err );
+            mesh->vertex_set_coordinates( unghost_vertices[i], coordinates, err );MSQ_ERRRTN( err );
         }
 
         /* deallocate more arrays that we no longer need */

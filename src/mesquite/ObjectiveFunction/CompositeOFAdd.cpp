@@ -81,10 +81,8 @@ CompositeOFAdd::~CompositeOFAdd()
 
 void CompositeOFAdd::initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings, MsqError& err )
 {
-    objFunc1->initialize_queue( mesh_and_domain, settings, err );
-    MSQ_ERRRTN( err );
-    objFunc2->initialize_queue( mesh_and_domain, settings, err );
-    MSQ_ERRRTN( err );
+    objFunc1->initialize_queue( mesh_and_domain, settings, err );MSQ_ERRRTN( err );
+    objFunc2->initialize_queue( mesh_and_domain, settings, err );MSQ_ERRRTN( err );
 }
 
 bool CompositeOFAdd::initialize_block_coordinate_descent( MeshDomainAssoc* mesh_and_domain, const Settings* settings,

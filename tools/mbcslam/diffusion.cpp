@@ -76,8 +76,7 @@ ErrorCode add_field_value( Interface* mb, EntityHandle euler_set, int rank, Tag&
     void* data;  // pointer to the LOC in memory, for each vertex
     int count;
 
-    rval = mb->tag_iterate( tagTracer, connecVerts.begin(), connecVerts.end(), count, data );
-    MB_CHK_ERR( rval );
+    rval = mb->tag_iterate( tagTracer, connecVerts.begin(), connecVerts.end(), count, data );MB_CHK_ERR( rval );
     // here we are checking contiguity
     assert( count == (int)connecVerts.size() );
     double* ptr_DP = (double*)data;
@@ -93,8 +92,7 @@ ErrorCode add_field_value( Interface* mb, EntityHandle euler_set, int rank, Tag&
         {
             EntityHandle oldV = *vit;
             CartVect posi;
-            rval = mb->get_coords( &oldV, 1, &( posi[0] ) );
-            MB_CHK_ERR( rval );
+            rval = mb->get_coords( &oldV, 1, &( posi[0] ) );MB_CHK_ERR( rval );
 
             moab::IntxUtils::SphereCoords sphCoord = moab::IntxUtils::cart_to_spherical( posi );
 
@@ -120,8 +118,7 @@ ErrorCode add_field_value( Interface* mb, EntityHandle euler_set, int rank, Tag&
         {
             EntityHandle oldV = *vit;
             CartVect posi;
-            rval = mb->get_coords( &oldV, 1, &( posi[0] ) );
-            MB_CHK_ERR( rval );
+            rval = mb->get_coords( &oldV, 1, &( posi[0] ) );MB_CHK_ERR( rval );
 
             moab::IntxUtils::SphereCoords sphCoord = moab::IntxUtils::cart_to_spherical( posi );
 
@@ -139,8 +136,7 @@ ErrorCode add_field_value( Interface* mb, EntityHandle euler_set, int rank, Tag&
         {
             EntityHandle oldV = *vit;
             CartVect posi;
-            rval = mb->get_coords( &oldV, 1, &( posi[0] ) );
-            MB_CHK_ERR( rval );
+            rval = mb->get_coords( &oldV, 1, &( posi[0] ) );MB_CHK_ERR( rval );
 
             moab::IntxUtils::SphereCoords sphCoord = moab::IntxUtils::cart_to_spherical( posi );
 
@@ -158,24 +154,20 @@ ErrorCode add_field_value( Interface* mb, EntityHandle euler_set, int rank, Tag&
     double local_mass    = 0.;  // this is total mass on one proc
     while( iter != polygons.end() )
     {
-        rval = mb->tag_iterate( tagElem, iter, polygons.end(), count, data );
-        MB_CHK_ERR( rval );
+        rval = mb->tag_iterate( tagElem, iter, polygons.end(), count, data );MB_CHK_ERR( rval );
         double* ptr = (double*)data;
 
-        rval = mb->tag_iterate( tagArea, iter, polygons.end(), count, data );
-        MB_CHK_ERR( rval );
+        rval = mb->tag_iterate( tagArea, iter, polygons.end(), count, data );MB_CHK_ERR( rval );
         double* ptrArea = (double*)data;
         for( int i = 0; i < count; i++, ++iter, ptr++, ptrArea++ )
         {
             const moab::EntityHandle* conn = NULL;
             int num_nodes                  = 0;
-            rval                           = mb->get_connectivity( *iter, conn, num_nodes );
-            MB_CHK_ERR( rval );
+            rval                           = mb->get_connectivity( *iter, conn, num_nodes );MB_CHK_ERR( rval );
             if( num_nodes == 0 ) return MB_FAILURE;
             std::vector< double > nodeVals( num_nodes );
             double average = 0.;
-            rval           = mb->tag_get_data( tagTracer, conn, num_nodes, &nodeVals[0] );
-            MB_CHK_ERR( rval );
+            rval           = mb->tag_get_data( tagTracer, conn, num_nodes, &nodeVals[0] );MB_CHK_ERR( rval );
             for( int j = 0; j < num_nodes; j++ )
                 average += nodeVals[j];
             average /= num_nodes;
@@ -184,8 +176,7 @@ ErrorCode add_field_value( Interface* mb, EntityHandle euler_set, int rank, Tag&
             // now get area
             std::vector< double > coords;
             coords.resize( 3 * num_nodes );
-            rval = mb->get_coords( conn, num_nodes, &coords[0] );
-            MB_CHK_ERR( rval );
+            rval = mb->get_coords( conn, num_nodes, &coords[0] );MB_CHK_ERR( rval );
 
             moab::IntxAreaUtils sphAreaUtils;
             *ptrArea = sphAreaUtils.area_spherical_polygon( &coords[0], num_nodes, radius );
@@ -218,8 +209,7 @@ ErrorCode compute_velocity_case1( Interface* mb, EntityHandle euler_set, Tag& ta
     void* data;  // pointer to the velo in memory, for each vertex
     int count;
 
-    rval = mb->tag_iterate( tagh, connecVerts.begin(), connecVerts.end(), count, data );
-    MB_CHK_ERR( rval );
+    rval = mb->tag_iterate( tagh, connecVerts.begin(), connecVerts.end(), count, data );MB_CHK_ERR( rval );
     // here we are checking contiguity
     assert( count == (int)connecVerts.size() );
     double* ptr_velo = (double*)data;
@@ -229,8 +219,7 @@ ErrorCode compute_velocity_case1( Interface* mb, EntityHandle euler_set, Tag& ta
     {
         EntityHandle oldV = *vit;
         CartVect posi;
-        rval = mb->get_coords( &oldV, 1, &( posi[0] ) );
-        MB_CHK_ERR( rval );
+        rval = mb->get_coords( &oldV, 1, &( posi[0] ) );MB_CHK_ERR( rval );
         CartVect velo;
         double t = T * tStep / numSteps;  //
         IntxUtilsCSLAM::velocity_case1( posi, t, velo );
@@ -245,8 +234,7 @@ ErrorCode compute_velocity_case1( Interface* mb, EntityHandle euler_set, Tag& ta
 
     std::stringstream velos;
     velos << "Tracer" << rank << "_" << tStep << ".vtk";
-    rval = mb->write_file( velos.str().c_str(), 0, 0, &euler_set, 1, &tagh, 1 );
-    MB_CHK_ERR( rval );
+    rval = mb->write_file( velos.str().c_str(), 0, 0, &euler_set, 1, &tagh, 1 );MB_CHK_ERR( rval );
 
     return MB_SUCCESS;
 }
@@ -258,69 +246,58 @@ ErrorCode compute_tracer_case1( Interface* mb, Intx2MeshOnSphere& worker, Entity
     ErrorCode rval;
     EntityHandle dum = 0;
     Tag corrTag;
-    rval = mb->tag_get_handle( CORRTAGNAME, 1, MB_TYPE_HANDLE, corrTag, MB_TAG_DENSE, &dum );
-    MB_CHK_ERR( rval );
+    rval = mb->tag_get_handle( CORRTAGNAME, 1, MB_TYPE_HANDLE, corrTag, MB_TAG_DENSE, &dum );MB_CHK_ERR( rval );
 
     double t       = tStep * T / numSteps;  // numSteps is global; so is T
     double delta_t = T / numSteps;          // this is global too, actually
     Range polys;
-    rval = mb->get_entities_by_dimension( euler_set, 2, polys );
-    MB_CHK_ERR( rval );
+    rval = mb->get_entities_by_dimension( euler_set, 2, polys );MB_CHK_ERR( rval );
 
     // change coordinates of lagr mesh vertices
     for( Range::iterator vit = connecVerts.begin(); vit != connecVerts.end(); ++vit )
     {
         EntityHandle oldV = *vit;
         CartVect posi;
-        rval = mb->get_coords( &oldV, 1, &( posi[0] ) );
-        MB_CHK_ERR( rval );
+        rval = mb->get_coords( &oldV, 1, &( posi[0] ) );MB_CHK_ERR( rval );
         // Intx utils, case 1
         CartVect newPos;
         IntxUtilsCSLAM::departure_point_case1( posi, t, delta_t, newPos );
         newPos = radius * newPos;  // do we need this? the radius should be 1
         EntityHandle new_vert;
-        rval = mb->tag_get_data( corrTag, &oldV, 1, &new_vert );
-        MB_CHK_ERR( rval );
+        rval = mb->tag_get_data( corrTag, &oldV, 1, &new_vert );MB_CHK_ERR( rval );
         // set the new position for the new vertex
-        rval = mb->set_coords( &new_vert, 1, &( newPos[0] ) );
-        MB_CHK_ERR( rval );
+        rval = mb->set_coords( &new_vert, 1, &( newPos[0] ) );MB_CHK_ERR( rval );
     }
 
     // if in parallel, we have to move some elements to another proc, and receive other cells
     // from other procs
     // lagr and euler are preserved
     EntityHandle covering_set;
-    rval = worker.create_departure_mesh_3rd_alg( lagr_set, covering_set );
-    MB_CHK_ERR( rval );
+    rval = worker.create_departure_mesh_3rd_alg( lagr_set, covering_set );MB_CHK_ERR( rval );
     if( writeFiles )  // so if write
     {
         std::stringstream departureMesh;
         departureMesh << "Departure" << rank << "_" << tStep << ".vtk";
-        rval = mb->write_file( departureMesh.str().c_str(), 0, 0, &lagr_set, 1 );
-        MB_CHK_ERR( rval );
+        rval = mb->write_file( departureMesh.str().c_str(), 0, 0, &lagr_set, 1 );MB_CHK_ERR( rval );
 
         std::stringstream newTracer;
         newTracer << "Tracer" << rank << "_" << tStep << ".vtk";
-        rval = mb->write_file( newTracer.str().c_str(), 0, 0, &euler_set, 1 );
-        MB_CHK_ERR( rval );
+        rval = mb->write_file( newTracer.str().c_str(), 0, 0, &euler_set, 1 );MB_CHK_ERR( rval );
 
         std::stringstream lagr_cover;
         lagr_cover << "Cover" << rank << "_" << tStep << ".vtk";
-        rval = mb->write_file( lagr_cover.str().c_str(), 0, 0, &covering_set, 1 );
-        MB_CHK_ERR( rval );
+        rval = mb->write_file( lagr_cover.str().c_str(), 0, 0, &covering_set, 1 );MB_CHK_ERR( rval );
     }
     // so we have now the departure at the previous time
     // intersect the 2 meshes (what about some checking of convexity?) for sufficient
     // small dt, it is not an issue;
 
-    rval = worker.intersect_meshes( covering_set, euler_set, out_set );
-    MB_CHK_ERR( rval );
+    rval = worker.intersect_meshes( covering_set, euler_set, out_set );MB_CHK_ERR( rval );
     if( writeFiles )  // so if write
     {
         std::stringstream intx_mesh;
         intx_mesh << "Intx" << rank << "_" << tStep << ".vtk";
-        rval = mb->write_file( intx_mesh.str().c_str(), 0, 0, &out_set, 1 );
-        MB_CHK_ERR( rval );
+        rval = mb->write_file( intx_mesh.str().c_str(), 0, 0, &out_set, 1 );MB_CHK_ERR( rval );
     }
 
     // serially: lagr is the same order as euler;
@@ -331,11 +308,9 @@ ErrorCode compute_tracer_case1( Interface* mb, Intx2MeshOnSphere& worker, Entity
         std::stringstream resTrace;
         resTrace << "Tracer"
                  << "_" << tStep - 1 << ".h5m";
-        rval = mb->write_file( resTrace.str().c_str(), 0, "PARALLEL=WRITE_PART", &euler_set, 1, &tagElem, 1 );
-        MB_CHK_ERR( rval );
+        rval = mb->write_file( resTrace.str().c_str(), 0, "PARALLEL=WRITE_PART", &euler_set, 1, &tagElem, 1 );MB_CHK_ERR( rval );
     }
-    rval = worker.update_tracer_data( out_set, tagElem, tagArea );
-    MB_CHK_ERR( rval );
+    rval = worker.update_tracer_data( out_set, tagElem, tagArea );MB_CHK_ERR( rval );
 
     if( parallelWrite )
     {
@@ -349,40 +324,32 @@ ErrorCode compute_tracer_case1( Interface* mb, Intx2MeshOnSphere& worker, Entity
     {
         std::stringstream newIntx;
         newIntx << "newIntx" << rank << "_" << tStep << ".vtk";
-        rval = mb->write_file( newIntx.str().c_str(), 0, 0, &out_set, 1 );
-        MB_CHK_ERR( rval );
+        rval = mb->write_file( newIntx.str().c_str(), 0, 0, &out_set, 1 );MB_CHK_ERR( rval );
     }
     // delete now the polygons and the elements of out_set
     // also, all verts that are not in euler set or lagr_set
     Range allVerts;
-    rval = mb->get_entities_by_dimension( 0, 0, allVerts );
-    MB_CHK_ERR( rval );
+    rval = mb->get_entities_by_dimension( 0, 0, allVerts );MB_CHK_ERR( rval );
 
     Range allElems;
-    rval = mb->get_entities_by_dimension( 0, 2, allElems );
-    MB_CHK_ERR( rval );
+    rval = mb->get_entities_by_dimension( 0, 2, allElems );MB_CHK_ERR( rval );
 
     // add to polys range the lagr polys
     // do not delete lagr set either, with its vertices
-    rval = mb->get_entities_by_dimension( lagr_set, 2, polys );
-    MB_CHK_ERR( rval );
+    rval = mb->get_entities_by_dimension( lagr_set, 2, polys );MB_CHK_ERR( rval );
     // add to the connecVerts range all verts, from all initial polys
     Range vertsToStay;
-    rval = mb->get_connectivity( polys, vertsToStay );
-    MB_CHK_ERR( rval );
+    rval = mb->get_connectivity( polys, vertsToStay );MB_CHK_ERR( rval );
 
     Range todeleteVerts = subtract( allVerts, vertsToStay );
 
     Range todeleteElem = subtract( allElems, polys );
 
     // empty the out mesh set
-    rval = mb->clear_meshset( &out_set, 1 );
-    MB_CHK_ERR( rval );
+    rval = mb->clear_meshset( &out_set, 1 );MB_CHK_ERR( rval );
 
-    rval = mb->delete_entities( todeleteElem );
-    MB_CHK_ERR( rval );
-    rval = mb->delete_entities( todeleteVerts );
-    MB_CHK_ERR( rval );
+    rval = mb->delete_entities( todeleteElem );MB_CHK_ERR( rval );
+    rval = mb->delete_entities( todeleteVerts );MB_CHK_ERR( rval );
     if( rank == 0 ) std::cout << " step: " << tStep << "\n";
     return rval;
 }
@@ -432,16 +399,13 @@ int main( int argc, char** argv )
     Interface& mb = moab;
     EntityHandle euler_set;
     ErrorCode rval;
-    rval = mb.create_meshset( MESHSET_SET, euler_set );
-    MB_CHK_ERR( rval );
+    rval = mb.create_meshset( MESHSET_SET, euler_set );MB_CHK_ERR( rval );
 
-    rval = mb.load_file( filename_mesh1, &euler_set, optsRead.c_str() );
-    MB_CHK_ERR( rval );
+    rval = mb.load_file( filename_mesh1, &euler_set, optsRead.c_str() );MB_CHK_ERR( rval );
 
     ParallelComm* pcomm = ParallelComm::get_pcomm( &mb, 0 );
 
-    rval = pcomm->check_all_shared_handles();
-    MB_CHK_ERR( rval );
+    rval = pcomm->check_all_shared_handles();MB_CHK_ERR( rval );
 
     int rank = pcomm->proc_config().proc_rank();
 
@@ -457,49 +421,39 @@ int main( int argc, char** argv )
     // tagTracer is the value at nodes
     Tag tagTracer = 0;
     std::string tag_name( "Tracer" );
-    rval = mb.tag_get_handle( tag_name.c_str(), 1, MB_TYPE_DOUBLE, tagTracer, MB_TAG_DENSE | MB_TAG_CREAT );
-    MB_CHK_ERR( rval );
+    rval = mb.tag_get_handle( tag_name.c_str(), 1, MB_TYPE_DOUBLE, tagTracer, MB_TAG_DENSE | MB_TAG_CREAT );MB_CHK_ERR( rval );
 
     // tagElem is the average computed at each element, from nodal values
     Tag tagElem = 0;
     std::string tag_name2( "TracerAverage" );
-    rval = mb.tag_get_handle( tag_name2.c_str(), 1, MB_TYPE_DOUBLE, tagElem, MB_TAG_DENSE | MB_TAG_CREAT );
-    MB_CHK_ERR( rval );
+    rval = mb.tag_get_handle( tag_name2.c_str(), 1, MB_TYPE_DOUBLE, tagElem, MB_TAG_DENSE | MB_TAG_CREAT );MB_CHK_ERR( rval );
 
     // area of the euler element is fixed, store it; it is used to recompute the averages at each
     // time step
     Tag tagArea = 0;
     std::string tag_name4( "Area" );
-    rval = mb.tag_get_handle( tag_name4.c_str(), 1, MB_TYPE_DOUBLE, tagArea, MB_TAG_DENSE | MB_TAG_CREAT );
-    MB_CHK_ERR( rval );
+    rval = mb.tag_get_handle( tag_name4.c_str(), 1, MB_TYPE_DOUBLE, tagArea, MB_TAG_DENSE | MB_TAG_CREAT );MB_CHK_ERR( rval );
 
     // add a field value, quasi smooth first
-    rval = add_field_value( &mb, euler_set, rank, tagTracer, tagElem, tagArea );
-    MB_CHK_ERR( rval );
+    rval = add_field_value( &mb, euler_set, rank, tagTracer, tagElem, tagArea );MB_CHK_ERR( rval );
 
     // iniVals are used for 1-norm error computation
     Range redEls;
-    rval = mb.get_entities_by_dimension( euler_set, 2, redEls );
-    MB_CHK_ERR( rval );
+    rval = mb.get_entities_by_dimension( euler_set, 2, redEls );MB_CHK_ERR( rval );
     std::vector< double > iniVals( redEls.size() );
-    rval = mb.tag_get_data( tagElem, redEls, &iniVals[0] );
-    MB_CHK_ERR( rval );
+    rval = mb.tag_get_data( tagElem, redEls, &iniVals[0] );MB_CHK_ERR( rval );
 
     Tag tagh = 0;
     std::string tag_name3( "Case1" );
-    rval = mb.tag_get_handle( tag_name3.c_str(), 3, MB_TYPE_DOUBLE, tagh, MB_TAG_DENSE | MB_TAG_CREAT );
-    MB_CHK_ERR( rval );
+    rval = mb.tag_get_handle( tag_name3.c_str(), 3, MB_TYPE_DOUBLE, tagh, MB_TAG_DENSE | MB_TAG_CREAT );MB_CHK_ERR( rval );
 
     EntityHandle out_set, lagr_set;
-    rval = mb.create_meshset( MESHSET_SET, out_set );
-    MB_CHK_ERR( rval );
-    rval = mb.create_meshset( MESHSET_SET, lagr_set );
-    MB_CHK_ERR( rval );
+    rval = mb.create_meshset( MESHSET_SET, out_set );MB_CHK_ERR( rval );
+    rval = mb.create_meshset( MESHSET_SET, lagr_set );MB_CHK_ERR( rval );
     // copy the initial mesh in the lagrangian set
     // initial vertices will be at the same position as euler;
 
-    rval = IntxUtilsCSLAM::deep_copy_set( &mb, euler_set, lagr_set );
-    MB_CHK_ERR( rval );
+    rval = IntxUtilsCSLAM::deep_copy_set( &mb, euler_set, lagr_set );MB_CHK_ERR( rval );
 
     Intx2MeshOnSphere worker( &mb );
     worker.set_radius_source_mesh( radius );
@@ -507,12 +461,10 @@ int main( int argc, char** argv )
     worker.set_error_tolerance( gtol );
     worker.set_parallel_comm( pcomm );
 
-    rval = worker.FindMaxEdges( lagr_set, euler_set );
-    MB_CHK_ERR( rval );
+    rval = worker.FindMaxEdges( lagr_set, euler_set );MB_CHK_ERR( rval );
     Range local_verts;
     // output also the local_verts
-    rval = worker.build_processor_euler_boxes( euler_set, local_verts );
-    MB_CHK_ERR( rval );
+    rval = worker.build_processor_euler_boxes( euler_set, local_verts );MB_CHK_ERR( rval );
     // these stay fixed for one run
     // other things from intersection might need to change, like input blue set (departure set)
     // so we need also a method to clean memory
@@ -524,15 +476,13 @@ int main( int argc, char** argv )
         // the compute_tracer_case1 method actually computes the departure point position
         if( velocity )
         {
-            rval = compute_velocity_case1( &mb, euler_set, tagh, rank, i );
-            MB_CHK_ERR( rval );
+            rval = compute_velocity_case1( &mb, euler_set, tagh, rank, i );MB_CHK_ERR( rval );
         }
 
         // this is to actually compute concentrations at time step i, using the
         //  current concentrations
         rval =
-            compute_tracer_case1( &mb, worker, euler_set, lagr_set, out_set, tagElem, tagArea, rank, i, local_verts );
-        MB_CHK_ERR( rval );
+            compute_tracer_case1( &mb, worker, euler_set, lagr_set, out_set, tagElem, tagArea, rank, i, local_verts );MB_CHK_ERR( rval );
     }
 
     // final vals and 1-norm
@@ -543,12 +493,10 @@ int main( int argc, char** argv )
     int j = 0;  // index in iniVals
     while( iter != redEls.end() )
     {
-        rval = mb.tag_iterate( tagElem, iter, redEls.end(), count, data );
-        MB_CHK_ERR( rval );
+        rval = mb.tag_iterate( tagElem, iter, redEls.end(), count, data );MB_CHK_ERR( rval );
         double* ptrTracer = (double*)data;
 
-        rval = mb.tag_iterate( tagArea, iter, redEls.end(), count, data );
-        MB_CHK_ERR( rval );
+        rval = mb.tag_iterate( tagArea, iter, redEls.end(), count, data );MB_CHK_ERR( rval );
         double* ptrArea = (double*)data;
         for( int i = 0; i < count; i++, ++iter, ptrTracer++, ptrArea++, j++ )
         {

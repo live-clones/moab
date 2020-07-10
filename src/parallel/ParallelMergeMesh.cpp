@@ -27,8 +27,7 @@ ParallelMergeMesh::ParallelMergeMesh( ParallelComm* pc, const double epsilon ) :
 // Merges elements within a proximity of epsilon
 ErrorCode ParallelMergeMesh::merge( EntityHandle levelset, bool skip_local_merge, int dim )
 {
-    ErrorCode rval = PerformMerge( levelset, skip_local_merge, dim );
-    MB_CHK_ERR( rval );
+    ErrorCode rval = PerformMerge( levelset, skip_local_merge, dim );MB_CHK_ERR( rval );
     CleanUp();
     return rval;
 }
@@ -40,8 +39,7 @@ ErrorCode ParallelMergeMesh::PerformMerge( EntityHandle levelset, bool skip_loca
     ErrorCode rval;
     if( dim < 0 )
     {
-        rval = myMB->get_dimension( dim );
-        MB_CHK_ERR( rval );
+        rval = myMB->get_dimension( dim );MB_CHK_ERR( rval );
     }
 
     // Get the local skin elements
@@ -51,14 +49,12 @@ ErrorCode ParallelMergeMesh::PerformMerge( EntityHandle levelset, bool skip_loca
 
     // Determine the global bounding box
     double gbox[6];
-    rval = GetGlobalBox( gbox );
-    MB_CHK_ERR( rval );
+    rval = GetGlobalBox( gbox );MB_CHK_ERR( rval );
 
     /* Assemble The Destination Tuples */
     // Get a list of tuples which contain (toProc, handle, x,y,z)
     myTup.initialize( 1, 0, 1, 3, mySkinEnts[0].size() );
-    rval = PopulateMyTup( gbox );
-    MB_CHK_ERR( rval );
+    rval = PopulateMyTup( gbox );MB_CHK_ERR( rval );
 
     /* Gather-Scatter Tuple
        -tup comes out as (remoteProc,handle,x,y,z) */
@@ -75,8 +71,7 @@ ErrorCode ParallelMergeMesh::PerformMerge( EntityHandle levelset, bool skip_loca
     myMatches.initialize( 2, 0, 2, 0, mySkinEnts[0].size() );
 
     // ID the matching tuples
-    rval = PopulateMyMatches();
-    MB_CHK_ERR( rval );
+    rval = PopulateMyMatches();MB_CHK_ERR( rval );
 
     // We can free up the tuple myTup now
     myTup.reset();
@@ -91,8 +86,7 @@ ErrorCode ParallelMergeMesh::PerformMerge( EntityHandle levelset, bool skip_loca
     SortMyMatches();
 
     // Tag the shared elements
-    rval = TagSharedElements( dim );
-    MB_CHK_ERR( rval );
+    rval = TagSharedElements( dim );MB_CHK_ERR( rval );
 
     // Free up the matches tuples
     myMatches.reset();
@@ -105,14 +99,12 @@ ErrorCode ParallelMergeMesh::PopulateMySkinEnts( const EntityHandle meshset, int
     /*Merge Mesh Locally*/
     // Get all dim dimensional entities
     Range ents;
-    ErrorCode rval = myMB->get_entities_by_dimension( meshset, dim, ents );
-    MB_CHK_ERR( rval );
+    ErrorCode rval = myMB->get_entities_by_dimension( meshset, dim, ents );MB_CHK_ERR( rval );
 
     if( ents.empty() && dim == 3 )
     {
         dim--;
-        rval = myMB->get_entities_by_dimension( meshset, dim, ents );
-        MB_CHK_ERR( rval );  // maybe dimension 2
+        rval = myMB->get_entities_by_dimension( meshset, dim, ents );MB_CHK_ERR( rval );  // maybe dimension 2
     }
 
     // Merge Mesh Locally
@@ -125,8 +117,7 @@ ErrorCode ParallelMergeMesh::PopulateMySkinEnts( const EntityHandle meshset, int
 
         // Rebuild the ents range
         ents.clear();
-        rval = myMB->get_entities_by_dimension( meshset, dim, ents );
-        MB_CHK_ERR( rval );
+        rval = myMB->get_entities_by_dimension( meshset, dim, ents );MB_CHK_ERR( rval );
     }
 
     /*Get Skin
@@ -135,8 +126,7 @@ ErrorCode ParallelMergeMesh::PopulateMySkinEnts( const EntityHandle meshset, int
     Skinner skinner( myMB );
     for( int skin_dim = dim; skin_dim >= 0; skin_dim-- )
     {
-        rval = skinner.find_skin( meshset, ents, skin_dim, mySkinEnts[skin_dim] );
-        MB_CHK_ERR( rval );
+        rval = skinner.find_skin( meshset, ents, skin_dim, mySkinEnts[skin_dim] );MB_CHK_ERR( rval );
     }
     return MB_SUCCESS;
 }
@@ -150,8 +140,7 @@ ErrorCode ParallelMergeMesh::GetGlobalBox( double* gbox )
     BoundBox box;
     if( mySkinEnts[0].size() != 0 )
     {
-        rval = box.update( *myMB, mySkinEnts[0] );
-        MB_CHK_ERR( rval );
+        rval = box.update( *myMB, mySkinEnts[0] );MB_CHK_ERR( rval );
     }
 
     // Invert the max
@@ -175,8 +164,7 @@ ErrorCode ParallelMergeMesh::PopulateMyTup( double* gbox )
     /*Figure out how do partition the global box*/
     double lengths[3];
     int parts[3];
-    ErrorCode rval = PartitionGlobalBox( gbox, lengths, parts );
-    MB_CHK_ERR( rval );
+    ErrorCode rval = PartitionGlobalBox( gbox, lengths, parts );MB_CHK_ERR( rval );
 
     /* Get Skin Coordinates, Vertices */
     double* x = new double[mySkinEnts[0].size()];

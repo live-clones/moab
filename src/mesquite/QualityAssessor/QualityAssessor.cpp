@@ -361,8 +361,7 @@ void QualityAssessor::initialize_queue( MeshDomainAssoc* mesh_and_domain, const 
 {
     for( list_type::iterator i = assessList.begin(); i != assessList.end(); ++i )
     {
-        ( *i )->get_metric()->initialize_queue( mesh_and_domain, settings, err );
-        MSQ_ERRRTN( err );
+        ( *i )->get_metric()->initialize_queue( mesh_and_domain, settings, err );MSQ_ERRRTN( err );
     }
 }
 

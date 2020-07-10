@@ -273,26 +273,19 @@ ErrorCode get_sharing_processors( Interface& moab, EntityHandle entity, std::vec
 
     // get tags for parallel data
     Tag sharedp_tag, sharedps_tag, sharedh_tag, sharedhs_tag, pstatus_tag;
-    rval = moab.tag_get_handle( PARALLEL_SHARED_PROC_TAG_NAME, 1, MB_TYPE_INTEGER, sharedp_tag );
-    CHKERR( rval );
-    rval = moab.tag_get_handle( PARALLEL_SHARED_PROCS_TAG_NAME, MAX_SHARING_PROCS, MB_TYPE_INTEGER, sharedps_tag );
-    CHKERR( rval );
-    rval = moab.tag_get_handle( PARALLEL_SHARED_HANDLE_TAG_NAME, 1, MB_TYPE_HANDLE, sharedh_tag );
-    CHKERR( rval );
-    rval = moab.tag_get_handle( PARALLEL_SHARED_HANDLES_TAG_NAME, MAX_SHARING_PROCS, MB_TYPE_HANDLE, sharedhs_tag );
-    CHKERR( rval );
-    rval = moab.tag_get_handle( PARALLEL_STATUS_TAG_NAME, 1, MB_TYPE_OPAQUE, pstatus_tag );
-    CHKERR( rval );
+    rval = moab.tag_get_handle( PARALLEL_SHARED_PROC_TAG_NAME, 1, MB_TYPE_INTEGER, sharedp_tag );CHKERR( rval );
+    rval = moab.tag_get_handle( PARALLEL_SHARED_PROCS_TAG_NAME, MAX_SHARING_PROCS, MB_TYPE_INTEGER, sharedps_tag );CHKERR( rval );
+    rval = moab.tag_get_handle( PARALLEL_SHARED_HANDLE_TAG_NAME, 1, MB_TYPE_HANDLE, sharedh_tag );CHKERR( rval );
+    rval = moab.tag_get_handle( PARALLEL_SHARED_HANDLES_TAG_NAME, MAX_SHARING_PROCS, MB_TYPE_HANDLE, sharedhs_tag );CHKERR( rval );
+    rval = moab.tag_get_handle( PARALLEL_STATUS_TAG_NAME, 1, MB_TYPE_OPAQUE, pstatus_tag );CHKERR( rval );
 
     other_procs_out.clear();
     char status;
-    rval = moab.tag_get_data( pstatus_tag, &entity, 1, &status );
-    CHKERR( rval );
+    rval = moab.tag_get_data( pstatus_tag, &entity, 1, &status );CHKERR( rval );
     if( !( status & PSTATUS_SHARED ) ) return MB_SUCCESS;
 
     int proc_id;
-    rval = moab.tag_get_data( sharedp_tag, &entity, 1, &proc_id );
-    CHKERR( rval );
+    rval = moab.tag_get_data( sharedp_tag, &entity, 1, &proc_id );CHKERR( rval );
     if( proc_id >= 0 )
     {
         other_procs_out.push_back( proc_id );
@@ -300,8 +293,7 @@ ErrorCode get_sharing_processors( Interface& moab, EntityHandle entity, std::vec
     }
 
     int procs[MAX_SHARING_PROCS];
-    rval = moab.tag_get_data( sharedps_tag, &entity, 1, procs );
-    CHKERR( rval );
+    rval = moab.tag_get_data( sharedps_tag, &entity, 1, procs );CHKERR( rval );
     for( int i = 0; i < MAX_SHARING_PROCS && procs[i] >= 0; ++i )
         other_procs_out.push_back( procs[i] );
     return MB_SUCCESS;
@@ -372,14 +364,12 @@ ErrorCode parallel_create_mesh( Interface& mb, int vtx_ids[9], EntityHandle vtx_
     ErrorCode rval;
     Tag id_tag;
 
-    rval = mb.create_vertices( coords, 9, range );
-    CHKERR( rval );
+    rval = mb.create_vertices( coords, 9, range );CHKERR( rval );
     assert( range.size() == 9 );
     std::copy( range.begin(), range.end(), vtx_handles );
     range.clear();
     id_tag = mb.globalId_tag();
-    rval   = mb.tag_set_data( id_tag, vtx_handles, 9, &ids );
-    CHKERR( rval );
+    rval   = mb.tag_set_data( id_tag, vtx_handles, 9, &ids );CHKERR( rval );
 
     const EntityHandle conn[4][4] = { { vtx_handles[0], vtx_handles[3], vtx_handles[4], vtx_handles[1] },
                                       { vtx_handles[1], vtx_handles[4], vtx_handles[5], vtx_handles[2] },
@@ -389,21 +379,17 @@ ErrorCode parallel_create_mesh( Interface& mb, int vtx_ids[9], EntityHandle vtx_
     {
         const int id = 4 * rank + i + 1;
         EntityHandle h;
-        rval = mb.create_element( MBQUAD, conn[i], 4, h );
-        CHKERR( rval );
+        rval = mb.create_element( MBQUAD, conn[i], 4, h );CHKERR( rval );
         range.insert( h );
-        rval = mb.tag_set_data( id_tag, &h, 1, &id );
-        CHKERR( rval );
+        rval = mb.tag_set_data( id_tag, &h, 1, &id );CHKERR( rval );
     }
 
     if( !entity_sets ) return MB_SUCCESS;
 
     int set_ids[3] = { size + 1, rank / 2, rank / 2 + 1 };
     int nsets      = 0;
-    rval           = mb.create_meshset( MESHSET_SET, entity_sets[nsets++] );
-    CHKERR( rval );
-    rval = mb.create_meshset( MESHSET_SET, entity_sets[nsets++] );
-    CHKERR( rval );
+    rval           = mb.create_meshset( MESHSET_SET, entity_sets[nsets++] );CHKERR( rval );
+    rval = mb.create_meshset( MESHSET_SET, entity_sets[nsets++] );CHKERR( rval );
     entity_sets[nsets] = 0;
     if( rank < 2 )
     {  // if first (left-most) column
@@ -411,16 +397,13 @@ ErrorCode parallel_create_mesh( Interface& mb, int vtx_ids[9], EntityHandle vtx_
     }
     else if( rank / 2 < ( size - 1 ) / 2 )
     {  // if not last (right-most) column
-        rval = mb.create_meshset( MESHSET_SET, entity_sets[nsets++] );
-        CHKERR( rval );
+        rval = mb.create_meshset( MESHSET_SET, entity_sets[nsets++] );CHKERR( rval );
     }
     for( int i = 0; i < nsets; ++i )
     {
-        rval = mb.add_entities( entity_sets[0], range );
-        CHKERR( rval );
+        rval = mb.add_entities( entity_sets[0], range );CHKERR( rval );
     }
-    rval = mb.tag_set_data( id_tag, entity_sets, nsets, set_ids );
-    CHKERR( rval );
+    rval = mb.tag_set_data( id_tag, entity_sets, nsets, set_ids );CHKERR( rval );
 
     return MB_SUCCESS;
 }
@@ -441,8 +424,7 @@ ErrorCode test_elements_on_several_procs( const char* filename )
                            "PARTITION=GEOM_DIMENSION;PARTITION_VAL=3;"
                            "PARTITION_DISTRIBUTE;"
                            "PARALLEL_RESOLVE_SHARED_ENTS;"
-                           "PARALLEL_SEQUENCE_FACTOR=1.4" );
-    CHKERR( rval );
+                           "PARALLEL_SEQUENCE_FACTOR=1.4" );CHKERR( rval );
 
     // test contents of interface sets against sharedEnts structure in pcomm;
     int my_error        = 0;
@@ -461,8 +443,7 @@ ErrorCode test_elements_on_several_procs( const char* filename )
     PCHECK( !my_error );
 
     Tag geom_tag, id_tag;
-    rval = moab.tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, geom_tag );
-    CHKERR( rval );
+    rval = moab.tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, geom_tag );CHKERR( rval );
     id_tag = moab.globalId_tag();
 
     // Because we partitioned based on geometric volume sets, then for each
@@ -473,21 +454,18 @@ ErrorCode test_elements_on_several_procs( const char* filename )
     {
         Range geom_sets;
         const void* tagvals[] = { &dim };
-        rval                  = moab.get_entities_by_type_and_tag( 0, MBENTITYSET, &geom_tag, tagvals, 1, geom_sets );
-        CHKERR( rval );
+        rval                  = moab.get_entities_by_type_and_tag( 0, MBENTITYSET, &geom_tag, tagvals, 1, geom_sets );CHKERR( rval );
 
         for( Range::iterator j = geom_sets.begin(); j != geom_sets.end(); ++j )
         {
             Range ents;
-            rval = moab.get_entities_by_dimension( *j, dim, ents );
-            CHKERR( rval );
+            rval = moab.get_entities_by_dimension( *j, dim, ents );CHKERR( rval );
             if( ents.empty() ) continue;
 
             // get a single sharing list to compare with
             Range::iterator k = ents.begin();
             std::vector< int > procs;
-            rval = get_sharing_processors( moab, *k, procs );
-            CHKERR( rval );
+            rval = get_sharing_processors( moab, *k, procs );CHKERR( rval );
             std::sort( procs.begin(), procs.end() );
             if( procs.size() > 1 ) shared.merge( ents );
 
@@ -495,21 +473,18 @@ ErrorCode test_elements_on_several_procs( const char* filename )
             for( ++k; k != ents.end(); ++k )
             {
                 std::vector< int > tmp_procs;
-                rval = get_sharing_processors( moab, *k, tmp_procs );
-                CHKERR( rval );
+                rval = get_sharing_processors( moab, *k, tmp_procs );CHKERR( rval );
                 std::sort( tmp_procs.begin(), tmp_procs.end() );
                 if( tmp_procs != procs ) invalid.insert( *j );
             }
 
             // compare interior vertices
             ents.clear();
-            rval = moab.get_entities_by_dimension( *j, 0, ents );
-            CHKERR( rval );
+            rval = moab.get_entities_by_dimension( *j, 0, ents );CHKERR( rval );
             for( k = ents.begin(); k != ents.end(); ++k )
             {
                 std::vector< int > tmp_procs;
-                rval = get_sharing_processors( moab, *k, tmp_procs );
-                CHKERR( rval );
+                rval = get_sharing_processors( moab, *k, tmp_procs );CHKERR( rval );
                 if( tmp_procs != procs ) invalid.insert( *j );
             }
         }
@@ -542,20 +517,17 @@ ErrorCode test_elements_on_several_procs( const char* filename )
     for( Range::iterator i = shared.begin(); i != shared.end(); ++i )
     {
         std::vector< int > procs;
-        rval = get_sharing_processors( moab, *i, procs );
-        CHKERR( rval );
+        rval = get_sharing_processors( moab, *i, procs );CHKERR( rval );
         std::sort( procs.begin(), procs.end() );
 
         std::vector< EntityHandle > tmp;
         const EntityHandle* conn;
         int len;
-        rval = moab.get_connectivity( *i, conn, len, false, &tmp );
-        CHKERR( rval );
+        rval = moab.get_connectivity( *i, conn, len, false, &tmp );CHKERR( rval );
         for( int j = 0; j < len; ++j )
         {
             std::vector< int > vprocs;
-            rval = get_sharing_processors( moab, conn[j], vprocs );
-            CHKERR( rval );
+            rval = get_sharing_processors( moab, conn[j], vprocs );CHKERR( rval );
             std::sort( vprocs.begin(), vprocs.end() );
             std::vector< int > diff( std::max( procs.size(), vprocs.size() ) );
             std::vector< int >::iterator k =
@@ -585,11 +557,9 @@ ErrorCode get_ghost_entities( ParallelComm& pcomm, Range& ghost_ents )
     Range all_ents;
     ErrorCode rval;
 
-    rval = pcomm.get_moab()->get_entities_by_handle( 0, all_ents );
-    CHKERR( rval );
+    rval = pcomm.get_moab()->get_entities_by_handle( 0, all_ents );CHKERR( rval );
     std::vector< unsigned char > flags( all_ents.size() );
-    rval = pcomm.get_moab()->tag_get_data( pcomm.pstatus_tag(), all_ents, &flags[0] );
-    CHKERR( rval );
+    rval = pcomm.get_moab()->tag_get_data( pcomm.pstatus_tag(), all_ents, &flags[0] );CHKERR( rval );
 
     Range::iterator ins                            = ghost_ents.begin();
     std::vector< unsigned char >::const_iterator f = flags.begin();
@@ -607,13 +577,11 @@ ErrorCode get_ents_from_geometric_sets( Interface& moab, const Tag tags[2], int 
     {
         const void* tag_vals[2] = { &dimension, &ids[i] };
         Range sets;
-        rval = moab.get_entities_by_type_and_tag( 0, MBENTITYSET, tags, tag_vals, 2, sets );
-        CHKERR( rval );
+        rval = moab.get_entities_by_type_and_tag( 0, MBENTITYSET, tags, tag_vals, 2, sets );CHKERR( rval );
         for( Range::iterator j = sets.begin(); j != sets.end(); ++j )
         {
             Range ents;
-            rval = moab.get_entities_by_dimension( *j, dimension, ents );
-            CHKERR( rval );
+            rval = moab.get_entities_by_dimension( *j, dimension, ents );CHKERR( rval );
             results.merge( ents );
         }
     }
@@ -632,37 +600,31 @@ ErrorCode get_expected_ghosts( Interface& moab, const std::vector< int > partiti
 {
     ErrorCode rval;
     Tag tags[2];
-    rval = moab.tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, tags[0] );
-    CHKERR( rval );
+    rval = moab.tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, tags[0] );CHKERR( rval );
     tags[1] = moab.globalId_tag();
 
     // get face entities defining interface
     Range skin;
-    rval = get_ents_from_geometric_sets( moab, tags, 2, partition_geom_ids[2], skin );
-    CHKERR( rval );
+    rval = get_ents_from_geometric_sets( moab, tags, 2, partition_geom_ids[2], skin );CHKERR( rval );
 
     // get adjacent entities
     Range iface_ghosts, iface_ents;
     if( bridge_dimension == 2 ) { iface_ents = skin; }
     else
     {
-        rval = moab.get_adjacencies( skin, bridge_dimension, true, iface_ents, Interface::UNION );
-        CHKERR( rval );
+        rval = moab.get_adjacencies( skin, bridge_dimension, true, iface_ents, Interface::UNION );CHKERR( rval );
     }
     for( int n = 0; n < num_layers; ++n )
     {
         iface_ghosts.clear();
-        rval = moab.get_adjacencies( iface_ents, ghost_dimension, false, iface_ghosts, Interface::UNION );
-        CHKERR( rval );
+        rval = moab.get_adjacencies( iface_ents, ghost_dimension, false, iface_ghosts, Interface::UNION );CHKERR( rval );
         iface_ents.clear();
-        rval = moab.get_adjacencies( iface_ghosts, bridge_dimension, true, iface_ents, Interface::UNION );
-        CHKERR( rval );
+        rval = moab.get_adjacencies( iface_ghosts, bridge_dimension, true, iface_ents, Interface::UNION );CHKERR( rval );
     }
 
     // get volume entities owned by this process
     Range ents;
-    rval = get_ents_from_geometric_sets( moab, tags, 3, partition_geom_ids[3], ents );
-    CHKERR( rval );
+    rval = get_ents_from_geometric_sets( moab, tags, 3, partition_geom_ids[3], ents );CHKERR( rval );
 
     // get entities of ghost_dimension owned by this process
     Range owned;
@@ -670,8 +632,7 @@ ErrorCode get_expected_ghosts( Interface& moab, const std::vector< int > partiti
         owned = ents;
     else
     {
-        rval = moab.get_adjacencies( ents, ghost_dimension, false, owned, Interface::UNION );
-        CHKERR( rval );
+        rval = moab.get_adjacencies( ents, ghost_dimension, false, owned, Interface::UNION );CHKERR( rval );
     }
 
     // remove owned entities from ghost list
@@ -679,8 +640,7 @@ ErrorCode get_expected_ghosts( Interface& moab, const std::vector< int > partiti
 
     // get ids
     ghost_entity_ids.resize( ghosts.size() );
-    rval = moab.tag_get_data( tags[1], ghosts, &ghost_entity_ids[0] );
-    CHKERR( rval );
+    rval = moab.tag_get_data( tags[1], ghosts, &ghost_entity_ids[0] );CHKERR( rval );
     return MB_SUCCESS;
 }
 
@@ -697,11 +657,9 @@ ErrorCode test_ghost_elements( const char* filename, int ghost_dimension, int br
               << "PARALLEL_RESOLVE_SHARED_ENTS;"
               << "PARALLEL_GHOSTS=" << ghost_dimension << '.' << bridge_dimension << '.' << num_layers;
 
-    rval = moab.load_file( filename, 0, file_opts.str().c_str() );
-    CHKERR( rval );
+    rval = moab.load_file( filename, 0, file_opts.str().c_str() );CHKERR( rval );
     Tag geom_tag, id_tag;
-    rval = moab.tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, geom_tag );
-    CHKERR( rval );
+    rval = moab.tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, geom_tag );CHKERR( rval );
     id_tag = moab.globalId_tag();
 
     // Get partition sets
@@ -710,22 +668,19 @@ ErrorCode test_ghost_elements( const char* filename, int ghost_dimension, int br
     partition_geom[3]   = pcomm->partition_sets();
     PCHECK( !partition_geom[3].empty() );
 
-    rval = pcomm->check_all_shared_handles();
-    CHKERR( rval );
+    rval = pcomm->check_all_shared_handles();CHKERR( rval );
 
     // exchange id tags to allow comparison by id
     Range tmp_ents;
     rval = pcomm->get_shared_entities( -1, tmp_ents, -1, false, true );
-    rval = pcomm->exchange_tags( id_tag, tmp_ents );
-    CHKERR( rval );
+    rval = pcomm->exchange_tags( id_tag, tmp_ents );CHKERR( rval );
 
     // Get geometric surfaces
     Range surfs, tmp;
     for( Range::iterator i = partition_geom[3].begin(); i != partition_geom[3].end(); ++i )
     {
         tmp.clear();
-        rval = moab.get_child_meshsets( *i, tmp );
-        CHKERR( rval );
+        rval = moab.get_child_meshsets( *i, tmp );CHKERR( rval );
         surfs.merge( tmp );
     }
 
@@ -740,19 +695,16 @@ ErrorCode test_ghost_elements( const char* filename, int ghost_dimension, int br
     for( Range::iterator i = surfs.begin(); !error && i != surfs.end(); ++i )
     {
         ents.clear();
-        rval = moab.get_entities_by_dimension( *i, ghost_dimension - 1, ents );
-        CHKERR( rval );
+        rval = moab.get_entities_by_dimension( *i, ghost_dimension - 1, ents );CHKERR( rval );
         if( ents.empty() ) continue;
 
         std::vector< int > procs, tmp_procs;
         Range::iterator j = ents.begin();
-        rval              = get_sharing_processors( moab, *j, procs );
-        CHKERR( rval );
+        rval              = get_sharing_processors( moab, *j, procs );CHKERR( rval );
         for( ++j; !error && j != ents.end(); ++j )
         {
             tmp_procs.clear();
-            rval = get_sharing_processors( moab, *j, tmp_procs );
-            CHKERR( rval );
+            rval = get_sharing_processors( moab, *j, tmp_procs );CHKERR( rval );
             if( tmp_procs != procs )
             {
                 error_msg << "Failure at " << __FILE__ << ':' << __LINE__ << std::endl
@@ -779,8 +731,7 @@ ErrorCode test_ghost_elements( const char* filename, int ghost_dimension, int br
 
         partition_geom[2].insert( *i );
         ents.clear();
-        rval = moab.get_child_meshsets( *i, ents );
-        CHKERR( rval );
+        rval = moab.get_child_meshsets( *i, ents );CHKERR( rval );
         partition_geom[1].merge( ents );
     }
 
@@ -796,8 +747,7 @@ ErrorCode test_ghost_elements( const char* filename, int ghost_dimension, int br
     for( Range::iterator i = partition_geom[1].begin(); i != partition_geom[1].end(); ++i )
     {
         ents.clear();
-        rval = moab.get_child_meshsets( *i, ents );
-        CHKERR( rval );
+        rval = moab.get_child_meshsets( *i, ents );CHKERR( rval );
         partition_geom[0].merge( ents );
     }
 
@@ -805,19 +755,16 @@ ErrorCode test_ghost_elements( const char* filename, int ghost_dimension, int br
     for( int dim = 0; dim <= 3; ++dim )
     {
         partn_geom_ids[dim].resize( partition_geom[dim].size() );
-        rval = moab.tag_get_data( id_tag, partition_geom[dim], &( partn_geom_ids[dim][0] ) );
-        CHKERR( rval );
+        rval = moab.tag_get_data( id_tag, partition_geom[dim], &( partn_geom_ids[dim][0] ) );CHKERR( rval );
     }
 
     // get the global IDs of the ghosted entities
     Range ghost_ents;
-    rval = get_ghost_entities( *pcomm, ghost_ents );
-    CHKERR( rval );
+    rval = get_ghost_entities( *pcomm, ghost_ents );CHKERR( rval );
     std::pair< Range::iterator, Range::iterator > vtx = ghost_ents.equal_range( MBVERTEX );
     ghost_ents.erase( vtx.first, vtx.second );
     std::vector< int > actual_ghost_ent_ids( ghost_ents.size() );
-    rval = moab.tag_get_data( id_tag, ghost_ents, &actual_ghost_ent_ids[0] );
-    CHKERR( rval );
+    rval = moab.tag_get_data( id_tag, ghost_ents, &actual_ghost_ent_ids[0] );CHKERR( rval );
 
     // read file in serial
     Core moab2;
@@ -841,8 +788,7 @@ ErrorCode test_ghost_elements( const char* filename, int ghost_dimension, int br
     for( Range::iterator i = partition_geom[3].begin(); i != partition_geom[3].end(); ++i )
     {
         ents.clear();
-        rval = moab.get_entities_by_dimension( *i, 3, ents );
-        CHKERR( rval );
+        rval = moab.get_entities_by_dimension( *i, 3, ents );CHKERR( rval );
         myents.merge( ents );
     }
     if( ghost_dimension != 3 )
@@ -909,20 +855,17 @@ ErrorCode test_ghost_tag_exchange( const char* filename )
                            "PARTITION_DISTRIBUTE;"
                            "PARALLEL_RESOLVE_SHARED_ENTS;"
                            "PARALLEL_GHOSTS=3.2.1;"
-                           "PARALLEL_SEQUENCE_FACTOR=1.5" );
-    CHKERR( rval );
+                           "PARALLEL_SEQUENCE_FACTOR=1.5" );CHKERR( rval );
 
     // Get ghost elements
     ParallelComm* pcomm = ParallelComm::get_pcomm( &moab, 0 );
     Range local, ghosts;
-    rval = moab.get_entities_by_dimension( 0, 3, local );
-    CHKERR( rval );
+    rval = moab.get_entities_by_dimension( 0, 3, local );CHKERR( rval );
     Range::iterator i = local.begin();
     while( i != local.end() )
     {
         int rank;
-        rval = pcomm->get_owner( *i, rank );
-        CHKERR( rval );
+        rval = pcomm->get_owner( *i, rank );CHKERR( rval );
         if( rank == (int)pcomm->proc_config().proc_rank() ) { ++i; }
         else
         {
@@ -936,46 +879,38 @@ ErrorCode test_ghost_tag_exchange( const char* filename )
     EntityHandle defval = 0;
     // rval = moab.tag_get_handle( "TEST-TAG", sizeof(EntityHandle), MB_TAG_DENSE,
     //                         dense_test_tag, &defval ); CHKERR(rval);
-    rval = moab.tag_get_handle( "TEST-TAG", 1, MB_TYPE_HANDLE, dense_test_tag, MB_TAG_DENSE | MB_TAG_EXCL, &defval );
-    CHKERR( rval );
+    rval = moab.tag_get_handle( "TEST-TAG", 1, MB_TYPE_HANDLE, dense_test_tag, MB_TAG_DENSE | MB_TAG_EXCL, &defval );CHKERR( rval );
 
     // for all entities that I own, set tag to handle value
     std::vector< EntityHandle > handles( local.size() ), handles2;
     std::copy( local.begin(), local.end(), handles.begin() );
-    rval = moab.tag_set_data( dense_test_tag, local, &handles[0] );
-    CHKERR( rval );
+    rval = moab.tag_set_data( dense_test_tag, local, &handles[0] );CHKERR( rval );
 
     // exchange tag data
     Range tmp_range;
-    rval = pcomm->exchange_tags( dense_test_tag, tmp_range );
-    CHKERR( rval );
+    rval = pcomm->exchange_tags( dense_test_tag, tmp_range );CHKERR( rval );
 
     // make sure local values are unchanged
     handles2.resize( local.size() );
-    rval = moab.tag_get_data( dense_test_tag, local, &handles2[0] );
-    CHKERR( rval );
+    rval = moab.tag_get_data( dense_test_tag, local, &handles2[0] );CHKERR( rval );
     PCHECK( handles == handles2 );
 
     // compare values on ghost entities
     handles.resize( ghosts.size() );
     handles2.resize( ghosts.size() );
-    rval = moab.tag_get_data( dense_test_tag, ghosts, &handles2[0] );
-    CHKERR( rval );
-    rval = get_owner_handles( pcomm, ghosts, &handles[0] );
-    CHKERR( rval );
+    rval = moab.tag_get_data( dense_test_tag, ghosts, &handles2[0] );CHKERR( rval );
+    rval = get_owner_handles( pcomm, ghosts, &handles[0] );CHKERR( rval );
     PCHECK( handles == handles2 );
 
     // now do it all again for a sparse tag
     Tag sparse_test_tag;
     // rval = moab.tag_get_handle( "TEST-TAG-2", sizeof(int), MB_TAG_DENSE,
     //                         MB_TYPE_INTEGER, sparse_test_tag, 0 ); CHKERR(rval);
-    rval = moab.tag_get_handle( "TEST-TAG-2", 1, MB_TYPE_INTEGER, sparse_test_tag, MB_TAG_DENSE | MB_TAG_EXCL );
-    CHKERR( rval );
+    rval = moab.tag_get_handle( "TEST-TAG-2", 1, MB_TYPE_INTEGER, sparse_test_tag, MB_TAG_DENSE | MB_TAG_EXCL );CHKERR( rval );
 
     // for all entiites that I own, set tag to my rank
     std::vector< int > procs1( local.size(), pcomm->proc_config().proc_rank() );
-    rval = moab.tag_set_data( sparse_test_tag, local, &procs1[0] );
-    CHKERR( rval );
+    rval = moab.tag_set_data( sparse_test_tag, local, &procs1[0] );CHKERR( rval );
 
     // exchange tag data
     tmp_range.clear();
@@ -984,20 +919,17 @@ ErrorCode test_ghost_tag_exchange( const char* filename )
 
     // make sure local values are unchanged
     std::vector< int > procs2( local.size() );
-    rval = moab.tag_get_data( sparse_test_tag, local, &procs2[0] );
-    CHKERR( rval );
+    rval = moab.tag_get_data( sparse_test_tag, local, &procs2[0] );CHKERR( rval );
     PCHECK( procs1 == procs2 );
 
     // compare values on ghost entities
     procs1.resize( ghosts.size() );
     procs2.resize( ghosts.size() );
-    rval = moab.tag_get_data( sparse_test_tag, ghosts, &procs2[0] );
-    CHKERR( rval );
+    rval = moab.tag_get_data( sparse_test_tag, ghosts, &procs2[0] );CHKERR( rval );
     std::vector< int >::iterator j = procs1.begin();
     for( i = ghosts.begin(); i != ghosts.end(); ++i, ++j )
     {
-        rval = pcomm->get_owner( *i, *j );
-        CHKERR( rval );
+        rval = pcomm->get_owner( *i, *j );CHKERR( rval );
     }
     PCHECK( procs1 == procs2 );
 
@@ -1031,8 +963,7 @@ ErrorCode regression_ghost_tag_exchange_no_default( const char* filename )
     Tag dense_test_tag;
     // rval = moab.tag_get_handle( "TEST-TAG", sizeof(EntityHandle), MB_TAG_DENSE,
     //                         dense_test_tag, 0 ); CHKERR(rval);
-    rval = moab.tag_get_handle( "TEST-TAG", 1, MB_TYPE_HANDLE, dense_test_tag, MB_TAG_DENSE | MB_TAG_EXCL );
-    CHKERR( rval );
+    rval = moab.tag_get_handle( "TEST-TAG", 1, MB_TYPE_HANDLE, dense_test_tag, MB_TAG_DENSE | MB_TAG_EXCL );CHKERR( rval );
 
     // exchange tag data
     ParallelComm* pcomm = ParallelComm::get_pcomm( &moab, 0 );
@@ -1220,8 +1151,7 @@ ErrorCode check_consistent_ids( Interface& mb, const EntityHandle* entities, con
 
     Tag id_tag = mb.globalId_tag();
     std::vector< int > new_ids( num_ents );
-    rval = mb.tag_get_data( id_tag, entities, num_ents, &new_ids[0] );
-    CHKERR( rval );
+    rval = mb.tag_get_data( id_tag, entities, num_ents, &new_ids[0] );CHKERR( rval );
     // This test is wrong.  a) The caller can select a start ID so there's
     // no guarantee that the IDs will be in any specific range and b) There
     // is no reason to expect the global number of entities to be num_ents*size
@@ -1317,15 +1247,12 @@ ErrorCode test_assign_global_ids( const char* )
     EntityHandle quads[4];
     std::copy( quad_range.begin(), quad_range.end(), quads );
     int quad_ids[4];
-    rval = mb.tag_get_data( id_tag, quads, 4, quad_ids );
-    CHKERR( rval );
+    rval = mb.tag_get_data( id_tag, quads, 4, quad_ids );CHKERR( rval );
 
     // clear GLOBAL_ID tag
     int zero[9] = { 0 };
-    rval        = mb.tag_set_data( id_tag, verts, 9, zero );
-    CHKERR( rval );
-    rval = mb.tag_set_data( id_tag, quads, 4, zero );
-    CHKERR( rval );
+    rval        = mb.tag_set_data( id_tag, verts, 9, zero );CHKERR( rval );
+    rval = mb.tag_set_data( id_tag, quads, 4, zero );CHKERR( rval );
 
     // assign new global IDs
     rval = pcomm.assign_global_ids( 0, 2 );
@@ -1523,8 +1450,7 @@ ErrorCode check_shared_ents( ParallelComm& pcomm, Tag tagh, T fact, MPI_Op mpi_o
 {
     // get the shared entities
     Range shared_ents;
-    ErrorCode rval = pcomm.get_shared_entities( -1, shared_ents );
-    CHKERR( rval );
+    ErrorCode rval = pcomm.get_shared_entities( -1, shared_ents );CHKERR( rval );
 
     std::vector< int > shprocs( MAX_SHARING_PROCS );
     std::vector< EntityHandle > shhandles( MAX_SHARING_PROCS );
@@ -1532,16 +1458,14 @@ ErrorCode check_shared_ents( ParallelComm& pcomm, Tag tagh, T fact, MPI_Op mpi_o
     int np;
     unsigned char pstatus;
 
-    rval = pcomm.get_moab()->tag_get_data( tagh, shared_ents, &dum_vals[0] );
-    CHKERR( rval );
+    rval = pcomm.get_moab()->tag_get_data( tagh, shared_ents, &dum_vals[0] );CHKERR( rval );
 
     // for each, compare number of sharing procs against tag value, should be 1/fact the tag value
     Range::iterator rit;
     int i = 0;
     for( rit = shared_ents.begin(); rit != shared_ents.end(); ++rit, i++ )
     {
-        rval = pcomm.get_sharing_data( *rit, &shprocs[0], &shhandles[0], pstatus, np );
-        CHKERR( rval );
+        rval = pcomm.get_sharing_data( *rit, &shprocs[0], &shhandles[0], pstatus, np );CHKERR( rval );
         if( 1 == np && shprocs[0] != (int)pcomm.proc_config().proc_rank() ) np++;
         bool with_root = std::find( &shprocs[0], &shprocs[np], 0 ) - &shprocs[0] != np || !pcomm.rank();
         if( mpi_op == MPI_SUM )
@@ -1594,55 +1518,40 @@ ErrorCode test_reduce_tags( const char*, DataType tp )
     std::vector< T > dum_vals;
 
     // T, MPI_SUM
-    rval = mb.tag_get_handle( "test_tag", 1, tp, test_tag, MB_TAG_DENSE | MB_TAG_CREAT, &def_val );
-    CHKERR( rval );
-    rval = pcomm.reduce_tags( test_tag, MPI_SUM, dum_range );
-    CHKERR( rval );
-    rval = check_shared_ents( pcomm, test_tag, (T)2, MPI_SUM );
-    CHKERR( rval );
+    rval = mb.tag_get_handle( "test_tag", 1, tp, test_tag, MB_TAG_DENSE | MB_TAG_CREAT, &def_val );CHKERR( rval );
+    rval = pcomm.reduce_tags( test_tag, MPI_SUM, dum_range );CHKERR( rval );
+    rval = check_shared_ents( pcomm, test_tag, (T)2, MPI_SUM );CHKERR( rval );
     rval = mb.tag_delete( test_tag );
 
     // T, MPI_PROD
-    rval = mb.tag_get_handle( "test_tag", 1, tp, test_tag, MB_TAG_DENSE | MB_TAG_CREAT, &def_val );
-    CHKERR( rval );
-    rval = pcomm.reduce_tags( test_tag, MPI_PROD, dum_range );
-    CHKERR( rval );
-    rval = check_shared_ents( pcomm, test_tag, (T)2, MPI_PROD );
-    CHKERR( rval );
+    rval = mb.tag_get_handle( "test_tag", 1, tp, test_tag, MB_TAG_DENSE | MB_TAG_CREAT, &def_val );CHKERR( rval );
+    rval = pcomm.reduce_tags( test_tag, MPI_PROD, dum_range );CHKERR( rval );
+    rval = check_shared_ents( pcomm, test_tag, (T)2, MPI_PROD );CHKERR( rval );
     rval = mb.tag_delete( test_tag );
 
     // T, MPI_MAX
-    rval = mb.tag_get_handle( "test_tag", 1, tp, test_tag, MB_TAG_DENSE | MB_TAG_CREAT, &def_val );
-    CHKERR( rval );
+    rval = mb.tag_get_handle( "test_tag", 1, tp, test_tag, MB_TAG_DENSE | MB_TAG_CREAT, &def_val );CHKERR( rval );
     // get owned entities and set a different value on them
-    rval = pcomm.get_shared_entities( -1, dum_range, -1, false, false );
-    CHKERR( rval );
+    rval = pcomm.get_shared_entities( -1, dum_range, -1, false, false );CHKERR( rval );
     if( pcomm.rank() == 0 )
     {
         dum_vals.resize( dum_range.size(), (T)3 );
-        rval = mb.tag_set_data( test_tag, dum_range, &dum_vals[0] );
-        CHKERR( rval );
+        rval = mb.tag_set_data( test_tag, dum_range, &dum_vals[0] );CHKERR( rval );
     }
-    rval = pcomm.reduce_tags( test_tag, MPI_MAX, dum_range );
-    CHKERR( rval );
-    rval = check_shared_ents( pcomm, test_tag, (T)3, MPI_MAX );
-    CHKERR( rval );
+    rval = pcomm.reduce_tags( test_tag, MPI_MAX, dum_range );CHKERR( rval );
+    rval = check_shared_ents( pcomm, test_tag, (T)3, MPI_MAX );CHKERR( rval );
     rval = mb.tag_delete( test_tag );
 
     // T, MPI_MIN
-    rval = mb.tag_get_handle( "test_tag", 1, tp, test_tag, MB_TAG_DENSE | MB_TAG_CREAT, &def_val );
-    CHKERR( rval );
+    rval = mb.tag_get_handle( "test_tag", 1, tp, test_tag, MB_TAG_DENSE | MB_TAG_CREAT, &def_val );CHKERR( rval );
     // get owned entities and set a different value on them
     if( pcomm.rank() == 0 )
     {
         std::fill( dum_vals.begin(), dum_vals.end(), (T)-1 );
-        rval = mb.tag_set_data( test_tag, dum_range, &dum_vals[0] );
-        CHKERR( rval );
+        rval = mb.tag_set_data( test_tag, dum_range, &dum_vals[0] );CHKERR( rval );
     }
-    rval = pcomm.reduce_tags( test_tag, MPI_MIN, dum_range );
-    CHKERR( rval );
-    rval = check_shared_ents( pcomm, test_tag, (T)-1, MPI_MIN );
-    CHKERR( rval );
+    rval = pcomm.reduce_tags( test_tag, MPI_MIN, dum_range );CHKERR( rval );
+    rval = check_shared_ents( pcomm, test_tag, (T)-1, MPI_MIN );CHKERR( rval );
     rval = mb.tag_delete( test_tag );
 
     return MB_SUCCESS;
@@ -1677,22 +1586,17 @@ ErrorCode test_reduce_tag_failures( const char* )
     // explicit destination tag of different type
     Tag test_dest;
     std::vector< Tag > src_tags, dest_tags;
-    rval = mb.tag_get_handle( "test_tag", 1, MB_TYPE_INTEGER, test_tag, MB_TAG_DENSE | MB_TAG_CREAT, &def_int );
-    CHKERR( rval );
+    rval = mb.tag_get_handle( "test_tag", 1, MB_TYPE_INTEGER, test_tag, MB_TAG_DENSE | MB_TAG_CREAT, &def_int );CHKERR( rval );
     src_tags.push_back( test_tag );
-    rval = mb.tag_get_handle( "dtest_tag", 1, MB_TYPE_DOUBLE, test_dest, MB_TAG_DENSE | MB_TAG_CREAT, &def_dbl );
-    CHKERR( rval );
+    rval = mb.tag_get_handle( "dtest_tag", 1, MB_TYPE_DOUBLE, test_dest, MB_TAG_DENSE | MB_TAG_CREAT, &def_dbl );CHKERR( rval );
     dest_tags.push_back( test_dest );
     rval = pcomm.reduce_tags( src_tags, dest_tags, MPI_MIN, dum_range );
     PCHECK( rval == MB_FAILURE );
-    rval = mb.tag_delete( test_dest );
-    CHKERR( rval );
-    rval = mb.tag_delete( test_tag );
-    CHKERR( rval );
+    rval = mb.tag_delete( test_dest );CHKERR( rval );
+    rval = mb.tag_delete( test_tag );CHKERR( rval );
 
     // tag w/ no default value
-    rval = mb.tag_get_handle( "test_tag", 1, MB_TYPE_INTEGER, test_tag, MB_TAG_DENSE | MB_TAG_CREAT );
-    CHKERR( rval );
+    rval = mb.tag_get_handle( "test_tag", 1, MB_TYPE_INTEGER, test_tag, MB_TAG_DENSE | MB_TAG_CREAT );CHKERR( rval );
     rval = pcomm.reduce_tags( test_tag, MPI_MIN, dum_range );
     PCHECK( rval == MB_ENTITY_NOT_FOUND );
     rval = mb.tag_delete( test_tag );
@@ -1749,32 +1653,23 @@ ErrorCode test_reduce_tag_explicit_dest( const char* )
     // src tag has one value, pre-existing dest tag has another; should get MPI_Op of src values
     std::vector< Tag > src_tags, dest_tags;
     // create the tags
-    rval = mb.tag_get_handle( "src_tag", 1, MB_TYPE_DOUBLE, src_tag, MB_TAG_DENSE | MB_TAG_CREAT, &def_dbl );
-    CHKERR( rval );
+    rval = mb.tag_get_handle( "src_tag", 1, MB_TYPE_DOUBLE, src_tag, MB_TAG_DENSE | MB_TAG_CREAT, &def_dbl );CHKERR( rval );
     src_tags.push_back( src_tag );
-    rval = mb.tag_get_handle( "dest_tag", 1, MB_TYPE_DOUBLE, dest_tag, MB_TAG_DENSE | MB_TAG_CREAT, &def_dbl );
-    CHKERR( rval );
+    rval = mb.tag_get_handle( "dest_tag", 1, MB_TYPE_DOUBLE, dest_tag, MB_TAG_DENSE | MB_TAG_CREAT, &def_dbl );CHKERR( rval );
     dest_tags.push_back( dest_tag );
     // set values for src tag to one value, dest tag to another
-    rval = pcomm.get_shared_entities( -1, dum_range, -1, false, false );
-    CHKERR( rval );
+    rval = pcomm.get_shared_entities( -1, dum_range, -1, false, false );CHKERR( rval );
     std::vector< double > tag_vals( dum_range.size(), 1.0 );
-    rval = mb.tag_set_data( src_tag, dum_range, &tag_vals[0] );
-    CHKERR( rval );
+    rval = mb.tag_set_data( src_tag, dum_range, &tag_vals[0] );CHKERR( rval );
     std::fill( tag_vals.begin(), tag_vals.end(), 2.0 );
-    rval = mb.tag_set_data( dest_tag, dum_range, &tag_vals[0] );
-    CHKERR( rval );
+    rval = mb.tag_set_data( dest_tag, dum_range, &tag_vals[0] );CHKERR( rval );
     // do the reduce
-    rval = pcomm.reduce_tags( src_tags, dest_tags, MPI_SUM, dum_range );
-    CHKERR( rval );
+    rval = pcomm.reduce_tags( src_tags, dest_tags, MPI_SUM, dum_range );CHKERR( rval );
     // check the reduced value
-    rval = check_shared_ents< double >( pcomm, dest_tag, (double)1.0, MPI_SUM );
-    CHKERR( rval );
+    rval = check_shared_ents< double >( pcomm, dest_tag, (double)1.0, MPI_SUM );CHKERR( rval );
 
-    rval = mb.tag_delete( src_tag );
-    CHKERR( rval );
-    rval = mb.tag_delete( dest_tag );
-    CHKERR( rval );
+    rval = mb.tag_delete( src_tag );CHKERR( rval );
+    rval = mb.tag_delete( dest_tag );CHKERR( rval );
 
     return MB_SUCCESS;
 }
@@ -1788,32 +1683,27 @@ ErrorCode test_delete_entities( const char* filename )
     rval = moab.load_file( filename, 0,
                            "PARALLEL=READ_PART;"
                            "PARTITION=PARALLEL_PARTITION;"
-                           "PARALLEL_RESOLVE_SHARED_ENTS" );
-    CHKERR( rval );
+                           "PARALLEL_RESOLVE_SHARED_ENTS" );CHKERR( rval );
 
     // Get ghost elements
     ParallelComm* pcomm = ParallelComm::get_pcomm( &moab, 0 );
     // get some edges and faces, and delete some
     Range local;
-    rval = moab.get_entities_by_dimension( 0, 1, local );
-    CHKERR( rval );
-    rval = moab.get_entities_by_dimension( 0, 2, local );
-    CHKERR( rval );  // it is appending to range
+    rval = moab.get_entities_by_dimension( 0, 1, local );CHKERR( rval );
+    rval = moab.get_entities_by_dimension( 0, 2, local );CHKERR( rval );  // it is appending to range
 
     Range local2;  // extract about half of those
     std::copy( local.begin(), local.begin() + local.size() / 2, range_inserter( local2 ) );
 
     // delete local 2
-    rval = pcomm->delete_entities( local2 );
-    CHKERR( rval );
+    rval = pcomm->delete_entities( local2 );CHKERR( rval );
 
     for( Range::iterator it = local2.begin(); it != local2.end(); ++it )
     {
         if( mb_instance.is_valid( *it ) ) return MB_FAILURE;
     }
     const char* opt = "PARALLEL=WRITE_PART";
-    rval            = moab.write_file( "tmpx.h5m", 0, opt );
-    CHKERR( rval );
+    rval            = moab.write_file( "tmpx.h5m", 0, opt );CHKERR( rval );
     if( pcomm->proc_config().proc_rank() == 0 ) remove( "tmpx.h5m" );
 
     return MB_SUCCESS;
@@ -1829,8 +1719,7 @@ ErrorCode test_ghost_polyhedra( const char* filename )
                            "PARALLEL=READ_PART;"
                            "PARTITION=PARALLEL_PARTITION;"
                            "PARALLEL_RESOLVE_SHARED_ENTS;"
-                           "PARALLEL_GHOSTS=3.0.1" );
-    CHKERR( rval );
+                           "PARALLEL_GHOSTS=3.0.1" );CHKERR( rval );
 
     return MB_SUCCESS;
 }
@@ -1861,13 +1750,11 @@ ErrorCode test_sequences_after_ghosting( const char* filename )
                            "PARTITION=PARALLEL_PARTITION;"
                            "PARALLEL_RESOLVE_SHARED_ENTS;"
                            "PARALLEL_GHOSTS=3.2.1;"
-                           "PARALLEL_SEQUENCE_FACTOR=1.5" );
-    CHKERR( rval );
+                           "PARALLEL_SEQUENCE_FACTOR=1.5" );CHKERR( rval );
 
     // get all elements of dimension 3, and check they are on one sequence, with connect_iterate
     Range elems;
-    rval = moab.get_entities_by_dimension( 0, 3, elems );
-    CHKERR( rval );
+    rval = moab.get_entities_by_dimension( 0, 3, elems );CHKERR( rval );
     if( elems.psize() != 1 )
     {
         std::cout << " elems.psize() = " << elems.psize() << "\n";
@@ -1876,8 +1763,7 @@ ErrorCode test_sequences_after_ghosting( const char* filename )
     // we want only one sequence
     int count, vpere;
     EntityHandle* conn_ptr;
-    rval = moab.connect_iterate( elems.begin(), elems.end(), conn_ptr, vpere, count );
-    CHKERR( rval );
+    rval = moab.connect_iterate( elems.begin(), elems.end(), conn_ptr, vpere, count );CHKERR( rval );
 
     if( count != (int)elems.size() )
     {
@@ -1887,8 +1773,7 @@ ErrorCode test_sequences_after_ghosting( const char* filename )
     // check also global id tag, which is dense
     Tag id_tag          = moab.globalId_tag();
     void* globalid_data = NULL;
-    rval                = moab.tag_iterate( id_tag, elems.begin(), elems.end(), count, globalid_data );
-    CHKERR( rval );
+    rval                = moab.tag_iterate( id_tag, elems.begin(), elems.end(), count, globalid_data );CHKERR( rval );
     if( count != (int)elems.size() )
     {
         std::cout << " more than one tag sequence:  elems.size() = " << elems.size() << "  count:" << count << "\n";
@@ -1898,8 +1783,7 @@ ErrorCode test_sequences_after_ghosting( const char* filename )
     // repeat the tests for vertex sequences
     // get all elements of dimension 3, and check they are on one sequence, with coords_iterate
     Range verts;
-    rval = moab.get_entities_by_dimension( 0, 0, verts );
-    CHKERR( rval );
+    rval = moab.get_entities_by_dimension( 0, 0, verts );CHKERR( rval );
     if( verts.psize() != 1 )
     {
         std::cout << " verts.psize() = " << verts.psize() << "\n";
@@ -1907,8 +1791,7 @@ ErrorCode test_sequences_after_ghosting( const char* filename )
     }
     //
     double *x_ptr, *y_ptr, *z_ptr;
-    rval = moab.coords_iterate( verts.begin(), verts.end(), x_ptr, y_ptr, z_ptr, count );
-    CHKERR( rval );
+    rval = moab.coords_iterate( verts.begin(), verts.end(), x_ptr, y_ptr, z_ptr, count );CHKERR( rval );
 
     if( count != (int)verts.size() )
     {
@@ -1916,8 +1799,7 @@ ErrorCode test_sequences_after_ghosting( const char* filename )
         return MB_FAILURE;
     }
 
-    rval = moab.tag_iterate( id_tag, verts.begin(), verts.end(), count, globalid_data );
-    CHKERR( rval );
+    rval = moab.tag_iterate( id_tag, verts.begin(), verts.end(), count, globalid_data );CHKERR( rval );
     if( count != (int)verts.size() )
     {
         std::cout << " more than one tag sequence:  verts.size() = " << verts.size() << "  count:" << count << "\n";

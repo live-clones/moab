@@ -91,12 +91,10 @@ int CompareQM::get_negate_flag() const
 
 void CompareQM::get_evaluations( PatchData& pd, std::vector< size_t >& handles, bool free_only, MsqError& err )
 {
-    primaryMetric->get_evaluations( pd, handles, free_only, err );
-    MSQ_ERRRTN( err );
+    primaryMetric->get_evaluations( pd, handles, free_only, err );MSQ_ERRRTN( err );
 
     std::vector< size_t > handles2;
-    otherMetric->get_evaluations( pd, handles2, free_only, err );
-    MSQ_ERRRTN( err );
+    otherMetric->get_evaluations( pd, handles2, free_only, err );MSQ_ERRRTN( err );
 
     std::vector< size_t > handles1( handles );
     std::sort( handles1.begin(), handles1.end() );
@@ -196,8 +194,7 @@ void CompareQM::check_indices( size_t handle, const std::vector< size_t >& idx1,
 {
     if( idx1.size() != idx2.size() )
     {
-        index_mismatch( handle, idx1, idx2, err );
-        MSQ_ERRRTN( err );
+        index_mismatch( handle, idx1, idx2, err );MSQ_ERRRTN( err );
     }
 
     std::vector< size_t >::const_iterator i, j;
@@ -207,8 +204,7 @@ void CompareQM::check_indices( size_t handle, const std::vector< size_t >& idx1,
         j = std::find( idx2.begin(), idx2.end(), *i );
         if( j == idx2.end() )
         {
-            index_mismatch( handle, idx1, idx2, err );
-            MSQ_ERRRTN( err );
+            index_mismatch( handle, idx1, idx2, err );MSQ_ERRRTN( err );
         }
         map_out.push_back( j - idx2.begin() );
     }

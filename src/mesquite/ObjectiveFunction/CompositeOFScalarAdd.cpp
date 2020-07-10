@@ -71,8 +71,7 @@ void CompositeOFScalarAdd::clear()
 
 void CompositeOFScalarAdd::initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings, MsqError& err )
 {
-    objFunc->initialize_queue( mesh_and_domain, settings, err );
-    MSQ_ERRRTN( err );
+    objFunc->initialize_queue( mesh_and_domain, settings, err );MSQ_ERRRTN( err );
 }
 
 bool CompositeOFScalarAdd::initialize_block_coordinate_descent( MeshDomainAssoc* mesh_and_domain,

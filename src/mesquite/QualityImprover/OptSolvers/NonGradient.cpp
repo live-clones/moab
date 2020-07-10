@@ -100,8 +100,7 @@ NonGradient::NonGradient( ObjectiveFunction* of, MsqError& err )
     }
     else
     {
-        default_crit->add_iteration_limit( 5 );
-        MSQ_ERRRTN( err );
+        default_crit->add_iteration_limit( 5 );MSQ_ERRRTN( err );
     }
 }
 

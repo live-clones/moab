@@ -47,22 +47,18 @@ ErrorCode manufacture_lagrange_mesh_on_sphere( Interface* mb, EntityHandle euler
      *
      */
     Range polygons;
-    rval = mb->get_entities_by_dimension( euler_set, 2, polygons );
-    CHECK_ERR( rval );
+    rval = mb->get_entities_by_dimension( euler_set, 2, polygons );CHECK_ERR( rval );
 
     Range connecVerts;
-    rval = mb->get_connectivity( polygons, connecVerts );
-    CHECK_ERR( rval );
+    rval = mb->get_connectivity( polygons, connecVerts );CHECK_ERR( rval );
 
     Tag tagh = 0;
     std::string tag_name( "DP" );
-    rval = mb->tag_get_handle( tag_name.c_str(), 3, MB_TYPE_DOUBLE, tagh, MB_TAG_DENSE | MB_TAG_CREAT );
-    CHECK_ERR( rval );
+    rval = mb->tag_get_handle( tag_name.c_str(), 3, MB_TYPE_DOUBLE, tagh, MB_TAG_DENSE | MB_TAG_CREAT );CHECK_ERR( rval );
     void* data;  // pointer to the LOC in memory, for each vertex
     int count;
 
-    rval = mb->tag_iterate( tagh, connecVerts.begin(), connecVerts.end(), count, data );
-    CHECK_ERR( rval );
+    rval = mb->tag_iterate( tagh, connecVerts.begin(), connecVerts.end(), count, data );CHECK_ERR( rval );
     // here we are checking contiguity
     assert( count == (int)connecVerts.size() );
     double* ptr_DP = (double*)data;
@@ -77,8 +73,7 @@ ErrorCode manufacture_lagrange_mesh_on_sphere( Interface* mb, EntityHandle euler
     {
         EntityHandle oldV = *vit;
         CartVect posi;
-        rval = mb->get_coords( &oldV, 1, &( posi[0] ) );
-        CHECK_ERR( rval );
+        rval = mb->get_coords( &oldV, 1, &( posi[0] ) );CHECK_ERR( rval );
         // do some mumbo jumbo, as in python script
         IntxUtils::SphereCoords sphCoord = IntxUtils::cart_to_spherical( posi );
         double lat1                      = sphCoord.lat - 2 * M_PI * t / T;  // 0.1/5
@@ -143,16 +138,13 @@ int main( int argc, char** argv )
     Interface& mb = moab;
     EntityHandle euler_set;
     ErrorCode rval;
-    rval = mb.create_meshset( MESHSET_SET, euler_set );
-    CHECK_ERR( rval );
+    rval = mb.create_meshset( MESHSET_SET, euler_set );CHECK_ERR( rval );
 
     clock_t tt = clock();
 
-    rval = mb.load_file( filename_mesh1, &euler_set, opts.c_str() );
-    CHECK_ERR( rval );
+    rval = mb.load_file( filename_mesh1, &euler_set, opts.c_str() );CHECK_ERR( rval );
 
-    ParallelComm* pcomm = ParallelComm::get_pcomm( &mb, 0 );
-    CHECK_ERR( rval );
+    ParallelComm* pcomm = ParallelComm::get_pcomm( &mb, 0 );CHECK_ERR( rval );
 
     /*rval = pcomm->check_all_shared_handles();CHECK_ERR(rval);*/
     // end copy
@@ -170,20 +162,17 @@ int main( int argc, char** argv )
         tt = clock();
     }
 
-    rval = manufacture_lagrange_mesh_on_sphere( &mb, euler_set );
-    CHECK_ERR( rval );
+    rval = manufacture_lagrange_mesh_on_sphere( &mb, euler_set );CHECK_ERR( rval );
 
     // create a set with quads corresponding to each initial edge spanned with the displacement
     // field
     if( flux_form )
     {
-        rval = IntxUtilsCSLAM::create_span_quads( &mb, euler_set, rank );
-        CHECK_ERR( rval );
+        rval = IntxUtilsCSLAM::create_span_quads( &mb, euler_set, rank );CHECK_ERR( rval );
     }
 
     EntityHandle covering_lagr_set;
-    rval = mb.create_meshset( MESHSET_SET, covering_lagr_set );
-    CHECK_ERR( rval );
+    rval = mb.create_meshset( MESHSET_SET, covering_lagr_set );CHECK_ERR( rval );
 
     Intx2MeshOnSphere worker( &mb );
     // double radius = 1.; // input
@@ -196,12 +185,10 @@ int main( int argc, char** argv )
                   << ( clock() - tt ) / (double)CLOCKS_PER_SEC << " seconds" << std::endl;
         tt = clock();
     }
-    rval = worker.FindMaxEdges( euler_set, euler_set );
-    CHECK_ERR( rval );
+    rval = worker.FindMaxEdges( euler_set, euler_set );CHECK_ERR( rval );
     worker.set_error_tolerance( gtol );
 
-    rval = worker.create_departure_mesh_2nd_alg( euler_set, covering_lagr_set );
-    CHECK_ERR( rval );
+    rval = worker.create_departure_mesh_2nd_alg( euler_set, covering_lagr_set );CHECK_ERR( rval );
 
     if( 0 == rank )
     {
@@ -217,8 +204,7 @@ int main( int argc, char** argv )
         rval = mb.write_file( lagrIni.str().c_str(), 0, 0, &covering_lagr_set, 1 );
     }
 
-    rval = IntxUtils::enforce_convexity( &mb, covering_lagr_set, rank );
-    CHECK_ERR( rval );
+    rval = IntxUtils::enforce_convexity( &mb, covering_lagr_set, rank );CHECK_ERR( rval );
     if( Verbose )
     {
         std::stringstream ste;
@@ -229,10 +215,8 @@ int main( int argc, char** argv )
     if( MB_SUCCESS != rval ) std::cout << "can't write lagr set\n";
 
     EntityHandle outputSet;
-    rval = mb.create_meshset( MESHSET_SET, outputSet );
-    CHECK_ERR( rval );
-    rval = worker.intersect_meshes( covering_lagr_set, euler_set, outputSet );
-    CHECK_ERR( rval );
+    rval = mb.create_meshset( MESHSET_SET, outputSet );CHECK_ERR( rval );
+    rval = worker.intersect_meshes( covering_lagr_set, euler_set, outputSet );CHECK_ERR( rval );
 
     if( 0 == rank )
     {

@@ -188,8 +188,7 @@ void classify_boundary( Mesh* mesh, Mesh::VertexHandle corners_out[4], std::vect
                         MsqError& err )
 {
     std::vector< Mesh::VertexHandle > verts;
-    mesh->get_all_vertices( verts, err );
-    MSQ_ERRRTN( err );
+    mesh->get_all_vertices( verts, err );MSQ_ERRRTN( err );
 
     // Find the corner vertex that has negative X and Y coordinates
     Mesh::VertexHandle start;
@@ -200,13 +199,11 @@ void classify_boundary( Mesh* mesh, Mesh::VertexHandle corners_out[4], std::vect
     {
         elems.clear();
         offsets.clear();
-        mesh->vertices_get_attached_elements( &verts[i], 1, elems, offsets, err );
-        MSQ_ERRRTN( err );
+        mesh->vertices_get_attached_elements( &verts[i], 1, elems, offsets, err );MSQ_ERRRTN( err );
         if( elems.size() == 1 )
         {
             MsqVertex coords;
-            mesh->vertices_get_coordinates( &verts[i], &coords, 1, err );
-            MSQ_ERRRTN( err );
+            mesh->vertices_get_coordinates( &verts[i], &coords, 1, err );MSQ_ERRRTN( err );
             if( coords[0] < 0.0 && coords[1] < 0.0 )
             {
                 CHKMESH( !have_start, err );
@@ -222,8 +219,7 @@ void classify_boundary( Mesh* mesh, Mesh::VertexHandle corners_out[4], std::vect
     boundary.push_back( start );
     elems.clear();
     offsets.clear();
-    mesh->vertices_get_attached_elements( &start, 1, elems, offsets, err );
-    MSQ_ERRRTN( err );
+    mesh->vertices_get_attached_elements( &start, 1, elems, offsets, err );MSQ_ERRRTN( err );
     Mesh::ElementHandle prev = elems.front();
     corners_out[0]           = start;
     int ncorner              = 1;
@@ -238,8 +234,7 @@ void classify_boundary( Mesh* mesh, Mesh::VertexHandle corners_out[4], std::vect
         Mesh::VertexHandle next = verts[( idx + 1 ) % verts.size()];
         elems.clear();
         offsets.clear();
-        mesh->vertices_get_attached_elements( &next, 1, elems, offsets, err );
-        MSQ_ERRRTN( err );
+        mesh->vertices_get_attached_elements( &next, 1, elems, offsets, err );MSQ_ERRRTN( err );
         CHKMESH( elems.size() == 1 || elems.size() == 2, err );
         if( elems.size() == 2 )
         {

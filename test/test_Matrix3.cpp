@@ -81,8 +81,7 @@ void test_EigenDecomp()
 
     CartVect lamda;
     Matrix3 vectors;
-    moab::ErrorCode rval = mat.eigen_decomposition( lamda, vectors );
-    CHECK_ERR( rval );
+    moab::ErrorCode rval = mat.eigen_decomposition( lamda, vectors );CHECK_ERR( rval );
     for( int i = 0; i < 3; ++i )
         vectors.col( i ).normalize();
 

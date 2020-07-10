@@ -106,14 +106,12 @@ ErrorCode adj_perf( const char* filename )
     {
         read_options = "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_SHARED_ENTS";
 
-        error = mbImpl->load_file( filename, 0, read_options.c_str() );
-        CHECK_ERR( error );
+        error = mbImpl->load_file( filename, 0, read_options.c_str() );CHECK_ERR( error );
     }
     else if( procs == 1 )
     {
 #endif
-        error = mbImpl->load_file( filename );
-        CHECK_ERR( error );
+        error = mbImpl->load_file( filename );CHECK_ERR( error );
 #ifdef MOAB_HAVE_MPI
     }
 #endif

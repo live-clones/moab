@@ -245,18 +245,14 @@ Tqdcfr::Tqdcfr( Interface* impl )
         currElementIdOffset[this_type] = -1;
 
     ErrorCode rval;
-    rval = mdbImpl->tag_get_handle( MATERIAL_SET_TAG_NAME, 1, MB_TYPE_INTEGER, blockTag );
-    MB_CHK_SET_ERR_RET( rval, "Failed to tag_get_handle." );
-    rval = mdbImpl->tag_get_handle( DIRICHLET_SET_TAG_NAME, 1, MB_TYPE_INTEGER, nsTag );
-    MB_CHK_SET_ERR_RET( rval, "Failed to tag_get_handle." );
-    rval = mdbImpl->tag_get_handle( NEUMANN_SET_TAG_NAME, 1, MB_TYPE_INTEGER, ssTag );
-    MB_CHK_SET_ERR_RET( rval, "Failed to tag_get_handle." );
+    rval = mdbImpl->tag_get_handle( MATERIAL_SET_TAG_NAME, 1, MB_TYPE_INTEGER, blockTag );MB_CHK_SET_ERR_RET( rval, "Failed to tag_get_handle." );
+    rval = mdbImpl->tag_get_handle( DIRICHLET_SET_TAG_NAME, 1, MB_TYPE_INTEGER, nsTag );MB_CHK_SET_ERR_RET( rval, "Failed to tag_get_handle." );
+    rval = mdbImpl->tag_get_handle( NEUMANN_SET_TAG_NAME, 1, MB_TYPE_INTEGER, ssTag );MB_CHK_SET_ERR_RET( rval, "Failed to tag_get_handle." );
 
     if( 0 == entityNameTag )
     {
         rval = mdbImpl->tag_get_handle( NAME_TAG_NAME, NAME_TAG_SIZE, MB_TYPE_OPAQUE, entityNameTag,
-                                        MB_TAG_SPARSE | MB_TAG_CREAT );
-        MB_CHK_SET_ERR_RET( rval, "Failed to tag_get_handle." );
+                                        MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_SET_ERR_RET( rval, "Failed to tag_get_handle." );
     }
 
     cubMOABVertexMap = NULL;
@@ -321,24 +317,20 @@ ErrorCode Tqdcfr::load_file( const char* file_name, const EntityHandle*, const F
     }
 
     // Get "before" entities
-    result = mdbImpl->get_entities_by_handle( 0, beforeEnts );
-    MB_CHK_SET_ERR( result, "Couldn't get \"before\" entities" );
+    result = mdbImpl->get_entities_by_handle( 0, beforeEnts );MB_CHK_SET_ERR( result, "Couldn't get \"before\" entities" );
 
     // ***********************
     // Read model header type information...
     // ***********************
     if( debug ) std::cout << "Reading file header." << std::endl;
-    result = read_file_header();
-    RR;
+    result = read_file_header();RR;
 
     if( debug ) std::cout << "Reading model entries." << std::endl;
-    result = read_model_entries();
-    RR;
+    result = read_model_entries();RR;
 
     // Read model metadata
     if( debug ) std::cout << "Reading model metadata." << std::endl;
-    result = read_meta_data( fileTOC.modelMetaDataOffset, modelMetaData );
-    RR;
+    result = read_meta_data( fileTOC.modelMetaDataOffset, modelMetaData );RR;
 
     double data_version;
     int md_index = modelMetaData.get_md_entry( 2, "DataVersion" );
@@ -395,8 +387,7 @@ ErrorCode Tqdcfr::load_file( const char* file_name, const EntityHandle*, const F
     // ***********************
     std::string sat_file_name;
     if( MB_SUCCESS != opts.get_str_option( "SAT_FILE", sat_file_name ) ) sat_file_name.clear();
-    result = read_acis_records( sat_file_name.empty() ? NULL : sat_file_name.c_str() );
-    RR;
+    result = read_acis_records( sat_file_name.empty() ? NULL : sat_file_name.c_str() );RR;
 
     // ***********************
     // Read groups...
@@ -1106,8 +1097,7 @@ ErrorCode Tqdcfr::get_names( MetaDataContainer& md, unsigned int set_index, Enti
             Tag extra_name_tag;
             ErrorCode rval;
             rval = mdbImpl->tag_get_handle( moab_extra_name.str().c_str(), NAME_TAG_SIZE, MB_TYPE_OPAQUE,
-                                            extra_name_tag, MB_TAG_SPARSE | MB_TAG_CREAT );
-            MB_CHK_ERR( rval );
+                                            extra_name_tag, MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_ERR( rval );
             memset( name_tag_data, 0, NAME_TAG_SIZE );  // Make sure any extra bytes zeroed
             strncpy( name_tag_data, md_entry->mdStringValue.c_str(), NAME_TAG_SIZE - 1 );
             result = mdbImpl->tag_set_data( extra_name_tag, &seth, 1, name_tag_data );
@@ -1398,8 +1388,7 @@ ErrorCode Tqdcfr::read_nodes( const unsigned int gindex, Tqdcfr::ModelEntry* mod
     {
         // Get all vertices, removing ones in this batch
         Range vrange, tmp_range( dum_range );
-        result = mdbImpl->get_entities_by_type( 0, MBVERTEX, vrange );
-        RR;
+        result = mdbImpl->get_entities_by_type( 0, MBVERTEX, vrange );RR;
         if( !beforeEnts.empty() ) tmp_range.merge( beforeEnts.subset_by_type( MBVERTEX ) );
         vrange = subtract( vrange, tmp_range );
         // Compute the max cid; map is indexed by cid, so size is max_cid + 1

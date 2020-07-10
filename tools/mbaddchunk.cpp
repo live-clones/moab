@@ -46,23 +46,19 @@ int main( int argc, char* argv[] )
     ErrorCode rval;
     Core* mb = new Core();
 
-    rval = mb->load_file( inputfile.c_str() );
-    MB_CHK_SET_ERR( rval, "can't load input file" );
+    rval = mb->load_file( inputfile.c_str() );MB_CHK_SET_ERR( rval, "can't load input file" );
 
     std::cout << " opened " << inputfile << " with initial h5m data.\n";
     // open the netcdf file, and see if it has that variable we are looking for
 
     Range nodes;
-    rval = mb->get_entities_by_dimension( 0, 0, nodes );
-    MB_CHK_SET_ERR( rval, "can't get nodes" );
+    rval = mb->get_entities_by_dimension( 0, 0, nodes );MB_CHK_SET_ERR( rval, "can't get nodes" );
 
     Range edges;
-    rval = mb->get_entities_by_dimension( 0, 1, edges );
-    MB_CHK_SET_ERR( rval, "can't get edges" );
+    rval = mb->get_entities_by_dimension( 0, 1, edges );MB_CHK_SET_ERR( rval, "can't get edges" );
 
     Range cells;
-    rval = mb->get_entities_by_dimension( 0, 2, cells );
-    MB_CHK_SET_ERR( rval, "can't get cells" );
+    rval = mb->get_entities_by_dimension( 0, 2, cells );MB_CHK_SET_ERR( rval, "can't get cells" );
 
     std::cout << " it has " << nodes.size() << " vertices " << edges.size() << " edges " << cells.size() << " cells\n";
 
@@ -72,11 +68,9 @@ int main( int argc, char* argv[] )
     std::map< int, EntityHandle > cGidHandle;
     std::vector< int > gids;
     Tag gid;
-    rval = mb->tag_get_handle( "GLOBAL_ID", gid );
-    MB_CHK_SET_ERR( rval, "can't get global id tag" );
+    rval = mb->tag_get_handle( "GLOBAL_ID", gid );MB_CHK_SET_ERR( rval, "can't get global id tag" );
     gids.resize( nodes.size() );
-    rval = mb->tag_get_data( gid, nodes, &gids[0] );
-    MB_CHK_SET_ERR( rval, "can't get global id on vertices" );
+    rval = mb->tag_get_data( gid, nodes, &gids[0] );MB_CHK_SET_ERR( rval, "can't get global id on vertices" );
     int i = 0;
     for( Range::iterator vit = nodes.begin(); vit != nodes.end(); vit++ )
     {
@@ -84,8 +78,7 @@ int main( int argc, char* argv[] )
     }
 
     gids.resize( edges.size() );
-    rval = mb->tag_get_data( gid, edges, &gids[0] );
-    MB_CHK_SET_ERR( rval, "can't get global id on edges" );
+    rval = mb->tag_get_data( gid, edges, &gids[0] );MB_CHK_SET_ERR( rval, "can't get global id on edges" );
     i = 0;
     for( Range::iterator vit = edges.begin(); vit != edges.end(); vit++ )
     {
@@ -93,8 +86,7 @@ int main( int argc, char* argv[] )
     }
 
     gids.resize( cells.size() );
-    rval = mb->tag_get_data( gid, cells, &gids[0] );
-    MB_CHK_SET_ERR( rval, "can't get global id on cells" );
+    rval = mb->tag_get_data( gid, cells, &gids[0] );MB_CHK_SET_ERR( rval, "can't get global id on cells" );
     i = 0;
     for( Range::iterator vit = cells.begin(); vit != cells.end(); vit++ )
     {
@@ -115,10 +107,8 @@ int main( int argc, char* argv[] )
         }
         Tag pTag, cTag;
         int def_val = -1;
-        rval        = mb->tag_get_handle( "ProcID", 1, MB_TYPE_INTEGER, pTag, MB_TAG_CREAT | MB_TAG_DENSE, &def_val );
-        MB_CHK_SET_ERR( rval, "can't define processor tag" );
-        rval = mb->tag_get_handle( "ChunkID", 1, MB_TYPE_INTEGER, cTag, MB_TAG_CREAT | MB_TAG_DENSE, &def_val );
-        MB_CHK_SET_ERR( rval, "can't define chunk tag" );
+        rval        = mb->tag_get_handle( "ProcID", 1, MB_TYPE_INTEGER, pTag, MB_TAG_CREAT | MB_TAG_DENSE, &def_val );MB_CHK_SET_ERR( rval, "can't define processor tag" );
+        rval = mb->tag_get_handle( "ChunkID", 1, MB_TYPE_INTEGER, cTag, MB_TAG_CREAT | MB_TAG_DENSE, &def_val );MB_CHK_SET_ERR( rval, "can't define chunk tag" );
 
         int proc, lcid, ncols;
         while( inFile >> proc )
@@ -129,10 +119,8 @@ int main( int argc, char* argv[] )
             {
                 inFile >> Gid;
                 EntityHandle cell = cGidHandle[Gid];
-                rval              = mb->tag_set_data( pTag, &cell, 1, &proc );
-                MB_CHK_SET_ERR( rval, "can't set proc tag" );
-                rval = mb->tag_set_data( cTag, &cell, 1, &lcid );
-                MB_CHK_SET_ERR( rval, "can't set chunk tag" );
+                rval              = mb->tag_set_data( pTag, &cell, 1, &proc );MB_CHK_SET_ERR( rval, "can't set proc tag" );
+                rval = mb->tag_set_data( cTag, &cell, 1, &lcid );MB_CHK_SET_ERR( rval, "can't set chunk tag" );
             }
         }
 
@@ -155,12 +143,10 @@ int main( int argc, char* argv[] )
         int def_val             = -1;
         std::string procTagName = gsmapfile + "_proc";
         rval =
-            mb->tag_get_handle( procTagName.c_str(), 1, MB_TYPE_INTEGER, pTag, MB_TAG_CREAT | MB_TAG_DENSE, &def_val );
-        MB_CHK_SET_ERR( rval, "can't define processor tag" );
+            mb->tag_get_handle( procTagName.c_str(), 1, MB_TYPE_INTEGER, pTag, MB_TAG_CREAT | MB_TAG_DENSE, &def_val );MB_CHK_SET_ERR( rval, "can't define processor tag" );
         std::string segTagName = gsmapfile + "_seg";
         rval =
-            mb->tag_get_handle( segTagName.c_str(), 1, MB_TYPE_INTEGER, cTag, MB_TAG_CREAT | MB_TAG_DENSE, &def_val );
-        MB_CHK_SET_ERR( rval, "can't define segment tag" );
+            mb->tag_get_handle( segTagName.c_str(), 1, MB_TYPE_INTEGER, cTag, MB_TAG_CREAT | MB_TAG_DENSE, &def_val );MB_CHK_SET_ERR( rval, "can't define segment tag" );
 
         int compid, ngseg, gsize;
         inFile >> compid >> ngseg >> gsize;
@@ -173,18 +159,15 @@ int main( int argc, char* argv[] )
             {
                 Gid               = start + j;
                 EntityHandle cell = cGidHandle[Gid];
-                rval              = mb->tag_set_data( pTag, &cell, 1, &pe );
-                MB_CHK_SET_ERR( rval, "can't set proc tag" );
-                rval = mb->tag_set_data( cTag, &cell, 1, &i );
-                MB_CHK_SET_ERR( rval, "can't set segment tag" );
+                rval              = mb->tag_set_data( pTag, &cell, 1, &pe );MB_CHK_SET_ERR( rval, "can't set proc tag" );
+                rval = mb->tag_set_data( cTag, &cell, 1, &i );MB_CHK_SET_ERR( rval, "can't set segment tag" );
             }
         }
 
         inFile.close();
     }
 
-    rval = mb->write_file( outfile.c_str() );
-    MB_CHK_SET_ERR( rval, "can't write file" );
+    rval = mb->write_file( outfile.c_str() );MB_CHK_SET_ERR( rval, "can't write file" );
     std::cout << " wrote file " << outfile << "\n";
     return 0;
 }

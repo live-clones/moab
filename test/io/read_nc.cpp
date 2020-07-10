@@ -79,33 +79,25 @@ void test_read_eul_all()
     Interface& mb = moab;
 
     std::string opts;
-    ErrorCode rval = get_options( opts );
-    CHECK_ERR( rval );
+    ErrorCode rval = get_options( opts );CHECK_ERR( rval );
 
-    rval = mb.load_file( example_eul.c_str(), NULL, opts.c_str() );
-    CHECK_ERR( rval );
+    rval = mb.load_file( example_eul.c_str(), NULL, opts.c_str() );CHECK_ERR( rval );
 
     // Check for proper tags
     Tag Ttag0, Ttag1, coordTag;
-    rval = mb.tag_get_handle( "T0", levels, MB_TYPE_DOUBLE, Ttag0 );
-    CHECK_ERR( rval );
+    rval = mb.tag_get_handle( "T0", levels, MB_TYPE_DOUBLE, Ttag0 );CHECK_ERR( rval );
 
-    rval = mb.tag_get_handle( "T1", levels, MB_TYPE_DOUBLE, Ttag1 );
-    CHECK_ERR( rval );
+    rval = mb.tag_get_handle( "T1", levels, MB_TYPE_DOUBLE, Ttag1 );CHECK_ERR( rval );
 
-    rval = mb.tag_get_handle( "COORDS", 3, MB_TYPE_DOUBLE, coordTag );
-    CHECK_ERR( rval );
+    rval = mb.tag_get_handle( "COORDS", 3, MB_TYPE_DOUBLE, coordTag );CHECK_ERR( rval );
 
     // Check for some tags with double underscore in the tag name
     Tag tempTag;
-    rval = mb.tag_get_handle( "__lon_LOC_MINMAX", 2, MB_TYPE_INTEGER, tempTag );
-    CHECK_ERR( rval );
+    rval = mb.tag_get_handle( "__lon_LOC_MINMAX", 2, MB_TYPE_INTEGER, tempTag );CHECK_ERR( rval );
 
-    rval = mb.tag_get_handle( "__lon_LOC_VALS", 0, MB_TYPE_DOUBLE, tempTag, MB_TAG_VARLEN );
-    CHECK_ERR( rval );
+    rval = mb.tag_get_handle( "__lon_LOC_VALS", 0, MB_TYPE_DOUBLE, tempTag, MB_TAG_VARLEN );CHECK_ERR( rval );
 
-    rval = mb.tag_get_handle( "__lon_GLOBAL_MINMAX", 2, MB_TYPE_INTEGER, tempTag );
-    CHECK_ERR( rval );
+    rval = mb.tag_get_handle( "__lon_GLOBAL_MINMAX", 2, MB_TYPE_INTEGER, tempTag );CHECK_ERR( rval );
 }
 
 void test_read_eul_onevar()
@@ -113,20 +105,16 @@ void test_read_eul_onevar()
     Core moab;
     Interface& mb = moab;
     std::string opts;
-    ErrorCode rval = get_options( opts );
-    CHECK_ERR( rval );
+    ErrorCode rval = get_options( opts );CHECK_ERR( rval );
 
     opts += std::string( ";VARIABLE=T" );
-    rval = mb.load_file( example_eul.c_str(), NULL, opts.c_str() );
-    CHECK_ERR( rval );
+    rval = mb.load_file( example_eul.c_str(), NULL, opts.c_str() );CHECK_ERR( rval );
 
     // Check for proper tags
     Tag Ttag0, Ttag1;
-    rval = mb.tag_get_handle( "T0", levels, MB_TYPE_DOUBLE, Ttag0 );
-    CHECK_ERR( rval );
+    rval = mb.tag_get_handle( "T0", levels, MB_TYPE_DOUBLE, Ttag0 );CHECK_ERR( rval );
 
-    rval = mb.tag_get_handle( "T1", levels, MB_TYPE_DOUBLE, Ttag1 );
-    CHECK_ERR( rval );
+    rval = mb.tag_get_handle( "T1", levels, MB_TYPE_DOUBLE, Ttag1 );CHECK_ERR( rval );
 
     // Check values of tag T0 (first level) at some strategically chosen places below
 #ifdef MOAB_HAVE_MPI
@@ -144,8 +132,7 @@ void test_read_eul_onevar()
     if( 1 == procs )
     {
         Range global_quads;
-        rval = mb.get_entities_by_type( 0, MBQUAD, global_quads );
-        CHECK_ERR( rval );
+        rval = mb.get_entities_by_type( 0, MBQUAD, global_quads );CHECK_ERR( rval );
         CHECK_EQUAL( (size_t)4608, global_quads.size() );
 
         EntityHandle gloabl_quad_ents[] = { global_quads[0],    global_quads[2255], global_quads[2304],
@@ -165,8 +152,7 @@ void test_read_eul_onevar()
     else if( 2 == procs )
     {
         Range local_quads;
-        rval = mb.get_entities_by_type( 0, MBQUAD, local_quads );
-        CHECK_ERR( rval );
+        rval = mb.get_entities_by_type( 0, MBQUAD, local_quads );CHECK_ERR( rval );
         CHECK_EQUAL( (size_t)2304, local_quads.size() );
 
         EntityHandle local_quad_ents[] = { local_quads[0], local_quads[1151], local_quads[1152], local_quads[2303] };
@@ -202,20 +188,17 @@ void test_read_eul_onetimestep()
     Core moab;
     Interface& mb = moab;
     std::string opts;
-    ErrorCode rval = get_options( opts );
-    CHECK_ERR( rval );
+    ErrorCode rval = get_options( opts );CHECK_ERR( rval );
 
     opts += std::string( ";VARIABLE=T;TIMESTEP=1" );
-    rval = mb.load_file( example_eul.c_str(), NULL, opts.c_str() );
-    CHECK_ERR( rval );
+    rval = mb.load_file( example_eul.c_str(), NULL, opts.c_str() );CHECK_ERR( rval );
 
     // Check for proper tags
     Tag Ttag0, Ttag1;
     rval = mb.tag_get_handle( "T0", levels, MB_TYPE_DOUBLE, Ttag0 );
     CHECK_EQUAL( rval, MB_TAG_NOT_FOUND );
 
-    rval = mb.tag_get_handle( "T1", levels, MB_TYPE_DOUBLE, Ttag1 );
-    CHECK_ERR( rval );
+    rval = mb.tag_get_handle( "T1", levels, MB_TYPE_DOUBLE, Ttag1 );CHECK_ERR( rval );
 }
 
 void test_read_eul_nomesh()
@@ -225,33 +208,27 @@ void test_read_eul_nomesh()
 
     // Need a set for nomesh to work right
     EntityHandle set;
-    ErrorCode rval = mb.create_meshset( MESHSET_SET, set );
-    CHECK_ERR( rval );
+    ErrorCode rval = mb.create_meshset( MESHSET_SET, set );CHECK_ERR( rval );
 
     std::string orig, opts;
-    rval = get_options( orig );
-    CHECK_ERR( rval );
+    rval = get_options( orig );CHECK_ERR( rval );
 
     opts = orig + std::string( ";VARIABLE=T;TIMESTEP=0" );
-    rval = mb.load_file( example_eul.c_str(), &set, opts.c_str() );
-    CHECK_ERR( rval );
+    rval = mb.load_file( example_eul.c_str(), &set, opts.c_str() );CHECK_ERR( rval );
 
     // Check for proper tag
     Tag Ttag0, Ttag1;
-    rval = mb.tag_get_handle( "T0", levels, MB_TYPE_DOUBLE, Ttag0 );
-    CHECK_ERR( rval );
+    rval = mb.tag_get_handle( "T0", levels, MB_TYPE_DOUBLE, Ttag0 );CHECK_ERR( rval );
 
     rval = mb.tag_get_handle( "T1", levels, MB_TYPE_DOUBLE, Ttag1 );
     CHECK_EQUAL( rval, MB_TAG_NOT_FOUND );
 
     // Now read 2nd timestep with nomesh option
     opts = orig + std::string( ";VARIABLE=T;TIMESTEP=1;NOMESH" );
-    rval = mb.load_file( example_eul.c_str(), &set, opts.c_str() );
-    CHECK_ERR( rval );
+    rval = mb.load_file( example_eul.c_str(), &set, opts.c_str() );CHECK_ERR( rval );
 
     // Check for proper tag
-    rval = mb.tag_get_handle( "T1", levels, MB_TYPE_DOUBLE, Ttag1 );
-    CHECK_ERR( rval );
+    rval = mb.tag_get_handle( "T1", levels, MB_TYPE_DOUBLE, Ttag1 );CHECK_ERR( rval );
 }
 
 void test_read_eul_novars()
@@ -261,20 +238,16 @@ void test_read_eul_novars()
 
     // Need a set for nomesh to work right
     EntityHandle set;
-    ErrorCode rval = mb.create_meshset( MESHSET_SET, set );
-    CHECK_ERR( rval );
+    ErrorCode rval = mb.create_meshset( MESHSET_SET, set );CHECK_ERR( rval );
 
     std::string orig, opts;
-    rval = get_options( orig );
-    CHECK_ERR( rval );
+    rval = get_options( orig );CHECK_ERR( rval );
 
     opts = orig + std::string( ";NOMESH;VARIABLE=" );
-    rval = mb.load_file( example_eul.c_str(), &set, opts.c_str() );
-    CHECK_ERR( rval );
+    rval = mb.load_file( example_eul.c_str(), &set, opts.c_str() );CHECK_ERR( rval );
 
     opts = orig + std::string( ";VARIABLE=;TIMESTEP=0" );
-    rval = mb.load_file( example_eul.c_str(), &set, opts.c_str() );
-    CHECK_ERR( rval );
+    rval = mb.load_file( example_eul.c_str(), &set, opts.c_str() );CHECK_ERR( rval );
 
     // Check for proper tag
     Tag Ttag0, Ttag1;
@@ -282,23 +255,19 @@ void test_read_eul_novars()
     CHECK_EQUAL( rval, MB_TAG_NOT_FOUND );
 
     opts = orig + std::string( ";VARIABLE=T;TIMESTEP=0;NOMESH" );
-    rval = mb.load_file( example_eul.c_str(), &set, opts.c_str() );
-    CHECK_ERR( rval );
+    rval = mb.load_file( example_eul.c_str(), &set, opts.c_str() );CHECK_ERR( rval );
 
-    rval = mb.tag_get_handle( "T0", levels, MB_TYPE_DOUBLE, Ttag0 );
-    CHECK_ERR( rval );
+    rval = mb.tag_get_handle( "T0", levels, MB_TYPE_DOUBLE, Ttag0 );CHECK_ERR( rval );
 
     rval = mb.tag_get_handle( "T1", levels, MB_TYPE_DOUBLE, Ttag1 );
     CHECK_EQUAL( rval, MB_TAG_NOT_FOUND );
 
     // Now read 2nd timestep with nomesh option
     opts = orig + std::string( ";VARIABLE=T;TIMESTEP=1;NOMESH" );
-    rval = mb.load_file( example_eul.c_str(), &set, opts.c_str() );
-    CHECK_ERR( rval );
+    rval = mb.load_file( example_eul.c_str(), &set, opts.c_str() );CHECK_ERR( rval );
 
     // Check for proper tag
-    rval = mb.tag_get_handle( "T1", levels, MB_TYPE_DOUBLE, Ttag1 );
-    CHECK_ERR( rval );
+    rval = mb.tag_get_handle( "T1", levels, MB_TYPE_DOUBLE, Ttag1 );CHECK_ERR( rval );
 }
 
 void test_read_fv_all()
@@ -307,22 +276,17 @@ void test_read_fv_all()
     Interface& mb = moab;
 
     std::string opts;
-    ErrorCode rval = get_options( opts );
-    CHECK_ERR( rval );
+    ErrorCode rval = get_options( opts );CHECK_ERR( rval );
 
-    rval = mb.load_file( example_fv.c_str(), NULL, opts.c_str() );
-    CHECK_ERR( rval );
+    rval = mb.load_file( example_fv.c_str(), NULL, opts.c_str() );CHECK_ERR( rval );
 
     // Check for proper tags
     Tag Ttag0, Ttag1, coordTag;
-    rval = mb.tag_get_handle( "T0", levels, MB_TYPE_DOUBLE, Ttag0 );
-    CHECK_ERR( rval );
+    rval = mb.tag_get_handle( "T0", levels, MB_TYPE_DOUBLE, Ttag0 );CHECK_ERR( rval );
 
-    rval = mb.tag_get_handle( "T1", levels, MB_TYPE_DOUBLE, Ttag1 );
-    CHECK_ERR( rval );
+    rval = mb.tag_get_handle( "T1", levels, MB_TYPE_DOUBLE, Ttag1 );CHECK_ERR( rval );
 
-    rval = mb.tag_get_handle( "COORDS", 3, MB_TYPE_DOUBLE, coordTag );
-    CHECK_ERR( rval );
+    rval = mb.tag_get_handle( "COORDS", 3, MB_TYPE_DOUBLE, coordTag );CHECK_ERR( rval );
 }
 
 void test_read_fv_onevar()
@@ -330,20 +294,16 @@ void test_read_fv_onevar()
     Core moab;
     Interface& mb = moab;
     std::string opts;
-    ErrorCode rval = get_options( opts );
-    CHECK_ERR( rval );
+    ErrorCode rval = get_options( opts );CHECK_ERR( rval );
 
     opts += std::string( ";VARIABLE=T" );
-    rval = mb.load_file( example_fv.c_str(), NULL, opts.c_str() );
-    CHECK_ERR( rval );
+    rval = mb.load_file( example_fv.c_str(), NULL, opts.c_str() );CHECK_ERR( rval );
 
     // Check for proper tags
     Tag Ttag0, Ttag1;
-    rval = mb.tag_get_handle( "T0", levels, MB_TYPE_DOUBLE, Ttag0 );
-    CHECK_ERR( rval );
+    rval = mb.tag_get_handle( "T0", levels, MB_TYPE_DOUBLE, Ttag0 );CHECK_ERR( rval );
 
-    rval = mb.tag_get_handle( "T1", levels, MB_TYPE_DOUBLE, Ttag1 );
-    CHECK_ERR( rval );
+    rval = mb.tag_get_handle( "T1", levels, MB_TYPE_DOUBLE, Ttag1 );CHECK_ERR( rval );
 
     // Check values of tag T0 (first level) at some strategically chosen places below
 #ifdef MOAB_HAVE_MPI
@@ -361,8 +321,7 @@ void test_read_fv_onevar()
     if( 1 == procs )
     {
         Range global_quads;
-        rval = mb.get_entities_by_type( 0, MBQUAD, global_quads );
-        CHECK_ERR( rval );
+        rval = mb.get_entities_by_type( 0, MBQUAD, global_quads );CHECK_ERR( rval );
         CHECK_EQUAL( (size_t)3312, global_quads.size() );
 
         EntityHandle gloabl_quad_ents[] = { global_quads[0],    global_quads[1619], global_quads[1656],
@@ -382,8 +341,7 @@ void test_read_fv_onevar()
     else if( 2 == procs )
     {
         Range local_quads;
-        rval = mb.get_entities_by_type( 0, MBQUAD, local_quads );
-        CHECK_ERR( rval );
+        rval = mb.get_entities_by_type( 0, MBQUAD, local_quads );CHECK_ERR( rval );
         CHECK_EQUAL( (size_t)1656, local_quads.size() );
 
         EntityHandle local_quad_ents[] = { local_quads[0], local_quads[827], local_quads[828], local_quads[1655] };
@@ -419,31 +377,25 @@ void test_read_fv_onetimestep()
     Core moab;
     Interface& mb = moab;
     std::string opts;
-    ErrorCode rval = get_options( opts );
-    CHECK_ERR( rval );
+    ErrorCode rval = get_options( opts );CHECK_ERR( rval );
 
     opts += std::string( ";VARIABLE=T;TIMESTEP=1" );
-    rval = mb.load_file( example_fv.c_str(), NULL, opts.c_str() );
-    CHECK_ERR( rval );
+    rval = mb.load_file( example_fv.c_str(), NULL, opts.c_str() );CHECK_ERR( rval );
 
     // Check for proper tags
     Tag Ttag0, Ttag1;
     rval = mb.tag_get_handle( "T0", levels, MB_TYPE_DOUBLE, Ttag0 );
     CHECK_EQUAL( rval, MB_TAG_NOT_FOUND );
 
-    rval = mb.tag_get_handle( "T1", levels, MB_TYPE_DOUBLE, Ttag1 );
-    CHECK_ERR( rval );
+    rval = mb.tag_get_handle( "T1", levels, MB_TYPE_DOUBLE, Ttag1 );CHECK_ERR( rval );
 
     // Check for some tags with double underscore in the tag name
     Tag tempTag;
-    rval = mb.tag_get_handle( "__lon_LOC_MINMAX", 2, MB_TYPE_INTEGER, tempTag );
-    CHECK_ERR( rval );
+    rval = mb.tag_get_handle( "__lon_LOC_MINMAX", 2, MB_TYPE_INTEGER, tempTag );CHECK_ERR( rval );
 
-    rval = mb.tag_get_handle( "__lon_LOC_VALS", 0, MB_TYPE_DOUBLE, tempTag, MB_TAG_VARLEN );
-    CHECK_ERR( rval );
+    rval = mb.tag_get_handle( "__lon_LOC_VALS", 0, MB_TYPE_DOUBLE, tempTag, MB_TAG_VARLEN );CHECK_ERR( rval );
 
-    rval = mb.tag_get_handle( "__lon_GLOBAL_MINMAX", 2, MB_TYPE_INTEGER, tempTag );
-    CHECK_ERR( rval );
+    rval = mb.tag_get_handle( "__lon_GLOBAL_MINMAX", 2, MB_TYPE_INTEGER, tempTag );CHECK_ERR( rval );
 }
 
 void test_read_fv_nomesh()
@@ -453,33 +405,27 @@ void test_read_fv_nomesh()
 
     // Need a set for nomesh to work right
     EntityHandle set;
-    ErrorCode rval = mb.create_meshset( MESHSET_SET, set );
-    CHECK_ERR( rval );
+    ErrorCode rval = mb.create_meshset( MESHSET_SET, set );CHECK_ERR( rval );
 
     std::string orig, opts;
-    rval = get_options( orig );
-    CHECK_ERR( rval );
+    rval = get_options( orig );CHECK_ERR( rval );
 
     opts = orig + std::string( ";VARIABLE=T;TIMESTEP=0" );
-    rval = mb.load_file( example_fv.c_str(), &set, opts.c_str() );
-    CHECK_ERR( rval );
+    rval = mb.load_file( example_fv.c_str(), &set, opts.c_str() );CHECK_ERR( rval );
 
     // Check for proper tag
     Tag Ttag0, Ttag1;
-    rval = mb.tag_get_handle( "T0", levels, MB_TYPE_DOUBLE, Ttag0 );
-    CHECK_ERR( rval );
+    rval = mb.tag_get_handle( "T0", levels, MB_TYPE_DOUBLE, Ttag0 );CHECK_ERR( rval );
 
     rval = mb.tag_get_handle( "T1", levels, MB_TYPE_DOUBLE, Ttag1 );
     CHECK_EQUAL( rval, MB_TAG_NOT_FOUND );
 
     // Now read 2nd timestep with nomesh option
     opts = orig + std::string( ";VARIABLE=T;TIMESTEP=1;NOMESH" );
-    rval = mb.load_file( example_fv.c_str(), &set, opts.c_str() );
-    CHECK_ERR( rval );
+    rval = mb.load_file( example_fv.c_str(), &set, opts.c_str() );CHECK_ERR( rval );
 
     // Check for proper tag
-    rval = mb.tag_get_handle( "T1", levels, MB_TYPE_DOUBLE, Ttag1 );
-    CHECK_ERR( rval );
+    rval = mb.tag_get_handle( "T1", levels, MB_TYPE_DOUBLE, Ttag1 );CHECK_ERR( rval );
 }
 
 void test_read_fv_novars()
@@ -489,20 +435,16 @@ void test_read_fv_novars()
 
     // Need a set for nomesh to work right
     EntityHandle set;
-    ErrorCode rval = mb.create_meshset( MESHSET_SET, set );
-    CHECK_ERR( rval );
+    ErrorCode rval = mb.create_meshset( MESHSET_SET, set );CHECK_ERR( rval );
 
     std::string orig, opts;
-    rval = get_options( orig );
-    CHECK_ERR( rval );
+    rval = get_options( orig );CHECK_ERR( rval );
 
     opts = orig + std::string( ";NOMESH;VARIABLE=" );
-    rval = mb.load_file( example_fv.c_str(), &set, opts.c_str() );
-    CHECK_ERR( rval );
+    rval = mb.load_file( example_fv.c_str(), &set, opts.c_str() );CHECK_ERR( rval );
 
     opts = orig + std::string( ";VARIABLE=;TIMESTEP=0" );
-    rval = mb.load_file( example_fv.c_str(), &set, opts.c_str() );
-    CHECK_ERR( rval );
+    rval = mb.load_file( example_fv.c_str(), &set, opts.c_str() );CHECK_ERR( rval );
 
     // Check for proper tag
     Tag Ttag0, Ttag1;
@@ -510,23 +452,19 @@ void test_read_fv_novars()
     CHECK_EQUAL( rval, MB_TAG_NOT_FOUND );
 
     opts = orig + std::string( ";VARIABLE=T;TIMESTEP=0;NOMESH" );
-    rval = mb.load_file( example_fv.c_str(), &set, opts.c_str() );
-    CHECK_ERR( rval );
+    rval = mb.load_file( example_fv.c_str(), &set, opts.c_str() );CHECK_ERR( rval );
 
-    rval = mb.tag_get_handle( "T0", levels, MB_TYPE_DOUBLE, Ttag0 );
-    CHECK_ERR( rval );
+    rval = mb.tag_get_handle( "T0", levels, MB_TYPE_DOUBLE, Ttag0 );CHECK_ERR( rval );
 
     rval = mb.tag_get_handle( "T1", levels, MB_TYPE_DOUBLE, Ttag1 );
     CHECK_EQUAL( rval, MB_TAG_NOT_FOUND );
 
     // Now read 2nd timestep with nomesh option
     opts = orig + std::string( ";VARIABLE=T;TIMESTEP=1;NOMESH" );
-    rval = mb.load_file( example_fv.c_str(), &set, opts.c_str() );
-    CHECK_ERR( rval );
+    rval = mb.load_file( example_fv.c_str(), &set, opts.c_str() );CHECK_ERR( rval );
 
     // Check for proper tag
-    rval = mb.tag_get_handle( "T1", levels, MB_TYPE_DOUBLE, Ttag1 );
-    CHECK_ERR( rval );
+    rval = mb.tag_get_handle( "T1", levels, MB_TYPE_DOUBLE, Ttag1 );CHECK_ERR( rval );
 }
 
 #ifdef MOAB_HAVE_MPI
@@ -537,27 +475,22 @@ void test_read_fv_ghosting()
 
     // Need a set for nomesh to work right
     EntityHandle set;
-    ErrorCode rval = mb.create_meshset( MESHSET_SET, set );
-    CHECK_ERR( rval );
+    ErrorCode rval = mb.create_meshset( MESHSET_SET, set );CHECK_ERR( rval );
 
     std::string orig, opts;
-    rval = get_options( orig );
-    CHECK_ERR( rval );
+    rval = get_options( orig );CHECK_ERR( rval );
 
     opts = std::string( "PARALLEL=READ_PART;PARTITION;PARALLEL_GHOSTS=2.0.1;NOMESH;VARIABLE=;"
                         "PARTITION_METHOD=SQIJ" );
-    rval = mb.load_file( example_fv.c_str(), &set, opts.c_str() );
-    CHECK_ERR( rval );
+    rval = mb.load_file( example_fv.c_str(), &set, opts.c_str() );CHECK_ERR( rval );
 
     opts = std::string( "PARALLEL=READ_PART;PARTITION;PARALLEL_RESOLVE_SHARED_ENTS;PARALLEL_GHOSTS="
                         "2.0.1;PARTITION_METHOD=SQIJ;VARIABLE=" );
-    rval = mb.load_file( example_fv.c_str(), &set, opts.c_str() );
-    CHECK_ERR( rval );
+    rval = mb.load_file( example_fv.c_str(), &set, opts.c_str() );CHECK_ERR( rval );
 
     opts = std::string( "PARALLEL=READ_PART;PARTITION;PARTITION_METHOD=SQIJ;VARIABLE=TOT_CLD_"
                         "VISTAU;NOMESH;TIMESTEP=0;" );
-    rval = mb.load_file( example_fv.c_str(), &set, opts.c_str() );
-    CHECK_ERR( rval );
+    rval = mb.load_file( example_fv.c_str(), &set, opts.c_str() );CHECK_ERR( rval );
 }
 #endif
 
@@ -568,16 +501,13 @@ void test_read_domain()
 
     // Need a set for nomesh to work right
     EntityHandle set;
-    ErrorCode rval = mb.create_meshset( MESHSET_SET, set );
-    CHECK_ERR( rval );
+    ErrorCode rval = mb.create_meshset( MESHSET_SET, set );CHECK_ERR( rval );
 
     std::string orig, opts;
-    rval = get_options( orig );
-    CHECK_ERR( rval );
+    rval = get_options( orig );CHECK_ERR( rval );
 
     opts = orig + std::string( ";VARIABLE=" );
-    rval = mb.load_file( example_domain.c_str(), &set, opts.c_str() );
-    CHECK_ERR( rval );
+    rval = mb.load_file( example_domain.c_str(), &set, opts.c_str() );CHECK_ERR( rval );
 }
 ErrorCode get_options( std::string& opts )
 {

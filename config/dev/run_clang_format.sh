@@ -20,6 +20,7 @@ allfiles=$*
 function process_source()
 {
 	srcfile=$1
+
 	echo "Processing $srcfile ..."
 	eval `${CLANGFORMAT_EXE} -i -style=file ${srcfile}`
 	eval `${SEDWITHOPTIONS} -n -e 'H;${x;s/;\n  *MB_CHK/;MB_CHK/g;p;}' ${srcfile}`
@@ -32,6 +33,7 @@ function process_source()
 	eval `${SEDWITHOPTIONS} -n -e 'H;${x;s/;\n  *MSQ_ERRRTN/;MSQ_ERRRTN/g;p;}' ${srcfile}`
 	eval `${SEDWITHOPTIONS} '/./,$!d' ${srcfile}`
 	eval `rm ${srcfile}.bak`
+
 }
 
 # Process all given user input source files

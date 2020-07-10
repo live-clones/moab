@@ -76,8 +76,7 @@ void CompositeOFScalarMultiply::clear()
 void CompositeOFScalarMultiply::initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
                                                   MsqError& err )
 {
-    objFunc->initialize_queue( mesh_and_domain, settings, err );
-    MSQ_ERRRTN( err );
+    objFunc->initialize_queue( mesh_and_domain, settings, err );MSQ_ERRRTN( err );
 }
 
 bool CompositeOFScalarMultiply::initialize_block_coordinate_descent( MeshDomainAssoc* mesh_and_domain,

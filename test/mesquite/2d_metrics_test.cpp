@@ -106,32 +106,27 @@ void reference( MeshImpl* mesh )
 {
     MsqError err;
     std::string filename = std::string( STRINGIFY( SRCDIR ) ) + "/2d_metrics_reference.vtk";
-    mesh->read_vtk( filename.c_str(), err );
-    CHKERR( err )
+    mesh->read_vtk( filename.c_str(), err );CHKERR( err )
 }
 
 void exp_1_init( MeshImpl* mesh )
 {
     MsqError err;
     std::string filename = std::string( STRINGIFY( SRCDIR ) ) + "/2d_metrics_reference.vtk";
-    mesh->read_vtk( filename.c_str(), err );
-    CHKERR( err )
+    mesh->read_vtk( filename.c_str(), err );CHKERR( err )
 
     vector< Mesh::VertexHandle > handles;
-    mesh->get_all_vertices( handles, err );
-    CHKERR( err )
+    mesh->get_all_vertices( handles, err );CHKERR( err )
 
     // vector<Mesh::VertexHandle>::iterator i;
     for( size_t i = 0; i < 8; ++i )
     {
         MsqVertex vtx;
-        mesh->vertices_get_coordinates( &handles[i], &vtx, 1, err );
-        CHKERR( err )
+        mesh->vertices_get_coordinates( &handles[i], &vtx, 1, err );CHKERR( err )
 
         vtx[1] = -0.4 * ( vtx[0] - 0.5 ) * ( vtx[0] - 0.5 ) + 0.1;
 
-        mesh->vertex_set_coordinates( handles[i], vtx, err );
-        CHKERR( err )
+        mesh->vertex_set_coordinates( handles[i], vtx, err );CHKERR( err )
     }
 }
 
@@ -314,20 +309,17 @@ void scale( double s, Mesh* mesh )
 {
     MsqError err;
     vector< Mesh::VertexHandle > handles;
-    mesh->get_all_vertices( handles, err );
-    CHKERR( err )
+    mesh->get_all_vertices( handles, err );CHKERR( err )
 
     vector< Mesh::VertexHandle >::iterator i;
     for( i = handles.begin(); i != handles.end(); ++i )
     {
         MsqVertex vtx;
-        mesh->vertices_get_coordinates( &*i, &vtx, 1, err );
-        CHKERR( err )
+        mesh->vertices_get_coordinates( &*i, &vtx, 1, err );CHKERR( err )
 
         vtx *= s;
 
-        mesh->vertex_set_coordinates( *i, vtx, err );
-        CHKERR( err )
+        mesh->vertex_set_coordinates( *i, vtx, err );CHKERR( err )
     }
 }
 
@@ -335,23 +327,20 @@ void quarter_annulus( double inner, double outer, Mesh* mesh )
 {
     MsqError err;
     vector< Mesh::VertexHandle > handles;
-    mesh->get_all_vertices( handles, err );
-    CHKERR( err )
+    mesh->get_all_vertices( handles, err );CHKERR( err )
 
     vector< Mesh::VertexHandle >::iterator i;
     for( i = handles.begin(); i != handles.end(); ++i )
     {
         MsqVertex vtx;
-        mesh->vertices_get_coordinates( &*i, &vtx, 1, err );
-        CHKERR( err )
+        mesh->vertices_get_coordinates( &*i, &vtx, 1, err );CHKERR( err )
 
         double r = inner + ( outer - inner ) * vtx[1];
         double a = M_PI * 0.5 * ( 1.0 - vtx[0] );
         vtx[0]   = r * cos( a );
         vtx[1]   = r * sin( a );
 
-        mesh->vertex_set_coordinates( *i, vtx, err );
-        CHKERR( err )
+        mesh->vertex_set_coordinates( *i, vtx, err );CHKERR( err )
     }
 }
 
@@ -359,22 +348,19 @@ void parabolic_squash( double height, Mesh* mesh )
 {
     MsqError err;
     vector< Mesh::VertexHandle > handles;
-    mesh->get_all_vertices( handles, err );
-    CHKERR( err )
+    mesh->get_all_vertices( handles, err );CHKERR( err )
 
     vector< Mesh::VertexHandle >::iterator i;
     for( i = handles.begin(); i != handles.end(); ++i )
     {
         MsqVertex vtx;
-        mesh->vertices_get_coordinates( &*i, &vtx, 1, err );
-        CHKERR( err )
+        mesh->vertices_get_coordinates( &*i, &vtx, 1, err );CHKERR( err )
 
         const double br = ( 1.0 - vtx[1] ) * height;
         const double a  = -4 * br;
         vtx[1] += a * ( vtx[0] - 0.5 ) * ( vtx[0] - 0.5 ) + br;
 
-        mesh->vertex_set_coordinates( *i, vtx, err );
-        CHKERR( err )
+        mesh->vertex_set_coordinates( *i, vtx, err );CHKERR( err )
     }
 }
 
@@ -382,22 +368,19 @@ void horseshoe( double x_inner, double x_outer, double y_inner, double y_outer, 
 {
     MsqError err;
     vector< Mesh::VertexHandle > handles;
-    mesh->get_all_vertices( handles, err );
-    CHKERR( err )
+    mesh->get_all_vertices( handles, err );CHKERR( err )
 
     vector< Mesh::VertexHandle >::iterator i;
     for( i = handles.begin(); i != handles.end(); ++i )
     {
         MsqVertex vtx;
-        mesh->vertices_get_coordinates( &*i, &vtx, 1, err );
-        CHKERR( err )
+        mesh->vertices_get_coordinates( &*i, &vtx, 1, err );CHKERR( err )
 
         double a = M_PI * ( 1 - vtx[0] );
         vtx[0]   = ( x_inner + ( x_outer - x_inner ) * vtx[1] ) * cos( a );
         vtx[1]   = ( y_inner + ( y_outer - y_inner ) * vtx[1] ) * sin( a );
 
-        mesh->vertex_set_coordinates( *i, vtx, err );
-        CHKERR( err )
+        mesh->vertex_set_coordinates( *i, vtx, err );CHKERR( err )
     }
 }
 
@@ -407,15 +390,13 @@ void write_mesh( MeshImpl* mesh, const char* filename )
     if( WRITE_VTK )
     {
         string vfile = string( filename ) + ".vtk";
-        mesh->write_vtk( vfile.c_str(), err );
-        CHKERR( err )
+        mesh->write_vtk( vfile.c_str(), err );CHKERR( err )
         cout << "Wrote: \"" << vfile << '"' << endl;
     }
     if( WRITE_GNUPLOT )
     {
         string vfile = string( filename ) + ".eps";
-        MeshWriter::write_eps( mesh, vfile.c_str(), MeshWriter::Projection( MeshWriter::X, MeshWriter::Y ), err );
-        CHKERR( err )
+        MeshWriter::write_eps( mesh, vfile.c_str(), MeshWriter::Projection( MeshWriter::X, MeshWriter::Y ), err );CHKERR( err )
         cout << "Wrote: \"" << vfile << '"' << endl;
     }
 }
@@ -482,8 +463,7 @@ bool run_smoother( mesh_reader_t input_mesh, mesh_reader_t reference_mesh, int e
     solver->set_outer_termination_criterion( &outer );
 
     InstructionQueue q;
-    q.set_master_quality_improver( solver, err );
-    CHKERR( err )
+    q.set_master_quality_improver( solver, err );CHKERR( err )
 
     cout << "Running " << exp << "." << n << " ...";
 

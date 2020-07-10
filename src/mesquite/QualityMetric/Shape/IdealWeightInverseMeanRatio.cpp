@@ -51,8 +51,7 @@ namespace MBMesquite
 IdealWeightInverseMeanRatio::IdealWeightInverseMeanRatio( MsqError& err, double pow_dbl )
     : AveragingQM( QualityMetric::LINEAR )
 {
-    set_metric_power( pow_dbl, err );
-    MSQ_ERRRTN( err );
+    set_metric_power( pow_dbl, err );MSQ_ERRRTN( err );
 }
 
 IdealWeightInverseMeanRatio::IdealWeightInverseMeanRatio() : AveragingQM( QualityMetric::LINEAR )

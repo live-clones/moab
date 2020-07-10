@@ -71,16 +71,13 @@ PatchData* MeshUtil::get_global_patch( MsqError& err )
 
 void MeshUtil::edge_length_distribution( SimpleStats& results, MsqError& err )
 {
-    PatchData* pd = get_global_patch( err );
-    MSQ_ERRRTN( err );
-    EdgeIterator iter( pd, err );
-    MSQ_ERRRTN( err );
+    PatchData* pd = get_global_patch( err );MSQ_ERRRTN( err );
+    EdgeIterator iter( pd, err );MSQ_ERRRTN( err );
     while( !iter.is_at_end() )
     {
         Vector3D diff = iter.start() - iter.end();
         results.add_squared( diff % diff );
-        iter.step( err );
-        MSQ_ERRRTN( err );
+        iter.step( err );MSQ_ERRRTN( err );
     }
 
     if( results.empty() )
@@ -91,8 +88,7 @@ void MeshUtil::edge_length_distribution( SimpleStats& results, MsqError& err )
 
 void MeshUtil::lambda_distribution( SimpleStats& results, MsqError& err )
 {
-    PatchData& pd = *get_global_patch( err );
-    MSQ_ERRRTN( err );
+    PatchData& pd = *get_global_patch( err );MSQ_ERRRTN( err );
 
     std::vector< size_t > handles;
     TMPQualityMetric::get_patch_evaluations( pd, handles, false, err );
@@ -122,8 +118,7 @@ void MeshUtil::lambda_distribution( SimpleStats& results, MsqError& err )
             }
 
             MsqMatrix< 3, 3 > W;
-            mf->jacobian( pd, e, bits, s, indices, derivs3D, count, W, err );
-            MSQ_ERRRTN( err );
+            mf->jacobian( pd, e, bits, s, indices, derivs3D, count, W, err );MSQ_ERRRTN( err );
             assert( N >= count );
             lambda = TargetCalculator::size( W );
         }
@@ -139,8 +134,7 @@ void MeshUtil::lambda_distribution( SimpleStats& results, MsqError& err )
             }
 
             MsqMatrix< 3, 2 > W;
-            mf->jacobian( pd, e, bits, s, indices, derivs2D, count, W, err );
-            MSQ_ERRRTN( err );
+            mf->jacobian( pd, e, bits, s, indices, derivs2D, count, W, err );MSQ_ERRRTN( err );
             assert( N >= count );
             lambda = TargetCalculator::size( W );
         }

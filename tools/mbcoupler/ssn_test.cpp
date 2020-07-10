@@ -75,8 +75,7 @@ int main( int argc, char** argv )
                      "\"OPTION1=VALUE1;OPTION2;OPTION3=VALUE3\""
                   << std::endl;
 
-        err = integrate_scalar_field_test();
-        MB_CHK_SET_ERR( (ErrorCode)err, "Integrate scalar field test failed" );
+        err = integrate_scalar_field_test();MB_CHK_SET_ERR( (ErrorCode)err, "Integrate scalar field test failed" );
 
         err = MPI_Finalize();
 
@@ -109,8 +108,7 @@ int main( int argc, char** argv )
     std::vector< const char* > tagNames;
     std::vector< const char* > tagValues;
     std::string normTag, fileOpts;
-    get_file_options( argc, argv, filenames, normTag, tagNames, tagValues, fileOpts, &err );
-    MB_CHK_SET_ERR( (ErrorCode)err, "get_file_options failed" );
+    get_file_options( argc, argv, filenames, normTag, tagNames, tagValues, fileOpts, &err );MB_CHK_SET_ERR( (ErrorCode)err, "get_file_options failed" );
 
     // Print out the input parameters
     std::cout << "    Input Parameters - " << std::endl;
@@ -156,8 +154,7 @@ int main( int argc, char** argv )
         result = mbi->create_meshset( MESHSET_SET, roots[i] );
 
         MB_CHK_SET_ERR( result, "Creating root set failed" );
-        result = rps[i]->load_file( filenames[i], &roots[i], FileOptions( fileOpts.c_str() ) );
-        MB_CHK_SET_ERR( result, "load_file failed" );
+        result = rps[i]->load_file( filenames[i], &roots[i], FileOptions( fileOpts.c_str() ) );MB_CHK_SET_ERR( result, "load_file failed" );
     }
 
     // Initialize the debug object for Range printing
@@ -170,8 +167,7 @@ int main( int argc, char** argv )
     {
 
         Range rootRg;
-        result = mbi->get_entities_by_handle( roots[k], rootRg );
-        MB_CHK_SET_ERR( result, "can't get entities" );
+        result = mbi->get_entities_by_handle( roots[k], rootRg );MB_CHK_SET_ERR( result, "can't get entities" );
         debugOut.print( 2, "Root set entities: ", rootRg );
         rootRg.clear();
 
@@ -199,8 +195,7 @@ int main( int argc, char** argv )
     while( iTags < numTagNames )
     {
         std::cout << "Getting handle for " << tagNames[iTags] << std::endl;
-        result = mbi->tag_get_handle( tagNames[iTags], tagHandles[iTags] );
-        MB_CHK_SET_ERR( result, "Retrieving tag handles failed" );
+        result = mbi->tag_get_handle( tagNames[iTags], tagHandles[iTags] );MB_CHK_SET_ERR( result, "Retrieving tag handles failed" );
         iTags++;
     }
 
@@ -218,8 +213,7 @@ int main( int argc, char** argv )
         // Create tuple_list for each mesh's
         std::cout << "Creating tuples for mesh 1..." << std::endl;
         TupleList* m1TagTuples = NULL;
-        err                    = mbc.create_tuples( entsets1, &tagHandles[0], tagHandles.size(), &m1TagTuples );
-        MB_CHK_SET_ERR( (ErrorCode)err, "create_tuples failed" );
+        err                    = mbc.create_tuples( entsets1, &tagHandles[0], tagHandles.size(), &m1TagTuples );MB_CHK_SET_ERR( (ErrorCode)err, "create_tuples failed" );
 
         std::cout << "   create_tuples returned" << std::endl;
         print_tuples( m1TagTuples );
@@ -231,8 +225,7 @@ int main( int argc, char** argv )
 
         std::cout << "Creating tuples for mesh 2..." << std::endl;
         TupleList* m2TagTuples = NULL;
-        err = mbc.create_tuples( entsets2, (Tag*)( &tagHandles[0] ), tagHandles.size(), &m2TagTuples );
-        MB_CHK_SET_ERR( (ErrorCode)err, "create_tuples failed" );
+        err = mbc.create_tuples( entsets2, (Tag*)( &tagHandles[0] ), tagHandles.size(), &m2TagTuples );MB_CHK_SET_ERR( (ErrorCode)err, "create_tuples failed" );
 
         std::cout << "   create_tuples returned" << std::endl;
         print_tuples( m2TagTuples );
@@ -247,8 +240,7 @@ int main( int argc, char** argv )
         tplp_arr[0]           = m1TagTuples;
         tplp_arr[1]           = m2TagTuples;
 
-        err = mbc.consolidate_tuples( tplp_arr, 2, &unique_tpl );
-        MB_CHK_SET_ERR( (ErrorCode)err, "consolidate_tuples failed" );
+        err = mbc.consolidate_tuples( tplp_arr, 2, &unique_tpl );MB_CHK_SET_ERR( (ErrorCode)err, "consolidate_tuples failed" );
         std::cout << "    consolidate_tuples returned" << std::endl;
         print_tuples( unique_tpl );
     }
@@ -263,8 +255,7 @@ int main( int argc, char** argv )
     // Get matching entities for Mesh 1
     std::cout << "Get matching entities for mesh 1..." << std::endl;
     err = mbc.get_matching_entities( roots[0], &tagHandles[0], &tagValues[0], tagHandles.size(), &m1EntitySets,
-                                     &m1EntityGroups );
-    MB_CHK_SET_ERR( (ErrorCode)err, "get_matching_entities failed" );
+                                     &m1EntityGroups );MB_CHK_SET_ERR( (ErrorCode)err, "get_matching_entities failed" );
 
     std::cout << "    get_matching_entities returned " << m1EntityGroups.size() << " entity groups" << std::endl;
 
@@ -298,8 +289,7 @@ int main( int argc, char** argv )
     // Get matching entities for Mesh 2
     std::cout << "Get matching entities for mesh 2..." << std::endl;
     err = mbc.get_matching_entities( roots[1], &tagHandles[0], &tagValues[0], tagHandles.size(), &m2EntitySets,
-                                     &m2EntityGroups );
-    MB_CHK_SET_ERR( (ErrorCode)err, "get_matching_entities failed" );
+                                     &m2EntityGroups );MB_CHK_SET_ERR( (ErrorCode)err, "get_matching_entities failed" );
 
     std::cout << "    get_matching_entities returned " << m2EntityGroups.size() << " entity groups" << std::endl;
     for( iter_egi = m2EntityGroups.begin(), iter_esi = m2EntitySets.begin(), icnt = 1;
@@ -401,8 +391,7 @@ int main( int argc, char** argv )
         print_tuples( rcv_tuples );
     }
 
-    err = integrate_scalar_field_test();
-    MB_CHK_SET_ERR( (ErrorCode)err, "Failure in integrating a scalar_field" );
+    err = integrate_scalar_field_test();MB_CHK_SET_ERR( (ErrorCode)err, "Failure in integrating a scalar_field" );
 
     // ******************************
     std::cout << "********** Test get_group_integ_vals **********" << std::endl;
@@ -411,8 +400,7 @@ int main( int argc, char** argv )
     // print the field values at the vertices before change.
     std::cout << "    print vertex field values first:" << std::endl;
     Tag norm_hdl;
-    result = mbi->tag_get_handle( normTag.c_str(), norm_hdl );
-    MB_CHK_SET_ERR( (ErrorCode)err, "Failed to get tag handle." );
+    result = mbi->tag_get_handle( normTag.c_str(), norm_hdl );MB_CHK_SET_ERR( (ErrorCode)err, "Failed to get tag handle." );
 
     Coupler::IntegType integ_type = Coupler::VOLUME;
     // Mesh 1 field values
@@ -428,8 +416,7 @@ int main( int argc, char** argv )
 
     std::cout << "Get group integrated field values for mesh 1..." << std::endl;
     std::vector< double > m1IntegVals( m1EntityGroups.size() );
-    err = mbc.get_group_integ_vals( m1EntityGroups, m1IntegVals, normTag.c_str(), 4, integ_type );
-    MB_CHK_SET_ERR( (ErrorCode)err, "Failed to get the Mesh 1 group integration values." );
+    err = mbc.get_group_integ_vals( m1EntityGroups, m1IntegVals, normTag.c_str(), 4, integ_type );MB_CHK_SET_ERR( (ErrorCode)err, "Failed to get the Mesh 1 group integration values." );
     std::cout << "Mesh 1 integrated field values(" << m1IntegVals.size() << "): ";
     for( iter_ivals = m1IntegVals.begin(); iter_ivals != m1IntegVals.end(); ++iter_ivals )
     {
@@ -439,8 +426,7 @@ int main( int argc, char** argv )
 
     std::cout << "Get group integrated field values for mesh 2..." << std::endl;
     std::vector< double > m2IntegVals( m2EntityGroups.size() );
-    err = mbc.get_group_integ_vals( m2EntityGroups, m2IntegVals, normTag.c_str(), 4, integ_type );
-    MB_CHK_SET_ERR( (ErrorCode)err, "Failed to get the Mesh 2 group integration values." );
+    err = mbc.get_group_integ_vals( m2EntityGroups, m2IntegVals, normTag.c_str(), 4, integ_type );MB_CHK_SET_ERR( (ErrorCode)err, "Failed to get the Mesh 2 group integration values." );
     std::cout << "Mesh 2 integrated field values(" << m2IntegVals.size() << "): ";
     for( iter_ivals = m2IntegVals.begin(); iter_ivals != m2IntegVals.end(); ++iter_ivals )
     {
@@ -479,18 +465,15 @@ int main( int argc, char** argv )
     std::cout << std::endl;
 
     // Apply the factors and reprint the vertices
-    err = mbc.apply_group_norm_factor( m1EntitySets, m1IntegVals, normTag.c_str(), integ_type );
-    MB_CHK_SET_ERR( (ErrorCode)err, "Failed to apply norm factors to Mesh 1." );
+    err = mbc.apply_group_norm_factor( m1EntitySets, m1IntegVals, normTag.c_str(), integ_type );MB_CHK_SET_ERR( (ErrorCode)err, "Failed to apply norm factors to Mesh 1." );
 
-    err = mbc.apply_group_norm_factor( m2EntitySets, m2IntegVals, normTag.c_str(), integ_type );
-    MB_CHK_SET_ERR( (ErrorCode)err, "Failed to apply norm factors to Mesh 2." );
+    err = mbc.apply_group_norm_factor( m2EntitySets, m2IntegVals, normTag.c_str(), integ_type );MB_CHK_SET_ERR( (ErrorCode)err, "Failed to apply norm factors to Mesh 2." );
 
     // Get the norm_tag_factor on the EntitySets
     // Get the handle for the norm factor tag
     Tag norm_factor_hdl;
     std::string normFactor = normTag + "_normf";
-    result                 = mbi->tag_get_handle( normFactor.c_str(), norm_factor_hdl );
-    MB_CHK_SET_ERR( result, "Failed to get norm factor tag handle." );
+    result                 = mbi->tag_get_handle( normFactor.c_str(), norm_factor_hdl );MB_CHK_SET_ERR( result, "Failed to get norm factor tag handle." );
 
     // Mesh 1 values
     std::cout << "Mesh 1 norm factors per EntitySet...";
@@ -500,8 +483,7 @@ int main( int argc, char** argv )
         {
             double data     = 0;
             EntityHandle eh = *iter_esj;
-            result          = mbi->tag_get_data( norm_factor_hdl, &eh, 1, &data );
-            MB_CHK_SET_ERR( result, "Failed to get tag data." );
+            result          = mbi->tag_get_data( norm_factor_hdl, &eh, 1, &data );MB_CHK_SET_ERR( result, "Failed to get tag data." );
             std::cout << data << ", ";
         }
     }
@@ -515,8 +497,7 @@ int main( int argc, char** argv )
         {
             double data     = 0;
             EntityHandle eh = *iter_esj;
-            result          = mbi->tag_get_data( norm_factor_hdl, &eh, 1, &data );
-            MB_CHK_SET_ERR( result, "Failed to get tag data." );
+            result          = mbi->tag_get_data( norm_factor_hdl, &eh, 1, &data );MB_CHK_SET_ERR( result, "Failed to get tag data." );
             std::cout << data << ", ";
         }
     }
@@ -527,8 +508,7 @@ int main( int argc, char** argv )
     // Now call the Coupler::normalize_subset routine and see if we get an error.
     std::cout << "Running Coupler::normalize_subset() on mesh 1" << std::endl;
     err = mbc.normalize_subset( (EntityHandle)roots[0], normTag.c_str(), &tagNames[0], numTagNames, &tagValues[0],
-                                Coupler::VOLUME, 4 );
-    MB_CHK_SET_ERR( (ErrorCode)err, "Failure in call to Coupler::normalize_subset() on mesh 1" );
+                                Coupler::VOLUME, 4 );MB_CHK_SET_ERR( (ErrorCode)err, "Failure in call to Coupler::normalize_subset() on mesh 1" );
 
     // Print the normFactor on each EntitySet after the above call.
     // Mesh 1 values
@@ -539,8 +519,7 @@ int main( int argc, char** argv )
         {
             double data     = 0;
             EntityHandle eh = *iter_esj;
-            result          = mbi->tag_get_data( norm_factor_hdl, &eh, 1, &data );
-            MB_CHK_SET_ERR( result, "Failed to get tag data." );
+            result          = mbi->tag_get_data( norm_factor_hdl, &eh, 1, &data );MB_CHK_SET_ERR( result, "Failed to get tag data." );
             std::cout << data << ", ";
         }
     }
@@ -548,8 +527,7 @@ int main( int argc, char** argv )
 
     std::cout << "Running Coupler::normalize_subset() on mesh 2" << std::endl;
     err = mbc.normalize_subset( (EntityHandle)roots[1], normTag.c_str(), &tagNames[0], numTagNames, &tagValues[0],
-                                Coupler::VOLUME, 4 );
-    MB_CHK_SET_ERR( (ErrorCode)err, "Failure in call to Coupler::normalize_subset() on mesh 2" );
+                                Coupler::VOLUME, 4 );MB_CHK_SET_ERR( (ErrorCode)err, "Failure in call to Coupler::normalize_subset() on mesh 2" );
 
     // Mesh 2 values
     std::cout << "Mesh 2 norm factors per EntitySet...";
@@ -559,8 +537,7 @@ int main( int argc, char** argv )
         {
             double data     = 0;
             EntityHandle eh = *iter_esj;
-            result          = mbi->tag_get_data( norm_factor_hdl, &eh, 1, &data );
-            MB_CHK_SET_ERR( result, "Failed to get tag data." );
+            result          = mbi->tag_get_data( norm_factor_hdl, &eh, 1, &data );MB_CHK_SET_ERR( result, "Failed to get tag data." );
 
             std::cout << data << ", ";
         }

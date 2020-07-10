@@ -371,8 +371,7 @@ ErrorCode WriteSLAC::gather_mesh_information(
         for( ; iter != end_iter; ++iter )
         {
             if( TYPE_FROM_HANDLE( *iter ) != MBVERTEX ) continue;
-            result = mbImpl->tag_get_data( mEntityMark, &( *iter ), 1, &node_marked );
-            MB_CHK_SET_ERR( result, "Couldn't get mark data" );
+            result = mbImpl->tag_get_data( mEntityMark, &( *iter ), 1, &node_marked );MB_CHK_SET_ERR( result, "Couldn't get mark data" );
 
             if( 0x1 == node_marked ) dirset_data.nodes.push_back( *iter );
             j++;
@@ -401,10 +400,8 @@ ErrorCode WriteSLAC::gather_mesh_information(
         Range forward_elems, reverse_elems;
         if( get_neuset_elems( *vector_iter, 0, forward_elems, reverse_elems ) == MB_FAILURE ) return MB_FAILURE;
 
-        ErrorCode result = get_valid_sides( forward_elems, 1, neuset_data );
-        MB_CHK_SET_ERR( result, "Couldn't get valid sides data" );
-        result = get_valid_sides( reverse_elems, -1, neuset_data );
-        MB_CHK_SET_ERR( result, "Couldn't get valid sides data" );
+        ErrorCode result = get_valid_sides( forward_elems, 1, neuset_data );MB_CHK_SET_ERR( result, "Couldn't get valid sides data" );
+        result = get_valid_sides( reverse_elems, -1, neuset_data );MB_CHK_SET_ERR( result, "Couldn't get valid sides data" );
 
         neuset_data.number_elements = neuset_data.elements.size();
         neuset_info.push_back( neuset_data );
@@ -423,8 +420,7 @@ ErrorCode WriteSLAC::get_valid_sides( Range& elems, const int sense, WriteSLAC::
     for( Range::iterator iter = elems.begin(); iter != elems.end(); ++iter )
     {
         // Should insert here if "side" is a quad/tri on a quad/tri mesh
-        result = mbImpl->tag_get_data( mEntityMark, &( *iter ), 1, &element_marked );
-        MB_CHK_SET_ERR( result, "Couldn't get mark data" );
+        result = mbImpl->tag_get_data( mEntityMark, &( *iter ), 1, &element_marked );MB_CHK_SET_ERR( result, "Couldn't get mark data" );
 
         if( 0x1 == element_marked )
         {
@@ -447,8 +443,7 @@ ErrorCode WriteSLAC::get_valid_sides( Range& elems, const int sense, WriteSLAC::
                 // Make sure the adjacent parent element will be output
                 for( unsigned int k = 0; k < parents.size(); k++ )
                 {
-                    result = mbImpl->tag_get_data( mEntityMark, &( parents[k] ), 1, &element_marked );
-                    MB_CHK_SET_ERR( result, "Couldn't get mark data" );
+                    result = mbImpl->tag_get_data( mEntityMark, &( parents[k] ), 1, &element_marked );MB_CHK_SET_ERR( result, "Couldn't get mark data" );
 
                     int side_no, this_sense, this_offset;
                     if( 0x1 == element_marked &&
@@ -502,8 +497,7 @@ ErrorCode WriteSLAC::write_nodes( const int num_nodes, const Range& nodes, const
     {
         double trans_matrix[16];
         const EntityHandle mesh = 0;
-        result                  = mbImpl->tag_get_data( trans_tag, &mesh, 1, trans_matrix );
-        MB_CHK_SET_ERR( result, "Couldn't get transform data" );
+        result                  = mbImpl->tag_get_data( trans_tag, &mesh, 1, trans_matrix );MB_CHK_SET_ERR( result, "Couldn't get transform data" );
 
         for( int i = 0; i < num_nodes; i++ )
         {

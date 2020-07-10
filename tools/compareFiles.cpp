@@ -48,27 +48,22 @@ int main( int argc, char* argv[] )
     ErrorCode rval;
     Core* mb = new Core();
 
-    rval = mb->load_file( inputfile1.c_str() );
-    MB_CHK_SET_ERR( rval, "can't load input file 1" );
+    rval = mb->load_file( inputfile1.c_str() );MB_CHK_SET_ERR( rval, "can't load input file 1" );
 
     Core* mb2 = new Core();
-    rval      = mb2->load_file( inputfile2.c_str() );
-    MB_CHK_SET_ERR( rval, "can't load input file 2" );
+    rval      = mb2->load_file( inputfile2.c_str() );MB_CHK_SET_ERR( rval, "can't load input file 2" );
 
     std::cout << " opened " << inputfile1 << " and " << inputfile2 << " with initial h5m data.\n";
     // open the netcdf file, and see if it has that variable we are looking for
 
     Range nodes;
-    rval = mb->get_entities_by_dimension( 0, 0, nodes );
-    MB_CHK_SET_ERR( rval, "can't get nodes" );
+    rval = mb->get_entities_by_dimension( 0, 0, nodes );MB_CHK_SET_ERR( rval, "can't get nodes" );
 
     Range edges;
-    rval = mb->get_entities_by_dimension( 0, 1, edges );
-    MB_CHK_SET_ERR( rval, "can't get edges" );
+    rval = mb->get_entities_by_dimension( 0, 1, edges );MB_CHK_SET_ERR( rval, "can't get edges" );
 
     Range cells;
-    rval = mb->get_entities_by_dimension( 0, 2, cells );
-    MB_CHK_SET_ERR( rval, "can't get cells" );
+    rval = mb->get_entities_by_dimension( 0, 2, cells );MB_CHK_SET_ERR( rval, "can't get cells" );
 
     std::cout << inputfile1 << " has " << nodes.size() << " vertices " << edges.size() << " edges " << cells.size()
               << " cells\n";
@@ -79,11 +74,9 @@ int main( int argc, char* argv[] )
     std::map< int, EntityHandle > cGidHandle;
     std::vector< int > gids;
     Tag gid;
-    rval = mb->tag_get_handle( "GLOBAL_ID", gid );
-    MB_CHK_SET_ERR( rval, "can't get global id tag" );
+    rval = mb->tag_get_handle( "GLOBAL_ID", gid );MB_CHK_SET_ERR( rval, "can't get global id tag" );
     gids.resize( nodes.size() );
-    rval = mb->tag_get_data( gid, nodes, &gids[0] );
-    MB_CHK_SET_ERR( rval, "can't get global id on vertices" );
+    rval = mb->tag_get_data( gid, nodes, &gids[0] );MB_CHK_SET_ERR( rval, "can't get global id on vertices" );
     int i = 0;
     for( Range::iterator vit = nodes.begin(); vit != nodes.end(); vit++ )
     {
@@ -91,8 +84,7 @@ int main( int argc, char* argv[] )
     }
 
     gids.resize( edges.size() );
-    rval = mb->tag_get_data( gid, edges, &gids[0] );
-    MB_CHK_SET_ERR( rval, "can't get global id on edges" );
+    rval = mb->tag_get_data( gid, edges, &gids[0] );MB_CHK_SET_ERR( rval, "can't get global id on edges" );
     i = 0;
     for( Range::iterator vit = edges.begin(); vit != edges.end(); vit++ )
     {
@@ -100,8 +92,7 @@ int main( int argc, char* argv[] )
     }
 
     gids.resize( cells.size() );
-    rval = mb->tag_get_data( gid, cells, &gids[0] );
-    MB_CHK_SET_ERR( rval, "can't get global id on cells" );
+    rval = mb->tag_get_data( gid, cells, &gids[0] );MB_CHK_SET_ERR( rval, "can't get global id on cells" );
     i = 0;
     for( Range::iterator vit = cells.begin(); vit != cells.end(); vit++ )
     {
@@ -109,16 +100,13 @@ int main( int argc, char* argv[] )
     }
 
     Range nodes2;
-    rval = mb2->get_entities_by_dimension( 0, 0, nodes2 );
-    MB_CHK_SET_ERR( rval, "can't get nodes2" );
+    rval = mb2->get_entities_by_dimension( 0, 0, nodes2 );MB_CHK_SET_ERR( rval, "can't get nodes2" );
 
     Range edges2;
-    rval = mb2->get_entities_by_dimension( 0, 1, edges2 );
-    MB_CHK_SET_ERR( rval, "can't get edges2" );
+    rval = mb2->get_entities_by_dimension( 0, 1, edges2 );MB_CHK_SET_ERR( rval, "can't get edges2" );
 
     Range cells2;
-    rval = mb2->get_entities_by_dimension( 0, 2, cells2 );
-    MB_CHK_SET_ERR( rval, "can't get cells2" );
+    rval = mb2->get_entities_by_dimension( 0, 2, cells2 );MB_CHK_SET_ERR( rval, "can't get cells2" );
 
     std::cout << inputfile2 << " has " << nodes2.size() << " vertices " << edges2.size() << " edges " << cells2.size()
               << " cells\n";
@@ -129,11 +117,9 @@ int main( int argc, char* argv[] )
     std::map< int, EntityHandle > cGidHandle2;
 
     Tag gid2;
-    rval = mb2->tag_get_handle( "GLOBAL_ID", gid2 );
-    MB_CHK_SET_ERR( rval, "can't get global id tag2" );
+    rval = mb2->tag_get_handle( "GLOBAL_ID", gid2 );MB_CHK_SET_ERR( rval, "can't get global id tag2" );
     gids.resize( nodes2.size() );
-    rval = mb2->tag_get_data( gid2, nodes2, &gids[0] );
-    MB_CHK_SET_ERR( rval, "can't get global id on vertices2" );
+    rval = mb2->tag_get_data( gid2, nodes2, &gids[0] );MB_CHK_SET_ERR( rval, "can't get global id on vertices2" );
 
     i = 0;
     for( Range::iterator vit = nodes2.begin(); vit != nodes2.end(); vit++ )
@@ -142,8 +128,7 @@ int main( int argc, char* argv[] )
     }
 
     gids.resize( edges2.size() );
-    rval = mb2->tag_get_data( gid2, edges2, &gids[0] );
-    MB_CHK_SET_ERR( rval, "can't get global id on edges2" );
+    rval = mb2->tag_get_data( gid2, edges2, &gids[0] );MB_CHK_SET_ERR( rval, "can't get global id on edges2" );
     i = 0;
     for( Range::iterator vit = edges2.begin(); vit != edges2.end(); vit++ )
     {
@@ -151,8 +136,7 @@ int main( int argc, char* argv[] )
     }
 
     gids.resize( cells2.size() );
-    rval = mb2->tag_get_data( gid2, cells2, &gids[0] );
-    MB_CHK_SET_ERR( rval, "can't get global id on cells2" );
+    rval = mb2->tag_get_data( gid2, cells2, &gids[0] );MB_CHK_SET_ERR( rval, "can't get global id on cells2" );
     i = 0;
     for( Range::iterator vit = cells2.begin(); vit != cells2.end(); vit++ )
     {
@@ -160,12 +144,10 @@ int main( int argc, char* argv[] )
     }
 
     Tag tag;
-    rval = mb->tag_get_handle( tag_name.c_str(), tag );
-    MB_CHK_SET_ERR( rval, "can't get tag on file 1" );
+    rval = mb->tag_get_handle( tag_name.c_str(), tag );MB_CHK_SET_ERR( rval, "can't get tag on file 1" );
 
     int len_tag = 0;
-    rval        = mb->tag_get_length( tag, len_tag );
-    MB_CHK_SET_ERR( rval, "can't get tag length on tag" );
+    rval        = mb->tag_get_length( tag, len_tag );MB_CHK_SET_ERR( rval, "can't get tag length on tag" );
     std::cout << "length tag : " << len_tag << "\n";
 
     if( cells.size() != cells2.size() )
@@ -175,30 +157,24 @@ int main( int argc, char* argv[] )
     }
     std::vector< double > vals;
     vals.resize( len_tag * cells.size() );
-    rval = mb->tag_get_data( tag, cells, &vals[0] );
-    MB_CHK_SET_ERR( rval, "can't get tag data" );
+    rval = mb->tag_get_data( tag, cells, &vals[0] );MB_CHK_SET_ERR( rval, "can't get tag data" );
 
     Tag tag2;
-    rval = mb2->tag_get_handle( tag_name.c_str(), tag2 );
-    MB_CHK_SET_ERR( rval, "can't get tag on file 2" );
+    rval = mb2->tag_get_handle( tag_name.c_str(), tag2 );MB_CHK_SET_ERR( rval, "can't get tag on file 2" );
     std::vector< double > vals2;
     vals2.resize( len_tag * cells2.size() );
-    rval = mb2->tag_get_data( tag2, cells2, &vals2[0] );
-    MB_CHK_SET_ERR( rval, "can't get tag data on file 2" );
+    rval = mb2->tag_get_data( tag2, cells2, &vals2[0] );MB_CHK_SET_ERR( rval, "can't get tag data on file 2" );
 
-    rval = mb->delete_entities( edges );
-    MB_CHK_SET_ERR( rval, "can't delete edges from file 1" );
+    rval = mb->delete_entities( edges );MB_CHK_SET_ERR( rval, "can't delete edges from file 1" );
 
     std::string new_tag_name = tag_name + "_2";
     Tag newTag, newTagDiff;
     double def_val = -1000;
-    rval = mb->tag_get_handle( new_tag_name.c_str(), 1, MB_TYPE_DOUBLE, newTag, MB_TAG_CREAT | MB_TAG_DENSE, &def_val );
-    MB_CHK_SET_ERR( rval, "can't define new tag" );
+    rval = mb->tag_get_handle( new_tag_name.c_str(), 1, MB_TYPE_DOUBLE, newTag, MB_TAG_CREAT | MB_TAG_DENSE, &def_val );MB_CHK_SET_ERR( rval, "can't define new tag" );
 
     std::string tag_name_diff = tag_name + "_diff";
     rval = mb->tag_get_handle( tag_name_diff.c_str(), 1, MB_TYPE_DOUBLE, newTagDiff, MB_TAG_CREAT | MB_TAG_DENSE,
-                               &def_val );
-    MB_CHK_SET_ERR( rval, "can't define new tag diff" );
+                               &def_val );MB_CHK_SET_ERR( rval, "can't define new tag diff" );
     i = 0;
     for( Range::iterator c2it = cells2.begin(); c2it != cells2.end(); c2it++ )
     {
@@ -207,16 +183,13 @@ int main( int argc, char* argv[] )
         i++;
         EntityHandle c1 = cGidHandle[id2];
 
-        rval = mb->tag_set_data( newTag, &c1, 1, &val2 );
-        MB_CHK_SET_ERR( rval, "can't set new tag" );
+        rval = mb->tag_set_data( newTag, &c1, 1, &val2 );MB_CHK_SET_ERR( rval, "can't set new tag" );
         int indx    = cells.index( c1 );
         double diff = vals[indx] - val2;
-        rval        = mb->tag_set_data( newTagDiff, &c1, 1, &diff );
-        MB_CHK_SET_ERR( rval, "can't set new tag" );
+        rval        = mb->tag_set_data( newTagDiff, &c1, 1, &diff );MB_CHK_SET_ERR( rval, "can't set new tag" );
     }
 
-    rval = mb->write_file( outfile.c_str() );
-    MB_CHK_SET_ERR( rval, "can't write file" );
+    rval = mb->write_file( outfile.c_str() );MB_CHK_SET_ERR( rval, "can't write file" );
     std::cout << " wrote file " << outfile << "\n";
     return 0;
 }

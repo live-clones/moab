@@ -135,8 +135,7 @@ void run_test( Grouping grouping, int of_power, Weight w, const string filename 
 
     MeshImpl mesh, expected_mesh;
     std::string initfname = std::string( STRINGIFY( SRCDIR ) ) + "/2d_formulation_initial.vtk";
-    mesh.read_vtk( initfname.c_str(), err );
-    CHKERR( err )
+    mesh.read_vtk( initfname.c_str(), err );CHKERR( err )
     //  expected_mesh.read_vtk( (filename + ".vtk").c_str(), err ); CHKERR(err)
 
     PlanarDomain plane( PlanarDomain::XY );
@@ -151,8 +150,7 @@ void run_test( Grouping grouping, int of_power, Weight w, const string filename 
         TargetWriter writer( 0, &mw );
         InstructionQueue tq;
         tq.add_target_calculator( &writer, err );
-        tq.run_instructions( &mesh_and_domain, err );
-        CHKERR( err );
+        tq.run_instructions( &mesh_and_domain, err );CHKERR( err );
         qual_metric.set_weight_calculator( &reader );
     }
     else if( w == INV_METRIC )
@@ -160,15 +158,13 @@ void run_test( Grouping grouping, int of_power, Weight w, const string filename 
         TargetWriter writer( 0, &imw );
         InstructionQueue tq;
         tq.add_target_calculator( &writer, err );
-        tq.run_instructions( &mesh_and_domain, err );
-        CHKERR( err );
+        tq.run_instructions( &mesh_and_domain, err );CHKERR( err );
         qual_metric.set_weight_calculator( &reader );
     }
 
     InstructionQueue q;
     q.set_master_quality_improver( &solver, err );
-    q.run_instructions( &mesh_and_domain, err );
-    CHKERR( err )
+    q.run_instructions( &mesh_and_domain, err );CHKERR( err )
     /*
       vector<Mesh::VertexHandle> vemain.cpprts;
       vector<MsqVertex> mesh_coords, expected_coords;
@@ -193,8 +189,7 @@ void run_test( Grouping grouping, int of_power, Weight w, const string filename 
         cout << filename << " : FAILURE (" << error_count
              << " vertices differ by more than " << epsilon << ")" << endl;
     */
-    if( write_results ) mesh.write_vtk( ( filename + ".results.vtk" ).c_str(), err );
-    CHKERR( err )
+    if( write_results ) mesh.write_vtk( ( filename + ".results.vtk" ).c_str(), err );CHKERR( err )
 }
 
 int main()

@@ -95,12 +95,10 @@ void MeshImplTest::load_vtk( const char* file_data, MeshImpl& mesh, MsqError& er
     }
 
     fclose( f );
-    mesh.read_vtk( fname, err );
-    MSQ_CHKERR( err );
+    mesh.read_vtk( fname, err );MSQ_CHKERR( err );
     remove( fname );
 
-    mesh.mark_skin_fixed( err );
-    MSQ_CHKERR( err );
+    mesh.mark_skin_fixed( err );MSQ_CHKERR( err );
 }
 
 void MeshImplTest::dump_mesh( const char* filename, MeshImpl& mesh, MsqError& err )
