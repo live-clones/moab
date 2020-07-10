@@ -3,11 +3,12 @@ Language:      Cpp
 BasedOnStyle:  LLVM
 AccessModifierOffset: -2
 AlignAfterOpenBracket: Align
-AlignConsecutiveAssignments: false
-AlignConsecutiveDeclarations: true
+AlignConsecutiveAssignments: true
+AlignConsecutiveDeclarations: false
+AlignConsecutiveMacros: true
 AlignEscapedNewlinesLeft: true
 AlignOperands:   true
-AlignTrailingComments: false
+AlignTrailingComments: true
 AllowAllParametersOfDeclarationOnNextLine: false
 AllowShortBlocksOnASingleLine: true
 AllowShortCaseLabelsOnASingleLine: false
@@ -26,7 +27,6 @@ BraceWrapping:
   AfterEnum:       true
   AfterFunction:   true
   AfterNamespace:  true
-  AfterObjCDeclaration: false
   AfterStruct:     true
   AfterUnion:      true
   BeforeCatch:     true
@@ -40,7 +40,6 @@ ColumnLimit:     120
 ConstructorInitializerAllOnOneLineOrOnePerLine: false
 ConstructorInitializerIndentWidth: 4
 ContinuationIndentWidth: 4
-Cpp11BracedListStyle: true
 DerivePointerAlignment: false
 DisableFormat:   false
 ForEachMacros:   [ foreach, Q_FOREACH, BOOST_FOREACH ]
@@ -53,8 +52,6 @@ IndentCaseLabels: true
 IndentWidth:     4
 IndentWrappedFunctionNames: true
 KeepEmptyLinesAtTheStartOfBlocks: true
-MacroBlockBegin: ''
-MacroBlockEnd:   ''
 MaxEmptyLinesToKeep: 1
 NamespaceIndentation: Inner
 PenaltyBreakBeforeFirstCallParameter: 40

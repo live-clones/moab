@@ -49,7 +49,7 @@ readonly out=$(git clang-format -v --diff)
 if [[ "$out" == *"no modified files to format"* ]]; then exit 0; fi
 if [[ "$out" == *"clang-format did not modify any files"* ]]; then exit 0; fi
 
-echo "out: $out"
+# echo "out: $out"
 files=()
 for file in `git diff --cached --name-only --diff-filter=ACMRT | grep -E "\.(cpp|hpp)$"`; do
   if ! cmp -s <(git show :${file}) <(git show :${file}|clang-format); then
@@ -57,11 +57,11 @@ for file in `git diff --cached --name-only --diff-filter=ACMRT | grep -E "\.(cpp
   fi
 done
 
-echo "out: $files"
+# echo "out: $files"
 if [ -n "${files}" ]; then
   echo "Format error within the following files:"
   printf "%s\n" "${files[@]}"
-  echo "Running 'git clang-format -f' on your unstaged and cached files:"
+  echo "Running 'git clang-format' on your ached files:"
   readonly gcf=$(git clang-format -v --diff)
   if [[ "$gcf" == *"no modified files to format"* ]]; then
     echo "Nothing to reformat"
@@ -74,11 +74,11 @@ if [ -n "${files}" ]; then
 
   for (( i=0; i<${#files[@]}; i++ )); do 
     srcfile=${files[$i]}
-    echo "$PWD/config/dev/run_clang_format.sh ${srcfile}"
-    eval "`$PWD/config/dev/run_clang_format.sh ${srcfile}`"
-    eval "`git add ${srcfile}`"
+    $PWD/config/dev/run_clang_format.sh "$PWD/${srcfile}"
+    if [[ $? -ne 0 ]]; then exit 1; fi
+    git add "$PWD/${srcfile}"
   done
   exit 0
 fi
 
-exit 1
+exit 0

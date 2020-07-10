@@ -1,7 +1,11 @@
 #!/bin/bash
-# Use clang-format to enforce uniform coding style throughout the entire repository
-#   /usr/local/bin/clang-format -i -style=file <source_file_name>
-
+# Usage:
+#
+# Use clang-format to enforce uniform coding style throughout the entire repository or per-file basis
+#   config/dev/run_clang_format.sh <source_file_name>
+# Or use the following command to reformat the entire repository
+#   git ls-tree --name-only HEAD -r |  grep "cpp\|hpp" | xargs config/dev/run_clang_format.sh
+#
 CLANGFORMAT_EXE=`which clang-format`
 SEDWITHOPTIONS="sed -i.bak"
 
@@ -12,8 +16,6 @@ if [ "$#" -eq 0 ]; then
 fi
 
 allfiles=$*
-
-echo "Files: ${allfiles}"
 
 function process_source()
 {
@@ -39,9 +41,3 @@ do
 done
 
 exit 0
-
-# ALLSRCS=`git ls-tree --name-only HEAD -r |  grep "cpp\|hpp"`
-# for srcfile in ${ALLSRCS}
-# do
-# 	process_source $srcfile
-# done
