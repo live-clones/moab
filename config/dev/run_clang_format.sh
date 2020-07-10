@@ -13,6 +13,8 @@ fi
 
 allfiles=$*
 
+echo "Files: ${allfiles}"
+
 function process_source()
 {
 	srcfile=$1
